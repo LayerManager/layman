@@ -5,6 +5,7 @@
 | [kartoza/docker-geoserver](https://github.com/kartoza/docker-geoserver) | GNU GPL v2 | - | dev | bin | used as docker image |
 | [kartoza/docker-postgis](https://github.com/kartoza/docker-postgis) | - | kartoza/docker-geoserver | dev | bin | used as docker image |
 | [postgresql](https://www.postgresql.org/) | PostgreSQL | kartoza/docker-postgis | dev | bin | |
+| [postgis](https://postgis.net/) | GNU GPL v2 | kartoza/docker-postgis | dev | bin | |
 | [geoserver](https://github.com/geoserver/geoserver) | GNU GPL v2 | kartoza/docker-geoserver | dev | bin | |
 | [docker-library/tomcat](https://github.com/docker-library/tomcat) | Apache License 2.0 | kartoza/docker-geoserver | dev | bin | used as docker image |
 | [apache/tomcat](http://tomcat.apache.org/) | Apache License 2.0 | docker-library/tomcat | dev | bin | |
