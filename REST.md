@@ -2,20 +2,20 @@
 
 ## Files
 ### URL
-`/files`
+`/files/<user>`
 ### POST
 Upload new file.
 
 #### Input parameters
-- **user**
+- **\<user\>**, string `\w+`
    - owner of the file
-- **file**
-- **name** [aplhanunmeric characters or _]
-   - must be unique within one use
-- **title**
-- **crs**, EPSG code
+- **file**, file
+- **name**, string `\w+`
+   - must be unique within one user
+- **title**, string `.+`
 - **description**
-- **sld**
+- **crs**, EPSG code
+- **sld**, SLD file
 
 #### Output
 - **file_name**
