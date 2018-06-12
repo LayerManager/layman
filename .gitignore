@@ -1,3 +1,5 @@
 .idea
 geoserver_data
 tmp
+
+*.pyc

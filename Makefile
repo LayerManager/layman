@@ -15,10 +15,10 @@ reset-gs-datadir: guard-GS_VERSION
 	chmod -R a+rwx geoserver_data
 
 layman-build:
-	docker build -t "layman:latest" ./layman
+	docker-compose build
 
 layman-bash:
-	docker run -it --rm layman bash
+	docker-compose run --rm layman bash
 
 guard-%:
 	@ if [ "${${*}}" = "" ]; then \
