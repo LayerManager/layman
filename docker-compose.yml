@@ -4,6 +4,19 @@ volumes:
    geoserver-data:
 
 services:
+   layman:
+      container_name: layman
+      build: ./layman
+      image: layman:latest
+      command: python -m SimpleHTTPServer 8000
+      ports:
+        - 8000:8000
+      volumes:
+        - ./src:/code/src
+      depends_on:
+        - db
+        - geoserver
+
    db:
       image: kartoza/postgis:10.0-2.4
       volumes:
