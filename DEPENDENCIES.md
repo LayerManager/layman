@@ -2,11 +2,13 @@
 | name | license | used by | env | bin or src | note |
 | --- | --- | --- | --- | --- | --- |
 | [kartoza/docker-geoserver](https://github.com/kartoza/docker-geoserver) | GNU GPL v2 | - | dev | src | docker-compose.yml |
+| [geographicags/docker-gdal2](https://github.com/GeographicaGS/Docker-GDAL2) | MIT License | - | dev | bin | used as docker image |
 | [kartoza/docker-geoserver](https://github.com/kartoza/docker-geoserver) | GNU GPL v2 | - | dev | bin | used as docker image |
 | [kartoza/docker-postgis](https://github.com/kartoza/docker-postgis) | - | kartoza/docker-geoserver | dev | bin | used as docker image |
 | [postgresql](https://www.postgresql.org/) | PostgreSQL | kartoza/docker-postgis | dev | bin | |
 | [postgis](https://postgis.net/) | GNU GPL v2 | kartoza/docker-postgis | dev | bin | |
 | [geoserver](https://github.com/geoserver/geoserver) | GNU GPL v2 | kartoza/docker-geoserver | dev | bin | |
+| [gdal](http://www.gdal.org/) | MIT License | geographicags/docker-gdal2 | dev | bin | |
 | [docker-library/tomcat](https://github.com/docker-library/tomcat) | Apache License 2.0 | kartoza/docker-geoserver | dev | bin | used as docker image |
 | [apache/tomcat](http://tomcat.apache.org/) | Apache License 2.0 | docker-library/tomcat | dev | bin | |
 | [docker-library/openjdk](https://github.com/docker-library/openjdk) | MIT License | docker-library/tomcat | dev | bin | used as docker image |
