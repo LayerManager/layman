@@ -20,6 +20,23 @@ layman-build:
 layman-bash:
 	docker-compose run --rm layman bash
 
+start-layman-dev:
+	docker-compose -f docker-compose.dev.yml up
+
+start-layman-production:
+	docker-compose -f docker-compose.production.yml up -d
+
+stop-layman-production:
+	docker-compose -f docker-compose.production.yml stop
+
+start-layman-production-with-dbgeoserver:
+	docker-compose -f docker-compose.dependencies.yml up -d
+	docker-compose -f docker-compose.production.yml up -d
+
+stop-layman-production-with-dbgeoserver:
+	docker-compose -f docker-compose.dependencies.yml stop
+	docker-compose -f docker-compose.production.yml stop
+
 guard-%:
 	@ if [ "${${*}}" = "" ]; then \
 		echo "Environment variable $* not set"; \

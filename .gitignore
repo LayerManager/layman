@@ -1,5 +1,6 @@
-.idea
-geoserver_data
-tmp
+/.idea
+/geoserver_data
+/tmp
+/.env
 
 *.pyc

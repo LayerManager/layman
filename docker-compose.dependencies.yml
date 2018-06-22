@@ -4,22 +4,6 @@ volumes:
    geoserver-data:
 
 services:
-   layman:
-      container_name: layman
-      build: .
-      image: layman:latest
-      command: flask run --host=0.0.0.0 --port=8000
-      environment:
-         - FLASK_APP=src/hello.py
-         - FLASK_ENV=development
-      ports:
-        - 8000:8000
-      volumes:
-        - ./src:/code/src
-      depends_on:
-        - db
-        - geoserver
-
    db:
       image: kartoza/postgis:10.0-2.4
       volumes:
