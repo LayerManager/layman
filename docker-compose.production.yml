@@ -8,10 +8,11 @@ services:
       container_name: layman
       build: .
       image: layman:latest
-      command: flask run --host=0.0.0.0 --port=8000
+      command: bash start.sh
       env_file:
          - .env
       ports:
         - 8000:8000
       volumes:
         - ./src:/code/src
+        - ./start.sh:/code/start.sh

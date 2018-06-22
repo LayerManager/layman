@@ -18,10 +18,13 @@ layman-build:
 	docker-compose build
 
 layman-bash:
-	docker-compose run --rm layman bash
+	docker-compose -f docker-compose.dev.yml run --rm layman bash
 
 start-layman-dev:
 	docker-compose -f docker-compose.dev.yml up
+
+restart-layman-dev:
+	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d layman
 
 start-layman-production:
 	docker-compose -f docker-compose.production.yml up -d

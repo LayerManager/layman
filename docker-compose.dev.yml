@@ -8,16 +8,20 @@ services:
       container_name: layman
       build: .
       image: layman:latest
-      command: flask run --host=0.0.0.0 --port=8000
+      command: bash start.sh
       env_file:
          - .env.dev
       ports:
         - 8000:8000
       volumes:
         - ./src:/code/src
+        - ./start.sh:/code/start.sh
+        - ./geoserver_data:/geoserver_data
       depends_on:
-        - db
-        - geoserver
+        db:
+          condition: service_healthy
+        geoserver:
+          condition: service_healthy
 
    db:
       image: kartoza/postgis:10.0-2.4
