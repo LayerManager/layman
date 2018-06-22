@@ -39,6 +39,10 @@ make start-layman-production
 ## Run in production with dependencies
 If you don't have existing GeoServer & PostGIS instance:
 ```bash
+cp .env.production .env
+
+# edit .env
+
 # start dockerized layman & geoserver & DB
 make start-layman-production-with-dbgeoserver
 
