@@ -1,13 +1,13 @@
 # REST API
 
-## Files
+## Layers
 ### URL
-`/files/<user>`
+`/layers`
 ### POST
-Upload new file.
+Upload new layer.
 
 #### Input parameters
-- **\<user\>**, string `\w+`
+- **user**, string `\w+`
    - owner of the file
 - **file**, file
 - **name**, string `\w+`
