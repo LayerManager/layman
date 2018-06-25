@@ -1,5 +1,5 @@
 # gspld
-Uploading files to GeoServer
+Publishing geospatial vector data online
 
 ## Requirements
 - docker
