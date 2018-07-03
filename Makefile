@@ -24,6 +24,7 @@ start-layman-dev:
 	docker-compose -f docker-compose.dev.yml up
 
 restart-layman-dev:
+	find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | sudo xargs rm -rf
 	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d layman
 
 start-layman-production:
