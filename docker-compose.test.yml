@@ -19,6 +19,7 @@ services:
       volumes:
         - ./src:/code/src
         - ./test.sh:/code/test.sh
+        - ./sample:/code/sample
         - ./geoserver_data:/geoserver_data
       depends_on:
         db:

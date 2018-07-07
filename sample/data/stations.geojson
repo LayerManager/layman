@@ -1,0 +1,38 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id_by_provider": "11359201",
+        "name": "Brno, botanical garden PřF MU"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.5965222, 49.2050162]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_by_provider": "11359205",
+        "name": "Brno, FF MU, Arne Nováka"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.5981692, 49.2004947]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_by_provider": "11359196",
+        "name": "Brno, Kraví Hora"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.5838838, 49.2041505]
+      }
+    }
+  ]
+}
