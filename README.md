@@ -27,8 +27,6 @@ make start-layman-dev
 
 ## Test
 ```bash
-# first start layman for development
-# then continue with
 make test
 ```
 

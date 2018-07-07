@@ -1,0 +1,22 @@
+sudo: required
+
+dist: trusty
+
+language: bash
+
+services:
+  - docker
+
+before_install:
+  - sudo rm -f /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  - sudo service docker restart
+  - docker-compose -v
+  - docker -v
+
+script:
+  - GS_VERSION=2.13.0 make download-gs-datadir
+  - sudo GS_VERSION=2.13.0 make reset-gs-datadir
+  - make test

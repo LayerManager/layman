@@ -4,9 +4,9 @@ download-gs-datadir: guard-GS_VERSION
 	mkdir -p tmp/geoserver/${GS_VERSION}/
 	rm -rf tmp/geoserver/${GS_VERSION}/*
 	wget -O tmp/geoserver/${GS_VERSION}/geoserver.zip http://sourceforge.net/projects/geoserver/files/GeoServer/${GS_VERSION}/geoserver-${GS_VERSION}-war.zip
-	unzip tmp/geoserver/${GS_VERSION}/geoserver.zip -d tmp/geoserver/${GS_VERSION}/
+	unzip -q tmp/geoserver/${GS_VERSION}/geoserver.zip -d tmp/geoserver/${GS_VERSION}/
 	mkdir -p tmp/geoserver/${GS_VERSION}/geoserver
-	unzip tmp/geoserver/${GS_VERSION}/geoserver.war -d tmp/geoserver/${GS_VERSION}/geoserver
+	unzip -q tmp/geoserver/${GS_VERSION}/geoserver.war -d tmp/geoserver/${GS_VERSION}/geoserver
 
 reset-gs-datadir: guard-GS_VERSION
 	mkdir -p geoserver_data
@@ -33,6 +33,9 @@ start-layman-production:
 
 stop-layman-production:
 	docker-compose -f docker-compose.production.yml stop
+
+stop-layman-dependencies:
+	docker-compose -f docker-compose.dependencies.yml stop
 
 start-layman-production-with-dbgeoserver:
 	docker-compose -f docker-compose.dependencies.yml up -d
