@@ -1,4 +1,5 @@
 import os
+import re
 
 from flask import Flask, request, redirect, jsonify
 from werkzeug.utils import secure_filename
@@ -15,12 +16,20 @@ def index():
 
 @app.route('/layers', methods=['POST'])
 def upload_file():
-    app.logger.info('upload_file 2')
+    app.logger.info('upload_file')
+    if 'user' not in request.form:
+        return error(1, {'parameter': 'user'})
+
+    username = request.form['user']
+    username_re = r"^[a-zA-Z]\w*$"
+    if not re.match(username_re, username):
+        return error(2, {'parameter': 'user', 'expected': username_re})
+
+
+
     if 'file' not in request.files:
-        return error('Missing parameter "file"')
+        return error(1, {'parameter': 'file'})
     files = request.files.getlist("file")
-    if len(files) == 0:
-        return error('Parameter "file" contains no file')
     for file in files:
         filename = secure_filename(file.filename)
         file.save(os.path.join(LAYMAN_DATA_PATH, filename))

@@ -17,12 +17,19 @@ sudo GS_VERSION=2.13.0 make reset-gs-datadir
 ```
 
 ## Run
-Suitable for developemnt only.
+Suitable for development only.
 ```bash
 # start dockerized layman & geoserver & DB
 make start-layman-dev
 
 # visit http://localhost:8000/
+```
+
+## Test
+```bash
+# first start layman for development
+# then continue with
+make test
 ```
 
 ## Run standalone in production

@@ -25,6 +25,7 @@ start-layman-dev:
 
 restart-layman-dev:
 	find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | sudo xargs rm -rf
+	docker-compose -f docker-compose.dev.yml build layman
 	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d layman
 
 start-layman-production:
@@ -40,6 +41,9 @@ start-layman-production-with-dbgeoserver:
 stop-layman-production-with-dbgeoserver:
 	docker-compose -f docker-compose.dependencies.yml stop
 	docker-compose -f docker-compose.production.yml stop
+
+test:
+	docker-compose -f docker-compose.dev.yml run --rm layman pytest
 
 guard-%:
 	@ if [ "${${*}}" = "" ]; then \
