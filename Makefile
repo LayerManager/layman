@@ -46,7 +46,7 @@ stop-layman-production-with-dbgeoserver:
 	docker-compose -f docker-compose.production.yml stop
 
 test:
-	docker-compose -f docker-compose.dev.yml run --rm layman pytest
+	docker-compose -f docker-compose.test.yml run --rm layman
 
 guard-%:
 	@ if [ "${${*}}" = "" ]; then \
