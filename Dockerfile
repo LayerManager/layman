@@ -3,7 +3,7 @@ FROM geographica/gdal2:2.3.0
 RUN mkdir /code
 WORKDIR /code
 
-RUN apt-get update && apt-get install -y python3-pip && pip3 install --upgrade pip
+RUN apt-get update && apt-get install -y unzip curl python3-pip && pip3 install --upgrade pip
 
 # ttp://click.pocoo.org/python3/
 ENV LC_ALL=C.UTF-8

@@ -1,7 +1,20 @@
 <!doctype html>
-<title>Layman Demo</title>
-<h1>Upload New Layer</h1>
+<head>
+  <title>Layman Demo</title>
+  <h1>Upload New Layer</h1>
+  <style>
+  </style>
+</head>
+<body>
 <form method="post" enctype="multipart/form-data" action="/layers">
-  <input type="file" name="file" multiple>
-  <input type="submit" value="Upload">
+  <div>
+    <label for="user">User</label>
+    <input type="text" name="user" id="user" value="browser">
+  </div>
+  <div>
+    <label for="user">Vector data file</label>
+    <input type="file" name="file" id="file" multiple>
+  </div>
+  <input type="submit" value="Upload" id="file">
 </form>
+</body>

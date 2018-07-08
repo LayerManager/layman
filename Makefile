@@ -48,6 +48,9 @@ stop-layman-production-with-dbgeoserver:
 test:
 	docker-compose -f docker-compose.test.yml run --rm layman
 
+test-bash:
+	docker-compose -f docker-compose.test.yml run --rm layman bash
+
 guard-%:
 	@ if [ "${${*}}" = "" ]; then \
 		echo "Environment variable $* not set"; \

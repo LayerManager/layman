@@ -20,6 +20,7 @@ services:
         - ./src:/code/src
         - ./test.sh:/code/test.sh
         - ./sample:/code/sample
+        - ./tmp:/code/tmp
         - ./geoserver_data:/geoserver_data
       depends_on:
         db:
