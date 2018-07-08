@@ -6,8 +6,8 @@ from flask import Flask, request, redirect, jsonify
 from werkzeug.utils import secure_filename
 
 from .http import error
-from .settings import LAYMAN_DATA_PATH
-from .util import to_safe_layer_name
+from .settings import LAYMAN_DATA_PATH, MAIN_FILE_EXTENSIONS
+from .util import to_safe_layer_name, get_main_file_name
 
 app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
@@ -38,13 +38,11 @@ def upload_file():
     files = request.files.getlist("file")
     filenames = map(lambda f: f.filename, files)
 
-    supported_exts = ['.shp']
-    main_filename = next((fn for fn in filenames if os.path.splitext(fn)[1]
-                          in supported_exts), None)
+    main_filename = get_main_file_name(filenames)
     if main_filename is None:
         return error(2, {'parameter': 'file', 'expected': \
             'At least one file with any of extensions: '+\
-            ', '.join(supported_exts)})
+            ', '.join(MAIN_FILE_EXTENSIONS)})
 
     main_filename = os.path.splitext(main_filename)[0]
     files = list(filter(lambda f: f.filename.startswith(main_filename+'.'),

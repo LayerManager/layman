@@ -1,6 +1,6 @@
-import re
+import re, os, unicodedata
 from unidecode import unidecode
-import unicodedata
+from .settings import MAIN_FILE_EXTENSIONS
 
 
 def slugify(value):
@@ -18,3 +18,7 @@ def to_safe_layer_name(value):
     elif re.match(r'^[^a-z].*', value):
         value = 'layer_'+value
     return value
+
+def get_main_file_name(file_names):
+    return next((fn for fn in file_names if os.path.splitext(fn)[1]
+          in MAIN_FILE_EXTENSIONS), None)
