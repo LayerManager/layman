@@ -50,13 +50,14 @@ def test_no_file(client):
 def test_file_upload(client):
     username = 'testuser1'
     file_paths = [
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.prj',
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.README.html',
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp',
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shx',
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.VERSION.txt',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.prj',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.README.html',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shx',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.VERSION.txt',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
     for fp in file_paths:
         assert os.path.isfile(fp)
@@ -76,7 +77,6 @@ def test_file_upload(client):
     for fp in file_paths:
         assert os.path.isfile(os.path.join(
             LAYMAN_DATA_PATH, username, os.path.basename(fp)))
-
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post('/layers', data={
