@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 
 from .http import error
 from .settings import LAYMAN_DATA_PATH, MAIN_FILE_EXTENSIONS
-from .util import to_safe_layer_name, get_main_file_name
+from .util import to_safe_layer_name, get_main_file_name, get_file_name_mappings
 
 app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
@@ -36,7 +36,7 @@ def upload_file():
     if 'file' not in request.files:
         return error(1, {'parameter': 'file'})
     files = request.files.getlist("file")
-    filenames = map(lambda f: f.filename, files)
+    filenames = list(map(lambda f: f.filename, files))
 
     main_filename = get_main_file_name(filenames)
     if main_filename is None:
@@ -44,33 +44,36 @@ def upload_file():
             'At least one file with any of extensions: '+\
             ', '.join(MAIN_FILE_EXTENSIONS)})
 
-    main_filename = os.path.splitext(main_filename)[0]
-    files = list(filter(lambda f: f.filename.startswith(main_filename+'.'),
-                      files))
 
     # name
     if 'name' in request.form:
         layername = request.form['name']
     else:
-        layername = main_filename
+        layername = os.path.splitext(main_filename)[0]
     layername = to_safe_layer_name(layername)
 
 
+
     # file 2/2
-    filename_mapping = {}
-    filepath_mapping = {}
+    filename_mapping, filepath_mapping = get_file_name_mappings(
+        filenames, main_filename, layername, userdir
+    )
+    conflict_paths = [filename_mapping[k]
+                      for k, v in filepath_mapping.items()
+                      if v is not None and os.path.isfile(v)]
+    if len(conflict_paths) > 0:
+        return error(3, conflict_paths)
     for file in files:
-        new_fn = layername+file.filename[len(main_filename):]
-        filepath_mapping[file.filename] = os.path.join(userdir, new_fn)
-        filename_mapping[file.filename] = new_fn
-        if os.path.isfile(filepath_mapping[file.filename]):
-            return error(3, 'File {} (sent as {}) already exists.'.format(
-                new_fn, file.filename))
-    for file in files:
+        if filepath_mapping[file.filename] is None:
+            continue
         app.logger.info('Saving file {} as {}'.format(
             file.filename, filepath_mapping[file.filename]))
         file.save(filepath_mapping[file.filename])
+    n_uploaded_files = len({k:v
+                            for k, v in filepath_mapping.items()
+                            if v is not None})
     return jsonify({
-        'message': '{} files uploaded'.format(len(list(files))),
+        'message': '{} files uploaded, {} ignored.'.format(
+            n_uploaded_files, len(files)-n_uploaded_files),
         'saved_files': filename_mapping
     }), 200
