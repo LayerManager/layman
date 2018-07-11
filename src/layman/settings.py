@@ -12,10 +12,12 @@ INPUT_SRS_LIST = [
     'EPSG:4326',
 ]
 
+LAYMAN_PG_DBNAME = os.environ['LAYMAN_PG_DBNAME']
+
 PG_CONN = "host='{}' port='{}' dbname='{}' user='{}' password='{}'".format(
     os.environ['LAYMAN_PG_HOST'],
     os.environ['LAYMAN_PG_PORT'],
-    os.environ['LAYMAN_PG_DBNAME'],
+    LAYMAN_PG_DBNAME,
     os.environ['LAYMAN_PG_USER'],
     os.environ['LAYMAN_PG_PASSWORD'],
 )
@@ -29,4 +31,17 @@ PG_NON_USER_SCHEMAS = [
 ]
 
 PG_POSTGIS_SCHEMA = 'public'
+
+
+# related to TESTING mode
+LAYMAN_PG_TEMPLATE_DBNAME = os.getenv('LAYMAN_PG_TEMPLATE_DBNAME')
+
+PG_CONN_TEMPLATE = "host='{}' port='{}' dbname='{}' user='{}' password='{" \
+               "}'".format(
+    os.environ['LAYMAN_PG_HOST'],
+    os.environ['LAYMAN_PG_PORT'],
+    LAYMAN_PG_TEMPLATE_DBNAME,
+    os.environ['LAYMAN_PG_USER'],
+    os.environ['LAYMAN_PG_PASSWORD'],
+)
 

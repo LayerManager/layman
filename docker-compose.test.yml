@@ -10,10 +10,7 @@ services:
       image: layman:latest
       command: bash test.sh
       env_file:
-         - .env.dev
-      environment:
-         - TESTING=True
-         - LAYMAN_DATA_DIR=layman-test
+         - .env.test
       ports:
         - 8000:8000
       volumes:
