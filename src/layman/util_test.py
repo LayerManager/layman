@@ -2,6 +2,7 @@ from .util import slugify, to_safe_layer_name, get_main_file_name, get_file_name
 
 def test_slugify():
     assert slugify('Brno-město') == 'brno_mesto'
+    assert slugify('Brno__město') == 'brno_mesto'
     assert slugify(' ') == ''
     assert slugify(' ?:"+  @') == ''
     assert slugify('01 Stanice vodních toků 26.4.2017 (voda)') == \

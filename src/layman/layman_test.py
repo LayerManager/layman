@@ -2,7 +2,7 @@ import pytest
 import os
 
 from .layman import app as layman
-from .settings import LAYMAN_DATA_PATH
+from .settings import *
 
 @pytest.fixture
 def client():
@@ -47,6 +47,16 @@ def test_no_file(client):
     assert resp_json['data']['parameter']=='file'
 
 
+def test_username_schema_conflict(client):
+    rv = client.post('/layers', data={
+        'user': PG_NON_USER_SCHEMAS[0]
+    })
+    assert rv.status_code==409
+    resp_json = rv.get_json()
+    # print(resp_json)
+    assert resp_json['code']==8
+
+
 def test_file_upload(client):
     username = 'testuser1'
     file_paths = [
@@ -86,6 +96,31 @@ def test_file_upload(client):
         assert rv.status_code==409
         resp_json = rv.get_json()
         assert resp_json['code']==3
+    finally:
+        for fp in files:
+            fp[0].close()
+
+
+def test_layername_db_object_conflict(client):
+    username = 'testuser1'
+    file_paths = [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+        assert not os.path.isfile(os.path.join(LAYMAN_DATA_PATH,
+                                               os.path.basename(fp)))
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        rv = client.post('/layers', data={
+            'user': username,
+            'file': files,
+            'name': 'spatial_ref_sys'
+        })
+        assert rv.status_code == 409
+        resp_json = rv.get_json()
+        assert resp_json['code']==9
     finally:
         for fp in files:
             fp[0].close()

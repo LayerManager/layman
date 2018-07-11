@@ -7,14 +7,17 @@
 Upload new layer.
 
 #### Input parameters
-- **user**, string `\w+`
+- **user**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
    - owner of the file
 - **file**, file
-- **name**, string `\w+`
+   - GeoJSON file
+- **name**, string
+   - computer-friendly identifier of the layer
    - must be unique within one user
+   - will be automatically adjusted using `to_safe_layer_name` function
 - **title**, string `.+`
 - **description**
-- **crs**, EPSG code
+- **crs**, string `EPSG:3857` or `EPSG:4326`
 - **sld**, SLD file
 
 #### Output
