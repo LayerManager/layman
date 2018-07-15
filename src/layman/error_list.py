@@ -9,4 +9,5 @@ ERROR_LIST = {
     8: (409, 'Reserved DB schema name'),
     9: (409, 'DB object already exists'),
     10: (409, 'DB schema owned by another than layman user'),
+    11: (500, 'Error during import data into DB'),
 }

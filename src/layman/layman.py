@@ -32,6 +32,7 @@ def upload_file():
     if username in PG_NON_USER_SCHEMAS:
         return error(8, {'schema': username})
 
+    # DB schema name conflicts
     import psycopg2
     try:
         conn = psycopg2.connect(PG_CONN)
@@ -49,7 +50,13 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
     if len(rows)>0:
         return error(10, {'schema': username})
 
-
+    # user
+    try:
+        cur.execute("""CREATE SCHEMA IF NOT EXISTS {} AUTHORIZATION {}""".format(
+        username, LAYMAN_PG_USER))
+        conn.commit()
+    except:
+        return error(7)
     userdir = os.path.join(LAYMAN_DATA_PATH, username)
     pathlib.Path(userdir).mkdir(exist_ok=True)
 
@@ -63,7 +70,6 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
         return error(2, {'parameter': 'file', 'expected': \
             'At least one file with any of extensions: '+\
             ', '.join(MAIN_FILE_EXTENSIONS)})
-
 
     # name
     if 'name' in request.form:
@@ -90,10 +96,7 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
     if len(conflict_paths) > 0:
         return error(3, conflict_paths)
 
-    # TODO: DB create user schema
-
-
-    # DB name conflicts
+    # DB table name conflicts
     try:
         cur.execute("""SELECT n.nspname AS schemaname, c.relname, c.relkind
 FROM   pg_class c
@@ -135,15 +138,27 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
         if crs_id not in INPUT_SRS_LIST:
             return error(4, {'found': crs_id, 'supported_values': INPUT_SRS_LIST})
 
-    # TODO: run it real
-    print('ogr2ogr -t_srs "EPSG:3857" -s_srs "{}" -nln "{}" '
-        '--config OGR_ENABLE_PARTIAL_REPROJECTION TRUE '
-        '-f "PostgreSQL" PG:"{}" {}'.format(
-        crs_id, layername, PG_CONN, filepath_mapping[main_filename]))
+    import subprocess
+    bash_args = [
+        'ogr2ogr',
+        '-t_srs', 'EPSG:3857',
+        '-s_srs', crs_id,
+        '-nln', layername,
+        '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
+        '-lco', 'SCHEMA={}'.format(username),
+        '-f', 'PostgreSQL',
+        'PG:{}'.format(PG_CONN),
+        # 'PG:{} active_schema={}'.format(PG_CONN, username),
+        '{}'.format(filepath_mapping[main_filename]),
+    ]
+    # print('bash_args', ' '.join(bash_args))
+    return_code = subprocess.call(bash_args)
+    if return_code != 0:
+        return error(11)
 
 
     return jsonify({
-        'message': '{} files uploaded, {} ignored.'.format(
-            n_uploaded_files, len(files)-n_uploaded_files),
-        'saved_files': filename_mapping
+        'file_name': filename_mapping[main_filename],
+        'table_name': layername,
+        'layer_name': '{}:{}'.format(username, layername),
     }), 200

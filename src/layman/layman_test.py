@@ -42,7 +42,7 @@ def test_no_file(client):
     })
     assert rv.status_code==400
     resp_json = rv.get_json()
-    # print(resp_json)
+    # print('resp_json', resp_json)
     assert resp_json['code']==1
     assert resp_json['detail']['parameter']=='file'
 
@@ -98,9 +98,7 @@ def test_file_upload(client):
     finally:
         for fp in files:
             fp[0].close()
-    for fp in file_paths:
-        assert os.path.isfile(os.path.join(
-            LAYMAN_DATA_PATH, username, os.path.basename(fp)))
+
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post('/layers', data={
@@ -110,6 +108,18 @@ def test_file_upload(client):
         assert rv.status_code==409
         resp_json = rv.get_json()
         assert resp_json['code']==3
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    username = 'testuser2'
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        rv = client.post('/layers', data={
+            'user': username,
+            'file': files
+        })
+        assert rv.status_code == 200
     finally:
         for fp in files:
             fp[0].close()
