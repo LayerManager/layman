@@ -1,19 +1,38 @@
 <!doctype html>
 <head>
   <title>Layman Demo</title>
-  <h1>Upload New Layer</h1>
   <style>
+    .mandatory {
+      font-weight: bold;
+    }
+    form {
+      padding: 1em;
+    }
+    form > div {
+      padding: 0.5em 0;
+    }
   </style>
 </head>
 <body>
+<h2>Upload New Layer</h2>
+<p>
+  <a href="https://github.com/jirik/gspld/blob/master/REST.md" target="_blank">Documentation</a>
+</p>
+<p>
+  Mandatory fields are <span class="mandatory">bold</span>.
+</p>
 <form method="post" enctype="multipart/form-data" action="/layers">
   <div>
-    <label for="user">User</label>
+    <label class="mandatory" for="user">User: </label>
     <input type="text" name="user" id="user" value="browser">
   </div>
   <div>
-    <label for="user">Vector data file</label>
+    <label class="mandatory" for="user">Vector data file: </label>
     <input type="file" accept=".geojson,.json" name="file" id="file" multiple>
+  </div>
+  <div>
+    <label for="name">Layer name: </label>
+    <input type="text" name="name" id="name" value="">
   </div>
   <input type="submit" value="Upload" id="file">
 </form>

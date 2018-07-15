@@ -72,7 +72,7 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
             ', '.join(MAIN_FILE_EXTENSIONS)})
 
     # name
-    if 'name' in request.form:
+    if 'name' in request.form and len(request.form['name']) > 0:
         layername = request.form['name']
     else:
         layername = os.path.splitext(main_filename)[0]

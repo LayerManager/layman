@@ -20,6 +20,9 @@ layman-build:
 layman-bash:
 	docker-compose -f docker-compose.dev.yml run --rm layman bash
 
+clear-data:
+	docker-compose -f docker-compose.dev.yml run --rm layman python3 src/layman/clear.py
+
 start-layman-dev:
 	docker-compose -f docker-compose.dev.yml up
 
