@@ -2,6 +2,7 @@
 Publishing geospatial vector data online
 
 ## Requirements
+- linux
 - docker
 - docker-compose
 
