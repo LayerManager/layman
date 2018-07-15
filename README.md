@@ -26,6 +26,7 @@ make start-layman-dev
 ```
 
 ## Test
+:warning: It will delete all files within LAYMAN_DATA_DIR and all laymen-related schemas in LAYMAN_PG_DBNAME!
 ```bash
 make test
 ```
