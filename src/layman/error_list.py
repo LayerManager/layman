@@ -8,4 +8,5 @@ ERROR_LIST = {
     7: (500, 'Database query error'),
     8: (409, 'Reserved DB schema name'),
     9: (409, 'DB object already exists'),
+    10: (409, 'DB schema owned by another than layman user'),
 }

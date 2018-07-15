@@ -20,7 +20,7 @@ def test_no_user(client):
     resp_json = rv.get_json()
     # print(resp_json)
     assert resp_json['code']==1
-    assert resp_json['data']['parameter']=='user'
+    assert resp_json['detail']['parameter']=='user'
 
 
 def test_wrong_value_of_user(client):
@@ -33,7 +33,7 @@ def test_wrong_value_of_user(client):
         resp_json = rv.get_json()
         # print(resp_json)
         assert resp_json['code']==2
-        assert resp_json['data']['parameter']=='user'
+        assert resp_json['detail']['parameter']=='user'
 
 
 def test_no_file(client):
@@ -44,10 +44,12 @@ def test_no_file(client):
     resp_json = rv.get_json()
     # print(resp_json)
     assert resp_json['code']==1
-    assert resp_json['data']['parameter']=='file'
+    assert resp_json['detail']['parameter']=='file'
 
 
 def test_username_schema_conflict(client):
+    if len(PG_NON_USER_SCHEMAS) == 0:
+        pass
     rv = client.post('/layers', data={
         'user': PG_NON_USER_SCHEMAS[0]
     })
@@ -55,6 +57,18 @@ def test_username_schema_conflict(client):
     resp_json = rv.get_json()
     # print(resp_json)
     assert resp_json['code']==8
+    for schema_name in [
+        'pg_catalog',
+        'pg_toast',
+        'information_schema',
+    ]:
+        rv = client.post('/layers', data={
+            'user': schema_name
+        })
+        assert rv.status_code==409
+        resp_json = rv.get_json()
+        # print(resp_json)
+        assert resp_json['code']==10
 
 
 def test_file_upload(client):

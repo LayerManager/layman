@@ -16,6 +16,6 @@ def error(code_or_message, data=None, http_code=None):
     resp = {'code': code, 'message': message}
 
     if data is not None:
-        resp['data'] = data
+        resp['detail'] = data
 
     return jsonify(resp), http_code

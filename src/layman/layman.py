@@ -32,6 +32,24 @@ def upload_file():
     if username in PG_NON_USER_SCHEMAS:
         return error(8, {'schema': username})
 
+    import psycopg2
+    try:
+        conn = psycopg2.connect(PG_CONN)
+    except:
+        return error(6)
+    cur = conn.cursor()
+    try:
+        cur.execute("""select catalog_name, schema_name, schema_owner
+from information_schema.schemata
+where schema_owner <> '{}' and schema_name = '{}'""".format(
+            LAYMAN_PG_USER, username))
+    except:
+        return error(7)
+    rows = cur.fetchall()
+    if len(rows)>0:
+        return error(10, {'schema': username})
+
+
     userdir = os.path.join(LAYMAN_DATA_PATH, username)
     pathlib.Path(userdir).mkdir(exist_ok=True)
 
@@ -74,13 +92,6 @@ def upload_file():
 
     # TODO: DB create user schema
 
-
-    import psycopg2
-    try:
-        conn = psycopg2.connect(PG_CONN)
-    except:
-        return error(6)
-    cur = conn.cursor()
 
     # DB name conflicts
     try:

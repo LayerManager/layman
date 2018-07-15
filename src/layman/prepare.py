@@ -17,9 +17,9 @@ def main():
         cur.execute("""
 SELECT pg_terminate_backend(pg_stat_activity.pid)
 FROM pg_stat_activity
-WHERE pg_stat_activity.datname = '{}'
+WHERE pg_stat_activity.datname IN ('{}', '{}')
   AND pid <> pg_backend_pid();
-""".format(LAYMAN_PG_DBNAME))
+""".format(LAYMAN_PG_DBNAME, LAYMAN_PG_TEMPLATE_DBNAME))
         cur.execute("""DROP DATABASE IF EXISTS {}""".format(LAYMAN_PG_DBNAME))
         cur.execute("""CREATE DATABASE {} TEMPLATE {}""".format(
             LAYMAN_PG_DBNAME, LAYMAN_PG_TEMPLATE_DBNAME))
