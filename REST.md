@@ -11,14 +11,15 @@ Upload new layer.
    - owner of the file
 - **file**, file
    - GeoJSON file
-- **name**, string
+- *name*, string
    - computer-friendly identifier of the layer
    - must be unique within one user
    - will be automatically adjusted using `to_safe_layer_name` function
-- **title**, string `.+`
-- **description**
-- **crs**, string `EPSG:3857` or `EPSG:4326`
-- **sld**, SLD file
+- *title*, string `.+`
+- *description*
+- *crs*, string `EPSG:3857` or `EPSG:4326`
+   - by default, it is read/guessed from input file
+- *sld*, SLD file
 
 #### Output
 - **file_name**
