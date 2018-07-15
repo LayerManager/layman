@@ -38,6 +38,7 @@ If you have existing GeoServer & PostGIS instance:
 cp .env.production .env
 
 # edit .env
+# edit src/layman/settings.py
 
 # start dockerized layman only
 make start-layman-production
@@ -49,6 +50,7 @@ If you don't have existing GeoServer & PostGIS instance:
 cp .env.production .env
 
 # edit .env
+# edit src/layman/settings.py
 
 # start dockerized layman & geoserver & DB
 make start-layman-production-with-dbgeoserver

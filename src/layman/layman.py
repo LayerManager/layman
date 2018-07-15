@@ -72,7 +72,7 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
             ', '.join(MAIN_FILE_EXTENSIONS)})
 
     # name
-    if 'name' in request.form and len(request.form['name']) > 0:
+    if len(request.form.get('name', '')) > 0:
         layername = request.form['name']
     else:
         layername = os.path.splitext(main_filename)[0]
@@ -80,7 +80,7 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
 
     # CRS 1/2
     crs_id = None
-    if 'crs' in request.form:
+    if len(request.form.get('crs', '')) > 0:
         crs_id = request.form['crs']
         if crs_id not in INPUT_SRS_LIST:
             return error(2, {'parameter': 'crs', 'supported_values':
