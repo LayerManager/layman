@@ -1,4 +1,4 @@
-# gspld
+# gspld [![Build Status](https://travis-ci.org/jirik/gspld.svg?branch=master)](https://travis-ci.org/jirik/gspld)
 Publishing geospatial vector data online
 
 ## Requirements
