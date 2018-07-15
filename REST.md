@@ -22,8 +22,11 @@ Upload new layer.
 
 #### Output
 - **file_name**
+   - within user's directory
+- **table_name**
+   - within PostgreSQL user's schema
 - **layer_name**
-   - including namespace
+   - within GeoServer, including user's workspace
 - **wms**
    - URL of WMS endpoint
 - **wfs**
