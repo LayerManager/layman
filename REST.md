@@ -14,6 +14,7 @@ Upload new layer.
 - *name*, string
    - computer-friendly identifier of the layer
    - must be unique within one user
+   - by default, it is file name without extension
    - will be automatically adjusted using `to_safe_layer_name` function
 - *title*, string `.+`
 - *description*
