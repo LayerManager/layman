@@ -1,18 +1,10 @@
 .PHONY: download-gs-datadir reset-gs-datadir layman-build
 
-download-gs-datadir: guard-GS_VERSION
-	mkdir -p tmp/geoserver/${GS_VERSION}/
-	rm -rf tmp/geoserver/${GS_VERSION}/*
-	wget -O tmp/geoserver/${GS_VERSION}/geoserver.zip http://sourceforge.net/projects/geoserver/files/GeoServer/${GS_VERSION}/geoserver-${GS_VERSION}-war.zip
-	unzip -q tmp/geoserver/${GS_VERSION}/geoserver.zip -d tmp/geoserver/${GS_VERSION}/
-	mkdir -p tmp/geoserver/${GS_VERSION}/geoserver
-	unzip -q tmp/geoserver/${GS_VERSION}/geoserver.war -d tmp/geoserver/${GS_VERSION}/geoserver
+download-gs-datadir:
+	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman bash /code/src/download-gs-datadir.sh
 
-reset-gs-datadir: guard-GS_VERSION
-	mkdir -p geoserver_data
-	rm -rf geoserver_data/*
-	cp -r tmp/geoserver/${GS_VERSION}/geoserver/data/* geoserver_data
-	chmod -R a+rwx geoserver_data
+reset-gs-datadir:
+	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman bash /code/src/reset-gs-datadir.sh
 
 layman-build:
 	docker-compose build
@@ -54,8 +46,3 @@ test:
 test-bash:
 	docker-compose -f docker-compose.test.yml run --rm layman bash
 
-guard-%:
-	@ if [ "${${*}}" = "" ]; then \
-		echo "Environment variable $* not set"; \
-		exit 1; \
-	fi
