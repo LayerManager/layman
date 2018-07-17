@@ -15,6 +15,7 @@ services:
         - 8000:8000
       volumes:
         - ./geoserver_data:/geoserver_data
+        - ./sample:/code/sample
         - ./src:/code/src
         - ./tmp:/code/tmp
         - ./start.sh:/code/start.sh
