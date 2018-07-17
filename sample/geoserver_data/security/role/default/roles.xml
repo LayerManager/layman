@@ -3,10 +3,15 @@
     <roleList>
         <role id="ADMIN"/>
         <role id="GROUP_ADMIN"/>
+        <role id="LAYMAN_ROLE"/>
     </roleList>
     <userList>
         <userRoles username="admin">
             <roleRef roleID="ADMIN"/>
+        </userRoles>
+        <userRoles username="layman">
+            <roleRef roleID="ADMIN"/>
+            <roleRef roleID="LAYMAN_ROLE"/>
         </userRoles>
     </userList>
     <groupList/>
