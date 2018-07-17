@@ -14,9 +14,10 @@ services:
       ports:
         - 8000:8000
       volumes:
-        - ./src:/code/src
-        - ./start.sh:/code/start.sh
         - ./geoserver_data:/geoserver_data
+        - ./src:/code/src
+        - ./tmp:/code/tmp
+        - ./start.sh:/code/start.sh
       depends_on:
         db:
           condition: service_healthy
