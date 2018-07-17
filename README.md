@@ -13,8 +13,8 @@ git clone https://github.com/jirik/gspld.git
 cd gspld
 
 # prepare geoserver data directory
-GS_VERSION=2.13.0 make download-gs-datadir
-sudo GS_VERSION=2.13.0 make reset-gs-datadir
+make download-gs-datadir
+make reset-gs-datadir
 ```
 
 ## Run
