@@ -17,6 +17,5 @@ before_install:
   - docker -v
 
 script:
-  - GS_VERSION=2.13.0 make download-gs-datadir
-  - sudo GS_VERSION=2.13.0 make reset-gs-datadir
+  - make reset-layman-gs-datadir
   - make test
