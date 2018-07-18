@@ -55,8 +55,14 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
 
     # GeoServer workspace name conflicts
     import requests
-    headers_json = {'Accept': 'application/json'}
-    headers_xml = {'Accept': 'application/xml'}
+    headers_json = {
+        'Accept': 'application/json',
+        'Content-type': 'application/json',
+    }
+    headers_xml = {
+        'Accept': 'application/xml',
+        'Content-type': 'application/xml',
+    }
 
     r = requests.get(
         LAYMAN_GS_REST_WORKSPACES,
@@ -99,14 +105,57 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
         r = requests.post(
             LAYMAN_GS_REST_WORKSPACES,
             data=json.dumps({'workspace': {'name': username}}),
-            headers={'Content-type': 'application/json'},
+            headers=headers_json,
             auth=LAYMAN_GS_AUTH
         )
         r.raise_for_status()
         r = requests.post(
             LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
             data=json.dumps({username+'.*.r': 'LAYMAN_ROLE'}),
-            headers={'Content-type': 'application/json'},
+            headers=headers_json,
+            auth=LAYMAN_GS_AUTH
+        )
+        r.raise_for_status()
+        r = requests.post(
+            urljoin(LAYMAN_GS_REST_WORKSPACES, username+'/datastores'),
+            data=json.dumps({
+              "dataStore": {
+                "name": "postgresql",
+                "connectionParameters": {
+                  "entry": [
+                    {
+                      "@key": "dbtype",
+                      "$": "postgis"
+                    },
+                    {
+                      "@key": "host",
+                      "$": LAYMAN_PG_HOST
+                    },
+                    {
+                      "@key": "port",
+                      "$": LAYMAN_PG_PORT
+                    },
+                    {
+                      "@key": "database",
+                      "$": LAYMAN_PG_DBNAME
+                    },
+                    {
+                      "@key": "user",
+                      "$": LAYMAN_PG_USER
+                    },
+                    {
+                      "@key": "passwd",
+                      "$": LAYMAN_PG_PASSWORD
+                    },
+                    {
+                      "@key": "schema",
+                      "$": username
+                    },
+                  ]
+                },
+              }
+            }),
+            headers=headers_json,
             auth=LAYMAN_GS_AUTH
         )
         r.raise_for_status()

@@ -13,15 +13,18 @@ INPUT_SRS_LIST = [
     'EPSG:4326',
 ]
 
+LAYMAN_PG_HOST = os.environ['LAYMAN_PG_HOST']
+LAYMAN_PG_PORT = os.environ['LAYMAN_PG_PORT']
 LAYMAN_PG_DBNAME = os.environ['LAYMAN_PG_DBNAME']
 LAYMAN_PG_USER = os.environ['LAYMAN_PG_USER']
+LAYMAN_PG_PASSWORD = os.environ['LAYMAN_PG_PASSWORD']
 
 PG_CONN = "host='{}' port='{}' dbname='{}' user='{}' password='{}'".format(
-    os.environ['LAYMAN_PG_HOST'],
-    os.environ['LAYMAN_PG_PORT'],
+    LAYMAN_PG_HOST,
+    LAYMAN_PG_PORT,
     LAYMAN_PG_DBNAME,
     LAYMAN_PG_USER,
-    os.environ['LAYMAN_PG_PASSWORD'],
+    LAYMAN_PG_PASSWORD,
 )
 
 LAYMAN_GS_AUTH = (os.environ['LAYMAN_GS_USER'],
