@@ -1,5 +1,9 @@
 import shutil
-from settings import *
+import re
+from layman.settings import *
+from layman.util import get_layman_rules
+from urllib.parse import urljoin
+
 
 def main():
     if os.path.exists(LAYMAN_DATA_PATH):
@@ -33,6 +37,38 @@ AND pid <> pg_backend_pid();
         cur.execute("""CREATE DATABASE {} TEMPLATE {}""".format(
             LAYMAN_PG_DBNAME, LAYMAN_PG_TEMPLATE_DBNAME))
         conn.close()
+
+    import requests
+    headers_json = {
+        'Accept': 'application/json',
+        'Content-type': 'application/json',
+    }
+    r = requests.get(
+        LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
+        headers=headers_json,
+        auth=LAYMAN_GS_AUTH
+    )
+    r.raise_for_status()
+    all_rules = r.json()
+    layman_rules = get_layman_rules(all_rules)
+    for rule in layman_rules:
+        workspace = re.match(r"^([^.]+)\..*", rule).group(1)
+        r = requests.delete(
+            urljoin(LAYMAN_GS_REST_WORKSPACES, workspace),
+            headers=headers_json,
+            auth=LAYMAN_GS_AUTH,
+            params={
+                'recurse': 'true'
+            }
+        )
+        r.raise_for_status()
+        r = requests.delete(
+            urljoin(LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
+            headers=headers_json,
+            auth=LAYMAN_GS_AUTH,
+        )
+        r.raise_for_status()
+
 
 if __name__ == "__main__":
     main()
