@@ -13,13 +13,12 @@ layman-bash:
 	docker-compose -f docker-compose.dev.yml run --rm layman bash
 
 clear-data:
-	docker-compose -f docker-compose.dev.yml run --rm layman python3 src/layman/clear.py
+	docker-compose -f docker-compose.dev.yml run --rm layman bash -c "python3 src/layman/clear.py && python3 src/layman/prepare.py"
 
 start-layman-dev:
 	docker-compose -f docker-compose.dev.yml up
 
 restart-layman-dev:
-	find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | sudo xargs rm -rf
 	docker-compose -f docker-compose.dev.yml build layman
 	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d layman
 
