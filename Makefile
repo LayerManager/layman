@@ -22,6 +22,11 @@ restart-layman-dev:
 	docker-compose -f docker-compose.dev.yml build layman
 	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d layman
 
+restart-geoserver-dev:
+	docker-compose -f docker-compose.dev.yml stop geoserver
+	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman bash /code/src/reset-layman-gs-datadir.sh
+	docker-compose -f docker-compose.dev.yml up --no-deps -d geoserver
+
 start-layman-production:
 	docker-compose -f docker-compose.production.yml up -d
 
