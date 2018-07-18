@@ -13,4 +13,4 @@ if ! [ -f $ne_110m_cultural_admin_0_countries ]; then
   curl -L -o $ne_110m_cultural_admin_0_countries "https://github.com/nvkelso/natural-earth-vector/raw/master/geojson/ne_110m_admin_0_countries.geojson"
 fi
 
-python3 src/layman/clear.py && python3 src/layman/prepare.py && pytest -svv
+python3 src/clear_layman_data.py && python3 src/prepare_layman.py && pytest -svv

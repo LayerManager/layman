@@ -13,7 +13,7 @@ layman-bash:
 	docker-compose -f docker-compose.dev.yml run --rm layman bash
 
 clear-data:
-	docker-compose -f docker-compose.dev.yml run --rm layman bash -c "python3 src/layman/clear.py && python3 src/layman/prepare.py"
+	docker-compose -f docker-compose.dev.yml run --rm layman bash -c "python3 src/clear_layman_data.py && python3 src/prepare_layman.py"
 
 start-layman-dev:
 	docker-compose -f docker-compose.dev.yml up
@@ -24,7 +24,7 @@ restart-layman-dev:
 
 restart-geoserver-dev:
 	docker-compose -f docker-compose.dev.yml stop geoserver
-	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman bash /code/src/reset-layman-gs-datadir.sh
+	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman bash -c "bash /code/src/reset-layman-gs-datadir.sh && python3 src/prepare_layman.py"
 	docker-compose -f docker-compose.dev.yml up --no-deps -d geoserver
 
 start-layman-production:

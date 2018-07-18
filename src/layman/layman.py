@@ -1,6 +1,7 @@
 import os
 import re
 import pathlib
+import json
 from urllib.parse import urljoin
 
 from flask import Flask, request, redirect, jsonify
@@ -63,6 +64,7 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
         headers=headers_json,
         auth=LAYMAN_GS_AUTH
     )
+    r.raise_for_status()
     # app.logger.info(r.text)
     all_workspaces = r.json()['workspaces']['workspace']
 
@@ -72,6 +74,7 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
         headers=headers_json,
         auth=LAYMAN_GS_AUTH
     )
+    r.raise_for_status()
     # app.logger.info(r.text)
     all_rules = r.json()
     layman_rules = get_layman_rules(all_rules)
@@ -82,14 +85,31 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
         return error(12, {'workspace': username})
 
     # user
+    userdir = os.path.join(LAYMAN_DATA_PATH, username)
+    pathlib.Path(userdir).mkdir(exist_ok=True)
+
     try:
         cur.execute("""CREATE SCHEMA IF NOT EXISTS {} AUTHORIZATION {}""".format(
         username, LAYMAN_PG_USER))
         conn.commit()
     except:
         return error(7)
-    userdir = os.path.join(LAYMAN_DATA_PATH, username)
-    pathlib.Path(userdir).mkdir(exist_ok=True)
+
+    if not any(ws['name'] == username for ws in all_workspaces):
+        r = requests.post(
+            LAYMAN_GS_REST_WORKSPACES,
+            data=json.dumps({'workspace': {'name': username}}),
+            headers={'Content-type': 'application/json'},
+            auth=LAYMAN_GS_AUTH
+        )
+        r.raise_for_status()
+        r = requests.post(
+            LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
+            data=json.dumps({username+'.*.r': 'LAYMAN_ROLE'}),
+            headers={'Content-type': 'application/json'},
+            auth=LAYMAN_GS_AUTH
+        )
+        r.raise_for_status()
 
     # file names
     if 'file' not in request.files:
