@@ -10,4 +10,5 @@ ERROR_LIST = {
     9: (409, 'DB object already exists'),
     10: (409, 'DB schema owned by another than layman user'),
     11: (500, 'Error during import data into DB'),
+    12: (409, 'GeoServer workspace not assigned to LAYMAN_GS_ROLE'),
 }

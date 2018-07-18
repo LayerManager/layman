@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urljoin
 
 LAYMAN_DATA_PATH = os.path.join(os.environ['GEOSERVER_DATA_DIR'],
                                 os.environ['LAYMAN_DATA_DIR'])
@@ -22,6 +23,22 @@ PG_CONN = "host='{}' port='{}' dbname='{}' user='{}' password='{}'".format(
     LAYMAN_PG_USER,
     os.environ['LAYMAN_PG_PASSWORD'],
 )
+
+LAYMAN_GS_AUTH = (os.environ['LAYMAN_GS_USER'],
+                  os.environ['LAYMAN_GS_PASSWORD'])
+
+LAYMAN_GS_URL = "http://{}:{}{}".format(
+    os.environ['LAYMAN_GS_HOST'],
+    os.environ['LAYMAN_GS_PORT'],
+    os.environ['LAYMAN_GS_PATH'],
+)
+
+LAYMAN_GS_ROLE=os.environ['LAYMAN_GS_ROLE']
+
+LAYMAN_GS_REST = urljoin(LAYMAN_GS_URL, 'rest/')
+LAYMAN_GS_REST_WORKSPACES = urljoin(LAYMAN_GS_REST, 'workspaces/')
+LAYMAN_GS_REST_SECURITY_ACL_LAYERS = urljoin(LAYMAN_GS_REST,
+                                             'security/acl/layers/')
 
 # List of schemas that are owned by LAYMAN_PG_USER, but should not be used
 # by layman.

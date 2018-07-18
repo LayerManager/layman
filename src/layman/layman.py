@@ -1,13 +1,15 @@
 import os
 import re
 import pathlib
+from urllib.parse import urljoin
 
 from flask import Flask, request, redirect, jsonify
 from osgeo import ogr
 
 from .http import error
 from .settings import *
-from .util import to_safe_layer_name, get_main_file_name, get_file_name_mappings
+from .util import to_safe_layer_name, get_main_file_name, \
+    get_file_name_mappings, get_layman_rules, get_non_layman_workspaces
 
 app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
@@ -49,6 +51,35 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
     rows = cur.fetchall()
     if len(rows)>0:
         return error(10, {'schema': username})
+
+    # GeoServer workspace name conflicts
+    import requests
+    headers_json = {'Accept': 'application/json'}
+    headers_xml = {'Accept': 'application/xml'}
+
+    r = requests.get(
+        LAYMAN_GS_REST_WORKSPACES,
+        # data=json.dumps(payload),
+        headers=headers_json,
+        auth=LAYMAN_GS_AUTH
+    )
+    # app.logger.info(r.text)
+    all_workspaces = r.json()['workspaces']['workspace']
+
+    r = requests.get(
+        LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
+        # data=json.dumps(payload),
+        headers=headers_json,
+        auth=LAYMAN_GS_AUTH
+    )
+    # app.logger.info(r.text)
+    all_rules = r.json()
+    layman_rules = get_layman_rules(all_rules)
+    non_layman_workspaces = get_non_layman_workspaces(all_workspaces,
+                                                      layman_rules)
+
+    if any(ws['name']==username for ws in non_layman_workspaces):
+        return error(12, {'workspace': username})
 
     # user
     try:
