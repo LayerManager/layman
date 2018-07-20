@@ -1,6 +1,6 @@
 <wcs>
   <id>wcs</id>
-  <enabled>true</enabled>
+  <enabled>false</enabled>
   <name>WCS</name>
   <title>Web Coverage Service</title>
   <maintainer>http://geoserver.org/comm</maintainer>
