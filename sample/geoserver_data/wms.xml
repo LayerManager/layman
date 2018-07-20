@@ -29,6 +29,11 @@
     <entry key="svgAntiAlias">true</entry>
     <entry key="svgRenderer">Batik</entry>
   </metadata>
+  <srs>
+    <string>4326</string>
+    <string>3857</string>
+  </srs>
+  <bboxForEachCRS>true</bboxForEachCRS>
   <watermark class="org.geoserver.wms.WatermarkInfoImpl">
     <enabled>false</enabled>
     <position>BOT_RIGHT</position>
