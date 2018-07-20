@@ -1,4 +1,5 @@
 import os
+import requests
 from urllib.parse import urljoin
 
 LAYMAN_DATA_PATH = os.path.join(os.environ['GEOSERVER_DATA_DIR'],
@@ -40,8 +41,12 @@ LAYMAN_GS_ROLE=os.environ['LAYMAN_GS_ROLE']
 
 LAYMAN_GS_REST = urljoin(LAYMAN_GS_URL, 'rest/')
 LAYMAN_GS_REST_WORKSPACES = urljoin(LAYMAN_GS_REST, 'workspaces/')
+LAYMAN_GS_REST_SETTINGS = urljoin(LAYMAN_GS_REST, 'settings/')
 LAYMAN_GS_REST_SECURITY_ACL_LAYERS = urljoin(LAYMAN_GS_REST,
                                              'security/acl/layers/')
+
+from .gs_util import get_gs_proxy_base_url
+LAYMAN_GS_PROXY_URL = get_gs_proxy_base_url()
 
 # List of schemas that are owned by LAYMAN_PG_USER, but should not be used
 # by layman.

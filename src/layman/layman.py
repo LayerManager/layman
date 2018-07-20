@@ -257,8 +257,48 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
         return error(11)
 
 
+    title = layername
+    description = layername
+    keywords = [
+        "features",
+        layername,
+        title
+    ]
+    keywords = list(set(keywords))
+
+    r = requests.post(
+        urljoin(LAYMAN_GS_REST_WORKSPACES,
+                username+'/datastores/postgresql/featuretypes/'),
+        data=json.dumps(
+            {
+                "featureType": {
+                    "name": layername,
+                    "title": title,
+                    "abstract": description,
+                    "keywords": {
+                        "string": keywords
+                    },
+                    "srs": "EPSG:3857",
+                    "projectionPolicy": "FORCE_DECLARED",
+                    "enabled": True,
+                    "store": {
+                        "@class": "dataStore",
+                        "name": "browser:postgresql",
+                    },
+                }
+            }
+        ),
+        headers=headers_json,
+        auth=LAYMAN_GS_AUTH
+    )
+    r.raise_for_status()
+
+    wms_url = urljoin(LAYMAN_GS_PROXY_URL, 'browser/ows')
+    wfs_url = wms_url
+
     return jsonify({
         'file_name': filename_mapping[main_filename],
         'table_name': layername,
-        'layer_name': '{}:{}'.format(username, layername),
+        'wms': wms_url,
+        'wfs': wfs_url,
     }), 200
