@@ -31,10 +31,14 @@ PG_CONN = "host='{}' port='{}' dbname='{}' user='{}' password='{}'".format(
 LAYMAN_GS_AUTH = (os.environ['LAYMAN_GS_USER'],
                   os.environ['LAYMAN_GS_PASSWORD'])
 
+LAYMAN_GS_HOST = os.environ['LAYMAN_GS_HOST']
+LAYMAN_GS_PORT = os.environ['LAYMAN_GS_PORT']
+LAYMAN_GS_PATH = os.environ['LAYMAN_GS_PATH']
+
 LAYMAN_GS_URL = "http://{}:{}{}".format(
-    os.environ['LAYMAN_GS_HOST'],
-    os.environ['LAYMAN_GS_PORT'],
-    os.environ['LAYMAN_GS_PATH'],
+    LAYMAN_GS_HOST,
+    LAYMAN_GS_PORT,
+    LAYMAN_GS_PATH,
 )
 
 LAYMAN_GS_ROLE=os.environ['LAYMAN_GS_ROLE']
