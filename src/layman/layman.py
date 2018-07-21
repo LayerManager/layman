@@ -2,7 +2,8 @@ import os
 import re
 import pathlib
 import json
-from urllib.parse import urljoin
+import base64
+from urllib.parse import urljoin, urlparse
 
 from flask import Flask, request, redirect, jsonify
 from osgeo import ogr
@@ -111,7 +112,7 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
         r.raise_for_status()
         r = requests.post(
             LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
-            data=json.dumps({username+'.*.r': 'LAYMAN_ROLE'}),
+            data=json.dumps({username+'.*.r': LAYMAN_GS_ROLE+',ROLE_ANONYMOUS'}),
             headers=headers_json,
             auth=LAYMAN_GS_AUTH
         )
@@ -238,6 +239,7 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
         if crs_id not in INPUT_SRS_LIST:
             return error(4, {'found': crs_id, 'supported_values': INPUT_SRS_LIST})
 
+    # import file to database table
     import subprocess
     bash_args = [
         'ogr2ogr',
@@ -246,17 +248,18 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
         '-nln', layername,
         '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
         '-lco', 'SCHEMA={}'.format(username),
+        # '-clipsrc', '-180', '-85.06', '180', '85.06',
         '-f', 'PostgreSQL',
         'PG:{}'.format(PG_CONN),
         # 'PG:{} active_schema={}'.format(PG_CONN, username),
         '{}'.format(filepath_mapping[main_filename]),
     ]
-    # print('bash_args', ' '.join(bash_args))
+    # app.logger.info(' '.join(bash_args))
     return_code = subprocess.call(bash_args)
     if return_code != 0:
         return error(11)
 
-
+    # publish table as new layer
     title = layername
     description = layername
     keywords = [
@@ -265,7 +268,6 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
         title
     ]
     keywords = list(set(keywords))
-
     r = requests.post(
         urljoin(LAYMAN_GS_REST_WORKSPACES,
                 username+'/datastores/postgresql/featuretypes/'),
@@ -293,12 +295,52 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
     )
     r.raise_for_status()
 
-    wms_url = urljoin(LAYMAN_GS_PROXY_URL, 'browser/ows')
-    wfs_url = wms_url
+    # generate thumbnail
+    wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
+    from owslib.wms import WebMapService
+    wms = WebMapService(wms_url)
+    for operation in wms.operations:
+        # app.logger.info(operation.name)
+        for method in operation.methods:
+            method_url = urlparse(method['url'])
+            method_url = method_url._replace(
+                netloc = LAYMAN_GS_HOST + ':' + LAYMAN_GS_PORT,
+                path = urljoin(LAYMAN_GS_PATH, username + '/ows'))
+            method['url'] = method_url.geturl()
+    # app.logger.info(list(wms.contents))
+    bbox = list(wms[layername].boundingBox)
+    # app.logger.info(bbox)
+    min_range = min(bbox[2]-bbox[0], bbox[3]-bbox[1]) / 2
+    tn_bbox = (
+        (bbox[0] + bbox[2]) / 2 - min_range,
+        (bbox[1] + bbox[3]) / 2 - min_range,
+        (bbox[0] + bbox[2]) / 2 + min_range,
+        (bbox[1] + bbox[3]) / 2 + min_range,
+    )
+    tn_img = wms.getmap(
+        layers=[layername],
+        srs='EPSG:3857',
+        bbox=tn_bbox,
+        size=(300, 300),
+        format='image/png',
+        transparent=True,
+    )
+    tn_path = os.path.splitext(filepath_mapping[main_filename])[
+                  0]+'.thumbnail.png'
+    out = open(tn_path, 'wb')
+    out.write(tn_img.read())
+    out.close()
+
+    # return result
+    wms_proxy_url = urljoin(LAYMAN_GS_PROXY_URL, username + '/ows')
+    wfs_proxy_url = wms_proxy_url
 
     return jsonify({
         'file_name': filename_mapping[main_filename],
         'table_name': layername,
-        'wms': wms_url,
-        'wfs': wfs_url,
+        'layer_name': layername,
+        'wms': wms_proxy_url,
+        'wfs': wfs_proxy_url,
+        'thumbnail': ("data:image/png;" +
+                      "base64," + base64.b64encode(tn_img.read()).decode('utf-8')),
     }), 200

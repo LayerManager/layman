@@ -3,3 +3,4 @@ pytest==3.6.2
 unidecode==1.0.22
 psycopg2-binary==2.7.5
 requests==2.19.1
+OWSLib==0.16.0
