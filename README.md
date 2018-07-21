@@ -36,6 +36,9 @@ This is the recommended way how to run it in production. You need GeoServer & Po
 - GeoServer 2.13.0
 - PostgreSQL 10.0
 - PostGIS 2.4
+
+TODO: describe requirements on PostgreSQL and GeoServer user, privileges, etc.
+
 ```bash
 cp .env.production .env
 
