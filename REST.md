@@ -4,11 +4,21 @@
 ### URL
 `/layers`
 ### POST
-Upload new layer.
+Publish vector data file as new layer of WMS and WFS.
+
+Processing chain consists of few steps:
+- save file to user's directory within GeoServer data directory
+- import the file to PostgreSQL database as new table into user's schema
+- publish the table as new layer (feature type) within user's workspace of GeoServer
+- generate thumbnail image
+
+If user's directory, database schema, or GeoServer's worskpace does not exist yet, it is created on demand.
 
 #### Input parameters
 - **user**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
    - owner of the file
+   - it is not real user of file system, DB, or GeoServer
+   - it can be any string matching the regular expression
 - **file**, file
    - GeoJSON file
 - *name*, string
@@ -35,9 +45,9 @@ Upload new layer.
    - should be used for identifying layer within WMS and WFS
 - **wms**
    - URL of WMS endpoint
-   - points to user's workspace
+   - points to user's workspace WMS endpoint
 - **wfs**
    - URL of WFS endpoint
-   - points to user's workspace
+   - points to user's workspace WFS endpoint
 - **thumbnail**
    - base64 encoded PNG usable for HTML `img` `src` attribute
