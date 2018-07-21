@@ -28,7 +28,12 @@ make start-layman-dev
 ```
 
 ## Test
-:warning: It will delete all files within LAYMAN_DATA_DIR and all layman-related schemas in LAYMAN_PG_DBNAME! Default values are defined in [.env.test](https://github.com/jirik/gspld/blob/master/.env.test)
+:warning: It will delete
+- all files within LAYMAN_DATA_DIR!
+- all layman-related schemas in LAYMAN_PG_DBNAME!
+- all workspaces accessible namely by LAYMAN_GS_ROLE!
+
+Default values are defined in [.env.test](https://github.com/jirik/gspld/blob/master/.env.test)
 ```bash
 make test
 ```
