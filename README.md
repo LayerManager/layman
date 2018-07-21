@@ -23,6 +23,8 @@ Suitable for development only.
 make start-layman-dev
 
 # visit http://localhost:8000/
+
+# stop it with Ctrl+C
 ```
 
 ## Test
