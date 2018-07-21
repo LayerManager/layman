@@ -4,7 +4,7 @@
 | name | version | license | used by | env | bin or src | note |
 | --- | --- | --- | --- | --- | --- | --- |
 | [python](http://www.gdal.org/) | 3.5 | Python Software Foundation License | - | prod | bin | |
-| [flask](http://flask.pocoo.org/) | 1.0.2 | BSD License | - | prod | bin | |
+| [flask](http://flask.pocoo.org/) | 1.0.2 | BSD License | requirements.txt | prod | bin | |
 | [postgresql](https://www.postgresql.org/) | 10.0 | PostgreSQL | kartoza/docker-postgis | dev | bin | |
 | [postgis](https://postgis.net/) | 2.4 | GNU GPL v2 | kartoza/docker-postgis | dev | bin | |
 | [geoserver](https://github.com/geoserver/geoserver) | 2.13.0 | GNU GPL v2 | kartoza/docker-geoserver | dev | bin | |
@@ -14,8 +14,8 @@
 
 | name | license | used by | env | bin or src | note |
 | --- | --- | --- | --- | --- | --- |
-| [pytest](https://pytest.org/) | MIT License | - | test | bin | requirements.txt |
-| [kartoza/docker-geoserver](https://github.com/kartoza/docker-geoserver) | GNU GPL v2 | - | dev | src | docker-compose.yml |
+| [pytest](https://pytest.org/) | MIT License | requirements.txt | test | bin | |
+| [kartoza/docker-geoserver](https://github.com/kartoza/docker-geoserver) | GNU GPL v2 | - | dev | src | |
 | [geographicags/docker-gdal2](https://github.com/GeographicaGS/Docker-GDAL2) | MIT License | - | dev | bin | used as docker image |
 | [kartoza/docker-geoserver](https://github.com/kartoza/docker-geoserver) | GNU GPL v2 | - | dev | bin | used as docker image |
 | [kartoza/docker-postgis](https://github.com/kartoza/docker-postgis) | - | kartoza/docker-geoserver | dev | bin | used as docker image |
