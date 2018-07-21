@@ -2,7 +2,7 @@
 Publishing geospatial vector data online
 
 ## Requirements
-- linux
+- linux (needed only for `make` commands)
 - docker
 - docker-compose
 
