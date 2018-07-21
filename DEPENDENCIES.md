@@ -5,9 +5,9 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | [python](http://www.gdal.org/) | 3.5 | Python Software Foundation License | - | prod | bin | |
 | [flask](http://flask.pocoo.org/) | 1.0.2 | BSD License | requirements.txt | prod | bin | |
-| [postgresql](https://www.postgresql.org/) | 10.0 | PostgreSQL | kartoza/docker-postgis | dev | bin | |
-| [postgis](https://postgis.net/) | 2.4 | GNU GPL v2 | kartoza/docker-postgis | dev | bin | |
-| [geoserver](https://github.com/geoserver/geoserver) | 2.13.0 | GNU GPL v2 | kartoza/docker-geoserver | dev | bin | |
+| [postgresql](https://www.postgresql.org/) | 10.0 | PostgreSQL | kartoza/docker-postgis | dev, prod, prod-external | bin | |
+| [postgis](https://postgis.net/) | 2.4 | GNU GPL v2 | kartoza/docker-postgis | dev, prod, prod-external | bin | |
+| [geoserver](https://github.com/geoserver/geoserver) | 2.13.0 | GNU GPL v2 | kartoza/docker-geoserver, prod, prod-external | dev | bin | |
 | [gdal](http://www.gdal.org/) | 2.3.0 | MIT License | geographicags/docker-gdal2 | dev | bin | |
 
 ## Other dependencies
