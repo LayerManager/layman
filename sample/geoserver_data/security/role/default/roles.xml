@@ -4,6 +4,7 @@
         <role id="ADMIN"/>
         <role id="GROUP_ADMIN"/>
         <role id="LAYMAN_ROLE"/>
+        <role id="LAYMAN_TEST_ROLE"/>
     </roleList>
     <userList>
         <userRoles username="admin">
@@ -12,6 +13,10 @@
         <userRoles username="layman">
             <roleRef roleID="ADMIN"/>
             <roleRef roleID="LAYMAN_ROLE"/>
+        </userRoles>
+        <userRoles username="layman_test">
+            <roleRef roleID="ADMIN"/>
+            <roleRef roleID="LAYMAN_TEST_ROLE"/>
         </userRoles>
     </userList>
     <groupList/>

@@ -285,7 +285,7 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
                     "enabled": True,
                     "store": {
                         "@class": "dataStore",
-                        "name": "browser:postgresql",
+                        "name": username+":postgresql",
                     },
                 }
             }
