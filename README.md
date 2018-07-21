@@ -32,7 +32,10 @@ make test
 ```
 
 ## Run standalone in production
-If you have existing GeoServer & PostGIS instance:
+This is the recommended way how to run it in production. You need GeoServer & PostGIS instances. Tested versions:
+- GeoServer 2.13.0
+- PostgreSQL 10.0
+- PostGIS 2.4
 ```bash
 cp .env.production .env
 
@@ -44,7 +47,7 @@ make start-layman-production
 ```
 
 ## Run in production with dependencies
-If you don't have existing GeoServer & PostGIS instance:
+If you don't have existing GeoServer & PostGIS instance, you can use dockerized versions. It's easy to setup, but default settings are not safe for production. Performance might be also an issue.
 ```bash
 cp .env.production .env
 
