@@ -14,6 +14,7 @@
 
 | name | license | used by | env | bin or src | note |
 | --- | --- | --- | --- | --- | --- |
+| [owslib](https://github.com/geopython/OWSLib) | BSD 3-Clause | requirements.txt | prod | bin | |
 | [requests](http://python-requests.org) | Apache License 2.0 | requirements.txt | prod | bin | |
 | [psycopg2-binary](https://github.com/psycopg/psycopg2) | GNU LGPL | requirements.txt | prod | bin | |
 | [unidecode](https://github.com/avian2/unidecode) | GNU GPL v2 | requirements.txt | prod | bin | |
