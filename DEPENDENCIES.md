@@ -3,7 +3,7 @@
 
 | name | version | license | used by | env | bin or src | note |
 | --- | --- | --- | --- | --- | --- | --- |
-| [python](http://www.gdal.org/) | 3.5 | Python Software Foundation License | - | prod | bin | |
+| [python](http://www.gdal.org/) | 3.5 | Python Software Foundation License | geographicags/docker-gdal2 | prod | bin | |
 | [flask](http://flask.pocoo.org/) | 1.0.2 | BSD License | requirements.txt | prod | bin | |
 | [gdal](http://www.gdal.org/) | 2.3.0 | MIT License | geographicags/docker-gdal2 | prod | bin | |
 | [postgresql](https://www.postgresql.org/) | 10.0 | PostgreSQL | kartoza/docker-postgis | prod-external / prod | bin | |
