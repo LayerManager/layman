@@ -14,6 +14,8 @@
 
 | name | license | used by | env | bin or src | note |
 | --- | --- | --- | --- | --- | --- |
+| [psycopg2-binary](https://github.com/psycopg/psycopg2) | GNU LGPL | requirements.txt | prod | bin | |
+| [unidecode](https://github.com/avian2/unidecode) | GNU GPL v2 | requirements.txt | prod | bin | |
 | [pytest](https://pytest.org/) | MIT License | requirements.txt | test | bin | |
 | [geographicags/docker-gdal2](https://github.com/GeographicaGS/Docker-GDAL2) | MIT License | Dockerfile | dev | bin | used as docker image |
 | [kartoza/docker-geoserver](https://github.com/kartoza/docker-geoserver) | GNU GPL v2 | docker-compose.dev.yml | dev | bin | used as docker image |
