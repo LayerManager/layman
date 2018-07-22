@@ -1,5 +1,7 @@
 #!/bin/bash
 
+find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
+
 mkdir -p tmp/naturalearth/110m/cultural
 
 ne_110m_cultural=tmp/naturalearth/110m_cultural.zip
