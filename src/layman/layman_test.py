@@ -98,6 +98,10 @@ def test_file_upload(client):
     finally:
         for fp in files:
             fp[0].close()
+    from .gs_util import wms_proxy
+    wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
+    wms = wms_proxy(wms_url)
+    assert 'ne_110m_admin_0_countries' in wms.contents
 
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
@@ -123,6 +127,9 @@ def test_file_upload(client):
     finally:
         for fp in files:
             fp[0].close()
+    wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
+    wms = wms_proxy(wms_url)
+    assert 'ne_110m_admin_0_countries' in wms.contents
 
 
 def test_layername_db_object_conflict(client):

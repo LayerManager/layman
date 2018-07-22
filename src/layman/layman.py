@@ -297,16 +297,8 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
 
     # generate thumbnail
     wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
-    from owslib.wms import WebMapService
-    wms = WebMapService(wms_url)
-    for operation in wms.operations:
-        # app.logger.info(operation.name)
-        for method in operation.methods:
-            method_url = urlparse(method['url'])
-            method_url = method_url._replace(
-                netloc = LAYMAN_GS_HOST + ':' + LAYMAN_GS_PORT,
-                path = urljoin(LAYMAN_GS_PATH, username + '/ows'))
-            method['url'] = method_url.geturl()
+    from .gs_util import wms_proxy
+    wms = wms_proxy(wms_url)
     # app.logger.info(list(wms.contents))
     bbox = list(wms[layername].boundingBox)
     # app.logger.info(bbox)
