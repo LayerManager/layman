@@ -12,4 +12,5 @@ ERROR_LIST = {
     11: (500, 'Error during import data into DB'),
     12: (409, 'GeoServer workspace not assigned to LAYMAN_GS_ROLE'),
     13: (409, 'Reserved GeoServer workspace name'),
+    14: (400, 'Invalid SLD file'),
 }

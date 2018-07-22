@@ -302,6 +302,63 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
     )
     r.raise_for_status()
 
+    # SLD
+    if 'sld' in request.files:
+        sld_file = request.files['sld']
+        r = requests.post(
+            urljoin(LAYMAN_GS_REST_WORKSPACES, username + '/styles/'),
+            data=json.dumps(
+                {
+                    "style": {
+                        "name": layername,
+                        # "workspace": {
+                        #     "name": "browser"
+                        # },
+                        "format": "sld",
+                        # "languageVersion": {
+                        #     "version": "1.0.0"
+                        # },
+                        "filename": layername+".sld"
+                    }
+                }
+            ),
+            headers=headers_json,
+            auth=LAYMAN_GS_AUTH
+        )
+        r.raise_for_status()
+        # app.logger.info(sld_file.read())
+        r = requests.put(
+            urljoin(LAYMAN_GS_REST_WORKSPACES, username +
+                    '/styles/'+layername),
+            data=sld_file.read(),
+            headers={
+                'Accept': 'application/json',
+                'Content-type': 'application/vnd.ogc.sld+xml',
+            },
+            auth=LAYMAN_GS_AUTH
+        )
+        if r.status_code == 400:
+            return error(14, data=r.text)
+        r.raise_for_status()
+        r = requests.put(
+            urljoin(LAYMAN_GS_REST_WORKSPACES, username +
+                    '/layers/'+layername),
+            data=json.dumps(
+                {
+                    "layer": {
+                        "defaultStyle": {
+                            "name": username + ':' + layername,
+                            "workspace": username,
+                        },
+                    }
+                }
+            ),
+            headers=headers_json,
+            auth=LAYMAN_GS_AUTH
+        )
+        # app.logger.info(r.text)
+        r.raise_for_status()
+
     # generate thumbnail
     wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
     from .gs_util import wms_proxy
