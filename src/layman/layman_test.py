@@ -117,6 +117,8 @@ def test_file_upload(client):
             fp[0].close()
 
     username = 'testuser2'
+    sld_path = 'sample/style/generic-blue.xml'
+    assert os.path.isfile(sld_path)
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post('/layers', data={
@@ -124,6 +126,7 @@ def test_file_upload(client):
             'file': files,
             'title': 'staty',
             'description': 'popis států',
+            'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
         })
         assert rv.status_code == 200
     finally:
@@ -134,6 +137,8 @@ def test_file_upload(client):
     assert 'ne_110m_admin_0_countries' in wms.contents
     assert wms['ne_110m_admin_0_countries'].title == 'staty'
     assert wms['ne_110m_admin_0_countries'].abstract == 'popis států'
+    assert wms['ne_110m_admin_0_countries'].styles[
+        username+':ne_110m_admin_0_countries']['title'] == 'Generic Blue'
 
 
 def test_layername_db_object_conflict(client):
