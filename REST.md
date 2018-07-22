@@ -27,7 +27,7 @@ If user's directory, database schema, or GeoServer's worskpace does not exist ye
    - by default, it is file name without extension
    - will be automatically adjusted using `to_safe_layer_name` function
 - *title*, string `.+`
-   - by default it is name (if set) or file name without extension
+   - by default it is layer_name
 - *description*
    - by default it is empty string
 - *crs*, string `EPSG:3857` or `EPSG:4326`

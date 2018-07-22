@@ -121,7 +121,9 @@ def test_file_upload(client):
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post('/layers', data={
             'user': username,
-            'file': files
+            'file': files,
+            'title': 'staty',
+            'description': 'popis států',
         })
         assert rv.status_code == 200
     finally:
@@ -130,6 +132,8 @@ def test_file_upload(client):
     wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
     assert 'ne_110m_admin_0_countries' in wms.contents
+    assert wms['ne_110m_admin_0_countries'].title == 'staty'
+    assert wms['ne_110m_admin_0_countries'].abstract == 'popis států'
 
 
 def test_layername_db_object_conflict(client):
