@@ -55,6 +55,8 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
         return error(10, {'schema': username})
 
     # GeoServer workspace name conflicts
+    if username in GS_RESERVED_WORKSPACE_NAMES:
+        return error(13, {'workspace': username})
     import requests
     headers_json = {
         'Accept': 'application/json',
@@ -96,7 +98,7 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
     pathlib.Path(userdir).mkdir(exist_ok=True)
 
     try:
-        cur.execute("""CREATE SCHEMA IF NOT EXISTS {} AUTHORIZATION {}""".format(
+        cur.execute("""CREATE SCHEMA IF NOT EXISTS "{}" AUTHORIZATION {}""".format(
         username, LAYMAN_PG_USER))
         conn.commit()
     except:
