@@ -221,7 +221,7 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
                             for k, v in filepath_mapping.items()
                             if v is not None})
 
-    # feature layer
+    # check feature layers in source file
     inDriver = ogr.GetDriverByName("GeoJSON")
     inDataSource = inDriver.Open(filepath_mapping[main_filename], 0)
     n_layers = inDataSource.GetLayerCount()
@@ -259,9 +259,14 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
     if return_code != 0:
         return error(11)
 
+    # title and description
+    if len(request.form.get('title', '')) > 0:
+        title = request.form['title']
+    else:
+        title = layername
+    description = request.form.get('description', '')
+
     # publish table as new layer
-    title = layername
-    description = layername
     keywords = [
         "features",
         layername,
