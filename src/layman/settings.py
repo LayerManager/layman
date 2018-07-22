@@ -61,6 +61,10 @@ PG_NON_USER_SCHEMAS = [
     'topology',
 ]
 
+GS_RESERVED_WORKSPACE_NAMES = [
+    'default',
+]
+
 PG_POSTGIS_SCHEMA = 'public'
 
 

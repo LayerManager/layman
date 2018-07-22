@@ -22,7 +22,7 @@ where schema_owner = '{}' and schema_name NOT IN ({})""".format(
             ', '.join(map(lambda s: "'" + s + "'", PG_NON_USER_SCHEMAS))))
         rows = cur.fetchall()
         for row in rows:
-            cur.execute("""DROP SCHEMA {} CASCADE""".format(row[1]))
+            cur.execute("""DROP SCHEMA "{}" CASCADE""".format(row[1]))
         conn.close()
     except:
         conn = psycopg2.connect(PG_CONN_TEMPLATE)
