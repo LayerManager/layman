@@ -16,3 +16,4 @@ services:
       volumes:
         - ./src:/code/src
         - ./start.sh:/code/start.sh
+        - ./geoserver_data:/geoserver_data

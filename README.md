@@ -32,7 +32,7 @@ layman       |  * Restarting with stat
 layman       |  * Debugger is active!
 layman       |  * Debugger PIN: 103-830-055
 ```
-Then visit [http://localhost:8000/]().
+Then visit [http://localhost:8000/](). You will see simple HTML form that enables to publish vector data file as new layer of WMS and WFS using [REST API](https://github.com/jirik/gspld/blob/master/REST.md). The form is for testing purpose only, the REST API is for production.
 
 To stop running service, press Ctrl+C.
 
@@ -81,13 +81,17 @@ make start-layman-production
 ## Run in production with dependencies
 If you don't have existing GeoServer & PostGIS instance, you can use dockerized versions. It's easy to setup, but default settings are not safe for production. Performance might be also an issue.
 ```bash
+# edit docker-compose.production.yml, e.g. to add geoserver_data volume
+# prepare geoserver data directory
+make reset-layman-gs-datadir
+
 cp .env.production .env
 
 # edit .env
 # edit src/layman/settings.py
 
 # start dockerized layman & geoserver & DB
-make start-layman-production-with-dbgeoserver
+make start-layman-production-with-dependencies
 
 # visit http://localhost:8000/
 ```
