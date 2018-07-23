@@ -36,11 +36,11 @@ stop-layman-production:
 stop-layman-dependencies:
 	docker-compose -f docker-compose.dependencies.yml stop
 
-start-layman-production-with-dbgeoserver:
+start-layman-production-with-dependencies:
 	docker-compose -f docker-compose.dependencies.yml up -d
 	docker-compose -f docker-compose.production.yml up -d
 
-stop-layman-production-with-dbgeoserver:
+stop-layman-production-with-dependencies:
 	docker-compose -f docker-compose.dependencies.yml stop
 	docker-compose -f docker-compose.production.yml stop
 
