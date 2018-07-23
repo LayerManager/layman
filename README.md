@@ -21,11 +21,31 @@ Suitable for development only.
 ```bash
 # start dockerized layman & geoserver & DB
 make start-layman-dev
-
-# visit http://localhost:8000/
-
-# stop it with Ctrl+C
 ```
+Initial startup takes few minutes (download docker images, build it, run it). Wait until you see something like
+```
+layman       |  * Serving Flask app "src/layman/layman.py" (lazy loading)
+layman       |  * Environment: development
+layman       |  * Debug mode: on
+layman       |  * Running on http://0.0.0.0:8000/ (Press CTRL+C to quit)
+layman       |  * Restarting with stat
+layman       |  * Debugger is active!
+layman       |  * Debugger PIN: 103-830-055
+```
+Then visit [http://localhost:8000/]().
+
+To stop running service, press Ctrl+C.
+
+## Configuration
+TLDR: Default settings are suitable for developemnt and testing (`make start-layman-dev` and `make test` commands). If you run it in production, you manual configuration is needed.
+
+The most general documentation is found in `docker-compose.*.yml` files used as [docker-compose configuration files](https://docs.docker.com/compose/compose-file/compose-file-v2/).
+- `docker-compose.dev.yml` used for development
+- `docker-compose.test.yml` used for automatic testing
+- `docker-compose.production.yml` used for production (standalone layman)
+- `docker-compose.dependencies.yml` used for production (GeoServer and PostgreSQL)
+
+Another part of settings is in `.env.*` files, also separate for development, testing, and production. See especially Layman settings and Flask settings. Remember layman is dockerized, so connection parameters such as host names and port numbers must be set according to docker-compose configuration.
 
 ## Test
 :warning: It will delete
@@ -40,11 +60,13 @@ make test
 
 ## Run standalone in production
 This is the recommended way how to run it in production. You need GeoServer & PostGIS instances. Tested versions:
-- GeoServer 2.13.0
 - PostgreSQL 10.0
 - PostGIS 2.4
+- GeoServer 2.13.0
 
-TODO: describe requirements on PostgreSQL and GeoServer user, privileges, etc.
+PostgreSQL user LAYMAN_PG_USER needs enough privileges to create new schemas in LAYMAN_PG_DBNAME database. **The LAYMAN_PG_USER must be another user than default `postgres` user!** The user also needs access to `public` schema where PostGIS must be installed.
+
+Within GeoServer, you need one Layman user LAYMAN_GS_USER and one layman role LAYMAN_GS_ROLE. **The LAYMAN_GS_USER must be another user than default `admin` user and the LAYMAN_GS_ROLE must be another role than default `ADMIN` role!** The user must have at least the LAYMAN_GS_ROLE and admin role. See [default development configuration](https://github.com/jirik/gspld/blob/geoserver_setup/sample/geoserver_data/security/role/default/roles.xml).
 
 ```bash
 cp .env.production .env
