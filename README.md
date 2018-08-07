@@ -2,10 +2,14 @@
 Publishing geospatial vector data online
 
 ## Requirements
-- linux (needed only for `make` commands)
-- docker v17.12+
-- docker-compose v1.14+
+- docker v17.12+, installation instructions for [centos 7](https://docs.docker.com/install/linux/docker-ce/centos/)
+- docker-compose v1.14+, installation instructions for [centos 7](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-centos-7)
 
+**Optionally**
+- linux or any tool to run tasks defined in Makefile using `make` command
+   - can be replaced by running commands defined in [Makefile](https://github.com/jirik/gspld/blob/master/Makefile) directly
+- git
+   - can be replaced by downloading ZIP archive of the repository
 
 ## Installation
 ```bash
