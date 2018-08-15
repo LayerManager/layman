@@ -1,14 +1,12 @@
-import os
-import re
-import pathlib
-import json
 import base64
-from urllib.parse import urljoin, urlparse
+import json
+import pathlib
+import re
 
 from flask import Flask, request, redirect, jsonify
-from osgeo import ogr
 
-from .http import error
+from .filesystem.filesystem import save_files
+from .http import LaymanError
 from .settings import *
 from .util import to_safe_layer_name, get_main_file_name, \
     get_file_name_mappings, get_layman_rules, get_non_layman_workspaces
@@ -26,22 +24,22 @@ def upload_file():
 
     # user
     if 'user' not in request.form:
-        return error(1, {'parameter': 'user'})
+        raise LaymanError(1, {'parameter': 'user'})
 
     username = request.form['user']
     username_re = r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$"
     if not re.match(username_re, username):
-        return error(2, {'parameter': 'user', 'expected': username_re})
+        raise LaymanError(2, {'parameter': 'user', 'expected': username_re})
 
     if username in PG_NON_USER_SCHEMAS:
-        return error(8, {'schema': username})
+        raise LaymanError(8, {'schema': username})
 
     # DB schema name conflicts
     import psycopg2
     try:
         conn = psycopg2.connect(PG_CONN)
     except:
-        return error(6)
+        raise LaymanError(6)
     cur = conn.cursor()
     try:
         cur.execute("""select catalog_name, schema_name, schema_owner
@@ -49,14 +47,14 @@ from information_schema.schemata
 where schema_owner <> '{}' and schema_name = '{}'""".format(
             LAYMAN_PG_USER, username))
     except:
-        return error(7)
+        raise LaymanError(7)
     rows = cur.fetchall()
     if len(rows)>0:
-        return error(10, {'schema': username})
+        raise LaymanError(10, {'schema': username})
 
     # GeoServer workspace name conflicts
     if username in GS_RESERVED_WORKSPACE_NAMES:
-        return error(13, {'workspace': username})
+        raise LaymanError(13, {'workspace': username})
     import requests
     headers_json = {
         'Accept': 'application/json',
@@ -91,7 +89,7 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
                                                       layman_rules)
 
     if any(ws['name']==username for ws in non_layman_workspaces):
-        return error(12, {'workspace': username})
+        raise LaymanError(12, {'workspace': username})
 
     # user
     userdir = os.path.join(LAYMAN_DATA_PATH, username)
@@ -102,7 +100,7 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
         username, LAYMAN_PG_USER))
         conn.commit()
     except:
-        return error(7)
+        raise LaymanError(7)
 
     if not any(ws['name'] == username for ws in all_workspaces):
         r = requests.post(
@@ -165,12 +163,12 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
 
     # file names
     if 'file' not in request.files:
-        return error(1, {'parameter': 'file'})
+        raise LaymanError(1, {'parameter': 'file'})
     files = request.files.getlist("file")
     filenames = list(map(lambda f: f.filename, files))
     main_filename = get_main_file_name(filenames)
     if main_filename is None:
-        return error(2, {'parameter': 'file', 'expected': \
+        raise LaymanError(2, {'parameter': 'file', 'expected': \
             'At least one file with any of extensions: '+\
             ', '.join(MAIN_FILE_EXTENSIONS)})
 
@@ -186,7 +184,7 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
     if len(request.form.get('crs', '')) > 0:
         crs_id = request.form['crs']
         if crs_id not in INPUT_SRS_LIST:
-            return error(2, {'parameter': 'crs', 'supported_values':
+            raise LaymanError(2, {'parameter': 'crs', 'supported_values':
                 INPUT_SRS_LIST})
 
     # file name conflicts
@@ -197,7 +195,7 @@ where schema_owner <> '{}' and schema_name = '{}'""".format(
                       for k, v in filepath_mapping.items()
                       if v is not None and os.path.isfile(v)]
     if len(conflict_paths) > 0:
-        return error(3, conflict_paths)
+        raise LaymanError(3, conflict_paths)
 
     # DB table name conflicts
     try:
@@ -207,39 +205,17 @@ JOIN   pg_namespace n ON n.oid = c.relnamespace
 WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
             username, PG_POSTGIS_SCHEMA, layername))
     except:
-        return error(7)
+        raise LaymanError(7)
     rows = cur.fetchall()
     if len(rows)>0:
-        return error(9, {'db_object_name': layername})
+        raise LaymanError(9, {'db_object_name': layername})
 
     # file saving
-    for file in files:
-        if filepath_mapping[file.filename] is None:
-            continue
-        app.logger.info('Saving file {} as {}'.format(
-            file.filename, filepath_mapping[file.filename]))
-        file.save(filepath_mapping[file.filename])
-    n_uploaded_files = len({k:v
-                            for k, v in filepath_mapping.items()
-                            if v is not None})
+    crs_id = save_files(files, filepath_mapping, main_filename, crs_id is None)
+    # n_uploaded_files = len({k:v
+    #                         for k, v in filepath_mapping.items()
+    #                         if v is not None})
 
-    # check feature layers in source file
-    inDriver = ogr.GetDriverByName("GeoJSON")
-    inDataSource = inDriver.Open(filepath_mapping[main_filename], 0)
-    n_layers = inDataSource.GetLayerCount()
-    if n_layers != 1:
-        return error(5, {'found': n_layers, 'expected': 1})
-    feature_layer = inDataSource.GetLayerByIndex(0)
-    # feature_layer.GetName()
-
-    # CRS 2/2
-    if crs_id is None:
-        crs = feature_layer.GetSpatialRef()
-        crs_auth_name = crs.GetAuthorityName(None)
-        crs_code = crs.GetAuthorityCode(None)
-        crs_id = crs_auth_name+":"+crs_code
-        if crs_id not in INPUT_SRS_LIST:
-            return error(4, {'found': crs_id, 'supported_values': INPUT_SRS_LIST})
 
     # import file to database table
     import subprocess
@@ -259,7 +235,7 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
     # app.logger.info(' '.join(bash_args))
     return_code = subprocess.call(bash_args)
     if return_code != 0:
-        return error(11)
+        raise LaymanError(11)
 
     # title and description
     if len(request.form.get('title', '')) > 0:
@@ -338,7 +314,7 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
             auth=LAYMAN_GS_AUTH
         )
         if r.status_code == 400:
-            return error(14, data=r.text)
+            raise LaymanError(14, data=r.text)
         r.raise_for_status()
         r = requests.put(
             urljoin(LAYMAN_GS_REST_WORKSPACES, username +
@@ -391,6 +367,7 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
     wms_proxy_url = urljoin(LAYMAN_GS_PROXY_URL, username + '/ows')
     wfs_proxy_url = wms_proxy_url
 
+    app.logger.info('uploaded layer '+layername)
     return jsonify({
         'file_name': filename_mapping[main_filename],
         'table_name': layername,
@@ -400,3 +377,10 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
         'thumbnail': ("data:image/png;" +
                       "base64," + base64.b64encode(tn_img.read()).decode('utf-8')),
     }), 200
+
+
+@app.errorhandler(LaymanError)
+def handle_invalid_usage(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.http_code
+    return response
