@@ -1,8 +1,16 @@
 import pytest
-import os
+import io
 
 from .layman import app as layman
 from .settings import *
+
+min_geojson = """
+{
+  "type": "Feature",
+  "geometry": null,
+  "properties": null
+}
+"""
 
 @pytest.fixture
 def client():
@@ -63,11 +71,14 @@ def test_username_schema_conflict(client):
         'information_schema',
     ]:
         rv = client.post('/layers', data={
-            'user': schema_name
+            'user': schema_name,
+            'file': [
+                (io.BytesIO(min_geojson.encode()), '/file.geojson')
+            ]
         })
-        assert rv.status_code==409
         resp_json = rv.get_json()
         # print(resp_json)
+        assert rv.status_code==409
         assert resp_json['code']==10
 
 
