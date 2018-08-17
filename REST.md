@@ -12,7 +12,6 @@
    - owner of the layer
    - it can be almost any string matching the regular expression (some keywords are not allowed)
    - it is not real user of file system, DB, or GeoServer
-   - if user's directory, database schema, GeoServer's worskpace, or GeoServer's store does not exist yet, it is created on demand
 
 ## Layers
 ### URL
@@ -36,6 +35,8 @@ Processing chain consists of few steps:
 - import the file to PostgreSQL database as new table into user's schema, including geometry transformation to EPSG:3857
 - publish the table as new layer (feature type) within user's workspace of GeoServer
 - generate thumbnail image
+
+If user's directory, database schema, GeoServer's worskpace, or GeoServer's store does not exist yet, it is created on demand.
 
 #### Input parameters
 - **file**, file
