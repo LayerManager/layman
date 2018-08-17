@@ -1,8 +1,27 @@
 # REST API
 
+## Overview
+|Endpoint|URL|GET|POST|PUT|DELETE|
+|---|---|---|---|---|---|
+|Layers|`/<user>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | x |
+|Layer|`/<user>/layers/<layername>`|[GET](#get-layer)| x | [PUT](#put-layer) | [DELETE](#delete-layer) |
+|Layer Thumbnail|`/<user>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
+
 ## Layers
+
 ### URL
 `/<user>/layers`
+
+### GET Layers
+Get list of layers available at WMS and WFS endpoints.
+
+#### Input parameters
+None.
+#### Output
+JSON array of objects with following structure:
+- **name**: String. Name of the layer.
+- **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
+
 ### POST Layers
 Publish vector data file as new layer of WMS and WFS.
 
@@ -39,16 +58,6 @@ If user's directory, database schema, GeoServer's worskpace, or GeoServer's stor
 
 #### Output
 JSON object with following structure:
-- **name**: String. Name of the layer.
-- **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
-
-### GET Layers
-Get list of layers available at WMS and WFS endpoints.
-
-#### Input parameters
-None.
-#### Output
-JSON array of objects with following structure:
 - **name**: String. Name of the layer.
 - **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
 
