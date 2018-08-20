@@ -1,7 +1,8 @@
 import pytest
 import io
+from flask import url_for
 
-from .layman import app as layman
+from layman import app as layman
 from .settings import *
 
 min_geojson = """
@@ -15,39 +16,30 @@ min_geojson = """
 @pytest.fixture
 def client():
     layman.config['TESTING'] = True
+    layman.config['SERVER_NAME'] = '127.0.0.1:9000'
+    layman.config['SESSION_COOKIE_DOMAIN'] = 'localhost:9000'
     client = layman.test_client()
 
-    with layman.app_context():
+    with layman.app_context() as ctx:
+        ctx.push()
         pass
 
     yield client
 
-def test_no_user(client):
-    rv = client.post('/layers')
-    assert rv.status_code==400
-    resp_json = rv.get_json()
-    # print(resp_json)
-    assert resp_json['code']==1
-    assert resp_json['detail']['parameter']=='user'
-
-
 def test_wrong_value_of_user(client):
-    usernames = ['', ' ', '2a', 'ě', ';', '?', 'ABC']
+    usernames = [' ', '2a', 'ě', ';', '?', 'ABC']
     for username in usernames:
-        rv = client.post('/layers', data={
-            'user': username
-        })
-        assert rv.status_code==400
+        rv = client.post(url_for('post_layers', username=username))
         resp_json = rv.get_json()
+        # print('username', username)
         # print(resp_json)
+        assert rv.status_code==400
         assert resp_json['code']==2
         assert resp_json['detail']['parameter']=='user'
 
 
 def test_no_file(client):
-    rv = client.post('/layers', data={
-        'user': 'testuser1'
-    })
+    rv = client.post(url_for('post_layers', username='testuser1'))
     assert rv.status_code==400
     resp_json = rv.get_json()
     # print('resp_json', resp_json)
@@ -58,9 +50,7 @@ def test_no_file(client):
 def test_username_schema_conflict(client):
     if len(PG_NON_USER_SCHEMAS) == 0:
         pass
-    rv = client.post('/layers', data={
-        'user': PG_NON_USER_SCHEMAS[0]
-    })
+    rv = client.post(url_for('post_layers', username=PG_NON_USER_SCHEMAS[0]))
     assert rv.status_code==409
     resp_json = rv.get_json()
     # print(resp_json)
@@ -70,8 +60,7 @@ def test_username_schema_conflict(client):
         'pg_toast',
         'information_schema',
     ]:
-        rv = client.post('/layers', data={
-            'user': schema_name,
+        rv = client.post(url_for('post_layers', username=schema_name), data={
             'file': [
                 (io.BytesIO(min_geojson.encode()), '/file.geojson')
             ]
@@ -84,6 +73,7 @@ def test_username_schema_conflict(client):
 
 def test_file_upload(client):
     username = 'testuser1'
+    rest_path = url_for('post_layers', username=username)
     file_paths = [
         # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
         # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
@@ -101,8 +91,7 @@ def test_file_upload(client):
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post('/layers', data={
-            'user': username,
+        rv = client.post(rest_path, data={
             'file': files
         })
         assert rv.status_code == 200
@@ -116,8 +105,7 @@ def test_file_upload(client):
 
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post('/layers', data={
-            'user': username,
+        rv = client.post(rest_path, data={
             'file': files
         })
         assert rv.status_code==409
@@ -128,12 +116,12 @@ def test_file_upload(client):
             fp[0].close()
 
     username = 'testuser2'
+    rest_path = url_for('post_layers', username=username)
     sld_path = 'sample/style/generic-blue.xml'
     assert os.path.isfile(sld_path)
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post('/layers', data={
-            'user': username,
+        rv = client.post(rest_path, data={
             'file': files,
             'title': 'staty',
             'description': 'popis států',
@@ -153,7 +141,6 @@ def test_file_upload(client):
 
 
 def test_layername_db_object_conflict(client):
-    username = 'testuser1'
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
@@ -164,8 +151,7 @@ def test_layername_db_object_conflict(client):
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post('/layers', data={
-            'user': username,
+        rv = client.post(url_for('post_layers', username='testuser1'), data={
             'file': files,
             'name': 'spatial_ref_sys'
         })

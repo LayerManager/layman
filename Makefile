@@ -15,6 +15,9 @@ layman-bash:
 clear-data:
 	docker-compose -f docker-compose.dev.yml run --rm layman bash -c "python3 src/clear_layman_data.py && python3 src/prepare_layman.py"
 
+clear-python:
+	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman bash /code/src/clear-python-cache.sh
+
 start-layman-dev:
 	docker-compose -f docker-compose.dev.yml up
 
