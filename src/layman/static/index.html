@@ -12,6 +12,15 @@
       padding: 0.5em 0;
     }
   </style>
+  <script type="application/ecmascript">
+    const on_load = () => {
+      const form = document.getElementById('post-layers-form');
+      const user = document.getElementById('user');
+      form.addEventListener("submit", () => {
+        form.action = `/rest/${user.value}/layers`;
+      });
+    }
+  </script>
 </head>
 <body>
 <h2>Upload New Layer</h2>
@@ -21,7 +30,7 @@
 <p>
   Mandatory fields are <span class="mandatory">bold</span>.
 </p>
-<form method="post" enctype="multipart/form-data" action="/layers">
+<form method="post" enctype="multipart/form-data" action="/rest/layers" id="post-layers-form">
   <div>
     <label class="mandatory" for="user">User: </label>
     <input type="text" name="user" id="user" value="browser">
@@ -50,6 +59,7 @@
     <label for="sld">SLD style: </label>
     <input type="file" accept=".sld,.xml" name="sld" id="sld">
   </div>
-  <input type="submit" value="Upload" id="file">
+  <input type="submit" value="Upload" id="submit">
 </form>
+<script>on_load();</script>
 </body>
