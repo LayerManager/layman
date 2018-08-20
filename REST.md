@@ -3,9 +3,9 @@
 ## Overview
 |Endpoint|URL|GET|POST|PUT|DELETE|
 |---|---|---|---|---|---|
-|Layers|`/<user>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | x |
-|Layer|`/<user>/layers/<layername>`|[GET](#get-layer)| x | [PUT](#put-layer) | [DELETE](#delete-layer) |
-|Layer Thumbnail|`/<user>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
+|Layers|`/rest/<user>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | x |
+|Layer|`/rest/<user>/layers/<layername>`|[GET](#get-layer)| x | [PUT](#put-layer) | [DELETE](#delete-layer) |
+|Layer Thumbnail|`/rest/<user>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
 
 #### Path parameters
 - **user**, `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
@@ -15,7 +15,7 @@
 
 ## Layers
 ### URL
-`/<user>/layers`
+`/rest/<user>/layers`
 
 ### GET Layers
 Get list of layers available at WMS and WFS endpoints.
@@ -64,7 +64,7 @@ JSON array of objects representing posted layers with following structure:
 
 ## Layer
 ### URL
-`/<user>/layers/<layername>`
+`/rest/<user>/layers/<layername>`
 
 #### Path parameters
 - **layername**
@@ -128,7 +128,7 @@ JSON object representing deleted layer:
 
 ## Layer Thumbnail
 ### URL
-`/<user>/layers/<layername>/thumbnail`
+`/rest/<user>/layers/<layername>/thumbnail`
 ### GET Layer Thumbnail
 Get thumbnail of the layer in PNG format, 300x300 px, transparent background.
 
