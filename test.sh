@@ -1,6 +1,8 @@
 #!/bin/bash
 
-find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
+bash src/clear-python-cache.sh
+
+bash src/ensure-test-client.sh
 
 mkdir -p tmp/naturalearth/110m/cultural
 
