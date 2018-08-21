@@ -4,3 +4,5 @@
 /.env
 
 *.pyc
+
+src/layman/static/test-client

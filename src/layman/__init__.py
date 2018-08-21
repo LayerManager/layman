@@ -16,7 +16,7 @@ app.secret_key = os.environ['FLASK_SECRET_KEY']
 
 @app.route('/')
 def index():
-    return redirect('/static/index.html')
+    return redirect('/static/test-client/index.html')
 
 @app.route('/rest/<username>/layers', methods=['POST'])
 def post_layers(username):
