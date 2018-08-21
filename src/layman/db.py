@@ -21,7 +21,9 @@ def get_connection_cursor():
     return CONNECTION, CURSOR
 
 
-def ensure_user_schema(username, conn_cur=get_connection_cursor()):
+def ensure_user_schema(username, conn_cur=None):
+    if conn_cur is None:
+        conn_cur = get_connection_cursor()
     conn, cur = conn_cur
     try:
         cur.execute("""select catalog_name, schema_name, schema_owner
@@ -43,7 +45,10 @@ def ensure_user_schema(username, conn_cur=get_connection_cursor()):
 
 
 # def import_layer_vector_file(username, layername, main):
-def import_layer_vector_file(username, layername, main_filepath, crs_id, conn_cur=get_connection_cursor()):
+def import_layer_vector_file(username, layername, main_filepath, crs_id,
+                             conn_cur=None):
+    if conn_cur is None:
+        conn_cur = get_connection_cursor()
     conn, cur = conn_cur
     # DB table name conflicts
     try:
