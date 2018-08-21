@@ -6,6 +6,9 @@ reset-empty-gs-datadir:
 reset-layman-gs-datadir:
 	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman bash /code/src/reset-layman-gs-datadir.sh
 
+reset-test-client:
+	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman bash -c "rm -rf /code/src/layman/static/test-client && bash /code/src/ensure-test-client.sh"
+
 layman-build:
 	docker-compose build
 
