@@ -13,4 +13,6 @@ ERROR_LIST = {
     12: (409, 'GeoServer workspace not assigned to LAYMAN_GS_ROLE'),
     13: (409, 'Reserved GeoServer workspace name'),
     14: (400, 'Invalid SLD file'),
+    15: (404, 'Layer was not found'),
+    16: (404, 'Thumbnail was not found'),
 }
