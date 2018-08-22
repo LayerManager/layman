@@ -92,7 +92,7 @@ JSON object with following structure:
   - *url*: String. URL of layer thumbnail. It points to [GET Layer Thumbnail](#get-layer-thumbnail).
   - *status*: Status information about generating and availability of thumbnail. No status object = thumbnail was successfully generated and it is available.
 - **file**
-  - *name*: String. Path to input vector data file that was imported to the DB table. Path is relative to user's directory.
+  - *path*: String. Path to input vector data file that was imported to the DB table. Path is relative to user's directory.
   - *status*: Status information about saving and availability of files. No status object = file was successfully saved.
 - **db_table**
   - **name**: String. DB table name within PostgreSQL user's schema. This table is used as GeoServer source of layer.

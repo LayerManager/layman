@@ -1,10 +1,13 @@
 import os
+
+from flask import url_for
 from osgeo import ogr
 import pathlib
+import glob, sys
 
 from .http import LaymanError
 from .settings import *
-from .util import get_main_file_name, to_safe_layer_name, get_file_name_mappings
+from .util import to_safe_layer_name, get_file_name_mappings
 
 
 def get_user_dir(username):
@@ -50,14 +53,9 @@ def check_layer_crs(main_filepath):
                               'supported_values': INPUT_SRS_LIST})
 
 
-def get_main_filename(files):
+def get_safe_layername(unsafe_layername, files):
     filenames = list(map(lambda f: f.filename, files))
     main_filename = get_main_file_name(filenames)
-    return main_filename
-
-
-def get_safe_layername(unsafe_layername, files):
-    main_filename = get_main_filename(files)
     if unsafe_layername is None:
         unsafe_layername = ''
     if len(unsafe_layername) == 0 and main_filename is not None:
@@ -67,12 +65,12 @@ def get_safe_layername(unsafe_layername, files):
 
 
 def save_layer_files(username, layername, files):
-    main_filename = get_main_filename(files)
+    filenames = list(map(lambda f: f.filename, files))
+    main_filename = get_main_file_name(filenames)
     if main_filename is None:
         raise LaymanError(2, {'parameter': 'file', 'expected': \
             'At least one file with any of extensions: ' + \
             ', '.join(MAIN_FILE_EXTENSIONS)})
-    filenames = list(map(lambda f: f.filename, files))
     userdir = get_user_dir(username)
     filename_mapping, filepath_mapping = get_file_name_mappings(
         filenames, main_filename, layername, userdir
@@ -93,3 +91,46 @@ def save_layer_files(username, layername, files):
     check_main_file(filepath_mapping[main_filename])
     main_filename = filename_mapping[main_filename]
     return main_filename
+
+
+def get_layer_main_file_info(username, layername):
+    userdir = get_user_dir(username)
+    pattern = os.path.join(userdir, layername+'.*')
+    filenames = glob.glob(pattern)
+    main_filename = get_main_file_name(filenames)
+    if main_filename is not None:
+        main_filename = os.path.relpath(main_filename, userdir)
+        return {
+            'file': {
+                'path': main_filename
+            }
+        }
+    else:
+        return {}
+
+
+def get_layer_thumbnail_path(username, layername):
+    userdir = get_user_dir(username)
+    thumbnail_path = os.path.join(userdir, layername+'.thumbnail.png')
+    if os.path.exists(thumbnail_path):
+        thumbnail_path = os.path.relpath(thumbnail_path, userdir)
+        return thumbnail_path
+    return None
+
+
+def get_layer_thumbnail_info(username, layername):
+    thumbnail_path = get_layer_thumbnail_path(username, layername)
+    if thumbnail_path is not None:
+        return {
+            'thumbnail': {
+                'url': url_for('get_layer_thumbnail', username=username,
+                               layername=layername)
+            }
+        }
+    return {}
+
+
+def get_main_file_name(filenames):
+    return next((fn for fn in filenames if os.path.splitext(fn)[1]
+                 in MAIN_FILE_EXTENSIONS), None)
+

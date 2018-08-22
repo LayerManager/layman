@@ -19,9 +19,6 @@ def to_safe_layer_name(value):
         value = 'layer_'+value
     return value
 
-def get_main_file_name(file_names):
-    return next((fn for fn in file_names if os.path.splitext(fn)[1]
-          in MAIN_FILE_EXTENSIONS), None)
 
 def get_file_name_mappings(file_names, main_file_name, layer_name, user_dir):
     main_file_name = os.path.splitext(main_file_name)[0]

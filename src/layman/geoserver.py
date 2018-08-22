@@ -16,10 +16,7 @@ headers_xml = {
 }
 
 
-def ensure_user_workspace(username):
-    # GeoServer workspace name conflicts
-    if username in GS_RESERVED_WORKSPACE_NAMES:
-        raise LaymanError(13, {'workspace': username})
+def get_all_workspaces():
     r = requests.get(
         LAYMAN_GS_REST_WORKSPACES,
         # data=json.dumps(payload),
@@ -29,6 +26,9 @@ def ensure_user_workspace(username):
     r.raise_for_status()
     # app.logger.info(r.text)
     all_workspaces = r.json()['workspaces']['workspace']
+    return all_workspaces
+
+def get_all_rules():
     r = requests.get(
         LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
         # data=json.dumps(payload),
@@ -38,11 +38,25 @@ def ensure_user_workspace(username):
     r.raise_for_status()
     # app.logger.info(r.text)
     all_rules = r.json()
+    return all_rules
+
+def classify_workspaces(all_workspaces, all_rules):
     layman_rules = get_layman_rules(all_rules)
     non_layman_workspaces = get_non_layman_workspaces(all_workspaces,
                                                       layman_rules)
+    layman_workspaces = filter(lambda ws: ws not in non_layman_workspaces,
+                               all_workspaces)
+    return layman_workspaces, non_layman_workspaces
+
+def check_username(username, all_workspaces, all_rules):
+    _, non_layman_workspaces = classify_workspaces(all_workspaces, all_rules)
     if any(ws['name'] == username for ws in non_layman_workspaces):
         raise LaymanError(12, {'workspace': username})
+
+def ensure_user_workspace(username):
+    all_workspaces = get_all_workspaces()
+    all_rules = get_all_rules()
+    check_username(username, all_workspaces, all_rules)
     if not any(ws['name'] == username for ws in all_workspaces):
         r = requests.post(
             LAYMAN_GS_REST_WORKSPACES,
@@ -230,3 +244,36 @@ def generate_layer_thumbnail(username, layername):
     out.write(tn_img.read())
     out.close()
     return tn_img
+
+
+def get_layer_info(username, layername):
+    all_workspaces = get_all_workspaces()
+    all_rules = get_all_rules()
+    check_username(username, all_workspaces, all_rules)
+
+    try:
+        r = requests.get(
+            urljoin(LAYMAN_GS_REST_WORKSPACES, username +
+                    '/datastores/postgresql/featuretypes/' + layername),
+            headers=headers_json,
+            auth=LAYMAN_GS_AUTH
+        )
+        # app.logger.info(r.text)
+        r.raise_for_status()
+        feature_type = r.json()['featureType']
+        wms_proxy_url = urljoin(LAYMAN_GS_PROXY_URL, username + '/ows')
+        wfs_proxy_url = wms_proxy_url
+
+        return {
+            'title': feature_type['title'],
+            'description': feature_type['abstract'],
+            'wms': {
+                'url': wms_proxy_url
+            },
+            'wfs': {
+                'url': wfs_proxy_url
+            },
+        }
+    except:
+        return {}
+

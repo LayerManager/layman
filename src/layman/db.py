@@ -88,3 +88,26 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
     return_code = subprocess.call(bash_args)
     if return_code != 0:
         raise LaymanError(11)
+
+def get_table_info(username, layername, conn_cur=None):
+    if conn_cur is None:
+        conn_cur = get_connection_cursor()
+    conn, cur = conn_cur
+    try:
+        cur.execute("""
+SELECT schemaname, tablename, tableowner
+FROM pg_tables
+WHERE schemaname = '{}'
+	AND tablename = '{}'
+	AND tableowner = '{}'
+""".format(username, layername, LAYMAN_PG_USER))
+    except:
+        raise LaymanError(7)
+    rows = cur.fetchall()
+    if len(rows) > 0:
+        return {
+            'db_table': layername
+        }
+    else:
+        return {}
+
