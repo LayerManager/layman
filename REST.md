@@ -82,9 +82,12 @@ JSON object with following structure:
 - **url**: String. URL pointing to this endpoint.
 - **title**: String.
 - **description**: String.
-- *status*: Status information about GeoServer import and availability of the layer. No status object = import was successfully completed and the layer is available.
-- **wms**: String. URL of WMS endpoint. It points to WMS endpoint of user's workspace.
-- **wfs**: String. URL of WFS endpoint. It points to WFS endpoint of user's workspace.
+- **wms**
+  - *url*: String. URL of WMS endpoint. It points to WMS endpoint of user's workspace.
+  - *status*: Status information about GeoServer import and availability of WMS layer. No status object = import was successfully completed and WMS layer is available.
+- **wfs**
+  - *url*: String. URL of WFS endpoint. It points to WFS endpoint of user's workspace.
+  - *status*: Status information about GeoServer import and availability of WFS feature type. No status object = import was successfully completed and the feature type is available.
 - **thumbnail**
   - *url*: String. URL of layer thumbnail. It points to [GET Layer Thumbnail](#get-layer-thumbnail).
   - *status*: Status information about generating and availability of thumbnail. No status object = thumbnail was successfully generated and it is available.
