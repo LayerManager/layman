@@ -7,7 +7,7 @@
 |Layer|`/rest/<user>/layers/<layername>`|[GET](#get-layer)| x | [PUT](#put-layer) | [DELETE](#delete-layer) |
 |Layer Thumbnail|`/rest/<user>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
 
-#### Path parameters
+#### REST path parameters
 - **user**, `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
    - owner of the layer
    - it can be almost any string matching the regular expression (some keywords are not allowed)
@@ -20,9 +20,11 @@
 ### GET Layers
 Get list of layers available at WMS and WFS endpoints.
 
-#### Input parameters
-None.
-#### Output
+#### Request
+No action parameters.
+#### Response
+Content-Type: `application/json`
+
 JSON array of objects representing available layers with following structure:
 - **name**: String. Name of the layer.
 - **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
@@ -38,7 +40,10 @@ Processing chain consists of few steps:
 
 If user's directory, database schema, GeoServer's worskpace, or GeoServer's store does not exist yet, it is created on demand.
 
-#### Input parameters
+#### Request
+Content-Type: `multipart/form-data`
+
+Body parameters:
 - **file**, file
    - GeoJSON file
 - *name*, string
@@ -57,7 +62,9 @@ If user's directory, database schema, GeoServer's worskpace, or GeoServer's stor
 - *sld*, SLD file
    - by default default SLD style of GeoServer is used
 
-#### Output
+#### Response
+Content-Type: `application/json`
+
 JSON array of objects representing posted layers with following structure:
 - **name**: String. Name of the layer.
 - **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
@@ -66,7 +73,7 @@ JSON array of objects representing posted layers with following structure:
 ### URL
 `/rest/<user>/layers/<layername>`
 
-#### Path parameters
+#### Endpoint path parameters
 - **layername**
    - layer name used for identification
    - it can be obtained from responses of [GET Layers](#get-layers), [POST Layers](#post-layers), and all responses of this endpoint
@@ -74,9 +81,11 @@ JSON array of objects representing posted layers with following structure:
 ### GET Layer
 Get information about existing layer.
 
-#### Input parameters
-None.
-#### Output
+#### Request
+No action parameters.
+#### Response
+Content-Type: `application/json`
+
 JSON object with following structure:
 - **name**: String. Layer name within user's workspace of GeoServer. It should be used for identifying layer within WMS and WFS endpoints.
 - **url**: String. URL pointing to this endpoint.
@@ -102,8 +111,12 @@ JSON object with following structure:
 ### PUT Layer
 Update information about existing layer.
 
-#### Input parameters
+#### Request
+Content-Type: `multipart/form-data`
+
 Parameters have same meaning as in case of [POST Layers](#post-layers).
+
+Body parameters:
 - *file*, file
    - If provided, current layer vector data file will be deleted and replaced by this file. GeoServer layer, DB table, and thumbnail will be temporarily deleted and created again using the new file.
 - *title*
@@ -113,19 +126,23 @@ Parameters have same meaning as in case of [POST Layers](#post-layers).
 - *sld*, SLD file
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 
-#### Output
+#### Response
+Content-Type: `application/json`
+
 JSON object, same as in case of [GET](#get-layer).
 
 
 ### DELETE Layer
 Delete existing layer and all associated sources, including vector data file and DB table.
 
-#### Input parameters
-None.
+#### Request
+No action parameters.
 
-#### Output
+#### Response
+Content-Type: `application/json`
+
 JSON object representing deleted layer:
-- **name**: String. Former Name of the layer.
+- **name**: String. Former name of the layer.
 - **url**: String. Former URL of the layer. It points to [GET Layer](#get-layer).
 
 
@@ -135,7 +152,9 @@ JSON object representing deleted layer:
 ### GET Layer Thumbnail
 Get thumbnail of the layer in PNG format, 300x300 px, transparent background.
 
-#### Input parameters
-None.
-#### Output
+#### Request
+No action parameters.
+#### Response
+Content-Type: `image/png`
+
 PNG image.
