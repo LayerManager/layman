@@ -18,7 +18,7 @@
 `/rest/<user>/layers`
 
 ### GET Layers
-Get list of layers available at WMS and WFS endpoints.
+Get list of published layers.
 
 #### Request
 No action parameters.
