@@ -6,3 +6,5 @@
 *.pyc
 
 src/layman/static/test-client
+
+/pg
