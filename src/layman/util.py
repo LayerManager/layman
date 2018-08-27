@@ -1,5 +1,8 @@
-import re, os, unicodedata
+import re
+import unicodedata
+
 from unidecode import unidecode
+
 from .settings import *
 
 
@@ -19,20 +22,6 @@ def to_safe_layer_name(value):
         value = 'layer_'+value
     return value
 
-
-def get_file_name_mappings(file_names, main_file_name, layer_name, user_dir):
-    main_file_name = os.path.splitext(main_file_name)[0]
-    filename_mapping = {}
-    filepath_mapping = {}
-    for file_name in file_names:
-        if file_name.startswith(main_file_name + '.'):
-            new_fn = layer_name + file_name[len(main_file_name):]
-            filepath_mapping[file_name] = os.path.join(user_dir, new_fn)
-            filename_mapping[file_name] = new_fn
-        else:
-            filename_mapping[file_name] = None
-            filepath_mapping[file_name] = None
-    return (filename_mapping, filepath_mapping)
 
 def get_layman_rules(all_rules, layman_role=LAYMAN_GS_ROLE):
     re_role = r".*\b" + re.escape(layman_role) + r"\b.*"
