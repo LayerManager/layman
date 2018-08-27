@@ -3,14 +3,9 @@ import re
 
 from flask import Flask, request, redirect, jsonify, url_for, send_file
 
-from .db import create_connection_cursor, ensure_user_schema, \
-    import_layer_vector_file, get_table_info
-from .filesystem import get_safe_layername, \
-    save_layer_files, check_layer_crs, ensure_user_dir, \
-    get_layer_main_file_info, get_layer_thumbnail_info, get_user_dir, \
-    get_layer_thumbnail_path
-from .geoserver import ensure_user_workspace, publish_layer_from_db, \
-    generate_layer_thumbnail, get_layer_info, get_layer_info
+from layman import db
+from layman import filesystem
+from layman import geoserver
 from .http import LaymanError
 from .settings import *
 
@@ -23,6 +18,35 @@ layername_re = username_re
 @app.route('/')
 def index():
     return redirect('/static/test-client/index.html')
+
+
+@app.route('/rest/<username>/layers', methods=['GET'])
+def get_layers(username):
+    app.logger.info('GET Layers')
+
+    # USER
+    if not re.match(username_re, username):
+        raise LaymanError(2, {'parameter': 'user', 'expected': username_re})
+    if username in PG_NON_USER_SCHEMAS:
+        raise LaymanError(8, {'schema': username})
+    if username in GS_RESERVED_WORKSPACE_NAMES:
+        raise LaymanError(13, {'workspace': username})
+
+    layernames =\
+        filesystem.get_layer_names(username)\
+        + db.get_layer_names(username)\
+        + geoserver.get_layer_names(username)
+    layernames = list(set(layernames))
+
+    infos = list(map(
+        lambda layername: {
+            'name': layername,
+            'url': url_for('get_layer', layername=layername, username=username)
+        },
+        layernames
+    ))
+    return jsonify(infos), 200
+
 
 @app.route('/rest/<username>/layers', methods=['POST'])
 def post_layers(username):
@@ -43,7 +67,7 @@ def post_layers(username):
 
     # NAME
     unsafe_layername = request.form.get('name', '')
-    layername = get_safe_layername(unsafe_layername, files)
+    layername = filesystem.get_safe_layername(unsafe_layername, files)
 
     # CRS
     crs_id = None
@@ -69,27 +93,25 @@ def post_layers(username):
         sld_file = request.files['sld']
 
     # save files
-    userdir = ensure_user_dir(username)
-    main_filename = save_layer_files(username, layername, files)
+    userdir = filesystem.ensure_user_dir(username)
+    main_filename = filesystem.save_layer_files(username, layername, files)
     main_filepath = os.path.join(userdir, main_filename)
     if check_crs:
-        check_layer_crs(main_filepath)
+        filesystem.check_layer_crs(main_filepath)
 
     # import into DB table
-    conn_cur = create_connection_cursor()
-    ensure_user_schema(username, conn_cur=conn_cur)
-    import_layer_vector_file(username, layername, main_filepath, crs_id, conn_cur=conn_cur)
+    conn_cur = db.create_connection_cursor()
+    db.ensure_user_schema(username, conn_cur=conn_cur)
+    db.import_layer_vector_file(username, layername, main_filepath, crs_id,
+                              conn_cur=conn_cur)
 
     # publish layer to GeoServer
-    ensure_user_workspace(username)
-    publish_layer_from_db(username, layername, description, title, sld_file)
+    geoserver.ensure_user_workspace(username)
+    geoserver.publish_layer_from_db(username, layername, description, title,
+                                    sld_file)
 
     # generate thumbnail
-    tn_img = generate_layer_thumbnail(username, layername)
-
-    # return result
-    wms_proxy_url = urljoin(LAYMAN_GS_PROXY_URL, username + '/ows')
-    wfs_proxy_url = wms_proxy_url
+    geoserver.generate_layer_thumbnail(username, layername)
 
     layerurl = url_for('get_layer', layername=layername, username=username)
 
@@ -118,13 +140,13 @@ def get_layer(username, layername):
             layername_re})
 
 
-    main_file_info = get_layer_main_file_info(username, layername)
+    main_file_info = filesystem.get_layer_main_file_info(username, layername)
 
-    thumbnail_info = get_layer_thumbnail_info(username, layername)
+    thumbnail_info = filesystem.get_layer_thumbnail_info(username, layername)
 
-    table_info = get_table_info(username, layername)
+    table_info = db.get_table_info(username, layername)
 
-    layer_info = get_layer_info(username, layername)
+    layer_info = geoserver.get_layer_info(username, layername)
 
     infos = [
         main_file_info,
@@ -182,9 +204,9 @@ def get_layer_thumbnail(username, layername):
             layername_re})
 
 
-    thumbnail_path = get_layer_thumbnail_path(username, layername)
+    thumbnail_path = filesystem.get_layer_thumbnail_path(username, layername)
     if thumbnail_path is not None:
-        userdir = get_user_dir(username)
+        userdir = filesystem.get_user_dir(username)
         thumbnail_path = os.path.join(userdir, thumbnail_path)
         return send_file(thumbnail_path, mimetype='image/png')
 

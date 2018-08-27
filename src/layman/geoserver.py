@@ -277,3 +277,26 @@ def get_layer_info(username, layername):
     except:
         return {}
 
+
+def get_layer_names(username):
+    all_workspaces = get_all_workspaces()
+    all_rules = get_all_rules()
+    check_username(username, all_workspaces, all_rules)
+
+    try:
+        r = requests.get(
+            urljoin(LAYMAN_GS_REST_WORKSPACES, username +
+                    '/datastores/postgresql/featuretypes'),
+            headers=headers_json,
+            auth=LAYMAN_GS_AUTH
+        )
+        # app.logger.info(r.text)
+        r.raise_for_status()
+        feature_types = r.json()['featureTypes']['featureType']
+        layernames = list(map(
+            lambda ft: ft['name'],
+            feature_types
+        ))
+        return layernames
+    except:
+        return []
