@@ -5,7 +5,10 @@ from flask import Flask, request, redirect, jsonify, url_for, send_file
 
 from layman import db
 from layman import filesystem
+from layman.filesystem import thumbnail
+from layman.filesystem import input_files
 from layman import geoserver
+from .util import to_safe_layer_name
 from .http import LaymanError
 from .settings import *
 
@@ -32,9 +35,9 @@ def get_layers(username):
     if username in GS_RESERVED_WORKSPACE_NAMES:
         raise LaymanError(13, {'workspace': username})
 
-    layernames =\
-        filesystem.get_layer_names(username)\
-        + db.get_layer_names(username)\
+    layernames = \
+        input_files.get_layer_names(username) \
+        + db.get_layer_names(username) \
         + geoserver.get_layer_names(username)
     layernames = list(set(layernames))
 
@@ -67,7 +70,9 @@ def post_layers(username):
 
     # NAME
     unsafe_layername = request.form.get('name', '')
-    layername = filesystem.get_safe_layername(unsafe_layername, files)
+    if len(unsafe_layername) == 0:
+        unsafe_layername = input_files.get_unsafe_layername(files)
+    layername = to_safe_layer_name(unsafe_layername)
 
     # CRS
     crs_id = None
@@ -94,10 +99,10 @@ def post_layers(username):
 
     # save files
     userdir = filesystem.ensure_user_dir(username)
-    main_filename = filesystem.save_layer_files(username, layername, files)
+    main_filename = input_files.save_layer_files(username, layername, files)
     main_filepath = os.path.join(userdir, main_filename)
     if check_crs:
-        filesystem.check_layer_crs(main_filepath)
+        input_files.check_layer_crs(main_filepath)
 
     # import into DB table
     conn_cur = db.create_connection_cursor()
@@ -140,9 +145,9 @@ def get_layer(username, layername):
             layername_re})
 
 
-    main_file_info = filesystem.get_layer_main_file_info(username, layername)
+    main_file_info = input_files.get_layer_info(username, layername)
 
-    thumbnail_info = filesystem.get_layer_thumbnail_info(username, layername)
+    thumbnail_info = thumbnail.get_layer_info(username, layername)
 
     table_info = db.get_table_info(username, layername)
 
@@ -204,7 +209,8 @@ def get_layer_thumbnail(username, layername):
             layername_re})
 
 
-    thumbnail_path = filesystem.get_layer_thumbnail_path(username, layername)
+    thumbnail_path = thumbnail.get_layer_thumbnail_path(username,
+                                                            layername)
     if thumbnail_path is not None:
         userdir = filesystem.get_user_dir(username)
         thumbnail_path = os.path.join(userdir, thumbnail_path)
