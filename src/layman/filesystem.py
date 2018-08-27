@@ -134,3 +134,14 @@ def get_main_file_name(filenames):
     return next((fn for fn in filenames if os.path.splitext(fn)[1]
                  in MAIN_FILE_EXTENSIONS), None)
 
+
+def get_layer_names(username):
+    userdir = get_user_dir(username)
+    pattern = os.path.join(userdir, '*')
+    filenames = glob.glob(pattern)
+    main_filenames = filter(lambda fn: os.path.splitext(fn)[1]
+                 in MAIN_FILE_EXTENSIONS, filenames)
+    layer_names = list(map(
+        lambda fn: os.path.splitext(os.path.basename(fn))[0],
+        main_filenames))
+    return layer_names

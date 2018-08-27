@@ -71,6 +71,14 @@ def test_username_schema_conflict(client):
         assert resp_json['code']==10
 
 
+def test_get_layers_empty(client):
+    username = 'testuser1'
+    rv = client.get(url_for('get_layers', username=username))
+    resp_json = rv.get_json()
+    assert rv.status_code==200
+    assert len(resp_json) == 0
+
+
 def test_file_upload(client):
     username = 'testuser1'
     rest_path = url_for('post_layers', username=username)
@@ -124,6 +132,7 @@ def test_file_upload(client):
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
             'file': files,
+            'name': 'countries',
             'title': 'staty',
             'description': 'popis států',
             'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
@@ -137,11 +146,11 @@ def test_file_upload(client):
             fp[0].close()
     wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
-    assert 'ne_110m_admin_0_countries' in wms.contents
-    assert wms['ne_110m_admin_0_countries'].title == 'staty'
-    assert wms['ne_110m_admin_0_countries'].abstract == 'popis států'
-    assert wms['ne_110m_admin_0_countries'].styles[
-        username+':ne_110m_admin_0_countries']['title'] == 'Generic Blue'
+    assert 'countries' in wms.contents
+    assert wms['countries'].title == 'staty'
+    assert wms['countries'].abstract == 'popis států'
+    assert wms['countries'].styles[
+        username+':countries']['title'] == 'Generic Blue'
 
     assert layername != ''
     rest_path = url_for('get_layer', username=username, layername=layername)
@@ -151,6 +160,21 @@ def test_file_upload(client):
     assert resp_json['title']=='staty'
     assert resp_json['description']=='popis států'
 
+
+def test_get_layers(client):
+    username = 'testuser1'
+    rv = client.get(url_for('get_layers', username=username))
+    resp_json = rv.get_json()
+    assert rv.status_code==200
+    assert len(resp_json) == 1
+    assert resp_json[0]['name'] == 'ne_110m_admin_0_countries'
+
+    username = 'testuser2'
+    rv = client.get(url_for('get_layers', username=username))
+    resp_json = rv.get_json()
+    assert rv.status_code==200
+    assert len(resp_json) == 1
+    assert resp_json[0]['name'] == 'countries'
 
 
 def test_layername_db_object_conflict(client):
