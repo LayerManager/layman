@@ -1,7 +1,7 @@
 import shutil
 import re
 from layman.settings import *
-from layman.util import get_layman_rules
+from layman.geoserver import get_layman_rules
 from urllib.parse import urljoin
 
 

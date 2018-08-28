@@ -4,6 +4,7 @@
 /.env
 
 *.pyc
+**/.pytest_cache
 
 src/layman/static/test-client
 

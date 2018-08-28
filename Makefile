@@ -56,3 +56,6 @@ test:
 test-bash:
 	docker-compose -f docker-compose.test.yml run --rm layman bash
 
+stop-all-docker-containers:
+	docker stop $$(docker ps -q)
+
