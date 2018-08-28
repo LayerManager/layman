@@ -1,5 +1,4 @@
 import os
-import requests
 from urllib.parse import urljoin
 
 LAYMAN_DATA_PATH = os.path.join(os.environ['GEOSERVER_DATA_DIR'],
@@ -47,7 +46,11 @@ LAYMAN_GS_REST_SETTINGS = urljoin(LAYMAN_GS_REST, 'settings/')
 LAYMAN_GS_REST_SECURITY_ACL_LAYERS = urljoin(LAYMAN_GS_REST,
                                              'security/acl/layers/')
 
-from .gs_util import get_gs_proxy_base_url
+GS_RESERVED_WORKSPACE_NAMES = [
+    'default',
+]
+
+from layman.geoserver.util import get_gs_proxy_base_url
 LAYMAN_GS_PROXY_URL = get_gs_proxy_base_url()
 
 # List of schemas that are owned by LAYMAN_PG_USER, but should not be used
@@ -57,10 +60,6 @@ LAYMAN_GS_PROXY_URL = get_gs_proxy_base_url()
 PG_NON_USER_SCHEMAS = [
     'public',
     'topology',
-]
-
-GS_RESERVED_WORKSPACE_NAMES = [
-    'default',
 ]
 
 PG_POSTGIS_SCHEMA = 'public'
@@ -81,6 +80,7 @@ PG_CONN_TEMPLATE = "host='{}' port='{}' dbname='{}' user='{}' password='{" \
 SOURCES = [
     'layman.filesystem.input_files',
     'layman.db',
-    'layman.geoserver',
+    'layman.geoserver.wms',
+    'layman.geoserver.wfs',
     'layman.filesystem.thumbnail',
 ]
