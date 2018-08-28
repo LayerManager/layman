@@ -6,8 +6,6 @@ from flask import current_app
 from unidecode import unidecode
 
 from layman.http import LaymanError
-import layman.db as db
-import layman.geoserver as geoserver
 from layman.settings import *
 
 USERNAME_RE = r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$"
