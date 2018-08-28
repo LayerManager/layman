@@ -1,10 +1,10 @@
 import psycopg2
 
+from flask import g, current_app
+
 from .http import LaymanError
 from .settings import *
 
-CONNECTION = None
-CURSOR = None
 
 def create_connection_cursor():
     try:
@@ -15,10 +15,11 @@ def create_connection_cursor():
     return (connection, cursor)
 
 def get_connection_cursor():
-    global CURSOR, CONNECTION
-    if CURSOR is None or CONNECTION is None:
-        CONNECTION, CURSOR = create_connection_cursor()
-    return CONNECTION, CURSOR
+    key = 'layman.postgresql.conn_cur'
+    if key not in g:
+        conn_cur = create_connection_cursor()
+        g.setdefault(key, conn_cur)
+    return g.get(key)
 
 
 def ensure_user_schema(username, conn_cur=None):

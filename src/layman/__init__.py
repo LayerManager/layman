@@ -105,10 +105,8 @@ def post_layers(username):
         input_files.check_layer_crs(main_filepath)
 
     # import into DB table
-    conn_cur = db.create_connection_cursor()
-    db.ensure_user_schema(username, conn_cur=conn_cur)
-    db.import_layer_vector_file(username, layername, main_filepath, crs_id,
-                              conn_cur=conn_cur)
+    db.ensure_user_schema(username)
+    db.import_layer_vector_file(username, layername, main_filepath, crs_id)
 
     # publish layer to GeoServer
     geoserver.ensure_user_workspace(username)
