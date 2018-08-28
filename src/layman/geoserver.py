@@ -21,7 +21,6 @@ headers_xml = {
 def get_all_workspaces():
     key = 'layman.geoserver.workspaces'
     if key not in g:
-        current_app.logger.info('workspaces NOT EXIST')
         r = requests.get(
             LAYMAN_GS_REST_WORKSPACES,
             # data=json.dumps(payload),
@@ -32,8 +31,6 @@ def get_all_workspaces():
         # app.logger.info(r.text)
         all_workspaces = r.json()['workspaces']['workspace']
         g.setdefault(key, all_workspaces)
-    else:
-        current_app.logger.info('workspaces EXISTS')
 
     return g.get(key)
 
