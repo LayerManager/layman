@@ -78,3 +78,9 @@ PG_CONN_TEMPLATE = "host='{}' port='{}' dbname='{}' user='{}' password='{" \
     os.environ['LAYMAN_PG_PASSWORD'],
 )
 
+SOURCES = [
+    'layman.filesystem.input_files',
+    'layman.db',
+    'layman.geoserver',
+    'layman.filesystem.thumbnail',
+]
