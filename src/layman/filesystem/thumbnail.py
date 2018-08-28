@@ -20,6 +20,18 @@ def get_layer_info(username, layername):
     return {}
 
 
+def update_layer(username, layername, layerinfo):
+    pass
+
+
+def delete_layer(username, layername):
+    thumbnail_path = get_layer_thumbnail_path(username, layername)
+    try:
+        os.remove(thumbnail_path)
+    except OSError:
+        pass
+
+
 def get_layer_names(username):
     ending = '.thumbnail.png'
     userdir = get_user_dir(username)

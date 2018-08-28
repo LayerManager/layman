@@ -56,6 +56,7 @@ def post_layers(username):
     if len(unsafe_layername) == 0:
         unsafe_layername = input_files.get_unsafe_layername(files)
     layername = util.to_safe_layer_name(unsafe_layername)
+    util.check_layername(layername)
 
     # CRS
     crs_id = None
@@ -119,36 +120,81 @@ def get_layer(username, layername):
     util.check_layername(layername)
 
 
-    partial_info = util.get_layer_info(username, layername)
+    info = util.get_layer_info(username, layername)
 
-    if not any(partial_info):
-        raise LaymanError(15, {'layername': layername})
+    return jsonify(info), 200
 
-    complete_info = {
-        'name': layername,
-        'url': request.path,
-        'title': layername,
-        'description': '',
-        'wms': {
-            'status': 'not_available'
-        },
-        'wfs': {
-            'status': 'not_available'
-        },
-        'thumbnail': {
-            'status': 'not_available'
-        },
-        'file': {
-            'status': 'not_available'
-        },
-        'db_table': {
-            'status': 'not_available'
-        },
-    }
 
-    complete_info.update(partial_info)
+@app.route('/rest/<username>/layers/<layername>', methods=['PUT'])
+def put_layer(username, layername):
+    app.logger.info('PUT Layer')
 
-    return jsonify(complete_info), 200
+    # USER
+    util.check_username(username)
+
+    info = util.get_layer_info(username, layername)
+
+    # FILE
+    files = request.files.getlist("file")
+
+    # CRS
+    crs_id = None
+    if 'file' in request.files and len(request.form.get('crs', '')) > 0:
+        crs_id = request.form['crs']
+        if crs_id not in INPUT_SRS_LIST:
+            raise LaymanError(2, {'parameter': 'crs', 'supported_values':
+                INPUT_SRS_LIST})
+    check_crs = crs_id is None
+
+    # TITLE
+    if len(request.form.get('title', '')) > 0:
+        info['title'] = request.form['title']
+
+    # DESCRIPTION
+    if len(request.form.get('description', '')) > 0:
+        info['description'] = request.form['description']
+
+    # SLD
+    sld_file = None
+    if 'sld' in request.files:
+        sld_file = request.files['sld']
+
+    delete_from = None
+    if sld_file is not None:
+        delete_from = 'layman.geoserver.wms'
+    elif len(files) > 0:
+        delete_from = 'layman.filesystem.input_files'
+
+    if delete_from is None:
+        util.update_layer(username, layername, info)
+    else:
+        raise Exception('Not yet implemented')
+
+
+    # # save files
+    # userdir = filesystem.ensure_user_dir(username)
+    # main_filename = input_files.save_layer_files(username, layername, files)
+    # main_filepath = os.path.join(userdir, main_filename)
+    # if check_crs:
+    #     input_files.check_layer_crs(main_filepath)
+    #
+    # # import into DB table
+    # db.ensure_user_schema(username)
+    # db.import_layer_vector_file(username, layername, main_filepath, crs_id)
+    #
+    # # publish layer to GeoServer
+    # geoserver.ensure_user_workspace(username)
+    # geoserver.publish_layer_from_db(username, layername, description, title,
+    #                                 sld_file)
+    #
+    # # generate thumbnail
+    # filesystem.thumbnail.generate_layer_thumbnail(username, layername)
+    #
+    # layerurl = url_for('get_layer', layername=layername, username=username)
+
+    info = util.get_layer_info(username, layername)
+
+    return jsonify(info), 200
 
 
 @app.route('/rest/<username>/layers/<layername>/thumbnail', methods=['GET'])

@@ -2,7 +2,7 @@ import importlib
 import re
 import unicodedata
 
-from flask import current_app
+from flask import current_app, url_for
 from unidecode import unidecode
 
 from layman.http import LaymanError
@@ -90,15 +90,56 @@ def get_layer_names(username):
     return layernames
 
 def get_layer_info(username, layername):
-    info = {}
+    partial_info = {}
     active_sources = get_sources()
     fn_name = 'get_layer_info'
     for m in active_sources:
         fn = getattr(m, fn_name, None)
         if fn is not None:
-            info.update(fn(username, layername))
+            partial_info.update(fn(username, layername))
         else:
             current_app.logger.warn(
                 'Module {} does not have {} method.'.format(m.__name__,
                                                             fn_name))
-    return info
+
+    if not any(partial_info):
+        raise LaymanError(15, {'layername': layername})
+
+    complete_info = {
+        'name': layername,
+        'url': url_for('get_layer', layername=layername, username=username),
+        'title': layername,
+        'description': '',
+        'wms': {
+            'status': 'not_available'
+        },
+        'wfs': {
+            'status': 'not_available'
+        },
+        'thumbnail': {
+            'status': 'not_available'
+        },
+        'file': {
+            'status': 'not_available'
+        },
+        'db_table': {
+            'status': 'not_available'
+        },
+    }
+
+    complete_info.update(partial_info)
+
+    return complete_info
+
+
+def update_layer(username, layername, layerinfo):
+    active_sources = get_sources()
+    fn_name = 'update_layer'
+    for m in active_sources:
+        fn = getattr(m, fn_name, None)
+        if fn is not None:
+            fn(username, layername, layerinfo)
+        else:
+            current_app.logger.warn(
+                'Module {} does not have {} method.'.format(m.__name__,
+                                                            fn_name))
