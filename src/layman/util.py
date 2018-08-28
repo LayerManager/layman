@@ -33,10 +33,15 @@ def check_username(username):
     if not re.match(USERNAME_RE, username):
         raise LaymanError(2, {'parameter': 'user', 'expected': USERNAME_RE})
     active_sources = get_sources()
+    fn_name = 'check_username'
     for m in active_sources:
-        fn = getattr(m, 'check_username', None)
+        fn = getattr(m, fn_name, None)
         if fn is not None:
             fn(username)
+        else:
+            current_app.logger.warn(
+                'Module {} does not have {} method.'.format(m.__name__,
+                                                            fn_name))
 
 
 def check_layername(layername):
@@ -57,18 +62,28 @@ def get_sources():
 def get_layer_names(username):
     layernames = []
     active_sources = get_sources()
+    fn_name = 'get_layer_names'
     for m in active_sources:
-        fn = getattr(m, 'get_layer_names', None)
+        fn = getattr(m, fn_name, None)
         if fn is not None:
             layernames += fn(username)
+        else:
+            current_app.logger.warn(
+                'Module {} does not have {} method.'.format(m.__name__,
+                                                            fn_name))
     layernames = list(set(layernames))
     return layernames
 
 def get_layer_info(username, layername):
     info = {}
     active_sources = get_sources()
+    fn_name = 'get_layer_info'
     for m in active_sources:
-        fn = getattr(m, 'get_layer_info', None)
+        fn = getattr(m, fn_name, None)
         if fn is not None:
             info.update(fn(username, layername))
+        else:
+            current_app.logger.warn(
+                'Module {} does not have {} method.'.format(m.__name__,
+                                                            fn_name))
     return info
