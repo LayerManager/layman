@@ -22,15 +22,14 @@ def get_connection_cursor():
     return g.get(key)
 
 
-def check_username(username):
+def check_username(username, conn_cur=None):
     if username in PG_NON_USER_SCHEMAS:
         raise LaymanError(8, {'schema': username})
 
-
-def ensure_user_schema(username, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
+
     try:
         cur.execute("""select catalog_name, schema_name, schema_owner
     from information_schema.schemata
@@ -41,6 +40,12 @@ def ensure_user_schema(username, conn_cur=None):
     rows = cur.fetchall()
     if len(rows) > 0:
         raise LaymanError(10, {'schema': username})
+
+
+def ensure_user_schema(username, conn_cur=None):
+    if conn_cur is None:
+        conn_cur = get_connection_cursor()
+    conn, cur = conn_cur
 
     try:
         cur.execute("""CREATE SCHEMA IF NOT EXISTS "{}" AUTHORIZATION {}""".format(
