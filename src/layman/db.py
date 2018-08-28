@@ -22,6 +22,11 @@ def get_connection_cursor():
     return g.get(key)
 
 
+def check_username(username):
+    if username in PG_NON_USER_SCHEMAS:
+        raise LaymanError(8, {'schema': username})
+
+
 def ensure_user_schema(username, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()

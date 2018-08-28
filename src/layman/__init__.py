@@ -8,15 +8,12 @@ from layman import filesystem
 from layman.filesystem import thumbnail
 from layman.filesystem import input_files
 from layman import geoserver
-from .util import to_safe_layer_name
+from layman import util
 from .http import LaymanError
 from .settings import *
 
 app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
-
-username_re = r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$"
-layername_re = username_re
 
 @app.route('/')
 def index():
@@ -28,12 +25,7 @@ def get_layers(username):
     app.logger.info('GET Layers')
 
     # USER
-    if not re.match(username_re, username):
-        raise LaymanError(2, {'parameter': 'user', 'expected': username_re})
-    if username in PG_NON_USER_SCHEMAS:
-        raise LaymanError(8, {'schema': username})
-    if username in GS_RESERVED_WORKSPACE_NAMES:
-        raise LaymanError(13, {'workspace': username})
+    util.check_username(username)
 
     layernames = \
         input_files.get_layer_names(username) \
@@ -56,12 +48,7 @@ def post_layers(username):
     app.logger.info('POST Layers')
 
     # USER
-    if not re.match(username_re, username):
-        raise LaymanError(2, {'parameter': 'user', 'expected': username_re})
-    if username in PG_NON_USER_SCHEMAS:
-        raise LaymanError(8, {'schema': username})
-    if username in GS_RESERVED_WORKSPACE_NAMES:
-        raise LaymanError(13, {'workspace': username})
+    util.check_username(username)
 
     # FILE
     if 'file' not in request.files:
@@ -72,7 +59,7 @@ def post_layers(username):
     unsafe_layername = request.form.get('name', '')
     if len(unsafe_layername) == 0:
         unsafe_layername = input_files.get_unsafe_layername(files)
-    layername = to_safe_layer_name(unsafe_layername)
+    layername = util.to_safe_layer_name(unsafe_layername)
 
     # CRS
     crs_id = None
@@ -130,17 +117,10 @@ def get_layer(username, layername):
     app.logger.info('GET Layer')
 
     # USER
-    if not re.match(username_re, username):
-        raise LaymanError(2, {'parameter': 'user', 'expected': username_re})
-    if username in PG_NON_USER_SCHEMAS:
-        raise LaymanError(8, {'schema': username})
-    if username in GS_RESERVED_WORKSPACE_NAMES:
-        raise LaymanError(13, {'workspace': username})
+    util.check_username(username)
 
     # LAYER
-    if not re.match(layername_re, layername):
-        raise LaymanError(2, {'parameter': 'layername', 'expected':
-            layername_re})
+    util.check_layername(layername)
 
 
     main_file_info = input_files.get_layer_info(username, layername)
@@ -194,17 +174,10 @@ def get_layer_thumbnail(username, layername):
     app.logger.info('GET Layer Thumbnail')
 
     # USER
-    if not re.match(username_re, username):
-        raise LaymanError(2, {'parameter': 'user', 'expected': username_re})
-    if username in PG_NON_USER_SCHEMAS:
-        raise LaymanError(8, {'schema': username})
-    if username in GS_RESERVED_WORKSPACE_NAMES:
-        raise LaymanError(13, {'workspace': username})
+    util.check_username(username)
 
     # LAYER
-    if not re.match(layername_re, layername):
-        raise LaymanError(2, {'parameter': 'layername', 'expected':
-            layername_re})
+    util.check_layername(layername)
 
 
     thumbnail_path = thumbnail.get_layer_thumbnail_path(username,

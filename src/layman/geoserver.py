@@ -53,6 +53,8 @@ def get_all_rules():
 
 
 def check_username(username):
+    if username in GS_RESERVED_WORKSPACE_NAMES:
+        raise LaymanError(13, {'workspace': username})
     non_layman_workspaces = get_non_layman_workspaces()
     if any(ws['name'] == username for ws in non_layman_workspaces):
         raise LaymanError(12, {'workspace': username})
@@ -60,7 +62,6 @@ def check_username(username):
 
 def ensure_user_workspace(username):
     all_workspaces = get_all_workspaces()
-    check_username(username)
     if not any(ws['name'] == username for ws in all_workspaces):
         r = requests.post(
             LAYMAN_GS_REST_WORKSPACES,
@@ -251,8 +252,6 @@ def generate_layer_thumbnail(username, layername):
 
 
 def get_layer_info(username, layername):
-    check_username(username)
-
     try:
         r = requests.get(
             urljoin(LAYMAN_GS_REST_WORKSPACES, username +
@@ -281,8 +280,6 @@ def get_layer_info(username, layername):
 
 
 def get_layer_names(username):
-    check_username(username)
-
     try:
         r = requests.get(
             urljoin(LAYMAN_GS_REST_WORKSPACES, username +
