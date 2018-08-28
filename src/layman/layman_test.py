@@ -170,6 +170,14 @@ def test_file_upload(client):
     # print(resp_json)
     assert resp_json['title']=='staty'
     assert resp_json['description']=='popis států'
+    for source in [
+        'wms',
+        'wfs',
+        'thumbnail',
+        'file',
+        'db_table',
+    ]:
+        assert 'status' not in resp_json[source]
 
 
 def test_get_layers(client):

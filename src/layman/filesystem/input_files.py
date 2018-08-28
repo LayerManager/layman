@@ -2,7 +2,7 @@ import glob
 import os
 from osgeo import ogr
 
-from .__init__ import get_user_dir
+from . import get_user_dir
 from layman.settings import MAIN_FILE_EXTENSIONS, INPUT_SRS_LIST
 from layman.http import LaymanError
 
