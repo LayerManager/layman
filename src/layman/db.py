@@ -100,7 +100,7 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
     if return_code != 0:
         raise LaymanError(11)
 
-def get_table_info(username, layername, conn_cur=None):
+def get_layer_info(username, layername, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
