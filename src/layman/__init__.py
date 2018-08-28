@@ -27,11 +27,7 @@ def get_layers(username):
     # USER
     util.check_username(username)
 
-    layernames = \
-        input_files.get_layer_names(username) \
-        + db.get_layer_names(username) \
-        + geoserver.get_layer_names(username)
-    layernames = list(set(layernames))
+    layernames = util.get_layer_names(username)
 
     infos = list(map(
         lambda layername: {
@@ -123,22 +119,9 @@ def get_layer(username, layername):
     util.check_layername(layername)
 
 
-    main_file_info = input_files.get_layer_info(username, layername)
+    partial_info = util.get_layer_info(username, layername)
 
-    thumbnail_info = thumbnail.get_layer_info(username, layername)
-
-    table_info = db.get_table_info(username, layername)
-
-    layer_info = geoserver.get_layer_info(username, layername)
-
-    infos = [
-        main_file_info,
-        thumbnail_info,
-        table_info,
-        layer_info,
-    ]
-
-    if not any(infos):
+    if not any(partial_info):
         raise LaymanError(15, {'layername': layername})
 
     complete_info = {
@@ -163,8 +146,7 @@ def get_layer(username, layername):
         },
     }
 
-    for info in infos:
-        complete_info.update(info)
+    complete_info.update(partial_info)
 
     return jsonify(complete_info), 200
 
