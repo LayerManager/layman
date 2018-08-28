@@ -162,7 +162,7 @@ def put_layer(username, layername):
     delete_from = None
     if sld_file is not None:
         delete_from = 'layman.geoserver.wms'
-    elif len(files) > 0:
+    if len(files) > 0:
         delete_from = 'layman.filesystem.input_files'
 
     if delete_from is None:
