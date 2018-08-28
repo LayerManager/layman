@@ -1,9 +1,10 @@
 import os
+import glob
 from urllib.parse import urljoin
 
 from flask import url_for
 
-from .__init__ import get_user_dir
+from . import get_user_dir
 from layman.settings import *
 
 
@@ -17,6 +18,17 @@ def get_layer_info(username, layername):
             }
         }
     return {}
+
+
+def get_layer_names(username):
+    ending = '.thumbnail.png'
+    userdir = get_user_dir(username)
+    pattern = os.path.join(userdir, '*'+ending)
+    filenames = glob.glob(pattern)
+    layer_names = list(map(
+        lambda fn: os.path.basename(fn)[:-len(ending)],
+        filenames))
+    return layer_names
 
 
 def get_layer_thumbnail_path(username, layername):

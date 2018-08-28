@@ -30,11 +30,12 @@ def to_safe_layer_name(value):
 
 
 def check_username(username):
+    current_app.logger.info('check_username')
     if not re.match(USERNAME_RE, username):
         raise LaymanError(2, {'parameter': 'user', 'expected': USERNAME_RE})
-    active_sources = get_sources()
+    providers = get_providers()
     fn_name = 'check_username'
-    for m in active_sources:
+    for m in providers:
         fn = getattr(m, fn_name, None)
         if fn is not None:
             fn(username)
@@ -57,6 +58,20 @@ def get_sources():
             SOURCES
         ))
         current_app.config[key] = active_sources
+    return current_app.config[key]
+
+def get_providers():
+    key = 'layman.providers'
+    if key not in current_app.config:
+        paths = list(set(map(
+            lambda src: src[:src.rfind('.')],
+            SOURCES
+        )))
+        providers = list(map(
+            lambda path: importlib.import_module(path),
+            paths
+        ))
+        current_app.config[key] = providers
     return current_app.config[key]
 
 def get_layer_names(username):

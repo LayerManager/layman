@@ -1,10 +1,7 @@
 from urllib.parse import urljoin
 
-import requests
-
 from flask import g, current_app
 
-from .__init__ import headers_json
 from layman.settings import *
 
 def get_wms_proxy(username):

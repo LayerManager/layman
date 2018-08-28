@@ -1,4 +1,4 @@
-from layman.geoserver import get_layman_rules, get_non_layman_workspaces
+from . import get_layman_rules, get_non_layman_workspaces
 
 
 def test_get_layman_rules():
