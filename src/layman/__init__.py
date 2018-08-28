@@ -97,7 +97,7 @@ def post_layers(username):
                                     sld_file)
 
     # generate thumbnail
-    geoserver.generate_layer_thumbnail(username, layername)
+    filesystem.thumbnail.generate_layer_thumbnail(username, layername)
 
     layerurl = url_for('get_layer', layername=layername, username=username)
 

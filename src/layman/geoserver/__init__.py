@@ -1,12 +1,11 @@
 import json
-import os
 import re
 
-from flask import g, current_app
+import requests
+from flask import g
 
-from .filesystem import get_user_dir
-from .http import LaymanError
-from .settings import *
+from layman.http import LaymanError
+from layman.settings import *
 
 headers_json = {
     'Accept': 'application/json',
@@ -219,84 +218,6 @@ def create_layer_style(username, layername, sld_file):
     )
     # app.logger.info(r.text)
     r.raise_for_status()
-
-
-def generate_layer_thumbnail(username, layername):
-    wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
-    userdir = get_user_dir(username)
-    from .gs_util import wms_proxy
-    wms = wms_proxy(wms_url)
-    # app.logger.info(list(wms.contents))
-    bbox = list(wms[layername].boundingBox)
-    # app.logger.info(bbox)
-    min_range = min(bbox[2] - bbox[0], bbox[3] - bbox[1]) / 2
-    tn_bbox = (
-        (bbox[0] + bbox[2]) / 2 - min_range,
-        (bbox[1] + bbox[3]) / 2 - min_range,
-        (bbox[0] + bbox[2]) / 2 + min_range,
-        (bbox[1] + bbox[3]) / 2 + min_range,
-    )
-    tn_img = wms.getmap(
-        layers=[layername],
-        srs='EPSG:3857',
-        bbox=tn_bbox,
-        size=(300, 300),
-        format='image/png',
-        transparent=True,
-    )
-    tn_path = os.path.join(userdir, layername+'.thumbnail.png')
-    out = open(tn_path, 'wb')
-    out.write(tn_img.read())
-    out.close()
-    return tn_img
-
-
-def get_layer_info(username, layername):
-    try:
-        r = requests.get(
-            urljoin(LAYMAN_GS_REST_WORKSPACES, username +
-                    '/datastores/postgresql/featuretypes/' + layername),
-            headers=headers_json,
-            auth=LAYMAN_GS_AUTH
-        )
-        # app.logger.info(r.text)
-        r.raise_for_status()
-        feature_type = r.json()['featureType']
-        wms_proxy_url = urljoin(LAYMAN_GS_PROXY_URL, username + '/ows')
-        wfs_proxy_url = wms_proxy_url
-
-        return {
-            'title': feature_type['title'],
-            'description': feature_type['abstract'],
-            'wms': {
-                'url': wms_proxy_url
-            },
-            'wfs': {
-                'url': wfs_proxy_url
-            },
-        }
-    except:
-        return {}
-
-
-def get_layer_names(username):
-    try:
-        r = requests.get(
-            urljoin(LAYMAN_GS_REST_WORKSPACES, username +
-                    '/datastores/postgresql/featuretypes'),
-            headers=headers_json,
-            auth=LAYMAN_GS_AUTH
-        )
-        # app.logger.info(r.text)
-        r.raise_for_status()
-        feature_types = r.json()['featureTypes']['featureType']
-        layernames = list(map(
-            lambda ft: ft['name'],
-            feature_types
-        ))
-        return layernames
-    except:
-        return []
 
 
 def get_layman_rules(all_rules=None, layman_role=LAYMAN_GS_ROLE):

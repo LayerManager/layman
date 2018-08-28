@@ -1,6 +1,7 @@
 import requests
 from urllib.parse import urljoin, urlparse
 from owslib.wms import WebMapService
+from owslib.wfs import WebFeatureService
 
 headers_json = {
     'Accept': 'application/json',
@@ -9,8 +10,7 @@ headers_json = {
 
 GS_PROXY_BASE_URL = None
 
-from .settings import LAYMAN_GS_REST_SETTINGS, LAYMAN_GS_AUTH, \
-    LAYMAN_GS_REST_WORKSPACES, LAYMAN_GS_HOST, LAYMAN_GS_PORT, LAYMAN_GS_PATH
+from layman.settings import *
 def get_gs_proxy_base_url():
     global GS_PROXY_BASE_URL
     if GS_PROXY_BASE_URL is None:
@@ -56,3 +56,16 @@ def wms_proxy(wms_url):
                 path = wms_url_path)
             method['url'] = method_url.geturl()
     return wms
+
+def wfs_proxy(wfs_url):
+    wfs_url_path = urlparse(wfs_url).path
+    wfs = WebFeatureService(wfs_url)
+    for operation in wfs.operations:
+        # app.logger.info(operation.name)
+        for method in operation.methods:
+            method_url = urlparse(method['url'])
+            method_url = method_url._replace(
+                netloc = LAYMAN_GS_HOST + ':' + LAYMAN_GS_PORT,
+                path = wfs_url_path)
+            method['url'] = method_url.geturl()
+    return wfs
