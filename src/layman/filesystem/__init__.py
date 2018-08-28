@@ -13,5 +13,6 @@ def ensure_user_dir(username):
     pathlib.Path(userdir).mkdir(exist_ok=True)
     return userdir
 
+
 def check_username(username):
     pass

@@ -198,6 +198,20 @@ def test_get_layers(client):
     assert resp_json[0]['name'] == 'countries'
 
 
+def test_put_layer_title(client):
+    username = 'testuser1'
+    layername = 'ne_110m_admin_0_countries'
+    rest_path = url_for('put_layer', username=username, layername=layername)
+    with layman.app_context():
+        rv = client.put(rest_path, data={
+            'title': "New Title of Countries",
+            'description': "and new description"
+        })
+    assert rv.status_code == 200
+    resp_json = rv.get_json()
+    assert resp_json['title'] == "New Title of Countries"
+    assert resp_json['description'] == "and new description"
+
 def test_layername_db_object_conflict(client):
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',

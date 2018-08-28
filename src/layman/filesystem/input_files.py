@@ -7,6 +7,24 @@ from layman.settings import MAIN_FILE_EXTENSIONS, INPUT_SRS_LIST
 from layman.http import LaymanError
 
 
+def update_layer(username, layername, layerinfo):
+    pass
+
+
+def delete_layer(username, layername):
+    userdir = get_user_dir(username)
+    pattern = os.path.join(userdir, layername + '.*')
+    filenames = glob.glob(pattern)
+    filenames = filter(
+        lambda fn: not fn.endswith('.thumbnail.png'),
+        filenames
+    )
+    for filename in filenames:
+        try:
+            os.remove(filename)
+        except OSError:
+            pass
+
 def get_layer_info(username, layername):
     userdir = get_user_dir(username)
     pattern = os.path.join(userdir, layername+'.*')
