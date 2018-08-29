@@ -30,6 +30,7 @@ def delete_layer(username, layername):
         os.remove(thumbnail_path)
     except OSError:
         pass
+    return {}
 
 
 def get_layer_names(username):

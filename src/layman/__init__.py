@@ -5,9 +5,10 @@ from flask import Flask, request, redirect, jsonify, url_for, send_file
 
 from layman import db
 from layman import filesystem
-from layman.filesystem import thumbnail
+from layman.filesystem import thumbnail, get_user_dir
 from layman.filesystem import input_files
 from layman import geoserver
+from layman.geoserver import sld
 from layman import util
 from .http import LaymanError
 from .settings import *
@@ -94,8 +95,10 @@ def post_layers(username):
 
     # publish layer to GeoServer
     geoserver.ensure_user_workspace(username)
-    geoserver.publish_layer_from_db(username, layername, description, title,
-                                    sld_file)
+    geoserver.publish_layer_from_db(username, layername, description, title)
+
+    # create SLD style
+    geoserver.sld.create_layer_style(username, layername, sld_file)
 
     # generate thumbnail
     filesystem.thumbnail.generate_layer_thumbnail(username, layername)
@@ -161,37 +164,43 @@ def put_layer(username, layername):
 
     delete_from = None
     if sld_file is not None:
-        delete_from = 'layman.geoserver.wms'
+        delete_from = 'layman.geoserver.sld'
     if len(files) > 0:
         delete_from = 'layman.filesystem.input_files'
 
     if delete_from is None:
         util.update_layer(username, layername, info)
     else:
-        raise Exception('Not yet implemented')
+        deleted = util.delete_layer(username, layername, source=delete_from)
+        if delete_from == 'layman.filesystem.input_files':
 
+            # save files
+            main_filename = input_files.save_layer_files(username, layername,
+                                                         files)
+            userdir = get_user_dir(username)
+            main_filepath = os.path.join(userdir, main_filename)
+            if check_crs:
+                input_files.check_layer_crs(main_filepath)
 
-    # # save files
-    # userdir = filesystem.ensure_user_dir(username)
-    # main_filename = input_files.save_layer_files(username, layername, files)
-    # main_filepath = os.path.join(userdir, main_filename)
-    # if check_crs:
-    #     input_files.check_layer_crs(main_filepath)
-    #
-    # # import into DB table
-    # db.ensure_user_schema(username)
-    # db.import_layer_vector_file(username, layername, main_filepath, crs_id)
-    #
-    # # publish layer to GeoServer
-    # geoserver.ensure_user_workspace(username)
-    # geoserver.publish_layer_from_db(username, layername, description, title,
-    #                                 sld_file)
-    #
-    # # generate thumbnail
-    # filesystem.thumbnail.generate_layer_thumbnail(username, layername)
-    #
-    # layerurl = url_for('get_layer', layername=layername, username=username)
+            # import into DB table
+            db.import_layer_vector_file(username, layername, main_filepath,
+                                        crs_id)
 
+            # publish layer to GeoServer
+            geoserver.ensure_user_workspace(username)
+            geoserver.publish_layer_from_db(username, layername,
+                                            info['description'], info['title'])
+
+        if sld_file is None:
+            sld_file = deleted['sld']['file']
+
+        # create SLD style
+        geoserver.sld.create_layer_style(username, layername, sld_file)
+
+        # generate thumbnail
+        filesystem.thumbnail.generate_layer_thumbnail(username, layername)
+
+    app.logger.info('PUT Layer changes done')
     info = util.get_layer_info(username, layername)
 
     return jsonify(info), 200

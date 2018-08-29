@@ -81,7 +81,8 @@ PG_CONN_TEMPLATE = "host='{}' port='{}' dbname='{}' user='{}' password='{" \
 SOURCES = [
     'layman.filesystem.input_files',
     'layman.db.table',
-    'layman.geoserver.wms',
     'layman.geoserver.wfs',
+    'layman.geoserver.wms',
+    'layman.geoserver.sld',
     'layman.filesystem.thumbnail',
 ]
