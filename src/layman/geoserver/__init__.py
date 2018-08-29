@@ -1,4 +1,3 @@
-import io
 import json
 import re
 
@@ -127,7 +126,7 @@ def ensure_user_db_store(username):
     r.raise_for_status()
 
 
-def publish_layer_from_db(username, layername, description, title, sld_file):
+def publish_layer_from_db(username, layername, description, title):
     keywords = [
         "features",
         layername,
@@ -159,70 +158,6 @@ def publish_layer_from_db(username, layername, description, title, sld_file):
         headers=headers_json,
         auth=LAYMAN_GS_AUTH
     )
-    r.raise_for_status()
-    create_layer_style(username, layername, sld_file)
-
-
-def create_layer_style(username, layername, sld_file):
-    if sld_file is None:
-        r = requests.get(
-            urljoin(LAYMAN_GS_REST_STYLES, 'generic.sld'),
-            auth=LAYMAN_GS_AUTH
-        )
-        r.raise_for_status()
-        sld_file = io.BytesIO(r.content)
-    r = requests.post(
-        urljoin(LAYMAN_GS_REST_WORKSPACES, username + '/styles/'),
-        data=json.dumps(
-            {
-                "style": {
-                    "name": layername,
-                    # "workspace": {
-                    #     "name": "browser"
-                    # },
-                    "format": "sld",
-                    # "languageVersion": {
-                    #     "version": "1.0.0"
-                    # },
-                    "filename": layername + ".sld"
-                }
-            }
-        ),
-        headers=headers_json,
-        auth=LAYMAN_GS_AUTH
-    )
-    r.raise_for_status()
-    # app.logger.info(sld_file.read())
-    r = requests.put(
-        urljoin(LAYMAN_GS_REST_WORKSPACES, username +
-                '/styles/' + layername),
-        data=sld_file.read(),
-        headers={
-            'Accept': 'application/json',
-            'Content-type': 'application/vnd.ogc.sld+xml',
-        },
-        auth=LAYMAN_GS_AUTH
-    )
-    if r.status_code == 400:
-        raise LaymanError(14, data=r.text)
-    r.raise_for_status()
-    r = requests.put(
-        urljoin(LAYMAN_GS_REST_WORKSPACES, username +
-                '/layers/' + layername),
-        data=json.dumps(
-            {
-                "layer": {
-                    "defaultStyle": {
-                        "name": username + ':' + layername,
-                        "workspace": username,
-                    },
-                }
-            }
-        ),
-        headers=headers_json,
-        auth=LAYMAN_GS_AUTH
-    )
-    # app.logger.info(r.text)
     r.raise_for_status()
 
 

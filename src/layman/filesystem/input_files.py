@@ -24,6 +24,7 @@ def delete_layer(username, layername):
             os.remove(filename)
         except OSError:
             pass
+    return {}
 
 def get_layer_info(username, layername):
     userdir = get_user_dir(username)

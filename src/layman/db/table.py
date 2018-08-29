@@ -1,3 +1,4 @@
+from flask import current_app
 from . import get_connection_cursor
 from layman.settings import LAYMAN_PG_USER
 from layman.http import LaymanError
@@ -42,3 +43,17 @@ def get_layer_names(username, conn_cur=None):
     rows = cur.fetchall()
     layer_names = list(map(lambda row: row[0], rows))
     return layer_names
+
+
+def delete_layer(username, layername, conn_cur=None):
+    if conn_cur is None:
+        conn_cur = get_connection_cursor()
+    conn, cur = conn_cur
+    query = """
+    DROP TABLE IF EXISTS "{}"."{}" CASCADE
+    """.format(username, layername)
+    try:
+        cur.execute(query)
+        conn.commit()
+    except:
+        raise LaymanError(7)

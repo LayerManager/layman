@@ -30,7 +30,6 @@ def to_safe_layer_name(value):
 
 
 def check_username(username):
-    current_app.logger.info('check_username')
     if not re.match(USERNAME_RE, username):
         raise LaymanError(2, {'parameter': 'user', 'expected': USERNAME_RE})
     providers = get_providers()
@@ -143,3 +142,24 @@ def update_layer(username, layername, layerinfo):
             current_app.logger.warn(
                 'Module {} does not have {} method.'.format(m.__name__,
                                                             fn_name))
+
+
+def delete_layer(username, layername, source = None):
+    sources = get_sources()
+    source_idx = next((
+        idx for idx, m in enumerate(sources) if m.__name__ == source
+    ), 0)
+    fn_name = 'delete_layer'
+    end_idx = None if source_idx == 0 else source_idx-1
+    result = {}
+    for m in sources[:end_idx:-1]:
+        fn = getattr(m, fn_name, None)
+        if fn is not None:
+            partial_result = fn(username, layername)
+            if partial_result is not None:
+                result.update(partial_result)
+        else:
+            current_app.logger.warn(
+                'Module {} does not have {} method.'.format(m.__name__,
+                                                            fn_name))
+    return result

@@ -1,7 +1,12 @@
+import json
+import traceback
+
+import requests
 from urllib.parse import urljoin
 
 from flask import g, current_app
 
+from . import headers_json
 from layman.settings import *
 
 
@@ -11,6 +16,26 @@ FLASK_WMS_PROXY_KEY = 'layman.geoserver.wms_proxy'
 def update_layer(username, layername, layerinfo):
     g.pop(FLASK_WMS_PROXY_KEY, None)
     pass
+
+
+def delete_layer(username, layername):
+    try:
+        r = requests.delete(
+            urljoin(LAYMAN_GS_REST_WORKSPACES, username +
+                    '/layers/' + layername),
+            headers=headers_json,
+            auth=LAYMAN_GS_AUTH,
+            params = {
+                'recurse': 'true'
+            }
+        )
+        # app.logger.info(r.text)
+        r.raise_for_status()
+        g.pop(FLASK_WMS_PROXY_KEY, None)
+    except Exception:
+        traceback.print_exc()
+        pass
+    return {}
 
 
 def get_wms_proxy(username):

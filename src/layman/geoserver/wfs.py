@@ -1,4 +1,6 @@
 import json
+import traceback
+
 import requests
 from urllib.parse import urljoin
 
@@ -39,6 +41,25 @@ def update_layer(username, layername, layerinfo):
     )
     r.raise_for_status()
     g.pop(FLASK_WFS_PROXY_KEY, None)
+
+
+def delete_layer(username, layername):
+    try:
+        r = requests.delete(
+            urljoin(LAYMAN_GS_REST_WORKSPACES,
+                    username + '/datastores/postgresql/featuretypes/' + layername),
+            headers=headers_json,
+            auth=LAYMAN_GS_AUTH,
+            params = {
+                'recurse': 'true'
+            }
+        )
+        r.raise_for_status()
+        g.pop(FLASK_WFS_PROXY_KEY, None)
+    except Exception:
+        traceback.print_exc()
+        pass
+    return {}
 
 
 def get_wfs_proxy(username):
