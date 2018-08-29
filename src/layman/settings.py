@@ -41,6 +41,7 @@ LAYMAN_GS_URL = "http://{}:{}{}".format(
 LAYMAN_GS_ROLE=os.environ['LAYMAN_GS_ROLE']
 
 LAYMAN_GS_REST = urljoin(LAYMAN_GS_URL, 'rest/')
+LAYMAN_GS_REST_STYLES = urljoin(LAYMAN_GS_REST, 'styles/')
 LAYMAN_GS_REST_WORKSPACES = urljoin(LAYMAN_GS_REST, 'workspaces/')
 LAYMAN_GS_REST_SETTINGS = urljoin(LAYMAN_GS_REST, 'settings/')
 LAYMAN_GS_REST_SECURITY_ACL_LAYERS = urljoin(LAYMAN_GS_REST,

@@ -1,3 +1,4 @@
+import io
 import json
 import re
 
@@ -164,7 +165,12 @@ def publish_layer_from_db(username, layername, description, title, sld_file):
 
 def create_layer_style(username, layername, sld_file):
     if sld_file is None:
-        return
+        r = requests.get(
+            urljoin(LAYMAN_GS_REST_STYLES, 'generic.sld'),
+            auth=LAYMAN_GS_AUTH
+        )
+        r.raise_for_status()
+        sld_file = io.BytesIO(r.content)
     r = requests.post(
         urljoin(LAYMAN_GS_REST_WORKSPACES, username + '/styles/'),
         data=json.dumps(
