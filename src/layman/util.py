@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import importlib
 import re
 import unicodedata
@@ -49,6 +50,21 @@ def check_layername(layername):
         raise LaymanError(2, {'parameter': 'layername', 'expected':
             LAYERNAME_RE})
 
+
+def check_new_layername(username, layername):
+    check_layername(layername)
+    providers = get_providers()
+    fn_name = 'check_new_layername'
+    for m in providers:
+        current_app.logger.warn('Module {}'.format(m.__name__))
+        fn = getattr(m, fn_name, None)
+        if fn is not None:
+            fn(username, layername)
+        else:
+            current_app.logger.warn(
+                'Module {} does not have {} method.'.format(m.__name__,
+                                                            fn_name))
+
 def get_sources():
     key = 'layman.sources'
     if key not in current_app.config:
@@ -62,7 +78,7 @@ def get_sources():
 def get_providers():
     key = 'layman.providers'
     if key not in current_app.config:
-        paths = list(set(map(
+        paths = list(OrderedDict.fromkeys(map(
             lambda src: src[:src.rfind('.')],
             SOURCES
         )))
@@ -100,6 +116,10 @@ def get_layer_info(username, layername):
             current_app.logger.warn(
                 'Module {} does not have {} method.'.format(m.__name__,
                                                             fn_name))
+    return partial_info
+
+def get_complete_layer_info(username, layername):
+    partial_info = get_layer_info(username, layername)
 
     if not any(partial_info):
         raise LaymanError(15, {'layername': layername})

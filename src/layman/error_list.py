@@ -15,4 +15,5 @@ ERROR_LIST = {
     14: (400, 'Invalid SLD file'),
     15: (404, 'Layer was not found'),
     16: (404, 'Thumbnail was not found'),
+    17: (409, 'Layer already exists'),
 }

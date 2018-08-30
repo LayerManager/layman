@@ -58,6 +58,10 @@ def post_layers(username):
         unsafe_layername = input_files.get_unsafe_layername(files)
     layername = util.to_safe_layer_name(unsafe_layername)
     util.check_layername(layername)
+    info = util.get_layer_info(username, layername)
+    if info:
+        raise LaymanError(17, {layername: layername})
+    util.check_new_layername(username, layername)
 
     # CRS
     crs_id = None
@@ -123,7 +127,7 @@ def get_layer(username, layername):
     util.check_layername(layername)
 
 
-    info = util.get_layer_info(username, layername)
+    info = util.get_complete_layer_info(username, layername)
 
     return jsonify(info), 200
 
@@ -135,7 +139,7 @@ def put_layer(username, layername):
     # USER
     util.check_username(username)
 
-    info = util.get_layer_info(username, layername)
+    info = util.get_complete_layer_info(username, layername)
 
     # FILE
     files = request.files.getlist("file")
@@ -201,7 +205,7 @@ def put_layer(username, layername):
         filesystem.thumbnail.generate_layer_thumbnail(username, layername)
 
     app.logger.info('PUT Layer changes done')
-    info = util.get_layer_info(username, layername)
+    info = util.get_complete_layer_info(username, layername)
 
     return jsonify(info), 200
 
