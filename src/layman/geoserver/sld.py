@@ -19,17 +19,16 @@ def update_layer(username, layername, layerinfo):
 
 
 def delete_layer(username, layername):
+    style_url = urljoin(LAYMAN_GS_REST_WORKSPACES,
+                    username + '/styles/' + layername)
     try:
-        r = requests.get(
-            urljoin(LAYMAN_GS_REST_STYLES, 'generic.sld'),
+        r = requests.get(style_url + '.sld',
             auth=LAYMAN_GS_AUTH
         )
         r.raise_for_status()
         sld_file = io.BytesIO(r.content)
 
-        r = requests.delete(
-            urljoin(LAYMAN_GS_REST_WORKSPACES,
-                    username + '/styles/' + layername),
+        r = requests.delete(style_url,
             headers=headers_json,
             auth=LAYMAN_GS_AUTH,
             params = {
