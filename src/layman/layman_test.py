@@ -76,6 +76,30 @@ def test_username_schema_conflict(client):
         assert resp_json['code']==10
 
 
+def test_layername_db_object_conflict(client):
+    file_paths = [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+        assert not os.path.isfile(os.path.join(LAYMAN_DATA_PATH,
+                                               os.path.basename(fp)))
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with layman.app_context():
+            rv = client.post(url_for('post_layers', username='testuser1'), data={
+                'file': files,
+                'name': 'spatial_ref_sys'
+            })
+        assert rv.status_code == 409
+        resp_json = rv.get_json()
+        assert resp_json['code']==9
+    finally:
+        for fp in files:
+            fp[0].close()
+
+
 def test_get_layers_empty(client):
     username = 'testuser1'
     with layman.app_context():
@@ -126,7 +150,7 @@ def test_file_upload(client):
             })
         assert rv.status_code==409
         resp_json = rv.get_json()
-        assert resp_json['code']==3
+        assert resp_json['code']==17
     finally:
         for fp in files:
             fp[0].close()
@@ -211,26 +235,3 @@ def test_put_layer_title(client):
     resp_json = rv.get_json()
     assert resp_json['title'] == "New Title of Countries"
     assert resp_json['description'] == "and new description"
-
-def test_layername_db_object_conflict(client):
-    file_paths = [
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
-    ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
-        assert not os.path.isfile(os.path.join(LAYMAN_DATA_PATH,
-                                               os.path.basename(fp)))
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        with layman.app_context():
-            rv = client.post(url_for('post_layers', username='testuser1'), data={
-                'file': files,
-                'name': 'spatial_ref_sys'
-            })
-        assert rv.status_code == 409
-        resp_json = rv.get_json()
-        assert resp_json['code']==9
-    finally:
-        for fp in files:
-            fp[0].close()

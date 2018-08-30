@@ -55,24 +55,7 @@ def ensure_user_schema(username, conn_cur=None):
 
 
 # def import_layer_vector_file(username, layername, main):
-def import_layer_vector_file(username, layername, main_filepath, crs_id,
-                             conn_cur=None):
-    if conn_cur is None:
-        conn_cur = get_connection_cursor()
-    conn, cur = conn_cur
-    # DB table name conflicts
-    try:
-        cur.execute("""SELECT n.nspname AS schemaname, c.relname, c.relkind
-FROM   pg_class c
-JOIN   pg_namespace n ON n.oid = c.relnamespace
-WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
-            username, PG_POSTGIS_SCHEMA, layername))
-    except:
-        raise LaymanError(7)
-    rows = cur.fetchall()
-    if len(rows) > 0:
-        raise LaymanError(9, {'db_object_name': layername})
-
+def import_layer_vector_file(username, layername, main_filepath, crs_id):
     # import file to database table
     import subprocess
     bash_args = [
@@ -100,3 +83,20 @@ WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
         raise LaymanError(11)
 
 
+def check_new_layername(username, layername, conn_cur=None):
+    if conn_cur is None:
+        conn_cur = get_connection_cursor()
+    conn, cur = conn_cur
+
+    # DB table name conflicts
+    try:
+        cur.execute("""SELECT n.nspname AS schemaname, c.relname, c.relkind
+    FROM   pg_class c
+    JOIN   pg_namespace n ON n.oid = c.relnamespace
+    WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
+            username, PG_POSTGIS_SCHEMA, layername))
+    except:
+        raise LaymanError(7)
+    rows = cur.fetchall()
+    if len(rows) > 0:
+        raise LaymanError(9, {'db_object_name': layername})

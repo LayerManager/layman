@@ -190,3 +190,6 @@ def get_layman_workspaces():
     layman_workspaces = filter(lambda ws: ws not in non_layman_workspaces,
                                all_workspaces)
     return layman_workspaces
+
+def check_new_layername(username, layername):
+    pass
