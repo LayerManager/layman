@@ -56,7 +56,6 @@ def check_new_layername(username, layername):
     providers = get_providers()
     fn_name = 'check_new_layername'
     for m in providers:
-        current_app.logger.warn('Module {}'.format(m.__name__))
         fn = getattr(m, fn_name, None)
         if fn is not None:
             fn(username, layername)

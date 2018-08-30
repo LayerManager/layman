@@ -153,13 +153,17 @@ def put_layer(username, layername):
                 INPUT_SRS_LIST})
     check_crs = crs_id is None
 
+    update_info = False
+
     # TITLE
     if len(request.form.get('title', '')) > 0:
         info['title'] = request.form['title']
+        update_info = True
 
     # DESCRIPTION
     if len(request.form.get('description', '')) > 0:
         info['description'] = request.form['description']
+        update_info = True
 
     # SLD
     sld_file = None
@@ -172,9 +176,9 @@ def put_layer(username, layername):
     if len(files) > 0:
         delete_from = 'layman.filesystem.input_files'
 
-    if delete_from is None:
+    if update_info and delete_from != 'layman.filesystem.input_files':
         util.update_layer(username, layername, info)
-    else:
+    if delete_from is not None:
         deleted = util.delete_layer(username, layername, source=delete_from)
         if delete_from == 'layman.filesystem.input_files':
 

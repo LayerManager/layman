@@ -4,6 +4,10 @@ from layman.settings import LAYMAN_PG_USER
 from layman.http import LaymanError
 
 
+def update_layer(username, layername, layerinfo):
+    pass
+
+
 def get_layer_info(username, layername, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
