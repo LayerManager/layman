@@ -139,6 +139,9 @@ def put_layer(username, layername):
     # USER
     util.check_username(username)
 
+    # LAYER
+    util.check_layername(layername)
+
     info = util.get_complete_layer_info(username, layername)
 
     # FILE
@@ -214,6 +217,29 @@ def put_layer(username, layername):
     return jsonify(info), 200
 
 
+@app.route('/rest/<username>/layers/<layername>', methods=['DELETE'])
+def delete_layer(username, layername):
+    app.logger.info('DELETE Layer')
+
+    # USER
+    util.check_username(username)
+
+    # LAYER
+    util.check_layername(layername)
+
+    # raise exception if layer does not exist
+    info = util.get_complete_layer_info(username, layername)
+
+    util.delete_layer(username, layername)
+
+    app.logger.info('DELETE Layer done')
+
+    return jsonify({
+        'name': layername,
+        'url': info['url'],
+    }), 200
+
+
 @app.route('/rest/<username>/layers/<layername>/thumbnail', methods=['GET'])
 def get_layer_thumbnail(username, layername):
     app.logger.info('GET Layer Thumbnail')
@@ -224,6 +250,8 @@ def get_layer_thumbnail(username, layername):
     # LAYER
     util.check_layername(layername)
 
+    # raise exception if layer does not exist
+    util.get_complete_layer_info(username, layername)
 
     thumbnail_path = thumbnail.get_layer_thumbnail_path(username,
                                                             layername)

@@ -25,7 +25,8 @@ def update_layer(username, layername, layerinfo):
 
 
 def delete_layer(username, layername):
-    thumbnail_path = get_layer_thumbnail_path(username, layername)
+    userdir = get_user_dir(username)
+    thumbnail_path = os.path.join(userdir, layername+'.thumbnail.png')
     try:
         os.remove(thumbnail_path)
     except OSError:

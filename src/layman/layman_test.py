@@ -313,3 +313,28 @@ def test_put_layer_data(client):
     assert next((
         a for a in attributes if a['name'] == 'adm0cap'
     ), None) is not None
+
+
+def test_delete_layer(client):
+    username = 'testuser2'
+    layername = 'countries'
+    rest_path = url_for('delete_layer', username=username, layername=layername)
+    with layman.app_context():
+        rv = client.delete(rest_path)
+    assert rv.status_code == 200
+
+    rest_path = url_for('delete_layer', username=username, layername=layername)
+    with layman.app_context():
+        rv = client.delete(rest_path)
+    assert rv.status_code == 404
+    resp_json = rv.get_json()
+    assert resp_json['code'] == 15
+
+def test_get_layers_empty_again(client):
+    username = 'testuser2'
+    with layman.app_context():
+        rv = client.get(url_for('get_layers', username=username))
+    resp_json = rv.get_json()
+    assert rv.status_code==200
+    assert len(resp_json) == 0
+
