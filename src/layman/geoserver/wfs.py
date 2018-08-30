@@ -19,8 +19,6 @@ def update_layer(username, layername, layerinfo):
         layername,
         title
     ]
-    current_app.logger.info('update_layer {} {}'.format(title,
-                                           description))
     keywords = list(set(keywords))
     r = requests.put(
         urljoin(LAYMAN_GS_REST_WORKSPACES,
@@ -44,7 +42,8 @@ def update_layer(username, layername, layerinfo):
 
 
 def delete_layer(username, layername):
-    try:
+    info = get_layer_info(username, layername)
+    if info:
         r = requests.delete(
             urljoin(LAYMAN_GS_REST_WORKSPACES,
                     username + '/datastores/postgresql/featuretypes/' + layername),
@@ -56,9 +55,6 @@ def delete_layer(username, layername):
         )
         r.raise_for_status()
         g.pop(FLASK_WFS_PROXY_KEY, None)
-    except Exception:
-        traceback.print_exc()
-        pass
     return {}
 
 

@@ -3,6 +3,7 @@ import io
 import pytest
 from flask import url_for
 
+from layman.geoserver.util import get_feature_type, wms_proxy
 from layman import app as layman
 from .settings import *
 
@@ -82,8 +83,6 @@ def test_layername_db_object_conflict(client):
     ]
     for fp in file_paths:
         assert os.path.isfile(fp)
-        assert not os.path.isfile(os.path.join(LAYMAN_DATA_PATH,
-                                               os.path.basename(fp)))
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
@@ -109,7 +108,7 @@ def test_get_layers_empty(client):
     assert len(resp_json) == 0
 
 
-def test_file_upload(client):
+def test_post_layers_simple(client):
     username = 'testuser1'
     rest_path = url_for('post_layers', username=username)
     file_paths = [
@@ -124,8 +123,6 @@ def test_file_upload(client):
     ]
     for fp in file_paths:
         assert os.path.isfile(fp)
-        assert not os.path.isfile(os.path.join(LAYMAN_DATA_PATH,
-                                               os.path.basename(fp)))
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
@@ -137,11 +134,21 @@ def test_file_upload(client):
     finally:
         for fp in files:
             fp[0].close()
-    from layman.geoserver.util import wms_proxy
+
     wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
     assert 'ne_110m_admin_0_countries' in wms.contents
 
+
+def test_post_layers_layer_exists(client):
+    username = 'testuser1'
+    rest_path = url_for('post_layers', username=username)
+    file_paths = [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         with layman.app_context():
@@ -155,8 +162,15 @@ def test_file_upload(client):
         for fp in files:
             fp[0].close()
 
+def test_post_layers_complex(client):
     username = 'testuser2'
     rest_path = url_for('post_layers', username=username)
+    file_paths = [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
     sld_path = 'sample/style/generic-blue.xml'
     assert os.path.isfile(sld_path)
     layername = ''
@@ -203,6 +217,12 @@ def test_file_upload(client):
     ]:
         assert 'status' not in resp_json[source]
 
+    feature_type = get_feature_type(username, 'postgresql', layername)
+    attributes = feature_type['attributes']['attribute']
+    assert next((
+        a for a in attributes if a['name'] == 'sovereignt'
+    ), None) is not None
+
 
 def test_get_layers(client):
     username = 'testuser1'
@@ -235,3 +255,61 @@ def test_put_layer_title(client):
     resp_json = rv.get_json()
     assert resp_json['title'] == "New Title of Countries"
     assert resp_json['description'] == "and new description"
+
+def test_put_layer_style(client):
+    username = 'testuser1'
+    layername = 'ne_110m_admin_0_countries'
+    rest_path = url_for('put_layer', username=username, layername=layername)
+    sld_path = 'sample/style/generic-blue.xml'
+    assert os.path.isfile(sld_path)
+    with layman.app_context():
+        rv = client.put(rest_path, data={
+            'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
+            'title': 'countries in blue'
+        })
+    assert rv.status_code == 200
+
+    resp_json = rv.get_json()
+    assert resp_json['title'] == "countries in blue"
+
+    wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
+    wms = wms_proxy(wms_url)
+    assert layername in wms.contents
+    assert wms[layername].title == 'countries in blue'
+    assert wms[layername].styles[
+        username+':'+layername]['title'] == 'Generic Blue'
+
+
+def test_put_layer_data(client):
+    username = 'testuser2'
+    layername = 'countries'
+    rest_path = url_for('put_layer', username=username, layername=layername)
+    file_paths = [
+        'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
+                 file_paths]
+        with layman.app_context():
+            rv = client.put(rest_path, data={
+                'file': files,
+                'title': 'populated places'
+            })
+        assert rv.status_code == 200
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    resp_json = rv.get_json()
+    assert resp_json['title'] == "populated places"
+    feature_type = get_feature_type(username, 'postgresql', layername)
+    attributes = feature_type['attributes']['attribute']
+    assert next((
+        a for a in attributes if a['name'] == 'sovereignt'
+    ), None) is None
+    assert next((
+        a for a in attributes if a['name'] == 'adm0cap'
+    ), None) is not None
