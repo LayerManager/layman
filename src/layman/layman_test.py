@@ -1,6 +1,7 @@
 import io
 
 import pytest
+import unittest
 from flask import url_for
 
 from layman.geoserver.util import get_feature_type, wms_proxy
@@ -139,6 +140,37 @@ def test_post_layers_simple(client):
     wms = wms_proxy(wms_url)
     assert 'ne_110m_admin_0_countries' in wms.contents
 
+def test_post_layers_shp(client):
+    username = 'testuser1'
+    rest_path = url_for('post_layers', username=username)
+    file_paths = [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.prj',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.README.html',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shx',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.VERSION.txt',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with layman.app_context():
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': 'ne_110m_admin_0_countries_shp'
+            })
+        assert rv.status_code == 200
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
+    wms = wms_proxy(wms_url)
+    assert 'ne_110m_admin_0_countries_shp' in wms.contents
+
 
 def test_post_layers_layer_exists(client):
     username = 'testuser1'
@@ -230,8 +262,11 @@ def test_get_layers(client):
         rv = client.get(url_for('get_layers', username=username))
     resp_json = rv.get_json()
     assert rv.status_code==200
-    assert len(resp_json) == 1
-    assert resp_json[0]['name'] == 'ne_110m_admin_0_countries'
+    assert len(resp_json) == 2
+    assert sorted(map(lambda l: l['name'], resp_json)) == [
+        'ne_110m_admin_0_countries',
+        'ne_110m_admin_0_countries_shp'
+    ]
 
     username = 'testuser2'
     with layman.app_context():

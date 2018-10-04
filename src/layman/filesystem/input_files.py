@@ -54,9 +54,19 @@ def get_layer_names(username):
     return layer_names
 
 
+def get_ogr_driver(main_filepath):
+    ext_to_ogr_driver = {
+        '.shp': "ESRI Shapefile",
+        '.geojson': "GeoJSON",
+    }
+    ext = os.path.splitext(main_filepath)[1]
+    driver_name = ext_to_ogr_driver.get(ext, None)
+    return ogr.GetDriverByName(driver_name)
+
+
 def check_main_file(main_filepath):
     # check feature layers in source file
-    inDriver = ogr.GetDriverByName("GeoJSON")
+    inDriver = get_ogr_driver(main_filepath)
     inDataSource = inDriver.Open(main_filepath, 0)
     n_layers = inDataSource.GetLayerCount()
     if n_layers != 1:
@@ -64,7 +74,7 @@ def check_main_file(main_filepath):
 
 
 def check_layer_crs(main_filepath):
-    inDriver = ogr.GetDriverByName("GeoJSON")
+    inDriver = get_ogr_driver(main_filepath)
     inDataSource = inDriver.Open(main_filepath, 0)
     feature_layer = inDataSource.GetLayerByIndex(0)
 

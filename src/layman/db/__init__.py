@@ -73,6 +73,10 @@ def import_layer_vector_file(username, layername, main_filepath, crs_id):
         bash_args.extend([
             '-s_srs', crs_id,
         ])
+    if os.path.splitext(main_filepath)[1] == '.shp':
+        bash_args.extend([
+            '-nlt', 'PROMOTE_TO_MULTI',
+        ])
     bash_args.extend([
         '{}'.format(main_filepath),
     ])
