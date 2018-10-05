@@ -96,13 +96,37 @@ def save_files(files, filepath_mapping):
         file.save(filepath_mapping[file.filename])
 
 
-def save_layer_files(username, layername, files):
+def save_layer_files(username, layername, files, check_crs):
     filenames = list(map(lambda f: f.filename, files))
     main_filename = get_main_file_name(filenames)
     if main_filename is None:
         raise LaymanError(2, {'parameter': 'file', 'expected': \
             'At least one file with any of extensions: ' + \
             ', '.join(MAIN_FILE_EXTENSIONS)})
+    basename, ext = map(
+        lambda s: s.lower(),
+        os.path.splitext(main_filename)
+    )
+    if ext == '.shp':
+        lower_filenames = list(map(
+            lambda fn: fn.lower(),
+            filenames
+        ))
+        shp_exts = ['.dbf', '.shx']
+        if check_crs:
+            shp_exts.append('.prj')
+        missing_exts = list(filter(
+            lambda e: basename+e not in lower_filenames,
+            shp_exts
+        ))
+        if len(missing_exts) > 0:
+            detail = {
+                'missing_extensions': missing_exts
+            }
+            if '.prj' in missing_exts:
+                detail['suggestion'] = 'Missing .prj file can be fixed also ' \
+                                       'by setting "crs" parameter.'
+            raise LaymanError(18, detail)
     userdir = get_user_dir(username)
     filename_mapping, filepath_mapping = get_file_name_mappings(
         filenames, main_filename, layername, userdir
@@ -121,6 +145,8 @@ def save_layer_files(username, layername, files):
     #                         if v is not None})
 
     check_main_file(filepath_mapping[main_filename])
+    if check_crs:
+        check_layer_crs(filepath_mapping[main_filename])
     main_filename = filename_mapping[main_filename]
     return main_filename
 

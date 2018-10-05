@@ -113,13 +113,6 @@ def test_post_layers_simple(client):
     username = 'testuser1'
     rest_path = url_for('post_layers', username=username)
     file_paths = [
-        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
-        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
-        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.prj',
-        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.README.html',
-        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp',
-        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shx',
-        # 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.VERSION.txt',
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
     for fp in file_paths:
@@ -139,6 +132,36 @@ def test_post_layers_simple(client):
     wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
     assert 'ne_110m_admin_0_countries' in wms.contents
+
+
+def test_post_layers_shp_missing_extensions(client):
+    username = 'testuser1'
+    rest_path = url_for('post_layers', username=username)
+    file_paths = [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.VERSION.txt',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with layman.app_context():
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': 'ne_110m_admin_0_countries_shp'
+            })
+        resp_json = rv.get_json()
+        # print(resp_json)
+        assert rv.status_code == 400
+        assert resp_json['code']==18
+        assert sorted(resp_json['detail']['missing_extensions']) == [
+            '.prj', '.shx']
+    finally:
+        for fp in files:
+            fp[0].close()
+
 
 def test_post_layers_shp(client):
     username = 'testuser1'

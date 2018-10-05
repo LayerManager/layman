@@ -88,10 +88,9 @@ def post_layers(username):
 
     # save files
     userdir = filesystem.ensure_user_dir(username)
-    main_filename = input_files.save_layer_files(username, layername, files)
+    main_filename = input_files.save_layer_files(username, layername, files,
+                                                 check_crs)
     main_filepath = os.path.join(userdir, main_filename)
-    if check_crs:
-        input_files.check_layer_crs(main_filepath)
 
     # import into DB table
     db.ensure_user_schema(username)
@@ -187,11 +186,9 @@ def put_layer(username, layername):
 
             # save files
             main_filename = input_files.save_layer_files(username, layername,
-                                                         files)
+                                                         files, check_crs)
             userdir = get_user_dir(username)
             main_filepath = os.path.join(userdir, main_filename)
-            if check_crs:
-                input_files.check_layer_crs(main_filepath)
 
             # import into DB table
             db.import_layer_vector_file(username, layername, main_filepath,
