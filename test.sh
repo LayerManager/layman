@@ -5,6 +5,7 @@ bash src/clear-python-cache.sh
 bash src/ensure-test-client.sh
 
 mkdir -p tmp/naturalearth/110m/cultural
+mkdir -p tmp/naturalearth/10m/cultural
 
 ne_110m_cultural=tmp/naturalearth/110m_cultural.zip
 if ! [ -f $ne_110m_cultural ]; then
@@ -15,6 +16,11 @@ fi
 ne_110m_cultural_admin_0_countries=tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson
 if ! [ -f $ne_110m_cultural_admin_0_countries ]; then
   curl -L -o $ne_110m_cultural_admin_0_countries "https://github.com/nvkelso/natural-earth-vector/raw/master/geojson/ne_110m_admin_0_countries.geojson"
+fi
+
+ne_10m_cultural_admin_0_countries=tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson
+if ! [ -f $ne_10m_cultural_admin_0_countries ]; then
+  curl -L -o $ne_10m_cultural_admin_0_countries "https://github.com/nvkelso/natural-earth-vector/raw/master/geojson/ne_10m_admin_0_countries.geojson"
 fi
 
 ne_110m_cultural_populated_places=tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson
