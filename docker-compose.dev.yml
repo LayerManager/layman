@@ -25,6 +25,41 @@ services:
         geoserver:
           condition: service_healthy
 
+   redis:
+      image: redis:3.0.0
+
+   celery_worker:
+      image: layman:latest
+      # use watchdog
+      command: bash -c "cd src && watchmedo auto-restart -d . -p '*.py' --recursive -- python3 -m celery -A layman.celery_app worker --loglevel=info"
+#      command: bash -c "cd src && python3 -m celery -A layman.celery_app worker --loglevel=info"
+      env_file: .env.dev
+      environment:
+        - C_FORCE_ROOT=true
+      volumes:
+        - ./geoserver_data:/geoserver_data
+        - ./sample:/code/sample
+        - ./src:/code/src
+        - ./tmp:/code/tmp
+      depends_on:
+        - layman
+        - redis
+
+   flower:
+      container_name: flower
+      image: layman:latest
+      command: bash -c "cd src && python3 -m flower -A layman.celery_app --port=5555"
+      env_file: .env.dev
+      volumes:
+        - ./geoserver_data:/geoserver_data
+        - ./sample:/code/sample
+        - ./src:/code/src
+        - ./tmp:/code/tmp
+      ports:
+        - 5555:5555
+      depends_on:
+        - celery_worker
+
    db:
       image: kartoza/postgis:10.0-2.4
       volumes:

@@ -33,6 +33,14 @@ restart-geoserver-dev:
 	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman bash -c "bash /code/src/reset-layman-gs-datadir.sh && python3 src/prepare_layman.py"
 	docker-compose -f docker-compose.dev.yml up --no-deps -d geoserver
 
+restart-celery-dev:
+	docker-compose -f docker-compose.dev.yml stop flower
+	docker-compose -f docker-compose.dev.yml stop celery_worker
+	docker-compose -f docker-compose.dev.yml stop redis
+	docker-compose -f docker-compose.dev.yml up --no-deps -d redis
+	docker-compose -f docker-compose.dev.yml up --no-deps -d celery_worker
+	docker-compose -f docker-compose.dev.yml up --no-deps -d flower
+
 start-layman-production:
 	docker-compose -f docker-compose.production.yml up -d
 

@@ -10,11 +10,16 @@ from layman.filesystem import input_files
 from layman import geoserver
 from layman.geoserver import sld
 from layman import util
+from .make_celery import make_celery
 from .http import LaymanError
 from .settings import *
 
 app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
+
+celery_app = make_celery(app)
+
+celery_tasks = {}
 
 @app.route('/')
 def index():
@@ -112,6 +117,36 @@ def post_layers(username):
     return jsonify([{
         'name': layername,
         'url': layerurl,
+    }]), 200
+
+@app.route('/rest/<username>/test', methods=['GET'])
+def test(username):
+    app.logger.info('GET test')
+
+    insp = celery_app.control.inspect()
+    actives = str(insp.active())
+
+
+    from layman.db import tasks
+
+    app.logger.info('GET test done')
+    all_task_states = {id: r.state for id,r in celery_tasks.items()}
+    tasks_to_kill = [r for r in celery_tasks.values() if r.state not in \
+        ['SUCCESS', 'REVOKED']]
+
+    for t in tasks_to_kill:
+        app.logger.info('ABORTING '+t.id)
+        t.abort()
+
+    res = tasks.long.apply_async(('','','',''))
+    if isinstance(res.id, str) and len(res.id) > 0:
+        celery_tasks[res.id] = res
+
+    return jsonify([{
+        'done': True,
+        'tasks': all_task_states,
+        'tasks_to_kill': [r.id for r in tasks_to_kill],
+        'active_tasks': actives,
     }]), 200
 
 
