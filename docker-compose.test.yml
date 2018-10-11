@@ -24,6 +24,8 @@ services:
           condition: service_healthy
         geoserver:
           condition: service_healthy
+        celery_worker_test:
+          condition: service_healthy
 
    db:
       image: kartoza/postgis:10.0-2.4
@@ -56,4 +58,22 @@ services:
         interval: 1m30s
         timeout: 10s
         retries: 3
+
+   redis:
+      image: redis:3.0.0
+
+   celery_worker_test:
+      image: layman:latest
+      # use watchdog
+      command: bash -c "cd src && watchmedo auto-restart -d . -p '*.py' --recursive -- python3 -m celery -Q $${LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info"
+      env_file: .env.test
+      environment:
+        - C_FORCE_ROOT=true
+      volumes:
+        - ./geoserver_data:/geoserver_data
+        - ./sample:/code/sample
+        - ./src:/code/src
+        - ./tmp:/code/tmp
+      depends_on:
+        - redis
 

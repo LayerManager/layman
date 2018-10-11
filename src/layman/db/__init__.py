@@ -93,7 +93,8 @@ def import_layer_vector_file_async(username, layername, main_filepath,
     ])
 
     # print(' '.join(bash_args))
-    p = subprocess.Popen(bash_args, stdout=subprocess.PIPE)
+    p = subprocess.Popen(bash_args, stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT)
     return p
 
 

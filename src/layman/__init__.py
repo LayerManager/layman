@@ -1,3 +1,4 @@
+import time
 import base64
 import re
 
@@ -18,6 +19,8 @@ app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
 
 celery_app = make_celery(app)
+from layman.db import tasks
+
 
 celery_tasks = {}
 
@@ -43,6 +46,19 @@ def get_layers(username):
         layernames
     ))
     return jsonify(infos), 200
+
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        msg = '{:s} function took {:.3f} ms'.format(f.__name__, (time2-time1)*1000.0)
+        # app.logger.info(msg)
+        # print(msg)
+
+        return ret
+    return wrap
+
 
 
 @app.route('/rest/<username>/layers', methods=['POST'])
@@ -93,23 +109,29 @@ def post_layers(username):
 
     # save files
     userdir = filesystem.ensure_user_dir(username)
-    main_filename = input_files.save_layer_files(username, layername, files,
+    main_filename = timing(input_files.save_layer_files)(username, layername,
+                                                        files,
                                                  check_crs)
     main_filepath = os.path.join(userdir, main_filename)
 
     # import into DB table
     db.ensure_user_schema(username)
-    db.import_layer_vector_file(username, layername, main_filepath, crs_id)
+    # timing(db.import_layer_vector_file)(username, layername, main_filepath, crs_id)
+    res = db.tasks.import_layer_vector_file.apply_async((username,
+                                                          layername, main_filepath,
+                                    crs_id), queue=LAYMAN_CELERY_QUEUE)
+    res.get()
 
     # publish layer to GeoServer
     geoserver.ensure_user_workspace(username)
-    geoserver.publish_layer_from_db(username, layername, description, title)
+    timing(geoserver.publish_layer_from_db)(username, layername, description,
+                                           title)
 
     # create SLD style
-    geoserver.sld.create_layer_style(username, layername, sld_file)
+    timing(geoserver.sld.create_layer_style)(username, layername, sld_file)
 
     # generate thumbnail
-    filesystem.thumbnail.generate_layer_thumbnail(username, layername)
+    timing(filesystem.thumbnail.generate_layer_thumbnail)(username, layername)
 
     layerurl = url_for('get_layer', layername=layername, username=username)
 
@@ -127,7 +149,6 @@ def test(username):
     actives = str(insp.active())
 
 
-    from layman.db import tasks
 
     app.logger.info('GET test done')
     all_task_states = {id: r.state for id,r in celery_tasks.items()}
@@ -138,7 +159,7 @@ def test(username):
         app.logger.info('ABORTING '+t.id)
         t.abort()
 
-    res = tasks.long.apply_async(('','','',''))
+    res = db.tasks.long.apply_async(('','','',''), queue=LAYMAN_CELERY_QUEUE)
     if isinstance(res.id, str) and len(res.id) > 0:
         celery_tasks[res.id] = res
 
