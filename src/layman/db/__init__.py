@@ -56,6 +56,17 @@ def ensure_user_schema(username, conn_cur=None):
 
 # def import_layer_vector_file(username, layername, main):
 def import_layer_vector_file(username, layername, main_filepath, crs_id):
+    p = import_layer_vector_file_async(username, layername, main_filepath,
+                                    crs_id)
+    while p.poll() is None:
+        pass
+    return_code = p.poll()
+    if return_code != 0:
+        raise LaymanError(11)
+
+
+def import_layer_vector_file_async(username, layername, main_filepath,
+                                    crs_id):
     # import file to database table
     import subprocess
     bash_args = [
@@ -81,10 +92,9 @@ def import_layer_vector_file(username, layername, main_filepath, crs_id):
         '{}'.format(main_filepath),
     ])
 
-    # app.logger.info(' '.join(bash_args))
-    return_code = subprocess.call(bash_args)
-    if return_code != 0:
-        raise LaymanError(11)
+    # print(' '.join(bash_args))
+    p = subprocess.Popen(bash_args, stdout=subprocess.PIPE)
+    return p
 
 
 def check_new_layername(username, layername, conn_cur=None):
