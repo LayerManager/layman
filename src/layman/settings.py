@@ -81,6 +81,9 @@ PG_CONN_TEMPLATE = "host='{}' port='{}' dbname='{}' user='{}' password='{" \
     os.environ['LAYMAN_PG_PASSWORD'],
 )
 
+LAYMAN_CELERY_QUEUE = os.environ['LAYMAN_CELERY_QUEUE']
+
+
 SOURCES = [
     'layman.filesystem.input_files',
     'layman.db.table',

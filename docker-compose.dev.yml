@@ -31,7 +31,7 @@ services:
    celery_worker:
       image: layman:latest
       # use watchdog
-      command: bash -c "cd src && watchmedo auto-restart -d . -p '*.py' --recursive -- python3 -m celery -A layman.celery_app worker --loglevel=info"
+      command: bash -c "cd src && watchmedo auto-restart -d . -p '*.py' --recursive -- python3 -m celery -Q $${LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info"
 #      command: bash -c "cd src && python3 -m celery -A layman.celery_app worker --loglevel=info"
       env_file: .env.dev
       environment:
