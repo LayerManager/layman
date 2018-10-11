@@ -7,8 +7,9 @@ def make_celery(app):
         backend='redis://redis:6379/0',
         broker='redis://redis:6379/0',
         include=[
-            # 'layman.tasks',
             'layman.db.tasks',
+            'layman.filesystem.tasks',
+            'layman.geoserver.tasks',
         ],
     )
     # celery.conf.update(app.config)

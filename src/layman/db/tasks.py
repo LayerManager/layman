@@ -43,7 +43,7 @@ def import_layer_vector_file(self, username, layername, main_filepath, crs_id):
         p.terminate()
         delete_layer(username, layername)
     else:
-        logger.info('STDOUT', p.stdout.read())
+        # logger.info('STDOUT', p.stdout.read())
         return_code = p.poll()
         if return_code != 0:
             raise LaymanError(11)
