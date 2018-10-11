@@ -34,11 +34,13 @@ restart-geoserver-dev:
 	docker-compose -f docker-compose.dev.yml up --no-deps -d geoserver
 
 restart-celery-dev:
-	docker-compose -f docker-compose.dev.yml stop flower
-	docker-compose -f docker-compose.dev.yml stop celery_worker
-	docker-compose -f docker-compose.dev.yml stop redis
+	docker-compose -f docker-compose.dev.yml rm -fsv flower
+	docker-compose -f docker-compose.dev.yml rm -fsv celery_worker
+	docker-compose -f docker-compose.test.yml rm -fsv celery_worker_test
+	docker-compose -f docker-compose.dev.yml rm -fsv redis
 	docker-compose -f docker-compose.dev.yml up --no-deps -d redis
 	docker-compose -f docker-compose.dev.yml up --no-deps -d celery_worker
+	docker-compose -f docker-compose.test.yml up --no-deps -d celery_worker_test
 	docker-compose -f docker-compose.dev.yml up --no-deps -d flower
 
 start-layman-production:

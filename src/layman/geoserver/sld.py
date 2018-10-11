@@ -57,14 +57,16 @@ def get_layer_names(username):
     return []
 
 
-def create_layer_style(username, layername, sld_file):
-    if sld_file is None:
+def create_layer_style(username, layername, sld_path):
+    if sld_path is None:
         r = requests.get(
             urljoin(LAYMAN_GS_REST_STYLES, 'generic.sld'),
             auth=LAYMAN_GS_AUTH
         )
         r.raise_for_status()
         sld_file = io.BytesIO(r.content)
+    else:
+        sld_file = open(sld_path, 'rb')
     r = requests.post(
         urljoin(LAYMAN_GS_REST_WORKSPACES, username + '/styles/'),
         data=json.dumps(

@@ -20,6 +20,8 @@ app.secret_key = os.environ['FLASK_SECRET_KEY']
 
 celery_app = make_celery(app)
 from layman.db import tasks
+from layman.geoserver import tasks
+from layman.filesystem import tasks
 
 
 celery_tasks = {}
@@ -103,35 +105,51 @@ def post_layers(username):
     description = request.form.get('description', '')
 
     # SLD
+    userdir = filesystem.ensure_user_dir(username)
     sld_file = None
+    sld_path = None
     if 'sld' in request.files:
         sld_file = request.files['sld']
+        sld_path = os.path.join(userdir, layername+'.sld')
 
     # save files
-    userdir = filesystem.ensure_user_dir(username)
     main_filename = timing(input_files.save_layer_files)(username, layername,
                                                         files,
                                                  check_crs)
     main_filepath = os.path.join(userdir, main_filename)
+    if sld_file is not None:
+        sld_file.save(sld_path)
 
     # import into DB table
     db.ensure_user_schema(username)
     # timing(db.import_layer_vector_file)(username, layername, main_filepath, crs_id)
-    res = db.tasks.import_layer_vector_file.apply_async((username,
-                                                          layername, main_filepath,
-                                    crs_id), queue=LAYMAN_CELERY_QUEUE)
+    res = db.tasks.import_layer_vector_file.apply_async(
+        (username, layername, main_filepath, crs_id),
+        queue=LAYMAN_CELERY_QUEUE)
     res.get()
 
     # publish layer to GeoServer
     geoserver.ensure_user_workspace(username)
-    timing(geoserver.publish_layer_from_db)(username, layername, description,
-                                           title)
+    # timing(geoserver.publish_layer_from_db)(username, layername, description,
+    #                                        title)
+    res = geoserver.tasks.publish_layer_from_db.apply_async(
+        (username, layername, description, title),
+        queue=LAYMAN_CELERY_QUEUE)
+    res.get()
 
     # create SLD style
-    timing(geoserver.sld.create_layer_style)(username, layername, sld_file)
+    # timing(geoserver.sld.create_layer_style)(username, layername, sld_path)
+    res = geoserver.tasks.create_layer_style.apply_async(
+        (username, layername, sld_path),
+        queue=LAYMAN_CELERY_QUEUE)
+    res.get()
 
     # generate thumbnail
-    timing(filesystem.thumbnail.generate_layer_thumbnail)(username, layername)
+    # timing(filesystem.thumbnail.generate_layer_thumbnail)(username, layername)
+    res = filesystem.tasks.generate_layer_thumbnail.apply_async(
+        (username, layername),
+        queue=LAYMAN_CELERY_QUEUE)
+    res.get()
 
     layerurl = url_for('get_layer', layername=layername, username=username)
 
@@ -224,9 +242,12 @@ def put_layer(username, layername):
         update_info = True
 
     # SLD
+    userdir = get_user_dir(username)
     sld_file = None
+    sld_path = None
     if 'sld' in request.files:
         sld_file = request.files['sld']
+        sld_path = os.path.join(userdir, layername+'.sld')
 
     delete_from = None
     if sld_file is not None:
@@ -238,12 +259,14 @@ def put_layer(username, layername):
         util.update_layer(username, layername, info)
     if delete_from is not None:
         deleted = util.delete_layer(username, layername, source=delete_from)
+        if sld_file is not None:
+            sld_file.save(sld_path)
+
         if delete_from == 'layman.filesystem.input_files':
 
             # save files
             main_filename = input_files.save_layer_files(username, layername,
                                                          files, check_crs)
-            userdir = get_user_dir(username)
             main_filepath = os.path.join(userdir, main_filename)
 
             # import into DB table
@@ -257,9 +280,12 @@ def put_layer(username, layername):
 
         if sld_file is None:
             sld_file = deleted['sld']['file']
+            sld_path = os.path.join(userdir, layername + '.sld')
+            with open(sld_path, 'wb') as out:
+                out.write(sld_file.read())
 
         # create SLD style
-        geoserver.sld.create_layer_style(username, layername, sld_file)
+        geoserver.sld.create_layer_style(username, layername, sld_path)
 
         # generate thumbnail
         filesystem.thumbnail.generate_layer_thumbnail(username, layername)
