@@ -270,13 +270,21 @@ def put_layer(username, layername):
             main_filepath = os.path.join(userdir, main_filename)
 
             # import into DB table
-            db.import_layer_vector_file(username, layername, main_filepath,
-                                        crs_id)
+            # db.import_layer_vector_file(username, layername, main_filepath,
+            #                             crs_id)
+            res = db.tasks.import_layer_vector_file.apply_async(
+                (username, layername, main_filepath, crs_id),
+                queue=LAYMAN_CELERY_QUEUE)
+            res.get()
 
             # publish layer to GeoServer
             geoserver.ensure_user_workspace(username)
-            geoserver.publish_layer_from_db(username, layername,
-                                            info['description'], info['title'])
+            # geoserver.publish_layer_from_db(username, layername,
+            #                                 info['description'], info['title'])
+            res = geoserver.tasks.publish_layer_from_db.apply_async(
+                (username, layername, info['description'], info['title']),
+                queue=LAYMAN_CELERY_QUEUE)
+            res.get()
 
         if sld_file is None:
             sld_file = deleted['sld']['file']
@@ -285,10 +293,18 @@ def put_layer(username, layername):
                 out.write(sld_file.read())
 
         # create SLD style
-        geoserver.sld.create_layer_style(username, layername, sld_path)
+        # geoserver.sld.create_layer_style(username, layername, sld_path)
+        res = geoserver.tasks.create_layer_style.apply_async(
+            (username, layername, sld_path),
+            queue=LAYMAN_CELERY_QUEUE)
+        res.get()
 
         # generate thumbnail
         filesystem.thumbnail.generate_layer_thumbnail(username, layername)
+        res = filesystem.tasks.generate_layer_thumbnail.apply_async(
+            (username, layername),
+            queue=LAYMAN_CELERY_QUEUE)
+        res.get()
 
     app.logger.info('PUT Layer changes done')
     info = util.get_complete_layer_info(username, layername)
