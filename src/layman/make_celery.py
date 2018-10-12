@@ -1,4 +1,5 @@
 from celery import Celery
+from celery.contrib import abortable
 
 def make_celery(app):
     celery_app = Celery(
@@ -24,5 +25,11 @@ def make_celery(app):
             with app.app_context():
                 return self.run(*args, **kwargs)
 
+    class AbortableTask(abortable.AbortableTask):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
     celery_app.Task = Task
+    celery_app.AbortableTask = AbortableTask
     return celery_app

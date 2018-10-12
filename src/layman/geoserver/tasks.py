@@ -1,9 +1,6 @@
-from . import wms
-from . import wfs
-from . import sld
+from . import wms, wfs, sld, ensure_user_workspace
 from layman import geoserver
 from layman import celery_app
-from celery.contrib.abortable import AbortableTask
 from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
@@ -11,9 +8,23 @@ logger = get_task_logger(__name__)
 @celery_app.task(
     name='layman.geoserver.publish_layer_from_db',
     bind=True,
-    base=AbortableTask
+    base=celery_app.AbortableTask
 )
-def publish_layer_from_db(self, username, layername, description, title):
+def publish_layer_from_db(
+        self,
+        username,
+        layername,
+        description=None,
+        title=None,
+        ensure_user=False
+    ):
+    if description is None:
+        description = layername
+    if title is None:
+        title = layername
+    if ensure_user:
+        ensure_user_workspace(username)
+
     geoserver.publish_layer_from_db(username, layername, description, title)
 
     if self.is_aborted():
@@ -24,7 +35,7 @@ def publish_layer_from_db(self, username, layername, description, title):
 @celery_app.task(
     name='layman.geoserver.sld.create_layer_style',
     bind=True,
-    base=AbortableTask
+    base=celery_app.AbortableTask
 )
 def create_layer_style(self, username, layername):
     sld.create_layer_style(username, layername)

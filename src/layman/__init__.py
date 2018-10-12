@@ -1,6 +1,4 @@
 import time
-import base64
-import re
 
 from flask import Flask, request, redirect, jsonify, url_for, send_file
 
@@ -10,8 +8,6 @@ from layman.filesystem import thumbnail, get_user_dir
 from layman.filesystem import input_files
 from layman.filesystem import input_sld
 from layman import geoserver
-from layman.geoserver import sld
-from layman import util
 from .make_celery import make_celery
 from .http import LaymanError
 from .settings import *
@@ -20,6 +16,7 @@ app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
 
 celery_app = make_celery(app)
+from layman import util
 from layman.db import tasks
 from layman.geoserver import tasks
 from layman.filesystem import tasks
@@ -115,36 +112,13 @@ def post_layers(username):
     timing(input_files.save_layer_files)(username, layername, files, check_crs)
     input_sld.save_layer_file(username, layername, sld_file)
 
-    # import into DB table
-    db.ensure_user_schema(username)
-    # timing(db.tasks.import_layer_vector_file)(username, layername, crs_id)
-    res = db.tasks.import_layer_vector_file.apply_async(
-        (username, layername, crs_id),
-        queue=LAYMAN_CELERY_QUEUE)
-    res.get()
-
-    # publish layer to GeoServer
-    geoserver.ensure_user_workspace(username)
-    # timing(geoserver.publish_layer_from_db)(username, layername, description,
-    #                                        title)
-    res = geoserver.tasks.publish_layer_from_db.apply_async(
-        (username, layername, description, title),
-        queue=LAYMAN_CELERY_QUEUE)
-    res.get()
-
-    # create SLD style
-    # timing(geoserver.sld.create_layer_style)(username, layername, sld_path)
-    res = geoserver.tasks.create_layer_style.apply_async(
-        (username, layername),
-        queue=LAYMAN_CELERY_QUEUE)
-    res.get()
-
-    # generate thumbnail
-    # timing(filesystem.thumbnail.generate_layer_thumbnail)(username, layername)
-    res = filesystem.tasks.generate_layer_thumbnail.apply_async(
-        (username, layername),
-        queue=LAYMAN_CELERY_QUEUE)
-    res.get()
+    task_options = {
+        'crs_id': crs_id,
+        'description': description,
+        'title': title,
+        'ensure_user': True,
+    }
+    util.post_layer(username, layername, task_options)
 
     layerurl = url_for('get_layer', layername=layername, username=username)
 
