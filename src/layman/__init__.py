@@ -111,18 +111,15 @@ def post_layers(username):
         sld_file = request.files['sld']
 
     # save files
-    userdir = filesystem.ensure_user_dir(username)
-    main_filename = timing(input_files.save_layer_files)(username, layername,
-                                                        files,
-                                                 check_crs)
-    main_filepath = os.path.join(userdir, main_filename)
+    filesystem.ensure_user_dir(username)
+    timing(input_files.save_layer_files)(username, layername, files, check_crs)
     input_sld.save_layer_file(username, layername, sld_file)
 
     # import into DB table
     db.ensure_user_schema(username)
-    # timing(db.import_layer_vector_file)(username, layername, main_filepath, crs_id)
+    # timing(db.tasks.import_layer_vector_file)(username, layername, crs_id)
     res = db.tasks.import_layer_vector_file.apply_async(
-        (username, layername, main_filepath, crs_id),
+        (username, layername, crs_id),
         queue=LAYMAN_CELERY_QUEUE)
     res.get()
 
@@ -259,16 +256,13 @@ def put_layer(username, layername):
         if delete_from == 'layman.filesystem.input_files':
 
             # save files
-            main_filename = input_files.save_layer_files(username, layername,
+            input_files.save_layer_files(username, layername,
                                                          files, check_crs)
-            userdir = get_user_dir(username)
-            main_filepath = os.path.join(userdir, main_filename)
 
             # import into DB table
-            # db.import_layer_vector_file(username, layername, main_filepath,
-            #                             crs_id)
+            # timing(db.tasks.import_layer_vector_file)(username, layername, crs_id)
             res = db.tasks.import_layer_vector_file.apply_async(
-                (username, layername, main_filepath, crs_id),
+                (username, layername, crs_id),
                 queue=LAYMAN_CELERY_QUEUE)
             res.get()
 
