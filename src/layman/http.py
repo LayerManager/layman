@@ -4,7 +4,7 @@ from .error_list import ERROR_LIST
 class LaymanError(Exception):
 
     def __init__(self, code_or_message, data=None, http_code=None):
-        Exception.__init__(self)
+        # Exception.__init__(self)
 
         self.http_code = http_code
         self.data = data
