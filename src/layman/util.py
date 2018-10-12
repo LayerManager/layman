@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import importlib
+import inspect
 import re
 import unicodedata
 
@@ -8,6 +9,13 @@ from unidecode import unidecode
 
 from layman.http import LaymanError
 from layman.settings import *
+from layman import db
+from layman.db import tasks
+from layman import geoserver
+from layman.geoserver import tasks
+from layman import filesystem
+from layman.filesystem import tasks
+
 
 USERNAME_RE = r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$"
 LAYERNAME_RE = USERNAME_RE
@@ -161,6 +169,33 @@ def update_layer(username, layername, layerinfo):
             current_app.logger.warn(
                 'Module {} does not have {} method.'.format(m.__name__,
                                                             fn_name))
+
+
+def post_layer(username, layername, task_options):
+    post_tasks = [
+        db.tasks.import_layer_vector_file,
+        geoserver.tasks.publish_layer_from_db,
+        geoserver.tasks.create_layer_style,
+        filesystem.tasks.generate_layer_thumbnail,
+    ]
+
+    for task in post_tasks:
+        param_names = [
+            pname
+            for pname in inspect.signature(task).parameters.keys()
+            if pname not in ['username', 'layername']
+        ]
+        task_opts = {
+            key: value
+            for key, value in task_options.items()
+            if key in param_names
+        }
+        res = task.apply_async(
+            (username, layername),
+            task_opts,
+            queue=LAYMAN_CELERY_QUEUE
+        )
+        res.get()
 
 
 def delete_layer(username, layername, source = None):

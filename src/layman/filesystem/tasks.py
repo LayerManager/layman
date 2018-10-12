@@ -1,6 +1,5 @@
 from . import thumbnail
 from layman import celery_app
-from celery.contrib.abortable import AbortableTask
 from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
@@ -8,7 +7,7 @@ logger = get_task_logger(__name__)
 @celery_app.task(
     name='layman.filesystem.thumbnail.generate_layer_thumbnail',
     bind=True,
-    base=AbortableTask
+    base=celery_app.AbortableTask
 )
 def generate_layer_thumbnail(self, username, layername):
     thumbnail.generate_layer_thumbnail(username, layername)
