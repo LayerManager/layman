@@ -86,6 +86,7 @@ LAYMAN_CELERY_QUEUE = os.environ['LAYMAN_CELERY_QUEUE']
 
 SOURCES = [
     'layman.filesystem.input_files',
+    'layman.filesystem.input_sld',
     'layman.db.table',
     'layman.geoserver.wfs',
     'layman.geoserver.wms',
