@@ -15,6 +15,7 @@ from layman import geoserver
 from layman.geoserver import tasks
 from layman import filesystem
 from layman.filesystem import tasks
+from celery import chain
 
 
 USERNAME_RE = r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$"
@@ -179,7 +180,7 @@ def post_layer(username, layername, task_options):
         filesystem.tasks.generate_layer_thumbnail,
     ]
 
-    for task in post_tasks:
+    def get_signature(task):
         param_names = [
             pname
             for pname in inspect.signature(task).parameters.keys()
@@ -190,12 +191,16 @@ def post_layer(username, layername, task_options):
             for key, value in task_options.items()
             if key in param_names
         }
-        res = task.apply_async(
+        return task.signature(
             (username, layername),
             task_opts,
-            queue=LAYMAN_CELERY_QUEUE
+            queue=LAYMAN_CELERY_QUEUE,
+            immutable=True,
         )
-        res.get()
+
+    post_chain = chain(*list(map(get_signature, post_tasks)))
+    res = post_chain.apply_async()
+    res.get()
 
 
 def delete_layer(username, layername, source = None):
