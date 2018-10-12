@@ -26,8 +26,8 @@ def publish_layer_from_db(self, username, layername, description, title):
     bind=True,
     base=AbortableTask
 )
-def create_layer_style(self, username, layername, sld_path):
-    sld.create_layer_style(username, layername, sld_path)
+def create_layer_style(self, username, layername):
+    sld.create_layer_style(username, layername)
 
     if self.is_aborted():
         print('aborting create_layer_style', username, layername)
