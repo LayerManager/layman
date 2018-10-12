@@ -54,6 +54,13 @@ def get_layer_names(username):
     return layer_names
 
 
+def get_layer_main_file_path(username, layername):
+    userdir = get_user_dir(username)
+    pattern = os.path.join(userdir, layername+'.*')
+    filenames = glob.glob(pattern)
+    return get_main_file_name(filenames)
+
+
 def get_ogr_driver(main_filepath):
     ext_to_ogr_driver = {
         '.shp': "ESRI Shapefile",

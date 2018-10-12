@@ -1,5 +1,5 @@
 import time
-# import layman.db as db
+from layman.filesystem.input_files import get_layer_main_file_path
 from .table import delete_layer
 from .__init__ import import_layer_vector_file_async
 from layman import celery_app
@@ -33,7 +33,9 @@ def long(self, username, layername, main_filepath, crs_id):
     bind=True,
     base=AbortableTask
 )
-def import_layer_vector_file(self, username, layername, main_filepath, crs_id):
+def import_layer_vector_file(self, username, layername, crs_id):
+    main_filepath = get_layer_main_file_path(username, layername)
+    print('task import_layer_vector_file main_filepath', main_filepath)
     p = import_layer_vector_file_async(username, layername, main_filepath,
                                     crs_id)
     while p.poll() is None and not self.is_aborted():
