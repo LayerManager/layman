@@ -1,10 +1,10 @@
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import importlib
 import inspect
 import re
 import unicodedata
 
-from flask import current_app, url_for
+from flask import current_app, url_for, g
 from unidecode import unidecode
 
 from layman.http import LaymanError
@@ -124,6 +124,17 @@ def get_layer_info(username, layername):
             current_app.logger.warn(
                 'Module {} does not have {} method.'.format(m.__name__,
                                                             fn_name))
+
+    layer_tasks = get_layer_not_ready_tasks(username, layername)
+    for task_name, linfo_keys in TASKS_TO_LAYER_INFO_KEYS.items():
+        for tinfo in layer_tasks:
+            if task_name in tinfo['by_name']:
+                res = tinfo['by_name'][task_name]
+                if not res.ready():
+                    for linfo_key in linfo_keys:
+                        partial_info[linfo_key] = {
+                            'status': res.state
+                        }
     return partial_info
 
 def get_complete_layer_info(username, layername):
@@ -199,8 +210,32 @@ def post_layer(username, layername, task_options):
         )
 
     post_chain = chain(*list(map(get_signature, post_tasks)))
-    res = post_chain.apply_async()
-    res.get()
+    # res = post_chain.apply_async()
+    res = post_chain()
+
+    layer_tasks = get_layer_tasks(username, layername)
+    tinfo = {
+        'last': res,
+        'by_name': {
+            'layman.db.import_layer_vector_file': res.parent.parent.parent,
+            'layman.geoserver.publish_layer_from_db': res.parent.parent,
+            'layman.geoserver.sld.create_layer_style': res.parent,
+            'layman.filesystem.thumbnail.generate_layer_thumbnail': res,
+        },
+        'by_order': [
+            res.parent.parent.parent,
+            res.parent.parent,
+            res.parent,
+            res,
+        ]
+    }
+    layer_tasks.append(tinfo)
+
+TASKS_TO_LAYER_INFO_KEYS = {
+    'layman.db.import_layer_vector_file': ['db_table'],
+    'layman.geoserver.publish_layer_from_db': ['wms', 'wfs'],
+    'layman.filesystem.thumbnail.generate_layer_thumbnail': ['thumbnail'],
+}
 
 
 def delete_layer(username, layername, source = None):
@@ -222,3 +257,20 @@ def delete_layer(username, layername, source = None):
                 'Module {} does not have {} method.'.format(m.__name__,
                                                             fn_name))
     return result
+
+
+USER_TASKS = defaultdict(lambda: defaultdict(list))
+
+
+def get_layer_tasks(username, layername):
+    layertasks = USER_TASKS[username][layername]
+    return layertasks
+
+
+def get_layer_not_ready_tasks(username, layername):
+    layertasks = get_layer_tasks(username, layername)
+    layertasks = list(filter(
+        lambda t: not t['last'].ready(),
+        layertasks
+    ))
+    return layertasks

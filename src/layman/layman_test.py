@@ -6,6 +6,7 @@ from flask import url_for
 
 from layman.geoserver.util import get_feature_type, wms_proxy
 from layman import app as layman
+from layman import util
 from .settings import *
 
 min_geojson = """
@@ -129,9 +130,26 @@ def test_post_layers_simple(client):
         for fp in files:
             fp[0].close()
 
+    layername = 'ne_110m_admin_0_countries'
+
+    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
+    assert len(layer_tasks) == 1
+
+    layer_info = util.get_layer_info(username, layername)
+    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
+    for key_to_check in keys_to_check:
+            assert 'status' in layer_info[key_to_check]
+
+    layer_tasks[0]['last'].get()
+
+    layer_info = util.get_layer_info(username, layername)
+    for key_to_check in keys_to_check:
+            assert isinstance(layer_info[key_to_check], str) \
+                   or 'status' not in layer_info[key_to_check]
+
     wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
-    assert 'ne_110m_admin_0_countries' in wms.contents
+    assert layername in wms.contents
 
 
 def test_post_layers_shp_missing_extensions(client):
@@ -165,6 +183,7 @@ def test_post_layers_shp_missing_extensions(client):
 
 def test_post_layers_shp(client):
     username = 'testuser1'
+    layername = 'ne_110m_admin_0_countries_shp'
     rest_path = url_for('post_layers', username=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
@@ -183,12 +202,16 @@ def test_post_layers_shp(client):
         with layman.app_context():
             rv = client.post(rest_path, data={
                 'file': files,
-                'name': 'ne_110m_admin_0_countries_shp'
+                'name': layername
             })
         assert rv.status_code == 200
     finally:
         for fp in files:
             fp[0].close()
+
+    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
+    assert len(layer_tasks) == 1
+    layer_tasks[0]['last'].get()
 
     wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
@@ -246,6 +269,11 @@ def test_post_layers_complex(client):
     finally:
         for fp in files:
             fp[0].close()
+
+    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
+    assert len(layer_tasks) == 1
+    layer_tasks[0]['last'].get()
+
     wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
     assert 'countries' in wms.contents
