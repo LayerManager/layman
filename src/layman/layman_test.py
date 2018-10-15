@@ -135,6 +135,19 @@ def test_post_layers_simple(client):
     layer_tasks = util.get_layer_not_ready_tasks(username, layername)
     assert len(layer_tasks) == 1
 
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with layman.app_context():
+            rv = client.post(rest_path, data={
+                'file': files
+            })
+        assert rv.status_code == 409
+        resp_json = rv.get_json()
+        assert resp_json['code'] == 17
+    finally:
+        for fp in files:
+            fp[0].close()
+
     layer_info = util.get_layer_info(username, layername)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
     for key_to_check in keys_to_check:
