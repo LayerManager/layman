@@ -19,3 +19,7 @@ before_install:
 script:
   - make reset-layman-gs-datadir
   - make test
+
+after_failure:
+  - docker logs layman
+  - docker logs gspld_celery_worker_test_1
