@@ -236,6 +236,52 @@ def post_layer(username, layername, task_options):
     }
     layer_tasks.append(tinfo)
 
+def put_layer(username, layername, delete_from, task_options):
+    if delete_from == 'layman.filesystem.input_files':
+        start_idx = 0
+    elif delete_from == 'layman.geoserver.sld':
+        start_idx = 2
+    else:
+        raise Exception('Unsupported delete_from='+delete_from)
+
+    put_tasks = POST_TASKS[start_idx:]
+
+    post_chain = chain(*list(map(
+        lambda t: _get_task_signature(username, layername, task_options, t),
+        put_tasks
+    )))
+    # res = post_chain.apply_async()
+    res = post_chain()
+
+    tasks_by_name = {
+        'layman.geoserver.sld.create_layer_style': res.parent,
+        'layman.filesystem.thumbnail.generate_layer_thumbnail': res,
+    }
+    tasks_by_order = [
+        res.parent,
+        res,
+    ]
+    if delete_from == 'layman.filesystem.input_files':
+        tasks_by_name = {
+            **tasks_by_name,
+            **{
+                'layman.db.import_layer_vector_file': res.parent.parent.parent,
+                'layman.geoserver.publish_layer_from_db': res.parent.parent,
+            }
+        }
+        tasks_by_order = [
+            res.parent.parent.parent,
+            res.parent.parent,
+        ] + tasks_by_order
+
+    layer_tasks = get_layer_tasks(username, layername)
+    tinfo = {
+        'last': res,
+        'by_name': tasks_by_name,
+        'by_order': tasks_by_order
+    }
+    layer_tasks.append(tinfo)
+
 TASKS_TO_LAYER_INFO_KEYS = {
     'layman.db.import_layer_vector_file': ['db_table'],
     'layman.geoserver.publish_layer_from_db': ['wms', 'wfs'],
@@ -279,3 +325,17 @@ def get_layer_not_ready_tasks(username, layername):
         layertasks
     ))
     return layertasks
+
+def abort_layer_tasks(username, layername):
+    not_ready_tasks = get_layer_not_ready_tasks(username, layername)
+    for not_ready_task in not_ready_tasks:
+        task_results = list(filter(
+            lambda r: not r.ready(),
+            not_ready_task['by_order']
+        ))
+        for task_result in task_results:
+            current_app.logger.info('aborting result '+task_result.id)
+            task_result.abort()
+            # task_result.revoke()
+            task_result.get()
+            current_app.logger.info('aborted ' + task_result.id)

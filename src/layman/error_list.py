@@ -17,4 +17,5 @@ ERROR_LIST = {
     16: (404, 'Thumbnail was not found'),
     17: (409, 'Layer already exists'),
     18: (400, 'Missing one or more ShapeFile files.'),
+    19: (400, 'Layer is already in process.'),
 }

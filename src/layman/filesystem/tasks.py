@@ -10,9 +10,10 @@ logger = get_task_logger(__name__)
     base=celery_app.AbortableTask
 )
 def generate_layer_thumbnail(self, username, layername):
+    if self.is_aborted():
+        return
     thumbnail.generate_layer_thumbnail(username, layername)
 
     if self.is_aborted():
-        print('aborting generate_layer_thumbnail', username, layername)
         thumbnail.delete_layer(username, layername)
 

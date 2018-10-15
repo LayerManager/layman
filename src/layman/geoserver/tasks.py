@@ -25,10 +25,11 @@ def publish_layer_from_db(
     if ensure_user:
         ensure_user_workspace(username)
 
+    if self.is_aborted():
+        return
     geoserver.publish_layer_from_db(username, layername, description, title)
 
     if self.is_aborted():
-        print('aborting publish_layer_from_db', username, layername)
         wms.delete_layer(username, layername)
         wfs.delete_layer(username, layername)
 
@@ -38,9 +39,10 @@ def publish_layer_from_db(
     base=celery_app.AbortableTask
 )
 def create_layer_style(self, username, layername):
+    if self.is_aborted():
+        return
     sld.create_layer_style(username, layername)
 
     if self.is_aborted():
-        print('aborting create_layer_style', username, layername)
         sld.delete_layer(username, layername)
 

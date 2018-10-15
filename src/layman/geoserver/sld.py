@@ -45,7 +45,7 @@ def delete_layer(username, layername):
             }
         }
     except Exception:
-        traceback.print_exc()
+        # traceback.print_exc()
         pass
     return {}
 

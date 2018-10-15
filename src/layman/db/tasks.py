@@ -1,4 +1,5 @@
 import time
+import celery
 from layman.filesystem.input_files import get_layer_main_file_path
 from .table import delete_layer
 from . import import_layer_vector_file_async, ensure_user_schema
@@ -41,15 +42,17 @@ def import_layer_vector_file(
     ):
     if ensure_user:
         ensure_user_schema(username)
+    if self.is_aborted():
+        return
     main_filepath = get_layer_main_file_path(username, layername)
-    print('task import_layer_vector_file main_filepath', main_filepath)
     p = import_layer_vector_file_async(username, layername, main_filepath,
                                     crs_id)
     while p.poll() is None and not self.is_aborted():
         pass
     if self.is_aborted():
-        print('aborting import_layer_vector_file_async', username, layername)
+        logger.info('aborting'.format(username, layername))
         p.terminate()
+        logger.info('aborted'.format(username, layername))
         delete_layer(username, layername)
     else:
         # logger.info('STDOUT', p.stdout.read())
