@@ -184,6 +184,10 @@ def put_layer(username, layername):
     # LAYER
     util.check_layername(layername)
 
+    not_ready_tasks = util.get_layer_not_ready_tasks(username, layername)
+    if len(not_ready_tasks):
+        raise LaymanError(19)
+
     info = util.get_complete_layer_info(username, layername)
 
     # FILE
@@ -236,34 +240,13 @@ def put_layer(username, layername):
             input_files.save_layer_files(username, layername,
                                                          files, check_crs)
 
-            # import into DB table
-            # timing(db.tasks.import_layer_vector_file)(username, layername, crs_id)
-            res = db.tasks.import_layer_vector_file.apply_async(
-                (username, layername, crs_id),
-                queue=LAYMAN_CELERY_QUEUE)
-            res.get()
-
-            # publish layer to GeoServer
-            # geoserver.publish_layer_from_db(username, layername,
-            #                                 info['description'], info['title'])
-            res = geoserver.tasks.publish_layer_from_db.apply_async(
-                (username, layername, info['description'], info['title']),
-                queue=LAYMAN_CELERY_QUEUE)
-            res.get()
-
-        # create SLD style
-        # geoserver.sld.create_layer_style(username, layername)
-        res = geoserver.tasks.create_layer_style.apply_async(
-            (username, layername),
-            queue=LAYMAN_CELERY_QUEUE)
-        res.get()
-
-        # generate thumbnail
-        filesystem.thumbnail.generate_layer_thumbnail(username, layername)
-        res = filesystem.tasks.generate_layer_thumbnail.apply_async(
-            (username, layername),
-            queue=LAYMAN_CELERY_QUEUE)
-        res.get()
+        task_options = {
+            'crs_id': crs_id,
+            'description': info['description'],
+            'title': info['title'],
+            'ensure_user': False,
+        }
+        util.put_layer(username, layername, delete_from, task_options)
 
     app.logger.info('PUT Layer changes done')
     info = util.get_complete_layer_info(username, layername)
@@ -283,6 +266,8 @@ def delete_layer(username, layername):
 
     # raise exception if layer does not exist
     info = util.get_complete_layer_info(username, layername)
+
+    util.abort_layer_tasks(username, layername)
 
     util.delete_layer(username, layername)
 

@@ -134,20 +134,6 @@ def test_post_layers_simple(client):
 
     layer_tasks = util.get_layer_not_ready_tasks(username, layername)
     assert len(layer_tasks) == 1
-
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        with layman.app_context():
-            rv = client.post(rest_path, data={
-                'file': files
-            })
-        assert rv.status_code == 409
-        resp_json = rv.get_json()
-        assert resp_json['code'] == 17
-    finally:
-        for fp in files:
-            fp[0].close()
-
     layer_info = util.get_layer_info(username, layername)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
     for key_to_check in keys_to_check:
@@ -163,6 +149,46 @@ def test_post_layers_simple(client):
     wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
     assert layername in wms.contents
+
+
+def test_post_layers_concurrent(client):
+    username = 'testuser1'
+    layername = 'countries_concurrent'
+    rest_path = url_for('post_layers', username=username)
+    file_paths = [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with layman.app_context():
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': layername,
+            })
+        assert rv.status_code == 200
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
+    assert len(layer_tasks) == 1
+
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with layman.app_context():
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': layername,
+            })
+        assert rv.status_code == 409
+        resp_json = rv.get_json()
+        assert resp_json['code'] == 17
+    finally:
+        for fp in files:
+            fp[0].close()
 
 
 def test_post_layers_shp_missing_extensions(client):
@@ -326,8 +352,9 @@ def test_get_layers(client):
         rv = client.get(url_for('get_layers', username=username))
     resp_json = rv.get_json()
     assert rv.status_code==200
-    assert len(resp_json) == 2
+    assert len(resp_json) == 3
     assert sorted(map(lambda l: l['name'], resp_json)) == [
+        'countries_concurrent',
         'ne_110m_admin_0_countries',
         'ne_110m_admin_0_countries_shp'
     ]
@@ -372,6 +399,14 @@ def test_put_layer_style(client):
         })
     assert rv.status_code == 200
 
+    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
+    assert len(layer_tasks) == 1
+    resp_json = rv.get_json()
+    keys_to_check = ['thumbnail']
+    for key_to_check in keys_to_check:
+            assert 'status' in resp_json[key_to_check]
+    layer_tasks[0]['last'].get()
+
     resp_json = rv.get_json()
     assert resp_json['title'] == "countries in blue"
 
@@ -406,6 +441,19 @@ def test_put_layer_data(client):
         for fp in files:
             fp[0].close()
 
+    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
+    assert len(layer_tasks) == 1
+    resp_json = rv.get_json()
+    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
+    for key_to_check in keys_to_check:
+            assert 'status' in resp_json[key_to_check]
+    layer_tasks[0]['last'].get()
+
+    rest_path = url_for('get_layer', username=username, layername=layername)
+    with layman.app_context():
+        rv = client.get(rest_path)
+    assert 200 <= rv.status_code < 300
+
     resp_json = rv.get_json()
     assert resp_json['title'] == "populated places"
     feature_type = get_feature_type(username, 'postgresql', layername)
@@ -418,9 +466,93 @@ def test_put_layer_data(client):
     ), None) is not None
 
 
-def test_delete_layer(client):
+def test_put_layer_concurrent_and_delete_it(client):
     username = 'testuser2'
     layername = 'countries'
+    rest_path = url_for('put_layer', username=username, layername=layername)
+    file_paths = [
+        'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
+                 file_paths]
+        with layman.app_context():
+            rv = client.put(rest_path, data={
+                'file': files,
+                'title': 'populated places'
+            })
+        assert rv.status_code == 200
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
+    assert len(layer_tasks) == 1
+
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
+                 file_paths]
+        with layman.app_context():
+            rv = client.put(rest_path, data={
+                'file': files,
+            })
+        assert rv.status_code == 400
+        resp_json = rv.get_json()
+        assert resp_json['code'] == 19
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    rest_path = url_for('delete_layer', username=username, layername=layername)
+    with layman.app_context():
+        rv = client.delete(rest_path)
+    assert rv.status_code == 200
+
+
+def test_post_layers_long_and_delete_it(client):
+    username = 'testuser1'
+    rest_path = url_for('post_layers', username=username)
+    file_paths = [
+        'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with layman.app_context():
+            rv = client.post(rest_path, data={
+                'file': files
+            })
+        assert rv.status_code == 200
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    layername = 'ne_10m_admin_0_countries'
+
+    import time
+    time.sleep(1)
+
+    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
+    assert len(layer_tasks) == 1
+    layer_info = util.get_layer_info(username, layername)
+    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
+    for key_to_check in keys_to_check:
+            assert 'status' in layer_info[key_to_check]
+
+    rest_path = url_for('delete_layer', username=username, layername=layername)
+    with layman.app_context():
+        rv = client.delete(rest_path)
+    assert rv.status_code == 200
+
+
+def test_delete_layer(client):
+    username = 'testuser1'
+    layername = 'ne_110m_admin_0_countries'
     rest_path = url_for('delete_layer', username=username, layername=layername)
     with layman.app_context():
         rv = client.delete(rest_path)
