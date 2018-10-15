@@ -4,7 +4,6 @@ from celery.contrib import abortable
 def make_celery(app):
     celery_app = Celery(
         'layman',
-        # app.import_name,
         backend='redis://redis:6379/0',
         broker='redis://redis:6379/0',
         include=[
@@ -12,6 +11,12 @@ def make_celery(app):
             'layman.filesystem.tasks',
             'layman.geoserver.tasks',
         ],
+        # http://docs.celeryproject.org/en/latest/getting-started/brokers/redis.html
+        broker_transport_options={
+            'visibility_timeout': 3600, # 1 hour
+            'fanout_prefix': True,
+            'fanout_patterns': True,
+        },
     )
     # celery.conf.update(app.config)
     # celery_app.conf.update(
