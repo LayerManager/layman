@@ -183,33 +183,38 @@ def update_layer(username, layername, layerinfo):
                                                             fn_name))
 
 
-def post_layer(username, layername, task_options):
-    post_tasks = [
-        db.tasks.import_layer_vector_file,
-        geoserver.tasks.publish_layer_from_db,
-        geoserver.tasks.create_layer_style,
-        filesystem.tasks.generate_layer_thumbnail,
+POST_TASKS = [
+    db.tasks.import_layer_vector_file,
+    geoserver.tasks.publish_layer_from_db,
+    geoserver.tasks.create_layer_style,
+    filesystem.tasks.generate_layer_thumbnail,
+]
+
+
+def _get_task_signature(username, layername, task_options, task):
+    param_names = [
+        pname
+        for pname in inspect.signature(task).parameters.keys()
+        if pname not in ['username', 'layername']
     ]
+    task_opts = {
+        key: value
+        for key, value in task_options.items()
+        if key in param_names
+    }
+    return task.signature(
+        (username, layername),
+        task_opts,
+        queue=LAYMAN_CELERY_QUEUE,
+        immutable=True,
+    )
 
-    def get_signature(task):
-        param_names = [
-            pname
-            for pname in inspect.signature(task).parameters.keys()
-            if pname not in ['username', 'layername']
-        ]
-        task_opts = {
-            key: value
-            for key, value in task_options.items()
-            if key in param_names
-        }
-        return task.signature(
-            (username, layername),
-            task_opts,
-            queue=LAYMAN_CELERY_QUEUE,
-            immutable=True,
-        )
 
-    post_chain = chain(*list(map(get_signature, post_tasks)))
+def post_layer(username, layername, task_options):
+    post_chain = chain(*list(map(
+        lambda t: _get_task_signature(username, layername, task_options, t),
+        POST_TASKS
+    )))
     # res = post_chain.apply_async()
     res = post_chain()
 

@@ -351,6 +351,10 @@ def test_put_layer_title(client):
             'description': "and new description"
         })
     assert rv.status_code == 200
+
+    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
+    assert len(layer_tasks) == 0
+
     resp_json = rv.get_json()
     assert resp_json['title'] == "New Title of Countries"
     assert resp_json['description'] == "and new description"
