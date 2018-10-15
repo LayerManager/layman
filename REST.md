@@ -40,6 +40,8 @@ Processing chain consists of few steps:
 
 If user's directory, database schema, GeoServer's worskpace, or GeoServer's store does not exist yet, it is created on demand.
 
+Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Layer](#get-layer) and the **status** properties of layer sources (wms, wfs, thumbnail, db_table).
+
 #### Request
 Content-Type: `multipart/form-data`
 
@@ -112,7 +114,10 @@ JSON object with following structure:
 
 
 ### PUT Layer
-Update information about existing layer. It deletes updated layer sources first, and then publishes them again with new parameters.
+Update information about existing layer. It deletes updated layer sources first, and then publishes them again with new parameters. THe processing chain is similar to [POST Layers](#post-layers).
+
+Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing.
+
 
 #### Request
 Content-Type: `multipart/form-data`
@@ -136,7 +141,7 @@ JSON object, same as in case of [GET](#get-layer).
 
 
 ### DELETE Layer
-Delete existing layer and all associated sources, including vector data file and DB table.
+Delete existing layer and all associated sources, including vector data file and DB table. It is possible to delete layer, whose publication process is still running. In such case, the publication process is aborted safely.
 
 #### Request
 No action parameters.
