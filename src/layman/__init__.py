@@ -223,8 +223,11 @@ def put_layer(username, layername):
 
     if update_info and delete_from != 'layman.filesystem.input_files':
         util.update_layer(username, layername, info)
+
     if delete_from is not None:
         deleted = util.delete_layer(username, layername, source=delete_from)
+        if sld_file is None:
+            sld_file = deleted['sld']['file']
         input_sld.save_layer_file(username, layername, sld_file)
 
         if delete_from == 'layman.filesystem.input_files':
@@ -241,17 +244,12 @@ def put_layer(username, layername):
             res.get()
 
             # publish layer to GeoServer
-            geoserver.ensure_user_workspace(username)
             # geoserver.publish_layer_from_db(username, layername,
             #                                 info['description'], info['title'])
             res = geoserver.tasks.publish_layer_from_db.apply_async(
                 (username, layername, info['description'], info['title']),
                 queue=LAYMAN_CELERY_QUEUE)
             res.get()
-
-        if sld_file is None:
-            sld_file = deleted['sld']['file']
-            input_sld.save_layer_file(username, layername, sld_file)
 
         # create SLD style
         # geoserver.sld.create_layer_style(username, layername)
