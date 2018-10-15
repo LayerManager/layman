@@ -93,13 +93,16 @@ JSON object with following structure:
 - **description**: String.
 - **wms**
   - *url*: String. URL of WMS endpoint. It points to WMS endpoint of user's workspace.
-  - *status*: Status information about GeoServer import and availability of WMS layer. No status object = import was successfully completed and WMS layer is available.
+  - *status*: Status information about GeoServer import and availability of WMS layer. No status object means the source is available. Usual state values are
+    - PENDING: publishing of this source is queued, but it did not start yet
+    - STARTED: publishing of this source is in process
+    - NOT_AVAILABLE: source is not available, e.g. because publishing process failed
 - **wfs**
   - *url*: String. URL of WFS endpoint. It points to WFS endpoint of user's workspace.
-  - *status*: Status information about GeoServer import and availability of WFS feature type. No status object = import was successfully completed and the feature type is available.
+  - *status*: Status information about GeoServer import and availability of WFS feature type. See GET Layer **wms** property for meaning.
 - **thumbnail**
   - *url*: String. URL of layer thumbnail. It points to [GET Layer Thumbnail](#get-layer-thumbnail).
-  - *status*: Status information about generating and availability of thumbnail. No status object = thumbnail was successfully generated and it is available.
+  - *status*: Status information about generating and availability of thumbnail. See GET Layer **wms** property for meaning.
 - **file**
   - *path*: String. Path to input vector data file that was imported to the DB table. Path is relative to user's directory.
   - *status*: Status information about saving and availability of files. No status object = file was successfully saved.
