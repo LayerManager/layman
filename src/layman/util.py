@@ -149,19 +149,19 @@ def get_complete_layer_info(username, layername):
         'title': layername,
         'description': '',
         'wms': {
-            'status': 'not_available'
+            'status': 'NOT_AVAILABLE'
         },
         'wfs': {
-            'status': 'not_available'
+            'status': 'NOT_AVAILABLE'
         },
         'thumbnail': {
-            'status': 'not_available'
+            'status': 'NOT_AVAILABLE'
         },
         'file': {
-            'status': 'not_available'
+            'status': 'NOT_AVAILABLE'
         },
         'db_table': {
-            'status': 'not_available'
+            'status': 'NOT_AVAILABLE'
         },
     }
 
