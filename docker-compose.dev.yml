@@ -26,7 +26,7 @@ services:
           condition: service_healthy
 
    redis:
-      image: redis:3.0.0
+      image: redis:4.0.11-alpine
 
    celery_worker:
       image: layman:latest
