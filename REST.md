@@ -109,7 +109,7 @@ JSON object with following structure:
 
 
 ### PUT Layer
-Update information about existing layer.
+Update information about existing layer. It deletes updated layer sources first, and then publishes them again with new parameters.
 
 #### Request
 Content-Type: `multipart/form-data`

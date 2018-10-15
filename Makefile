@@ -10,7 +10,7 @@ reset-test-client:
 	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman bash -c "rm -rf /code/src/layman/static/test-client && bash /code/src/ensure-test-client.sh"
 
 layman-build:
-	docker-compose build
+	docker-compose -f docker-compose.dev.yml build
 
 layman-bash:
 	docker-compose -f docker-compose.dev.yml run --rm layman bash
