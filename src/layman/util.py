@@ -334,7 +334,13 @@ def abort_layer_tasks(username, layername):
             not_ready_task['by_order']
         ))
         for task_result in task_results:
-            current_app.logger.info('aborting result '+task_result.id)
+            task_name = list(not_ready_task['by_name'].keys())[
+                list(not_ready_task['by_name'].values()).index(task_result)
+            ]
+            current_app.logger.info('aborting result {} {}'.format(
+                task_name,
+                task_result.id
+            ))
             task_result.abort()
             # task_result.revoke()
             task_result.get()
