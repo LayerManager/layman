@@ -1,10 +1,27 @@
+import datetime
+import json
+from flask import current_app
 import glob
 import os
 from osgeo import ogr
+import pathlib
+import shutil
 
-from . import get_user_dir
+from . import get_user_dir, get_layer_dir
 from layman.settings import MAIN_FILE_EXTENSIONS, INPUT_SRS_LIST
 from layman.http import LaymanError
+
+
+def get_layer_resumable_dir(username, layername):
+    resumable_dir = os.path.join(get_layer_dir(username, layername),
+                                 'input_files_resumable')
+    return resumable_dir
+
+
+def ensure_layer_resumable_dir(username, layername):
+    resumable_dir = get_layer_resumable_dir(username, layername)
+    pathlib.Path(resumable_dir).mkdir(parents=True, exist_ok=True)
+    return resumable_dir
 
 
 def update_layer(username, layername, layerinfo):
@@ -16,7 +33,8 @@ def delete_layer(username, layername):
     pattern = os.path.join(userdir, layername + '.*')
     filenames = glob.glob(pattern)
     filenames = filter(
-        lambda fn: not fn.endswith('.thumbnail.png'),
+        lambda fn: not fn.endswith('.thumbnail.png') \
+                   or not fn.endswith('.sld'),
         filenames
     )
     for filename in filenames:
@@ -24,6 +42,10 @@ def delete_layer(username, layername):
             os.remove(filename)
         except OSError:
             pass
+    try:
+        shutil.rmtree(get_layer_dir(username, layername))
+    except FileNotFoundError:
+        pass
     return {}
 
 def get_layer_info(username, layername):
@@ -38,6 +60,10 @@ def get_layer_info(username, layername):
                 'path': main_filename
             }
         }
+    elif os.path.exists(get_layer_dir(username, layername)):
+        return {
+            'name': layername
+        }
     else:
         return {}
 
@@ -51,6 +77,13 @@ def get_layer_names(username):
     layer_names = list(map(
         lambda fn: os.path.splitext(os.path.basename(fn))[0],
         main_filenames))
+    dirnames = list(map(
+        lambda dn: os.path.basename(os.path.dirname(dn)),
+        glob.glob(os.path.join(userdir, '*/'))
+    ))
+    layer_names += dirnames
+    layer_names = list(set(layer_names))
+    layer_names.sort()
     return layer_names
 
 
@@ -103,8 +136,7 @@ def save_files(files, filepath_mapping):
         file.save(filepath_mapping[file.filename])
 
 
-def save_layer_files(username, layername, files, check_crs):
-    filenames = list(map(lambda f: f.filename, files))
+def check_filenames(username, layername, filenames, check_crs):
     main_filename = get_main_file_name(filenames)
     if main_filename is None:
         raise LaymanError(2, {'parameter': 'file', 'expected': \
@@ -146,6 +178,16 @@ def save_layer_files(username, layername, files, check_crs):
     if len(conflict_paths) > 0:
         raise LaymanError(3, conflict_paths)
 
+
+def save_layer_files(username, layername, files, check_crs):
+    filenames = list(map(lambda f: f.filename, files))
+    check_filenames(username, layername, filenames, check_crs)
+    main_filename = get_main_file_name(filenames)
+    userdir = get_user_dir(username)
+    filename_mapping, filepath_mapping = get_file_name_mappings(
+        filenames, main_filename, layername, userdir
+    )
+
     save_files(files, filepath_mapping)
     # n_uploaded_files = len({k:v
     #                         for k, v in filepath_mapping.items()
@@ -154,12 +196,145 @@ def save_layer_files(username, layername, files, check_crs):
     check_main_file(filepath_mapping[main_filename])
     if check_crs:
         check_layer_crs(filepath_mapping[main_filename])
-    main_filename = filename_mapping[main_filename]
-    return main_filename
+    # main_filename = filename_mapping[main_filename]
+    target_file_paths = [
+        fp for k, fp in filepath_mapping.items() if fp is not None
+    ]
+    return target_file_paths
+
+
+def save_layer_files_str(username, layername, files_str, check_crs,
+                         request_endpoint):
+    filenames = files_str
+    check_filenames(username, layername, filenames, check_crs)
+    main_filename = get_main_file_name(filenames)
+    userdir = get_user_dir(username)
+    _, filepath_mapping = get_file_name_mappings(
+        filenames, main_filename, layername, userdir
+    )
+    filepath_mapping = {
+        k: v for k, v in filepath_mapping.items() if v is not None
+    }
+    files_to_upload = [
+        {
+            'input_file': k,
+            'target_file': v,
+            'layman_original_parameter': 'file',
+            'finished': False,
+        } for k, v in filepath_mapping.items()
+    ]
+
+    file_content = {
+        'timestamp': datetime.datetime.now().isoformat(),
+        'request_endpoint': request_endpoint,
+        'files_to_upload': files_to_upload,
+        'check_crs': check_crs,
+    }
+    resumable_dir = get_layer_resumable_dir(username, layername)
+    ensure_layer_resumable_dir(username, layername)
+    os.mkdir(os.path.join(resumable_dir, 'chunks'))
+    info_path = os.path.join(resumable_dir, 'info.json')
+    with open(info_path, 'w') as file:
+        json.dump(file_content, file)
+    return files_to_upload
+
+
+def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
+                          chunk_number, total_chunks):
+    resumable_dir = get_layer_resumable_dir(username, layername)
+    info_path = os.path.join(resumable_dir, 'info.json')
+    chunk_dir = os.path.join(resumable_dir, 'chunks')
+    if os.path.isfile(info_path):
+        with open(info_path, 'r+') as info_file:
+            info = json.load(info_file)
+            files_to_upload = info['files_to_upload']
+            file_info = next(
+                (
+                    fi for fi in files_to_upload
+                    if fi['input_file'] == filename and fi[
+                        'layman_original_parameter'] == parameter_name
+                ),
+                None
+            )
+            if file_info is None:
+                raise LaymanError(21, {
+                    'file': filename,
+                    'layman_original_parameter': parameter_name,
+                })
+            target_filename = os.path.basename(file_info['target_file'])
+            chunk_name = _get_chunk_name(target_filename, chunk_number)
+            chunk_path = os.path.join(chunk_dir, chunk_name)
+            chunk.save(chunk_path)
+            current_app.logger.debug('Resumable chunk saved to: %s',
+                                     chunk_path)
+
+            chunk_paths = [
+                os.path.join(chunk_dir, _get_chunk_name(target_filename, x))
+                for x in range(1, total_chunks + 1)
+            ]
+            file_upload_complete =\
+                all([os.path.exists(p) for p in chunk_paths])
+
+            if file_upload_complete:
+                target_filepath = file_info['target_file']
+                with open(target_filepath, "ab") as target_file:
+                    for chunk_path in chunk_paths:
+                        stored_chunk_file = open(chunk_path, 'rb')
+                        target_file.write(stored_chunk_file.read())
+                        stored_chunk_file.close()
+                        os.unlink(chunk_path)
+                target_file.close()
+                file_info['finished'] = True
+                info_file.seek(0)
+                json.dump(info, info_file)
+                info_file.truncate()
+                current_app.logger.debug('Resumable file saved to: %s',
+                                         target_filepath)
+    else:
+        raise LaymanError(20)
+
+
+def layer_file_chunk_exists(username, layername, parameter_name, filename,
+                           chunk_number):
+    resumable_dir = get_layer_resumable_dir(username, layername)
+    info_path = os.path.join(resumable_dir, 'info.json')
+    chunk_dir = os.path.join(resumable_dir, 'chunks')
+    if os.path.isfile(info_path):
+        with open(info_path, 'r') as info_file:
+            info = json.load(info_file)
+            files_to_upload = info['files_to_upload']
+            file_info = next(
+                (
+                    fi for fi in files_to_upload
+                    if fi['input_file'] == filename and fi[
+                        'layman_original_parameter'] == parameter_name
+                ),
+                None
+            )
+            if file_info is None:
+                raise LaymanError(21, {
+                    'file': filename,
+                    'layman_original_parameter': parameter_name,
+                })
+            target_filepath = file_info['target_file']
+            target_filename = os.path.basename(target_filepath)
+            chunk_name = _get_chunk_name(target_filename, chunk_number)
+            chunk_path = os.path.join(chunk_dir, chunk_name)
+            return os.path.exists(chunk_path) or os.path.exists(
+                target_filepath)
+    else:
+        raise LaymanError(20)
+
+
+def _get_chunk_name(uploaded_filename, chunk_number):
+    return uploaded_filename + "_part_%03d" % chunk_number
 
 
 def get_unsafe_layername(files):
-    filenames = list(map(lambda f: f.filename, files))
+    filenames = list(map(
+        lambda f: f if isinstance(f, str) else f.filename,
+        files
+    ))
     main_filename = get_main_file_name(filenames)
     unsafe_layername = ''
     if main_filename is not None:

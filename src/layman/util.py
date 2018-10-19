@@ -125,16 +125,28 @@ def get_layer_info(username, layername):
                 'Module {} does not have {} method.'.format(m.__name__,
                                                             fn_name))
 
-    layer_tasks = get_layer_not_ready_tasks(username, layername)
-    for task_name, linfo_keys in TASKS_TO_LAYER_INFO_KEYS.items():
-        for tinfo in layer_tasks:
-            if task_name in tinfo['by_name']:
-                res = tinfo['by_name'][task_name]
-                if not res.ready():
-                    for linfo_key in linfo_keys:
-                        partial_info[linfo_key] = {
-                            'status': res.state
-                        }
+    last_task = _get_layer_last_task(username, layername)
+    if last_task is None or _is_task_successful(last_task):
+        return partial_info
+
+    failed = False
+    for res in last_task['by_order']:
+        task_name = next(k for k,v in last_task['by_name'].items() if v == res)
+        if task_name not in TASKS_TO_LAYER_INFO_KEYS:
+            continue
+        source_state = {
+            'status': res.state if not failed else 'NOT_AVAILABLE'
+        }
+        if res.failed():
+            failed = True
+            res_exc = res.get(propagate=False)
+            if isinstance(res_exc, LaymanError):
+                source_state.update({
+                    'error': res_exc.to_dict()
+                })
+        for linfo_key in TASKS_TO_LAYER_INFO_KEYS[task_name]:
+            partial_info[linfo_key] = source_state
+
     return partial_info
 
 def get_complete_layer_info(username, layername):
@@ -218,7 +230,7 @@ def post_layer(username, layername, task_options):
     # res = post_chain.apply_async()
     res = post_chain()
 
-    layer_tasks = get_layer_tasks(username, layername)
+    layer_tasks = _get_layer_tasks(username, layername)
     tinfo = {
         'last': res,
         'by_name': {
@@ -274,7 +286,7 @@ def put_layer(username, layername, delete_from, task_options):
             res.parent.parent,
         ] + tasks_by_order
 
-    layer_tasks = get_layer_tasks(username, layername)
+    layer_tasks = _get_layer_tasks(username, layername)
     tinfo = {
         'last': res,
         'by_name': tasks_by_name,
@@ -313,37 +325,63 @@ def delete_layer(username, layername, source = None):
 USER_TASKS = defaultdict(lambda: defaultdict(list))
 
 
-def get_layer_tasks(username, layername):
+def _get_layer_tasks(username, layername):
     layertasks = USER_TASKS[username][layername]
     return layertasks
 
 
-def get_layer_not_ready_tasks(username, layername):
-    layertasks = get_layer_tasks(username, layername)
-    layertasks = list(filter(
-        lambda t: not t['last'].ready(),
-        layertasks
-    ))
-    return layertasks
+def _get_layer_last_task(username, layername):
+    layertasks = _get_layer_tasks(username, layername)
+    if len(layertasks) > 0:
+        return layertasks[-1]
+    else:
+        return None
+
+
+def is_layer_last_task_ready(username, layername):
+    last_task = _get_layer_last_task(username, layername)
+    return last_task is None or _is_task_ready(last_task)
+
+
+def _is_task_successful(task_info):
+    return task_info['last'].successful()
+
+
+def _is_task_failed(task_info):
+    return any(tr.failed() for tr in task_info['by_order'])
+
+
+def _is_task_ready(task_info):
+    return _is_task_successful(task_info) or _is_task_failed(task_info)
+
 
 def abort_layer_tasks(username, layername):
-    not_ready_tasks = get_layer_not_ready_tasks(username, layername)
-    for not_ready_task in not_ready_tasks:
-        task_results = list(filter(
-            lambda r: not r.ready(),
-            not_ready_task['by_order']
+    last_task = _get_layer_last_task(username, layername)
+    if last_task is None or _is_task_ready(last_task):
+        return
+
+    task_results = list(filter(
+        lambda r: not r.ready(),
+        last_task['by_order']
+    ))
+    for task_result in reversed(task_results):
+        task_name = next(k for k,v in last_task['by_name'].items() if v == task_result)
+        # current_app.logger.info('processing result {} {} {} {} {} {}'
+        #                         ''.format(
+        #     task_name,
+        #     task_result.id,
+        #     task_result.state,
+        #     task_result.ready(),
+        #     task_result.successful(),
+        #     task_result.failed(),
+        # ))
+        if task_result.ready():
+            continue
+        current_app.logger.info('aborting result {} {}'.format(
+            task_name,
+            task_result.id
         ))
-        for task_result in reversed(task_results):
-            if task_result.ready():
-                pass
-            task_name = list(not_ready_task['by_name'].keys())[
-                list(not_ready_task['by_name'].values()).index(task_result)
-            ]
-            current_app.logger.info('aborting result {} {}'.format(
-                task_name,
-                task_result.id
-            ))
-            task_result.abort()
-            # task_result.revoke()
-            task_result.get()
-            current_app.logger.info('aborted ' + task_result.id)
+        task_result.abort()
+        # task_result.revoke()
+        task_result.get(propagate=False)
+        current_app.logger.info('aborted ' + task_result.id)

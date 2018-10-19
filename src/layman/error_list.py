@@ -18,4 +18,7 @@ ERROR_LIST = {
     17: (409, 'Layer already exists'),
     18: (400, 'Missing one or more ShapeFile files.'),
     19: (400, 'Layer is already in process.'),
+    20: (400, 'Chunk upload is not active for this layer.'),
+    21: (400, 'Unknown combination of resumableFilename and '
+              'layman_original_parameter.'),
 }
