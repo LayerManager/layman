@@ -132,14 +132,14 @@ def test_post_layers_simple(client):
 
     layername = 'ne_110m_admin_0_countries'
 
-    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
-    assert len(layer_tasks) == 1
+    last_task = util._get_layer_last_task(username, layername)
+    assert last_task is not None and not util._is_task_ready(last_task)
     layer_info = util.get_layer_info(username, layername)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
     for key_to_check in keys_to_check:
             assert 'status' in layer_info[key_to_check]
 
-    layer_tasks[0]['last'].get()
+    last_task['last'].get()
 
     layer_info = util.get_layer_info(username, layername)
     for key_to_check in keys_to_check:
@@ -173,8 +173,8 @@ def test_post_layers_concurrent(client):
         for fp in files:
             fp[0].close()
 
-    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
-    assert len(layer_tasks) == 1
+    last_task = util._get_layer_last_task(username, layername)
+    assert last_task is not None and not util._is_task_ready(last_task)
 
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
@@ -248,9 +248,9 @@ def test_post_layers_shp(client):
         for fp in files:
             fp[0].close()
 
-    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
-    assert len(layer_tasks) == 1
-    layer_tasks[0]['last'].get()
+    last_task = util._get_layer_last_task(username, layername)
+    assert last_task is not None and not util._is_task_ready(last_task)
+    last_task['last'].get()
 
     wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
@@ -309,9 +309,9 @@ def test_post_layers_complex(client):
         for fp in files:
             fp[0].close()
 
-    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
-    assert len(layer_tasks) == 1
-    layer_tasks[0]['last'].get()
+    last_task = util._get_layer_last_task(username, layername)
+    assert last_task is not None and not util._is_task_ready(last_task)
+    last_task['last'].get()
 
     wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
@@ -379,8 +379,8 @@ def test_put_layer_title(client):
         })
     assert rv.status_code == 200
 
-    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
-    assert len(layer_tasks) == 0
+    last_task = util._get_layer_last_task(username, layername)
+    assert last_task is not None and util._is_task_ready(last_task)
 
     resp_json = rv.get_json()
     assert resp_json['title'] == "New Title of Countries"
@@ -399,13 +399,13 @@ def test_put_layer_style(client):
         })
     assert rv.status_code == 200
 
-    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
-    assert len(layer_tasks) == 1
+    last_task = util._get_layer_last_task(username, layername)
+    assert last_task is not None and not util._is_task_ready(last_task)
     resp_json = rv.get_json()
     keys_to_check = ['thumbnail']
     for key_to_check in keys_to_check:
             assert 'status' in resp_json[key_to_check]
-    layer_tasks[0]['last'].get()
+    last_task['last'].get()
 
     resp_json = rv.get_json()
     assert resp_json['title'] == "countries in blue"
@@ -441,13 +441,13 @@ def test_put_layer_data(client):
         for fp in files:
             fp[0].close()
 
-    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
-    assert len(layer_tasks) == 1
+    last_task = util._get_layer_last_task(username, layername)
+    assert last_task is not None and not util._is_task_ready(last_task)
     resp_json = rv.get_json()
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
     for key_to_check in keys_to_check:
             assert 'status' in resp_json[key_to_check]
-    layer_tasks[0]['last'].get()
+    last_task['last'].get()
 
     rest_path = url_for('get_layer', username=username, layername=layername)
     with layman.app_context():
@@ -489,8 +489,8 @@ def test_put_layer_concurrent_and_delete_it(client):
         for fp in files:
             fp[0].close()
 
-    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
-    assert len(layer_tasks) == 1
+    last_task = util._get_layer_last_task(username, layername)
+    assert last_task is not None and not util._is_task_ready(last_task)
 
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
@@ -537,8 +537,8 @@ def test_post_layers_long_and_delete_it(client):
     import time
     time.sleep(1)
 
-    layer_tasks = util.get_layer_not_ready_tasks(username, layername)
-    assert len(layer_tasks) == 1
+    last_task = util._get_layer_last_task(username, layername)
+    assert last_task is not None and not util._is_task_ready(last_task)
     layer_info = util.get_layer_info(username, layername)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
     for key_to_check in keys_to_check:

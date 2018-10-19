@@ -69,9 +69,15 @@ def post_layers(username):
     util.check_username(username)
 
     # FILE
-    if 'file' not in request.files:
+    use_files_str = False
+    if 'file' in request.files:
+        files = request.files.getlist("file")
+    elif len(request.form.getlist('file')) > 0:
+        files = request.form.getlist('file')
+        use_files_str = True
+    else:
         raise LaymanError(1, {'parameter': 'file'})
-    files = request.files.getlist("file")
+
 
     # NAME
     unsafe_layername = request.form.get('name', '')
@@ -107,56 +113,53 @@ def post_layers(username):
     if 'sld' in request.files:
         sld_file = request.files['sld']
 
-    # save files
-    filesystem.ensure_user_dir(username)
-    timing(input_files.save_layer_files)(username, layername, files, check_crs)
-    input_sld.save_layer_file(username, layername, sld_file)
-
     task_options = {
         'crs_id': crs_id,
         'description': description,
         'title': title,
         'ensure_user': True,
+        'check_crs': False,
+        'target_file_paths': [],
     }
-    util.post_layer(username, layername, task_options)
 
     layerurl = url_for('get_layer', layername=layername, username=username)
 
-    app.logger.info('uploaded layer '+layername)
-    return jsonify([{
+    layer_result = {
         'name': layername,
         'url': layerurl,
-    }]), 200
+    }
 
-@app.route('/rest/<username>/test', methods=['GET'])
-def test(username):
-    app.logger.info('GET test')
+    # save files
+    filesystem.ensure_user_dir(username)
+    input_sld.save_layer_file(username, layername, sld_file)
+    if use_files_str:
+        # app.logger.info('POST Layers files_str '+str(files))
+        files_to_upload = input_files.save_layer_files_str(
+            username, layername, files, check_crs, request.endpoint)
+        # app.logger.info('POST Layers files_str saved')
+        layer_result.update({
+            'files_to_upload': [{
+                'file': fo['input_file'],
+                'layman_original_parameter': fo['layman_original_parameter'],
+            } for fo in files_to_upload],
+        })
+        task_options.update({
+            'check_crs': check_crs,
+            'target_file_paths': [
+                fo['target_file'] for fo in files_to_upload
+            ],
+        })
+    else:
+        target_file_paths = input_files.save_layer_files(
+            username, layername, files, check_crs)
+        task_options.update({
+            'target_file_paths': target_file_paths,
+        })
 
-    insp = celery_app.control.inspect()
-    actives = str(insp.active())
+    util.post_layer(username, layername, task_options)
 
-
-
-    app.logger.info('GET test done')
-    all_task_states = {id: r.state for id,r in celery_tasks.items()}
-    tasks_to_kill = [r for r in celery_tasks.values() if r.state not in \
-        ['SUCCESS', 'REVOKED']]
-
-    for t in tasks_to_kill:
-        app.logger.info('ABORTING '+t.id)
-        t.abort()
-
-    res = db.tasks.long.apply_async(('','','',''), queue=LAYMAN_CELERY_QUEUE)
-    if isinstance(res.id, str) and len(res.id) > 0:
-        celery_tasks[res.id] = res
-
-    return jsonify([{
-        'done': True,
-        'tasks': all_task_states,
-        'tasks_to_kill': [r.id for r in tasks_to_kill],
-        'active_tasks': actives,
-    }]), 200
-
+    # app.logger.info('uploaded layer '+layername)
+    return jsonify([layer_result]), 200
 
 @app.route('/rest/<username>/layers/<layername>', methods=['GET'])
 def get_layer(username, layername):
@@ -184,8 +187,7 @@ def put_layer(username, layername):
     # LAYER
     util.check_layername(layername)
 
-    not_ready_tasks = util.get_layer_not_ready_tasks(username, layername)
-    if len(not_ready_tasks):
+    if not util.is_layer_last_task_ready(username, layername):
         raise LaymanError(19)
 
     info = util.get_complete_layer_info(username, layername)
@@ -301,6 +303,57 @@ def get_layer_thumbnail(username, layername):
 
     raise LaymanError(16, {'layername': layername})
 
+
+@app.route("/rest/<username>/layers/<layername>/chunk", methods=['POST'])
+def post_layer_chunk(username, layername):
+    app.logger.info('POST Layer Chunk')
+
+    # USER
+    util.check_username(username)
+
+    # LAYER
+    util.check_layername(layername)
+
+    total_chunks = request.form.get('resumableTotalChunks', type=int)
+    chunk_number = request.form.get('resumableChunkNumber', default=1,
+                                            type=int)
+    filename = request.form.get('resumableFilename', default='error',
+                                         type=str)
+    parameter_name = request.form.get('layman_original_parameter', default='error',
+                                         type=str)
+    chunk = request.files['file']
+
+    input_files.save_layer_file_chunk(username, layername, parameter_name,
+                                      filename, chunk,
+                                      chunk_number, total_chunks)
+
+    return jsonify({
+        'message': 'Chunk saved.'
+    }), 200
+
+
+@app.route("/rest/<username>/layers/<layername>/chunk", methods=['GET'])
+def get_layer_chunk(username, layername):
+    app.logger.info('GET Layer Chunk')
+
+    chunk_number = request.args.get('resumableChunkNumber', default=1,
+                                            type=int)
+    filename = request.args.get('resumableFilename', default='error',
+                                         type=str)
+    parameter_name = request.args.get('layman_original_parameter', default='error',
+                                         type=str)
+
+    chunk_exists = input_files.layer_file_chunk_exists(
+        username, layername, parameter_name, filename, chunk_number)
+
+    if chunk_exists:
+        return jsonify({
+            'message': 'Chunk exists.'
+        }), 200
+    else:
+        return jsonify({
+            'message': 'Chunk not found.'
+        }), 404
 
 
 @app.errorhandler(LaymanError)

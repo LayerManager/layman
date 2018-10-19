@@ -98,19 +98,25 @@ JSON object with following structure:
   - *status*: Status information about GeoServer import and availability of WMS layer. No status object means the source is available. Usual state values are
     - PENDING: publishing of this source is queued, but it did not start yet
     - STARTED: publishing of this source is in process
+    - FAILURE: publishing process failed
     - NOT_AVAILABLE: source is not available, e.g. because publishing process failed
+  - *error*: If status is FAILURE, this may contain error object.
 - **wfs**
   - *url*: String. URL of WFS endpoint. It points to WFS endpoint of user's workspace.
   - *status*: Status information about GeoServer import and availability of WFS feature type. See GET Layer **wms** property for meaning.
+  - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
   - *url*: String. URL of layer thumbnail. It points to [GET Layer Thumbnail](#get-layer-thumbnail).
   - *status*: Status information about generating and availability of thumbnail. See GET Layer **wms** property for meaning.
+  - *error*: If status is FAILURE, this may contain error object.
 - **file**
   - *path*: String. Path to input vector data file that was imported to the DB table. Path is relative to user's directory.
   - *status*: Status information about saving and availability of files. No status object = file was successfully saved.
+  - *error*: If status is FAILURE, this may contain error object.
 - **db_table**
   - **name**: String. DB table name within PostgreSQL user's schema. This table is used as GeoServer source of layer.
   - *status*: Status information about DB import and availability of the table. No status object = import was successfully completed.
+  - *error*: If status is FAILURE, this may contain error object.
 
 
 ### PUT Layer
