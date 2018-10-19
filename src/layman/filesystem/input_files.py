@@ -220,7 +220,6 @@ def save_layer_files_str(username, layername, files_str, check_crs,
             'input_file': k,
             'target_file': v,
             'layman_original_parameter': 'file',
-            'finished': False,
         } for k, v in filepath_mapping.items()
     ]
 
@@ -284,7 +283,6 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
                         stored_chunk_file.close()
                         os.unlink(chunk_path)
                 target_file.close()
-                file_info['finished'] = True
                 info_file.seek(0)
                 json.dump(info, info_file)
                 info_file.truncate()
@@ -322,6 +320,30 @@ def layer_file_chunk_exists(username, layername, parameter_name, filename,
             chunk_path = os.path.join(chunk_dir, chunk_name)
             return os.path.exists(chunk_path) or os.path.exists(
                 target_filepath)
+    else:
+        raise LaymanError(20)
+
+
+def layer_file_chunk_info(username, layername):
+    resumable_dir = get_layer_resumable_dir(username, layername)
+    info_path = os.path.join(resumable_dir, 'info.json')
+    chunk_dir = os.path.join(resumable_dir, 'chunks')
+    if os.path.isfile(info_path):
+        with open(info_path, 'r') as info_file:
+            info = json.load(info_file)
+            files_to_upload = info['files_to_upload']
+
+            num_files_saved = len([
+                fi for fi in files_to_upload
+                if os.path.exists(fi['target_file'])
+            ])
+            all_files_saved = num_files_saved == len(files_to_upload)
+            if all_files_saved:
+                num_chunks_saved = 0
+            else:
+                num_chunks_saved = len(os.listdir(chunk_dir))
+
+            return all_files_saved, num_files_saved, num_chunks_saved
     else:
         raise LaymanError(20)
 

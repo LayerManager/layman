@@ -222,10 +222,13 @@ def _get_task_signature(username, layername, task_options, task):
     )
 
 
-def post_layer(username, layername, task_options):
+def post_layer(username, layername, task_options, use_files_str):
+    post_tasks = POST_TASKS.copy()
+    if use_files_str:
+        post_tasks.insert(0, filesystem.tasks.wait_for_upload)
     post_chain = chain(*list(map(
         lambda t: _get_task_signature(username, layername, task_options, t),
-        POST_TASKS
+        post_tasks
     )))
     # res = post_chain.apply_async()
     res = post_chain()
@@ -240,12 +243,16 @@ def post_layer(username, layername, task_options):
             'layman.filesystem.thumbnail.generate_layer_thumbnail': res,
         },
         'by_order': [
-            res.parent.parent.parent,
-            res.parent.parent,
-            res.parent,
             res,
         ]
     }
+    while res.parent is not None:
+        res = res.parent
+        tinfo['by_order'].insert(0, res)
+    if use_files_str:
+        tinfo['by_name'].update({
+            'layman.filesystem.input_files.wait_for_upload': res,
+        })
     layer_tasks.append(tinfo)
 
 def put_layer(username, layername, delete_from, task_options):
@@ -295,6 +302,7 @@ def put_layer(username, layername, delete_from, task_options):
     layer_tasks.append(tinfo)
 
 TASKS_TO_LAYER_INFO_KEYS = {
+    'layman.filesystem.input_files.wait_for_upload': ['file'],
     'layman.db.import_layer_vector_file': ['db_table'],
     'layman.geoserver.publish_layer_from_db': ['wms', 'wfs'],
     'layman.filesystem.thumbnail.generate_layer_thumbnail': ['thumbnail'],

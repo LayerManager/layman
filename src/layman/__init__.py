@@ -119,7 +119,6 @@ def post_layers(username):
         'title': title,
         'ensure_user': True,
         'check_crs': False,
-        'target_file_paths': [],
     }
 
     layerurl = url_for('get_layer', layername=layername, username=username)
@@ -145,18 +144,12 @@ def post_layers(username):
         })
         task_options.update({
             'check_crs': check_crs,
-            'target_file_paths': [
-                fo['target_file'] for fo in files_to_upload
-            ],
         })
     else:
-        target_file_paths = input_files.save_layer_files(
+        input_files.save_layer_files(
             username, layername, files, check_crs)
-        task_options.update({
-            'target_file_paths': target_file_paths,
-        })
 
-    util.post_layer(username, layername, task_options)
+    util.post_layer(username, layername, task_options, use_files_str)
 
     # app.logger.info('uploaded layer '+layername)
     return jsonify([layer_result]), 200
