@@ -1,4 +1,5 @@
 import time
+from layman.settings import *
 from . import thumbnail
 from . import input_files
 from layman import celery_app
@@ -7,8 +8,6 @@ from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 
-MAX_INACTIVITY_TIME = 10 # 10 seconds
-# MAX_INACTIVITY_TIME = 5 * 60 # 5 minutes
 
 
 @celery_app.task(
@@ -26,7 +25,7 @@ def wait_for_upload(self, username, layername, check_crs=True):
 
     logger.debug('chunk_info {}'.format(str(chunk_info)))
     while not chunk_info[0] and \
-                            time.time() - last_change <= MAX_INACTIVITY_TIME:
+            time.time() - last_change <= UPLOAD_MAX_INACTIVITY_TIME:
         time.sleep(0.5)
         if self.is_aborted():
             logger.info('Aborting for layer {}.{}'.format(username, layername))
@@ -41,7 +40,7 @@ def wait_for_upload(self, username, layername, check_crs=True):
             last_change = time.time()
             num_files_saved = chunk_info[1]
             num_chunks_saved = chunk_info[2]
-    if time.time() - last_change > MAX_INACTIVITY_TIME:
+    if time.time() - last_change > UPLOAD_MAX_INACTIVITY_TIME:
         raise LaymanError(22)
     else:
         logger.info('Layer chunks uploaded {}.{}'.format(username, layername))

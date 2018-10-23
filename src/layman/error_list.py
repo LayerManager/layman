@@ -21,5 +21,5 @@ ERROR_LIST = {
     20: (400, 'Chunk upload is not active for this layer.'),
     21: (400, 'Unknown combination of resumableFilename and '
               'layman_original_parameter.'),
-    22: (400, 'MAX_INACTIVITY_TIME during upload reached.'),
+    22: (400, 'UPLOAD_MAX_INACTIVITY_TIME during upload reached.'),
 }
