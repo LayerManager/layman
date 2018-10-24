@@ -65,7 +65,7 @@ def test_resumable():
         file_input = chrome.find_elements_by_name('file')
         assert len(file_input) == 1
         file_input = file_input[0]
-        app.logger.info(" \n ".join(file_paths))
+        # print(" \n ".join(file_paths))
         file_input.send_keys(" \n ".join(file_paths))
         chrome.save_screenshot('/code/tmp/test-2.png')
 
@@ -79,7 +79,7 @@ def test_resumable():
                     )
         r = requests.get(layer_url)
         keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file']
-        max_attempts = 40
+        max_attempts = 20
         attempts = 1
         while not (r.status_code == 200 and all(
             'status' not in r.json()[k] for k in keys_to_check
