@@ -87,7 +87,7 @@ def post_layers(username):
     util.check_layername(layername)
     info = util.get_layer_info(username, layername)
     if info:
-        raise LaymanError(17, {layername: layername})
+        raise LaymanError(17, {'layername': layername})
     util.check_new_layername(username, layername)
 
     # CRS

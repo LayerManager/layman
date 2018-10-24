@@ -246,6 +246,10 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
     if os.path.isfile(info_path):
         with open(info_path, 'r+') as info_file:
             info = json.load(info_file)
+            info['total_chunks'] = total_chunks
+            info_file.seek(0)
+            json.dump(info, info_file)
+            info_file.truncate()
             files_to_upload = info['files_to_upload']
             file_info = next(
                 (
@@ -264,30 +268,9 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
             chunk_name = _get_chunk_name(target_filename, chunk_number)
             chunk_path = os.path.join(chunk_dir, chunk_name)
             chunk.save(chunk_path)
-            current_app.logger.debug('Resumable chunk saved to: %s',
+            current_app.logger.info('Resumable chunk saved to: %s',
                                      chunk_path)
 
-            chunk_paths = [
-                os.path.join(chunk_dir, _get_chunk_name(target_filename, x))
-                for x in range(1, total_chunks + 1)
-            ]
-            file_upload_complete =\
-                all([os.path.exists(p) for p in chunk_paths])
-
-            if file_upload_complete:
-                target_filepath = file_info['target_file']
-                with open(target_filepath, "ab") as target_file:
-                    for chunk_path in chunk_paths:
-                        stored_chunk_file = open(chunk_path, 'rb')
-                        target_file.write(stored_chunk_file.read())
-                        stored_chunk_file.close()
-                        os.unlink(chunk_path)
-                target_file.close()
-                info_file.seek(0)
-                json.dump(info, info_file)
-                info_file.truncate()
-                current_app.logger.debug('Resumable file saved to: %s',
-                                         target_filepath)
     else:
         raise LaymanError(20)
 
@@ -332,6 +315,30 @@ def layer_file_chunk_info(username, layername):
         with open(info_path, 'r') as info_file:
             info = json.load(info_file)
             files_to_upload = info['files_to_upload']
+
+            if 'total_chunks' in info:
+                total_chunks = info['total_chunks']
+                for fi in files_to_upload:
+                    target_fn = os.path.basename(fi['target_file'])
+                    chunk_paths = [
+                        os.path.join(chunk_dir, _get_chunk_name(target_fn, x))
+                        for x in range(1, total_chunks + 1)
+                    ]
+                    file_upload_complete = \
+                        all([os.path.exists(p) for p in chunk_paths])
+                    if file_upload_complete:
+                        current_app.logger.info(
+                            'file_upload_complete ' + target_fn)
+                        target_fp = fi['target_file']
+                        with open(target_fp, "ab") as target_file:
+                            for chunk_path in chunk_paths:
+                                stored_chunk_file = open(chunk_path, 'rb')
+                                target_file.write(stored_chunk_file.read())
+                                stored_chunk_file.close()
+                                os.unlink(chunk_path)
+                        target_file.close()
+                        current_app.logger.info('Resumable file saved to: %s',
+                                                 target_fp)
 
             num_files_saved = len([
                 fi for fi in files_to_upload
