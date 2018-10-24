@@ -3,7 +3,7 @@ FROM geographica/gdal2:2.3.0
 RUN mkdir /code
 WORKDIR /code
 
-RUN apt-get update && apt-get install -y unzip curl python3-pip chromium-browser && pip3 install --upgrade pip
+RUN apt-get update && apt-get install -y -qq unzip curl python3-pip chromium-browser && pip3 install --upgrade pip
 
 RUN (cd /tmp && curl -O https://chromedriver.storage.googleapis.com/2.43/chromedriver_linux64.zip && unzip chromedriver_linux64.zip -d /usr/bin && rm chromedriver_linux64.zip)
 
