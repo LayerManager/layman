@@ -13,8 +13,6 @@ services:
       command: bash test.sh
       env_file:
          - .env.test
-      ports:
-        - 8000:8000
       volumes:
         - ./geoserver_data:/geoserver_data
         - ./sample:/code/sample
