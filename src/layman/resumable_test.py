@@ -1,4 +1,5 @@
 import os
+import requests
 import time
 from multiprocessing import Process
 
@@ -20,6 +21,7 @@ def test_resumable():
         assert os.path.isfile(fp)
 
     port = 9002
+    # time.sleep(5)
     server = Process(target=app.run, kwargs={
         'host': '0.0.0.0',
         'port': port,
@@ -40,6 +42,8 @@ def test_resumable():
     )
 
     try:
+        r = requests.get(domain+'/static/test-client/index.html')
+        assert r.status_code==200
 
         chrome.get(domain+'/static/test-client/index'
                           '.html')
@@ -73,7 +77,6 @@ def test_resumable():
         layer_url = '{}/rest/{}/layers/{}?'.format(
                         domain, username, layername
                     )
-        import requests
         r = requests.get(layer_url)
         keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file']
         max_attempts = 40
