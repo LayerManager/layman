@@ -4,12 +4,12 @@ volumes:
    geoserver-data:
 
 services:
-   layman:
-      container_name: layman
+   layman_test:
+      container_name: layman_test
       build:
         context: .
         dockerfile: Dockerfile.test
-      image: layman:latest
+      image: layman_test:latest
       command: bash test.sh
       env_file:
          - .env.test
@@ -65,7 +65,7 @@ services:
       image: redis:4.0.11-alpine
 
    celery_worker_test:
-      image: layman:latest
+      image: layman_test:latest
       # use watchdog
       command: bash -c "cd src && watchmedo auto-restart -d . -p '*.py' --recursive -- python3 -m celery -Q $${LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info"
       env_file: .env.test

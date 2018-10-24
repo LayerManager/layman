@@ -9,7 +9,7 @@ from layman import app
 import pytest
 
 
-def test_rebumable():
+def test_resumable():
     username = 'testuser1'
     layername = 'country_chunks'
     file_paths = list(map(lambda fp: os.path.join(os.getcwd(), fp), [
@@ -19,10 +19,10 @@ def test_rebumable():
     for fp in file_paths:
         assert os.path.isfile(fp)
 
-    port = 9001
+    port = 9002
     server = Process(target=app.run, kwargs={
         'host': '0.0.0.0',
-        'port': 9001,
+        'port': port,
         'debug': False,
     })
     server.start()
