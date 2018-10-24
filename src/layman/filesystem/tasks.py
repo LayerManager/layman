@@ -24,8 +24,9 @@ def wait_for_upload(self, username, layername, check_crs=True):
     chunk_info = input_files.layer_file_chunk_info(username, layername)
 
     logger.debug('chunk_info {}'.format(str(chunk_info)))
-    while not chunk_info[0] and \
-            time.time() - last_change <= UPLOAD_MAX_INACTIVITY_TIME:
+    while not chunk_info[0]:
+        if time.time() - last_change > UPLOAD_MAX_INACTIVITY_TIME:
+            raise LaymanError(22)
         time.sleep(0.5)
         if self.is_aborted():
             logger.info('Aborting for layer {}.{}'.format(username, layername))
@@ -40,8 +41,6 @@ def wait_for_upload(self, username, layername, check_crs=True):
             last_change = time.time()
             num_files_saved = chunk_info[1]
             num_chunks_saved = chunk_info[2]
-    if time.time() - last_change > UPLOAD_MAX_INACTIVITY_TIME:
-        raise LaymanError(22)
     else:
         logger.info('Layer chunks uploaded {}.{}'.format(username, layername))
 

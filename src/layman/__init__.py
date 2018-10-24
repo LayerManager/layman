@@ -319,7 +319,7 @@ def post_layer_chunk(username, layername):
     input_files.save_layer_file_chunk(username, layername, parameter_name,
                                       filename, chunk,
                                       chunk_number, total_chunks)
-    time.sleep(5)
+    # time.sleep(5)
 
     return jsonify({
         'message': 'Chunk saved.'
