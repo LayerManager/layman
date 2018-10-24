@@ -24,6 +24,9 @@
 | [flower](https://github.com/mher/flower) | BSD 3-Clause | requirements.txt | dev | bin | |
 | [watchdog](https://github.com/gorakhargosh/watchdog) | Apache License 2.0 | requirements.txt | dev | bin | |
 | [pytest](https://pytest.org/) | MIT License | requirements.txt | test | bin | |
+| [selenium](https://www.chromium.org/) | Apache License 2.0 | requirements.text.txt | test | bin | |
+| [chromium](https://www.chromium.org/) | BSD and others | Dockerfile.test | test | bin | |
+| [chromedriver](http://chromedriver.chromium.org/) | BSD and others | Dockerfile.test | test | bin | |
 | [geographicags/docker-gdal2](https://github.com/GeographicaGS/Docker-GDAL2) | MIT License | Dockerfile | prod | bin | used as docker image |
 | [kartoza/docker-geoserver](https://github.com/kartoza/docker-geoserver) | GNU GPL v2 | docker-compose.dev.yml | dev | bin | used as docker image |
 | [kartoza/docker-postgis](https://github.com/kartoza/docker-postgis) | - | kartoza/docker-geoserver | dev | bin | used as docker image |
