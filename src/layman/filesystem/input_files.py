@@ -203,8 +203,7 @@ def save_layer_files(username, layername, files, check_crs):
     return target_file_paths
 
 
-def save_layer_files_str(username, layername, files_str, check_crs,
-                         request_endpoint):
+def save_layer_files_str(username, layername, files_str, check_crs):
     filenames = files_str
     check_filenames(username, layername, filenames, check_crs)
     main_filename = get_main_file_name(filenames)
@@ -225,7 +224,6 @@ def save_layer_files_str(username, layername, files_str, check_crs,
 
     file_content = {
         'timestamp': datetime.datetime.now().isoformat(),
-        'request_endpoint': request_endpoint,
         'files_to_upload': files_to_upload,
         'check_crs': check_crs,
     }

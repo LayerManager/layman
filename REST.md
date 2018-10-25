@@ -117,6 +117,9 @@ JSON object with following structure:
   - **name**: String. DB table name within PostgreSQL user's schema. This table is used as GeoServer source of layer.
   - *status*: Status information about DB import and availability of the table. No status object = import was successfully completed.
   - *error*: If status is FAILURE, this may contain error object.
+- *sld*
+  - **status**: Status information about publishing SLD. See GET Layer **wms** property for meaning.
+  - *error*: If status is FAILURE, this may contain error object.
 
 
 ### PUT Layer
