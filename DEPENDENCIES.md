@@ -9,9 +9,9 @@
 | [postgresql](https://www.postgresql.org/) | 10.0 | PostgreSQL | kartoza/docker-postgis | prod-external / prod | bin | to store vector data effectively |
 | [postgis](https://postgis.net/) | 2.4 | GNU GPL v2 | kartoza/docker-postgis | prod-external / prod | bin | to store vector data effectively |
 | [geoserver](https://github.com/geoserver/geoserver) | 2.13.0 | GNU GPL v2 | kartoza/docker-geoserver | prod-external / prod | bin | to provide WMS/WFS endpoints |
-| [celery](http://www.celeryproject.org/) | 4.2.1 | BSD 3-Clause | requirements.txt | prod | bin | to enable asynchronous processing |
-| [redis](https://redis.io/) | 4.0.11 | BSD 3-Clause | docker-library/redis | prod | bin | to enable asynchronous processing, source of truth for layman and celery worker |
-| [gspld-test-client](https://github.com/jirik/gspld-test-client) | 0.5.0 | GNU GPL v3 | docker-library/redis | optional | bin | to communicate with REST API |
+| [celery](http://www.celeryproject.org/) | 4.2.1 | BSD 3-Clause | requirements.txt | prod | bin | asynchronous task runner |
+| [redis](https://redis.io/) | 4.0.11 | BSD 3-Clause | docker-library/redis | prod | bin | celery message broker, source of truth for server side |
+| [gspld-test-client](https://github.com/jirik/gspld-test-client) | 0.5.0 | GNU GPL v3 | docker-library/redis | optional | bin | to demonstrate communication with REST API |
 
 ## Other dependencies
 
