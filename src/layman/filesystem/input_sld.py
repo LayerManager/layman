@@ -10,7 +10,12 @@ from layman.settings import *
 
 
 def get_layer_info(username, layername):
-    return {}
+    if os.path.exists(get_file_path(username, layername)):
+        return {
+            'name': layername
+        }
+    else:
+        return {}
 
 
 def update_layer(username, layername, layerinfo):

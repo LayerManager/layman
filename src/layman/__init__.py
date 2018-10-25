@@ -47,19 +47,6 @@ def get_layers(username):
     ))
     return jsonify(infos), 200
 
-def timing(f):
-    def wrap(*args):
-        time1 = time.time()
-        ret = f(*args)
-        time2 = time.time()
-        msg = '{:s} function took {:.3f} ms'.format(f.__name__, (time2-time1)*1000.0)
-        # app.logger.info(msg)
-        # print(msg)
-
-        return ret
-    return wrap
-
-
 
 @app.route('/rest/<username>/layers', methods=['POST'])
 def post_layers(username):
@@ -73,11 +60,14 @@ def post_layers(username):
     if 'file' in request.files:
         files = request.files.getlist("file")
     elif len(request.form.getlist('file')) > 0:
-        files = request.form.getlist('file')
-        use_chunk_upload = True
+        files = list(filter(
+            lambda f: len(f) > 0,
+            request.form.getlist('file')
+        ))
+        if len(files):
+            use_chunk_upload = True
     else:
         raise LaymanError(1, {'parameter': 'file'})
-
 
     # NAME
     unsafe_layername = request.form.get('name', '')
@@ -133,7 +123,7 @@ def post_layers(username):
     input_sld.save_layer_file(username, layername, sld_file)
     if use_chunk_upload:
         files_to_upload = input_files.save_layer_files_str(
-            username, layername, files, check_crs, request.endpoint)
+            username, layername, files, check_crs)
         layer_result.update({
             'files_to_upload': files_to_upload,
         })
@@ -181,11 +171,22 @@ def put_layer(username, layername):
     info = util.get_complete_layer_info(username, layername)
 
     # FILE
-    files = request.files.getlist("file")
+    use_chunk_upload = False
+    if 'file' in request.files:
+        files = request.files.getlist("file")
+    elif len(request.form.getlist('file')) > 0:
+        files = list(filter(
+            lambda f: len(f) > 0,
+            request.form.getlist('file')
+        ))
+        if len(files):
+            use_chunk_upload = True
+    else:
+        files = []
 
     # CRS
     crs_id = None
-    if 'file' in request.files and len(request.form.get('crs', '')) > 0:
+    if len(files) > 0 and len(request.form.get('crs', '')) > 0:
         crs_id = request.form['crs']
         if crs_id not in INPUT_SRS_LIST:
             raise LaymanError(2, {'parameter': 'crs', 'supported_values':
@@ -218,17 +219,13 @@ def put_layer(username, layername):
     if update_info and delete_from != 'layman.filesystem.input_files':
         util.update_layer(username, layername, info)
 
+    layer_result = {}
+
     if delete_from is not None:
         deleted = util.delete_layer(username, layername, source=delete_from)
         if sld_file is None:
             sld_file = deleted['sld']['file']
         input_sld.save_layer_file(username, layername, sld_file)
-
-        if delete_from == 'layman.filesystem.input_files':
-
-            # save files
-            input_files.save_layer_files(username, layername,
-                                                         files, check_crs)
 
         task_options = {
             'crs_id': crs_id,
@@ -236,10 +233,27 @@ def put_layer(username, layername):
             'title': info['title'],
             'ensure_user': False,
         }
-        util.put_layer(username, layername, delete_from, task_options)
+
+        if delete_from == 'layman.filesystem.input_files':
+
+            if use_chunk_upload:
+                files_to_upload = input_files.save_layer_files_str(
+                    username, layername, files, check_crs)
+                layer_result.update({
+                    'files_to_upload': files_to_upload,
+                })
+                task_options.update({
+                    'check_crs': check_crs,
+                })
+            else:
+                input_files.save_layer_files(
+                    username, layername, files, check_crs)
+
+        util.put_layer(username, layername, delete_from, task_options, use_chunk_upload)
 
     app.logger.info('PUT Layer changes done')
     info = util.get_complete_layer_info(username, layername)
+    info.update(layer_result)
 
     return jsonify(info), 200
 

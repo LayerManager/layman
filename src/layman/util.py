@@ -132,8 +132,6 @@ def get_layer_info(username, layername):
     failed = False
     for res in last_task['by_order']:
         task_name = next(k for k,v in last_task['by_name'].items() if v == res)
-        if task_name not in TASKS_TO_LAYER_INFO_KEYS:
-            continue
         source_state = {
             'status': res.state if not failed else 'NOT_AVAILABLE'
         }
@@ -144,6 +142,8 @@ def get_layer_info(username, layername):
                 source_state.update({
                     'error': res_exc.to_dict()
                 })
+        if task_name not in TASKS_TO_LAYER_INFO_KEYS:
+            continue
         for linfo_key in TASKS_TO_LAYER_INFO_KEYS[task_name]:
             partial_info[linfo_key] = source_state
 
@@ -222,9 +222,9 @@ def _get_task_signature(username, layername, task_options, task):
     )
 
 
-def post_layer(username, layername, task_options, use_files_str):
+def post_layer(username, layername, task_options, use_chunk_upload):
     post_tasks = POST_TASKS.copy()
-    if use_files_str:
+    if use_chunk_upload:
         post_tasks.insert(0, filesystem.tasks.wait_for_upload)
     post_chain = chain(*list(map(
         lambda t: _get_task_signature(username, layername, task_options, t),
@@ -236,26 +236,17 @@ def post_layer(username, layername, task_options, use_files_str):
     layer_tasks = _get_layer_tasks(username, layername)
     tinfo = {
         'last': res,
-        'by_name': {
-            'layman.db.import_layer_vector_file': res.parent.parent.parent,
-            'layman.geoserver.publish_layer_from_db': res.parent.parent,
-            'layman.geoserver.sld.create_layer_style': res.parent,
-            'layman.filesystem.thumbnail.generate_layer_thumbnail': res,
-        },
-        'by_order': [
-            res,
-        ]
+        'by_name': {},
+        'by_order': []
     }
-    while res.parent is not None:
-        res = res.parent
+    for post_task in reversed(post_tasks):
+        tinfo['by_name'][post_task.name] = res
         tinfo['by_order'].insert(0, res)
-    if use_files_str:
-        tinfo['by_name'].update({
-            'layman.filesystem.input_files.wait_for_upload': res,
-        })
+        res = res.parent
     layer_tasks.append(tinfo)
 
-def put_layer(username, layername, delete_from, task_options):
+
+def put_layer(username, layername, delete_from, task_options, use_chunk_upload):
     if delete_from == 'layman.filesystem.input_files':
         start_idx = 0
     elif delete_from == 'layman.geoserver.sld':
@@ -264,47 +255,34 @@ def put_layer(username, layername, delete_from, task_options):
         raise Exception('Unsupported delete_from='+delete_from)
 
     put_tasks = POST_TASKS[start_idx:]
+    if use_chunk_upload:
+        put_tasks.insert(0, filesystem.tasks.wait_for_upload)
 
-    post_chain = chain(*list(map(
+    put_chain = chain(*list(map(
         lambda t: _get_task_signature(username, layername, task_options, t),
         put_tasks
     )))
-    # res = post_chain.apply_async()
-    res = post_chain()
-
-    tasks_by_name = {
-        'layman.geoserver.sld.create_layer_style': res.parent,
-        'layman.filesystem.thumbnail.generate_layer_thumbnail': res,
-    }
-    tasks_by_order = [
-        res.parent,
-        res,
-    ]
-    if delete_from == 'layman.filesystem.input_files':
-        tasks_by_name = {
-            **tasks_by_name,
-            **{
-                'layman.db.import_layer_vector_file': res.parent.parent.parent,
-                'layman.geoserver.publish_layer_from_db': res.parent.parent,
-            }
-        }
-        tasks_by_order = [
-            res.parent.parent.parent,
-            res.parent.parent,
-        ] + tasks_by_order
+    # res = put_chain.apply_async()
+    res = put_chain()
 
     layer_tasks = _get_layer_tasks(username, layername)
     tinfo = {
         'last': res,
-        'by_name': tasks_by_name,
-        'by_order': tasks_by_order
+        'by_name': {},
+        'by_order': []
     }
+    for post_task in reversed(put_tasks):
+        tinfo['by_name'][post_task.name] = res
+        tinfo['by_order'].insert(0, res)
+        res = res.parent
     layer_tasks.append(tinfo)
+
 
 TASKS_TO_LAYER_INFO_KEYS = {
     'layman.filesystem.input_files.wait_for_upload': ['file'],
     'layman.db.import_layer_vector_file': ['db_table'],
     'layman.geoserver.publish_layer_from_db': ['wms', 'wfs'],
+    'layman.geoserver.sld.create_layer_style': ['sld'],
     'layman.filesystem.thumbnail.generate_layer_thumbnail': ['thumbnail'],
 }
 
