@@ -9,7 +9,25 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from layman import app
 import pytest
 
+PORT = 9002
 
+
+@pytest.fixture(scope="module")
+def flask_server():
+    server = Process(target=app.run, kwargs={
+        'host': '0.0.0.0',
+        'port': PORT,
+        'debug': False,
+    })
+    # print('START FLASK SERVER')
+    server.start()
+    yield server
+    # print('STOP FLASK SERVER')
+    server.terminate()
+    server.join()
+
+
+@pytest.mark.usefixtures("flask_server")
 def test_resumable():
     username = 'testuser1'
     layername = 'country_chunks'
@@ -20,16 +38,9 @@ def test_resumable():
     for fp in file_paths:
         assert os.path.isfile(fp)
 
-    port = 9002
     # time.sleep(5)
-    server = Process(target=app.run, kwargs={
-        'host': '0.0.0.0',
-        'port': port,
-        'debug': False,
-    })
-    server.start()
 
-    domain = "http://localhost:{}".format(port)
+    domain = "http://localhost:{}".format(PORT)
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -105,11 +116,7 @@ def test_resumable():
                 ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
             )
 
-    except Exception as e:
-        assert 1==2
     finally:
         chrome.close()
         chrome.quit()
 
-        server.terminate()
-        server.join()
