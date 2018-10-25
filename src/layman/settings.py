@@ -97,3 +97,7 @@ SOURCES = [
 
 # UPLOAD_MAX_INACTIVITY_TIME = 10 # 10 seconds
 UPLOAD_MAX_INACTIVITY_TIME = 5 * 60 # 5 minutes
+
+LAYMAN_REDIS_URL = os.environ['LAYMAN_REDIS_URL']
+import redis
+LAYMAN_REDIS = redis.Redis.from_url(LAYMAN_REDIS_URL)
