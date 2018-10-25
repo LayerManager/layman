@@ -235,7 +235,12 @@ def save_layer_files_str(username, layername, files_str, check_crs,
     info_path = os.path.join(resumable_dir, 'info.json')
     with open(info_path, 'w') as file:
         json.dump(file_content, file)
-    return files_to_upload
+    return [
+        {
+            'file': fo['input_file'],
+            'layman_original_parameter': fo['layman_original_parameter'],
+        } for fo in files_to_upload
+    ]
 
 
 def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
