@@ -21,6 +21,7 @@ Publishing geospatial vector data online through [REST API](REST.md).
   - one WFS feature type per DB table
   - one SLD style per WMS layer
 - Configurable by environment variables
+- Standing on the shoulders of Docker, Python, Flask, PostgreSQL, PostGIS, GDAL, GeoServer, Celery, Redis, and [more](DEPENDENCIES.md).
 
 ## Requirements
 - docker v17.12+, installation instructions for [centos 7](https://docs.docker.com/install/linux/docker-ce/centos/)
