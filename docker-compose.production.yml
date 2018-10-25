@@ -14,6 +14,35 @@ services:
       ports:
         - 8000:8000
       volumes:
+        - ./geoserver_data:/geoserver_data
         - ./src:/code/src
         - ./start.sh:/code/start.sh
+
+   redis:
+      image: redis:4.0.11-alpine
+
+   celery_worker:
+      image: layman:latest
+      command: bash -c "cd src && python3 -m celery -Q $${LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info"
+      env_file: .env
+      environment:
+        - C_FORCE_ROOT=true
+      volumes:
         - ./geoserver_data:/geoserver_data
+        - ./src:/code/src
+      depends_on:
+        - layman
+        - redis
+
+   flower:
+      container_name: flower
+      image: layman:latest
+      command: bash -c "cd src && python3 -m flower -A layman.celery_app --port=5555"
+      env_file: .env.dev
+      volumes:
+        - ./geoserver_data:/geoserver_data
+        - ./src:/code/src
+      ports:
+        - 5555:5555
+      depends_on:
+        - celery_worker
