@@ -1,11 +1,13 @@
 from celery import Celery
 from celery.contrib import abortable
+from .settings import *
+
 
 def make_celery(app):
     celery_app = Celery(
         'layman',
-        backend='redis://redis:6379/0',
-        broker='redis://redis:6379/0',
+        backend=LAYMAN_REDIS_URL,
+        broker=LAYMAN_REDIS_URL,
         include=[
             'layman.db.tasks',
             'layman.filesystem.tasks',

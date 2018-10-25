@@ -1,3 +1,4 @@
+from collections import defaultdict
 import datetime
 import json
 from flask import current_app
@@ -8,7 +9,7 @@ import pathlib
 import shutil
 
 from . import get_user_dir, get_layer_dir
-from layman.settings import MAIN_FILE_EXTENSIONS, INPUT_SRS_LIST
+from layman.settings import MAIN_FILE_EXTENSIONS, INPUT_SRS_LIST, LAYMAN_REDIS
 from layman.http import LaymanError
 
 
@@ -241,6 +242,11 @@ def save_layer_files_str(username, layername, files_str, check_crs):
     ]
 
 
+def get_layer_redis_total_chunks_key(username, layername):
+    return 'layman.users.{}.layers.{}.total_chunks'.format(
+                    username, layername)
+
+
 def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
                           chunk_number, total_chunks):
     resumable_dir = get_layer_resumable_dir(username, layername)
@@ -249,10 +255,6 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
     if os.path.isfile(info_path):
         with open(info_path, 'r+') as info_file:
             info = json.load(info_file)
-            info['total_chunks'] = total_chunks
-            info_file.seek(0)
-            json.dump(info, info_file)
-            info_file.truncate()
             files_to_upload = info['files_to_upload']
             file_info = next(
                 (
@@ -267,6 +269,11 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
                     'file': filename,
                     'layman_original_parameter': parameter_name,
                 })
+            LAYMAN_REDIS.hset(
+                get_layer_redis_total_chunks_key(username, layername),
+                '{}:{}'.format(parameter_name, file_info['target_file']),
+                total_chunks
+            )
             target_filename = os.path.basename(file_info['target_file'])
             chunk_name = _get_chunk_name(target_filename, chunk_number)
             chunk_path = os.path.join(chunk_dir, chunk_name)
@@ -311,37 +318,46 @@ def layer_file_chunk_exists(username, layername, parameter_name, filename,
 
 
 def layer_file_chunk_info(username, layername):
+    # print('print layer_file_chunk_info')
     resumable_dir = get_layer_resumable_dir(username, layername)
     info_path = os.path.join(resumable_dir, 'info.json')
     chunk_dir = os.path.join(resumable_dir, 'chunks')
     if os.path.isfile(info_path):
+        # print('print layer_file_chunk_info info_path')
         with open(info_path, 'r') as info_file:
             info = json.load(info_file)
             files_to_upload = info['files_to_upload']
 
-            if 'total_chunks' in info:
-                total_chunks = info['total_chunks']
-                for fi in files_to_upload:
-                    target_fn = os.path.basename(fi['target_file'])
-                    chunk_paths = [
-                        os.path.join(chunk_dir, _get_chunk_name(target_fn, x))
-                        for x in range(1, total_chunks + 1)
-                    ]
-                    file_upload_complete = \
-                        all([os.path.exists(p) for p in chunk_paths])
-                    if file_upload_complete:
-                        current_app.logger.info(
-                            'file_upload_complete ' + target_fn)
-                        target_fp = fi['target_file']
-                        with open(target_fp, "ab") as target_file:
-                            for chunk_path in chunk_paths:
-                                stored_chunk_file = open(chunk_path, 'rb')
-                                target_file.write(stored_chunk_file.read())
-                                stored_chunk_file.close()
-                                os.unlink(chunk_path)
-                        target_file.close()
-                        current_app.logger.info('Resumable file saved to: %s',
-                                                 target_fp)
+            r_key = get_layer_redis_total_chunks_key(username, layername)
+            for fi in files_to_upload:
+                rh_key = '{}:{}'.format(
+                        fi['layman_original_parameter'], fi['target_file'])
+                total_chunks = LAYMAN_REDIS.hget(r_key, rh_key)
+                # print('file {} {}'.format(rh_key, total_chunks))
+                if total_chunks is None:
+                    continue
+                total_chunks = int(total_chunks)
+                target_fn = os.path.basename(fi['target_file'])
+                chunk_paths = [
+                    os.path.join(chunk_dir, _get_chunk_name(target_fn, x))
+                    for x in range(1, total_chunks + 1)
+                ]
+                file_upload_complete = \
+                    all([os.path.exists(p) for p in chunk_paths])
+                if file_upload_complete:
+                    current_app.logger.info(
+                        'file_upload_complete ' + target_fn)
+                    target_fp = fi['target_file']
+                    with open(target_fp, "ab") as target_file:
+                        for chunk_path in chunk_paths:
+                            stored_chunk_file = open(chunk_path, 'rb')
+                            target_file.write(stored_chunk_file.read())
+                            stored_chunk_file.close()
+                            os.unlink(chunk_path)
+                    target_file.close()
+                    LAYMAN_REDIS.hdel(r_key, rh_key)
+                    current_app.logger.info('Resumable file saved to: %s',
+                                             target_fp)
 
             num_files_saved = len([
                 fi for fi in files_to_upload
@@ -349,6 +365,8 @@ def layer_file_chunk_info(username, layername):
             ])
             all_files_saved = num_files_saved == len(files_to_upload)
             if all_files_saved:
+                shutil.rmtree(get_layer_dir(username, layername))
+                LAYMAN_REDIS.delete(r_key)
                 num_chunks_saved = 0
             else:
                 num_chunks_saved = len(os.listdir(chunk_dir))
