@@ -69,12 +69,12 @@ def post_layers(username):
     util.check_username(username)
 
     # FILE
-    use_files_str = False
+    use_chunk_upload = False
     if 'file' in request.files:
         files = request.files.getlist("file")
     elif len(request.form.getlist('file')) > 0:
         files = request.form.getlist('file')
-        use_files_str = True
+        use_chunk_upload = True
     else:
         raise LaymanError(1, {'parameter': 'file'})
 
@@ -131,16 +131,11 @@ def post_layers(username):
     # save files
     filesystem.ensure_user_dir(username)
     input_sld.save_layer_file(username, layername, sld_file)
-    if use_files_str:
-        # app.logger.info('POST Layers files_str '+str(files))
+    if use_chunk_upload:
         files_to_upload = input_files.save_layer_files_str(
             username, layername, files, check_crs, request.endpoint)
-        # app.logger.info('POST Layers files_str saved')
         layer_result.update({
-            'files_to_upload': [{
-                'file': fo['input_file'],
-                'layman_original_parameter': fo['layman_original_parameter'],
-            } for fo in files_to_upload],
+            'files_to_upload': files_to_upload,
         })
         task_options.update({
             'check_crs': check_crs,
@@ -149,7 +144,7 @@ def post_layers(username):
         input_files.save_layer_files(
             username, layername, files, check_crs)
 
-    util.post_layer(username, layername, task_options, use_files_str)
+    util.post_layer(username, layername, task_options, use_chunk_upload)
 
     # app.logger.info('uploaded layer '+layername)
     return jsonify([layer_result]), 200
