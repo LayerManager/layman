@@ -26,6 +26,9 @@ def wait_for_upload(self, username, layername, check_crs=True):
     logger.debug('chunk_info {}'.format(str(chunk_info)))
     while not chunk_info[0]:
         if time.time() - last_change > UPLOAD_MAX_INACTIVITY_TIME:
+            logger.info('UPLOAD_MAX_INACTIVITY_TIME reached {}.{}'.format(
+                username, layername))
+            input_files.delete_layer(username, layername)
             raise LaymanError(22)
         time.sleep(0.5)
         if self.is_aborted():
