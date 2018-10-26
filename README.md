@@ -1,5 +1,5 @@
 # gspld [![Build Status](https://travis-ci.org/jirik/gspld.svg?branch=master)](https://travis-ci.org/jirik/gspld)
-Publishing geospatial vector data online through [REST API](REST.md).
+Publishing geospatial vector data online through [REST API](doc/rest.md).
 - Accepts SHP and GeoJSON data files and SLD styles for visualization
 - Even large files can be uploaded from browser
 - Asynchronous upload and processing
@@ -11,7 +11,7 @@ Publishing geospatial vector data online through [REST API](REST.md).
   - input file saved in file system
   - DB table with imported input file
 - Everything is automatically named and structured first by user name, second by layer name
-  - [REST API](REST.md): `/rest/<username>/layers/<layername>` 
+  - [REST API](doc/rest.md): `/rest/<username>/layers/<layername>` 
   - file system: `/path/to/LAYMAN_DATA_DIR/<username>/<layername>` 
   - DB: `db=LAYMAN_PG_DBNAME, schema=<username>, table=<layername>` 
   - WMS/WFS: `/geoserver/<username>/ows, layer=<layername>, style=<layername>` 
@@ -21,7 +21,7 @@ Publishing geospatial vector data online through [REST API](REST.md).
   - one WFS feature type per DB table
   - one SLD style per WMS layer
 - Configurable by environment variables
-- Standing on the shoulders of Docker, Python, Flask, PostgreSQL, PostGIS, GDAL, GeoServer, Celery, Redis, and [more](DEPENDENCIES.md).
+- Standing on the shoulders of Docker, Python, Flask, PostgreSQL, PostGIS, GDAL, GeoServer, Celery, Redis, and [more](doc/dependencies.md).
 
 ## Requirements
 - docker v17.12+, installation instructions for [centos 7](https://docs.docker.com/install/linux/docker-ce/centos/)
@@ -58,7 +58,7 @@ layman       |  * Restarting with stat
 layman       |  * Debugger is active!
 layman       |  * Debugger PIN: 103-830-055
 ```
-Then visit [http://localhost:8000/](). You will see simple HTML form that enables to publish vector data file as new layer of WMS and WFS using [REST API](REST.md). The form is for testing purpose only, the REST API is for production.
+Then visit [http://localhost:8000/](). You will see simple HTML form that enables to publish vector data file as new layer of WMS and WFS using [REST API](doc/rest.md). The form is for testing purpose only, the REST API is for production.
 
 To stop running service, press Ctrl+C.
 
