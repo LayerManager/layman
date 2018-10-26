@@ -1,6 +1,6 @@
 # Asynchronous file upload
 
-In case of [POST Layers](#post-layers) and [PUT Layer](#put-layer), it is possible to upload data files asynchronously, which is suitable for large files. Let's demonstrate how it can be implemented on client side.
+In case of [POST Layers](rest.md#post-layers) and [PUT Layer](rest.md#put-layer), it is possible to upload data files asynchronously, which is suitable for large files. Let's demonstrate how it can be implemented on client side.
 
 ## HTML
 You need some HTML form for user to choose files he wants to publish and fill some additional parametes:
