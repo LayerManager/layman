@@ -6,6 +6,7 @@
 |Layers|`/rest/<user>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | x |
 |Layer|`/rest/<user>/layers/<layername>`|[GET](#get-layer)| x | [PUT](#put-layer) | [DELETE](#delete-layer) |
 |Layer Thumbnail|`/rest/<user>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
+|Layer Chunk|`/rest/<username>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
 
 #### REST path parameters
 - **user**, `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
@@ -40,14 +41,25 @@ Processing chain consists of few steps:
 
 If user's directory, database schema, GeoServer's worskpace, or GeoServer's store does not exist yet, it is created on demand.
 
-Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Layer](#get-layer) and the **status** properties of layer sources (wms, wfs, thumbnail, db_table).
+Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Layer](#get-layer) and **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, sld).
+
+It is possible to upload data files asynchronously, which is suitable for large files. This can be done in three steps:
+1. Send POST Layers request with **file** parameter filled by file names that you want to upload
+2. Read set of files accepted to upload from POST Layers response, **files_to_upload** property. The set of accepted files will be either equal to or subset of file names sent in **file** parameter.
+3. Send [POST Layer Chunk](#post-layer-chunk) requests using Resumable.js to upload files.
+
+Check [Asynchronous file upload](async-file-upload.md) example.
 
 #### Request
 Content-Type: `multipart/form-data`
 
 Body parameters:
-- **file**, file
-   - GeoJSON file
+- *file*, file(s) or file name(s)
+   - one of following options is expected:
+      - GeoJSON file
+      - ShapeFile files (at least three files: .shp, .shx, .dbf)
+      - file names, i.e. array of strings
+   - if file names are provided, files must be uploaded subsequently using [POST Layer Chunk](#post-layer-chunk)
 - *name*, string
    - computer-friendly identifier of the layer
    - must be unique within one user
@@ -70,6 +82,9 @@ Content-Type: `application/json`
 JSON array of objects representing posted layers with following structure:
 - **name**: String. Name of the layer.
 - **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
+- *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. Each object represents one file that server expects to be subsequently uploaded using [POST Layer Chunk](#post-layer-chunk). Each object has following properties:
+   - **file**: name of the file, equal to one of file name from **file** parameter
+   - **layman_original_parameter**: name of the request parameter that contained the file name; currently, the only possible value is `file`
 
 ## Layer
 ### URL
@@ -123,9 +138,11 @@ JSON object with following structure:
 
 
 ### PUT Layer
-Update information about existing layer. It deletes updated layer sources first, and then publishes them again with new parameters. THe processing chain is similar to [POST Layers](#post-layers).
+Update information about existing layer. It deletes updated layer sources first, and then publishes them again with new parameters. The processing chain is similar to [POST Layers](#post-layers).
 
 Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing.
+
+It is possible to upload data files asynchronously, which is suitable for large files. See [POST Layers](#post-layers).
 
 
 #### Request
@@ -134,8 +151,13 @@ Content-Type: `multipart/form-data`
 Parameters have same meaning as in case of [POST Layers](#post-layers).
 
 Body parameters:
-- *file*, file
-   - If provided, current layer vector data file will be deleted and replaced by this file. GeoServer layer, DB table, and thumbnail will be temporarily deleted and created again using the new file.
+- *file*, file(s) or file name(s)
+   - If provided, current layer vector data file will be deleted and replaced by this file. GeoServer layer, DB table, and thumbnail will be deleted and created again using the new file.
+   - one of following options is expected:
+      - GeoJSON file
+      - ShapeFile files (at least three files: .shp, .shx, .dbf)
+      - file names, i.e. array of strings
+   - if file names are provided, files must be uploaded subsequently using [POST Layer Chunk](#post-layer-chunk)
 - *title*
 - *description*
 - *crs*, string `EPSG:3857` or `EPSG:4326`
@@ -146,7 +168,8 @@ Body parameters:
 #### Response
 Content-Type: `application/json`
 
-JSON object, same as in case of [GET](#get-layer).
+JSON object, same as in case of [GET](#get-layer), possible extended with one extra property:
+- *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. See [POST Layers](#post-layers) response to find out more.
 
 
 ### DELETE Layer
@@ -175,3 +198,49 @@ No action parameters.
 Content-Type: `image/png`
 
 PNG image.
+
+
+## Layer Chunk
+Layer Chunk endpoint enables to upload layer data files asynchronously by splitting them into small parts called *chunks* that are uploaded independently. The endpoint is expected to be operated using [Resumable.js](http://www.resumablejs.com/) library. Resumable.js can split and upload files by chunks using [HTML File API](https://developer.mozilla.org/en-US/docs/Web/API/File), widely [supported by major browsers](https://caniuse.com/#feat=fileapi).
+
+Check [Asynchronous file upload](async-file-upload.md) example. 
+
+The endpoint is activated after [POST Layers](#post-layers) or [PUT Layer](#put-layer) request if and only if the **file** parameter contained file name(s). The endpoint is active till first of the following happens:
+- all file chunks are uploaded
+- no chunk is uploaded within [UPLOAD_MAX_INACTIVITY_TIME](src/layman/settings.py)
+- layer is deleted
+
+
+### URL
+`/rest/<username>/layers/<layername>/chunk`
+### GET Layer Chunk
+Test if file chunk is already uploaded on the server.
+
+#### Request
+Query parameters:
+- **layman_original_parameter**, name of parameter of preceding request ([POST Layers](#post-layers) or [PUT Layer](#put-layer)) that contained the file name
+- **resumableFilename**, name of file whose chunk is requested
+- **resumableChunkNumber**, serial number of requested chunk
+
+#### Response
+Content-Type: `application/json`
+
+HTTP status code 200 if chunk is already uploaded on the server, otherwise 404.
+
+### POST Layer Chunk
+Upload file chunk to the server.
+
+#### Request
+Content-Type: `multipart/form-data`
+
+Body parameters:
+- **file**, uploaded chunk
+- **resumableChunkNumber**, serial number of uploaded chunk
+- **resumableFilename**, name of file whose chunk is uploaded
+- **layman_original_parameter**, name of parameter of preceding request ([POST Layers](#post-layers) or [PUT Layer](#put-layer)) that contained the file name
+- **resumableTotalChunks**, number of chunks the file is split to
+
+#### Response
+Content-Type: `application/json`
+
+HTTP status code 200 if chunk was successfully saved.
