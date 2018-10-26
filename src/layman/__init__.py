@@ -317,6 +317,11 @@ def post_layer_chunk(username, layername):
     util.check_layername(layername)
 
     total_chunks = request.form.get('resumableTotalChunks', type=int)
+    if total_chunks > 999:
+        raise LaymanError(2, {
+            'parameter': 'resumableTotalChunks',
+            'expected value': 'number from 0 to 999',
+        })
     chunk_number = request.form.get('resumableChunkNumber', default=1,
                                             type=int)
     filename = request.form.get('resumableFilename', default='error',
