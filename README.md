@@ -111,9 +111,9 @@ If you don't have existing GeoServer & PostGIS instance, you can use dockerized 
 # prepare geoserver data directory
 make reset-layman-gs-datadir
 
-cp .env.production .env
+cp .env.production-and-deps .env
 
-# edit .env
+# edit .env, at least add FLASK_SECRET_KEY
 # edit src/layman/settings.py
 
 # start dockerized layman & geoserver & DB
