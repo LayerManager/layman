@@ -24,6 +24,8 @@ Publishing geospatial vector data online through [REST API](doc/rest.md).
 - Standing on the shoulders of Docker, Python, Flask, PostgreSQL, PostGIS, GDAL, GeoServer, Celery, Redis, and [more](doc/dependencies.md).
 
 ## Requirements
+- at least 3 GB RAM
+- at least 5 GB disk space
 - docker v17.12+, installation instructions for [centos 7](https://docs.docker.com/install/linux/docker-ce/centos/)
 - docker-compose v1.14+, installation instructions for [centos 7](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-centos-7)
 
