@@ -6,7 +6,7 @@
 |Layers|`/rest/<user>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | x |
 |Layer|`/rest/<user>/layers/<layername>`|[GET](#get-layer)| x | [PUT](#put-layer) | [DELETE](#delete-layer) |
 |Layer Thumbnail|`/rest/<user>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
-|Layer Chunk|`/rest/<username>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
+|Layer Chunk|`/rest/<user>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
 
 #### REST path parameters
 - **user**, `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
