@@ -15,6 +15,9 @@ layman-build:
 layman-bash:
 	docker-compose -f docker-compose.dev.yml run --rm layman bash
 
+psql:
+	docker-compose -f docker-compose.dev.yml run -e PGPASSWORD=docker --entrypoint "psql -U docker -p 5432 -h db gis" --rm db
+
 clear-data:
 	docker-compose -f docker-compose.dev.yml run --rm layman bash -c "python3 src/clear_layman_data.py && python3 src/prepare_layman.py"
 
