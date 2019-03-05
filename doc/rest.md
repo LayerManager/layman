@@ -268,7 +268,7 @@ JSON array of objects representing available maps with following structure:
 Publish new map composition. Accepts JSON valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema) used by [Hslayers-ng](https://github.com/hslayers/hslayers-ng).
 
 Processing chain consists of few steps:
-- validate JSON file agains [composiotion schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema)
+- validate JSON file against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema)
 - save file to user's directory
 - if needed, update some JSON attributes, e.g. `name` or `title`
 - generate thumbnail image
