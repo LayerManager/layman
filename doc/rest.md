@@ -270,7 +270,7 @@ Publish new map composition. Accepts JSON valid against [map-composition schema]
 Processing chain consists of few steps:
 - validate JSON file against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema)
 - save file to user's directory
-- if needed, update some JSON attributes, e.g. `name` or `title`
+- if needed, update some JSON attributes, e.g. `name`, `title` or `abstract`
 - generate thumbnail image
 
 If user's directory does not exist yet, it is created on demand.
@@ -292,6 +292,8 @@ Body parameters:
 - *title*, string `.+`
    - human readable name of the map
    - by default it is either `title` attribute of JSON root object or map name
+- *description*
+   - by default it is either `abstract` attribute of JSON root object empty string
 
 #### Response
 Content-Type: `application/json`
