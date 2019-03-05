@@ -7,7 +7,7 @@
 |Layer|`/rest/<user>/layers/<layername>`|[GET](#get-layer)| x | [PUT](#put-layer) | [DELETE](#delete-layer) |
 |Layer Thumbnail|`/rest/<user>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
 |Layer Chunk|`/rest/<user>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
-|Maps|`/rest/<user>/maps`|[GET](#get-layers)| [POST](#post-layers) | x | x |
+|Maps|`/rest/<user>/maps`|[GET](#get-maps)| [POST](#post-maps) | x | x |
 |Map|`/rest/<user>/maps/<mapname>`|[GET](#get-map)| x | [PUT](#put-map) | [DELETE](#delete-map) |
 |Map File|`/rest/<user>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
 |Map Thumbnail|`/rest/<user>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
