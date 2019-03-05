@@ -7,12 +7,17 @@
 |Layer|`/rest/<user>/layers/<layername>`|[GET](#get-layer)| x | [PUT](#put-layer) | [DELETE](#delete-layer) |
 |Layer Thumbnail|`/rest/<user>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
 |Layer Chunk|`/rest/<user>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
+|Maps|`/rest/<user>/maps`|[GET](#get-layers)| [POST](#post-layers) | x | x |
+|Map|`/rest/<user>/maps/<mapname>`|[GET](#get-map)| x | [PUT](#put-map) | [DELETE](#delete-map) |
+|Map File|`/rest/<user>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
+|Map Thumbnail|`/rest/<user>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
 
 #### REST path parameters
-- **user**, `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
+- **user**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
    - owner of the layer
    - it can be almost any string matching the regular expression (some keywords are not allowed)
    - it is not real user of file system, DB, or GeoServer
+
 
 ## Layers
 ### URL
@@ -54,7 +59,7 @@ Check [Asynchronous file upload](async-file-upload.md) example.
 Content-Type: `multipart/form-data`
 
 Body parameters:
-- *file*, file(s) or file name(s)
+- **file**, file(s) or file name(s)
    - one of following options is expected:
       - GeoJSON file
       - ShapeFile files (at least three files: .shp, .shx, .dbf)
@@ -67,7 +72,7 @@ Body parameters:
    - will be automatically adjusted using `to_safe_layer_name` function
 - *title*, string `.+`
    - human readable name of the layer
-   - by default it is layer_name
+   - by default it is layer name
 - *description*
    - by default it is empty string
 - *crs*, string `EPSG:3857` or `EPSG:4326`
@@ -85,6 +90,7 @@ JSON array of objects representing posted layers with following structure:
 - *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. Each object represents one file that server expects to be subsequently uploaded using [POST Layer Chunk](#post-layer-chunk). Each object has following properties:
    - **file**: name of the file, equal to one of file name from **file** parameter
    - **layman_original_parameter**: name of the request parameter that contained the file name; currently, the only possible value is `file`
+
 
 ## Layer
 ### URL
@@ -118,32 +124,30 @@ JSON object with following structure:
   - *error*: If status is FAILURE, this may contain error object.
 - **wfs**
   - *url*: String. URL of WFS endpoint. It points to WFS endpoint of user's workspace.
-  - *status*: Status information about GeoServer import and availability of WFS feature type. See GET Layer **wms** property for meaning.
+  - *status*: Status information about GeoServer import and availability of WFS feature type. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
   - *url*: String. URL of layer thumbnail. It points to [GET Layer Thumbnail](#get-layer-thumbnail).
-  - *status*: Status information about generating and availability of thumbnail. See GET Layer **wms** property for meaning.
+  - *status*: Status information about generating and availability of thumbnail. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **file**
   - *path*: String. Path to input vector data file that was imported to the DB table. Path is relative to user's directory.
-  - *status*: Status information about saving and availability of files. No status object = file was successfully saved.
+  - *status*: Status information about saving and availability of files. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **db_table**
   - **name**: String. DB table name within PostgreSQL user's schema. This table is used as GeoServer source of layer.
-  - *status*: Status information about DB import and availability of the table. No status object = import was successfully completed.
+  - *status*: Status information about DB import and availability of the table. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *sld*
-  - **status**: Status information about publishing SLD. See GET Layer **wms** property for meaning.
+  - **status**: Status information about publishing SLD. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 
-
 ### PUT Layer
-Update information about existing layer. It deletes updated layer sources first, and then publishes them again with new parameters. The processing chain is similar to [POST Layers](#post-layers).
+Update information about existing layer. First, it deletes sources of the layer, and then it publishes them again with new parameters. The processing chain is similar to [POST Layers](#post-layers).
 
 Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing.
 
 It is possible to upload data files asynchronously, which is suitable for large files. See [POST Layers](#post-layers).
-
 
 #### Request
 Content-Type: `multipart/form-data`
@@ -168,9 +172,8 @@ Body parameters:
 #### Response
 Content-Type: `application/json`
 
-JSON object, same as in case of [GET](#get-layer), possible extended with one extra property:
+JSON object, same as in case of [GET](#get-layer), possibly extended with one extra property:
 - *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. See [POST Layers](#post-layers) response to find out more.
-
 
 ### DELETE Layer
 Delete existing layer and all associated sources, including vector data file and DB table. It is possible to delete layer, whose publication process is still running. In such case, the publication process is aborted safely.
@@ -210,7 +213,6 @@ The endpoint is activated after [POST Layers](#post-layers) or [PUT Layer](#put-
 - no chunk is uploaded within [UPLOAD_MAX_INACTIVITY_TIME](src/layman/settings.py)
 - layer is deleted
 
-
 ### URL
 `/rest/<username>/layers/<layername>/chunk`
 ### GET Layer Chunk
@@ -244,3 +246,152 @@ Body parameters:
 Content-Type: `application/json`
 
 HTTP status code 200 if chunk was successfully saved.
+
+
+## Maps
+### URL
+`/rest/<user>/maps`
+
+### GET Maps
+Get list of published maps (map compositions).
+
+#### Request
+No action parameters.
+#### Response
+Content-Type: `application/json`
+
+JSON array of objects representing available maps with following structure:
+- **name**: String. Name of the map.
+- **url**: String. URL of the map. It points to [GET Map](#get-map).
+
+### POST Maps
+Publish new map composition. Accepts JSON valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema) used by [Hslayers-ng](https://github.com/hslayers/hslayers-ng).
+
+Processing chain consists of few steps:
+- validate JSON file agains [composiotion schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema)
+- save file to user's directory
+- if needed, update some JSON attributes, e.g. `name` or `title`
+- generate thumbnail image
+
+If user's directory does not exist yet, it is created on demand.
+
+#### Request
+Content-Type: `multipart/form-data`
+
+Body parameters:
+- **file**, JSON file
+   - must be valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema)
+- *name*, string
+   - computer-friendly identifier of the map
+   - must be unique within one user
+   - by default, it is the first available of following options:
+      - `name` attribute of JSON root object
+      - `title` attribute of JSON root object
+      - file name without extension
+   - will be automatically adjusted using `to_safe_map_name` function
+- *title*, string `.+`
+   - human readable name of the map
+   - by default it is either `title` attribute of JSON root object or map name
+
+#### Response
+Content-Type: `application/json`
+
+JSON array of objects representing posted maps with following structure:
+- **name**: String. Name of the map.
+- **url**: String. URL of the map. It points to [GET Map](#get-map).
+
+
+## Map
+### URL
+`/rest/<user>/maps/<mapname>`
+
+#### Endpoint path parameters
+- **mapname**
+   - map name used for identification
+   - it can be obtained from responses of [GET Maps](#get-maps), [POST Maps](#post-maps), and all responses of this endpoint
+
+### GET Map
+Get information about existing map.
+
+#### Request
+No action parameters.
+#### Response
+Content-Type: `application/json`
+
+JSON object with following structure:
+- **name**: String. Map name used for identification within user's namespace. Equal to `name` attribute of JSON root object
+- **url**: String. URL pointing to this endpoint.
+- **title**: String. Taken from `title` attribute of JSON root object
+- **description**: String. Taken from `abstract` attribute of JSON root object.
+- **file**
+  - *url*: String. URL of map-composition JSON file. It points to [GET Map File](#get-map-file).
+  - *path*: String. Path to map-composition JSON file, relative to user's directory.
+  - *status*: Status information about availability of file. See [GET Layer](#get-layer) **wms** property for meaning.
+  - *error*: If status is FAILURE, this may contain error object.
+- **thumbnail**
+  - *url*: String. URL of map thumbnail. It points to [GET Map Thumbnail](#get-map-thumbnail).
+  - *status*: Status information about generating and availability of thumbnail. See GET Map **wms** property for meaning.
+  - *error*: If status is FAILURE, this may contain error object.
+
+### PUT Map
+Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Maps](#post-maps).
+
+#### Request
+Content-Type: `multipart/form-data`
+
+Parameters have same meaning as in case of [POST Maps](#post-maps).
+
+Body parameters:
+- *file*, JSON file
+   - must be valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema)
+- *title*, string `.+`
+   - human readable name of the map
+   - by default it is either `title` attribute of JSON root object or map name
+
+#### Response
+Content-Type: `application/json`
+
+JSON object, same as in case of [GET](#get-map).
+
+### DELETE Map
+Delete existing map and all associated sources, including map-composition JSON file and map thumbnail.
+
+#### Request
+No action parameters.
+
+#### Response
+Content-Type: `application/json`
+
+JSON object representing deleted map:
+- **name**: String. Former name of the map.
+- **url**: String. Former URL of the map. It points to [GET Map](#get-map).
+
+
+## Map File
+### URL
+`/rest/<user>/maps/<mapname>/file`
+### GET Map File
+Get JSON file describing the map valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema).
+
+#### Request
+No action parameters.
+#### Response
+Content-Type: `application/json`
+
+JSON file describing the map valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema).
+
+
+## Map Thumbnail
+### URL
+`/rest/<user>/maps/<mapname>/thumbnail`
+### GET Map Thumbnail
+Get thumbnail of the map in PNG format, 300x300 px, transparent background.
+
+#### Request
+No action parameters.
+#### Response
+Content-Type: `image/png`
+
+PNG image.
+
+
