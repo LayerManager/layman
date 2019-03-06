@@ -12,7 +12,7 @@ Publishing geospatial vector data online through [REST API](doc/rest.md).
   - DB table with imported input file
 - Everything is automatically named and structured first by user name, second by layer name
   - [REST API](doc/rest.md): `/rest/<username>/layers/<layername>` 
-  - file system: `/path/to/LAYMAN_DATA_DIR/<username>/<layername>` 
+  - file system: `/path/to/LAYMAN_DATA_DIR/users/<username>/layers/<layername>` 
   - DB: `db=LAYMAN_PG_DBNAME, schema=<username>, table=<layername>` 
   - WMS/WFS: `/geoserver/<username>/ows, layer=<layername>, style=<layername>` 
 - Simple rules

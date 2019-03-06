@@ -3,21 +3,21 @@ import shutil
 
 from .__init__ import import_layer_vector_file_async
 from layman.settings import *
-from layman.filesystem import get_user_dir
+from layman.filesystem.input_files import ensure_layer_input_file_dir
 
 
 def test_abort_import_layer_vector_file():
     username = 'testuser1'
     layername = 'ne_10m_admin_0_countries'
     src_dir = 'tmp/naturalearth/10m/cultural'
-    userdir = get_user_dir(username)
+    input_file_dir = ensure_layer_input_file_dir(username, layername)
     filename = layername+'.geojson'
-    main_filepath = os.path.join(userdir, filename)
+    main_filepath = os.path.join(input_file_dir, filename)
 
     crs_id = None
     shutil.copy(
         os.path.join(src_dir, filename),
-        userdir
+        input_file_dir
     )
 
     def abort_layer_import():

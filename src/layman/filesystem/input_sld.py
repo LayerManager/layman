@@ -1,12 +1,23 @@
 import os
-import glob
+import pathlib
+import shutil
+
 from werkzeug.datastructures import FileStorage
-from urllib.parse import urljoin
 
-from flask import url_for
-
-from . import get_user_dir
+from . import get_layer_dir
 from layman.settings import *
+
+
+def get_layer_input_sld_dir(username, layername):
+    input_sld_dir = os.path.join(get_layer_dir(username, layername),
+                                 'input_sld')
+    return input_sld_dir
+
+
+def ensure_layer_input_sld_dir(username, layername):
+    input_sld_dir = get_layer_input_sld_dir(username, layername)
+    pathlib.Path(input_sld_dir).mkdir(parents=True, exist_ok=True)
+    return input_sld_dir
 
 
 def get_layer_info(username, layername):
@@ -23,28 +34,24 @@ def update_layer(username, layername, layerinfo):
 
 
 def delete_layer(username, layername):
-    sld_path = get_file_path(username, layername)
     try:
-        os.remove(sld_path)
-    except OSError:
+        shutil.rmtree(get_layer_input_sld_dir(username, layername))
+    except FileNotFoundError:
         pass
+    layerdir = get_layer_dir(username, layername)
+    if os.path.exists(layerdir) and not os.listdir(layerdir):
+        os.rmdir(layerdir)
     return {}
 
 
 def get_file_path(username, layername):
-    userdir = get_user_dir(username)
-    return os.path.join(userdir, layername+'.sld')
+    input_sld_dir = get_layer_input_sld_dir(username, layername)
+    return os.path.join(input_sld_dir, layername+'.sld')
 
 
 def get_layer_names(username):
-    ending = '.sld'
-    userdir = get_user_dir(username)
-    pattern = os.path.join(userdir, '*'+ending)
-    filenames = glob.glob(pattern)
-    layer_names = list(map(
-        lambda fn: os.path.basename(fn)[:-len(ending)],
-        filenames))
-    return layer_names
+    # covered by input_files.get_layer_names
+    return []
 
 
 def save_layer_file(username, layername, sld_file):
@@ -52,8 +59,10 @@ def save_layer_file(username, layername, sld_file):
     if sld_file is None:
         delete_layer(username, layername)
     elif isinstance(sld_file, FileStorage):
+        ensure_layer_input_sld_dir(username, layername)
         sld_file.save(sld_path)
     else:
+        ensure_layer_input_sld_dir(username, layername)
         with open(sld_path, 'wb') as out:
             out.write(sld_file.read())
 

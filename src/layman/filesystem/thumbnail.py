@@ -1,20 +1,35 @@
 import os
 import glob
+import pathlib
+import shutil
 from urllib.parse import urljoin
 
 from flask import url_for
 
-from . import get_user_dir
+from . import get_user_dir, get_layer_dir
 from layman.settings import *
+
+
+def get_layer_thumbnail_dir(username, layername):
+    thumbnail_dir = os.path.join(get_layer_dir(username, layername),
+                                 'thumbnail')
+    return thumbnail_dir
+
+
+def ensure_layer_thumbnail_dir(username, layername):
+    thumbnail_dir = get_layer_thumbnail_dir(username, layername)
+    pathlib.Path(thumbnail_dir).mkdir(parents=True, exist_ok=True)
+    return thumbnail_dir
 
 
 def get_layer_info(username, layername):
     thumbnail_path = get_layer_thumbnail_path(username, layername)
-    if thumbnail_path is not None:
+    if os.path.exists(thumbnail_path):
         return {
             'thumbnail': {
                 'url': url_for('get_layer_thumbnail', username=username,
-                               layername=layername)
+                               layername=layername),
+                'path': os.path.relpath(thumbnail_path, get_user_dir(username))
             }
         }
     return {}
@@ -25,38 +40,28 @@ def update_layer(username, layername, layerinfo):
 
 
 def delete_layer(username, layername):
-    userdir = get_user_dir(username)
-    thumbnail_path = os.path.join(userdir, layername+'.thumbnail.png')
     try:
-        os.remove(thumbnail_path)
-    except OSError:
+        shutil.rmtree(get_layer_thumbnail_dir(username, layername))
+    except FileNotFoundError:
         pass
+    layerdir = get_layer_dir(username, layername)
+    if os.path.exists(layerdir) and not os.listdir(layerdir):
+        os.rmdir(layerdir)
     return {}
 
 
 def get_layer_names(username):
-    ending = '.thumbnail.png'
-    userdir = get_user_dir(username)
-    pattern = os.path.join(userdir, '*'+ending)
-    filenames = glob.glob(pattern)
-    layer_names = list(map(
-        lambda fn: os.path.basename(fn)[:-len(ending)],
-        filenames))
-    return layer_names
+    # covered by input_files.get_layer_names
+    return []
 
 
 def get_layer_thumbnail_path(username, layername):
-    userdir = get_user_dir(username)
-    thumbnail_path = os.path.join(userdir, layername+'.thumbnail.png')
-    if os.path.exists(thumbnail_path):
-        thumbnail_path = os.path.relpath(thumbnail_path, userdir)
-        return thumbnail_path
-    return None
+    thumbnail_dir = get_layer_thumbnail_dir(username, layername)
+    return os.path.join(thumbnail_dir, layername+'.png')
 
 
 def generate_layer_thumbnail(username, layername):
     wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
-    userdir = get_user_dir(username)
     from layman.geoserver.util import wms_proxy
     wms = wms_proxy(wms_url)
     # app.logger.info(list(wms.contents))
@@ -77,7 +82,8 @@ def generate_layer_thumbnail(username, layername):
         format='image/png',
         transparent=True,
     )
-    tn_path = os.path.join(userdir, layername+'.thumbnail.png')
+    ensure_layer_thumbnail_dir(username, layername)
+    tn_path = get_layer_thumbnail_path(username, layername)
     out = open(tn_path, 'wb')
     out.write(tn_img.read())
     out.close()
