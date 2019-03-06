@@ -80,6 +80,7 @@ Body parameters:
    - by default it is read/guessed from input file
 - *sld*, SLD file
    - by default default SLD style of GeoServer is used
+   - uploading of additional style files, e.g. point-symbol images or fonts is not supported
 
 #### Response
 Content-Type: `application/json`
