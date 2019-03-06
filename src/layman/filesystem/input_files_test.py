@@ -18,7 +18,7 @@ def test_get_main_file_name():
     ]
     assert get_main_file_name(filenames) == 'tmp/countries_lakes.geojson'
 
-def test_get_main_file_name():
+def test_get_main_file_name_shp():
     filenames = [
         'tmp/countries.cpg',
         'tmp/countries.dbf',
@@ -79,7 +79,7 @@ def test_get_file_name_mappings():
         ],
         'main_file_name': 'tmp/countries.shp',
         'layer_name': 'cntr',
-        'user_dir': '/data'
+        'output_dir': '/data'
     }
     assert get_file_name_mappings(**cfg)[1] == {
         'tmp/countries.cpg': '/data/cntr.cpg',

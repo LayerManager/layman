@@ -296,10 +296,10 @@ def get_layer_thumbnail(username, layername):
     # raise exception if layer does not exist
     util.get_complete_layer_info(username, layername)
 
-    thumbnail_path = thumbnail.get_layer_thumbnail_path(username,
-                                                            layername)
-    if thumbnail_path is not None:
+    thumbnail_info = thumbnail.get_layer_info(username, layername)
+    if thumbnail_info:
         userdir = filesystem.get_user_dir(username)
+        thumbnail_path = thumbnail_info['thumbnail']['path']
         thumbnail_path = os.path.join(userdir, thumbnail_path)
         return send_file(thumbnail_path, mimetype='image/png')
 
