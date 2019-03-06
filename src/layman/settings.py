@@ -1,8 +1,7 @@
 import os
 from urllib.parse import urljoin
 
-LAYMAN_DATA_PATH = os.path.join(os.environ['GEOSERVER_DATA_DIR'],
-                                os.environ['LAYMAN_DATA_DIR'])
+LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
 
 MAIN_FILE_EXTENSIONS = [
     '.geojson',

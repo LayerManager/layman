@@ -15,6 +15,7 @@ services:
          - .env.test
       volumes:
         - ./geoserver_data:/geoserver_data
+        - ./layman_data_test:/layman_data_test
         - ./sample:/code/sample
         - ./src:/code/src
         - ./tmp:/code/tmp
@@ -70,7 +71,7 @@ services:
       environment:
         - C_FORCE_ROOT=true
       volumes:
-        - ./geoserver_data:/geoserver_data
+        - ./layman_data_test:/layman_data_test
         - ./sample:/code/sample
         - ./src:/code/src
         - ./tmp:/code/tmp

@@ -1,5 +1,7 @@
 /.idea
 /geoserver_data
+/layman_data
+/layman_data_test
 /tmp
 /.env
 
