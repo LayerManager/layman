@@ -1,3 +1,4 @@
+import os
 import shutil
 import re
 from layman.settings import *
@@ -6,8 +7,13 @@ from urllib.parse import urljoin
 
 
 def main():
-    if os.path.exists(LAYMAN_DATA_PATH):
-        shutil.rmtree(LAYMAN_DATA_PATH)
+    if os.path.exists(LAYMAN_DATA_DIR):
+        for the_file in os.listdir(LAYMAN_DATA_DIR):
+            file_path = os.path.join(LAYMAN_DATA_DIR, the_file)
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
 
     import psycopg2
     try:
