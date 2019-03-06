@@ -15,6 +15,7 @@ services:
         - 8000:8000
       volumes:
         - ./geoserver_data:/geoserver_data
+        - ./layman_data:/layman_data
         - ./sample:/code/sample
         - ./src:/code/src
         - ./tmp:/code/tmp
@@ -37,7 +38,7 @@ services:
       environment:
         - C_FORCE_ROOT=true
       volumes:
-        - ./geoserver_data:/geoserver_data
+        - ./layman_data:/layman_data
         - ./sample:/code/sample
         - ./src:/code/src
         - ./tmp:/code/tmp
@@ -51,7 +52,6 @@ services:
       command: bash -c "cd src && python3 -m flower -A layman.celery_app --port=5555"
       env_file: .env.dev
       volumes:
-        - ./geoserver_data:/geoserver_data
         - ./sample:/code/sample
         - ./src:/code/src
         - ./tmp:/code/tmp

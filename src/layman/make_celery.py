@@ -19,6 +19,8 @@ def make_celery(app):
             'fanout_prefix': True,
             'fanout_patterns': True,
         },
+        # https://stackoverflow.com/a/38267978
+        task_track_started=True,
     )
     # celery.conf.update(app.config)
     # celery_app.conf.update(

@@ -4,7 +4,7 @@ from layman.settings import *
 
 
 def get_user_dir(username):
-    userdir = os.path.join(LAYMAN_DATA_PATH, username)
+    userdir = os.path.join(LAYMAN_DATA_DIR, username)
     return userdir
 
 
