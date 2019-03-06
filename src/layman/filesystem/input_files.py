@@ -8,9 +8,21 @@ from osgeo import ogr
 import pathlib
 import shutil
 
-from . import get_user_dir, get_layer_dir
+from . import get_layers_dir, get_user_dir, get_layer_dir
 from layman.settings import MAIN_FILE_EXTENSIONS, INPUT_SRS_LIST, LAYMAN_REDIS
 from layman.http import LaymanError
+
+
+def get_layer_input_file_dir(username, layername):
+    resumable_dir = os.path.join(get_layer_dir(username, layername),
+                                 'input_file')
+    return resumable_dir
+
+
+def ensure_layer_input_file_dir(username, layername):
+    input_file_dir = get_layer_input_file_dir(username, layername)
+    pathlib.Path(input_file_dir).mkdir(parents=True, exist_ok=True)
+    return input_file_dir
 
 
 def get_layer_resumable_dir(username, layername):
@@ -30,32 +42,23 @@ def update_layer(username, layername, layerinfo):
 
 
 def delete_layer(username, layername):
-    userdir = get_user_dir(username)
-    pattern = os.path.join(userdir, layername + '.*')
-    filenames = glob.glob(pattern)
-    filenames = filter(
-        lambda fn: not fn.endswith('.thumbnail.png') \
-                   or not fn.endswith('.sld'),
-        filenames
-    )
-    for filename in filenames:
-        try:
-            os.remove(filename)
-        except OSError:
-            pass
     try:
-        shutil.rmtree(get_layer_dir(username, layername))
+        shutil.rmtree(get_layer_input_file_dir(username, layername))
     except FileNotFoundError:
         pass
+    layerdir = get_layer_dir(username, layername)
+    if os.path.exists(layerdir) and not os.listdir(layerdir):
+        os.rmdir(layerdir)
     return {}
 
+
 def get_layer_info(username, layername):
-    userdir = get_user_dir(username)
-    pattern = os.path.join(userdir, layername+'.*')
+    input_file_dir = get_layer_input_file_dir(username, layername)
+    pattern = os.path.join(input_file_dir, layername+'.*')
     filenames = glob.glob(pattern)
     main_filename = get_main_file_name(filenames)
     if main_filename is not None:
-        main_filename = os.path.relpath(main_filename, userdir)
+        main_filename = os.path.relpath(main_filename, get_user_dir(username))
         return {
             'file': {
                 'path': main_filename
@@ -70,27 +73,20 @@ def get_layer_info(username, layername):
 
 
 def get_layer_names(username):
-    userdir = get_user_dir(username)
-    pattern = os.path.join(userdir, '*')
-    filenames = glob.glob(pattern)
-    main_filenames = filter(lambda fn: os.path.splitext(fn)[1]
-                 in MAIN_FILE_EXTENSIONS, filenames)
-    layer_names = list(map(
-        lambda fn: os.path.splitext(os.path.basename(fn))[0],
-        main_filenames))
-    dirnames = list(map(
-        lambda dn: os.path.basename(os.path.dirname(dn)),
-        glob.glob(os.path.join(userdir, '*/'))
-    ))
-    layer_names += dirnames
-    layer_names = list(set(layer_names))
-    layer_names.sort()
+    layersdir = get_layers_dir(username)
+    if not os.path.exists(layersdir):
+        return []
+    layer_names = [
+        subfile for subfile in os.listdir(layersdir)
+            if os.path.isdir(os.path.join(layersdir,subfile))
+    ]
+
     return layer_names
 
 
 def get_layer_main_file_path(username, layername):
-    userdir = get_user_dir(username)
-    pattern = os.path.join(userdir, layername+'.*')
+    input_file_dir = get_layer_input_file_dir(username, layername)
+    pattern = os.path.join(input_file_dir, layername+'.*')
     filenames = glob.glob(pattern)
     return get_main_file_name(filenames)
 
@@ -167,15 +163,15 @@ def check_filenames(username, layername, filenames, check_crs):
                 detail['suggestion'] = 'Missing .prj file can be fixed also ' \
                                        'by setting "crs" parameter.'
             raise LaymanError(18, detail)
-    userdir = get_user_dir(username)
+    input_file_dir = get_layer_input_file_dir(username, layername)
     filename_mapping, filepath_mapping = get_file_name_mappings(
-        filenames, main_filename, layername, userdir
+        filenames, main_filename, layername, input_file_dir
     )
 
     conflict_paths = [filename_mapping[k]
                       for k, v in filename_mapping.items()
-                      if v is not None and os.path.isfile(os.path.join(
-            userdir, v))]
+                      if v is not None and os.path.exists(os.path.join(
+            input_file_dir, v))]
     if len(conflict_paths) > 0:
         raise LaymanError(3, conflict_paths)
 
@@ -184,9 +180,9 @@ def save_layer_files(username, layername, files, check_crs):
     filenames = list(map(lambda f: f.filename, files))
     check_filenames(username, layername, filenames, check_crs)
     main_filename = get_main_file_name(filenames)
-    userdir = get_user_dir(username)
+    input_file_dir = ensure_layer_input_file_dir(username, layername)
     filename_mapping, filepath_mapping = get_file_name_mappings(
-        filenames, main_filename, layername, userdir
+        filenames, main_filename, layername, input_file_dir
     )
 
     save_files(files, filepath_mapping)
@@ -208,9 +204,9 @@ def save_layer_files_str(username, layername, files_str, check_crs):
     filenames = files_str
     check_filenames(username, layername, filenames, check_crs)
     main_filename = get_main_file_name(filenames)
-    userdir = get_user_dir(username)
+    input_file_dir = get_layer_input_file_dir(username, layername)
     _, filepath_mapping = get_file_name_mappings(
-        filenames, main_filename, layername, userdir
+        filenames, main_filename, layername, input_file_dir
     )
     filepath_mapping = {
         k: v for k, v in filepath_mapping.items() if v is not None
@@ -228,8 +224,7 @@ def save_layer_files_str(username, layername, files_str, check_crs):
         'files_to_upload': files_to_upload,
         'check_crs': check_crs,
     }
-    resumable_dir = get_layer_resumable_dir(username, layername)
-    ensure_layer_resumable_dir(username, layername)
+    resumable_dir = ensure_layer_resumable_dir(username, layername)
     os.mkdir(os.path.join(resumable_dir, 'chunks'))
     info_path = os.path.join(resumable_dir, 'info.json')
     with open(info_path, 'w') as file:
@@ -253,7 +248,7 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
     info_path = os.path.join(resumable_dir, 'info.json')
     chunk_dir = os.path.join(resumable_dir, 'chunks')
     if os.path.isfile(info_path):
-        with open(info_path, 'r+') as info_file:
+        with open(info_path, 'r') as info_file:
             info = json.load(info_file)
             files_to_upload = info['files_to_upload']
             file_info = next(
@@ -348,6 +343,7 @@ def layer_file_chunk_info(username, layername):
                     current_app.logger.info(
                         'file_upload_complete ' + target_fn)
                     target_fp = fi['target_file']
+                    ensure_layer_input_file_dir(username, layername)
                     with open(target_fp, "ab") as target_file:
                         for chunk_path in chunk_paths:
                             stored_chunk_file = open(chunk_path, 'rb')
@@ -365,7 +361,7 @@ def layer_file_chunk_info(username, layername):
             ])
             all_files_saved = num_files_saved == len(files_to_upload)
             if all_files_saved:
-                shutil.rmtree(get_layer_dir(username, layername))
+                shutil.rmtree(get_layer_resumable_dir(username, layername))
                 LAYMAN_REDIS.delete(r_key)
                 num_chunks_saved = 0
             else:
@@ -397,14 +393,14 @@ def get_main_file_name(filenames):
                  in MAIN_FILE_EXTENSIONS), None)
 
 
-def get_file_name_mappings(file_names, main_file_name, layer_name, user_dir):
+def get_file_name_mappings(file_names, main_file_name, layer_name, output_dir):
     main_file_name = os.path.splitext(main_file_name)[0]
     filename_mapping = {}
     filepath_mapping = {}
     for file_name in file_names:
         if file_name.startswith(main_file_name + '.'):
             new_fn = layer_name + file_name[len(main_file_name):]
-            filepath_mapping[file_name] = os.path.join(user_dir, new_fn)
+            filepath_mapping[file_name] = os.path.join(output_dir, new_fn)
             filename_mapping[file_name] = new_fn
         else:
             filename_mapping[file_name] = None

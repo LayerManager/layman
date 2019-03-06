@@ -87,6 +87,7 @@ def import_layer_vector_file_async(username, layername, main_filepath,
     if os.path.splitext(main_filepath)[1] == '.shp':
         bash_args.extend([
             '-nlt', 'PROMOTE_TO_MULTI',
+            '-lco', 'PRECISION=NO',
         ])
     bash_args.extend([
         '{}'.format(main_filepath),
