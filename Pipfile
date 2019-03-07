@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pytest = "*"
+flower = "*"
+watchdog = "*"
+selenium = "*"
+
+[packages]
+celery = {extras = ["redis"],version = "*"}
+flask = "*"
+unidecode = "*"
+psycopg2-binary = "*"
+requests = "*"
+owslib = "*"
+tornado = ">=4.2.0,<6.0.0"
+
+[requires]
+python_version = "3.6"
