@@ -10,7 +10,7 @@ from . import headers_json
 from layman.settings import *
 
 
-FLASK_WMS_PROXY_KEY = 'layman.geoserver.wms_proxy'
+FLASK_WMS_PROXY_KEY = 'layman.layer.geoserver.wms_proxy'
 
 
 def update_layer(username, layername, layerinfo):

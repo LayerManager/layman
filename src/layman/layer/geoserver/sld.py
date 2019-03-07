@@ -1,19 +1,15 @@
 import io
 import json
-import traceback
 
 import requests
-from urllib.parse import urljoin
+from flask import g
 
-from flask import g, current_app
-
-from layman.filesystem.input_sld import get_layer_file
+from layman.layer.filesystem.input_sld import get_layer_file
 from layman.http import LaymanError
-
-from . import headers_json
 from layman.settings import *
+from . import headers_json
 
-FLASK_WFS_PROXY_KEY = 'layman.geoserver.wfs_proxy'
+FLASK_WFS_PROXY_KEY = 'layman.layer.geoserver.wfs_proxy'
 
 def update_layer(username, layername, layerinfo):
     pass
