@@ -151,7 +151,7 @@ def test_put_layer_chunk(chrome):
                       '.html')
     # chrome.save_screenshot('/code/tmp/test-1.png')
 
-    button = chrome.find_elements_by_xpath('//button[text()="PUT"]')
+    button = chrome.find_elements_by_xpath('//button[text()="PATCH"]')
     assert len(button) == 1
     button = button[0]
     button.click()

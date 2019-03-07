@@ -370,9 +370,9 @@ def test_get_layers(client):
 def test_put_layer_title(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
-    rest_path = url_for('rest_layer.put', username=username, layername=layername)
+    rest_path = url_for('rest_layer.patch', username=username, layername=layername)
     with layman.app_context():
-        rv = client.put(rest_path, data={
+        rv = client.patch(rest_path, data={
             'title': "New Title of Countries",
             'description': "and new description"
         })
@@ -388,11 +388,11 @@ def test_put_layer_title(client):
 def test_put_layer_style(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
-    rest_path = url_for('rest_layer.put', username=username, layername=layername)
+    rest_path = url_for('rest_layer.patch', username=username, layername=layername)
     sld_path = 'sample/style/generic-blue.xml'
     assert os.path.isfile(sld_path)
     with layman.app_context():
-        rv = client.put(rest_path, data={
+        rv = client.patch(rest_path, data={
             'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
             'title': 'countries in blue'
         })
@@ -420,7 +420,7 @@ def test_put_layer_style(client):
 def test_put_layer_data(client):
     username = 'testuser2'
     layername = 'countries'
-    rest_path = url_for('rest_layer.put', username=username, layername=layername)
+    rest_path = url_for('rest_layer.patch', username=username, layername=layername)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
     ]
@@ -431,7 +431,7 @@ def test_put_layer_data(client):
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
                  file_paths]
         with layman.app_context():
-            rv = client.put(rest_path, data={
+            rv = client.patch(rest_path, data={
                 'file': files,
                 'title': 'populated places'
             })
@@ -468,7 +468,7 @@ def test_put_layer_data(client):
 def test_put_layer_concurrent_and_delete_it(client):
     username = 'testuser2'
     layername = 'countries'
-    rest_path = url_for('rest_layer.put', username=username, layername=layername)
+    rest_path = url_for('rest_layer.patch', username=username, layername=layername)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
     ]
@@ -479,7 +479,7 @@ def test_put_layer_concurrent_and_delete_it(client):
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
                  file_paths]
         with layman.app_context():
-            rv = client.put(rest_path, data={
+            rv = client.patch(rest_path, data={
                 'file': files,
                 'title': 'populated places'
             })
@@ -495,7 +495,7 @@ def test_put_layer_concurrent_and_delete_it(client):
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
                  file_paths]
         with layman.app_context():
-            rv = client.put(rest_path, data={
+            rv = client.patch(rest_path, data={
                 'file': files,
             })
         assert rv.status_code == 400
