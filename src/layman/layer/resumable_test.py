@@ -127,7 +127,7 @@ def test_post_layers_chunk(chrome):
 
 
 @pytest.mark.usefixtures("flask_server")
-def test_put_layer_chunk(chrome):
+def test_patch_layer_chunk(chrome):
     username = 'testuser1'
     layername = 'country_chunks'
 
