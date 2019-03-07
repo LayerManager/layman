@@ -13,13 +13,13 @@ def get_layer_info(username, layername, conn_cur=None):
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
     try:
-        cur.execute("""
+        cur.execute(f"""
 SELECT schemaname, tablename, tableowner
 FROM pg_tables
-WHERE schemaname = '{}'
-	AND tablename = '{}'
-	AND tableowner = '{}'
-""".format(username, layername, LAYMAN_PG_USER))
+WHERE schemaname = '{username}'
+	AND tablename = '{layername}'
+	AND tableowner = '{LAYMAN_PG_USER}'
+""")
     except:
         raise LaymanError(7)
     rows = cur.fetchall()
@@ -36,12 +36,12 @@ def get_layer_names(username, conn_cur=None):
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
     try:
-        cur.execute("""
+        cur.execute(f"""
     SELECT tablename
     FROM pg_tables
-    WHERE schemaname = '{}'
-    	AND tableowner = '{}'
-    """.format(username, LAYMAN_PG_USER))
+    WHERE schemaname = '{username}'
+    	AND tableowner = '{LAYMAN_PG_USER}'
+    """)
     except:
         raise LaymanError(7)
     rows = cur.fetchall()
@@ -53,9 +53,9 @@ def delete_layer(username, layername, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
-    query = """
-    DROP TABLE IF EXISTS "{}"."{}" CASCADE
-    """.format(username, layername)
+    query = f"""
+    DROP TABLE IF EXISTS "{username}"."{layername}" CASCADE
+    """
     try:
         cur.execute(query)
         conn.commit()

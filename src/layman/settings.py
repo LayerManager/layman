@@ -19,13 +19,7 @@ LAYMAN_PG_DBNAME = os.environ['LAYMAN_PG_DBNAME']
 LAYMAN_PG_USER = os.environ['LAYMAN_PG_USER']
 LAYMAN_PG_PASSWORD = os.environ['LAYMAN_PG_PASSWORD']
 
-PG_CONN = "host='{}' port='{}' dbname='{}' user='{}' password='{}'".format(
-    LAYMAN_PG_HOST,
-    LAYMAN_PG_PORT,
-    LAYMAN_PG_DBNAME,
-    LAYMAN_PG_USER,
-    LAYMAN_PG_PASSWORD,
-)
+PG_CONN = f"host='{LAYMAN_PG_HOST}' port='{LAYMAN_PG_PORT}' dbname='{LAYMAN_PG_DBNAME}' user='{LAYMAN_PG_USER}' password='{LAYMAN_PG_PASSWORD}'"
 
 LAYMAN_GS_AUTH = (os.environ['LAYMAN_GS_USER'],
                   os.environ['LAYMAN_GS_PASSWORD'])
@@ -34,11 +28,7 @@ LAYMAN_GS_HOST = os.environ['LAYMAN_GS_HOST']
 LAYMAN_GS_PORT = os.environ['LAYMAN_GS_PORT']
 LAYMAN_GS_PATH = os.environ['LAYMAN_GS_PATH']
 
-LAYMAN_GS_URL = "http://{}:{}{}".format(
-    LAYMAN_GS_HOST,
-    LAYMAN_GS_PORT,
-    LAYMAN_GS_PATH,
-)
+LAYMAN_GS_URL = f"http://{LAYMAN_GS_HOST}:{LAYMAN_GS_PORT}{LAYMAN_GS_PATH}"
 
 LAYMAN_GS_ROLE=os.environ['LAYMAN_GS_ROLE']
 
@@ -71,14 +61,7 @@ PG_POSTGIS_SCHEMA = 'public'
 # related to testing only
 LAYMAN_PG_TEMPLATE_DBNAME = os.getenv('LAYMAN_PG_TEMPLATE_DBNAME')
 
-PG_CONN_TEMPLATE = "host='{}' port='{}' dbname='{}' user='{}' password='{" \
-               "}'".format(
-    os.environ['LAYMAN_PG_HOST'],
-    os.environ['LAYMAN_PG_PORT'],
-    LAYMAN_PG_TEMPLATE_DBNAME,
-    os.environ['LAYMAN_PG_USER'],
-    os.environ['LAYMAN_PG_PASSWORD'],
-)
+PG_CONN_TEMPLATE = f"host='{os.environ['LAYMAN_PG_HOST']}' port='{os.environ['LAYMAN_PG_PORT']}' dbname='{LAYMAN_PG_TEMPLATE_DBNAME}' user='{os.environ['LAYMAN_PG_USER']}' password='{os.environ['LAYMAN_PG_PASSWORD']}'"
 
 LAYMAN_CELERY_QUEUE = os.environ['LAYMAN_CELERY_QUEUE']
 

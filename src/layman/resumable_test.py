@@ -60,7 +60,7 @@ def test_post_layers_chunk(chrome):
     for fp in file_paths:
         assert os.path.isfile(fp)
 
-    domain = "http://localhost:{}".format(PORT)
+    domain = f"http://localhost:{PORT}"
 
     r = requests.get(domain+'/static/test-client/index.html')
     assert r.status_code==200
@@ -96,9 +96,7 @@ def test_post_layers_chunk(chrome):
 
     time.sleep(0.1)
 
-    layer_url = '{}/rest/{}/layers/{}?'.format(
-                    domain, username, layername
-                )
+    layer_url = f'{domain}/rest/{username}/layers/{layername}?'
     r = requests.get(layer_url)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file']
     max_attempts = 20
@@ -121,9 +119,7 @@ def test_post_layers_chunk(chrome):
         assert entry['level'] == 'INFO' or (
             entry['level'] == 'SEVERE'
             and entry['message'].startswith(
-                '{}/rest/{}/layers/{}/chunk?'.format(
-                    domain, username, layername
-                )
+                f'{domain}/rest/{username}/layers/{layername}/chunk?'
             ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
     total_chunks_key = input_files.get_layer_redis_total_chunks_key(username,
@@ -146,7 +142,7 @@ def test_put_layer_chunk(chrome):
         # print('fp', fp)
         assert os.path.isfile(fp)
 
-    domain = "http://localhost:{}".format(PORT)
+    domain = f"http://localhost:{PORT}"
 
 
     r = requests.get(domain+'/static/test-client/index.html')
@@ -188,9 +184,7 @@ def test_put_layer_chunk(chrome):
 
     time.sleep(0.1)
 
-    layer_url = '{}/rest/{}/layers/{}?'.format(
-                    domain, username, layername
-                )
+    layer_url = f'{domain}/rest/{username}/layers/{layername}?'
     r = requests.get(layer_url)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file']
     max_attempts = 20
@@ -214,9 +208,7 @@ def test_put_layer_chunk(chrome):
         assert entry['level'] == 'INFO' or (
             entry['level'] == 'SEVERE'
             and entry['message'].startswith(
-                '{}/rest/{}/layers/{}/chunk?'.format(
-                    domain, username, layername
-                )
+                f'{domain}/rest/{username}/layers/{layername}/chunk?'
             ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
     total_chunks_key = input_files.get_layer_redis_total_chunks_key(username,
