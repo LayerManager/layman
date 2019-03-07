@@ -18,7 +18,7 @@ before_install:
 
 script:
   - make layman-build-dev
-  - make reset-layman-gs-datadir-production
+  - make reset-layman-gs-datadir-dev
   - make test
 
 after_failure:
