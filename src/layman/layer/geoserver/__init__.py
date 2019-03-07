@@ -18,7 +18,7 @@ headers_xml = {
 
 
 def get_all_workspaces():
-    key = 'layman.geoserver.workspaces'
+    key = 'layman.layer.geoserver.workspaces'
     if key not in g:
         r = requests.get(
             LAYMAN_GS_REST_WORKSPACES,
@@ -35,7 +35,7 @@ def get_all_workspaces():
 
 
 def get_all_rules():
-    key = 'layman.geoserver.rules'
+    key = 'layman.layer.geoserver.rules'
     if key not in g:
         r = requests.get(
             LAYMAN_GS_REST_SECURITY_ACL_LAYERS,

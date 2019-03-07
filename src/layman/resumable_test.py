@@ -1,17 +1,16 @@
 import glob
-import os
-import requests
 import time
 from multiprocessing import Process
 
+import pytest
+import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+from layman.layer.filesystem import input_files
 from layman import app
-from layman.filesystem import input_files
 from layman.settings import *
-import pytest
 
 PORT = 9002
 

@@ -1,22 +1,21 @@
-from collections import OrderedDict, defaultdict
 import importlib
 import inspect
 import re
 import unicodedata
+from collections import OrderedDict, defaultdict
 
-from flask import current_app, url_for, g
+from celery import chain
+from flask import current_app, url_for
 from unidecode import unidecode
 
+from layman.layer import db
+from layman.layer import filesystem
+from layman.layer import geoserver
+from layman.layer.db import tasks
+from layman.layer.filesystem import tasks
+from layman.layer.geoserver import tasks
 from layman.http import LaymanError
 from layman.settings import *
-from layman import db
-from layman.db import tasks
-from layman import geoserver
-from layman.geoserver import tasks
-from layman import filesystem
-from layman.filesystem import tasks
-from celery import chain
-
 
 USERNAME_RE = r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$"
 LAYERNAME_RE = USERNAME_RE
@@ -242,9 +241,9 @@ def post_layer(username, layername, task_options, use_chunk_upload):
 
 
 def put_layer(username, layername, delete_from, task_options, use_chunk_upload):
-    if delete_from == 'layman.filesystem.input_files':
+    if delete_from == 'layman.layer.filesystem.input_files':
         start_idx = 0
-    elif delete_from == 'layman.geoserver.sld':
+    elif delete_from == 'layman.layer.geoserver.sld':
         start_idx = 2
     else:
         raise Exception('Unsupported delete_from='+delete_from)
@@ -274,11 +273,11 @@ def put_layer(username, layername, delete_from, task_options, use_chunk_upload):
 
 
 TASKS_TO_LAYER_INFO_KEYS = {
-    'layman.filesystem.input_files.wait_for_upload': ['file'],
-    'layman.db.import_layer_vector_file': ['db_table'],
-    'layman.geoserver.publish_layer_from_db': ['wms', 'wfs'],
-    'layman.geoserver.sld.create_layer_style': ['sld'],
-    'layman.filesystem.thumbnail.generate_layer_thumbnail': ['thumbnail'],
+    'layman.layer.filesystem.input_files.wait_for_upload': ['file'],
+    'layman.layer.db.import_layer_vector_file': ['db_table'],
+    'layman.layer.geoserver.publish_layer_from_db': ['wms', 'wfs'],
+    'layman.layer.geoserver.sld.create_layer_style': ['sld'],
+    'layman.layer.filesystem.thumbnail.generate_layer_thumbnail': ['thumbnail'],
 }
 
 

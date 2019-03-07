@@ -1,12 +1,13 @@
-from . import wms, wfs, sld, ensure_user_workspace
-from layman import geoserver
-from layman import celery_app
 from celery.utils.log import get_task_logger
+
+from layman import celery_app
+from layman.layer import geoserver
+from . import wms, wfs, sld, ensure_user_workspace
 
 logger = get_task_logger(__name__)
 
 @celery_app.task(
-    name='layman.geoserver.publish_layer_from_db',
+    name='layman.layer.geoserver.publish_layer_from_db',
     bind=True,
     base=celery_app.AbortableTask
 )
@@ -34,7 +35,7 @@ def publish_layer_from_db(
         wfs.delete_layer(username, layername)
 
 @celery_app.task(
-    name='layman.geoserver.sld.create_layer_style',
+    name='layman.layer.geoserver.sld.create_layer_style',
     bind=True,
     base=celery_app.AbortableTask
 )

@@ -1,9 +1,9 @@
-import time
 import shutil
+import time
 
-from .__init__ import import_layer_vector_file_async
+from layman.layer.filesystem.input_files import ensure_layer_input_file_dir
 from layman.settings import *
-from layman.filesystem.input_files import ensure_layer_input_file_dir
+from .__init__ import import_layer_vector_file_async
 
 
 def test_abort_import_layer_vector_file():

@@ -1,17 +1,19 @@
 import time
-from layman.settings import *
-from . import thumbnail
-from . import input_files
+
+from celery.utils.log import get_task_logger
+
 from layman import celery_app
 from layman.http import LaymanError
-from celery.utils.log import get_task_logger
+from layman.settings import *
+from . import input_files
+from . import thumbnail
 
 logger = get_task_logger(__name__)
 
 
 
 @celery_app.task(
-    name='layman.filesystem.input_files.wait_for_upload',
+    name='layman.layer.filesystem.input_files.wait_for_upload',
     bind=True,
     base=celery_app.AbortableTask
 )
@@ -53,7 +55,7 @@ def wait_for_upload(self, username, layername, check_crs=True):
 
 
 @celery_app.task(
-    name='layman.filesystem.thumbnail.generate_layer_thumbnail',
+    name='layman.layer.filesystem.thumbnail.generate_layer_thumbnail',
     bind=True,
     base=celery_app.AbortableTask
 )

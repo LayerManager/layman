@@ -2,7 +2,7 @@ import os
 import shutil
 import re
 from layman.settings import *
-from layman.geoserver import get_layman_rules
+from layman.layer.geoserver import get_layman_rules
 from urllib.parse import urljoin
 
 

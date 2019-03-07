@@ -9,9 +9,9 @@ def make_celery(app):
         backend=LAYMAN_REDIS_URL,
         broker=LAYMAN_REDIS_URL,
         include=[
-            'layman.db.tasks',
-            'layman.filesystem.tasks',
-            'layman.geoserver.tasks',
+            'layman.layer.db.tasks',
+            'layman.layer.filesystem.tasks',
+            'layman.layer.geoserver.tasks',
         ],
         # http://docs.celeryproject.org/en/latest/getting-started/brokers/redis.html
         broker_transport_options={

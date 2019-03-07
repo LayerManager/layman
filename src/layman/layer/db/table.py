@@ -1,4 +1,3 @@
-from flask import current_app
 from . import get_connection_cursor
 from layman.settings import LAYMAN_PG_USER
 from layman.http import LaymanError
