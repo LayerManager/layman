@@ -32,17 +32,17 @@ def test_get_non_layman_workspaces():
     all_workspaces = [
         {
             "name":"acme",
-            "href":"http:\/\/geoserver:8080\/geoserver\/rest\/workspaces\/acme.json"
+            "href":r"http:\/\/geoserver:8080\/geoserver\/rest\/workspaces\/acme.json"
         },
         {
             "name":"acme2",
-            "href":"http:\/\/geoserver:8080\/geoserver\/rest\/workspaces\/acme2.json"
+            "href":r"http:\/\/geoserver:8080\/geoserver\/rest\/workspaces\/acme2.json"
         },
     ]
     assert get_non_layman_workspaces(all_workspaces, layman_rules) == [
         {
             "name":"acme2",
-            "href":"http:\/\/geoserver:8080\/geoserver\/rest\/workspaces\/acme2.json"
+            "href":r"http:\/\/geoserver:8080\/geoserver\/rest\/workspaces\/acme2.json"
         },
     ]
     layman_rules = {}
