@@ -6,7 +6,9 @@ volumes:
 services:
    layman:
       container_name: layman
-      build: .
+      build:
+        context: .
+        dockerfile: Dockerfile.production
       image: layman:latest
       command: bash start.sh
       env_file:
