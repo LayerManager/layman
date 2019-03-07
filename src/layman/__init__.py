@@ -1,15 +1,8 @@
-import time
-
 from flask import Flask, request, redirect, jsonify, url_for, send_file
-
-from layman import db
-from layman import filesystem
-from layman.filesystem import thumbnail, get_user_dir
-from layman.filesystem import input_files
-from layman.filesystem import input_sld
-from layman import geoserver
-from .make_celery import make_celery
+from layman.layer.filesystem import input_files, input_sld, thumbnail
+from layman.layer import filesystem
 from .http import LaymanError
+from .make_celery import make_celery
 from .settings import *
 
 app = Flask(__name__)
@@ -17,10 +10,6 @@ app.secret_key = os.environ['FLASK_SECRET_KEY']
 
 celery_app = make_celery(app)
 from layman import util
-from layman.db import tasks
-from layman.geoserver import tasks
-from layman.filesystem import tasks
-
 
 celery_tasks = {}
 
@@ -212,11 +201,11 @@ def put_layer(username, layername):
 
     delete_from = None
     if sld_file is not None:
-        delete_from = 'layman.geoserver.sld'
+        delete_from = 'layman.layer.geoserver.sld'
     if len(files) > 0:
-        delete_from = 'layman.filesystem.input_files'
+        delete_from = 'layman.layer.filesystem.input_files'
 
-    if update_info and delete_from != 'layman.filesystem.input_files':
+    if update_info and delete_from != 'layman.layer.filesystem.input_files':
         util.update_layer(username, layername, info)
 
     layer_result = {}
@@ -234,7 +223,7 @@ def put_layer(username, layername):
             'ensure_user': False,
         }
 
-        if delete_from == 'layman.filesystem.input_files':
+        if delete_from == 'layman.layer.filesystem.input_files':
 
             if use_chunk_upload:
                 files_to_upload = input_files.save_layer_files_str(

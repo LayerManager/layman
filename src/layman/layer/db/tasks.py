@@ -1,11 +1,12 @@
 import time
-import celery
-from layman.filesystem.input_files import get_layer_main_file_path
-from .table import delete_layer
-from . import import_layer_vector_file_async, ensure_user_schema
+
+from celery.utils.log import get_task_logger
+
+from layman.layer.filesystem.input_files import get_layer_main_file_path
 from layman import celery_app
 from layman.http import LaymanError
-from celery.utils.log import get_task_logger
+from . import import_layer_vector_file_async, ensure_user_schema
+from .table import delete_layer
 
 logger = get_task_logger(__name__)
 
@@ -29,7 +30,7 @@ def long(self, username, layername, main_filepath, crs_id):
 
 
 @celery_app.task(
-    name='layman.db.import_layer_vector_file',
+    name='layman.layer.db.import_layer_vector_file',
     bind=True,
     base=celery_app.AbortableTask
 )

@@ -43,7 +43,7 @@ GS_RESERVED_WORKSPACE_NAMES = [
     'default',
 ]
 
-from layman.geoserver.util import get_gs_proxy_base_url
+from layman.layer.geoserver.util import get_gs_proxy_base_url
 LAYMAN_GS_PROXY_URL = get_gs_proxy_base_url()
 
 # List of schemas that are owned by LAYMAN_PG_USER, but should not be used
@@ -67,13 +67,13 @@ LAYMAN_CELERY_QUEUE = os.environ['LAYMAN_CELERY_QUEUE']
 
 
 SOURCES = [
-    'layman.filesystem.input_files',
-    'layman.filesystem.input_sld',
-    'layman.db.table',
-    'layman.geoserver.wfs',
-    'layman.geoserver.wms',
-    'layman.geoserver.sld',
-    'layman.filesystem.thumbnail',
+    'layman.layer.filesystem.input_files',
+    'layman.layer.filesystem.input_sld',
+    'layman.layer.db.table',
+    'layman.layer.geoserver.wfs',
+    'layman.layer.geoserver.wms',
+    'layman.layer.geoserver.sld',
+    'layman.layer.filesystem.thumbnail',
 ]
 
 

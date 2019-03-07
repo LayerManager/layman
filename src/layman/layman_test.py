@@ -1,10 +1,9 @@
 import io
 
 import pytest
-import unittest
 from flask import url_for
 
-from layman.geoserver.util import get_feature_type, wms_proxy
+from layman.layer.geoserver.util import get_feature_type, wms_proxy
 from layman import app as layman
 from layman import util
 from .settings import *
