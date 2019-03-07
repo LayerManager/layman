@@ -367,7 +367,7 @@ def test_get_layers(client):
     assert resp_json[0]['name'] == 'countries'
 
 
-def test_put_layer_title(client):
+def test_patch_layer_title(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
     rest_path = url_for('rest_layer.patch', username=username, layername=layername)
@@ -385,7 +385,7 @@ def test_put_layer_title(client):
     assert resp_json['title'] == "New Title of Countries"
     assert resp_json['description'] == "and new description"
 
-def test_put_layer_style(client):
+def test_patch_layer_style(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
     rest_path = url_for('rest_layer.patch', username=username, layername=layername)
@@ -417,7 +417,7 @@ def test_put_layer_style(client):
         username+':'+layername]['title'] == 'Generic Blue'
 
 
-def test_put_layer_data(client):
+def test_patch_layer_data(client):
     username = 'testuser2'
     layername = 'countries'
     rest_path = url_for('rest_layer.patch', username=username, layername=layername)
@@ -465,7 +465,7 @@ def test_put_layer_data(client):
     ), None) is not None
 
 
-def test_put_layer_concurrent_and_delete_it(client):
+def test_patch_layer_concurrent_and_delete_it(client):
     username = 'testuser2'
     layername = 'countries'
     rest_path = url_for('rest_layer.patch', username=username, layername=layername)
