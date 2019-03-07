@@ -182,7 +182,7 @@ def post_layer(username, layername, task_options, use_chunk_upload):
     layer_tasks.append(tinfo)
 
 
-def put_layer(username, layername, delete_from, task_options, use_chunk_upload):
+def patch_layer(username, layername, delete_from, task_options, use_chunk_upload):
     if delete_from == 'layman.layer.filesystem.input_files':
         start_idx = 0
     elif delete_from == 'layman.layer.geoserver.sld':
@@ -190,16 +190,16 @@ def put_layer(username, layername, delete_from, task_options, use_chunk_upload):
     else:
         raise Exception('Unsupported delete_from='+delete_from)
 
-    put_tasks = POST_TASKS[start_idx:]
+    patch_tasks = POST_TASKS[start_idx:]
     if use_chunk_upload:
-        put_tasks.insert(0, filesystem.tasks.wait_for_upload)
+        patch_tasks.insert(0, filesystem.tasks.wait_for_upload)
 
-    put_chain = chain(*list(map(
+    patch_chain = chain(*list(map(
         lambda t: _get_task_signature(username, layername, task_options, t),
-        put_tasks
+        patch_tasks
     )))
-    # res = put_chain.apply_async()
-    res = put_chain()
+    # res = patch_chain.apply_async()
+    res = patch_chain()
 
     layer_tasks = _get_layer_tasks(username, layername)
     tinfo = {
@@ -207,8 +207,8 @@ def put_layer(username, layername, delete_from, task_options, use_chunk_upload):
         'by_name': {},
         'by_order': []
     }
-    for post_task in reversed(put_tasks):
-        tinfo['by_name'][post_task.name] = res
+    for patch_task in reversed(patch_tasks):
+        tinfo['by_name'][patch_task.name] = res
         tinfo['by_order'].insert(0, res)
         res = res.parent
     layer_tasks.append(tinfo)

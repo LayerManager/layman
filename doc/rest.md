@@ -1,14 +1,14 @@
 # REST API
 
 ## Overview
-|Endpoint|URL|GET|POST|PUT|DELETE|
+|Endpoint|URL|GET|POST|PATCH|DELETE|
 |---|---|---|---|---|---|
 |Layers|`/rest/<user>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | x |
-|Layer|`/rest/<user>/layers/<layername>`|[GET](#get-layer)| x | [PUT](#put-layer) | [DELETE](#delete-layer) |
+|Layer|`/rest/<user>/layers/<layername>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
 |Layer Thumbnail|`/rest/<user>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
 |Layer Chunk|`/rest/<user>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
 |Maps|`/rest/<user>/maps`|[GET](#get-maps)| [POST](#post-maps) | x | x |
-|Map|`/rest/<user>/maps/<mapname>`|[GET](#get-map)| x | [PUT](#put-map) | [DELETE](#delete-map) |
+|Map|`/rest/<user>/maps/<mapname>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
 |Map File|`/rest/<user>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
 |Map Thumbnail|`/rest/<user>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
 
@@ -143,7 +143,7 @@ JSON object with following structure:
   - **status**: Status information about publishing SLD. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 
-### PUT Layer
+### PATCH Layer
 Update information about existing layer. First, it deletes sources of the layer, and then it publishes them again with new parameters. The processing chain is similar to [POST Layers](#post-layers).
 
 Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing.
@@ -209,7 +209,7 @@ Layer Chunk endpoint enables to upload layer data files asynchronously by splitt
 
 Check [Asynchronous file upload](async-file-upload.md) example. 
 
-The endpoint is activated after [POST Layers](#post-layers) or [PUT Layer](#put-layer) request if and only if the **file** parameter contained file name(s). The endpoint is active till first of the following happens:
+The endpoint is activated after [POST Layers](#post-layers) or [PATCH Layer](#patch-layer) request if and only if the **file** parameter contained file name(s). The endpoint is active till first of the following happens:
 - all file chunks are uploaded
 - no chunk is uploaded within [UPLOAD_MAX_INACTIVITY_TIME](src/layman/settings.py)
 - layer is deleted
@@ -221,7 +221,7 @@ Test if file chunk is already uploaded on the server.
 
 #### Request
 Query parameters:
-- **layman_original_parameter**, name of parameter of preceding request ([POST Layers](#post-layers) or [PUT Layer](#put-layer)) that contained the file name
+- **layman_original_parameter**, name of parameter of preceding request ([POST Layers](#post-layers) or [PATCH Layer](#patch-layer)) that contained the file name
 - **resumableFilename**, name of file whose chunk is requested
 - **resumableChunkNumber**, serial number of requested chunk
 
@@ -240,7 +240,7 @@ Body parameters:
 - **file**, uploaded chunk
 - **resumableChunkNumber**, serial number of uploaded chunk
 - **resumableFilename**, name of file whose chunk is uploaded
-- **layman_original_parameter**, name of parameter of preceding request ([POST Layers](#post-layers) or [PUT Layer](#put-layer)) that contained the file name
+- **layman_original_parameter**, name of parameter of preceding request ([POST Layers](#post-layers) or [PATCH Layer](#patch-layer)) that contained the file name
 - **resumableTotalChunks**, number of chunks the file is split to
 
 #### Response
@@ -336,7 +336,7 @@ JSON object with following structure:
   - *status*: Status information about generating and availability of thumbnail. See GET Map **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 
-### PUT Map
+### PATCH Map
 Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Maps](#post-maps).
 
 #### Request

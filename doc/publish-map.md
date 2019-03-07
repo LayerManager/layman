@@ -24,7 +24,7 @@ In response of [POST Maps](rest.md#post-maps) you will obtain
  Later on, you can
  - get metadata about this map using [GET Map](rest.md#get-map)
  - get uploaded JSON file using [GET Map File](rest.md#get-map-file)
- - update the map using [PUT Map](rest.md#put-map)
+ - update the map using [PATCH Map](rest.md#patch-map)
  - delete the map using [DELETE Map](rest.md#delete-map)
  
  Also, you can obtain list of all maps using [GET Maps](rest.md#get-maps).
