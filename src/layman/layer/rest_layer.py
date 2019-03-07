@@ -27,9 +27,9 @@ def get(username, layername):
     return jsonify(info), 200
 
 
-@bp.route('/layers/<layername>', methods=['PUT'])
-def put(username, layername):
-    app.logger.info('PUT Layer')
+@bp.route('/layers/<layername>', methods=['PATCH'])
+def patch(username, layername):
+    app.logger.info('PATCH Layer')
 
     # USER
     check_username(username)
@@ -121,9 +121,9 @@ def put(username, layername):
                 input_files.save_layer_files(
                     username, layername, files, check_crs)
 
-        util.put_layer(username, layername, delete_from, task_options, use_chunk_upload)
+        util.patch_layer(username, layername, delete_from, task_options, use_chunk_upload)
 
-    app.logger.info('PUT Layer changes done')
+    app.logger.info('PATCH Layer changes done')
     info = util.get_complete_layer_info(username, layername)
     info.update(layer_result)
 
