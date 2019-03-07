@@ -40,8 +40,11 @@ Publishing geospatial vector data online through [REST API](doc/rest.md).
 git clone https://github.com/jirik/gspld.git
 cd gspld
 
+# build layman images
+make layman-build-dev
+
 # prepare geoserver data directory
-make reset-layman-gs-datadir-production
+make reset-layman-gs-datadir-dev
 ```
 
 ## Run
