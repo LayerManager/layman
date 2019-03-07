@@ -39,7 +39,7 @@ def chrome():
     desired_capabilities = DesiredCapabilities.CHROME
     desired_capabilities['loggingPrefs'] = {'browser': 'ALL'}
     chrome = webdriver.Chrome(
-        chrome_options=chrome_options,
+        options=chrome_options,
         desired_capabilities=desired_capabilities,
     )
     chrome.set_window_size(1000,2000)
