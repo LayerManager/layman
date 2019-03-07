@@ -3,10 +3,10 @@ import io
 import pytest
 from flask import url_for
 
-from layman.layer.geoserver.util import get_feature_type, wms_proxy
+from . import util
+from .geoserver.util import get_feature_type, wms_proxy
 from layman import app as layman
-from layman import util
-from .settings import *
+from layman.settings import *
 
 min_geojson = """
 {
@@ -33,7 +33,7 @@ def test_wrong_value_of_user(client):
     usernames = [' ', '2a', 'ě', ';', '?', 'ABC']
     for username in usernames:
         with layman.app_context():
-            rv = client.post(url_for('post_layers', username=username))
+            rv = client.post(url_for('rest_layers.post', username=username))
         resp_json = rv.get_json()
         # print('username', username)
         # print(resp_json)
@@ -44,7 +44,7 @@ def test_wrong_value_of_user(client):
 
 def test_no_file(client):
     with layman.app_context():
-        rv = client.post(url_for('post_layers', username='testuser1'))
+        rv = client.post(url_for('rest_layers.post', username='testuser1'))
     assert rv.status_code==400
     resp_json = rv.get_json()
     # print('resp_json', resp_json)
@@ -56,7 +56,7 @@ def test_username_schema_conflict(client):
     if len(PG_NON_USER_SCHEMAS) == 0:
         pass
     with layman.app_context():
-        rv = client.post(url_for('post_layers', username=PG_NON_USER_SCHEMAS[0]))
+        rv = client.post(url_for('rest_layers.post', username=PG_NON_USER_SCHEMAS[0]))
     assert rv.status_code==409
     resp_json = rv.get_json()
     # print(resp_json)
@@ -67,7 +67,7 @@ def test_username_schema_conflict(client):
         'information_schema',
     ]:
         with layman.app_context():
-            rv = client.post(url_for('post_layers', username=schema_name), data={
+            rv = client.post(url_for('rest_layers.post', username=schema_name), data={
                 'file': [
                     (io.BytesIO(min_geojson.encode()), '/file.geojson')
                 ]
@@ -88,7 +88,7 @@ def test_layername_db_object_conflict(client):
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         with layman.app_context():
-            rv = client.post(url_for('post_layers', username='testuser1'), data={
+            rv = client.post(url_for('rest_layers.post', username='testuser1'), data={
                 'file': files,
                 'name': 'spatial_ref_sys'
             })
@@ -103,7 +103,7 @@ def test_layername_db_object_conflict(client):
 def test_get_layers_empty(client):
     username = 'testuser1'
     with layman.app_context():
-        rv = client.get(url_for('get_layers', username=username))
+        rv = client.get(url_for('rest_layers.get', username=username))
     resp_json = rv.get_json()
     assert rv.status_code==200
     assert len(resp_json) == 0
@@ -111,7 +111,7 @@ def test_get_layers_empty(client):
 
 def test_post_layers_simple(client):
     username = 'testuser1'
-    rest_path = url_for('post_layers', username=username)
+    rest_path = url_for('rest_layers.post', username=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
@@ -153,7 +153,7 @@ def test_post_layers_simple(client):
 def test_post_layers_concurrent(client):
     username = 'testuser1'
     layername = 'countries_concurrent'
-    rest_path = url_for('post_layers', username=username)
+    rest_path = url_for('rest_layers.post', username=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
@@ -192,7 +192,7 @@ def test_post_layers_concurrent(client):
 
 def test_post_layers_shp_missing_extensions(client):
     username = 'testuser1'
-    rest_path = url_for('post_layers', username=username)
+    rest_path = url_for('rest_layers.post', username=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp',
@@ -222,7 +222,7 @@ def test_post_layers_shp_missing_extensions(client):
 def test_post_layers_shp(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries_shp'
-    rest_path = url_for('post_layers', username=username)
+    rest_path = url_for('rest_layers.post', username=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
@@ -258,7 +258,7 @@ def test_post_layers_shp(client):
 
 def test_post_layers_layer_exists(client):
     username = 'testuser1'
-    rest_path = url_for('post_layers', username=username)
+    rest_path = url_for('rest_layers.post', username=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
@@ -280,7 +280,7 @@ def test_post_layers_layer_exists(client):
 
 def test_post_layers_complex(client):
     username = 'testuser2'
-    rest_path = url_for('post_layers', username=username)
+    rest_path = url_for('rest_layers.post', username=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
@@ -321,7 +321,7 @@ def test_post_layers_complex(client):
         username+':countries']['title'] == 'Generic Blue'
 
     assert layername != ''
-    rest_path = url_for('get_layer', username=username, layername=layername)
+    rest_path = url_for('rest_layer.get', username=username, layername=layername)
     with layman.app_context():
         rv = client.get(rest_path)
     assert 200 <= rv.status_code < 300
@@ -348,7 +348,7 @@ def test_post_layers_complex(client):
 def test_get_layers(client):
     username = 'testuser1'
     with layman.app_context():
-        rv = client.get(url_for('get_layers', username=username))
+        rv = client.get(url_for('rest_layers.get', username=username))
     resp_json = rv.get_json()
     assert rv.status_code==200
     assert len(resp_json) == 3
@@ -360,7 +360,7 @@ def test_get_layers(client):
 
     username = 'testuser2'
     with layman.app_context():
-        rv = client.get(url_for('get_layers', username=username))
+        rv = client.get(url_for('rest_layers.get', username=username))
     resp_json = rv.get_json()
     assert rv.status_code==200
     assert len(resp_json) == 1
@@ -370,7 +370,7 @@ def test_get_layers(client):
 def test_put_layer_title(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
-    rest_path = url_for('put_layer', username=username, layername=layername)
+    rest_path = url_for('rest_layer.put', username=username, layername=layername)
     with layman.app_context():
         rv = client.put(rest_path, data={
             'title': "New Title of Countries",
@@ -388,7 +388,7 @@ def test_put_layer_title(client):
 def test_put_layer_style(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
-    rest_path = url_for('put_layer', username=username, layername=layername)
+    rest_path = url_for('rest_layer.put', username=username, layername=layername)
     sld_path = 'sample/style/generic-blue.xml'
     assert os.path.isfile(sld_path)
     with layman.app_context():
@@ -420,7 +420,7 @@ def test_put_layer_style(client):
 def test_put_layer_data(client):
     username = 'testuser2'
     layername = 'countries'
-    rest_path = url_for('put_layer', username=username, layername=layername)
+    rest_path = url_for('rest_layer.put', username=username, layername=layername)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
     ]
@@ -448,7 +448,7 @@ def test_put_layer_data(client):
             assert 'status' in resp_json[key_to_check]
     last_task['last'].get()
 
-    rest_path = url_for('get_layer', username=username, layername=layername)
+    rest_path = url_for('rest_layer.get', username=username, layername=layername)
     with layman.app_context():
         rv = client.get(rest_path)
     assert 200 <= rv.status_code < 300
@@ -468,7 +468,7 @@ def test_put_layer_data(client):
 def test_put_layer_concurrent_and_delete_it(client):
     username = 'testuser2'
     layername = 'countries'
-    rest_path = url_for('put_layer', username=username, layername=layername)
+    rest_path = url_for('rest_layer.put', username=username, layername=layername)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
     ]
@@ -505,7 +505,7 @@ def test_put_layer_concurrent_and_delete_it(client):
         for fp in files:
             fp[0].close()
 
-    rest_path = url_for('delete_layer', username=username, layername=layername)
+    rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
     with layman.app_context():
         rv = client.delete(rest_path)
     assert rv.status_code == 200
@@ -513,7 +513,7 @@ def test_put_layer_concurrent_and_delete_it(client):
 
 def test_post_layers_long_and_delete_it(client):
     username = 'testuser1'
-    rest_path = url_for('post_layers', username=username)
+    rest_path = url_for('rest_layers.post', username=username)
     file_paths = [
         'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
     ]
@@ -543,7 +543,7 @@ def test_post_layers_long_and_delete_it(client):
     for key_to_check in keys_to_check:
             assert 'status' in layer_info[key_to_check]
 
-    rest_path = url_for('delete_layer', username=username, layername=layername)
+    rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
     with layman.app_context():
         rv = client.delete(rest_path)
     assert rv.status_code == 200
@@ -552,12 +552,12 @@ def test_post_layers_long_and_delete_it(client):
 def test_delete_layer(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
-    rest_path = url_for('delete_layer', username=username, layername=layername)
+    rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
     with layman.app_context():
         rv = client.delete(rest_path)
     assert rv.status_code == 200
 
-    rest_path = url_for('delete_layer', username=username, layername=layername)
+    rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
     with layman.app_context():
         rv = client.delete(rest_path)
     assert rv.status_code == 404
@@ -567,7 +567,7 @@ def test_delete_layer(client):
 def test_get_layers_empty_again(client):
     username = 'testuser2'
     with layman.app_context():
-        rv = client.get(url_for('get_layers', username=username))
+        rv = client.get(url_for('rest_layers.get', username=username))
     resp_json = rv.get_json()
     assert rv.status_code==200
     assert len(resp_json) == 0

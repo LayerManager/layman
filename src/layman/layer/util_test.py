@@ -1,4 +1,4 @@
-from .util import *
+from .util import slugify, to_safe_layer_name
 
 
 def test_slugify():
