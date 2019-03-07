@@ -128,8 +128,8 @@ def save_files(files, filepath_mapping):
     for file in files:
         if filepath_mapping[file.filename] is None:
             continue
-        # logger.info('Saving file {} as {}'.format(
-        #     file.filename, filepath_mapping[file.filename]))
+        # logger.info(
+        #     f'Saving file {file.filename} as {filepath_mapping[file.filename]}')
         file.save(filepath_mapping[file.filename])
 
 
@@ -238,8 +238,7 @@ def save_layer_files_str(username, layername, files_str, check_crs):
 
 
 def get_layer_redis_total_chunks_key(username, layername):
-    return 'layman.users.{}.layers.{}.total_chunks'.format(
-                    username, layername)
+    return f'layman.users.{username}.layers.{layername}.total_chunks'
 
 
 def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
@@ -266,7 +265,7 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
                 })
             LAYMAN_REDIS.hset(
                 get_layer_redis_total_chunks_key(username, layername),
-                '{}:{}'.format(parameter_name, file_info['target_file']),
+                f'{parameter_name}:{file_info["target_file"]}',
                 total_chunks
             )
             target_filename = os.path.basename(file_info['target_file'])
@@ -325,10 +324,9 @@ def layer_file_chunk_info(username, layername):
 
             r_key = get_layer_redis_total_chunks_key(username, layername)
             for fi in files_to_upload:
-                rh_key = '{}:{}'.format(
-                        fi['layman_original_parameter'], fi['target_file'])
+                rh_key = f'{fi["layman_original_parameter"]}:{fi["target_file"]}'
                 total_chunks = LAYMAN_REDIS.hget(r_key, rh_key)
-                # print('file {} {}'.format(rh_key, total_chunks))
+                # print(f'file {rh_key} {total_chunks}')
                 if total_chunks is None:
                     continue
                 total_chunks = int(total_chunks)
