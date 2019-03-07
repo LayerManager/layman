@@ -10,10 +10,6 @@ reset-test-client-dev:
 	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman_dev bash -c "rm -rf /code/src/layman/static/test-client && bash /code/src/ensure-test-client.sh"
 
 layman-build-dev:
-	docker-compose -f docker-compose.production.yml build layman
-	docker-compose -f docker-compose.dev.yml build layman_dev
-
-layman-build-dev-only:
 	docker-compose -f docker-compose.dev.yml build layman_dev
 
 layman-build-production-only:
@@ -35,7 +31,6 @@ start-layman-dev:
 	docker-compose -f docker-compose.dev.yml up
 
 restart-layman-dev:
-	docker-compose -f docker-compose.production.yml build layman
 	docker-compose -f docker-compose.dev.yml build layman_dev
 	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_dev
 
