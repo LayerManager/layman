@@ -30,10 +30,9 @@ def check_username(username, conn_cur=None):
     conn, cur = conn_cur
 
     try:
-        cur.execute("""select catalog_name, schema_name, schema_owner
+        cur.execute(f"""select catalog_name, schema_name, schema_owner
     from information_schema.schemata
-    where schema_owner <> '{}' and schema_name = '{}'""".format(
-            LAYMAN_PG_USER, username))
+    where schema_owner <> '{LAYMAN_PG_USER}' and schema_name = '{username}'""")
     except:
         raise LaymanError(7)
     rows = cur.fetchall()
@@ -47,8 +46,8 @@ def ensure_user_schema(username, conn_cur=None):
     conn, cur = conn_cur
 
     try:
-        cur.execute("""CREATE SCHEMA IF NOT EXISTS "{}" AUTHORIZATION {}""".format(
-        username, LAYMAN_PG_USER))
+        cur.execute(
+            f"""CREATE SCHEMA IF NOT EXISTS "{username}" AUTHORIZATION {LAYMAN_PG_USER}""")
         conn.commit()
     except:
         raise LaymanError(7)
@@ -74,10 +73,10 @@ def import_layer_vector_file_async(username, layername, main_filepath,
         '-t_srs', 'EPSG:3857',
         '-nln', layername,
         '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
-        '-lco', 'SCHEMA={}'.format(username),
+        '-lco', f'SCHEMA={username}',
         # '-clipsrc', '-180', '-85.06', '180', '85.06',
         '-f', 'PostgreSQL',
-        'PG:{}'.format(PG_CONN),
+        f'PG:{PG_CONN}',
         # 'PG:{} active_schema={}'.format(PG_CONN, username),
     ]
     if crs_id is not None:
@@ -90,7 +89,7 @@ def import_layer_vector_file_async(username, layername, main_filepath,
             '-lco', 'PRECISION=NO',
         ])
     bash_args.extend([
-        '{}'.format(main_filepath),
+        f'{main_filepath}',
     ])
 
     # print(' '.join(bash_args))
@@ -106,11 +105,10 @@ def check_new_layername(username, layername, conn_cur=None):
 
     # DB table name conflicts
     try:
-        cur.execute("""SELECT n.nspname AS schemaname, c.relname, c.relkind
+        cur.execute(f"""SELECT n.nspname AS schemaname, c.relname, c.relkind
     FROM   pg_class c
     JOIN   pg_namespace n ON n.oid = c.relnamespace
-    WHERE  n.nspname IN ('{}', '{}') AND c.relname='{}'""".format(
-            username, PG_POSTGIS_SCHEMA, layername))
+    WHERE  n.nspname IN ('{username}', '{PG_POSTGIS_SCHEMA}') AND c.relname='{layername}'""")
     except:
         raise LaymanError(7)
     rows = cur.fetchall()

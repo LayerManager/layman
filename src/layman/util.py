@@ -50,8 +50,7 @@ def check_username(username):
             fn(username)
         else:
             current_app.logger.warn(
-                'Module {} does not have {} method.'.format(m.__name__,
-                                                            fn_name))
+                f'Module {m.__name__} does not have {fn_name} method.')
 
 
 def check_layername(layername):
@@ -70,8 +69,7 @@ def check_new_layername(username, layername):
             fn(username, layername)
         else:
             current_app.logger.warn(
-                'Module {} does not have {} method.'.format(m.__name__,
-                                                            fn_name))
+                f'Module {m.__name__} does not have {fn_name} method.')
 
 def get_sources():
     key = 'layman.sources'
@@ -107,8 +105,7 @@ def get_layer_names(username):
             layernames += fn(username)
         else:
             current_app.logger.warn(
-                'Module {} does not have {} method.'.format(m.__name__,
-                                                            fn_name))
+                f'Module {m.__name__} does not have {fn_name} method.')
     layernames = list(set(layernames))
     return layernames
 
@@ -122,8 +119,7 @@ def get_layer_info(username, layername):
             partial_info.update(fn(username, layername))
         else:
             current_app.logger.warn(
-                'Module {} does not have {} method.'.format(m.__name__,
-                                                            fn_name))
+                f'Module {m.__name__} does not have {fn_name} method.')
 
     last_task = _get_layer_last_task(username, layername)
     if last_task is None or _is_task_successful(last_task):
@@ -191,8 +187,7 @@ def update_layer(username, layername, layerinfo):
             fn(username, layername, layerinfo)
         else:
             current_app.logger.warn(
-                'Module {} does not have {} method.'.format(m.__name__,
-                                                            fn_name))
+                f'Module {m.__name__} does not have {fn_name} method.')
 
 
 POST_TASKS = [
@@ -303,8 +298,7 @@ def delete_layer(username, layername, source = None):
                 result.update(partial_result)
         else:
             current_app.logger.warn(
-                'Module {} does not have {} method.'.format(m.__name__,
-                                                            fn_name))
+                f'Module {m.__name__} does not have {fn_name} method.')
     return result
 
 
@@ -352,21 +346,12 @@ def abort_layer_tasks(username, layername):
     ))
     for task_result in reversed(task_results):
         task_name = next(k for k,v in last_task['by_name'].items() if v == task_result)
-        # current_app.logger.info('processing result {} {} {} {} {} {}'
-        #                         ''.format(
-        #     task_name,
-        #     task_result.id,
-        #     task_result.state,
-        #     task_result.ready(),
-        #     task_result.successful(),
-        #     task_result.failed(),
-        # ))
+        # current_app.logger.info(
+        #     f'processing result {task_name} {task_result.id} {task_result.state} {task_result.ready()} {task_result.successful()} {task_result.failed()}')
         if task_result.ready():
             continue
-        current_app.logger.info('aborting result {} {}'.format(
-            task_name,
-            task_result.id
-        ))
+        current_app.logger.info(
+            f'aborting result {task_name} {task_result.id}')
         task_result.abort()
         # task_result.revoke()
         task_result.get(propagate=False)

@@ -50,9 +50,9 @@ def import_layer_vector_file(
     while p.poll() is None and not self.is_aborted():
         pass
     if self.is_aborted():
-        logger.info('aborting'.format(username, layername))
+        logger.info(f'aborting {username} {layername}')
         p.terminate()
-        logger.info('aborted'.format(username, layername))
+        logger.info(f'aborted {username} {layername}')
         delete_layer(username, layername)
     else:
         # logger.info('STDOUT', p.stdout.read())

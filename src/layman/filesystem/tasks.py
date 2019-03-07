@@ -23,29 +23,29 @@ def wait_for_upload(self, username, layername, check_crs=True):
     num_chunks_saved = 0
     chunk_info = input_files.layer_file_chunk_info(username, layername)
 
-    logger.debug('chunk_info {}'.format(str(chunk_info)))
+    logger.debug(f'chunk_info {str(chunk_info)}')
     while not chunk_info[0]:
         if time.time() - last_change > UPLOAD_MAX_INACTIVITY_TIME:
-            logger.info('UPLOAD_MAX_INACTIVITY_TIME reached {}.{}'.format(
-                username, layername))
+            logger.info(
+                f'UPLOAD_MAX_INACTIVITY_TIME reached {username}.{layername}')
             input_files.delete_layer(username, layername)
             raise LaymanError(22)
         time.sleep(0.5)
         if self.is_aborted():
-            logger.info('Aborting for layer {}.{}'.format(username, layername))
+            logger.info(f'Aborting for layer {username}.{layername}')
             input_files.delete_layer(username, layername)
-            logger.info('Aborted for layer {}.{}'.format(username, layername))
+            logger.info(f'Aborted for layer {username}.{layername}')
             return
 
         chunk_info = input_files.layer_file_chunk_info(username, layername)
-        logger.debug('chunk_info {}'.format(str(chunk_info)))
+        logger.debug(f'chunk_info {str(chunk_info)}')
         if num_files_saved != chunk_info[1] \
                 or num_chunks_saved != chunk_info[2]:
             last_change = time.time()
             num_files_saved = chunk_info[1]
             num_chunks_saved = chunk_info[2]
     else:
-        logger.info('Layer chunks uploaded {}.{}'.format(username, layername))
+        logger.info(f'Layer chunks uploaded {username}.{layername}')
 
     if check_crs:
         main_filepath = input_files.get_layer_main_file_path(username, layername)

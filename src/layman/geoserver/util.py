@@ -34,9 +34,7 @@ def get_feature_type(
         workspace, data_store, feature_type,
         gs_rest_workspaces=LAYMAN_GS_REST_WORKSPACES):
     r_url = urljoin(gs_rest_workspaces,
-                    '{}/datastores/{}/featuretypes/{}'.format(workspace,
-                                                              data_store,
-                                                              feature_type))
+                    f'{workspace}/datastores/{data_store}/featuretypes/{feature_type}')
     r = requests.get(r_url,
         headers=headers_json,
         auth=LAYMAN_GS_AUTH
