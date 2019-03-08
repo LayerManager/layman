@@ -4,11 +4,15 @@ import shutil
 from flask import url_for
 
 from layman.settings import *
-from . import get_user_dir, get_layer_dir
+from . import util
+from . import input_files
+
+
+LAYER_SUBDIR = __name__.split('.')[-1]
 
 
 def get_layer_thumbnail_dir(username, layername):
-    thumbnail_dir = os.path.join(get_layer_dir(username, layername),
+    thumbnail_dir = os.path.join(util.get_layer_dir(username, layername),
                                  'thumbnail')
     return thumbnail_dir
 
@@ -26,30 +30,20 @@ def get_layer_info(username, layername):
             'thumbnail': {
                 'url': url_for('rest_layer_thumbnail.get', username=username,
                                layername=layername),
-                'path': os.path.relpath(thumbnail_path, get_user_dir(username))
+                'path': os.path.relpath(thumbnail_path, util.get_user_dir(username))
             }
         }
     return {}
 
 
-def update_layer(username, layername, layerinfo):
-    pass
+update_layer = input_files.update_layer
 
 
 def delete_layer(username, layername):
-    try:
-        shutil.rmtree(get_layer_thumbnail_dir(username, layername))
-    except FileNotFoundError:
-        pass
-    layerdir = get_layer_dir(username, layername)
-    if os.path.exists(layerdir) and not os.listdir(layerdir):
-        os.rmdir(layerdir)
-    return {}
+    util.delete_layer_subdir(username, layername, LAYER_SUBDIR)
 
 
-def get_layer_names(username):
-    # covered by input_files.get_layer_names
-    return []
+get_layer_names = input_files.get_layer_names
 
 
 def get_layer_thumbnail_path(username, layername):

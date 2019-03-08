@@ -4,13 +4,17 @@ import shutil
 
 from werkzeug.datastructures import FileStorage
 
-from . import get_layer_dir
+from . import util
 from layman.settings import *
+from . import input_files
+
+
+LAYER_SUBDIR = __name__.split('.')[-1]
 
 
 def get_layer_input_sld_dir(username, layername):
-    input_sld_dir = os.path.join(get_layer_dir(username, layername),
-                                 'input_sld')
+    input_sld_dir = os.path.join(util.get_layer_dir(username, layername),
+                                 LAYER_SUBDIR)
     return input_sld_dir
 
 
@@ -20,38 +24,22 @@ def ensure_layer_input_sld_dir(username, layername):
     return input_sld_dir
 
 
-def get_layer_info(username, layername):
-    if os.path.exists(get_file_path(username, layername)):
-        return {
-            'name': layername
-        }
-    else:
-        return {}
+get_layer_info = input_files.get_layer_info
 
 
-def update_layer(username, layername, layerinfo):
-    pass
+get_layer_names = input_files.get_layer_names
+
+
+update_layer = input_files.update_layer
 
 
 def delete_layer(username, layername):
-    try:
-        shutil.rmtree(get_layer_input_sld_dir(username, layername))
-    except FileNotFoundError:
-        pass
-    layerdir = get_layer_dir(username, layername)
-    if os.path.exists(layerdir) and not os.listdir(layerdir):
-        os.rmdir(layerdir)
-    return {}
+    util.delete_layer_subdir(username, layername, LAYER_SUBDIR)
 
 
 def get_file_path(username, layername):
     input_sld_dir = get_layer_input_sld_dir(username, layername)
     return os.path.join(input_sld_dir, layername+'.sld')
-
-
-def get_layer_names(username):
-    # covered by input_files.get_layer_names
-    return []
 
 
 def save_layer_file(username, layername, sld_file):
