@@ -42,16 +42,11 @@ def check_layername(layername):
 
 
 def get_layer_names(username):
+    sources = get_sources()
+    results = call_modules_fn(sources, 'get_layer_names', [username])
     layernames = []
-    active_sources = get_sources()
-    fn_name = 'get_layer_names'
-    for m in active_sources:
-        fn = getattr(m, fn_name, None)
-        if fn is not None:
-            layernames += fn(username)
-        else:
-            raise Exception(
-                f'Module {m.__name__} does not have {fn_name} method.')
+    for r in results:
+        layernames += r
     layernames = list(set(layernames))
     return layernames
 
@@ -210,7 +205,6 @@ def delete_layer(username, layername, source = None):
     source_idx = next((
         idx for idx, m in enumerate(sources) if m.__name__ == source
     ), 0)
-    fn_name = 'delete_layer'
     end_idx = None if source_idx == 0 else source_idx-1
     sources = sources[:end_idx:-1]
 

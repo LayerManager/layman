@@ -14,14 +14,7 @@ def check_username(username):
     if not re.match(USERNAME_RE, username):
         raise LaymanError(2, {'parameter': 'user', 'expected': USERNAME_RE})
     providers = get_providers()
-    fn_name = 'check_username'
-    for m in providers:
-        fn = getattr(m, fn_name, None)
-        if fn is not None:
-            fn(username)
-        else:
-            current_app.logger.warn(
-                f'Module {m.__name__} does not have {fn_name} method.')
+    call_modules_fn(providers, 'check_username', [username])
 
 
 def get_sources():
