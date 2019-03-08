@@ -5,7 +5,7 @@ from layman.http import LaymanError
 from layman.util import check_username
 from layman.settings import *
 from . import util
-from .filesystem import input_files, input_sld
+from .filesystem import input_files, input_sld, input_chunk
 
 
 bp = Blueprint('rest_layer', __name__)
@@ -109,7 +109,7 @@ def patch(username, layername):
         if delete_from == 'layman.layer.filesystem.input_files':
 
             if use_chunk_upload:
-                files_to_upload = input_files.save_layer_files_str(
+                files_to_upload = input_chunk.save_layer_files_str(
                     username, layername, files, check_crs)
                 layer_result.update({
                     'files_to_upload': files_to_upload,

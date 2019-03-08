@@ -5,8 +5,7 @@ from celery.utils.log import get_task_logger
 from layman import celery_app
 from layman.http import LaymanError
 from layman.settings import *
-from . import input_files
-from . import thumbnail
+from . import input_files, input_chunk, thumbnail
 
 logger = get_task_logger(__name__)
 
@@ -23,7 +22,7 @@ def wait_for_upload(self, username, layername, check_crs=True):
     last_change = time.time()
     num_files_saved = 0
     num_chunks_saved = 0
-    chunk_info = input_files.layer_file_chunk_info(username, layername)
+    chunk_info = input_chunk.layer_file_chunk_info(username, layername)
 
     logger.debug(f'chunk_info {str(chunk_info)}')
     while not chunk_info[0]:
@@ -39,7 +38,7 @@ def wait_for_upload(self, username, layername, check_crs=True):
             logger.info(f'Aborted for layer {username}.{layername}')
             return
 
-        chunk_info = input_files.layer_file_chunk_info(username, layername)
+        chunk_info = input_chunk.layer_file_chunk_info(username, layername)
         logger.debug(f'chunk_info {str(chunk_info)}')
         if num_files_saved != chunk_info[1] \
                 or num_chunks_saved != chunk_info[2]:

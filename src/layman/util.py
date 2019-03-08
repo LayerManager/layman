@@ -42,20 +42,24 @@ def get_providers():
     return current_app.config[key]
 
 
-def call_modules_fn(modules, fn_name, args=None, kwargs=None):
+def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_calls=True):
     if args is None:
         args = []
     if kwargs is None:
         kwargs = {}
 
-    results = []
+    fns = []
     for m in modules:
         fn = getattr(m, fn_name, None)
-        if fn is not None:
-            results.append(fn(*args, **kwargs))
-        else:
+        if fn is None:
             raise Exception(
                 f'Module {m.__name__} does not have {fn_name} method.')
+        if fn not in fns or not omit_duplicate_calls:
+            fns.append(fn)
+
+    results = []
+    for fn in fns:
+        results.append(fn(*args, **kwargs))
 
     return results
 

@@ -4,7 +4,7 @@ from flask import current_app as app
 from layman.http import LaymanError
 from layman.util import check_username
 from . import util
-from .filesystem import input_files
+from .filesystem import input_chunk
 
 
 bp = Blueprint('rest_layer_chunk', __name__)
@@ -33,9 +33,9 @@ def post(username, layername):
                                          type=str)
     chunk = request.files['file']
 
-    input_files.save_layer_file_chunk(username, layername, parameter_name,
-                                      filename, chunk,
-                                      chunk_number, total_chunks)
+    input_chunk.save_layer_file_chunk(username, layername, parameter_name,
+                                                     filename, chunk,
+                                                     chunk_number, total_chunks)
     # time.sleep(5)
 
     return jsonify({
@@ -54,7 +54,7 @@ def get(username, layername):
     parameter_name = request.args.get('layman_original_parameter', default='error',
                                          type=str)
 
-    chunk_exists = input_files.layer_file_chunk_exists(
+    chunk_exists = input_chunk.layer_file_chunk_exists(
         username, layername, parameter_name, filename, chunk_number)
 
     if chunk_exists:

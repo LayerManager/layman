@@ -1,10 +1,10 @@
 from flask import Blueprint, send_file
 from flask import current_app as app
 
+from .filesystem.util import get_user_dir
 from layman.http import LaymanError
 from layman.util import check_username
 from layman.settings import *
-from . import filesystem
 from . import util
 from .filesystem import thumbnail
 
@@ -26,7 +26,7 @@ def get(username, layername):
 
     thumbnail_info = thumbnail.get_layer_info(username, layername)
     if thumbnail_info:
-        userdir = filesystem.get_user_dir(username)
+        userdir = get_user_dir(username)
         thumbnail_path = thumbnail_info['thumbnail']['path']
         thumbnail_path = os.path.join(userdir, thumbnail_path)
         return send_file(thumbnail_path, mimetype='image/png')
