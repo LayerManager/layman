@@ -5,7 +5,7 @@ from layman.http import LaymanError
 from layman.util import check_username
 from layman.settings import *
 from . import util
-from .filesystem import input_files, input_sld, input_chunk
+from .filesystem import input_file, input_sld, input_chunk
 
 
 bp = Blueprint('rest_layers', __name__)
@@ -53,7 +53,7 @@ def post(username):
     # NAME
     unsafe_layername = request.form.get('name', '')
     if len(unsafe_layername) == 0:
-        unsafe_layername = input_files.get_unsafe_layername(files)
+        unsafe_layername = input_file.get_unsafe_layername(files)
     layername = util.to_safe_layer_name(unsafe_layername)
     util.check_layername(layername)
     info = util.get_layer_info(username, layername)
@@ -111,7 +111,7 @@ def post(username):
             'check_crs': check_crs,
         })
     else:
-        input_files.save_layer_files(
+        input_file.save_layer_files(
             username, layername, files, check_crs)
 
     util.post_layer(username, layername, task_options, use_chunk_upload)

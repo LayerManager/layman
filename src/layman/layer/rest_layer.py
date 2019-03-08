@@ -5,7 +5,7 @@ from layman.http import LaymanError
 from layman.util import check_username
 from layman.settings import *
 from . import util
-from .filesystem import input_files, input_sld, input_chunk
+from .filesystem import input_file, input_sld, input_chunk
 
 
 bp = Blueprint('rest_layer', __name__)
@@ -86,9 +86,9 @@ def patch(username, layername):
     if sld_file is not None:
         delete_from = 'layman.layer.geoserver.sld'
     if len(files) > 0:
-        delete_from = 'layman.layer.filesystem.input_files'
+        delete_from = 'layman.layer.filesystem.input_file'
 
-    if update_info and delete_from != 'layman.layer.filesystem.input_files':
+    if update_info and delete_from != 'layman.layer.filesystem.input_file':
         util.update_layer(username, layername, info)
 
     layer_result = {}
@@ -106,7 +106,7 @@ def patch(username, layername):
             'ensure_user': False,
         }
 
-        if delete_from == 'layman.layer.filesystem.input_files':
+        if delete_from == 'layman.layer.filesystem.input_file':
 
             if use_chunk_upload:
                 files_to_upload = input_chunk.save_layer_files_str(
@@ -118,7 +118,7 @@ def patch(username, layername):
                     'check_crs': check_crs,
                 })
             else:
-                input_files.save_layer_files(
+                input_file.save_layer_files(
                     username, layername, files, check_crs)
 
         util.patch_layer(username, layername, delete_from, task_options, use_chunk_upload)
