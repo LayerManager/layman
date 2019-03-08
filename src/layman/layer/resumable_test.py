@@ -8,7 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-from layman.layer.filesystem import input_files
+from layman.layer.filesystem import input_chunk
 from layman import app
 from layman.settings import *
 
@@ -121,8 +121,7 @@ def test_post_layers_chunk(chrome):
                 f'{domain}/rest/{username}/layers/{layername}/chunk?'
             ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
-    total_chunks_key = input_files.get_layer_redis_total_chunks_key(username,
-                                                                    layername)
+    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(username, layername)
     assert not LAYMAN_REDIS.exists(total_chunks_key)
 
 
@@ -210,8 +209,7 @@ def test_patch_layer_chunk(chrome):
                 f'{domain}/rest/{username}/layers/{layername}/chunk?'
             ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
-    total_chunks_key = input_files.get_layer_redis_total_chunks_key(username,
-                                                                    layername)
+    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(username, layername)
     assert not LAYMAN_REDIS.exists(total_chunks_key)
 
 
