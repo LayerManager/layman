@@ -8,7 +8,7 @@ from flask import current_app
 
 from layman import LaymanError, LAYMAN_REDIS
 from . import util
-from . import input_files
+from . import input_file
 
 
 LAYER_SUBDIR = __name__.split('.')[-1]
@@ -31,21 +31,21 @@ def delete_layer(username, layername):
     LAYMAN_REDIS.delete(chunk_key)
 
 
-get_layer_info = input_files.get_layer_info
+get_layer_info = input_file.get_layer_info
 
 
-get_layer_names = input_files.get_layer_names
+get_layer_names = input_file.get_layer_names
 
 
-update_layer = input_files.update_layer
+update_layer = input_file.update_layer
 
 
 def save_layer_files_str(username, layername, files_str, check_crs):
     filenames = files_str
-    input_files.check_filenames(username, layername, filenames, check_crs)
-    main_filename = input_files.get_main_file_name(filenames)
-    input_file_dir = input_files.get_layer_input_file_dir(username, layername)
-    _, filepath_mapping = input_files.get_file_name_mappings(
+    input_file.check_filenames(username, layername, filenames, check_crs)
+    main_filename = input_file.get_main_file_name(filenames)
+    input_file_dir = input_file.get_layer_input_file_dir(username, layername)
+    _, filepath_mapping = input_file.get_file_name_mappings(
         filenames, main_filename, layername, input_file_dir
     )
     filepath_mapping = {
@@ -181,7 +181,7 @@ def layer_file_chunk_info(username, layername):
                     current_app.logger.info(
                         'file_upload_complete ' + target_fn)
                     target_fp = fi['target_file']
-                    input_files.ensure_layer_input_file_dir(username, layername)
+                    input_file.ensure_layer_input_file_dir(username, layername)
                     with open(target_fp, "ab") as target_file:
                         for chunk_path in chunk_paths:
                             stored_chunk_file = open(chunk_path, 'rb')
