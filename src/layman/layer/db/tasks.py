@@ -2,7 +2,7 @@ import time
 
 from celery.utils.log import get_task_logger
 
-from layman.layer.filesystem.input_files import get_layer_main_file_path
+from layman.layer.filesystem.input_file import get_layer_main_file_path
 from layman import celery_app
 from layman.http import LaymanError
 from . import import_layer_vector_file_async, ensure_user_schema

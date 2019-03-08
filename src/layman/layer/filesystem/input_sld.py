@@ -6,7 +6,7 @@ from werkzeug.datastructures import FileStorage
 
 from . import util
 from layman.settings import *
-from . import input_files
+from . import input_file
 
 
 LAYER_SUBDIR = __name__.split('.')[-1]
@@ -24,13 +24,13 @@ def ensure_layer_input_sld_dir(username, layername):
     return input_sld_dir
 
 
-get_layer_info = input_files.get_layer_info
+get_layer_info = input_file.get_layer_info
 
 
-get_layer_names = input_files.get_layer_names
+get_layer_names = input_file.get_layer_names
 
 
-update_layer = input_files.update_layer
+update_layer = input_file.update_layer
 
 
 def delete_layer(username, layername):

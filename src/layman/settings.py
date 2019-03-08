@@ -67,7 +67,7 @@ LAYMAN_CELERY_QUEUE = os.environ['LAYMAN_CELERY_QUEUE']
 
 
 SOURCES = [
-    'layman.layer.filesystem.input_files',
+    'layman.layer.filesystem.input_file',
     'layman.layer.filesystem.input_sld',
     'layman.layer.filesystem.input_chunk',
     'layman.layer.db.table',

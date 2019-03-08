@@ -5,14 +5,14 @@ from celery.utils.log import get_task_logger
 from layman import celery_app
 from layman.http import LaymanError
 from layman.settings import *
-from . import input_files, input_chunk, thumbnail
+from . import input_file, input_chunk, thumbnail
 
 logger = get_task_logger(__name__)
 
 
 
 @celery_app.task(
-    name='layman.layer.filesystem.input_files.wait_for_upload',
+    name='layman.layer.filesystem.input_file.wait_for_upload',
     bind=True,
     base=celery_app.AbortableTask
 )
@@ -29,12 +29,12 @@ def wait_for_upload(self, username, layername, check_crs=True):
         if time.time() - last_change > UPLOAD_MAX_INACTIVITY_TIME:
             logger.info(
                 f'UPLOAD_MAX_INACTIVITY_TIME reached {username}.{layername}')
-            input_files.delete_layer(username, layername)
+            input_file.delete_layer(username, layername)
             raise LaymanError(22)
         time.sleep(0.5)
         if self.is_aborted():
             logger.info(f'Aborting for layer {username}.{layername}')
-            input_files.delete_layer(username, layername)
+            input_file.delete_layer(username, layername)
             logger.info(f'Aborted for layer {username}.{layername}')
             return
 
@@ -49,8 +49,8 @@ def wait_for_upload(self, username, layername, check_crs=True):
         logger.info(f'Layer chunks uploaded {username}.{layername}')
 
     if check_crs:
-        main_filepath = input_files.get_layer_main_file_path(username, layername)
-        input_files.check_layer_crs(main_filepath)
+        main_filepath = input_file.get_layer_main_file_path(username, layername)
+        input_file.check_layer_crs(main_filepath)
 
 
 @celery_app.task(

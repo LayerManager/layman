@@ -160,7 +160,7 @@ def post_layer(username, layername, task_options, use_chunk_upload):
 
 
 def patch_layer(username, layername, delete_from, task_options, use_chunk_upload):
-    if delete_from == 'layman.layer.filesystem.input_files':
+    if delete_from == 'layman.layer.filesystem.input_file':
         start_idx = 0
     elif delete_from == 'layman.layer.geoserver.sld':
         start_idx = 2
@@ -192,7 +192,7 @@ def patch_layer(username, layername, delete_from, task_options, use_chunk_upload
 
 
 TASKS_TO_LAYER_INFO_KEYS = {
-    'layman.layer.filesystem.input_files.wait_for_upload': ['file'],
+    'layman.layer.filesystem.input_file.wait_for_upload': ['file'],
     'layman.layer.db.import_layer_vector_file': ['db_table'],
     'layman.layer.geoserver.publish_layer_from_db': ['wms', 'wfs'],
     'layman.layer.geoserver.sld.create_layer_style': ['sld'],

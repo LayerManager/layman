@@ -5,7 +5,7 @@ from flask import url_for
 
 from layman.settings import *
 from . import util
-from . import input_files
+from . import input_file
 
 
 LAYER_SUBDIR = __name__.split('.')[-1]
@@ -36,14 +36,14 @@ def get_layer_info(username, layername):
     return {}
 
 
-update_layer = input_files.update_layer
+update_layer = input_file.update_layer
 
 
 def delete_layer(username, layername):
     util.delete_layer_subdir(username, layername, LAYER_SUBDIR)
 
 
-get_layer_names = input_files.get_layer_names
+get_layer_names = input_file.get_layer_names
 
 
 def get_layer_thumbnail_path(username, layername):

@@ -1,4 +1,4 @@
-from .input_files import get_main_file_name, get_file_name_mappings
+from .input_file import get_main_file_name, get_file_name_mappings
 
 
 def test_get_main_file_name():
