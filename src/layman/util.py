@@ -49,3 +49,20 @@ def get_providers():
     return current_app.config[key]
 
 
+def call_modules_fn(modules, fn_name, args=None, kwargs=None):
+    if args is None:
+        args = []
+    if kwargs is None:
+        kwargs = {}
+
+    results = []
+    for m in modules:
+        fn = getattr(m, fn_name, None)
+        if fn is not None:
+            results.append(fn(*args, **kwargs))
+        else:
+            raise Exception(
+                f'Module {m.__name__} does not have {fn_name} method.')
+
+    return results
+

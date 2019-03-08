@@ -12,7 +12,8 @@ from layman.layer.db import tasks
 from layman.layer.geoserver import tasks
 from layman.layer.filesystem import tasks
 from layman import LaymanError, LAYMAN_CELERY_QUEUE
-from layman.util import USERNAME_RE, get_sources, get_providers
+from layman.util import USERNAME_RE, get_sources, get_providers, \
+    call_modules_fn
 
 LAYERNAME_RE = USERNAME_RE
 
@@ -49,7 +50,7 @@ def get_layer_names(username):
         if fn is not None:
             layernames += fn(username)
         else:
-            current_app.logger.warn(
+            raise Exception(
                 f'Module {m.__name__} does not have {fn_name} method.')
     layernames = list(set(layernames))
     return layernames
@@ -58,27 +59,15 @@ def get_layer_names(username):
 def check_new_layername(username, layername):
     check_layername(layername)
     providers = get_providers()
-    fn_name = 'check_new_layername'
-    for m in providers:
-        fn = getattr(m, fn_name, None)
-        if fn is not None:
-            fn(username, layername)
-        else:
-            current_app.logger.warn(
-                f'Module {m.__name__} does not have {fn_name} method.')
+    call_modules_fn(providers, 'check_new_layername', [username, layername])
 
 
 def get_layer_info(username, layername):
+    sources = get_sources()
+    partial_infos = call_modules_fn(sources, 'get_layer_info', [username, layername])
     partial_info = {}
-    active_sources = get_sources()
-    fn_name = 'get_layer_info'
-    for m in active_sources:
-        fn = getattr(m, fn_name, None)
-        if fn is not None:
-            partial_info.update(fn(username, layername))
-        else:
-            current_app.logger.warn(
-                f'Module {m.__name__} does not have {fn_name} method.')
+    for pi in partial_infos:
+        partial_info.update(pi)
 
     last_task = _get_layer_last_task(username, layername)
     if last_task is None or _is_task_successful(last_task):
@@ -139,15 +128,8 @@ def get_complete_layer_info(username, layername):
 
 
 def update_layer(username, layername, layerinfo):
-    active_sources = get_sources()
-    fn_name = 'update_layer'
-    for m in active_sources:
-        fn = getattr(m, fn_name, None)
-        if fn is not None:
-            fn(username, layername, layerinfo)
-        else:
-            current_app.logger.warn(
-                f'Module {m.__name__} does not have {fn_name} method.')
+    sources = get_sources()
+    call_modules_fn(sources, 'update_layer', [username, layername, layerinfo])
 
 
 POST_TASKS = [
@@ -230,16 +212,13 @@ def delete_layer(username, layername, source = None):
     ), 0)
     fn_name = 'delete_layer'
     end_idx = None if source_idx == 0 else source_idx-1
+    sources = sources[:end_idx:-1]
+
     result = {}
-    for m in sources[:end_idx:-1]:
-        fn = getattr(m, fn_name, None)
-        if fn is not None:
-            partial_result = fn(username, layername)
-            if partial_result is not None:
-                result.update(partial_result)
-        else:
-            current_app.logger.warn(
-                f'Module {m.__name__} does not have {fn_name} method.')
+    results = call_modules_fn(sources, 'delete_layer', [username, layername])
+    for r in results:
+        if r is not None:
+            result.update(r)
     return result
 
 
