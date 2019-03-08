@@ -66,7 +66,7 @@ PG_CONN_TEMPLATE = f"host='{os.environ['LAYMAN_PG_HOST']}' port='{os.environ['LA
 LAYMAN_CELERY_QUEUE = os.environ['LAYMAN_CELERY_QUEUE']
 
 
-SOURCES = [
+LAYER_SOURCES = [
     'layman.layer.filesystem.input_file',
     'layman.layer.filesystem.input_sld',
     'layman.layer.filesystem.input_chunk',
@@ -76,6 +76,8 @@ SOURCES = [
     'layman.layer.geoserver.sld',
     'layman.layer.filesystem.thumbnail',
 ]
+
+ALL_SOURCES = LAYER_SOURCES.copy()
 
 
 # UPLOAD_MAX_INACTIVITY_TIME = 10 # 10 seconds
