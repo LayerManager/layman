@@ -1,7 +1,8 @@
+import importlib
 import inspect
 import re
 import unicodedata
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from celery import chain
 from flask import current_app, url_for
@@ -12,8 +13,8 @@ from layman.layer.db import tasks
 from layman.layer.geoserver import tasks
 from layman.layer.filesystem import tasks
 from layman import LaymanError, LAYMAN_CELERY_QUEUE
-from layman.util import USERNAME_RE, get_sources, get_providers, \
-    call_modules_fn
+from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names
+from layman.settings import LAYER_SOURCES
 
 LAYERNAME_RE = USERNAME_RE
 
@@ -39,6 +40,20 @@ def check_layername(layername):
     if not re.match(LAYERNAME_RE, layername):
         raise LaymanError(2, {'parameter': 'layername', 'expected':
             LAYERNAME_RE})
+
+
+def get_sources():
+    key = 'layman.layer.sources'
+    if key not in current_app.config:
+        current_app.config[key] = get_modules_from_names(LAYER_SOURCES)
+    return current_app.config[key]
+
+
+def get_providers():
+    key = 'layman.layer.providers'
+    if key not in current_app.config:
+        current_app.config[key] = get_providers_from_source_names(LAYER_SOURCES)
+    return current_app.config[key]
 
 
 def get_layer_names(username):

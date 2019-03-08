@@ -5,7 +5,7 @@ from collections import OrderedDict
 from flask import current_app
 
 from layman.http import LaymanError
-from layman.settings import *
+from layman.settings import ALL_SOURCES
 
 USERNAME_RE = r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$"
 
@@ -17,29 +17,28 @@ def check_username(username):
     call_modules_fn(providers, 'check_username', [username])
 
 
-def get_sources():
-    key = 'layman.sources'
-    if key not in current_app.config:
-        active_sources = list(map(
-            lambda path: importlib.import_module(path),
-            SOURCES
-        ))
-        current_app.config[key] = active_sources
-    return current_app.config[key]
-
 def get_providers():
     key = 'layman.providers'
     if key not in current_app.config:
-        paths = list(OrderedDict.fromkeys(map(
-            lambda src: src[:src.rfind('.')],
-            SOURCES
-        )))
-        providers = list(map(
-            lambda path: importlib.import_module(path),
-            paths
-        ))
-        current_app.config[key] = providers
+        current_app.config[key] = get_providers_from_source_names(ALL_SOURCES)
     return current_app.config[key]
+
+
+def get_providers_from_source_names(source_names):
+    provider_names = list(OrderedDict.fromkeys(map(
+        lambda src: src[:src.rfind('.')],
+        source_names
+    )))
+    providers = get_modules_from_names(provider_names)
+    return providers
+
+
+def get_modules_from_names(module_names):
+    modules = list(map(
+        lambda module_name: importlib.import_module(module_name),
+        module_names
+    ))
+    return modules
 
 
 def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_calls=True):
