@@ -6,8 +6,9 @@ from urllib.parse import urljoin
 
 from flask import g, current_app
 
+from .util import get_gs_proxy_base_url
 from . import headers_json
-from layman.settings import *
+from layman import settings
 
 FLASK_WFS_PROXY_KEY = 'layman.layer.geoserver.wfs_proxy'
 
@@ -21,7 +22,7 @@ def update_layer(username, layername, layerinfo):
     ]
     keywords = list(set(keywords))
     r = requests.put(
-        urljoin(LAYMAN_GS_REST_WORKSPACES,
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
                 username + '/datastores/postgresql/featuretypes/'+layername),
         data=json.dumps(
             {
@@ -35,7 +36,7 @@ def update_layer(username, layername, layerinfo):
             }
         ),
         headers=headers_json,
-        auth=LAYMAN_GS_AUTH
+        auth=settings.LAYMAN_GS_AUTH
     )
     r.raise_for_status()
     g.pop(FLASK_WFS_PROXY_KEY, None)
@@ -45,10 +46,10 @@ def delete_layer(username, layername):
     info = get_layer_info(username, layername)
     if info:
         r = requests.delete(
-            urljoin(LAYMAN_GS_REST_WORKSPACES,
+            urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
                     username + '/datastores/postgresql/featuretypes/' + layername),
             headers=headers_json,
-            auth=LAYMAN_GS_AUTH,
+            auth=settings.LAYMAN_GS_AUTH,
             params = {
                 'recurse': 'true'
             }
@@ -61,7 +62,7 @@ def delete_layer(username, layername):
 def get_wfs_proxy(username):
     key = FLASK_WFS_PROXY_KEY
     if key not in g:
-        wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
+        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
         from .util import wms_proxy
         wms_proxy = wms_proxy(wms_url)
         g.setdefault(key, wms_proxy)
@@ -71,7 +72,7 @@ def get_wfs_proxy(username):
 def get_layer_info(username, layername):
     try:
         wfs = get_wfs_proxy(username)
-        wfs_proxy_url = urljoin(LAYMAN_GS_PROXY_URL, username + '/ows')
+        wfs_proxy_url = urljoin(get_gs_proxy_base_url(), username + '/ows')
 
         return {
             'title': wfs.contents[layername].title,

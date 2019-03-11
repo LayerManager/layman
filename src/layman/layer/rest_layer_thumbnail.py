@@ -1,10 +1,11 @@
+import os
+
 from flask import Blueprint, send_file
 from flask import current_app as app
 
 from .filesystem.util import get_user_dir
 from layman.http import LaymanError
 from layman.util import check_username
-from layman.settings import *
 from . import util
 from .filesystem import thumbnail
 

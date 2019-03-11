@@ -7,7 +7,8 @@ from urllib.parse import urljoin
 from flask import g, current_app
 
 from . import headers_json
-from layman.settings import *
+from .util import get_gs_proxy_base_url
+from layman import settings
 
 
 FLASK_WMS_PROXY_KEY = 'layman.layer.geoserver.wms_proxy'
@@ -22,10 +23,10 @@ def delete_layer(username, layername):
     info = get_layer_info(username, layername)
     if info:
         r = requests.delete(
-            urljoin(LAYMAN_GS_REST_WORKSPACES, username +
+            urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username +
                     '/layers/' + layername),
             headers=headers_json,
-            auth=LAYMAN_GS_AUTH,
+            auth=settings.LAYMAN_GS_AUTH,
             params = {
                 'recurse': 'true'
             }
@@ -39,7 +40,7 @@ def delete_layer(username, layername):
 def get_wms_proxy(username):
     key = FLASK_WMS_PROXY_KEY
     if key not in g:
-        wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
+        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
         from .util import wms_proxy
         wms_proxy = wms_proxy(wms_url)
         g.setdefault(key, wms_proxy)
@@ -49,7 +50,7 @@ def get_layer_info(username, layername):
 
     try:
         wms = get_wms_proxy(username)
-        wms_proxy_url = urljoin(LAYMAN_GS_PROXY_URL, username + '/ows')
+        wms_proxy_url = urljoin(get_gs_proxy_base_url(), username + '/ows')
 
         return {
             'title': wms.contents[layername].title,

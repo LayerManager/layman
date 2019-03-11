@@ -24,7 +24,7 @@ psql:
 clear-data-dev:
 	docker-compose -f docker-compose.dev.yml run --rm layman_dev bash -c "python3 src/clear_layman_data.py && python3 src/prepare_layman.py"
 
-clear-python-dev:
+clear-python-cache-dev:
 	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman_dev bash /code/src/clear-python-cache.sh
 
 start-layman-dev:

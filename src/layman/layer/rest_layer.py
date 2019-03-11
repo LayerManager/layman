@@ -3,7 +3,7 @@ from flask import current_app as app
 
 from layman.http import LaymanError
 from layman.util import check_username
-from layman.settings import *
+from layman import settings
 from . import util
 from .filesystem import input_file, input_sld, input_chunk
 
@@ -60,9 +60,9 @@ def patch(username, layername):
     crs_id = None
     if len(files) > 0 and len(request.form.get('crs', '')) > 0:
         crs_id = request.form['crs']
-        if crs_id not in INPUT_SRS_LIST:
+        if crs_id not in settings.INPUT_SRS_LIST:
             raise LaymanError(2, {'parameter': 'crs', 'supported_values':
-                INPUT_SRS_LIST})
+                settings.INPUT_SRS_LIST})
     check_crs = crs_id is None
 
     update_info = False

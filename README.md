@@ -65,7 +65,7 @@ Then visit [http://localhost:8000/](). You will see simple HTML form that enable
 To stop running service, press Ctrl+C.
 
 ## Configuration
-TLDR: Default settings are suitable for developemnt and testing (`make start-layman-dev` and `make test` commands). If you run it in production, manual configuration is needed.
+TLDR: Default settings are suitable for development and testing (`make start-layman-dev` and `make test` commands). If you run it in production, manual configuration is needed.
 
 The most general configuration is found in `docker-compose.*.yml` files used as [docker-compose configuration files](https://docs.docker.com/compose/compose-file/compose-file-v2/).
 - `docker-compose.dev.yml` used for development
@@ -100,7 +100,7 @@ Within GeoServer, you need one Layman user [LAYMAN_GS_USER](.env.production) and
 cp .env.production .env
 
 # edit .env
-# edit src/layman/settings.py
+# edit src/layman_settings.py
 
 # start dockerized layman only
 make start-layman-production
@@ -116,7 +116,7 @@ make reset-layman-gs-datadir
 cp .env.production-and-deps .env
 
 # edit .env, at least add FLASK_SECRET_KEY
-# edit src/layman/settings.py
+# edit src/layman_settings.py
 
 # start dockerized layman & geoserver & DB
 make start-layman-production-with-dependencies

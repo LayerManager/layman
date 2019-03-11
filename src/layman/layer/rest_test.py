@@ -1,4 +1,6 @@
 import io
+import os
+from urllib.parse import urljoin
 
 import pytest
 from flask import url_for
@@ -6,7 +8,7 @@ from flask import url_for
 from . import util
 from .geoserver.util import get_feature_type, wms_proxy
 from layman import app as layman
-from layman.settings import *
+from layman import settings
 
 min_geojson = """
 {
@@ -53,10 +55,10 @@ def test_no_file(client):
 
 
 def test_username_schema_conflict(client):
-    if len(PG_NON_USER_SCHEMAS) == 0:
+    if len(settings.PG_NON_USER_SCHEMAS) == 0:
         pass
     with layman.app_context():
-        rv = client.post(url_for('rest_layers.post', username=PG_NON_USER_SCHEMAS[0]))
+        rv = client.post(url_for('rest_layers.post', username=settings.PG_NON_USER_SCHEMAS[0]))
     assert rv.status_code==409
     resp_json = rv.get_json()
     # print(resp_json)
@@ -145,7 +147,7 @@ def test_post_layers_simple(client):
             assert isinstance(layer_info[key_to_check], str) \
                    or 'status' not in layer_info[key_to_check]
 
-    wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
+    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
     assert layername in wms.contents
 
@@ -251,7 +253,7 @@ def test_post_layers_shp(client):
     assert last_task is not None and not util._is_task_ready(last_task)
     last_task['last'].get()
 
-    wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
+    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
     assert 'ne_110m_admin_0_countries_shp' in wms.contents
 
@@ -312,7 +314,7 @@ def test_post_layers_complex(client):
     assert last_task is not None and not util._is_task_ready(last_task)
     last_task['last'].get()
 
-    wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
+    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
     assert 'countries' in wms.contents
     assert wms['countries'].title == 'staty'
@@ -409,7 +411,7 @@ def test_patch_layer_style(client):
     resp_json = rv.get_json()
     assert resp_json['title'] == "countries in blue"
 
-    wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
+    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
     assert layername in wms.contents
     assert wms[layername].title == 'countries in blue'

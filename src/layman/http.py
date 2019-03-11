@@ -1,4 +1,3 @@
-from flask import jsonify
 from .error_list import ERROR_LIST
 
 class LaymanError(Exception):

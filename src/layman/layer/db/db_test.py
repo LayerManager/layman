@@ -1,8 +1,8 @@
+import os
 import shutil
 import time
 
 from layman.layer.filesystem.input_file import ensure_layer_input_file_dir
-from layman.settings import *
 from .__init__ import import_layer_vector_file_async
 
 
