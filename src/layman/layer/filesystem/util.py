@@ -2,11 +2,11 @@ import os
 import pathlib
 import shutil
 
-from layman import LAYMAN_DATA_DIR
+from layman import settings
 
 
 def get_user_dir(username):
-    userdir = os.path.join(LAYMAN_DATA_DIR, 'users', username)
+    userdir = os.path.join(settings.LAYMAN_DATA_DIR, 'users', username)
     return userdir
 
 

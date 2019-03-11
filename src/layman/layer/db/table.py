@@ -1,5 +1,5 @@
 from . import get_connection_cursor
-from layman.settings import LAYMAN_PG_USER
+from layman import settings
 from layman.http import LaymanError
 
 
@@ -17,7 +17,7 @@ SELECT schemaname, tablename, tableowner
 FROM pg_tables
 WHERE schemaname = '{username}'
 	AND tablename = '{layername}'
-	AND tableowner = '{LAYMAN_PG_USER}'
+	AND tableowner = '{settings.LAYMAN_PG_USER}'
 """)
     except:
         raise LaymanError(7)
@@ -39,7 +39,7 @@ def get_layer_names(username, conn_cur=None):
     SELECT tablename
     FROM pg_tables
     WHERE schemaname = '{username}'
-    	AND tableowner = '{LAYMAN_PG_USER}'
+    	AND tableowner = '{settings.LAYMAN_PG_USER}'
     """)
     except:
         raise LaymanError(7)

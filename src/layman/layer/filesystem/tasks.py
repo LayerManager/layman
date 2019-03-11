@@ -4,7 +4,7 @@ from celery.utils.log import get_task_logger
 
 from layman import celery_app
 from layman.http import LaymanError
-from layman.settings import *
+from layman import settings
 from . import input_file, input_chunk, thumbnail
 
 logger = get_task_logger(__name__)
@@ -26,7 +26,7 @@ def wait_for_upload(self, username, layername, check_crs=True):
 
     logger.debug(f'chunk_info {str(chunk_info)}')
     while not chunk_info[0]:
-        if time.time() - last_change > UPLOAD_MAX_INACTIVITY_TIME:
+        if time.time() - last_change > settings.UPLOAD_MAX_INACTIVITY_TIME:
             logger.info(
                 f'UPLOAD_MAX_INACTIVITY_TIME reached {username}.{layername}')
             input_file.delete_layer(username, layername)

@@ -43,9 +43,6 @@ GS_RESERVED_WORKSPACE_NAMES = [
     'default',
 ]
 
-from layman.layer.geoserver.util import get_gs_proxy_base_url
-LAYMAN_GS_PROXY_URL = get_gs_proxy_base_url()
-
 # List of schemas that are owned by LAYMAN_PG_USER, but should not be used
 # by layman.
 # Note: Schemas as public, topology, or pg_catalog are usually owned by
@@ -66,18 +63,9 @@ PG_CONN_TEMPLATE = f"host='{os.environ['LAYMAN_PG_HOST']}' port='{os.environ['LA
 LAYMAN_CELERY_QUEUE = os.environ['LAYMAN_CELERY_QUEUE']
 
 
-LAYER_SOURCES = [
-    'layman.layer.filesystem.input_file',
-    'layman.layer.filesystem.input_sld',
-    'layman.layer.filesystem.input_chunk',
-    'layman.layer.db.table',
-    'layman.layer.geoserver.wfs',
-    'layman.layer.geoserver.wms',
-    'layman.layer.geoserver.sld',
-    'layman.layer.filesystem.thumbnail',
+PUBLICATION_MODULES = [
+    'layman.layer',
 ]
-
-ALL_SOURCES = LAYER_SOURCES.copy()
 
 
 # UPLOAD_MAX_INACTIVITY_TIME = 10 # 10 seconds

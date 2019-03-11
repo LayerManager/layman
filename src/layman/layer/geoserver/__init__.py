@@ -1,11 +1,12 @@
 import json
 import re
+from urllib.parse import urljoin
 
 import requests
 from flask import g
 
 from layman.http import LaymanError
-from layman.settings import *
+from layman import settings
 
 headers_json = {
     'Accept': 'application/json',
@@ -21,10 +22,10 @@ def get_all_workspaces():
     key = 'layman.layer.geoserver.workspaces'
     if key not in g:
         r = requests.get(
-            LAYMAN_GS_REST_WORKSPACES,
+            settings.LAYMAN_GS_REST_WORKSPACES,
             # data=json.dumps(payload),
             headers=headers_json,
-            auth=LAYMAN_GS_AUTH
+            auth=settings.LAYMAN_GS_AUTH
         )
         r.raise_for_status()
         # app.logger.info(r.text)
@@ -38,10 +39,10 @@ def get_all_rules():
     key = 'layman.layer.geoserver.rules'
     if key not in g:
         r = requests.get(
-            LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
+            settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
             # data=json.dumps(payload),
             headers=headers_json,
-            auth=LAYMAN_GS_AUTH
+            auth=settings.LAYMAN_GS_AUTH
         )
         r.raise_for_status()
         # app.logger.info(r.text)
@@ -52,7 +53,7 @@ def get_all_rules():
 
 
 def check_username(username):
-    if username in GS_RESERVED_WORKSPACE_NAMES:
+    if username in settings.GS_RESERVED_WORKSPACE_NAMES:
         raise LaymanError(13, {'workspace': username})
     non_layman_workspaces = get_non_layman_workspaces()
     if any(ws['name'] == username for ws in non_layman_workspaces):
@@ -63,18 +64,18 @@ def ensure_user_workspace(username):
     all_workspaces = get_all_workspaces()
     if not any(ws['name'] == username for ws in all_workspaces):
         r = requests.post(
-            LAYMAN_GS_REST_WORKSPACES,
+            settings.LAYMAN_GS_REST_WORKSPACES,
             data=json.dumps({'workspace': {'name': username}}),
             headers=headers_json,
-            auth=LAYMAN_GS_AUTH
+            auth=settings.LAYMAN_GS_AUTH
         )
         r.raise_for_status()
         r = requests.post(
-            LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
+            settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
             data=json.dumps(
-                {username + '.*.r': LAYMAN_GS_ROLE + ',ROLE_ANONYMOUS'}),
+                {username + '.*.r': settings.LAYMAN_GS_ROLE + ',ROLE_ANONYMOUS'}),
             headers=headers_json,
-            auth=LAYMAN_GS_AUTH
+            auth=settings.LAYMAN_GS_AUTH
         )
         r.raise_for_status()
         ensure_user_db_store(username)
@@ -82,7 +83,7 @@ def ensure_user_workspace(username):
 
 def ensure_user_db_store(username):
     r = requests.post(
-        urljoin(LAYMAN_GS_REST_WORKSPACES, username + '/datastores'),
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + '/datastores'),
         data=json.dumps({
             "dataStore": {
                 "name": "postgresql",
@@ -94,23 +95,23 @@ def ensure_user_db_store(username):
                         },
                         {
                             "@key": "host",
-                            "$": LAYMAN_PG_HOST
+                            "$": settings.LAYMAN_PG_HOST
                         },
                         {
                             "@key": "port",
-                            "$": LAYMAN_PG_PORT
+                            "$": settings.LAYMAN_PG_PORT
                         },
                         {
                             "@key": "database",
-                            "$": LAYMAN_PG_DBNAME
+                            "$": settings.LAYMAN_PG_DBNAME
                         },
                         {
                             "@key": "user",
-                            "$": LAYMAN_PG_USER
+                            "$": settings.LAYMAN_PG_USER
                         },
                         {
                             "@key": "passwd",
-                            "$": LAYMAN_PG_PASSWORD
+                            "$": settings.LAYMAN_PG_PASSWORD
                         },
                         {
                             "@key": "schema",
@@ -121,7 +122,7 @@ def ensure_user_db_store(username):
             }
         }),
         headers=headers_json,
-        auth=LAYMAN_GS_AUTH
+        auth=settings.LAYMAN_GS_AUTH
     )
     r.raise_for_status()
 
@@ -134,7 +135,7 @@ def publish_layer_from_db(username, layername, description, title):
     ]
     keywords = list(set(keywords))
     r = requests.post(
-        urljoin(LAYMAN_GS_REST_WORKSPACES,
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
                 username + '/datastores/postgresql/featuretypes/'),
         data=json.dumps(
             {
@@ -156,12 +157,12 @@ def publish_layer_from_db(username, layername, description, title):
             }
         ),
         headers=headers_json,
-        auth=LAYMAN_GS_AUTH
+        auth=settings.LAYMAN_GS_AUTH
     )
     r.raise_for_status()
 
 
-def get_layman_rules(all_rules=None, layman_role=LAYMAN_GS_ROLE):
+def get_layman_rules(all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
     if all_rules==None:
         all_rules = get_all_rules()
     re_role = r".*\b" + re.escape(layman_role) + r"\b.*"
