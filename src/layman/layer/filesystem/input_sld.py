@@ -1,11 +1,9 @@
 import os
 import pathlib
-import shutil
 
 from werkzeug.datastructures import FileStorage
 
 from . import util
-from layman.settings import *
 from . import input_file
 
 

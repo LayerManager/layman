@@ -8,13 +8,10 @@ from celery import chain
 from flask import current_app, url_for
 from unidecode import unidecode
 
-from layman.layer import db, geoserver, filesystem
-from layman.layer.db import tasks
-from layman.layer.geoserver import tasks
-from layman.layer.filesystem import tasks
-from layman import LaymanError, LAYMAN_CELERY_QUEUE
+from layman import LaymanError
+from layman import settings
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names
-from layman.settings import LAYER_SOURCES
+from . import get_layer_sources
 
 LAYERNAME_RE = USERNAME_RE
 
@@ -45,14 +42,14 @@ def check_layername(layername):
 def get_sources():
     key = 'layman.layer.sources'
     if key not in current_app.config:
-        current_app.config[key] = get_modules_from_names(LAYER_SOURCES)
+        current_app.config[key] = get_modules_from_names(get_layer_sources())
     return current_app.config[key]
 
 
 def get_providers():
     key = 'layman.layer.providers'
     if key not in current_app.config:
-        current_app.config[key] = get_providers_from_source_names(LAYER_SOURCES)
+        current_app.config[key] = get_providers_from_source_names(get_layer_sources())
     return current_app.config[key]
 
 
@@ -143,17 +140,23 @@ def update_layer(username, layername, layerinfo):
 
 
 POST_TASKS = [
-    db.tasks.import_layer_vector_file,
-    geoserver.tasks.publish_layer_from_db,
-    geoserver.tasks.create_layer_style,
-    filesystem.tasks.generate_layer_thumbnail,
+    'layman.layer.db.tasks.import_layer_vector_file',
+    'layman.layer.geoserver.tasks.publish_layer_from_db',
+    'layman.layer.geoserver.tasks.create_layer_style',
+    'layman.layer.filesystem.tasks.generate_layer_thumbnail',
 ]
 
 
 def post_layer(username, layername, task_options, use_chunk_upload):
     post_tasks = POST_TASKS.copy()
     if use_chunk_upload:
-        post_tasks.insert(0, filesystem.tasks.wait_for_upload)
+        post_tasks.insert(0, 'layman.layer.filesystem.tasks.wait_for_upload')
+    post_tasks = [
+        getattr(
+            importlib.import_module(taskname.rsplit('.', 1)[0]),
+            taskname.rsplit('.', 1)[1]
+        ) for taskname in post_tasks
+    ]
     post_chain = chain(*list(map(
         lambda t: _get_task_signature(username, layername, task_options, t),
         post_tasks
@@ -184,7 +187,13 @@ def patch_layer(username, layername, delete_from, task_options, use_chunk_upload
 
     patch_tasks = POST_TASKS[start_idx:]
     if use_chunk_upload:
-        patch_tasks.insert(0, filesystem.tasks.wait_for_upload)
+        patch_tasks.insert(0, 'layman.layer.filesystem.tasks.wait_for_upload')
+    patch_tasks = [
+        getattr(
+            importlib.import_module(taskname.rsplit('.', 1)[0]),
+            taskname.rsplit('.', 1)[1]
+        ) for taskname in patch_tasks
+    ]
 
     patch_chain = chain(*list(map(
         lambda t: _get_task_signature(username, layername, task_options, t),
@@ -289,7 +298,7 @@ def _get_task_signature(username, layername, task_options, task):
     return task.signature(
         (username, layername),
         task_opts,
-        queue=LAYMAN_CELERY_QUEUE,
+        queue=settings.LAYMAN_CELERY_QUEUE,
         immutable=True,
     )
 

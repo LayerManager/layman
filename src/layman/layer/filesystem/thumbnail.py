@@ -1,9 +1,9 @@
+import os
 import pathlib
-import shutil
-
+from urllib.parse import urljoin
+from layman import settings
 from flask import url_for
 
-from layman.settings import *
 from . import util
 from . import input_file
 
@@ -52,7 +52,7 @@ def get_layer_thumbnail_path(username, layername):
 
 
 def generate_layer_thumbnail(username, layername):
-    wms_url = urljoin(LAYMAN_GS_URL, username + '/ows')
+    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
     from layman.layer.geoserver.util import wms_proxy
     wms = wms_proxy(wms_url)
     # app.logger.info(list(wms.contents))

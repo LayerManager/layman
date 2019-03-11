@@ -6,7 +6,8 @@ import pathlib
 
 from flask import current_app
 
-from layman import LaymanError, LAYMAN_REDIS
+from layman import LaymanError
+from layman import settings
 from . import util
 from . import input_file
 
@@ -28,7 +29,7 @@ def ensure_layer_resumable_dir(username, layername):
 def delete_layer(username, layername):
     util.delete_layer_subdir(username, layername, LAYER_SUBDIR)
     chunk_key = get_layer_redis_total_chunks_key(username, layername)
-    LAYMAN_REDIS.delete(chunk_key)
+    settings.LAYMAN_REDIS.delete(chunk_key)
 
 
 get_layer_info = input_file.get_layer_info
@@ -103,7 +104,7 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
                     'file': filename,
                     'layman_original_parameter': parameter_name,
                 })
-            LAYMAN_REDIS.hset(
+            settings.LAYMAN_REDIS.hset(
                 get_layer_redis_total_chunks_key(username, layername),
                 f'{parameter_name}:{file_info["target_file"]}',
                 total_chunks
@@ -165,7 +166,7 @@ def layer_file_chunk_info(username, layername):
             r_key = get_layer_redis_total_chunks_key(username, layername)
             for fi in files_to_upload:
                 rh_key = f'{fi["layman_original_parameter"]}:{fi["target_file"]}'
-                total_chunks = LAYMAN_REDIS.hget(r_key, rh_key)
+                total_chunks = settings.LAYMAN_REDIS.hget(r_key, rh_key)
                 # print(f'file {rh_key} {total_chunks}')
                 if total_chunks is None:
                     continue
@@ -189,7 +190,7 @@ def layer_file_chunk_info(username, layername):
                             stored_chunk_file.close()
                             os.unlink(chunk_path)
                     target_file.close()
-                    LAYMAN_REDIS.hdel(r_key, rh_key)
+                    settings.LAYMAN_REDIS.hdel(r_key, rh_key)
                     current_app.logger.info('Resumable file saved to: %s',
                                              target_fp)
 

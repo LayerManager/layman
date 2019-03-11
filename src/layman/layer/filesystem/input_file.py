@@ -5,7 +5,7 @@ import pathlib
 from osgeo import ogr
 
 from layman.http import LaymanError
-from layman.settings import MAIN_FILE_EXTENSIONS, INPUT_SRS_LIST
+from layman import settings
 from . import util
 
 
@@ -98,9 +98,9 @@ def check_layer_crs(main_filepath):
     crs_auth_name = crs.GetAuthorityName(None)
     crs_code = crs.GetAuthorityCode(None)
     crs_id = crs_auth_name+":"+crs_code
-    if crs_id not in INPUT_SRS_LIST:
+    if crs_id not in settings.INPUT_SRS_LIST:
         raise LaymanError(4, {'found': crs_id,
-                              'supported_values': INPUT_SRS_LIST})
+                              'supported_values': settings.INPUT_SRS_LIST})
 
 
 def save_files(files, filepath_mapping):
@@ -117,7 +117,7 @@ def check_filenames(username, layername, filenames, check_crs):
     if main_filename is None:
         raise LaymanError(2, {'parameter': 'file', 'expected': \
             'At least one file with any of extensions: ' + \
-            ', '.join(MAIN_FILE_EXTENSIONS)})
+            ', '.join(settings.MAIN_FILE_EXTENSIONS)})
     basename, ext = map(
         lambda s: s.lower(),
         os.path.splitext(main_filename)
@@ -193,7 +193,7 @@ def get_unsafe_layername(files):
 
 def get_main_file_name(filenames):
     return next((fn for fn in filenames if os.path.splitext(fn)[1]
-                 in MAIN_FILE_EXTENSIONS), None)
+                 in settings.MAIN_FILE_EXTENSIONS), None)
 
 
 def get_file_name_mappings(file_names, main_file_name, layer_name, output_dir):

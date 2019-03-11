@@ -1,5 +1,5 @@
 import pathlib
-from layman.settings import *
+from layman_settings import *
 
 def main():
     pathlib.Path(LAYMAN_DATA_DIR).mkdir(exist_ok=True, parents=True)
