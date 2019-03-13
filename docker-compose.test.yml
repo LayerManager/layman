@@ -18,10 +18,6 @@ services:
         - ./tmp:/code/tmp
         - ./test.sh:/code/test.sh
       depends_on:
-        db:
-          condition: service_healthy
-        geoserver:
-          condition: service_healthy
         celery_worker_test:
           condition: service_healthy
 
@@ -73,5 +69,10 @@ services:
         - ./src:/code/src
         - ./tmp:/code/tmp
       depends_on:
-        - redis
+        db:
+          condition: service_healthy
+        geoserver:
+          condition: service_healthy
+        redis:
+          condition: service_started
 
