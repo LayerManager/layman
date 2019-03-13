@@ -30,6 +30,7 @@ services:
       env_file: .env
       environment:
         - C_FORCE_ROOT=true
+        - IS_CELERY_WORKER=true
       volumes:
         - ./layman_data:/layman_data
         - ./src:/code/src
