@@ -55,6 +55,17 @@ def get_layer_names(username):
     return []
 
 
+def get_publication_names(username, publication_type):
+    if publication_type != '.'.join(__name__.split('.')[:-2]):
+        raise Exception(f'Unknown pyblication type {publication_type}')
+
+    return []
+
+
+def get_publication_uuid(username, publication_type, publication_name):
+    return None
+
+
 def create_layer_style(username, layername):
     sld_file = get_layer_file(username, layername)
     # print('create_layer_style', sld_file)

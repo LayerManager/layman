@@ -63,6 +63,17 @@ def get_layer_names(username):
     return layer_names
 
 
+def get_publication_names(username, publication_type):
+    if publication_type != '.'.join(__name__.split('.')[:-2]):
+        raise Exception(f'Unknown pyblication type {publication_type}')
+
+    return get_layer_names(username)
+
+
+from . import uuid
+get_publication_uuid = uuid.get_publication_uuid
+
+
 def get_layer_main_file_path(username, layername):
     input_file_dir = get_layer_input_file_dir(username, layername)
     pattern = os.path.join(input_file_dir, layername+'.*')
@@ -112,7 +123,7 @@ def save_files(files, filepath_mapping):
         file.save(filepath_mapping[file.filename])
 
 
-def check_filenames(username, layername, filenames, check_crs):
+def check_filenames(username, layername, filenames, check_crs, ignore_existing_files=False):
     main_filename = get_main_file_name(filenames)
     if main_filename is None:
         raise LaymanError(2, {'parameter': 'file', 'expected': \
@@ -147,17 +158,17 @@ def check_filenames(username, layername, filenames, check_crs):
         filenames, main_filename, layername, input_file_dir
     )
 
-    conflict_paths = [filename_mapping[k]
-                      for k, v in filename_mapping.items()
-                      if v is not None and os.path.exists(os.path.join(
-            input_file_dir, v))]
-    if len(conflict_paths) > 0:
-        raise LaymanError(3, conflict_paths)
+    if not ignore_existing_files:
+        conflict_paths = [filename_mapping[k]
+                          for k, v in filename_mapping.items()
+                          if v is not None and os.path.exists(os.path.join(
+                input_file_dir, v))]
+        if len(conflict_paths) > 0:
+            raise LaymanError(3, conflict_paths)
 
 
 def save_layer_files(username, layername, files, check_crs):
     filenames = list(map(lambda f: f.filename, files))
-    check_filenames(username, layername, filenames, check_crs)
     main_filename = get_main_file_name(filenames)
     input_file_dir = ensure_layer_input_file_dir(username, layername)
     filename_mapping, filepath_mapping = get_file_name_mappings(

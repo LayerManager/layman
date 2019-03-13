@@ -5,7 +5,7 @@ from layman.http import LaymanError
 from layman.util import check_username
 from layman import settings
 from . import util
-from .filesystem import input_file, input_sld, input_chunk
+from .filesystem import input_file, input_sld, input_chunk, uuid
 
 
 bp = Blueprint('rest_layers', __name__)
@@ -18,14 +18,16 @@ def get(username):
     check_username(username)
 
     layernames = util.get_layer_names(username)
+    layernames.sort()
 
-    infos = list(map(
-        lambda layername: {
+    infos = [
+        {
             'name': layername,
-            'url': url_for('rest_layer.get', layername=layername, username=username)
-        },
-        layernames
-    ))
+            'url': url_for('rest_layer.get', layername=layername, username=username),
+            'uuid': uuid.get_layer_uuid(username, layername),
+        }
+        for layername in layernames
+    ]
     return jsonify(infos), 200
 
 
@@ -98,6 +100,19 @@ def post(username):
         'name': layername,
         'url': layerurl,
     }
+
+    # FILE NAMES
+    if use_chunk_upload:
+        filenames = files
+    else:
+        filenames = [f.filename for f in files]
+    input_file.check_filenames(username, layername, filenames, check_crs)
+
+    # register layer uuid
+    uuid_str = uuid.assign_layer_uuid(username, layername)
+    layer_result.update({
+        'uuid': uuid_str,
+    })
 
     # save files
     input_sld.save_layer_file(username, layername, sld_file)

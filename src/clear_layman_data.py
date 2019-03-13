@@ -1,7 +1,6 @@
 import shutil
 import re
 from layman_settings import *
-from layman.layer.geoserver import get_layman_rules
 from urllib.parse import urljoin
 
 
@@ -43,7 +42,12 @@ AND pid <> pg_backend_pid();
             f"""CREATE DATABASE {LAYMAN_PG_DBNAME} TEMPLATE {LAYMAN_PG_TEMPLATE_DBNAME}""")
         conn.close()
 
+
+    LAYMAN_REDIS.flushdb()
+
+
     import requests
+    from layman.layer.geoserver import get_layman_rules
     headers_json = {
         'Accept': 'application/json',
         'Content-type': 'application/json',
