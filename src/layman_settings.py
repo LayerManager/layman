@@ -1,6 +1,8 @@
 import os
 from urllib.parse import urljoin
 
+IS_CELERY_WORKER = os.getenv('IS_CELERY_WORKER', '').lower() == 'true'
+
 LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
 
 MAIN_FILE_EXTENSIONS = [

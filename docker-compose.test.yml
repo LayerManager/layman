@@ -63,6 +63,7 @@ services:
       env_file: .env.test
       environment:
         - C_FORCE_ROOT=true
+        - IS_CELERY_WORKER=true
       volumes:
         - ./layman_data_test:/layman_data_test
         - ./sample:/code/sample
