@@ -3,6 +3,7 @@ import shutil
 import time
 
 from layman.layer.filesystem.input_file import ensure_layer_input_file_dir
+from layman.layer.filesystem.util import get_layer_dir
 from .__init__ import import_layer_vector_file_async
 
 
@@ -36,4 +37,6 @@ def test_abort_import_layer_vector_file():
 
     return_code = abort_layer_import()
     assert return_code != 0
+    layerdir = get_layer_dir(username, layername)
+    shutil.rmtree(layerdir)
 

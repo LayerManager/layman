@@ -19,6 +19,7 @@ PUBLICATION_TYPES = {
             layer_thumbnail_bp,
         ],
         'internal_sources': [ # internal sources to process when new source is published
+            'layman.layer.filesystem.uuid',
             'layman.layer.filesystem.input_file',
             'layman.layer.filesystem.input_sld',
             'layman.layer.filesystem.input_chunk',

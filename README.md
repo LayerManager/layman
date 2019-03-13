@@ -80,6 +80,7 @@ Another part of settings is in `.env.*` files, also separate for development, te
 - all files within LAYMAN_DATA_DIR!
 - all layman-related schemas in LAYMAN_PG_DBNAME!
 - all workspaces accessible namely by LAYMAN_GS_ROLE!
+- all keys in Redis keyspace identified by LAYMAN_REDIS_URL!
 
 Default values are defined in [.env.test](.env.test)
 ```bash
