@@ -67,6 +67,9 @@ stop-layman-production-with-dependencies:
 	docker-compose -f docker-compose.production.yml stop
 
 test:
+	docker-compose -f docker-compose.test.yml run --rm layman_test
+
+test-dev:
 	docker-compose -f docker-compose.test.yml up --force-recreate --no-deps -d celery_worker_test
 	docker-compose -f docker-compose.test.yml run --rm layman_test
 
