@@ -33,6 +33,7 @@ Content-Type: `application/json`
 
 JSON array of objects representing available layers with following structure:
 - **name**: String. Name of the layer.
+- **uuid**: String. UUID of the layer.
 - **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
 
 ### POST Layers
@@ -87,6 +88,7 @@ Content-Type: `application/json`
 
 JSON array of objects representing posted layers with following structure:
 - **name**: String. Name of the layer.
+- **uuid**: String. UUID of the layer.
 - **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
 - *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. Each object represents one file that server expects to be subsequently uploaded using [POST Layer Chunk](#post-layer-chunk). Each object has following properties:
    - **file**: name of the file, equal to one of file name from **file** parameter
@@ -112,6 +114,7 @@ Content-Type: `application/json`
 
 JSON object with following structure:
 - **name**: String. Layer name within user's workspace of GeoServer. It should be used for identifying layer within WMS and WFS endpoints.
+- **uuid**: String. UUID of the layer.
 - **url**: String. URL pointing to this endpoint.
 - **title**: String.
 - **description**: String.
@@ -187,6 +190,7 @@ Content-Type: `application/json`
 
 JSON object representing deleted layer:
 - **name**: String. Former name of the layer.
+- **uuid**: String. Former UUID of the layer.
 - **url**: String. Former URL of the layer. It points to [GET Layer](#get-layer).
 
 
@@ -263,6 +267,7 @@ Content-Type: `application/json`
 
 JSON array of objects representing available maps with following structure:
 - **name**: String. Name of the map.
+- **uuid**: String. UUID of the map.
 - **url**: String. URL of the map. It points to [GET Map](#get-map).
 
 ### POST Maps
@@ -301,6 +306,7 @@ Content-Type: `application/json`
 
 JSON array of objects representing posted maps with following structure:
 - **name**: String. Name of the map.
+- **uuid**: String. UUID of the map.
 - **url**: String. URL of the map. It points to [GET Map](#get-map).
 
 
@@ -323,6 +329,7 @@ Content-Type: `application/json`
 
 JSON object with following structure:
 - **name**: String. Map name used for identification within user's namespace. Equal to `name` attribute of JSON root object
+- **uuid**: String. UUID of the map.
 - **url**: String. URL pointing to this endpoint.
 - **title**: String. Taken from `title` attribute of JSON root object
 - **description**: String. Taken from `abstract` attribute of JSON root object.
@@ -367,6 +374,7 @@ Content-Type: `application/json`
 
 JSON object representing deleted map:
 - **name**: String. Former name of the map.
+- **uuid**: String. Former UUID of the map.
 - **url**: String. Former URL of the map. It points to [GET Map](#get-map).
 
 
