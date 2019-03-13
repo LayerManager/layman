@@ -18,11 +18,14 @@ from .util import get_blueprints
 for bp in get_blueprints():
     app.register_blueprint(bp, url_prefix='/rest/<username>')
 
-if not settings.IS_CELERY_WORKER:
-    app.logger.info('This is NOT celery worker.')
+
+# load UUIDs only once
+if not settings.IS_CELERY_WORKER and os.getenv('LAYMAN_SKIP_REDIS_LOADING', 'false') != 'true':
+    os.environ['LAYMAN_SKIP_REDIS_LOADING'] = 'true'
     with app.app_context():
         from .uuid import import_uuids_to_redis
         import_uuids_to_redis()
+
 
 @app.route('/')
 def index():

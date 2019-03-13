@@ -9,6 +9,7 @@ UUID_METADATA_KEY_PREFIX = 'layman.uuid.'
 
 
 def import_uuids_to_redis():
+    current_app.logger.info('Importing UUIDs to REDIS')
     all_sources = []
     for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
         for type_def in publ_module.PUBLICATION_TYPES.values():
