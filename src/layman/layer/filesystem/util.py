@@ -5,8 +5,13 @@ import shutil
 from layman import settings
 
 
+def get_users_dir():
+    usersdir = os.path.join(settings.LAYMAN_DATA_DIR, 'users')
+    return usersdir
+
+
 def get_user_dir(username):
-    userdir = os.path.join(settings.LAYMAN_DATA_DIR, 'users', username)
+    userdir = os.path.join(get_users_dir(), username)
     return userdir
 
 
@@ -44,3 +49,13 @@ def delete_layer_subdir(username, layername, layer_subdir):
     return {}
 
 
+def delete_layer_subfile(username, layername, layer_subfile):
+    layerdir = get_layer_dir(username, layername)
+    layer_subfile = os.path.join(layerdir, layer_subfile)
+    try:
+        os.remove(layer_subfile)
+    except OSError:
+        pass
+    if os.path.exists(layerdir) and not os.listdir(layerdir):
+        os.rmdir(layerdir)
+    return {}

@@ -192,5 +192,12 @@ def get_layman_workspaces():
                                all_workspaces)
     return layman_workspaces
 
+
+def get_usernames():
+    return [
+        ws['name'] for ws in get_layman_workspaces()
+    ]
+
+
 def check_new_layername(username, layername):
     pass

@@ -41,9 +41,14 @@ get_layer_names = input_file.get_layer_names
 update_layer = input_file.update_layer
 
 
+get_publication_names = input_file.get_publication_names
+
+
+get_publication_uuid = input_file.get_publication_uuid
+
+
 def save_layer_files_str(username, layername, files_str, check_crs):
     filenames = files_str
-    input_file.check_filenames(username, layername, filenames, check_crs)
     main_filename = input_file.get_main_file_name(filenames)
     input_file_dir = input_file.get_layer_input_file_dir(username, layername)
     _, filepath_mapping = input_file.get_file_name_mappings(

@@ -22,6 +22,24 @@ def get_connection_cursor():
     return g.get(key)
 
 
+def get_usernames(conn_cur=None):
+    if conn_cur is None:
+        conn_cur = get_connection_cursor()
+    conn, cur = conn_cur
+
+    try:
+        cur.execute(f"""select schema_name
+    from information_schema.schemata
+    where schema_name NOT IN ('{"', '".join(settings.PG_NON_USER_SCHEMAS)}') AND schema_owner = '{settings.LAYMAN_PG_USER}'""")
+    except:
+        raise LaymanError(7)
+    rows = cur.fetchall()
+    return [
+        r[0] for r in rows
+    ]
+
+
+
 def check_username(username, conn_cur=None):
     if username in settings.PG_NON_USER_SCHEMAS:
         raise LaymanError(8, {'schema': username})

@@ -92,3 +92,14 @@ def get_layer_names(username):
         return [*wfs.contents]
     except:
         return []
+
+
+def get_publication_names(username, publication_type):
+    if publication_type != '.'.join(__name__.split('.')[:-2]):
+        raise Exception(f'Unknown pyblication type {publication_type}')
+
+    return get_layer_names(username)
+
+
+def get_publication_uuid(username, publication_type, publication_name):
+    return None

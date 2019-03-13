@@ -88,6 +88,15 @@ def patch(username, layername):
     if len(files) > 0:
         delete_from = 'layman.layer.filesystem.input_file'
 
+    # FILE NAMES
+    if delete_from == 'layman.layer.filesystem.input_file':
+        if use_chunk_upload:
+            filenames = files
+        else:
+            filenames = [f.filename for f in files]
+        input_file.check_filenames(username, layername, filenames,
+                                           check_crs, ignore_existing_files=True)
+
     if update_info and delete_from != 'layman.layer.filesystem.input_file':
         util.update_layer(username, layername, info)
 
@@ -152,6 +161,7 @@ def delete_layer(username, layername):
     return jsonify({
         'name': layername,
         'url': info['url'],
+        'uuid': info['uuid'],
     }), 200
 
 
