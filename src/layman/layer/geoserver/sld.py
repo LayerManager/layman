@@ -9,8 +9,8 @@ from layman.layer.filesystem.input_sld import get_layer_file
 from layman.http import LaymanError
 from layman import settings
 from . import headers_json
+from . import wfs
 
-FLASK_WFS_PROXY_KEY = 'layman.layer.geoserver.wfs_proxy'
 
 def update_layer(username, layername, layerinfo):
     pass
@@ -35,7 +35,7 @@ def delete_layer(username, layername):
             }
         )
         r.raise_for_status()
-        g.pop(FLASK_WFS_PROXY_KEY, None)
+        g.pop(wfs.get_flask_proxy_key(username), None)
         return {
             'sld': {
                 'file': sld_file

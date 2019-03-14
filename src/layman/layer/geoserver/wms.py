@@ -11,11 +11,15 @@ from .util import get_gs_proxy_base_url
 from layman import settings
 
 
-FLASK_WMS_PROXY_KEY = 'layman.layer.geoserver.wms_proxy'
+FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
+
+
+def get_flask_proxy_key(username):
+    return FLASK_PROXY_KEY.format(username=username)
 
 
 def update_layer(username, layername, layerinfo):
-    g.pop(FLASK_WMS_PROXY_KEY, None)
+    g.pop(get_flask_proxy_key(username), None)
     pass
 
 
@@ -33,12 +37,12 @@ def delete_layer(username, layername):
         )
         # app.logger.info(r.text)
         r.raise_for_status()
-        g.pop(FLASK_WMS_PROXY_KEY, None)
+        g.pop(get_flask_proxy_key(username), None)
     return {}
 
 
 def get_wms_proxy(username):
-    key = FLASK_WMS_PROXY_KEY
+    key = get_flask_proxy_key(username)
     if key not in g:
         wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
         from .util import wms_proxy
