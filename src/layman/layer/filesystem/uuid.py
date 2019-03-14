@@ -27,7 +27,7 @@ def get_layer_info(username, layername):
 def delete_layer(username, layername):
     uuid_str = get_layer_uuid(username, layername)
     if uuid_str is not None:
-        delete_publication_uuid(uuid_str)
+        delete_publication_uuid(username, '.'.join(__name__.split('.')[:-2]), layername, uuid_str)
     util.delete_layer_subfile(username, layername, LAYER_SUBFILE)
 
 

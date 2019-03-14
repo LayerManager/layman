@@ -22,4 +22,5 @@ ERROR_LIST = {
     21: (400, 'Unknown combination of resumableFilename and '
               'layman_original_parameter.'),
     22: (400, 'UPLOAD_MAX_INACTIVITY_TIME during upload reached.'),
+    23: (409, 'Publication already exists.'),
 }
