@@ -9,6 +9,17 @@ from layman.util import get_publication_types
 PUBL_TYPE_DEF_KEY = '.'.join(__name__.split('.')[:-1])
 
 
+def get_usernames():
+    usersdir = get_users_dir()
+    if not os.path.exists(usersdir):
+        return []
+    user_names = [
+        subfile for subfile in os.listdir(usersdir)
+        if os.path.isdir(os.path.join(usersdir, subfile))
+    ]
+    return user_names
+
+
 def get_users_dir():
     usersdir = os.path.join(settings.LAYMAN_DATA_DIR, 'users')
     return usersdir
