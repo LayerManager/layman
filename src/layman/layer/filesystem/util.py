@@ -1,61 +1,23 @@
-import os
-import pathlib
-import shutil
+from functools import partial
 
-from layman import settings
+from layman.common.filesystem import util as publ_util
 
 
-def get_users_dir():
-    usersdir = os.path.join(settings.LAYMAN_DATA_DIR, 'users')
-    return usersdir
+LAYER_TYPE = '.'.join(__name__.split('.')[:-2])
 
 
-def get_user_dir(username):
-    userdir = os.path.join(get_users_dir(), username)
-    return userdir
+# username
+get_layers_dir = partial(publ_util.get_publications_dir, LAYER_TYPE)
 
 
-def get_layers_dir(username):
-    layersdir = os.path.join(get_user_dir(username), 'layers')
-    return layersdir
+# username, layername
+get_layer_dir = partial(publ_util.get_publication_dir, LAYER_TYPE)
 
 
-def get_layer_dir(username, layername):
-    layerdir = os.path.join(get_layers_dir(username), layername)
-    return layerdir
+# username, layername
+ensure_layer_dir = partial(publ_util.ensure_publication_dir, LAYER_TYPE)
 
 
-def ensure_user_dir(username):
-    userdir = get_user_dir(username)
-    pathlib.Path(userdir).mkdir(exist_ok=True, parents=True)
-    return userdir
+# username, layername, subdir
+delete_layer_subdir = partial(publ_util.delete_publication_subdir, LAYER_TYPE)
 
-
-def ensure_layer_dir(username, layername):
-    layerdir = get_layer_dir(username, layername)
-    pathlib.Path(layerdir).mkdir(exist_ok=True, parents=True)
-    return layerdir
-
-
-def delete_layer_subdir(username, layername, layer_subdir):
-    layerdir = get_layer_dir(username, layername)
-    layer_subdir = os.path.join(layerdir, layer_subdir)
-    try:
-        shutil.rmtree(layer_subdir)
-    except FileNotFoundError:
-        pass
-    if os.path.exists(layerdir) and not os.listdir(layerdir):
-        os.rmdir(layerdir)
-    return {}
-
-
-def delete_layer_subfile(username, layername, layer_subfile):
-    layerdir = get_layer_dir(username, layername)
-    layer_subfile = os.path.join(layerdir, layer_subfile)
-    try:
-        os.remove(layer_subfile)
-    except OSError:
-        pass
-    if os.path.exists(layerdir) and not os.listdir(layerdir):
-        os.rmdir(layerdir)
-    return {}

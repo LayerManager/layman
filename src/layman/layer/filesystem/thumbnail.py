@@ -5,6 +5,7 @@ from layman import settings
 from flask import url_for
 
 from . import util
+from layman.common.filesystem import util as common_util
 from . import input_file
 
 
@@ -30,7 +31,7 @@ def get_layer_info(username, layername):
             'thumbnail': {
                 'url': url_for('rest_layer_thumbnail.get', username=username,
                                layername=layername),
-                'path': os.path.relpath(thumbnail_path, util.get_user_dir(username))
+                'path': os.path.relpath(thumbnail_path, common_util.get_user_dir(username))
             }
         }
     return {}

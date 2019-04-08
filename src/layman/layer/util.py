@@ -1,36 +1,21 @@
 import importlib
 import inspect
 import re
-import unicodedata
 from collections import defaultdict, OrderedDict
 
 from celery import chain
 from flask import current_app, url_for
-from unidecode import unidecode
 
 from layman import LaymanError
 from layman import settings
-from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names
+from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name
 from . import get_layer_sources
 
 LAYERNAME_RE = USERNAME_RE
 
 
-def slugify(value):
-    value = unidecode(value)
-    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
-    value = re.sub(r'[^\w\s\-\.]', '', value).lower()
-    value = re.sub(r'[\s\-\._]+', '_', value).strip('_')
-    return value
-
-
 def to_safe_layer_name(value):
-    value = slugify(value)
-    if len(value)==0:
-        value = 'layer'
-    elif re.match(r'^[^a-z].*', value):
-        value = 'layer_'+value
-    return value
+    return to_safe_name(value, 'layer')
 
 
 def check_layername(layername):
