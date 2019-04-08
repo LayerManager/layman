@@ -1,9 +1,9 @@
 import os
-from . import util
+from layman.common.filesystem import util as common_util
 
 
 def get_usernames():
-    usersdir = util.get_users_dir()
+    usersdir = common_util.get_users_dir()
     if not os.path.exists(usersdir):
         return []
     user_names = [

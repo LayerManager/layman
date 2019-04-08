@@ -3,7 +3,7 @@ import os
 from flask import Blueprint, send_file
 from flask import current_app as app
 
-from .filesystem.util import get_user_dir
+from layman.common.filesystem.util import get_user_dir
 from layman.http import LaymanError
 from layman.util import check_username
 from . import util

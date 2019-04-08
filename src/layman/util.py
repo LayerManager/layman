@@ -1,13 +1,33 @@
 import importlib
 import re
 from collections import OrderedDict
+import unicodedata
 
 from flask import current_app
+from unidecode import unidecode
 
 from layman.http import LaymanError
 from layman import settings
 
 USERNAME_RE = r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$"
+
+
+def slugify(value):
+    value = unidecode(value)
+    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+    value = re.sub(r'[^\w\s\-\.]', '', value).lower()
+    value = re.sub(r'[\s\-\._]+', '_', value).strip('_')
+    return value
+
+
+def to_safe_name(unsafe_name, type_name):
+    value = slugify(unsafe_name)
+    if len(value)==0:
+        value = type_name
+    elif re.match(r'^[^a-z].*', value):
+        value = f'{type_name}_{value}'
+    return value
+
 
 
 def check_username(username):
@@ -25,6 +45,16 @@ def get_internal_providers():
             for type_def in publ_module.PUBLICATION_TYPES.values():
                 all_sources += type_def['internal_sources']
         current_app.config[key] = get_providers_from_source_names(all_sources)
+    return current_app.config[key]
+
+
+def get_publication_types():
+    key = 'layman.publication_types'
+    if key not in current_app.config:
+        all_types = {}
+        for publ_module in get_publication_modules():
+            all_types.update(publ_module.PUBLICATION_TYPES)
+        current_app.config[key] = all_types
     return current_app.config[key]
 
 

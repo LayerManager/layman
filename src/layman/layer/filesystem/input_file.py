@@ -7,6 +7,7 @@ from osgeo import ogr
 from layman.http import LaymanError
 from layman import settings
 from . import util
+from layman.common.filesystem import util as common_util
 
 
 LAYER_SUBDIR = __name__.split('.')[-1]
@@ -37,7 +38,7 @@ def get_layer_info(username, layername):
     filenames = glob.glob(pattern)
     main_filename = get_main_file_name(filenames)
     if main_filename is not None:
-        main_filename = os.path.relpath(main_filename, util.get_user_dir(username))
+        main_filename = os.path.relpath(main_filename, common_util.get_user_dir(username))
         return {
             'file': {
                 'path': main_filename

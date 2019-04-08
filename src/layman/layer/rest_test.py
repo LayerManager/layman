@@ -154,7 +154,10 @@ def test_post_layers_simple(client):
     wms = wms_proxy(wms_url)
     assert layername in wms.contents
 
-    uuid_filename = layer_uuid.get_layer_uuid_file(username, layername)
+    from layman.layer import get_layer_type_def
+    from layman.common.filesystem import uuid as common_uuid
+    uuid_filename = common_uuid.get_publication_uuid_file(
+        get_layer_type_def()['type'], username, layername)
     assert os.path.isfile(uuid_filename)
     uuid_str = None
     with open(uuid_filename, "r") as f:
@@ -547,7 +550,10 @@ def test_patch_layer_concurrent_and_delete_it(client):
         rv = client.delete(rest_path)
     assert rv.status_code == 200
 
-    uuid_filename = layer_uuid.get_layer_uuid_file(username, layername)
+    from layman.layer import get_layer_type_def
+    from layman.common.filesystem import uuid as common_uuid
+    uuid_filename = common_uuid.get_publication_uuid_file(
+        get_layer_type_def()['type'], username, layername)
     assert not os.path.isfile(uuid_filename)
     assert not settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
     assert not settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))

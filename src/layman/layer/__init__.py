@@ -1,5 +1,9 @@
+def get_layer_type_def():
+    return PUBLICATION_TYPES[f'{__name__}']
+
+
 def get_layer_sources():
-    return PUBLICATION_TYPES[f'{__name__}']['internal_sources']
+    return get_layer_type_def()['internal_sources']
 
 
 from .rest_layers import bp as layers_bp
@@ -33,7 +37,10 @@ PUBLICATION_TYPES = {
             'layman.layer.db.tasks',
             'layman.layer.filesystem.tasks',
             'layman.layer.geoserver.tasks',
-        ]
+        ],
+        'layman.common.filesystem': {
+            'publications_dir': 'layers'
+        },
     }
 }
 
