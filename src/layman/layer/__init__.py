@@ -1,5 +1,5 @@
 def get_layer_sources():
-    return PUBLICATION_TYPES[f'__name__']['internal_sources']
+    return PUBLICATION_TYPES[f'{__name__}']['internal_sources']
 
 
 from .rest_layers import bp as layers_bp
@@ -9,7 +9,7 @@ from .rest_layer_thumbnail import bp as layer_thumbnail_bp
 
 
 PUBLICATION_TYPES = {
-    f'__name__': {
+    f'{__name__}': {
         'type': __name__, # unique type name, same as dict key
         'module': __name__, # name of module that defines the type
         'blueprints': [ # blueprints to register
