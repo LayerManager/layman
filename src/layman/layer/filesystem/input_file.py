@@ -8,6 +8,7 @@ from layman.http import LaymanError
 from layman import settings
 from . import util
 from layman.common.filesystem import util as common_util
+from layman.common.filesystem import input_file as common
 
 
 LAYER_SUBDIR = __name__.split('.')[-1]
@@ -115,15 +116,6 @@ def check_layer_crs(main_filepath):
                               'supported_values': settings.INPUT_SRS_LIST})
 
 
-def save_files(files, filepath_mapping):
-    for file in files:
-        if filepath_mapping[file.filename] is None:
-            continue
-        # logger.info(
-        #     f'Saving file {file.filename} as {filepath_mapping[file.filename]}')
-        file.save(filepath_mapping[file.filename])
-
-
 def check_filenames(username, layername, filenames, check_crs, ignore_existing_files=False):
     main_filename = get_main_file_name(filenames)
     if main_filename is None:
@@ -176,7 +168,7 @@ def save_layer_files(username, layername, files, check_crs):
         filenames, main_filename, layername, input_file_dir
     )
 
-    save_files(files, filepath_mapping)
+    common.save_files(files, filepath_mapping)
     # n_uploaded_files = len({k:v
     #                         for k, v in filepath_mapping.items()
     #                         if v is not None})
