@@ -276,7 +276,7 @@ Publish new map composition. Accepts JSON valid against [map-composition schema]
 Processing chain consists of few steps:
 - validate JSON file against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema)
 - save file to user's directory
-- if needed, update some JSON attributes, e.g. `name`, `title` or `abstract`
+- if needed, update some JSON attributes (`name`, `title`, or `abstract`)
 - generate thumbnail image
 
 If user's directory does not exist yet, it is created on demand.
@@ -383,6 +383,18 @@ JSON object representing deleted map:
 `/rest/<user>/maps/<mapname>/file`
 ### GET Map File
 Get JSON file describing the map valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema).
+
+Notice that some JSON properties are automatically updated by layman, so file obtained by this endpoint may be slightly different from file that was uploaded. Expected changes:
+- **name** set to `<mapname>` in URL of this endpoint
+- **title** obtained from [POST Maps](#post-maps) or [PATCH Map](#patch-map) as `title`
+- **abstract** obtained from [POST Maps](#post-maps) or [PATCH Map](#patch-map) as `description`
+- **user** updated on the fly during this request:
+   - **name** set to `<username>` in URL of this endpoint
+   - **email** set to empty string (because Layman is not yet connected to any authorization system)
+   - other properties will be deleted
+- **groups** updated on the fly during this request:
+   - **guest** set to `"w"` (because Layman is not yet connected to any authorization system and all REST endpoints are accessible to anyone)
+   - other properties will be deleted
 
 #### Request
 No action parameters.
