@@ -134,3 +134,64 @@ def is_valid_uuid(maybe_uuid_str):
     except ValueError:
         return False
     return True
+
+
+def check_redis_consistency(expected_publ_num_by_type=None):
+
+    num_total_publs = 0
+    total_publs = []
+    all_sources = []
+    for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
+        for type_def in publ_module.PUBLICATION_TYPES.values():
+            all_sources += type_def['internal_sources']
+    providers = get_providers_from_source_names(all_sources)
+    results = call_modules_fn(providers, 'get_usernames')
+    usernames = []
+    for r in results:
+        usernames += r
+    usernames = list(set(usernames))
+    for username in usernames:
+        for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
+            for type_def in publ_module.PUBLICATION_TYPES.values():
+                publ_type_name = type_def['type']
+                sources = get_modules_from_names(type_def['internal_sources'])
+                pubnames = []
+                results = call_modules_fn(sources, 'get_publication_names', [username, publ_type_name])
+                for r in results:
+                    pubnames += r
+                pubnames = list(set(pubnames))
+                print(f'username {username}, publ_type_name {publ_type_name}, pubnames {pubnames}')
+                num_total_publs += len(pubnames)
+                for pubname in pubnames:
+                    total_publs.append((username, publ_type_name, pubname))
+
+    redis = settings.LAYMAN_REDIS
+    user_publ_keys = redis.keys(':'.join(USER_TYPE_NAMES_KEY.split(':')[:2])+':*')
+    uuid_keys = redis.keys(':'.join(UUID_METADATA_KEY.split(':')[:2])+':*')
+    assert num_total_publs == len(uuid_keys), f"total_publs: {total_publs}"
+    if expected_publ_num_by_type is not None:
+        for publ_type, publ_num in expected_publ_num_by_type.items():
+            publs = [p for p in total_publs if p[1] == publ_type]
+            assert publ_num == len(publs), f"expected {publ_num} {publ_type}, found {len(publs)}: {total_publs}"
+
+    num_publ = 0
+    for user_publ_key in user_publ_keys:
+        num_publ += redis.hlen(user_publ_key)
+    assert num_publ == len(uuid_keys)
+
+    uuids = redis.smembers(UUID_SET_KEY)
+    assert len(uuids) == num_publ
+
+    for uuid_str in uuids:
+        assert get_uuid_metadata_key(uuid_str) in uuid_keys
+
+    for uuid_key in uuid_keys:
+        uuid_dict = redis.hgetall(uuid_key)
+        assert redis.hexists(
+            get_user_type_names_key(
+                uuid_dict['username'],
+                uuid_dict['publication_type']
+            ),
+            uuid_dict['publication_name'],
+        )
+

@@ -83,7 +83,7 @@ def post(username):
 
     # SLD
     sld_file = None
-    if 'sld' in request.files:
+    if 'sld' in request.files and not request.files['sld'].filename == '':
         sld_file = request.files['sld']
 
     task_options = {
