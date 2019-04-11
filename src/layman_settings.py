@@ -67,6 +67,7 @@ LAYMAN_CELERY_QUEUE = os.environ['LAYMAN_CELERY_QUEUE']
 
 PUBLICATION_MODULES = [
     'layman.layer',
+    'layman.map',
 ]
 
 
