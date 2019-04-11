@@ -23,4 +23,8 @@ ERROR_LIST = {
               'layman_original_parameter.'),
     22: (400, 'UPLOAD_MAX_INACTIVITY_TIME during upload reached.'),
     23: (409, 'Publication already exists.'),
+    24: (409, 'Map already exists'),
+    25: (404, 'This endpoint and method are not implemented yet!'),
+    26: (404, 'Map was not found'),
+    27: (404, 'File was not found'),
 }
