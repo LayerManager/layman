@@ -3,7 +3,7 @@ FROM geographica/gdal2:2.4.0
 RUN mkdir /code
 WORKDIR /code
 
-RUN apt-get update && \
+RUN apt-get clean && apt-get update && \
     apt-get install -y unzip curl python3-pip && \
     pip3 install pipenv
 

@@ -31,8 +31,10 @@ start-layman-dev:
 	docker-compose -f docker-compose.dev.yml up
 
 restart-layman-dev:
-	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_dev
-	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d celery_worker_dev
+	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_dev celery_worker_dev
+
+stop-layman-dev:
+	docker-compose -f docker-compose.dev.yml rm --stop --force layman_dev celery_worker_dev
 
 restart-layman-dev-and-build:
 	docker-compose -f docker-compose.dev.yml build layman_dev

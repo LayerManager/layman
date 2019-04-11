@@ -108,7 +108,10 @@ def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_cal
 
     results = []
     for fn in fns:
-        results.append(fn(*args, **kwargs))
+        results.append(fn(*args, **{
+            k:v for k, v in kwargs.items()
+            if k in fn.__code__.co_varnames
+        }))
 
     return results
 

@@ -18,6 +18,10 @@ class LaymanError(Exception):
             if http_code is None:
                 self.http_code = 400
 
+    def __str__(self):
+        return f'LaymanError code={self.code} message={self.message} data={self.data}'
+
+
     def to_dict(self):
         resp = {'code': self.code, 'message': self.message}
 
