@@ -29,6 +29,6 @@ if ! [ -f $ne_110m_cultural_populated_places ]; then
 fi
 
 #python3 src/clear_layman_data.py && && python3 -m pytest -svv
-#python3 src/clear_layman_data.py && python3 -m pytest -svv -k "not resumable_test" && python3 -m pytest -svv -k "resumable_test"
-python3 src/clear_layman_data.py && python3 -m pytest -svv -k "not resumable_test" && python3 -m pytest -svv -k "resumable_test"
-#python3 src/clear_layman_data.py && python3 -m pytest -svv -k "resumable_test"
+#python3 src/clear_layman_data.py && python3 -m pytest -svv -k "not client_test" && python3 -m pytest -svv -k "client_test"
+python3 src/clear_layman_data.py && python3 -m pytest -vv -k "not client_test" && python3 -m pytest -vv -k "client_test"
+#python3 src/clear_layman_data.py && python3 -m pytest -svv src/layman/map/client_test.py
