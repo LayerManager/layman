@@ -10,9 +10,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from layman.layer.filesystem import input_chunk
-from layman import app
-from layman import settings
-from .rest_test import check_redis_consistency
+from layman.layer import LAYER_TYPE
+from layman import app, settings
+from layman.uuid import check_redis_consistency
 
 PORT = 9002
 
@@ -127,7 +127,9 @@ def test_post_layers_chunk(chrome):
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
 
     with app.app_context():
-        check_redis_consistency(expected_num_publs=3)
+        check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': 3
+        })
 
 
 @pytest.mark.usefixtures("flask_server")
@@ -218,5 +220,7 @@ def test_patch_layer_chunk(chrome):
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
 
     with app.app_context():
-        check_redis_consistency(expected_num_publs=3)
+        check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': 3
+        })
 
