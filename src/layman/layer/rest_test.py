@@ -746,6 +746,50 @@ def test_delete_layer(client):
     assert resp_json['code'] == 15
 
 
+def test_post_layers_zero_length_attribute(client):
+    username = 'testuser1'
+    rest_path = url_for('rest_layers.post', username=username)
+    file_paths = [
+        'sample/data/zero_length_attribute.geojson',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with layman.app_context():
+            rv = client.post(rest_path, data={
+                'file': files
+            })
+        assert rv.status_code == 200
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    layername = 'zero_length_attribute'
+
+    layer_info = util.get_layer_info(username, layername)
+    while 'status' in layer_info['db_table'] and layer_info['db_table']['status'] == 'PENDING':
+        time.sleep(0.1)
+        layer_info = util.get_layer_info(username, layername)
+    assert layer_info['db_table']['status'] == 'FAILURE'
+    assert layer_info['db_table']['error']['code'] == 28
+
+
+def test_delete_layer_zero_length_attribute(client):
+    username = 'testuser1'
+    layername = 'zero_length_attribute'
+
+    rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
+    with layman.app_context():
+        rv = client.delete(rest_path)
+    assert rv.status_code == 200
+
+    uuid.check_redis_consistency(expected_publ_num_by_type={
+        f'{LAYER_TYPE}': 2
+    })
+
+
 def test_get_layers_empty_again(client):
     username = 'testuser2'
     with layman.app_context():

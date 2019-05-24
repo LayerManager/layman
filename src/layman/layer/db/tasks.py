@@ -56,7 +56,12 @@ def import_layer_vector_file(
         logger.info(f'aborted {username} {layername}')
         delete_layer(username, layername)
     else:
-        # logger.info('STDOUT', p.stdout.read())
         return_code = p.poll()
         if return_code != 0:
-            raise LaymanError(11)
+            pg_error = str(p.stdout.read())
+            logger.error('STDOUT', pg_error)
+            if "ERROR:  zero-length delimited identifier at or near" in pg_error:
+                err_code = 28
+            else:
+                err_code = 11
+            raise LaymanError(err_code, private_data=pg_error)
