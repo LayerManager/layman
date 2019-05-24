@@ -1,5 +1,8 @@
 import io
 import os
+import requests
+import time
+import xml.etree.ElementTree as ET
 from urllib.parse import urljoin
 
 import pytest
@@ -377,6 +380,17 @@ def test_post_layers_complex(client):
     ]:
         assert 'status' not in resp_json[source]
 
+    style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                    username + '/styles/' + layername)
+    r = requests.get(style_url + '.sld',
+        auth=settings.LAYMAN_GS_AUTH
+    )
+    r.raise_for_status()
+    sld_file = io.BytesIO(r.content)
+    tree = ET.parse(sld_file)
+    root = tree.getroot()
+    assert root.attrib['version'] == '1.0.0'
+
     feature_type = get_feature_type(username, 'postgresql', layername)
     attributes = feature_type['attributes']['attribute']
     assert next((
@@ -465,6 +479,87 @@ def test_patch_layer_style(client):
     assert wms[layername].title == 'countries in blue'
     assert wms[layername].styles[
         username+':'+layername]['title'] == 'Generic Blue'
+    uuid.check_redis_consistency(expected_publ_num_by_type={
+        f'{LAYER_TYPE}': 4
+    })
+
+
+def test_post_layers_sld_1_1_0(client):
+    username = 'testuser1'
+    layername = 'countries_sld_1_1_0'
+    rest_path = url_for('rest_layers.post', username=username, layername=layername)
+
+    file_paths = [
+        'sample/data/test_layer4.geojson',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    sld_path = 'sample/style/sld_1_1_0.xml'
+    assert os.path.isfile(sld_path)
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with layman.app_context():
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': layername,
+                'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
+            })
+        assert rv.status_code == 200
+        resp_json = rv.get_json()
+        # print(resp_json)
+        assert layername == resp_json[0]['name']
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    time.sleep(0.5)
+
+    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+    wms = wms_proxy(wms_url)
+    assert layername in wms.contents
+    assert wms[layername].title == 'countries_sld_1_1_0'
+
+    style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                    username + '/styles/' + layername)
+    r = requests.get(style_url + '.sld',
+        auth=settings.LAYMAN_GS_AUTH
+    )
+    r.raise_for_status()
+    sld_file = io.BytesIO(r.content)
+    tree = ET.parse(sld_file)
+    root = tree.getroot()
+    # for some reason, GeoServer REST API in 2.13.0 transforms SLD 1.1.0 to 1.0.0
+    # web interface is not doing this
+    # assert root.attrib['version'] == '1.1.0'
+    assert root.attrib['version'] == '1.0.0'
+    assert root[0][1][1][1][1][0][0].text == '#e31a1c'
+    # assert wms[layername].styles[
+    #     username+':'+layername]['title'] == 'test_layer2'
+
+    uuid.check_redis_consistency(expected_publ_num_by_type={
+        f'{LAYER_TYPE}': 5
+    })
+
+def test_delete_layer_sld_1_1_0(client):
+    # for some reason I need to delete the layer in separate test,
+    # otherwise it's not deleted because of flask.g wms_proxy key is not correctly updated,
+    # it seems like there are multiple flask.g objects
+    # to investigate see http://flask.pocoo.org/docs/1.0/api/#flask.appcontext_pushed http://flask.pocoo.org/docs/1.0/api/#flask.appcontext_popped
+    username = 'testuser1'
+    layername = 'countries_sld_1_1_0'
+
+    uuid_str = layer_uuid.get_layer_uuid(username, layername)
+    assert uuid.is_valid_uuid(uuid_str)
+
+    rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
+    with layman.app_context():
+        pass
+
+    with layman.app_context():
+        rv = client.delete(rest_path)
+    assert rv.status_code == 200
+
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': 4
     })
@@ -614,7 +709,6 @@ def test_post_layers_long_and_delete_it(client):
 
     layername = 'ne_10m_admin_0_countries'
 
-    import time
     time.sleep(1)
 
     last_task = util._get_layer_last_task(username, layername)
