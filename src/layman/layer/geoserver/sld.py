@@ -1,9 +1,10 @@
 import io
 import json
 from urllib.parse import urljoin
+import xml.etree.ElementTree as ET
 
 import requests
-from flask import g
+from flask import g, current_app
 
 from layman.layer.filesystem.input_sld import get_layer_file
 from layman.http import LaymanError
@@ -98,13 +99,23 @@ def create_layer_style(username, layername):
     )
     r.raise_for_status()
     # app.logger.info(sld_file.read())
+
+    tree = ET.parse(sld_file)
+    root = tree.getroot()
+    if 'version' in root.attrib and root.attrib['version'] == '1.1.0':
+        sld_content_type = 'application/vnd.ogc.se+xml'
+    else:
+        sld_content_type = 'application/vnd.ogc.sld+xml'
+
+    sld_file.seek(0)
+
     r = requests.put(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username +
                 '/styles/' + layername),
         data=sld_file.read(),
         headers={
             'Accept': 'application/json',
-            'Content-type': 'application/vnd.ogc.sld+xml',
+            'Content-type': sld_content_type,
         },
         auth=settings.LAYMAN_GS_AUTH
     )
