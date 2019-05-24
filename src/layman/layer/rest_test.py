@@ -541,28 +541,13 @@ def test_post_layers_sld_1_1_0(client):
         f'{LAYER_TYPE}': 5
     })
 
-def test_delete_layer_sld_1_1_0(client):
-    # for some reason I need to delete the layer in separate test,
-    # otherwise it's not deleted because of flask.g wms_proxy key is not correctly updated,
-    # it seems like there are multiple flask.g objects
-    # to investigate see http://flask.pocoo.org/docs/1.0/api/#flask.appcontext_pushed http://flask.pocoo.org/docs/1.0/api/#flask.appcontext_popped
-    username = 'testuser1'
-    layername = 'countries_sld_1_1_0'
-
-    uuid_str = layer_uuid.get_layer_uuid(username, layername)
-    assert uuid.is_valid_uuid(uuid_str)
-
     rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
     with layman.app_context():
-        pass
-
-    with layman.app_context():
         rv = client.delete(rest_path)
-    assert rv.status_code == 200
-
-    uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 4
-    })
+        assert rv.status_code == 200
+        uuid.check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': 4
+        })
 
 
 def test_patch_layer_data(client):
@@ -775,19 +760,13 @@ def test_post_layers_zero_length_attribute(client):
     assert layer_info['db_table']['status'] == 'FAILURE'
     assert layer_info['db_table']['error']['code'] == 28
 
-
-def test_delete_layer_zero_length_attribute(client):
-    username = 'testuser1'
-    layername = 'zero_length_attribute'
-
     rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
     with layman.app_context():
         rv = client.delete(rest_path)
-    assert rv.status_code == 200
-
-    uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 2
-    })
+        assert rv.status_code == 200
+        uuid.check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': 2
+        })
 
 
 def test_get_layers_empty_again(client):
