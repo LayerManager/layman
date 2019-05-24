@@ -27,4 +27,5 @@ ERROR_LIST = {
     25: (404, 'This endpoint and method are not implemented yet!'),
     26: (404, 'Map was not found'),
     27: (404, 'File was not found'),
+    28: (400, 'Zero-length identifier found. Data file probably contains attribute with zero-length name (e.g. empty string).'),
 }
