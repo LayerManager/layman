@@ -3,19 +3,22 @@ from urllib.parse import urljoin, urlparse
 from owslib.wms import WebMapService
 from owslib.wfs import WebFeatureService
 
+from werkzeug.contrib.cache import SimpleCache
+cache = SimpleCache()
+
 headers_json = {
     'Accept': 'application/json',
     'Content-type': 'application/json',
 }
 
-GS_PROXY_BASE_URL = None
+CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL:'
 
 from layman import settings
 
 
 def get_gs_proxy_base_url():
-    global GS_PROXY_BASE_URL
-    if GS_PROXY_BASE_URL is None:
+    proxy_base_url = cache.get(CACHE_GS_PROXY_BASE_URL_KEY)
+    if proxy_base_url is None:
         try:
             r = requests.get(
                 settings.LAYMAN_GS_REST_SETTINGS,
@@ -26,10 +29,13 @@ def get_gs_proxy_base_url():
                 auth=settings.LAYMAN_GS_AUTH
             )
             if r.status_code == 200:
-                GS_PROXY_BASE_URL = r.json()['global']['settings'].get('proxyBaseUrl', None)
+                proxy_base_url = r.json()['global']['settings'].get(
+                    'proxyBaseUrl', None)
         except:
             pass
-    return GS_PROXY_BASE_URL
+        if proxy_base_url is not None:
+            cache.set(CACHE_GS_PROXY_BASE_URL_KEY, proxy_base_url, timeout=1 * 60)
+    return proxy_base_url
 
 
 def get_feature_type(
