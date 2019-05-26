@@ -66,6 +66,16 @@ def post_map(username, mapname, kwargs):
     call_modules_fn(sources, 'post_map', [username, mapname], kwargs=kwargs)
 
 
+def patch_map(username, mapname, kwargs):
+    sources = get_sources()
+    call_modules_fn(sources, 'patch_map', [username, mapname], kwargs=kwargs)
+
+
+def delete_map(username, mapname, kwargs=None):
+    sources = get_sources()
+    call_modules_fn(sources, 'delete_map', [username, mapname], kwargs=kwargs)
+
+
 def get_complete_map_info(username, mapname):
     partial_info = get_map_info(username, mapname)
 
@@ -78,6 +88,9 @@ def get_complete_map_info(username, mapname):
         'title': mapname,
         'description': '',
         'file': {
+            'status': 'NOT_AVAILABLE'
+        },
+        'thumbnail': {
             'status': 'NOT_AVAILABLE'
         },
     }

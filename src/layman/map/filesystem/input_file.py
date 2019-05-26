@@ -23,10 +23,6 @@ def ensure_map_input_file_dir(username, mapname):
     return input_file_dir
 
 
-def update_map(username, mapname, mapinfo):
-    pass
-
-
 def delete_map(username, mapname):
     util.delete_map_subdir(username, mapname, MAP_SUBDIR)
 
@@ -38,14 +34,18 @@ def get_map_file(username, mapname):
 
 
 def get_map_info(username, mapname):
-    mapfile_path = get_map_file(username, mapname)
-    if os.path.exists(mapfile_path):
-        mapfile_path = os.path.relpath(mapfile_path, common_util.get_user_dir(username))
+    map_file_path = get_map_file(username, mapname)
+    if os.path.exists(map_file_path):
+        with open(map_file_path, 'r') as map_file:
+            map_json = json.load(map_file)
+        map_file_path = os.path.relpath(map_file_path, common_util.get_user_dir(username))
         return {
             'file': {
-                'path': mapfile_path,
+                'path': map_file_path,
                 'url': url_for('rest_map_file.get', mapname=mapname, username=username),
-            }
+            },
+            'title': map_json['title'] or '',
+            'description': map_json['abstract'] or '',
         }
     elif os.path.exists(util.get_map_dir(username, mapname)):
         return {
@@ -124,3 +124,6 @@ def post_map(username, mapname, description, title):
     map_json['abstract'] = description
     with open(map_file_path, 'w') as map_file:
         json.dump(map_json, map_file, indent=4)
+
+
+patch_map = post_map

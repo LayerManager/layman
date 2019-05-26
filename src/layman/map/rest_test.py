@@ -1,4 +1,5 @@
 import os
+import urllib
 
 import pytest
 from flask import url_for
@@ -6,6 +7,7 @@ from flask import url_for
 from . import MAP_TYPE
 from layman import app as layman
 from layman import uuid
+from layman.map.filesystem import uuid as map_uuid
 
 
 @pytest.fixture
@@ -116,19 +118,39 @@ def test_post_maps_simple(client):
         assert len(resp_json) == 1
         assert resp_json[0]['name'] == expected_mapname
         mapname = resp_json[0]['name']
+        uuid_str = resp_json[0]['uuid']
     finally:
         for fp in files:
             fp[0].close()
+
+    assert uuid.is_valid_uuid(uuid_str)
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{MAP_TYPE}': 1
     })
 
+    rv = client.get(url_for('rest_map.get', username=username, mapname=mapname))
+    assert rv.status_code == 200
+    resp_json = rv.get_json()
+    assert resp_json['name'] == mapname
+    assert resp_json['uuid'] == uuid_str
+    assert resp_json['url'] == urllib.parse.urlparse(url_for('rest_map.get', username=username, mapname=mapname)).path
+    assert resp_json['title'] == "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
+    assert resp_json['description'] == "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce."
+    map_file = resp_json['file']
+    assert 'status' not in map_file
+    assert 'path' in map_file
+    assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
+    thumbnail = resp_json['thumbnail']
+    assert thumbnail['status'] == 'NOT_AVAILABLE'
+    # assert 'status' not in thumbnail
+    # assert 'path' in thumbnail
+    # assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
+
     rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
     assert rv.status_code == 200
     resp_json = rv.get_json()
     assert resp_json['name'] == mapname
-
 
 
 def test_post_maps_complex(client):
@@ -156,12 +178,31 @@ def test_post_maps_complex(client):
         # print('resp_json', resp_json)
         assert len(resp_json) == 1
         assert resp_json[0]['name'] == mapname
+        uuid_str = resp_json[0]['uuid']
     finally:
         for fp in files:
             fp[0].close()
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{MAP_TYPE}': 2
     })
+
+    rv = client.get(url_for('rest_map.get', username=username, mapname=mapname))
+    assert rv.status_code == 200
+    resp_json = rv.get_json()
+    assert resp_json['name'] == mapname
+    assert resp_json['uuid'] == uuid_str
+    assert resp_json['url'] == urllib.parse.urlparse(url_for('rest_map.get', username=username, mapname=mapname)).path
+    assert resp_json['title'] == title
+    assert resp_json['description'] == description
+    map_file = resp_json['file']
+    assert 'status' not in map_file
+    assert 'path' in map_file
+    assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
+    thumbnail = resp_json['thumbnail']
+    assert thumbnail['status'] == 'NOT_AVAILABLE'
+    # assert 'status' not in thumbnail
+    # assert 'path' in thumbnail
+    # assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
 
     rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
     assert rv.status_code == 200
@@ -178,3 +219,99 @@ def test_post_maps_complex(client):
     assert len(groups_json) == 1
 
 
+def test_patch_map(client):
+    username = 'testuser1'
+    mapname = 'administrativni_cleneni_libereckeho_kraje'
+    uuid_str = map_uuid.get_map_uuid(username, mapname)
+    rest_path = url_for('rest_map.patch', username=username, mapname=mapname)
+
+    file_paths = [
+        'sample/layman.map/full2.json',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        rv = client.patch(rest_path, data={
+            'file': files,
+        })
+        assert rv.status_code == 200
+        resp_json = rv.get_json()
+        # print('resp_json', resp_json)
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    uuid.check_redis_consistency(expected_publ_num_by_type={
+        f'{MAP_TYPE}': 2
+    })
+
+    assert resp_json['uuid'] == uuid_str
+    assert resp_json['url'] == urllib.parse.urlparse(url_for('rest_map.get', username=username, mapname=mapname)).path
+    assert resp_json['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
+    assert resp_json['description'] == "Jiný popis"
+    map_file = resp_json['file']
+    assert 'status' not in map_file
+    assert 'path' in map_file
+    assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
+    thumbnail = resp_json['thumbnail']
+    assert thumbnail['status'] == 'NOT_AVAILABLE'
+
+    rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
+    assert rv.status_code == 200
+    resp_json = rv.get_json()
+    assert resp_json['name'] == mapname
+    assert resp_json['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
+    assert resp_json['abstract'] == "Jiný popis"
+    user_json = resp_json['user']
+    assert user_json['name'] == username
+    assert user_json['email'] == ''
+    assert len(user_json) == 2
+    groups_json = resp_json['groups']
+    assert groups_json['guest'] == 'w'
+    assert len(groups_json) == 1
+
+    title = 'Nový název'
+    rv = client.patch(rest_path, data={
+        'title': title,
+    })
+    assert rv.status_code == 200
+    resp_json = rv.get_json()
+    assert resp_json['title'] == "Nový název"
+    assert resp_json['description'] == "Jiný popis"
+
+    description = 'Nový popis'
+    rv = client.patch(rest_path, data={
+        'description': description,
+    })
+    assert rv.status_code == 200
+    resp_json = rv.get_json()
+    assert resp_json['title'] == "Nový název"
+    assert resp_json['description'] == "Nový popis"
+
+    uuid.check_redis_consistency(expected_publ_num_by_type={
+        f'{MAP_TYPE}': 2
+    })
+
+
+def test_delete_map(client):
+    username = 'testuser1'
+    mapname = 'administrativni_cleneni_libereckeho_kraje'
+    rest_path = url_for('rest_map.delete_map', username=username, mapname=mapname)
+    rv = client.delete(rest_path)
+    assert rv.status_code == 200
+
+    uuid.check_redis_consistency(expected_publ_num_by_type={
+        f'{MAP_TYPE}': 1
+    })
+
+    rest_path = url_for('rest_map.delete_map', username=username, mapname=mapname)
+    rv = client.delete(rest_path)
+    assert rv.status_code == 404
+    resp_json = rv.get_json()
+    assert resp_json['code'] == 26
+
+    uuid.check_redis_consistency(expected_publ_num_by_type={
+        f'{MAP_TYPE}': 1
+    })

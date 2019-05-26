@@ -42,7 +42,6 @@ def post(username):
     check_username(username)
 
     # FILE
-    use_chunk_upload = False
     if 'file' in request.files and not request.files['file'].filename == '':
         file = request.files["file"]
     else:
