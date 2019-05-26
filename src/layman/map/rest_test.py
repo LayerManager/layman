@@ -16,15 +16,13 @@ def client():
     client = layman.test_client()
 
     with layman.app_context() as ctx:
-        ctx.push()
+        yield client
         pass
 
-    yield client
 
 def test_get_maps_empty(client):
     username = 'testuser1'
-    with layman.app_context():
-        rv = client.get(url_for('rest_maps.get', username=username))
+    rv = client.get(url_for('rest_maps.get', username=username))
     resp_json = rv.get_json()
     assert rv.status_code==200
     assert len(resp_json) == 0
@@ -34,8 +32,7 @@ def test_get_maps_empty(client):
 
 
 def test_no_file(client):
-    with layman.app_context():
-        rv = client.post(url_for('rest_maps.post', username='testuser1'))
+    rv = client.post(url_for('rest_maps.post', username='testuser1'))
     assert rv.status_code==400
     resp_json = rv.get_json()
     # print('resp_json', resp_json)
@@ -54,10 +51,9 @@ def test_post_maps_invalid_file(client):
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        with layman.app_context():
-            rv = client.post(rest_path, data={
-                'file': files
-            })
+        rv = client.post(rest_path, data={
+            'file': files
+        })
         assert rv.status_code == 400
         resp_json = rv.get_json()
         # print('resp_json', resp_json)
@@ -80,10 +76,9 @@ def test_post_maps_invalid_json(client):
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        with layman.app_context():
-            rv = client.post(rest_path, data={
-                'file': files
-            })
+        rv = client.post(rest_path, data={
+            'file': files
+        })
         assert rv.status_code == 400
         resp_json = rv.get_json()
         # print('resp_json', resp_json)
@@ -112,10 +107,9 @@ def test_post_maps_simple(client):
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        with layman.app_context():
-            rv = client.post(rest_path, data={
-                'file': files
-            })
+        rv = client.post(rest_path, data={
+            'file': files
+        })
         assert rv.status_code == 200
         resp_json = rv.get_json()
         # print('resp_json', resp_json)
@@ -130,8 +124,7 @@ def test_post_maps_simple(client):
         f'{MAP_TYPE}': 1
     })
 
-    with layman.app_context():
-        rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
+    rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
     assert rv.status_code == 200
     resp_json = rv.get_json()
     assert resp_json['name'] == mapname
@@ -152,13 +145,12 @@ def test_post_maps_complex(client):
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        with layman.app_context():
-            rv = client.post(rest_path, data={
-                'file': files,
-                'name': mapname,
-                'title': title,
-                'description': description,
-            })
+        rv = client.post(rest_path, data={
+            'file': files,
+            'name': mapname,
+            'title': title,
+            'description': description,
+        })
         assert rv.status_code == 200
         resp_json = rv.get_json()
         # print('resp_json', resp_json)
@@ -171,8 +163,7 @@ def test_post_maps_complex(client):
         f'{MAP_TYPE}': 2
     })
 
-    with layman.app_context():
-        rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
+    rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
     assert rv.status_code == 200
     resp_json = rv.get_json()
     assert resp_json['name'] == mapname
