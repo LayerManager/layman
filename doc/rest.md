@@ -357,6 +357,8 @@ Body parameters:
 - *title*, string `.+`
    - human readable name of the map
    - by default it is either `title` attribute of JSON root object or map name
+- *description*, string `.+`
+   - by default it is either `abstract` attribute of JSON root object or empty string
 
 #### Response
 Content-Type: `application/json`

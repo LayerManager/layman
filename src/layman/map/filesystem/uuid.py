@@ -35,8 +35,9 @@ def get_map_uuid(username, mapname):
 assign_map_uuid = partial(common_uuid.assign_publication_uuid, MAP_TYPE)
 
 
-# username, mapname, map_info
-update_map = partial(common_uuid.update_publication, MAP_TYPE)
-
 def post_map(username, mapname):
+    pass
+
+
+def patch_map(username, mapname):
     pass
