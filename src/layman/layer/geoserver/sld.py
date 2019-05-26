@@ -11,6 +11,7 @@ from layman.http import LaymanError
 from layman import settings
 from . import headers_json
 from . import wfs
+from . import wms
 
 
 def update_layer(username, layername, layerinfo):
@@ -36,6 +37,7 @@ def delete_layer(username, layername):
             }
         )
         r.raise_for_status()
+        g.pop(wms.get_flask_proxy_key(username), None)
         g.pop(wfs.get_flask_proxy_key(username), None)
         return {
             'sld': {
