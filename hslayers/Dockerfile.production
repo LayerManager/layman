@@ -1,0 +1,17 @@
+FROM node:10.16-alpine
+
+RUN mkdir /code
+WORKDIR /code
+
+ADD .babelrc \
+    index.html \
+    index.js \
+    package.json \
+    package-lock.json \
+    proxy.js \
+    /code/
+
+ADD src /code/src
+
+RUN npm ci && npm run build
+

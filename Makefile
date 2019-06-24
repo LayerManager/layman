@@ -18,6 +18,12 @@ layman-build-production-only:
 layman-bash:
 	docker-compose -f docker-compose.dev.yml run --rm layman_dev bash
 
+hslayers-build:
+	docker-compose -f docker-compose.dev.yml build hslayers
+
+hslayers-bash:
+	docker-compose -f docker-compose.dev.yml run --rm --service-ports hslayers sh
+
 psql:
 	docker-compose -f docker-compose.dev.yml run -e PGPASSWORD=docker --entrypoint "psql -U docker -p 5432 -h db gis" --rm db
 
