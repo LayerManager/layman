@@ -4,19 +4,15 @@ RUN mkdir /code
 WORKDIR /code
 
 RUN apt-get clean && apt-get update && \
-    apt-get -y -qq install unzip curl python3-pip && \
+    apt-get -y -qq install unzip curl python3-pip chromium-browser=75\* && \
     pip3 install pipenv
 
-# ttp://click.pocoo.org/python3/
+# http://click.pocoo.org/python3/
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 COPY Pipfile* /code/
 
-RUN apt-get -y -qq install chromium-browser
+RUN (cd /tmp && curl -O https://chromedriver.storage.googleapis.com/75.0.3770.90/chromedriver_linux64.zip && unzip chromedriver_linux64.zip -d /usr/bin && rm chromedriver_linux64.zip)
 
-RUN (cd /tmp && curl -O https://chromedriver.storage.googleapis.com/2.43/chromedriver_linux64.zip && unzip chromedriver_linux64.zip -d /usr/bin && rm chromedriver_linux64.zip)
-
-# we need specific version of tornado because of celery/flower bug:
-# https://github.com/mher/flower/issues/878
 RUN pipenv install --system --dev

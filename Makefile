@@ -30,6 +30,9 @@ clear-python-cache-dev:
 start-layman-dev:
 	docker-compose -f docker-compose.dev.yml up
 
+start-layman-dev-d:
+	docker-compose -f docker-compose.dev.yml up -d
+
 restart-layman-dev:
 	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_dev celery_worker_dev
 

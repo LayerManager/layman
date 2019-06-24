@@ -88,10 +88,7 @@ def test_post_no_file(chrome):
     assert resp_json['code'] == 1
 
     entries = chrome.get_log('browser')
-    assert len(entries) > 3
-    for entry in entries:
-        # print(entry)
-        assert entry['level'] in ['INFO', 'SEVERE']
+    assert len(entries) == 1
 
     severe_entries = [e for e in entries if e['level'] == 'SEVERE']
     assert len(severe_entries) == 1
