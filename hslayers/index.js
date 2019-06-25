@@ -6,7 +6,7 @@ import { saveAs } from 'file-saver';
 
 const url_params = new URLSearchParams(window.location.search);
 const map_def_url = url_params.get('map_def_url');
-const file_name = url_params.get('file_name') || 'map.png';
+const file_name = url_params.get('file_name');
 
 
 const main = async () => {
@@ -28,14 +28,17 @@ const main = async () => {
   });
 
   ol_map.once('rendercomplete', (event) => {
-    console.log('rendercomplete');
+    // console.log('rendercomplete');
     const canvas = event.context.canvas;
-    if (navigator.msSaveBlob) {
-      navigator.msSaveBlob(canvas.msToBlob(), file_name);
-    } else {
-      canvas.toBlob((blob) => {
-        saveAs(blob, file_name);
-      });
+    console.log('dataurl', canvas.toDataURL());
+    if(file_name) {
+      if (navigator.msSaveBlob) {
+        navigator.msSaveBlob(canvas.msToBlob(), file_name);
+      } else {
+        canvas.toBlob((blob) => {
+          saveAs(blob, file_name);
+        });
+      }
     }
   });
   ol_map.renderSync();
