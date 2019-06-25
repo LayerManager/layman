@@ -46,7 +46,7 @@ const json_to_extent = (value) => {
 
 export const proxify = (requested_url, toEncoding) => {
   // toEncoding = toEncoding === undefined ? true : !!toEncoding;
-  return `http://localhost:8081/${requested_url}`;
+  return `http://${window.location.hostname}:8081/${requested_url}`;
 };
 
 
