@@ -1,0 +1,119 @@
+{
+  "abstract": "Na map\u011b jsou zobrazen\u00e9 t\u0159\u00eddy ochrany p\u016fdy v Libereck\u00e9m kraji", 
+  "center": [
+    1672068, 
+    6568819
+  ], 
+  "current_base_layer": null, 
+  "extent": [
+    "14.62", 
+    "50.58", 
+    "15.42", 
+    "50.82"
+  ], 
+  "groups": {
+    "guest": "w"
+  }, 
+  "layers": [
+    {
+      "className": "HSLayers.Layer.WMS", 
+      "dimensions": {}, 
+      "legends": [
+        "https%3A%2F%2Fgeoportal.kraj-lbc.cz%2Fcgi-bin%2Fmapserv%3Fmap%3D%2Fdata%2Fgis%2FMapServer%2Fprojects%2Fwms%2Fatlas%2Fpuda.map%26version%3D1.3.0%26service%3DWMS%26request%3DGetLegendGraphic%26sld_version%3D1.1.0%26layer%3Dtridyochrany%26format%3Dimage%2Fpng%26STYLE%3Ddefault"
+      ], 
+      "maxResolution": null, 
+      "metadata": {}, 
+      "minResolution": 0, 
+      "opacity": "1", 
+      "params": {
+        "FORMAT": "image/png", 
+        "FROMCRS": "EPSG:3857", 
+        "LAYERS": "tridyochrany", 
+        "VERSION": "1.3.0"
+      }, 
+      "ratio": 1.5, 
+      "singleTile": true, 
+      "title": "T\u0159\u00eddy ochrany p\u016fdy", 
+      "url": "https%3A%2F%2Fgeoportal.kraj-lbc.cz%2Fcgi-bin%2Fmapserv%3Fmap%3D%2Fdata%2Fgis%2FMapServer%2Fprojects%2Fwms%2Fatlas%2Fpuda.map%26", 
+      "visibility": true, 
+      "wmsMaxScale": 0
+    }, 
+    {
+      "className": "HSLayers.Layer.WMS", 
+      "maxResolution": null, 
+      "metadata": {}, 
+      "minResolution": 0, 
+      "opacity": 1, 
+      "params": {
+        "ABSTRACT": "St\u00ednovan\u00fd model reli\u00e9fu Libereck\u00e9ho kraje", 
+        "FORMAT": "image/png", 
+        "LAYERS": "stinovany_relief"
+      }, 
+      "ratio": 1.5, 
+      "singleTile": true, 
+      "title": "St\u00ednovan\u00fd model reli\u00e9fu", 
+      "url": "https%3A%2F%2Fgeoportal.kraj-lbc.cz%2Fcgi-bin%2Fmapserv%3Fmap%3D%2Fdata%2Fgis%2FMapServer%2Fprojects%2Fwms%2Fort.map",
+      "visibility": true
+    }, 
+    {
+      "className": "HSLayers.Layer.WMS", 
+      "maxResolution": null, 
+      "metadata": {}, 
+      "minResolution": 0, 
+      "opacity": 1, 
+      "params": {
+        "ABSTRACT": "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje", 
+        "FORMAT": "image/png", 
+        "LAYERS": "administrativni_celky_hranice"
+      }, 
+      "ratio": 1.5, 
+      "singleTile": true, 
+      "title": "Administrativn\u00ed \u010dlen\u011bn\u00ed", 
+      "url": "https%3A%2F%2Fgeoportal.kraj-lbc.cz%2Fcgi-bin%2Fmapserv%3Fmap%3D%2Fdata%2Fgis%2FMapServer%2Fprojects%2Fwms%2Fatlas%2Fadministrativni_cleneni.map", 
+      "visibility": true
+    }, 
+    {
+      "className": "HSLayers.Layer.WMS", 
+      "maxResolution": null, 
+      "metadata": {}, 
+      "minResolution": 0, 
+      "opacity": 1, 
+      "params": {
+        "ABSTRACT": "Jednoduch\u00e1 podkladov\u00e1 mapa Libereck\u00e9ho kraje", 
+        "FORMAT": "image/png", 
+        "LAYERS": "podkladova_mapa"
+      }, 
+      "ratio": 1.5, 
+      "singleTile": true, 
+      "title": "Jednoduch\u00e1 podkladov\u00e1 mapa", 
+      "url": "https%3A%2F%2Fgeoportal.kraj-lbc.cz%2Fcgi-bin%2Fmapserv%3Fmap%3D%2Fdata%2Fgis%2FMapServer%2Fprojects%2Fwms%2Fatlas%2Fzabaged_2017_wms.map", 
+      "visibility": true
+    }, 
+    {
+      "className": "HSLayers.Layer.WMS", 
+      "maxResolution": null, 
+      "metadata": {}, 
+      "minResolution": 0, 
+      "opacity": 1, 
+      "params": {
+        "ABSTRACT": "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje", 
+        "FORMAT": "image/png", 
+        "LAYERS": "definicni_body_administrativnich_celku"
+      }, 
+      "ratio": 1.5, 
+      "singleTile": true, 
+      "title": "S\u00eddla", 
+      "url": "https%3A%2F%2Fgeoportal.kraj-lbc.cz%2Fcgi-bin%2Fmapserv%3Fmap%3D%2Fdata%2Fgis%2FMapServer%2Fprojects%2Fwms%2Fatlas%2Fadministrativni_cleneni.map", 
+      "visibility": true
+    }
+  ], 
+  "name": "tridy_ochrany_pudy", 
+  "projection": "epsg:3857", 
+  "scale": 1, 
+  "title": "T\u0159\u00eddy ochrany p\u016fdy", 
+  "units": "m", 
+  "user": {
+    "email": "", 
+    "name": "browser"
+  }
+}
