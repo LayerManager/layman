@@ -20,6 +20,8 @@ services:
       depends_on:
         celery_worker_test:
           condition: service_healthy
+        hslayers:
+          condition: service_started
 
    db:
       image: kartoza/postgis:10.0-2.4
@@ -76,4 +78,17 @@ services:
           condition: service_healthy
         redis:
           condition: service_started
+
+   hslayers:
+      container_name: hslayers
+      build:
+        context: hslayers
+        dockerfile: Dockerfile.production
+      image: hslayers:latest
+      command: sh -c "node proxy.js & ./node_modules/.bin/http-server dist/"
+#      env_file:
+#         - .env.dev
+      ports:
+        - 8080:8080
+        - 8081:8081
 

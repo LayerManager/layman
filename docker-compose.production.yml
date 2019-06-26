@@ -20,6 +20,9 @@ services:
         - ./layman_data:/layman_data
         - ./src:/code/src
         - ./start.sh:/code/start.sh
+      depends_on:
+        hslayers:
+          condition: service_started
 
    redis:
       image: redis:4.0.11-alpine

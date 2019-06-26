@@ -30,5 +30,9 @@ fi
 
 #python3 src/clear_layman_data.py && && python3 -m pytest -svv
 #python3 src/clear_layman_data.py && python3 -m pytest -svv -k "not client_test" && python3 -m pytest -svv -k "client_test"
-python3 src/clear_layman_data.py && python3 -m pytest -vv -k "not client_test" && python3 -m pytest -vv -k "client_test"
-#python3 src/clear_layman_data.py && python3 -m pytest -svv src/layman/map/client_test.py
+#python3 src/clear_layman_data.py && python3 -m pytest -vv -k "not client_test" && python3 -m pytest -vv -k "client_test"
+#python3 src/clear_layman_data.py && python3 -m pytest -svv -k "rest_test"
+python3 src/clear_layman_data.py && \
+    python3 -m pytest -vv --ignore=src/layman/map/rest_test.py -k "not client_test" && \
+    python3 -m pytest -vv src/layman/map/rest_test.py && \
+    python3 -m pytest -vv -k "client_test"
