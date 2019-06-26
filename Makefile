@@ -1,4 +1,4 @@
-.PHONY: download-gs-datadir reset-gs-datadir layman-build
+.PHONY: reset-empty-gs-datadir-dev reset-layman-gs-datadir-dev layman-build-dev
 
 reset-empty-gs-datadir-dev:
 	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman_dev bash /code/src/reset-empty-gs-datadir.sh
