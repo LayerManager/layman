@@ -1,25 +1,47 @@
 import os
 import urllib
+import time
+from multiprocessing import Process
 
 import pytest
 from flask import url_for
 
 from . import MAP_TYPE
-from layman import app as layman
+from layman import app
 from layman import uuid
 from layman.map.filesystem import uuid as map_uuid
 
 
-@pytest.fixture
-def client():
-    layman.config['TESTING'] = True
-    layman.config['SERVER_NAME'] = '127.0.0.1:9000'
-    layman.config['SESSION_COOKIE_DOMAIN'] = 'localhost:9000'
-    client = layman.test_client()
+PORT = 8000
 
-    with layman.app_context() as ctx:
+@pytest.fixture(scope="module")
+def client():
+    # print('before app.test_client()')
+    client = app.test_client()
+
+    # print('before Process(target=app.run, kwargs={...')
+    server = Process(target=app.run, kwargs={
+        'host': '0.0.0.0',
+        'port': PORT,
+        'debug': False,
+    })
+    # print('before server.start()')
+    server.start()
+    time.sleep(1)
+
+    app.config['TESTING'] = True
+    app.config['DEBUG'] = True
+    app.config['SERVER_NAME'] = f'layman_test:{PORT}'
+    app.config['SESSION_COOKIE_DOMAIN'] = f'layman_test:{PORT}'
+
+    # print('before app.app_context()')
+    with app.app_context() as ctx:
         yield client
-        pass
+
+    # print('before server.terminate()')
+    server.terminate()
+    # print('before server.join()')
+    server.join()
 
 
 def test_get_maps_empty(client):
@@ -142,10 +164,9 @@ def test_post_maps_simple(client):
     assert 'path' in map_file
     assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
     thumbnail = resp_json['thumbnail']
-    assert thumbnail['status'] == 'NOT_AVAILABLE'
-    # assert 'status' not in thumbnail
-    # assert 'path' in thumbnail
-    # assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
+    assert 'status' not in thumbnail
+    assert 'path' in thumbnail
+    assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
 
     rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
     assert rv.status_code == 200
@@ -199,10 +220,9 @@ def test_post_maps_complex(client):
     assert 'path' in map_file
     assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
     thumbnail = resp_json['thumbnail']
-    assert thumbnail['status'] == 'NOT_AVAILABLE'
-    # assert 'status' not in thumbnail
-    # assert 'path' in thumbnail
-    # assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
+    assert 'status' not in thumbnail
+    assert 'path' in thumbnail
+    assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
 
     rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
     assert rv.status_code == 200
@@ -256,7 +276,9 @@ def test_patch_map(client):
     assert 'path' in map_file
     assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
     thumbnail = resp_json['thumbnail']
-    assert thumbnail['status'] == 'NOT_AVAILABLE'
+    assert 'status' not in thumbnail
+    assert 'path' in thumbnail
+    assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
 
     rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
     assert rv.status_code == 200

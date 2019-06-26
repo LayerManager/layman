@@ -79,7 +79,7 @@ def test_post_no_file(chrome):
 
     time.sleep(0.1)
 
-    chrome.save_screenshot('/code/tmp/test-3.png')
+    # chrome.save_screenshot('/code/tmp/test-3.png')
 
     resp_msg_div = chrome.find_elements_by_css_selector('div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.negative.message > code')
     assert len(resp_msg_div) == 1

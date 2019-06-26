@@ -29,6 +29,8 @@ services:
           condition: service_healthy
         redis:
           condition: service_started
+        hslayers:
+          condition: service_started
 
    redis:
       image: redis:4.0.11-alpine
