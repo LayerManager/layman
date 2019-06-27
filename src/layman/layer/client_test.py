@@ -52,6 +52,11 @@ def chrome():
 
 @pytest.mark.usefixtures("flask_server")
 def test_post_layers_chunk(chrome):
+    with app.app_context():
+        check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': 4
+        })
+
     username = 'testuser1'
     layername = 'country_chunks'
     file_paths = list(map(lambda fp: os.path.join(os.getcwd(), fp), [
@@ -128,7 +133,7 @@ def test_post_layers_chunk(chrome):
 
     with app.app_context():
         check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': 3
+            f'{LAYER_TYPE}': 5
         })
 
 
@@ -221,6 +226,6 @@ def test_patch_layer_chunk(chrome):
 
     with app.app_context():
         check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': 3
+            f'{LAYER_TYPE}': 5
         })
 

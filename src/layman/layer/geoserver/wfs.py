@@ -8,6 +8,7 @@ from flask import g, current_app
 
 from .util import get_gs_proxy_base_url
 from . import headers_json
+from . import wms
 from layman import settings
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
@@ -45,6 +46,7 @@ def update_layer(username, layername, layerinfo):
     )
     r.raise_for_status()
     g.pop(get_flask_proxy_key(username), None)
+    g.pop(wms.get_flask_proxy_key(username), None)
 
 
 def delete_layer(username, layername):
@@ -61,6 +63,7 @@ def delete_layer(username, layername):
         )
         r.raise_for_status()
         g.pop(get_flask_proxy_key(username), None)
+        g.pop(wms.get_flask_proxy_key(username), None)
     return {}
 
 

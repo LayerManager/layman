@@ -95,7 +95,10 @@ def post_map(username, mapname):
     entries = chrome.get_log('browser')
     max_attempts = 40
     attempts = 0
-    while len(entries) == 0 and attempts < max_attempts:
+    while next((
+            e for e in entries
+            if e['level'] != 'INFO' or (e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message'])
+        ), None) is None and attempts < max_attempts:
         # current_app.logger.info(f"waiting for entries")
         time.sleep(0.5)
         attempts += 1

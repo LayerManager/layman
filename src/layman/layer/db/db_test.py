@@ -1,13 +1,27 @@
 import os
 import shutil
+import pytest
 import time
 
+from layman import app as layman
 from layman.layer.filesystem.input_file import ensure_layer_input_file_dir
 from layman.layer.filesystem.util import get_layer_dir
 from .__init__ import import_layer_vector_file_async
 
 
-def test_abort_import_layer_vector_file():
+@pytest.fixture(scope="module")
+def client():
+    layman.config['TESTING'] = True
+    layman.config['SERVER_NAME'] = '127.0.0.1:9000'
+    layman.config['SESSION_COOKIE_DOMAIN'] = 'localhost:9000'
+    client = layman.test_client()
+
+    with layman.app_context() as ctx:
+        yield client
+        pass
+
+
+def test_abort_import_layer_vector_file(client):
     username = 'testuser1'
     layername = 'ne_10m_admin_0_countries'
     src_dir = 'tmp/naturalearth/10m/cultural'
