@@ -58,6 +58,9 @@ services:
       build:
         context: hslayers
         dockerfile: Dockerfile.production
+        args:
+           - LAYMAN_GS_HOST=${LAYMAN_GS_HOST}
+           - LAYMAN_GS_PORT=${LAYMAN_GS_PORT}
       image: hslayers:latest
       command: sh -c "node proxy.js & ./node_modules/.bin/http-server dist/"
 #      env_file:

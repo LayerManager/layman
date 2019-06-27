@@ -1,10 +1,17 @@
 FROM node:10.16-alpine
 
+ARG LAYMAN_GS_HOST
+ARG LAYMAN_GS_PORT
+
+ENV LAYMAN_GS_HOST $LAYMAN_GS_HOST
+ENV LAYMAN_GS_PORT $LAYMAN_GS_PORT
+
 RUN mkdir /code
 WORKDIR /code
 
 ADD .babelrc \
     index.html \
+    config.js \
     index.js \
     package.json \
     package-lock.json \

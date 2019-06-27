@@ -1,5 +1,5 @@
 // import 'ol/ol.css';
-import {json_to_map, proxify} from './src/map';
+import {json_to_map, adjust_map_url} from './src/map';
 import { saveAs } from 'file-saver';
 
 // const map_def_url = 'https://raw.githubusercontent.com/jirik/gspld/1252fad2677f55182478c2206f47fbacb922fb97/sample/layman.map/full.json';
@@ -15,7 +15,7 @@ const main = async () => {
     return;
   }
 
-  const map_json = await fetch(proxify(map_def_url))
+  const map_json = await fetch(adjust_map_url(map_def_url))
       .then(response => {
             if (response.status !== 200) {
               throw Error(`Cannot read composition ${map_def_url}`);

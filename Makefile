@@ -21,8 +21,12 @@ layman-bash:
 hslayers-build:
 	docker-compose -f docker-compose.dev.yml build hslayers
 
+hslayers-restart:
+	docker-compose -f docker-compose.dev.yml build hslayers
+	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d hslayers
+
 hslayers-bash:
-	docker-compose -f docker-compose.dev.yml run --rm --service-ports hslayers sh
+	docker-compose -f docker-compose.dev.yml run --rm hslayers sh
 
 psql:
 	docker-compose -f docker-compose.dev.yml run -e PGPASSWORD=docker --entrypoint "psql -U docker -p 5432 -h db gis" --rm db
