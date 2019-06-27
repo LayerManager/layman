@@ -27,13 +27,14 @@ THE SOFTWARE.
 
  */
 
-import * as ol_proj from 'ol/proj';
 import ol_Map from 'ol/Map';
+import * as ol_proj from 'ol/proj';
 import ol_View from 'ol/View';
 import ol_source_ImageWMS from 'ol/source/ImageWMS';
 import ol_source_TileWMS from 'ol/source/TileWMS';
 import ol_layer_Image from 'ol/layer/Image';
 import ol_layer_Tile from 'ol/layer/Tile';
+import * as config from './../config';
 
 const json_to_extent = (value) => {
   if (typeof value === 'string') {
@@ -44,9 +45,31 @@ const json_to_extent = (value) => {
 };
 
 
-export const proxify = (requested_url, toEncoding) => {
+const proxify = (requested_url) => {
   // toEncoding = toEncoding === undefined ? true : !!toEncoding;
   return `http://${window.location.hostname}:8081/${requested_url}`;
+};
+
+
+export const adjust_map_url = (requested_url) => {
+  requested_url = decodeURIComponent(requested_url);
+  if(requested_url.startsWith(`http://localhost:8000`)) {
+    const old = requested_url;
+    requested_url = requested_url.replace(`http://localhost:8000`, `http://layman_dev:8000`);
+    console.log(`replaced map URL ${old} with ${requested_url}`);
+  }
+  return proxify(requested_url);
+};
+
+
+const adjust_layer_url = (requested_url) => {
+  requested_url = decodeURIComponent(requested_url);
+  if(requested_url.startsWith(`http://localhost:8600`)) {
+    const old = requested_url;
+    requested_url = requested_url.replace(`http://localhost:8600`, `http://${config.LAYMAN_GS_HOSTPORT}`);
+    console.log(`replaced layer URL ${old} with ${requested_url}`);
+  }
+  return proxify(requested_url);
 };
 
 
@@ -57,12 +80,12 @@ const proxify_layer_loader = (layer, tiled) => {
     source.setTileUrlFunction((b, c, d) => {
       // console.log('setTileUrlFunction')
       const requested_url = tile_url_function(b, c, d);
-      return proxify(requested_url);
+      return adjust_layer_url(requested_url);
     });
   } else {
     source.setImageLoadFunction((image, requested_url) => {
       // console.log('setImageLoadFunction', requested_url, proxify(requested_url));
-      image.getImage().src = proxify(requested_url);
+      image.getImage().src = adjust_layer_url(requested_url);
     })
   }
 };
@@ -158,7 +181,9 @@ export const json_to_map = ({
   // console.log('extent_4326', extent_4326);
   const extent = ol_proj.transformExtent(extent_4326, 'EPSG:4326', view.getProjection());
   // console.log('extent', extent);
-  view.fit(extent);
+  view.fit(extent, {
+    constrainResolution: false
+  });
 
   const layers = json_to_layers(map_json.layers);
   layers.forEach(layer => {
