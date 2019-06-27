@@ -45,7 +45,9 @@ def get_map_info(username, mapname):
     return {}
 
 
-patch_map = input_file.patch_map
+def patch_map(username, mapname, file_changed=True):
+    if file_changed or not get_map_info(username, mapname):
+        post_map(username, mapname)
 
 
 get_publication_names = input_file.get_publication_names
