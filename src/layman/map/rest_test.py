@@ -1,3 +1,4 @@
+import glob
 import os
 import urllib
 import time
@@ -337,3 +338,92 @@ def test_delete_map(client):
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{MAP_TYPE}': 1
     })
+
+
+def test_map_composed_from_local_layers(client):
+    username = 'testuser1'
+    rest_path = url_for('rest_layers.post', username=username)
+
+    layername1 = 'mista'
+    pattern = os.path.join(os.getcwd(), 'tmp/naturalearth/110m/cultural/ne_110m_populated_places.*')
+    file_paths = glob.glob(pattern)
+    assert len(file_paths) > 0
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        rv = client.post(rest_path, data={
+            'file': files,
+            'name': layername1,
+        })
+        assert rv.status_code == 200
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    layername2 = 'hranice'
+    pattern = os.path.join(os.getcwd(), 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.*')
+    file_paths = glob.glob(pattern)
+    assert len(file_paths) > 0
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        rv = client.post(rest_path, data={
+            'file': files,
+            'name': layername2,
+        })
+        assert rv.status_code == 200
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
+    layer_info = client.get(url_for('rest_layer.get', username=username, layername=layername1)).get_json()
+    while any(('status' in layer_info[key] for key in keys_to_check)):
+        time.sleep(0.1)
+        print('layer_info1', layer_info)
+        layer_info = client.get(url_for('rest_layer.get', username=username, layername=layername1)).get_json()
+    wms_url1 = layer_info['wms']['url']
+
+    layer_info = client.get(url_for('rest_layer.get', username=username, layername=layername2)).get_json()
+    while any(('status' in layer_info[key] for key in keys_to_check)):
+        time.sleep(0.1)
+        print('layer_info2', layer_info)
+        layer_info = client.get(url_for('rest_layer.get', username=username, layername=layername2)).get_json()
+    wms_url2 = layer_info['wms']['url']
+
+    expected_url = 'http://localhost:8600/geoserver/testuser1/ows'
+    assert wms_url1 == expected_url
+    assert wms_url2 == expected_url
+
+    mapname = 'svet'
+    rest_path = url_for('rest_maps.post', username=username)
+    file_paths = [
+        'sample/layman.map/internal_url.json',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        rv = client.post(rest_path, data={
+            'file': files,
+            'name': mapname,
+        })
+        assert rv.status_code == 200
+        resp_json = rv.get_json()
+        # print('resp_json', resp_json)
+        assert len(resp_json) == 1
+        assert resp_json[0]['name'] == mapname
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
+    thumbnail = map_info['thumbnail']
+    assert 'status' not in thumbnail
+    assert 'path' in thumbnail
+    assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path

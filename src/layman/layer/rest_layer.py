@@ -6,6 +6,7 @@ from layman.util import check_username
 from layman import settings
 from . import util
 from .filesystem import input_file, input_sld, input_chunk
+from .geoserver import pop_cache as pop_geoserver_cache
 
 
 bp = Blueprint('rest_layer', __name__)
@@ -17,6 +18,7 @@ def get(username, layername):
 
     # USER
     check_username(username)
+    pop_geoserver_cache(username)
 
     # LAYER
     util.check_layername(layername)
@@ -33,6 +35,7 @@ def patch(username, layername):
 
     # USER
     check_username(username)
+    pop_geoserver_cache(username)
 
     # LAYER
     util.check_layername(layername)
@@ -145,6 +148,7 @@ def delete_layer(username, layername):
 
     # USER
     check_username(username)
+    pop_geoserver_cache(username)
 
     # LAYER
     util.check_layername(layername)
