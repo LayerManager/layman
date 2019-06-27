@@ -6,7 +6,7 @@ from werkzeug.datastructures import FileStorage
 
 from layman.util import check_username
 from . import util
-from .filesystem import input_file
+from .filesystem import input_file, thumbnail
 
 
 bp = Blueprint('rest_map', __name__)
@@ -64,6 +64,7 @@ def patch(username, mapname):
         description = info['description']
 
     if file is not None:
+        thumbnail.delete_map(username, mapname)
         file = FileStorage(
             io.BytesIO(json.dumps(file_json).encode()),
             file.filename
@@ -74,6 +75,7 @@ def patch(username, mapname):
     kwargs = {
         'title': title,
         'description': description,
+        'file_changed': file is not None,
     }
 
     util.patch_map(username, mapname, kwargs)
