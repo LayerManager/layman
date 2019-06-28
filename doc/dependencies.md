@@ -24,12 +24,12 @@
 | [requests](http://python-requests.org) | Apache License 2.0 | Pipfile | prod | bin | |
 | [psycopg2-binary](https://github.com/psycopg/psycopg2) | GNU LGPL | Pipfile | prod | bin | |
 | [unidecode](https://github.com/avian2/unidecode) | GNU GPL v2 | Pipfile | prod | bin | |
+| [selenium](https://www.chromium.org/) | Apache License 2.0 | requirements.text.txt | prod | bin | for client-side map rendering and integration testing |
+| [chromium](https://www.chromium.org/) | BSD and others | Dockerfile.test | test | prod | for client-side map rendering and integration testing |
+| [chromedriver](http://chromedriver.chromium.org/) | BSD and others | Dockerfile.test | prod | bin | for client-side map rendering and integration testing |
 | [flower](https://github.com/mher/flower) | BSD 3-Clause | Pipfile | dev | bin | to monitor celery tasks |
 | [watchdog](https://github.com/gorakhargosh/watchdog) | Apache License 2.0 | Pipfile | dev | bin | |
 | [pytest](https://pytest.org/) | MIT License | Pipfile | test | bin | |
-| [selenium](https://www.chromium.org/) | Apache License 2.0 | requirements.text.txt | test | bin | for integration testing |
-| [chromium](https://www.chromium.org/) | BSD and others | Dockerfile.test | test | bin | for integration testing |
-| [chromedriver](http://chromedriver.chromium.org/) | BSD and others | Dockerfile.test | test | bin | for integration testing |
 | [geographicags/docker-gdal2](https://github.com/GeographicaGS/Docker-GDAL2) | MIT License | Dockerfile | prod | bin | |
 | [kartoza/docker-geoserver](https://github.com/kartoza/docker-geoserver) | GNU GPL v2 | docker-compose.dev.yml | dev | bin | |
 | [kartoza/docker-postgis](https://github.com/kartoza/docker-postgis) | - | docker-compose.dev.yml | dev | bin | |
