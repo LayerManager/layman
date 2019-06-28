@@ -41,7 +41,7 @@ git clone https://github.com/jirik/gspld.git
 cd gspld
 
 # prepare geoserver data directory
-make reset-layman-gs-datadir
+make reset-layman-gs-datadir-dev
 ```
 
 ## Run
