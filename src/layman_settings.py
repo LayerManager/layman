@@ -77,3 +77,6 @@ UPLOAD_MAX_INACTIVITY_TIME = 5 * 60 # 5 minutes
 LAYMAN_REDIS_URL = os.environ['LAYMAN_REDIS_URL']
 import redis
 LAYMAN_REDIS = redis.Redis.from_url(LAYMAN_REDIS_URL, encoding="utf-8", decode_responses=True)
+
+
+LAYMAN_DOCKER_MAIN_SERVICE = os.environ['LAYMAN_DOCKER_MAIN_SERVICE']

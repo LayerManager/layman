@@ -86,11 +86,11 @@ stop-layman-production-with-dependencies:
 	docker-compose -f docker-compose.production.yml stop
 
 test:
-	docker-compose -f docker-compose.test.yml run --rm layman_test
+	docker-compose -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
 
 test-dev:
 	docker-compose -f docker-compose.test.yml up --force-recreate --no-deps -d celery_worker_test
-	docker-compose -f docker-compose.test.yml run --rm layman_test
+	docker-compose -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
 
 test-bash:
 	docker-compose -f docker-compose.test.yml run --rm layman_test bash
@@ -100,4 +100,7 @@ redis-test-bash:
 
 stop-all-docker-containers:
 	docker stop $$(docker ps -q)
+
+remove-all-docker-containers:
+	docker rm $$(docker ps -aq)
 

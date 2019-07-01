@@ -15,6 +15,7 @@ from selenium.webdriver.common.desired_capabilities import \
 from . import util
 from layman.common.filesystem import util as common_util
 from . import input_file
+from layman import settings
 
 
 MAP_SUBDIR = __name__.split('.')[-1]
@@ -69,11 +70,13 @@ def get_map_thumbnail_path(username, mapname):
 
 
 def post_map(username, mapname):
-    map_file_get_url = url_for('rest_map_file.get', username=username,
-                               mapname=mapname)
+    pass
 
-    hostname = socket.gethostname()
-    # current_app.logger.info(f"hostname {hostname}")
+
+def generate_map_thumbnail(username, mapname):
+    map_file_get_url = f'/rest/{username}/maps/{mapname}/file'
+
+    hostname = settings.LAYMAN_DOCKER_MAIN_SERVICE
     map_file_get_url = f"http://{hostname}:8000{map_file_get_url}"
     params = urlencode({
         'map_def_url': map_file_get_url,

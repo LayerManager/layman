@@ -27,6 +27,7 @@ PUBLICATION_TYPES = {
             'layman.map.filesystem.thumbnail',
         ],
         'task_modules': [
+            'layman.map.filesystem.tasks',
         ],
         'layman.common.filesystem': {
             'publications_dir': 'maps'

@@ -165,6 +165,19 @@ def test_post_maps_simple(client):
     assert 'path' in map_file
     assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
     thumbnail = resp_json['thumbnail']
+    assert 'status' in thumbnail
+    assert thumbnail['status'] == 'PENDING'
+
+    map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
+    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] == 'PENDING':
+        time.sleep(0.1)
+        map_info = client.get(url_for('rest_map.get', username=username,
+                                      mapname=mapname)).get_json()
+
+    rv = client.get(url_for('rest_map.get', username=username, mapname=mapname))
+    assert rv.status_code == 200
+    resp_json = rv.get_json()
+    thumbnail = resp_json['thumbnail']
     assert 'status' not in thumbnail
     assert 'path' in thumbnail
     assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
@@ -221,6 +234,28 @@ def test_post_maps_complex(client):
     assert 'path' in map_file
     assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
     thumbnail = resp_json['thumbnail']
+    assert 'status' in thumbnail
+    assert thumbnail['status'] == 'PENDING'
+
+    # assert another PATCH is not possible now
+    rv = client.patch(url_for('rest_map.patch', username=username, mapname=mapname), data={
+        'title': 'abcd',
+    })
+    assert rv.status_code == 400
+    resp_json = rv.get_json()
+    assert resp_json['code']==29
+
+    # continue with thumbnail assertion
+    map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
+    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] == 'PENDING':
+        time.sleep(0.1)
+        map_info = client.get(url_for('rest_map.get', username=username,
+                                      mapname=mapname)).get_json()
+
+    rv = client.get(url_for('rest_map.get', username=username, mapname=mapname))
+    assert rv.status_code == 200
+    resp_json = rv.get_json()
+    thumbnail = resp_json['thumbnail']
     assert 'status' not in thumbnail
     assert 'path' in thumbnail
     assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
@@ -276,6 +311,19 @@ def test_patch_map(client):
     assert 'status' not in map_file
     assert 'path' in map_file
     assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
+    thumbnail = resp_json['thumbnail']
+    assert 'status' in thumbnail
+    assert thumbnail['status'] == 'PENDING'
+
+    map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
+    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] == 'PENDING':
+        time.sleep(0.1)
+        map_info = client.get(url_for('rest_map.get', username=username,
+                                      mapname=mapname)).get_json()
+
+    rv = client.get(url_for('rest_map.get', username=username, mapname=mapname))
+    assert rv.status_code == 200
+    resp_json = rv.get_json()
     thumbnail = resp_json['thumbnail']
     assert 'status' not in thumbnail
     assert 'path' in thumbnail
@@ -424,6 +472,19 @@ def test_map_composed_from_local_layers(client):
 
     map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
     thumbnail = map_info['thumbnail']
+    assert 'status' in thumbnail
+    assert thumbnail['status'] == 'PENDING'
+
+    map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
+    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] == 'PENDING':
+        time.sleep(0.1)
+        map_info = client.get(url_for('rest_map.get', username=username,
+                                      mapname=mapname)).get_json()
+
+    rv = client.get(url_for('rest_map.get', username=username, mapname=mapname))
+    assert rv.status_code == 200
+    resp_json = rv.get_json()
+    thumbnail = resp_json['thumbnail']
     assert 'status' not in thumbnail
     assert 'path' in thumbnail
     assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path

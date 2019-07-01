@@ -340,7 +340,7 @@ JSON object with following structure:
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
   - *url*: String. URL of map thumbnail. It points to [GET Map Thumbnail](#get-map-thumbnail).
-  - *status*: Status information about generating and availability of thumbnail. See GET Map **wms** property for meaning.
+  - *status*: Status information about generating and availability of thumbnail. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 
 ### PATCH Map
