@@ -4,6 +4,7 @@ import io
 from flask import Blueprint, jsonify, request, current_app as app
 from werkzeug.datastructures import FileStorage
 
+from layman import LaymanError
 from layman.util import check_username
 from . import util
 from .filesystem import input_file, thumbnail
@@ -36,6 +37,9 @@ def patch(username, mapname):
 
     # MAP
     util.check_mapname(mapname)
+
+    if not util.is_map_last_task_ready(username, mapname):
+        raise LaymanError(29)
 
     info = util.get_complete_map_info(username, mapname)
 
@@ -72,13 +76,14 @@ def patch(username, mapname):
         input_file.save_map_files(
                 username, mapname, [file])
 
+    file_changed = file is not None
     kwargs = {
         'title': title,
         'description': description,
-        'file_changed': file is not None,
+        'file_changed': file_changed,
     }
 
-    util.patch_map(username, mapname, kwargs)
+    util.patch_map(username, mapname, kwargs, file_changed)
 
     info = util.get_complete_map_info(username, mapname)
 
@@ -97,6 +102,8 @@ def delete_map(username, mapname):
 
     # raise exception if map does not exist
     info = util.get_complete_map_info(username, mapname)
+
+    util.abort_map_tasks(username, mapname)
 
     util.delete_map(username, mapname)
 
