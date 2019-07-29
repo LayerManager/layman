@@ -73,7 +73,7 @@ The most general configuration is found in `docker-compose.*.yml` files used as 
 - `docker-compose.production.yml` used for production (layman, redis, celery worker, flower)
 - `docker-compose.dependencies.yml` optionally used for production (GeoServer and PostgreSQL)
 
-Another part of settings is in `.env.*` files, also separate for development, testing, and production. See especially Layman settings and Flask settings. Remember layman is dockerized, so connection parameters such as host names and port numbers must be set according to docker-compose configuration. These settings are brought to python and extended by [settings.py](src/layman/settings.py).
+Another part of settings is in `.env.*` files, also separate for development, testing, and production. See especially Layman settings and Flask settings. Remember layman is dockerized, so connection parameters such as host names and port numbers must be set according to docker-compose configuration. These settings are brought to python and extended by [layman_settings.py](src/layman_settings.py).
 
 ## Test
 :warning: It will delete
