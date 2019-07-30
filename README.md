@@ -95,7 +95,7 @@ This is the recommended way how to run it in production. You need to provide ext
 
 Within PostgreSQL, you need one user [LAYMAN_PG_USER](.env.production) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](.env.production) database. **The LAYMAN_PG_USER must be another user than default `postgres` user!** The user also needs access to `public` schema where PostGIS must be installed.
 
-Within GeoServer, you need one Layman user [LAYMAN_GS_USER](.env.production) and one layman role [LAYMAN_GS_ROLE](.env.production). **The LAYMAN_GS_USER must be another user than default `admin` user and the LAYMAN_GS_ROLE must be another role than default `ADMIN` role!** The user must have at least the LAYMAN_GS_ROLE and admin role. See [default development configuration](sample/geoserver_data/security/role/default/roles.xml).
+Within GeoServer, you need one Layman user [LAYMAN_GS_USER](.env.production) and one layman role [LAYMAN_GS_ROLE](.env.production). **The LAYMAN_GS_USER must be another user than default `admin` user and the LAYMAN_GS_ROLE must be another role than default `ADMIN` role!** The LAYMAN_GS_USER user must have at least the LAYMAN_GS_ROLE and ADMIN role. See default development configuration of [roles](sample/geoserver_data/security/role/default/roles.xml) and [layer access rights](sample/geoserver_data/security/layers.properties).
 
 ```bash
 cp .env.production .env
