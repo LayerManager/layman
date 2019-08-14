@@ -1,21 +1,30 @@
 import json
 import io
 
-from flask import Blueprint, jsonify, request, current_app as app
+from flask import Blueprint, jsonify, request, current_app as app, g
 from werkzeug.datastructures import FileStorage
 
 from layman import LaymanError
 from layman.util import check_username
 from . import util
 from .filesystem import input_file, thumbnail
+from layman.authn import authenticate
+from layman.authz import authorize
 
 
 bp = Blueprint('rest_map', __name__)
 
 
+@bp.before_request
+@authenticate
+@authorize
+def before_request():
+    pass
+
+
 @bp.route('/maps/<mapname>', methods=['GET'])
 def get(username, mapname):
-    app.logger.info('GET Map')
+    app.logger.info(f"GET Map, user={g.user and g.user['name']}")
 
     # USER
     check_username(username)
@@ -30,7 +39,7 @@ def get(username, mapname):
 
 @bp.route('/maps/<mapname>', methods=['PATCH'])
 def patch(username, mapname):
-    app.logger.info('PATCH Map')
+    app.logger.info(f"PATCH Map, user={g.user and g.user['name']}")
 
     # USER
     check_username(username)
@@ -92,7 +101,7 @@ def patch(username, mapname):
 
 @bp.route('/maps/<mapname>', methods=['DELETE'])
 def delete_map(username, mapname):
-    app.logger.info('DELETE Map')
+    app.logger.info(f"DELETE Map, user={g.user and g.user['name']}")
 
     # USER
     check_username(username)
