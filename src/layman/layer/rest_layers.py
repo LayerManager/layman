@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, url_for
+from flask import Blueprint, jsonify, request, url_for, g
 from flask import current_app as app
 
 from layman.http import LaymanError
@@ -6,13 +6,22 @@ from layman.util import check_username
 from layman import settings
 from . import util
 from .filesystem import input_file, input_sld, input_chunk, uuid
+from layman.authn import authenticate
+from layman.authz import authorize
 
 
 bp = Blueprint('rest_layers', __name__)
 
+@bp.before_request
+@authenticate
+@authorize
+def before_request():
+    pass
+
+
 @bp.route('/layers', methods=['GET'])
 def get(username):
-    app.logger.info('GET Layers')
+    app.logger.info(f"GET Layers, user={g.user and g.user['name']}")
 
     # USER
     check_username(username)
@@ -33,7 +42,7 @@ def get(username):
 
 @bp.route('/layers', methods=['POST'])
 def post(username):
-    app.logger.info('POST Layers')
+    app.logger.info(f"POST Layers, user={g.user and g.user['name']}")
 
     # USER
     check_username(username)

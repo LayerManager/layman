@@ -1,5 +1,4 @@
-from flask import Blueprint, jsonify, request
-from flask import current_app as app
+from flask import Blueprint, jsonify, request, current_app as app, g
 
 from layman.http import LaymanError
 from layman.util import check_username
@@ -7,14 +6,23 @@ from layman import settings
 from . import util
 from .filesystem import input_file, input_sld, input_chunk
 from .geoserver import pop_cache as pop_geoserver_cache
+from layman.authn import authenticate
+from layman.authz import authorize
 
 
 bp = Blueprint('rest_layer', __name__)
 
 
+@bp.before_request
+@authenticate
+@authorize
+def before_request():
+    pass
+
+
 @bp.route('/layers/<layername>', methods=['GET'])
 def get(username, layername):
-    app.logger.info('GET Layer')
+    app.logger.info(f"GET Layer, user={g.user and g.user['name']}")
 
     # USER
     check_username(username)
@@ -31,7 +39,7 @@ def get(username, layername):
 
 @bp.route('/layers/<layername>', methods=['PATCH'])
 def patch(username, layername):
-    app.logger.info('PATCH Layer')
+    app.logger.info(f"PATCH Layer, user={g.user and g.user['name']}")
 
     # USER
     check_username(username)
@@ -144,7 +152,7 @@ def patch(username, layername):
 
 @bp.route('/layers/<layername>', methods=['DELETE'])
 def delete_layer(username, layername):
-    app.logger.info('DELETE Layer')
+    app.logger.info(f"DELETE Layer, user={g.user and g.user['name']}")
 
     # USER
     check_username(username)

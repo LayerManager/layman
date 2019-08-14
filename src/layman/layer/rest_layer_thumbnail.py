@@ -1,20 +1,28 @@
 import os
 
-from flask import Blueprint, send_file
-from flask import current_app as app
+from flask import Blueprint, send_file, current_app as app, g
 
 from layman.common.filesystem.util import get_user_dir
 from layman.http import LaymanError
 from layman.util import check_username
 from . import util
 from .filesystem import thumbnail
+from layman.authn import authenticate
+from layman.authz import authorize
 
 
 bp = Blueprint('rest_layer_thumbnail', __name__)
 
+@bp.before_request
+@authenticate
+@authorize
+def before_request():
+    pass
+
+
 @bp.route('/layers/<layername>/thumbnail', methods=['GET'])
 def get(username, layername):
-    app.logger.info('GET Layer Thumbnail')
+    app.logger.info(f"GET Layer Thumbnail, user={g.user and g.user['name']}")
 
     # USER
     check_username(username)

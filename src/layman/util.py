@@ -73,6 +73,13 @@ def get_publication_modules():
     return current_app.config[key]
 
 
+def get_authn_modules():
+    key = 'layman.authn_modules'
+    if key not in current_app.config:
+        current_app.config[key] = get_modules_from_names(settings.AUTHN_MODULES)
+    return current_app.config[key]
+
+
 def get_providers_from_source_names(source_names):
     provider_names = list(OrderedDict.fromkeys(map(
         lambda src: src[:src.rfind('.')],
@@ -91,7 +98,7 @@ def get_modules_from_names(module_names):
     return modules
 
 
-def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_calls=True):
+def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_calls=True, until=None):
     if args is None:
         args = []
     if kwargs is None:
@@ -113,6 +120,8 @@ def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_cal
             if k in fn.__code__.co_varnames
         })
         results.append(res)
+        if until is not None and until(res):
+            return results
 
     return results
 
