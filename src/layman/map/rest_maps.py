@@ -1,21 +1,29 @@
 import json
 import io
 
-from flask import Blueprint, jsonify, request, url_for
-from flask import current_app as app
+from flask import Blueprint, jsonify, request, url_for, current_app as app, g
 from werkzeug.datastructures import FileStorage
 
 from layman.http import LaymanError
 from layman.util import check_username
 from . import util
 from .filesystem import input_file, uuid
+from layman.authn import authenticate
+from layman.authz import authorize
 
 
 bp = Blueprint('rest_maps', __name__)
 
+@bp.before_request
+@authenticate
+@authorize
+def before_request():
+    pass
+
+
 @bp.route('/maps', methods=['GET'])
 def get(username):
-    app.logger.info('GET Maps')
+    app.logger.info(f"GET Maps, user={g.user and g.user['name']}")
 
     # USER
     check_username(username)
@@ -36,7 +44,7 @@ def get(username):
 
 @bp.route('/maps', methods=['POST'])
 def post(username):
-    app.logger.info('POST Maps')
+    app.logger.info(f"POST Maps, user={g.user and g.user['name']}")
 
     # USER
     check_username(username)

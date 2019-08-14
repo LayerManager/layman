@@ -1,17 +1,25 @@
-from flask import Blueprint, jsonify, request
-from flask import current_app as app
+from flask import Blueprint, jsonify, request, current_app as app, g
 
 from layman.http import LaymanError
 from layman.util import check_username
 from . import util
 from .filesystem import input_chunk
+from layman.authn import authenticate
+from layman.authz import authorize
 
 
 bp = Blueprint('rest_layer_chunk', __name__)
 
+@bp.before_request
+@authenticate
+@authorize
+def before_request():
+    pass
+
+
 @bp.route("/layers/<layername>/chunk", methods=['POST'])
 def post(username, layername):
-    app.logger.info('POST Layer Chunk')
+    app.logger.info(f"POST Layer Chunk, user={g.user and g.user['name']}")
 
     # USER
     check_username(username)
@@ -45,7 +53,7 @@ def post(username, layername):
 
 @bp.route("/layers/<layername>/chunk", methods=['GET'])
 def get(username, layername):
-    app.logger.info('GET Layer Chunk')
+    app.logger.info(f"GET Layer Chunk, user={g.user and g.user['name']}")
 
     chunk_number = request.args.get('resumableChunkNumber', default=1,
                                             type=int)

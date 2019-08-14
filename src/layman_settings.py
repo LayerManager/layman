@@ -70,6 +70,10 @@ PUBLICATION_MODULES = [
     'layman.map',
 ]
 
+AUTHN_MODULES = [
+    'layman.authn.url_path',
+]
+
 
 # UPLOAD_MAX_INACTIVITY_TIME = 10 # 10 seconds
 UPLOAD_MAX_INACTIVITY_TIME = 5 * 60 # 5 minutes

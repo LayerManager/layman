@@ -1,19 +1,28 @@
 import json
 import os
-from flask import Blueprint, jsonify, current_app as app
+from flask import Blueprint, jsonify, current_app as app, g
 
 from layman.http import LaymanError
 from layman.util import check_username
 from layman.common.filesystem.util import get_user_dir
 from . import util
+from layman.authn import authenticate
+from layman.authz import authorize
 
 
 bp = Blueprint('rest_map_file', __name__)
 
 
+@bp.before_request
+@authenticate
+@authorize
+def before_request():
+    pass
+
+
 @bp.route('/maps/<mapname>/file', methods=['GET'])
 def get(username, mapname):
-    app.logger.info('GET Map File')
+    app.logger.info(f"GET Map File, user={g.user and g.user['name']}")
 
     # USER
     check_username(username)
