@@ -104,17 +104,17 @@ def generate_map_thumbnail(username, mapname):
             e for e in entries
             if e['level'] != 'INFO' or (e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message'])
         ), None) is None and attempts < max_attempts:
-        # current_app.logger.info(f"waiting for entries")
+        current_app.logger.info(f"waiting for entries")
         time.sleep(0.5)
         attempts += 1
         entries = chrome.get_log('browser')
     if attempts >= max_attempts:
-        # current_app.logger.info(f"max attempts reach")
+        current_app.logger.info(f"max attempts reach")
         return
-    # for entry in entries:
-        # current_app.logger.info(f"browser entry {entry}")
+    for entry in entries:
+        current_app.logger.info(f"browser entry {entry}")
 
-    # chrome.save_screenshot(f'/code/tmp/{tmp_file_name}')
+    chrome.save_screenshot(f'/code/tmp/{username}.{mapname}.png')
     chrome.close()
     chrome.quit()
 
