@@ -11,6 +11,11 @@ from layman import settings
 
 USERNAME_RE = r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$"
 
+FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
+FLASK_PUBLICATION_TYPES_KEY = f'{__name__}:PUBLICATION_TYPES'
+FLASK_PUBLICATION_MODULES_KEY = f'{__name__}:PUBLICATION_MODULES'
+FLASK_AUTHN_MODULES_KEY = f'{__name__}:AUTHN_MODULES'
+
 
 def slugify(value):
     value = unidecode(value)
@@ -38,7 +43,7 @@ def check_username(username):
 
 
 def get_internal_providers():
-    key = 'layman.providers'
+    key = FLASK_PROVIDERS_KEY
     if key not in current_app.config:
         all_sources = []
         for publ_module in get_publication_modules():
@@ -49,7 +54,7 @@ def get_internal_providers():
 
 
 def get_publication_types():
-    key = 'layman.publication_types'
+    key = FLASK_PUBLICATION_TYPES_KEY
     if key not in current_app.config:
         all_types = {}
         for publ_module in get_publication_modules():
@@ -67,14 +72,14 @@ def get_blueprints():
 
 
 def get_publication_modules():
-    key = 'layman.publication_modules'
+    key = FLASK_PUBLICATION_MODULES_KEY
     if key not in current_app.config:
         current_app.config[key] = get_modules_from_names(settings.PUBLICATION_MODULES)
     return current_app.config[key]
 
 
 def get_authn_modules():
-    key = 'layman.authn_modules'
+    key = FLASK_AUTHN_MODULES_KEY
     if key not in current_app.config:
         current_app.config[key] = get_modules_from_names(settings.AUTHN_MODULES)
     return current_app.config[key]
