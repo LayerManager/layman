@@ -17,6 +17,7 @@
 
 | name | license | used by | env | bin or src | purpose |
 | --- | --- | --- | --- | --- | --- |
+| [openlayers](https://openlayers.org/) | BSD 2-Clause | package.json | prod | bin | |
 | [hslayers-ng](https://github.com/hslayers/hslayers-ng) | MIT | schema.draft-07.json | prod | src | |
 | [jsonschema](https://github.com/Julian/jsonschema) | MIT | Pipfile | prod | bin | |
 | [redis-py](https://github.com/andymccurdy/redis-py) | MIT | Pipfile | prod | bin | |

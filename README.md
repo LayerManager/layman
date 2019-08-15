@@ -1,27 +1,23 @@
-# gspld [![Build Status](https://travis-ci.org/jirik/gspld.svg?branch=master)](https://travis-ci.org/jirik/gspld)
-Publishing geospatial vector data online through [REST API](doc/rest.md).
-- Accepts SHP and GeoJSON data files and SLD styles for visualization
+# Layman
+[![Build Status](https://travis-ci.org/jirik/gspld.svg?branch=master)](https://travis-ci.org/jirik/gspld)
+
+Publishing geospatial data online through [REST API](doc/rest.md).
+
+- Two models available:
+  - [**layer**](doc/models.md#layer): visual representation of single vector dataset (i.e. ShapeFile or GeoJSON)
+  - [**map**](doc/models.md#layer): collection of layers
+- Accepts data in [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON), [ShapeFile](https://en.wikipedia.org/wiki/Shapefile), [Styled Layer Descriptor](https://www.opengeospatial.org/standards/sld), [Symbology Encoding](https://www.opengeospatial.org/standards/se), or [HSLayers Map Composition](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema) format
 - Even large files can be uploaded from browser
 - Asynchronous upload and processing
-- Provides URL endpoints:
-  - WMS (powered by GeoServer)
-  - WFS (powered by GeoServer)
-  - thumbnail
-- And other internal sources:
-  - input file saved in file system
-  - DB table with imported input file
-- Everything is automatically named and structured first by user name, second by layer name
-  - [REST API](doc/rest.md): `/rest/<username>/layers/<layername>` 
-  - file system: `/path/to/LAYMAN_DATA_DIR/users/<username>/layers/<layername>` 
-  - DB: `db=LAYMAN_PG_DBNAME, schema=<username>, table=<layername>` 
-  - WMS/WFS: `/geoserver/<username>/ows, layer=<layername>, style=<layername>` 
-- Simple rules
-  - one DB table per input file
-  - one WMS layer per DB table
-  - one WFS feature type per DB table
-  - one SLD style per WMS layer
+- Each vector dataset is automatically imported into PostGIS database
+- Provides URL endpoints
+  - [Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms)
+  - [Web Feature Service (WFS)](https://www.opengeospatial.org/standards/wfs)
+  - thumbnail image
+- Documented [REST API](doc/rest.md)
 - Configurable by environment variables
-- Standing on the shoulders of Docker, Python, Flask, PostgreSQL, PostGIS, GDAL, GeoServer, Celery, Redis, and [more](doc/dependencies.md).
+- Standing on the shoulders of Docker, Python, Flask, PostgreSQL, PostGIS, GDAL, GeoServer, OpenLayers, Celery, Redis, and [more](doc/dependencies.md)
+- Inspired by [CCSS-CZ/layman](https://github.com/CCSS-CZ/layman)
 
 ## Requirements
 - at least 3 GB RAM
@@ -45,7 +41,7 @@ make reset-layman-gs-datadir-dev
 ```
 
 ## Run
-Suitable for development only.
+Suitable for **development only**.
 ```bash
 # start dockerized layman, geoserver, postgresql, redis, celery worker, and flower 
 make start-layman-dev
@@ -60,7 +56,7 @@ layman       |  * Restarting with stat
 layman       |  * Debugger is active!
 layman       |  * Debugger PIN: 103-830-055
 ```
-Then visit [http://localhost:8000/](). You will see simple HTML form that enables to publish vector data file as new layer of WMS and WFS using [REST API](doc/rest.md). The form is for testing purpose only, the REST API is for production.
+Then visit [http://localhost:8000/](). You will see simple web client that interacts with [REST API](doc/rest.md).
 
 To stop running service, press Ctrl+C.
 
@@ -73,7 +69,9 @@ The most general configuration is found in `docker-compose.*.yml` files used as 
 - `docker-compose.production.yml` used for production (layman, redis, celery worker, flower)
 - `docker-compose.dependencies.yml` optionally used for production (GeoServer and PostgreSQL)
 
-Another part of settings is in `.env.*` files, also separate for development, testing, and production. See especially Layman settings and Flask settings. Remember layman is dockerized, so connection parameters such as host names and port numbers must be set according to docker-compose configuration. These settings are brought to python and extended by [layman_settings.py](src/layman_settings.py).
+Another part of settings is in `.env.*` files, also separately for development, testing, and production. See especially Layman settings and Flask settings. Remember layman is dockerized, so connection parameters such as host names and port numbers must be set according to docker-compose configuration.
+
+Settings from `.env.*` are brought to python and extended by [layman_settings.py](src/layman_settings.py).
 
 ## Test
 :warning: It will delete
