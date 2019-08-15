@@ -13,6 +13,9 @@ from . import get_layer_sources
 
 LAYERNAME_RE = USERNAME_RE
 
+FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
+FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
+
 
 def to_safe_layer_name(value):
     return to_safe_name(value, 'layer')
@@ -25,14 +28,14 @@ def check_layername(layername):
 
 
 def get_sources():
-    key = 'layman.layer.sources'
+    key = FLASK_SOURCES_KEY
     if key not in current_app.config:
         current_app.config[key] = get_modules_from_names(get_layer_sources())
     return current_app.config[key]
 
 
 def get_providers():
-    key = 'layman.layer.providers'
+    key = FLASK_PROVIDERS_KEY
     if key not in current_app.config:
         current_app.config[key] = get_providers_from_source_names(get_layer_sources())
     return current_app.config[key]

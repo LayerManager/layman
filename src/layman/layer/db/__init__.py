@@ -6,6 +6,9 @@ from layman.http import LaymanError
 from layman import settings
 
 
+FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
+
+
 def create_connection_cursor():
     try:
         connection = psycopg2.connect(settings.PG_CONN)
@@ -15,7 +18,7 @@ def create_connection_cursor():
     return (connection, cursor)
 
 def get_connection_cursor():
-    key = 'layman.postgresql.conn_cur'
+    key = FLASK_CONN_CUR_KEY
     if key not in g:
         conn_cur = create_connection_cursor()
         g.setdefault(key, conn_cur)
