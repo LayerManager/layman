@@ -3,6 +3,9 @@ import shutil
 import pytest
 import time
 
+import sys
+del sys.modules['layman']
+
 from layman import app as layman
 from layman.layer.filesystem.input_file import ensure_layer_input_file_dir
 from layman.layer.filesystem.util import get_layer_dir

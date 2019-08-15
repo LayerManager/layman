@@ -9,26 +9,50 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+import sys
+del sys.modules['layman']
+
 from layman.layer.filesystem import input_chunk
 from layman.layer import LAYER_TYPE
 from layman import app, settings
 from layman.uuid import check_redis_consistency
 
-PORT = 9002
 
+PORT = 8000
+
+num_layers_before_test = 0
 
 @pytest.fixture(scope="module")
-def flask_server():
+def client():
+
+    # print('before app.test_client()')
+    client = app.test_client()
+
+    # print('before Process(target=app.run, kwargs={...')
     server = Process(target=app.run, kwargs={
         'host': '0.0.0.0',
         'port': PORT,
         'debug': False,
     })
-    # print('START FLASK SERVER')
+    # print('before server.start()')
     server.start()
-    yield server
-    # print('STOP FLASK SERVER')
+    time.sleep(1)
+
+    app.config['TESTING'] = True
+    app.config['DEBUG'] = True
+    app.config['SERVER_NAME'] = f'layman_test:{PORT}'
+    app.config['SESSION_COOKIE_DOMAIN'] = f'layman_test:{PORT}'
+
+    # print('before app.app_context()')
+    with app.app_context() as ctx:
+        publs_by_type = check_redis_consistency()
+        global num_layers_before_test
+        num_layers_before_test = len(publs_by_type[LAYER_TYPE])
+        yield client
+
+    # print('before server.terminate()')
     server.terminate()
+    # print('before server.join()')
     server.join()
 
 
@@ -45,17 +69,14 @@ def chrome():
     )
     chrome.set_window_size(1000,2000)
     yield chrome
-    # print('STOP FLASK SERVER')
     chrome.close()
     chrome.quit()
 
 
-@pytest.mark.usefixtures("flask_server")
-def test_post_layers_chunk(chrome):
-    with app.app_context():
-        check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': 4
-        })
+def test_post_layers_chunk(client, chrome):
+    check_redis_consistency(expected_publ_num_by_type={
+        f'{LAYER_TYPE}': num_layers_before_test
+    })
 
     username = 'testuser1'
     layername = 'country_chunks'
@@ -131,14 +152,12 @@ def test_post_layers_chunk(chrome):
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(username, layername)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
 
-    with app.app_context():
-        check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': 5
-        })
+    check_redis_consistency(expected_publ_num_by_type={
+        f'{LAYER_TYPE}': num_layers_before_test + 1
+    })
 
 
-@pytest.mark.usefixtures("flask_server")
-def test_patch_layer_chunk(chrome):
+def test_patch_layer_chunk(client, chrome):
     username = 'testuser1'
     layername = 'country_chunks'
 
@@ -224,8 +243,7 @@ def test_patch_layer_chunk(chrome):
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(username, layername)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
 
-    with app.app_context():
-        check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': 5
-        })
+    check_redis_consistency(expected_publ_num_by_type={
+        f'{LAYER_TYPE}': num_layers_before_test + 1
+    })
 

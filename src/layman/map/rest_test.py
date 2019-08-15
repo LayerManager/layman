@@ -7,6 +7,9 @@ from multiprocessing import Process
 import pytest
 from flask import url_for
 
+import sys
+del sys.modules['layman']
+
 from . import MAP_TYPE
 from layman import app
 from layman import uuid
@@ -14,6 +17,9 @@ from layman.map.filesystem import uuid as map_uuid
 
 
 PORT = 8000
+
+num_maps_before_test = 0
+
 
 @pytest.fixture(scope="module")
 def client():
@@ -37,6 +43,9 @@ def client():
 
     # print('before app.app_context()')
     with app.app_context() as ctx:
+        publs_by_type = uuid.check_redis_consistency()
+        global num_maps_before_test
+        num_maps_before_test = len(publs_by_type[MAP_TYPE])
         yield client
 
     # print('before server.terminate()')
@@ -52,7 +61,7 @@ def test_get_maps_empty(client):
     assert rv.status_code==200
     assert len(resp_json) == 0
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{MAP_TYPE}': 0
+        f'{MAP_TYPE}': num_maps_before_test + 0
     })
 
 
@@ -115,7 +124,7 @@ def test_post_maps_invalid_json(client):
         for fp in files:
             fp[0].close()
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{MAP_TYPE}': 0
+        f'{MAP_TYPE}': num_maps_before_test + 0
     })
 
 
@@ -149,7 +158,7 @@ def test_post_maps_simple(client):
     assert uuid.is_valid_uuid(uuid_str)
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{MAP_TYPE}': 1
+        f'{MAP_TYPE}': num_maps_before_test + 1
     })
 
     rv = client.get(url_for('rest_map.get', username=username, mapname=mapname))
@@ -218,7 +227,7 @@ def test_post_maps_complex(client):
         for fp in files:
             fp[0].close()
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{MAP_TYPE}': 2
+        f'{MAP_TYPE}': num_maps_before_test + 2
     })
 
     rv = client.get(url_for('rest_map.get', username=username, mapname=mapname))
@@ -300,7 +309,7 @@ def test_patch_map(client):
             fp[0].close()
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{MAP_TYPE}': 2
+        f'{MAP_TYPE}': num_maps_before_test + 2
     })
 
     assert resp_json['uuid'] == uuid_str
@@ -362,7 +371,7 @@ def test_patch_map(client):
     assert resp_json['description'] == "Nový popis"
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{MAP_TYPE}': 2
+        f'{MAP_TYPE}': num_maps_before_test + 2
     })
 
 
@@ -374,7 +383,7 @@ def test_delete_map(client):
     assert rv.status_code == 200
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{MAP_TYPE}': 1
+        f'{MAP_TYPE}': num_maps_before_test + 1
     })
 
     rest_path = url_for('rest_map.delete_map', username=username, mapname=mapname)
@@ -384,7 +393,7 @@ def test_delete_map(client):
     assert resp_json['code'] == 26
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{MAP_TYPE}': 1
+        f'{MAP_TYPE}': num_maps_before_test + 1
     })
 
 
@@ -488,3 +497,7 @@ def test_map_composed_from_local_layers(client):
     assert 'status' not in thumbnail
     assert 'path' in thumbnail
     assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
+
+    uuid.check_redis_consistency(expected_publ_num_by_type={
+        f'{MAP_TYPE}': num_maps_before_test + 2
+    })
