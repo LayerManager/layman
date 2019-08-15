@@ -1,3 +1,4 @@
+from collections import defaultdict
 from uuid import UUID, uuid4
 
 from flask import current_app
@@ -169,10 +170,15 @@ def check_redis_consistency(expected_publ_num_by_type=None):
     user_publ_keys = redis.keys(':'.join(USER_TYPE_NAMES_KEY.split(':')[:2])+':*')
     uuid_keys = redis.keys(':'.join(UUID_METADATA_KEY.split(':')[:2])+':*')
     assert num_total_publs == len(uuid_keys), f"total_publs: {total_publs}"
+
+    total_publs_by_type = defaultdict(list)
+    for publ in total_publs:
+        total_publs_by_type[publ[1]].append((publ[0], publ[2]))
+
     if expected_publ_num_by_type is not None:
         for publ_type, publ_num in expected_publ_num_by_type.items():
-            publs = [p for p in total_publs if p[1] == publ_type]
-            assert publ_num == len(publs), f"expected {publ_num} {publ_type}, found {len(publs)}: {total_publs}"
+            found_publ_num = len(total_publs_by_type[publ_type])
+            assert publ_num == found_publ_num, f"expected {publ_num} of {publ_type}, found {found_publ_num}: {total_publs}"
 
     num_publ = 0
     for user_publ_key in user_publ_keys:
@@ -194,4 +200,4 @@ def check_redis_consistency(expected_publ_num_by_type=None):
             ),
             uuid_dict['publication_name'],
         )
-
+    return total_publs_by_type

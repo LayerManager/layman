@@ -9,12 +9,17 @@ from urllib.parse import urljoin
 import pytest
 from flask import url_for
 
+import sys
+del sys.modules['layman']
+
 from . import util, LAYER_TYPE
 from .geoserver.util import get_feature_type, wms_proxy
 from layman import app as app
 from layman import settings
 from layman.layer.filesystem import uuid as layer_uuid
 from layman import uuid, util as layman_util
+from .geoserver import pop_cache as pop_geoserver_cache
+
 
 min_geojson = """
 {
@@ -25,6 +30,9 @@ min_geojson = """
 """
 
 PORT = 8000
+
+num_layers_before_test = 0
+
 
 @pytest.fixture(scope="module")
 def client():
@@ -48,6 +56,10 @@ def client():
 
     # print('before app.app_context()')
     with app.app_context() as ctx:
+        publs_by_type = uuid.check_redis_consistency()
+        global num_layers_before_test
+        num_layers_before_test = len(publs_by_type[LAYER_TYPE])
+        print(f'fixture client num_layers_before_test={num_layers_before_test}')
         yield client
 
     # print('before server.terminate()')
@@ -137,14 +149,14 @@ def test_layername_db_object_conflict(client):
             fp[0].close()
 
 
-def test_get_layers_empty(client):
+def test_get_layers_testuser1_v1(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username))
-    resp_json = rv.get_json()
     assert rv.status_code==200
-    assert len(resp_json) == 0
+    # resp_json = rv.get_json()
+    # assert len(resp_json) == 0
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 0
+        f'{LAYER_TYPE}': num_layers_before_test + 0
     })
 
 
@@ -177,6 +189,7 @@ def test_post_layers_simple(client):
             assert 'status' in layer_info[key_to_check]
 
     last_task['last'].get()
+    pop_geoserver_cache(username)
 
     layer_info = util.get_layer_info(username, layername)
     for key_to_check in keys_to_check:
@@ -204,7 +217,7 @@ def test_post_layers_simple(client):
     )
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 1
+        f'{LAYER_TYPE}': num_layers_before_test + 1
     })
 
 
@@ -245,7 +258,7 @@ def test_post_layers_concurrent(client):
         for fp in files:
             fp[0].close()
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 2
+        f'{LAYER_TYPE}': num_layers_before_test + 2
     })
 
 
@@ -276,7 +289,7 @@ def test_post_layers_shp_missing_extensions(client):
         for fp in files:
             fp[0].close()
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 2
+        f'{LAYER_TYPE}': num_layers_before_test + 2
     })
 
 
@@ -315,7 +328,7 @@ def test_post_layers_shp(client):
     wms = wms_proxy(wms_url)
     assert 'ne_110m_admin_0_countries_shp' in wms.contents
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 3
+        f'{LAYER_TYPE}': num_layers_before_test + 3
     })
 
 
@@ -340,7 +353,7 @@ def test_post_layers_layer_exists(client):
         for fp in files:
             fp[0].close()
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 3
+        f'{LAYER_TYPE}': num_layers_before_test + 3
     })
 
 def test_post_layers_complex(client):
@@ -418,21 +431,23 @@ def test_post_layers_complex(client):
         a for a in attributes if a['name'] == 'sovereignt'
     ), None) is not None
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 4
+        f'{LAYER_TYPE}': num_layers_before_test + 4
     })
 
 
-def test_get_layers(client):
+def test_get_layers_testuser1_v2(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username))
-    resp_json = rv.get_json()
     assert rv.status_code==200
-    assert len(resp_json) == 3
-    assert sorted(map(lambda l: l['name'], resp_json)) == [
+    resp_json = rv.get_json()
+    # assert len(resp_json) == 3
+    layernames = [l['name'] for l in resp_json]
+    for ln in [
         'countries_concurrent',
         'ne_110m_admin_0_countries',
         'ne_110m_admin_0_countries_shp'
-    ]
+    ]:
+        assert ln in layernames
 
     username = 'testuser2'
     rv = client.get(url_for('rest_layers.get', username=username))
@@ -442,7 +457,7 @@ def test_get_layers(client):
     assert resp_json[0]['name'] == 'countries'
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 4
+        f'{LAYER_TYPE}': num_layers_before_test + 4
     })
 
 
@@ -463,7 +478,7 @@ def test_patch_layer_title(client):
     assert resp_json['title'] == "New Title of Countries"
     assert resp_json['description'] == "and new description"
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 4
+        f'{LAYER_TYPE}': num_layers_before_test + 4
     })
 
 
@@ -497,7 +512,7 @@ def test_patch_layer_style(client):
     assert wms[layername].styles[
         username+':'+layername]['title'] == 'Generic Blue'
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 4
+        f'{LAYER_TYPE}': num_layers_before_test + 4
     })
 
 
@@ -554,14 +569,14 @@ def test_post_layers_sld_1_1_0(client):
     #     username+':'+layername]['title'] == 'test_layer2'
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 5
+        f'{LAYER_TYPE}': num_layers_before_test + 5
     })
 
     rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
     rv = client.delete(rest_path)
     assert rv.status_code == 200
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 4
+        f'{LAYER_TYPE}': num_layers_before_test + 4
     })
 
 
@@ -610,7 +625,7 @@ def test_patch_layer_data(client):
         a for a in attributes if a['name'] == 'adm0cap'
     ), None) is not None
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 4
+        f'{LAYER_TYPE}': num_layers_before_test + 4
     })
 
 
@@ -640,7 +655,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
         for fp in files:
             fp[0].close()
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 4
+        f'{LAYER_TYPE}': num_layers_before_test + 4
     })
 
     last_task = util._get_layer_last_task(username, layername)
@@ -659,7 +674,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
         for fp in files:
             fp[0].close()
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 4
+        f'{LAYER_TYPE}': num_layers_before_test + 4
     })
 
     rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
@@ -678,7 +693,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
         layername
     )
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 3
+        f'{LAYER_TYPE}': num_layers_before_test + 3
     })
 
 
@@ -716,7 +731,7 @@ def test_post_layers_long_and_delete_it(client):
     rv = client.delete(rest_path)
     assert rv.status_code == 200
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 3
+        f'{LAYER_TYPE}': num_layers_before_test + 3
     })
 
 
@@ -727,7 +742,7 @@ def test_delete_layer(client):
     rv = client.delete(rest_path)
     assert rv.status_code == 200
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 2
+        f'{LAYER_TYPE}': num_layers_before_test + 2
     })
 
     rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
@@ -769,18 +784,18 @@ def test_post_layers_zero_length_attribute(client):
     rv = client.delete(rest_path)
     assert rv.status_code == 200
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 2
+        f'{LAYER_TYPE}': num_layers_before_test + 2
     })
 
 
-def test_get_layers_empty_again(client):
+def test_get_layers_testuser2(client):
     username = 'testuser2'
     rv = client.get(url_for('rest_layers.get', username=username))
-    resp_json = rv.get_json()
     assert rv.status_code==200
+    resp_json = rv.get_json()
     assert len(resp_json) == 0
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': 2
+        f'{LAYER_TYPE}': num_layers_before_test + 2
     })
 
 
