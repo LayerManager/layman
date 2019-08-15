@@ -1,20 +1,19 @@
 import importlib
 import re
-from collections import OrderedDict
 import unicodedata
+from collections import OrderedDict
 
 from flask import current_app
 from unidecode import unidecode
 
-from layman.http import LaymanError
 from layman import settings
+from layman.http import LaymanError
 
 USERNAME_RE = r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$"
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_PUBLICATION_TYPES_KEY = f'{__name__}:PUBLICATION_TYPES'
 FLASK_PUBLICATION_MODULES_KEY = f'{__name__}:PUBLICATION_MODULES'
-FLASK_AUTHN_MODULES_KEY = f'{__name__}:AUTHN_MODULES'
 
 
 def slugify(value):
@@ -75,13 +74,6 @@ def get_publication_modules():
     key = FLASK_PUBLICATION_MODULES_KEY
     if key not in current_app.config:
         current_app.config[key] = get_modules_from_names(settings.PUBLICATION_MODULES)
-    return current_app.config[key]
-
-
-def get_authn_modules():
-    key = FLASK_AUTHN_MODULES_KEY
-    if key not in current_app.config:
-        current_app.config[key] = get_modules_from_names(settings.AUTHN_MODULES)
     return current_app.config[key]
 
 

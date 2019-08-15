@@ -20,7 +20,7 @@ for bp in get_blueprints():
 
 
 # load UUIDs only once
-if not settings.IS_CELERY_WORKER and os.getenv('LAYMAN_SKIP_REDIS_LOADING', 'false') != 'true':
+if not settings.IS_CELERY_WORKER and os.getenv('LAYMAN_SKIP_REDIS_LOADING', 'false').lower() != 'true':
     os.environ['LAYMAN_SKIP_REDIS_LOADING'] = 'true'
     with app.app_context():
         from .uuid import import_uuids_to_redis
