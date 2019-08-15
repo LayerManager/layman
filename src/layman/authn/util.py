@@ -11,14 +11,14 @@ def authenticate(f):
     def decorated_function(*args, **kwargs):
         # print(f"authenticate ARGS {args} KWARGS {kwargs}")
         authn_modules = get_authn_modules()
-        if len(authn_modules) == 0:
-            raise Exception('At least one authentication module must be set (see AUTHN_MODULES).')
         results = call_modules_fn(authn_modules, 'authenticate', until=lambda r: r is not None)
-        authenticated = results[-1] is not None
+        authenticated = len(results)>0 and results[-1] is not None
         if authenticated:
             authn_module = authn_modules[len(results) - 1]
             g.user['AUTHN_MODULE'] = authn_module.__name__
         #     TODO also read user's profile
+        else:
+            g.user = None
         return f(*args, **kwargs)
     return decorated_function
 

@@ -28,8 +28,5 @@ if ! [ -f $ne_110m_cultural_populated_places ]; then
   curl -L -o $ne_110m_cultural_populated_places "https://github.com/nvkelso/natural-earth-vector/raw/master/geojson/ne_110m_populated_places.geojson"
 fi
 
-#python3 src/clear_layman_data.py && && python3 -m pytest -svv
-#python3 src/clear_layman_data.py && python3 -m pytest -svv -k "not client_test" && python3 -m pytest -svv -k "client_test"
-#python3 src/clear_layman_data.py && python3 -m pytest -vv -k "not client_test" && python3 -m pytest -vv -k "client_test"
-#python3 src/clear_layman_data.py && python3 -m pytest -svv -k "rest_test"
+#python3 src/clear_layman_data.py && python3 -m pytest -svv src/layman/layer/rest_test.py::test_get_layers_testuser1_v1
 python3 src/clear_layman_data.py && python3 -m pytest -vv
