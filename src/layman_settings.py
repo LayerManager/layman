@@ -71,8 +71,9 @@ PUBLICATION_MODULES = [
 ]
 
 AUTHN_MODULES = [
-    'layman.authn.url_path',
 ]
+
+AUTHZ_MODULE = os.environ['LAYMAN_AUTHZ_MODULE']
 
 
 # UPLOAD_MAX_INACTIVITY_TIME = 10 # 10 seconds
