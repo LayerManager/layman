@@ -59,7 +59,6 @@ def client():
         publs_by_type = uuid.check_redis_consistency()
         global num_layers_before_test
         num_layers_before_test = len(publs_by_type[LAYER_TYPE])
-        print(f'fixture client num_layers_before_test={num_layers_before_test}')
         yield client
 
     # print('before server.terminate()')
