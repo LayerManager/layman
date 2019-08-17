@@ -37,8 +37,8 @@ def delete_layer(username, layername):
             }
         )
         r.raise_for_status()
-        g.pop(wms.get_flask_proxy_key(username), None)
-        g.pop(wfs.get_flask_proxy_key(username), None)
+        wfs.clear_cache(username)
+        wms.clear_cache(username)
         return {
             'sld': {
                 'file': sld_file

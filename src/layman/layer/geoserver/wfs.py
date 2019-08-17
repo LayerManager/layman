@@ -10,6 +10,7 @@ from .util import get_gs_proxy_base_url
 from . import headers_json
 from . import wms
 from layman import settings
+from layman.cache import mem_redis
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
 
@@ -45,8 +46,8 @@ def update_layer(username, layername, layerinfo):
         auth=settings.LAYMAN_GS_AUTH
     )
     r.raise_for_status()
-    g.pop(get_flask_proxy_key(username), None)
-    g.pop(wms.get_flask_proxy_key(username), None)
+    clear_cache(username)
+    wms.clear_cache(username)
 
 
 def delete_layer(username, layername):
@@ -62,19 +63,37 @@ def delete_layer(username, layername):
             }
         )
         r.raise_for_status()
-        g.pop(get_flask_proxy_key(username), None)
-        g.pop(wms.get_flask_proxy_key(username), None)
+        clear_cache(username)
+        wms.clear_cache(username)
     return {}
 
 
 def get_wfs_proxy(username):
     key = get_flask_proxy_key(username)
-    if key not in g:
-        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
-        from .util import wms_proxy
-        wms_proxy = wms_proxy(wms_url)
-        g.setdefault(key, wms_proxy)
-    return g.get(key)
+
+    ows_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+    def create_string_value():
+        r = requests.get(ows_url, params={
+            'SERVICE': 'WFS',
+            'REQUEST': 'GetCapabilities',
+            'VERSION': '1.0.0',
+        })
+        r.raise_for_status()
+        return r.text
+
+    def mem_value_from_string_value(string_value):
+        from .util import wfs_proxy
+        wfs_proxy = wfs_proxy(ows_url, xml=string_value)
+        return wfs_proxy
+
+    wfs_proxy = mem_redis.get(key, create_string_value, mem_value_from_string_value)
+
+    return wfs_proxy
+
+
+def clear_cache(username):
+    key = get_flask_proxy_key(username)
+    mem_redis.delete(key)
 
 
 def get_layer_info(username, layername):
@@ -82,14 +101,17 @@ def get_layer_info(username, layername):
         wfs = get_wfs_proxy(username)
         wfs_proxy_url = urljoin(get_gs_proxy_base_url(), username + '/ows')
 
+        wfs_layername = f"{username}:{layername}"
         return {
-            'title': wfs.contents[layername].title,
-            'description': wfs.contents[layername].abstract,
+            'title': wfs.contents[wfs_layername].title,
+            'description': wfs.contents[wfs_layername].abstract,
             'wfs': {
                 'url': wfs_proxy_url
             },
         }
     except:
+        current_app.logger.info('Exception during WFS.get_layer_info')
+        # traceback.print_exc()
         return {}
 
 
@@ -97,8 +119,14 @@ def get_layer_names(username):
     try:
         wfs = get_wfs_proxy(username)
 
-        return [*wfs.contents]
+        return [
+            wfs_layername.split(':')[1]
+            for wfs_layername in [*wfs.contents]
+        ]
     except:
+        # TODO remove except:, handle raise_for_status in better way
+        current_app.logger.info('Exception during WFS.get_layer_names')
+        # traceback.print_exc()
         return []
 
 

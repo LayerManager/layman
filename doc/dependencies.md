@@ -22,6 +22,7 @@
 | [jsonschema](https://github.com/Julian/jsonschema) | MIT | Pipfile | prod | bin | |
 | [redis-py](https://github.com/andymccurdy/redis-py) | MIT | Pipfile | prod | bin | |
 | [owslib](https://github.com/geopython/OWSLib) | BSD 3-Clause | Pipfile | prod | bin | |
+| [cacheout](https://github.com/dgilland/cacheout) | MIT | Pipfile | prod | bin | |
 | [requests](http://python-requests.org) | Apache License 2.0 | Pipfile | prod | bin | |
 | [psycopg2-binary](https://github.com/psycopg/psycopg2) | GNU LGPL | Pipfile | prod | bin | |
 | [unidecode](https://github.com/avian2/unidecode) | GNU GPL v2 | Pipfile | prod | bin | |

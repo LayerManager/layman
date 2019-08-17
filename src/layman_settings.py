@@ -79,6 +79,9 @@ AUTHZ_MODULE = os.environ['LAYMAN_AUTHZ_MODULE']
 # UPLOAD_MAX_INACTIVITY_TIME = 10 # 10 seconds
 UPLOAD_MAX_INACTIVITY_TIME = 5 * 60 # 5 minutes
 
+# max time (in seconds) to cache GeoServer's requests like WMS capabilities
+LAYMAN_CACHE_GS_TIMEOUT = 1 * 60 # 1 minute
+
 LAYMAN_REDIS_URL = os.environ['LAYMAN_REDIS_URL']
 import redis
 LAYMAN_REDIS = redis.Redis.from_url(LAYMAN_REDIS_URL, encoding="utf-8", decode_responses=True)
