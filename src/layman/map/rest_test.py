@@ -398,6 +398,7 @@ def test_delete_map(client):
 
 
 def test_map_composed_from_local_layers(client):
+    # TODO failing
     username = 'testuser1'
     rest_path = url_for('rest_layers.post', username=username)
 

@@ -40,22 +40,25 @@ def get(key, create_string_value, mem_value_from_string_value):
                 else:
                     refresh_mem = True
                     redis_value = create_string_value()
-                    value = mem_value_from_string_value(redis_value)
-                    hash = hashlib.md5(redis_value.encode('utf-8')).hexdigest()
-                    redis_obj = {
-                        'hash': hash,
-                        'value': redis_value,
-                    }
-                    pipe.multi()
-                    pipe.hmset(key, redis_obj)
-                    pipe.expire(key, settings.LAYMAN_CACHE_GS_TIMEOUT)
+                    if redis_value is not None:
+                        value = mem_value_from_string_value(redis_value)
+                        hash = hashlib.md5(redis_value.encode('utf-8')).hexdigest()
+                        redis_obj = {
+                            'hash': hash,
+                            'value': redis_value,
+                        }
+                        pipe.multi()
+                        pipe.hmset(key, redis_obj)
+                        pipe.expire(key, settings.LAYMAN_CACHE_GS_TIMEOUT)
 
                 pipe.execute()
                 break
             except WatchError:
                 continue
 
-    if refresh_mem or value != mem_value or hash != mem_hash:
+    if value is None:
+        MEM_CACHE.delete(key)
+    elif refresh_mem or value != mem_value or hash != mem_hash:
         mem_obj = {
             'hash': hash,
             'value': value,

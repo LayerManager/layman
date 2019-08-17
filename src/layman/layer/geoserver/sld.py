@@ -1,5 +1,6 @@
 import io
 import json
+import traceback
 from urllib.parse import urljoin
 import xml.etree.ElementTree as ET
 
@@ -44,8 +45,9 @@ def delete_layer(username, layername):
                 'file': sld_file
             }
         }
+    # TODO remove except Exception:, handle 404 in better way
     except Exception:
-        # traceback.print_exc()
+        traceback.print_exc()
         pass
     return {}
 

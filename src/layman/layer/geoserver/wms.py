@@ -25,20 +25,18 @@ def update_layer(username, layername, layerinfo):
 
 
 def delete_layer(username, layername):
-    info = get_layer_info(username, layername)
-    if info:
-        r = requests.delete(
-            urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username +
-                    '/layers/' + layername),
-            headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH,
-            params = {
-                'recurse': 'true'
-            }
-        )
-        # app.logger.info(r.text)
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username +
+                '/layers/' + layername),
+        headers=headers_json,
+        auth=settings.LAYMAN_GS_AUTH,
+        params = {
+            'recurse': 'true'
+        }
+    )
+    if r.status_code != 404:
         r.raise_for_status()
-        clear_cache(username)
+    clear_cache(username)
     return {}
 
 
@@ -52,8 +50,14 @@ def get_wms_proxy(username):
             'REQUEST': 'GetCapabilities',
             'VERSION': '1.1.1',
         })
-        r.raise_for_status()
-        return r.text
+        if r.status_code != 200:
+            result = None
+            if r.status_code != 404:
+                r.raise_for_status()
+                raise Exception(f'Status code = {r.status_code}')
+        else:
+            result = r.text
+        return result
 
     def mem_value_from_string_value(string_value):
         from .util import wms_proxy
@@ -70,34 +74,28 @@ def clear_cache(username):
 
 
 def get_layer_info(username, layername):
-
-    try:
-        wms = get_wms_proxy(username)
-        wms_proxy_url = urljoin(get_gs_proxy_base_url(), username + '/ows')
-
-        return {
-            'title': wms.contents[layername].title,
-            'description': wms.contents[layername].abstract,
-            'wms': {
-                'url': wms_proxy_url
-            },
-        }
-    except:
-        current_app.logger.info('Exception during WMS.get_layer_info')
-        # traceback.print_exc()
+    wms = get_wms_proxy(username)
+    if wms is None:
         return {}
+    wms_proxy_url = urljoin(get_gs_proxy_base_url(), username + '/ows')
+
+    if layername not in wms.contents:
+        return {}
+    return {
+        'title': wms.contents[layername].title,
+        'description': wms.contents[layername].abstract,
+        'wms': {
+            'url': wms_proxy_url
+        },
+    }
 
 
 def get_layer_names(username):
-    try:
-        wms = get_wms_proxy(username)
-
-        return [*wms.contents]
-    except:
-        # TODO remove except:, handle raise_for_status in better way
-        current_app.logger.info('Exception during WMS.get_layer_names')
-        # traceback.print_exc()
+    wms = get_wms_proxy(username)
+    if wms is None:
         return []
+
+    return [*wms.contents]
 
 
 def get_publication_names(username, publication_type):

@@ -51,20 +51,19 @@ def update_layer(username, layername, layerinfo):
 
 
 def delete_layer(username, layername):
-    info = get_layer_info(username, layername)
-    if info:
-        r = requests.delete(
-            urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                    username + '/datastores/postgresql/featuretypes/' + layername),
-            headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH,
-            params = {
-                'recurse': 'true'
-            }
-        )
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                username + '/datastores/postgresql/featuretypes/' + layername),
+        headers=headers_json,
+        auth=settings.LAYMAN_GS_AUTH,
+        params = {
+            'recurse': 'true'
+        }
+    )
+    if r.status_code != 404:
         r.raise_for_status()
-        clear_cache(username)
-        wms.clear_cache(username)
+    clear_cache(username)
+    wms.clear_cache(username)
     return {}
 
 
@@ -78,8 +77,14 @@ def get_wfs_proxy(username):
             'REQUEST': 'GetCapabilities',
             'VERSION': '1.0.0',
         })
-        r.raise_for_status()
-        return r.text
+        if r.status_code != 200:
+            result = None
+            if r.status_code != 404:
+                r.raise_for_status()
+                raise Exception(f'Status code = {r.status_code}')
+        else:
+            result = r.text
+        return result
 
     def mem_value_from_string_value(string_value):
         from .util import wfs_proxy
@@ -97,37 +102,32 @@ def clear_cache(username):
 
 
 def get_layer_info(username, layername):
-    try:
-        wfs = get_wfs_proxy(username)
-        wfs_proxy_url = urljoin(get_gs_proxy_base_url(), username + '/ows')
-
-        wfs_layername = f"{username}:{layername}"
-        return {
-            'title': wfs.contents[wfs_layername].title,
-            'description': wfs.contents[wfs_layername].abstract,
-            'wfs': {
-                'url': wfs_proxy_url
-            },
-        }
-    except:
-        current_app.logger.info('Exception during WFS.get_layer_info')
-        # traceback.print_exc()
+    wfs = get_wfs_proxy(username)
+    if wfs is None:
         return {}
+    wfs_proxy_url = urljoin(get_gs_proxy_base_url(), username + '/ows')
+
+    wfs_layername = f"{username}:{layername}"
+    if wfs_layername not in wfs.contents:
+        return {}
+    return {
+        'title': wfs.contents[wfs_layername].title,
+        'description': wfs.contents[wfs_layername].abstract,
+        'wfs': {
+            'url': wfs_proxy_url
+        },
+    }
 
 
 def get_layer_names(username):
-    try:
-        wfs = get_wfs_proxy(username)
-
-        return [
-            wfs_layername.split(':')[1]
-            for wfs_layername in [*wfs.contents]
-        ]
-    except:
-        # TODO remove except:, handle raise_for_status in better way
-        current_app.logger.info('Exception during WFS.get_layer_names')
-        # traceback.print_exc()
+    wfs = get_wfs_proxy(username)
+    if wfs is None:
         return []
+
+    return [
+        wfs_layername.split(':')[1]
+        for wfs_layername in [*wfs.contents]
+    ]
 
 
 def get_publication_names(username, publication_type):
