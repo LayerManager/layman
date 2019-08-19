@@ -8,8 +8,8 @@ from .mem import CACHE as MEM_CACHE
 def get(key, create_string_value, mem_value_from_string_value):
     mem_hash = None
     mem_value = None
-    if key in MEM_CACHE:
-        mem_obj = MEM_CACHE.get(key)
+    mem_obj = MEM_CACHE.get(key)
+    if mem_obj is not None:
         mem_hash = mem_obj['hash']
         mem_value = mem_obj['value']
 
