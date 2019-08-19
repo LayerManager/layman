@@ -64,7 +64,13 @@ def get_wms_proxy(username):
         wms_proxy = wms_proxy(ows_url, xml=string_value)
         return wms_proxy
 
-    wms_proxy = mem_redis.get(key, create_string_value, mem_value_from_string_value)
+    def currently_changing():
+        from layman.celery import is_task_running
+        from .tasks import PUBLISH_LAYER_FROM_DB_NAME
+        result = is_task_running(PUBLISH_LAYER_FROM_DB_NAME, username)
+        return result
+
+    wms_proxy = mem_redis.get(key, create_string_value, mem_value_from_string_value, currently_changing)
     return wms_proxy
 
 
@@ -93,9 +99,11 @@ def get_layer_info(username, layername):
 def get_layer_names(username):
     wms = get_wms_proxy(username)
     if wms is None:
-        return []
+        result = []
+    else:
+        result = [*wms.contents]
 
-    return [*wms.contents]
+    return result
 
 
 def get_publication_names(username, publication_type):

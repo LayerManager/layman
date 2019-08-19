@@ -1,3 +1,4 @@
+from flask import g, current_app
 import hashlib
 from redis import WatchError
 
@@ -5,7 +6,8 @@ from layman import settings
 from .mem import CACHE as MEM_CACHE
 
 
-def get(key, create_string_value, mem_value_from_string_value):
+def get(key, create_string_value, mem_value_from_string_value, currently_changing):
+    cache_results = True
     mem_hash = None
     mem_value = None
     mem_obj = MEM_CACHE.get(key)
@@ -39,24 +41,27 @@ def get(key, create_string_value, mem_value_from_string_value):
                         hash = redis_hash
                 else:
                     refresh_mem = True
+                    cache_results = cache_results and not currently_changing()
                     redis_value = create_string_value()
                     if redis_value is not None:
                         value = mem_value_from_string_value(redis_value)
                         hash = hashlib.md5(redis_value.encode('utf-8')).hexdigest()
-                        redis_obj = {
-                            'hash': hash,
-                            'value': redis_value,
-                        }
-                        pipe.multi()
-                        pipe.hmset(key, redis_obj)
-                        pipe.expire(key, settings.LAYMAN_CACHE_GS_TIMEOUT)
+                        cache_results = cache_results and not currently_changing()
+                        if cache_results:
+                            redis_obj = {
+                                'hash': hash,
+                                'value': redis_value,
+                            }
+                            pipe.multi()
+                            pipe.hmset(key, redis_obj)
+                            pipe.expire(key, settings.LAYMAN_CACHE_GS_TIMEOUT)
 
                 pipe.execute()
                 break
             except WatchError:
                 continue
 
-    if value is None:
+    if value is None or not cache_results:
         MEM_CACHE.delete(key)
     elif refresh_mem or value != mem_value or hash != mem_hash:
         mem_obj = {
