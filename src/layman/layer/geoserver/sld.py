@@ -21,33 +21,33 @@ def update_layer(username, layername, layerinfo):
 def delete_layer(username, layername):
     style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
                     username + '/styles/' + layername)
-    try:
-        r = requests.get(style_url + '.sld',
-            auth=settings.LAYMAN_GS_AUTH
-        )
+    r = requests.get(style_url + '.sld',
+        auth=settings.LAYMAN_GS_AUTH
+    )
+    if r.status_code == 404:
+        return {}
+    else:
         r.raise_for_status()
-        sld_file = io.BytesIO(r.content)
+    sld_file = io.BytesIO(r.content)
 
-        r = requests.delete(style_url,
-            headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH,
-            params = {
-                'purge': 'true',
-                'recurse': 'true',
-            }
-        )
-        r.raise_for_status()
-        wms.clear_cache(username)
-        return {
-            'sld': {
-                'file': sld_file
-            }
+    r = requests.delete(style_url,
+        headers=headers_json,
+        auth=settings.LAYMAN_GS_AUTH,
+        params = {
+            'purge': 'true',
+            'recurse': 'true',
         }
-    # TODO remove except Exception:, handle 404 in better way
-    except Exception:
-        traceback.print_exc()
-        pass
-    return {}
+    )
+    if r.status_code == 404:
+        return {}
+    else:
+        r.raise_for_status()
+    wms.clear_cache(username)
+    return {
+        'sld': {
+            'file': sld_file
+        }
+    }
 
 
 def get_layer_info(username, layername):
