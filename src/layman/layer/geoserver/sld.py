@@ -11,7 +11,6 @@ from layman.layer.filesystem.input_sld import get_layer_file
 from layman.http import LaymanError
 from layman import settings
 from . import headers_json
-from . import wfs
 from . import wms
 
 
@@ -38,7 +37,6 @@ def delete_layer(username, layername):
             }
         )
         r.raise_for_status()
-        wfs.clear_cache(username)
         wms.clear_cache(username)
         return {
             'sld': {
