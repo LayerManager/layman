@@ -7,9 +7,10 @@ services:
    layman_dev:
       container_name: layman_dev
       build:
-        context: .
+        context: docker/.
         dockerfile: Dockerfile.dev
       image: layman_dev:latest
+      user: ${UID_GID}
       command: bash start.sh
       env_file:
          - .env.dev
@@ -37,6 +38,7 @@ services:
 
    celery_worker_dev:
       image: layman_dev:latest
+      user: ${UID_GID}
       # use watchdog
       command: bash -c "cd src && watchmedo auto-restart -d . -p '*.py' --recursive -- python3 -m celery -Q $${LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info"
 #      command: bash -c "cd src && python3 -m celery -A layman.celery_app worker --loglevel=info"
@@ -55,6 +57,7 @@ services:
    flower:
       container_name: flower
       image: layman_dev:latest
+      user: ${UID_GID}
       command: bash -c "cd src && python3 -m flower -A layman.celery_app --port=5555"
       env_file: .env.dev
       volumes:
@@ -107,6 +110,7 @@ services:
            - LAYMAN_GS_HOST=${LAYMAN_GS_HOST}
            - LAYMAN_GS_PORT=${LAYMAN_GS_PORT}
       image: hslayers:latest
+      user: ${UID_GID}
       command: sh -c "node proxy.js & ./node_modules/.bin/http-server dist/"
 #      env_file:
 #         - .env.dev

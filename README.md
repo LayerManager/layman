@@ -35,6 +35,13 @@ Publishing geospatial data online through [REST API](doc/rest.md).
 ```bash
 git clone https://github.com/jirik/layman.git
 cd layman
+```
+
+## Run
+Suitable for **development only**.
+
+Before the first run:
+```bash
 # use development settings
 cp .env.dev .env
 
@@ -42,13 +49,12 @@ cp .env.dev .env
 make reset-layman-gs-datadir-dev
 ```
 
-## Run
-Suitable for **development only**.
+Now everything is ready to start:
 ```bash
-# start dockerized layman, geoserver, postgresql, redis, celery worker, and flower 
+# start all needed dockerized containers 
 make start-layman-dev
 ```
-Initial startup takes few minutes (download docker images, build it, run it). Wait until you see something like
+Initial startup may take few minutes (download docker images, build it, run it). Wait until you see something like
 ```
 layman       |  * Serving Flask app "src/layman/layman.py" (lazy loading)
 layman       |  * Environment: development
@@ -61,6 +67,35 @@ layman       |  * Debugger PIN: 103-830-055
 Then visit [http://localhost:8000/](). You will see simple web client that interacts with [REST API](doc/rest.md).
 
 To stop running service, press Ctrl+C.
+
+### Mount some volumes as non-root user
+By default, docker run all containers as **root** user. It's possible to change it by defining `UID_GID` permanent environment variable. First stop all running containers:
+```bash
+docker-compose -f docker-compose.dev.yml rm -fsv 
+```
+The `UID_GID` variable should look like `"<user id>:<group id>"` of current user, e.g. `UID_GID="1000:1000"`. As it should be permanent, you can solve it for example by adding following line to your `~/.bashrc` file:
+```
+export UID_GID="1000:1000"
+```
+and restart terminal. Verification:
+```bash
+$ echo $UID_GID
+1000:1000
+```
+Then change ownership of some directories
+```bash
+make prepare-dirs
+sudo chown -R 1000:1000 geoserver_data/
+sudo chown -R 1000:1000 layman_data/
+sudo chown -R 1000:1000 layman_data_test/
+sudo chown -R 1000:1000 src/
+sudo chown -R 1000:1000 tmp/
+sudo chown -R 1000:1000 src/layman/static/test-client/
+```
+and restart layman
+```bash
+make start-layman-dev
+```
 
 ## Configuration
 TLDR: Default settings are suitable for development and testing (`make start-layman-dev` and `make test` commands). If you run it in production, manual configuration is needed.
@@ -101,25 +136,29 @@ Within GeoServer, you need one Layman user [LAYMAN_GS_USER](.env.production) and
 cp .env.production .env
 
 # edit .env
+# edit docker-compose.production.yml, e.g. to change geoserver_data volume
 # edit src/layman_settings.py
 
-# start dockerized layman only
+# prepare geoserver data directory
+make reset-layman-gs-datadir-production
+
+# start dockerized containers
 make start-layman-production
+
+# visit http://localhost:8000/
 ```
 
 ## Run in production with dependencies
-If you don't have existing GeoServer & PostGIS instance, you can use dockerized versions. It's easy to setup, but default settings are not safe for production. Performance might be also an issue.
+If you don't have existing GeoServer & PostGIS instance, you can use dockerized versions. It's easy to setup, but default settings are **not safe** for production. Performance might be also an issue.
 ```bash
-# edit docker-compose.production.yml, e.g. to add geoserver_data volume
-# prepare geoserver data directory
-make reset-layman-gs-datadir
-
 cp .env.production-and-deps .env
 
 # edit .env, at least add FLASK_SECRET_KEY
-# edit src/layman_settings.py
 
-# start dockerized layman & geoserver & DB
+# prepare geoserver data directory
+make reset-layman-gs-datadir-production
+
+# start dockerized containers
 make start-layman-production-with-dependencies
 
 # visit http://localhost:8000/

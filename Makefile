@@ -3,8 +3,14 @@
 reset-empty-gs-datadir-dev:
 	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman_dev bash /code/src/reset-empty-gs-datadir.sh
 
+prepare-dirs:
+	mkdir -p geoserver_data layman_data layman_data_test tmp
+
 reset-layman-gs-datadir-dev:
 	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman_dev bash /code/src/reset-layman-gs-datadir.sh
+
+reset-layman-gs-datadir-production:
+	docker-compose -f docker-compose.production.yml run --rm --no-deps layman bash /code/src/reset-layman-gs-datadir.sh
 
 reset-test-client-dev:
 	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman_dev bash -c "rm -rf /code/src/layman/static/test-client && bash /code/src/ensure-test-client.sh"
@@ -97,6 +103,9 @@ test-bash:
 
 redis-test-bash:
 	docker-compose -f docker-compose.dev.yml exec redis redis-cli -h redis -p 6379 -n 15
+
+geoserver-bash:
+	docker-compose -f docker-compose.dev.yml run --rm geoserver bash
 
 stop-all-docker-containers:
 	docker stop $$(docker ps -q)

@@ -7,7 +7,7 @@ services:
    layman:
       container_name: layman
       build:
-        context: .
+        context: docker/.
         dockerfile: Dockerfile.production
       image: layman:latest
       command: bash start.sh
