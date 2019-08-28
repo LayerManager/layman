@@ -6,8 +6,11 @@ from . import wms, wfs, sld, ensure_user_workspace
 
 logger = get_task_logger(__name__)
 
+PUBLISH_LAYER_FROM_DB_NAME = 'layman.layer.geoserver.publish_layer_from_db'
+
+
 @celery_app.task(
-    name='layman.layer.geoserver.publish_layer_from_db',
+    name=PUBLISH_LAYER_FROM_DB_NAME,
     bind=True,
     base=celery_app.AbortableTask
 )

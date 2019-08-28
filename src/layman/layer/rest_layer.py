@@ -5,7 +5,6 @@ from layman.util import check_username
 from layman import settings
 from . import util
 from .filesystem import input_file, input_sld, input_chunk
-from .geoserver import pop_cache as pop_geoserver_cache
 from layman.authn import authenticate
 from layman.authz import authorize
 
@@ -26,7 +25,6 @@ def get(username, layername):
 
     # USER
     check_username(username)
-    pop_geoserver_cache(username)
 
     # LAYER
     util.check_layername(layername)
@@ -43,7 +41,6 @@ def patch(username, layername):
 
     # USER
     check_username(username)
-    pop_geoserver_cache(username)
 
     # LAYER
     util.check_layername(layername)
@@ -55,17 +52,19 @@ def patch(username, layername):
 
     # FILE
     use_chunk_upload = False
+    files = []
     if 'file' in request.files:
-        files = request.files.getlist("file")
-    elif len(request.form.getlist('file')) > 0:
-        files = list(filter(
-            lambda f: len(f) > 0,
-            request.form.getlist('file')
-        ))
-        if len(files):
+        files = [
+            f for f in request.files.getlist("file")
+            if len(f.filename) > 0
+        ]
+    if len(files) == 0 and len(request.form.getlist('file')) > 0:
+        files = [
+            filename for filename in request.form.getlist('file')
+            if len(filename) > 0
+        ]
+        if len(files) > 0:
             use_chunk_upload = True
-    else:
-        files = []
 
     # CRS
     crs_id = None
@@ -156,7 +155,6 @@ def delete_layer(username, layername):
 
     # USER
     check_username(username)
-    pop_geoserver_cache(username)
 
     # LAYER
     util.check_layername(layername)

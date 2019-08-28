@@ -160,16 +160,11 @@ def publish_layer_from_db(username, layername, description, title):
         auth=settings.LAYMAN_GS_AUTH
     )
     r.raise_for_status()
-    # current_app.logger.info(f'publish_layer_from_db before pop_cache {username}')
-    pop_cache(username)
-
-
-def pop_cache(username):
-    # current_app.logger.info(f'pop_cache {username}')
+    # current_app.logger.info(f'publish_layer_from_db before clear_cache {username}')
     from . import wms
     from . import wfs
-    g.pop(wms.get_flask_proxy_key(username), None)
-    g.pop(wfs.get_flask_proxy_key(username), None)
+    wfs.clear_cache(username)
+    wms.clear_cache(username)
 
 
 def get_layman_rules(all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
