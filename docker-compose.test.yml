@@ -7,6 +7,7 @@ services:
    layman_test:
       container_name: layman_test
       image: layman_dev:latest
+      user: ${UID_GID}
       command: bash test.sh
       env_file:
          - .env.test
@@ -60,6 +61,7 @@ services:
 
    celery_worker_test:
       image: layman_dev:latest
+      user: ${UID_GID}
       # use watchdog
       command: bash -c "cd src && watchmedo auto-restart -d . -p '*.py' --recursive -- python3 -m celery -Q $${LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info"
       env_file: .env.test
@@ -88,6 +90,7 @@ services:
            - LAYMAN_GS_HOST=${LAYMAN_GS_HOST}
            - LAYMAN_GS_PORT=${LAYMAN_GS_PORT}
       image: hslayers:latest
+      user: ${UID_GID}
       command: sh -c "node proxy.js & ./node_modules/.bin/http-server dist/"
 #      env_file:
 #         - .env.dev
