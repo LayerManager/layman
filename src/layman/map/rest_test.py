@@ -439,17 +439,24 @@ def test_map_composed_from_local_layers(client):
 
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
     layer_info = client.get(url_for('rest_layer.get', username=username, layername=layername1)).get_json()
-    while any(('status' in layer_info[key] for key in keys_to_check)):
+    max_attempts = 100
+    num_attempts = 1
+    while num_attempts < max_attempts and any(('status' in layer_info[key] for key in keys_to_check)):
         time.sleep(0.1)
-        print('layer_info1', layer_info)
+        # print('layer_info1', layer_info)
         layer_info = client.get(url_for('rest_layer.get', username=username, layername=layername1)).get_json()
+        num_attempts+=1
+    assert num_attempts < max_attempts, f"Max attempts reach, layer1info={layer_info}"
     wms_url1 = layer_info['wms']['url']
 
     layer_info = client.get(url_for('rest_layer.get', username=username, layername=layername2)).get_json()
+    num_attempts = 1
     while any(('status' in layer_info[key] for key in keys_to_check)):
         time.sleep(0.1)
-        print('layer_info2', layer_info)
+        # print('layer_info2', layer_info)
         layer_info = client.get(url_for('rest_layer.get', username=username, layername=layername2)).get_json()
+        num_attempts+=1
+    assert num_attempts < max_attempts, f"Max attempts reach, layer2info={layer_info}"
     wms_url2 = layer_info['wms']['url']
 
     expected_url = 'http://localhost:8600/geoserver/testuser1/ows'

@@ -47,7 +47,6 @@ AND pid <> pg_backend_pid();
 
 
     import requests
-    from layman.layer.geoserver import get_layman_rules
     headers_json = {
         'Accept': 'application/json',
         'Content-type': 'application/json',
@@ -59,7 +58,13 @@ AND pid <> pg_backend_pid();
     )
     r.raise_for_status()
     all_rules = r.json()
-    layman_rules = get_layman_rules(all_rules)
+
+    def get_role_rules(all_rules, role):
+        re_role = r".*\b" + re.escape(role) + r"\b.*"
+        result = {k: v for k, v in all_rules.items() if re.match(re_role, v)}
+        return result
+
+    layman_rules = get_role_rules(all_rules, LAYMAN_GS_ROLE)
     for rule in layman_rules:
         workspace = re.match(r"^([^.]+)\..*", rule).group(1)
         r = requests.delete(

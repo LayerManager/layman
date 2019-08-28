@@ -3,21 +3,20 @@ from urllib.parse import urljoin, urlparse
 from owslib.wms import WebMapService
 from owslib.wfs import WebFeatureService
 
-from werkzeug.contrib.cache import SimpleCache
-cache = SimpleCache()
+from layman.cache.mem import CACHE as MEM_CACHE
 
 headers_json = {
     'Accept': 'application/json',
     'Content-type': 'application/json',
 }
 
-CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL:'
+CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL'
 
 from layman import settings
 
 
 def get_gs_proxy_base_url():
-    proxy_base_url = cache.get(CACHE_GS_PROXY_BASE_URL_KEY)
+    proxy_base_url = MEM_CACHE.get(CACHE_GS_PROXY_BASE_URL_KEY)
     if proxy_base_url is None:
         try:
             r = requests.get(
@@ -34,7 +33,7 @@ def get_gs_proxy_base_url():
         except:
             pass
         if proxy_base_url is not None:
-            cache.set(CACHE_GS_PROXY_BASE_URL_KEY, proxy_base_url, timeout=1 * 60)
+            MEM_CACHE.set(CACHE_GS_PROXY_BASE_URL_KEY, proxy_base_url, ttl=settings.LAYMAN_CACHE_GS_TIMEOUT)
     return proxy_base_url
 
 
@@ -50,9 +49,9 @@ def get_feature_type(
     r.raise_for_status()
     return r.json()['featureType']
 
-def wms_proxy(wms_url):
+def wms_proxy(wms_url, xml=None):
     wms_url_path = urlparse(wms_url).path
-    wms = WebMapService(wms_url)
+    wms = WebMapService(wms_url, xml=xml)
     for operation in wms.operations:
         # app.logger.info(operation.name)
         for method in operation.methods:
@@ -63,9 +62,9 @@ def wms_proxy(wms_url):
             method['url'] = method_url.geturl()
     return wms
 
-def wfs_proxy(wfs_url):
+def wfs_proxy(wfs_url, xml=None):
     wfs_url_path = urlparse(wfs_url).path
-    wfs = WebFeatureService(wfs_url)
+    wfs = WebFeatureService(wfs_url, xml=xml)
     for operation in wfs.operations:
         # app.logger.info(operation.name)
         for method in operation.methods:
