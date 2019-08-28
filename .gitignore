@@ -1,8 +1,8 @@
-/.idea
-/geoserver_data
-/layman_data
-/layman_data_test
-/tmp
+/.idea/
+/geoserver_data/
+/layman_data/
+/layman_data_test/
+/tmp/
 /.env
 
 *.pyc
@@ -10,4 +10,4 @@
 
 src/layman/static/test-client
 
-/pg
+/pg/
