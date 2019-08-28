@@ -22,5 +22,5 @@ script:
   - make test
 
 after_failure:
-  - docker logs gspld_celery_worker_test_1
+  - docker logs layman_celery_worker_test_1
   - docker logs hslayers

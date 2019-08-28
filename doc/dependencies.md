@@ -11,7 +11,7 @@
 | [geoserver](https://github.com/geoserver/geoserver) | 2.13.0 | GNU GPL v2 | kartoza/docker-geoserver | prod-external / prod | bin | to provide WMS/WFS endpoints |
 | [celery](http://www.celeryproject.org/) | 4.2.1 | BSD 3-Clause | Pipfile | prod | bin | asynchronous task runner |
 | [redis](https://redis.io/) | 4.0.11 | BSD 3-Clause | docker-library/redis | prod | bin | celery message broker, source of truth for server side |
-| [gspld-test-client](https://github.com/jirik/gspld-test-client) | 0.7.0 | GNU GPL v3 | src/ensure-test-client.sh | opt | bin | to demonstrate communication with REST API |
+| [layman-test-client](https://github.com/jirik/layman-test-client) | 0.10.0 | GNU GPL v3 | src/ensure-test-client.sh | opt | bin | to demonstrate communication with REST API |
 
 ## Other dependencies
 

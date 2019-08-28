@@ -1,4 +1,5 @@
-# gspld [![Build Status](https://travis-ci.org/jirik/gspld.svg?branch=master)](https://travis-ci.org/jirik/gspld)
+# layman
+[![Build Status](https://travis-ci.org/jirik/layman.svg?branch=master)](https://travis-ci.org/jirik/layman)
 Publishing geospatial vector data online through [REST API](doc/rest.md).
 - Accepts SHP and GeoJSON data files and SLD styles for visualization
 - Even large files can be uploaded from browser
@@ -37,8 +38,10 @@ Publishing geospatial vector data online through [REST API](doc/rest.md).
 
 ## Installation
 ```bash
-git clone https://github.com/jirik/gspld.git
-cd gspld
+git clone https://github.com/jirik/layman.git
+cd layman
+# use development settings
+cp .env.dev .env
 
 # prepare geoserver data directory
 make reset-layman-gs-datadir-dev
