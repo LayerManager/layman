@@ -11,6 +11,7 @@
 |Map|`/rest/<user>/maps/<mapname>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
 |Map File|`/rest/<user>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
 |Map Thumbnail|`/rest/<user>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
+|Current User|`/rest/current-user`|[GET](#get-current-user)| x | x | x |
 
 #### REST path parameters
 - **user**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
@@ -420,3 +421,19 @@ Content-Type: `image/png`
 PNG image.
 
 
+## Current User
+### URL
+`/rest/current-user`
+
+### GET Current User
+Get information about current user.
+
+#### Request
+No action parameters.
+#### Response
+Content-Type: `application/json`
+
+JSON object with following structure:
+- **authenticated**: Boolean. `true` if user is authenticated, `false` if user is anonymous.
+- *friendly_name*: String. "Screen" name of the user (do not confuse with username in `/rest/<user>`)
+- *workspace*: String. Workspace name to be used as username in some REST API paths (i.e. `/rest/<user>/...`). If not set, user's workspace name was not yet registered.

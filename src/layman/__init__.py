@@ -18,6 +18,8 @@ from .util import get_blueprints
 for bp in get_blueprints():
     app.register_blueprint(bp, url_prefix='/rest/<username>')
 
+from .user.current_user import bp as current_user_bp
+app.register_blueprint(current_user_bp, url_prefix='/rest/current-user')
 
 # load UUIDs only once
 if not settings.IS_CELERY_WORKER and os.getenv('LAYMAN_SKIP_REDIS_LOADING', 'false').lower() != 'true':
