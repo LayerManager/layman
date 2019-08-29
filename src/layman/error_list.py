@@ -30,4 +30,5 @@ ERROR_LIST = {
     28: (400, 'Zero-length identifier found. Data file probably contains attribute with zero-length name (e.g. empty string).'),
     29: (400, 'Map is already in process.'),
     30: (403, 'Unauthorized access'),
+    31: (400, 'Unexpected HTTP method.'),
 }
