@@ -5,8 +5,10 @@ from layman.authn.url_path import USER_PATH_PATTERN
 
 
 def authorize():
-    if request.method not in ['POST', 'PUT', 'PATCH', 'DELETE']:
+    if request.method in ['GET']:
         return
+    elif request.method not in ['POST', 'PUT', 'PATCH', 'DELETE']:
+        raise LaymanError(31, {'method': request.method})
 
     if g.user is None:
         raise LaymanError(30, 'authenticated as anonymous user')
