@@ -15,6 +15,7 @@ Publishing geospatial data online through [REST API](doc/rest.md).
   - [Web Feature Service (WFS)](https://www.opengeospatial.org/standards/wfs)
   - thumbnail image
 - Documented [REST API](doc/rest.md)
+- Documented [security system](doc/security.md)
 - Configurable by environment variables
 - Standing on the shoulders of Docker, Python, Flask, PostgreSQL, PostGIS, GDAL, GeoServer, OpenLayers, Celery, Redis, and [more](doc/dependencies.md)
 - Inspired by [CCSS-CZ/layman](https://github.com/CCSS-CZ/layman)
@@ -85,7 +86,6 @@ $ echo $UID_GID
 Then change ownership of some directories
 ```bash
 make prepare-dirs
-sudo chown -R 1000:1000 geoserver_data/
 sudo chown -R 1000:1000 layman_data/
 sudo chown -R 1000:1000 layman_data_test/
 sudo chown -R 1000:1000 src/
