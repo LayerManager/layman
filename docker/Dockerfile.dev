@@ -1,6 +1,7 @@
 FROM geographica/gdal2:2.4.0
 
 RUN mkdir /code
+RUN chmod 777 /code
 WORKDIR /code
 
 RUN apt-get clean && apt-get update && \
