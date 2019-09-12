@@ -1,5 +1,4 @@
 /.idea/
-/geoserver_data/
 /layman_data/
 /layman_data_test/
 /tmp/
@@ -10,4 +9,5 @@
 
 src/layman/static/test-client
 
-/pg/
+/deps/*/data
+/deps/*/tmp

@@ -47,13 +47,13 @@ Before the first run:
 cp .env.dev .env
 
 # prepare geoserver data directory
-make reset-layman-gs-datadir-dev
+make geoserver-reset-default-layman-datadir
 ```
 
 Now everything is ready to start:
 ```bash
 # start all needed dockerized containers 
-make start-layman-dev
+make start-dev
 ```
 Initial startup may take few minutes (download docker images, build it, run it). Wait until you see something like
 ```
@@ -72,7 +72,7 @@ To stop running service, press Ctrl+C.
 ### Mount some volumes as non-root user
 By default, docker run all containers as **root** user. It's possible to change it by defining `UID_GID` permanent environment variable. First stop all running containers:
 ```bash
-docker-compose -f docker-compose.dev.yml rm -fsv 
+make stop-and-remove-dev 
 ```
 The `UID_GID` variable should look like `"<user id>:<group id>"` of current user, e.g. `UID_GID="1000:1000"`. As it should be permanent, you can solve it for example by adding following line to your `~/.bashrc` file:
 ```
@@ -94,7 +94,7 @@ sudo chown -R 1000:1000 src/layman/static/test-client/
 ```
 and restart layman
 ```bash
-make start-layman-dev
+make start-dev
 ```
 
 ## Configuration
@@ -103,8 +103,8 @@ TLDR: Default settings are suitable for development and testing (`make start-lay
 The most general configuration is found in `docker-compose.*.yml` files used as [docker-compose configuration files](https://docs.docker.com/compose/compose-file/compose-file-v2/).
 - `docker-compose.dev.yml` used for development
 - `docker-compose.test.yml` used for automatic testing
-- `docker-compose.production.yml` used for production (layman, redis, celery worker, flower)
-- `docker-compose.dependencies.yml` optionally used for production (GeoServer and PostgreSQL)
+- `docker-compose.production.yml` used for production (layman, celery worker, flower)
+- `docker-compose.deps.yml` used for development, testing, and optionally for production (GeoServer, PostgreSQL, Redis)
 
 Another part of settings is in `.env.*` files, also separately for development, testing, and production. See especially Layman settings and Flask settings. Remember layman is dockerized, so connection parameters such as host names and port numbers must be set according to docker-compose configuration.
 
@@ -130,17 +130,17 @@ This is the recommended way how to run it in production. You need to provide ext
 
 Within PostgreSQL, you need one user [LAYMAN_PG_USER](.env.production) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](.env.production) database. **The LAYMAN_PG_USER must be another user than default `postgres` user!** The user also needs access to `public` schema where PostGIS must be installed.
 
-Within GeoServer, you need one Layman user [LAYMAN_GS_USER](.env.production) and one layman role [LAYMAN_GS_ROLE](.env.production). **The LAYMAN_GS_USER must be another user than default `admin` user and the LAYMAN_GS_ROLE must be another role than default `ADMIN` role!** The LAYMAN_GS_USER user must have at least the LAYMAN_GS_ROLE and ADMIN role. See default development configuration of [roles](sample/geoserver_data/security/role/default/roles.xml) and [layer access rights](sample/geoserver_data/security/layers.properties).
+Within GeoServer, you need one Layman user [LAYMAN_GS_USER](.env.production) and one layman role [LAYMAN_GS_ROLE](.env.production). **The LAYMAN_GS_USER must be another user than default `admin` user and the LAYMAN_GS_ROLE must be another role than default `ADMIN` role!** The LAYMAN_GS_USER user must have at least the LAYMAN_GS_ROLE and ADMIN role. See default development configuration of [roles](deps/geoserver/sample/geoserver_data/security/role/default/roles.xml) and [layer access rights](deps/geoserver/sample/geoserver_data/security/layers.properties).
 
 ```bash
 cp .env.production .env
 
 # edit .env
-# edit docker-compose.production.yml, e.g. to change geoserver_data volume
+# edit docker-compose.production.yml
 # edit src/layman_settings.py
 
 # prepare geoserver data directory
-make reset-layman-gs-datadir-production
+make geoserver-reset-default-layman-datadir
 
 # start dockerized containers
 make start-layman-production
@@ -156,7 +156,7 @@ cp .env.production-and-deps .env
 # edit .env, at least add FLASK_SECRET_KEY
 
 # prepare geoserver data directory
-make reset-layman-gs-datadir-production
+make geoserver-reset-default-layman-datadir
 
 # start dockerized containers
 make start-layman-production-with-dependencies
