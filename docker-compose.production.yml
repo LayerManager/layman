@@ -16,16 +16,12 @@ services:
       ports:
         - 8000:8000
       volumes:
-        - ./geoserver_data:/geoserver_data
         - ./layman_data:/layman_data
         - ./src:/code/src
         - ./start.sh:/code/start.sh
       depends_on:
         hslayers:
           condition: service_started
-
-   redis:
-      image: redis:4.0.11-alpine
 
    celery_worker:
       image: layman:latest

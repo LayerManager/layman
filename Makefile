@@ -1,115 +1,119 @@
-.PHONY: reset-empty-gs-datadir-dev reset-layman-gs-datadir-dev layman-build-dev
+.PHONY:
 
-reset-empty-gs-datadir-dev:
-	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman_dev bash /code/src/reset-empty-gs-datadir.sh
+start-dev:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up
 
-prepare-dirs:
-	mkdir -p geoserver_data layman_data layman_data_test tmp
+start-dev-d:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d
 
-reset-layman-gs-datadir-dev:
-	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman_dev bash /code/src/reset-layman-gs-datadir.sh
+stop-dev:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm --stop --force layman_dev celery_worker_dev
 
-reset-layman-gs-datadir-production:
-	docker-compose -f docker-compose.production.yml run --rm --no-deps layman bash /code/src/reset-layman-gs-datadir.sh
+stop-and-remove-dev:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv
 
-reset-test-client-dev:
-	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman_dev bash -c "rm -rf /code/src/layman/static/test-client && bash /code/src/ensure-test-client.sh"
+restart-dev:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_dev celery_worker_dev
 
-layman-build-dev:
-	docker-compose -f docker-compose.dev.yml build layman_dev
-
-layman-build-production-only:
-	docker-compose -f docker-compose.production.yml build layman
-
-layman-bash:
-	docker-compose -f docker-compose.dev.yml run --rm layman_dev bash
-
-hslayers-build:
-	docker-compose -f docker-compose.dev.yml build hslayers
-
-hslayers-restart:
-	docker-compose -f docker-compose.dev.yml build hslayers
-	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d hslayers
-
-hslayers-bash:
-	docker-compose -f docker-compose.dev.yml run --rm hslayers sh
-
-psql:
-	docker-compose -f docker-compose.dev.yml run -e PGPASSWORD=docker --entrypoint "psql -U docker -p 5432 -h db gis" --rm db
-
-clear-data-dev:
-	docker-compose -f docker-compose.dev.yml run --rm layman_dev bash -c "python3 src/clear_layman_data.py"
-
-clear-python-cache-dev:
-	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman_dev bash /code/src/clear-python-cache.sh
-
-start-layman-dev:
-	docker-compose -f docker-compose.dev.yml up
-
-start-layman-dev-d:
-	docker-compose -f docker-compose.dev.yml up -d
-
-restart-layman-dev:
-	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_dev celery_worker_dev
-
-stop-layman-dev:
-	docker-compose -f docker-compose.dev.yml rm --stop --force layman_dev celery_worker_dev
-
-restart-layman-dev-and-build:
-	docker-compose -f docker-compose.dev.yml build layman_dev
-	docker-compose -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_dev
-
-restart-geoserver-dev:
-	docker-compose -f docker-compose.dev.yml stop geoserver
-	docker-compose -f docker-compose.dev.yml run --rm --no-deps layman bash -c "bash /code/src/reset-layman-gs-datadir.sh"
-	docker-compose -f docker-compose.dev.yml up --no-deps -d geoserver
+rebuild-and-restart-dev:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_dev
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_dev
 
 restart-celery-dev:
-	docker-compose -f docker-compose.dev.yml rm -fsv flower
-	docker-compose -f docker-compose.dev.yml rm -fsv celery_worker_dev
-	docker-compose -f docker-compose.test.yml rm -fsv celery_worker_test
-	docker-compose -f docker-compose.dev.yml rm -fsv redis
-	docker-compose -f docker-compose.dev.yml up --no-deps -d redis
-	docker-compose -f docker-compose.dev.yml up --no-deps -d celery_worker_dev
-	docker-compose -f docker-compose.test.yml up --no-deps -d celery_worker_test
-	docker-compose -f docker-compose.dev.yml up --no-deps -d flower
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv flower
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv celery_worker_dev
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml rm -fsv celery_worker_test
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv redis
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --no-deps -d redis
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --no-deps -d celery_worker_dev
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml up --no-deps -d celery_worker_test
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --no-deps -d flower
 
-start-layman-production:
-	docker-compose -f docker-compose.production.yml up -d
+prepare-dirs:
+	mkdir -p layman_data layman_data_test tmp
 
-stop-layman-production:
-	docker-compose -f docker-compose.production.yml stop
+reset-test-client-dev:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps layman_dev bash -c "rm -rf /code/src/layman/static/test-client && bash /code/src/ensure-test-client.sh"
 
-stop-layman-dependencies:
-	docker-compose -f docker-compose.dependencies.yml stop
+build-dev:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_dev
 
-start-layman-production-with-dependencies:
-	docker-compose -f docker-compose.dependencies.yml up -d
-	docker-compose -f docker-compose.production.yml up -d
+build-production-only:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml build layman
 
-stop-layman-production-with-dependencies:
-	docker-compose -f docker-compose.dependencies.yml stop
-	docker-compose -f docker-compose.production.yml stop
+bash:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_dev bash
+
+clear-data-dev:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_dev bash -c "python3 src/clear_layman_data.py"
+
+clear-python-cache-dev:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps layman_dev bash /code/src/clear-python-cache.sh
 
 test:
-	docker-compose -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
 
 test-dev:
-	docker-compose -f docker-compose.test.yml up --force-recreate --no-deps -d celery_worker_test
-	docker-compose -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml up --force-recreate --no-deps -d celery_worker_test
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
 
 test-bash:
 	docker-compose -f docker-compose.test.yml run --rm layman_test bash
 
-redis-test-bash:
+start-production:
+	docker-compose -f docker-compose.production.yml up -d
+
+stop-production:
+	docker-compose -f docker-compose.production.yml stop
+
+start-dependencies:
+	docker-compose -f docker-compose.deps.yml up -d
+
+stop-dependencies:
+	docker-compose -f docker-compose.deps.yml stop
+
+start-production-with-dependencies:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml up -d
+
+stop-production-with-dependencies:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml stop
+
+psql:
+	docker-compose -f docker-compose.deps.yml run -e PGPASSWORD=docker --entrypoint "psql -U docker -p 5432 -h db gis" --rm db
+
+hslayers-build:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build hslayers
+
+hslayers-restart:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build hslayers
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d hslayers
+
+hslayers-bash:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm hslayers sh
+
+redis-cli-test-db:
 	docker-compose -f docker-compose.dev.yml exec redis redis-cli -h redis -p 6379 -n 15
 
-geoserver-bash:
-	docker-compose -f docker-compose.dev.yml run --rm geoserver bash
+geoserver-reset-default-layman-datadir:
+	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash /geoserver_code/reset-default-layman-datadir.sh
 
-stop-all-docker-containers:
+geoserver-restart:
+	docker-compose -f docker-compose.deps.yml stop geoserver
+	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash /geoserver_code/reset-default-layman-datadir.sh
+	docker-compose -f docker-compose.deps.yml up --no-deps -d geoserver
+
+geoserver-reset-empty-datadir:
+	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash /geoserver_code/reset-empty-datadir.sh
+
+geoserver-bash:
+	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash
+
+docker-stop-all-containers:
 	docker stop $$(docker ps -q)
 
-remove-all-docker-containers:
+docker-remove-all-containers:
 	docker rm $$(docker ps -aq)
 
+docker-stop-and-remove-all-containers:
+	docker stop $$(docker ps -q)
+	docker rm $$(docker ps -aq)
