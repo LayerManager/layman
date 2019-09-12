@@ -18,6 +18,7 @@ before_install:
 
 script:
   - make geoserver-reset-default-layman-datadir
+  - make build-dev
   - cp .env.test .env
   - make test
 
