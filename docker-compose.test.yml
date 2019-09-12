@@ -41,7 +41,7 @@ services:
         - ./src:/code/src
         - ./tmp:/code/tmp
       depends_on:
-        db:
+        postgresql:
           condition: service_healthy
         geoserver:
           condition: service_healthy

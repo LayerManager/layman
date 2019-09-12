@@ -78,9 +78,6 @@ start-production-with-dependencies:
 stop-production-with-dependencies:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml stop
 
-psql:
-	docker-compose -f docker-compose.deps.yml run -e PGPASSWORD=docker --entrypoint "psql -U docker -p 5432 -h db gis" --rm db
-
 hslayers-build:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build hslayers
 
@@ -90,6 +87,9 @@ hslayers-restart:
 
 hslayers-bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm hslayers sh
+
+postgresql-psql:
+	docker-compose -f docker-compose.deps.yml run -e PGPASSWORD=docker --entrypoint "psql -U docker -p 5432 -h postgresql gis" --rm postgresql
 
 redis-cli-test-db:
 	docker-compose -f docker-compose.dev.yml exec redis redis-cli -h redis -p 6379 -n 15

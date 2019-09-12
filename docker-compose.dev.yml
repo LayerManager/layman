@@ -23,7 +23,7 @@ services:
         - ./tmp:/code/tmp
         - ./start.sh:/code/start.sh
       depends_on:
-        db:
+        postgresql:
           condition: service_healthy
         geoserver:
           condition: service_healthy
