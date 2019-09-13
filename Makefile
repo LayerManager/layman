@@ -1,13 +1,16 @@
 .PHONY:
 
 start-demo:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml up --force-recreate
+	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml up --force-recreate --no-deps postgresql geoserver redis layman celery_worker flower hslayers
 
 start-demo-d:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml up --force-recreate -d
+	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml up --force-recreate --no-deps -d postgresql geoserver redis layman celery_worker flower hslayers
 
 stop-demo:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml stop
+
+start-demo-with-optional-deps:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml up --force-recreate
 
 build-production:
 	docker-compose -f docker-compose.production.yml build layman
@@ -117,6 +120,15 @@ geoserver-reset-empty-datadir:
 
 geoserver-bash:
 	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash
+
+liferay-introspect:
+	curl 'http://localhost:8082/o/oauth2/introspect' --data 'client_id=id-353ab09c-f117-f2d5-d3a3-85cfb89e6746&token=...'
+
+liferay-userprofile:
+	curl -H "Authorization: Bearer ..." http://localhost:8082/api/jsonws/user/get-current-user
+
+liferay-bash:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec liferay bash
 
 stop-all-docker-containers:
 	docker stop $$(docker ps -q)

@@ -11,3 +11,6 @@ src/layman/static/test-client
 
 /deps/*/data
 /deps/*/tmp
+
+/deps/liferay/transit/*
+!/deps/liferay/transit/.gitkeep
