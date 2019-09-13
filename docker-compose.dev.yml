@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3.7'
 
 volumes:
    geoserver-data:
@@ -23,25 +23,21 @@ services:
         - ./tmp:/code/tmp
         - ./start.sh:/code/start.sh
       depends_on:
-        postgresql:
-          condition: service_healthy
-        geoserver:
-          condition: service_healthy
-        redis:
-          condition: service_started
-        hslayers:
-          condition: service_started
+        - hslayers
+        - redis
+        - postgresql
+        - geoserver
 
    celery_worker_dev:
       image: layman_dev:latest
       user: ${UID_GID}
       # use watchdog
-      command: bash -c "cd src && watchmedo auto-restart -d . -p '*.py' --recursive -- python3 -m celery -Q $${LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info"
+      command: bash -c "cd src && python3 wait_for_deps.py && watchmedo auto-restart -d . -p '*.py' --recursive -- python3 -m celery -Q $${LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info"
 #      command: bash -c "cd src && python3 -m celery -A layman.celery_app worker --loglevel=info"
       env_file: .env.dev
       environment:
         - C_FORCE_ROOT=true
-        - IS_CELERY_WORKER=true
+        - LAYMAN_SKIP_REDIS_LOADING=true
       volumes:
         - ./layman_data:/layman_data
         - ./sample:/code/sample
@@ -54,8 +50,10 @@ services:
       container_name: flower
       image: layman_dev:latest
       user: ${UID_GID}
-      command: bash -c "cd src && python3 -m flower -A layman.celery_app --port=5555"
+      command: bash -c "cd src && python3 wait_for_deps.py && python3 -m flower -A layman.celery_app --port=5555"
       env_file: .env.dev
+      environment:
+        - LAYMAN_SKIP_REDIS_LOADING=true
       volumes:
         - ./sample:/code/sample
         - ./src:/code/src

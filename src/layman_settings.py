@@ -1,8 +1,6 @@
 import os
 from urllib.parse import urljoin
 
-IS_CELERY_WORKER = os.getenv('IS_CELERY_WORKER', '').lower() == 'true'
-
 LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
 
 MAIN_FILE_EXTENSIONS = [
@@ -21,9 +19,16 @@ LAYMAN_PG_DBNAME = os.environ['LAYMAN_PG_DBNAME']
 LAYMAN_PG_USER = os.environ['LAYMAN_PG_USER']
 LAYMAN_PG_PASSWORD = os.environ['LAYMAN_PG_PASSWORD']
 
-PG_CONN = f"host='{LAYMAN_PG_HOST}' port='{LAYMAN_PG_PORT}' dbname='{LAYMAN_PG_DBNAME}' user='{LAYMAN_PG_USER}' password='{LAYMAN_PG_PASSWORD}'"
+PG_CONN = {
+    'host': LAYMAN_PG_HOST,
+    'port': LAYMAN_PG_PORT,
+    'dbname': LAYMAN_PG_DBNAME,
+    'user': LAYMAN_PG_USER,
+    'password': LAYMAN_PG_PASSWORD,
+}
 
-LAYMAN_GS_AUTH = (os.environ['LAYMAN_GS_USER'],
+LAYMAN_GS_USER = os.environ['LAYMAN_GS_USER']
+LAYMAN_GS_AUTH = (LAYMAN_GS_USER,
                   os.environ['LAYMAN_GS_PASSWORD'])
 
 LAYMAN_GS_HOST = os.environ['LAYMAN_GS_HOST']
@@ -60,7 +65,13 @@ PG_POSTGIS_SCHEMA = 'public'
 # related to testing only
 LAYMAN_PG_TEMPLATE_DBNAME = os.getenv('LAYMAN_PG_TEMPLATE_DBNAME')
 
-PG_CONN_TEMPLATE = f"host='{os.environ['LAYMAN_PG_HOST']}' port='{os.environ['LAYMAN_PG_PORT']}' dbname='{LAYMAN_PG_TEMPLATE_DBNAME}' user='{os.environ['LAYMAN_PG_USER']}' password='{os.environ['LAYMAN_PG_PASSWORD']}'"
+PG_CONN_TEMPLATE = {
+    'host': LAYMAN_PG_HOST,
+    'port': LAYMAN_PG_PORT,
+    'dbname': LAYMAN_PG_TEMPLATE_DBNAME,
+    'user': LAYMAN_PG_USER,
+    'password': LAYMAN_PG_PASSWORD,
+}
 
 LAYMAN_CELERY_QUEUE = os.environ['LAYMAN_CELERY_QUEUE']
 
