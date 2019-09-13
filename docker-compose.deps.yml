@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3.7'
 
 volumes:
    geoserver-data:
@@ -15,8 +15,6 @@ services:
          - PASS=docker
          - ALLOW_IP_RANGE=0.0.0.0/0
       restart: on-failure
-      healthcheck:
-        test: "exit 0"
 
    geoserver:
       build:
@@ -35,13 +33,7 @@ services:
       env_file:
         - deps/geoserver/docker/.env
       depends_on:
-        postgresql:
-          condition: service_healthy
-      healthcheck:
-        test: curl --fail -s http://localhost:8080/ || exit 1
-        interval: 1m30s
-        timeout: 10s
-        retries: 3
+        - postgresql
 
    redis:
       image: redis:4.0.11-alpine

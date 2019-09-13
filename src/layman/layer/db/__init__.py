@@ -11,7 +11,7 @@ FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 
 def create_connection_cursor():
     try:
-        connection = psycopg2.connect(settings.PG_CONN)
+        connection = psycopg2.connect(**settings.PG_CONN)
     except:
         raise LaymanError(6)
     cursor = connection.cursor()
@@ -90,6 +90,7 @@ def import_layer_vector_file_async(username, layername, main_filepath,
                                     crs_id):
     # import file to database table
     import subprocess
+    pg_conn = ' '.join([f"{k}='{v}'" for k, v in settings.PG_CONN.items()])
     bash_args = [
         'ogr2ogr',
         '-t_srs', 'EPSG:3857',
@@ -98,7 +99,7 @@ def import_layer_vector_file_async(username, layername, main_filepath,
         '-lco', f'SCHEMA={username}',
         # '-clipsrc', '-180', '-85.06', '180', '85.06',
         '-f', 'PostgreSQL',
-        f'PG:{settings.PG_CONN}',
+        f'PG:{pg_conn}',
         # 'PG:{} active_schema={}'.format(PG_CONN, username),
     ]
     if crs_id is not None:

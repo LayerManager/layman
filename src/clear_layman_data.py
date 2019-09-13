@@ -15,7 +15,7 @@ def main():
 
     import psycopg2
     try:
-        conn = psycopg2.connect(PG_CONN)
+        conn = psycopg2.connect(**PG_CONN)
         conn.autocommit = True
         cur = conn.cursor()
         cur.execute(f"""
@@ -29,7 +29,7 @@ where schema_owner = '{LAYMAN_PG_USER}'
             cur.execute(f"""DROP SCHEMA "{row[1]}" CASCADE""")
         conn.close()
     except:
-        conn = psycopg2.connect(PG_CONN_TEMPLATE)
+        conn = psycopg2.connect(**PG_CONN_TEMPLATE)
         conn.autocommit = True
         cur = conn.cursor()
         cur.execute(f"""
