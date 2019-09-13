@@ -83,6 +83,7 @@ hslayers-bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm hslayers sh
 
 test:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_dev
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
 
 test-dev:
