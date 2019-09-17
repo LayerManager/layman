@@ -21,7 +21,7 @@ def before_request():
 
 @bp.route('/layers', methods=['GET'])
 def get(username):
-    app.logger.info(f"GET Layers, user={g.user and g.user['name']}")
+    app.logger.info(f"GET Layers, user={g.user}")
 
     # USER
     check_username(username)
@@ -42,7 +42,7 @@ def get(username):
 
 @bp.route('/layers', methods=['POST'])
 def post(username):
-    app.logger.info(f"POST Layers, user={g.user and g.user['name']}")
+    app.logger.info(f"POST Layers, user={g.user}")
 
     # USER
     check_username(username)

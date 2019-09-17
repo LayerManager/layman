@@ -22,7 +22,7 @@ def before_request():
 
 @bp.route('/maps/<mapname>/thumbnail', methods=['GET'])
 def get(username, mapname):
-    app.logger.info(f"GET Map Thumbnail, user={g.user and g.user['name']}")
+    app.logger.info(f"GET Map Thumbnail, user={g.user}")
 
     # USER
     check_username(username)

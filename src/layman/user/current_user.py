@@ -16,7 +16,7 @@ def before_request():
 
 @bp.route('', methods=['GET'])
 def get():
-    app.logger.info(f"GET Current User, user={g.user and g.user['name']}")
+    app.logger.info(f"GET Current User, user={g.user}")
 
     user_profile = get_user_profile(g.user)
 

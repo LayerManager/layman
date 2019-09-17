@@ -31,4 +31,6 @@ ERROR_LIST = {
     29: (400, 'Map is already in process.'),
     30: (403, 'Unauthorized access'),
     31: (400, 'Unexpected HTTP method.'),
+    32: (403, 'Unsuccessful OAuth2 authentication.'),
+    33: (400, 'Authenticated user did not claim any username within Layman yet.'),
 }

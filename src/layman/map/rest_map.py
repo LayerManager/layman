@@ -24,7 +24,7 @@ def before_request():
 
 @bp.route('/maps/<mapname>', methods=['GET'])
 def get(username, mapname):
-    app.logger.info(f"GET Map, user={g.user and g.user['name']}")
+    app.logger.info(f"GET Map, user={g.user}")
 
     # USER
     check_username(username)
@@ -39,7 +39,7 @@ def get(username, mapname):
 
 @bp.route('/maps/<mapname>', methods=['PATCH'])
 def patch(username, mapname):
-    app.logger.info(f"PATCH Map, user={g.user and g.user['name']}")
+    app.logger.info(f"PATCH Map, user={g.user}")
 
     # USER
     check_username(username)
@@ -101,7 +101,7 @@ def patch(username, mapname):
 
 @bp.route('/maps/<mapname>', methods=['DELETE'])
 def delete_map(username, mapname):
-    app.logger.info(f"DELETE Map, user={g.user and g.user['name']}")
+    app.logger.info(f"DELETE Map, user={g.user}")
 
     # USER
     check_username(username)

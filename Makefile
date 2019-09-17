@@ -104,8 +104,14 @@ test-wait-for-deps:
 postgresql-psql:
 	docker-compose -f docker-compose.deps.yml run -e PGPASSWORD=docker --entrypoint "psql -U docker -p 5432 -h postgresql gis" --rm postgresql
 
+redis-cli-db:
+	docker-compose -f docker-compose.deps.yml exec redis redis-cli -h redis -p 6379 -n 0
+
 redis-cli-test-db:
-	docker-compose -f docker-compose.dev.yml exec redis redis-cli -h redis -p 6379 -n 15
+	docker-compose -f docker-compose.deps.yml exec redis redis-cli -h redis -p 6379 -n 15
+
+redis-cli-client-db:
+	docker-compose -f docker-compose.deps.yml exec redis redis-cli -h redis -p 6379 -n 1
 
 geoserver-reset-default-layman-datadir:
 	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash /geoserver_code/reset-default-layman-datadir.sh
@@ -122,7 +128,7 @@ geoserver-bash:
 	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash
 
 liferay-introspect:
-	curl 'http://localhost:8082/o/oauth2/introspect' --data 'client_id=id-353ab09c-f117-f2d5-d3a3-85cfb89e6746&token=...'
+	curl 'http://localhost:8082/o/oauth2/introspect' --data 'client_id=id-353ab09c-f117-f2d5-d3a3-85cfb89e6746&client_secret=secret-d31a82c8-3e73-1058-e38a-f9191f7c2014&token=...'
 
 liferay-userprofile:
 	curl -H "Authorization: Bearer ..." http://localhost:8082/api/jsonws/user/get-current-user

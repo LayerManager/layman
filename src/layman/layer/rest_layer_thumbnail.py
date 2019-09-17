@@ -22,7 +22,7 @@ def before_request():
 
 @bp.route('/layers/<layername>/thumbnail', methods=['GET'])
 def get(username, layername):
-    app.logger.info(f"GET Layer Thumbnail, user={g.user and g.user['name']}")
+    app.logger.info(f"GET Layer Thumbnail, user={g.user}")
 
     # USER
     check_username(username)
