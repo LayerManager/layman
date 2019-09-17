@@ -21,7 +21,7 @@ def before_request():
 
 @bp.route('/layers/<layername>', methods=['GET'])
 def get(username, layername):
-    app.logger.info(f"GET Layer, user={g.user and g.user['name']}")
+    app.logger.info(f"GET Layer, user={g.user}")
 
     # USER
     check_username(username)
@@ -37,7 +37,7 @@ def get(username, layername):
 
 @bp.route('/layers/<layername>', methods=['PATCH'])
 def patch(username, layername):
-    app.logger.info(f"PATCH Layer, user={g.user and g.user['name']}")
+    app.logger.info(f"PATCH Layer, user={g.user}")
 
     # USER
     check_username(username)
@@ -151,7 +151,7 @@ def patch(username, layername):
 
 @bp.route('/layers/<layername>', methods=['DELETE'])
 def delete_layer(username, layername):
-    app.logger.info(f"DELETE Layer, user={g.user and g.user['name']}")
+    app.logger.info(f"DELETE Layer, user={g.user}")
 
     # USER
     check_username(username)

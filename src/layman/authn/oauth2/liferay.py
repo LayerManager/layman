@@ -1,0 +1,5 @@
+from layman import settings
+
+AUTH_URLS = settings.LIFERAY_OAUTH2_AUTH_URLS
+INTROSPECTION_URL = settings.LIFERAY_OAUTH2_INTROSPECTION_URL
+

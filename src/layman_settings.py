@@ -83,6 +83,20 @@ PUBLICATION_MODULES = [
 
 AUTHN_MODULES = [
 ]
+AUTHN_OAUTH2_PROVIDERS = [
+    'layman.authn.oauth2.liferay'
+]
+LIFERAY_OAUTH2_AUTH_URLS = [
+    "http://localhost:8082/o/oauth2/authorize"
+]
+LIFERAY_OAUTH2_INTROSPECTION_URL = "http://liferay:8080/o/oauth2/introspect"
+
+LIFERAY_OAUTH2_CLIENTS = [
+    {
+        'id': 'id-353ab09c-f117-f2d5-d3a3-85cfb89e6746',
+        'secret': 'secret-d31a82c8-3e73-1058-e38a-f9191f7c2014',
+   }
+]
 
 AUTHZ_MODULE = os.environ['LAYMAN_AUTHZ_MODULE']
 

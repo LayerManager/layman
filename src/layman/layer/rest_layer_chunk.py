@@ -19,7 +19,7 @@ def before_request():
 
 @bp.route("/layers/<layername>/chunk", methods=['POST'])
 def post(username, layername):
-    app.logger.info(f"POST Layer Chunk, user={g.user and g.user['name']}")
+    app.logger.info(f"POST Layer Chunk, user={g.user}")
 
     # USER
     check_username(username)
@@ -53,7 +53,7 @@ def post(username, layername):
 
 @bp.route("/layers/<layername>/chunk", methods=['GET'])
 def get(username, layername):
-    app.logger.info(f"GET Layer Chunk, user={g.user and g.user['name']}")
+    app.logger.info(f"GET Layer Chunk, user={g.user}")
 
     chunk_number = request.args.get('resumableChunkNumber', default=1,
                                             type=int)

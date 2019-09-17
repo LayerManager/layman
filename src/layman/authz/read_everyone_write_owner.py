@@ -13,7 +13,9 @@ def authorize():
     if g.user is None:
         raise LaymanError(30, 'authenticated as anonymous user')
 
-    username = g.user['name']
+    username = g.user.get('name', None)
+    if username is None:
+        raise LaymanError(33)
 
     req_path = request.script_root + request.path
     m = USER_PATH_PATTERN.match(req_path)
