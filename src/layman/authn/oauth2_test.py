@@ -16,16 +16,61 @@ from .oauth2 import liferay
 
 
 introspection_bp = Blueprint('rest_test_oauth2_introspection', __name__)
+user_profile_bp = Blueprint('rest_test_oauth2_user_profile', __name__)
 
 
-@introspection_bp.route('', methods=['POST'])
-def get():
+@introspection_bp.route('introspection', methods=['POST'])
+def post():
     is_active = request.args.get('is_active', None)
     is_active = is_active is not None and is_active.lower() == 'true'
 
     return jsonify({
         'active': is_active,
         'token_type': 'Bearer',
+    }), 200
+
+
+@user_profile_bp.route('user-profile', methods=['GET'])
+def get():
+    return jsonify({
+        "agreedToTermsOfUse": False,
+        "comments": "",
+        "companyId": "20099",
+        "contactId": "20141",
+        "createDate": 1557361648854,
+        "defaultUser": False,
+        "emailAddress": "test@liferay.com",
+        "emailAddressVerified": True,
+        "externalReferenceCode": "",
+        "facebookId": "0",
+        "failedLoginAttempts": 0,
+        "firstName": "Test",
+        "googleUserId": "",
+        "graceLoginCount": 0,
+        "greeting": "Welcome Test Test!",
+        "jobTitle": "",
+        "languageId": "en_US",
+        "lastFailedLoginDate": None,
+        "lastLoginDate": 1565768756360,
+        "lastLoginIP": "172.19.0.1",
+        "lastName": "Test",
+        "ldapServerId": "-1",
+        "lockout": False,
+        "lockoutDate": None,
+        "loginDate": 1568805421539,
+        "loginIP": "172.18.0.1",
+        "middleName": "",
+        "modifiedDate": 1568805421548,
+        "mvccVersion": "11",
+        "openId": "",
+        "portraitId": "0",
+        "reminderQueryAnswer": "aa",
+        "reminderQueryQuestion": "what-is-your-father's-middle-name",
+        "screenName": "test",
+        "status": 0,
+        "timeZoneId": "UTC",
+        "userId": "20139",
+        "uuid": "4ef84411-749a-e617-6191-10e0c6a7147b"
     }), 200
 
 
@@ -55,7 +100,7 @@ def unexisting_introspection_url():
 @pytest.fixture()
 def inactive_token_introspection_url():
     introspection_url = liferay.INTROSPECTION_URL
-    liferay.INTROSPECTION_URL = url_for('rest_test_oauth2_introspection.get')
+    liferay.INTROSPECTION_URL = url_for('rest_test_oauth2_introspection.post')
     yield
     liferay.INTROSPECTION_URL = introspection_url
 
@@ -63,14 +108,14 @@ def inactive_token_introspection_url():
 @pytest.fixture()
 def active_token_introspection_url():
     introspection_url = liferay.INTROSPECTION_URL
-    liferay.INTROSPECTION_URL = url_for('rest_test_oauth2_introspection.get', is_active='true')
+    liferay.INTROSPECTION_URL = url_for('rest_test_oauth2_introspection.post', is_active='true')
     yield
     liferay.INTROSPECTION_URL = introspection_url
 
 
 @pytest.fixture(scope="module")
 def client():
-    app.register_blueprint(introspection_bp, url_prefix='/rest/test-oauth2-introspection')
+    app.register_blueprint(introspection_bp, url_prefix='/rest/test-oauth2/')
     client = app.test_client()
     server = Process(target=app.run, kwargs={
         'host': '0.0.0.0',
@@ -165,18 +210,6 @@ def test_no_provider_found(client):
     assert resp_json['detail'] == f'No OAuth2 provider was found for URL passed in HTTP header {ISS_URL_HEADER}.'
 
 
-def test_token_not_valid(client):
-    username = 'testuser1'
-    rv = client.get(url_for('rest_layers.get', username=username), headers={
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-        f'{TOKEN_HEADER}': 'Bearer abc',
-    })
-    assert rv.status_code == 403
-    resp_json = rv.get_json()
-    assert resp_json['code'] == 32
-    assert resp_json['detail'] == f'Introspection endpoint did not recognize access_token, or the token is not active.'
-
-
 @pytest.mark.usefixtures('unexisting_introspection_url')
 def test_unexisting_introspection_url(client):
     username = 'testuser1'
@@ -187,7 +220,7 @@ def test_unexisting_introspection_url(client):
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
-    assert resp_json['detail'] == f'Introspection endpoint {liferay.INTROSPECTION_URL} is not reachable.'
+    assert resp_json['detail'] == f'Introspection endpoint is not reachable.'
 
 
 @pytest.mark.usefixtures('inactive_token_introspection_url')
@@ -200,7 +233,7 @@ def test_token_inactive(client):
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
-    assert resp_json['detail'] == f'Introspection endpoint did not recognize access_token, or the token is not active.'
+    assert resp_json['detail'] == f'Introspection endpoint claims that access token is not active or it\'s not Bearer token.'
 
 
 @pytest.mark.usefixtures('active_token_introspection_url')
