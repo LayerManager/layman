@@ -50,8 +50,8 @@ def client():
 
     app.config['TESTING'] = True
     app.config['DEBUG'] = True
-    app.config['SERVER_NAME'] = f'layman_test:{PORT}'
-    app.config['SESSION_COOKIE_DOMAIN'] = f'layman_test:{PORT}'
+    app.config['SERVER_NAME'] = f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{PORT}'
+    app.config['SESSION_COOKIE_DOMAIN'] = f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{PORT}'
 
     # print('before app.app_context()')
     with app.app_context() as ctx:
@@ -67,19 +67,6 @@ def client():
 
 
 
-
-# @pytest.fixture
-# def client():
-#     layman.config['TESTING'] = True
-#     layman.config['SERVER_NAME'] = '127.0.0.1:9000'
-#     layman.config['SESSION_COOKIE_DOMAIN'] = 'localhost:9000'
-#     client = layman.test_client()
-#
-#     with layman.app_context() as ctx:
-#         ctx.push()
-#         pass
-#
-#     yield client
 
 def test_wrong_value_of_user(client):
     usernames = [' ', '2a', 'ě', ';', '?', 'ABC']
