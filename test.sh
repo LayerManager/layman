@@ -29,5 +29,5 @@ if ! [ -f $ne_110m_cultural_populated_places ]; then
 fi
 
 #python3 src/clear_layman_data.py && python3 -m pytest -svv src/layman/layer/rest_test.py::test_get_layers_testuser1_v1
-python3 src/wait_for_deps.py && python3 src/clear_layman_data.py && python3 -m pytest -svv
+python3 src/wait_for_deps.py && python3 src/clear_layman_data.py && python3 -m pytest -vv
 
