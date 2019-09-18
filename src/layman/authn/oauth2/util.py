@@ -61,7 +61,7 @@ def authenticate():
             continue
 
     if all_connection_errors:
-        raise LaymanError(32, f'Introspection endpoint is not reachable.')
+        raise LaymanError(32, f'Introspection endpoint {provider_module.INTROSPECTION_URL} is not reachable.')
 
     if valid_resp is None:
         raise LaymanError(32, f'Introspection endpoint did not recognize access_token, or the token is not active.')

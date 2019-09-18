@@ -14,13 +14,13 @@ def authorize():
         raise LaymanError(30, 'authenticated as anonymous user')
 
     username = g.user.get('name', None)
-    if username is None:
+    if request.method == 'POST' and username is None:
         raise LaymanError(33)
 
     req_path = request.script_root + request.path
     m = USER_PATH_PATTERN.match(req_path)
     ownername = m.group(1)
 
-    if username != ownername:
+    if username != ownername or ownername is None or len(ownername) == 0:
         raise LaymanError(30, {'user': username})
 

@@ -11,8 +11,7 @@ import sys
 del sys.modules['layman']
 
 from . import MAP_TYPE
-from layman import app
-from layman import uuid
+from layman import app, settings, uuid
 from layman.map.filesystem import uuid as map_uuid
 
 
@@ -38,8 +37,8 @@ def client():
 
     app.config['TESTING'] = True
     app.config['DEBUG'] = True
-    app.config['SERVER_NAME'] = f'layman_test:{PORT}'
-    app.config['SESSION_COOKIE_DOMAIN'] = f'layman_test:{PORT}'
+    app.config['SERVER_NAME'] = f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{PORT}'
+    app.config['SESSION_COOKIE_DOMAIN'] = f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{PORT}'
 
     # print('before app.app_context()')
     with app.app_context() as ctx:

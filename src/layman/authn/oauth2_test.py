@@ -44,6 +44,30 @@ def adjust_settings():
     settings.AUTHN_MODULES = authn_modules
 
 
+@pytest.fixture()
+def unexisting_introspection_url():
+    introspection_url = liferay.INTROSPECTION_URL
+    liferay.INTROSPECTION_URL = 'http://blabla:8000/bla'
+    yield
+    liferay.INTROSPECTION_URL = introspection_url
+
+
+@pytest.fixture()
+def inactive_token_introspection_url():
+    introspection_url = liferay.INTROSPECTION_URL
+    liferay.INTROSPECTION_URL = url_for('rest_test_oauth2_introspection.get')
+    yield
+    liferay.INTROSPECTION_URL = introspection_url
+
+
+@pytest.fixture()
+def active_token_introspection_url():
+    introspection_url = liferay.INTROSPECTION_URL
+    liferay.INTROSPECTION_URL = url_for('rest_test_oauth2_introspection.get', is_active='true')
+    yield
+    liferay.INTROSPECTION_URL = introspection_url
+
+
 @pytest.fixture(scope="module")
 def client():
     app.register_blueprint(introspection_bp, url_prefix='/rest/test-oauth2-introspection')
@@ -153,10 +177,9 @@ def test_token_not_valid(client):
     assert resp_json['detail'] == f'Introspection endpoint did not recognize access_token, or the token is not active.'
 
 
+@pytest.mark.usefixtures('unexisting_introspection_url')
 def test_unexisting_introspection_url(client):
     username = 'testuser1'
-    introspection_url = liferay.INTROSPECTION_URL
-    liferay.INTROSPECTION_URL = 'http://blabla:8000/bla'
     rv = client.get(url_for('rest_layers.get', username=username), headers={
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
@@ -164,14 +187,12 @@ def test_unexisting_introspection_url(client):
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
-    assert resp_json['detail'] == f'Introspection endpoint is not reachable.'
-    liferay.INTROSPECTION_URL = introspection_url
+    assert resp_json['detail'] == f'Introspection endpoint {liferay.INTROSPECTION_URL} is not reachable.'
 
 
+@pytest.mark.usefixtures('inactive_token_introspection_url')
 def test_token_inactive(client):
     username = 'testuser1'
-    introspection_url = liferay.INTROSPECTION_URL
-    liferay.INTROSPECTION_URL = url_for('rest_test_oauth2_introspection.get')
     rv = client.get(url_for('rest_layers.get', username=username), headers={
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
@@ -180,18 +201,15 @@ def test_token_inactive(client):
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
     assert resp_json['detail'] == f'Introspection endpoint did not recognize access_token, or the token is not active.'
-    liferay.INTROSPECTION_URL = introspection_url
 
 
+@pytest.mark.usefixtures('active_token_introspection_url')
 def test_token_active(client):
     username = 'testuser1'
-    introspection_url = liferay.INTROSPECTION_URL
-    liferay.INTROSPECTION_URL = url_for('rest_test_oauth2_introspection.get', is_active='true')
     rv = client.get(url_for('rest_layers.get', username=username), headers={
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
     })
     assert rv.status_code == 200
-    liferay.INTROSPECTION_URL = introspection_url
 
 

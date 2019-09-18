@@ -6,17 +6,20 @@ import time
 import sys
 del sys.modules['layman']
 
-from layman import app as layman
+from layman import app as layman, settings
 from layman.layer.filesystem.input_file import ensure_layer_input_file_dir
 from layman.layer.filesystem.util import get_layer_dir
 from .__init__ import import_layer_vector_file_async
 
 
+PORT = 8000
+
+
 @pytest.fixture(scope="module")
 def client():
     layman.config['TESTING'] = True
-    layman.config['SERVER_NAME'] = '127.0.0.1:9000'
-    layman.config['SESSION_COOKIE_DOMAIN'] = 'localhost:9000'
+    layman.config['SERVER_NAME'] = f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{PORT}'
+    layman.config['SESSION_COOKIE_DOMAIN'] = f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{PORT}'
     client = layman.test_client()
 
     with layman.app_context() as ctx:
