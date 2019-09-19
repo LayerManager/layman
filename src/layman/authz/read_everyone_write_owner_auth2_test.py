@@ -1,5 +1,6 @@
 import os
 from multiprocessing import Process
+import requests
 import time
 
 import pytest
@@ -12,7 +13,7 @@ from layman.layer import LAYER_TYPE
 from layman import app as app
 from layman import settings
 from layman import uuid
-from layman.authn.oauth2_test import introspection_bp, active_token_introspection_url
+from layman.authn.oauth2_test import introspection_bp, user_profile_bp, active_token_introspection_url, user_profile_url
 from layman.authn.oauth2 import liferay
 from layman.authn.oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
 
@@ -37,7 +38,8 @@ def adjust_settings():
 
 @pytest.fixture(scope="module")
 def client():
-    app.register_blueprint(introspection_bp, url_prefix='/rest/test-oauth2-introspection')
+    app.register_blueprint(introspection_bp, url_prefix='/rest/test-oauth2/')
+    app.register_blueprint(user_profile_bp, url_prefix='/rest/test-oauth2/')
     client = app.test_client()
     server = Process(target=app.run, kwargs={
         'host': '0.0.0.0',
@@ -56,12 +58,19 @@ def client():
         publs_by_type = uuid.check_redis_consistency()
         global num_layers_before_test
         num_layers_before_test = len(publs_by_type[LAYER_TYPE])
-        yield client
+    yield client
 
     server.terminate()
     server.join()
 
 
+@pytest.fixture()
+def app_context():
+    with app.app_context() as ctx:
+        yield ctx
+
+
+@pytest.mark.usefixtures('app_context')
 def test_anonymous_get_access(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username))
@@ -71,6 +80,7 @@ def test_anonymous_get_access(client):
     })
 
 
+@pytest.mark.usefixtures('app_context')
 def test_anonymous_post_access(client):
     username = 'testuser1'
     rest_path = url_for('rest_layers.post', username=username)
@@ -99,7 +109,7 @@ def test_anonymous_post_access(client):
     })
 
 
-@pytest.mark.usefixtures('active_token_introspection_url')
+@pytest.mark.usefixtures('app_context', 'active_token_introspection_url')
 def test_authn_get_access(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers={
@@ -109,7 +119,7 @@ def test_authn_get_access(client):
     assert rv.status_code == 200
 
 
-@pytest.mark.usefixtures('active_token_introspection_url')
+@pytest.mark.usefixtures('app_context', 'active_token_introspection_url')
 def test_authn_post_access_without_workspace(client):
     username = 'testuser1'
     rest_path = url_for('rest_layers.post', username=username)
@@ -137,17 +147,4 @@ def test_authn_post_access_without_workspace(client):
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 0
     })
-
-
-@pytest.mark.usefixtures('active_token_introspection_url')
-def test_authn_get_current_user_without_workspace(client):
-    rest_path = url_for('rest_current_user.get')
-    rv = client.get(rest_path, headers={
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-        f'{TOKEN_HEADER}': 'Bearer abc',
-    })
-    assert rv.status_code == 200
-    resp_json = rv.get_json()
-    # print(resp_json)
-
 
