@@ -7,10 +7,10 @@ def get_user_profile(user_obj):
             'authenticated': False,
         }
     else:
-        username = user_obj.get('name', None)
+        username = user_obj.get('username', None)
         result = {
             'authenticated': True,
-            'name': username,
+            'username': username,
         }
     result = {k: v for k, v in result.items() if v is not None}
     claims = get_open_id_claims().copy()

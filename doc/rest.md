@@ -435,5 +435,5 @@ Content-Type: `application/json`
 
 JSON object with following structure:
 - **authenticated**: Boolean. `true` if user is authenticated, `false` if user is anonymous.
-- **claims**: Object. Dictionary of known claims according to [OpenID Connect standard claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims) (e.g. name, nickname, preferred_username, or email). Some claims are set even if the user is anonymous (e.g. name).
-- *name*: String. Username the user claimed within Layman. If not set, it was not claimed yet. To be used as username in some REST API paths (i.e. `/rest/<user>/...`)
+- **claims**: Object. Dictionary of known claims (e.g. name, nickname, preferred_username, or email). Claims are inspired by and have same meaning as [OpenID Connect standard claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims). Some claims are set even if the user is anonymous (e.g. name).
+- *username*: String. Username the user claimed within Layman. If not set, it was not claimed yet. To be used as username in some REST API paths (i.e. `/rest/<user>/...`)
