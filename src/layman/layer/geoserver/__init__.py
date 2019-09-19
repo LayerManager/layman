@@ -57,10 +57,10 @@ def get_all_rules():
 
 def check_username(username):
     if username in settings.GS_RESERVED_WORKSPACE_NAMES:
-        raise LaymanError(13, {'workspace': username})
+        raise LaymanError(35, {'reserved_by': __name__, 'workspace': username})
     non_layman_workspaces = get_non_layman_workspaces()
     if any(ws['name'] == username for ws in non_layman_workspaces):
-        raise LaymanError(12, {'workspace': username})
+        raise LaymanError(35, {'reserved_by': __name__, 'reason': 'GeoServer workspace not assigned to LAYMAN_GS_ROLE'})
 
 
 def ensure_user_workspace(username):
@@ -82,6 +82,24 @@ def ensure_user_workspace(username):
         )
         r.raise_for_status()
         ensure_user_db_store(username)
+
+
+def delete_user_workspace(username):
+    delete_user_db_store(username)
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, username + '.*.r'),
+        headers=headers_json,
+        auth=settings.LAYMAN_GS_AUTH
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username),
+        headers=headers_json,
+        auth=settings.LAYMAN_GS_AUTH
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
 
 
 def ensure_user_db_store(username):
@@ -128,6 +146,16 @@ def ensure_user_db_store(username):
         auth=settings.LAYMAN_GS_AUTH
     )
     r.raise_for_status()
+
+
+def delete_user_db_store(username):
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + f'/datastores/{username}'),
+        headers=headers_json,
+        auth=settings.LAYMAN_GS_AUTH
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
 
 
 def publish_layer_from_db(username, layername, description, title):

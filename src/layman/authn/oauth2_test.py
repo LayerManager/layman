@@ -302,13 +302,12 @@ def test_authn_get_current_user_without_workspace(client):
     assert claims['sub'] == '20139'
 
 
-@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url', 'server')
+@pytest.mark.usefixtures('app_context')
 def test_get_current_user_anonymous(client):
     rest_path = url_for('rest_current_user.get')
     rv = client.get(rest_path)
     assert rv.status_code == 200
     resp_json = rv.get_json()
-    print(resp_json)
     assert resp_json['authenticated'] is False
     assert {'authenticated', 'claims'} == set(resp_json.keys())
     claims = resp_json['claims']
@@ -317,3 +316,25 @@ def test_get_current_user_anonymous(client):
            } == set(claims.keys())
     assert claims['name'] == 'Anonymous'
     assert claims['nickname'] == 'Anonymous'
+
+
+@pytest.mark.usefixtures('app_context')
+def test_patch_current_user_anonymous(client):
+    rest_path = url_for('rest_current_user.patch')
+    rv = client.patch(rest_path)
+    assert rv.status_code == 403
+    resp_json = rv.get_json()
+    assert resp_json['code'] == 30
+
+
+@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url', 'server')
+def test_patch_current_user_without_workspace(client):
+    rest_path = url_for('rest_current_user.patch', adjust_username='true')
+    rv = client.patch(rest_path, headers={
+        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+        f'{TOKEN_HEADER}': 'Bearer abc',
+    })
+    assert rv.status_code == 200
+    # resp_json = rv.get_json()
+
+

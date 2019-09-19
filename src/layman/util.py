@@ -33,12 +33,43 @@ def to_safe_name(unsafe_name, type_name):
     return value
 
 
+def to_safe_names(unsafe_names, type_name):
+    values = [slugify(n) for n in unsafe_names]
+    values = [v for v in values if len(v) > 0]
+    values_letter_prefix, values_other_prefix = [], []
+    for v in values:
+        (values_other_prefix if re.match(r'^[^a-z].*', v) else values_letter_prefix).append(v)
+    values = values_letter_prefix + [f'{type_name}_{v}' for v in values_other_prefix]
+    if len(values) == 0:
+        values = [type_name]
+    return values
+
 
 def check_username(username):
     if not re.match(USERNAME_RE, username):
         raise LaymanError(2, {'parameter': 'user', 'expected': USERNAME_RE})
     providers = get_internal_providers()
     call_modules_fn(providers, 'check_username', [username])
+
+
+def get_usernames():
+    providers = get_internal_providers()
+    results = call_modules_fn(providers, 'get_usernames')
+    usernames = []
+    for r in results:
+        usernames += r
+    usernames = list(set(usernames))
+    return usernames
+
+
+def ensure_user_workspace(username):
+    providers = get_internal_providers()
+    call_modules_fn(providers, 'ensure_user_workspace', [username])
+
+
+def delete_user_workspace(username):
+    providers = get_internal_providers()
+    call_modules_fn(providers, 'delete_user_workspace', [username])
 
 
 def get_internal_providers():
