@@ -18,6 +18,7 @@ from layman import app as app
 from layman import settings
 from layman.layer.filesystem import uuid as layer_uuid
 from layman import uuid, util as layman_util
+from layman.layer import db
 
 
 min_geojson = """
@@ -96,7 +97,9 @@ def test_username_schema_conflict(client):
     assert rv.status_code==409
     resp_json = rv.get_json()
     # print(resp_json)
-    assert resp_json['code']==8
+    assert resp_json['code'] == 35
+    assert resp_json['detail']['reserved_by'] == db.__name__
+    assert 'reason' not in resp_json['detail']
     for schema_name in [
         'pg_catalog',
         'pg_toast',
@@ -109,8 +112,10 @@ def test_username_schema_conflict(client):
         })
         resp_json = rv.get_json()
         # print(resp_json)
-        assert rv.status_code==409
-        assert resp_json['code']==10
+        assert rv.status_code == 409
+        assert resp_json['code'] == 35
+        assert resp_json['detail']['reserved_by'] == db.__name__
+        assert resp_json['detail']['reason'] == 'DB schema owned by another than layman user'
 
 
 def test_layername_db_object_conflict(client):

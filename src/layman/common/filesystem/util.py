@@ -30,10 +30,18 @@ def get_user_dir(username):
     return userdir
 
 
-def ensure_user_dir(username):
+def ensure_user_workspace(username):
     userdir = get_user_dir(username)
     pathlib.Path(userdir).mkdir(exist_ok=True, parents=True)
     return userdir
+
+
+def delete_user_workspace(username):
+    userdir = get_user_dir(username)
+    try:
+        os.rmdir(userdir)
+    except FileNotFoundError:
+        pass
 
 
 def get_publications_dir(publ_type, username):

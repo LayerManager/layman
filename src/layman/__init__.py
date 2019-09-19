@@ -18,7 +18,7 @@ from .util import get_blueprints
 for bp in get_blueprints():
     app.register_blueprint(bp, url_prefix='/rest/<username>')
 
-from .user.current_user import bp as current_user_bp
+from .user.rest_current_user import bp as current_user_bp
 app.register_blueprint(current_user_bp, url_prefix='/rest/current-user')
 
 # load UUIDs only once

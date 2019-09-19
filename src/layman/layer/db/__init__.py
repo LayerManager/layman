@@ -45,7 +45,7 @@ def get_usernames(conn_cur=None):
 
 def check_username(username, conn_cur=None):
     if username in settings.PG_NON_USER_SCHEMAS:
-        raise LaymanError(8, {'schema': username})
+        raise LaymanError(35, {'reserved_by': __name__, 'schema': username})
 
     if conn_cur is None:
         conn_cur = get_connection_cursor()
@@ -59,10 +59,10 @@ def check_username(username, conn_cur=None):
         raise LaymanError(7)
     rows = cur.fetchall()
     if len(rows) > 0:
-        raise LaymanError(10, {'schema': username})
+        raise LaymanError(35, {'reserved_by': __name__, 'schema': username, 'reason': 'DB schema owned by another than layman user'})
 
 
-def ensure_user_schema(username, conn_cur=None):
+def ensure_user_workspace(username, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
@@ -70,6 +70,19 @@ def ensure_user_schema(username, conn_cur=None):
     try:
         cur.execute(
             f"""CREATE SCHEMA IF NOT EXISTS "{username}" AUTHORIZATION {settings.LAYMAN_PG_USER}""")
+        conn.commit()
+    except:
+        raise LaymanError(7)
+
+
+def delete_user_workspace(username, conn_cur=None):
+    if conn_cur is None:
+        conn_cur = get_connection_cursor()
+    conn, cur = conn_cur
+
+    try:
+        cur.execute(
+            f"""DROP SCHEMA IF EXISTS "{username}" RESTRICT""")
         conn.commit()
     except:
         raise LaymanError(7)

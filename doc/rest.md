@@ -11,7 +11,7 @@
 |Map|`/rest/<user>/maps/<mapname>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
 |Map File|`/rest/<user>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
 |Map Thumbnail|`/rest/<user>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
-|Current User|`/rest/current-user`|[GET](#get-current-user)| x | x | x |
+|Current User|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | x |
 
 #### REST path parameters
 - **user**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
@@ -58,7 +58,7 @@ It is possible to upload data files asynchronously, which is suitable for large 
 Check [Asynchronous file upload](async-file-upload.md) example.
 
 #### Request
-Content-Type: `multipart/form-data`
+Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
 
 Body parameters:
 - **file**, file(s) or file name(s)
@@ -155,7 +155,7 @@ Response to this request may be returned sooner than the processing chain is fin
 It is possible to upload data files asynchronously, which is suitable for large files. See [POST Layers](#post-layers).
 
 #### Request
-Content-Type: `multipart/form-data`
+Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
 
 Parameters have same meaning as in case of [POST Layers](#post-layers).
 
@@ -348,7 +348,7 @@ JSON object with following structure:
 Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Maps](#post-maps).
 
 #### Request
-Content-Type: `multipart/form-data`
+Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
 
 Parameters have same meaning as in case of [POST Maps](#post-maps).
 
@@ -436,4 +436,25 @@ Content-Type: `application/json`
 JSON object with following structure:
 - **authenticated**: Boolean. `true` if user is authenticated, `false` if user is anonymous.
 - **claims**: Object. Dictionary of known claims (e.g. name, nickname, preferred_username, or email). Claims are inspired by and have same meaning as [OpenID Connect standard claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims). Some claims are set even if the user is anonymous (e.g. name).
-- *username*: String. Username the user claimed within Layman. If not set, it was not claimed yet. To be used as username in some REST API paths (i.e. `/rest/<user>/...`)
+- *username*: String. Username the user reserved within Layman. If not set, it was not reserved yet. To be used as username in some REST API paths (i.e. `/rest/<user>/...`)
+- *name*: String. Full name used e.g. for maps metadata. Available only for authenticated users with reserved username.
+- *email*: String. Email address used e.g. for maps metadata. Available only for authenticated users with reserved username.
+
+### PATCH Current User
+Update information about current user. Currently used only for reserving `username`.
+
+#### Request
+Content-Type: `application/x-www-form-urlencoded`
+
+Query parameters:
+- *adjust_username*: String.
+  - `false` (default): If `username` sent in body parameter is already reserved by another user, Layman will return error.
+  - `true`: If `username` sent in body parameter is already reserved by another user or `username` is an empty string, layman will definitely reserve some `username`, preferably similar to the value sent in `username` body parameter or to one of claims.
+
+Body parameters:
+- *username*: String. The `username` that should be reserved for current user. The `username` can be reserved only once and it cannot be changed. See URL parameter `adjust_username` for other details.
+
+#### Response
+Content-Type: `application/json`
+
+JSON object, same as in case of [GET](#get-current-user).

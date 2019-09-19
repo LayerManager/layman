@@ -5,7 +5,7 @@ from celery.utils.log import get_task_logger
 from layman.layer.filesystem.input_file import get_layer_main_file_path
 from layman import celery_app
 from layman.http import LaymanError
-from . import import_layer_vector_file_async, ensure_user_schema
+from . import import_layer_vector_file_async, ensure_user_workspace
 from .table import delete_layer
 
 logger = get_task_logger(__name__)
@@ -42,7 +42,7 @@ def import_layer_vector_file(
         ensure_user=False
     ):
     if ensure_user:
-        ensure_user_schema(username)
+        ensure_user_workspace(username)
     if self.is_aborted():
         return
     main_filepath = get_layer_main_file_path(username, layername)

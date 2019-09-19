@@ -29,7 +29,7 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
         # print(f"login_required ARGS {args} KWARGS {kwargs}")
         if g.user is None:
-            raise LaymanError(1)
+            raise LaymanError(30)
         return f(*args, **kwargs)
     return decorated_function
 
