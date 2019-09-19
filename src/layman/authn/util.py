@@ -1,10 +1,11 @@
 from functools import wraps
-from flask import g, current_app
+from flask import g, current_app, request
 
 from layman import LaymanError, settings
 from layman.util import call_modules_fn, get_modules_from_names
 
 FLASK_MODULES_KEY = f'{__name__}:MODULES'
+
 
 def authenticate(f):
     @wraps(f)
@@ -33,8 +34,25 @@ def login_required(f):
     return decorated_function
 
 
+def get_open_id_claims():
+    user = g.user
+    if user is None:
+        result = {
+            'iss': request.host_url,
+            'name': 'Anonymous',
+            'nickname': 'Anonymous',
+        }
+    else:
+        authn_module = user['AUTHN_MODULE']
+        authn_module = next((m for m in get_authn_modules() if m.__name__ == authn_module))
+        result = authn_module.get_open_id_claims()
+    g.open_id_claims = result
+    return result
+
+
 def get_authn_modules():
     key = FLASK_MODULES_KEY
     if key not in current_app.config:
         current_app.config[key] = get_modules_from_names(settings.AUTHN_MODULES)
     return current_app.config[key]
+

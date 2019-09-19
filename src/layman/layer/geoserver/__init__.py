@@ -8,6 +8,9 @@ from flask import g, current_app
 from layman.http import LaymanError
 from layman import settings
 
+FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
+FLASK_RULES_KEY = f"{__name__}:RULES"
+
 headers_json = {
     'Accept': 'application/json',
     'Content-type': 'application/json',
@@ -19,7 +22,7 @@ headers_xml = {
 
 
 def get_all_workspaces():
-    key = 'layman.layer.geoserver.workspaces'
+    key = FLASK_WORKSPACES_KEY
     if key not in g:
         r = requests.get(
             settings.LAYMAN_GS_REST_WORKSPACES,
@@ -36,7 +39,7 @@ def get_all_workspaces():
 
 
 def get_all_rules():
-    key = 'layman.layer.geoserver.rules'
+    key = FLASK_RULES_KEY
     if key not in g:
         r = requests.get(
             settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,

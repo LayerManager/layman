@@ -113,17 +113,19 @@ def active_token_introspection_url():
     liferay.INTROSPECTION_URL = introspection_url
 
 
+@pytest.fixture()
+def user_profile_url():
+    user_profile_url = liferay.USER_PROFILE_URL
+    liferay.USER_PROFILE_URL = url_for('rest_test_oauth2_user_profile.get')
+    yield
+    liferay.USER_PROFILE_URL = user_profile_url
+
+
 @pytest.fixture(scope="module")
 def client():
     app.register_blueprint(introspection_bp, url_prefix='/rest/test-oauth2/')
+    app.register_blueprint(user_profile_bp, url_prefix='/rest/test-oauth2/')
     client = app.test_client()
-    server = Process(target=app.run, kwargs={
-        'host': '0.0.0.0',
-        'port': PORT,
-        'debug': False,
-    })
-    server.start()
-    time.sleep(1)
 
     app.config['TESTING'] = True
     app.config['DEBUG'] = True
@@ -134,12 +136,35 @@ def client():
         publs_by_type = uuid.check_redis_consistency()
         global num_layers_before_test
         num_layers_before_test = len(publs_by_type[LAYER_TYPE])
-        yield client
+    yield client
+
+    # server.terminate()
+    # server.join()
+
+
+@pytest.fixture(scope="module")
+def server():
+    server = Process(target=app.run, kwargs={
+        'host': '0.0.0.0',
+        'port': PORT,
+        'debug': False,
+    })
+    server.start()
+    time.sleep(1)
+
+    yield server
 
     server.terminate()
     server.join()
 
 
+@pytest.fixture()
+def app_context():
+    with app.app_context() as ctx:
+        yield ctx
+
+
+@pytest.mark.usefixtures('app_context')
 def test_no_iss_url_header(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers={
@@ -151,6 +176,7 @@ def test_no_iss_url_header(client):
     assert resp_json['detail'] == f'HTTP header {TOKEN_HEADER} was set, but HTTP header {ISS_URL_HEADER} was not found'
 
 
+@pytest.mark.usefixtures('app_context')
 def test_no_auth_header(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers={
@@ -162,6 +188,7 @@ def test_no_auth_header(client):
     assert resp_json['detail'] == f'HTTP header {ISS_URL_HEADER} was set, but HTTP header {TOKEN_HEADER} was not found.'
 
 
+@pytest.mark.usefixtures('app_context')
 def test_auth_header_one_part(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers={
@@ -174,6 +201,7 @@ def test_auth_header_one_part(client):
     assert resp_json['detail'] == f'HTTP header {TOKEN_HEADER} must have 2 parts: "Bearer <access_token>", but has 1 parts.'
 
 
+@pytest.mark.usefixtures('app_context')
 def test_auth_header_bad_first_part(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers={
@@ -186,6 +214,7 @@ def test_auth_header_bad_first_part(client):
     assert resp_json['detail'] == f'First part of HTTP header {TOKEN_HEADER} must be "Bearer", but it\'s abc'
 
 
+@pytest.mark.usefixtures('app_context')
 def test_auth_header_no_access_token(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers={
@@ -198,6 +227,7 @@ def test_auth_header_no_access_token(client):
     assert resp_json['detail'] == f'HTTP header {TOKEN_HEADER} contains empty access token. The structure must be "Bearer <access_token>"'
 
 
+@pytest.mark.usefixtures('app_context')
 def test_no_provider_found(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers={
@@ -210,7 +240,7 @@ def test_no_provider_found(client):
     assert resp_json['detail'] == f'No OAuth2 provider was found for URL passed in HTTP header {ISS_URL_HEADER}.'
 
 
-@pytest.mark.usefixtures('unexisting_introspection_url')
+@pytest.mark.usefixtures('app_context', 'unexisting_introspection_url')
 def test_unexisting_introspection_url(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers={
@@ -223,7 +253,7 @@ def test_unexisting_introspection_url(client):
     assert resp_json['detail'] == f'Introspection endpoint is not reachable.'
 
 
-@pytest.mark.usefixtures('inactive_token_introspection_url')
+@pytest.mark.usefixtures('app_context', 'inactive_token_introspection_url', 'server')
 def test_token_inactive(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers={
@@ -236,7 +266,7 @@ def test_token_inactive(client):
     assert resp_json['detail'] == f'Introspection endpoint claims that access token is not active or it\'s not Bearer token.'
 
 
-@pytest.mark.usefixtures('active_token_introspection_url')
+@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'server')
 def test_token_active(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers={
@@ -246,3 +276,44 @@ def test_token_active(client):
     assert rv.status_code == 200
 
 
+@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url', 'server')
+def test_authn_get_current_user_without_workspace(client):
+    rest_path = url_for('rest_current_user.get')
+    rv = client.get(rest_path, headers={
+        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+        f'{TOKEN_HEADER}': 'Bearer abc',
+    })
+    assert rv.status_code == 200
+    resp_json = rv.get_json()
+    assert resp_json['authenticated'] is True
+    assert {'authenticated', 'claims'} == set(resp_json.keys())
+    claims = resp_json['claims']
+    assert {
+               'email', 'email_verified', 'family_name', 'given_name', 'iss', 'middle_name', 'name',
+               'preferred_username', 'sub'
+           } == set(claims.keys())
+    assert claims['email'] == 'test@liferay.com'
+    assert claims['email_verified'] is True
+    assert claims['family_name'] == 'Test'
+    assert claims['given_name'] == 'Test'
+    assert claims['middle_name'] == ''
+    assert claims['name'] == 'Test Test'
+    assert claims['preferred_username'] == 'test'
+    assert claims['sub'] == '20139'
+
+
+@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url', 'server')
+def test_get_current_user_anonymous(client):
+    rest_path = url_for('rest_current_user.get')
+    rv = client.get(rest_path)
+    assert rv.status_code == 200
+    resp_json = rv.get_json()
+    print(resp_json)
+    assert resp_json['authenticated'] is False
+    assert {'authenticated', 'claims'} == set(resp_json.keys())
+    claims = resp_json['claims']
+    assert {
+               'iss', 'name', 'nickname'
+           } == set(claims.keys())
+    assert claims['name'] == 'Anonymous'
+    assert claims['nickname'] == 'Anonymous'

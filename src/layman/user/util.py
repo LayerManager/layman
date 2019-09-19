@@ -1,17 +1,19 @@
+from layman.authn import get_open_id_claims
+
 
 def get_user_profile(user_obj):
     if user_obj is None:
         result = {
             'authenticated': False,
-            'friendly_name': 'Anonymous',
         }
     else:
-        friendly_name = user_obj.get('name', None)
-        workspace = user_obj.get('name', None)
+        username = user_obj.get('name', None)
         result = {
             'authenticated': True,
-            'friendly_name': friendly_name,
-            'workspace': workspace,
+            'name': username,
         }
     result = {k: v for k, v in result.items() if v is not None}
+    claims = get_open_id_claims().copy()
+    claims.pop('updated_at', None)
+    result['claims'] = claims
     return result
