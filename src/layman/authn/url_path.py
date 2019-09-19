@@ -15,14 +15,14 @@ def authenticate():
         username = m.group(1)
         check_username(username)
         user = {
-            'name': username
+            'username': username
         }
     g.user = user
     return user
 
 
 def get_open_id_claims():
-    username = g.user['name']
+    username = g.user['username']
     result = {
         'iss': request.host_url,
         'sub': username,
