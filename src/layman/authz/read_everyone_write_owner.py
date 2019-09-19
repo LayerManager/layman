@@ -13,7 +13,7 @@ def authorize():
     if g.user is None:
         raise LaymanError(30, 'authenticated as anonymous user')
 
-    username = g.user.get('name', None)
+    username = g.user.get('username', None)
     if request.method == 'POST' and username is None:
         raise LaymanError(33)
 
