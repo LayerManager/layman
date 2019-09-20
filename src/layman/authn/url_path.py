@@ -33,3 +33,9 @@ def get_open_id_claims():
     return result
 
 
+def get_iss_id():
+    return __name__
+
+
+def get_sub():
+    return g.user['username']

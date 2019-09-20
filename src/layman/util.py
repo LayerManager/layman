@@ -62,6 +62,20 @@ def get_usernames():
     return usernames
 
 
+def get_usernames_no_cache():
+    all_sources = []
+    for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
+        for type_def in publ_module.PUBLICATION_TYPES.values():
+            all_sources += type_def['internal_sources']
+    providers = get_providers_from_source_names(all_sources)
+    results = call_modules_fn(providers, 'get_usernames')
+    usernames = []
+    for r in results:
+        usernames += r
+    usernames = list(set(usernames))
+    return usernames
+
+
 def ensure_user_workspace(username):
     providers = get_internal_providers()
     call_modules_fn(providers, 'ensure_user_workspace', [username])

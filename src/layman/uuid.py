@@ -6,7 +6,7 @@ from flask import current_app
 from layman import LaymanError
 from redis import WatchError
 from . import settings
-from .util import get_modules_from_names, get_providers_from_source_names, call_modules_fn
+from .util import get_usernames_no_cache, get_modules_from_names, get_providers_from_source_names, call_modules_fn
 
 UUID_SET_KEY = f'{__name__}:UUID_SET'
 UUID_METADATA_KEY = f'{__name__}:UUID_METADATA:{{uuid}}'
@@ -15,16 +15,7 @@ USER_TYPE_NAMES_KEY = f'{__name__}:USER_TYPE_NAMES:{{username}}:{{publication_ty
 
 def import_uuids_to_redis():
     current_app.logger.info('Importing UUIDs to REDIS')
-    all_sources = []
-    for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
-        for type_def in publ_module.PUBLICATION_TYPES.values():
-            all_sources += type_def['internal_sources']
-    providers = get_providers_from_source_names(all_sources)
-    results = call_modules_fn(providers, 'get_usernames')
-    usernames = []
-    for r in results:
-        usernames += r
-    usernames = list(set(usernames))
+    usernames = get_usernames_no_cache()
 
     for username in usernames:
         for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):

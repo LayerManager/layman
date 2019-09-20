@@ -33,6 +33,6 @@ ERROR_LIST = {
     31: (400, 'Unexpected HTTP method.'),
     32: (403, 'Unsuccessful OAuth2 authentication.'),
     33: (400, 'Authenticated user did not claim any username within Layman yet.'),
-    34: (400, 'User already registered other username.'),
+    34: (400, 'User already reserved username.'),
     35: (409, 'Username already reserved.'),
 }
