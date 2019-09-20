@@ -1,4 +1,5 @@
 from multiprocessing import Process
+import shutil
 import time
 
 import pytest
@@ -18,21 +19,69 @@ from .oauth2 import liferay
 introspection_bp = Blueprint('rest_test_oauth2_introspection', __name__)
 user_profile_bp = Blueprint('rest_test_oauth2_user_profile', __name__)
 
+token_2_introspection = {
+    'abc': {
+        'sub': "20139",
+    },
+    'test2': {
+        'sub': "20140",
+    },
+    'test3': {
+        'sub': "20141",
+    },
+}
+token_2_profile = {
+    'abc': {
+        "emailAddress": "test@liferay.com",
+        "firstName": "Test",
+        "lastName": "Test",
+        "middleName": "",
+        "screenName": "test",
+        "userId": "20139",
+    },
+    'test2': {
+        "emailAddress": "test2@liferay.com",
+        "firstName": "Test",
+        "lastName": "Test",
+        "middleName": "",
+        "screenName": "test2",
+        "userId": "20140",
+    },
+    'test3': {
+        "emailAddress": "test3@liferay.com",
+        "firstName": "Test",
+        "lastName": "Test",
+        "middleName": "",
+        "screenName": "test3",
+        "userId": "20141",
+    },
+}
+
 
 @introspection_bp.route('introspection', methods=['POST'])
 def post():
     is_active = request.args.get('is_active', None)
     is_active = is_active is not None and is_active.lower() == 'true'
 
-    return jsonify({
-        'active': is_active,
-        'token_type': 'Bearer',
-    }), 200
+    access_token = request.form.get('token')
+    assert access_token in token_2_introspection
+    result = {
+        "active": is_active, "client_id": "id-353ab09c-f117-f2d5-d3a3-85cfb89e6746", "exp": 1568981517,
+        "iat": 1568980917,
+        "scope": "liferay-json-web-services.everything.read.userprofile", "sub": "20139", "token_type": "Bearer",
+        "username": "Test Test", "company.id": "20099"
+    }
+    result.update(token_2_introspection[access_token])
+
+    return jsonify(result), 200
 
 
 @user_profile_bp.route('user-profile', methods=['GET'])
 def get():
-    return jsonify({
+    access_token = request.headers.get(TOKEN_HEADER).split(' ')[1]
+    assert access_token in token_2_profile
+
+    result = {
         "agreedToTermsOfUse": False,
         "comments": "",
         "companyId": "20099",
@@ -71,7 +120,10 @@ def get():
         "timeZoneId": "UTC",
         "userId": "20139",
         "uuid": "4ef84411-749a-e617-6191-10e0c6a7147b"
-    }), 200
+    }
+    result.update(token_2_profile[access_token])
+
+    return jsonify(result), 200
 
 
 PORT = 8000
@@ -108,7 +160,8 @@ def inactive_token_introspection_url():
 @pytest.fixture()
 def active_token_introspection_url():
     introspection_url = liferay.INTROSPECTION_URL
-    liferay.INTROSPECTION_URL = url_for('rest_test_oauth2_introspection.post', is_active='true')
+    with app.app_context():
+        liferay.INTROSPECTION_URL = url_for('rest_test_oauth2_introspection.post', is_active='true')
     yield
     liferay.INTROSPECTION_URL = introspection_url
 
@@ -116,7 +169,8 @@ def active_token_introspection_url():
 @pytest.fixture()
 def user_profile_url():
     user_profile_url = liferay.USER_PROFILE_URL
-    liferay.USER_PROFILE_URL = url_for('rest_test_oauth2_user_profile.get')
+    with app.app_context():
+        liferay.USER_PROFILE_URL = url_for('rest_test_oauth2_user_profile.get')
     yield
     liferay.USER_PROFILE_URL = user_profile_url
 
@@ -277,7 +331,7 @@ def test_token_active(client):
 
 
 @pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url', 'server')
-def test_authn_get_current_user_without_workspace(client):
+def test_authn_get_current_user_without_username(client):
     rest_path = url_for('rest_current_user.get')
     rv = client.get(rest_path, headers={
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
@@ -327,14 +381,85 @@ def test_patch_current_user_anonymous(client):
     assert resp_json['code'] == 30
 
 
-@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url', 'server')
-def test_patch_current_user_without_workspace(client):
-    rest_path = url_for('rest_current_user.patch', adjust_username='true')
-    rv = client.patch(rest_path, headers={
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-        f'{TOKEN_HEADER}': 'Bearer abc',
-    })
-    assert rv.status_code == 200
-    # resp_json = rv.get_json()
+@pytest.mark.usefixtures('active_token_introspection_url', 'user_profile_url', 'server')
+def test_patch_current_user_without_username(client):
+    # reserve username
+    with app.app_context():
+        rest_path = url_for('rest_current_user.patch', adjust_username='true')
+        rv = client.patch(rest_path, headers={
+            f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+            f'{TOKEN_HEADER}': 'Bearer test2',
+        })
+        assert rv.status_code == 200
+
+    # check if it was reserved
+    with app.app_context():
+        rest_path = url_for('rest_current_user.get')
+        rv = client.get(rest_path, headers={
+            f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+            f'{TOKEN_HEADER}': 'Bearer test2',
+        })
+        assert rv.status_code == 200
+        resp_json = rv.get_json()
+        assert resp_json['authenticated'] is True
+        assert 'username' in resp_json
+        exp_username = 'test2'
+        exp_sub = '20140'
+        assert resp_json['username'] == exp_username
+        assert resp_json['claims']['sub'] == exp_sub
+
+        iss_id = liferay.__name__
+        from layman.authn.redis import _get_issid_sub_2_username_key
+        rds_key = _get_issid_sub_2_username_key(iss_id, exp_sub)
+        rds = settings.LAYMAN_REDIS
+        assert rds.get(rds_key) == exp_username
+
+        from layman.authn.filesystem import get_authn_info
+        authn_info = get_authn_info(exp_username)
+        assert authn_info['iss_id'] == iss_id
+        assert authn_info['sub'] == exp_sub
+
+    # re-reserve username
+    with app.app_context():
+        rest_path = url_for('rest_current_user.patch', adjust_username='true')
+        rv = client.patch(rest_path, headers={
+            f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+            f'{TOKEN_HEADER}': 'Bearer test2',
+        })
+        assert rv.status_code == 400
+        r_json = rv.get_json()
+        assert r_json['code'] == 34
+        assert r_json['detail']['username'] == exp_username
+
+    # reserve same username by other user
+    with app.app_context():
+        rest_path = url_for('rest_current_user.patch')
+        rv = client.patch(rest_path, data={
+            'username': exp_username,
+        }, headers={
+            f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+            f'{TOKEN_HEADER}': 'Bearer test3',
+        })
+        assert rv.status_code == 409
+        r_json = rv.get_json()
+        assert r_json['code'] == 35
+        assert 'detail' not in r_json
+
+    # reserve other username by other user
+    with app.app_context():
+        exp_username2 = 'test3'
+        exp_sub2 = '20141'
+        rest_path = url_for('rest_current_user.patch')
+        rv = client.patch(rest_path, data={
+            'username': exp_username2,
+        }, headers={
+            f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+            f'{TOKEN_HEADER}': 'Bearer test3',
+        })
+        assert rv.status_code == 200
+        resp_json = rv.get_json()
+        assert 'username' in resp_json
+        assert resp_json['username'] == exp_username2
+        assert resp_json['claims']['sub'] == exp_sub2
 
 

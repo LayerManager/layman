@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, g, current_app as app, request
 
-from layman import LaymanError
-from layman.authn import authenticate, login_required, get_open_id_claims
+from layman.authn import authenticate
+from layman.authn.util import login_required
 from layman.authz import authorize
 from .util import get_user_profile, reserve_username
 

@@ -1,5 +1,6 @@
 from layman import settings
 from layman.http import LaymanError
+from layman.authn.redis import get_username
 import importlib
 import requests
 from requests.exceptions import ConnectionError
@@ -8,6 +9,7 @@ from flask import request, g, current_app
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_PROVIDER_KEY = f'{__name__}:PROVIDER'
 FLASK_ACCESS_TOKEN_KEY = f'{__name__}:ACCESS_TOKEN'
+FLASK_SUB_KEY = f'{__name__}:SUB'
 
 ISS_URL_HEADER = 'AuthorizationIssUrl'
 TOKEN_HEADER = 'Authorization'
@@ -68,12 +70,21 @@ def authenticate():
     if valid_resp is None:
         raise LaymanError(32, f'Introspection endpoint claims that access token is not active or it\'s not Bearer token.')
 
+    sub = valid_resp['sub']
+
     assert FLASK_PROVIDER_KEY not in g
     assert FLASK_ACCESS_TOKEN_KEY not in g
+    assert FLASK_SUB_KEY not in g
     g.setdefault(FLASK_PROVIDER_KEY,  provider_module)
     g.setdefault(FLASK_ACCESS_TOKEN_KEY,  access_token)
+    g.setdefault(FLASK_SUB_KEY,  sub)
+
+    iss_id = get_iss_id()
+    username = get_username(iss_id, sub)
 
     user = {}
+    if username is not None:
+        user['username'] = username
     g.user = user
     return user
 
@@ -90,6 +101,15 @@ def _get_provider_modules():
 
 def _get_provider_module():
     key = FLASK_PROVIDER_KEY
+    return g.get(key)
+
+
+def get_iss_id():
+    return _get_provider_module().__name__
+
+
+def get_sub():
+    key = FLASK_SUB_KEY
     return g.get(key)
 
 

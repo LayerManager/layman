@@ -17,7 +17,6 @@ def authenticate(f):
         if authenticated:
             authn_module = authn_modules[len(results) - 1]
             g.user['AUTHN_MODULE'] = authn_module.__name__
-        #     TODO also read user's profile
         else:
             g.user = None
         return f(*args, **kwargs)
@@ -43,11 +42,27 @@ def get_open_id_claims():
             'nickname': 'Anonymous',
         }
     else:
-        authn_module = user['AUTHN_MODULE']
-        authn_module = next((m for m in get_authn_modules() if m.__name__ == authn_module))
+        authn_module = get_authn_module()
         result = authn_module.get_open_id_claims()
     g.open_id_claims = result
     return result
+
+
+def get_authn_module():
+    user = g.user
+    authn_module = user['AUTHN_MODULE']
+    authn_module = next((m for m in get_authn_modules() if m.__name__ == authn_module))
+    return authn_module
+
+
+def get_iss_id():
+    authn_module = get_authn_module()
+    return authn_module.get_iss_id()
+
+
+def get_sub():
+    authn_module = get_authn_module()
+    return authn_module.get_sub()
 
 
 def get_authn_modules():

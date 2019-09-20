@@ -27,6 +27,8 @@ if os.getenv('LAYMAN_SKIP_REDIS_LOADING', 'false').lower() != 'true':
     with app.app_context():
         from .uuid import import_uuids_to_redis
         import_uuids_to_redis()
+        from .authn.redis import import_authn_to_redis
+        import_authn_to_redis()
 
 
 @app.route('/')

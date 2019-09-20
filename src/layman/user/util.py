@@ -1,7 +1,8 @@
 from flask import g
 from layman import LaymanError
-from layman.authn import get_open_id_claims
+from layman.authn import get_open_id_claims, get_iss_id, get_sub
 from layman.util import slugify, to_safe_names, check_username, get_usernames, ensure_user_workspace, delete_user_workspace
+from layman.authn import redis as authn_redis, filesystem as authn_filesystem
 
 
 def get_user_profile(user_obj):
@@ -23,6 +24,7 @@ def get_user_profile(user_obj):
 
 
 def reserve_username(username, adjust=False):
+    # todo accept also email (or general claims) and save it with reservation
     if 'username' in g.user:
         raise LaymanError(34, {'username': g.user['username']})
     if adjust is not True:
@@ -32,6 +34,7 @@ def reserve_username(username, adjust=False):
             raise LaymanError(35)
         try:
             ensure_user_workspace(username)
+            _save_reservation(username)
         except LaymanError as e:
             delete_user_workspace(username)
             raise e
@@ -59,12 +62,21 @@ def reserve_username(username, adjust=False):
             try:
                 ensure_user_workspace(suggestion)
                 username = suggestion
+                _save_reservation(username)
                 break
             except LaymanError:
                 delete_user_workspace(suggestion)
         if username is not None:
             break
         idx += 1
+
+
+def _save_reservation(username):
+    iss_id = get_iss_id()
+    sub = get_sub()
+    authn_redis.save_username_reservation(username, iss_id, sub)
+    authn_filesystem.save_username_reservation(username, iss_id, sub)
+    g.user['username'] = username
 
 
 def get_username_suggestions_from_claims(claims):

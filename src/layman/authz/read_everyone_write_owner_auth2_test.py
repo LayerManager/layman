@@ -120,7 +120,7 @@ def test_authn_get_access(client):
 
 
 @pytest.mark.usefixtures('app_context', 'active_token_introspection_url')
-def test_authn_post_access_without_workspace(client):
+def test_authn_post_access_without_username(client):
     username = 'testuser1'
     rest_path = url_for('rest_layers.post', username=username)
     file_paths = [
