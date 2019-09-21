@@ -5,13 +5,14 @@ from layman.common.filesystem import util
 AUTHN_SUBFILE = 'authn.txt'
 
 
-def save_username_reservation(username, iss_id, sub):
+def save_username_reservation(username, iss_id, sub, claims):
     authn_path = get_authn_file(username)
     assert not os.path.isfile(authn_path)
     with open(authn_path, "w") as authn_file:
         json.dump({
             'iss_id': iss_id,
             'sub': sub,
+            'claims': claims,
         }, authn_file)
 
 

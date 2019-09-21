@@ -23,3 +23,10 @@ def get_authz_module():
     if key not in current_app.config:
         current_app.config[key] = importlib.import_module(settings.AUTHZ_MODULE)
     return current_app.config[key]
+
+
+def get_publication_access_rights(publ_type, username, publication_name):
+    authz_module = get_authz_module()
+    return authz_module.get_publication_access_rights(publ_type, username, publication_name)
+
+

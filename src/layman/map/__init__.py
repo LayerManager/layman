@@ -1,6 +1,7 @@
 def get_map_sources():
     return PUBLICATION_TYPES[f'{__name__}']['internal_sources']
 
+MAP_TYPE = __name__
 
 from .rest_maps import bp as maps_bp
 from .rest_map import bp as map_bp
@@ -8,7 +9,6 @@ from .rest_map_file import bp as map_file_bp
 from .rest_map_thumbnail import bp as map_thumbnail_bp
 
 
-MAP_TYPE = __name__
 
 
 PUBLICATION_TYPES = {

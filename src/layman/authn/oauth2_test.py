@@ -1,4 +1,5 @@
 from multiprocessing import Process
+import os
 import shutil
 import time
 
@@ -192,9 +193,6 @@ def client():
         num_layers_before_test = len(publs_by_type[LAYER_TYPE])
     yield client
 
-    # server.terminate()
-    # server.join()
-
 
 @pytest.fixture(scope="module")
 def server():
@@ -344,7 +342,7 @@ def test_authn_get_current_user_without_username(client):
     claims = resp_json['claims']
     assert {
                'email', 'email_verified', 'family_name', 'given_name', 'iss', 'middle_name', 'name',
-               'preferred_username', 'sub'
+               'preferred_username', 'sub', 'updated_at'
            } == set(claims.keys())
     assert claims['email'] == 'test@liferay.com'
     assert claims['email_verified'] is True
@@ -461,5 +459,45 @@ def test_patch_current_user_without_username(client):
         assert 'username' in resp_json
         assert resp_json['username'] == exp_username2
         assert resp_json['claims']['sub'] == exp_sub2
+
+    # test map metadata
+    username = exp_username
+    exp_email = 'test2@liferay.com'
+    exp_name = 'Test Test'
+    mapname = 'map1'
+    with app.app_context():
+        rest_path = url_for('rest_maps.post', username=username)
+        file_paths = [
+            'sample/layman.map/full.json',
+        ]
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': mapname,
+            })
+            assert rv.status_code == 200
+            resp_json = rv.get_json()
+            assert resp_json[0]['name'] == mapname
+        finally:
+            for fp in files:
+                fp[0].close()
+
+    with app.app_context():
+        rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
+        assert rv.status_code == 200
+        resp_json = rv.get_json()
+        assert resp_json['name'] == mapname
+        user_info = resp_json['user']
+        assert {'email', 'name'} == set(user_info.keys())
+        assert user_info['name'] == exp_name
+        assert user_info['email'] == exp_email
+        # read_everyone_write_everyone
+        access_rights = resp_json['groups']
+        assert {'guest'} == set(access_rights.keys())
+        assert access_rights['guest'] == 'w'
 
 

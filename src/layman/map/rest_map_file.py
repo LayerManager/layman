@@ -39,13 +39,8 @@ def get(username, mapname):
         file_path = os.path.join(userdir, file_path)
         with open(file_path) as json_file:
             data = json.load(json_file)
-            data['user'] = {
-                'name': username,
-                'email': '',
-            }
-            data['groups'] = {
-                'guest': 'w',
-            }
+            data['user'] = util.get_map_owner_info(username)
+            data['groups'] = util.get_groups_info(username, mapname)
             return jsonify(data), 200
 
     raise LaymanError(27, {'mapname': mapname})
