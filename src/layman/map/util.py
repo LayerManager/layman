@@ -6,13 +6,15 @@ import os
 import re
 from collections import defaultdict, OrderedDict
 
+from layman.authn.filesystem import get_authn_info
+from layman.authz import get_publication_access_rights
 from celery import chain
 from flask import current_app, url_for
 
 from layman import LaymanError
 from layman import settings
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name
-from . import get_map_sources
+from . import get_map_sources, MAP_TYPE
 
 MAPNAME_RE = USERNAME_RE
 
@@ -301,3 +303,17 @@ def _get_task_signature(username, mapname, task_options, task):
     )
 
 
+def get_map_owner_info(username):
+    claims = get_authn_info(username).get('claims', {})
+    name = claims.get('name', username)
+    email = claims.get('email', '')
+    result = {
+        'name': name,
+        'email': email,
+    }
+    return result
+
+
+def get_groups_info(username, mapname):
+    result = get_publication_access_rights(MAP_TYPE, username, mapname)
+    return result

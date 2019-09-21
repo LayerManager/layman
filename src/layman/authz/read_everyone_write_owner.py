@@ -22,5 +22,12 @@ def authorize():
     ownername = m.group(1)
 
     if username != ownername or ownername is None or len(ownername) == 0:
-        raise LaymanError(30, {'user': username})
+        raise LaymanError(30, {'username': username})
+
+
+def get_publication_access_rights(publ_type, username, publication_name):
+    return {
+        'guest': 'r',
+    }
+
 

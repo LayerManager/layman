@@ -27,8 +27,6 @@ def get_open_id_claims():
         'iss': request.host_url,
         'sub': username,
         'preferred_username': username,
-        'layman_name': username,
-        'layman_workspace': username,
     }
     return result
 

@@ -148,3 +148,75 @@ def test_authn_post_access_without_username(client):
         f'{LAYER_TYPE}': num_layers_before_test + 0
     })
 
+
+@pytest.mark.usefixtures('user_profile_url', 'active_token_introspection_url')
+def test_authn_map_access_rights(client):
+    # register username if it's not yet registered
+    with app.app_context():
+        rest_path = url_for('rest_current_user.get')
+        rv = client.get(rest_path, headers={
+            f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+            f'{TOKEN_HEADER}': 'Bearer test2',
+        })
+        assert rv.status_code == 200
+        resp_json = rv.get_json()
+    with app.app_context():
+        if 'username' not in resp_json:
+            rest_path = url_for('rest_current_user.patch', adjust_username='true')
+            rv = client.patch(rest_path, headers={
+                f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+                f'{TOKEN_HEADER}': 'Bearer test2',
+            })
+            resp_json = rv.get_json()
+            assert rv.status_code == 200
+        username = resp_json['username']
+        assert username == 'test2'
+
+    # insert map
+    mapname = 'map2'
+    with app.app_context():
+        rest_path = url_for('rest_maps.post', username=username)
+        file_paths = [
+            'sample/layman.map/full.json',
+        ]
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+            rv = client.post(rest_path, headers={
+                f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+                f'{TOKEN_HEADER}': 'Bearer test2',
+            }, data={
+                'file': files,
+                'name': mapname,
+            })
+            resp_json = rv.get_json()
+            # print(resp_json)
+            assert rv.status_code == 200
+            assert resp_json[0]['name'] == mapname
+        finally:
+            for fp in files:
+                fp[0].close()
+
+    # test map metadata
+    with app.app_context():
+        rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
+        assert rv.status_code == 200
+        resp_json = rv.get_json()
+        access_rights = resp_json['groups']
+        assert {'guest'} == set(access_rights.keys())
+        assert access_rights['guest'] == 'r'
+
+    # test non-owner access
+    with app.app_context():
+        rv = client.patch(url_for('rest_map.patch', username=username, mapname=mapname), headers={
+                f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+                f'{TOKEN_HEADER}': 'Bearer test3',
+            }, data={
+            'title': 'abcd',
+        })
+        assert rv.status_code == 403
+        resp_json = rv.get_json()
+        assert resp_json['code'] == 30
+        assert resp_json['detail']['username'] in [None, 'test3']

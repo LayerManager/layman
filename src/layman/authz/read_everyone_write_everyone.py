@@ -9,3 +9,9 @@ def authorize():
     pass
 
 
+def get_publication_access_rights(publ_type, username, publication_name):
+    return {
+        'guest': 'w',
+    }
+
+
