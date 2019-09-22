@@ -13,7 +13,7 @@ from layman.layer import LAYER_TYPE
 from layman import app as app
 from layman import settings
 from layman import uuid
-from layman.authn.oauth2_test import introspection_bp, user_profile_bp, active_token_introspection_url, user_profile_url
+from layman.authn.oauth2_test import liferay_mock, active_token_introspection_url, user_profile_url
 from layman.authn.oauth2 import liferay
 from layman.authn.oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
 
@@ -38,8 +38,6 @@ def adjust_settings():
 
 @pytest.fixture(scope="module")
 def client():
-    app.register_blueprint(introspection_bp, url_prefix='/rest/test-oauth2/')
-    app.register_blueprint(user_profile_bp, url_prefix='/rest/test-oauth2/')
     client = app.test_client()
     server = Process(target=app.run, kwargs={
         'host': '0.0.0.0',

@@ -15,116 +15,37 @@ from layman import settings
 from layman import uuid
 from .oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
 from .oauth2 import liferay
+from test.mock.liferay import run
 
 
-introspection_bp = Blueprint('rest_test_oauth2_introspection', __name__)
-user_profile_bp = Blueprint('rest_test_oauth2_user_profile', __name__)
-
-token_2_introspection = {
-    'abc': {
-        'sub': "20139",
-    },
-    'test2': {
-        'sub': "20140",
-    },
-    'test3': {
-        'sub': "20141",
-    },
-}
-token_2_profile = {
-    'abc': {
-        "emailAddress": "test@liferay.com",
-        "firstName": "Test",
-        "lastName": "Test",
-        "middleName": "",
-        "screenName": "test",
-        "userId": "20139",
-    },
-    'test2': {
-        "emailAddress": "test2@liferay.com",
-        "firstName": "Test",
-        "lastName": "Test",
-        "middleName": "",
-        "screenName": "test2",
-        "userId": "20140",
-    },
-    'test3': {
-        "emailAddress": "test3@liferay.com",
-        "firstName": "Test",
-        "lastName": "Test",
-        "middleName": "",
-        "screenName": "test3",
-        "userId": "20141",
-    },
-}
+LIFERAY_PORT = 8020
 
 
-@introspection_bp.route('introspection', methods=['POST'])
-def post():
-    is_active = request.args.get('is_active', None)
-    is_active = is_active is not None and is_active.lower() == 'true'
+@pytest.fixture(scope="session")
+def liferay_mock():
+    server = Process(target=run, kwargs={
+        'env_vars': {
+        },
+        'app_config': {
+            'ENV': 'development',
+            'SERVER_NAME': f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{LIFERAY_PORT}',
+            'SESSION_COOKIE_DOMAIN': f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{LIFERAY_PORT}',
+        },
+        'host': '0.0.0.0',
+        'port': LIFERAY_PORT,
+        'debug': True,  # preserve error log in HTTP responses
+        'load_dotenv': False,
+        'options': {
+            'use_reloader': False,
+        },
+    })
+    server.start()
+    time.sleep(1)
 
-    access_token = request.form.get('token')
-    assert access_token in token_2_introspection
-    result = {
-        "active": is_active, "client_id": "id-353ab09c-f117-f2d5-d3a3-85cfb89e6746", "exp": 1568981517,
-        "iat": 1568980917,
-        "scope": "liferay-json-web-services.everything.read.userprofile", "sub": "20139", "token_type": "Bearer",
-        "username": "Test Test", "company.id": "20099"
-    }
-    result.update(token_2_introspection[access_token])
+    yield server
 
-    return jsonify(result), 200
-
-
-@user_profile_bp.route('user-profile', methods=['GET'])
-def get():
-    access_token = request.headers.get(TOKEN_HEADER).split(' ')[1]
-    assert access_token in token_2_profile
-
-    result = {
-        "agreedToTermsOfUse": False,
-        "comments": "",
-        "companyId": "20099",
-        "contactId": "20141",
-        "createDate": 1557361648854,
-        "defaultUser": False,
-        "emailAddress": "test@liferay.com",
-        "emailAddressVerified": True,
-        "externalReferenceCode": "",
-        "facebookId": "0",
-        "failedLoginAttempts": 0,
-        "firstName": "Test",
-        "googleUserId": "",
-        "graceLoginCount": 0,
-        "greeting": "Welcome Test Test!",
-        "jobTitle": "",
-        "languageId": "en_US",
-        "lastFailedLoginDate": None,
-        "lastLoginDate": 1565768756360,
-        "lastLoginIP": "172.19.0.1",
-        "lastName": "Test",
-        "ldapServerId": "-1",
-        "lockout": False,
-        "lockoutDate": None,
-        "loginDate": 1568805421539,
-        "loginIP": "172.18.0.1",
-        "middleName": "",
-        "modifiedDate": 1568805421548,
-        "mvccVersion": "11",
-        "openId": "",
-        "portraitId": "0",
-        "reminderQueryAnswer": "aa",
-        "reminderQueryQuestion": "what-is-your-father's-middle-name",
-        "screenName": "test",
-        "status": 0,
-        "timeZoneId": "UTC",
-        "userId": "20139",
-        "uuid": "4ef84411-749a-e617-6191-10e0c6a7147b"
-    }
-    result.update(token_2_profile[access_token])
-
-    return jsonify(result), 200
+    server.terminate()
+    server.join()
 
 
 PORT = 8000
@@ -151,35 +72,31 @@ def unexisting_introspection_url():
 
 
 @pytest.fixture()
-def inactive_token_introspection_url():
+def inactive_token_introspection_url(liferay_mock):
     introspection_url = liferay.INTROSPECTION_URL
-    liferay.INTROSPECTION_URL = url_for('rest_test_oauth2_introspection.post')
+    liferay.INTROSPECTION_URL = f'http://{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{LIFERAY_PORT}/rest/test-oauth2/introspection'
     yield
     liferay.INTROSPECTION_URL = introspection_url
 
 
 @pytest.fixture()
-def active_token_introspection_url():
+def active_token_introspection_url(liferay_mock):
     introspection_url = liferay.INTROSPECTION_URL
-    with app.app_context():
-        liferay.INTROSPECTION_URL = url_for('rest_test_oauth2_introspection.post', is_active='true')
+    liferay.INTROSPECTION_URL = f'http://{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{LIFERAY_PORT}/rest/test-oauth2/introspection?is_active=true'
     yield
     liferay.INTROSPECTION_URL = introspection_url
 
 
 @pytest.fixture()
-def user_profile_url():
+def user_profile_url(liferay_mock):
     user_profile_url = liferay.USER_PROFILE_URL
-    with app.app_context():
-        liferay.USER_PROFILE_URL = url_for('rest_test_oauth2_user_profile.get')
+    liferay.USER_PROFILE_URL = f'http://{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{LIFERAY_PORT}/rest/test-oauth2/user-profile'
     yield
     liferay.USER_PROFILE_URL = user_profile_url
 
 
 @pytest.fixture(scope="module")
 def client():
-    app.register_blueprint(introspection_bp, url_prefix='/rest/test-oauth2/')
-    app.register_blueprint(user_profile_bp, url_prefix='/rest/test-oauth2/')
     client = app.test_client()
 
     app.config['TESTING'] = True
