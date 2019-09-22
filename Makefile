@@ -1,4 +1,4 @@
-.PHONY:
+.PHONY: test
 
 start-demo:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml up --force-recreate --no-deps postgresql geoserver redis layman celery_worker flower hslayers
