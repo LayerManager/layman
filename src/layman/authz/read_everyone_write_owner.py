@@ -19,7 +19,10 @@ def authorize():
 
     req_path = request.script_root + request.path
     m = USER_PATH_PATTERN.match(req_path)
-    ownername = m.group(1)
+    ownername = m.group(1) if m is not None else None
+
+    if ownername is None and request.path == '/rest/current-user':
+        return
 
     if username != ownername or ownername is None or len(ownername) == 0:
         raise LaymanError(30, {'username': username})

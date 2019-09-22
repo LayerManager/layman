@@ -15,6 +15,7 @@ services:
         - ./layman_data_test:/layman_data_test
         - ./sample:/code/sample
         - ./src:/code/src
+        - ./test:/code/test
         - ./tmp:/code/tmp
         - ./test.sh:/code/test.sh
       depends_on:
