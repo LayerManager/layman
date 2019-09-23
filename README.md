@@ -54,6 +54,7 @@ This is the easiest way how to start layman for demonstration purposes. It inclu
 ```bash
 # use demo settings
 cp .env.demo .env
+cp src/layman_settings_demo.py src/layman_settings.py
 
 # prepare GeoServer data directory with appropriate configuration for Layman
 make geoserver-reset-default-layman-datadir
@@ -115,7 +116,9 @@ Within Redis, you need to provide one database. Connection string is defined by 
 To run layman in production, you need to provide [external dependencies](#dependencies) and [configure](#configuration) layman manually, at least `.env` file:
 
 ```bash
+# use production settings
 cp .env.production .env
+cp src/layman_settings_production.py src/layman_settings.py
 
 # edit .env
 # optionally edit docker-compose.production.yml
@@ -138,6 +141,10 @@ Before the first run:
 ```bash
 # prepare geoserver data directory
 make geoserver-reset-default-layman-datadir
+
+# use dev settings
+cp .env.demo .env
+
 ```
 
 Now everything is ready to start:

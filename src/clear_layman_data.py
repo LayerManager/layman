@@ -1,13 +1,17 @@
-import shutil
+import importlib
+import os
 import re
-from layman_settings import *
+import shutil
 from urllib.parse import urljoin
 
 
+settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
+
+
 def main():
-    if os.path.exists(LAYMAN_DATA_DIR):
-        for the_file in os.listdir(LAYMAN_DATA_DIR):
-            file_path = os.path.join(LAYMAN_DATA_DIR, the_file)
+    if os.path.exists(settings.LAYMAN_DATA_DIR):
+        for the_file in os.listdir(settings.LAYMAN_DATA_DIR):
+            file_path = os.path.join(settings.LAYMAN_DATA_DIR, the_file)
             if os.path.isfile(file_path):
                 os.unlink(file_path)
             elif os.path.isdir(file_path):
@@ -15,35 +19,35 @@ def main():
 
     import psycopg2
     try:
-        conn = psycopg2.connect(**PG_CONN)
+        conn = psycopg2.connect(**settings.PG_CONN)
         conn.autocommit = True
         cur = conn.cursor()
         cur.execute(f"""
 select catalog_name, schema_name, schema_owner
 from information_schema.schemata
-where schema_owner = '{LAYMAN_PG_USER}'
-    and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", PG_NON_USER_SCHEMAS))})
+where schema_owner = '{settings.LAYMAN_PG_USER}'
+    and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_USER_SCHEMAS))})
 """)
         rows = cur.fetchall()
         for row in rows:
             cur.execute(f"""DROP SCHEMA "{row[1]}" CASCADE""")
         conn.close()
     except:
-        conn = psycopg2.connect(**PG_CONN_TEMPLATE)
+        conn = psycopg2.connect(**settings.PG_CONN_TEMPLATE)
         conn.autocommit = True
         cur = conn.cursor()
         cur.execute(f"""
 SELECT pg_terminate_backend(pg_stat_activity.pid)
 FROM pg_stat_activity
-WHERE pg_stat_activity.datname = '{LAYMAN_PG_TEMPLATE_DBNAME}'
+WHERE pg_stat_activity.datname = '{settings.LAYMAN_PG_TEMPLATE_DBNAME}'
 AND pid <> pg_backend_pid();
 """)
         cur.execute(
-            f"""CREATE DATABASE {LAYMAN_PG_DBNAME} TEMPLATE {LAYMAN_PG_TEMPLATE_DBNAME}""")
+            f"""CREATE DATABASE {settings.LAYMAN_PG_DBNAME} TEMPLATE {settings.LAYMAN_PG_TEMPLATE_DBNAME}""")
         conn.close()
 
 
-    LAYMAN_REDIS.flushdb()
+    settings.LAYMAN_REDIS.flushdb()
 
 
     import requests
@@ -52,9 +56,9 @@ AND pid <> pg_backend_pid();
         'Content-type': 'application/json',
     }
     r = requests.get(
-        LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
+        settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
         headers=headers_json,
-        auth=LAYMAN_GS_AUTH
+        auth=settings.LAYMAN_GS_AUTH
     )
     r.raise_for_status()
     all_rules = r.json()
@@ -64,22 +68,22 @@ AND pid <> pg_backend_pid();
         result = {k: v for k, v in all_rules.items() if re.match(re_role, v)}
         return result
 
-    layman_rules = get_role_rules(all_rules, LAYMAN_GS_ROLE)
+    layman_rules = get_role_rules(all_rules, settings.LAYMAN_GS_ROLE)
     for rule in layman_rules:
         workspace = re.match(r"^([^.]+)\..*", rule).group(1)
         r = requests.delete(
-            urljoin(LAYMAN_GS_REST_WORKSPACES, workspace),
+            urljoin(settings.LAYMAN_GS_REST_WORKSPACES, workspace),
             headers=headers_json,
-            auth=LAYMAN_GS_AUTH,
+            auth=settings.LAYMAN_GS_AUTH,
             params={
                 'recurse': 'true'
             }
         )
         r.raise_for_status()
         r = requests.delete(
-            urljoin(LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
+            urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
             headers=headers_json,
-            auth=LAYMAN_GS_AUTH,
+            auth=settings.LAYMAN_GS_AUTH,
         )
         r.raise_for_status()
 
