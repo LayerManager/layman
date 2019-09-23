@@ -1,8 +1,12 @@
 import traceback
 
+import importlib
+import os
 import sys
 import time
-from layman_settings import *
+
+
+settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 ATTEMPT_INTERVAL = 2
 MAX_ATTEMPTS = 30
@@ -14,8 +18,8 @@ def main():
 
     # Redis
     import redis
-    rds = redis.Redis.from_url(LAYMAN_REDIS_URL, encoding="utf-8", decode_responses=True)
-    wait_for_msg = f"Redis, url={LAYMAN_REDIS_URL}"
+    rds = redis.Redis.from_url(settings.LAYMAN_REDIS_URL, encoding="utf-8", decode_responses=True)
+    wait_for_msg = f"Redis, url={settings.LAYMAN_REDIS_URL}"
     print(f"Waiting for {wait_for_msg}")
     while True:
         try:
@@ -28,7 +32,7 @@ def main():
     print()
 
     # PostgreSQL
-    conn_dict = PG_CONN if LAYMAN_PG_TEMPLATE_DBNAME is None else PG_CONN_TEMPLATE
+    conn_dict = settings.PG_CONN if settings.LAYMAN_PG_TEMPLATE_DBNAME is None else settings.PG_CONN_TEMPLATE
     secret_conn_dict = {k: v for k, v in conn_dict.items() if k != 'password'}
     wait_for_msg = f"PostgreSQL database, {secret_conn_dict}"
     print(f"Waiting for {wait_for_msg}")
@@ -49,15 +53,15 @@ def main():
         'Accept': 'application/json',
         'Content-type': 'application/json',
     }
-    wait_for_msg = f"GeoServer REST API, user={LAYMAN_GS_USER}, url={LAYMAN_GS_REST_WORKSPACES}"
+    wait_for_msg = f"GeoServer REST API, user={settings.LAYMAN_GS_USER}, url={settings.LAYMAN_GS_REST_WORKSPACES}"
     print(f"Waiting for {wait_for_msg}")
     while True:
         import requests
         try:
             r = requests.get(
-                LAYMAN_GS_REST_WORKSPACES,
+                settings.LAYMAN_GS_REST_WORKSPACES,
                 headers=headers_json,
-                auth=LAYMAN_GS_AUTH,
+                auth=settings.LAYMAN_GS_AUTH,
                 timeout=0.1
             )
             r.raise_for_status()

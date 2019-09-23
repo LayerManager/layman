@@ -13,7 +13,7 @@ services:
       user: ${UID_GID}
       command: bash start.sh
       env_file:
-         - .env.dev
+         - .env
       ports:
         - 8000:8000
       volumes:
@@ -34,7 +34,7 @@ services:
       # use watchdog
       command: bash -c "cd src && python3 wait_for_deps.py && watchmedo auto-restart -d . -p '*.py' --recursive -- python3 -m celery -Q $${LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info"
 #      command: bash -c "cd src && python3 -m celery -A layman.celery_app worker --loglevel=info"
-      env_file: .env.dev
+      env_file: .env
       environment:
         - C_FORCE_ROOT=true
         - LAYMAN_SKIP_REDIS_LOADING=true
@@ -51,7 +51,7 @@ services:
       image: layman_dev:latest
       user: ${UID_GID}
       command: bash -c "cd src && python3 wait_for_deps.py && python3 -m flower -A layman.celery_app --port=5555"
-      env_file: .env.dev
+      env_file: .env
       environment:
         - LAYMAN_SKIP_REDIS_LOADING=true
       volumes:
@@ -75,7 +75,7 @@ services:
       user: ${UID_GID}
       command: sh -c "node proxy.js & ./node_modules/.bin/http-server dist/"
 #      env_file:
-#         - .env.dev
+#         - .env
       ports:
         - 8080:8080
         - 8081:8081
