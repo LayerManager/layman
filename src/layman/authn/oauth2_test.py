@@ -142,7 +142,7 @@ def test_no_iss_url_header(client):
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
-    assert resp_json['detail'] == f'HTTP header {TOKEN_HEADER} was set, but HTTP header {ISS_URL_HEADER} was not found'
+    assert resp_json['sub_code'] == 1
 
 
 @pytest.mark.usefixtures('app_context')
@@ -154,7 +154,7 @@ def test_no_auth_header(client):
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
-    assert resp_json['detail'] == f'HTTP header {ISS_URL_HEADER} was set, but HTTP header {TOKEN_HEADER} was not found.'
+    assert resp_json['sub_code'] == 2
 
 
 @pytest.mark.usefixtures('app_context')
@@ -167,7 +167,7 @@ def test_auth_header_one_part(client):
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
-    assert resp_json['detail'] == f'HTTP header {TOKEN_HEADER} must have 2 parts: "Bearer <access_token>", but has 1 parts.'
+    assert resp_json['sub_code'] == 3
 
 
 @pytest.mark.usefixtures('app_context')
@@ -180,7 +180,7 @@ def test_auth_header_bad_first_part(client):
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
-    assert resp_json['detail'] == f'First part of HTTP header {TOKEN_HEADER} must be "Bearer", but it\'s abc'
+    assert resp_json['sub_code'] == 4
 
 
 @pytest.mark.usefixtures('app_context')
@@ -193,7 +193,7 @@ def test_auth_header_no_access_token(client):
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
-    assert resp_json['detail'] == f'HTTP header {TOKEN_HEADER} contains empty access token. The structure must be "Bearer <access_token>"'
+    assert resp_json['sub_code'] == 5
 
 
 @pytest.mark.usefixtures('app_context')
@@ -206,7 +206,7 @@ def test_no_provider_found(client):
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
-    assert resp_json['detail'] == f'No OAuth2 provider was found for URL passed in HTTP header {ISS_URL_HEADER}.'
+    assert resp_json['sub_code'] == 6
 
 
 @pytest.mark.usefixtures('app_context', 'unexisting_introspection_url')
@@ -219,7 +219,7 @@ def test_unexisting_introspection_url(client):
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
-    assert resp_json['detail'] == f'Introspection endpoint is not reachable.'
+    assert resp_json['sub_code'] == 8
 
 
 @pytest.mark.usefixtures('app_context', 'inactive_token_introspection_url', 'server')
@@ -232,7 +232,7 @@ def test_token_inactive(client):
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
-    assert resp_json['detail'] == f'Introspection endpoint claims that access token is not active or it\'s not Bearer token.'
+    assert resp_json['sub_code'] == 9
 
 
 @pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'server')

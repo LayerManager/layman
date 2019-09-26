@@ -2,7 +2,7 @@ from .error_list import ERROR_LIST
 
 class LaymanError(Exception):
 
-    def __init__(self, code_or_message, data=None, http_code=None, private_data=None):
+    def __init__(self, code_or_message, data=None, http_code=None, private_data=None, sub_code=None):
         # Exception.__init__(self)
 
         self.http_code = http_code
@@ -18,6 +18,7 @@ class LaymanError(Exception):
             if http_code is None:
                 self.http_code = 400
         self.private_data = private_data
+        self.sub_code = sub_code
 
     def __str__(self):
         return f'LaymanError code={self.code} message={self.message} data={self.data} private_info={self.private_data}'
@@ -25,6 +26,8 @@ class LaymanError(Exception):
 
     def to_dict(self):
         resp = {'code': self.code, 'message': self.message}
+        if self.sub_code is not None:
+            resp['sub_code'] = self.sub_code
 
         if self.data is not None:
             resp['detail'] = self.data

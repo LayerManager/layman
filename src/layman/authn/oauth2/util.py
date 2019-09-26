@@ -23,22 +23,22 @@ def authenticate():
         return user
 
     if iss_url is None:
-        raise LaymanError(32, f'HTTP header {TOKEN_HEADER} was set, but HTTP header {ISS_URL_HEADER} was not found')
+        raise LaymanError(32, f'HTTP header {TOKEN_HEADER} was set, but HTTP header {ISS_URL_HEADER} was not found', sub_code=1)
     if authz_header is None:
-        raise LaymanError(32, f'HTTP header {ISS_URL_HEADER} was set, but HTTP header {TOKEN_HEADER} was not found.')
+        raise LaymanError(32, f'HTTP header {ISS_URL_HEADER} was set, but HTTP header {TOKEN_HEADER} was not found.', sub_code=2)
 
     authz_header_parts = authz_header.split(' ')
     if len(authz_header_parts) != 2:
-        raise LaymanError(32, f'HTTP header {TOKEN_HEADER} must have 2 parts: "Bearer <access_token>", but has {len(authz_header_parts)} parts.')
+        raise LaymanError(32, f'HTTP header {TOKEN_HEADER} must have 2 parts: "Bearer <access_token>", but has {len(authz_header_parts)} parts.', sub_code=3)
     if authz_header_parts[0] != 'Bearer':
-        raise LaymanError(32, f'First part of HTTP header {TOKEN_HEADER} must be "Bearer", but it\'s {authz_header_parts[0]}')
+        raise LaymanError(32, f'First part of HTTP header {TOKEN_HEADER} must be "Bearer", but it\'s {authz_header_parts[0]}', sub_code=4)
     access_token = authz_header_parts[1]
     if len(access_token) == 0:
-        raise LaymanError(32, f'HTTP header {TOKEN_HEADER} contains empty access token. The structure must be "Bearer <access_token>"')
+        raise LaymanError(32, f'HTTP header {TOKEN_HEADER} contains empty access token. The structure must be "Bearer <access_token>"', sub_code=5)
 
     provider_module = _get_provider_by_auth_url(iss_url)
     if provider_module is None:
-        raise LaymanError(32, f'No OAuth2 provider was found for URL passed in HTTP header {ISS_URL_HEADER}.')
+        raise LaymanError(32, f'No OAuth2 provider was found for URL passed in HTTP header {ISS_URL_HEADER}.', sub_code=6)
 
     # TODO: implement redis cache of access tokens to avoid reaching introspection endpoint on each request
     clients = settings.LIFERAY_OAUTH2_CLIENTS
@@ -55,7 +55,7 @@ def authenticate():
         except ConnectionError:
             continue
         if r.status_code != 200:
-            raise LaymanError(32, f'Introspection endpoint returned {r.status_code} status code.')
+            raise LaymanError(32, f'Introspection endpoint returned {r.status_code} status code.', sub_code=7)
         try:
             r_json = r.json()
             if r_json['active'] is True and r_json['token_type'] == 'Bearer':
@@ -65,10 +65,10 @@ def authenticate():
             continue
 
     if all_connection_errors:
-        raise LaymanError(32, f'Introspection endpoint is not reachable.')
+        raise LaymanError(32, f'Introspection endpoint is not reachable.', sub_code=8)
 
     if valid_resp is None:
-        raise LaymanError(32, f'Introspection endpoint claims that access token is not active or it\'s not Bearer token.')
+        raise LaymanError(32, f'Introspection endpoint claims that access token is not active or it\'s not Bearer token.', sub_code=9)
 
     sub = valid_resp['sub']
 

@@ -69,6 +69,9 @@ build-dev:
 bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_dev bash
 
+bash-exec:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec layman_dev bash
+
 clear-data-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_dev bash -c "python3 src/clear_layman_data.py"
 
