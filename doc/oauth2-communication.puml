@@ -1,0 +1,36 @@
+@startuml
+hide footbox
+participant "LTC Client" as ltcc
+
+box "LTC Server"
+    participant "Login\nEndpoint" as ltcslogin
+    participant "Redirection\nEndpoint" as ltcsredir
+end box
+
+box "Liferay"
+	participant "Authorization\nEndpoint" as lrauth
+	participant "Token\nEndpoint" as lrtoken
+end box
+
+
+ltcc [#0000FF]-> ltcslogin: Authorization Request
+activate ltcc
+ltcslogin [#0000FF]--> lrauth: Authorization Code Request
+activate lrauth
+lrauth [#0000FF]-> lrauth: End-user\nAction
+lrauth [#0000FF]--> ltcsredir: Authorization Code Response
+deactivate lrauth
+activate ltcsredir
+ltcsredir [#ff0000]--> lrtoken: Access Token Request
+lrtoken [#ff0000]--> ltcsredir: Access Token Response
+ltcsredir [#0000FF]--> ltcc: Redirection after authorization
+deactivate ltcsredir
+deactivate ltcc
+
+legend left
+    |Arrow color| Description |
+    |<#0000FF>| Communication visible in browser |
+    |<#FF0000>| Communication hidden from browser |
+endlegend
+
+@enduml
