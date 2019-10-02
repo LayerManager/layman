@@ -1,0 +1,37 @@
+@startuml
+hide footbox
+participant "LTC Client" as ltcc
+
+box "LTC Server"
+    participant "Layman\nProxy" as ltcsproxy
+end box
+participant "Layman\nREST API" as layman
+
+box "Liferay"
+	participant "Introspection\nEndpoint" as lris
+	participant "User Profile\nEndpoint" as lruser
+end box
+
+
+ltcc [#0000FF]--> ltcsproxy: GET Current User\nRequest
+activate ltcc
+activate ltcsproxy
+ltcsproxy [#FF0000]--> layman: GET Current User\nRequest
+activate layman
+layman [#FF0000]--> lris: Validate Access Token\nRequest
+lris [#FF0000]--> layman: Validate Access Token\nResponse
+layman [#FF0000]--> lruser: User Profile Request
+lruser [#FF0000]--> layman: User Profile Request
+layman [#FF0000]--> ltcsproxy: GET Current User\nResponse
+deactivate layman
+ltcsproxy [#FF0000]--> ltcc: GET Current User\nResponse
+deactivate ltcsproxy
+deactivate ltcc
+
+legend left
+    |Arrow color| Description |
+    |<#0000FF>| Communication visible to browser |
+    |<#FF0000>| Communication hidden from browser |
+endlegend
+
+@enduml
