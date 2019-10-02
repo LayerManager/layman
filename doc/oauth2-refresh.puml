@@ -1,0 +1,28 @@
+@startuml
+hide footbox
+box "LTC Server"
+    participant "Layman\nProxy" as ltcsproxy
+end box
+
+box "Liferay"
+	participant "Token\nEndpoint" as lrtoken
+end box
+
+
+ltcsproxy [#ff0000]--> lrtoken: Refresh Request
+lrtoken [#ff0000]--> ltcsproxy: Refresh Response
+note over ltcsproxy
+    Now Proxy saves
+    new access token
+    and refresh token
+    to database
+    for later usage.
+end note
+
+legend left
+    |Arrow color| Description |
+    |<#0000FF>| Communication visible to browser |
+    |<#FF0000>| Communication hidden from browser |
+endlegend
+
+@enduml

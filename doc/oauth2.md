@@ -50,6 +50,10 @@ Although LTC is currently the only OAuth2 client for Layman, there is an intenti
 
 ## Communication
 ### Initial Authorization using Authorization Code
+**Authorization Code** flow between *client* and *authorization server* is described in [Liferay documentation](https://portal.liferay.dev/docs/7-1/deploy/-/knowledge_base/d/authorizing-account-access-with-oauth2#authorization-code-flow).
+
+Schema specific for LTC, distinguishing client side and server side of LTC:
+
 ![oauth2-auth-code.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-auth-code.puml) 
 
 ### Request Layman REST API
@@ -77,11 +81,19 @@ The fetch should happen regularly during end-user session to test if authenticat
  
 
 ### Reserve Username
-Immediately after the first fetch of user-related metadata, *client* should check if **username** was already registered for authenticated end-user (response to [GET Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#get-current-user) contains `username`) or not (response does not contains `username`). If username was not registered yet, it is recommended to register it as soon as possible, because it's required when user wants to publish any data.
+Immediately after the first [fetch of user-related metadata](#fetch-user-related-metadata), *client* should check if **username** was already registered for authenticated end-user (response to [GET Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#get-current-user) contains `username`) or not (response does not contains `username`). If username was not registered yet, it is recommended to register it as soon as possible, because it's required when user wants to publish any data.
 
 Username is registered by [PATCH Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#patch-current-user). Username can be either generated automatically (this approach is used by LTC) or set manually; this is controlled by `adjust_username` parameter.
 
 ![oauth2-patch-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-patch-current-user.puml) 
+
+### Refresh Access Token
+During end-user's session, *client* keeps both access tokens and refresh token. When access token expires (or it's lifetime is close), *client* should use refresh token to generate new access token at [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2).
+
+Refreshing flow between *client* and *authorization server* is described in [Liferay issue](https://issues.liferay.com/browse/OAUTH2-167). In case of LTC, refreshing happens automatically on any request to Layman REST API if access token expired.
+
+Schema specific for LTC:
+![oauth2-refresh.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-refresh.puml) 
 
 
 ## Settings
