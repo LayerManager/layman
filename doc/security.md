@@ -13,7 +13,7 @@ Authentication is performed by chain of zero or more authentication modules cont
 
 Currently there are two authentication options:
 - use no authentication module, so every user is considered as **anonymous**
-- **OAuth2** module ([`'layman.authn.oauth2'`](../src/layman/authn/oauth2)) with Liferay as authorization server. See separate [Oauth2 documentation](oauth2/index.md).
+- **OAuth2** module ([`'layman.authn.oauth2'`](../src/layman/authn/oauth2)) with Liferay as authorization server. See separate [OAuth2 documentation](oauth2/index.md).
 
 ## Authorization
 
