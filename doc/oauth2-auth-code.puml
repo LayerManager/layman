@@ -29,7 +29,7 @@ deactivate ltcc
 
 legend left
     |Arrow color| Description |
-    |<#0000FF>| Communication visible in browser |
+    |<#0000FF>| Communication visible to browser |
     |<#FF0000>| Communication hidden from browser |
 endlegend
 

@@ -48,7 +48,10 @@ Although LTC is currently the only OAuth2 client for Layman, there is an intenti
 
 ## Communication
 ### Initial Authorization using Authorization Code
- 
+![oauth2-auth-code.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-auth-code.puml) 
+
+### Fetch User-Related Metadata
+![oauth2-get-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-get-current-user.puml) 
 
 
 ## Settings
