@@ -133,6 +133,9 @@ geoserver-bash:
 liferay-introspect:
 	curl 'http://localhost:8082/o/oauth2/introspect' --data 'client_id=id-353ab09c-f117-f2d5-d3a3-85cfb89e6746&client_secret=secret-d31a82c8-3e73-1058-e38a-f9191f7c2014&token=...'
 
+liferay-refresh:
+	curl 'http://localhost:8082/o/oauth2/token' --data 'grant_type=refresh_token&client_id=id-353ab09c-f117-f2d5-d3a3-85cfb89e6746&client_secret=secret-d31a82c8-3e73-1058-e38a-f9191f7c2014&refresh_token=...'
+
 liferay-userprofile:
 	curl -H "Authorization: Bearer ..." http://localhost:8082/api/jsonws/user/get-current-user
 
