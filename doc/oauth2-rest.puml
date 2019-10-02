@@ -12,18 +12,29 @@ box "Liferay"
 end box
 
 
-ltcc [#0000FF]--> ltcsproxy: PATCH Current User\nRequest
+ltcc [#0000FF]--> ltcsproxy: Request to\nLayman REST API
 activate ltcc
 activate ltcsproxy
-ltcsproxy [#FF0000]--> layman: PATCH Current User\nRequest
+note over ltcsproxy
+    Proxy adds HTTP headers
+    Authorization and AuthorizationIssUrl
+    to every request
+    to Layman REST API.
+end note
+ltcsproxy [#FF0000]--> layman: Request to\nLayman REST API
 activate layman
 group Validation of Access Token
+    note right of layman
+        Validation of access token
+        happens on every request
+        to Layman REST API.
+    end note
     layman [#FF0000]--> lris: Validate Access Token\nRequest
     lris [#FF0000]--> layman: Validate Access Token\nResponse
 end
 note over layman
-    Now Layman reserves
-    username.
+    Now Layman makes
+    requested action.
 end note
 layman [#FF0000]--> ltcsproxy: PATCH Current User\nResponse
 deactivate layman

@@ -16,18 +16,9 @@ end box
 ltcc [#0000FF]--> ltcsproxy: GET Current User\nRequest
 activate ltcc
 activate ltcsproxy
-note right of ltcsproxy
-    Proxy adds access token
-    to every request to Layman REST API.
-end note
 ltcsproxy [#FF0000]--> layman: GET Current User\nRequest
 activate layman
 group Validation of Access Token
-    note right of layman
-        Validation of access token
-        happens on every request
-        to Layman REST API.
-    end note
     layman [#FF0000]--> lris: Validate Access Token\nRequest
     lris [#FF0000]--> layman: Validate Access Token\nResponse
 end
