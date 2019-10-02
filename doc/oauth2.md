@@ -43,6 +43,8 @@ Layman acts as *resource server*. On every request to REST API, Layman accepts O
 - passing access token to Layman REST API with every request
 - refreshing access token using refresh token
 
+Key feature of LTC is that is has client side as well as server side that is completely separate from Layman REST API. The server side exists to [keep access tokens and refresh tokens in secret](oauth2-client-recommendations.md#storing-tokens-on-a-client). 
+
 Although LTC is currently the only OAuth2 client for Layman, there is an intention to implement also other clients, e.g. for QGIS or HS Layers. If you want to implement such client, see [recommendations for implementing Layman's client](oauth2-client-recommendations.md).
 
 
@@ -50,12 +52,28 @@ Although LTC is currently the only OAuth2 client for Layman, there is an intenti
 ### Initial Authorization using Authorization Code
 ![oauth2-auth-code.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-auth-code.puml) 
 
+### Request Layman REST API
+After successful authorization, *client* is able to communicate with Layman REST API. To authenticate using OAuth2, every request to Layman REST API must contain two HTTP headers:
+- `Authorization`
+- `AuthorizationIssUrl`
+
+**Authorization** header contains access token according to [RFC6750 Bearer Token Usage](https://tools.ietf.org/html/rfc6750#section-2.1). Structure of its value is `"Bearer <access token>"`.
+
+**AuthorizationIssUrl** header is Layman-specific header and it contains URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), e.g. `"http://localhost:8082/o/oauth2/authorize"`. LTC uses the value from LIFERAY_OAUTH2_AUTH_URL setting.
+
+Because access token is known only on server side of LTC and not to client side, every request from client side to Layman REST API goes through **proxy** on LTC server side. The proxy adds `Authorization` and `AuthorizationIssUrl` headers to the request and forward it to the Layman. To authenticate end-user, Layman then validates access token on *authorization server* using [Token Introspection](https://oauth.net/2/token-introspection/) mechanism.
+ 
+General schema of any request to Layman REST API:
+
+![oauth2-rest.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-rest.puml)
+
+
 ### Fetch User-Related Metadata
-Fetching user-related metadata happens automatically immediately after successful initial authorization.
+Fetching user-related metadata happens automatically immediately after successful initial authorization by [GET Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#get-current-user).
 
 ![oauth2-get-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-get-current-user.puml)
 
-The fetch can (and should) happen regularly during end-user session to test if user credentials (access token) is still valid. 
+The fetch should happen regularly during end-user session to test if authentication (access token) is still valid. 
  
 
 ### Reserve Username

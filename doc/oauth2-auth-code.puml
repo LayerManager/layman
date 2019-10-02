@@ -23,7 +23,7 @@ deactivate lrauth
 activate ltcsredir
 ltcsredir [#ff0000]--> lrtoken: Access Token Request
 lrtoken [#ff0000]--> ltcsredir: Access Token Response
-note right of ltcsredir
+note over ltcsredir
     Now Redirection Endpoint saves
     access token and refresh token
     to database for later usage.
