@@ -50,7 +50,7 @@ Although LTC is currently the only OAuth2 client for Layman, there is an intenti
 
 ## Communication
 ### Initial Authorization using Authorization Code
-**Authorization Code** flow between *client* and *authorization server* is described in [Liferay documentation](https://portal.liferay.dev/docs/7-1/deploy/-/knowledge_base/d/authorizing-account-access-with-oauth2#authorization-code-flow).
+[**Authorization Code**](https://oauth.net/2/grant-types/authorization-code/) grant flow between *client* and *authorization server* is described in [Liferay documentation](https://portal.liferay.dev/docs/7-1/deploy/-/knowledge_base/d/authorizing-account-access-with-oauth2#authorization-code-flow).
 
 Schema specific for LTC, distinguishing client side and server side of LTC:
 
@@ -81,9 +81,9 @@ The fetch should happen regularly during end-user session to test if authenticat
  
 
 ### Reserve Username
-Immediately after the first [fetch of user-related metadata](#fetch-user-related-metadata), *client* should check if **username** was already registered for authenticated end-user (response to [GET Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#get-current-user) contains `username`) or not (response does not contains `username`). If username was not registered yet, it is recommended to register it as soon as possible, because it's required when user wants to publish any data.
+Immediately after the first [fetch of user-related metadata](#fetch-user-related-metadata), *client* should check if **username** was already reserved for authenticated end-user (response to [GET Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#get-current-user) contains `username`) or not (response does not contains `username`). If username was not reserved yet, it is recommended to reserve it as soon as possible, because it's required when user wants to publish any data.
 
-Username is registered by [PATCH Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#patch-current-user). Username can be either generated automatically (this approach is used by LTC) or set manually; this is controlled by `adjust_username` parameter.
+Username is reserved by [PATCH Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#patch-current-user). Username can be either generated automatically (this approach is used by LTC) or set manually; this is controlled by `adjust_username` parameter.
 
 ![oauth2-patch-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-patch-current-user.puml) 
 
@@ -93,6 +93,7 @@ During end-user's session, *client* keeps both access tokens and refresh token. 
 Refreshing flow between *client* and *authorization server* is described in [Liferay issue](https://issues.liferay.com/browse/OAUTH2-167). In case of LTC, refreshing happens automatically on any request to Layman REST API if access token expired.
 
 Schema specific for LTC:
+
 ![oauth2-refresh.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-refresh.puml) 
 
 
@@ -111,7 +112,7 @@ Sample values for OAuth2 authentication can be found in [`layman_settings_dev.py
 ### Liferay Settings
 Every *client* must be registered in Liferay as *application*, as described in [Liferay documentation](https://portal.liferay.dev/docs/7-1/deploy/-/knowledge_base/d/oauth-2-0#creating-an-application). For LTC, fill in following settings:
 - **Website URL** should point to application's home page, e.g. `http://localhost:3000/`.
-- **Callback URIs** must contain URL of OAuth2 [*Redirection Endpoint*](https://tools.ietf.org/html/rfc6749#section-3.1.2). In case of LTC, the value is the same as LTC setting LIFERAY_OAUTH2_CALLBACK_URL.
+- **Callback URIs** must contain URL of OAuth2 [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2). In case of LTC, the value is the same as LTC setting LIFERAY_OAUTH2_CALLBACK_URL.
 - **Client Profile**: Web Application
 - **Allowed Authorization Types**:
     - Authorization Code
