@@ -149,7 +149,7 @@ def test_authn_post_access_without_username(client):
 
 @pytest.mark.usefixtures('user_profile_url', 'active_token_introspection_url')
 def test_authn_map_access_rights(client):
-    # register username if it's not yet registered
+    # reserve username if it's not yet reserved
     with app.app_context():
         rest_path = url_for('rest_current_user.get')
         rv = client.get(rest_path, headers={

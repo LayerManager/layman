@@ -51,7 +51,19 @@ Although LTC is currently the only OAuth2 client for Layman, there is an intenti
 ![oauth2-auth-code.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-auth-code.puml) 
 
 ### Fetch User-Related Metadata
-![oauth2-get-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-get-current-user.puml) 
+Fetching user-related metadata happens automatically immediately after successful initial authorization.
+
+![oauth2-get-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-get-current-user.puml)
+
+The fetch can (and should) happen regularly during end-user session to test if user credentials (access token) is still valid. 
+ 
+
+### Reserve Username
+Immediately after the first fetch of user-related metadata, *client* should check if **username** was already registered for authenticated end-user (response to [GET Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#get-current-user) contains `username`) or not (response does not contains `username`). If username was not registered yet, it is recommended to register it as soon as possible, because it's required when user wants to publish any data.
+
+Username is registered by [PATCH Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#patch-current-user). Username can be either generated automatically (this approach is used by LTC) or set manually; this is controlled by `adjust_username` parameter.
+
+![oauth2-patch-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2-patch-current-user.puml) 
 
 
 ## Settings
