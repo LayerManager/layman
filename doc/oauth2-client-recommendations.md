@@ -12,7 +12,7 @@ An important decision when implementing OAuth2 *client* is where to store access
 [*Web Applications*](https://tools.ietf.org/html/rfc6749#section-2.1) are able to store tokens either on server side or client side. There exists quite straightforward recommendations (see e.g. [auth0](https://auth0.com/docs/security/store-tokens#regular-web-apps), [DZone](https://dzone.com/articles/security-best-practices-for-managing-api-access-to) or [StackOverflow](https://security.stackexchange.com/a/209388)). Generally three options are available:
 1. Store access tokens in browser memory. It would mean to provide new authorization request against Liferay Portal and manual end-user authorization consent on every page open or page reload.
 2. Store access tokens in both secure and HTTP-only cookies. This option requires to have server side to set access tokens in cookies, and to refresh them using refresh tokens. Also refresh tokens need to be saved on server side.
-3. Store access token on server side.
+3. Store access token on server side in any well-protected database.
 
 Because option 1 is totally impractical and both options 2 and 3 require server side, it was decided to implement option 3 in LTC as the most secure one (it does not expose access token to client/browser at all).
 
