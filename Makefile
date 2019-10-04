@@ -142,6 +142,18 @@ liferay-userprofile:
 liferay-bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec liferay bash
 
+liferay-export-settings:
+	rm -f deps/liferay/transit/*
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec liferay bash -c "cd data/hypersonic; cp lportal.log /etc/liferay/tmp/; cp lportal.properties /etc/liferay/tmp/; cp lportal.script /etc/liferay/tmp/"
+	rm -f deps/liferay/sample/hypersonic/*
+	mv -f deps/liferay/transit/* deps/liferay/sample/hypersonic/
+
+liferay-start:
+	docker-compose -f docker-compose.deps.yml up --force-recreate -d liferay
+
+liferay-stop:
+	docker-compose -f docker-compose.deps.yml stop liferay
+
 stop-all-docker-containers:
 	docker stop $$(docker ps -q)
 
