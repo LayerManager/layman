@@ -1,23 +1,64 @@
 @startuml
 hide footbox
+participant "LTC Client" as ltcc
+
 box "LTC Server"
     participant "Layman\nProxy" as ltcsproxy
 end box
 
+participant "Layman\nREST API" as layman
+
 box "Liferay"
+	participant "Introspection\nEndpoint" as lris
 	participant "Token\nEndpoint" as lrtoken
 end box
 
 
-ltcsproxy [#ff0000]--> lrtoken: Refresh Request
-lrtoken [#ff0000]--> ltcsproxy: Refresh Response
+ltcc [#0000FF]-> ltcsproxy: Request to\nLayman REST API
+activate ltcc
+activate ltcsproxy
+
 note over ltcsproxy
-    Now Proxy saves
-    new access token
-    and refresh token
-    to database
-    for later usage.
+    If access token expired
+    or its expiration time is close,
+    Proxy asks Liferay to refresh the token
+    before any other action.
 end note
+
+group Refreshing Access Token
+    ltcsproxy [#ff0000]--> lrtoken: Refresh Request
+    lrtoken [#ff0000]--> ltcsproxy: Refresh Response
+    note over ltcsproxy
+        Now Proxy saves
+        new access token
+        and refresh token
+        to database
+        for later usage.
+    end note
+end
+
+note over ltcsproxy
+    Following request to Layman REST API
+    already contains refreshed access token
+    in HTTP header Authorization.
+end note
+
+
+ltcsproxy [#FF0000]--> layman: Request to\nLayman REST API
+activate layman
+group Validation of Access Token
+    layman [#FF0000]--> lris: Validate Access Token\nRequest
+    lris [#FF0000]--> layman: Validate Access Token\nResponse
+end
+note over layman
+    Now Layman makes
+    requested action.
+end note
+layman [#FF0000]--> ltcsproxy: PATCH Current User\nResponse
+deactivate layman
+ltcsproxy [#0000FF]--> ltcc: PATCH Current User\nResponse
+deactivate ltcsproxy
+deactivate ltcc
 
 legend left
     |Arrow color| Description |
