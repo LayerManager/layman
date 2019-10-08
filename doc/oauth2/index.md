@@ -88,9 +88,9 @@ Username is reserved by [PATCH Current User](https://github.com/jirik/layman/blo
 ![patch-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2/patch-current-user.puml) 
 
 ### Refresh Access Token
-During end-user's session, *client* keeps both access tokens and refresh token. When access token expires (or it's lifetime is close), *client* should use refresh token to generate new access token at [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2).
+During end-user's session, *client* keeps both access tokens and refresh token. When access token expires or it's lifetime is close, *client* should use refresh token to generate new access token at [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2).
 
-Refreshing flow between *client* and *authorization server* is described in [Liferay issue](https://issues.liferay.com/browse/OAUTH2-167). In case of LTC, refreshing happens automatically on any request to Layman REST API if access token expired.
+Refreshing flow between *client* and *authorization server* is described in [Liferay issue](https://issues.liferay.com/browse/OAUTH2-167). In case of LTC, refreshing happens automatically on any request to Layman REST API if access token expired or it's lifetime is closer than 10 seconds.
 
 Schema specific for LTC:
 

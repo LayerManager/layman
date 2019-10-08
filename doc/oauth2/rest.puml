@@ -12,7 +12,7 @@ box "Liferay"
 end box
 
 
-ltcc [#0000FF]--> ltcsproxy: Request to\nLayman REST API
+ltcc [#0000FF]-> ltcsproxy: Request to\nLayman REST API
 activate ltcc
 activate ltcsproxy
 note over ltcsproxy
