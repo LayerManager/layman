@@ -122,6 +122,14 @@ Every *client* must be registered in Liferay as *application*, as described in [
 
 Furthermore, check "read your personal user data" (liferay-json-web-services.everything.read.userprofile) in **Scopes** tab. This scope will enable `/api/jsonws/user/get-current-user` endpoint to provide user-related metadata to Layman.
 
+By default, only Liferay users with Administrator role have enough privileges to use OAuth2 authorization. To enable other roles to use OAuth2 (e.g. User role), you need to
+- add **View** permission for **Authorize Screen URL** to desired roles
+  - **Authorize Screen URL** can be found in *Configuration > System Settings > OAuth 2 > Authorize Screen*
+  - to open permissions of default Authorize Screen URL `/?p_p_id=com_liferay_oauth2_provider_web_internal_portlet_OAuth2AuthorizePortlet&p_p_state=maximized`, visit [this URL](http://localhost:8080/?p_p_id=com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet&p_p_state=pop_up&_com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet_mvcPath=%2Fedit_permissions.jsp&_com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet_portletConfiguration=true&_com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet_portletResource=com_liferay_oauth2_provider_web_internal_portlet_OAuth2AuthorizePortlet&_com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet_resourcePrimKey=com_liferay_oauth2_provider_web_internal_portlet_OAuth2AuthorizePortlet)
+    - see [Workaround #1](https://issues.liferay.com/browse/OAUTH2-202) for details
+- add **View** and **Create token** permissions for each registered OAuth2 application to desired roles
+  - to open permissions, visit *Configuration > OAuth 2 Administration*, click on three dots for desired application and select *Permissions*
+
 After registration, add **Client ID** and **Client Secret** pair to Layman's setting LIFERAY_OAUTH2_CLIENTS.
 
 ### Layman Test Client Settings
