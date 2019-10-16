@@ -32,7 +32,7 @@ When user [publishes new layer](rest.md#post-layers)
 Subsequently, when asynchronous tasks run,
 - vector data file chunks and completed vector data files are saved to [filesystem](#filesystem) (if sent [asynchronously](async-file-upload.md)),
 - vector data files are imported to [PostgreSQL](#postgresql),
-- vector data files are registered to and visualization file is saved to [GeoServer](#geoserver),
+- PostgreSQL table with vector data is registered to and visualization file is saved to [GeoServer](#geoserver),
 - and thumbnail file is saved to [filesystem](#filesystem).
 
 When user [patches existing layer](rest.md#patch-layer), data is saved in the same way.
