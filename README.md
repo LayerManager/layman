@@ -3,12 +3,12 @@
 
 Publishing geospatial data online through [REST API](doc/rest.md).
 
-- Two models available:
+- Two publication models available:
   - [**layer**](doc/models.md#layer): visual representation of single vector dataset (i.e. ShapeFile or GeoJSON)
   - [**map**](doc/models.md#layer): collection of layers
 - Accepts data in [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON), [ShapeFile](https://en.wikipedia.org/wiki/Shapefile), [Styled Layer Descriptor](https://www.opengeospatial.org/standards/sld), [Symbology Encoding](https://www.opengeospatial.org/standards/se), or [HSLayers Map Composition](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema) format
-- Even large files can be uploaded from browser
-- Asynchronous upload and processing
+- Even large files can be easily uploaded from browser thanks to asynchronous chunk upload
+- Asynchronous processing
 - Each vector dataset is automatically imported into PostGIS database
 - Provides URL endpoints
   - [Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms)
@@ -16,6 +16,7 @@ Publishing geospatial data online through [REST API](doc/rest.md).
   - thumbnail image
 - Documented [REST API](doc/rest.md)
 - Documented [security system](doc/security.md)
+- Documented [data storage](doc/data-storage.md)
 - Configurable by environment variables
 - Standing on the shoulders of Docker, Python, Flask, PostgreSQL, PostGIS, GDAL, GeoServer, OpenLayers, Celery, Redis, and [more](doc/dependencies.md)
 - Inspired by [CCSS-CZ/layman](https://github.com/CCSS-CZ/layman)
