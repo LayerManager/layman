@@ -10,7 +10,7 @@
   - [Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms)
   - [Web Feature Service (WFS)](https://www.opengeospatial.org/standards/wfs)
 - Thumbnail image available
-- Layer-related data is named and structured first by username, second by layer name
+- Layer-related data is named and structured first by username, second by layername
   - [REST API](doc/rest.md): `/rest/<username>/layers/<layername>` 
   - [filesystem](data-storage.md#filesystem): `/path/to/LAYMAN_DATA_DIR/users/<username>/layers/<layername>` 
   - [PostgreSQL](data-storage.md#postgresql): `db=LAYMAN_PG_DBNAME, schema=<username>, table=<layername>` 
@@ -29,7 +29,7 @@
 - Maps composed from WMS layers only are fully supported
 - Documented [map publishing](publish-map.md) process 
 - Thumbnail image available
-- Map-related data is named and structured first by user name, second by map name
+- Map-related data is named and structured first by username, second by mapname
   - [REST API](doc/rest.md): `/rest/<username>/maps/<mapname>` 
   - file system: `/path/to/LAYMAN_DATA_DIR/users/<username>/maps/<mapname>` 
   
