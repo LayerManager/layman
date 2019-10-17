@@ -35,7 +35,7 @@ if os.getenv('LAYMAN_SKIP_REDIS_LOADING', 'false').lower() != 'true':
         import_authn_to_redis()
 
 
-if app.config['DEBUG']:
+if settings.LAYMAN_PRELOAD_MODULES:
     # because Flask with reloader reloads when *.pyc files is created
     app.logger.info(f'Preload auth* modules.')
     with app.app_context():
