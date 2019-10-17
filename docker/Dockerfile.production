@@ -13,6 +13,6 @@ ENV LANG=C.UTF-8
 
 COPY Pipfile* /code/
 
-RUN (cd /tmp && curl -O https://chromedriver.storage.googleapis.com/LATEST_RELEASE_77/chromedriver_linux64.zip && unzip chromedriver_linux64.zip -d /usr/bin && rm chromedriver_linux64.zip)
+RUN (cd /tmp && curl -O https://chromedriver.storage.googleapis.com/77.0.3865.10/chromedriver_linux64.zip && unzip chromedriver_linux64.zip -d /usr/bin && rm chromedriver_linux64.zip)
 
 RUN pipenv install --system
