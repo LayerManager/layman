@@ -1,4 +1,4 @@
-from flask import g
+from flask import g, current_app
 from layman import LaymanError
 from layman.authn import get_open_id_claims, get_iss_id, get_sub
 from layman.util import slugify, to_safe_names, check_username, get_usernames, ensure_user_workspace, delete_user_workspace
@@ -46,8 +46,8 @@ def reserve_username(username, adjust=False):
     suggestions = to_safe_names(suggestions, 'user')
     usernames = get_usernames()
     username = None
+    idx = 0
     while True:
-        idx = 0
         for suggestion in suggestions:
             if idx > 0:
                 suggestion = f"{suggestion}{idx}"
@@ -80,14 +80,15 @@ def _save_reservation(username, claims):
 
 def get_username_suggestions_from_claims(claims):
     keys = [
-        'preferred_username',
         'nickname',
+        'preferred_username',
         'name',
-        'email',
-        'sub',
     ]
     result = [
         claims.get(k, None) for k in keys
     ]
+    email = claims.get('email', None)
+    if email is not None:
+        result.insert(1, email.split('@')[0])
     return result
 

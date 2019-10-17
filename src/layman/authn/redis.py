@@ -32,7 +32,7 @@ def import_authn_to_redis():
     for username in usernames:
         authn_info = filesystem.get_authn_info(username)
         if not authn_info:
-            pass
+            continue
         iss_id = authn_info['iss_id']
         sub = authn_info['sub']
         save_username_reservation(username, iss_id, sub)
