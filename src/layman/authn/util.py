@@ -10,7 +10,7 @@ FLASK_MODULES_KEY = f'{__name__}:MODULES'
 def authenticate(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # print(f"authenticate ARGS {args} KWARGS {kwargs}")
+        # current_app.logger.info(f"authenticate ARGS {args} KWARGS {kwargs}")
         authn_modules = get_authn_modules()
         results = call_modules_fn(authn_modules, 'authenticate', until=lambda r: r is not None)
         authenticated = len(results)>0 and results[-1] is not None
