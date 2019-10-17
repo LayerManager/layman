@@ -57,7 +57,9 @@ Task information are saved to [Redis](#redis) only.
 
 ## Stores
 ### Redis
-Data is saved in LAYMAN_REDIS_URL database. Keys are prefixed either with Python module name that saved the data, or with `celery` in case of Celery task data.
+Data is saved in LAYMAN_REDIS_URL database. Keys are prefixed with
+- Layman python module name that saved the data, followed by `:`, e.g. `layman.layer.geoserver:` or `layman:`
+- other strings, e.g. `celery`, `_kombu`, or `unacked` in case of Celery task data.
 
 Redis is used as temporary data store. When Layman stops, data persists in Redis, however on each startup Layman flushes the Redis database and imports user-related data and publication-related data from [filesystem](#filesystem). It means that any [task-related](#tasks) data is lost on startup. This can be controlled by LAYMAN_SKIP_REDIS_LOADING.
 

@@ -5,7 +5,7 @@ RUN chmod 777 /code
 WORKDIR /code
 
 RUN apt-get clean && apt-get update && \
-    apt-get -y -qq install unzip curl python3-pip chromium-browser=76\* && \
+    apt-get -y -qq install unzip curl python3-pip chromium-browser=77\* && \
     pip3 install pipenv
 
 # http://click.pocoo.org/python3/
@@ -14,7 +14,6 @@ ENV LANG=C.UTF-8
 
 COPY Pipfile* /code/
 
-RUN (cd /tmp && curl -O https://chromedriver.storage.googleapis.com/76.0.3809.68/chromedriver_linux64.zip && unzip chromedriver_linux64.zip -d /usr/bin && rm chromedriver_linux64.zip)
-RUN chmod +x /usr/bin/chromedriver
+RUN (cd /tmp && curl -O https://chromedriver.storage.googleapis.com/LATEST_RELEASE_77/chromedriver_linux64.zip && unzip chromedriver_linux64.zip -d /usr/bin && rm chromedriver_linux64.zip)
 
 RUN pipenv install --system --dev

@@ -1,8 +1,5 @@
 version: '3.3'
 
-volumes:
-   geoserver-data:
-
 services:
    layman_test:
       container_name: layman_test

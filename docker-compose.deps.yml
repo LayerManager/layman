@@ -1,7 +1,7 @@
 version: '3.3'
 
 volumes:
-   geoserver-data:
+   redis-data:
 
 services:
    postgresql:
@@ -39,6 +39,8 @@ services:
       image: redis:4.0.11-alpine
       ports:
         - 6379:6379
+      volumes:
+        - redis-data:/data
 
    liferay:
       build:

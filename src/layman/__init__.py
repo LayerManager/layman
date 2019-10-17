@@ -5,12 +5,16 @@ import importlib
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
-from .http import LaymanError
-from .make_celery import make_celery
-
 app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
 
+if os.getenv('LAYMAN_SKIP_REDIS_LOADING', 'false').lower() != 'true':
+    app.logger.info(f'Flush Redis database.')
+    settings.LAYMAN_REDIS.flushdb()
+
+
+from .http import LaymanError
+from .make_celery import make_celery
 celery_app = make_celery(app)
 
 
@@ -29,6 +33,16 @@ if os.getenv('LAYMAN_SKIP_REDIS_LOADING', 'false').lower() != 'true':
         import_uuids_to_redis()
         from .authn.redis import import_authn_to_redis
         import_authn_to_redis()
+
+
+if app.config['DEBUG']:
+    # because Flask with reloader reloads when *.pyc files is created
+    app.logger.info(f'Preload auth* modules.')
+    with app.app_context():
+        from .authn.util import get_authn_modules
+        get_authn_modules()
+        from .authz.util import get_authz_module
+        get_authz_module()
 
 
 @app.route('/')

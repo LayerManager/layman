@@ -40,6 +40,17 @@ start-dev-d:
 stop-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop
 
+start-dev-only:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower hslayers
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up layman_dev celery_worker_dev flower hslayers
+
+start-dev-only-d:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower hslayers
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d layman_dev celery_worker_dev flower hslayers
+
+stop-dev-only:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop layman_dev celery_worker_dev flower hslayers
+
 restart-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_dev celery_worker_dev
 
@@ -64,7 +75,10 @@ reset-test-client-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps layman_dev bash -c "rm -rf /code/src/layman/static/test-client && bash /code/src/ensure-test-client.sh"
 
 build-dev:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_dev
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build --force-rm layman_dev
+
+rebuild-dev:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build --no-cache --force-rm layman_dev
 
 bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_dev bash
@@ -163,3 +177,10 @@ remove-all-docker-containers:
 stop-and-remove-all-docker-containers:
 	docker stop $$(docker ps -q)
 	docker rm $$(docker ps -aq)
+
+github-purge-cache:
+	if ! [ -f tmp/github-purge.sh ] ; then \
+		curl -o tmp/github-purge.sh -LO https://raw.githubusercontent.com/mpyw/hub-purge/master/hub-purge.sh ; \
+	fi
+	chmod +x tmp/github-purge.sh
+	./tmp/github-purge.sh ${ARGS}
