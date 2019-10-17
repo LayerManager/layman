@@ -144,7 +144,7 @@ Before the first run:
 make geoserver-reset-default-layman-datadir
 
 # use dev settings
-cp .env.demo .env
+cp .env.dev .env
 
 ```
 

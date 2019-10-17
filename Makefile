@@ -153,6 +153,9 @@ liferay-refresh:
 liferay-userprofile:
 	curl -H "Authorization: Bearer ..." http://localhost:8082/api/jsonws/user/get-current-user
 
+get-current-user:
+	curl -H "Authorization: Bearer ..." -H "AuthorizationIssUrl: ..." http://localhost:8000/rest/current-user
+
 liferay-bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec liferay bash
 
