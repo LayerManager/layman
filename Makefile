@@ -83,8 +83,17 @@ rebuild-dev:
 bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_dev bash
 
+bash-root:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm -u root layman_dev bash
+
 bash-exec:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec layman_dev bash
+
+bash-production:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml run --rm layman bash
+
+bash-production-root:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml run --rm -u root layman bash
 
 clear-data-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_dev bash -c "python3 src/clear_layman_data.py"
