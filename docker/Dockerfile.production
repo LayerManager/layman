@@ -11,8 +11,16 @@ RUN apt-get clean && apt-get update && \
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
-COPY Pipfile* /code/
+COPY docker/Pipfile* /code/
+COPY docker/requirements.production.txt /code/
+COPY start.sh /code/
+COPY src /code/src
 
 RUN (cd /tmp && curl -O https://chromedriver.storage.googleapis.com/77.0.3865.10/chromedriver_linux64.zip && unzip chromedriver_linux64.zip -d /usr/bin && rm chromedriver_linux64.zip)
 
 RUN pipenv install --system
+RUN pip3 install -r requirements.production.txt
+
+RUN chmod -R o+x src/*.sh
+RUN chmod -R ugo+rw src
+RUN src/ensure-test-client.sh

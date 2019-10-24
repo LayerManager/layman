@@ -4,19 +4,18 @@ services:
    layman:
       container_name: layman
       build:
-        context: docker/.
-        dockerfile: Dockerfile.production
+        context: .
+        dockerfile: docker/Dockerfile.production
       image: layman:latest
       user: ${UID_GID}
-      command: bash -c "bash start.sh --no-reload"
+      command: bash -c "python3 src/wait_for_deps.py && cd src && gunicorn -w 1 -b 0.0.0.0:8000 layman:app"
       env_file:
          - .env
       ports:
         - 8000:8000
       volumes:
         - ./layman_data:/layman_data
-        - ./src:/code/src
-        - ./start.sh:/code/start.sh
+        - ./src/layman_settings_demo.py:/code/src/layman_settings.py
       depends_on:
         - hslayers
 
@@ -30,7 +29,7 @@ services:
         - LAYMAN_SKIP_REDIS_LOADING=true
       volumes:
         - ./layman_data:/layman_data
-        - ./src:/code/src
+        - ./src/layman_settings_demo.py:/code/src/layman_settings.py
       depends_on:
         - layman
 
@@ -43,7 +42,7 @@ services:
       environment:
         - LAYMAN_SKIP_REDIS_LOADING=true
       volumes:
-        - ./src:/code/src
+        - ./src/layman_settings_demo.py:/code/src/layman_settings.py
       ports:
         - 5555:5555
       depends_on:
