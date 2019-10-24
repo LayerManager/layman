@@ -203,6 +203,7 @@ make start-dev
 - all layman-related schemas in LAYMAN_PG_DBNAME!
 - all workspaces accessible namely by LAYMAN_GS_ROLE!
 - all keys in Redis keyspace identified by LAYMAN_REDIS_URL!
+- all keys in Redis keyspace identified by LTC_REDIS_URL!
 
 Default values are defined in [.env.test](.env.test)
 ```bash

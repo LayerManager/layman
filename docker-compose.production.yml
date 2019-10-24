@@ -20,6 +20,7 @@ services:
         - ./src/layman_settings_demo.py:/code/src/layman_settings.py
       depends_on:
         - hslayers
+        - layman_client
 
    celery_worker:
       image: layman:latest
@@ -61,8 +62,20 @@ services:
       image: hslayers:latest
       user: ${UID_GID}
       command: sh -c "node proxy.js & ./node_modules/.bin/http-server dist/"
-#      env_file:
-#         - .env.dev
       ports:
         - 8080:8080
         - 8081:8081
+
+   layman_client:
+      container_name: layman_client
+      build:
+        context: client
+        dockerfile: docker/Dockerfile.production
+        args:
+           - LAYMAN_CLIENT_VERSION=${LAYMAN_CLIENT_VERSION}
+      image: layman_client:latest
+      command: sh -c "npm run build && npm start"
+      env_file:
+         - .env
+      ports:
+        - 3000:3000

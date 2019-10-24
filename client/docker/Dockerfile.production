@@ -1,0 +1,16 @@
+FROM node:12-alpine
+
+RUN mkdir /code
+WORKDIR /code
+
+RUN apk update && apk add wget
+
+ARG LAYMAN_CLIENT_VERSION
+# https://stackoverflow.com/a/42144033
+RUN test -n "LAYMAN_CLIENT_VERSION"
+
+RUN wget "https://github.com/jirik/layman-test-client/archive/$LAYMAN_CLIENT_VERSION.tar.gz" -O client.tar.gz && \
+    tar -xvf client.tar.gz --strip 1 && \
+    rm client.tar.gz && \
+    npm ci
+

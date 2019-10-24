@@ -41,15 +41,15 @@ stop-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop
 
 start-dev-only:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower hslayers
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up layman_dev celery_worker_dev flower hslayers
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower hslayers layman_client
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up layman_dev celery_worker_dev flower hslayers layman_client
 
 start-dev-only-d:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower hslayers
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d layman_dev celery_worker_dev flower hslayers
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower hslayers layman_client
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d layman_dev celery_worker_dev flower hslayers layman_client
 
 stop-dev-only:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop layman_dev celery_worker_dev flower hslayers
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop layman_dev celery_worker_dev flower hslayers layman_client
 
 restart-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_dev celery_worker_dev
@@ -70,9 +70,6 @@ restart-celery-dev:
 
 prepare-dirs:
 	mkdir -p layman_data layman_data_test tmp
-
-reset-test-client-dev:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps layman_dev bash -c "rm -rf /code/src/layman/static/test-client && bash /code/src/ensure-test-client.sh"
 
 build-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build --force-rm layman_dev
@@ -111,6 +108,22 @@ hslayers-restart:
 hslayers-bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm hslayers sh
 
+client-build:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_client
+
+client-restart:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_client
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_client
+
+client-bash:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_client sh
+
+client-bash-root:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm -u root layman_client sh
+
+client-bash-exec-root:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec -u root layman_client sh
+
 test:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_dev
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
@@ -136,8 +149,14 @@ redis-cli-db:
 redis-cli-test-db:
 	docker-compose -f docker-compose.deps.yml exec redis redis-cli -h redis -p 6379 -n 15
 
-redis-cli-client-db:
+redis-cli-client-dev-db:
 	docker-compose -f docker-compose.deps.yml exec redis redis-cli -h redis -p 6379 -n 1
+
+redis-cli-client-test-db:
+	docker-compose -f docker-compose.deps.yml exec redis redis-cli -h redis -p 6379 -n 13
+
+redis-cli-client-standalone-db:
+	docker-compose -f docker-compose.deps.yml exec redis redis-cli -h redis -p 6379 -n 14
 
 geoserver-reset-default-layman-datadir:
 	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash /geoserver_code/reset-default-layman-datadir.sh

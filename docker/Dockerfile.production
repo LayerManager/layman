@@ -25,6 +25,4 @@ RUN (cd /tmp && curl -O https://chromedriver.storage.googleapis.com/77.0.3865.10
 RUN pipenv install --system
 RUN pip3 install -r requirements.production.txt
 
-RUN bash src/ensure-test-client.sh
-
 RUN chown -R ${UID_GID:-"0:0"} src
