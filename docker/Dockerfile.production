@@ -1,5 +1,10 @@
 FROM geographica/gdal2:2.4.0
 
+# because docker-compose passes empty string if environment variable is not defined at host, the following default value is not used
+# https://github.com/docker/compose/issues/3608
+ARG UID_GID=0:0
+# therefore we need to use it in this way anywhere below: ${UID_GID:-"0:0"}
+
 RUN mkdir /code
 WORKDIR /code
 
@@ -13,7 +18,6 @@ ENV LANG=C.UTF-8
 
 COPY docker/Pipfile* /code/
 COPY docker/requirements.production.txt /code/
-COPY start.sh /code/
 COPY src /code/src
 
 RUN (cd /tmp && curl -O https://chromedriver.storage.googleapis.com/77.0.3865.10/chromedriver_linux64.zip && unzip chromedriver_linux64.zip -d /usr/bin && rm chromedriver_linux64.zip)
@@ -21,6 +25,6 @@ RUN (cd /tmp && curl -O https://chromedriver.storage.googleapis.com/77.0.3865.10
 RUN pipenv install --system
 RUN pip3 install -r requirements.production.txt
 
-RUN chmod -R o+x src/*.sh
-RUN chmod -R ugo+rw src
-RUN src/ensure-test-client.sh
+RUN bash src/ensure-test-client.sh
+
+RUN chown -R ${UID_GID:-"0:0"} src

@@ -6,6 +6,8 @@ services:
       build:
         context: .
         dockerfile: docker/Dockerfile.production
+        args:
+           - UID_GID
       image: layman:latest
       user: ${UID_GID}
       command: bash -c "python3 src/wait_for_deps.py && cd src && gunicorn -w 1 -b 0.0.0.0:8000 layman:app"
