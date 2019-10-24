@@ -9,7 +9,7 @@ import time
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 ATTEMPT_INTERVAL = 2
-MAX_ATTEMPTS = 30
+MAX_ATTEMPTS = 60
 
 
 def main():
