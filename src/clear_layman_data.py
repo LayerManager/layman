@@ -48,7 +48,9 @@ AND pid <> pg_backend_pid();
 
 
     settings.LAYMAN_REDIS.flushdb()
-
+    import redis
+    ltc_redis = redis.Redis.from_url(os.environ['LTC_REDIS_URI'], encoding="utf-8", decode_responses=True)
+    ltc_redis.flushdb()
 
     import requests
     headers_json = {

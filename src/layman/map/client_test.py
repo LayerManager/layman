@@ -77,13 +77,12 @@ def test_post_no_file(client, chrome):
     })
 
     username = 'testuser2'
-    domain = f"http://localhost:{PORT}"
+    client_url = f'http://{settings.LAYMAN_CLIENT_DOCKER_SERVICE}:3000/client/'
 
-    r = requests.get(domain+'/static/test-client/index.html')
+    r = requests.get(client_url)
     assert r.status_code==200
 
-    chrome.get(domain+'/static/test-client/index'
-                      '.html')
+    chrome.get(client_url)
     chrome.set_window_size(1000,2000)
     # chrome.save_screenshot('/code/tmp/test-1.png')
 
@@ -119,7 +118,7 @@ def test_post_no_file(client, chrome):
     severe_entries = [e for e in entries if e['level'] == 'SEVERE']
     assert len(severe_entries) == 1
     for entry in severe_entries:
-        assert entry['message'].startswith(f'{domain}/rest/{username}/maps?'
+        assert entry['message'].startswith(f'{client_url}rest/{username}/maps?'
             ) and entry['message'].endswith(
             'Failed to load resource: the server responded with a status of 400 (BAD REQUEST)')
 

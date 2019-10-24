@@ -115,5 +115,6 @@ LAYMAN_REDIS = redis.Redis.from_url(LAYMAN_REDIS_URL, encoding="utf-8", decode_r
 
 
 LAYMAN_DOCKER_MAIN_SERVICE = os.environ['LAYMAN_DOCKER_MAIN_SERVICE']
+LAYMAN_CLIENT_DOCKER_SERVICE = os.environ['LAYMAN_CLIENT_DOCKER_SERVICE']
 
 LAYMAN_PRELOAD_MODULES = os.getenv('LAYMAN_PRELOAD_MODULES', 'false').lower() == 'true'

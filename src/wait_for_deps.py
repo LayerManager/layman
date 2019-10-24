@@ -72,6 +72,25 @@ def main():
             attempt += 1
     print()
 
+    # Layman Test Client
+    ltc_url = f'http://{settings.LAYMAN_CLIENT_DOCKER_SERVICE}:3000/'
+    wait_for_msg = f"Layman Test Client, url={ltc_url}"
+    print(f"Waiting for {wait_for_msg}")
+    while True:
+        try:
+            r = requests.get(
+                ltc_url,
+                allow_redirects=False,
+                timeout=0.1
+            )
+            r.raise_for_status()
+            print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
+            break
+        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
+            handle_exception(e, attempt, wait_for_msg)
+            attempt += 1
+    print()
+
 
 def handle_exception(e, attempt, wait_for_msg=None):
     if attempt < MAX_ATTEMPTS:

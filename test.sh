@@ -2,8 +2,6 @@
 
 bash src/clear-python-cache.sh
 
-bash src/ensure-test-client.sh
-
 mkdir -p tmp/naturalearth/110m/cultural
 mkdir -p tmp/naturalearth/10m/cultural
 
