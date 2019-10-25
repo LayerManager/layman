@@ -1,28 +1,25 @@
 .PHONY: test
 
 start-demo:
-	docker-compose -f docker-compose.deps.yml up --force-recreate postgresql geoserver redis
-	docker-compose -f docker-compose.production.yml up --force-recreate layman celery_worker flower hslayers layman_client
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up --force-recreate postgresql geoserver redis layman celery_worker flower hslayers layman_client nginx
 
 start-demo-d:
-	docker-compose -f docker-compose.deps.yml up -d --force-recreate postgresql geoserver redis
-	docker-compose -f docker-compose.production.yml up -d --force-recreate layman celery_worker flower hslayers layman_client
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower hslayers layman_client nginx
+
+start-demo-only-d:
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps layman celery_worker flower hslayers layman_client
 
 stop-demo:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml stop
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml stop
 
 start-demo-with-optional-deps:
-	docker-compose -f docker-compose.deps.yml up --force-recreate
-	docker-compose -f docker-compose.production.yml up --force-recreate
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up --force-recreate
 
-build-production:
-	docker-compose -f docker-compose.production.yml build layman
+start-demo-with-optional-deps-d:
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate
 
-start-production:
-	docker-compose -f docker-compose.production.yml up --force-recreate -d
-
-stop-production:
-	docker-compose -f docker-compose.production.yml stop
+build-demo:
+	docker-compose -f docker-compose.demo.yml build layman
 
 deps-start:
 	docker-compose -f docker-compose.deps.yml up --force-recreate -d
@@ -89,11 +86,11 @@ bash-root:
 bash-exec:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec layman_dev bash
 
-bash-production:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml run --rm layman bash
+bash-demo:
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm layman bash
 
-bash-production-root:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml run --rm -u root layman bash
+bash-demo-root:
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm -u root layman bash
 
 clear-data-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_dev bash -c "python3 src/clear_layman_data.py"

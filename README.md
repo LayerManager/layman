@@ -84,12 +84,12 @@ You can start Layman also in background with `make start-demo-d` (`d` for detach
 Default settings are suitable for development, testing and demo purposes. If you run it in production, manual configuration is required.
 
 The most general configuration is found in `docker-compose.*.yml` files used as [docker-compose configuration files](https://docs.docker.com/compose/compose-file/compose-file-v3/).
-- `docker-compose.production.yml` used for production and demo purposes
+- `docker-compose.demo.yml` used for demo purposes
 - `docker-compose.deps.yml` [external dependencies](#dependencies) used for development, testing, and demo purposes
 - `docker-compose.dev.yml` used for development
 - `docker-compose.test.yml` used for automatic testing
 
-Another part of settings is in `.env.*` files, separately for demo, production, development, and testing. See especially Layman settings and Flask settings. Remember layman is dockerized, so connection parameters such as host names and port numbers must be set according to docker-compose configuration.
+Another part of settings is in `.env.*` files, separately for demo, development, and testing. See especially Layman settings and Flask settings. Remember layman is dockerized, so connection parameters such as host names and port numbers must be set according to docker-compose configuration.
 
 Settings from `.env.*` are brought to python and extended by [layman_settings.py](src/layman_settings.py).
 
@@ -99,6 +99,7 @@ Layman has [many dependencies](doc/dependencies.md). Most of them is shipped wit
 - PostgreSQL & PostGIS
 - GeoServer
 - Redis
+
 These external dependencies are shipped with Layman for development, testing and demo purposes. They are grouped in `docker-compose.deps.yml` file.
 
 However, if you want to run Layman in production, it is strongly recommended to install external dependencies separately. Recommended (i.e. tested) versions are:
@@ -106,34 +107,20 @@ However, if you want to run Layman in production, it is strongly recommended to 
 - GeoServer 2.13.0
 - Redis 4.0
 
-Within PostgreSQL, you need to provide one user [LAYMAN_PG_USER](.env.production) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](.env.production) database. **The LAYMAN_PG_USER must be another user than default `postgres` user!** The user also needs access to `public` schema where PostGIS must be installed.
+Within PostgreSQL, you need to provide one user [LAYMAN_PG_USER](doc/env-settings.md#LAYMAN_PG_USER) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME) database. The user also needs access to `public` schema where PostGIS must be installed.
 
-Within GeoServer, you need to provide one Layman user [LAYMAN_GS_USER](.env.production) and one layman role [LAYMAN_GS_ROLE](.env.production). **The LAYMAN_GS_USER must be another user than default `admin` user and the LAYMAN_GS_ROLE must be another role than default `ADMIN` role!** The LAYMAN_GS_USER user must have at least the LAYMAN_GS_ROLE and ADMIN role. See default development configuration of [roles](deps/geoserver/sample/geoserver_data/security/role/default/roles.xml) and [layer access rights](deps/geoserver/sample/geoserver_data/security/layers.properties).
+Within GeoServer, you need to provide one Layman user [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and one layman role [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE).
 
-Within Redis, you need to provide one database. Connection string is defined by [LAYMAN_REDIS_URL](.env.production).
+Within Redis, you need to provide two databases, one for Layman, second for Layman Test Client. Connection strings are defined by [LAYMAN_REDIS_URL](doc/env-settings.md#LAYMAN_REDIS_URL) and [LTC_REDIS_URL](doc/env-settings.md#LTC_REDIS_URL).
 
 
 ## Run in production
-To run layman in production, you need to provide [external dependencies](#dependencies) and [configure](#configuration) layman manually, at least `.env` file:
+To run layman in production, you need to provide [external dependencies](#dependencies) and [configure](#configuration) layman manually, at least `.env` file. Focus especially on
+- FLASK_ENV (should be set to `production`)
+- LTC_SESSION_SECRET
+- FLASK_SECRET_KEY
 
-```bash
-# use production settings
-cp .env.production .env
-cp src/layman_settings_production.py src/layman_settings.py
-
-# edit .env
-# optionally edit docker-compose.production.yml
-# optionally edit src/layman_settings.py
-
-# prepare geoserver data directory
-make geoserver-reset-default-layman-datadir
-
-# start dockerized containers
-make start-production
-
-# visit http://localhost:8000/
-```
-
+Demo configuration is a good starting point to setup Layman for production, however it needs to be adjusted carefully.
 
 ## Run in development
 Suitable for **development only**.

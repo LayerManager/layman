@@ -47,12 +47,13 @@ services:
         args:
            - LAYMAN_GS_HOST=${LAYMAN_GS_HOST}
            - LAYMAN_GS_PORT=${LAYMAN_GS_PORT}
+           - LAYMAN_DOCKER_MAIN_SERVICE=${LAYMAN_DOCKER_MAIN_SERVICE}
       image: hslayers:latest
       user: ${UID_GID}
       command: sh -c "node proxy.js & ./node_modules/.bin/http-server dist/"
-      ports:
-        - 8080:8080
-        - 8081:8081
+#      ports:
+#        - 8080:8080
+#        - 8081:8081
 
    layman_client_test:
       container_name: layman_client_test

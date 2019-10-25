@@ -55,7 +55,7 @@ export const adjust_map_url = (requested_url) => {
   requested_url = decodeURIComponent(requested_url);
   if(requested_url.startsWith(`http://localhost:8000`)) {
     const old = requested_url;
-    requested_url = requested_url.replace(`http://localhost:8000`, `http://layman_dev:8000`);
+    requested_url = requested_url.replace(`http://localhost:8000`, `http://${config.LAYMAN_DOCKER_MAIN_SERVICE}:8000`);
     console.log(`replaced map URL ${old} with ${requested_url}`);
   }
   return proxify(requested_url);
