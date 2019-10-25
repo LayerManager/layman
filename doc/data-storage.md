@@ -73,7 +73,7 @@ Data is saved to LAYMAN_DATA_DIR directory.
 Filesystem is used as persistent data store, so data survives Layman restart.
  
 ### PostgreSQL
-**[User schema](https://www.postgresql.org/docs/9.1/ddl-schemas.html)** is created for every user who reserved username. Name of user schema is always the same as username. Every user-related information is saved in this schema. Besides this, explicit [access rule](https://docs.geoserver.org/stable/en/user/security/layer.html) for all layers in user workspace is created. The rule looks like `<workspace>.*.r=<LAYMAN_GS_ROLE>,ROLE_ANONYMOUS`.
+**[User schema](https://www.postgresql.org/docs/9.1/ddl-schemas.html)** is created for every user who reserved username. Name of user schema is always the same as username. Every user-related information is saved in this schema.
 
 **[Table](https://www.postgresql.org/docs/9.1/sql-createtable.html)** is created in user schema for each layer the user published. Name of the table is the same as layername. Every layer-related information is saved in tha table. The table contains data from vector data files.
 

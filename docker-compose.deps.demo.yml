@@ -1,0 +1,49 @@
+version: '3.3'
+
+volumes:
+   redis-data:
+
+services:
+   postgresql:
+      image: kartoza/postgis:10.0-2.4
+      volumes:
+        - ./deps/postgresql/data:/var/lib/postgresql
+      environment:
+         - USERNAME=docker
+         - PASS=docker
+         - ALLOW_IP_RANGE=0.0.0.0/0
+      restart: on-failure
+
+   geoserver:
+      build:
+        context: deps/geoserver/docker
+        dockerfile: Dockerfile
+      volumes:
+        - ./deps/geoserver/data:/opt/geoserver/data_dir
+        - ./deps/geoserver/docker/code:/geoserver_code
+        - ./deps/geoserver/sample:/geoserver_sample
+        - ./deps/geoserver/tmp:/geoserver_tmp
+      restart: on-failure
+      environment:
+        - GS_VERSION=2.13.0
+      env_file:
+        - deps/geoserver/docker/.env
+      depends_on:
+        - postgresql
+
+   redis:
+      image: redis:4.0.11-alpine
+      volumes:
+        - redis-data:/data
+
+   liferay:
+      build:
+        context: deps/liferay/docker
+        dockerfile: Dockerfile
+      ports:
+        - 8082:8080
+      volumes:
+        - ./deps/liferay/transit:/etc/liferay/tmp # for copying files from within the container to host
+                                                  # https://github.com/docker/compose/issues/3270#issuecomment-206214034
+                                                  # ./deps/liferay/out must be owned by non-root
+        - ./deps/liferay/sample/hypersonic:/etc/liferay/mount/files/data/hypersonic
