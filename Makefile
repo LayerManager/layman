@@ -1,16 +1,19 @@
 .PHONY: test
 
 start-demo:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml up --force-recreate --no-deps postgresql geoserver redis layman celery_worker flower hslayers
+	docker-compose -f docker-compose.deps.yml up --force-recreate postgresql geoserver redis
+	docker-compose -f docker-compose.production.yml up --force-recreate layman celery_worker flower hslayers layman_client
 
 start-demo-d:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml up --force-recreate --no-deps -d postgresql geoserver redis layman celery_worker flower hslayers
+	docker-compose -f docker-compose.deps.yml up -d --force-recreate postgresql geoserver redis
+	docker-compose -f docker-compose.production.yml up -d --force-recreate layman celery_worker flower hslayers layman_client
 
 stop-demo:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml stop
 
 start-demo-with-optional-deps:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.production.yml up --force-recreate
+	docker-compose -f docker-compose.deps.yml up --force-recreate
+	docker-compose -f docker-compose.production.yml up --force-recreate
 
 build-production:
 	docker-compose -f docker-compose.production.yml build layman
@@ -110,10 +113,12 @@ hslayers-bash:
 
 client-build:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_client
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build layman_client_test
 
 client-restart:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_client
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_client
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml up --force-recreate --no-deps -d layman_client_test
 
 client-bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_client sh
