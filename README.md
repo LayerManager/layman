@@ -45,9 +45,9 @@ cd layman
 ## Run
 There are following ways how to run Layman:
 - [demo](#run-demo): the easiest and recommended way how to start layman for demonstration purposes 
-- [production](#run-in-production): run layman in production, requires installation of [external dependencies](#dependencies) and manual [configuration](#configuration)
 - [development](#run-in-development): run layman in development mode
-- [test](#test): just run automatic tests
+- [test](#test): run automatic tests
+- [production](#run-in-production): run layman in production, requires installation of [external dependencies](#dependencies) and manual [configuration](#configuration)
 
 
 ## Run demo
@@ -81,26 +81,38 @@ You can start Layman also in background with `make start-demo-d` (`d` for detach
 
 
 ## Configuration
-Default settings are suitable for development, testing and demo purposes. If you run it in production, manual configuration is required.
+Layman's source code provides settings suitable for development, testing and demo purposes. Furthermore, there exists [`Makefile`](#Makefile) with predefined commands for each purpose including starting all necessary services (both in background and foreground) and stoping it.
 
-The most general configuration is found in `docker-compose.*.yml` files used as [docker-compose configuration files](https://docs.docker.com/compose/compose-file/compose-file-v3/).
-- `docker-compose.demo.yml` used for demo purposes
-- `docker-compose.deps.yml` [external dependencies](#dependencies) used for development, testing, and demo purposes
-- `docker-compose.dev.yml` used for development
-- `docker-compose.test.yml` used for automatic testing
+Layman's configuration is split into three levels:
+- `docker-compose.*.yml` files used as [docker-compose configuration files](https://docs.docker.com/compose/compose-file/compose-file-v3/) with most general settings of docker containers including volume mappings, port mappings, container names and startup commands
+- `.env*` files with environment settings of both build stage and runtime of docker containers
+- `src/layman_settings*.py` Python modules with settings of Layman's Python modules for runtime
 
-Another part of settings is in `.env.*` files, separately for demo, development, and testing. See especially Layman settings and Flask settings. Remember layman is dockerized, so connection parameters such as host names and port numbers must be set according to docker-compose configuration.
+Files at all three levels are suffixed with strings that indicates what they are intended to:
+- `demo` to [demonstration purposes](#run-demo)
+- `dev` to [development](#run-in-development)
+- `test` to [automatic tests](#test)
+- `deps` to [external dependencies](#dependencies)
 
-Settings from `.env.*` are brought to python and extended by [layman_settings.py](src/layman_settings.py).
+When you are switching between different contexts (e.g. between demo and dev), always check that you are using settings intended for your context, especially
+- `.env*` file (check `env_file` properties in )
+- `layman_settings*` file (check `LAYMAN_SETTINGS_MODULE` environment variable in `env*` file)
+
+Also, anytime you change `.env` file, remember to rebuild docker images as some environemnt variables affect build stage of docker images. Particularly these environment settings:
+- UID_GID
+- LAYMAN_GS_HOST
+- LAYMAN_GS_PORT
+- LAYMAN_DOCKER_MAIN_SERVICE
+- LAYMAN_CLIENT_VERSION
 
 
 ## Dependencies
-Layman has [many dependencies](doc/dependencies.md). Most of them is shipped with layman. However there are some **external dependencies** that should be treated carefully:
+Layman has [many dependencies](doc/dependencies.md). Most of them is shipped with Layman. However there are some **external dependencies** that should be treated carefully:
 - PostgreSQL & PostGIS
 - GeoServer
 - Redis
 
-These external dependencies are shipped with Layman for development, testing and demo purposes. They are grouped in `docker-compose.deps.yml` file.
+These external dependencies are shipped with Layman for development, testing and demo purposes. They are grouped in `docker-compose.deps*.yml` files.
 
 However, if you want to run Layman in production, it is strongly recommended to install external dependencies separately. Recommended (i.e. tested) versions are:
 - PostgreSQL 10.0 & PostGIS 2.4
@@ -115,12 +127,42 @@ Within Redis, you need to provide two databases, one for Layman, second for Laym
 
 
 ## Run in production
-To run layman in production, you need to provide [external dependencies](#dependencies) and [configure](#configuration) layman manually, at least `.env` file. Focus especially on
+To run layman in production, you need to provide [external dependencies](#dependencies) and [configure](#configuration) layman manually.
+
+When providing external dependencies, check their production-related documentation:
+- [PostgreSQL 10.0](https://www.postgresql.org/docs/10/admin.html) & [PostGIS 2.4](http://postgis.net/docs/manual-2.4/performance_tips.html)
+- [GeoServer 2.13.0](https://docs.geoserver.org/2.13.0/user/production/index.html#production)
+- [Redis 4.0](https://redis.io/topics/admin)
+
+After providing external dependencies there is time to provide **internal dependencies** (system-level, python-level and node.js-level dependencies). You can either use our docker and docker-compose configuration to generate docker images that already provides internal dependencies, or you can provide internal dependencies by you self (if you prefer not to use docker in production).
+
+**System-level** dependencies includes
+- python 3.6+
+- [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) utility of [gdal](https://gdal.org/) 2.4+
+- [chromium-browser](https://chromium.org/) 77
+- [chromedriver](https://chromedriver.chromium.org/) 77
+- [pipenv](https://pipenv.kennethreitz.org/en/latest/)
+- [node.js](https://nodejs.org/) 10+ & npm
+
+Pipenv is recommended tool for installing **python-level** dependencies. Both Pipfile and Pipfile.lock are located in [`docker/`](#docker/) directory.
+
+Npm is recommended tool for installing **node.js-level** dependencies. Both package.json and package-lock.json are located in [`hslayers/`](#hslayers/) directory.
+
+Next you need to choose how you deploy Layman. As Layman is a Flask application, check Flask's [deployment options](https://flask.palletsprojects.com/en/1.1.x/deploying/). Keep in mind that Flask is safe to run with **one process** only.
+
+Configure Layman using [environment settings](doc/env-settings.md). First focus for example on
+- LAYMAN_SETTINGS_MODULE
 - FLASK_ENV (should be set to `production`)
 - LTC_SESSION_SECRET
 - FLASK_SECRET_KEY
 
 Demo configuration is a good starting point to setup Layman for production, however it needs to be adjusted carefully.
+
+Last, start layman and necessary services:
+- hslayers using npm
+- layman client using npm
+- layman using you deployment server
+- celery worker using python
 
 ## Run in development
 Suitable for **development only**.
