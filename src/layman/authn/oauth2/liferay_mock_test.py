@@ -21,8 +21,8 @@ def create_server(port, env='development'):
         },
         'app_config': {
             'ENV': env,
-            'SERVER_NAME': f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{port}',
-            'SESSION_COOKIE_DOMAIN': f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{port}',
+            'SERVER_NAME': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{port}",
+            'SESSION_COOKIE_DOMAIN': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{port}",
         },
         'host': '0.0.0.0',
         'port': port,
@@ -61,7 +61,7 @@ def server2():
 
 @pytest.mark.usefixtures('server', 'server2')
 def test_mock():
-    url1 = f'http://{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{PORT1}/rest/test-oauth2/user-profile'
+    url1 = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT1}/rest/test-oauth2/user-profile"
     rv = requests.get(url1, headers={
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc'
@@ -70,7 +70,7 @@ def test_mock():
     resp_json = rv.json()
     assert resp_json['FLASK_ENV'] == 'development'
 
-    url2 = f'http://{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{PORT2}/rest/test-oauth2/user-profile'
+    url2 = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT2}/rest/test-oauth2/user-profile"
     rv = requests.get(url2, headers={
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc'

@@ -96,13 +96,13 @@ Files at all three levels are suffixed with strings that indicates what they are
 
 When you are switching between different contexts (e.g. between demo and dev), always check that you are using settings intended for your context, especially
 - `.env*` file (check `env_file` properties in `docker-compose.*.yml` file)
-- `layman_settings*` file (check `LAYMAN_SETTINGS_MODULE` environment variable in `env*` file)
+- `layman_settings*` file (check [LAYMAN_SETTINGS_MODULE](doc/env-settings.md#LAYMAN_SETTINGS_MODULE) environment variable in `env*` file)
 
 Also, anytime you change `.env` file, remember to rebuild docker images as some environemnt variables affect build stage of docker images. Particularly these environment settings:
 - UID_GID
 - LAYMAN_GS_HOST
 - LAYMAN_GS_PORT
-- LAYMAN_DOCKER_MAIN_SERVICE
+- LAYMAN_SERVER_NAME
 - LAYMAN_CLIENT_VERSION
 
 
@@ -157,10 +157,10 @@ Configure Layman using [environment settings](doc/env-settings.md). Demo configu
 - FLASK_SECRET_KEY
 
 Last, start layman and necessary services:
-- hslayers using npm
-- layman client using npm
-- layman using you deployment server
-- celery worker using python
+- thumbnail image generator (TIMGEN, also referred to as hslayers) using npm (see startup command of `hslayers` docker-compose service)
+- Layman client using npm (see startup command of `layman_client` docker-compose service)
+- Layman using your deployment server (see startup command of `layman` docker-compose service)
+- Layman celery worker using python (see startup command of `celery_worker` docker-compose service)
 
 ## Run in development
 Suitable for **development only**.

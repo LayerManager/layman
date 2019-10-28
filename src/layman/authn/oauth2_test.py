@@ -28,8 +28,8 @@ def liferay_mock():
         },
         'app_config': {
             'ENV': 'development',
-            'SERVER_NAME': f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{LIFERAY_PORT}',
-            'SESSION_COOKIE_DOMAIN': f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{LIFERAY_PORT}',
+            'SERVER_NAME': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}",
+            'SESSION_COOKIE_DOMAIN': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}",
         },
         'host': '0.0.0.0',
         'port': LIFERAY_PORT,
@@ -47,8 +47,6 @@ def liferay_mock():
     server.terminate()
     server.join()
 
-
-PORT = 8000
 
 num_layers_before_test = 0
 
@@ -74,7 +72,7 @@ def unexisting_introspection_url():
 @pytest.fixture()
 def inactive_token_introspection_url(liferay_mock):
     introspection_url = liferay.INTROSPECTION_URL
-    liferay.INTROSPECTION_URL = f'http://{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{LIFERAY_PORT}/rest/test-oauth2/introspection'
+    liferay.INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection"
     yield
     liferay.INTROSPECTION_URL = introspection_url
 
@@ -82,7 +80,7 @@ def inactive_token_introspection_url(liferay_mock):
 @pytest.fixture()
 def active_token_introspection_url(liferay_mock):
     introspection_url = liferay.INTROSPECTION_URL
-    liferay.INTROSPECTION_URL = f'http://{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{LIFERAY_PORT}/rest/test-oauth2/introspection?is_active=true'
+    liferay.INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection?is_active=true"
     yield
     liferay.INTROSPECTION_URL = introspection_url
 
@@ -90,7 +88,7 @@ def active_token_introspection_url(liferay_mock):
 @pytest.fixture()
 def user_profile_url(liferay_mock):
     user_profile_url = liferay.USER_PROFILE_URL
-    liferay.USER_PROFILE_URL = f'http://{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{LIFERAY_PORT}/rest/test-oauth2/user-profile'
+    liferay.USER_PROFILE_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile"
     yield
     liferay.USER_PROFILE_URL = user_profile_url
 
@@ -101,8 +99,8 @@ def client():
 
     app.config['TESTING'] = True
     app.config['DEBUG'] = True
-    app.config['SERVER_NAME'] = f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{PORT}'
-    app.config['SESSION_COOKIE_DOMAIN'] = f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{PORT}'
+    app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
+    app.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
 
     with app.app_context() as ctx:
         publs_by_type = uuid.check_redis_consistency()
@@ -115,7 +113,7 @@ def client():
 def server():
     server = Process(target=app.run, kwargs={
         'host': '0.0.0.0',
-        'port': PORT,
+        'port': settings.LAYMAN_SERVER_NAME.split(':')[1],
         'debug': False,
     })
     server.start()

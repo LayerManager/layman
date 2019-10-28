@@ -69,7 +69,7 @@ services:
         args:
            - LAYMAN_GS_HOST=${LAYMAN_GS_HOST}
            - LAYMAN_GS_PORT=${LAYMAN_GS_PORT}
-           - LAYMAN_DOCKER_MAIN_SERVICE=${LAYMAN_DOCKER_MAIN_SERVICE}
+           - LAYMAN_SERVER_NAME=${LAYMAN_SERVER_NAME}
       image: hslayers:latest
       user: ${UID_GID}
       command: sh -c "node proxy.js & ./node_modules/.bin/http-server dist/"
