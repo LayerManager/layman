@@ -12,14 +12,11 @@ from layman.layer.filesystem.util import get_layer_dir
 from .__init__ import import_layer_vector_file_async
 
 
-PORT = 8000
-
-
 @pytest.fixture(scope="module")
 def client():
     layman.config['TESTING'] = True
-    layman.config['SERVER_NAME'] = f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{PORT}'
-    layman.config['SESSION_COOKIE_DOMAIN'] = f'{settings.LAYMAN_DOCKER_MAIN_SERVICE}:{PORT}'
+    layman.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
+    layman.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
     client = layman.test_client()
 
     with layman.app_context() as ctx:

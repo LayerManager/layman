@@ -76,13 +76,12 @@ def post_map(username, mapname):
 def generate_map_thumbnail(username, mapname):
     map_file_get_url = f'/rest/{username}/maps/{mapname}/file'
 
-    hostname = settings.LAYMAN_DOCKER_MAIN_SERVICE
-    map_file_get_url = f"http://{hostname}:8000{map_file_get_url}"
+    map_file_get_url = f"http://{settings.LAYMAN_SERVER_NAME}{map_file_get_url}"
     params = urlencode({
         'map_def_url': map_file_get_url,
         # 'file_name': tmp_file_name,
     })
-    hslayers_url = f"http://hslayers:8080/?{params}"
+    hslayers_url = f"{settings.LAYMAN_TIMGEN_URL}?{params}"
     # current_app.logger.info(f"HSLayers URL: {hslayers_url}")
 
     chrome_options = Options()

@@ -73,7 +73,7 @@ def main():
     print()
 
     # Layman Test Client
-    ltc_url = f'http://{settings.LAYMAN_CLIENT_DOCKER_SERVICE}:3000/'
+    ltc_url = settings.LAYMAN_CLIENT_URL
     wait_for_msg = f"Layman Test Client, url={ltc_url}"
     print(f"Waiting for {wait_for_msg}")
     while True:
