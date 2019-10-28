@@ -1,5 +1,20 @@
 # Environment Settings
 
+## FLASK_APP
+See [Flask documentation](https://flask.palletsprojects.com/en/1.1.x/cli/#application-discovery).
+
+## FLASK_ENV
+See [Flask documentation](https://flask.palletsprojects.com/en/1.1.x/config/#environment-and-debug-features).
+
+## FLASK_SECRET_KEY
+See [Flask documentation](https://flask.palletsprojects.com/en/1.1.x/config/#SECRET_KEY).
+
+## LAYMAN_CLIENT_VERSION
+Git commit hash or tag of [Layman Test Client](https://github.com/jirik/layman-test-client). Referenced version will be used as default client for this Layman instance.
+
+## LAYMAN_DATA_DIR
+Filesystem directory where most of published data is stored, including data about authentication credentials, users, and publications.
+
 ## LAYMAN_GS_HOST
 URL host of GeoServer instance.
 
@@ -19,13 +34,19 @@ Name of [PostgreSQL database](https://www.postgresql.org/docs/9.5/sql-createdata
 Name of [PostgreSQL user](https://www.postgresql.org/docs/9.5/sql-createuser.html) that Layman uses for authentication and communication with PostgreSQL. The user needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](#LAYMAN_PG_DBNAME) database. The LAYMAN_PG_USER must be another user than default `postgres` user! The user also needs access to `public` schema where PostGIS must be installed.
 
 ## LAYMAN_REDIS_URL
-URL of [Redis logical database](https://redis.io/commands/select) including database number where Layman stores internal data about publications, users, etc.
+URL of [Redis logical database](https://redis.io/commands/select) including database number where Layman stores internal data about publications, users, etc. Layman flushes the whole logical database on every startup!
+
+## LAYMAN_SERVER_NAME
+String with domain and port `<domain>:<port>` of Layman's main instance (not celery worker). Used to call Layman from thumbnail image generator (TIMGEN).
 
 ## LAYMAN_SETTINGS_MODULE
 Dotted path to a Python module with Layman settings for Python level.
 
 ## LTC_REDIS_URL
 URL of [Redis logical database](https://redis.io/commands/select) including database number where Layman Test Client stores user sessions including authentication credentials.
+
+## LTC_SESSION_SECRET
+See [express-session documentation](https://www.npmjs.com/package/express-session#secret).
 
 ## UID_GID
 String with unix-like user identifier and group identifier `<UID>:<GID>`, e.g. `1000:1000`. Suitable for [mounting some volumes as non-root user](./../README.md#mount-some-volumes-as-non-root-user).
