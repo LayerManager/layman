@@ -81,7 +81,7 @@ You can start Layman also in background with `make start-demo-d` (`d` for detach
 
 
 ## Configuration
-Layman's source code provides settings suitable for development, testing and demo purposes. Furthermore, there exists [`Makefile`](#Makefile) with predefined commands for each purpose including starting all necessary services (both in background and foreground) and stoping it.
+Layman's source code provides settings suitable for development, testing and demo purposes. Furthermore, there exists [`Makefile`](Makefile) with predefined commands for each purpose including starting all necessary services (both in background and foreground) and stoping it.
 
 Layman's configuration is split into three levels:
 - `docker-compose.*.yml` files used as [docker-compose configuration files](https://docs.docker.com/compose/compose-file/compose-file-v3/) with most general settings of docker containers including volume mappings, port mappings, container names and startup commands
@@ -95,7 +95,7 @@ Files at all three levels are suffixed with strings that indicates what they are
 - `deps` to [external dependencies](#dependencies)
 
 When you are switching between different contexts (e.g. between demo and dev), always check that you are using settings intended for your context, especially
-- `.env*` file (check `env_file` properties in )
+- `.env*` file (check `env_file` properties in `docker-compose.*.yml` file)
 - `layman_settings*` file (check `LAYMAN_SETTINGS_MODULE` environment variable in `env*` file)
 
 Also, anytime you change `.env` file, remember to rebuild docker images as some environemnt variables affect build stage of docker images. Particularly these environment settings:
@@ -119,12 +119,6 @@ However, if you want to run Layman in production, it is strongly recommended to 
 - GeoServer 2.13.0
 - Redis 4.0
 
-Within PostgreSQL, you need to provide one user [LAYMAN_PG_USER](doc/env-settings.md#LAYMAN_PG_USER) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME) database. The user also needs access to `public` schema where PostGIS must be installed.
-
-Within GeoServer, you need to provide one Layman user [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and one layman role [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE).
-
-Within Redis, you need to provide two databases, one for Layman, second for Layman Test Client. Connection strings are defined by [LAYMAN_REDIS_URL](doc/env-settings.md#LAYMAN_REDIS_URL) and [LTC_REDIS_URL](doc/env-settings.md#LTC_REDIS_URL).
-
 
 ## Run in production
 To run layman in production, you need to provide [external dependencies](#dependencies) and [configure](#configuration) layman manually.
@@ -134,7 +128,13 @@ When providing external dependencies, check their production-related documentati
 - [GeoServer 2.13.0](https://docs.geoserver.org/2.13.0/user/production/index.html#production)
 - [Redis 4.0](https://redis.io/topics/admin)
 
-After providing external dependencies there is time to provide **internal dependencies** (system-level, python-level and node.js-level dependencies). You can either use our docker and docker-compose configuration to generate docker images that already provides internal dependencies, or you can provide internal dependencies by you self (if you prefer not to use docker in production).
+Within PostgreSQL, you need to provide one user [LAYMAN_PG_USER](doc/env-settings.md#LAYMAN_PG_USER) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME) database. The user also needs access to `public` schema where PostGIS must be installed.
+
+Within GeoServer, you need to provide one Layman user [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and one layman role [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE).
+
+Within Redis, you need to provide two databases, one for Layman, second for Layman Test Client. Connection strings are defined by [LAYMAN_REDIS_URL](doc/env-settings.md#LAYMAN_REDIS_URL) and [LTC_REDIS_URL](doc/env-settings.md#LTC_REDIS_URL).
+
+After providing external dependencies there is time to provide **internal dependencies** (system-level, python-level and node.js-level dependencies). You can either use our docker and docker-compose configuration to generate docker images that already provides internal dependencies, or you can provide internal dependencies by yourself (if you prefer not to use docker in production).
 
 **System-level** dependencies includes
 - python 3.6+
@@ -144,19 +144,17 @@ After providing external dependencies there is time to provide **internal depend
 - [pipenv](https://pipenv.kennethreitz.org/en/latest/)
 - [node.js](https://nodejs.org/) 10+ & npm
 
-Pipenv is recommended tool for installing **python-level** dependencies. Both Pipfile and Pipfile.lock are located in [`docker/`](#docker/) directory.
+Pipenv is recommended tool for installing **python-level** dependencies. Both Pipfile and Pipfile.lock are located in [`docker/`](docker/) directory.
 
-Npm is recommended tool for installing **node.js-level** dependencies. Both package.json and package-lock.json are located in [`hslayers/`](#hslayers/) directory.
+Npm is recommended tool for installing **node.js-level** dependencies. Both package.json and package-lock.json are located in [`hslayers/`](hslayers/) directory.
 
-Next you need to choose how you deploy Layman. As Layman is a Flask application, check Flask's [deployment options](https://flask.palletsprojects.com/en/1.1.x/deploying/). Keep in mind that Flask is safe to run with **one process** only.
+Next you need to choose how you deploy Layman. As Layman is Flask application, check Flask's [deployment options](https://flask.palletsprojects.com/en/1.1.x/deploying/). Keep in mind that Layman is safe to run with **one process** only (and any number of celery worker processes).
 
-Configure Layman using [environment settings](doc/env-settings.md). First focus for example on
+Configure Layman using [environment settings](doc/env-settings.md). Demo configuration is a good starting point to setup Layman for production, however it needs to be adjusted carefully. First focus for example on
 - LAYMAN_SETTINGS_MODULE
 - FLASK_ENV (should be set to `production`)
 - LTC_SESSION_SECRET
 - FLASK_SECRET_KEY
-
-Demo configuration is a good starting point to setup Layman for production, however it needs to be adjusted carefully.
 
 Last, start layman and necessary services:
 - hslayers using npm
