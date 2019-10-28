@@ -99,11 +99,11 @@ When you are switching between different contexts (e.g. between demo and dev), a
 - `layman_settings*` file (check [LAYMAN_SETTINGS_MODULE](doc/env-settings.md#LAYMAN_SETTINGS_MODULE) environment variable in `env*` file)
 
 Also, anytime you change `.env` file, remember to rebuild docker images as some environemnt variables affect build stage of docker images. Particularly these environment settings:
-- UID_GID
-- LAYMAN_GS_HOST
-- LAYMAN_GS_PORT
-- LAYMAN_SERVER_NAME
-- LAYMAN_CLIENT_VERSION
+- [UID_GID](doc/env-settings.md#UID_GID)
+- [LAYMAN_GS_HOST](doc/env-settings.md#LAYMAN_GS_HOST)
+- [LAYMAN_GS_PORT](doc/env-settings.md#LAYMAN_GS_PORT)
+- [LAYMAN_SERVER_NAME](doc/env-settings.md#LAYMAN_SERVER_NAME)
+- [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION)
 
 
 ## Dependencies
@@ -151,10 +151,11 @@ Npm is recommended tool for installing **node.js-level** dependencies. Both pack
 Next you need to choose how you deploy Layman. As Layman is Flask application, check Flask's [deployment options](https://flask.palletsprojects.com/en/1.1.x/deploying/). Keep in mind that Layman is safe to run with **one process** only (and any number of celery worker processes).
 
 Configure Layman using [environment settings](doc/env-settings.md). Demo configuration is a good starting point to setup Layman for production, however it needs to be adjusted carefully. First focus for example on
-- LAYMAN_SETTINGS_MODULE
-- FLASK_ENV (should be set to `production`)
-- LTC_SESSION_SECRET
-- FLASK_SECRET_KEY
+- [LAYMAN_SETTINGS_MODULE](doc/env-settings.md#LAYMAN_SETTINGS_MODULE)
+- [FLASK_APP](doc/env-settings.md#FLASK_APP)
+- [FLASK_ENV](doc/env-settings.md#FLASK_ENV) (should be set to `production`)
+- [FLASK_SECRET_KEY](doc/env-settings.md#FLASK_SECRET_KEY)
+- [LTC_SESSION_SECRET](doc/env-settings.md#LTC_SESSION_SECRET)
 
 Last, start layman and necessary services:
 - thumbnail image generator (TIMGEN, also referred to as hslayers) using npm (see startup command of `hslayers` docker-compose service)
@@ -226,11 +227,11 @@ make start-dev
 
 ## Test
 :warning: It will delete
-- all files within LAYMAN_DATA_DIR!
-- all layman-related schemas in LAYMAN_PG_DBNAME!
-- all workspaces accessible namely by LAYMAN_GS_ROLE!
-- all keys in Redis keyspace identified by LAYMAN_REDIS_URL!
-- all keys in Redis keyspace identified by LTC_REDIS_URL!
+- all files within [LAYMAN_DATA_DIR](doc/env-settings.md#LAYMAN_DATA_DIR)!
+- all layman-related schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME)!
+- all workspaces accessible namely by [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE)!
+- all keys in Redis logical database identified by [LAYMAN_REDIS_URL](doc/env-settings.md#LAYMAN_REDIS_URL)!
+- all keys in Redis logical database identified by [LTC_REDIS_URL](doc/env-settings.md#LTC_REDIS_URL)!
 
 Default values are defined in [.env.test](.env.test)
 ```bash
