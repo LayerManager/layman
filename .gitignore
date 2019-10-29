@@ -15,3 +15,8 @@ src/layman/static/test-client
 
 /deps/liferay/transit/*
 !/deps/liferay/transit/.gitkeep
+
+/.env*
+!/.env.demo
+!/.env.dev
+!/.env.test
