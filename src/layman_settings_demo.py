@@ -123,7 +123,6 @@ import redis
 LAYMAN_REDIS = redis.Redis.from_url(LAYMAN_REDIS_URL, encoding="utf-8", decode_responses=True)
 
 
-LAYMAN_PRELOAD_MODULES = os.getenv('LAYMAN_PRELOAD_MODULES', 'false').lower() == 'true'
 LAYMAN_TIMGEN_URL = os.environ['LAYMAN_TIMGEN_URL']
 LAYMAN_CLIENT_URL = os.environ['LAYMAN_CLIENT_URL']
 LAYMAN_CLIENT_PUBLIC_URL = os.getenv('LAYMAN_CLIENT_PUBLIC_URL', None)

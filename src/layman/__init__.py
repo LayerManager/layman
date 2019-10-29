@@ -8,10 +8,6 @@ settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
 
-if os.getenv('LAYMAN_SKIP_REDIS_LOADING', 'false').lower() != 'true':
-    app.logger.info(f'Flush Redis database.')
-    settings.LAYMAN_REDIS.flushdb()
-
 
 from .http import LaymanError
 from .make_celery import make_celery
@@ -26,23 +22,15 @@ from .user.rest_current_user import bp as current_user_bp
 app.register_blueprint(current_user_bp, url_prefix='/rest/current-user')
 
 # load UUIDs only once
-if os.getenv('LAYMAN_SKIP_REDIS_LOADING', 'false').lower() != 'true':
-    os.environ['LAYMAN_SKIP_REDIS_LOADING'] = 'true'
+REDIS_LOADED_KEY = f"{__name__}:REDIS_LOADED"
+if settings.LAYMAN_REDIS.get(REDIS_LOADED_KEY) is None:
+    settings.LAYMAN_REDIS.set(REDIS_LOADED_KEY, 'true')
+    app.logger.info(f'Loading Redis database')
     with app.app_context():
         from .uuid import import_uuids_to_redis
         import_uuids_to_redis()
         from .authn.redis import import_authn_to_redis
         import_authn_to_redis()
-
-
-if settings.LAYMAN_PRELOAD_MODULES:
-    # because Flask with reloader reloads when *.pyc files is created
-    app.logger.info(f'Preload auth* modules.')
-    with app.app_context():
-        from .authn.util import get_authn_modules
-        get_authn_modules()
-        from .authz.util import get_authz_module
-        get_authz_module()
 
 
 @app.route('/')

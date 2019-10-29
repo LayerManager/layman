@@ -101,12 +101,6 @@ def _get_provider_modules():
     return current_app.config[key]
 
 
-if current_app and current_app.config['DEBUG']:
-    # because Flask with reloader reloads when *.pyc files is created
-    current_app.logger.info(f'Preload oauth2 provider modules.')
-    _get_provider_modules()
-
-
 def _get_provider_module():
     key = FLASK_PROVIDER_KEY
     return g.get(key)
