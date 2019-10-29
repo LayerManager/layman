@@ -113,7 +113,7 @@ def generate_map_thumbnail(username, mapname):
     for entry in entries:
         current_app.logger.info(f"browser entry {entry}")
 
-    chrome.save_screenshot(f'/code/tmp/{username}.{mapname}.png')
+    # chrome.save_screenshot(f'/code/tmp/{username}.{mapname}.png')
     chrome.close()
     chrome.quit()
 

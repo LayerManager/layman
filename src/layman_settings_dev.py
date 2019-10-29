@@ -89,12 +89,12 @@ AUTHN_OAUTH2_PROVIDERS = [
     'layman.authn.oauth2.liferay'
 ]
 
-LIFERAY_OAUTH2_AUTH_URLS = [
+OAUTH2_LIFERAY_AUTH_URLS = [
     "http://localhost:8082/o/oauth2/authorize"
 ]
-LIFERAY_OAUTH2_INTROSPECTION_URL = "http://liferay:8080/o/oauth2/introspect"
-LIFERAY_OAUTH2_USER_PROFILE_URL = "http://liferay:8080/api/jsonws/user/get-current-user"
-LIFERAY_OAUTH2_CLIENTS = [
+OAUTH2_LIFERAY_INTROSPECTION_URL = "http://liferay:8080/o/oauth2/introspect"
+OAUTH2_LIFERAY_USER_PROFILE_URL = "http://liferay:8080/api/jsonws/user/get-current-user"
+OAUTH2_LIFERAY_CLIENTS = [
     {
         'id': 'id-353ab09c-f117-f2d5-d3a3-85cfb89e6746',
         'secret': 'secret-d31a82c8-3e73-1058-e38a-f9191f7c2014',

@@ -41,7 +41,8 @@ def authenticate():
         raise LaymanError(32, f'No OAuth2 provider was found for URL passed in HTTP header {ISS_URL_HEADER}.', sub_code=6)
 
     # TODO: implement redis cache of access tokens to avoid reaching introspection endpoint on each request
-    clients = settings.LIFERAY_OAUTH2_CLIENTS
+    # TODO and do not forget to invalidate it in case of some errors
+    clients = settings.OAUTH2_LIFERAY_CLIENTS
     valid_resp = None
     all_connection_errors = True
     for client in clients:
@@ -68,6 +69,7 @@ def authenticate():
         raise LaymanError(32, f'Introspection endpoint is not reachable.', sub_code=8)
 
     if valid_resp is None:
+        # TODO in this case, invalidate cache
         raise LaymanError(32, f'Introspection endpoint claims that access token is not active or it\'s not Bearer token.', sub_code=9)
 
     sub = valid_resp['sub']
