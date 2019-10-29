@@ -47,7 +47,7 @@ if settings.LAYMAN_PRELOAD_MODULES:
 
 @app.route('/')
 def index():
-    return redirect('/static/test-client/index.html')
+    return redirect(settings.LAYMAN_CLIENT_PUBLIC_URL)
 
 
 @app.errorhandler(LaymanError)

@@ -9,7 +9,7 @@ Layman`s security uses two well-known concepts:
 
 Authentication (**authn**) is the process of obtaining and ensuring identity of [user](models.md#user) from incoming request to [REST API](rest.md).
 
-Authentication is performed by chain of zero or more authentication modules controlled by [`AUTHN_MODULES`](../src/layman_settings.py) setting. When request comes to REST API, security system calls authentication modules one by one (one module at a time), until one module ensures user identity or until there is no module left. If no module ensured user`s identity, user is considered as **anonymous** user.
+Authentication is performed by chain of zero or more authentication modules controlled by [`LAYMAN_AUTHN_MODULES`](../src/layman_settings.py) setting. When request comes to REST API, security system calls authentication modules one by one (one module at a time), until one module ensures user identity or until there is no module left. If no module ensured user`s identity, user is considered as **anonymous** user.
 
 Currently there are two authentication options:
 - use no authentication module, so every user is considered as **anonymous**
