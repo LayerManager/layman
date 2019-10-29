@@ -100,8 +100,8 @@ Schema specific for LTC:
 ## Settings
 
 To enable OAuth2 authentication in Layman, adjust following settings in `layman_settings.py`:
-- AUTHN_MODULES
-- AUTHN_OAUTH2_PROVIDERS
+- LAYMAN_AUTHN_MODULES
+- LAYMAN_AUTHN_OAUTH2_PROVIDERS
 - OAUTH2_LIFERAY_AUTH_URLS
 - OAUTH2_LIFERAY_INTROSPECTION_URL
 - OAUTH2_LIFERAY_USER_PROFILE_URL

@@ -95,7 +95,7 @@ def _get_provider_modules():
     key = FLASK_PROVIDERS_KEY
     if key not in current_app.config:
         modules = [
-            importlib.import_module(m) for m in settings.AUTHN_OAUTH2_PROVIDERS
+            importlib.import_module(m) for m in settings.LAYMAN_AUTHN_OAUTH2_PROVIDERS
         ]
         current_app.config[key] = modules
     return current_app.config[key]

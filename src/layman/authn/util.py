@@ -68,6 +68,6 @@ def get_sub():
 def get_authn_modules():
     key = FLASK_MODULES_KEY
     if key not in current_app.config:
-        current_app.config[key] = get_modules_from_names(settings.AUTHN_MODULES)
+        current_app.config[key] = get_modules_from_names(settings.LAYMAN_AUTHN_MODULES)
     return current_app.config[key]
 

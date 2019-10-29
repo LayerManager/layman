@@ -19,7 +19,7 @@ start-demo-with-optional-deps-d:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate
 
 build-demo:
-	docker-compose -f docker-compose.demo.yml build layman
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman
 
 deps-start:
 	docker-compose -f docker-compose.deps.yml up --force-recreate -d

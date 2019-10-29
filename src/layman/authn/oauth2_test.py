@@ -53,12 +53,12 @@ num_layers_before_test = 0
 
 @pytest.fixture(scope="module", autouse=True)
 def adjust_settings():
-    authn_modules = settings.AUTHN_MODULES
-    settings.AUTHN_MODULES = [
+    authn_modules = settings.LAYMAN_AUTHN_MODULES
+    settings.LAYMAN_AUTHN_MODULES = [
         'layman.authn.oauth2'
     ]
     yield
-    settings.AUTHN_MODULES = authn_modules
+    settings.LAYMAN_AUTHN_MODULES = authn_modules
 
 
 @pytest.fixture()

@@ -81,24 +81,32 @@ PUBLICATION_MODULES = [
     'layman.map',
 ]
 
-AUTHN_MODULES = [
-    'layman.authn.oauth2'
+LAYMAN_AUTHN_MODULES = [
+    m for m in os.getenv('LAYMAN_AUTHN_MODULES', '').split(',')
+    if len(m) > 0
 ]
 
-AUTHN_OAUTH2_PROVIDERS = [
-    'layman.authn.oauth2.liferay'
+LAYMAN_AUTHN_OAUTH2_PROVIDERS = [
+    m for m in os.getenv('LAYMAN_AUTHN_OAUTH2_PROVIDERS', '').split(',')
+    if len(m) > 0
 ]
 
 OAUTH2_LIFERAY_AUTH_URLS = [
-    "http://localhost:8082/o/oauth2/authorize"
+    u for u in [
+        os.getenv('OAUTH2_LIFERAY_AUTH_URL', ''),
+    ]
+    if len(u) > 0
 ]
-OAUTH2_LIFERAY_INTROSPECTION_URL = "http://liferay:8080/o/oauth2/introspect"
-OAUTH2_LIFERAY_USER_PROFILE_URL = "http://liferay:8080/api/jsonws/user/get-current-user"
+OAUTH2_LIFERAY_INTROSPECTION_URL = os.getenv('OAUTH2_LIFERAY_INTROSPECTION_URL', None)
+OAUTH2_LIFERAY_USER_PROFILE_URL = os.getenv('OAUTH2_LIFERAY_USER_PROFILE_URL', None)
 OAUTH2_LIFERAY_CLIENTS = [
-    {
-        'id': 'id-353ab09c-f117-f2d5-d3a3-85cfb89e6746',
-        'secret': 'secret-d31a82c8-3e73-1058-e38a-f9191f7c2014',
-    }
+    d for d in [
+        {
+            'id': os.getenv('OAUTH2_LIFERAY_CLIENT_ID', ''),
+            'secret': os.getenv('OAUTH2_LIFERAY_SECRET', ''),
+        },
+    ]
+    if len(d['id']) > 0 and len(d['secret']) > 0
 ]
 
 AUTHZ_MODULE = os.environ['LAYMAN_AUTHZ_MODULE']
@@ -118,4 +126,5 @@ LAYMAN_REDIS = redis.Redis.from_url(LAYMAN_REDIS_URL, encoding="utf-8", decode_r
 LAYMAN_PRELOAD_MODULES = os.getenv('LAYMAN_PRELOAD_MODULES', 'false').lower() == 'true'
 LAYMAN_TIMGEN_URL = os.environ['LAYMAN_TIMGEN_URL']
 LAYMAN_CLIENT_URL = os.environ['LAYMAN_CLIENT_URL']
+LAYMAN_CLIENT_PUBLIC_URL = os.getenv('LAYMAN_CLIENT_PUBLIC_URL', None)
 LAYMAN_SERVER_NAME = os.environ['LAYMAN_SERVER_NAME']

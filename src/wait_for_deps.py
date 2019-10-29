@@ -73,7 +73,7 @@ def main():
     print()
 
     # Layman Test Client
-    ltc_url = settings.LAYMAN_CLIENT_URL
+    ltc_url = f"{settings.LAYMAN_CLIENT_URL}static/test-client/global.css"
     wait_for_msg = f"Layman Test Client, url={ltc_url}"
     print(f"Waiting for {wait_for_msg}")
     while True:

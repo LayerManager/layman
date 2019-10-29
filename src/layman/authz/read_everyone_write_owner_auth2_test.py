@@ -25,13 +25,13 @@ num_layers_before_test = 0
 def adjust_settings():
     authz_module = settings.AUTHZ_MODULE
     settings.AUTHZ_MODULE = 'layman.authz.read_everyone_write_owner'
-    authn_modules = settings.AUTHN_MODULES
-    settings.AUTHN_MODULES = [
+    authn_modules = settings.LAYMAN_AUTHN_MODULES
+    settings.LAYMAN_AUTHN_MODULES = [
         'layman.authn.oauth2'
     ]
     yield
     settings.AUTHZ_MODULE = authz_module
-    settings.AUTHN_MODULES = authn_modules
+    settings.LAYMAN_AUTHN_MODULES = authn_modules
 
 
 @pytest.fixture(scope="module")
