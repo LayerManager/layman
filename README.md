@@ -60,20 +60,23 @@ cp src/layman_settings_demo.py src/layman_settings.py
 # prepare GeoServer data directory with appropriate configuration for Layman
 make geoserver-reset-default-layman-datadir
 
-# start dockerized containers
-make start-demo
+# start dockerized containers in background
+make start-demo-d
 ```
-Initial startup may take few minutes (download docker images, build it, run it). Wait until you see something like
+Initial startup may take few minutes (download docker images, build it, run it). You are interested in container named `layman`. You can check it's logs with command
+```bash
+docker logs -f layman
 ```
-layman       |  * Serving Flask app "src/layman"
-layman       |  * Environment: production
-layman       |    WARNING: This is a development server. Do not use it in a production deployment.
-layman       |    Use a production WSGI server instead.
-layman       |  * Debug mode: off
-layman       |  * Running on http://0.0.0.0:8000/ (Press CTRL+C to quit)
+Wait until you see something like
 ```
 
-Then visit [http://localhost:8000/](). You will see simple web client that interacts with [REST API](doc/rest.md).
+[2019-10-30 13:45:36 +0000] [1] [INFO] Starting gunicorn 19.9.0
+[2019-10-30 13:45:36 +0000] [1] [INFO] Listening at: http://0.0.0.0:8000 (1)
+[2019-10-30 13:45:36 +0000] [1] [INFO] Using worker: sync
+[2019-10-30 13:45:36 +0000] [12] [INFO] Booting worker with pid: 12
+```
+
+Then visit [http://localhost/](). You will see simple web client that interacts with [REST API](doc/rest.md).
 
 To stop running service, press Ctrl+C.
 
