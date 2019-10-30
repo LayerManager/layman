@@ -63,6 +63,6 @@ services:
         args:
            - LAYMAN_CLIENT_VERSION=${LAYMAN_CLIENT_VERSION}
       image: layman_client_test:latest
-      command: sh -c "npm run build && npm start"
+      command: sh -c "npm start"
       env_file:
          - .env.test
