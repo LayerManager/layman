@@ -99,13 +99,16 @@ Schema specific for LTC:
 
 ## Settings
 
-To enable OAuth2 authentication in Layman, adjust following settings in `layman_settings.py`:
+To enable OAuth2 authentication in Layman, adjust following [environment settings](../env-settings.md):
 - LAYMAN_AUTHN_MODULES
 - LAYMAN_AUTHN_OAUTH2_PROVIDERS
-- OAUTH2_LIFERAY_AUTH_URLS
+- OAUTH2_LIFERAY_AUTH_URL
 - OAUTH2_LIFERAY_INTROSPECTION_URL
 - OAUTH2_LIFERAY_USER_PROFILE_URL
-- OAUTH2_LIFERAY_CLIENTS
+- OAUTH2_LIFERAY_CLIENT_ID
+- OAUTH2_LIFERAY_SECRET
+- OAUTH2_LIFERAY_TOKEN_URL
+- OAUTH2_LIFERAY_CALLBACK_URL
 
 Sample values for OAuth2 authentication can be found in [`layman_settings_dev.py`](../src/layman_settings_dev.py).
 
@@ -139,7 +142,7 @@ Check following environment variables of LTC:
 - OAUTH2_LIFERAY_AUTH_URL: URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), usually the same as the first URL from Layman's OAUTH2_LIFERAY_AUTH_URLS
 - OAUTH2_LIFERAY_TOKEN_URL: URL of [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2). In case of liferay, it's something like `<http or https>://<Liferay domain and port>/o/oauth2/token`
 - OAUTH2_LIFERAY_CALLBACK_URL: URL of [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2), the value is `<http or https>://<LTC domain, port, and path prefix>/auth/oauth2-liferay/callback`.
-- LAYMAN_USER_PROFILE_URL: URL of Layman's [GET Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#get-current-user)
+- OAUTH2_LIFERAY_USER_PROFILE_URL: URL of Layman's [GET Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#get-current-user)
 
 
 
