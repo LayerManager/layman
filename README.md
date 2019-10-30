@@ -55,7 +55,6 @@ This is the easiest way how to start layman for demonstration purposes. It inclu
 ```bash
 # use demo settings
 cp .env.demo .env
-cp src/layman_settings_demo.py src/layman_settings.py
 
 # prepare GeoServer data directory with appropriate configuration for Layman
 make geoserver-reset-default-layman-datadir
