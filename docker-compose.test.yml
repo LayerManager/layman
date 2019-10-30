@@ -66,3 +66,5 @@ services:
       command: sh -c "npm start"
       env_file:
          - .env.test
+      depends_on:
+        - redis

@@ -13,8 +13,6 @@ services:
       command: bash -c "python3 src/layman_flush_redis.py && python3 src/wait_for_deps.py && cd src && gunicorn -w 1 -b 0.0.0.0:8000 layman:app"
       env_file:
          - .env
-#      ports:
-#        - 8000:8000
       volumes:
         - ./layman_data:/layman_data
         - ./src/layman_settings_demo.py:/code/src/layman_settings.py
@@ -49,8 +47,6 @@ services:
         - LAYMAN_SKIP_REDIS_LOADING=true
       volumes:
         - ./src/layman_settings_demo.py:/code/src/layman_settings.py
-#      ports:
-#        - 5555:5555
       depends_on:
         - celery_worker
 
@@ -66,9 +62,6 @@ services:
       image: hslayers:latest
       user: ${UID_GID}
       command: sh -c "node proxy.js & ./node_modules/.bin/http-server dist/"
-#      ports:
-#        - 8080:8080
-#        - 8081:8081
 
    layman_client:
       container_name: layman_client
@@ -81,8 +74,8 @@ services:
       command: sh -c "npm start"
       env_file:
          - .env
-#      ports:
-#        - 3000:3000
+      depends_on:
+        - redis
 
    nginx:
       image: nginx:1.16-alpine
