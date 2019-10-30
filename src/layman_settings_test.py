@@ -91,6 +91,8 @@ LAYMAN_AUTHN_OAUTH2_PROVIDERS = [
     if len(m) > 0
 ]
 
+LAYMAN_AUTHN_CACHE_MAX_TIMEOUT = 60
+
 OAUTH2_LIFERAY_AUTH_URLS = [
     u for u in [
         os.getenv('OAUTH2_LIFERAY_AUTH_URL', ''),

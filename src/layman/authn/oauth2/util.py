@@ -2,7 +2,10 @@ from layman import settings
 from layman.http import LaymanError
 from layman.authn.redis import get_username
 import importlib
+import json
+import math
 import requests
+import time
 from requests.exceptions import ConnectionError
 from flask import request, g, current_app
 
@@ -13,6 +16,8 @@ FLASK_SUB_KEY = f'{__name__}:SUB'
 
 ISS_URL_HEADER = 'AuthorizationIssUrl'
 TOKEN_HEADER = 'Authorization'
+
+REDIS_ACCESS_TOKEN_KEY = f'{__name__}:ISS_ACCESS_TOKEN:{{provider_module}}:{{access_token}}'
 
 
 def authenticate():
@@ -40,39 +45,55 @@ def authenticate():
     if provider_module is None:
         raise LaymanError(32, f'No OAuth2 provider was found for URL passed in HTTP header {ISS_URL_HEADER}.', sub_code=6)
 
-    # TODO: implement redis cache of access tokens to avoid reaching introspection endpoint on each request
-    # TODO and do not forget to invalidate it in case of some errors
-    clients = settings.OAUTH2_LIFERAY_CLIENTS
-    valid_resp = None
-    all_connection_errors = True
-    for client in clients:
-        try:
-            r = requests.post(provider_module.INTROSPECTION_URL, data={
-                'client_id': client['id'],
-                'client_secret': client['secret'],
-                'token': access_token,
-            })
-            all_connection_errors = False
-        except ConnectionError:
-            continue
-        if r.status_code != 200:
-            raise LaymanError(32, f'Introspection endpoint returned {r.status_code} status code.', sub_code=7)
-        try:
-            r_json = r.json()
-            if r_json['active'] is True and r_json['token_type'] == 'Bearer':
-                valid_resp = r_json
-                break
-        except ValueError:
-            continue
+    access_token_info = _get_redis_access_token_info(provider_module, access_token)
 
-    if all_connection_errors:
-        raise LaymanError(32, f'Introspection endpoint is not reachable.', sub_code=8)
+    if access_token_info is None:
+        # current_app.logger.info(f"Veryfying cretentials against OAuth2 provider")
 
-    if valid_resp is None:
-        # TODO in this case, invalidate cache
-        raise LaymanError(32, f'Introspection endpoint claims that access token is not active or it\'s not Bearer token.', sub_code=9)
+        clients = settings.OAUTH2_LIFERAY_CLIENTS
+        valid_resp = None
+        all_connection_errors = True
+        for client in clients:
+            try:
+                r = requests.post(provider_module.INTROSPECTION_URL, data={
+                    'client_id': client['id'],
+                    'client_secret': client['secret'],
+                    'token': access_token,
+                })
+                all_connection_errors = False
+            except ConnectionError:
+                continue
+            if r.status_code != 200:
+                raise LaymanError(32, f'Introspection endpoint returned {r.status_code} status code.', sub_code=7)
+            try:
+                r_json = r.json()
+                # current_app.logger.info(f"r_json={r_json}")
+                if r_json['active'] is True and r_json['token_type'] == 'Bearer':
+                    valid_resp = r_json
+                    break
+            except ValueError:
+                continue
 
-    sub = valid_resp['sub']
+        if all_connection_errors:
+            raise LaymanError(32, f'Introspection endpoint is not reachable.', sub_code=8)
+
+        if valid_resp is None:
+            raise LaymanError(32, f'Introspection endpoint claims that access token is not active or it\'s not Bearer token.', sub_code=9)
+
+        sub = valid_resp['sub']
+
+        exp = valid_resp['exp']
+        exp_in = math.ceil(exp - time.time())
+        key_exp = max(min(exp_in, settings.LAYMAN_AUTHN_CACHE_MAX_TIMEOUT), 1)
+        authn_info = {
+            'sub': sub
+        }
+        # current_app.logger.info(f'Cache authn info, info={authn_info}, exp_in={exp_in}')
+        _set_redis_access_token_info(provider_module, access_token, authn_info, ex=key_exp)
+
+    else:
+        # current_app.logger.info(f"Cretentials verified against Layman cache")
+        sub = access_token_info['sub']
 
     assert FLASK_PROVIDER_KEY not in g
     assert FLASK_ACCESS_TOKEN_KEY not in g
@@ -130,7 +151,36 @@ def _get_provider_by_auth_url(iss_url):
 def get_open_id_claims():
     provider = _get_provider_module()
     access_token = _get_access_token()
-    result = provider.get_open_id_claims(access_token)
+    result = {}
+    try:
+        result = provider.get_open_id_claims(access_token)
+    except (ConnectionError, requests.HTTPError):
+        flush_cache()
     result['iss'] = provider.AUTH_URLS[0]
     return result
+
+
+def _get_redis_access_token_key(provider_module, access_token):
+    return REDIS_ACCESS_TOKEN_KEY.format(provider_module=provider_module.__name__, access_token=access_token)
+
+
+def _get_redis_access_token_info(provider_module, access_token):
+    key = _get_redis_access_token_key(provider_module, access_token)
+    val = settings.LAYMAN_REDIS.get(key)
+    val = json.loads(val) if val is not None else val
+    return val
+
+
+def _set_redis_access_token_info(provider_module, access_token, authn_info, ex=None):
+    key = _get_redis_access_token_key(provider_module, access_token)
+    val = json.dumps(authn_info)
+    return settings.LAYMAN_REDIS.set(key, val, ex=ex)
+
+
+def flush_cache():
+    # current_app.logger.info(f"Flushing cache")
+    provider_module = _get_provider_module()
+    access_token = _get_access_token()
+    key = _get_redis_access_token_key(provider_module, access_token)
+    settings.LAYMAN_REDIS.delete(key)
 
