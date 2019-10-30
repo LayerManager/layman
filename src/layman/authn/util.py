@@ -65,6 +65,11 @@ def get_sub():
     return authn_module.get_sub()
 
 
+def flush_cache():
+    authn_module = get_authn_module()
+    return authn_module.flush_cache()
+
+
 def get_authn_modules():
     key = FLASK_MODULES_KEY
     if key not in current_app.config:

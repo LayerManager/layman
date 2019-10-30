@@ -11,7 +11,7 @@
 |[Map](models.md#map)|`/rest/<username>/maps/<mapname>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
 |Map File|`/rest/<username>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
 |Map Thumbnail|`/rest/<username>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
-|Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | x |
+|Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | [DELETE](#delete-current-user) |
 
 #### REST path parameters
 - **username**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
@@ -454,3 +454,13 @@ Body parameters:
 Content-Type: `application/json`
 
 JSON object, same as in case of [GET](#get-current-user).
+
+### DELETE Current User
+Deletes current authentication credentials from Layman's cache. This should be called when user logs out from client.
+
+#### Request
+No action parameters.
+#### Response
+Content-Type: `application/json`
+
+HTTP status code 200 if credentials were deleted.
