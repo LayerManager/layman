@@ -12,8 +12,9 @@ bp = Blueprint('rest_layer_chunk', __name__)
 
 @bp.before_request
 @authenticate
-@check_username_decorator
 @authorize
+@check_username_decorator
+@util.check_layername_decorator
 def before_request():
     pass
 
@@ -21,9 +22,6 @@ def before_request():
 @bp.route("/layers/<layername>/chunk", methods=['POST'])
 def post(username, layername):
     app.logger.info(f"POST Layer Chunk, user={g.user}")
-
-    # LAYER
-    util.check_layername(layername)
 
     total_chunks = request.form.get('resumableTotalChunks', type=int)
     if total_chunks > 999:
