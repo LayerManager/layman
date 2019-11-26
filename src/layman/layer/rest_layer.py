@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, current_app as app, g
 
 from layman.http import LaymanError
-from layman.util import check_username
+from layman.util import check_username_decorator
 from layman import settings
 from . import util
 from .filesystem import input_file, input_sld, input_chunk
@@ -15,6 +15,7 @@ bp = Blueprint('rest_layer', __name__)
 @bp.before_request
 @authenticate
 @authorize
+@check_username_decorator
 def before_request():
     pass
 
@@ -22,9 +23,6 @@ def before_request():
 @bp.route('/layers/<layername>', methods=['GET'])
 def get(username, layername):
     app.logger.info(f"GET Layer, user={g.user}")
-
-    # USER
-    check_username(username)
 
     # LAYER
     util.check_layername(layername)
@@ -38,9 +36,6 @@ def get(username, layername):
 @bp.route('/layers/<layername>', methods=['PATCH'])
 def patch(username, layername):
     app.logger.info(f"PATCH Layer, user={g.user}")
-
-    # USER
-    check_username(username)
 
     # LAYER
     util.check_layername(layername)
@@ -152,9 +147,6 @@ def patch(username, layername):
 @bp.route('/layers/<layername>', methods=['DELETE'])
 def delete_layer(username, layername):
     app.logger.info(f"DELETE Layer, user={g.user}")
-
-    # USER
-    check_username(username)
 
     # LAYER
     util.check_layername(layername)

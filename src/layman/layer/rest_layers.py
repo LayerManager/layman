@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, url_for, g
 from flask import current_app as app
 
 from layman.http import LaymanError
-from layman.util import check_username
+from layman.util import check_username_decorator
 from layman import settings
 from . import util
 from .filesystem import input_file, input_sld, input_chunk, uuid
@@ -15,6 +15,7 @@ bp = Blueprint('rest_layers', __name__)
 @bp.before_request
 @authenticate
 @authorize
+@check_username_decorator
 def before_request():
     pass
 
@@ -22,9 +23,6 @@ def before_request():
 @bp.route('/layers', methods=['GET'])
 def get(username):
     app.logger.info(f"GET Layers, user={g.user}")
-
-    # USER
-    check_username(username)
 
     layernames = util.get_layer_names(username)
     layernames.sort()
@@ -43,9 +41,6 @@ def get(username):
 @bp.route('/layers', methods=['POST'])
 def post(username):
     app.logger.info(f"POST Layers, user={g.user}")
-
-    # USER
-    check_username(username)
 
     # FILE
     use_chunk_upload = False

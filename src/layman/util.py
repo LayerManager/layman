@@ -1,9 +1,10 @@
+from functools import wraps
 import importlib
 import re
 import unicodedata
 from collections import OrderedDict
 
-from flask import current_app
+from flask import current_app, request
 from unidecode import unidecode
 
 from layman import settings
@@ -43,6 +44,15 @@ def to_safe_names(unsafe_names, type_name):
     if len(values) == 0:
         values = [type_name]
     return values
+
+
+def check_username_decorator(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        check_username(request.view_args['username'])
+        result = f(*args, **kwargs)
+        return result
+    return decorated_function
 
 
 def check_username(username):

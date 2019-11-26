@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, current_app as app, g
 
 from layman.http import LaymanError
-from layman.util import check_username
+from layman.util import check_username_decorator
 from . import util
 from .filesystem import input_chunk
 from layman.authn import authenticate
@@ -12,6 +12,7 @@ bp = Blueprint('rest_layer_chunk', __name__)
 
 @bp.before_request
 @authenticate
+@check_username_decorator
 @authorize
 def before_request():
     pass
@@ -20,9 +21,6 @@ def before_request():
 @bp.route("/layers/<layername>/chunk", methods=['POST'])
 def post(username, layername):
     app.logger.info(f"POST Layer Chunk, user={g.user}")
-
-    # USER
-    check_username(username)
 
     # LAYER
     util.check_layername(layername)

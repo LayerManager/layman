@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, request, current_app as app, g
 from werkzeug.datastructures import FileStorage
 
 from layman import LaymanError
-from layman.util import check_username
+from layman.util import check_username_decorator
 from . import util
 from .filesystem import input_file, thumbnail
 from layman.authn import authenticate
@@ -18,6 +18,7 @@ bp = Blueprint('rest_map', __name__)
 @bp.before_request
 @authenticate
 @authorize
+@check_username_decorator
 def before_request():
     pass
 
@@ -25,9 +26,6 @@ def before_request():
 @bp.route('/maps/<mapname>', methods=['GET'])
 def get(username, mapname):
     app.logger.info(f"GET Map, user={g.user}")
-
-    # USER
-    check_username(username)
 
     # MAP
     util.check_mapname(mapname)
@@ -40,9 +38,6 @@ def get(username, mapname):
 @bp.route('/maps/<mapname>', methods=['PATCH'])
 def patch(username, mapname):
     app.logger.info(f"PATCH Map, user={g.user}")
-
-    # USER
-    check_username(username)
 
     # MAP
     util.check_mapname(mapname)
@@ -102,9 +97,6 @@ def patch(username, mapname):
 @bp.route('/maps/<mapname>', methods=['DELETE'])
 def delete_map(username, mapname):
     app.logger.info(f"DELETE Map, user={g.user}")
-
-    # USER
-    check_username(username)
 
     # MAP
     util.check_mapname(mapname)
