@@ -19,6 +19,7 @@ bp = Blueprint('rest_map', __name__)
 @authenticate
 @authorize
 @check_username_decorator
+@util.check_mapname_decorator
 def before_request():
     pass
 
@@ -26,9 +27,6 @@ def before_request():
 @bp.route('/maps/<mapname>', methods=['GET'])
 def get(username, mapname):
     app.logger.info(f"GET Map, user={g.user}")
-
-    # MAP
-    util.check_mapname(mapname)
 
     info = util.get_complete_map_info(username, mapname)
 
@@ -38,9 +36,6 @@ def get(username, mapname):
 @bp.route('/maps/<mapname>', methods=['PATCH'])
 def patch(username, mapname):
     app.logger.info(f"PATCH Map, user={g.user}")
-
-    # MAP
-    util.check_mapname(mapname)
 
     if not util.is_map_last_task_ready(username, mapname):
         raise LaymanError(29)
@@ -97,9 +92,6 @@ def patch(username, mapname):
 @bp.route('/maps/<mapname>', methods=['DELETE'])
 def delete_map(username, mapname):
     app.logger.info(f"DELETE Map, user={g.user}")
-
-    # MAP
-    util.check_mapname(mapname)
 
     # raise exception if map does not exist
     info = util.get_complete_map_info(username, mapname)

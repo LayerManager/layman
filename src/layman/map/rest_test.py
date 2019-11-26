@@ -62,6 +62,19 @@ def test_get_maps_empty(client):
     })
 
 
+def test_wrong_value_of_mapname(client):
+    username = 'testuser1'
+    mapnames = [' ', '2a', 'ě', ';', '?', 'ABC']
+    for mapname in mapnames:
+        rv = client.get(url_for('rest_map.get', username=username, mapname=mapname))
+        resp_json = rv.get_json()
+        # print('username', username)
+        # print(resp_json)
+        assert rv.status_code==400
+        assert resp_json['code']==2
+        assert resp_json['detail']['parameter']=='mapname'
+
+
 def test_no_file(client):
     rv = client.post(url_for('rest_maps.post', username='testuser1'))
     assert rv.status_code==400
