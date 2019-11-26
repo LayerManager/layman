@@ -79,6 +79,19 @@ def test_wrong_value_of_user(client):
         assert resp_json['detail']['parameter']=='user'
 
 
+def test_wrong_value_of_layername(client):
+    username = 'testuser1'
+    layernames = [' ', '2a', 'ě', ';', '?', 'ABC']
+    for layername in layernames:
+        rv = client.get(url_for('rest_layer.get', username=username, layername=layername))
+        resp_json = rv.get_json()
+        # print('username', username)
+        # print(resp_json)
+        assert rv.status_code==400
+        assert resp_json['code']==2
+        assert resp_json['detail']['parameter']=='layername'
+
+
 def test_no_file(client):
     rv = client.post(url_for('rest_layers.post', username='testuser1'))
     assert rv.status_code==400

@@ -16,6 +16,7 @@ bp = Blueprint('rest_layer', __name__)
 @authenticate
 @authorize
 @check_username_decorator
+@util.check_layername_decorator
 def before_request():
     pass
 
@@ -23,10 +24,6 @@ def before_request():
 @bp.route('/layers/<layername>', methods=['GET'])
 def get(username, layername):
     app.logger.info(f"GET Layer, user={g.user}")
-
-    # LAYER
-    util.check_layername(layername)
-
 
     info = util.get_complete_layer_info(username, layername)
 
@@ -36,9 +33,6 @@ def get(username, layername):
 @bp.route('/layers/<layername>', methods=['PATCH'])
 def patch(username, layername):
     app.logger.info(f"PATCH Layer, user={g.user}")
-
-    # LAYER
-    util.check_layername(layername)
 
     if not util.is_layer_last_task_ready(username, layername):
         raise LaymanError(19)
@@ -147,9 +141,6 @@ def patch(username, layername):
 @bp.route('/layers/<layername>', methods=['DELETE'])
 def delete_layer(username, layername):
     app.logger.info(f"DELETE Layer, user={g.user}")
-
-    # LAYER
-    util.check_layername(layername)
 
     # raise exception if layer does not exist
     info = util.get_complete_layer_info(username, layername)

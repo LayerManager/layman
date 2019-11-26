@@ -1,10 +1,11 @@
+from functools import wraps
 import importlib
 import inspect
 import re
 from collections import defaultdict, OrderedDict
 
 from celery import chain
-from flask import current_app, url_for
+from flask import current_app, url_for, request
 
 from layman import LaymanError
 from layman import settings
@@ -19,6 +20,15 @@ FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
 
 def to_safe_layer_name(value):
     return to_safe_name(value, 'layer')
+
+
+def check_layername_decorator(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        check_layername(request.view_args['layername'])
+        result = f(*args, **kwargs)
+        return result
+    return decorated_function
 
 
 def check_layername(layername):
