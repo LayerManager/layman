@@ -1,3 +1,4 @@
+from functools import wraps
 import importlib
 import inspect
 import json
@@ -9,7 +10,7 @@ from collections import defaultdict, OrderedDict
 from layman.authn.filesystem import get_authn_info
 from layman.authz import get_publication_access_rights
 from celery import chain
-from flask import current_app, url_for
+from flask import current_app, url_for, request
 
 from layman import LaymanError
 from layman import settings
@@ -24,6 +25,15 @@ FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
 
 def to_safe_map_name(value):
     return to_safe_name(value, 'map')
+
+
+def check_mapname_decorator(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        check_mapname(request.view_args['mapname'])
+        result = f(*args, **kwargs)
+        return result
+    return decorated_function
 
 
 def check_mapname(mapname):
