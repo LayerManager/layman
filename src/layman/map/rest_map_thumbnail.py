@@ -4,7 +4,7 @@ from flask import Blueprint, send_file, current_app as app, g
 
 from layman.common.filesystem.util import get_user_dir
 from layman.http import LaymanError
-from layman.util import check_username
+from layman.util import check_username_decorator
 from . import util
 from .filesystem import thumbnail
 from layman.authn import authenticate
@@ -16,6 +16,7 @@ bp = Blueprint('rest_map_thumbnail', __name__)
 @bp.before_request
 @authenticate
 @authorize
+@check_username_decorator
 def before_request():
     pass
 
@@ -23,9 +24,6 @@ def before_request():
 @bp.route('/maps/<mapname>/thumbnail', methods=['GET'])
 def get(username, mapname):
     app.logger.info(f"GET Map Thumbnail, user={g.user}")
-
-    # USER
-    check_username(username)
 
     # MAP
     util.check_mapname(mapname)

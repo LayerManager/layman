@@ -3,7 +3,7 @@ import os
 from flask import Blueprint, jsonify, current_app as app, g
 
 from layman.http import LaymanError
-from layman.util import check_username
+from layman.util import check_username_decorator
 from layman.common.filesystem.util import get_user_dir
 from . import util
 from layman.authn import authenticate
@@ -16,6 +16,7 @@ bp = Blueprint('rest_map_file', __name__)
 @bp.before_request
 @authenticate
 @authorize
+@check_username_decorator
 def before_request():
     pass
 
@@ -23,9 +24,6 @@ def before_request():
 @bp.route('/maps/<mapname>/file', methods=['GET'])
 def get(username, mapname):
     app.logger.info(f"GET Map File, user={g.user}")
-
-    # USER
-    check_username(username)
 
     # LAYER
     util.check_mapname(mapname)

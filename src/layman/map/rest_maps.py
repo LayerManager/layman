@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, request, url_for, current_app as app, g
 from werkzeug.datastructures import FileStorage
 
 from layman.http import LaymanError
-from layman.util import check_username
+from layman.util import check_username_decorator
 from . import util
 from .filesystem import input_file, uuid
 from layman.authn import authenticate
@@ -17,6 +17,7 @@ bp = Blueprint('rest_maps', __name__)
 @bp.before_request
 @authenticate
 @authorize
+@check_username_decorator
 def before_request():
     pass
 
@@ -24,9 +25,6 @@ def before_request():
 @bp.route('/maps', methods=['GET'])
 def get(username):
     app.logger.info(f"GET Maps, user={g.user}")
-
-    # USER
-    check_username(username)
 
     mapnames = util.get_map_names(username)
     mapnames.sort()
@@ -45,9 +43,6 @@ def get(username):
 @bp.route('/maps', methods=['POST'])
 def post(username):
     app.logger.info(f"POST Maps, user={g.user}")
-
-    # USER
-    check_username(username)
 
     # FILE
     if 'file' in request.files and not request.files['file'].filename == '':
