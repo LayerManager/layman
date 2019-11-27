@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 from flask import current_app
 
 from layman import LaymanError
+from layman import celery as celery_util
 from redis import WatchError
 from . import settings
 from .util import get_usernames_no_cache, get_modules_from_names, get_providers_from_source_names, call_modules_fn
@@ -191,4 +192,22 @@ def check_redis_consistency(expected_publ_num_by_type=None):
             ),
             uuid_dict['publication_name'],
         )
+
+    task_infos_len = redis.hlen(celery_util.PUBLICATION_TASK_INFOS)
+    assert task_infos_len == len(total_publs)
+
+    task_names_tuples = [
+        h.split(':') for h in redis.smembers(celery_util.REDIS_CURRENT_TASK_NAMES)
+    ]
+
+    for username, publ_type_name, pubname in total_publs:
+        tinfo = celery_util.get_publication_task_info(username, publ_type_name, pubname)
+        is_ready = celery_util.is_task_ready(tinfo)
+        assert tinfo['finished'] is is_ready
+        assert (next((
+            t for t in task_names_tuples
+            if t[1] == username and t[2] == pubname and t[0].startswith(publ_type_name)
+        ), None) is None) is is_ready, f"{username}, {publ_type_name}, {pubname}: {is_ready}, {task_names_tuples}"
+        assert (redis.hget(celery_util.TASK_ID_TO_PUBLICATION, tinfo['last'].task_id) is None) is is_ready
+
     return total_publs_by_type

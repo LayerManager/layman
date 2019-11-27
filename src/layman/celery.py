@@ -6,26 +6,52 @@ from celery.contrib.abortable import AbortableAsyncResult
 
 REDIS_CURRENT_TASK_NAMES = f"{__name__}:CURRENT_TASK_NAMES"
 PUBLICATION_TASK_INFOS = f'{__name__}:PUBLICATION_TASK_INFOS'
+TASK_ID_TO_PUBLICATION = f'{__name__}:TASK_ID_TO_PUBLICATION'
 
 
 def task_prerun(task_name, username, publication_name):
     current_app.logger.info(f"PRE task={task_name}, username={username}, publication_name={publication_name}")
-    redis = settings.LAYMAN_REDIS
+    rds = settings.LAYMAN_REDIS
     key = REDIS_CURRENT_TASK_NAMES
     task_hash = _get_task_hash(task_name, username, publication_name)
-    redis.sadd(key, task_hash)
+    rds.sadd(key, task_hash)
 
 
-def task_postrun(task_name, username, publication_name):
+def task_postrun(task_name, username, publication_name, task_id):
     current_app.logger.info(f"POST task={task_name}, username={username}, publication_name={publication_name}")
-    redis = settings.LAYMAN_REDIS
+    rds = settings.LAYMAN_REDIS
     key = REDIS_CURRENT_TASK_NAMES
     task_hash = _get_task_hash(task_name, username, publication_name)
-    redis.srem(key, task_hash)
+    rds.srem(key, task_hash)
+
+    key = TASK_ID_TO_PUBLICATION
+    hash = task_id
+    if rds.hexists(key, hash):
+        finnish_publication_task(task_id)
 
 
 def _get_task_hash(task_name, username, publication_name):
     return f"{task_name}:{username}:{publication_name}"
+
+
+def finnish_publication_task(task_id):
+    rds = settings.LAYMAN_REDIS
+    key = TASK_ID_TO_PUBLICATION
+    hash = task_id
+    publ_hash = rds.hget(key, hash)
+    if publ_hash is None:
+        return
+    username, publication_type, publication_name = _hash_to_publication(publ_hash)
+
+    tinfo = get_publication_task_info_dict(username, publication_type, publication_name)
+    tinfo['finished'] = True
+    set_publication_task_info_dict(username, publication_type, publication_name, tinfo)
+
+    rds.hdel(key, hash)
+
+
+def _hash_to_publication(hash):
+    return hash.split(':')
 
 
 def is_task_running(task_name, username, publication_name=None):
@@ -43,13 +69,18 @@ def is_task_running(task_name, username, publication_name=None):
     return result
 
 
-def get_publication_task_info(username, publication_type, publication_name):
-    from layman import celery_app
+def get_publication_task_info_dict(username, publication_type, publication_name):
     rds = settings.LAYMAN_REDIS
     key = PUBLICATION_TASK_INFOS
     hash = _get_publication_hash(username, publication_type, publication_name)
     val = rds.hget(key, hash)
     tinfo = json.loads(val) if val is not None else val
+    return tinfo
+
+
+def get_publication_task_info(username, publication_type, publication_name):
+    tinfo = get_publication_task_info_dict(username, publication_type, publication_name)
+    from layman import celery_app
     if tinfo is not None:
         results = {
             task_id: AbortableAsyncResult(task_id, backend=celery_app.backend)
@@ -68,6 +99,14 @@ def get_publication_task_info(username, publication_type, publication_name):
     return tinfo
 
 
+def set_publication_task_info_dict(username, publication_type, publication_name, task_info):
+    rds = settings.LAYMAN_REDIS
+    val = json.dumps(task_info)
+    key = PUBLICATION_TASK_INFOS
+    hash = _get_publication_hash(username, publication_type, publication_name)
+    rds.hset(key, hash, val)
+
+
 def set_publication_task_info(username, publication_type, publication_name, tasks, task_result):
     chained_results = [task_result]
     prev_result = task_result
@@ -79,22 +118,21 @@ def set_publication_task_info(username, publication_type, publication_name, task
         'by_name': {
             tasks[idx].name: r.task_id for idx, r in enumerate(chained_results)
         },
-        'by_order': [r.task_id for r in chained_results]
+        'by_order': [r.task_id for r in chained_results],
+        'finished': False,
     }
-    val = json.dumps(task_info)
+    set_publication_task_info_dict(username, publication_type, publication_name, task_info)
 
     rds = settings.LAYMAN_REDIS
-    key = PUBLICATION_TASK_INFOS
-    hash = _get_publication_hash(username, publication_type, publication_name)
-    return rds.hset(key, hash, val)
+    key = TASK_ID_TO_PUBLICATION
+    val = _get_publication_hash(username, publication_type, publication_name)
+    hash = task_info['last']
+    rds.hset(key, hash, val)
 
 
 def abort_task(task_info):
     if task_info is None or is_task_ready(task_info):
         return
-    # todo if all tasks are in pending state, it means that either they did not started yet or their celery already deleted their results
-    # if it's the first case, tasks should be revoked instead of aborted
-    # generally, if it's pending, revoke it, otherwise abort it
 
     task_results = [r for r in task_info['by_order'] if not r.ready()]
     for task_result in reversed(task_results):
@@ -103,12 +141,17 @@ def abort_task(task_info):
         #     f'processing result {task_name} {task_result.id} {task_result.state} {task_result.ready()} {task_result.successful()} {task_result.failed()}')
         if task_result.ready():
             continue
-        current_app.logger.info(
-            f'aborting result {task_name} {task_result.id}')
-        task_result.abort()
-        # task_result.revoke()
-        task_result.get(propagate=False)
-        current_app.logger.info('aborted ' + task_result.id)
+        if task_result == 'PENDING':
+            current_app.logger.info(f'revoking result {task_name} {task_result.id}')
+            task_result.revoke(wait=True, timeout=1)
+            task_result.get(propagate=False)
+            current_app.logger.info(f'revoked result {task_name} {task_result.id}')
+        else:
+            current_app.logger.info(f'aborting result {task_name} {task_result.id}')
+            task_result.abort()
+            task_result.get(propagate=False)
+            current_app.logger.info('aborted ' + task_result.id)
+    finnish_publication_task(task_info['last'].task_id)
 
 
 def is_task_successful(task_info):
@@ -120,7 +163,7 @@ def is_task_failed(task_info):
 
 
 def is_task_ready(task_info):
-    return is_task_successful(task_info) or is_task_failed(task_info)
+    return is_task_successful(task_info) or is_task_failed(task_info) or task_info['finished'] is True
 
 
 def _get_publication_hash(username, publication_type, publication_name):
@@ -128,3 +171,14 @@ def _get_publication_hash(username, publication_type, publication_name):
     return hash
 
 
+def delete_publication(username, publication_type, publication_name):
+    tinfo = get_publication_task_info_dict(username, publication_type, publication_name)
+    task_id = tinfo['last']
+
+    rds = settings.LAYMAN_REDIS
+    key = PUBLICATION_TASK_INFOS
+    hash = _get_publication_hash(username, publication_type, publication_name)
+    rds.hdel(key, hash)
+
+    key = TASK_ID_TO_PUBLICATION
+    rds.hdel(key, task_id)

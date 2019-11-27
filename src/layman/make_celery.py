@@ -86,5 +86,6 @@ def on_task_postrun(**kwargs):
             return
         username = kwargs['args'][0]
         publication_name = kwargs['args'][1]
-        task_postrun(task_name, username, publication_name)
+        task_id = kwargs['task_id']
+        task_postrun(task_name, username, publication_name, task_id)
 

@@ -215,6 +215,7 @@ def delete_layer(username, layername, source = None):
     for r in results:
         if r is not None:
             result.update(r)
+    celery_util.delete_publication(username, LAYER_TYPE, layername)
     return result
 
 
