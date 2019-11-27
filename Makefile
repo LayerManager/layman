@@ -59,14 +59,18 @@ rebuild-and-restart-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_dev
 
 restart-celery-dev:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_client
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv flower
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv celery_worker_dev
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml rm -fsv celery_worker_test
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv redis
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --no-deps -d redis
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --no-deps -d layman_dev
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --no-deps -d celery_worker_dev
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml up --no-deps -d celery_worker_test
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --no-deps -d flower
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --no-deps -d layman_client
 
 prepare-dirs:
 	mkdir -p layman_data layman_data_test tmp
