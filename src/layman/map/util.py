@@ -5,7 +5,6 @@ import json
 from jsonschema import validate, ValidationError, Draft7Validator
 import os
 import re
-from collections import defaultdict, OrderedDict
 
 from layman.authn.filesystem import get_authn_info
 from layman.authz import get_publication_access_rights
@@ -15,6 +14,7 @@ from flask import current_app, url_for, request
 from layman import LaymanError
 from layman import settings
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name
+from layman import celery as celery_util
 from . import get_map_sources, MAP_TYPE
 
 MAPNAME_RE = USERNAME_RE
@@ -78,8 +78,8 @@ def get_map_info(username, mapname):
     for pi in partial_infos:
         partial_info.update(pi)
 
-    last_task = _get_map_last_task(username, mapname)
-    if last_task is None or _is_task_successful(last_task):
+    last_task = _get_map_task(username, mapname)
+    if last_task is None or celery_util.is_task_successful(last_task):
         return partial_info
 
     failed = False
@@ -128,17 +128,7 @@ def post_map(username, mapname, kwargs):
     # res = post_chain.apply_async()
     res = post_chain()
 
-    map_tasks = _get_map_tasks(username, mapname)
-    tinfo = {
-        'last': res,
-        'by_name': {},
-        'by_order': []
-    }
-    for post_task in reversed(post_tasks):
-        tinfo['by_name'][post_task.name] = res
-        tinfo['by_order'].insert(0, res)
-        res = res.parent
-    map_tasks.append(tinfo)
+    celery_util.set_publication_task_info(username, MAP_TYPE, mapname, post_tasks, res)
 
 
 def patch_map(username, mapname, kwargs, file_changed):
@@ -164,17 +154,7 @@ def patch_map(username, mapname, kwargs, file_changed):
     # res = post_chain.apply_async()
     res = post_chain()
 
-    map_tasks = _get_map_tasks(username, mapname)
-    tinfo = {
-        'last': res,
-        'by_name': {},
-        'by_order': []
-    }
-    for post_task in reversed(post_tasks):
-        tinfo['by_name'][post_task.name] = res
-        tinfo['by_order'].insert(0, res)
-        res = res.parent
-    map_tasks.append(tinfo)
+    celery_util.set_publication_task_info(username, MAP_TYPE, mapname, post_tasks, res)
 
 
 def delete_map(username, mapname, kwargs=None):
@@ -239,59 +219,19 @@ def check_file(file):
         })
 
 
-USER_TASKS = defaultdict(lambda: defaultdict(list))
-
-def _is_task_successful(task_info):
-    return task_info['last'].successful()
-
-
-def _is_task_failed(task_info):
-    return any(tr.failed() for tr in task_info['by_order'])
-
-
-def _is_task_ready(task_info):
-    return _is_task_successful(task_info) or _is_task_failed(task_info)
-
-
-def _get_map_tasks(username, mapname):
-    maptasks = USER_TASKS[username][mapname]
-    return maptasks
-
-
-def _get_map_last_task(username, mapname):
-    maptasks = _get_map_tasks(username, mapname)
-    if len(maptasks) > 0:
-        return maptasks[-1]
-    else:
-        return None
-
-
-def is_map_last_task_ready(username, mapname):
-    last_task = _get_map_last_task(username, mapname)
-    return last_task is None or _is_task_ready(last_task)
+def _get_map_task(username, mapname):
+    tinfo = celery_util.get_publication_task_info(username, MAP_TYPE, mapname)
+    return tinfo
 
 
 def abort_map_tasks(username, mapname):
-    last_task = _get_map_last_task(username, mapname)
-    if last_task is None or _is_task_ready(last_task):
-        return
+    last_task = _get_map_task(username, mapname)
+    celery_util.abort_task(last_task)
 
-    task_results = list(filter(
-        lambda r: not r.ready(),
-        last_task['by_order']
-    ))
-    for task_result in reversed(task_results):
-        task_name = next(k for k,v in last_task['by_name'].items() if v == task_result)
-        # current_app.logger.info(
-        #     f'processing result {task_name} {task_result.id} {task_result.state} {task_result.ready()} {task_result.successful()} {task_result.failed()}')
-        if task_result.ready():
-            continue
-        current_app.logger.info(
-            f'aborting result {task_name} {task_result.id}')
-        task_result.abort()
-        # task_result.revoke()
-        task_result.get(propagate=False)
-        current_app.logger.info('aborted ' + task_result.id)
+
+def is_map_task_ready(username, mapname):
+    last_task = _get_map_task(username, mapname)
+    return celery_util.is_task_ready(last_task)
 
 
 def _get_task_signature(username, mapname, task_options, task):

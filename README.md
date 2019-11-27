@@ -150,7 +150,7 @@ Pipenv is recommended tool for installing **python-level** dependencies. Both Pi
 
 Npm is recommended tool for installing **node.js-level** dependencies. Both package.json and package-lock.json are located in [`hslayers/`](hslayers/) directory.
 
-Next you need to choose how you deploy Layman. As Layman is Flask application, check Flask's [deployment options](https://flask.palletsprojects.com/en/1.1.x/deploying/). Keep in mind that Layman is safe to run with **one process** only (and any number of celery worker processes).
+Next you need to choose how you deploy Layman. As Layman is Flask application, check Flask's [deployment options](https://flask.palletsprojects.com/en/1.1.x/deploying/). Layman is safe to run with multiple WSGI Flask process and with multiple Celery worker processes.
 
 Configure Layman using [environment settings](doc/env-settings.md). Demo configuration is a good starting point to setup Layman for production, however it needs to be adjusted carefully. First focus for example on
 - [LAYMAN_SETTINGS_MODULE](doc/env-settings.md#LAYMAN_SETTINGS_MODULE)

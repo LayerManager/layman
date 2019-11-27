@@ -19,6 +19,7 @@ from layman import settings
 from layman.layer.filesystem import uuid as layer_uuid
 from layman import uuid, util as layman_util
 from layman.layer import db
+from layman import celery as celery_util
 
 
 min_geojson = """
@@ -182,8 +183,8 @@ def test_post_layers_simple(client):
 
     layername = 'ne_110m_admin_0_countries'
 
-    last_task = util._get_layer_last_task(username, layername)
-    assert last_task is not None and not util._is_task_ready(last_task)
+    last_task = util._get_layer_task(username, layername)
+    assert last_task is not None and not celery_util.is_task_ready(last_task)
     layer_info = util.get_layer_info(username, layername)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
     for key_to_check in keys_to_check:
@@ -242,8 +243,8 @@ def test_post_layers_concurrent(client):
         for fp in files:
             fp[0].close()
 
-    last_task = util._get_layer_last_task(username, layername)
-    assert last_task is not None and not util._is_task_ready(last_task)
+    last_task = util._get_layer_task(username, layername)
+    assert last_task is not None and not celery_util.is_task_ready(last_task)
 
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
@@ -320,8 +321,8 @@ def test_post_layers_shp(client):
         for fp in files:
             fp[0].close()
 
-    last_task = util._get_layer_last_task(username, layername)
-    assert last_task is not None and not util._is_task_ready(last_task)
+    last_task = util._get_layer_task(username, layername)
+    assert last_task is not None and not celery_util.is_task_ready(last_task)
     last_task['last'].get()
 
     wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
@@ -385,9 +386,10 @@ def test_post_layers_complex(client):
         for fp in files:
             fp[0].close()
 
-    last_task = util._get_layer_last_task(username, layername)
-    assert last_task is not None and not util._is_task_ready(last_task)
+    last_task = util._get_layer_task(username, layername)
+    assert last_task is not None and not celery_util.is_task_ready(last_task)
     last_task['last'].get()
+    assert celery_util.is_task_ready(last_task)
 
     wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
@@ -471,8 +473,8 @@ def test_patch_layer_title(client):
     })
     assert rv.status_code == 200
 
-    last_task = util._get_layer_last_task(username, layername)
-    assert last_task is not None and util._is_task_ready(last_task)
+    last_task = util._get_layer_task(username, layername)
+    assert last_task is not None and celery_util.is_task_ready(last_task)
 
     resp_json = rv.get_json()
     assert resp_json['title'] == "New Title of Countries"
@@ -494,7 +496,7 @@ def test_patch_layer_style(client):
     })
     assert rv.status_code == 200
 
-    last_task = util._get_layer_last_task(username, layername)
+    last_task = util._get_layer_task(username, layername)
     # TODO
     # Time to generate testing thumbnail is probably shorter than getting & parsing WMS/WFS capabilities documents
     # so it's finished before PATCH request is completed
@@ -606,8 +608,8 @@ def test_patch_layer_data(client):
         for fp in files:
             fp[0].close()
 
-    last_task = util._get_layer_last_task(username, layername)
-    assert last_task is not None and not util._is_task_ready(last_task)
+    last_task = util._get_layer_task(username, layername)
+    assert last_task is not None and not celery_util.is_task_ready(last_task)
     resp_json = rv.get_json()
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
     for key_to_check in keys_to_check:
@@ -662,8 +664,8 @@ def test_patch_layer_concurrent_and_delete_it(client):
         f'{LAYER_TYPE}': num_layers_before_test + 4
     })
 
-    last_task = util._get_layer_last_task(username, layername)
-    assert last_task is not None and not util._is_task_ready(last_task)
+    last_task = util._get_layer_task(username, layername)
+    assert last_task is not None and not celery_util.is_task_ready(last_task)
 
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
@@ -724,8 +726,8 @@ def test_post_layers_long_and_delete_it(client):
 
     time.sleep(1)
 
-    last_task = util._get_layer_last_task(username, layername)
-    assert last_task is not None and not util._is_task_ready(last_task)
+    last_task = util._get_layer_task(username, layername)
+    assert last_task is not None and not celery_util.is_task_ready(last_task)
     layer_info = util.get_layer_info(username, layername)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
     for key_to_check in keys_to_check:
@@ -734,6 +736,10 @@ def test_post_layers_long_and_delete_it(client):
     rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
     rv = client.delete(rest_path)
     assert rv.status_code == 200
+    rv = client.get(url_for('rest_layer.get', username=username, layername=layername))
+    resp_json = rv.get_json()
+    # print(resp_json)
+    assert rv.status_code == 404
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 3
     })
@@ -778,7 +784,7 @@ def test_post_layers_zero_length_attribute(client):
     layername = 'zero_length_attribute'
 
     layer_info = util.get_layer_info(username, layername)
-    while 'status' in layer_info['db_table'] and layer_info['db_table']['status'] == 'PENDING':
+    while 'status' in layer_info['db_table'] and layer_info['db_table']['status'] in ['PENDING', 'STARTED']:
         time.sleep(0.1)
         layer_info = util.get_layer_info(username, layername)
     assert layer_info['db_table']['status'] == 'FAILURE'

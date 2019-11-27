@@ -1,5 +1,7 @@
 from celery import Celery, signals
 from celery.contrib import abortable
+from flask import current_app
+from celery.contrib.abortable import AbortableAsyncResult
 from layman import settings
 from .util import get_modules_from_names
 
@@ -10,21 +12,17 @@ def make_celery(app):
         backend=settings.LAYMAN_REDIS_URL,
         broker=settings.LAYMAN_REDIS_URL,
         include=get_task_modules(),
+    )
+    celery_app.conf.update(
         # http://docs.celeryproject.org/en/latest/getting-started/brokers/redis.html
         broker_transport_options={
-            'visibility_timeout': 3600, # 1 hour
+            'visibility_timeout': 3600,  # 1 hour
             'fanout_prefix': True,
             'fanout_patterns': True,
         },
         # https://stackoverflow.com/a/38267978
         task_track_started=True,
     )
-    # celery.conf.update(app.config)
-    # celery_app.conf.update(
-    #     task_serializer='pickle',
-    #     accept_content=['pickle', 'json'],
-    #     result_serializer='pickle',
-    # )
 
     class Task(celery_app.Task):
         def __call__(self, *args, **kwargs):
@@ -52,7 +50,7 @@ def get_task_modules():
 @signals.task_prerun.connect
 def on_task_prerun(**kwargs):
     task_name = kwargs['task'].name
-    from layman import app
+    from layman import app, celery_app
     from layman.util import get_publication_types
     from layman.celery import task_prerun
     with app.app_context():
@@ -73,7 +71,7 @@ def on_task_prerun(**kwargs):
 @signals.task_postrun.connect
 def on_task_postrun(**kwargs):
     task_name = kwargs['task'].name
-    from layman import app
+    from layman import app, celery_app
     from layman.util import get_publication_types
     from layman.celery import task_postrun
     with app.app_context():
