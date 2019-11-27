@@ -185,10 +185,10 @@ def test_post_maps_simple(client):
     assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
     thumbnail = resp_json['thumbnail']
     assert 'status' in thumbnail
-    assert thumbnail['status'] == 'PENDING'
+    assert thumbnail['status'] in ['PENDING', 'STARTED']
 
     map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
-    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] == 'PENDING':
+    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] in ['PENDING', 'STARTED']:
         time.sleep(0.1)
         map_info = client.get(url_for('rest_map.get', username=username,
                                       mapname=mapname)).get_json()
@@ -254,7 +254,7 @@ def test_post_maps_complex(client):
     assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
     thumbnail = resp_json['thumbnail']
     assert 'status' in thumbnail
-    assert thumbnail['status'] == 'PENDING'
+    assert thumbnail['status'] in ['PENDING', 'STARTED']
 
     # assert another PATCH is not possible now
     rv = client.patch(url_for('rest_map.patch', username=username, mapname=mapname), data={
@@ -266,7 +266,7 @@ def test_post_maps_complex(client):
 
     # continue with thumbnail assertion
     map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
-    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] == 'PENDING':
+    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] in ['PENDING', 'STARTED']:
         time.sleep(0.1)
         map_info = client.get(url_for('rest_map.get', username=username,
                                       mapname=mapname)).get_json()
@@ -332,10 +332,10 @@ def test_patch_map(client):
     assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
     thumbnail = resp_json['thumbnail']
     assert 'status' in thumbnail
-    assert thumbnail['status'] == 'PENDING'
+    assert thumbnail['status'] in ['PENDING', 'STARTED']
 
     map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
-    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] == 'PENDING':
+    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] in ['PENDING', 'STARTED']:
         time.sleep(0.1)
         map_info = client.get(url_for('rest_map.get', username=username,
                                       mapname=mapname)).get_json()
@@ -499,10 +499,10 @@ def test_map_composed_from_local_layers(client):
     map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
     thumbnail = map_info['thumbnail']
     assert 'status' in thumbnail
-    assert thumbnail['status'] == 'PENDING'
+    assert thumbnail['status'] in ['PENDING', 'STARTED']
 
     map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
-    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] == 'PENDING':
+    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] in ['PENDING', 'STARTED']:
         time.sleep(0.1)
         map_info = client.get(url_for('rest_map.get', username=username,
                                       mapname=mapname)).get_json()

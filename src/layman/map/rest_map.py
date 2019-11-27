@@ -37,7 +37,7 @@ def get(username, mapname):
 def patch(username, mapname):
     app.logger.info(f"PATCH Map, user={g.user}")
 
-    if not util.is_map_last_task_ready(username, mapname):
+    if not util.is_map_task_ready(username, mapname):
         raise LaymanError(29)
 
     info = util.get_complete_map_info(username, mapname)

@@ -34,7 +34,7 @@ def get(username, layername):
 def patch(username, layername):
     app.logger.info(f"PATCH Layer, user={g.user}")
 
-    if not util.is_layer_last_task_ready(username, layername):
+    if not util.is_layer_task_ready(username, layername):
         raise LaymanError(19)
 
     info = util.get_complete_layer_info(username, layername)

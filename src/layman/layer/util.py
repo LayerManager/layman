@@ -2,7 +2,6 @@ from functools import wraps
 import importlib
 import inspect
 import re
-from collections import defaultdict, OrderedDict
 
 from celery import chain
 from flask import current_app, url_for, request
@@ -10,7 +9,8 @@ from flask import current_app, url_for, request
 from layman import LaymanError
 from layman import settings
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name
-from . import get_layer_sources
+from layman import celery as celery_util
+from . import get_layer_sources, LAYER_TYPE
 
 LAYERNAME_RE = USERNAME_RE
 
@@ -74,8 +74,8 @@ def get_layer_info(username, layername):
     for pi in partial_infos:
         partial_info.update(pi)
 
-    last_task = _get_layer_last_task(username, layername)
-    if last_task is None or _is_task_successful(last_task):
+    last_task = _get_layer_task(username, layername)
+    if last_task is None or celery_util.is_task_successful(last_task):
         return partial_info
 
     failed = False
@@ -162,17 +162,7 @@ def post_layer(username, layername, task_options, use_chunk_upload):
     # res = post_chain.apply_async()
     res = post_chain()
 
-    layer_tasks = _get_layer_tasks(username, layername)
-    tinfo = {
-        'last': res,
-        'by_name': {},
-        'by_order': []
-    }
-    for post_task in reversed(post_tasks):
-        tinfo['by_name'][post_task.name] = res
-        tinfo['by_order'].insert(0, res)
-        res = res.parent
-    layer_tasks.append(tinfo)
+    celery_util.set_publication_task_info(username, LAYER_TYPE, layername, post_tasks, res)
 
 
 def patch_layer(username, layername, delete_from, task_options, use_chunk_upload):
@@ -200,17 +190,7 @@ def patch_layer(username, layername, delete_from, task_options, use_chunk_upload
     # res = patch_chain.apply_async()
     res = patch_chain()
 
-    layer_tasks = _get_layer_tasks(username, layername)
-    tinfo = {
-        'last': res,
-        'by_name': {},
-        'by_order': []
-    }
-    for patch_task in reversed(patch_tasks):
-        tinfo['by_name'][patch_task.name] = res
-        tinfo['by_order'].insert(0, res)
-        res = res.parent
-    layer_tasks.append(tinfo)
+    celery_util.set_publication_task_info(username, LAYER_TYPE, layername, patch_tasks, res)
 
 
 TASKS_TO_LAYER_INFO_KEYS = {
@@ -238,48 +218,19 @@ def delete_layer(username, layername, source = None):
     return result
 
 
-USER_TASKS = defaultdict(lambda: defaultdict(list))
-
-
-def _get_layer_tasks(username, layername):
-    layertasks = USER_TASKS[username][layername]
-    return layertasks
-
-
-def _get_layer_last_task(username, layername):
-    layertasks = _get_layer_tasks(username, layername)
-    if len(layertasks) > 0:
-        return layertasks[-1]
-    else:
-        return None
-
-
-def is_layer_last_task_ready(username, layername):
-    last_task = _get_layer_last_task(username, layername)
-    return last_task is None or _is_task_ready(last_task)
+def _get_layer_task(username, layername):
+    tinfo = celery_util.get_publication_task_info(username, LAYER_TYPE, layername)
+    return tinfo
 
 
 def abort_layer_tasks(username, layername):
-    last_task = _get_layer_last_task(username, layername)
-    if last_task is None or _is_task_ready(last_task):
-        return
+    last_task = _get_layer_task(username, layername)
+    celery_util.abort_task(last_task)
 
-    task_results = list(filter(
-        lambda r: not r.ready(),
-        last_task['by_order']
-    ))
-    for task_result in reversed(task_results):
-        task_name = next(k for k,v in last_task['by_name'].items() if v == task_result)
-        # current_app.logger.info(
-        #     f'processing result {task_name} {task_result.id} {task_result.state} {task_result.ready()} {task_result.successful()} {task_result.failed()}')
-        if task_result.ready():
-            continue
-        current_app.logger.info(
-            f'aborting result {task_name} {task_result.id}')
-        task_result.abort()
-        # task_result.revoke()
-        task_result.get(propagate=False)
-        current_app.logger.info('aborted ' + task_result.id)
+
+def is_layer_task_ready(username, layername):
+    last_task = _get_layer_task(username, layername)
+    return celery_util.is_task_ready(last_task)
 
 
 def _get_task_signature(username, layername, task_options, task):
@@ -300,14 +251,3 @@ def _get_task_signature(username, layername, task_options, task):
         immutable=True,
     )
 
-
-def _is_task_successful(task_info):
-    return task_info['last'].successful()
-
-
-def _is_task_failed(task_info):
-    return any(tr.failed() for tr in task_info['by_order'])
-
-
-def _is_task_ready(task_info):
-    return _is_task_successful(task_info) or _is_task_failed(task_info)
