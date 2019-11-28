@@ -232,7 +232,7 @@ def abort_map_tasks(username, mapname):
 
 def is_map_task_ready(username, mapname):
     last_task = _get_map_task(username, mapname)
-    return celery_util.is_task_ready(last_task)
+    return last_task is None or celery_util.is_task_ready(last_task)
 
 
 def _get_task_signature(username, mapname, task_options, task):

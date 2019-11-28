@@ -231,7 +231,7 @@ def abort_layer_tasks(username, layername):
 
 def is_layer_task_ready(username, layername):
     last_task = _get_layer_task(username, layername)
-    return celery_util.is_task_ready(last_task)
+    return last_task is None or celery_util.is_task_ready(last_task)
 
 
 def _get_task_signature(username, layername, task_options, task):

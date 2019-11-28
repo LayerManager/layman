@@ -1,5 +1,6 @@
 from celery.utils.log import get_task_logger
 
+from layman.celery import AbortedException
 from layman import celery_app
 from layman.layer import geoserver
 from . import wms, wfs, sld, ensure_user_workspace
@@ -30,12 +31,13 @@ def publish_layer_from_db(
         ensure_user_workspace(username)
 
     if self.is_aborted():
-        return
+        raise AbortedException
     geoserver.publish_layer_from_db(username, layername, description, title)
 
     if self.is_aborted():
         wms.delete_layer(username, layername)
         wfs.delete_layer(username, layername)
+        raise AbortedException
 
 @celery_app.task(
     name='layman.layer.geoserver.sld.create_layer_style',
@@ -44,9 +46,10 @@ def publish_layer_from_db(
 )
 def create_layer_style(self, username, layername):
     if self.is_aborted():
-        return
+        raise AbortedException
     sld.create_layer_style(username, layername)
 
     if self.is_aborted():
         sld.delete_layer(username, layername)
+        raise AbortedException
 

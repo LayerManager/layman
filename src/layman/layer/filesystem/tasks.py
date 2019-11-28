@@ -2,6 +2,7 @@ import time
 
 from celery.utils.log import get_task_logger
 
+from layman.celery import AbortedException
 from layman import celery_app
 from layman.http import LaymanError
 from layman import settings
@@ -18,7 +19,7 @@ logger = get_task_logger(__name__)
 )
 def wait_for_upload(self, username, layername, check_crs=True):
     if self.is_aborted():
-        return
+        raise AbortedException
     last_change = time.time()
     num_files_saved = 0
     num_chunks_saved = 0
@@ -36,7 +37,7 @@ def wait_for_upload(self, username, layername, check_crs=True):
             logger.info(f'Aborting for layer {username}.{layername}')
             input_file.delete_layer(username, layername)
             logger.info(f'Aborted for layer {username}.{layername}')
-            return
+            raise AbortedException
 
         chunk_info = input_chunk.layer_file_chunk_info(username, layername)
         logger.debug(f'chunk_info {str(chunk_info)}')
@@ -60,9 +61,10 @@ def wait_for_upload(self, username, layername, check_crs=True):
 )
 def generate_layer_thumbnail(self, username, layername):
     if self.is_aborted():
-        return
+        raise AbortedException
     thumbnail.generate_layer_thumbnail(username, layername)
 
     if self.is_aborted():
         thumbnail.delete_layer(username, layername)
+        raise AbortedException
 
