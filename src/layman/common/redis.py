@@ -7,6 +7,31 @@ from layman import LaymanError
 PUBLICATION_LOCKS_KEY = f'{__name__}:PUBLICATION_LOCKS'
 
 
+def create_lock_decorator(publication_type, publication_name_key, error_code, is_task_ready_fn):
+
+    def lock_decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            username = request.view_args['username']
+            publication_name = request.view_args[publication_name_key]
+            check_http_method(username, publication_type, publication_name, error_code)
+            lock_publication(username, publication_type, publication_name, request.method)
+            try:
+                result = f(*args, **kwargs)
+                if is_task_ready_fn(username, publication_name):
+                    unlock_publication(username, publication_type, publication_name)
+            except Exception as e:
+                try:
+                    if is_task_ready_fn(username, publication_name):
+                        unlock_publication(username, publication_type, publication_name)
+                finally:
+                    unlock_publication(username, publication_type, publication_name)
+                raise e
+            return result
+        return decorated_function
+    return lock_decorator
+
+
 def get_publication_lock(username, publication_type, publication_name):
     rds = settings.LAYMAN_REDIS
     key = PUBLICATION_LOCKS_KEY
