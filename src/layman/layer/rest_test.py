@@ -58,7 +58,7 @@ def client():
         publs_by_type = uuid.check_redis_consistency()
         global num_layers_before_test
         num_layers_before_test = len(publs_by_type[LAYER_TYPE])
-        yield client
+    yield client
 
     # print('before server.terminate()')
     server.terminate()
@@ -66,8 +66,13 @@ def client():
     server.join()
 
 
+@pytest.fixture()
+def app_context():
+    with app.app_context() as ctx:
+        yield ctx
 
 
+@pytest.mark.usefixtures('app_context')
 def test_wrong_value_of_user(client):
     usernames = [' ', '2a', 'ě', ';', '?', 'ABC']
     for username in usernames:
@@ -80,6 +85,7 @@ def test_wrong_value_of_user(client):
         assert resp_json['detail']['parameter']=='user'
 
 
+@pytest.mark.usefixtures('app_context')
 def test_wrong_value_of_layername(client):
     username = 'testuser1'
     layernames = [' ', '2a', 'ě', ';', '?', 'ABC']
@@ -93,6 +99,7 @@ def test_wrong_value_of_layername(client):
         assert resp_json['detail']['parameter']=='layername'
 
 
+@pytest.mark.usefixtures('app_context')
 def test_no_file(client):
     rv = client.post(url_for('rest_layers.post', username='testuser1'))
     assert rv.status_code==400
@@ -102,6 +109,7 @@ def test_no_file(client):
     assert resp_json['detail']['parameter']=='file'
 
 
+@pytest.mark.usefixtures('app_context')
 def test_username_schema_conflict(client):
     if len(settings.PG_NON_USER_SCHEMAS) == 0:
         pass
@@ -130,6 +138,7 @@ def test_username_schema_conflict(client):
         assert resp_json['detail']['reason'] == 'DB schema owned by another than layman user'
 
 
+@pytest.mark.usefixtures('app_context')
 def test_layername_db_object_conflict(client):
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
@@ -151,6 +160,7 @@ def test_layername_db_object_conflict(client):
             fp[0].close()
 
 
+@pytest.mark.usefixtures('app_context')
 def test_get_layers_testuser1_v1(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username))
@@ -162,6 +172,7 @@ def test_get_layers_testuser1_v1(client):
     })
 
 
+@pytest.mark.usefixtures('app_context')
 def test_post_layers_simple(client):
     username = 'testuser1'
     rest_path = url_for('rest_layers.post', username=username)
@@ -222,6 +233,7 @@ def test_post_layers_simple(client):
     })
 
 
+@pytest.mark.usefixtures('app_context')
 def test_post_layers_concurrent(client):
     username = 'testuser1'
     layername = 'countries_concurrent'
@@ -263,6 +275,7 @@ def test_post_layers_concurrent(client):
     })
 
 
+@pytest.mark.usefixtures('app_context')
 def test_post_layers_shp_missing_extensions(client):
     username = 'testuser1'
     rest_path = url_for('rest_layers.post', username=username)
@@ -294,6 +307,7 @@ def test_post_layers_shp_missing_extensions(client):
     })
 
 
+@pytest.mark.usefixtures('app_context')
 def test_post_layers_shp(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries_shp'
@@ -333,6 +347,7 @@ def test_post_layers_shp(client):
     })
 
 
+@pytest.mark.usefixtures('app_context')
 def test_post_layers_layer_exists(client):
     username = 'testuser1'
     rest_path = url_for('rest_layers.post', username=username)
@@ -357,6 +372,8 @@ def test_post_layers_layer_exists(client):
         f'{LAYER_TYPE}': num_layers_before_test + 3
     })
 
+
+@pytest.mark.usefixtures('app_context')
 def test_post_layers_complex(client):
     username = 'testuser2'
     rest_path = url_for('rest_layers.post', username=username)
@@ -437,6 +454,7 @@ def test_post_layers_complex(client):
     })
 
 
+@pytest.mark.usefixtures('app_context')
 def test_get_layers_testuser1_v2(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username))
@@ -463,6 +481,7 @@ def test_get_layers_testuser1_v2(client):
     })
 
 
+@pytest.mark.usefixtures('app_context')
 def test_patch_layer_title(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
@@ -471,7 +490,7 @@ def test_patch_layer_title(client):
         'title': "New Title of Countries",
         'description': "and new description"
     })
-    assert rv.status_code == 200
+    assert rv.status_code == 200, rv.get_json()
 
     last_task = util._get_layer_task(username, layername)
     assert last_task is not None and celery_util.is_task_ready(last_task)
@@ -484,6 +503,7 @@ def test_patch_layer_title(client):
     })
 
 
+@pytest.mark.usefixtures('app_context')
 def test_patch_layer_style(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
@@ -522,6 +542,7 @@ def test_patch_layer_style(client):
     })
 
 
+@pytest.mark.usefixtures('app_context')
 def test_post_layers_sld_1_1_0(client):
     username = 'testuser1'
     layername = 'countries_sld_1_1_0'
@@ -587,122 +608,129 @@ def test_post_layers_sld_1_1_0(client):
 
 
 def test_patch_layer_data(client):
-    username = 'testuser2'
-    layername = 'countries'
-    rest_path = url_for('rest_layer.patch', username=username, layername=layername)
-    file_paths = [
-        'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
-    ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
-                 file_paths]
-        rv = client.patch(rest_path, data={
-            'file': files,
-            'title': 'populated places'
-        })
-        assert rv.status_code == 200
-    finally:
-        for fp in files:
-            fp[0].close()
+    with app.app_context():
+        username = 'testuser2'
+        layername = 'countries'
+        rest_path = url_for('rest_layer.patch', username=username, layername=layername)
+        file_paths = [
+            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
+        ]
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
+                     file_paths]
+            rv = client.patch(rest_path, data={
+                'file': files,
+                'title': 'populated places'
+            })
+            assert rv.status_code == 200
+        finally:
+            for fp in files:
+                fp[0].close()
 
-    last_task = util._get_layer_task(username, layername)
-    assert last_task is not None and not celery_util.is_task_ready(last_task)
-    resp_json = rv.get_json()
-    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
-    for key_to_check in keys_to_check:
-            assert 'status' in resp_json[key_to_check]
-    last_task['last'].get()
-
-    rest_path = url_for('rest_layer.get', username=username, layername=layername)
-    rv = client.get(rest_path)
-    assert 200 <= rv.status_code < 300
-
-    resp_json = rv.get_json()
-    assert resp_json['title'] == "populated places"
-    feature_type = get_feature_type(username, 'postgresql', layername)
-    attributes = feature_type['attributes']['attribute']
-    assert next((
-        a for a in attributes if a['name'] == 'sovereignt'
-    ), None) is None
-    assert next((
-        a for a in attributes if a['name'] == 'adm0cap'
-    ), None) is not None
-    uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 4
-    })
-
-
-def test_patch_layer_concurrent_and_delete_it(client):
-    username = 'testuser2'
-    layername = 'countries'
-    rest_path = url_for('rest_layer.patch', username=username, layername=layername)
-    file_paths = [
-        'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
-    ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
-
-    uuid_str = layer_uuid.get_layer_uuid(username, layername)
-    assert uuid.is_valid_uuid(uuid_str)
-
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
-                 file_paths]
-        rv = client.patch(rest_path, data={
-            'file': files,
-            'title': 'populated places'
-        })
-        assert rv.status_code == 200
-    finally:
-        for fp in files:
-            fp[0].close()
-    uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 4
-    })
-
-    last_task = util._get_layer_task(username, layername)
-    assert last_task is not None and not celery_util.is_task_ready(last_task)
-
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
-                 file_paths]
-        rv = client.patch(rest_path, data={
-            'file': files,
-        })
-        assert rv.status_code == 400
+        last_task = util._get_layer_task(username, layername)
+        assert last_task is not None and not celery_util.is_task_ready(last_task)
         resp_json = rv.get_json()
-        assert resp_json['code'] == 19
-    finally:
-        for fp in files:
-            fp[0].close()
-    uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 4
-    })
+        keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
+        for key_to_check in keys_to_check:
+                assert 'status' in resp_json[key_to_check]
+        last_task['last'].get()
 
-    rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
-    rv = client.delete(rest_path)
-    assert rv.status_code == 200
+    with app.app_context():
+        rest_path = url_for('rest_layer.get', username=username, layername=layername)
+        rv = client.get(rest_path)
+        assert 200 <= rv.status_code < 300
 
-    from layman.layer import get_layer_type_def
-    from layman.common.filesystem import uuid as common_uuid
-    uuid_filename = common_uuid.get_publication_uuid_file(
-        get_layer_type_def()['type'], username, layername)
-    assert not os.path.isfile(uuid_filename)
-    assert not settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
-    assert not settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
-    assert not settings.LAYMAN_REDIS.hexists(
-        uuid.get_user_type_names_key(username, '.'.join(__name__.split('.')[:-1])),
-        layername
-    )
-    uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 3
-    })
+        resp_json = rv.get_json()
+        assert resp_json['title'] == "populated places"
+        feature_type = get_feature_type(username, 'postgresql', layername)
+        attributes = feature_type['attributes']['attribute']
+        assert next((
+            a for a in attributes if a['name'] == 'sovereignt'
+        ), None) is None
+        assert next((
+            a for a in attributes if a['name'] == 'adm0cap'
+        ), None) is not None
+        uuid.check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': num_layers_before_test + 4
+        })
 
 
+@pytest.mark.usefixtures('app_context')
+def test_patch_layer_concurrent_and_delete_it(client):
+    with app.app_context():
+        username = 'testuser2'
+        layername = 'countries'
+        rest_path = url_for('rest_layer.patch', username=username, layername=layername)
+        file_paths = [
+            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
+        ]
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+
+        uuid_str = layer_uuid.get_layer_uuid(username, layername)
+        assert uuid.is_valid_uuid(uuid_str)
+
+        files = []
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
+                     file_paths]
+            rv = client.patch(rest_path, data={
+                'file': files,
+                'title': 'populated places'
+            })
+            assert rv.status_code == 200
+        finally:
+            for fp in files:
+                fp[0].close()
+        uuid.check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': num_layers_before_test + 4
+        })
+
+        last_task = util._get_layer_task(username, layername)
+        assert last_task is not None and not celery_util.is_task_ready(last_task)
+
+    with app.app_context():
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
+                     file_paths]
+            rv = client.patch(rest_path, data={
+                'file': files,
+            })
+            assert rv.status_code == 400
+            resp_json = rv.get_json()
+            assert resp_json['code'] == 19
+        finally:
+            for fp in files:
+                fp[0].close()
+        uuid.check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': num_layers_before_test + 4
+        })
+
+    with app.app_context():
+        rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
+        rv = client.delete(rest_path)
+        assert rv.status_code == 200
+
+        from layman.layer import get_layer_type_def
+        from layman.common.filesystem import uuid as common_uuid
+        uuid_filename = common_uuid.get_publication_uuid_file(
+            get_layer_type_def()['type'], username, layername)
+        assert not os.path.isfile(uuid_filename)
+        assert not settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
+        assert not settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
+        assert not settings.LAYMAN_REDIS.hexists(
+            uuid.get_user_type_names_key(username, '.'.join(__name__.split('.')[:-1])),
+            layername
+        )
+        uuid.check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': num_layers_before_test + 3
+        })
+
+
+@pytest.mark.usefixtures('app_context')
 def test_post_layers_long_and_delete_it(client):
     username = 'testuser1'
     rest_path = url_for('rest_layers.post', username=username)
@@ -745,6 +773,7 @@ def test_post_layers_long_and_delete_it(client):
     })
 
 
+@pytest.mark.usefixtures('app_context')
 def test_delete_layer(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
@@ -762,6 +791,7 @@ def test_delete_layer(client):
     assert resp_json['code'] == 15
 
 
+@pytest.mark.usefixtures('app_context')
 def test_post_layers_zero_length_attribute(client):
     username = 'testuser1'
     rest_path = url_for('rest_layers.post', username=username)
@@ -798,6 +828,7 @@ def test_post_layers_zero_length_attribute(client):
     })
 
 
+@pytest.mark.usefixtures('app_context')
 def test_get_layers_testuser2(client):
     username = 'testuser2'
     rv = client.get(url_for('rest_layers.get', username=username))

@@ -4,10 +4,11 @@ from flask import current_app as app
 from layman.http import LaymanError
 from layman.util import check_username_decorator
 from layman import settings
-from . import util
+from . import util, LAYER_TYPE
 from .filesystem import input_file, input_sld, input_chunk, uuid
 from layman.authn import authenticate
 from layman.authz import authorize
+from layman.common import redis as redis_util
 
 
 bp = Blueprint('rest_layers', __name__)
@@ -116,28 +117,38 @@ def post(username):
         filenames = [f.filename for f in files]
     input_file.check_filenames(username, layername, filenames, check_crs)
 
-    # register layer uuid
-    uuid_str = uuid.assign_layer_uuid(username, layername)
-    layer_result.update({
-        'uuid': uuid_str,
-    })
+    redis_util.lock_publication(username, LAYER_TYPE, layername, request.method)
 
-    # save files
-    input_sld.save_layer_file(username, layername, sld_file)
-    if use_chunk_upload:
-        files_to_upload = input_chunk.save_layer_files_str(
-            username, layername, files, check_crs)
+    try:
+        # register layer uuid
+        uuid_str = uuid.assign_layer_uuid(username, layername)
         layer_result.update({
-            'files_to_upload': files_to_upload,
+            'uuid': uuid_str,
         })
-        task_options.update({
-            'check_crs': check_crs,
-        })
-    else:
-        input_file.save_layer_files(
-            username, layername, files, check_crs)
 
-    util.post_layer(username, layername, task_options, use_chunk_upload)
+        # save files
+        input_sld.save_layer_file(username, layername, sld_file)
+        if use_chunk_upload:
+            files_to_upload = input_chunk.save_layer_files_str(
+                username, layername, files, check_crs)
+            layer_result.update({
+                'files_to_upload': files_to_upload,
+            })
+            task_options.update({
+                'check_crs': check_crs,
+            })
+        else:
+            input_file.save_layer_files(
+                username, layername, files, check_crs)
+
+        util.post_layer(username, layername, task_options, use_chunk_upload)
+    except Exception as e:
+        try:
+            if util.is_layer_task_ready(username, layername):
+                redis_util.unlock_publication(username, LAYER_TYPE, layername)
+        finally:
+            redis_util.unlock_publication(username, LAYER_TYPE, layername)
+        raise e
 
     # app.logger.info('uploaded layer '+layername)
     return jsonify([layer_result]), 200

@@ -4,18 +4,21 @@ import inspect
 import re
 
 from celery import chain
-from flask import current_app, url_for, request
+from flask import current_app, url_for, request, g
 
 from layman import LaymanError
 from layman import settings
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name
 from layman import celery as celery_util
 from . import get_layer_sources, LAYER_TYPE
+from layman.common import redis as redis_util
+
 
 LAYERNAME_RE = USERNAME_RE
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
+FLASK_INFO_KEY = f'{__name__}:LAYER_INFO'
 
 
 def to_safe_layer_name(value):
@@ -27,6 +30,45 @@ def check_layername_decorator(f):
     def decorated_function(*args, **kwargs):
         check_layername(request.view_args['layername'])
         result = f(*args, **kwargs)
+        return result
+    return decorated_function
+
+
+def info_decorator(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        username = request.view_args['username']
+        layername = request.view_args['layername']
+        info = get_complete_layer_info(username, layername)
+        assert FLASK_INFO_KEY not in g, g.get(FLASK_INFO_KEY)
+        # current_app.logger.info(f"Setting INFO of layer {username}:{layername}")
+        g.setdefault(FLASK_INFO_KEY, info)
+        result = f(*args, **kwargs)
+        return result
+    return decorated_function
+
+
+def lock_decorator(f):
+    publication_type = LAYER_TYPE
+    publication_name_key = 'layername'
+    error_code = 19
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        username = request.view_args['username']
+        publication_name = request.view_args[publication_name_key]
+        redis_util.check_http_method(username, publication_type, publication_name, error_code)
+        redis_util.lock_publication(username, publication_type, publication_name, request.method)
+        try:
+            result = f(*args, **kwargs)
+            if is_layer_task_ready(username, publication_name):
+                redis_util.unlock_publication(username, publication_type, publication_name)
+        except Exception as e:
+            try:
+                if is_layer_task_ready(username, publication_name):
+                    redis_util.unlock_publication(username, publication_type, publication_name)
+            finally:
+                redis_util.unlock_publication(username, publication_type, publication_name)
+            raise e
         return result
     return decorated_function
 
@@ -87,6 +129,7 @@ def get_layer_info(username, layername):
         if res.failed():
             failed = True
             res_exc = res.get(propagate=False)
+            # current_app.logger.info(f"Exception catched: {str(res_exc)}")
             if isinstance(res_exc, LaymanError):
                 source_state.update({
                     'error': res_exc.to_dict()
@@ -99,7 +142,10 @@ def get_layer_info(username, layername):
     return partial_info
 
 
-def get_complete_layer_info(username, layername):
+def get_complete_layer_info(username=None, layername=None, cached=False):
+    assert (username is not None and layername is not None) or cached
+    if cached:
+        return g.get(FLASK_INFO_KEY)
     partial_info = get_layer_info(username, layername)
 
     if not any(partial_info):

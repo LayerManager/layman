@@ -42,7 +42,7 @@ def import_layer_vector_file(
         return_code = p.poll()
         if return_code != 0:
             pg_error = str(p.stdout.read())
-            logger.error('STDOUT', pg_error)
+            logger.error(f"STDOUT: {pg_error}")
             if "ERROR:  zero-length delimited identifier at or near" in pg_error:
                 err_code = 28
             else:

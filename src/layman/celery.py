@@ -3,6 +3,7 @@ import time
 from flask import current_app
 from layman import settings
 from celery.contrib.abortable import AbortableAsyncResult
+from layman.common import redis as redis_util
 
 
 REDIS_CURRENT_TASK_NAMES = f"{__name__}:CURRENT_TASK_NAMES"
@@ -10,7 +11,7 @@ PUBLICATION_TASK_INFOS = f'{__name__}:PUBLICATION_TASK_INFOS'
 TASK_ID_TO_PUBLICATION = f'{__name__}:TASK_ID_TO_PUBLICATION'
 
 
-def task_prerun(task_name, username, publication_name):
+def task_prerun(username, publication_type, publication_name, task_id, task_name):
     current_app.logger.info(f"PRE task={task_name}, username={username}, publication_name={publication_name}")
     rds = settings.LAYMAN_REDIS
     key = REDIS_CURRENT_TASK_NAMES
@@ -18,7 +19,7 @@ def task_prerun(task_name, username, publication_name):
     rds.sadd(key, task_hash)
 
 
-def task_postrun(task_name, username, publication_name, task_id):
+def task_postrun(username, publication_type, publication_name, task_id, task_name, task_state):
     current_app.logger.info(f"POST task={task_name}, username={username}, publication_name={publication_name}")
     rds = settings.LAYMAN_REDIS
     key = REDIS_CURRENT_TASK_NAMES
@@ -29,6 +30,11 @@ def task_postrun(task_name, username, publication_name, task_id):
     hash = task_id
     if rds.hexists(key, hash):
         finnish_publication_task(task_id)
+    elif task_state == 'FAILURE':
+        tinfo = get_publication_task_info_dict(username, publication_type, publication_name)
+        if tinfo is not None:
+            last_task_id = tinfo['last']
+            finnish_publication_task(last_task_id)
 
 
 def _get_task_hash(task_name, username, publication_name):
@@ -49,6 +55,10 @@ def finnish_publication_task(task_id):
     set_publication_task_info_dict(username, publication_type, publication_name, tinfo)
 
     rds.hdel(key, hash)
+
+    lock = redis_util.get_publication_lock(username, publication_type, publication_name)
+    if lock in ['patch', 'post']:
+        redis_util.unlock_publication(username, publication_type, publication_name)
 
 
 def _hash_to_publication(hash):
