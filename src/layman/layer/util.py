@@ -48,31 +48,6 @@ def info_decorator(f):
     return decorated_function
 
 
-def lock_decorator(f):
-    publication_type = LAYER_TYPE
-    publication_name_key = 'layername'
-    error_code = 19
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        username = request.view_args['username']
-        publication_name = request.view_args[publication_name_key]
-        redis_util.check_http_method(username, publication_type, publication_name, error_code)
-        redis_util.lock_publication(username, publication_type, publication_name, request.method)
-        try:
-            result = f(*args, **kwargs)
-            if is_layer_task_ready(username, publication_name):
-                redis_util.unlock_publication(username, publication_type, publication_name)
-        except Exception as e:
-            try:
-                if is_layer_task_ready(username, publication_name):
-                    redis_util.unlock_publication(username, publication_type, publication_name)
-            finally:
-                redis_util.unlock_publication(username, publication_type, publication_name)
-            raise e
-        return result
-    return decorated_function
-
-
 def check_layername(layername):
     if not re.match(LAYERNAME_RE, layername):
         raise LaymanError(2, {'parameter': 'layername', 'expected':
@@ -298,3 +273,5 @@ def _get_task_signature(username, layername, task_options, task):
         immutable=True,
     )
 
+
+lock_decorator = redis_util.create_lock_decorator(LAYER_TYPE, 'layername', 19, is_layer_task_ready)
