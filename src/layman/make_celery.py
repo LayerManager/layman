@@ -65,7 +65,8 @@ def on_task_prerun(**kwargs):
             return
         username = kwargs['args'][0]
         publication_name = kwargs['args'][1]
-        task_prerun(task_name, username, publication_name)
+        task_id = kwargs['task_id']
+        task_prerun(username, publication_type, publication_name, task_id, task_name)
 
 
 @signals.task_postrun.connect
@@ -87,5 +88,5 @@ def on_task_postrun(**kwargs):
         username = kwargs['args'][0]
         publication_name = kwargs['args'][1]
         task_id = kwargs['task_id']
-        task_postrun(task_name, username, publication_name, task_id)
+        task_postrun(username, publication_type, publication_name, task_id, task_name, kwargs['state'])
 

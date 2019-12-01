@@ -9,18 +9,21 @@ import re
 from layman.authn.filesystem import get_authn_info
 from layman.authz import get_publication_access_rights
 from celery import chain
-from flask import current_app, url_for, request
+from flask import current_app, url_for, request, g
 
 from layman import LaymanError
 from layman import settings
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name
 from layman import celery as celery_util
 from . import get_map_sources, MAP_TYPE
+from layman.common import redis as redis_util
+
 
 MAPNAME_RE = USERNAME_RE
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
+FLASK_INFO_KEY = f'{__name__}:MAP_INFO'
 
 
 def to_safe_map_name(value):
@@ -32,6 +35,45 @@ def check_mapname_decorator(f):
     def decorated_function(*args, **kwargs):
         check_mapname(request.view_args['mapname'])
         result = f(*args, **kwargs)
+        return result
+    return decorated_function
+
+
+def info_decorator(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        username = request.view_args['username']
+        mapname = request.view_args['mapname']
+        info = get_complete_map_info(username, mapname)
+        assert FLASK_INFO_KEY not in g, g.get(FLASK_INFO_KEY)
+        # current_app.logger.info(f"Setting INFO of map {username}:{mapname}")
+        g.setdefault(FLASK_INFO_KEY, info)
+        result = f(*args, **kwargs)
+        return result
+    return decorated_function
+
+
+def lock_decorator(f):
+    publication_type = MAP_TYPE
+    publication_name_key = 'mapname'
+    error_code = 29
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        username = request.view_args['username']
+        publication_name = request.view_args[publication_name_key]
+        redis_util.check_http_method(username, publication_type, publication_name, error_code)
+        redis_util.lock_publication(username, publication_type, publication_name, request.method)
+        try:
+            result = f(*args, **kwargs)
+            if is_map_task_ready(username, publication_name):
+                redis_util.unlock_publication(username, publication_type, publication_name)
+        except Exception as e:
+            try:
+                if is_map_task_ready(username, publication_name):
+                    redis_util.unlock_publication(username, publication_type, publication_name)
+            finally:
+                redis_util.unlock_publication(username, publication_type, publication_name)
+            raise e
         return result
     return decorated_function
 
@@ -163,7 +205,10 @@ def delete_map(username, mapname, kwargs=None):
     celery_util.delete_publication(username, MAP_TYPE, mapname)
 
 
-def get_complete_map_info(username, mapname):
+def get_complete_map_info(username=None, mapname=None, cached=False):
+    assert (username is not None and mapname is not None) or cached
+    if cached:
+        return g.get(FLASK_INFO_KEY)
     partial_info = get_map_info(username, mapname)
 
     if not any(partial_info):

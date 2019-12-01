@@ -1,9 +1,10 @@
 from flask import Blueprint, jsonify, request, current_app as app, g
 
+from layman.common import redis as redis_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator
 from layman import settings
-from . import util
+from . import util, LAYER_TYPE
 from .filesystem import input_file, input_sld, input_chunk
 from layman.authn import authenticate
 from layman.authz import authorize
@@ -17,6 +18,7 @@ bp = Blueprint('rest_layer', __name__)
 @authorize
 @check_username_decorator
 @util.check_layername_decorator
+@util.info_decorator
 def before_request():
     pass
 
@@ -25,19 +27,17 @@ def before_request():
 def get(username, layername):
     app.logger.info(f"GET Layer, user={g.user}")
 
-    info = util.get_complete_layer_info(username, layername)
+    info = util.get_complete_layer_info(cached=True)
 
     return jsonify(info), 200
 
 
 @bp.route('/layers/<layername>', methods=['PATCH'])
+@util.lock_decorator
 def patch(username, layername):
     app.logger.info(f"PATCH Layer, user={g.user}")
 
-    if not util.is_layer_task_ready(username, layername):
-        raise LaymanError(19)
-
-    info = util.get_complete_layer_info(username, layername)
+    info = util.get_complete_layer_info(cached=True)
 
     # FILE
     use_chunk_upload = False
@@ -139,11 +139,11 @@ def patch(username, layername):
 
 
 @bp.route('/layers/<layername>', methods=['DELETE'])
+@util.lock_decorator
 def delete_layer(username, layername):
     app.logger.info(f"DELETE Layer, user={g.user}")
 
-    # raise exception if layer does not exist
-    info = util.get_complete_layer_info(username, layername)
+    info = util.get_complete_layer_info(cached=True)
 
     util.abort_layer_tasks(username, layername)
 

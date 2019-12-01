@@ -153,7 +153,7 @@ def check_redis_consistency(expected_publ_num_by_type=None):
                 for r in results:
                     pubnames += r
                 pubnames = list(set(pubnames))
-                print(f'username {username}, publ_type_name {publ_type_name}, pubnames {pubnames}')
+                # print(f'username {username}, publ_type_name {publ_type_name}, pubnames {pubnames}')
                 num_total_publs += len(pubnames)
                 for pubname in pubnames:
                     total_publs.append((username, publ_type_name, pubname))
