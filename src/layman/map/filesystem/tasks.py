@@ -9,11 +9,11 @@ logger = get_task_logger(__name__)
 
 
 @celery_app.task(
-    name='layman.map.filesystem.thumbnail.generate_map_thumbnail',
+    name='layman.map.filesystem.thumbnail.refresh',
     bind=True,
     base=celery_app.AbortableTask
 )
-def generate_map_thumbnail(self, username, mapname):
+def refresh_map_thumbnail(self, username, mapname):
     if self.is_aborted():
         raise AbortedException
     thumbnail.generate_map_thumbnail(username, mapname)

@@ -12,11 +12,11 @@ from .table import delete_layer
 logger = get_task_logger(__name__)
 
 @celery_app.task(
-    name='layman.layer.db.import_layer_vector_file',
+    name='layman.layer.db.table.refresh',
     bind=True,
     base=celery_app.AbortableTask
 )
-def import_layer_vector_file(
+def refresh_table(
         self,
         username,
         layername,

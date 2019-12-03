@@ -84,7 +84,7 @@ def get_map_names(username):
 
 
 TASKS_TO_MAP_INFO_KEYS = {
-    'layman.map.filesystem.thumbnail.generate_map_thumbnail': ['thumbnail'],
+    'layman.map.filesystem.thumbnail.refresh': ['thumbnail'],
 }
 
 
@@ -121,7 +121,7 @@ def get_map_info(username, mapname):
 
 
 POST_TASKS = [
-    'layman.map.filesystem.tasks.generate_map_thumbnail',
+    'layman.map.filesystem.tasks.refresh_map_thumbnail',
 ]
 
 

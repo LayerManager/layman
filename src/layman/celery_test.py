@@ -63,7 +63,7 @@ def client():
 
 def test_single_abortable_task(client):
     task_names = [
-        'layman.layer.filesystem.tasks.wait_for_upload',
+        'layman.layer.filesystem.tasks.refresh_input_chunk',
     ]
     tasks = [
         getattr(
@@ -106,9 +106,9 @@ def test_single_abortable_task(client):
 
 def test_abortable_task_chain(client):
     task_names = [
-        'layman.layer.filesystem.tasks.wait_for_upload',
-        'layman.layer.db.tasks.import_layer_vector_file',
-        'layman.layer.geoserver.tasks.publish_layer_from_db',
+        'layman.layer.filesystem.tasks.refresh_input_chunk',
+        'layman.layer.db.tasks.refresh_table',
+        'layman.layer.geoserver.tasks.refresh_wfs',
     ]
     tasks = [
         getattr(

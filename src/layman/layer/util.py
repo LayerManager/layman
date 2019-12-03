@@ -159,17 +159,17 @@ def update_layer(username, layername, layerinfo):
 
 
 POST_TASKS = [
-    'layman.layer.db.tasks.import_layer_vector_file',
-    'layman.layer.geoserver.tasks.publish_layer_from_db',
-    'layman.layer.geoserver.tasks.create_layer_style',
-    'layman.layer.filesystem.tasks.generate_layer_thumbnail',
+    'layman.layer.db.tasks.refresh_table',
+    'layman.layer.geoserver.tasks.refresh_wfs',
+    'layman.layer.geoserver.tasks.refresh_sld',
+    'layman.layer.filesystem.tasks.refresh_layer_thumbnail',
 ]
 
 
 def post_layer(username, layername, task_options, use_chunk_upload):
     post_tasks = POST_TASKS.copy()
     if use_chunk_upload:
-        post_tasks.insert(0, 'layman.layer.filesystem.tasks.wait_for_upload')
+        post_tasks.insert(0, 'layman.layer.filesystem.tasks.refresh_input_chunk')
     post_tasks = [
         getattr(
             importlib.import_module(taskname.rsplit('.', 1)[0]),
@@ -196,7 +196,7 @@ def patch_layer(username, layername, delete_from, task_options, use_chunk_upload
 
     patch_tasks = POST_TASKS[start_idx:]
     if use_chunk_upload:
-        patch_tasks.insert(0, 'layman.layer.filesystem.tasks.wait_for_upload')
+        patch_tasks.insert(0, 'layman.layer.filesystem.tasks.refresh_input_chunk')
     patch_tasks = [
         getattr(
             importlib.import_module(taskname.rsplit('.', 1)[0]),
@@ -215,11 +215,11 @@ def patch_layer(username, layername, delete_from, task_options, use_chunk_upload
 
 
 TASKS_TO_LAYER_INFO_KEYS = {
-    'layman.layer.filesystem.input_file.wait_for_upload': ['file'],
-    'layman.layer.db.import_layer_vector_file': ['db_table'],
-    'layman.layer.geoserver.publish_layer_from_db': ['wms', 'wfs'],
-    'layman.layer.geoserver.sld.create_layer_style': ['sld'],
-    'layman.layer.filesystem.thumbnail.generate_layer_thumbnail': ['thumbnail'],
+    'layman.layer.filesystem.input_chunk.refresh': ['file'],
+    'layman.layer.db.table.refresh': ['db_table'],
+    'layman.layer.geoserver.wfs.refresh': ['wms', 'wfs'],
+    'layman.layer.geoserver.sld.refresh': ['sld'],
+    'layman.layer.filesystem.thumbnail.refresh': ['thumbnail'],
 }
 
 
