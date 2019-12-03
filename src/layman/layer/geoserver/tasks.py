@@ -7,7 +7,7 @@ from . import wms, wfs, sld, ensure_user_workspace
 
 logger = get_task_logger(__name__)
 
-PUBLISH_LAYER_FROM_DB_NAME = 'layman.layer.geoserver.publish_layer_from_db'
+PUBLISH_LAYER_FROM_DB_NAME = 'layman.layer.geoserver.wfs.refresh'
 
 
 @celery_app.task(
@@ -15,7 +15,7 @@ PUBLISH_LAYER_FROM_DB_NAME = 'layman.layer.geoserver.publish_layer_from_db'
     bind=True,
     base=celery_app.AbortableTask
 )
-def publish_layer_from_db(
+def refresh_wfs(
         self,
         username,
         layername,
@@ -40,11 +40,11 @@ def publish_layer_from_db(
         raise AbortedException
 
 @celery_app.task(
-    name='layman.layer.geoserver.sld.create_layer_style',
+    name='layman.layer.geoserver.sld.refresh',
     bind=True,
     base=celery_app.AbortableTask
 )
-def create_layer_style(self, username, layername):
+def refresh_sld(self, username, layername):
     if self.is_aborted():
         raise AbortedException
     sld.create_layer_style(username, layername)

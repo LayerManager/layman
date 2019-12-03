@@ -13,11 +13,11 @@ logger = get_task_logger(__name__)
 
 
 @celery_app.task(
-    name='layman.layer.filesystem.input_file.wait_for_upload',
+    name='layman.layer.filesystem.input_chunk.refresh',
     bind=True,
     base=celery_app.AbortableTask
 )
-def wait_for_upload(self, username, layername, check_crs=True):
+def refresh_input_chunk(self, username, layername, check_crs=True):
     if self.is_aborted():
         raise AbortedException
     last_change = time.time()
@@ -55,11 +55,11 @@ def wait_for_upload(self, username, layername, check_crs=True):
 
 
 @celery_app.task(
-    name='layman.layer.filesystem.thumbnail.generate_layer_thumbnail',
+    name='layman.layer.filesystem.thumbnail.refresh',
     bind=True,
     base=celery_app.AbortableTask
 )
-def generate_layer_thumbnail(self, username, layername):
+def refresh_layer_thumbnail(self, username, layername):
     if self.is_aborted():
         raise AbortedException
     thumbnail.generate_layer_thumbnail(username, layername)
