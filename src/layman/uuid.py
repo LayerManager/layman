@@ -5,6 +5,7 @@ from flask import current_app
 
 from layman import LaymanError
 from layman import celery as celery_util
+from layman.common import redis as redis_util
 from redis import WatchError
 from . import settings
 from .util import get_usernames_no_cache, get_modules_from_names, get_providers_from_source_names, call_modules_fn
@@ -131,6 +132,7 @@ def is_valid_uuid(maybe_uuid_str):
 
 def check_redis_consistency(expected_publ_num_by_type=None):
 
+    # get info from non-redis sources
     num_total_publs = 0
     total_publs = []
     all_sources = []
@@ -158,6 +160,7 @@ def check_redis_consistency(expected_publ_num_by_type=None):
                 for pubname in pubnames:
                     total_publs.append((username, publ_type_name, pubname))
 
+    # publication types and names
     redis = settings.LAYMAN_REDIS
     user_publ_keys = redis.keys(':'.join(USER_TYPE_NAMES_KEY.split(':')[:2])+':*')
     uuid_keys = redis.keys(':'.join(UUID_METADATA_KEY.split(':')[:2])+':*')
@@ -177,6 +180,7 @@ def check_redis_consistency(expected_publ_num_by_type=None):
         num_publ += redis.hlen(user_publ_key)
     assert num_publ == len(uuid_keys)
 
+    # publication uuids
     uuids = redis.smembers(UUID_SET_KEY)
     assert len(uuids) == num_publ
 
@@ -193,6 +197,7 @@ def check_redis_consistency(expected_publ_num_by_type=None):
             uuid_dict['publication_name'],
         )
 
+    # publication tasks
     task_infos_len = redis.hlen(celery_util.PUBLICATION_TASK_INFOS)
     assert task_infos_len == len(total_publs)
 
@@ -210,4 +215,13 @@ def check_redis_consistency(expected_publ_num_by_type=None):
         ), None) is None) is is_ready, f"{username}, {publ_type_name}, {pubname}: {is_ready}, {task_names_tuples}"
         assert (redis.hget(celery_util.TASK_ID_TO_PUBLICATION, tinfo['last'].task_id) is None) is is_ready
 
+    # publication locks
+    locks = redis.hgetall(redis_util.PUBLICATION_LOCKS_KEY)
+    assert len(locks) == len(task_names_tuples), f"{locks} != {task_names_tuples}"
+    for k, v in locks.items():
+        username, publication_type, publication_name = k.split(':')
+        assert next((
+            t for t in task_names_tuples
+            if t[1] == username and t[2] == publication_name and t[0].startswith(publication_type)
+        ), None) is not None
     return total_publs_by_type
