@@ -81,7 +81,12 @@ def patch(username, mapname):
         'file_changed': file_changed,
     }
 
-    util.patch_map(username, mapname, kwargs, file_changed)
+    util.patch_map(
+        username,
+        mapname,
+        kwargs,
+        'layman.map.filesystem.input_file' if file_changed else None
+    )
 
     info = util.get_complete_map_info(username, mapname)
 

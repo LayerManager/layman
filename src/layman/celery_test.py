@@ -15,6 +15,7 @@ from layman import uuid
 from layman.layer import util as layer_util
 from layman.layer.filesystem import input_chunk
 from layman import celery as celery_util
+from layman.common import tasks as tasks_util
 
 
 min_geojson = """
@@ -84,7 +85,7 @@ def test_single_abortable_task(client):
     layername = 'test_abort_layer'
     files_to_upload = input_chunk.save_layer_files_str(username, layername, filenames, check_crs)
     task_chain = chain(*[
-        layer_util._get_task_signature(username, layername, task_options, t)
+        tasks_util._get_task_signature(username, layername, t, task_options, 'layername')
         for t in tasks
     ])
     task_result = task_chain()
@@ -129,7 +130,7 @@ def test_abortable_task_chain(client):
     layername = 'test_abort_layer2'
     files_to_upload = input_chunk.save_layer_files_str(username, layername, filenames, check_crs)
     task_chain = chain(*[
-        layer_util._get_task_signature(username, layername, task_options, t)
+        tasks_util._get_task_signature(username, layername, t, task_options, 'layername')
         for t in tasks
     ])
     task_result = task_chain()

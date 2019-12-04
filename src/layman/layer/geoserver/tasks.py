@@ -10,6 +10,10 @@ logger = get_task_logger(__name__)
 PUBLISH_LAYER_FROM_DB_NAME = 'layman.layer.geoserver.wfs.refresh'
 
 
+def refresh_wfs_needed(username, layername, task_options):
+    return True
+
+
 @celery_app.task(
     name=PUBLISH_LAYER_FROM_DB_NAME,
     bind=True,
@@ -38,6 +42,11 @@ def refresh_wfs(
         wms.delete_layer(username, layername)
         wfs.delete_layer(username, layername)
         raise AbortedException
+
+
+def refresh_sld_needed(username, layername, task_options):
+    return True
+
 
 @celery_app.task(
     name='layman.layer.geoserver.sld.refresh',

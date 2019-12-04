@@ -104,7 +104,12 @@ def post(username):
             'description': description,
         }
     
-        util.post_map(username, mapname, kwargs)
+        util.post_map(
+            username,
+            mapname,
+            kwargs,
+            'layman.map.filesystem.input_file'
+        )
     except Exception as e:
         try:
             if util.is_map_task_ready(username, mapname):

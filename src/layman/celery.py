@@ -121,6 +121,8 @@ def set_publication_task_info_dict(username, publication_type, publication_name,
 
 
 def set_publication_task_info(username, publication_type, publication_name, tasks, task_result):
+    if task_result is None:
+        return
     chained_results = [task_result]
     prev_result = task_result
     while prev_result.parent is not None:
