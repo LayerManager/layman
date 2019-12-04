@@ -11,6 +11,11 @@ from .table import delete_layer
 
 logger = get_task_logger(__name__)
 
+
+def refresh_table_needed(username, layername, task_options):
+    return True
+
+
 @celery_app.task(
     name='layman.layer.db.table.refresh',
     bind=True,

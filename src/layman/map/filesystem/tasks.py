@@ -7,13 +7,16 @@ from . import thumbnail
 logger = get_task_logger(__name__)
 
 
+def refresh_thumbnail_needed(username, layername, task_options):
+    return True
+
 
 @celery_app.task(
     name='layman.map.filesystem.thumbnail.refresh',
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_map_thumbnail(self, username, mapname):
+def refresh_thumbnail(self, username, mapname):
     if self.is_aborted():
         raise AbortedException
     thumbnail.generate_map_thumbnail(username, mapname)

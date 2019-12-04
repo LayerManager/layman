@@ -15,8 +15,8 @@ from layman import LaymanError
 from layman import settings
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name
 from layman import celery as celery_util
-from . import get_map_sources, MAP_TYPE
-from layman.common import redis as redis_util
+from . import get_map_sources, MAP_TYPE, get_map_type_def
+from layman.common import redis as redis_util, tasks as tasks_util
 
 
 MAPNAME_RE = USERNAME_RE
@@ -120,58 +120,32 @@ def get_map_info(username, mapname):
     return partial_info
 
 
-POST_TASKS = [
-    'layman.map.filesystem.tasks.refresh_map_thumbnail',
-]
-
-
-def post_map(username, mapname, kwargs):
+def post_map(username, mapname, task_options, start_at):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'post_map', [username, mapname], kwargs=kwargs)
+    call_modules_fn(sources, 'post_map', [username, mapname], kwargs=task_options)
 
     # async processing
-    post_tasks = POST_TASKS.copy()
-    post_tasks = [
-        getattr(
-            importlib.import_module(taskname.rsplit('.', 1)[0]),
-            taskname.rsplit('.', 1)[1]
-        ) for taskname in post_tasks
-    ]
-    post_chain = chain(*list(map(
-        lambda t: _get_task_signature(username, mapname, kwargs, t),
-        post_tasks
-    )))
+    post_tasks = tasks_util.get_task_methods(get_map_type_def(), username, mapname, task_options, start_at)
+    post_chain = tasks_util.get_chain_of_methods(username, mapname, post_tasks, task_options, 'mapname')
     # res = post_chain.apply_async()
     res = post_chain()
 
     celery_util.set_publication_task_info(username, MAP_TYPE, mapname, post_tasks, res)
 
 
-def patch_map(username, mapname, kwargs, file_changed):
+def patch_map(username, mapname, task_options, start_at):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'patch_map', [username, mapname], kwargs=kwargs)
-
-    if not file_changed:
-        return
+    call_modules_fn(sources, 'patch_map', [username, mapname], kwargs=task_options)
 
     # async processing
-    post_tasks = POST_TASKS.copy()
-    post_tasks = [
-        getattr(
-            importlib.import_module(taskname.rsplit('.', 1)[0]),
-            taskname.rsplit('.', 1)[1]
-        ) for taskname in post_tasks
-    ]
-    post_chain = chain(*list(map(
-        lambda t: _get_task_signature(username, mapname, kwargs, t),
-        post_tasks
-    )))
-    # res = post_chain.apply_async()
-    res = post_chain()
+    patch_tasks = tasks_util.get_task_methods(get_map_type_def(), username, mapname, task_options, start_at)
+    patch_chain = tasks_util.get_chain_of_methods(username, mapname, patch_tasks, task_options, 'mapname')
+    # res = patch_chain.apply_async()
+    res = patch_chain()
 
-    celery_util.set_publication_task_info(username, MAP_TYPE, mapname, post_tasks, res)
+    celery_util.set_publication_task_info(username, MAP_TYPE, mapname, patch_tasks, res)
 
 
 def delete_map(username, mapname, kwargs=None):
@@ -253,25 +227,6 @@ def abort_map_tasks(username, mapname):
 def is_map_task_ready(username, mapname):
     last_task = _get_map_task(username, mapname)
     return last_task is None or celery_util.is_task_ready(last_task)
-
-
-def _get_task_signature(username, mapname, task_options, task):
-    param_names = [
-        pname
-        for pname in inspect.signature(task).parameters.keys()
-        if pname not in ['username', 'mapname']
-    ]
-    task_opts = {
-        key: value
-        for key, value in task_options.items()
-        if key in param_names
-    }
-    return task.signature(
-        (username, mapname),
-        task_opts,
-        queue=settings.LAYMAN_CELERY_QUEUE,
-        immutable=True,
-    )
 
 
 def get_map_owner_info(username):

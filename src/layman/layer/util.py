@@ -3,15 +3,14 @@ import importlib
 import inspect
 import re
 
-from celery import chain
 from flask import current_app, url_for, request, g
 
 from layman import LaymanError
 from layman import settings
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name
 from layman import celery as celery_util
-from . import get_layer_sources, LAYER_TYPE
-from layman.common import redis as redis_util
+from . import get_layer_sources, LAYER_TYPE, get_layer_type_def
+from layman.common import redis as redis_util, tasks as tasks_util
 
 
 LAYERNAME_RE = USERNAME_RE
@@ -158,56 +157,18 @@ def update_layer(username, layername, layerinfo):
     call_modules_fn(sources, 'update_layer', [username, layername, layerinfo])
 
 
-POST_TASKS = [
-    'layman.layer.db.tasks.refresh_table',
-    'layman.layer.geoserver.tasks.refresh_wfs',
-    'layman.layer.geoserver.tasks.refresh_sld',
-    'layman.layer.filesystem.tasks.refresh_layer_thumbnail',
-]
-
-
-def post_layer(username, layername, task_options, use_chunk_upload):
-    post_tasks = POST_TASKS.copy()
-    if use_chunk_upload:
-        post_tasks.insert(0, 'layman.layer.filesystem.tasks.refresh_input_chunk')
-    post_tasks = [
-        getattr(
-            importlib.import_module(taskname.rsplit('.', 1)[0]),
-            taskname.rsplit('.', 1)[1]
-        ) for taskname in post_tasks
-    ]
-    post_chain = chain(*list(map(
-        lambda t: _get_task_signature(username, layername, task_options, t),
-        post_tasks
-    )))
+def post_layer(username, layername, task_options, start_at):
+    post_tasks = tasks_util.get_task_methods(get_layer_type_def(), username, layername, task_options, start_at)
+    post_chain = tasks_util.get_chain_of_methods(username, layername, post_tasks, task_options, 'layername')
     # res = post_chain.apply_async()
     res = post_chain()
 
     celery_util.set_publication_task_info(username, LAYER_TYPE, layername, post_tasks, res)
 
 
-def patch_layer(username, layername, delete_from, task_options, use_chunk_upload):
-    if delete_from == 'layman.layer.filesystem.input_file':
-        start_idx = 0
-    elif delete_from == 'layman.layer.geoserver.sld':
-        start_idx = 2
-    else:
-        raise Exception('Unsupported delete_from='+delete_from)
-
-    patch_tasks = POST_TASKS[start_idx:]
-    if use_chunk_upload:
-        patch_tasks.insert(0, 'layman.layer.filesystem.tasks.refresh_input_chunk')
-    patch_tasks = [
-        getattr(
-            importlib.import_module(taskname.rsplit('.', 1)[0]),
-            taskname.rsplit('.', 1)[1]
-        ) for taskname in patch_tasks
-    ]
-
-    patch_chain = chain(*list(map(
-        lambda t: _get_task_signature(username, layername, task_options, t),
-        patch_tasks
-    )))
+def patch_layer(username, layername, task_options, start_at):
+    patch_tasks = tasks_util.get_task_methods(get_layer_type_def(), username, layername, task_options, start_at)
+    patch_chain = tasks_util.get_chain_of_methods(username, layername, patch_tasks, task_options, 'layername')
     # res = patch_chain.apply_async()
     res = patch_chain()
 
@@ -223,7 +184,7 @@ TASKS_TO_LAYER_INFO_KEYS = {
 }
 
 
-def delete_layer(username, layername, source = None):
+def delete_layer(username, layername, source=None):
     sources = get_sources()
     source_idx = next((
         idx for idx, m in enumerate(sources) if m.__name__ == source
@@ -253,25 +214,6 @@ def abort_layer_tasks(username, layername):
 def is_layer_task_ready(username, layername):
     last_task = _get_layer_task(username, layername)
     return last_task is None or celery_util.is_task_ready(last_task)
-
-
-def _get_task_signature(username, layername, task_options, task):
-    param_names = [
-        pname
-        for pname in inspect.signature(task).parameters.keys()
-        if pname not in ['username', 'layername']
-    ]
-    task_opts = {
-        key: value
-        for key, value in task_options.items()
-        if key in param_names
-    }
-    return task.signature(
-        (username, layername),
-        task_opts,
-        queue=settings.LAYMAN_CELERY_QUEUE,
-        immutable=True,
-    )
 
 
 lock_decorator = redis_util.create_lock_decorator(LAYER_TYPE, 'layername', 19, is_layer_task_ready)

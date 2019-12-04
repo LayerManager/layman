@@ -141,7 +141,12 @@ def post(username):
             input_file.save_layer_files(
                 username, layername, files, check_crs)
 
-        util.post_layer(username, layername, task_options, use_chunk_upload)
+        util.post_layer(
+            username,
+            layername,
+            task_options,
+            'layman.layer.filesystem.input_chunk' if use_chunk_upload else 'layman.layer.filesystem.input_file'
+        )
     except Exception as e:
         try:
             if util.is_layer_task_ready(username, layername):
