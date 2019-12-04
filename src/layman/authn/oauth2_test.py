@@ -132,6 +132,13 @@ def app_context():
 
 
 @pytest.mark.usefixtures('app_context')
+def test_two_clients():
+    assert len(settings.OAUTH2_LIFERAY_CLIENTS) == 2
+    assert settings.OAUTH2_LIFERAY_CLIENTS[0]['secret'] is None
+    assert type(settings.OAUTH2_LIFERAY_CLIENTS[1]['secret']) is str
+
+
+@pytest.mark.usefixtures('app_context')
 def test_no_iss_url_header(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers={

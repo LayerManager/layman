@@ -1,5 +1,6 @@
 import os
 from urllib.parse import urljoin
+from layman_settings_util import read_clients_dict_from_env
 
 LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
 
@@ -102,13 +103,8 @@ OAUTH2_LIFERAY_AUTH_URLS = [
 OAUTH2_LIFERAY_INTROSPECTION_URL = os.getenv('OAUTH2_LIFERAY_INTROSPECTION_URL', None)
 OAUTH2_LIFERAY_USER_PROFILE_URL = os.getenv('OAUTH2_LIFERAY_USER_PROFILE_URL', None)
 OAUTH2_LIFERAY_CLIENTS = [
-    d for d in [
-        {
-            'id': os.getenv('OAUTH2_LIFERAY_CLIENT_ID', ''),
-            'secret': os.getenv('OAUTH2_LIFERAY_SECRET', ''),
-        },
-    ]
-    if len(d['id']) > 0 and len(d['secret']) > 0
+    d for d in read_clients_dict_from_env()
+    if len(d['id']) > 0
 ]
 
 AUTHZ_MODULE = os.environ['LAYMAN_AUTHZ_MODULE']

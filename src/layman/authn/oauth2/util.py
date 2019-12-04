@@ -55,11 +55,16 @@ def authenticate():
         all_connection_errors = True
         for client in clients:
             try:
-                r = requests.post(provider_module.INTROSPECTION_URL, data={
-                    'client_id': client['id'],
-                    'client_secret': client['secret'],
-                    'token': access_token,
-                })
+                request_data = {
+                    k: v for k, v in
+                    {
+                        'client_id': client['id'],
+                        'client_secret': client['secret'],
+                        'token': access_token,
+                    }.items()
+                    if v is not None
+                }
+                r = requests.post(provider_module.INTROSPECTION_URL, data=request_data)
                 all_connection_errors = False
             except ConnectionError:
                 continue
