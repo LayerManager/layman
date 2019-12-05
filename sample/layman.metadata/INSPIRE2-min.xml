@@ -9,33 +9,42 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/iso/19139/20060504/gmd/metadataEntity.xsd http://www.isotc211.org/2005/gmx http://schemas.opengis.net/iso/19139/20060504/gmx/gmx.xsd">
 
 	<!-- CZ-1
-	nemusi to byt jen UUID - domluvili jsme se, ze to bude UUID vrstvy s prefixem "m"
+	layer UUID with prefix "m"
+	known to Layman
 	-->
 	<gmd:fileIdentifier>
 		<gco:CharacterString>ca238200-8200-1a23-9399-42c9fca53542</gco:CharacterString>
 	</gmd:fileIdentifier>
-	
-	<!-- 10.3 -->
+
+	<!-- 10.3
+	language of metadata profile
+	guessable by Layman
+	-->
 	<gmd:language>
 		<gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="cze">cze</gmd:LanguageCode>
 	</gmd:language>
-	
-	<!-- CZ-2 - jen v případě exisujícího nadřazeného záznamu
-	NEPOVINNY, nebudu posilat
+
+	<!-- CZ-2
+	 only in case of parent metadata
+	 optional, will not send
+	 unknown to Layman
 	-->
 	<gmd:parentIdentifier>
 		<gco:CharacterString>ca238200-8200-ab78-9399-42c9fca53542</gco:CharacterString>
 	</gmd:parentIdentifier>
-	
+
 	<!-- 1.3
-	datova sada "dataset"
-	mapova kompozice "application"
+	layer: "dataset"
+	map composition: "application"
+	known to Layman
 	-->
 	<gmd:hierarchyLevel>
 		<gmd:MD_ScopeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</gmd:MD_ScopeCode>
 	</gmd:hierarchyLevel>
-	
-	<!-- 10.1-->
+
+	<!-- 10.1
+	unknown to Layman (maybe guessable from GET Current User, in such case individualName should be used instead of organisationName)
+	-->
 	<gmd:contact>
 		<gmd:CI_ResponsibleParty>
 			<gmd:organisationName>
@@ -53,7 +62,7 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 					<gmd:onlineResource>
 						<gmd:CI_OnlineResource>
 							<gmd:linkage>
-{#                                NENI POVINNY #}
+								<!-- optional -->
 								<gmd:URL>http://www.env.cz</gmd:URL>
 							</gmd:linkage>
 						</gmd:CI_OnlineResource>
@@ -67,14 +76,15 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 	</gmd:contact>
 
 	<!-- 10.2
-	naposilam, aktualizuje si to Micka
+	do not send to Layman
+	it's updated by Micka automatically
 	-->
 	<gmd:dateStamp>
 		<gco:Date>2009-11-03</gco:Date>
 	</gmd:dateStamp>
 	
 	<!-- IO-1
-	Prosotrovy souradny system
+	known to Layman
 	-->
 	<gmd:referenceSystemInfo>
 		<gmd:MD_ReferenceSystem>
@@ -88,20 +98,25 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 		</gmd:MD_ReferenceSystem>
 	</gmd:referenceSystemInfo>
 
-{#    nemusi byt atributy id ani uuid, micka vygeneruje sama#}
+	<!-- IO-1
+	there is no need to fill ID and UUID attributes, Micka will generate it automatically
+	-->
 	<gmd:identificationInfo>
 		<gmd:MD_DataIdentification id="_ca238200-8200-1a23-9399-42c9fca53542" uuid="ca238200-8200-1a23-9399-42c9fca53542">
 			<gmd:citation>
 				<gmd:CI_Citation>
-					<!-- 1.1 -->
+					<!-- 1.1
+					known to Layman
+					-->
 					<gmd:title>
 						<gco:CharacterString>CORINE - Krajinný pokryv CLC 90</gco:CharacterString>
 					</gmd:title>
 					<gmd:date>
 						<gmd:CI_Date>
-							<!--
-							kdy byla data naposledy aktualizovana
-							5a -->
+							<!-- 5a
+							known to Layman ??? check GeoServer's REST API
+							consider revision or publication dateType
+							-->
 							<gmd:date>
 								<gco:Date>2007-05-25</gco:Date>
 							</gmd:date>
@@ -112,7 +127,9 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 					</gmd:date>
 					
 					<!-- 1.5
-					musi byt ve forme URI, ale popis je nepovinny (MZP-CORINE)
+					known to Layman
+					it must be URI, but text node is optional (MZP-CORINE)
+					it can point to Layman's Layer endpoint
 					-->
 					<gmd:identifier>
 						<gmd:MD_Identifier>
@@ -123,12 +140,16 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 					</gmd:identifier>
 				</gmd:CI_Citation>
 			</gmd:citation>
-			<!-- 1.2 -->
+			<!-- 1.2
+			known to Layman
+			-->
 			<gmd:abstract>
 				<gco:CharacterString>Klasifikace pokryvu zemského povrchu v rozsahu ČR</gco:CharacterString>
 			</gmd:abstract>
 
-			<!-- 9 -->
+			<!-- 9
+			unknown to Layman
+			-->
 			<gmd:pointOfContact>
 				<gmd:CI_ResponsibleParty>
 					<gmd:organisationName>
@@ -157,9 +178,25 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 					</gmd:role>
 				</gmd:CI_ResponsibleParty>
 			</gmd:pointOfContact>
-				
+
 			<!-- 3
-			Pokud jsou to INSPIRE data, musi ukazovat na alespon jedno INSPIRE tema
+			known to Layman
+			-->
+			<gmd:graphicOverview>
+				<gmd:MD_BrowseGraphic>
+					<gmd:fileName>
+						<gco:CharacterString xmlns:gco="http://www.isotc211.org/2005/gco">
+							http://www.geology.cz/img/ikony/ikonky66/wms/wms_CGS_G-VDC-POD-WMS.png
+						</gco:CharacterString>
+					</gmd:fileName>
+					<gmd:fileType>
+						<gco:CharacterString xmlns:gco="http://www.isotc211.org/2005/gco"/>
+					</gmd:fileType>
+				</gmd:MD_BrowseGraphic>
+			</gmd:graphicOverview>
+
+			<!-- 3
+			unknown to Layman
 			-->
 			<gmd:descriptiveKeywords>
 				<gmd:MD_Keywords>
@@ -185,8 +222,10 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 					</gmd:thesaurusName>
 				</gmd:MD_Keywords>
 			</gmd:descriptiveKeywords>
-			
-			<!-- 8.1 -->
+
+			<!-- 8.1
+			unknown to Layman
+			-->
 			<gmd:resourceConstraints>
 				<gmd:MD_LegalConstraints>
 					<gmd:accessConstraints>
@@ -197,8 +236,10 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 					</gmd:otherConstraints>
 				</gmd:MD_LegalConstraints>
 			</gmd:resourceConstraints>
-			
-			<!-- 8.2 -->
+
+			<!-- 8.2
+			unknown to Layman
+			-->
 			<gmd:resourceConstraints>
 				<gmd:MD_LegalConstraints>
 					<gmd:useConstraints>
@@ -209,16 +250,18 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 					</gmd:otherConstraints>
 				</gmd:MD_LegalConstraints>
 			</gmd:resourceConstraints>
-			
+
 			<!-- IO - 6
-			jen pro vrstvy
+			known to Layman
+			only for layers
 			-->
 			<gmd:spatialRepresentationType>
 				<gmd:MD_SpatialRepresentationTypeCode codeListValue="vector" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_SpatialRepresentationTypeCode">vector</gmd:MD_SpatialRepresentationTypeCode>
 			</gmd:spatialRepresentationType>
-			
+
 			<!-- 6.2
-			doporuceny - nejspis generovat automaticky z dat
+			guessable by Layman
+			recommended
 			-->
 			<gmd:spatialResolution>
 				<gmd:MD_Resolution>
@@ -231,21 +274,25 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 					</gmd:equivalentScale>
 				</gmd:MD_Resolution>
 			</gmd:spatialResolution>
-			
+
 			<!-- 1.7
-			bez jazyka: hodnota "zxx"
+			guessable by Layman
+			code for no language is "zxx"
 			-->
 			<gmd:language>
 				<gmd:LanguageCode codeListValue="cze" codeList="http://www.loc.gov/standards/iso639-2/">cze</gmd:LanguageCode>
 			</gmd:language>
-			
-			<!-- IO-5 -->
+
+			<!-- IO-5
+			known to Layman
+			-->
 			<gmd:characterSet>
 				<gmd:MD_CharacterSetCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="8859part1">8859part1</gmd:MD_CharacterSetCode>
 			</gmd:characterSet>
-			
+
 			<!-- 2.1
-			povinne pro ISO
+			mandatory for ISO
+			unknown to Layman
 			-->
 			<gmd:topicCategory>
 				<gmd:MD_TopicCategoryCode>environment</gmd:MD_TopicCategoryCode>
@@ -253,8 +300,10 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 			<gmd:extent>
 				<gmd:EX_Extent>
 					<gmd:geographicElement>
-					
-						<!-- 4.1 -->
+
+						<!-- 4.1
+						known to Layman
+						-->
 						<gmd:EX_GeographicBoundingBox>
 							<gmd:westBoundLongitude>
 								<gco:Decimal>11.87</gco:Decimal>
@@ -276,23 +325,34 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 	</gmd:identificationInfo>
 	<gmd:distributionInfo>
 		<gmd:MD_Distribution>
-				
-			<!-- 1.4 -->
+
+			<!-- 1.4
+			known to Layman
+			-->
 			<gmd:transferOptions>
 				<gmd:MD_DigitalTransferOptions>
-{#                    1x onLine pro WMS, 1x pro WFS #}
+					<!--
+					one "online" tag for WMS, second "online" tag for WFS
+					how to encode layer name ???
+					-->
 					<gmd:onLine>
 						<gmd:CI_OnlineResource>
+							<!--
+							URL of web service
+							-->
 							<gmd:linkage>
-{#                                odkaz na webovou sluzbu a odpovidajici hodnotu z ciselniku, napr.
-	https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-1.3.0
-    https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-2.0.0
-#}
 								<gmd:URL>http://www.env.cz/corine/data/download.zip</gmd:URL>
 							</gmd:linkage>
+							<!--
+							https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-1.3.0
+							https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-2.0.0
+							-->
 							<gmd:protocol>
 								<gmx:Anchor xlink:href="http://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:DOWNLOAD-1.0-http--download">WWW:DOWNLOAD-1.0-http--download</gmx:Anchor>
 							</gmd:protocol>
+							<!--
+							download for both WMS and WFS
+							-->
 							 <gmd:function>
 								<gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</gmd:CI_OnLineFunctionCode>
 							 </gmd:function>
@@ -302,12 +362,13 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 			</gmd:transferOptions>
 		</gmd:MD_Distribution>
 	</gmd:distributionInfo>
-	
+
 	<gmd:dataQualityInfo>
 		<gmd:DQ_DataQuality>
-		
+
 			<!-- CZ-4
-			tzn. ze popisuje kvalitu celeho souboru
+			unknown to Layman
+			this value means the DQ_DataQuality element describes quality of the whole dataset
 			-->
 			<gmd:scope>
 				<gmd:DQ_Scope>
@@ -316,9 +377,10 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 					</gmd:level>
 				</gmd:DQ_Scope>
 			</gmd:scope>
-			
+
 			<!-- 7
-			povinne jen pokud jde o INSPIRE data, jinak muzu vynechat
+			unknown to Layman
+			mandatory only for INSPIRE data, otherwise skip
 			-->
 			<gmd:report>
 				<gmd:DQ_DomainConsistency>
@@ -351,8 +413,10 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 					</gmd:result>
 				</gmd:DQ_DomainConsistency>
 			</gmd:report>
-							
-			<!-- 6.1 -->
+
+			<!-- 6.1
+			unknown to Layman
+			-->
 			<gmd:lineage>
 				<gmd:LI_Lineage>
 					<gmd:statement>
@@ -362,25 +426,5 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 			</gmd:lineage>
 		</gmd:DQ_DataQuality>
 	</gmd:dataQualityInfo>
-
-{#
-
-thumbnail
-
-gmd:graphicOverview
-<gmd:graphicOverview>
-<gmd:MD_BrowseGraphic>
-<gmd:fileName>
-<gco:CharacterString xmlns:gco="http://www.isotc211.org/2005/gco">
-http://www.geology.cz/img/ikony/ikonky66/wms/wms_CGS_G-VDC-POD-WMS.png
-</gco:CharacterString>
-</gmd:fileName>
-<gmd:fileType>
-<gco:CharacterString xmlns:gco="http://www.isotc211.org/2005/gco"/>
-</gmd:fileType>
-</gmd:MD_BrowseGraphic>
-</gmd:graphicOverview>
-
-#}
 
 </gmd:MD_Metadata>
