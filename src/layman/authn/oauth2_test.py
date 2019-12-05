@@ -134,8 +134,8 @@ def app_context():
 @pytest.mark.usefixtures('app_context')
 def test_two_clients():
     assert len(settings.OAUTH2_LIFERAY_CLIENTS) == 2
-    assert settings.OAUTH2_LIFERAY_CLIENTS[0]['secret'] is None
-    assert type(settings.OAUTH2_LIFERAY_CLIENTS[1]['secret']) is str
+    assert type(settings.OAUTH2_LIFERAY_CLIENTS[0]['secret']) is str
+    assert settings.OAUTH2_LIFERAY_CLIENTS[1]['secret'] is None
 
 
 @pytest.mark.usefixtures('app_context')
