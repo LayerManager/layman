@@ -1,4 +1,4 @@
-from . import default_values
+from . import template
 from xml.etree import ElementTree as ET
 
 
@@ -28,17 +28,10 @@ def indent(elem, level=0):
             elem.tail = i
 
 
-def get_default_values_dict():
-    return {
-        k: v for k, v in vars(default_values).items()
-        if not k.startswith('_')
-    }
-
-
 def fill_template(template_path, filled_path=None):
     with open(template_path, 'r') as template_file:
         template_str = template_file.read()
-    defaults = get_default_values_dict()
+    defaults = template.get_layer_values()
     xml_str = template_str.format(**defaults)
     root_el = ET.fromstring(xml_str)
 
