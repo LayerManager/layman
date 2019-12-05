@@ -1,6 +1,7 @@
 from . import default_values
 from xml.etree import ElementTree as ET
 
+
 NAMESPACES = {
     'gco': 'http://www.isotc211.org/2005/gco',
     'gmd': 'http://www.isotc211.org/2005/gmd',
@@ -9,6 +10,7 @@ NAMESPACES = {
 }
 for k, v in NAMESPACES.items():
     ET.register_namespace(k, v)
+
 
 def indent(elem, level=0):
     i = "\n" + level*"  "
