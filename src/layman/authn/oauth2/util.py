@@ -64,7 +64,7 @@ def authenticate():
                     }.items()
                     if v is not None
                 }
-                r = requests.post(provider_module.INTROSPECTION_URL, data=request_data)
+                r = requests.post(provider_module.INTROSPECTION_URL, data=request_data, timeout=min(25/len(clients), 15))
                 all_connection_errors = False
             except ConnectionError:
                 continue
