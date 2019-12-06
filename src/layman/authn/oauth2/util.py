@@ -65,11 +65,11 @@ def authenticate():
                     if v is not None
                 }
                 r = requests.post(provider_module.INTROSPECTION_URL, data=request_data, timeout=min(25/len(clients), 15))
+                if r.status_code != 200:
+                    continue
                 all_connection_errors = False
             except ConnectionError:
                 continue
-            if r.status_code != 200:
-                raise LaymanError(32, f'Introspection endpoint returned {r.status_code} status code.', sub_code=7)
             try:
                 r_json = r.json()
                 # current_app.logger.info(f"r_json={r_json}")
@@ -80,7 +80,7 @@ def authenticate():
                 continue
 
         if all_connection_errors:
-            raise LaymanError(32, f'Introspection endpoint is not reachable.', sub_code=8)
+            raise LaymanError(32, f'Introspection endpoint is not reachable or returned status code other than 200.', sub_code=8)
 
         if valid_resp is None:
             raise LaymanError(32, f'Introspection endpoint claims that access token is not active or it\'s not Bearer token.', sub_code=9)
