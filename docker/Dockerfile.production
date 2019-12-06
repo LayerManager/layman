@@ -18,11 +18,11 @@ ENV LANG=C.UTF-8
 
 COPY docker/Pipfile* /code/
 COPY docker/requirements.production.txt /code/
-COPY src /code/src
 
 RUN (cd /tmp && curl -O https://chromedriver.storage.googleapis.com/78.0.3904.11/chromedriver_linux64.zip && unzip chromedriver_linux64.zip -d /usr/bin && rm chromedriver_linux64.zip)
 
 RUN pipenv install --system
 RUN pip3 install -r requirements.production.txt
 
+COPY src /code/src
 RUN chown -R ${UID_GID:-"0:0"} src
