@@ -15,6 +15,7 @@ services:
          - .env
       extra_hosts:
          - ${EXTRA_HOST1}
+         - ${EXTRA_HOST2}
       volumes:
         - ./layman_data:/layman_data
         - ./src/layman_settings_demo.py:/code/src/layman_settings.py
@@ -35,6 +36,7 @@ services:
         - LAYMAN_SKIP_REDIS_LOADING=true
       extra_hosts:
          - ${EXTRA_HOST1}
+         - ${EXTRA_HOST2}
       volumes:
         - ./layman_data:/layman_data
         - ./src/layman_settings_demo.py:/code/src/layman_settings.py
@@ -51,6 +53,7 @@ services:
         - LAYMAN_SKIP_REDIS_LOADING=true
       extra_hosts:
          - ${EXTRA_HOST1}
+         - ${EXTRA_HOST2}
       volumes:
         - ./src/layman_settings_demo.py:/code/src/layman_settings.py
       depends_on:
@@ -68,6 +71,9 @@ services:
       image: hslayers:latest
       user: ${UID_GID}
       command: sh -c "node proxy.js & ./node_modules/.bin/http-server dist/"
+      extra_hosts:
+         - ${EXTRA_HOST1}
+         - ${EXTRA_HOST2}
 
    layman_client:
       container_name: layman_client
@@ -82,6 +88,7 @@ services:
          - .env
       extra_hosts:
          - ${EXTRA_HOST1}
+         - ${EXTRA_HOST2}
       depends_on:
         - redis
 
