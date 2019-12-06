@@ -13,6 +13,8 @@ services:
       command: bash -c "python3 src/layman_flush_redis.py && python3 src/wait_for_deps.py && cd src && gunicorn -w 1 -b 0.0.0.0:8000 layman:app"
       env_file:
          - .env
+      extra_hosts:
+         - ${EXTRA_HOST1}
       volumes:
         - ./layman_data:/layman_data
         - ./src/layman_settings_demo.py:/code/src/layman_settings.py
@@ -31,6 +33,8 @@ services:
       environment:
         - C_FORCE_ROOT=true
         - LAYMAN_SKIP_REDIS_LOADING=true
+      extra_hosts:
+         - ${EXTRA_HOST1}
       volumes:
         - ./layman_data:/layman_data
         - ./src/layman_settings_demo.py:/code/src/layman_settings.py
@@ -45,6 +49,8 @@ services:
       env_file: .env
       environment:
         - LAYMAN_SKIP_REDIS_LOADING=true
+      extra_hosts:
+         - ${EXTRA_HOST1}
       volumes:
         - ./src/layman_settings_demo.py:/code/src/layman_settings.py
       depends_on:
@@ -74,6 +80,8 @@ services:
       command: sh -c "npm start"
       env_file:
          - .env
+      extra_hosts:
+         - ${EXTRA_HOST1}
       depends_on:
         - redis
 
