@@ -35,6 +35,7 @@ PUBLICATION_TYPES = {
             'layman.layer.geoserver.wms',
             'layman.layer.geoserver.sld',
             'layman.layer.filesystem.thumbnail',
+            'layman.layer.filesystem.metadata',
         ],
         'task_modules': [
             'layman.layer.db.tasks',
