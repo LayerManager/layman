@@ -5,6 +5,8 @@ import requests
 import time
 import xml.etree.ElementTree as ET
 from urllib.parse import urljoin
+import filecmp
+import difflib
 
 import pytest
 from flask import url_for
@@ -20,6 +22,7 @@ from layman.layer.filesystem import uuid as layer_uuid
 from layman import uuid, util as layman_util
 from layman.layer import db
 from layman import celery as celery_util
+from .filesystem import metadata
 
 
 min_geojson = """
@@ -345,6 +348,20 @@ def test_post_layers_shp(client):
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 3
     })
+
+    # assert metadata file is the same as filled template except for UUID
+    xml_path = metadata.get_file_path(username, layername)
+    expected_path = 'src/layman/layer/rest_test_filled_template.xml'
+    diff_lines = list(difflib.unified_diff(open(xml_path).readlines(), open(expected_path).readlines()))
+    assert len(diff_lines) == 11, ''.join(diff_lines)
+    plus_lines = [l for l in diff_lines if l.startswith('+ ')]
+    assert len(plus_lines) == 1
+    minus_lines = [l for l in diff_lines if l.startswith('- ')]
+    assert len(minus_lines) == 1
+    plus_line = plus_lines[0]
+    assert plus_line == '+    <gco:CharacterString>m81c0debe-b2ea-4829-9b16-581083b29907</gco:CharacterString>\n'
+    minus_line = minus_lines[0]
+    assert minus_line.startswith('-    <gco:CharacterString>m') and minus_line.endswith('</gco:CharacterString>\n')
 
 
 @pytest.mark.usefixtures('app_context')
