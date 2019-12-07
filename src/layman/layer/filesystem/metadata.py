@@ -1,7 +1,78 @@
-from flask import url_for
+import os
+import pathlib
+
+from flask import url_for, current_app
+
+from . import util
+from . import input_file
+from layman.common.metadata.util import fill_template
 
 
-def get_layer_values(
+DIR = __name__.split('.')[-1]
+
+
+def get_dir(username, layername):
+    input_sld_dir = os.path.join(util.get_layer_dir(username, layername),
+                                 DIR)
+    return input_sld_dir
+
+
+def ensure_dir(username, layername):
+    input_sld_dir = get_dir(username, layername)
+    pathlib.Path(input_sld_dir).mkdir(parents=True, exist_ok=True)
+    return input_sld_dir
+
+
+get_layer_info = input_file.get_layer_info
+
+
+get_layer_names = input_file.get_layer_names
+
+
+update_layer = input_file.update_layer
+
+
+get_publication_names = input_file.get_publication_names
+
+
+get_publication_uuid = input_file.get_publication_uuid
+
+
+def delete_layer(username, layername):
+    util.delete_layer_subdir(username, layername, DIR)
+
+
+def get_file_path(username, layername):
+    input_sld_dir = get_dir(username, layername)
+    return os.path.join(input_sld_dir, layername+'.xml')
+
+
+def save_file(username, layername, xml_file):
+    xml_path = get_file_path(username, layername)
+    if xml_file is None:
+        delete_layer(username, layername)
+    else:
+        ensure_dir(username, layername)
+        with open(xml_path, 'wb') as out:
+            out.write(xml_file.read())
+
+
+def get_file(username, layername):
+    sld_path = get_file_path(username, layername)
+
+    if os.path.exists(sld_path):
+        return open(sld_path, 'rb')
+    return None
+
+
+def create_file(username, layername):
+    template_values = _get_template_values(username=username, layername=layername)
+    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'metadata-template.xml')
+    file_object = fill_template(template_path, template_values)
+    save_file(username, layername, file_object)
+
+
+def _get_template_values(
         uuid='ca238200-8200-1a23-9399-42c9fca53542',
         epsg_codes=None,
         title='CORINE - Krajinný pokryv CLC 90',

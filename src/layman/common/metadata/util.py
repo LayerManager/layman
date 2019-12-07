@@ -1,5 +1,5 @@
-from . import template
 from xml.etree import ElementTree as ET
+from io import BytesIO
 
 
 NAMESPACES = {
@@ -28,21 +28,23 @@ def indent(elem, level=0):
             elem.tail = i
 
 
-def fill_template(template_path, filled_path=None):
+def fill_template(template_path, template_values):
     with open(template_path, 'r') as template_file:
         template_str = template_file.read()
-    defaults = template.get_layer_values()
-    xml_str = template_str.format(**defaults)
+    xml_str = template_str.format(**template_values)
     root_el = ET.fromstring(xml_str)
 
-    # for k, v in namespace_map.items():
-    #     root_el.attrib[f"xmlns:{k}"] = v
     indent(root_el)
     el_tree = ET.ElementTree(root_el)
 
-    if filled_path is not None:
-        el_tree.write(
-            filled_path,
-            encoding='UTF-8',
-            xml_declaration=True,
-        )
+    file_object = BytesIO()
+
+    el_tree.write(
+        file_object,
+        encoding='UTF-8',
+        xml_declaration=True,
+    )
+
+    file_object.seek(0)
+
+    return file_object

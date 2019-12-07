@@ -1,12 +1,16 @@
 from multiprocessing import Process
 import pytest
 import time
+import os
+import filecmp
+import difflib
 
 import sys
 del sys.modules['layman']
 
 from layman import app as app
 from layman import settings
+from layman.layer.filesystem.metadata import _get_template_values
 
 from . import util
 
@@ -47,4 +51,20 @@ def app_context():
 
 @pytest.mark.usefixtures('app_context')
 def test_fill_template(client):
-    xmlstr = util.fill_template('src/layman/metadata/layer-template.xml', filled_path='src/layman/metadata/INSPIRE2-min.xml')
+    xml_path = 'tmp/metadata-template.xml'
+    try:
+        os.remove(xml_path)
+    except OSError:
+        pass
+    file_object = util.fill_template('src/layman/layer/filesystem/metadata-template.xml', _get_template_values())
+    with open(xml_path, 'wb') as out:
+        out.write(file_object.read())
+
+    def get_diff(p1, p2):
+        diff = difflib.unified_diff(open(p1).readlines(), open(p2).readlines())
+        return f"diff={''.join(diff)}"
+
+    expected_path = 'src/layman/common/metadata/util_test_filled_template.xml'
+    assert filecmp.cmp(xml_path, expected_path), get_diff(xml_path, expected_path)
+
+
