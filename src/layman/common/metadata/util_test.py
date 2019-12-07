@@ -65,6 +65,6 @@ def test_fill_template(client):
         return f"diff={''.join(diff)}"
 
     expected_path = 'src/layman/common/metadata/util_test_filled_template.xml'
-    assert filecmp.cmp(xml_path, expected_path), get_diff(xml_path, expected_path)
+    assert filecmp.cmp(xml_path, expected_path, shallow=False), get_diff(xml_path, expected_path)
 
 

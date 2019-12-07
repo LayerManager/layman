@@ -1,11 +1,18 @@
+from datetime import datetime
 import os
 import pathlib
 
 from flask import url_for, current_app
 
-from . import util
-from . import input_file
+from . import util, input_file
 from layman.common.metadata.util import fill_template
+from layman.common.filesystem.uuid import get_publication_uuid_file
+from .uuid import get_layer_uuid
+from layman.layer.geoserver.wms import get_wms_proxy
+from layman.layer.geoserver.util import get_gs_proxy_base_url
+from layman.layer import LAYER_TYPE
+from urllib.parse import urljoin
+from xml.sax.saxutils import escape, quoteattr
 
 
 DIR = __name__.split('.')[-1]
@@ -66,30 +73,47 @@ def get_file(username, layername):
 
 
 def create_file(username, layername):
-    template_values = _get_template_values(username=username, layername=layername)
+    wms = get_wms_proxy(username)
+    wms_layer = wms.contents[layername]
+    uuid_file_path = get_publication_uuid_file(LAYER_TYPE, username, layername)
+    publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
+
+    template_values = _get_template_values(
+        username=username,
+        layername=layername,
+        uuid=get_layer_uuid(username, layername),
+        title=wms_layer.title,
+        abstract=wms_layer.abstract or None,
+        date=publ_datetime.strftime('%Y-%m-%d'),
+        date_type='publication',
+        data_identifier=url_for('rest_layer.get', username=username, layername=layername, _external=True),
+        data_identifier_label=layername,
+        extent=wms_layer.boundingBoxWGS84,
+        ows_url=urljoin(get_gs_proxy_base_url(), username + '/ows')
+    )
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'metadata-template.xml')
     file_object = fill_template(template_path, template_values)
     save_file(username, layername, file_object)
 
 
 def _get_template_values(
+        username='browser',
+        layername='layer',
         uuid='ca238200-8200-1a23-9399-42c9fca53542',
-        epsg_codes=None,
         title='CORINE - Krajinný pokryv CLC 90',
+        abstract=None,
         date='2007-05-25',
         date_type='revision',
         data_identifier='http://www.env.cz/data/corine/1990',
         data_identifier_label='MZP-CORINE',
-        abstract=None,
-        username='browser',
-        layername='layer',
-        extent=None,
+        extent=None,  # w, s, e, n
         ows_url="http://www.env.cz/corine/data/download.zip",
+        epsg_codes=None,
         scale_denominator=None,
         dataset_language=None,
 ):
     epsg_codes = epsg_codes or ['3857', '4326']
-    extent = extent or [11.87, 19.13, 48.12, 51.59]
+    extent = extent or [11.87, 48.12, 19.13, 51.59]
 
     result = {
         ###############################################################################################################
@@ -133,15 +157,15 @@ f"""
 
         # it must be URI, but text node is optional (MZP-CORINE)
         # it can point to Layman's Layer endpoint
-        'data_identifier': f'<gmx:Anchor xlink:href="{data_identifier}">{data_identifier_label}</gmx:Anchor>',
+        'data_identifier': f'<gmx:Anchor xlink:href="{data_identifier}">{escape(data_identifier_label)}</gmx:Anchor>',
 
         'abstract': '<gmd:abstract gco:nilReason="unknown" />' if abstract is None else f"""
 <gmd:abstract>
-    <gco:CharacterString>{abstract}</gco:CharacterString>
+    <gco:CharacterString>{escape(abstract)}</gco:CharacterString>
 </gmd:abstract>
 """,
 
-        'graphic_url': url_for('rest_layer_thumbnail.get', username=username, layername=layername, _external=True),
+        'graphic_url': escape(url_for('rest_layer_thumbnail.get', username=username, layername=layername, _external=True)),
 
         'extent': """
 <gmd:EX_GeographicBoundingBox>
@@ -158,13 +182,13 @@ f"""
         <gco:Decimal>{}</gco:Decimal>
     </gmd:northBoundLatitude>
 </gmd:EX_GeographicBoundingBox>
-""".format(*extent),
+""".format(extent[0], extent[2], extent[1], extent[3]),
 
-        'wms_url': ows_url,
+        'wms_url': escape(ows_url),
 
-        'wfs_url': ows_url,
+        'wfs_url': escape(ows_url),
 
-        'layer_endpoint': url_for('rest_layer.get', username=username, layername=layername, _external=True),
+        'layer_endpoint': escape(url_for('rest_layer.get', username=username, layername=layername, _external=True)),
 
 
         ###############################################################################################################
