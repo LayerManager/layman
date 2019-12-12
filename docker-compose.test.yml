@@ -38,6 +38,7 @@ services:
         - redis
         - postgresql
         - geoserver
+        - micka
 
    hslayers:
       container_name: hslayers

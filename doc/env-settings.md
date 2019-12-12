@@ -1,5 +1,14 @@
 # Environment Settings
 
+## CSW_BASIC_AUTHN
+HTTP Basic Authentication credentials for communication with [CSW](#CSW_URL) encoded as `user:password`.
+
+## CSW_RECORD_URL
+URL of [CSW](#CSW_URL) metadata record accessible by web browser, probably with some editing capabilities. Must contain `{identifier}` string that will be replaced with record ID.
+
+## CSW_URL
+URL of [OGC Catalogue Service v2.0.2](https://www.opengeospatial.org/standards/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
+
 ## FLASK_APP
 See [Flask documentation](https://flask.palletsprojects.com/en/1.1.x/cli/#application-discovery).
 

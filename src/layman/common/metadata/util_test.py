@@ -10,7 +10,7 @@ del sys.modules['layman']
 
 from layman import app as app
 from layman import settings
-from layman.layer.filesystem.metadata import _get_template_values
+from layman.layer.filesystem.metadata import _get_template_values, get_layer_info, csw_insert
 
 from . import util
 
@@ -68,3 +68,20 @@ def test_fill_template(client):
     assert filecmp.cmp(xml_path, expected_path, shallow=False), get_diff(xml_path, expected_path)
 
 
+@pytest.mark.usefixtures('app_context')
+def test_get_empty_record(client):
+    csw = util.create_csw()
+    assert csw is not None, f"{settings.CSW_URL}, {settings.CSW_BASIC_AUTHN}"
+    from owslib.fes import PropertyIsEqualTo, PropertyIsLike, BBox
+    any_query = PropertyIsLike('apiso:Identifier', '*', wildCard='*')
+    csw.getrecords2(constraints=[any_query], maxrecords=100)
+    assert csw.exceptionreport is None
+    assert len(csw.records) == 0
+
+
+@pytest.mark.usefixtures('app_context')
+def test_generate_csw_insert(client):
+    muuid = csw_insert('mickauser', 'mickalayer')
+    info = get_layer_info('a', 'b', uuid=muuid[2:])
+    # print(info)
+    assert 'metadata' in info

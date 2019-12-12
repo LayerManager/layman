@@ -25,6 +25,7 @@ services:
         - postgresql
         - geoserver
         - layman_client
+        - micka
 
    celery_worker_dev:
       image: layman_dev:latest

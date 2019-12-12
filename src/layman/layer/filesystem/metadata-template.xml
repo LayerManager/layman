@@ -19,7 +19,7 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 
 	<gmd:contact>
 		<gmd:CI_ResponsibleParty>
-			<gmd:organisationName gco:nilReason="unknown" />
+			{organisation_name}
 			<gmd:contactInfo>
 				<gmd:CI_Contact>
 					<gmd:address>
@@ -64,7 +64,7 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 
 			<gmd:pointOfContact>
 				<gmd:CI_ResponsibleParty>
-					<gmd:organisationName gco:nilReason="unknown" />
+					{data_organisation_name}
 					<gmd:contactInfo>
 						<gmd:CI_Contact>
 							<gmd:address>

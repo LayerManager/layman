@@ -1,0 +1,86 @@
+parameters:
+    app:
+        # UI theme
+        layoutTheme = default
+        # UI langauges (must have translation files)
+        langs = 'eng,cze'
+        # dafult profile used
+        startProfil = 5
+        #records per page
+        maxRecords = 10
+        #max number of records per page
+        limitMaxRecords = 100
+        #default sort
+        sortBy = 'title,ASC'
+        importReport = FALSE
+        #switch the validator
+        validator = TRUE
+        directSummary = TRUE 
+        directDetail = TRUE 
+        directXml = TRUE 
+        formSign = FALSE
+        defaultEditGroup = editor
+        defaultViewGroup = reader
+        # record indication for access from csw etc.
+        mdDataType = "-1=>'semifinished',0=>'private',1=>'public',2=>'portal'"
+        # admin IP list
+        adminIP = '127.0.0.1'
+        # web proxy address
+        proxy =
+    map:
+        # initial map extent
+        hs_initext = 12.0 48.5 18.9 51
+        # address of the connected WMS viewer web app
+        viewerURL = "https://geoportal.gov.cz/web/guest/map"
+    contact:
+        #contact info used in Capabilities document etc.
+        title:
+            cze = "Katalog prostorových metadat."
+            eng = "Spatial Metadata Catalogue."
+        abstract:
+            eng = "Catalogue based on OGC Catalogue service 2.0.2 ISO AP 1.0"
+            cze = "Katalog prostorových metadat podle OGC CSW 2.0.2 ISO AP 1.0"
+        org:
+            eng = "Your company name"
+            cze = "Název vaší organizace"
+        person = "Your name"
+        position:
+            eng = "Responsible preson"
+            cze = "Zodpovědná osoba"
+        email = ""
+        delivery = "your delivery point"
+        city = ""
+        postcode = ""
+        phone = ""
+        www = ""    
+    langCodes: 
+        cs: cze
+        da: dan
+        de: ger
+        en: eng
+        es: spa
+        fi: fin
+        fr: fre
+        hu: hun
+        it: ita
+        lv: lav
+        no: nor
+        pl: pol
+        pt: por
+        sk: slo
+        sl: slv
+        sv: swe
+
+database:
+    dsn: 'pgsql:host=postgresql;dbname=hsrs_micka6;port=5432'
+    user: 'docker'
+    password: 'docker'
+    debugger: false
+    options:
+        lazy: yes
+
+translation:
+    default: en
+    fallback: [cs]
+    resolvers:
+        header: off

@@ -92,6 +92,26 @@ def main():
     print()
 
 
+    # Micka
+    micka_url = f"{settings.CSW_URL}"
+    wait_for_msg = f"Micka, url={micka_url}"
+    print(f"Waiting for {wait_for_msg}")
+    while True:
+        try:
+            r = requests.get(
+                micka_url,
+                allow_redirects=False,
+                timeout=0.1
+            )
+            r.raise_for_status()
+            print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
+            break
+        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
+            handle_exception(e, attempt, wait_for_msg)
+            attempt += 1
+    print()
+
+
 def handle_exception(e, attempt, wait_for_msg=None):
     if attempt < MAX_ATTEMPTS:
         msg_end = f"Waiting {ATTEMPT_INTERVAL} seconds before next attempt."
