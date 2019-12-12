@@ -5,12 +5,13 @@ import pathlib
 from flask import url_for, current_app
 
 from . import util, input_file
-from layman.common.metadata.util import fill_template
+from layman.common.metadata.util import fill_template, fill_template_as_pretty_str, create_csw, csw_insert as util_csw_insert
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from .uuid import get_layer_uuid
 from layman.layer.geoserver.wms import get_wms_proxy
 from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer import LAYER_TYPE
+from layman import settings
 from urllib.parse import urljoin
 from xml.sax.saxutils import escape, quoteattr
 
@@ -30,7 +31,25 @@ def ensure_dir(username, layername):
     return input_sld_dir
 
 
-get_layer_info = input_file.get_layer_info
+def get_metadata_uuid(uuid):
+    return f"m-{uuid}" if uuid is not None else None
+
+
+def get_layer_info(username, layername, uuid=None):
+    uuid = uuid or get_layer_uuid(username, layername)
+    csw = create_csw()
+    if uuid is None or csw is None:
+        return {}
+    muuid = get_metadata_uuid(uuid)
+    csw.getrecordbyid(id=[muuid], esn='brief')
+    if muuid in csw.records:
+        return {
+            'metadata': {
+                'url': settings.CSW_RECORD_URL.format(identifier=muuid)
+            }
+        }
+    else:
+        return {}
 
 
 get_layer_names = input_file.get_layer_names
@@ -72,7 +91,38 @@ def get_file(username, layername):
     return None
 
 
+def csw_insert(username, layername):
+    # TODO currently just for demonstration purposes
+    template_values = _get_template_values(
+        username=username,
+        layername=layername,
+        uuid=f"uuid-{username}-{layername}",
+        title='Layer title',
+        abstract=None,
+        date='2019-12-01',
+        date_type='publication',
+        data_identifier=f"identifier-{username}-{layername}",
+        data_identifier_label=layername,
+        extent=None,
+        ows_url=urljoin(get_gs_proxy_base_url(), username + '/ows'),
+        organisation_name='TODO',
+        data_organisation_name='TODO',
+    )
+    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'metadata-template.xml')
+    record = fill_template_as_pretty_str(template_path, template_values)
+    muuid = util_csw_insert({
+        'record': record
+    })
+    return muuid
+
+
 def create_file(username, layername):
+    template_path, template_values = get_template_path_and_values(username, layername)
+    file_object = fill_template(template_path, template_values)
+    save_file(username, layername, file_object)
+
+
+def get_template_path_and_values(username, layername):
     wms = get_wms_proxy(username)
     wms_layer = wms.contents[layername]
     uuid_file_path = get_publication_uuid_file(LAYER_TYPE, username, layername)
@@ -92,8 +142,7 @@ def create_file(username, layername):
         ows_url=urljoin(get_gs_proxy_base_url(), username + '/ows')
     )
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'metadata-template.xml')
-    file_object = fill_template(template_path, template_values)
-    save_file(username, layername, file_object)
+    return template_path, template_values
 
 
 def _get_template_values(
@@ -102,6 +151,8 @@ def _get_template_values(
         uuid='ca238200-8200-1a23-9399-42c9fca53542',
         title='CORINE - Krajinný pokryv CLC 90',
         abstract=None,
+        organisation_name=None,
+        data_organisation_name=None,
         date='2007-05-25',
         date_type='revision',
         data_identifier='http://www.env.cz/data/corine/1990',
@@ -120,8 +171,8 @@ def _get_template_values(
         # KNOWN TO LAYMAN
         ###############################################################################################################
 
-        # layer UUID with prefix "m"
-        'file_identifier': f"m{uuid}",
+        # layer UUID with prefix "m-"
+        'file_identifier': get_metadata_uuid(uuid),
 
         'reference_system': ' '.join([
 f"""
@@ -208,6 +259,20 @@ f"""
 </gmd:language>
 """,
 
+        ###############################################################################################################
+        # UNKNOWN TO LAYMAN
+        ###############################################################################################################
+        'organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if organisation_name is None else f"""
+    <gmd:organisationName>
+        <gco:CharacterString>{escape(organisation_name)}</gco:CharacterString>
+    </gmd:organisationName>
+    """,
+
+        'data_organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if data_organisation_name is None else f"""
+    <gmd:organisationName>
+        <gco:CharacterString>{escape(data_organisation_name)}</gco:CharacterString>
+    </gmd:organisationName>
+    """,
     }
 
     return result

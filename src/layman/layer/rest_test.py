@@ -353,15 +353,19 @@ def test_post_layers_shp(client):
     xml_path = metadata.get_file_path(username, layername)
     expected_path = 'src/layman/layer/rest_test_filled_template.xml'
     diff_lines = list(difflib.unified_diff(open(xml_path).readlines(), open(expected_path).readlines()))
-    assert len(diff_lines) == 11, ''.join(diff_lines)
+    assert len(diff_lines) == 20, ''.join(diff_lines)
     plus_lines = [l for l in diff_lines if l.startswith('+ ')]
-    assert len(plus_lines) == 1
+    assert len(plus_lines) == 2
     minus_lines = [l for l in diff_lines if l.startswith('- ')]
-    assert len(minus_lines) == 1
+    assert len(minus_lines) == 2
     plus_line = plus_lines[0]
     assert plus_line == '+    <gco:CharacterString>m81c0debe-b2ea-4829-9b16-581083b29907</gco:CharacterString>\n'
     minus_line = minus_lines[0]
     assert minus_line.startswith('-    <gco:CharacterString>m') and minus_line.endswith('</gco:CharacterString>\n')
+    plus_line = plus_lines[1]
+    assert plus_line == '+                <gco:Date>2019-12-07</gco:Date>\n'
+    minus_line = minus_lines[1]
+    assert minus_line.startswith('-                <gco:Date>') and minus_line.endswith('</gco:Date>\n')
 
 
 @pytest.mark.usefixtures('app_context')
@@ -716,7 +720,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
             rv = client.patch(rest_path, data={
                 'file': files,
             })
-            assert rv.status_code == 400
+            assert rv.status_code == 400, rv.get_json()
             resp_json = rv.get_json()
             assert resp_json['code'] == 19
         finally:

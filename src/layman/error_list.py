@@ -35,4 +35,6 @@ ERROR_LIST = {
     33: (400, 'Authenticated user did not claim any username within Layman yet.'),
     34: (400, 'User already reserved username.'),
     35: (409, 'Username already reserved.'),
+    36: (409, 'Metadata record already exists.'),
+    37: (400, 'Micka exception.'),
 }

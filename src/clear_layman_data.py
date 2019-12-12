@@ -9,6 +9,7 @@ settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 
 def main():
+    # filesystem
     if os.path.exists(settings.LAYMAN_DATA_DIR):
         for the_file in os.listdir(settings.LAYMAN_DATA_DIR):
             file_path = os.path.join(settings.LAYMAN_DATA_DIR, the_file)
@@ -17,6 +18,7 @@ def main():
             elif os.path.isdir(file_path):
                 shutil.rmtree(file_path)
 
+    # postgresql
     import psycopg2
     try:
         conn = psycopg2.connect(**settings.PG_CONN)
@@ -46,12 +48,13 @@ AND pid <> pg_backend_pid();
             f"""CREATE DATABASE {settings.LAYMAN_PG_DBNAME} TEMPLATE {settings.LAYMAN_PG_TEMPLATE_DBNAME}""")
         conn.close()
 
-
+    # redis
     settings.LAYMAN_REDIS.flushdb()
     import redis
     ltc_redis = redis.Redis.from_url(os.environ['LTC_REDIS_URI'], encoding="utf-8", decode_responses=True)
     ltc_redis.flushdb()
 
+    # geoserver
     import requests
     headers_json = {
         'Accept': 'application/json',
@@ -88,6 +91,37 @@ AND pid <> pg_backend_pid();
             auth=settings.LAYMAN_GS_AUTH,
         )
         r.raise_for_status()
+
+    # micka
+    opts = {} if settings.CSW_BASIC_AUTHN is None else {
+        'username': settings.CSW_BASIC_AUTHN[0],
+        'password': settings.CSW_BASIC_AUTHN[1],
+    }
+    from owslib.csw import CatalogueServiceWeb
+    csw = CatalogueServiceWeb(settings.CSW_URL, **opts) if settings.CSW_URL is not None else None
+    csw.getrecords2(xml=f"""
+        <csw:GetRecords xmlns:ogc="http://www.opengis.net/ogc" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:ows="http://www.opengis.net/ows" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:apiso="http://www.opengis.net/cat/csw/apiso/1.0" xmlns:gmd="http://www.isotc211.org/2005/gmd" outputSchema="http://www.isotc211.org/2005/gmd" maxRecords="100" startPosition="1" outputFormat="application/xml" service="CSW" resultType="results" version="2.0.2" requestId="1" debug="0">
+         <csw:Query typeNames="gmd:MD_Metadata">
+          <csw:ElementSetName>summary</csw:ElementSetName>
+          <csw:Constraint version="1.1.0">
+           <ogc:Filter xmlns:gml="http://www.opengis.net/gml">
+             <ogc:PropertyIsLike wildCard="*" singleChar="@" escapeChar="\">
+               <ogc:PropertyName>apiso:Identifier</ogc:PropertyName>
+               <ogc:Literal>*</ogc:Literal>
+             </ogc:PropertyIsLike>
+           </ogc:Filter>
+          </csw:Constraint>
+         </csw:Query>
+        </csw:GetRecords>
+        """)
+    assert csw.exceptionreport is None
+    items = csw.records.items()
+    for record_id, record in items:
+        urls = [ol.url for ol in record.distribution.online]
+        url_part = f"://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/"
+        if any((url_part in u for u in urls)):
+            print(f"Deleting record {record_id}")
+            csw.transaction(ttype='delete', typename='gmd:MD_Metadata', identifier=record_id)
 
 
 if __name__ == "__main__":
