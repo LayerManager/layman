@@ -4,7 +4,7 @@ import re
 import unicodedata
 from collections import OrderedDict
 
-from flask import current_app, request
+from flask import current_app, request, url_for
 from unidecode import unidecode
 
 from layman import settings
@@ -177,3 +177,21 @@ def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_cal
 
     return results
 
+
+DUMB_MAP_ADAPTER = None
+
+
+def url_for_external(endpoint, **values):
+    # Flask does not accept SERVER_NAME without dot, and without SERVER_NAME url_for cannot be used
+    # therefore DUMB_MAP_ADAPTER is created manually ...
+    global DUMB_MAP_ADAPTER
+    if current_app.config.get('SERVER_NAME', None) is None:
+        if DUMB_MAP_ADAPTER is None:
+            DUMB_MAP_ADAPTER = current_app.url_map.bind(
+                settings.LAYMAN_PROXY_SERVER_NAME,
+                url_scheme=current_app.config['PREFERRED_URL_SCHEME']
+            )
+        result = DUMB_MAP_ADAPTER.build(endpoint, values=values, force_external=True)
+    else:
+        result = url_for(endpoint, **values, _external=True)
+    return result
