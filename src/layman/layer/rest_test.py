@@ -686,7 +686,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
         layername = 'countries'
         rest_path = url_for('rest_layer.patch', username=username, layername=layername)
         file_paths = [
-            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
+            'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
         ]
         for fp in file_paths:
             assert os.path.isfile(fp)

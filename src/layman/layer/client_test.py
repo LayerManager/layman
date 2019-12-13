@@ -93,7 +93,7 @@ def test_post_layers_chunk(client, chrome):
 
     chrome.get(client_url)
     chrome.set_window_size(1000,2000)
-    # chrome.save_screenshot('/code/tmp/test-1.png')
+    chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-1.png')
 
     user_input = chrome.find_elements_by_name('user')
     assert len(user_input) == 1
@@ -112,14 +112,14 @@ def test_post_layers_chunk(client, chrome):
     file_input = file_input[0]
     # print(" \n ".join(file_paths))
     file_input.send_keys(" \n ".join(file_paths))
-    # chrome.save_screenshot('/code/tmp/test-2.png')
+    chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-2.png')
 
     button = chrome.find_elements_by_xpath('//button[@type="submit"]')
     assert len(button) == 1
     button = button[0]
     button.click()
 
-    time.sleep(0.1)
+    time.sleep(0.5)
 
     layer_url = f'{domain}/rest/{username}/layers/{layername}?'
     r = requests.get(layer_url)
@@ -134,9 +134,9 @@ def test_post_layers_chunk(client, chrome):
         r = requests.get(layer_url)
         attempts += 1
         if attempts > max_attempts:
-            # chrome.save_screenshot('/code/tmp/test-2.5.png')
+            chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-2.5.png')
             raise Exception('Max attempts reached!')
-    # chrome.save_screenshot('/code/tmp/test-3.png')
+    chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-3.png')
 
     entries = chrome.get_log('browser')
     assert len(entries) > 3
@@ -167,7 +167,7 @@ def test_patch_layer_chunk(client, chrome):
     #     'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
     # ]))
     for fp in file_paths:
-        # print('fp', fp)
+        print('fp', fp)
         assert os.path.isfile(fp)
 
     domain = f"http://{settings.LAYMAN_SERVER_NAME}"
@@ -178,13 +178,13 @@ def test_patch_layer_chunk(client, chrome):
     assert r.status_code==200
 
     chrome.get(client_url)
-    # chrome.save_screenshot('/code/tmp/test-1.png')
+    chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-1.png')
 
     button = chrome.find_elements_by_xpath('//button[text()="PATCH"]')
     assert len(button) == 1
     button = button[0]
     button.click()
-    # chrome.save_screenshot('/code/tmp/test-2.png')
+    chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-2.png')
 
     user_input = chrome.find_elements_by_name('user')
     assert len(user_input) == 1
@@ -203,14 +203,14 @@ def test_patch_layer_chunk(client, chrome):
     file_input = file_input[0]
     # print(" \n ".join(file_paths))
     file_input.send_keys(" \n ".join(file_paths))
-    # chrome.save_screenshot('/code/tmp/test-3.png')
+    chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.png')
 
     button = chrome.find_elements_by_xpath('//button[@type="submit"]')
     assert len(button) == 1
     button = button[0]
     button.click()
 
-    time.sleep(0.1)
+    time.sleep(0.5)
 
     layer_url = f'{domain}/rest/{username}/layers/{layername}?'
     r = requests.get(layer_url)
@@ -225,14 +225,14 @@ def test_patch_layer_chunk(client, chrome):
         r = requests.get(layer_url)
         attempts += 1
         if attempts > max_attempts:
-            # chrome.save_screenshot('/code/tmp/test-4.png')
+            chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.5.png')
             raise Exception('Max attempts reached!')
-    # chrome.save_screenshot('/code/tmp/test-4.png')
+    chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-4.png')
 
     entries = chrome.get_log('browser')
-    assert len(entries) > 3
+    assert len(entries) > 3, entries
     for entry in entries:
-        # print(entry)
+        print(entry)
         assert entry['level'] == 'INFO' or (
             entry['level'] == 'SEVERE'
             and entry['message'].startswith(
