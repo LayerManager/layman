@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 import pathlib
 
-from flask import url_for, current_app
+from flask import current_app
 
 from . import util, input_file
 from layman.common.metadata.util import fill_template, fill_template_as_pretty_str, create_csw, csw_insert as util_csw_insert
@@ -12,6 +12,7 @@ from layman.layer.geoserver.wms import get_wms_proxy
 from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer import LAYER_TYPE
 from layman import settings
+from layman.util import url_for_external
 from urllib.parse import urljoin
 from xml.sax.saxutils import escape, quoteattr
 
@@ -136,7 +137,7 @@ def get_template_path_and_values(username, layername):
         abstract=wms_layer.abstract or None,
         date=publ_datetime.strftime('%Y-%m-%d'),
         date_type='publication',
-        data_identifier=url_for('rest_layer.get', username=username, layername=layername, _external=True),
+        data_identifier=url_for_external('rest_layer.get', username=username, layername=layername),
         data_identifier_label=layername,
         extent=wms_layer.boundingBoxWGS84,
         ows_url=urljoin(get_gs_proxy_base_url(), username + '/ows')
@@ -216,7 +217,7 @@ f"""
 </gmd:abstract>
 """,
 
-        'graphic_url': escape(url_for('rest_layer_thumbnail.get', username=username, layername=layername, _external=True)),
+        'graphic_url': escape(url_for_external('rest_layer_thumbnail.get', username=username, layername=layername)),
 
         'extent': """
 <gmd:EX_GeographicBoundingBox>
@@ -239,7 +240,7 @@ f"""
 
         'wfs_url': escape(ows_url),
 
-        'layer_endpoint': escape(url_for('rest_layer.get', username=username, layername=layername, _external=True)),
+        'layer_endpoint': escape(url_for_external('rest_layer.get', username=username, layername=layername)),
 
 
         ###############################################################################################################
