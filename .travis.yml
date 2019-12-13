@@ -24,6 +24,7 @@ script:
 after_failure:
 - docker logs layman_celery_worker_test_1
 - docker logs hslayers
+- docker logs micka
 - git clone https://jirik:${GITHUB_TOKEN}@gist.github.com/3c7f15736f03e8711d5dde8445f6b68d.git
   travis-artifacts
 - rm -rf travis-artifacts/*
