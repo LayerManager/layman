@@ -12,7 +12,7 @@ from . import wms
 from layman import settings
 from layman.cache import mem_redis
 from layman.layer.filesystem import input_file
-from layman.layer.util import is_layer_last_task_ready
+from layman.layer.util import is_layer_task_ready
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
 
@@ -96,7 +96,7 @@ def get_wfs_proxy(username):
     def currently_changing():
         layernames = input_file.get_layer_names(username)
         result = any((
-            not is_layer_last_task_ready(username, layername)
+            not is_layer_task_ready(username, layername)
             for layername in layernames
         ))
         return result
