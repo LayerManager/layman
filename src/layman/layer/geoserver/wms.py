@@ -10,6 +10,8 @@ from . import headers_json
 from .util import get_gs_proxy_base_url
 from layman import settings
 from layman.cache import mem_redis
+from layman.layer.filesystem import input_file
+from layman.layer.util import is_layer_last_task_ready
 
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
@@ -65,9 +67,11 @@ def get_wms_proxy(username):
         return wms_proxy
 
     def currently_changing():
-        from layman.celery import is_task_running
-        from .tasks import PUBLISH_LAYER_FROM_DB_NAME
-        result = is_task_running(PUBLISH_LAYER_FROM_DB_NAME, username)
+        layernames = input_file.get_layer_names(username)
+        result = any((
+            not is_layer_last_task_ready(username, layername)
+            for layername in layernames
+        ))
         return result
 
     wms_proxy = mem_redis.get(key, create_string_value, mem_value_from_string_value, currently_changing)
