@@ -5,22 +5,35 @@ dist: trusty
 language: bash
 
 services:
-  - docker
+- docker
 
 before_install:
-  - sudo rm -f /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
-  - sudo service docker restart
-  - docker-compose -v
-  - docker -v
+- sudo rm -f /usr/local/bin/docker-compose
+- curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` > docker-compose
+- chmod +x docker-compose
+- sudo mv docker-compose /usr/local/bin
+- sudo service docker restart
+- docker-compose -v
+- docker -v
 
 script:
-  - make geoserver-reset-default-layman-datadir
-  - cp .env.test .env
-  - make test
+- make geoserver-reset-default-layman-datadir
+- cp .env.test .env
+- make test
 
 after_failure:
-  - docker logs layman_celery_worker_test_1
-  - docker logs hslayers
+- docker logs layman_celery_worker_test_1
+- docker logs hslayers
+- git clone https://jirik:${GITHUB_TOKEN}@gist.github.com/3c7f15736f03e8711d5dde8445f6b68d.git
+  travis-artifacts
+- rm -rf travis-artifacts/*
+- cp tmp/artifacts/* travis-artifacts
+- cd travis-artifacts
+- git remote set-url origin https://jirik:${GITHUB_TOKEN}@gist.github.com/3c7f15736f03e8711d5dde8445f6b68d.git
+- git add .
+- git commit -m "Artifacts of build $TRAVIS_BUILD_NUMBER, commit $TRAVIS_COMMIT"
+- git push
+
+env:
+  global:
+    secure: rxRvrkqIGE67Okn6kDLqoWc6ysMk+SJIEec3hMIDSFcQeN1GXdwB5pyhQ1hS6WrZXfPVi2Z9zZxTFbRlUuxjAc+BznvKlaksAnCVWWKFrkgVXafqjtio3EJfk4x7Zb5rVthU+HSfY8zABtNQ7rrLcX7As6jdURHNZv6shwksPvLIYLOi5Tu1aUist7nfM/HOs49zJDd2GAGpR1AH5TYhzsoL2jILJ0BK7WT1KRRA93imAyRJppE9kf7MRkE8pq++24XY1nkW22nh1e5DhMPDgERIBIeiT7lvAt5/mhT3pbzHB0+cevIwRttoh5oxiAyO5sKed9HP4Nq9PvYOXkzMkk7J0zydsOf7M9xq64PqSUicyEBoqG7RcFoeDxyoMX363C7+/nfbfju7fn1cq1wle15KHPzwDGweUp3ulLM8nzuFEN+rUhIfrTYXT5DRmVjI50+uBkBFkS/m1FcU8qkxNlcFRCD/W8qeRNb8DLbQhQcQDEyP+cKvzxut+hdYcZGsuT9Mu7X1y7+R4dWXxuAGp9EK6hF4nzNMUTFO401mEkFTcEcXSyYjIWMI54nwQ/QLripIzNWi2zqGBl8l/pgqjB0rZDl74omB4WVslPCjbeNW7lA/LLL5J+JqcqDkBBLiwEVvOK1ucN/gPLMSZLhCCs47dBuZsQ54oLtt5Lngw+Y=
