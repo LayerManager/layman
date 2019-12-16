@@ -34,7 +34,7 @@ Subsequently, when asynchronous tasks run,
 - vector data files are imported to [PostgreSQL](#postgresql),
 - PostgreSQL table with vector data is registered to and visualization file is saved to [GeoServer](#geoserver),
 - thumbnail file is saved to [filesystem](#filesystem),
-- and metadata record is saved to [PostgreSQL](#postgresql) using Micka.
+- and metadata record is saved to [PostgreSQL](#postgresql) using Micka's CSW or SOAP API.
 
 When user [patches existing layer](rest.md#patch-layer), data is saved in the same way.
 
@@ -80,7 +80,7 @@ Layman uses directly one PostgreSQL database LAYMAN_PG_DBNAME to store vector la
 
 **[Table](https://www.postgresql.org/docs/9.1/sql-createtable.html)** is created in user schema for each layer the user published. Name of the table is the same as layername. Every layer-related information is saved in tha table. The table contains data from vector data files.
 
-Second PostgreSQL database is used by Micka to store metadata records. The database is not accessed by Layman directly. By default, it's named `hsrs_micka6`.
+Second PostgreSQL database is used by Micka to store metadata records. The database including its structure is completely managed by Micka. By default, it's named `hsrs_micka6`.
 
 PostgreSQL is used as persistent data store, so data survives Layman restart.
 
