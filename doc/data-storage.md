@@ -33,7 +33,8 @@ Subsequently, when asynchronous tasks run,
 - vector data file chunks and completed vector data files are saved to [filesystem](#filesystem) (if sent [asynchronously](async-file-upload.md)),
 - vector data files are imported to [PostgreSQL](#postgresql),
 - PostgreSQL table with vector data is registered to and visualization file is saved to [GeoServer](#geoserver),
-- and thumbnail file is saved to [filesystem](#filesystem).
+- thumbnail file is saved to [filesystem](#filesystem),
+- and metadata record is saved to [PostgreSQL](#postgresql) using Micka.
 
 When user [patches existing layer](rest.md#patch-layer), data is saved in the same way.
 
@@ -51,7 +52,7 @@ Subsequently, when asynchronous tasks run,
 When user [patches existing map](rest.md#patch-map), data is saved in the same way.
 
 ### Tasks
-Information about asynchronous tasks consists of few parameters necessary for Celery task runner. In case of publushing or patching new layer or map, it includes e.g. task name, owner name, layer/map name, and additional parameters derived from HTTP POST/PATCH parameters.
+Information about asynchronous tasks consists of few parameters necessary for Celery task runner. In case of publishing or patching layer or map, it includes e.g. task name, owner name, layer/map name, and additional parameters derived from HTTP POST/PATCH parameters.
 
 Task information are saved to [Redis](#redis) only.
 
@@ -73,9 +74,13 @@ Data is saved to LAYMAN_DATA_DIR directory.
 Filesystem is used as persistent data store, so data survives Layman restart.
  
 ### PostgreSQL
+Layman uses directly one PostgreSQL database LAYMAN_PG_DBNAME to store vector layer data.
+
 **[User schema](https://www.postgresql.org/docs/9.1/ddl-schemas.html)** is created for every user who reserved username. Name of user schema is always the same as username. Every user-related information is saved in this schema.
 
 **[Table](https://www.postgresql.org/docs/9.1/sql-createtable.html)** is created in user schema for each layer the user published. Name of the table is the same as layername. Every layer-related information is saved in tha table. The table contains data from vector data files.
+
+Second PostgreSQL database is used by Micka to store metadata records. The database is not accessed by Layman directly. By default, it's named `hsrs_micka6`.
 
 PostgreSQL is used as persistent data store, so data survives Layman restart.
 

@@ -9,8 +9,9 @@
 - Published layer can be accessed by standardized OGC interfaces
   - [Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms)
   - [Web Feature Service (WFS)](https://www.opengeospatial.org/standards/wfs)
+  - [Catalogue Service](https://www.opengeospatial.org/standards/cat)
 - Thumbnail image available
-- Layer-related data is named and structured first by username, second by layername
+- Layer-related data is named and structured first by username, second by layername (if possible):
   - [REST API](doc/rest.md): `/rest/<username>/layers/<layername>` 
   - [filesystem](data-storage.md#filesystem): `/path/to/LAYMAN_DATA_DIR/users/<username>/layers/<layername>` 
   - [PostgreSQL](data-storage.md#postgresql): `db=LAYMAN_PG_DBNAME, schema=<username>, table=<layername>` 
@@ -21,6 +22,7 @@
   - one WMS layer per DB table
   - one SLD style per WMS layer
   - one thumbnail per WMS layer
+  - one metadata record per WMS&WFS layer
   
 ## Map
 - Also referred to as **map composition**
