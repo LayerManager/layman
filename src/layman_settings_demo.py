@@ -66,14 +66,6 @@ PG_POSTGIS_SCHEMA = 'public'
 # related to testing only
 LAYMAN_PG_TEMPLATE_DBNAME = os.getenv('LAYMAN_PG_TEMPLATE_DBNAME')
 
-PG_CONN_TEMPLATE = {
-    'host': LAYMAN_PG_HOST,
-    'port': LAYMAN_PG_PORT,
-    'dbname': LAYMAN_PG_TEMPLATE_DBNAME,
-    'user': LAYMAN_PG_USER,
-    'password': LAYMAN_PG_PASSWORD,
-}
-
 LAYMAN_CELERY_QUEUE = os.environ['LAYMAN_CELERY_QUEUE']
 
 

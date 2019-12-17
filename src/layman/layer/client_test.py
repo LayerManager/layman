@@ -123,7 +123,7 @@ def test_post_layers_chunk(client, chrome):
 
     layer_url = f'{domain}/rest/{username}/layers/{layername}?'
     r = requests.get(layer_url)
-    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file']
+    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
     max_attempts = 20
     attempts = 1
     while not (r.status_code == 200 and all(
@@ -214,7 +214,7 @@ def test_patch_layer_chunk(client, chrome):
 
     layer_url = f'{domain}/rest/{username}/layers/{layername}?'
     r = requests.get(layer_url)
-    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file']
+    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
     max_attempts = 20
     attempts = 1
     while not (r.status_code == 200 and all(
