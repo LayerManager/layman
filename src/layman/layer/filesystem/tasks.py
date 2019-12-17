@@ -6,7 +6,7 @@ from layman.celery import AbortedException
 from layman import celery_app
 from layman.http import LaymanError
 from layman import settings
-from . import input_file, input_chunk, thumbnail, metadata
+from . import input_file, input_chunk, thumbnail
 
 logger = get_task_logger(__name__)
 
@@ -74,23 +74,3 @@ def refresh_thumbnail(self, username, layername):
     if self.is_aborted():
         thumbnail.delete_layer(username, layername)
         raise AbortedException
-
-
-def refresh_metadata_needed(username, layername, task_options):
-    return True
-
-
-@celery_app.task(
-    name='layman.layer.filesystem.metadata.refresh',
-    bind=True,
-    base=celery_app.AbortableTask
-)
-def refresh_metadata(self, username, layername):
-    if self.is_aborted():
-        raise AbortedException
-    metadata.csw_insert(username, layername)
-
-    if self.is_aborted():
-        metadata.delete_layer(username, layername)
-        raise AbortedException
-

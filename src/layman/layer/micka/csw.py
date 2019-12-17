@@ -4,10 +4,9 @@ import pathlib
 
 from flask import current_app
 
-from . import util, input_file
-from layman.common.metadata.util import fill_template_as_pretty_str, create_csw, csw_insert as util_csw_insert, csw_delete as util_csw_delete
+from . import util
 from layman.common.filesystem.uuid import get_publication_uuid_file
-from .uuid import get_layer_uuid
+from layman.layer.filesystem.uuid import get_layer_uuid
 from layman.layer.geoserver.wms import get_wms_proxy
 from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer import LAYER_TYPE
@@ -23,7 +22,7 @@ def get_metadata_uuid(uuid):
 
 def get_layer_info(username, layername):
     uuid = get_layer_uuid(username, layername)
-    csw = create_csw()
+    csw = util.create_csw()
     if uuid is None or csw is None:
         return {}
     muuid = get_metadata_uuid(uuid)
@@ -48,24 +47,30 @@ def update_layer(username, layername, layerinfo):
     pass
 
 
-get_publication_names = input_file.get_publication_names
+def get_publication_names(username, publication_type):
+    if publication_type != '.'.join(__name__.split('.')[:-2]):
+        raise Exception(f'Unknown pyblication type {publication_type}')
+
+    return []
 
 
-get_publication_uuid = input_file.get_publication_uuid
+def get_publication_uuid(username, publication_type, publication_name):
+    return None
 
 
 def delete_layer(username, layername):
+    # TODO do not delete on patch
     uuid = get_layer_uuid(username, layername)
     muuid = get_metadata_uuid(uuid)
     if muuid is None:
         return
-    util_csw_delete(muuid)
+    util.csw_delete(muuid)
 
 
 def csw_insert(username, layername):
     template_path, template_values = get_template_path_and_values(username, layername)
-    record = fill_template_as_pretty_str(template_path, template_values)
-    muuid = util_csw_insert({
+    record = util.fill_template_as_pretty_str(template_path, template_values)
+    muuid = util.csw_insert({
         'record': record
     })
     return muuid
@@ -93,7 +98,7 @@ def get_template_path_and_values(username, layername):
         organisation_name='TODO',
         data_organisation_name='TODO',
     )
-    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'metadata-template.xml')
+    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
     return template_path, template_values
 
 
