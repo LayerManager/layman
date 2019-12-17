@@ -461,6 +461,13 @@ def test_map_composed_from_local_layers(client):
             for fp in files:
                 fp[0].close()
 
+    # TODO if no sleep, Micka throws 500
+    # [2019-12-17 11-04-31] Nette\Database\UniqueConstraintViolationException: SQLSTATE[23505]: Unique violation: 7 ERROR:  duplicate key value violates unique constraint "md_pkey" DETAIL:  Key (recno)=(1) already exists. #23505 in /var/www/html/Micka/php/vendor/nette/database/src/Database/DriverException.php:25 caused by PDOException: SQLSTATE[23505]: Unique violation: 7 ERROR:  duplicate key value violates unique constraint "md_pkey" DETAIL:  Key (recno)=(1) already exists. #23505 in /var/www/html/Micka/php/vendor/nette/database/src/Database/ResultSet.php:72  @  http://micka/csw  @@  .exception--2019-12-17--10-43--401e60c4ef.html.swp
+    # in /var/www/html/Micka/php/app/model/RecordModel.php, line 197 setEditMd2Md INSERT INTO ...
+    # probably problem with concurrent CSW insert
+    # so report bug to Micka
+    time.sleep(0.2)
+
     with app.app_context():
         layername2 = 'hranice'
         pattern = os.path.join(os.getcwd(), 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.*')

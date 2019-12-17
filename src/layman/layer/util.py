@@ -145,6 +145,9 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
         'db_table': {
             'status': 'NOT_AVAILABLE'
         },
+        'metadata': {
+            'status': 'NOT_AVAILABLE'
+        },
     }
 
     complete_info.update(partial_info)
@@ -181,6 +184,7 @@ TASKS_TO_LAYER_INFO_KEYS = {
     'layman.layer.geoserver.wfs.refresh': ['wms', 'wfs'],
     'layman.layer.geoserver.sld.refresh': ['sld'],
     'layman.layer.filesystem.thumbnail.refresh': ['thumbnail'],
+    'layman.layer.filesystem.metadata.refresh': ['metadata'],
 }
 
 

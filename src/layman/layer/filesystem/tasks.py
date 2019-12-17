@@ -88,7 +88,7 @@ def refresh_metadata_needed(username, layername, task_options):
 def refresh_metadata(self, username, layername):
     if self.is_aborted():
         raise AbortedException
-    metadata.create_file(username, layername)
+    metadata.csw_insert(username, layername)
 
     if self.is_aborted():
         metadata.delete_layer(username, layername)
