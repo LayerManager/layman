@@ -35,12 +35,13 @@ PUBLICATION_TYPES = {
             'layman.layer.geoserver.wms',
             'layman.layer.geoserver.sld',
             'layman.layer.filesystem.thumbnail',
-            'layman.layer.filesystem.metadata',
+            'layman.layer.micka.csw',
         ],
         'task_modules': [
             'layman.layer.db.tasks',
             'layman.layer.filesystem.tasks',
             'layman.layer.geoserver.tasks',
+            'layman.layer.micka.tasks',
         ],
         'layman.common.filesystem': {
             'publications_dir': 'layers'

@@ -8,9 +8,11 @@ import difflib
 import sys
 del sys.modules['layman']
 
+from layman import uuid
 from layman import app as app
 from layman import settings
-from layman.layer.filesystem.metadata import _get_template_values, get_layer_info, csw_insert
+from layman.layer import LAYER_TYPE
+from .csw import _get_template_values
 
 from . import util
 
@@ -51,12 +53,12 @@ def app_context():
 
 @pytest.mark.usefixtures('app_context')
 def test_fill_template(client):
-    xml_path = 'tmp/metadata-template.xml'
+    xml_path = 'tmp/record-template.xml'
     try:
         os.remove(xml_path)
     except OSError:
         pass
-    file_object = util.fill_template('src/layman/layer/filesystem/metadata-template.xml', _get_template_values())
+    file_object = util.fill_template('src/layman/layer/micka/record-template.xml', _get_template_values())
     with open(xml_path, 'w') as out:
         out.write(file_object.read())
 
@@ -64,18 +66,20 @@ def test_fill_template(client):
         diff = difflib.unified_diff(open(p1).readlines(), open(p2).readlines())
         return f"diff={''.join(diff)}"
 
-    expected_path = 'src/layman/common/metadata/util_test_filled_template.xml'
+    expected_path = 'src/layman/layer/micka/util_test_filled_template.xml'
     assert filecmp.cmp(xml_path, expected_path, shallow=False), get_diff(xml_path, expected_path)
 
 
 @pytest.mark.usefixtures('app_context')
-def test_get_empty_record(client):
+def test_num_records(client):
+    publs_by_type = uuid.check_redis_consistency()
+    num_layers = len(publs_by_type[LAYER_TYPE])
     csw = util.create_csw()
     assert csw is not None, f"{settings.CSW_URL}, {settings.CSW_BASIC_AUTHN}"
     from owslib.fes import PropertyIsEqualTo, PropertyIsLike, BBox
     any_query = PropertyIsLike('apiso:Identifier', '*', wildCard='*')
     csw.getrecords2(constraints=[any_query], maxrecords=100)
     assert csw.exceptionreport is None
-    assert len(csw.records) == 0
+    assert len(csw.records) == num_layers
 
 
