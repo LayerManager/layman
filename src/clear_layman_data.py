@@ -35,15 +35,11 @@ where schema_owner = '{settings.LAYMAN_PG_USER}'
             cur.execute(f"""DROP SCHEMA "{row[1]}" CASCADE""")
         conn.close()
     except:
-        conn = psycopg2.connect(**settings.PG_CONN_TEMPLATE)
+        conn_dict = settings.PG_CONN.copy()
+        conn_dict['dbname'] = 'postgres'
+        conn = psycopg2.connect(**conn_dict)
         conn.autocommit = True
         cur = conn.cursor()
-        cur.execute(f"""
-SELECT pg_terminate_backend(pg_stat_activity.pid)
-FROM pg_stat_activity
-WHERE pg_stat_activity.datname = '{settings.LAYMAN_PG_TEMPLATE_DBNAME}'
-AND pid <> pg_backend_pid();
-""")
         cur.execute(
             f"""CREATE DATABASE {settings.LAYMAN_PG_DBNAME} TEMPLATE {settings.LAYMAN_PG_TEMPLATE_DBNAME}""")
         conn.close()
