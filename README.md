@@ -5,7 +5,7 @@ Publishing geospatial data online through [REST API](doc/rest.md).
 
 - Two publication models available:
   - [**layer**](doc/models.md#layer): visual representation of single vector dataset (i.e. ShapeFile or GeoJSON)
-  - [**map**](doc/models.md#layer): collection of layers
+  - [**map**](doc/models.md#map): collection of layers
 - Accepts data in [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON), [ShapeFile](https://en.wikipedia.org/wiki/Shapefile), [Styled Layer Descriptor](https://www.opengeospatial.org/standards/sld), [Symbology Encoding](https://www.opengeospatial.org/standards/se), or [HSLayers Map Composition](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema) format
 - Even large files can be easily uploaded from browser thanks to asynchronous chunk upload
 - Asynchronous processing
@@ -13,6 +13,7 @@ Publishing geospatial data online through [REST API](doc/rest.md).
 - Provides URL endpoints
   - [Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms)
   - [Web Feature Service (WFS)](https://www.opengeospatial.org/standards/wfs)
+  - [Catalogue Service (CSW)](https://www.opengeospatial.org/standards/cat)
   - thumbnail image
 - Documented [REST API](doc/rest.md)
 - Documented [security system](doc/security.md)
