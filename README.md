@@ -141,8 +141,7 @@ After providing external dependencies there is time to provide **internal depend
 **System-level** dependencies includes
 - python 3.6+
 - [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) utility of [gdal](https://gdal.org/) 2.4+
-- [chromium-browser](https://chromium.org/) 77
-- [chromedriver](https://chromedriver.chromium.org/) 77
+- [chromium-browser](https://chromium.org/) 77+ and corresponding version of [chromedriver](https://chromedriver.chromium.org/)
 - [pipenv](https://pipenv.kennethreitz.org/en/latest/)
 - [node.js](https://nodejs.org/) 10+ & npm
 
