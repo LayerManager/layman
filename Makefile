@@ -205,6 +205,12 @@ liferay-start:
 liferay-stop:
 	docker-compose -f docker-compose.deps.yml stop liferay
 
+micka-restart:
+	docker-compose -f docker-compose.deps.yml up --force-recreate --no-deps -d micka
+
+micka-bash:
+	docker-compose -f docker-compose.deps.yml exec micka bash
+
 stop-all-docker-containers:
 	docker stop $$(docker ps -q)
 

@@ -1,6 +1,6 @@
 import os
 from xml.etree import ElementTree as ET
-from io import BytesIO
+from io import StringIO
 from owslib.csw import CatalogueServiceWeb
 from owslib.util import nspath_eval
 from flask import g, current_app
@@ -60,10 +60,10 @@ def fill_template_as_pretty_el(template_path, template_values):
 def fill_template_as_pretty_file_object(template_path, template_values):
     root_el = fill_template_as_pretty_el(template_path, template_values)
     el_tree = ET.ElementTree(root_el)
-    file_object = BytesIO()
+    file_object = StringIO()
     el_tree.write(
         file_object,
-        encoding='UTF-8',
+        encoding='unicode',
         xml_declaration=True,
     )
     file_object.seek(0)
@@ -88,20 +88,20 @@ def create_csw():
 def csw_insert(template_values):
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-insert-template.xml')
     xml_str = fill_template_as_str(template_path, template_values)
-    # print(f"xml_str=\n{xml_str}")
+    # print(f"CSW insert=\n{xml_str}")
     r = requests.post(settings.CSW_URL, auth=settings.CSW_BASIC_AUTHN, data=xml_str.encode('utf-8'))
+    # print(f"CSW insert response=\n{r.text}")
     r.raise_for_status()
     root_el = ET.fromstring(r.content)
 
     def is_record_exists_exception(root_el):
-        return len(root_el) != 1 or \
-                len(root_el) != 1 or \
-                root_el[0].tag != nspath_eval('ows:Exception', NAMESPACES) or \
-                "exceptionCode" not in root_el[0].attrib or \
-                root_el[0].attrib["exceptionCode"] != 'TransactionFailed' or \
-                len(root_el[0]) != 1 or \
-                root_el[0][0].tag != nspath_eval('ows:ExceptionText', NAMESPACES) or \
-                not root_el[0][0].text.startswith('Record exists')
+        return len(root_el) == 1 and \
+                root_el[0].tag == nspath_eval('ows:Exception', NAMESPACES) and \
+                "exceptionCode" in root_el[0].attrib and \
+                root_el[0].attrib["exceptionCode"] == 'TransactionFailed' and \
+                len(root_el[0]) == 1 and \
+                root_el[0][0].tag == nspath_eval('ows:ExceptionText', NAMESPACES) and \
+                root_el[0][0].text.startswith('Record exists')
 
     if root_el.tag == nspath_eval('ows:ExceptionReport', NAMESPACES):
         if is_record_exists_exception(root_el):
@@ -112,7 +112,7 @@ def csw_insert(template_values):
             })
         else:
             raise LaymanError(37, data={
-                'response': r.content
+                'response': r.text
             })
     assert root_el.tag == nspath_eval('csw:TransactionResponse', NAMESPACES), r.content
     assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalInserted', NAMESPACES)).text == "1", r.content
@@ -122,3 +122,33 @@ def csw_insert(template_values):
     muuid = muuid_els[0].text
     return muuid
 
+
+def csw_delete(muuid):
+    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-delete-template.xml')
+    template_values = {
+        'muuid': muuid
+    }
+    xml_str = fill_template_as_str(template_path, template_values)
+    # print(f"CSW delete request=\n{xml_str}")
+    r = requests.post(settings.CSW_URL, auth=settings.CSW_BASIC_AUTHN, data=xml_str.encode('utf-8'))
+    # print(f"CSW delete response=\n{r.text}")
+    r.raise_for_status()
+    root_el = ET.fromstring(r.content)
+
+    def is_record_does_not_exist_exception(root_el):
+        return len(root_el) == 1 and \
+                root_el[0].tag == nspath_eval('ows:Exception', NAMESPACES) and \
+                "exceptionCode" in root_el[0].attrib and \
+                root_el[0].attrib["exceptionCode"] == 'TransactionFailed' and \
+                len(root_el[0]) == 0 and \
+                root_el[0].text is None
+
+    if root_el.tag == nspath_eval('ows:ExceptionReport', NAMESPACES):
+        if is_record_does_not_exist_exception(root_el):
+            return
+        else:
+            raise LaymanError(37, data={
+                'response': r.text
+            })
+    assert root_el.tag == nspath_eval('csw:TransactionResponse', NAMESPACES), r.content
+    assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalDeleted', NAMESPACES)).text == "1", r.content

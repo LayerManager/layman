@@ -11,7 +11,9 @@
   </gmd:hierarchyLevel>
   <gmd:contact>
     <gmd:CI_ResponsibleParty>
-      <gmd:organisationName gco:nilReason="unknown" />
+      <gmd:organisationName>
+        <gco:CharacterString>TODO</gco:CharacterString>
+      </gmd:organisationName>
       <gmd:contactInfo>
         <gmd:CI_Contact>
           <gmd:address>
@@ -83,7 +85,9 @@
       <gmd:abstract gco:nilReason="unknown" />
       <gmd:pointOfContact>
         <gmd:CI_ResponsibleParty>
-          <gmd:organisationName gco:nilReason="unknown" />
+          <gmd:organisationName>
+            <gco:CharacterString>TODO</gco:CharacterString>
+          </gmd:organisationName>
           <gmd:contactInfo>
             <gmd:CI_Contact>
               <gmd:address>
@@ -177,10 +181,10 @@
           <gmd:geographicElement>
             <gmd:EX_GeographicBoundingBox>
               <gmd:westBoundLongitude>
-                <gco:Decimal>-180.0000148869775</gco:Decimal>
+                <gco:Decimal>-180</gco:Decimal>
               </gmd:westBoundLongitude>
               <gmd:eastBoundLongitude>
-                <gco:Decimal>180.0000148869775</gco:Decimal>
+                <gco:Decimal>180</gco:Decimal>
               </gmd:eastBoundLongitude>
               <gmd:southBoundLatitude>
                 <gco:Decimal>-85.60903859383285</gco:Decimal>

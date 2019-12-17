@@ -23,6 +23,7 @@ from layman import uuid, util as layman_util
 from layman.layer import db
 from layman import celery as celery_util
 from .filesystem import metadata
+from layman.common.metadata import util as metadata_util
 
 
 min_geojson = """
@@ -175,6 +176,13 @@ def test_get_layers_testuser1_v1(client):
     })
 
 
+def wait_till_ready(username, layername):
+    last_task = util._get_layer_task(username, layername)
+    while last_task is not None and not celery_util.is_task_ready(last_task):
+        time.sleep(0.1)
+        last_task = util._get_layer_task(username, layername)
+
+
 @pytest.mark.usefixtures('app_context')
 def test_post_layers_simple(client):
     username = 'testuser1'
@@ -200,11 +208,16 @@ def test_post_layers_simple(client):
     last_task = util._get_layer_task(username, layername)
     assert last_task is not None and not celery_util.is_task_ready(last_task)
     layer_info = util.get_layer_info(username, layername)
-    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
+    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
     for key_to_check in keys_to_check:
             assert 'status' in layer_info[key_to_check]
 
-    last_task['last'].get()
+    # TODO for some reason this hangs forever on get() if run (either with src/layman/authz/read_everyone_write_owner_auth2_test.py::test_authn_map_access_rights or src/layman/authn/oauth2_test.py::test_patch_current_user_without_username) and with src/layman/common/metadata/util.csw_insert
+    # last_task['last'].get()
+    # e.g. python3 src/wait_for_deps.py && python3 src/clear_layman_data.py && python3 -m pytest -W ignore::DeprecationWarning -xsvv src/layman/authn/oauth2_test.py::test_patch_current_user_without_username src/layman/layer/rest_test.py::test_post_layers_simple
+    # this can badly affect also .get(propagate=False) in layman.celery.abort_task_chain
+    # but hopefully this is only related to magic flask&celery test suite
+    wait_till_ready(username, layername)
 
     layer_info = util.get_layer_info(username, layername)
     for key_to_check in keys_to_check:
@@ -340,7 +353,8 @@ def test_post_layers_shp(client):
 
     last_task = util._get_layer_task(username, layername)
     assert last_task is not None and not celery_util.is_task_ready(last_task)
-    last_task['last'].get()
+    wait_till_ready(username, layername)
+    # last_task['last'].get()
 
     wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
@@ -350,9 +364,12 @@ def test_post_layers_shp(client):
     })
 
     # assert metadata file is the same as filled template except for UUID
-    xml_path = metadata.get_file_path(username, layername)
+    template_path, template_values = metadata.get_template_path_and_values(username, layername)
+    xml_file_object = metadata_util.fill_template_as_pretty_file_object(template_path, template_values)
     expected_path = 'src/layman/layer/rest_test_filled_template.xml'
-    diff_lines = list(difflib.unified_diff(open(xml_path).readlines(), open(expected_path).readlines()))
+    with open(expected_path) as f:
+        expected_lines = f.readlines()
+    diff_lines = list(difflib.unified_diff(xml_file_object.readlines(), expected_lines))
     assert len(diff_lines) == 20, ''.join(diff_lines)
     plus_lines = [l for l in diff_lines if l.startswith('+ ')]
     assert len(plus_lines) == 2
@@ -426,7 +443,8 @@ def test_post_layers_complex(client):
 
     last_task = util._get_layer_task(username, layername)
     assert last_task is not None and not celery_util.is_task_ready(last_task)
-    last_task['last'].get()
+    wait_till_ready(username, layername)
+    # last_task['last'].get()
     assert celery_util.is_task_ready(last_task)
 
     wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
@@ -451,6 +469,7 @@ def test_post_layers_complex(client):
         'thumbnail',
         'file',
         'db_table',
+        'metadata',
     ]:
         assert 'status' not in resp_json[source]
 
@@ -547,7 +566,8 @@ def test_patch_layer_style(client):
     # keys_to_check = ['thumbnail']
     # for key_to_check in keys_to_check:
     #         assert 'status' in resp_json[key_to_check]
-    last_task['last'].get()
+    wait_till_ready(username, layername)
+    # last_task['last'].get()
 
     resp_json = rv.get_json()
     assert resp_json['title'] == "countries in blue"
@@ -654,10 +674,11 @@ def test_patch_layer_data(client):
         last_task = util._get_layer_task(username, layername)
         assert last_task is not None and not celery_util.is_task_ready(last_task)
         resp_json = rv.get_json()
-        keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
+        keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
         for key_to_check in keys_to_check:
                 assert 'status' in resp_json[key_to_check]
-        last_task['last'].get()
+        wait_till_ready(username, layername)
+        # last_task['last'].get()
 
     with app.app_context():
         rest_path = url_for('rest_layer.get', username=username, layername=layername)
@@ -778,7 +799,7 @@ def test_post_layers_long_and_delete_it(client):
     last_task = util._get_layer_task(username, layername)
     assert last_task is not None and not celery_util.is_task_ready(last_task)
     layer_info = util.get_layer_info(username, layername)
-    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail']
+    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
     for key_to_check in keys_to_check:
             assert 'status' in layer_info[key_to_check]
 

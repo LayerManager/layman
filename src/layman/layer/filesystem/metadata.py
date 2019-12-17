@@ -5,7 +5,7 @@ import pathlib
 from flask import current_app
 
 from . import util, input_file
-from layman.common.metadata.util import fill_template, fill_template_as_pretty_str, create_csw, csw_insert as util_csw_insert
+from layman.common.metadata.util import fill_template_as_pretty_str, create_csw, csw_insert as util_csw_insert, csw_delete as util_csw_delete
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from .uuid import get_layer_uuid
 from layman.layer.geoserver.wms import get_wms_proxy
@@ -14,30 +14,15 @@ from layman.layer import LAYER_TYPE
 from layman import settings
 from layman.util import url_for_external
 from urllib.parse import urljoin
-from xml.sax.saxutils import escape, quoteattr
-
-
-DIR = __name__.split('.')[-1]
-
-
-def get_dir(username, layername):
-    input_sld_dir = os.path.join(util.get_layer_dir(username, layername),
-                                 DIR)
-    return input_sld_dir
-
-
-def ensure_dir(username, layername):
-    input_sld_dir = get_dir(username, layername)
-    pathlib.Path(input_sld_dir).mkdir(parents=True, exist_ok=True)
-    return input_sld_dir
+from xml.sax.saxutils import escape
 
 
 def get_metadata_uuid(uuid):
     return f"m-{uuid}" if uuid is not None else None
 
 
-def get_layer_info(username, layername, uuid=None):
-    uuid = uuid or get_layer_uuid(username, layername)
+def get_layer_info(username, layername):
+    uuid = get_layer_uuid(username, layername)
     csw = create_csw()
     if uuid is None or csw is None:
         return {}
@@ -53,10 +38,14 @@ def get_layer_info(username, layername, uuid=None):
         return {}
 
 
-get_layer_names = input_file.get_layer_names
+def get_layer_names(username):
+    # TODO consider reading layer names from all Micka's metadata records by linkage URL
+    return []
 
 
-update_layer = input_file.update_layer
+def update_layer(username, layername, layerinfo):
+    # TODO implement patching layer
+    pass
 
 
 get_publication_names = input_file.get_publication_names
@@ -66,61 +55,20 @@ get_publication_uuid = input_file.get_publication_uuid
 
 
 def delete_layer(username, layername):
-    util.delete_layer_subdir(username, layername, DIR)
-
-
-def get_file_path(username, layername):
-    input_sld_dir = get_dir(username, layername)
-    return os.path.join(input_sld_dir, layername+'.xml')
-
-
-def save_file(username, layername, xml_file):
-    xml_path = get_file_path(username, layername)
-    if xml_file is None:
-        delete_layer(username, layername)
-    else:
-        ensure_dir(username, layername)
-        with open(xml_path, 'wb') as out:
-            out.write(xml_file.read())
-
-
-def get_file(username, layername):
-    sld_path = get_file_path(username, layername)
-
-    if os.path.exists(sld_path):
-        return open(sld_path, 'rb')
-    return None
+    uuid = get_layer_uuid(username, layername)
+    muuid = get_metadata_uuid(uuid)
+    if muuid is None:
+        return
+    util_csw_delete(muuid)
 
 
 def csw_insert(username, layername):
-    # TODO currently just for demonstration purposes
-    template_values = _get_template_values(
-        username=username,
-        layername=layername,
-        uuid=f"uuid-{username}-{layername}",
-        title='Layer title',
-        abstract=None,
-        date='2019-12-01',
-        date_type='publication',
-        data_identifier=f"identifier-{username}-{layername}",
-        data_identifier_label=layername,
-        extent=None,
-        ows_url=urljoin(get_gs_proxy_base_url(), username + '/ows'),
-        organisation_name='TODO',
-        data_organisation_name='TODO',
-    )
-    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'metadata-template.xml')
+    template_path, template_values = get_template_path_and_values(username, layername)
     record = fill_template_as_pretty_str(template_path, template_values)
     muuid = util_csw_insert({
         'record': record
     })
     return muuid
-
-
-def create_file(username, layername):
-    template_path, template_values = get_template_path_and_values(username, layername)
-    file_object = fill_template(template_path, template_values)
-    save_file(username, layername, file_object)
 
 
 def get_template_path_and_values(username, layername):
@@ -140,7 +88,10 @@ def get_template_path_and_values(username, layername):
         data_identifier=url_for_external('rest_layer.get', username=username, layername=layername),
         data_identifier_label=layername,
         extent=wms_layer.boundingBoxWGS84,
-        ows_url=urljoin(get_gs_proxy_base_url(), username + '/ows')
+        ows_url=urljoin(get_gs_proxy_base_url(), username + '/ows'),
+        # TODO create config env variable to decide if to set organisation name or not
+        organisation_name='TODO',
+        data_organisation_name='TODO',
     )
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'metadata-template.xml')
     return template_path, template_values
@@ -165,7 +116,8 @@ def _get_template_values(
         dataset_language=None,
 ):
     epsg_codes = epsg_codes or ['3857', '4326']
-    extent = extent or [11.87, 48.12, 19.13, 51.59]
+    w, s, e, n = extent or [11.87, 48.12, 19.13, 51.59]
+    extent = [max(w, -180), max(s, -90), min(e, 180), min(n, 90)]
 
     result = {
         ###############################################################################################################
