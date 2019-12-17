@@ -1,16 +1,17 @@
 FROM geographica/gdal2:2.4.0
 
-# because docker-compose passes empty string if environment variable is not defined at host, the following default value is not used
-# https://github.com/docker/compose/issues/3608
-ARG UID_GID=0:0
-# therefore we need to use it in this way anywhere below: ${UID_GID:-"0:0"}
+RUN apt-get clean && apt-get update && \
+    apt-get -y -qq install unzip curl python3-pip chromium-browser && \
+    pip3 install pipenv
+
+RUN export MAIN_CHROME_VERSION=$(apt-cache policy chromium-browser | grep -oP "Installed: \K\w+") && \
+    echo "Installed chromium-browser ${MAIN_CHROME_VERSION}" && \
+    export CHROMEDRIVER_VERSION=$(curl https://chromedriver.storage.googleapis.com/ | grep -oP "(?<=<Key>)${MAIN_CHROME_VERSION}\.[0-9.]+(?=/chromedriver_linux64.zip</Key>)" | tail -1) && \
+    echo "Installing chromedriver version ${CHROMEDRIVER_VERSION}" && \
+    (cd /tmp && curl -O "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" && unzip chromedriver_linux64.zip -d /usr/bin && rm chromedriver_linux64.zip)
 
 RUN mkdir /code
 WORKDIR /code
-
-RUN apt-get clean && apt-get update && \
-    apt-get -y -qq install unzip curl python3-pip chromium-browser=79\* && \
-    pip3 install pipenv
 
 # http://click.pocoo.org/python3/
 ENV LC_ALL=C.UTF-8
@@ -19,10 +20,14 @@ ENV LANG=C.UTF-8
 COPY docker/Pipfile* /code/
 COPY docker/requirements.production.txt /code/
 
-RUN (cd /tmp && curl -O https://chromedriver.storage.googleapis.com/79.0.3945.36/chromedriver_linux64.zip && unzip chromedriver_linux64.zip -d /usr/bin && rm chromedriver_linux64.zip)
-
 RUN pipenv install --system
 RUN pip3 install -r requirements.production.txt
 
 COPY src /code/src
+
+# because docker-compose passes empty string if environment variable is not defined at host, the following default value is not used
+# https://github.com/docker/compose/issues/3608
+ARG UID_GID=0:0
+# therefore we need to use it in this way anywhere below: ${UID_GID:-"0:0"}
+
 RUN chown -R ${UID_GID:-"0:0"} src
