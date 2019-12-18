@@ -33,7 +33,8 @@ def get_layer_info(username, layername):
     if muuid in csw.records:
         return {
             'metadata': {
-                'url': settings.CSW_RECORD_URL.format(identifier=muuid)
+                'csw_url': settings.CSW_URL,
+                'record_url': settings.CSW_RECORD_URL.format(identifier=muuid),
             }
         }
     else:
