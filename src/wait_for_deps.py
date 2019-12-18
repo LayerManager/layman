@@ -33,7 +33,6 @@ def main():
 
     # PostgreSQL
     conn_dict = settings.PG_CONN.copy()
-    conn_dict['dbname'] = 'postgres'
     secret_conn_dict = {k: v for k, v in conn_dict.items() if k != 'password'}
     wait_for_msg = f"PostgreSQL database, {secret_conn_dict}"
     print(f"Waiting for {wait_for_msg}")
