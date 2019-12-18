@@ -122,3 +122,4 @@ LAYMAN_PROXY_SERVER_NAME = os.environ['LAYMAN_PROXY_SERVER_NAME']
 CSW_URL = os.getenv('CSW_URL', None)
 CSW_BASIC_AUTHN = None if ':' not in os.getenv('CSW_URL', '') else tuple(os.environ['CSW_BASIC_AUTHN'].split(':'))
 CSW_RECORD_URL = os.getenv('CSW_RECORD_URL', None)
+CSW_ORGANISATION_NAME_REQUIRED = os.getenv('CSW_ORGANISATION_NAME_REQUIRED', 'false').lower() == 'true'

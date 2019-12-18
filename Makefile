@@ -6,16 +6,22 @@ start-demo:
 start-demo-d:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower hslayers layman_client nginx
 
+start-demo-full:
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up --force-recreate postgresql geoserver redis layman celery_worker flower hslayers layman_client micka nginx
+
+start-demo-full-d:
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower hslayers layman_client micka nginx
+
 start-demo-only-d:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps layman celery_worker flower hslayers layman_client
 
 stop-demo:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml stop
 
-start-demo-with-optional-deps:
+start-demo-full-with-optional-deps:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up --force-recreate
 
-start-demo-with-optional-deps-d:
+start-demo-full-with-optional-deps-d:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate
 
 build-demo:

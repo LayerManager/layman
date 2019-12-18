@@ -61,7 +61,7 @@ cp .env.demo .env
 make geoserver-reset-default-layman-datadir
 
 # start dockerized containers in background
-make start-demo-d
+make start-demo-full-d
 ```
 Initial startup may take few minutes (download docker images, build it, run it). You are interested in container named `layman`. You can check it's logs with command
 ```bash
@@ -80,7 +80,7 @@ Then visit [http://localhost/](). You will see simple web client that interacts 
 
 To stop running service, press Ctrl+C.
 
-You can start Layman also in background with `make start-demo-d` (`d` for detached), and stop it with `stop-demo`.
+You can start Layman also in background with `make start-demo-full-d` (`d` for detached), and stop it with `stop-demo`.
 
 
 ## Configuration
@@ -114,6 +114,7 @@ Layman has [many dependencies](doc/dependencies.md). Most of them is shipped wit
 - PostgreSQL & PostGIS
 - GeoServer
 - Redis
+- Micka
 
 These external dependencies are shipped with Layman for development, testing and demo purposes. They are grouped in `docker-compose.deps*.yml` files.
 
@@ -121,6 +122,7 @@ However, if you want to run Layman in production, it is strongly recommended to 
 - PostgreSQL 10.0 & PostGIS 2.4
 - GeoServer 2.13.0
 - Redis 4.0
+- Micka 6 (2019-12-11, commit [e6f083b](https://github.com/hsrs-cz/Micka/tree/e6f083bb2cf6a54a1893e97b7525d3369fa64b1e))
 
 
 ## Run in production
@@ -130,12 +132,15 @@ When providing external dependencies, check their production-related documentati
 - [PostgreSQL 10.0](https://www.postgresql.org/docs/10/admin.html) & [PostGIS 2.4](http://postgis.net/docs/manual-2.4/performance_tips.html)
 - [GeoServer 2.13.0](https://docs.geoserver.org/2.13.0/user/production/index.html#production)
 - [Redis 4.0](https://redis.io/topics/admin)
+- [Micka 6](https://github.com/hsrs-cz/Micka/blob/e6f083bb2cf6a54a1893e97b7525d3369fa64b1e/README.md#installation), see also [configuration](deps/micka/sample/confs/config.local.neon) of [dockerized Micka](https://github.com/jirik/docker-micka).
 
-Within PostgreSQL, you need to provide one user [LAYMAN_PG_USER](doc/env-settings.md#LAYMAN_PG_USER) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME) database. The user also needs access to `public` schema where PostGIS must be installed.
+Within PostgreSQL, you need to provide one database for Layman and one database for Micka. For Layman, you also need to provide one user [LAYMAN_PG_USER](doc/env-settings.md#LAYMAN_PG_USER) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME) database. The user also needs access to `public` schema where PostGIS must be installed.
 
 Within GeoServer, you need to provide one Layman user [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and one layman role [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE).
 
 Within Redis, you need to provide two databases, one for Layman, second for Layman Test Client. Connection strings are defined by [LAYMAN_REDIS_URL](doc/env-settings.md#LAYMAN_REDIS_URL) and [LTC_REDIS_URL](doc/env-settings.md#LTC_REDIS_URL).
+
+Within Micka, you need to provide one user with editor privileges, whose credentials are defined by [CSW_BASIC_AUTHN](doc/env-settings.md#CSW_BASIC_AUTHN).
 
 After providing external dependencies there is time to provide **internal dependencies** (system-level, python-level and node.js-level dependencies). You can either use our docker and docker-compose configuration to generate docker images that already provides internal dependencies, or you can provide internal dependencies by yourself (if you prefer not to use docker in production).
 
