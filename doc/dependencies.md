@@ -13,6 +13,7 @@
 | [celery](http://www.celeryproject.org/) | 4.2.1 | BSD 3-Clause | Pipfile | prod | bin | asynchronous task runner |
 | [layman-test-client](https://github.com/jirik/layman-test-client) | 1.0.0 | GNU GPL v3 | docker-compose.*.yml | opt | bin | to demonstrate communication with REST API |
 | [liferay portal](https://portal.liferay.dev/) | 7.1.3 | GNU GPL v2 | liferay/portal | opt | bin | as OAuth2 provider |
+| [micka](https://github.com/hsrs-cz/Micka) | [e6f083b](https://github.com/hsrs-cz/Micka/tree/e6f083bb2cf6a54a1893e97b7525d3369fa64b1e) | BSD 3-Clause | jirikcz/micka | prod-external | bin | to provide CSW endpoint |
 
 ## Other dependencies
 
@@ -45,6 +46,9 @@
 | [docker-library/buildpack-deps](https://github.com/docker-library/buildpack-deps) | MIT License | docker-library/openjdk | dev | bin | |
 | [debuerreotype/docker-debian-artifacts](https://github.com/debuerreotype/docker-debian-artifacts) | Apache License 2.0 | docker-library/buildpack-deps, kartoza/docker-postgis | dev | bin | |
 | [debian](https://www.debian.org/) | GNU GPL mostly | debuerreotype/docker-debian-artifacts | dev | bin | |
+| [liferay/portal](https://github.com/docker-library/redis) | GNU GPL v2 | docker-compose.*.yml | opt | bin | |
+| [jirikcz/micka](https://github.com/jirik/docker-micka) | GNU GPL v3 | docker-compose.*.yml | prod-external | bin | |
+| [samtux/micka](https://github.com/samtux/docker-micka) | GNU GPL v3 | jirikcz/micka | prod-external | src | |
 | [docker-library/redis](https://github.com/docker-library/redis) | BSD 3-Clause | docker-compose.*.yml | prod | bin | |
 | [gliderlabs/docker-alpine](https://github.com/gliderlabs/docker-alpine) | BSD 3-Clause | docker-library/redis | prod | bin | |
 | [alpine-linux](https://alpinelinux.org/) | GNU GPL mostly | gliderlabs/docker-alpine | prod | bin | |

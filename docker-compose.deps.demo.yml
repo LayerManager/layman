@@ -47,3 +47,19 @@ services:
                                                   # https://github.com/docker/compose/issues/3270#issuecomment-206214034
                                                   # ./deps/liferay/out must be owned by non-root
         - ./deps/liferay/sample/hypersonic:/etc/liferay/mount/files/data/hypersonic
+
+   micka:
+      container_name: micka
+      image: jirikcz/micka:micka-e6f083b-v1.0.0
+      command: bash -c "cd /code/src && python3 wait_for_deps.py && /etc/init.d/php5.6-fpm start && nginx -g 'daemon off;'"
+      env_file:
+        - deps/micka/docker/.env
+      ports:
+        - 3080:80
+      volumes:
+        - ./deps/micka/data:/var/lib/postgresql/data
+        - ./deps/micka/docker/code/src:/code/src
+        - ./deps/micka/sample/confs/config.local.neon:/var/www/html/Micka/php/app/config/config.local.neon
+        - ./deps/micka/sample/confs/default:/etc/nginx/sites-available/default
+      depends_on:
+        - postgresql
