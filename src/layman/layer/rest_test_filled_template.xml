@@ -12,7 +12,7 @@
   <gmd:contact>
     <gmd:CI_ResponsibleParty>
       <gmd:organisationName>
-        <gco:CharacterString>TODO</gco:CharacterString>
+        <gco:CharacterString>neznámá hodnota</gco:CharacterString>
       </gmd:organisationName>
       <gmd:contactInfo>
         <gmd:CI_Contact>
@@ -86,7 +86,7 @@
       <gmd:pointOfContact>
         <gmd:CI_ResponsibleParty>
           <gmd:organisationName>
-            <gco:CharacterString>TODO</gco:CharacterString>
+            <gco:CharacterString>neznámá hodnota</gco:CharacterString>
           </gmd:organisationName>
           <gmd:contactInfo>
             <gmd:CI_Contact>
