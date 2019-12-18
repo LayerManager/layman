@@ -9,10 +9,12 @@ settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 
 def main():
+    print(f"Clearing Layman data.")
     # filesystem
     if os.path.exists(settings.LAYMAN_DATA_DIR):
         for the_file in os.listdir(settings.LAYMAN_DATA_DIR):
             file_path = os.path.join(settings.LAYMAN_DATA_DIR, the_file)
+            print(f"Removing filesystem path {file_path}")
             if os.path.isfile(file_path):
                 os.unlink(file_path)
             elif os.path.isdir(file_path):
@@ -21,6 +23,9 @@ def main():
     # postgresql
     import psycopg2
     try:
+        conn_dict = settings.PG_CONN.copy()
+        secret_conn_dict = {k: v for k, v in conn_dict.items() if k != 'password'}
+        print(f"Trying to connect to DB {secret_conn_dict}")
         conn = psycopg2.connect(**settings.PG_CONN)
         conn.autocommit = True
         cur = conn.cursor()
@@ -31,10 +36,13 @@ where schema_owner = '{settings.LAYMAN_PG_USER}'
     and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_USER_SCHEMAS))})
 """)
         rows = cur.fetchall()
+        print(f"Dropping schemas in DB {conn_dict['dbname']}: {[r[1] for r in rows]}")
         for row in rows:
             cur.execute(f"""DROP SCHEMA "{row[1]}" CASCADE""")
         conn.close()
+        print(f"Schemas in DB {conn_dict['dbname']} dropped.")
     except:
+        print(f"DB {conn_dict['dbname']} does not exists, creating.")
         conn_dict = settings.PG_CONN.copy()
         conn_dict['dbname'] = 'postgres'
         conn = psycopg2.connect(**conn_dict)
@@ -43,10 +51,13 @@ where schema_owner = '{settings.LAYMAN_PG_USER}'
         cur.execute(
             f"""CREATE DATABASE {settings.LAYMAN_PG_DBNAME} TEMPLATE {settings.LAYMAN_PG_TEMPLATE_DBNAME}""")
         conn.close()
+        print(f"DB {settings.LAYMAN_PG_DBNAME} created.")
 
     # redis
+    print(f"Flushing Redis DB {settings.LAYMAN_REDIS_URL}")
     settings.LAYMAN_REDIS.flushdb()
     import redis
+    print(f"Flushing Redis DB {os.environ['LTC_REDIS_URI']}")
     ltc_redis = redis.Redis.from_url(os.environ['LTC_REDIS_URI'], encoding="utf-8", decode_responses=True)
     ltc_redis.flushdb()
 
@@ -72,6 +83,7 @@ where schema_owner = '{settings.LAYMAN_PG_USER}'
     layman_rules = get_role_rules(all_rules, settings.LAYMAN_GS_ROLE)
     for rule in layman_rules:
         workspace = re.match(r"^([^.]+)\..*", rule).group(1)
+        print(f"Deleting GeoServer workspace {workspace}")
         r = requests.delete(
             urljoin(settings.LAYMAN_GS_REST_WORKSPACES, workspace),
             headers=headers_json,
@@ -81,6 +93,7 @@ where schema_owner = '{settings.LAYMAN_PG_USER}'
             }
         )
         r.raise_for_status()
+        print(f"Deleting GeoServer ACL rule {rule}")
         r = requests.delete(
             urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
             headers=headers_json,
@@ -116,7 +129,7 @@ where schema_owner = '{settings.LAYMAN_PG_USER}'
         urls = [ol.url for ol in record.distribution.online]
         url_part = f"://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/"
         if any((url_part in u for u in urls)):
-            print(f"Deleting record {record_id}")
+            print(f"Deleting metadata record {record_id}")
             csw.transaction(ttype='delete', typename='gmd:MD_Metadata', identifier=record_id)
 
 

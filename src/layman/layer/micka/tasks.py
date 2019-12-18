@@ -16,10 +16,12 @@ def refresh_csw_needed(username, layername, task_options):
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_csw(self, username, layername):
+def refresh_csw(self, username, layername, http_method='post'):
     if self.is_aborted():
         raise AbortedException
-    csw.csw_insert(username, layername)
+    # TODO implement also PATCH
+    if http_method == 'post':
+        csw.csw_insert(username, layername)
 
     if self.is_aborted():
         csw.delete_layer(username, layername)

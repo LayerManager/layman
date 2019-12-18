@@ -112,6 +112,7 @@ def patch(username, layername):
             'description': info['description'],
             'title': info['title'],
             'ensure_user': False,
+            'http_method': 'patch',
         }
 
         if delete_from == 'layman.layer.filesystem.input_file':
