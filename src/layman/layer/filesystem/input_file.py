@@ -5,13 +5,17 @@ import pathlib
 from osgeo import ogr
 
 from layman.http import LaymanError
-from layman import settings
+from layman import settings, patch_mode
 from . import util
 from layman.common.filesystem import util as common_util
 from layman.common.filesystem import input_file as common
 
 
 LAYER_SUBDIR = __name__.split('.')[-1]
+
+
+PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
+
 
 def get_layer_input_file_dir(username, layername):
     resumable_dir = os.path.join(util.get_layer_dir(username, layername),

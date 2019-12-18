@@ -9,9 +9,12 @@ from flask import g, current_app
 
 from layman.layer.filesystem.input_sld import get_layer_file
 from layman.http import LaymanError
-from layman import settings
+from layman import settings, patch_mode
 from . import headers_json
 from . import wms
+
+
+PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
 def update_layer(username, layername, layerinfo):

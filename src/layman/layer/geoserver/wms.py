@@ -8,13 +8,16 @@ from flask import g, current_app
 
 from . import headers_json
 from .util import get_gs_proxy_base_url
-from layman import settings
+from layman import settings, patch_mode
 from layman.cache import mem_redis
 from layman.layer.filesystem import input_file
 from layman.layer.util import is_layer_task_ready
 
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
+
+
+PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
 def get_flask_proxy_key(username):

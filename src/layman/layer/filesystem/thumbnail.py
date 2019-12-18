@@ -4,12 +4,16 @@ from urllib.parse import urljoin
 from layman import settings
 from flask import url_for
 
+from layman import patch_mode
 from . import util
 from layman.common.filesystem import util as common_util
 from . import input_file
 
 
 LAYER_SUBDIR = __name__.split('.')[-1]
+
+
+PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
 def get_layer_thumbnail_dir(username, layername):

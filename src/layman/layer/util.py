@@ -5,7 +5,7 @@ import re
 
 from flask import current_app, url_for, request, g
 
-from layman import LaymanError
+from layman import LaymanError, patch_mode
 from layman import settings
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name
 from layman import celery as celery_util
@@ -188,13 +188,19 @@ TASKS_TO_LAYER_INFO_KEYS = {
 }
 
 
-def delete_layer(username, layername, source=None):
+def delete_layer(username, layername, source=None, http_method='delete'):
     sources = get_sources()
     source_idx = next((
         idx for idx, m in enumerate(sources) if m.__name__ == source
     ), 0)
     end_idx = None if source_idx == 0 else source_idx-1
     sources = sources[:end_idx:-1]
+    if http_method == 'patch':
+        sources = [
+            m for m in sources
+            if m.PATCH_MODE == patch_mode.DELETE_IF_DEPENDANT
+        ]
+    # print(f"delete_layer {username}.{layername} using {len(sources)} sources: {[s.__name__ for s in sources]}")
 
     result = {}
     results = call_modules_fn(sources, 'delete_layer', [username, layername])
