@@ -85,6 +85,7 @@ def get_template_path_and_values(username, layername):
     uuid_file_path = get_publication_uuid_file(LAYER_TYPE, username, layername)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
 
+    unknown_value = 'neznámá hodnota'
     template_values = _get_template_values(
         username=username,
         layername=layername,
@@ -98,8 +99,8 @@ def get_template_path_and_values(username, layername):
         extent=wms_layer.boundingBoxWGS84,
         ows_url=urljoin(get_gs_proxy_base_url(), username + '/ows'),
         # TODO create config env variable to decide if to set organisation name or not
-        organisation_name='TODO',
-        data_organisation_name='TODO',
+        organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
+        data_organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
     )
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
     return template_path, template_values
