@@ -22,36 +22,21 @@ def main():
 
     # postgresql
     import psycopg2
-    try:
-        conn_dict = settings.PG_CONN.copy()
-        secret_conn_dict = {k: v for k, v in conn_dict.items() if k != 'password'}
-        print(f"Trying to connect to DB {secret_conn_dict}")
-        conn = psycopg2.connect(**settings.PG_CONN)
-        conn.autocommit = True
-        cur = conn.cursor()
-        cur.execute(f"""
+    conn_dict = settings.PG_CONN.copy()
+    conn = psycopg2.connect(**settings.PG_CONN)
+    conn.autocommit = True
+    cur = conn.cursor()
+    cur.execute(f"""
 select catalog_name, schema_name, schema_owner
 from information_schema.schemata
 where schema_owner = '{settings.LAYMAN_PG_USER}'
-    and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_USER_SCHEMAS))})
+and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_USER_SCHEMAS))})
 """)
-        rows = cur.fetchall()
-        print(f"Dropping schemas in DB {conn_dict['dbname']}: {[r[1] for r in rows]}")
-        for row in rows:
-            cur.execute(f"""DROP SCHEMA "{row[1]}" CASCADE""")
-        conn.close()
-        print(f"Schemas in DB {conn_dict['dbname']} dropped.")
-    except:
-        print(f"DB {conn_dict['dbname']} does not exists, creating.")
-        conn_dict = settings.PG_CONN.copy()
-        conn_dict['dbname'] = 'postgres'
-        conn = psycopg2.connect(**conn_dict)
-        conn.autocommit = True
-        cur = conn.cursor()
-        cur.execute(
-            f"""CREATE DATABASE {settings.LAYMAN_PG_DBNAME} TEMPLATE {settings.LAYMAN_PG_TEMPLATE_DBNAME}""")
-        conn.close()
-        print(f"DB {settings.LAYMAN_PG_DBNAME} created.")
+    rows = cur.fetchall()
+    print(f"Dropping schemas in DB {conn_dict['dbname']}: {[r[1] for r in rows]}")
+    for row in rows:
+        cur.execute(f"""DROP SCHEMA "{row[1]}" CASCADE""")
+    conn.close()
 
     # redis
     print(f"Flushing Redis DB {settings.LAYMAN_REDIS_URL}")

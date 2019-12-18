@@ -214,7 +214,7 @@ def test_post_layers_simple(client):
 
     # TODO for some reason this hangs forever on get() if run (either with src/layman/authz/read_everyone_write_owner_auth2_test.py::test_authn_map_access_rights or src/layman/authn/oauth2_test.py::test_patch_current_user_without_username) and with src/layman/common/metadata/util.csw_insert
     # last_task['last'].get()
-    # e.g. python3 src/wait_for_deps.py && python3 src/clear_layman_data.py && python3 -m pytest -W ignore::DeprecationWarning -xsvv src/layman/authn/oauth2_test.py::test_patch_current_user_without_username src/layman/layer/rest_test.py::test_post_layers_simple
+    # e.g. python3 -m pytest -W ignore::DeprecationWarning -xsvv src/layman/authn/oauth2_test.py::test_patch_current_user_without_username src/layman/layer/rest_test.py::test_post_layers_simple
     # this can badly affect also .get(propagate=False) in layman.celery.abort_task_chain
     # but hopefully this is only related to magic flask&celery test suite
     wait_till_ready(username, layername)
