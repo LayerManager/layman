@@ -10,10 +10,13 @@ from layman.layer.filesystem.uuid import get_layer_uuid
 from layman.layer.geoserver.wms import get_wms_proxy
 from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer import LAYER_TYPE
-from layman import settings
+from layman import settings, patch_mode
 from layman.util import url_for_external
 from urllib.parse import urljoin
 from xml.sax.saxutils import escape
+
+
+PATCH_MODE = patch_mode.NO_DELETE
 
 
 def get_metadata_uuid(uuid):

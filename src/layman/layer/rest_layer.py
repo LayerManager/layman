@@ -102,7 +102,7 @@ def patch(username, layername):
     layer_result = {}
 
     if delete_from is not None:
-        deleted = util.delete_layer(username, layername, source=delete_from)
+        deleted = util.delete_layer(username, layername, source=delete_from, http_method='patch')
         if sld_file is None:
             sld_file = deleted['sld']['file']
         input_sld.save_layer_file(username, layername, sld_file)

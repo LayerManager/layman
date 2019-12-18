@@ -7,12 +7,15 @@ import pathlib
 from flask import current_app
 
 from layman import LaymanError
-from layman import settings
+from layman import settings, patch_mode
 from . import util
 from . import input_file
 
 
 LAYER_SUBDIR = __name__.split('.')[-1]
+
+
+PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
 def get_layer_resumable_dir(username, layername):

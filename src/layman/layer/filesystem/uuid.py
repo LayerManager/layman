@@ -1,7 +1,11 @@
 from functools import partial
 
+from layman import patch_mode
 from layman.common.filesystem import uuid as common_uuid
 from . import input_file
+
+
+PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
 LAYER_TYPE = '.'.join(__name__.split('.')[:-2])
