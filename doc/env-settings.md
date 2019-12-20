@@ -42,6 +42,9 @@ Name of [PostgreSQL database](https://www.postgresql.org/docs/9.5/sql-createdata
 ## LAYMAN_PG_USER
 Name of [PostgreSQL user](https://www.postgresql.org/docs/9.5/sql-createuser.html) that Layman uses for authentication and communication with PostgreSQL. The user needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](#LAYMAN_PG_DBNAME) database. The LAYMAN_PG_USER must be another user than default `postgres` user! The user also needs access to `public` schema where PostGIS must be installed.
 
+## LAYMAN_PROXY_SERVER_NAME
+Flask-style server name (domain and port), to be used as Flask's [SERVER_NAME](https://flask.palletsprojects.com/en/1.1.x/config/#SERVER_NAME). 
+
 ## LAYMAN_REDIS_URL
 URL of [Redis logical database](https://redis.io/commands/select) including database number where Layman stores internal data about publications, users, etc. Layman flushes the whole logical database on every startup!
 
