@@ -5,7 +5,7 @@ Layman is able to publish partial metadata records to [OGC Catalogue Service](ht
 - [metadata properties guessable by Layman](#metadata-properties-guessable-by-layman) (not yet implemented) 
 - [metadata properties unknown to Layman](#metadata-properties-unknown-to-layman), that are needed to create metadata record acceptable by Micka. 
 
-Although metadata records sent to Micka are partial, they can (and should) be completed using Micka web editor GUI.
+Although metadata records sent to Micka are partial, they can (and should) be completed using Micka web editor GUI. URL of layer's metadata record leading to Micka's GUI is available in [GET Layer](rest.md#get-layer) response as `metadata.record_url` property. To complete metadata records, just open this URL in browser, log in to micka as editor or admin, and complete the record.
 
 Properties listed below contains XPath expression pointing to specific placement of the property inside metadata document. All listed metadata properties on Micka can be synced with metadata properties provided by Layman, whereas only some properties on Layman can be synced with properties provided by Micka (only `title` and `abstract`). No synchronization is implemented yet.
 
