@@ -224,7 +224,7 @@ def abort_task_chain__deprecated(results_by_order, results_by_name=None):
 
 
 def is_task_successful(task_info):
-    return task_info['last'].successful()
+    return task_info['last'].successful() or task_info['finished'] is True
 
 
 def is_task_failed(task_info):
@@ -232,7 +232,7 @@ def is_task_failed(task_info):
 
 
 def is_task_ready(task_info):
-    return is_task_successful(task_info) or is_task_failed(task_info) or task_info['finished'] is True
+    return is_task_successful(task_info) or is_task_failed(task_info)
 
 
 def _get_publication_hash(username, publication_type, publication_name):
