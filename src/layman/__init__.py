@@ -9,19 +9,6 @@ app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
 
 
-def _is_ip_address(maybe_ip):
-    import socket
-    try:
-        socket.inet_aton(maybe_ip)
-        return True
-    except socket.error:
-        return False
-
-
-if "." in settings.LAYMAN_PROXY_SERVER_NAME and not _is_ip_address(settings.LAYMAN_PROXY_SERVER_NAME):
-    app.config['SERVER_NAME'] = settings.LAYMAN_PROXY_SERVER_NAME
-
-
 from .http import LaymanError
 from .make_celery import make_celery
 celery_app = make_celery(app)
