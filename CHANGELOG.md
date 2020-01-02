@@ -1,6 +1,15 @@
 # Changelog
 
-## Version 1.1.0 (2019-12)
+## v1.1.2
+2019-12-26
+- Allow requesting layman from other docker containers (fix [#38](https://github.com/jirik/layman/issues/38))
+
+## v1.1.1
+2019-12-23
+- Fix PENDING in state after celery task is removed from redis
+
+## v1.1.0
+2019-12-23
 - Publish metadata record of [layer](doc/models.md#layer) to Micka on [POST Layers](doc/rest.md#post-layers). Connection to Micka is configurable using [CSW_*](doc/env-settings.md) environment variables.
 - Delete metadata record of layer from Micka on [DELETE Layer](doc/rest.md#delete-layer).
 - Add `metatada` info to [GET Layer](doc/rest.md#get-layer) response, including CSW URL and metadata record URL.
