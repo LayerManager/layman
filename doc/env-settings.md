@@ -47,7 +47,7 @@ Dotted path to Python module to be used for authorization. Paths are separated w
 Client ID of Layman's Test Client registered as OAuth2 provider at Liferay instance.
 
 ### OAUTH2_LIFERAY_CLIENT&lt;n&gt;_ID
-Client ID of another Layman's client registered as OAuth2 provider at Liferay instance. The **&lt;n&gt;** must be integer starting from `1`. In case of more clients other than LTC, list of **&lt;n&gt;**s must be uninterrupted series of integers.
+Client ID of another Layman's client registered as OAuth2 provider at Liferay instance. The **n** must be integer starting from `1`. In case of more clients other than LTC, list of **n**s must be uninterrupted series of integers.
 
 ### OAUTH2_LIFERAY_SECRET
 Client secret of Layman's Test Client registered as OAuth2 provider at Liferay instance.
