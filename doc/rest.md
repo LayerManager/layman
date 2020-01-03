@@ -219,7 +219,7 @@ Check [Asynchronous file upload](async-file-upload.md) example.
 
 The endpoint is activated after [POST Layers](#post-layers) or [PATCH Layer](#patch-layer) request if and only if the **file** parameter contained file name(s). The endpoint is active till first of the following happens:
 - all file chunks are uploaded
-- no chunk is uploaded within [UPLOAD_MAX_INACTIVITY_TIME](../src/layman_settings.py)
+- no chunk is uploaded within [UPLOAD_MAX_INACTIVITY_TIME](../src/layman_settings_demo.py)
 - layer is deleted
 
 ### URL

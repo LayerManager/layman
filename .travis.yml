@@ -4,6 +4,9 @@ dist: trusty
 
 language: bash
 
+node_js:
+  - "11"
+
 services:
 - docker
 
@@ -20,6 +23,8 @@ script:
 - make geoserver-reset-default-layman-datadir
 - cp .env.test .env
 - make test
+- npm install --global remark-cli remark-validate-links remark-lint-no-dead-urls
+- remark --frail *.md */*.md */*/*.md
 
 after_failure:
 - docker logs layman_celery_worker_test_1
