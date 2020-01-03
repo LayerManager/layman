@@ -54,7 +54,7 @@ Although LTC is currently the only OAuth2 client for Layman, there is an intenti
 
 Schema specific for LTC, distinguishing client side and server side of LTC:
 
-![auth-code.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercotent.com/jirik/layman/master/doc/oauth2/auth-code.puml) 
+![auth-code.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/master/doc/oauth2/auth-code.puml) 
 
 ### Request Layman REST API
 After successful authorization, *client* is able to communicate with Layman REST API. To authenticate using OAuth2, every request to Layman REST API must contain two HTTP headers:
