@@ -198,7 +198,7 @@ layman       |  * Restarting with stat
 layman       |  * Debugger is active!
 layman       |  * Debugger PIN: 103-830-055
 ```
-Then visit [http://localhost:8000/](). You will see simple web client that interacts with [REST API](doc/rest.md).
+Then visit [http://localhost:8000/](http://localhost:8000/). You will see simple web client that interacts with [REST API](doc/rest.md).
 
 To stop running service, press Ctrl+C.
 
