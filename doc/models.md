@@ -13,7 +13,7 @@
 - Thumbnail image available
 - Layer-related data is named and structured 
   - either by username and layername
-      - [REST API](doc/rest.md): `/rest/<username>/layers/<layername>` 
+      - [REST API](rest.md): `/rest/<username>/layers/<layername>` 
       - [filesystem](data-storage.md#filesystem): `/path/to/LAYMAN_DATA_DIR/users/<username>/layers/<layername>` 
       - [PostgreSQL](data-storage.md#postgresql): `db=LAYMAN_PG_DBNAME, schema=<username>, table=<layername>` 
       - [GeoServer WMS/WFS](data-storage.md#geoserver): `/geoserver/<username>/ows, layer=<layername>, style=<layername>` 
@@ -35,7 +35,7 @@
 - Documented [map publishing](publish-map.md) process 
 - Thumbnail image available
 - Map-related data is named and structured first by username, second by mapname
-  - [REST API](doc/rest.md): `/rest/<username>/maps/<mapname>` 
+  - [REST API](rest.md): `/rest/<username>/maps/<mapname>` 
   - file system: `/path/to/LAYMAN_DATA_DIR/users/<username>/maps/<mapname>` 
   
 ## User

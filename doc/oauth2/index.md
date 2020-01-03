@@ -38,8 +38,8 @@ Layman acts as *resource server*. On every request to REST API, Layman accepts O
 [Layman Test Client](https://github.com/jirik/layman-test-client) (LTC) acts as *client*. It is responsible for
 - asking appropriate [authorization grant](https://tools.ietf.org/html/rfc6749#section-1.3) from *resource server* to get valid access token
 - safely storing access token and [refresh token](https://oauth.net/2/grant-types/refresh-token/) during end-user's session
-- fetching user-related metadata from Layman's [GET Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#get-current-user)
-- reserving username for the end-user on Layman's side using [PATCH Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#patch-current-user) if end-user does not have any username yet
+- fetching user-related metadata from Layman's [GET Current User](../rest.md#get-current-user)
+- reserving username for the end-user on Layman's side using [PATCH Current User](../rest.md#patch-current-user) if end-user does not have any username yet
 - passing access token to Layman REST API with every request
 - refreshing access token using refresh token
 
@@ -54,7 +54,7 @@ Although LTC is currently the only OAuth2 client for Layman, there is an intenti
 
 Schema specific for LTC, distinguishing client side and server side of LTC:
 
-![auth-code.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2/auth-code.puml) 
+![auth-code.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/master/doc/oauth2/auth-code.puml) 
 
 ### Request Layman REST API
 After successful authorization, *client* is able to communicate with Layman REST API. To authenticate using OAuth2, every request to Layman REST API must contain two HTTP headers:
@@ -69,23 +69,23 @@ Because access token is known only on server side of LTC and not to client side,
  
 General schema of any request to Layman REST API:
 
-![rest.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2/rest.puml)
+![rest.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/master/doc/oauth2/rest.puml)
 
 
 ### Fetch User-Related Metadata
-Fetching user-related metadata happens automatically immediately after successful initial authorization by [GET Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#get-current-user).
+Fetching user-related metadata happens automatically immediately after successful initial authorization by [GET Current User](../rest.md#get-current-user).
 
-![get-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2/get-current-user.puml)
+![get-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/master/doc/oauth2/get-current-user.puml)
 
 The fetch should happen regularly during end-user session to test if authentication (access token) is still valid. 
  
 
 ### Reserve Username
-Immediately after the first [fetch of user-related metadata](#fetch-user-related-metadata), *client* should check if **username** was already reserved for authenticated end-user (response to [GET Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#get-current-user) contains `username`) or not (response does not contains `username`). If username was not reserved yet, it is recommended to reserve it as soon as possible, because it's required when user wants to publish any data.
+Immediately after the first [fetch of user-related metadata](#fetch-user-related-metadata), *client* should check if **username** was already reserved for authenticated end-user (response to [GET Current User](../rest.md#get-current-user) contains `username`) or not (response does not contains `username`). If username was not reserved yet, it is recommended to reserve it as soon as possible, because it's required when user wants to publish any data.
 
-Username is reserved by [PATCH Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#patch-current-user). Username can be either generated automatically (this approach is used by LTC) or set manually; this is controlled by `adjust_username` parameter.
+Username is reserved by [PATCH Current User](../rest.md#patch-current-user). Username can be either generated automatically (this approach is used by LTC) or set manually; this is controlled by `adjust_username` parameter.
 
-![patch-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2/patch-current-user.puml) 
+![patch-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/master/doc/oauth2/patch-current-user.puml) 
 
 ### Refresh Access Token
 During end-user's session, *client* keeps both access tokens and refresh token. When access token expires or it's lifetime is close, *client* should use refresh token to generate new access token at [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2).
@@ -94,23 +94,23 @@ Refreshing flow between *client* and *authorization server* is described in [Lif
 
 Schema specific for LTC:
 
-![refresh.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/auth-stage2/doc/oauth2/refresh.puml) 
+![refresh.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/master/doc/oauth2/refresh.puml) 
 
 
 ## Settings
 
 To enable OAuth2 authentication in Layman, adjust following [environment settings](../env-settings.md):
-- LAYMAN_AUTHN_MODULES
-- LAYMAN_AUTHN_OAUTH2_PROVIDERS
-- OAUTH2_LIFERAY_AUTH_URL
-- OAUTH2_LIFERAY_INTROSPECTION_URL
-- OAUTH2_LIFERAY_USER_PROFILE_URL
-- OAUTH2_LIFERAY_CLIENT_ID
-- OAUTH2_LIFERAY_SECRET
-- OAUTH2_LIFERAY_TOKEN_URL
-- OAUTH2_LIFERAY_CALLBACK_URL
+- [LAYMAN_AUTHN_MODULES](../env-settings.md#LAYMAN_AUTHN_MODULES)
+- [LAYMAN_AUTHN_OAUTH2_PROVIDERS](../env-settings.md#LAYMAN_AUTHN_OAUTH2_PROVIDERS)
+- [OAUTH2_LIFERAY_AUTH_URL](../env-settings.md#OAUTH2_LIFERAY_AUTH_URL)
+- [OAUTH2_LIFERAY_INTROSPECTION_URL](../env-settings.md#OAUTH2_LIFERAY_INTROSPECTION_URL)
+- [OAUTH2_LIFERAY_USER_PROFILE_URL](../env-settings.md#OAUTH2_LIFERAY_USER_PROFILE_URL)
+- [OAUTH2_LIFERAY_CLIENT_ID](../env-settings.md#OAUTH2_LIFERAY_CLIENT_ID)
+- [OAUTH2_LIFERAY_SECRET](../env-settings.md#OAUTH2_LIFERAY_SECRET)
+- [OAUTH2_LIFERAY_TOKEN_URL](../env-settings.md#OAUTH2_LIFERAY_TOKEN_URL)
+- [OAUTH2_LIFERAY_CALLBACK_URL](../env-settings.md#OAUTH2_LIFERAY_CALLBACK_URL)
 
-Sample values for OAuth2 authentication can be found in [`layman_settings_dev.py`](../src/layman_settings_dev.py).
+Sample values for OAuth2 authentication can be found in [`layman_settings_dev.py`](../../src/layman_settings_dev.py).
 
 ### Liferay Settings
 Every *client* must be registered in Liferay as *application*, as described in [Liferay documentation](https://portal.liferay.dev/docs/7-1/deploy/-/knowledge_base/d/oauth-2-0#creating-an-application). For LTC, fill in following settings:
@@ -142,7 +142,7 @@ Check following environment variables of LTC:
 - OAUTH2_LIFERAY_AUTH_URL: URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), usually the same as the first URL from Layman's OAUTH2_LIFERAY_AUTH_URLS
 - OAUTH2_LIFERAY_TOKEN_URL: URL of [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2). In case of liferay, it's something like `<http or https>://<Liferay domain and port>/o/oauth2/token`
 - OAUTH2_LIFERAY_CALLBACK_URL: URL of [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2), the value is `<http or https>://<LTC domain, port, and path prefix>/auth/oauth2-liferay/callback`.
-- OAUTH2_LIFERAY_USER_PROFILE_URL: URL of Layman's [GET Current User](https://github.com/jirik/layman/blob/auth-stage2/doc/rest.md#get-current-user)
+- OAUTH2_LIFERAY_USER_PROFILE_URL: URL of Layman's [GET Current User](../rest.md#get-current-user)
 
 
 
