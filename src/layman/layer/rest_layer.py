@@ -104,8 +104,12 @@ def patch(username, layername):
     if delete_from is not None:
         deleted = util.delete_layer(username, layername, source=delete_from, http_method='patch')
         if sld_file is None:
-            sld_file = deleted['sld']['file']
-        input_sld.save_layer_file(username, layername, sld_file)
+            try:
+                sld_file = deleted['sld']['file']
+            except KeyError:
+                pass
+        if sld_file is not None:
+            input_sld.save_layer_file(username, layername, sld_file)
 
         task_options = {
             'crs_id': crs_id,
