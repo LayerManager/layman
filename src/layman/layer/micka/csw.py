@@ -4,8 +4,8 @@ import pathlib
 
 from flask import current_app
 
-from . import util
 from layman.common.filesystem.uuid import get_publication_uuid_file
+from layman.common.micka import util as common_util
 from layman.layer.filesystem.uuid import get_layer_uuid
 from layman.layer.geoserver.wms import get_wms_proxy
 from layman.layer.geoserver.util import get_gs_proxy_base_url
@@ -25,7 +25,7 @@ def get_metadata_uuid(uuid):
 
 def get_layer_info(username, layername):
     uuid = get_layer_uuid(username, layername)
-    csw = util.create_csw()
+    csw = common_util.create_csw()
     if uuid is None or csw is None:
         return {}
     muuid = get_metadata_uuid(uuid)
@@ -67,13 +67,13 @@ def delete_layer(username, layername):
     muuid = get_metadata_uuid(uuid)
     if muuid is None:
         return
-    util.csw_delete(muuid)
+    common_util.csw_delete(muuid)
 
 
 def csw_insert(username, layername):
     template_path, template_values = get_template_path_and_values(username, layername)
-    record = util.fill_template_as_pretty_str(template_path, template_values)
-    muuid = util.csw_insert({
+    record = common_util.fill_template_as_pretty_str(template_path, template_values)
+    muuid = common_util.csw_insert({
         'record': record
     })
     return muuid

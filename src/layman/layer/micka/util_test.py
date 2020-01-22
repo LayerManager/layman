@@ -14,7 +14,7 @@ from layman import settings
 from layman.layer import LAYER_TYPE
 from .csw import _get_template_values
 
-from . import util
+from layman.common.micka import util as common_util
 
 
 @pytest.fixture(scope="module")
@@ -58,7 +58,7 @@ def test_fill_template(client):
         os.remove(xml_path)
     except OSError:
         pass
-    file_object = util.fill_template('src/layman/layer/micka/record-template.xml', _get_template_values())
+    file_object = common_util.fill_template('src/layman/layer/micka/record-template.xml', _get_template_values())
     with open(xml_path, 'w') as out:
         out.write(file_object.read())
 
@@ -74,7 +74,7 @@ def test_fill_template(client):
 def test_num_records(client):
     publs_by_type = uuid.check_redis_consistency()
     num_layers = len(publs_by_type[LAYER_TYPE])
-    csw = util.create_csw()
+    csw = common_util.create_csw()
     assert csw is not None, f"{settings.CSW_URL}, {settings.CSW_BASIC_AUTHN}"
     from owslib.fes import PropertyIsEqualTo, PropertyIsLike, BBox
     any_query = PropertyIsLike('apiso:Identifier', '*', wildCard='*')

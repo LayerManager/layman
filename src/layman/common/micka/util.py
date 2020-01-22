@@ -1,9 +1,9 @@
 import os
-from xml.etree import ElementTree as ET
-from io import StringIO
-from owslib.csw import CatalogueServiceWeb
 from owslib.util import nspath_eval
 from flask import g, current_app
+from io import StringIO
+from owslib.csw import CatalogueServiceWeb
+from xml.etree import ElementTree as ET
 from layman import settings, LaymanError
 import requests
 
