@@ -2,8 +2,9 @@
 <gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco"
 xmlns:xlink="http://www.w3.org/1999/xlink"
 xmlns:gmx="http://www.isotc211.org/2005/gmx"
+xmlns:srv="http://www.isotc211.org/2005/srv"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/iso/19139/20060504/gmd/metadataEntity.xsd http://www.isotc211.org/2005/gmx http://schemas.opengis.net/iso/19139/20060504/gmx/gmx.xsd">
+xsi:schemaLocation="http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd http://www.isotc211.org/2005/gmx http://schemas.opengis.net/iso/19139/20060504/gmx/gmx.xsd">
 
 	<gmd:fileIdentifier>
 		<gco:CharacterString>{file_identifier}</gco:CharacterString>
@@ -42,10 +43,18 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 
 	<gmd:dateStamp gco:nilReason="template" />
 
+    <gmd:metadataStandardName>
+        <gco:CharacterString xmlns:gco="http://www.isotc211.org/2005/gco">ISO 19115/INSPIRE_TG2/CZ4</gco:CharacterString>
+    </gmd:metadataStandardName>
+
+    <gmd:metadataStandardVersion>
+        <gco:CharacterString xmlns:gco="http://www.isotc211.org/2005/gco">2003/cor.1/2006</gco:CharacterString>
+    </gmd:metadataStandardVersion>
+
 	{reference_system}
 
 	<gmd:identificationInfo>
-		<gmd:MD_DataIdentification>
+		<srv:SV_ServiceIdentification>
 			<gmd:citation>
 				<gmd:CI_Citation>
 					<gmd:title>
@@ -57,6 +66,14 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 							<gmd:code>{data_identifier}</gmd:code>
 						</gmd:MD_Identifier>
 					</gmd:identifier>
+					<gmd:presentationForm>
+						<gmd:CI_PresentationFormCode codeListValue="documentDigital"
+													 codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_PresentationFormCode">documentDigital</gmd:CI_PresentationFormCode>
+					</gmd:presentationForm>
+					<gmd:presentationForm>
+						<gmd:CI_PresentationFormCode codeListValue="mapDigital"
+													 codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_PresentationFormCode">mapDigital</gmd:CI_PresentationFormCode>
+					</gmd:presentationForm>
 				</gmd:CI_Citation>
 			</gmd:citation>
 
@@ -141,29 +158,19 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 				</gmd:MD_LegalConstraints>
 			</gmd:resourceConstraints>
 
-			<!-- ??? -->
-			<gmd:spatialResolution>
-				<gmd:MD_Resolution>
-					<gmd:equivalentScale>
-						<gmd:MD_RepresentativeFraction>{scale_denominator}</gmd:MD_RepresentativeFraction>
-					</gmd:equivalentScale>
-				</gmd:MD_Resolution>
-			</gmd:spatialResolution>
+			<srv:serviceType>
+				<gco:LocalName xmlns:gco="http://www.isotc211.org/2005/gco"
+							   codeSpace="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType">Map</gco:LocalName>
+			</srv:serviceType>
 
 			{dataset_language}
 
-			<gmd:characterSet>
-				<gmd:MD_CharacterSetCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>
-			</gmd:characterSet>
-
-			<gmd:topicCategory gco:nilReason="unknown" />
-
-			<gmd:extent>
+			<srv:extent>
 				<gmd:EX_Extent>
 					<gmd:geographicElement>{extent}</gmd:geographicElement>
 				</gmd:EX_Extent>
-			</gmd:extent>
-		</gmd:MD_DataIdentification>
+			</srv:extent>
+		</srv:SV_ServiceIdentification>
 	</gmd:identificationInfo>
 
 	<gmd:distributionInfo>
@@ -201,24 +208,5 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 			</gmd:transferOptions>
 		</gmd:MD_Distribution>
 	</gmd:distributionInfo>
-
-	<gmd:dataQualityInfo>
-		<gmd:DQ_DataQuality>
-			<!-- ??? -->
-			<gmd:scope>
-				<gmd:DQ_Scope>
-					<gmd:level>
-						<gmd:MD_ScopeCode codeListValue="dataset" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode">dataset</gmd:MD_ScopeCode>
-					</gmd:level>
-				</gmd:DQ_Scope>
-			</gmd:scope>
-
-			<gmd:lineage>
-				<gmd:LI_Lineage>
-					<gmd:statement gco:nilReason="unknown" />
-				</gmd:LI_Lineage>
-			</gmd:lineage>
-		</gmd:DQ_DataQuality>
-	</gmd:dataQualityInfo>
 
 </gmd:MD_Metadata>
