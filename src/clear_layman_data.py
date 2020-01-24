@@ -99,7 +99,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
           <csw:ElementSetName>summary</csw:ElementSetName>
           <csw:Constraint version="1.1.0">
            <ogc:Filter xmlns:gml="http://www.opengis.net/gml">
-             <ogc:PropertyIsLike wildCard="*" singleChar="@" escapeChar="\">
+             <ogc:PropertyIsLike wildCard="*" singleChar="@" escapeChar="\\">
                <ogc:PropertyName>apiso:Identifier</ogc:PropertyName>
                <ogc:Literal>*</ogc:Literal>
              </ogc:PropertyIsLike>

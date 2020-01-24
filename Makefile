@@ -145,7 +145,7 @@ test-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
 
 test-bash:
-	docker-compose -f docker-compose.test.yml run --rm layman_test bash
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm layman_test bash
 
 test-wait-for-deps:
 	docker-compose -f docker-compose.deps.yml rm -fsv
@@ -216,6 +216,14 @@ micka-restart:
 
 micka-bash:
 	docker-compose -f docker-compose.deps.yml exec micka bash
+
+micka-logs:
+	mkdir -p deps/micka/log/micka
+	mkdir -p deps/micka/log/nginx
+	rm -rf deps/micka/log/micka/*
+	rm -rf deps/micka/log/nginx/*
+	docker cp micka:/var/www/html/Micka/php/log/. deps/micka/log/micka
+	docker cp micka:/var/log/nginx/. deps/micka/log/nginx
 
 stop-all-docker-containers:
 	docker stop $$(docker ps -q)

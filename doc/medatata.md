@@ -41,8 +41,6 @@ XPath
   - multiplicity 1
   - revision date
 
-Synchronizable from Micka to Layman: False
-
 ### data_identifier
 XPath
 - `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gmx:Anchor/@xlink:href`

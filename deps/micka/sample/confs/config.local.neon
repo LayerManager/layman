@@ -1,9 +1,15 @@
+#
+# WARNING: it is CRITICAL that this file & directory are NOT accessible directly via a web browser!
+# https://nette.org/security-warning
+#
 parameters:
     app:
+        # URL
+        # mickaUrl = http://localhost:3080/micka
         # UI theme
         layoutTheme = default
         # UI langauges (must have translation files)
-        langs = 'eng,cze'
+        langs = 'cze,eng'
         # dafult profile used
         startProfil = 5
         #records per page
@@ -53,34 +59,23 @@ parameters:
         postcode = ""
         phone = ""
         www = ""    
-    langCodes: 
-        cs: cze
-        da: dan
-        de: ger
-        en: eng
-        es: spa
-        fi: fin
-        fr: fre
-        hu: hun
-        it: ita
-        lv: lav
-        no: nor
-        pl: pol
-        pt: por
-        sk: slo
-        sl: slv
-        sv: swe
+    csw:
+        portal = "_DATA_TYPE_ = 2"
 
-database:
-    dsn: 'pgsql:host=postgresql;dbname=hsrs_micka6;port=5432'
-    user: 'docker'
+dibi:
+    driver: postgre
+    host: postgresql
+    port: 5432
+    database: hsrs_micka6
+    username: 'docker'
     password: 'docker'
+    charset: utf-8
+    profiler: false
     debugger: false
-    options:
-        lazy: yes
+    lazy: yes
 
 translation:
     default: en
-    fallback: [cs]
+#    fallback: [en]
     resolvers:
         header: off
