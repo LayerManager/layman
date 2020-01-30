@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 import os
 import pathlib
 
@@ -94,6 +94,7 @@ def get_template_path_and_values(username, layername):
         abstract=wms_layer.abstract or None,
         date=publ_datetime.strftime('%Y-%m-%d'),
         date_type='publication',
+        date_stamp=date.today().strftime('%Y-%m-%d'),
         data_identifier=url_for_external('rest_layer.get', username=username, layername=layername),
         data_identifier_label=layername,
         extent=wms_layer.boundingBoxWGS84,
@@ -116,6 +117,7 @@ def _get_template_values(
         data_organisation_name=None,
         date='2007-05-25',
         date_type='revision',
+        date_stamp='2007-05-25',
         data_identifier='http://www.env.cz/data/corine/1990',
         data_identifier_label='MZP-CORINE',
         extent=None,  # w, s, e, n
@@ -167,6 +169,9 @@ f"""
     </gmd:dateType>
 </gmd:CI_Date>
 """,
+
+        # date stamp of metadata
+        'date_stamp': date_stamp,
 
         # it must be URI, but text node is optional (MZP-CORINE)
         # it can point to Layman's Layer endpoint
