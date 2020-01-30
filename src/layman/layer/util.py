@@ -111,7 +111,8 @@ def get_layer_info(username, layername):
         if task_name not in TASKS_TO_LAYER_INFO_KEYS:
             continue
         for layerinfo_key in TASKS_TO_LAYER_INFO_KEYS[task_name]:
-            partial_info[layerinfo_key] = source_state
+            if layerinfo_key not in partial_info or not res.successful():
+                partial_info[layerinfo_key] = source_state
 
     return partial_info
 

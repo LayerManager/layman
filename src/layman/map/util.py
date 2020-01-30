@@ -115,7 +115,8 @@ def get_map_info(username, mapname):
         if task_name not in TASKS_TO_MAP_INFO_KEYS:
             continue
         for mapinfo_key in TASKS_TO_MAP_INFO_KEYS[task_name]:
-            partial_info[mapinfo_key] = source_state
+            if mapinfo_key not in partial_info or not res.successful():
+                partial_info[mapinfo_key] = source_state
 
     return partial_info
 
