@@ -1,6 +1,13 @@
-from layman import patch_mode
-from layman.util import url_for_external
+import os
+from datetime import datetime
 from xml.sax.saxutils import escape
+from layman import settings, patch_mode
+from layman.common.filesystem.uuid import get_publication_uuid_file
+from layman.common.micka import util as common_util
+from layman.map import MAP_TYPE
+from layman.map.filesystem.uuid import get_map_uuid
+from layman.map.filesystem.input_file import get_map_json
+from layman.util import url_for_external
 
 
 PATCH_MODE = patch_mode.NO_DELETE
@@ -10,14 +17,98 @@ def get_metadata_uuid(uuid):
     return f"m-{uuid}" if uuid is not None else None
 
 
+def get_map_info(username, mapname):
+    uuid = get_map_uuid(username, mapname)
+    csw = common_util.create_csw()
+    if uuid is None or csw is None:
+        return {}
+    muuid = get_metadata_uuid(uuid)
+    csw.getrecordbyid(id=[muuid], esn='brief')
+    if muuid in csw.records:
+        return {
+            'metadata': {
+                'csw_url': settings.CSW_URL,
+                'record_url': settings.CSW_RECORD_URL.format(identifier=muuid),
+            }
+        }
+    else:
+        return {}
+
+
+def get_map_names(username):
+    # TODO consider reading map names from all Micka's metadata records by linkage URL
+    return []
+
+
+def get_publication_names(username, publication_type):
+    if publication_type != '.'.join(__name__.split('.')[:-2]):
+        raise Exception(f'Unknown pyblication type {publication_type}')
+
+    return []
+
+
+def get_publication_uuid(username, publication_type, publication_name):
+    return None
+
+
+def delete_map(username, mapname):
+    uuid = get_map_uuid(username, mapname)
+    muuid = get_metadata_uuid(uuid)
+    if muuid is None:
+        return
+    common_util.csw_delete(muuid)
+
+
+def post_map(username, mapname):
+    pass
+
+
+def patch_map(username, mapname):
+    pass
+
+
+def csw_insert(username, mapname):
+    template_path, template_values = get_template_path_and_values(username, mapname)
+    record = common_util.fill_template_as_pretty_str(template_path, template_values)
+    muuid = common_util.csw_insert({
+        'record': record
+    })
+    return muuid
+
+
+def get_template_path_and_values(username, mapname):
+    uuid_file_path = get_publication_uuid_file(MAP_TYPE, username, mapname)
+    publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
+    map_json = get_map_json(username, mapname)
+
+    unknown_value = 'neznámá hodnota'
+    template_values = _get_template_values(
+        username=username,
+        mapname=mapname,
+        uuid=get_map_uuid(username, mapname),
+        title=map_json['title'],
+        abstract=map_json['abstract'] or None,
+        date=publ_datetime.strftime('%Y-%m-%d'),
+        date_type='publication',
+        data_identifier=url_for_external('rest_map.get', username=username, mapname=mapname),
+        data_identifier_label=mapname,
+        extent=[float(c) for c in map_json['extent']],
+        # TODO create config env variable to decide if to set organisation name or not
+        organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
+        data_organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
+    )
+    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
+    return template_path, template_values
+
+
 def _get_template_values(
         username='browser',
         mapname='map',
         uuid='af238200-8200-1a23-9399-42c9fca53543',
         title='Administrativní členění Libereckého kraje',
         abstract=None,
-        organisation_name='unknown',
-        data_organisation_name='unknown',
+        organisation_name=None,
+        data_organisation_name=None,
         date='2007-05-25',
         date_type='revision',
         data_identifier='http://www.env.cz/data/liberec/admin-cleneni',

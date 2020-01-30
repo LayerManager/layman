@@ -11,9 +11,7 @@
   </gmd:hierarchyLevel>
   <gmd:contact>
     <gmd:CI_ResponsibleParty>
-      <gmd:organisationName>
-        <gco:CharacterString>unknown</gco:CharacterString>
-      </gmd:organisationName>
+      <gmd:organisationName gco:nilReason="unknown" />
       <gmd:contactInfo>
         <gmd:CI_Contact>
           <gmd:address>
@@ -86,9 +84,7 @@
       <gmd:abstract gco:nilReason="unknown" />
       <gmd:pointOfContact>
         <gmd:CI_ResponsibleParty>
-          <gmd:organisationName>
-            <gco:CharacterString>unknown</gco:CharacterString>
-          </gmd:organisationName>
+          <gmd:organisationName gco:nilReason="unknown" />
           <gmd:contactInfo>
             <gmd:CI_Contact>
               <gmd:address>

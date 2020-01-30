@@ -85,6 +85,7 @@ def get_map_names(username):
 
 TASKS_TO_MAP_INFO_KEYS = {
     'layman.map.filesystem.thumbnail.refresh': ['thumbnail'],
+    'layman.map.micka.csw.refresh': ['metadata'],
 }
 
 
@@ -173,6 +174,9 @@ def get_complete_map_info(username=None, mapname=None, cached=False):
             'status': 'NOT_AVAILABLE'
         },
         'thumbnail': {
+            'status': 'NOT_AVAILABLE'
+        },
+        'metadata': {
             'status': 'NOT_AVAILABLE'
         },
     }
