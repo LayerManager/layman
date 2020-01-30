@@ -31,7 +31,9 @@
       </gmd:role>
     </gmd:CI_ResponsibleParty>
   </gmd:contact>
-  <gmd:dateStamp gco:nilReason="template" />
+  <gmd:dateStamp>
+    <gco:Date>2007-05-25</gco:Date>
+  </gmd:dateStamp>
   <gmd:metadataStandardName>
     <gco:CharacterString>ISO 19115/INSPIRE_TG2/CZ4</gco:CharacterString>
   </gmd:metadataStandardName>

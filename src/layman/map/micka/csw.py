@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from xml.sax.saxutils import escape
 from layman import settings, patch_mode
 from layman.common.filesystem.uuid import get_publication_uuid_file
@@ -90,6 +90,7 @@ def get_template_path_and_values(username, mapname):
         abstract=map_json['abstract'] or None,
         date=publ_datetime.strftime('%Y-%m-%d'),
         date_type='publication',
+        date_stamp=date.today().strftime('%Y-%m-%d'),
         data_identifier=url_for_external('rest_map.get', username=username, mapname=mapname),
         data_identifier_label=mapname,
         extent=[float(c) for c in map_json['extent']],
@@ -111,6 +112,7 @@ def _get_template_values(
         data_organisation_name=None,
         date='2007-05-25',
         date_type='revision',
+        date_stamp='2007-05-25',
         data_identifier='http://www.env.cz/data/liberec/admin-cleneni',
         data_identifier_label='Liberec-AdminUnits',
         extent=None,  # w, s, e, n
@@ -160,6 +162,9 @@ f"""
     </gmd:dateType>
 </gmd:CI_Date>
 """,
+
+        # date stamp of metadata
+        'date_stamp': f"""<gco:Date>{date_stamp}</gco:Date>""",
 
         # it must be URI, but text node is optional (MZP-CORINE)
         # it can point to Layman's Layer endpoint
