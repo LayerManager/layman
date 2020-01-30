@@ -73,13 +73,13 @@ def test_fill_template(client):
 @pytest.mark.usefixtures('app_context')
 def test_num_records(client):
     publs_by_type = uuid.check_redis_consistency()
-    num_layers = len(publs_by_type[LAYER_TYPE])
+    num_publications = sum([len(publs) for publs in publs_by_type.values()])
     csw = common_util.create_csw()
     assert csw is not None, f"{settings.CSW_URL}, {settings.CSW_BASIC_AUTHN}"
     from owslib.fes import PropertyIsEqualTo, PropertyIsLike, BBox
     any_query = PropertyIsLike('apiso:Identifier', '*', wildCard='*')
     csw.getrecords2(constraints=[any_query], maxrecords=100)
     assert csw.exceptionreport is None
-    assert len(csw.records) == num_layers
+    assert len(csw.records) == num_publications
 
 

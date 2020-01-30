@@ -32,9 +32,11 @@ PUBLICATION_TYPES = {
             'layman.map.filesystem.uuid',
             'layman.map.filesystem.input_file',
             'layman.map.filesystem.thumbnail',
+            'layman.map.micka.csw',
         ],
         'task_modules': [
             'layman.map.filesystem.tasks',
+            'layman.map.micka.tasks',
         ],
         'layman.common.filesystem': {
             'publications_dir': 'maps'

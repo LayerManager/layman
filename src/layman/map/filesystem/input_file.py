@@ -115,6 +115,16 @@ def get_file_name_mappings(file_names, main_file_name, map_name, output_dir):
     return (filename_mapping, filepath_mapping)
 
 
+def get_map_json(username, mapname):
+    map_file_path = get_map_file(username, mapname)
+    try:
+        with open(map_file_path, 'r') as map_file:
+            map_json = json.load(map_file)
+    except FileNotFoundError:
+        map_json = None
+    return map_json
+
+
 def post_map(username, mapname, description, title):
     map_file_path = get_map_file(username, mapname)
     with open(map_file_path, 'r') as map_file:

@@ -79,6 +79,7 @@ def patch(username, mapname):
         'title': title,
         'description': description,
         'file_changed': file_changed,
+        'http_method': 'patch',
     }
 
     util.patch_map(
