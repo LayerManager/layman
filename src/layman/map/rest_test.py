@@ -3,6 +3,7 @@ import os
 import urllib
 import time
 from multiprocessing import Process
+import difflib
 
 import pytest
 from flask import url_for
@@ -11,8 +12,10 @@ import sys
 del sys.modules['layman']
 
 from . import MAP_TYPE
+from .micka import csw
+from .filesystem import uuid as map_uuid
 from layman import app, settings, uuid
-from layman.map.filesystem import uuid as map_uuid
+from layman.common.micka import util as micka_common_util
 
 
 num_maps_before_test = 0
@@ -221,6 +224,31 @@ def test_post_maps_simple(client):
         assert rv.status_code == 200
         resp_json = rv.get_json()
         assert resp_json['name'] == mapname
+
+        # assert metadata file is the same as filled template except for UUID and dates
+        template_path, template_values = csw.get_template_path_and_values(username, mapname)
+        xml_file_object = micka_common_util.fill_template_as_pretty_file_object(template_path, template_values)
+        expected_path = 'src/layman/map/rest_test_filled_template.xml'
+        with open(expected_path) as f:
+            expected_lines = f.readlines()
+        diff_lines = list(difflib.unified_diff(xml_file_object.readlines(), expected_lines))
+        assert len(diff_lines) == 29, ''.join(diff_lines)
+        plus_lines = [l for l in diff_lines if l.startswith('+ ')]
+        assert len(plus_lines) == 3
+        minus_lines = [l for l in diff_lines if l.startswith('- ')]
+        assert len(minus_lines) == 3
+        plus_line = plus_lines[0]
+        assert plus_line == '+    <gco:CharacterString>m-91147a27-1ff4-4242-ba6d-faffb92224c6</gco:CharacterString>\n'
+        minus_line = minus_lines[0]
+        assert minus_line.startswith('-    <gco:CharacterString>m') and minus_line.endswith('</gco:CharacterString>\n')
+        plus_line = plus_lines[1]
+        assert plus_line == '+    <gco:Date>2007-05-25</gco:Date>\n'
+        minus_line = minus_lines[1]
+        assert minus_line.startswith('-    <gco:Date>') and minus_line.endswith('</gco:Date>\n')
+        plus_line = plus_lines[2]
+        assert plus_line == '+                <gco:Date>2007-05-25</gco:Date>\n'
+        minus_line = minus_lines[2]
+        assert minus_line.startswith('-                <gco:Date>') and minus_line.endswith('</gco:Date>\n')
 
 
 def test_post_maps_complex(client):

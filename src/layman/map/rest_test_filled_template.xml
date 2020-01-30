@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/iso/19139/20060504/gmd/metadataEntity.xsd http://www.isotc211.org/2005/gmx http://schemas.opengis.net/iso/19139/20060504/gmx/gmx.xsd">
+<gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd http://www.isotc211.org/2005/gmx http://schemas.opengis.net/iso/19139/20060504/gmx/gmx.xsd">
   <gmd:fileIdentifier>
-    <gco:CharacterString>m-81c0debe-b2ea-4829-9b16-581083b29907</gco:CharacterString>
+    <gco:CharacterString>m-91147a27-1ff4-4242-ba6d-faffb92224c6</gco:CharacterString>
   </gmd:fileIdentifier>
   <gmd:language>
     <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="cze">cze</gmd:LanguageCode>
   </gmd:language>
   <gmd:hierarchyLevel>
-    <gmd:MD_ScopeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</gmd:MD_ScopeCode>
+    <gmd:MD_ScopeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode" codeListValue="application">application</gmd:MD_ScopeCode>
   </gmd:hierarchyLevel>
   <gmd:contact>
     <gmd:CI_ResponsibleParty>
@@ -31,7 +31,9 @@
       </gmd:role>
     </gmd:CI_ResponsibleParty>
   </gmd:contact>
-  <gmd:dateStamp gco:nilReason="template" />
+  <gmd:dateStamp>
+    <gco:Date>2007-05-25</gco:Date>
+  </gmd:dateStamp>
   <gmd:metadataStandardName>
     <gco:CharacterString>ISO 19115/INSPIRE_TG2/CZ4</gco:CharacterString>
   </gmd:metadataStandardName>
@@ -49,28 +51,17 @@
       </gmd:referenceSystemIdentifier>
     </gmd:MD_ReferenceSystem>
   </gmd:referenceSystemInfo>
-  <gmd:referenceSystemInfo>
-    <gmd:MD_ReferenceSystem>
-      <gmd:referenceSystemIdentifier>
-        <gmd:RS_Identifier>
-          <gmd:code>
-            <gmx:Anchor xlink:href="http://www.opengis.net/def/crs/EPSG/0/4326">EPSG:4326</gmx:Anchor>
-          </gmd:code>
-        </gmd:RS_Identifier>
-      </gmd:referenceSystemIdentifier>
-    </gmd:MD_ReferenceSystem>
-  </gmd:referenceSystemInfo>
   <gmd:identificationInfo>
-    <gmd:MD_DataIdentification>
+    <srv:SV_ServiceIdentification>
       <gmd:citation>
         <gmd:CI_Citation>
           <gmd:title>
-            <gco:CharacterString>ne_110m_admin_0_countries_shp</gco:CharacterString>
+            <gco:CharacterString>Administrativní členění Libereckého kraje</gco:CharacterString>
           </gmd:title>
           <gmd:date>
             <gmd:CI_Date>
               <gmd:date>
-                <gco:Date>2019-12-07</gco:Date>
+                <gco:Date>2007-05-25</gco:Date>
               </gmd:date>
               <gmd:dateType>
                 <gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication">publication</gmd:CI_DateTypeCode>
@@ -80,13 +71,21 @@
           <gmd:identifier>
             <gmd:MD_Identifier>
               <gmd:code>
-                <gmx:Anchor xlink:href="http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries_shp">ne_110m_admin_0_countries_shp</gmx:Anchor>
+                <gmx:Anchor xlink:href="http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje">administrativni_cleneni_libereckeho_kraje</gmx:Anchor>
               </gmd:code>
             </gmd:MD_Identifier>
           </gmd:identifier>
+          <gmd:presentationForm>
+            <gmd:CI_PresentationFormCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_PresentationFormCode" codeListValue="documentDigital">documentDigital</gmd:CI_PresentationFormCode>
+          </gmd:presentationForm>
+          <gmd:presentationForm>
+            <gmd:CI_PresentationFormCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_PresentationFormCode" codeListValue="mapDigital">mapDigital</gmd:CI_PresentationFormCode>
+          </gmd:presentationForm>
         </gmd:CI_Citation>
       </gmd:citation>
-      <gmd:abstract gco:nilReason="unknown" />
+      <gmd:abstract>
+        <gco:CharacterString>Na tematické mapě při přiblížení jsou postupně zobrazované administrativní celky Libereckého kraje : okresy, OPÚ, ORP a obce.</gco:CharacterString>
+      </gmd:abstract>
       <gmd:pointOfContact>
         <gmd:CI_ResponsibleParty>
           <gmd:organisationName gco:nilReason="unknown" />
@@ -112,7 +111,7 @@
       <gmd:graphicOverview>
         <gmd:MD_BrowseGraphic>
           <gmd:fileName>
-            <gco:CharacterString>http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries_shp/thumbnail</gco:CharacterString>
+            <gco:CharacterString>http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje/thumbnail</gco:CharacterString>
           </gmd:fileName>
           <gmd:fileType>
             <gco:CharacterString>PNG</gco:CharacterString>
@@ -161,44 +160,31 @@
           </gmd:otherConstraints>
         </gmd:MD_LegalConstraints>
       </gmd:resourceConstraints>
-      <gmd:spatialRepresentationType>
-        <gmd:MD_SpatialRepresentationTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_SpatialRepresentationTypeCode" codeListValue="vector">vector</gmd:MD_SpatialRepresentationTypeCode>
-      </gmd:spatialRepresentationType>
-      <gmd:spatialResolution>
-        <gmd:MD_Resolution>
-          <gmd:equivalentScale>
-            <gmd:MD_RepresentativeFraction>
-              <gmd:denominator gco:nilReason="unknown" />
-            </gmd:MD_RepresentativeFraction>
-          </gmd:equivalentScale>
-        </gmd:MD_Resolution>
-      </gmd:spatialResolution>
+      <srv:serviceType>
+        <gco:LocalName codeSpace="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType">Map</gco:LocalName>
+      </srv:serviceType>
       <gmd:language gco:nilReason="unknown" />
-      <gmd:characterSet>
-        <gmd:MD_CharacterSetCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>
-      </gmd:characterSet>
-      <gmd:topicCategory gco:nilReason="unknown" />
-      <gmd:extent>
+      <srv:extent>
         <gmd:EX_Extent>
           <gmd:geographicElement>
             <gmd:EX_GeographicBoundingBox>
               <gmd:westBoundLongitude>
-                <gco:Decimal>-180</gco:Decimal>
+                <gco:Decimal>14.62</gco:Decimal>
               </gmd:westBoundLongitude>
               <gmd:eastBoundLongitude>
-                <gco:Decimal>180</gco:Decimal>
+                <gco:Decimal>15.42</gco:Decimal>
               </gmd:eastBoundLongitude>
               <gmd:southBoundLatitude>
-                <gco:Decimal>-85.60903859383285</gco:Decimal>
+                <gco:Decimal>50.58</gco:Decimal>
               </gmd:southBoundLatitude>
               <gmd:northBoundLatitude>
-                <gco:Decimal>83.64513109859944</gco:Decimal>
+                <gco:Decimal>50.82</gco:Decimal>
               </gmd:northBoundLatitude>
             </gmd:EX_GeographicBoundingBox>
           </gmd:geographicElement>
         </gmd:EX_Extent>
-      </gmd:extent>
-    </gmd:MD_DataIdentification>
+      </srv:extent>
+    </srv:SV_ServiceIdentification>
   </gmd:identificationInfo>
   <gmd:distributionInfo>
     <gmd:MD_Distribution>
@@ -207,33 +193,7 @@
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>http://localhost:8600/geoserver/testuser1/ows</gmd:URL>
-              </gmd:linkage>
-              <gmd:protocol>
-                <gmx:Anchor xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-1.3.0">OGC:WMS-1.3.0</gmx:Anchor>
-              </gmd:protocol>
-              <gmd:function>
-                <gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</gmd:CI_OnLineFunctionCode>
-              </gmd:function>
-            </gmd:CI_OnlineResource>
-          </gmd:onLine>
-          <gmd:onLine>
-            <gmd:CI_OnlineResource>
-              <gmd:linkage>
-                <gmd:URL>http://localhost:8600/geoserver/testuser1/ows</gmd:URL>
-              </gmd:linkage>
-              <gmd:protocol>
-                <gmx:Anchor xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-2.0.0">OGC:WFS-2.0.0</gmx:Anchor>
-              </gmd:protocol>
-              <gmd:function>
-                <gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</gmd:CI_OnLineFunctionCode>
-              </gmd:function>
-            </gmd:CI_OnlineResource>
-          </gmd:onLine>
-          <gmd:onLine>
-            <gmd:CI_OnlineResource>
-              <gmd:linkage>
-                <gmd:URL>http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries_shp</gmd:URL>
+                <gmd:URL>http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gmx:Anchor xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link">WWW:LINK-1.0-http--link</gmx:Anchor>
@@ -243,24 +203,21 @@
               </gmd:function>
             </gmd:CI_OnlineResource>
           </gmd:onLine>
+          <gmd:onLine>
+            <gmd:CI_OnlineResource>
+              <gmd:linkage>
+                <gmd:URL>http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje/file</gmd:URL>
+              </gmd:linkage>
+              <gmd:protocol>
+                <gmx:Anchor xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link">WWW:LINK-1.0-http--link</gmx:Anchor>
+              </gmd:protocol>
+              <gmd:function>
+                <gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</gmd:CI_OnLineFunctionCode>
+              </gmd:function>
+            </gmd:CI_OnlineResource>
+          </gmd:onLine>
         </gmd:MD_DigitalTransferOptions>
       </gmd:transferOptions>
     </gmd:MD_Distribution>
   </gmd:distributionInfo>
-  <gmd:dataQualityInfo>
-    <gmd:DQ_DataQuality>
-      <gmd:scope>
-        <gmd:DQ_Scope>
-          <gmd:level>
-            <gmd:MD_ScopeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</gmd:MD_ScopeCode>
-          </gmd:level>
-        </gmd:DQ_Scope>
-      </gmd:scope>
-      <gmd:lineage>
-        <gmd:LI_Lineage>
-          <gmd:statement gco:nilReason="unknown" />
-        </gmd:LI_Lineage>
-      </gmd:lineage>
-    </gmd:DQ_DataQuality>
-  </gmd:dataQualityInfo>
 </gmd:MD_Metadata>
