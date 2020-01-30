@@ -370,18 +370,22 @@ def test_post_layers_shp(client):
     with open(expected_path) as f:
         expected_lines = f.readlines()
     diff_lines = list(difflib.unified_diff(xml_file_object.readlines(), expected_lines))
-    assert len(diff_lines) == 20, ''.join(diff_lines)
+    assert len(diff_lines) == 29, ''.join(diff_lines)
     plus_lines = [l for l in diff_lines if l.startswith('+ ')]
-    assert len(plus_lines) == 2
+    assert len(plus_lines) == 3
     minus_lines = [l for l in diff_lines if l.startswith('- ')]
-    assert len(minus_lines) == 2
+    assert len(minus_lines) == 3
     plus_line = plus_lines[0]
     assert plus_line == '+    <gco:CharacterString>m-81c0debe-b2ea-4829-9b16-581083b29907</gco:CharacterString>\n'
     minus_line = minus_lines[0]
     assert minus_line.startswith('-    <gco:CharacterString>m') and minus_line.endswith('</gco:CharacterString>\n')
     plus_line = plus_lines[1]
-    assert plus_line == '+                <gco:Date>2019-12-07</gco:Date>\n'
+    assert plus_line == '+    <gco:Date>2007-05-25</gco:Date>\n'
     minus_line = minus_lines[1]
+    assert minus_line.startswith('-    <gco:Date>') and minus_line.endswith('</gco:Date>\n')
+    plus_line = plus_lines[2]
+    assert plus_line == '+                <gco:Date>2019-12-07</gco:Date>\n'
+    minus_line = minus_lines[2]
     assert minus_line.startswith('-                <gco:Date>') and minus_line.endswith('</gco:Date>\n')
 
 

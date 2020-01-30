@@ -164,7 +164,7 @@ f"""
 """,
 
         # date stamp of metadata
-        'date_stamp': f"""<gco:Date>{date_stamp}</gco:Date>""",
+        'date_stamp': date_stamp,
 
         # it must be URI, but text node is optional (MZP-CORINE)
         # it can point to Layman's Layer endpoint
