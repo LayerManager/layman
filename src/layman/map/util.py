@@ -152,7 +152,7 @@ def patch_map(username, mapname, task_options, start_at):
 
 def delete_map(username, mapname, kwargs=None):
     sources = get_sources()
-    call_modules_fn(sources, 'delete_map', [username, mapname], kwargs=kwargs)
+    call_modules_fn(sources[::-1], 'delete_map', [username, mapname], kwargs=kwargs)
     celery_util.delete_publication(username, MAP_TYPE, mapname)
 
 
