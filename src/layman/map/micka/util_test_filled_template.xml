@@ -182,6 +182,9 @@
           </gmd:geographicElement>
         </gmd:EX_Extent>
       </srv:extent>
+      <srv:couplingType>
+        <srv:SV_CouplingType codeList="http://standards.iso.org/iso/19139/resources/ML_gmxCodelists.xml#SV_CouplingType" codeListValue="tight" />
+      </srv:couplingType>
     </srv:SV_ServiceIdentification>
   </gmd:identificationInfo>
   <gmd:distributionInfo>

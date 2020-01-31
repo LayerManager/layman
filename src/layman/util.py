@@ -10,7 +10,9 @@ from unidecode import unidecode
 from layman import settings
 from layman.http import LaymanError
 
-USERNAME_RE = r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$"
+USERNAME_ONLY_PATTERN = r"[a-z][a-z0-9]*(?:_[a-z0-9]+)*"
+
+USERNAME_RE = r"^" + USERNAME_ONLY_PATTERN + r"$"
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_PUBLICATION_TYPES_KEY = f'{__name__}:PUBLICATION_TYPES'

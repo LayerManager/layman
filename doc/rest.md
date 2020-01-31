@@ -145,6 +145,7 @@ JSON object with following structure:
   - **status**: Status information about publishing SLD. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *metadata*
+  - *identifier*: String. Identifier of metadata record in CSW instance.
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.
   - *csw_url*: String. URL of CSW endpoint. It points to CSW endpoint of Micka.
   - *status*: Status information about metadata import and availability. See [GET Layer](#get-layer) **wms** property for meaning.
@@ -347,6 +348,7 @@ JSON object with following structure:
   - *status*: Status information about generating and availability of thumbnail. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *metadata*
+  - *identifier*: String. Identifier of metadata record in CSW instance.
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.
   - *csw_url*: String. URL of CSW endpoint. It points to CSW endpoint of Micka.
   - *status*: Status information about metadata import and availability. See [GET Map](#get-map) 
