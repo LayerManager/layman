@@ -33,9 +33,10 @@ deps-start:
 deps-stop:
 	docker-compose -f docker-compose.deps.yml stop
 
-deps-remove-data:
+remove-data:
 	docker-compose -f docker-compose.deps.yml rm -fsv
 	rm -rf deps/*/data
+	rm -rf layman_data/* layman_data_test/*
 
 start-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate

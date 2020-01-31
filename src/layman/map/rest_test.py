@@ -441,6 +441,13 @@ def test_delete_map(client):
         rest_path = url_for('rest_map.delete_map', username=username, mapname=mapname)
         rv = client.delete(rest_path)
         assert rv.status_code == 200
+        resp_json = rv.get_json()
+        uuid_str = resp_json['uuid']
+        md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
+        r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
+        r.raise_for_status()
+        assert 'Záznam nenalezen' in r.text
+        assert mapname not in r.text
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{MAP_TYPE}': num_maps_before_test + 1
