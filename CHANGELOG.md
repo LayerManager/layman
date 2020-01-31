@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.3
+2019-01-31
+- Improve documentation of [enviroment variables](doc/env-settings.md)
+- Show real info instead of just SUCCESS status in successfully finished tasks within GET Layer, GET Map, etc.
+- Check freshness of links and image URLs in documentation within CI
+- Add few words about Layman in [EN](doc/about.md) ans [CS](doc/cs/o-aplikaci.md)
+
 ## v1.1.2
 2019-12-26
 - Allow requesting layman from other docker containers (fix [#38](https://github.com/jirik/layman/issues/38))
