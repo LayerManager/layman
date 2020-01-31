@@ -244,6 +244,16 @@ def test_post_layers_simple(client):
         layername
     )
 
+    layer_info = client.get(url_for('rest_layer.get', username=username, layername=layername)).get_json()
+    assert set(layer_info['metadata'].keys()) == {'identifier', 'csw_url', 'record_url'}
+    assert layer_info['metadata']['identifier'] == f"m-{uuid_str}"
+    assert layer_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
+    md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
+    assert layer_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
+    r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
+    r.raise_for_status()
+    assert layername in r.text
+
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 1
     })
