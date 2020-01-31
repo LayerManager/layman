@@ -31,6 +31,7 @@ def get_map_info(username, mapname):
     if muuid in csw.records:
         return {
             'metadata': {
+                'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
                 'record_url': settings.CSW_RECORD_URL.format(identifier=muuid),
             }

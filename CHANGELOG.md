@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.2.0-alfa1
+2019-01-31
+- Publish metadata record of [map](doc/models.md#map) to Micka on [POST Maps](doc/rest.md#post-maps).
+- Add `metatada` info to [GET Map](doc/rest.md#get-map) response.
+- Extend `metatada` info with `identitier` attribute in case of both layer and map.
+- Add [CSW_PROXY_URL](doc/env-settings.md#CSW_PROXY_URL) to distinguish between internal CSW URL for Layman and public CSW URL for clients.
+- Add documentation of [map metadata properties](doc/metadata.md)
+- Add `date_stamp` metadata property to layer template
+- Use `metadataStandardName` and `metadataStandardVersion` in metadata templates
+- Upgrade Micka
+
 ## v1.1.3
 2019-01-31
 - Improve documentation of [enviroment variables](doc/env-settings.md)
@@ -20,7 +31,7 @@
 - Publish metadata record of [layer](doc/models.md#layer) to Micka on [POST Layers](doc/rest.md#post-layers). Connection to Micka is configurable using [CSW_*](doc/env-settings.md) environment variables.
 - Delete metadata record of layer from Micka on [DELETE Layer](doc/rest.md#delete-layer).
 - Add `metatada` info to [GET Layer](doc/rest.md#get-layer) response, including CSW URL and metadata record URL.
-- [Documentation of metadata](doc/medatata.md)
+- [Documentation of metadata](doc/metadata.md)
 - [LAYMAN_PROXY_SERVER_NAME](doc/env-settings.md#LAYMAN_PROXY_SERVER_NAME) environment variable
 - Do not depend on specific version of chromium-browser and chromedriver
 - Save write-lock to redis on POST, PATCH and DELETE of Layer and Map

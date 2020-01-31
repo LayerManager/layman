@@ -4,6 +4,7 @@ import urllib
 import time
 from multiprocessing import Process
 import difflib
+import requests
 
 import pytest
 from flask import url_for
@@ -225,6 +226,22 @@ def test_post_maps_simple(client):
         resp_json = rv.get_json()
         assert resp_json['name'] == mapname
 
+    with app.app_context():
+        map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
+    while 'status' in map_info['metadata'] and map_info['metadata']['status'] in ['PENDING', 'STARTED']:
+        time.sleep(0.1)
+        with app.app_context():
+            map_info = client.get(url_for('rest_map.get', username=username,
+                                          mapname=mapname)).get_json()
+
+    assert set(map_info['metadata'].keys()) == {'identifier', 'csw_url', 'record_url'}
+    assert map_info['metadata']['identifier'] == f"m-{uuid_str}"
+    assert map_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
+    md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
+    assert map_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
+    r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
+    r.raise_for_status()
+    assert mapname in r.text
 
 def test_post_maps_complex(client):
     with app.app_context():
