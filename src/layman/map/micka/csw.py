@@ -1,13 +1,17 @@
+import re
 import os
 from datetime import datetime, date, timedelta
-from xml.sax.saxutils import escape
+from xml.sax.saxutils import escape, quoteattr
 from layman import settings, patch_mode
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util
 from layman.map import MAP_TYPE
 from layman.map.filesystem.uuid import get_map_uuid
-from layman.map.filesystem.input_file import get_map_json
-from layman.util import url_for_external
+from layman.map.filesystem.input_file import get_map_json, unquote_urls
+from layman.layer.geoserver.util import get_gs_proxy_base_url
+from layman.layer.geoserver.wms import get_layer_info as wms_get_layer_info
+from layman.layer.micka.csw import get_layer_info as csw_get_layer_info
+from layman.util import url_for_external, USERNAME_ONLY_PATTERN
 
 
 PATCH_MODE = patch_mode.NO_DELETE
@@ -27,7 +31,7 @@ def get_map_info(username, mapname):
     if muuid in csw.records:
         return {
             'metadata': {
-                'csw_url': settings.CSW_URL,
+                'csw_url': settings.CSW_PROXY_URL,
                 'record_url': settings.CSW_RECORD_URL.format(identifier=muuid),
             }
         }
@@ -76,10 +80,54 @@ def csw_insert(username, mapname):
     return muuid
 
 
+def _map_json_to_operates_on(map_json):
+    unquote_urls(map_json)
+    gs_url = get_gs_proxy_base_url()
+    gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
+    gs_url_pattern = r'^' + re.escape(gs_url) + r'(' + USERNAME_ONLY_PATTERN + r')' + r'/ows.*$'
+    layman_layer_names = []
+    for map_layer in map_json['layers']:
+        layer_url = map_layer.get('url', None)
+        if not layer_url:
+            continue
+        # print(f"layer_url={layer_url}")
+        match = re.match(gs_url_pattern, layer_url)
+        if not match:
+            continue
+        layer_username = match.group(1)
+        if not layer_username:
+            continue
+        # print(f"layer_username={layer_username}")
+        layer_names = [
+            n for n in map_layer.get('params', {}).get('LAYERS', '').split(',')
+            if len(n) > 0
+        ]
+        if not layer_names:
+            continue
+        for layername in layer_names:
+            layman_layer_names.append((layer_username, layername))
+    operates_on = []
+    csw_url = settings.CSW_PROXY_URL
+    for (layer_username, layername) in layman_layer_names:
+        layer_metadata = csw_get_layer_info(layer_username, layername)
+        layer_wms = wms_get_layer_info(layer_username, layername)
+        if not (layer_metadata and layer_wms):
+            continue
+        layer_muuid = layer_metadata['metadata']['identifier']
+        layer_title = layer_wms['title']
+        layer_csw_url = f"{csw_url}?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID={layer_muuid}#_{layer_muuid}"
+        operates_on.append({
+            'xlink:title': layer_title,
+            'xlink:href': layer_csw_url,
+        })
+    return operates_on
+
+
 def get_template_path_and_values(username, mapname):
     uuid_file_path = get_publication_uuid_file(MAP_TYPE, username, mapname)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
     map_json = get_map_json(username, mapname)
+    operates_on = _map_json_to_operates_on(map_json)
 
     unknown_value = 'neznámá hodnota'
     template_values = _get_template_values(
@@ -97,6 +145,7 @@ def get_template_path_and_values(username, mapname):
         # TODO create config env variable to decide if to set organisation name or not
         organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
         data_organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
+        operates_on=operates_on,
     )
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
     return template_path, template_values
@@ -118,10 +167,21 @@ def _get_template_values(
         extent=None,  # w, s, e, n
         epsg_codes=None,
         dataset_language=None,
+        operates_on=None,
 ):
     epsg_codes = epsg_codes or ['3857']
     w, s, e, n = extent or [14.62, 50.58, 15.42, 50.82]
     extent = [max(w, -180), max(s, -90), min(e, 180), min(n, 90)]
+
+    # list of dictionaries, possible keys are 'xlink:title', 'xlink:href', 'uuidref'
+    operates_on = operates_on or []
+    operates_on = [
+        {
+            a: v for a, v in item.items()
+            if a in ['xlink:title', 'xlink:href', 'uuidref']
+        }
+        for item in operates_on
+    ]
 
     result = {
         ###############################################################################################################
@@ -199,6 +259,13 @@ f"""
 
         'map_file_endpoint': escape(url_for_external('rest_map_file.get', username=username, mapname=mapname)),
 
+        'operates_on': '\n'.join([
+            f"""
+<srv:operatesOn xlink:type="simple" {
+    ' '.join([f"{attr}={quoteattr(value)}" for attr, value in item.items()])
+}/>
+""" for item in operates_on
+        ]),
 
         ###############################################################################################################
         # GUESSABLE BY LAYMAN

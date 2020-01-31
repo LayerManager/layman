@@ -1,8 +1,8 @@
-import glob
 import json
 import os
 import pathlib
-from flask import url_for
+from flask import url_for, current_app
+from urllib.parse import unquote
 
 from . import util
 from layman.common.filesystem import util as common_util
@@ -122,6 +122,17 @@ def get_map_json(username, mapname):
             map_json = json.load(map_file)
     except FileNotFoundError:
         map_json = None
+    return map_json
+
+
+def unquote_urls(map_json):
+    for layer_def in map_json['layers']:
+        layer_url = layer_def.get('url', None)
+        if layer_url is None:
+            continue
+        if layer_url.startswith('http%3A') or layer_url.startswith('https%3A'):
+            layer_url = unquote(layer_url)
+        layer_def['url'] = layer_url
     return map_json
 
 

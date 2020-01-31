@@ -56,7 +56,7 @@
       <gmd:citation>
         <gmd:CI_Citation>
           <gmd:title>
-            <gco:CharacterString>Administrativní členění Libereckého kraje</gco:CharacterString>
+            <gco:CharacterString>World places and boundaries</gco:CharacterString>
           </gmd:title>
           <gmd:date>
             <gmd:CI_Date>
@@ -71,7 +71,7 @@
           <gmd:identifier>
             <gmd:MD_Identifier>
               <gmd:code>
-                <gmx:Anchor xlink:href="http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje">administrativni_cleneni_libereckeho_kraje</gmx:Anchor>
+                <gmx:Anchor xlink:href="http://layman_test_run_1:8000/rest/testuser1/maps/svet">svet</gmx:Anchor>
               </gmd:code>
             </gmd:MD_Identifier>
           </gmd:identifier>
@@ -84,7 +84,7 @@
         </gmd:CI_Citation>
       </gmd:citation>
       <gmd:abstract>
-        <gco:CharacterString>Na tematické mapě při přiblížení jsou postupně zobrazované administrativní celky Libereckého kraje : okresy, OPÚ, ORP a obce.</gco:CharacterString>
+        <gco:CharacterString>World places and boundaries abstract</gco:CharacterString>
       </gmd:abstract>
       <gmd:pointOfContact>
         <gmd:CI_ResponsibleParty>
@@ -111,7 +111,7 @@
       <gmd:graphicOverview>
         <gmd:MD_BrowseGraphic>
           <gmd:fileName>
-            <gco:CharacterString>http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje/thumbnail</gco:CharacterString>
+            <gco:CharacterString>http://layman_test_run_1:8000/rest/testuser1/maps/svet/thumbnail</gco:CharacterString>
           </gmd:fileName>
           <gmd:fileType>
             <gco:CharacterString>PNG</gco:CharacterString>
@@ -169,21 +169,26 @@
           <gmd:geographicElement>
             <gmd:EX_GeographicBoundingBox>
               <gmd:westBoundLongitude>
-                <gco:Decimal>14.62</gco:Decimal>
+                <gco:Decimal>-35.0</gco:Decimal>
               </gmd:westBoundLongitude>
               <gmd:eastBoundLongitude>
-                <gco:Decimal>15.42</gco:Decimal>
+                <gco:Decimal>179.0</gco:Decimal>
               </gmd:eastBoundLongitude>
               <gmd:southBoundLatitude>
-                <gco:Decimal>50.58</gco:Decimal>
+                <gco:Decimal>-48.5</gco:Decimal>
               </gmd:southBoundLatitude>
               <gmd:northBoundLatitude>
-                <gco:Decimal>50.82</gco:Decimal>
+                <gco:Decimal>81.5</gco:Decimal>
               </gmd:northBoundLatitude>
             </gmd:EX_GeographicBoundingBox>
           </gmd:geographicElement>
         </gmd:EX_Extent>
       </srv:extent>
+      <srv:couplingType>
+        <srv:SV_CouplingType codeList="http://standards.iso.org/iso/19139/resources/ML_gmxCodelists.xml#SV_CouplingType" codeListValue="tight" />
+      </srv:couplingType>
+      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=m-39cc8994-adbc-427a-8522-569eb7e691b2#_m-39cc8994-adbc-427a-8522-569eb7e691b2" xlink:title="hranice" xlink:type="simple" />
+      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=m-fb48a6e3-f36c-43fd-a885-ae7de82b3924#_m-fb48a6e3-f36c-43fd-a885-ae7de82b3924" xlink:title="mista" xlink:type="simple" />
     </srv:SV_ServiceIdentification>
   </gmd:identificationInfo>
   <gmd:distributionInfo>
@@ -193,7 +198,7 @@
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje</gmd:URL>
+                <gmd:URL>http://layman_test_run_1:8000/rest/testuser1/maps/svet</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gmx:Anchor xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link">WWW:LINK-1.0-http--link</gmx:Anchor>
@@ -206,7 +211,7 @@
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje/file</gmd:URL>
+                <gmd:URL>http://layman_test_run_1:8000/rest/testuser1/maps/svet/file</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gmx:Anchor xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link">WWW:LINK-1.0-http--link</gmx:Anchor>

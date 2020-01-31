@@ -172,6 +172,13 @@ xsi:schemaLocation="http://www.isotc211.org/2005/srv http://schemas.opengis.net/
 					<gmd:geographicElement>{extent}</gmd:geographicElement>
 				</gmd:EX_Extent>
 			</srv:extent>
+
+			<srv:couplingType>
+				<srv:SV_CouplingType codeList="http://standards.iso.org/iso/19139/resources/ML_gmxCodelists.xml#SV_CouplingType" codeListValue="tight"/>
+			</srv:couplingType>
+
+			{operates_on}
+
 		</srv:SV_ServiceIdentification>
 	</gmd:identificationInfo>
 

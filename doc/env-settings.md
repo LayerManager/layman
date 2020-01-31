@@ -141,7 +141,10 @@ HTTP Basic Authentication credentials for communication with [CSW](#CSW_URL) enc
 URL of [CSW](#CSW_URL) metadata record accessible by web browser, probably with some editing capabilities. Must contain `{identifier}` string that will be replaced with record ID.
 
 ### CSW_URL
-URL of [OGC Catalogue Service v2.0.2](https://www.opengeospatial.org/standards/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
+Internal URL of [OGC Catalogue Service v2.0.2](https://www.opengeospatial.org/standards/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
+
+### CSW_PROXY_URL
+Public URL of [OGC Catalogue Service v2.0.2](https://www.opengeospatial.org/standards/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
 
 ### CSW_ORGANISATION_NAME_REQUIRED
 Set to `true` if organisation name is required by CSW instance.
