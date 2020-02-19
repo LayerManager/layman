@@ -21,7 +21,7 @@ from test.mock.liferay import run
 LIFERAY_PORT = 8020
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def liferay_mock():
     server = Process(target=run, kwargs={
         'env_vars': {

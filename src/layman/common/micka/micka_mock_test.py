@@ -8,16 +8,16 @@ from layman import settings
 import sys
 del sys.modules['layman']
 
-from test.mock.liferay import run
-from .util import TOKEN_HEADER, ISS_URL_HEADER
+from test.mock.micka import run
 
 PORT1 = 8020
 PORT2 = 8021
 
 
-def create_server(port, env='development'):
+def create_server(port, resp_code, env='development'):
     server = Process(target=run, kwargs={
         'env_vars': {
+            'CSW_GET_RESP_CODE': str(resp_code)
         },
         'app_config': {
             'ENV': env,
@@ -37,7 +37,7 @@ def create_server(port, env='development'):
 
 @pytest.fixture(scope="module")
 def server():
-    server = create_server(PORT1)
+    server = create_server(PORT1, 404)
     server.start()
     time.sleep(1)
 
@@ -49,7 +49,7 @@ def server():
 
 @pytest.fixture(scope="module")
 def server2():
-    server = create_server(PORT2, env='production')
+    server = create_server(PORT2, 500)
     server.start()
     time.sleep(1)
 
@@ -61,20 +61,13 @@ def server2():
 
 @pytest.mark.usefixtures('server', 'server2')
 def test_mock():
-    url1 = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT1}/rest/test-oauth2/user-profile"
-    rv = requests.get(url1, headers={
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-        f'{TOKEN_HEADER}': 'Bearer abc'
-    })
-    assert rv.status_code == 200
-    resp_json = rv.json()
-    assert resp_json['FLASK_ENV'] == 'development'
+    csw_url = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT1}/csw"
+    rv = requests.get(csw_url)
+    assert rv.status_code == 404
+    assert rv.text == "Response code is 404"
 
-    url2 = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT2}/rest/test-oauth2/user-profile"
-    rv = requests.get(url2, headers={
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-        f'{TOKEN_HEADER}': 'Bearer abc'
-    })
-    assert rv.status_code == 200
-    resp_json = rv.json()
-    assert resp_json['FLASK_ENV'] == 'production'
+    csw_url = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT2}/csw"
+    rv = requests.get(csw_url)
+    assert rv.status_code == 500
+    assert rv.text == "Response code is 500"
+
