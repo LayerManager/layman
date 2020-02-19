@@ -12,6 +12,7 @@ from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer import LAYER_TYPE
 from layman import settings, patch_mode
 from layman.util import url_for_external
+from requests.exceptions import HTTPError, ConnectionError
 from urllib.parse import urljoin
 from xml.sax.saxutils import escape
 
@@ -25,11 +26,14 @@ def get_metadata_uuid(uuid):
 
 def get_layer_info(username, layername):
     uuid = get_layer_uuid(username, layername)
-    csw = util.create_csw()
-    if uuid is None or csw is None:
+    try:
+        csw = util.create_csw()
+        if uuid is None or csw is None:
+            return {}
+        muuid = get_metadata_uuid(uuid)
+        csw.getrecordbyid(id=[muuid], esn='brief')
+    except (HTTPError, ConnectionError):
         return {}
-    muuid = get_metadata_uuid(uuid)
-    csw.getrecordbyid(id=[muuid], esn='brief')
     if muuid in csw.records:
         return {
             'metadata': {
