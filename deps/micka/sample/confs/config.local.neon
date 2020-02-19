@@ -4,6 +4,10 @@
 #
 parameters:
     app:
+        # title of the tab
+        pageTitle:
+            cze = Micka
+            eng = Micka
         # URL
         # mickaUrl = http://localhost:3080/micka
         # UI theme
@@ -21,14 +25,11 @@ parameters:
         importReport = FALSE
         #switch the validator
         validator = TRUE
-        directSummary = TRUE 
-        directDetail = TRUE 
-        directXml = TRUE 
-        formSign = FALSE
+        directSummary = TRUE
+        directDetail = TRUE
+        directXml = TRUE
         defaultEditGroup = editor
         defaultViewGroup = reader
-        # record indication for access from csw etc.
-        mdDataType = "-1=>'semifinished',0=>'private',1=>'public',2=>'portal'"
         # admin IP list
         adminIP = '127.0.0.1'
         # web proxy address
@@ -58,7 +59,7 @@ parameters:
         city = ""
         postcode = ""
         phone = ""
-        www = ""    
+        www = ""
     csw:
         portal = "_DATA_TYPE_ = 2"
 

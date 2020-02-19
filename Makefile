@@ -106,6 +106,11 @@ bash-demo-root:
 clear-data-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_dev bash -c "python3 src/clear_layman_data.py"
 
+reset-data-directories:
+	sudo rm -rf layman_data layman_data_test deps/*/data
+	mkdir -p layman_data layman_data_test tmp
+	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash /geoserver_code/reset-default-layman-datadir.sh
+
 clear-python-cache-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps layman_dev bash /code/src/clear-python-cache.sh
 
