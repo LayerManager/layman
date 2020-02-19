@@ -81,6 +81,7 @@ def create_csw():
         'username': settings.CSW_BASIC_AUTHN[0],
         'password': settings.CSW_BASIC_AUTHN[1],
     }
+    opts['skip_caps'] = True
     csw = CatalogueServiceWeb(settings.CSW_URL, **opts) if settings.CSW_URL is not None else None
     return csw
 

@@ -1,6 +1,7 @@
 from datetime import datetime, date
 import os
 import pathlib
+import traceback
 
 from flask import current_app
 
@@ -33,6 +34,7 @@ def get_layer_info(username, layername):
         muuid = get_metadata_uuid(uuid)
         csw.getrecordbyid(id=[muuid], esn='brief')
     except (HTTPError, ConnectionError):
+        current_app.logger.info(traceback.format_exc())
         return {}
     if muuid in csw.records:
         return {

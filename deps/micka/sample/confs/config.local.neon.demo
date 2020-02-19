@@ -1,0 +1,82 @@
+#
+# WARNING: it is CRITICAL that this file & directory are NOT accessible directly via a web browser!
+# https://nette.org/security-warning
+#
+parameters:
+    app:
+        # title of the tab
+        pageTitle:
+            cze = Micka
+            eng = Micka
+        # URL
+        mickaUrl = http://localhost/micka
+        # UI theme
+        layoutTheme = default
+        # UI langauges (must have translation files)
+        langs = 'cze,eng'
+        # dafult profile used
+        startProfil = 5
+        #records per page
+        maxRecords = 10
+        #max number of records per page
+        limitMaxRecords = 100
+        #default sort
+        sortBy = 'title,ASC'
+        importReport = FALSE
+        #switch the validator
+        validator = TRUE
+        directSummary = TRUE
+        directDetail = TRUE
+        directXml = TRUE
+        defaultEditGroup = editor
+        defaultViewGroup = reader
+        # admin IP list
+        adminIP = '127.0.0.1'
+        # web proxy address
+        proxy =
+    map:
+        # initial map extent
+        hs_initext = 12.0 48.5 18.9 51
+        # address of the connected WMS viewer web app
+        viewerURL = "https://geoportal.gov.cz/web/guest/map"
+    contact:
+        #contact info used in Capabilities document etc.
+        title:
+            cze = "Katalog prostorových metadat."
+            eng = "Spatial Metadata Catalogue."
+        abstract:
+            eng = "Catalogue based on OGC Catalogue service 2.0.2 ISO AP 1.0"
+            cze = "Katalog prostorových metadat podle OGC CSW 2.0.2 ISO AP 1.0"
+        org:
+            eng = "Your company name"
+            cze = "Název vaší organizace"
+        person = "Your name"
+        position:
+            eng = "Responsible preson"
+            cze = "Zodpovědná osoba"
+        email = ""
+        delivery = "your delivery point"
+        city = ""
+        postcode = ""
+        phone = ""
+        www = ""
+    csw:
+        portal = "_DATA_TYPE_ = 2"
+
+dibi:
+    driver: postgre
+    host: postgresql
+    port: 5432
+    database: hsrs_micka6
+    username: 'docker'
+    password: 'docker'
+    charset: utf-8
+    profiler: false
+    debugger: false
+    lazy: yes
+
+translation:
+    default: en
+#    fallback: [en]
+    resolvers:
+        header: off
