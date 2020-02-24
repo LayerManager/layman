@@ -91,6 +91,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
         'username': settings.CSW_BASIC_AUTHN[0],
         'password': settings.CSW_BASIC_AUTHN[1],
     }
+    opts['skip_caps'] = True
     from owslib.csw import CatalogueServiceWeb
     csw = CatalogueServiceWeb(settings.CSW_URL, **opts) if settings.CSW_URL is not None else None
     csw.getrecords2(xml=f"""
