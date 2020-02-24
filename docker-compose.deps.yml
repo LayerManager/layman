@@ -56,7 +56,7 @@ services:
 
    micka:
       container_name: micka
-      image: jirikcz/micka:micka-jirik-14e52e5-v2.0.0
+      image: jirikcz/micka:micka-4ded0ae-v2.0.0
       command: bash -c "cd /code/src && python3 wait_for_deps.py && /etc/init.d/php7.3-fpm start && nginx -g 'daemon off;'"
       env_file:
         - deps/micka/docker/.env
@@ -67,5 +67,6 @@ services:
         - ./deps/micka/sample/confs/bootstrap.php:/var/www/html/Micka/php/app/bootstrap.php
         - ./deps/micka/sample/confs/config.local.neon:/var/www/html/Micka/php/app/config/config.local.neon
         - ./deps/micka/sample/confs/default:/etc/nginx/sites-available/default
+        - ./deps/micka/sample/php/app/router/RouterFactory.php:/var/www/html/Micka/php/app/router/RouterFactory.php
       depends_on:
         - postgresql
