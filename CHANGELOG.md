@@ -1,7 +1,11 @@
 # Changelog
 
+## v1.1.4
+2020-02-19
+- Better handle Micka's HTTP errors, [#43](https://github.com/jirik/layman/issues/43)
+
 ## v1.1.3
-2019-01-31
+2020-01-31
 - Improve documentation of [enviroment variables](doc/env-settings.md)
 - Show real info instead of just SUCCESS status in successfully finished tasks within GET Layer, GET Map, etc.
 - Check freshness of links and image URLs in documentation within CI
