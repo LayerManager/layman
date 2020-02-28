@@ -55,6 +55,7 @@ services:
          - ${EXTRA_HOST1}
          - ${EXTRA_HOST2}
       volumes:
+        - ./layman_data:/layman_data
         - ./src/layman_settings_demo.py:/code/src/layman_settings.py
       depends_on:
         - celery_worker
