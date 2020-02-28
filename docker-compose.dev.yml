@@ -54,6 +54,7 @@ services:
       environment:
         - LAYMAN_SKIP_REDIS_LOADING=true
       volumes:
+        - ./layman_data:/layman_data
         - ./sample:/code/sample
         - ./src:/code/src
         - ./tmp:/code/tmp

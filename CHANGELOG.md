@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.5
+2020-02-28
+- Load data into redis on startup even in Flower.
+
 ## v1.1.4
 2020-02-19
 - Better handle Micka's HTTP errors, [#43](https://github.com/jirik/layman/issues/43)
