@@ -1,7 +1,19 @@
 # Changelog
 
+## v1.2.x
+- Load data into redis on startup even in Flower.
+- Better handle Micka's HTTP errors, [#43](https://github.com/jirik/layman/issues/43)
+
+## v1.1.5
+2020-02-28
+- Load data into redis on startup even in Flower.
+
+## v1.1.4
+2020-02-19
+- Better handle Micka's HTTP errors, [#43](https://github.com/jirik/layman/issues/43)
+
 ## v1.2.0-alfa1
-2019-01-31
+2020-01-31
 - Publish metadata record of [map](doc/models.md#map) to Micka on [POST Maps](doc/rest.md#post-maps).
 - Add `metatada` info to [GET Map](doc/rest.md#get-map) response.
 - Extend `metatada` info with `identitier` attribute in case of both layer and map.
@@ -12,7 +24,7 @@
 - Upgrade Micka
 
 ## v1.1.3
-2019-01-31
+2020-01-31
 - Improve documentation of [enviroment variables](doc/env-settings.md)
 - Show real info instead of just SUCCESS status in successfully finished tasks within GET Layer, GET Map, etc.
 - Check freshness of links and image URLs in documentation within CI
