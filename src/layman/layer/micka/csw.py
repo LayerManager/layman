@@ -33,6 +33,7 @@ def get_layer_info(username, layername):
         muuid = get_metadata_uuid(uuid)
         csw.getrecordbyid(id=[muuid], esn='brief')
     except (HTTPError, ConnectionError):
+        current_app.logger.exception('CSW getrecordbyid exception')
         return {}
     if muuid in csw.records:
         return {
@@ -71,7 +72,11 @@ def delete_layer(username, layername):
     muuid = get_metadata_uuid(uuid)
     if muuid is None:
         return
-    util.csw_delete(muuid)
+    try:
+        util.csw_delete(muuid)
+    except (HTTPError, ConnectionError):
+        current_app.logger.exception('CSW delete_layer exception')
+        pass
 
 
 def csw_insert(username, layername):

@@ -1,4 +1,6 @@
+from flask import url_for
 from multiprocessing import Process
+import os
 import pytest
 import time
 
@@ -7,7 +9,8 @@ del sys.modules['layman']
 
 from layman import app as app
 from layman import settings
-from .csw import get_layer_info
+from .csw import get_layer_info, delete_layer
+from layman.layer.rest_test import wait_till_ready
 
 
 from test.mock.micka import run
@@ -82,6 +85,44 @@ def app_context():
         yield ctx
 
 
+TEST_USER = 'testuser_micka'
+
+
+TEST_LAYER = 'ne_110m_admin_0_countries'
+
+
+@pytest.fixture()
+def provide_layer(client):
+    with app.app_context():
+        username = TEST_USER
+        layername = TEST_LAYER
+        rest_path = url_for('rest_layers.post', username=username)
+        file_paths = [
+            'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+        ]
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': layername,
+            })
+            assert rv.status_code == 200
+        finally:
+            for fp in files:
+                fp[0].close()
+
+    wait_till_ready(username, layername)
+    yield
+    with app.app_context():
+        rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
+        rv = client.delete(rest_path)
+        assert rv.status_code == 200
+
+
+
 @pytest.fixture()
 def broken_micka_url(broken_micka):
     csw_url = settings.CSW_URL
@@ -99,14 +140,24 @@ def no_micka_url():
 
 
 @pytest.mark.usefixtures('app_context', 'broken_micka_url')
-def test_get_layer_info():
+def test_get_layer_info_broken_micka():
     layer_info = get_layer_info('abc', 'abcd')
     assert layer_info == {}
+
+
+@pytest.mark.usefixtures('provide_layer', 'broken_micka_url')
+def test_delete_layer_broken_micka():
+    with app.app_context():
+        delete_layer(TEST_USER, TEST_LAYER)
 
 
 @pytest.mark.usefixtures('app_context', 'no_micka_url')
-def test_get_layer_info():
+def test_get_layer_info_no_micka():
     layer_info = get_layer_info('abc', 'abcd')
     assert layer_info == {}
 
 
+@pytest.mark.usefixtures('provide_layer', 'no_micka_url')
+def test_delete_layer_no_micka():
+    with app.app_context():
+        delete_layer(TEST_USER, TEST_LAYER)
