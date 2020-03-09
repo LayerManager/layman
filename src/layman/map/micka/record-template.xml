@@ -7,7 +7,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd http://www.isotc211.org/2005/gmx http://schemas.opengis.net/iso/19139/20060504/gmx/gmx.xsd">
 
 	<gmd:fileIdentifier>
-		<gco:CharacterString>{file_identifier}</gco:CharacterString>
+		<gco:CharacterString>{md_file_identifier}</gco:CharacterString>
 	</gmd:fileIdentifier>
 
 	<gmd:language>
@@ -20,7 +20,7 @@ xsi:schemaLocation="http://www.isotc211.org/2005/srv http://schemas.opengis.net/
 
 	<gmd:contact>
 		<gmd:CI_ResponsibleParty>
-			{organisation_name}
+			{md_organisation_name}
 			<gmd:contactInfo>
 				<gmd:CI_Contact>
 					<gmd:address>
@@ -42,7 +42,7 @@ xsi:schemaLocation="http://www.isotc211.org/2005/srv http://schemas.opengis.net/
 	</gmd:contact>
 
 	<gmd:dateStamp>
-		<gco:Date>{date_stamp}</gco:Date>
+		<gco:Date>{md_date_stamp}</gco:Date>
 	</gmd:dateStamp>
 
     <gmd:metadataStandardName>
@@ -62,10 +62,10 @@ xsi:schemaLocation="http://www.isotc211.org/2005/srv http://schemas.opengis.net/
 					<gmd:title>
 						<gco:CharacterString>{title}</gco:CharacterString>
 					</gmd:title>
-					<gmd:date>{date}</gmd:date>
+					<gmd:date>{publication_date}</gmd:date>
 					<gmd:identifier>
 						<gmd:MD_Identifier>
-							<gmd:code>{data_identifier}</gmd:code>
+							<gmd:code>{identifier}</gmd:code>
 						</gmd:MD_Identifier>
 					</gmd:identifier>
 					<gmd:presentationForm>
@@ -83,7 +83,7 @@ xsi:schemaLocation="http://www.isotc211.org/2005/srv http://schemas.opengis.net/
 
 			<gmd:pointOfContact>
 				<gmd:CI_ResponsibleParty>
-					{data_organisation_name}
+					{organisation_name}
 					<gmd:contactInfo>
 						<gmd:CI_Contact>
 							<gmd:address>
@@ -165,7 +165,7 @@ xsi:schemaLocation="http://www.isotc211.org/2005/srv http://schemas.opengis.net/
 							   codeSpace="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType">Map</gco:LocalName>
 			</srv:serviceType>
 
-			{dataset_language}
+			{language}
 
 			<srv:extent>
 				<gmd:EX_Extent>

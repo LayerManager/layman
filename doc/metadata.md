@@ -11,12 +11,12 @@ Properties listed below contains XPath expression pointing to specific placement
 
 ## Metadata properties known to Layman
 
-### file_identifier
+### md_file_identifier
 XPath for Layer and Map
 - `gmd:MD_Metadata/gmd:fileIdentifier/gco:CharacterString/text()`
   - multiplicity 1
   
-### date_stamp
+### md_date_stamp
 XPath for Layer and Map
 - `gmd:MD_Metadata/gmd:dateStamp/gco:Date/text()`
   - multiplicity 1
@@ -41,24 +41,18 @@ XPath for Map
 - `gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString/text()`
   - multiplicity 1
 
-### date
+### publication_date
 XPath for Layer
 - `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue="publication"]/gmd:CI_Date/gmd:date/gco:Date/text()`
   - multiplicity 1
   - publication date
-- `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue="revision"]/gmd:CI_Date/gmd:date/gco:Date/text()`
-  - multiplicity 1
-  - revision date
 
 XPath for Map
 - `gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue="publication"]/gmd:CI_Date/gmd:date/gco:Date/text()`
   - multiplicity 1
   - publication date
-- `gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue="revision"]/gmd:CI_Date/gmd:date/gco:Date/text()`
-  - multiplicity 1
-  - revision date
 
-### data_identifier
+### identifier
 XPath for Layer
 - `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gmx:Anchor/@xlink:href`
     - multiplicity 1
@@ -142,7 +136,7 @@ XPath for Layer
 - `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/(gmd:denominator/gco:Integer/text()|gmd:denominator/[@gco:nilReason="unknown"])`
   - multiplicity 1
 
-### dataset_language
+### language
 XPath for Layer
 - `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/(gmd:language/gmd:LanguageCode[@codeList="http://www.loc.gov/standards/iso639-2/"]/@codeListValue|gmd:language/[@gco:nilReason="unknown"])`
   - multiplicity 1
@@ -153,12 +147,12 @@ XPath for Map
 
 ## Metadata properties unknown to Layman
 
-### organisation_name
+### md_organisation_name
 XPath for Layer and Map
 - `gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString/text()`
   - multiplicity 1
 
-### data_organisation_name
+### organisation_name
 XPath for Layer
 - `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString/text()`
   - multiplicity 1

@@ -137,15 +137,14 @@ def get_template_path_and_values(username, mapname):
         uuid=get_map_uuid(username, mapname),
         title=map_json['title'],
         abstract=map_json['abstract'] or None,
-        date=publ_datetime.strftime('%Y-%m-%d'),
-        date_type='publication',
-        date_stamp=date.today().strftime('%Y-%m-%d'),
-        data_identifier=url_for_external('rest_map.get', username=username, mapname=mapname),
+        publication_date=publ_datetime.strftime('%Y-%m-%d'),
+        md_date_stamp=date.today().strftime('%Y-%m-%d'),
+        identifier=url_for_external('rest_map.get', username=username, mapname=mapname),
         data_identifier_label=mapname,
         extent=[float(c) for c in map_json['extent']],
         # TODO create config env variable to decide if to set organisation name or not
+        md_organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
         organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
-        data_organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
         operates_on=operates_on,
     )
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
@@ -158,16 +157,15 @@ def _get_template_values(
         uuid='af238200-8200-1a23-9399-42c9fca53543',
         title='Administrativní členění Libereckého kraje',
         abstract=None,
+        md_organisation_name=None,
         organisation_name=None,
-        data_organisation_name=None,
-        date='2007-05-25',
-        date_type='revision',
-        date_stamp='2007-05-25',
-        data_identifier='http://www.env.cz/data/liberec/admin-cleneni',
+        publication_date='2007-05-25',
+        md_date_stamp='2007-05-25',
+        identifier='http://www.env.cz/data/liberec/admin-cleneni',
         data_identifier_label='Liberec-AdminUnits',
         extent=None,  # w, s, e, n
         epsg_codes=None,
-        dataset_language=None,
+        language=None,
         operates_on=None,
 ):
     epsg_codes = epsg_codes or ['3857']
@@ -190,7 +188,7 @@ def _get_template_values(
         ###############################################################################################################
 
         # layer UUID with prefix "m-"
-        'file_identifier': get_metadata_uuid(uuid),
+        'md_file_identifier': get_metadata_uuid(uuid),
 
         'reference_system': ' '.join([
 f"""
@@ -213,23 +211,23 @@ f"""
 
         # date of dataset
         # check GeoServer's REST API, consider revision or publication dateType
-        'date': f"""
+        'publication_date': f"""
 <gmd:CI_Date>
     <gmd:date>
-        <gco:Date>{date}</gco:Date>
+        <gco:Date>{publication_date}</gco:Date>
     </gmd:date>
     <gmd:dateType>
-        <gmd:CI_DateTypeCode codeListValue="{date_type}" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode">{date_type}</gmd:CI_DateTypeCode>
+        <gmd:CI_DateTypeCode codeListValue="publication" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode">publication</gmd:CI_DateTypeCode>
     </gmd:dateType>
 </gmd:CI_Date>
 """,
 
         # date stamp of metadata
-        'date_stamp': date_stamp,
+        'md_date_stamp': md_date_stamp,
 
         # it must be URI, but text node is optional (MZP-CORINE)
         # it can point to Layman's Layer endpoint
-        'data_identifier': f'<gmx:Anchor xlink:href="{data_identifier}">{escape(data_identifier_label)}</gmx:Anchor>',
+        'identifier': f'<gmx:Anchor xlink:href="{identifier}">{escape(data_identifier_label)}</gmx:Anchor>',
 
         'abstract': '<gmd:abstract gco:nilReason="unknown" />' if abstract is None else f"""
 <gmd:abstract>
@@ -273,24 +271,24 @@ f"""
         ###############################################################################################################
 
         # code for no language is "zxx"
-        'dataset_language': '<gmd:language gco:nilReason="unknown" />' if dataset_language is None else f"""
+        'language': '<gmd:language gco:nilReason="unknown" />' if language is None else f"""
 <gmd:language>
-    <gmd:LanguageCode codeListValue=\"{dataset_language}\" codeList=\"http://www.loc.gov/standards/iso639-2/\">{dataset_language}</gmd:LanguageCode>
+    <gmd:LanguageCode codeListValue=\"{language}\" codeList=\"http://www.loc.gov/standards/iso639-2/\">{language}</gmd:LanguageCode>
 </gmd:language>
 """,
 
         ###############################################################################################################
         # UNKNOWN TO LAYMAN
         ###############################################################################################################
-        'organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if organisation_name is None else f"""
+        'md_organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if md_organisation_name is None else f"""
     <gmd:organisationName>
-        <gco:CharacterString>{escape(organisation_name)}</gco:CharacterString>
+        <gco:CharacterString>{escape(md_organisation_name)}</gco:CharacterString>
     </gmd:organisationName>
     """,
 
-        'data_organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if data_organisation_name is None else f"""
+        'organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if organisation_name is None else f"""
     <gmd:organisationName>
-        <gco:CharacterString>{escape(data_organisation_name)}</gco:CharacterString>
+        <gco:CharacterString>{escape(organisation_name)}</gco:CharacterString>
     </gmd:organisationName>
     """,
     }
