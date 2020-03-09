@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.7
+2020-03-09
+- Assert version of Micka on startup.
+
 ## v1.1.6
 2020-03-02
 - Mute 500 error on CSW delete.

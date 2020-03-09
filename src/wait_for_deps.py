@@ -1,15 +1,18 @@
-import traceback
-
 import importlib
 import os
+import re
 import sys
 import time
+import traceback
+from urllib.parse import urlparse
 
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 ATTEMPT_INTERVAL = 2
 MAX_ATTEMPTS = 60
+
+MICKA_VERSION_RE = r":\s*([^:()\s]+)\s*\(\s*rev\.\s*([^:()\s]+)\s*\)"
 
 
 def main():
@@ -93,7 +96,7 @@ def main():
 
 
     # Micka
-    micka_url = f"{settings.CSW_URL}"
+    micka_url = urlparse(settings.CSW_URL)._replace(path="/about").geturl()
     wait_for_msg = f"Micka, url={micka_url}"
     print(f"Waiting for {wait_for_msg}")
     while True:
@@ -104,6 +107,13 @@ def main():
                 timeout=0.1
             )
             r.raise_for_status()
+            response = r.text
+            version_match = re.search(MICKA_VERSION_RE, response)
+            assert (version_match and len(version_match.groups()) == 2), 'Unknown version of Micka!'
+            found_version = version_match.groups()
+            assert found_version in settings.MICKA_ACCEPTED_VERSIONS, f"Found Micka version {found_version}, but expecting one of {settings.MICKA_ACCEPTED_VERSIONS}. Please use one of expected version, e.g. by upgrading/downgrading Micka. Take special care about Micka's database."
+            print(f"Found Micka version {found_version}.")
+
             print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
             break
         except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
