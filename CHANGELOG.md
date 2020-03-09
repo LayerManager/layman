@@ -1,12 +1,29 @@
 # Changelog
 
 ## v1.2.x
+- Rename metadata properties. All metadata-record-related properties have `md_` prefix. Dataset-related properties do not have any special prefix.
+
+    |Old name|New name|
+    |---|---|
+    |`data_identifier`|`identifier`|
+    |`data_organisation_name`|`organisation_name`|
+    |`dataset_language`|`language`|
+    |`date`|`publication_date`|
+    |`date_stamp`|`md_date_stamp`|
+    |`file_identifier`|`md_file_identifier`|
+    |`organisation_name`|`md_organisation_name`|
+
 - Load data into redis on startup even in Flower.
 - Better handle Micka's HTTP errors, [#43](https://github.com/jirik/layman/issues/43)
 
+## v1.1.6
+2020-03-02
+- Mute 500 error on CSW delete.
+
 ## v1.1.5
 2020-02-28
-- Load data into redis on startup even in Flower.
+
+Prior to 1.1.5, existing usernames, layers and maps **were not imported sometimes** on Layman's startup, that made it appear as they are missing. It should be fixed now by loading data into redis on startup even in Flower container.
 
 ## v1.1.4
 2020-02-19
