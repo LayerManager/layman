@@ -1,6 +1,8 @@
 # Changelog
 
 ## v1.2.x
+- TODO: Handle 500 error on CSW delete
+
 - Rename metadata properties. All metadata-record-related properties have `md_` prefix. Dataset-related properties do not have any special prefix.
 
     |Old name|New name|
@@ -13,8 +15,13 @@
     |`file_identifier`|`md_file_identifier`|
     |`organisation_name`|`md_organisation_name`|
 
+- Assert version of Micka on startup.
 - Load data into redis on startup even in Flower.
 - Better handle Micka's HTTP errors, [#43](https://github.com/jirik/layman/issues/43)
+
+## v1.1.7
+2020-03-09
+- Assert version of Micka on startup.
 
 ## v1.1.6
 2020-03-02

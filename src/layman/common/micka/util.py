@@ -3,8 +3,10 @@ from owslib.util import nspath_eval
 from flask import g, current_app
 from io import StringIO
 from owslib.csw import CatalogueServiceWeb
-from xml.etree import ElementTree as ET
+# from xml.etree import ElementTree as ET
+from lxml import etree as ET
 from layman import settings, LaymanError
+from . import PROPERTIES
 import requests
 
 
@@ -153,3 +155,13 @@ def csw_delete(muuid):
             })
     assert root_el.tag == nspath_eval('csw:TransactionResponse', NAMESPACES), r.content
     assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalDeleted', NAMESPACES)).text == "1", r.content
+
+
+def parse_md_properties(file_obj, properties):
+    # print('xml_str', xml_str)
+    root_el = ET.parse(file_obj)
+    print(f"root_el={root_el}")
+    return {
+        prop: str(root_el.xpath(PROPERTIES[prop]['xpath'], namespaces=NAMESPACES)[0])
+        for prop in properties
+    }

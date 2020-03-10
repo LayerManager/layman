@@ -71,6 +71,25 @@ def test_fill_template(client):
 
 
 @pytest.mark.usefixtures('app_context')
+def test_fill_template(client):
+    xml_path = 'tmp/record-template.xml'
+    try:
+        os.remove(xml_path)
+    except OSError:
+        pass
+    file_object = common_util.fill_template('src/layman/layer/micka/record-template.xml', _get_template_values())
+    with open(xml_path, 'w') as out:
+        out.write(file_object.read())
+
+    def get_diff(p1, p2):
+        diff = difflib.unified_diff(open(p1).readlines(), open(p2).readlines())
+        return f"diff={''.join(diff)}"
+
+    expected_path = 'src/layman/layer/micka/util_test_filled_template.xml'
+    assert filecmp.cmp(xml_path, expected_path, shallow=False), get_diff(xml_path, expected_path)
+
+
+@pytest.mark.usefixtures('app_context')
 def test_num_records(client):
     publs_by_type = uuid.check_redis_consistency()
     num_publications = sum([len(publs) for publs in publs_by_type.values()])

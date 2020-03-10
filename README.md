@@ -128,7 +128,7 @@ However, if you want to run Layman in production, it is strongly recommended to 
 ## Run in production
 To run layman in production, you need to provide [external dependencies](#dependencies) and [configure](#configuration) layman manually.
 
-When providing external dependencies, check their production-related documentation:
+When providing **external dependencies**, check their production-related documentation:
 - [PostgreSQL 10.0](https://www.postgresql.org/docs/10/admin.html) & [PostGIS 2.4](http://postgis.net/docs/manual-2.4/performance_tips.html)
 - [GeoServer 2.13.0](https://docs.geoserver.org/2.13.0/user/production/index.html#production)
 - [Redis 4.0](https://redis.io/topics/admin)
@@ -146,6 +146,7 @@ After providing external dependencies there is time to provide **internal depend
 
 **System-level** dependencies includes
 - python 3.6+
+- [python3-lxml](https://lxml.de/installation.html)
 - [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) utility of [gdal](https://gdal.org/) 2.4+
 - [chromium-browser](https://chromium.org/) 77+ and corresponding version of [chromedriver](https://chromedriver.chromium.org/)
 - [pipenv](https://pipenv.kennethreitz.org/en/latest/)
