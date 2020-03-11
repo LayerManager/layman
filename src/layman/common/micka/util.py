@@ -162,6 +162,6 @@ def parse_md_properties(file_obj, properties):
     root_el = ET.parse(file_obj)
     print(f"root_el={root_el}")
     return {
-        prop: str(root_el.xpath(PROPERTIES[prop]['xpath'], namespaces=NAMESPACES)[0])
+        prop: PROPERTIES[prop]['fn'](root_el.xpath(PROPERTIES[prop]['xpath'], namespaces=NAMESPACES))
         for prop in properties
     }
