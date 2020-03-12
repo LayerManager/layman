@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd http://www.isotc211.org/2005/gmx http://schemas.opengis.net/iso/19139/20060504/gmx/gmx.xsd">
+<gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd http://www.isotc211.org/2005/gmx http://schemas.opengis.net/iso/19139/20060504/gmx/gmx.xsd">
   <gmd:fileIdentifier>
     <gco:CharacterString>m-af238200-8200-1a23-9399-42c9fca53543</gco:CharacterString>
   </gmd:fileIdentifier>
@@ -11,23 +11,23 @@
   </gmd:hierarchyLevel>
   <gmd:contact>
     <gmd:CI_ResponsibleParty>
-      <gmd:organisationName gco:nilReason="unknown" />
+      <gmd:organisationName gco:nilReason="unknown"/>
       <gmd:contactInfo>
         <gmd:CI_Contact>
           <gmd:address>
             <gmd:CI_Address>
-              <gmd:electronicMailAddress gco:nilReason="unknown" />
+              <gmd:electronicMailAddress gco:nilReason="unknown"/>
             </gmd:CI_Address>
           </gmd:address>
           <gmd:onlineResource>
             <gmd:CI_OnlineResource>
-              <gmd:linkage gco:nilReason="unknown" />
+              <gmd:linkage gco:nilReason="unknown"/>
             </gmd:CI_OnlineResource>
           </gmd:onlineResource>
         </gmd:CI_Contact>
       </gmd:contactInfo>
       <gmd:role>
-        <gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
+        <gmd:CI_RoleCode codeListValue="pointOfContact" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode">pointOfContact</gmd:CI_RoleCode>
       </gmd:role>
     </gmd:CI_ResponsibleParty>
   </gmd:contact>
@@ -64,7 +64,7 @@
                 <gco:Date>2007-05-25</gco:Date>
               </gmd:date>
               <gmd:dateType>
-                <gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication">publication</gmd:CI_DateTypeCode>
+                <gmd:CI_DateTypeCode codeListValue="publication" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode">publication</gmd:CI_DateTypeCode>
               </gmd:dateType>
             </gmd:CI_Date>
           </gmd:date>
@@ -76,33 +76,33 @@
             </gmd:MD_Identifier>
           </gmd:identifier>
           <gmd:presentationForm>
-            <gmd:CI_PresentationFormCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_PresentationFormCode" codeListValue="documentDigital">documentDigital</gmd:CI_PresentationFormCode>
+            <gmd:CI_PresentationFormCode codeListValue="documentDigital" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_PresentationFormCode">documentDigital</gmd:CI_PresentationFormCode>
           </gmd:presentationForm>
           <gmd:presentationForm>
-            <gmd:CI_PresentationFormCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_PresentationFormCode" codeListValue="mapDigital">mapDigital</gmd:CI_PresentationFormCode>
+            <gmd:CI_PresentationFormCode codeListValue="mapDigital" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_PresentationFormCode">mapDigital</gmd:CI_PresentationFormCode>
           </gmd:presentationForm>
         </gmd:CI_Citation>
       </gmd:citation>
-      <gmd:abstract gco:nilReason="unknown" />
+      <gmd:abstract gco:nilReason="unknown"/>
       <gmd:pointOfContact>
         <gmd:CI_ResponsibleParty>
-          <gmd:organisationName gco:nilReason="unknown" />
+          <gmd:organisationName gco:nilReason="unknown"/>
           <gmd:contactInfo>
             <gmd:CI_Contact>
               <gmd:address>
                 <gmd:CI_Address>
-                  <gmd:electronicMailAddress gco:nilReason="unknown" />
+                  <gmd:electronicMailAddress gco:nilReason="unknown"/>
                 </gmd:CI_Address>
               </gmd:address>
               <gmd:onlineResource>
                 <gmd:CI_OnlineResource>
-                  <gmd:linkage gco:nilReason="unknown" />
+                  <gmd:linkage gco:nilReason="unknown"/>
                 </gmd:CI_OnlineResource>
               </gmd:onlineResource>
             </gmd:CI_Contact>
           </gmd:contactInfo>
           <gmd:role>
-            <gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="custodian">custodian</gmd:CI_RoleCode>
+            <gmd:CI_RoleCode codeListValue="custodian" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode">custodian</gmd:CI_RoleCode>
           </gmd:role>
         </gmd:CI_ResponsibleParty>
       </gmd:pointOfContact>
@@ -118,7 +118,7 @@
       </gmd:graphicOverview>
       <gmd:descriptiveKeywords>
         <gmd:MD_Keywords>
-          <gmd:keyword gco:nilReason="unknown" />
+          <gmd:keyword gco:nilReason="unknown"/>
           <gmd:thesaurusName>
             <gmd:CI_Citation>
               <gmd:title>
@@ -130,7 +130,7 @@
                     <gco:Date>2008-06-01</gco:Date>
                   </gmd:date>
                   <gmd:dateType>
-                    <gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication">publication</gmd:CI_DateTypeCode>
+                    <gmd:CI_DateTypeCode codeListValue="publication" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode">publication</gmd:CI_DateTypeCode>
                   </gmd:dateType>
                 </gmd:CI_Date>
               </gmd:date>
@@ -141,7 +141,7 @@
       <gmd:resourceConstraints>
         <gmd:MD_LegalConstraints>
           <gmd:accessConstraints>
-            <gmd:MD_RestrictionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
+            <gmd:MD_RestrictionCode codeListValue="otherRestrictions" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode">otherRestrictions</gmd:MD_RestrictionCode>
           </gmd:accessConstraints>
           <gmd:otherConstraints>
             <gmx:Anchor xlink:href="http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations">Bez omezení</gmx:Anchor>
@@ -151,7 +151,7 @@
       <gmd:resourceConstraints>
         <gmd:MD_LegalConstraints>
           <gmd:useConstraints>
-            <gmd:MD_RestrictionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
+            <gmd:MD_RestrictionCode codeListValue="otherRestrictions" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode">otherRestrictions</gmd:MD_RestrictionCode>
           </gmd:useConstraints>
           <gmd:otherConstraints>
             <gmx:Anchor xlink:href="http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply">Žádné podmínky neplatí</gmx:Anchor>
@@ -161,7 +161,7 @@
       <srv:serviceType>
         <gco:LocalName codeSpace="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType">Map</gco:LocalName>
       </srv:serviceType>
-      <gmd:language gco:nilReason="unknown" />
+      <gmd:language gco:nilReason="unknown"/>
       <srv:extent>
         <gmd:EX_Extent>
           <gmd:geographicElement>
@@ -183,7 +183,7 @@
         </gmd:EX_Extent>
       </srv:extent>
       <srv:couplingType>
-        <srv:SV_CouplingType codeList="http://standards.iso.org/iso/19139/resources/ML_gmxCodelists.xml#SV_CouplingType" codeListValue="tight" />
+        <srv:SV_CouplingType codeList="http://standards.iso.org/iso/19139/resources/ML_gmxCodelists.xml#SV_CouplingType" codeListValue="tight"/>
       </srv:couplingType>
     </srv:SV_ServiceIdentification>
   </gmd:identificationInfo>

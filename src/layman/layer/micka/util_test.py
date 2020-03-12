@@ -78,7 +78,7 @@ def test_fill_template(client):
     except OSError:
         pass
     file_object = common_util.fill_template('src/layman/layer/micka/record-template.xml', _get_template_values())
-    with open(xml_path, 'w') as out:
+    with open(xml_path, 'wb') as out:
         out.write(file_object.read())
 
     def get_diff(p1, p2):

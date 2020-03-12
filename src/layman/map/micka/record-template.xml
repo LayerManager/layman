@@ -46,11 +46,11 @@ xsi:schemaLocation="http://www.isotc211.org/2005/srv http://schemas.opengis.net/
 	</gmd:dateStamp>
 
     <gmd:metadataStandardName>
-        <gco:CharacterString xmlns:gco="http://www.isotc211.org/2005/gco">ISO 19115/INSPIRE_TG2/CZ4</gco:CharacterString>
+        <gco:CharacterString>ISO 19115/INSPIRE_TG2/CZ4</gco:CharacterString>
     </gmd:metadataStandardName>
 
     <gmd:metadataStandardVersion>
-        <gco:CharacterString xmlns:gco="http://www.isotc211.org/2005/gco">2003/cor.1/2006</gco:CharacterString>
+        <gco:CharacterString>2003/cor.1/2006</gco:CharacterString>
     </gmd:metadataStandardVersion>
 
 	{reference_system}
@@ -161,7 +161,7 @@ xsi:schemaLocation="http://www.isotc211.org/2005/srv http://schemas.opengis.net/
 			</gmd:resourceConstraints>
 
 			<srv:serviceType>
-				<gco:LocalName xmlns:gco="http://www.isotc211.org/2005/gco"
+				<gco:LocalName
 							   codeSpace="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType">Map</gco:LocalName>
 			</srv:serviceType>
 

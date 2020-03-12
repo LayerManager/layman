@@ -51,7 +51,7 @@ def get_feature_type(
 
 def wms_proxy(wms_url, xml=None):
     wms_url_path = urlparse(wms_url).path
-    wms = WebMapService(wms_url, xml=xml)
+    wms = WebMapService(wms_url, xml=xml.encode('utf-8') if xml is not None else xml)
     for operation in wms.operations:
         # app.logger.info(operation.name)
         for method in operation.methods:
@@ -64,7 +64,7 @@ def wms_proxy(wms_url, xml=None):
 
 def wfs_proxy(wfs_url, xml=None):
     wfs_url_path = urlparse(wfs_url).path
-    wfs = WebFeatureService(wfs_url, xml=xml)
+    wfs = WebFeatureService(wfs_url, xml=xml.encode('utf-8') if xml is not None else xml)
     for operation in wfs.operations:
         # app.logger.info(operation.name)
         for method in operation.methods:

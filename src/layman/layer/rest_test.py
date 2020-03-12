@@ -379,7 +379,7 @@ def test_post_layers_shp(client):
     expected_path = 'src/layman/layer/rest_test_filled_template.xml'
     with open(expected_path) as f:
         expected_lines = f.readlines()
-    diff_lines = list(difflib.unified_diff(xml_file_object.readlines(), expected_lines))
+    diff_lines = list(difflib.unified_diff([l.decode('utf-8') for l in xml_file_object.readlines()], expected_lines))
     assert len(diff_lines) == 29, ''.join(diff_lines)
     plus_lines = [l for l in diff_lines if l.startswith('+ ')]
     assert len(plus_lines) == 3
