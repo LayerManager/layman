@@ -24,22 +24,6 @@ for k, v in NAMESPACES.items():
     ET.register_namespace(k, v)
 
 
-def indent(elem, level=0):
-    i = "\n" + level*"  "
-    if len(elem):
-        if not elem.text or not elem.text.strip():
-            elem.text = i + "  "
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-        for elem in elem:
-            indent(elem, level+1)
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-    else:
-        if level and (not elem.tail or not elem.tail.strip()):
-            elem.tail = i
-
-
 def fill_template(template_path, template_values):
     file_object = fill_template_as_pretty_file_object(template_path, template_values)
     return file_object
@@ -52,30 +36,31 @@ def fill_template_as_str(template_path, template_values):
     return xml_str
 
 
-def fill_template_as_pretty_el(template_path, template_values):
+def fill_template_as_el(template_path, template_values):
     xml_str = fill_template_as_str(template_path, template_values)
-    root_el = ET.fromstring(xml_str.encode('utf-8'))
+    parser = ET.XMLParser(remove_blank_text=True)
+    root_el = ET.fromstring(xml_str.encode('utf-8'), parser=parser)
 
-    indent(root_el)
     return root_el
 
 
 def fill_template_as_pretty_file_object(template_path, template_values):
-    root_el = fill_template_as_pretty_el(template_path, template_values)
+    root_el = fill_template_as_el(template_path, template_values)
     el_tree = ET.ElementTree(root_el)
     file_object = BytesIO()
     el_tree.write(
         file_object,
         encoding='utf-8',
         xml_declaration=True,
+        pretty_print=True,
     )
     file_object.seek(0)
     return file_object
 
 
 def fill_template_as_pretty_str(template_path, template_values):
-    root_el = fill_template_as_pretty_el(template_path, template_values)
-    pretty_str = ET.tostring(root_el, encoding='unicode')
+    root_el = fill_template_as_el(template_path, template_values)
+    pretty_str = ET.tostring(root_el, encoding='unicode', pretty_print=True)
     return pretty_str
 
 
@@ -171,7 +156,7 @@ def parse_md_properties(file_obj, properties):
         parent_el = root_el.xpath(micka_prop['xpath_parent'], namespaces=NAMESPACES)
         parent_el = parent_el[0] if parent_el else None
         # print(f"prop['xpath_property']={prop['xpath_property']}")
-        prop_els = parent_el.xpath(micka_prop['xpath_property'], namespaces=NAMESPACES) if parent_el else []
+        prop_els = parent_el.xpath(micka_prop['xpath_property'], namespaces=NAMESPACES) if parent_el is not None else []
         # print(f"prop['xpath_extract']={prop['xpath_extract']}")
         # print(f"len(prop_els)={len(prop_els)}")
         prop_values = []

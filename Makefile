@@ -138,6 +138,9 @@ client-bash-root:
 client-bash-exec-root:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec -u root layman_client sh
 
+celery-worker-test-bash:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm celery_worker_test bash
+
 test:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_dev
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
