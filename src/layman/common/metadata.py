@@ -2,6 +2,9 @@ PROPERTIES = {
     'md_file_identifier': {
         'upper_mp': '1',
     },
+    'md_organisation_name': {
+        'upper_mp': '1',
+    },
     'md_date_stamp': {
         'upper_mp': '1',
     },
@@ -21,7 +24,16 @@ PROPERTIES = {
     'abstract': {
         'upper_mp': '1',
     },
+    'organisation_name': {
+        'upper_mp': '1',
+    },
     'graphic_url': {
+        'upper_mp': '1',
+    },
+    'scale_denominator': {
+        'upper_mp': '1',
+    },
+    'language': {
         'upper_mp': '1',
     },
     'extent': {

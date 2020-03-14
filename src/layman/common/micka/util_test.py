@@ -9,17 +9,33 @@ from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
 def test_fill_template():
     xml_path = 'src/layman/layer/micka/util_test_filled_template.xml'
     with open(xml_path, 'r') as xml_file:
-        props = parse_md_properties(xml_file, MICKA_PROPERTIES.keys())
+        props = parse_md_properties(xml_file, [
+           'abstract',
+           'extent',
+           'graphic_url',
+           'identifier',
+           'layer_endpoint',
+           'md_date_stamp',
+           'md_file_identifier',
+           'publication_date',
+           'reference_system',
+           'title',
+           'wfs_url',
+           'wms_url',
+        ])
     expected = {
         'md_file_identifier': 'm-ca238200-8200-1a23-9399-42c9fca53542',
         'md_date_stamp': '2007-05-25',
-        'reference_system': ['EPSG:4326', 'EPSG:3857'],
+        'reference_system': [4326, 3857],
         'title': 'CORINE - Krajinný pokryv CLC 90',
         'publication_date': '2007-05-25',
-        'identifier': 'http://www.env.cz/data/corine/1990',
+        'identifier': {
+            'identifier': 'http://www.env.cz/data/corine/1990',
+            'label': 'MZP-CORINE',
+        },
         'abstract': None,
         'graphic_url': 'http://layman_test_run_1:8000/rest/browser/layers/layer/thumbnail',
-        'extent': [11.87, 19.13, 48.12, 51.59],
+        'extent': [11.87, 48.12, 19.13, 51.59],
         'wms_url': 'http://www.env.cz/corine/data/download.zip',
         'wfs_url': 'http://www.env.cz/corine/data/download.zip',
         'layer_endpoint': 'http://layman_test_run_1:8000/rest/browser/layers/layer',

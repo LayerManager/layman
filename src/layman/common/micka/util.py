@@ -9,6 +9,7 @@ from layman import settings, LaymanError
 from . import PROPERTIES as MICKA_PROPERTIES
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
 import requests
+from copy import deepcopy
 
 
 NAMESPACES = {
@@ -22,6 +23,86 @@ NAMESPACES = {
 }
 for k, v in NAMESPACES.items():
     ET.register_namespace(k, v)
+
+
+def get_single_prop_els(parent_el, prop_name):
+    micka_prop = MICKA_PROPERTIES[prop_name]
+    single_prop_els = parent_el.xpath(micka_prop['xpath_property'], namespaces=NAMESPACES)
+    last_prop_el = None
+    if len(single_prop_els) == 0 and micka_prop['xpath_property'].find('[') >= 0:
+        simple_xpath_property = micka_prop['xpath_property'][:micka_prop['xpath_property'].find('[')]
+        single_prop_els = [
+            e for e in
+            parent_el.xpath(simple_xpath_property, namespaces=NAMESPACES)
+        ]
+        last_prop_el = single_prop_els[-1] if single_prop_els else None
+        single_prop_els = [
+            e for e in
+            single_prop_els
+            if len(e) == 0
+        ]
+    last_prop_el = single_prop_els[-1] if single_prop_els else last_prop_el
+    return single_prop_els, last_prop_el
+
+
+def fill_xml_template(template_path, prop_values):
+    with open(template_path, 'r') as template_file:
+        xml_str = template_file.read()
+    parser = ET.XMLParser(remove_blank_text=True)
+    root_el = ET.fromstring(xml_str.encode('utf-8'), parser=parser)
+    for prop_name, prop_value in prop_values.items():
+        # print(f'prop_name={prop_name}')
+        common_prop = COMMON_PROPERTIES[prop_name]
+        micka_prop = MICKA_PROPERTIES[prop_name]
+        parent_el = root_el.xpath(micka_prop['xpath_parent'], namespaces=NAMESPACES)[0]
+        single_prop_els, last_prop_el = get_single_prop_els(parent_el, prop_name)
+        assert len(single_prop_els) > 0 or last_prop_el is not None, f"Element of property {prop_name} not found!"
+        single_prop_values = [prop_value] if common_prop['upper_mp'] == '1' else prop_value
+        all_new_els = []
+        if len(single_prop_els) > len(single_prop_values):
+            for idx in range(len(single_prop_values), len(single_prop_els)):
+                # print(f'Removing node {idx}')
+                e = single_prop_els[idx]
+                e.getparent().remove(e)
+        elif len(single_prop_values) > len(single_prop_els):
+            e = single_prop_els[-1] if single_prop_els else last_prop_el
+            for idx in range(len(single_prop_values) - len(single_prop_els)):
+                pe = e.getparent()
+                # print(f'Adding node {idx}')
+                new_el = deepcopy(e)
+                if not single_prop_els:
+                    all_new_els.append(new_el)
+                pe.insert(pe.index(e)+1, new_el)
+        if all_new_els:
+            single_prop_els = all_new_els
+        else:
+            single_prop_els, _ = get_single_prop_els(parent_el, prop_name)
+        assert len(single_prop_els) == len(single_prop_values), f"{len(single_prop_els)} != {len(single_prop_values)}"
+        # print(f"single_prop_values={single_prop_values}")
+        for idx, single_prop_el in enumerate(single_prop_els):
+            single_prop_value = single_prop_values[idx]
+            micka_prop['adjust_property_element'](single_prop_el, single_prop_value)
+    return root_el
+
+
+def fill_xml_template_as_pretty_str(template_path, prop_values):
+    root_el = fill_xml_template(template_path, prop_values)
+    pretty_str = ET.tostring(root_el, encoding='unicode', pretty_print=True)
+    return pretty_str
+
+
+def fill_xml_template_as_pretty_file_object(template_path, prop_values):
+    root_el = fill_xml_template(template_path, prop_values)
+    el_tree = ET.ElementTree(root_el)
+    file_object = BytesIO()
+    el_tree.write(
+        file_object,
+        encoding='utf-8',
+        xml_declaration=True,
+        pretty_print=True,
+    )
+    file_object.seek(0)
+    return file_object
 
 
 def fill_template(template_path, template_values):

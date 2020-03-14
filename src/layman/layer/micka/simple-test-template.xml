@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco"
+xmlns:xlink="http://www.w3.org/1999/xlink"
+xmlns:gmx="http://www.isotc211.org/2005/gmx"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/iso/19139/20060504/gmd/metadataEntity.xsd http://www.isotc211.org/2005/gmx http://schemas.opengis.net/iso/19139/20060504/gmx/gmx.xsd">
+
+	<gmd:fileIdentifier gco:nilReason="unknown" />
+
+	<gmd:language>
+		<gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="cze">cze</gmd:LanguageCode>
+	</gmd:language>
+
+	<gmd:hierarchyLevel>
+		<gmd:MD_ScopeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</gmd:MD_ScopeCode>
+	</gmd:hierarchyLevel>
+
+	<gmd:contact>
+		<gmd:CI_ResponsibleParty>
+			<gmd:organisationName gco:nilReason="unknown" />
+			<gmd:contactInfo>
+				<gmd:CI_Contact>
+					<gmd:address>
+						<gmd:CI_Address>
+							<gmd:electronicMailAddress gco:nilReason="unknown" />
+						</gmd:CI_Address>
+					</gmd:address>
+					<gmd:onlineResource>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage gco:nilReason="unknown" />
+						</gmd:CI_OnlineResource>
+					</gmd:onlineResource>
+				</gmd:CI_Contact>
+			</gmd:contactInfo>
+			<gmd:role>
+				<gmd:CI_RoleCode codeListValue="pointOfContact" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode">pointOfContact</gmd:CI_RoleCode>
+			</gmd:role>
+		</gmd:CI_ResponsibleParty>
+	</gmd:contact>
+
+	<gmd:dateStamp gco:nilReason="unknown" />
+
+    <gmd:metadataStandardName>
+        <gco:CharacterString>ISO 19115/INSPIRE_TG2/CZ4</gco:CharacterString>
+    </gmd:metadataStandardName>
+
+    <gmd:metadataStandardVersion>
+        <gco:CharacterString>2003/cor.1/2006</gco:CharacterString>
+    </gmd:metadataStandardVersion>
+
+	<gmd:referenceSystemInfo gco:nilReason="unknown" />
+
+	<gmd:identificationInfo>
+		<gmd:MD_DataIdentification>
+			<gmd:citation>
+				<gmd:CI_Citation>
+					<gmd:title>
+						<gco:CharacterString gco:nilReason="unknown" />
+					</gmd:title>
+					<gmd:date gco:nilReason="unknown" />
+					<gmd:identifier>
+						<gmd:MD_Identifier>
+							<gmd:code gco:nilReason="unknown" />
+						</gmd:MD_Identifier>
+					</gmd:identifier>
+				</gmd:CI_Citation>
+			</gmd:citation>
+
+			<gmd:abstract gco:nilReason="unknown" />
+
+			<gmd:pointOfContact>
+				<gmd:CI_ResponsibleParty>
+					<gmd:organisationName gco:nilReason="unknown" />
+					<gmd:contactInfo>
+						<gmd:CI_Contact>
+							<gmd:address>
+								<gmd:CI_Address>
+									<gmd:electronicMailAddress gco:nilReason="unknown" />
+								</gmd:CI_Address>
+							</gmd:address>
+							<gmd:onlineResource>
+								<gmd:CI_OnlineResource>
+									<gmd:linkage gco:nilReason="unknown" />
+								</gmd:CI_OnlineResource>
+							</gmd:onlineResource>
+						</gmd:CI_Contact>
+					</gmd:contactInfo>
+					<gmd:role>
+						<gmd:CI_RoleCode codeListValue="custodian" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode">custodian</gmd:CI_RoleCode>
+					</gmd:role>
+				</gmd:CI_ResponsibleParty>
+			</gmd:pointOfContact>
+
+			<gmd:graphicOverview gco:nilReason="unknown" />
+
+			<gmd:spatialResolution>
+				<gmd:MD_Resolution>
+					<gmd:equivalentScale>
+						<gmd:MD_RepresentativeFraction>
+							<gmd:denominator gco:nilReason="unknown" />
+						</gmd:MD_RepresentativeFraction>
+					</gmd:equivalentScale>
+				</gmd:MD_Resolution>
+			</gmd:spatialResolution>
+
+			<gmd:language gco:nilReason="unknown" />
+
+			<gmd:characterSet>
+				<gmd:MD_CharacterSetCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>
+			</gmd:characterSet>
+
+			<gmd:topicCategory gco:nilReason="unknown" />
+
+			<gmd:extent gco:nilReason="unknown" />
+
+		</gmd:MD_DataIdentification>
+	</gmd:identificationInfo>
+
+	<gmd:distributionInfo>
+		<gmd:MD_Distribution>
+
+			<gmd:transferOptions>
+				<gmd:MD_DigitalTransferOptions>
+					<gmd:onLine gco:nilReason="unknown" />
+				</gmd:MD_DigitalTransferOptions>
+			</gmd:transferOptions>
+
+		</gmd:MD_Distribution>
+	</gmd:distributionInfo>
+
+	<gmd:dataQualityInfo>
+		<gmd:DQ_DataQuality>
+			<gmd:scope>
+				<gmd:DQ_Scope>
+					<gmd:level>
+						<gmd:MD_ScopeCode codeListValue="dataset" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode">dataset</gmd:MD_ScopeCode>
+					</gmd:level>
+				</gmd:DQ_Scope>
+			</gmd:scope>
+
+			<gmd:lineage>
+				<gmd:LI_Lineage>
+					<gmd:statement gco:nilReason="unknown" />
+				</gmd:LI_Lineage>
+			</gmd:lineage>
+		</gmd:DQ_DataQuality>
+	</gmd:dataQualityInfo>
+</gmd:MD_Metadata>

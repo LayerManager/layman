@@ -90,6 +90,40 @@ def test_fill_template(client):
 
 
 @pytest.mark.usefixtures('app_context')
+def test_fill_xml_template(client):
+
+    xml_file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/simple-test-template.xml', {
+        'md_file_identifier': 'm-abc',
+        'md_organisation_name': 'My Metadata Organization',
+        'md_date_stamp': '2007-01-22',
+        'reference_system': [4326, 5514],
+        'title': 'My title',
+        'publication_date': '2006-12-12',
+        'identifier': {
+            'identifier': 'id-abc',
+            'label': 'Dataset ABC',
+        },
+        'abstract': None,
+        'organisation_name': 'My Organization',
+        'graphic_url': 'https://example.com/myimage.png',
+        'scale_denominator': None,
+        'language': None,
+        'extent': [11.87, 48.12, 19.13, 51.59],
+        'wms_url': 'https://example.com/wms',
+        'wfs_url': 'https://example.com/wfs',
+        'layer_endpoint': 'https://example.com/layer_endpoint',
+    })
+
+    expected_path = 'src/layman/layer/micka/simple-test-template-filled.xml'
+    with open(expected_path) as f:
+        expected_lines = f.readlines()
+    lines = [l.decode('utf-8') for l in xml_file_object.readlines()]
+    # print(f"FILE:\n{''.join(lines)}")
+    diff_lines = list(difflib.unified_diff(expected_lines, lines))
+    assert len(diff_lines) == 0, f"DIFF LINES:\n{''.join(diff_lines)}"
+
+
+@pytest.mark.usefixtures('app_context')
 def test_num_records(client):
     publs_by_type = uuid.check_redis_consistency()
     num_publications = sum([len(publs) for publs in publs_by_type.values()])
