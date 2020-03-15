@@ -81,10 +81,14 @@ def test_parse_md_properties():
            'graphic_url',
            'identifier',
            'layer_endpoint',
+           'language',
            'md_date_stamp',
            'md_file_identifier',
+           'md_organisation_name',
+           'organisation_name',
            'publication_date',
            'reference_system',
+           'scale_denominator',
            'title',
            'wfs_url',
            'wms_url',
@@ -92,6 +96,10 @@ def test_parse_md_properties():
     expected = {
         'md_file_identifier': 'm-ca238200-8200-1a23-9399-42c9fca53542',
         'md_date_stamp': '2007-05-25',
+        'md_organisation_name': None,
+        'organisation_name': None,
+        'scale_denominator': None,
+        'language': None,
         'reference_system': [4326, 3857],
         'title': 'CORINE - Krajinný pokryv CLC 90',
         'publication_date': '2007-05-25',
@@ -141,7 +149,7 @@ def test_fill_xml_template(client):
     with open(expected_path) as f:
         expected_lines = f.readlines()
     lines = [l.decode('utf-8') for l in xml_file_object.readlines()]
-    print(f"FILE:\n{''.join(lines)}")
+    # print(f"FILE:\n{''.join(lines)}")
     diff_lines = list(difflib.unified_diff(expected_lines, lines))
     assert len(diff_lines) == 0, f"DIFF LINES:\n{''.join(diff_lines)}"
 

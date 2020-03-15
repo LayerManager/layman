@@ -1,3 +1,5 @@
+import json
+
 PROPERTIES = {
     'md_file_identifier': {
         'upper_mp': '1',
@@ -46,6 +48,16 @@ PROPERTIES = {
         'upper_mp': '1',
     },
     'layer_endpoint': {
+        'upper_mp': '1',
+    },
+    'operates_on': {
+        'upper_mp': '*',
+        'equals_fn': lambda a, b: set([json.dumps(ai, sort_keys=True) for ai in a]) == set([json.dumps(bi, sort_keys=True) for bi in b]),
+    },
+    'map_endpoint': {
+        'upper_mp': '1',
+    },
+    'map_file_endpoint': {
         'upper_mp': '1',
     },
 }

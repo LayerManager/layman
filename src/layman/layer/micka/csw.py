@@ -470,7 +470,7 @@ METADATA_PROPERTIES = {
         'xpath_property': './gmd:denominator',
         'xpath_extract': './gco:Integer/text()',
         'xpath_extract_fn': lambda l: int(l[0]) if l else None,
-        'adjust_property_element': _adjust_graphic_url,
+        'adjust_property_element': _adjust_integer,
     },
     'language': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification',

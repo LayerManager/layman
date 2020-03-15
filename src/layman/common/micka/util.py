@@ -18,6 +18,7 @@ NAMESPACES = {
     'gmd': 'http://www.isotc211.org/2005/gmd',
     'gmx': 'http://www.isotc211.org/2005/gmx',
     'xlink': 'http://www.w3.org/1999/xlink',
+    'srv': 'http://www.isotc211.org/2005/srv',
 }
 for k, v in NAMESPACES.items():
     ET.register_namespace(k, v)

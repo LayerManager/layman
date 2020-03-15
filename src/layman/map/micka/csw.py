@@ -295,3 +295,120 @@ f"""
 
     return result
 
+
+from layman.layer.micka.csw import _adjust_character_string, _adjust_date_string, _adjust_reference_system_info, _adjust_date_string_with_type, _adjust_identifier_with_label, _adjust_language, _adjust_graphic_url, _adjust_extent
+from layman.common.micka.util import NAMESPACES
+
+METADATA_PROPERTIES = {
+    'md_file_identifier': {
+        'xpath_parent': '/gmd:MD_Metadata',
+        'xpath_property': './gmd:fileIdentifier',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': _adjust_character_string,
+    },
+    'md_organisation_name': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty',
+        'xpath_property': './gmd:organisationName',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': _adjust_character_string,
+    },
+    'md_date_stamp': {
+        'xpath_parent': '/gmd:MD_Metadata',
+        'xpath_property': './gmd:dateStamp',
+        'xpath_extract': './gco:Date/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': _adjust_date_string,
+    },
+    'reference_system': {
+        'xpath_parent': '/gmd:MD_Metadata',
+        'xpath_property': './gmd:referenceSystemInfo[gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor[starts-with(@xlink:href, "http://www.opengis.net/def/crs/EPSG/0/")]]',
+        'xpath_extract': './gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor/@xlink:href',
+        'xpath_extract_fn': lambda l: int(l[0].rsplit('/')[-1]) if len(l) else None,
+        'adjust_property_element': _adjust_reference_system_info,
+    },
+    'title': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation',
+        'xpath_property': './gmd:title',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': _adjust_character_string,
+    },
+    'publication_date': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation',
+        'xpath_property': './gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="publication"]]',
+        'xpath_extract': './gmd:CI_Date/gmd:date/gco:Date/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': _adjust_date_string_with_type,
+    },
+    'identifier': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation',
+        'xpath_property': './gmd:identifier',
+        'xpath_extract': './gmd:MD_Identifier/gmd:code/gmx:Anchor/@xlink:href',
+        'xpath_extract_fn': lambda l: {
+            'identifier': l[0],
+            'label': l[0].getparent().text,
+        } if l else None,
+        'adjust_property_element': _adjust_identifier_with_label,
+    },
+    'abstract': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification',
+        'xpath_property': './gmd:abstract',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': _adjust_character_string,
+    },
+    'organisation_name': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty',
+        'xpath_property': './gmd:organisationName',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': _adjust_character_string,
+    },
+    'graphic_url': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification',
+        'xpath_property': './gmd:graphicOverview[gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString]',
+        'xpath_extract': './gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': _adjust_graphic_url,
+    },
+    'language': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification',
+        'xpath_property': './gmd:language',
+        'xpath_extract': './gmd:LanguageCode/@codeListValue',
+        'xpath_extract_fn': lambda l: int(l[0]) if l else None,
+        'adjust_property_element': _adjust_language,
+    },
+    'extent': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification',
+        'xpath_property': './srv:extent',
+        'xpath_extract': './gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox/*/gco:Decimal/text()',
+        'xpath_extract_fn': lambda l: [float(l[0]), float(l[2]), float(l[1]), float(l[3])] if len(l) == 4 else None,
+        'adjust_property_element': _adjust_extent,
+    },
+    'operates_on': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification',
+        'xpath_property': './srv:operatesOn[@xlink:href]',
+        'xpath_extract': './@xlink:href',
+        'xpath_extract_fn': lambda l: {
+            'xlink:href': l[0],
+            'xlink:title': l[0].getparent().get(f"{{{NAMESPACES['xlink']}}}title"),
+        } if l else None,
+        # 'adjust_property_element': _adjust_layer_endpoint_url,
+    },
+    'map_endpoint': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
+        'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link" and gmd:CI_OnlineResource/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue="information"]',
+        'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        # 'adjust_property_element': _adjust_layer_endpoint_url,
+    },
+    'map_file_endpoint': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
+        'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link" and gmd:CI_OnlineResource/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue="download"]',
+        'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        # 'adjust_property_element': _adjust_layer_endpoint_url,
+    },
+}
