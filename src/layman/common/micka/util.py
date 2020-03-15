@@ -3,6 +3,7 @@ from owslib.util import nspath_eval
 from flask import g, current_app
 from io import BytesIO
 from owslib.csw import CatalogueServiceWeb
+from xml.sax.saxutils import escape
 from lxml import etree as ET
 from layman import settings, LaymanError
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
@@ -251,3 +252,176 @@ def parse_md_properties(file_obj, property_names, publ_properties):
     return result
 
 
+def _clear_el(el):
+    el.attrib.clear()
+    for child in list(el):
+        el.remove(child)
+
+
+def _add_unknown_reason(el):
+    el.attrib[ET.QName(NAMESPACES['gco'], 'nilReason')] = 'unknown'
+
+
+def adjust_character_string(prop_el, prop_value):
+    _clear_el(prop_el)
+    if prop_value is not None:
+        child_el = ET.fromstring(f"""<gco:CharacterString xmlns:gco="{NAMESPACES['gco']}">{escape(prop_value)}</gco:CharacterString>""")
+        prop_el.append(child_el)
+    else:
+        _add_unknown_reason(prop_el)
+
+
+def adjust_integer(prop_el, prop_value):
+    _clear_el(prop_el)
+    if prop_value is not None:
+        child_el = ET.fromstring(f"""<gco:Integer xmlns:gco="{NAMESPACES['gco']}">{escape(str(prop_value))}</gco:CharacterString>""")
+        prop_el.append(child_el)
+    else:
+        _add_unknown_reason(prop_el)
+
+
+def adjust_date_string(prop_el, prop_value):
+    _clear_el(prop_el)
+    if prop_value is not None:
+        child_el = ET.fromstring(f"""<gco:Date xmlns:gco="{NAMESPACES['gco']}">{escape(prop_value)}</gco:Date>""")
+        prop_el.append(child_el)
+    else:
+        _add_unknown_reason(prop_el)
+
+
+def adjust_date_string_with_type(prop_el, prop_value):
+    _clear_el(prop_el)
+    if prop_value is not None:
+        parser = ET.XMLParser(remove_blank_text=True)
+        child_el = ET.fromstring(f"""
+<gmd:CI_Date xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gco="{NAMESPACES['gco']}">
+    <gmd:date>
+        <gco:Date>{escape(prop_value)}</gco:Date>
+    </gmd:date>
+    <gmd:dateType>
+        <gmd:CI_DateTypeCode codeListValue="publication" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode">publication</gmd:CI_DateTypeCode>
+    </gmd:dateType>
+</gmd:CI_Date>
+""", parser=parser)
+        prop_el.append(child_el)
+    else:
+        _add_unknown_reason(prop_el)
+
+
+def adjust_reference_system_info(prop_el, prop_value):
+    _clear_el(prop_el)
+    if prop_value is not None:
+        parser = ET.XMLParser(remove_blank_text=True)
+        child_el = ET.fromstring(f"""
+<gmd:MD_ReferenceSystem xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gmx="{NAMESPACES['gmx']}" xmlns:xlink="{NAMESPACES['xlink']}">
+    <gmd:referenceSystemIdentifier>
+        <gmd:RS_Identifier>
+            <gmd:code>
+                <gmx:Anchor xlink:href="http://www.opengis.net/def/crs/EPSG/0/{prop_value}">EPSG:{prop_value}</gmx:Anchor>
+            </gmd:code>
+        </gmd:RS_Identifier>
+    </gmd:referenceSystemIdentifier>
+</gmd:MD_ReferenceSystem>
+""", parser=parser)
+        prop_el.append(child_el)
+    else:
+        _add_unknown_reason(prop_el)
+
+
+def adjust_identifier_with_label(prop_el, prop_value):
+    _clear_el(prop_el)
+    parser = ET.XMLParser(remove_blank_text=True)
+    if prop_value is not None:
+        identifier = prop_value['identifier']
+        label = prop_value['label']
+        child_el = ET.fromstring(f"""
+<gmd:MD_Identifier xmlns:gmx="{NAMESPACES['gmx']}" xmlns:gmd="{NAMESPACES['gmd']}" xmlns:xlink="{NAMESPACES['xlink']}">
+    <gmd:code>
+        <gmx:Anchor xlink:href="{identifier}">{escape(label)}</gmx:Anchor>
+    </gmd:code>
+</gmd:MD_Identifier>
+""", parser=parser)
+        prop_el.append(child_el)
+    else:
+        _add_unknown_reason(prop_el)
+
+
+def adjust_graphic_url(prop_el, prop_value):
+    _clear_el(prop_el)
+    if prop_value is not None:
+        parser = ET.XMLParser(remove_blank_text=True)
+        child_el = ET.fromstring(f"""
+<gmd:MD_BrowseGraphic xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gco="{NAMESPACES['gco']}">
+    <gmd:fileName>
+        <gco:CharacterString>{escape(prop_value)}</gco:CharacterString>
+    </gmd:fileName>
+    <gmd:fileType>
+        <gco:CharacterString>PNG</gco:CharacterString>
+    </gmd:fileType>
+</gmd:MD_BrowseGraphic>
+""", parser=parser)
+        prop_el.append(child_el)
+    else:
+        _add_unknown_reason(prop_el)
+
+
+def adjust_language(prop_el, prop_value):
+    _clear_el(prop_el)
+    if prop_value is not None:
+        child_el = ET.fromstring(f"""<gmd:LanguageCode xmlns:gmd="{NAMESPACES['gmd']}" codeListValue=\"{prop_value}\" codeList=\"http://www.loc.gov/standards/iso639-2/\">{prop_value}</gmd:LanguageCode>""")
+        prop_el.append(child_el)
+    else:
+        _add_unknown_reason(prop_el)
+
+
+def adjust_extent(prop_el, prop_value):
+    _clear_el(prop_el)
+    if prop_value is not None:
+        parser = ET.XMLParser(remove_blank_text=True)
+        child_el = ET.fromstring(f"""
+<gmd:EX_Extent xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gco="{NAMESPACES['gco']}">
+    <gmd:geographicElement>
+        <gmd:EX_GeographicBoundingBox>
+            <gmd:westBoundLongitude>
+                <gco:Decimal>{prop_value[0]}</gco:Decimal>
+            </gmd:westBoundLongitude>
+            <gmd:eastBoundLongitude>
+                <gco:Decimal>{prop_value[2]}</gco:Decimal>
+            </gmd:eastBoundLongitude>
+            <gmd:southBoundLatitude>
+                <gco:Decimal>{prop_value[1]}</gco:Decimal>
+            </gmd:southBoundLatitude>
+            <gmd:northBoundLatitude>
+                <gco:Decimal>{prop_value[3]}</gco:Decimal>
+            </gmd:northBoundLatitude>
+        </gmd:EX_GeographicBoundingBox>
+    </gmd:geographicElement>
+</gmd:EX_Extent>
+""", parser=parser)
+        prop_el.append(child_el)
+    else:
+        _add_unknown_reason(prop_el)
+
+
+def adjust_online_url(prop_el, prop_value, resource_protocol=None, online_function=None):
+    assert resource_protocol is not None
+    assert online_function is not None
+    _clear_el(prop_el)
+    if prop_value is not None:
+        parser = ET.XMLParser(remove_blank_text=True)
+        child_el = ET.fromstring(f"""
+<gmd:CI_OnlineResource xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gmx="{NAMESPACES['gmx']}" xmlns:xlink="{NAMESPACES['xlink']}">
+    <gmd:linkage>
+        <gmd:URL>{escape(prop_value)}</gmd:URL>
+    </gmd:linkage>
+    <gmd:protocol>
+        <gmx:Anchor xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/{resource_protocol}">{resource_protocol}</gmx:Anchor>
+    </gmd:protocol>
+     <gmd:function>
+        <gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="{online_function}">{online_function}</gmd:CI_OnLineFunctionCode>
+     </gmd:function>
+</gmd:CI_OnlineResource>
+""", parser=parser)
+        prop_el.append(child_el)
+    else:
+        _add_unknown_reason(prop_el)
