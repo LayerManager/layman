@@ -79,8 +79,8 @@ def delete_layer(username, layername):
 
 
 def csw_insert(username, layername):
-    template_path, template_values = get_template_path_and_values(username, layername)
-    record = common_util.fill_template_as_pretty_str(template_path, template_values)
+    template_path, prop_values = get_template_path_and_values(username, layername)
+    record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
     muuid = common_util.csw_insert({
         'record': record
     })
@@ -94,7 +94,7 @@ def get_template_path_and_values(username, layername):
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
 
     unknown_value = 'neznámá hodnota'
-    template_values = _get_template_values(
+    prop_values = _get_property_values(
         username=username,
         layername=layername,
         uuid=get_layer_uuid(username, layername),
@@ -103,18 +103,17 @@ def get_template_path_and_values(username, layername):
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
         identifier=url_for_external('rest_layer.get', username=username, layername=layername),
-        data_identifier_label=layername,
+        identifier_label=layername,
         extent=wms_layer.boundingBoxWGS84,
         ows_url=urljoin(get_gs_proxy_base_url(), username + '/ows'),
-        # TODO create config env variable to decide if to set organisation name or not
         md_organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
         organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
     )
-    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
-    return template_path, template_values
+    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'simple-test-template.xml')
+    return template_path, prop_values
 
 
-def _get_template_values(
+def _get_property_values(
         username='browser',
         layername='layer',
         uuid='ca238200-8200-1a23-9399-42c9fca53542',
@@ -125,127 +124,38 @@ def _get_template_values(
         publication_date='2007-05-25',
         md_date_stamp='2007-05-25',
         identifier='http://www.env.cz/data/corine/1990',
-        data_identifier_label='MZP-CORINE',
+        identifier_label='MZP-CORINE',
         extent=None,  # w, s, e, n
         ows_url="http://www.env.cz/corine/data/download.zip",
         epsg_codes=None,
         scale_denominator=None,
         language=None,
 ):
-    epsg_codes = epsg_codes or ['3857', '4326']
+    epsg_codes = epsg_codes or [3857, 4326]
     w, s, e, n = extent or [11.87, 48.12, 19.13, 51.59]
     extent = [max(w, -180), max(s, -90), min(e, 180), min(n, 90)]
 
     result = {
-        ###############################################################################################################
-        # KNOWN TO LAYMAN
-        ###############################################################################################################
-
-        # layer UUID with prefix "m-"
         'md_file_identifier': get_metadata_uuid(uuid),
-
-        'reference_system': ' '.join([
-f"""
-<gmd:referenceSystemInfo>
-    <gmd:MD_ReferenceSystem>
-        <gmd:referenceSystemIdentifier>
-            <gmd:RS_Identifier>
-                <gmd:code>
-                    <gmx:Anchor xlink:href="http://www.opengis.net/def/crs/EPSG/0/{epsg_code}">EPSG:{epsg_code}</gmx:Anchor>
-                </gmd:code>
-            </gmd:RS_Identifier>
-        </gmd:referenceSystemIdentifier>
-    </gmd:MD_ReferenceSystem>
-</gmd:referenceSystemInfo>
-""" for epsg_code in epsg_codes
-        ]),
-
-        # title of data
-        'title': title,
-
-        # date of dataset
-        # check GeoServer's REST API, consider revision or publication dateType
-        'publication_date': f"""
-<gmd:CI_Date>
-    <gmd:date>
-        <gco:Date>{publication_date}</gco:Date>
-    </gmd:date>
-    <gmd:dateType>
-        <gmd:CI_DateTypeCode codeListValue="publication" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode">publication</gmd:CI_DateTypeCode>
-    </gmd:dateType>
-</gmd:CI_Date>
-""",
-
-        # date stamp of metadata
         'md_date_stamp': md_date_stamp,
+        'reference_system': epsg_codes,
+        'title': title,
+        'publication_date': publication_date,
+        'identifier': {
+            'identifier': identifier,
+            'label': identifier_label,
+        },
+        'abstract': abstract,
+        'graphic_url': url_for_external('rest_layer_thumbnail.get', username=username, layername=layername),
+        'extent': extent,
 
-        # it must be URI, but text node is optional (MZP-CORINE)
-        # it can point to Layman's Layer endpoint
-        'identifier': f'<gmx:Anchor xlink:href="{identifier}">{escape(data_identifier_label)}</gmx:Anchor>',
-
-        'abstract': '<gmd:abstract gco:nilReason="unknown" />' if abstract is None else f"""
-<gmd:abstract>
-    <gco:CharacterString>{escape(abstract)}</gco:CharacterString>
-</gmd:abstract>
-""",
-
-        'graphic_url': escape(url_for_external('rest_layer_thumbnail.get', username=username, layername=layername)),
-
-        'extent': """
-<gmd:EX_GeographicBoundingBox>
-    <gmd:westBoundLongitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:westBoundLongitude>
-    <gmd:eastBoundLongitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:eastBoundLongitude>
-    <gmd:southBoundLatitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:southBoundLatitude>
-    <gmd:northBoundLatitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:northBoundLatitude>
-</gmd:EX_GeographicBoundingBox>
-""".format(extent[0], extent[2], extent[1], extent[3]),
-
-        'wms_url': escape(ows_url),
-
-        'wfs_url': escape(ows_url),
-
-        'layer_endpoint': escape(url_for_external('rest_layer.get', username=username, layername=layername)),
-
-
-        ###############################################################################################################
-        # GUESSABLE BY LAYMAN
-        ###############################################################################################################
-
-        'scale_denominator': '<gmd:denominator gco:nilReason="unknown" />' if scale_denominator is None else f"""
-<gmd:denominator>
-    <gco:Integer>{scale_denominator}</gco:Integer>
-</gmd:denominator>
-""",
-
-        # code for no language is "zxx"
-        'language': '<gmd:language gco:nilReason="unknown" />' if language is None else f"""
-<gmd:language>
-    <gmd:LanguageCode codeListValue=\"{language}\" codeList=\"http://www.loc.gov/standards/iso639-2/\">{language}</gmd:LanguageCode>
-</gmd:language>
-""",
-
-        ###############################################################################################################
-        # UNKNOWN TO LAYMAN
-        ###############################################################################################################
-        'md_organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if md_organisation_name is None else f"""
-    <gmd:organisationName>
-        <gco:CharacterString>{escape(md_organisation_name)}</gco:CharacterString>
-    </gmd:organisationName>
-    """,
-
-        'organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if organisation_name is None else f"""
-    <gmd:organisationName>
-        <gco:CharacterString>{escape(organisation_name)}</gco:CharacterString>
-    </gmd:organisationName>
-    """,
+        'wms_url': ows_url,
+        'wfs_url': ows_url,
+        'layer_endpoint': url_for_external('rest_layer.get', username=username, layername=layername),
+        'scale_denominator': scale_denominator,
+        'language': language,
+        'md_organisation_name': md_organisation_name,
+        'organisation_name': organisation_name,
     }
 
     return result
@@ -336,10 +246,17 @@ def _adjust_reference_system_info(prop_el, prop_value):
 def _adjust_identifier_with_label(prop_el, prop_value):
     from layman.common.micka.util import NAMESPACES
     _clear_el(prop_el)
+    parser = ET.XMLParser(remove_blank_text=True)
     if prop_value is not None:
         identifier = prop_value['identifier']
         label = prop_value['label']
-        child_el = ET.fromstring(f"""<gmx:Anchor xmlns:gmx="{NAMESPACES['gmx']}" xmlns:xlink="{NAMESPACES['xlink']}" xlink:href="{identifier}">{escape(label)}</gmx:Anchor>""")
+        child_el = ET.fromstring(f"""
+<gmd:MD_Identifier xmlns:gmx="{NAMESPACES['gmx']}" xmlns:gmd="{NAMESPACES['gmd']}" xmlns:xlink="{NAMESPACES['xlink']}">
+    <gmd:code>
+        <gmx:Anchor xlink:href="{identifier}">{escape(label)}</gmx:Anchor>
+    </gmd:code>
+</gmd:MD_Identifier>
+""", parser=parser)
         prop_el.append(child_el)
     else:
         _add_unknown_reason(prop_el)

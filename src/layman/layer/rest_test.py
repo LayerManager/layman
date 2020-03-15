@@ -374,8 +374,8 @@ def test_post_layers_shp(client):
     })
 
     # assert metadata file is the same as filled template except for UUID
-    template_path, template_values = csw.get_template_path_and_values(username, layername)
-    xml_file_object = micka_common_util.fill_template_as_pretty_file_object(template_path, template_values)
+    template_path, prop_values = csw.get_template_path_and_values(username, layername)
+    xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values, csw.METADATA_PROPERTIES)
     expected_path = 'src/layman/layer/rest_test_filled_template.xml'
     with open(expected_path) as f:
         expected_lines = f.readlines()

@@ -12,7 +12,7 @@ from layman import uuid
 from layman import app as app
 from layman import settings
 from layman.layer import LAYER_TYPE
-from .csw import _get_template_values
+from .csw import _get_property_values
 
 from layman.common.micka import util as common_util
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals
@@ -55,12 +55,12 @@ def app_context():
 
 @pytest.mark.usefixtures('app_context')
 def test_fill_template(client):
-    xml_path = 'tmp/record-template.xml'
+    xml_path = 'tmp/simple-test-template.xml'
     try:
         os.remove(xml_path)
     except OSError:
         pass
-    file_object = common_util.fill_template('src/layman/layer/micka/record-template.xml', _get_template_values())
+    file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/simple-test-template.xml', _get_property_values(), METADATA_PROPERTIES)
     with open(xml_path, 'wb') as out:
         out.write(file_object.read())
 
@@ -141,7 +141,7 @@ def test_fill_xml_template(client):
     with open(expected_path) as f:
         expected_lines = f.readlines()
     lines = [l.decode('utf-8') for l in xml_file_object.readlines()]
-    # print(f"FILE:\n{''.join(lines)}")
+    print(f"FILE:\n{''.join(lines)}")
     diff_lines = list(difflib.unified_diff(expected_lines, lines))
     assert len(diff_lines) == 0, f"DIFF LINES:\n{''.join(diff_lines)}"
 
