@@ -55,12 +55,12 @@ def app_context():
 
 @pytest.mark.usefixtures('app_context')
 def test_fill_template(client):
-    xml_path = 'tmp/simple-test-template.xml'
+    xml_path = 'tmp/record-template.xml'
     try:
         os.remove(xml_path)
     except OSError:
         pass
-    file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/simple-test-template.xml', _get_property_values(), METADATA_PROPERTIES)
+    file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml', _get_property_values(), METADATA_PROPERTIES)
     with open(xml_path, 'wb') as out:
         out.write(file_object.read())
 
@@ -115,7 +115,7 @@ def test_parse_md_properties():
 @pytest.mark.usefixtures('app_context')
 def test_fill_xml_template(client):
 
-    xml_file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/simple-test-template.xml', {
+    xml_file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml', {
         'md_file_identifier': 'm-abc',
         'md_organisation_name': 'My Metadata Organization',
         'md_date_stamp': '2007-01-22',
@@ -137,7 +137,7 @@ def test_fill_xml_template(client):
         'layer_endpoint': 'https://example.com/layer_endpoint',
     }, METADATA_PROPERTIES)
 
-    expected_path = 'src/layman/layer/micka/simple-test-template-filled.xml'
+    expected_path = 'src/layman/layer/micka/record-template-filled.xml'
     with open(expected_path) as f:
         expected_lines = f.readlines()
     lines = [l.decode('utf-8') for l in xml_file_object.readlines()]

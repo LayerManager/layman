@@ -109,7 +109,7 @@ def get_template_path_and_values(username, layername):
         md_organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
         organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
     )
-    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'simple-test-template.xml')
+    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
     return template_path, prop_values
 
 
