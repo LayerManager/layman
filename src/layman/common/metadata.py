@@ -49,3 +49,24 @@ PROPERTIES = {
         'upper_mp': '1',
     },
 }
+
+
+def prop_equals(value_a, value_b, equals_fn=None):
+    equals_fn = equals_fn or (lambda a,b: a==b)
+    if value_a is None or value_b is None:
+        return value_a is value_b
+    else:
+        return equals_fn(value_a, value_b)
+
+
+def prop_equals_or_none(values, equals_fn=None):
+    equals_fn = equals_fn or (lambda a,b: a==b)
+    values = [v for v in values if v is not None]
+    if len(values)<2:
+        return True
+    result = True
+    for idx in range(len(values)-1):
+        result = equals_fn(values[idx], values[idx+1])
+        if not result:
+            break
+    return result

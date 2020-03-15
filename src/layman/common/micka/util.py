@@ -3,10 +3,8 @@ from owslib.util import nspath_eval
 from flask import g, current_app
 from io import BytesIO
 from owslib.csw import CatalogueServiceWeb
-# from xml.etree import ElementTree as ET
 from lxml import etree as ET
 from layman import settings, LaymanError
-from . import PROPERTIES as MICKA_PROPERTIES
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
 import requests
 from copy import deepcopy
@@ -25,8 +23,8 @@ for k, v in NAMESPACES.items():
     ET.register_namespace(k, v)
 
 
-def get_single_prop_els(parent_el, prop_name):
-    micka_prop = MICKA_PROPERTIES[prop_name]
+def get_single_prop_els(parent_el, prop_name, publ_properties):
+    micka_prop = publ_properties[prop_name]
     single_prop_els = parent_el.xpath(micka_prop['xpath_property'], namespaces=NAMESPACES)
     last_prop_el = None
     if len(single_prop_els) == 0 and micka_prop['xpath_property'].find('[') >= 0:
@@ -45,7 +43,7 @@ def get_single_prop_els(parent_el, prop_name):
     return single_prop_els, last_prop_el
 
 
-def fill_xml_template(template_path, prop_values):
+def fill_xml_template(template_path, prop_values, publ_properties):
     with open(template_path, 'r') as template_file:
         xml_str = template_file.read()
     parser = ET.XMLParser(remove_blank_text=True)
@@ -53,9 +51,9 @@ def fill_xml_template(template_path, prop_values):
     for prop_name, prop_value in prop_values.items():
         # print(f'prop_name={prop_name}')
         common_prop = COMMON_PROPERTIES[prop_name]
-        micka_prop = MICKA_PROPERTIES[prop_name]
+        micka_prop = publ_properties[prop_name]
         parent_el = root_el.xpath(micka_prop['xpath_parent'], namespaces=NAMESPACES)[0]
-        single_prop_els, last_prop_el = get_single_prop_els(parent_el, prop_name)
+        single_prop_els, last_prop_el = get_single_prop_els(parent_el, prop_name, publ_properties)
         assert len(single_prop_els) > 0 or last_prop_el is not None, f"Element of property {prop_name} not found!"
         single_prop_values = [prop_value] if common_prop['upper_mp'] == '1' else prop_value
         all_new_els = []
@@ -76,7 +74,7 @@ def fill_xml_template(template_path, prop_values):
         if all_new_els:
             single_prop_els = all_new_els
         else:
-            single_prop_els, _ = get_single_prop_els(parent_el, prop_name)
+            single_prop_els, _ = get_single_prop_els(parent_el, prop_name, publ_properties)
         assert len(single_prop_els) == len(single_prop_values), f"{len(single_prop_els)} != {len(single_prop_values)}"
         # print(f"single_prop_values={single_prop_values}")
         for idx, single_prop_el in enumerate(single_prop_els):
@@ -85,14 +83,14 @@ def fill_xml_template(template_path, prop_values):
     return root_el
 
 
-def fill_xml_template_as_pretty_str(template_path, prop_values):
-    root_el = fill_xml_template(template_path, prop_values)
+def fill_xml_template_as_pretty_str(template_path, prop_values, publ_properties):
+    root_el = fill_xml_template(template_path, prop_values, publ_properties)
     pretty_str = ET.tostring(root_el, encoding='unicode', pretty_print=True)
     return pretty_str
 
 
-def fill_xml_template_as_pretty_file_object(template_path, prop_values):
-    root_el = fill_xml_template(template_path, prop_values)
+def fill_xml_template_as_pretty_file_object(template_path, prop_values, publ_properties):
+    root_el = fill_xml_template(template_path, prop_values, publ_properties)
     el_tree = ET.ElementTree(root_el)
     file_object = BytesIO()
     el_tree.write(
@@ -224,14 +222,14 @@ def csw_delete(muuid):
     assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalDeleted', NAMESPACES)).text == "1", r.content
 
 
-def parse_md_properties(file_obj, properties):
+def parse_md_properties(file_obj, property_names, publ_properties):
     # print('xml_str', xml_str)
     root_el = ET.parse(file_obj)
     # print(f"root_el={root_el}")
     result = {}
-    for prop_name in properties:
+    for prop_name in property_names:
         # print(f"prop_name={prop_name}")
-        micka_prop = MICKA_PROPERTIES[prop_name]
+        micka_prop = publ_properties[prop_name]
         common_prop = COMMON_PROPERTIES[prop_name]
         # print(f"prop['xpath_parent']={prop['xpath_parent']}")
         parent_el = root_el.xpath(micka_prop['xpath_parent'], namespaces=NAMESPACES)
@@ -252,22 +250,3 @@ def parse_md_properties(file_obj, properties):
     return result
 
 
-def prop_equals(value_a, value_b, equals_fn=None):
-    equals_fn = equals_fn or (lambda a,b: a==b)
-    if value_a is None or value_b is None:
-        return value_a is value_b
-    else:
-        return equals_fn(value_a, value_b)
-
-
-def prop_equals_or_none(values, equals_fn=None):
-    equals_fn = equals_fn or (lambda a,b: a==b)
-    values = [v for v in values if v is not None]
-    if len(values)<2:
-        return True
-    result = True
-    for idx in range(len(values)-1):
-        result = equals_fn(values[idx], values[idx+1])
-        if not result:
-            break
-    return result
