@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.8
+2020-03-16
+- Treat attribute names in SLD (aka 'launder'), [#45](https://github.com/jirik/layman/issues/45)
+
 ## v1.1.7
 2020-03-09
 - Assert version of Micka on startup.
