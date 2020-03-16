@@ -1,6 +1,7 @@
 import io
 import json
 import traceback
+import re
 from urllib.parse import urljoin
 import xml.etree.ElementTree as ET
 
@@ -72,6 +73,11 @@ def get_publication_uuid(username, publication_type, publication_name):
     return None
 
 
+def launder_attribute_name(attr_name):
+    # https://github.com/OSGeo/gdal/blob/355b41831cd2685c85d1aabe5b95665a2c6e99b7/gdal/ogr/ogrsf_frmts/pgdump/ogrpgdumpdatasource.cpp#L129,L155
+    return re.sub(r"['\-#]", '_', attr_name.lower())
+
+
 def create_layer_style(username, layername):
     sld_file = get_layer_file(username, layername)
     # print('create_layer_style', sld_file)
@@ -112,6 +118,16 @@ def create_layer_style(username, layername):
     else:
         sld_content_type = 'application/vnd.ogc.sld+xml'
 
+    propertname_els = tree.findall('.//{http://www.opengis.net/ogc}PropertyName')
+    for el in propertname_els:
+        el.text = launder_attribute_name(el.text)
+
+    sld_file = io.BytesIO()
+    tree.write(
+        sld_file,
+        encoding=None,
+        xml_declaration=True,
+    )
     sld_file.seek(0)
 
     r = requests.put(

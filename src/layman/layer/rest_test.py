@@ -37,6 +37,13 @@ min_geojson = """
 num_layers_before_test = 0
 
 
+def wait_till_ready(username, layername):
+    last_task = util._get_layer_task(username, layername)
+    while last_task is not None and not celery_util.is_task_ready(last_task):
+        time.sleep(0.1)
+        last_task = util._get_layer_task(username, layername)
+
+
 @pytest.fixture(scope="module")
 def client():
     # print('before app.test_client()')
@@ -174,13 +181,6 @@ def test_get_layers_testuser1_v1(client):
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 0
     })
-
-
-def wait_till_ready(username, layername):
-    last_task = util._get_layer_task(username, layername)
-    while last_task is not None and not celery_util.is_task_ready(last_task):
-        time.sleep(0.1)
-        last_task = util._get_layer_task(username, layername)
 
 
 @pytest.mark.usefixtures('app_context')
@@ -506,6 +506,84 @@ def test_post_layers_complex(client):
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 4
     })
+
+
+def test_uppercase_attr(client):
+    with app.app_context():
+        username = 'testuser2'
+        rest_path = url_for('rest_layers.post', username=username)
+        file_paths = [
+            'sample/data/upper_attr.geojson',
+        ]
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+        sld_path = 'sample/data/upper_attr.sld'
+        assert os.path.isfile(sld_path)
+        layername = 'upper_attr'
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': layername,
+                'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
+            })
+            assert rv.status_code == 200
+            resp_json = rv.get_json()
+            # print(resp_json)
+        finally:
+            for fp in files:
+                fp[0].close()
+
+        last_task = util._get_layer_task(username, layername)
+        assert last_task is not None and not celery_util.is_task_ready(last_task)
+        wait_till_ready(username, layername)
+        # last_task['last'].get()
+        assert celery_util.is_task_ready(last_task)
+
+    with app.app_context():
+        rest_path = url_for('rest_layer.get', username=username, layername=layername)
+        rv = client.get(rest_path)
+        assert 200 <= rv.status_code < 300
+        resp_json = rv.get_json()
+        # print(resp_json)
+        for source in [
+            'wms',
+            'wfs',
+            'thumbnail',
+            'file',
+            'db_table',
+            'metadata',
+        ]:
+            assert 'status' not in resp_json[source], f"{source}: {resp_json[source]}"
+
+        style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                        username + '/styles/' + layername)
+        r = requests.get(style_url + '.sld',
+            auth=settings.LAYMAN_GS_AUTH
+        )
+        r.raise_for_status()
+        sld_file = io.BytesIO(r.content)
+        tree = ET.parse(sld_file)
+        root = tree.getroot()
+        assert root.attrib['version'] == '1.0.0'
+
+        feature_type = get_feature_type(username, 'postgresql', layername)
+        attributes = feature_type['attributes']['attribute']
+        attr_names = ["id", "dpr_smer_k", "fid_zbg", "silnice", "silnice_bs", "typsil_p", "cislouseku", "jmeno", "typsil_k", "peazkom1", "peazkom2", "peazkom3", "peazkom4", "vym_tahy_k", "vym_tahy_p", "r_indsil7", "kruh_obj_k", "etah1", "etah2", "etah3", "etah4", "kruh_obj_p", "dpr_smer_p"]
+        for attr_name in attr_names:
+            assert next((
+                a for a in attributes if a['name'] == attr_name
+            ), None) is not None
+
+    with app.app_context():
+        rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
+        rv = client.delete(rest_path)
+        assert 200 <= rv.status_code < 300
+
+        uuid.check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': num_layers_before_test + 4
+        })
 
 
 @pytest.mark.usefixtures('app_context')
