@@ -1,5 +1,6 @@
 from datetime import datetime, date
 import os
+from functools import partial
 import pathlib
 import traceback
 
@@ -15,7 +16,6 @@ from layman import settings, patch_mode
 from layman.util import url_for_external
 from requests.exceptions import HTTPError, ConnectionError
 from urllib.parse import urljoin
-from xml.sax.saxutils import escape
 
 
 PATCH_MODE = patch_mode.NO_DELETE
@@ -78,8 +78,8 @@ def delete_layer(username, layername):
 
 
 def csw_insert(username, layername):
-    template_path, template_values = get_template_path_and_values(username, layername)
-    record = common_util.fill_template_as_pretty_str(template_path, template_values)
+    template_path, prop_values = get_template_path_and_values(username, layername)
+    record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
     muuid = common_util.csw_insert({
         'record': record
     })
@@ -93,7 +93,7 @@ def get_template_path_and_values(username, layername):
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
 
     unknown_value = 'neznámá hodnota'
-    template_values = _get_template_values(
+    prop_values = _get_property_values(
         username=username,
         layername=layername,
         uuid=get_layer_uuid(username, layername),
@@ -102,18 +102,17 @@ def get_template_path_and_values(username, layername):
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
         identifier=url_for_external('rest_layer.get', username=username, layername=layername),
-        data_identifier_label=layername,
+        identifier_label=layername,
         extent=wms_layer.boundingBoxWGS84,
         ows_url=urljoin(get_gs_proxy_base_url(), username + '/ows'),
-        # TODO create config env variable to decide if to set organisation name or not
         md_organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
         organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
     )
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
-    return template_path, template_values
+    return template_path, prop_values
 
 
-def _get_template_values(
+def _get_property_values(
         username='browser',
         layername='layer',
         uuid='ca238200-8200-1a23-9399-42c9fca53542',
@@ -124,128 +123,157 @@ def _get_template_values(
         publication_date='2007-05-25',
         md_date_stamp='2007-05-25',
         identifier='http://www.env.cz/data/corine/1990',
-        data_identifier_label='MZP-CORINE',
+        identifier_label='MZP-CORINE',
         extent=None,  # w, s, e, n
         ows_url="http://www.env.cz/corine/data/download.zip",
         epsg_codes=None,
         scale_denominator=None,
         language=None,
 ):
-    epsg_codes = epsg_codes or ['3857', '4326']
+    epsg_codes = epsg_codes or [3857, 4326]
     w, s, e, n = extent or [11.87, 48.12, 19.13, 51.59]
     extent = [max(w, -180), max(s, -90), min(e, 180), min(n, 90)]
 
     result = {
-        ###############################################################################################################
-        # KNOWN TO LAYMAN
-        ###############################################################################################################
-
-        # layer UUID with prefix "m-"
         'md_file_identifier': get_metadata_uuid(uuid),
-
-        'reference_system': ' '.join([
-f"""
-<gmd:referenceSystemInfo>
-    <gmd:MD_ReferenceSystem>
-        <gmd:referenceSystemIdentifier>
-            <gmd:RS_Identifier>
-                <gmd:code>
-                    <gmx:Anchor xlink:href="http://www.opengis.net/def/crs/EPSG/0/{epsg_code}">EPSG:{epsg_code}</gmx:Anchor>
-                </gmd:code>
-            </gmd:RS_Identifier>
-        </gmd:referenceSystemIdentifier>
-    </gmd:MD_ReferenceSystem>
-</gmd:referenceSystemInfo>
-""" for epsg_code in epsg_codes
-        ]),
-
-        # title of data
-        'title': title,
-
-        # date of dataset
-        # check GeoServer's REST API, consider revision or publication dateType
-        'publication_date': f"""
-<gmd:CI_Date>
-    <gmd:date>
-        <gco:Date>{publication_date}</gco:Date>
-    </gmd:date>
-    <gmd:dateType>
-        <gmd:CI_DateTypeCode codeListValue="publication" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode">publication</gmd:CI_DateTypeCode>
-    </gmd:dateType>
-</gmd:CI_Date>
-""",
-
-        # date stamp of metadata
         'md_date_stamp': md_date_stamp,
+        'reference_system': epsg_codes,
+        'title': title,
+        'publication_date': publication_date,
+        'identifier': {
+            'identifier': identifier,
+            'label': identifier_label,
+        },
+        'abstract': abstract,
+        'graphic_url': url_for_external('rest_layer_thumbnail.get', username=username, layername=layername),
+        'extent': extent,
 
-        # it must be URI, but text node is optional (MZP-CORINE)
-        # it can point to Layman's Layer endpoint
-        'identifier': f'<gmx:Anchor xlink:href="{identifier}">{escape(data_identifier_label)}</gmx:Anchor>',
-
-        'abstract': '<gmd:abstract gco:nilReason="unknown" />' if abstract is None else f"""
-<gmd:abstract>
-    <gco:CharacterString>{escape(abstract)}</gco:CharacterString>
-</gmd:abstract>
-""",
-
-        'graphic_url': escape(url_for_external('rest_layer_thumbnail.get', username=username, layername=layername)),
-
-        'extent': """
-<gmd:EX_GeographicBoundingBox>
-    <gmd:westBoundLongitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:westBoundLongitude>
-    <gmd:eastBoundLongitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:eastBoundLongitude>
-    <gmd:southBoundLatitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:southBoundLatitude>
-    <gmd:northBoundLatitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:northBoundLatitude>
-</gmd:EX_GeographicBoundingBox>
-""".format(extent[0], extent[2], extent[1], extent[3]),
-
-        'wms_url': escape(ows_url),
-
-        'wfs_url': escape(ows_url),
-
-        'layer_endpoint': escape(url_for_external('rest_layer.get', username=username, layername=layername)),
-
-
-        ###############################################################################################################
-        # GUESSABLE BY LAYMAN
-        ###############################################################################################################
-
-        'scale_denominator': '<gmd:denominator gco:nilReason="unknown" />' if scale_denominator is None else f"""
-<gmd:denominator>
-    <gco:Integer>{scale_denominator}</gco:Integer>
-</gmd:denominator>
-""",
-
-        # code for no language is "zxx"
-        'language': '<gmd:language gco:nilReason="unknown" />' if language is None else f"""
-<gmd:language>
-    <gmd:LanguageCode codeListValue=\"{language}\" codeList=\"http://www.loc.gov/standards/iso639-2/\">{language}</gmd:LanguageCode>
-</gmd:language>
-""",
-
-        ###############################################################################################################
-        # UNKNOWN TO LAYMAN
-        ###############################################################################################################
-        'md_organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if md_organisation_name is None else f"""
-    <gmd:organisationName>
-        <gco:CharacterString>{escape(md_organisation_name)}</gco:CharacterString>
-    </gmd:organisationName>
-    """,
-
-        'organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if organisation_name is None else f"""
-    <gmd:organisationName>
-        <gco:CharacterString>{escape(organisation_name)}</gco:CharacterString>
-    </gmd:organisationName>
-    """,
+        'wms_url': ows_url,
+        'wfs_url': ows_url,
+        'layer_endpoint': url_for_external('rest_layer.get', username=username, layername=layername),
+        'scale_denominator': scale_denominator,
+        'language': language,
+        'md_organisation_name': md_organisation_name,
+        'organisation_name': organisation_name,
     }
 
     return result
 
+
+METADATA_PROPERTIES = {
+    'md_file_identifier': {
+        'xpath_parent': '/gmd:MD_Metadata',
+        'xpath_property': './gmd:fileIdentifier',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_character_string,
+    },
+    'md_organisation_name': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty',
+        'xpath_property': './gmd:organisationName',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_character_string,
+    },
+    'md_date_stamp': {
+        'xpath_parent': '/gmd:MD_Metadata',
+        'xpath_property': './gmd:dateStamp',
+        'xpath_extract': './gco:Date/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_date_string,
+    },
+    'reference_system': {
+        'xpath_parent': '/gmd:MD_Metadata',
+        'xpath_property': './gmd:referenceSystemInfo[gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor[starts-with(@xlink:href, "http://www.opengis.net/def/crs/EPSG/0/")]]',
+        'xpath_extract': './gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor/@xlink:href',
+        'xpath_extract_fn': lambda l: int(l[0].rsplit('/')[-1]) if len(l) else None,
+        'adjust_property_element': common_util.adjust_reference_system_info,
+    },
+    'title': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation',
+        'xpath_property': './gmd:title',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_character_string,
+    },
+    'publication_date': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation',
+        'xpath_property': './gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="publication"]]',
+        'xpath_extract': './gmd:CI_Date/gmd:date/gco:Date/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_date_string_with_type,
+    },
+    'identifier': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation',
+        'xpath_property': './gmd:identifier',
+        'xpath_extract': './gmd:MD_Identifier/gmd:code/gmx:Anchor/@xlink:href',
+        'xpath_extract_fn': lambda l: {
+            'identifier': l[0],
+            'label': l[0].getparent().text,
+        } if l else None,
+        'adjust_property_element': common_util.adjust_identifier_with_label,
+    },
+    'abstract': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification',
+        'xpath_property': './gmd:abstract',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_character_string,
+    },
+    'organisation_name': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty',
+        'xpath_property': './gmd:organisationName',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_character_string,
+    },
+    'graphic_url': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification',
+        'xpath_property': './gmd:graphicOverview[gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString]',
+        'xpath_extract': './gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_graphic_url,
+    },
+    'scale_denominator': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction',
+        'xpath_property': './gmd:denominator',
+        'xpath_extract': './gco:Integer/text()',
+        'xpath_extract_fn': lambda l: int(l[0]) if l else None,
+        'adjust_property_element': common_util.adjust_integer,
+    },
+    'language': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification',
+        'xpath_property': './gmd:language',
+        'xpath_extract': './gmd:LanguageCode/@codeListValue',
+        'xpath_extract_fn': lambda l: int(l[0]) if l else None,
+        'adjust_property_element': common_util.adjust_language,
+    },
+    'extent': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification',
+        'xpath_property': './gmd:extent',
+        'xpath_extract': './gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox/*/gco:Decimal/text()',
+        'xpath_extract_fn': lambda l: [float(l[0]), float(l[2]), float(l[1]), float(l[3])] if len(l) == 4 else None,
+        'adjust_property_element': common_util.adjust_extent,
+    },
+    'wms_url': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
+        'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-1.3.0"]',
+        'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='OGC:WMS-1.3.0', online_function='download'),
+    },
+    'wfs_url': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
+        'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-2.0.0"]',
+        'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='OGC:WFS-2.0.0', online_function='download'),
+    },
+    'layer_endpoint': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
+        'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link"]',
+        'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='WWW:LINK-1.0-http--link', online_function='information'),
+    },
+}

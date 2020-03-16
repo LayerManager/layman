@@ -605,12 +605,13 @@ def test_map_composed_from_local_layers(client):
 
     with app.app_context():
         # assert metadata file is the same as filled template except for UUID and dates
-        template_path, template_values = csw.get_template_path_and_values(username, mapname)
-        xml_file_object = micka_common_util.fill_template_as_pretty_file_object(template_path, template_values)
+        template_path, prop_values = csw.get_template_path_and_values(username, mapname)
+        xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values,
+                                                                                    csw.METADATA_PROPERTIES)
         expected_path = 'src/layman/map/rest_test_filled_template.xml'
         with open(expected_path) as f:
             expected_lines = f.readlines()
-        diff_lines = list(difflib.unified_diff(xml_file_object.readlines(), expected_lines))
+        diff_lines = list(difflib.unified_diff([l.decode('utf-8') for l in xml_file_object.readlines()], expected_lines))
         assert len(diff_lines) == 40, ''.join(diff_lines)
         plus_lines = [l for l in diff_lines if l.startswith('+ ')]
         assert len(plus_lines) == 5
@@ -633,12 +634,12 @@ def test_map_composed_from_local_layers(client):
         assert minus_line.startswith('-                <gco:Date>') and minus_line.endswith('</gco:Date>\n')
 
         plus_line = plus_lines[3]
-        assert plus_line.startswith('+      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and plus_line.endswith('" xlink:title="hranice" xlink:type="simple" />\n')
+        assert plus_line.startswith('+      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and plus_line.endswith('" xlink:title="hranice" xlink:type="simple"/>\n'), plus_line
         minus_line = minus_lines[3]
-        assert minus_line.startswith('-      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and minus_line.endswith('" xlink:title="hranice" xlink:type="simple" />\n')
+        assert minus_line.startswith('-      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and minus_line.endswith('" xlink:title="hranice" xlink:type="simple"/>\n'), minus_line
 
         plus_line = plus_lines[4]
-        assert plus_line.startswith('+      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and plus_line.endswith('" xlink:title="mista" xlink:type="simple" />\n')
+        assert plus_line.startswith('+      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and plus_line.endswith('" xlink:title="mista" xlink:type="simple"/>\n'), plus_line
         minus_line = minus_lines[4]
-        assert minus_line.startswith('-      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and minus_line.endswith('" xlink:title="mista" xlink:type="simple" />\n')
+        assert minus_line.startswith('-      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and minus_line.endswith('" xlink:title="mista" xlink:type="simple"/>\n'), minus_line
 
