@@ -54,9 +54,7 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 		<gmd:MD_DataIdentification>
 			<gmd:citation>
 				<gmd:CI_Citation>
-					<gmd:title>
-						<gco:CharacterString gco:nilReason="unknown" />
-					</gmd:title>
+					<gmd:title gco:nilReason="unknown" />
 					<gmd:date gco:nilReason="unknown" />
 					<gmd:identifier gco:nilReason="unknown" />
 				</gmd:CI_Citation>

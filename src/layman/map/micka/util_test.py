@@ -127,3 +127,45 @@ def test_parse_md_properties():
         assert prop_equals(props[k], expected[k], equals_fn), f"Values of property {k} do not equal: {props[k]} != {expected[k]}"
 
 
+@pytest.mark.usefixtures('app_context')
+def test_fill_xml_template(client):
+
+    xml_file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/map/micka/simple-template.xml', {
+        'md_file_identifier': 'm-91147a27-1ff4-4242-ba6d-faffb92224c6',
+        'md_organisation_name': None,
+        'md_date_stamp': '2007-05-25',
+        'reference_system': [3857],
+        'title': 'World places and boundaries',
+        'publication_date': '2007-05-25',
+        'identifier': {
+            'identifier': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet',
+            'label': 'svet',
+        },
+        'abstract': 'World places and boundaries abstract',
+        'organisation_name': None,
+        'graphic_url': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet/thumbnail',
+        'language': None,
+        'extent': [-35, -48.5, 179, 81.5],
+        'map_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet',
+        'map_file_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet/file',
+        'operates_on': [
+            {
+                'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-39cc8994-adbc-427a-8522-569eb7e691b2#_m-39cc8994-adbc-427a-8522-569eb7e691b2',
+                'xlink:title': 'hranice',
+            },
+            {
+                'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-fb48a6e3-f36c-43fd-a885-ae7de82b3924#_m-fb48a6e3-f36c-43fd-a885-ae7de82b3924',
+                'xlink:title': 'mista',
+            },
+        ],
+    }, METADATA_PROPERTIES)
+
+    expected_path = 'src/layman/map/micka/simple-template-filled.xml'
+    with open(expected_path) as f:
+        expected_lines = f.readlines()
+    lines = [l.decode('utf-8') for l in xml_file_object.readlines()]
+    print(f"FILE:\n{''.join(lines)}")
+    diff_lines = list(difflib.unified_diff(expected_lines, lines))
+    assert len(diff_lines) == 0, f"DIFF LINES:\n{''.join(diff_lines)}"
+
+

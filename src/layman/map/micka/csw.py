@@ -1,3 +1,4 @@
+from functools import partial
 import re
 import os
 from datetime import datetime, date, timedelta
@@ -394,20 +395,20 @@ METADATA_PROPERTIES = {
             'xlink:href': l[0],
             'xlink:title': l[0].getparent().get(f"{{{NAMESPACES['xlink']}}}title"),
         } if l else None,
-        # 'adjust_property_element': adjust_layer_endpoint_url,
+        'adjust_property_element': common_util.adjust_operates_on,
     },
     'map_endpoint': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
         'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link" and gmd:CI_OnlineResource/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue="information"]',
         'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
-        # 'adjust_property_element': adjust_layer_endpoint_url,
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='WWW:LINK-1.0-http--link', online_function='information'),
     },
     'map_file_endpoint': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
         'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link" and gmd:CI_OnlineResource/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue="download"]',
         'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
-        # 'adjust_property_element': adjust_layer_endpoint_url,
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='WWW:LINK-1.0-http--link', online_function='download'),
     },
 }

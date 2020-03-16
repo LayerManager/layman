@@ -425,3 +425,13 @@ def adjust_online_url(prop_el, prop_value, resource_protocol=None, online_functi
         prop_el.append(child_el)
     else:
         _add_unknown_reason(prop_el)
+
+
+def adjust_operates_on(prop_el, prop_value):
+    _clear_el(prop_el)
+    if prop_value is not None:
+        prop_el.attrib[ET.QName(NAMESPACES['xlink'], 'href')] = prop_value['xlink:href']
+        prop_el.attrib[ET.QName(NAMESPACES['xlink'], 'title')] = prop_value['xlink:title']
+        prop_el.attrib[ET.QName(NAMESPACES['xlink'], 'type')] = 'simple'
+    else:
+        _add_unknown_reason(prop_el)
