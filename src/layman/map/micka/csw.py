@@ -1,3 +1,4 @@
+from functools import partial
 import re
 import os
 from datetime import datetime, date, timedelta
@@ -73,8 +74,8 @@ def patch_map(username, mapname):
 
 
 def csw_insert(username, mapname):
-    template_path, template_values = get_template_path_and_values(username, mapname)
-    record = common_util.fill_template_as_pretty_str(template_path, template_values)
+    template_path, prop_values = get_template_path_and_values(username, mapname)
+    record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
     muuid = common_util.csw_insert({
         'record': record
     })
@@ -131,7 +132,7 @@ def get_template_path_and_values(username, mapname):
     operates_on = _map_json_to_operates_on(map_json)
 
     unknown_value = 'neznámá hodnota'
-    template_values = _get_template_values(
+    template_values = _get_property_values(
         username=username,
         mapname=mapname,
         uuid=get_map_uuid(username, mapname),
@@ -140,7 +141,7 @@ def get_template_path_and_values(username, mapname):
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
         identifier=url_for_external('rest_map.get', username=username, mapname=mapname),
-        data_identifier_label=mapname,
+        identifier_label=mapname,
         extent=[float(c) for c in map_json['extent']],
         # TODO create config env variable to decide if to set organisation name or not
         md_organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
@@ -151,7 +152,7 @@ def get_template_path_and_values(username, mapname):
     return template_path, template_values
 
 
-def _get_template_values(
+def _get_property_values(
         username='browser',
         mapname='map',
         uuid='af238200-8200-1a23-9399-42c9fca53543',
@@ -162,7 +163,7 @@ def _get_template_values(
         publication_date='2007-05-25',
         md_date_stamp='2007-05-25',
         identifier='http://www.env.cz/data/liberec/admin-cleneni',
-        data_identifier_label='Liberec-AdminUnits',
+        identifier_label='Liberec-AdminUnits',
         extent=None,  # w, s, e, n
         epsg_codes=None,
         language=None,
@@ -183,115 +184,142 @@ def _get_template_values(
     ]
 
     result = {
-        ###############################################################################################################
-        # KNOWN TO LAYMAN
-        ###############################################################################################################
-
-        # layer UUID with prefix "m-"
         'md_file_identifier': get_metadata_uuid(uuid),
-
-        'reference_system': ' '.join([
-f"""
-<gmd:referenceSystemInfo>
-    <gmd:MD_ReferenceSystem>
-        <gmd:referenceSystemIdentifier>
-            <gmd:RS_Identifier>
-                <gmd:code>
-                    <gmx:Anchor xlink:href="http://www.opengis.net/def/crs/EPSG/0/{epsg_code}">EPSG:{epsg_code}</gmx:Anchor>
-                </gmd:code>
-            </gmd:RS_Identifier>
-        </gmd:referenceSystemIdentifier>
-    </gmd:MD_ReferenceSystem>
-</gmd:referenceSystemInfo>
-""" for epsg_code in epsg_codes
-        ]),
-
-        # title of data
-        'title': title,
-
-        # date of dataset
-        # check GeoServer's REST API, consider revision or publication dateType
-        'publication_date': f"""
-<gmd:CI_Date>
-    <gmd:date>
-        <gco:Date>{publication_date}</gco:Date>
-    </gmd:date>
-    <gmd:dateType>
-        <gmd:CI_DateTypeCode codeListValue="publication" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode">publication</gmd:CI_DateTypeCode>
-    </gmd:dateType>
-</gmd:CI_Date>
-""",
-
-        # date stamp of metadata
         'md_date_stamp': md_date_stamp,
-
-        # it must be URI, but text node is optional (MZP-CORINE)
-        # it can point to Layman's Layer endpoint
-        'identifier': f'<gmx:Anchor xlink:href="{identifier}">{escape(data_identifier_label)}</gmx:Anchor>',
-
-        'abstract': '<gmd:abstract gco:nilReason="unknown" />' if abstract is None else f"""
-<gmd:abstract>
-    <gco:CharacterString>{escape(abstract)}</gco:CharacterString>
-</gmd:abstract>
-""",
-
-        'graphic_url': escape(url_for_external('rest_map_thumbnail.get', username=username, mapname=mapname)),
-
-        'extent': """
-<gmd:EX_GeographicBoundingBox>
-    <gmd:westBoundLongitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:westBoundLongitude>
-    <gmd:eastBoundLongitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:eastBoundLongitude>
-    <gmd:southBoundLatitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:southBoundLatitude>
-    <gmd:northBoundLatitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:northBoundLatitude>
-</gmd:EX_GeographicBoundingBox>
-""".format(extent[0], extent[2], extent[1], extent[3]),
+        'reference_system': epsg_codes,
+        'title': title,
+        'publication_date': publication_date,
+        'identifier': {
+            'identifier': identifier,
+            'label': identifier_label,
+        },
+        'abstract': abstract,
+        'graphic_url': url_for_external('rest_map_thumbnail.get', username=username, mapname=mapname),
+        'extent': extent,
 
         'map_endpoint': escape(url_for_external('rest_map.get', username=username, mapname=mapname)),
-
         'map_file_endpoint': escape(url_for_external('rest_map_file.get', username=username, mapname=mapname)),
-
-        'operates_on': '\n'.join([
-            f"""
-<srv:operatesOn xlink:type="simple" {
-    ' '.join([f"{attr}={quoteattr(value)}" for attr, value in item.items()])
-}/>
-""" for item in operates_on
-        ]),
-
-        ###############################################################################################################
-        # GUESSABLE BY LAYMAN
-        ###############################################################################################################
-
-        # code for no language is "zxx"
-        'language': '<gmd:language gco:nilReason="unknown" />' if language is None else f"""
-<gmd:language>
-    <gmd:LanguageCode codeListValue=\"{language}\" codeList=\"http://www.loc.gov/standards/iso639-2/\">{language}</gmd:LanguageCode>
-</gmd:language>
-""",
-
-        ###############################################################################################################
-        # UNKNOWN TO LAYMAN
-        ###############################################################################################################
-        'md_organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if md_organisation_name is None else f"""
-    <gmd:organisationName>
-        <gco:CharacterString>{escape(md_organisation_name)}</gco:CharacterString>
-    </gmd:organisationName>
-    """,
-
-        'organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if organisation_name is None else f"""
-    <gmd:organisationName>
-        <gco:CharacterString>{escape(organisation_name)}</gco:CharacterString>
-    </gmd:organisationName>
-    """,
+        'operates_on': operates_on,
+        'language': language,
+        'md_organisation_name': md_organisation_name,
+        'organisation_name': organisation_name,
     }
 
     return result
 
+
+from layman.common.micka.util import NAMESPACES
+
+METADATA_PROPERTIES = {
+    'md_file_identifier': {
+        'xpath_parent': '/gmd:MD_Metadata',
+        'xpath_property': './gmd:fileIdentifier',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_character_string,
+    },
+    'md_organisation_name': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty',
+        'xpath_property': './gmd:organisationName',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_character_string,
+    },
+    'md_date_stamp': {
+        'xpath_parent': '/gmd:MD_Metadata',
+        'xpath_property': './gmd:dateStamp',
+        'xpath_extract': './gco:Date/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_date_string,
+    },
+    'reference_system': {
+        'xpath_parent': '/gmd:MD_Metadata',
+        'xpath_property': './gmd:referenceSystemInfo[gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor[starts-with(@xlink:href, "http://www.opengis.net/def/crs/EPSG/0/")]]',
+        'xpath_extract': './gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor/@xlink:href',
+        'xpath_extract_fn': lambda l: int(l[0].rsplit('/')[-1]) if len(l) else None,
+        'adjust_property_element': common_util.adjust_reference_system_info,
+    },
+    'title': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation',
+        'xpath_property': './gmd:title',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_character_string,
+    },
+    'publication_date': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation',
+        'xpath_property': './gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="publication"]]',
+        'xpath_extract': './gmd:CI_Date/gmd:date/gco:Date/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_date_string_with_type,
+    },
+    'identifier': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation',
+        'xpath_property': './gmd:identifier',
+        'xpath_extract': './gmd:MD_Identifier/gmd:code/gmx:Anchor/@xlink:href',
+        'xpath_extract_fn': lambda l: {
+            'identifier': l[0],
+            'label': l[0].getparent().text,
+        } if l else None,
+        'adjust_property_element': common_util.adjust_identifier_with_label,
+    },
+    'abstract': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification',
+        'xpath_property': './gmd:abstract',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_character_string,
+    },
+    'organisation_name': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty',
+        'xpath_property': './gmd:organisationName',
+        'xpath_extract': './gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_character_string,
+    },
+    'graphic_url': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification',
+        'xpath_property': './gmd:graphicOverview[gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString]',
+        'xpath_extract': './gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_graphic_url,
+    },
+    'language': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification',
+        'xpath_property': './gmd:language',
+        'xpath_extract': './gmd:LanguageCode/@codeListValue',
+        'xpath_extract_fn': lambda l: int(l[0]) if l else None,
+        'adjust_property_element': common_util.adjust_language,
+    },
+    'extent': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification',
+        'xpath_property': './srv:extent',
+        'xpath_extract': './gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox/*/gco:Decimal/text()',
+        'xpath_extract_fn': lambda l: [float(l[0]), float(l[2]), float(l[1]), float(l[3])] if len(l) == 4 else None,
+        'adjust_property_element': common_util.adjust_extent,
+    },
+    'operates_on': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification',
+        'xpath_property': './srv:operatesOn[@xlink:href]',
+        'xpath_extract': './@xlink:href',
+        'xpath_extract_fn': lambda l: {
+            'xlink:href': l[0],
+            'xlink:title': l[0].getparent().get(f"{{{NAMESPACES['xlink']}}}title"),
+        } if l else None,
+        'adjust_property_element': common_util.adjust_operates_on,
+    },
+    'map_endpoint': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
+        'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link" and gmd:CI_OnlineResource/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue="information"]',
+        'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='WWW:LINK-1.0-http--link', online_function='information'),
+    },
+    'map_file_endpoint': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
+        'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link" and gmd:CI_OnlineResource/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue="download"]',
+        'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='WWW:LINK-1.0-http--link', online_function='download'),
+    },
+}
