@@ -74,8 +74,8 @@ def patch_map(username, mapname):
 
 
 def csw_insert(username, mapname):
-    template_path, template_values = get_template_path_and_values(username, mapname)
-    record = common_util.fill_template_as_pretty_str(template_path, template_values)
+    template_path, prop_values = get_template_path_and_values(username, mapname)
+    record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
     muuid = common_util.csw_insert({
         'record': record
     })
@@ -132,7 +132,7 @@ def get_template_path_and_values(username, mapname):
     operates_on = _map_json_to_operates_on(map_json)
 
     unknown_value = 'neznámá hodnota'
-    template_values = _get_template_values(
+    template_values = _get_property_values(
         username=username,
         mapname=mapname,
         uuid=get_map_uuid(username, mapname),
@@ -141,7 +141,7 @@ def get_template_path_and_values(username, mapname):
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
         identifier=url_for_external('rest_map.get', username=username, mapname=mapname),
-        data_identifier_label=mapname,
+        identifier_label=mapname,
         extent=[float(c) for c in map_json['extent']],
         # TODO create config env variable to decide if to set organisation name or not
         md_organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
@@ -152,7 +152,7 @@ def get_template_path_and_values(username, mapname):
     return template_path, template_values
 
 
-def _get_template_values(
+def _get_property_values(
         username='browser',
         mapname='map',
         uuid='af238200-8200-1a23-9399-42c9fca53543',
@@ -163,7 +163,7 @@ def _get_template_values(
         publication_date='2007-05-25',
         md_date_stamp='2007-05-25',
         identifier='http://www.env.cz/data/liberec/admin-cleneni',
-        data_identifier_label='Liberec-AdminUnits',
+        identifier_label='Liberec-AdminUnits',
         extent=None,  # w, s, e, n
         epsg_codes=None,
         language=None,
@@ -184,114 +184,25 @@ def _get_template_values(
     ]
 
     result = {
-        ###############################################################################################################
-        # KNOWN TO LAYMAN
-        ###############################################################################################################
-
-        # layer UUID with prefix "m-"
         'md_file_identifier': get_metadata_uuid(uuid),
-
-        'reference_system': ' '.join([
-f"""
-<gmd:referenceSystemInfo>
-    <gmd:MD_ReferenceSystem>
-        <gmd:referenceSystemIdentifier>
-            <gmd:RS_Identifier>
-                <gmd:code>
-                    <gmx:Anchor xlink:href="http://www.opengis.net/def/crs/EPSG/0/{epsg_code}">EPSG:{epsg_code}</gmx:Anchor>
-                </gmd:code>
-            </gmd:RS_Identifier>
-        </gmd:referenceSystemIdentifier>
-    </gmd:MD_ReferenceSystem>
-</gmd:referenceSystemInfo>
-""" for epsg_code in epsg_codes
-        ]),
-
-        # title of data
-        'title': title,
-
-        # date of dataset
-        # check GeoServer's REST API, consider revision or publication dateType
-        'publication_date': f"""
-<gmd:CI_Date>
-    <gmd:date>
-        <gco:Date>{publication_date}</gco:Date>
-    </gmd:date>
-    <gmd:dateType>
-        <gmd:CI_DateTypeCode codeListValue="publication" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode">publication</gmd:CI_DateTypeCode>
-    </gmd:dateType>
-</gmd:CI_Date>
-""",
-
-        # date stamp of metadata
         'md_date_stamp': md_date_stamp,
-
-        # it must be URI, but text node is optional (MZP-CORINE)
-        # it can point to Layman's Layer endpoint
-        'identifier': f'<gmx:Anchor xlink:href="{identifier}">{escape(data_identifier_label)}</gmx:Anchor>',
-
-        'abstract': '<gmd:abstract gco:nilReason="unknown" />' if abstract is None else f"""
-<gmd:abstract>
-    <gco:CharacterString>{escape(abstract)}</gco:CharacterString>
-</gmd:abstract>
-""",
-
-        'graphic_url': escape(url_for_external('rest_map_thumbnail.get', username=username, mapname=mapname)),
-
-        'extent': """
-<gmd:EX_GeographicBoundingBox>
-    <gmd:westBoundLongitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:westBoundLongitude>
-    <gmd:eastBoundLongitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:eastBoundLongitude>
-    <gmd:southBoundLatitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:southBoundLatitude>
-    <gmd:northBoundLatitude>
-        <gco:Decimal>{}</gco:Decimal>
-    </gmd:northBoundLatitude>
-</gmd:EX_GeographicBoundingBox>
-""".format(extent[0], extent[2], extent[1], extent[3]),
+        'reference_system': epsg_codes,
+        'title': title,
+        'publication_date': publication_date,
+        'identifier': {
+            'identifier': identifier,
+            'label': identifier_label,
+        },
+        'abstract': abstract,
+        'graphic_url': url_for_external('rest_map_thumbnail.get', username=username, mapname=mapname),
+        'extent': extent,
 
         'map_endpoint': escape(url_for_external('rest_map.get', username=username, mapname=mapname)),
-
         'map_file_endpoint': escape(url_for_external('rest_map_file.get', username=username, mapname=mapname)),
-
-        'operates_on': '\n'.join([
-            f"""
-<srv:operatesOn xlink:type="simple" {
-    ' '.join([f"{attr}={quoteattr(value)}" for attr, value in item.items()])
-}/>
-""" for item in operates_on
-        ]),
-
-        ###############################################################################################################
-        # GUESSABLE BY LAYMAN
-        ###############################################################################################################
-
-        # code for no language is "zxx"
-        'language': '<gmd:language gco:nilReason="unknown" />' if language is None else f"""
-<gmd:language>
-    <gmd:LanguageCode codeListValue=\"{language}\" codeList=\"http://www.loc.gov/standards/iso639-2/\">{language}</gmd:LanguageCode>
-</gmd:language>
-""",
-
-        ###############################################################################################################
-        # UNKNOWN TO LAYMAN
-        ###############################################################################################################
-        'md_organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if md_organisation_name is None else f"""
-    <gmd:organisationName>
-        <gco:CharacterString>{escape(md_organisation_name)}</gco:CharacterString>
-    </gmd:organisationName>
-    """,
-
-        'organisation_name': '<gmd:organisationName gco:nilReason="unknown" />' if organisation_name is None else f"""
-    <gmd:organisationName>
-        <gco:CharacterString>{escape(organisation_name)}</gco:CharacterString>
-    </gmd:organisationName>
-    """,
+        'operates_on': operates_on,
+        'language': language,
+        'md_organisation_name': md_organisation_name,
+        'organisation_name': organisation_name,
     }
 
     return result

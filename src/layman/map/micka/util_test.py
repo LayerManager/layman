@@ -12,7 +12,7 @@ from layman import uuid
 from layman import app as app
 from layman import settings
 from layman.map import MAP_TYPE
-from .csw import _get_template_values, METADATA_PROPERTIES
+from .csw import _get_property_values, METADATA_PROPERTIES
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals
 
 from layman.common.micka import util as common_util
@@ -59,7 +59,7 @@ def test_fill_template(client):
         os.remove(xml_path)
     except OSError:
         pass
-    file_object = common_util.fill_template('src/layman/map/micka/record-template.xml', _get_template_values())
+    file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/map/micka/record-template.xml', _get_property_values(), METADATA_PROPERTIES)
     with open(xml_path, 'wb') as out:
         out.write(file_object.read())
 
@@ -130,7 +130,7 @@ def test_parse_md_properties():
 @pytest.mark.usefixtures('app_context')
 def test_fill_xml_template(client):
 
-    xml_file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/map/micka/simple-template.xml', {
+    xml_file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/map/micka/record-template.xml', {
         'md_file_identifier': 'm-91147a27-1ff4-4242-ba6d-faffb92224c6',
         'md_organisation_name': None,
         'md_date_stamp': '2007-05-25',
@@ -160,11 +160,11 @@ def test_fill_xml_template(client):
         ],
     }, METADATA_PROPERTIES)
 
-    expected_path = 'src/layman/map/micka/simple-template-filled.xml'
+    expected_path = 'src/layman/map/micka/record-template-filled.xml'
     with open(expected_path) as f:
         expected_lines = f.readlines()
     lines = [l.decode('utf-8') for l in xml_file_object.readlines()]
-    print(f"FILE:\n{''.join(lines)}")
+    # print(f"FILE:\n{''.join(lines)}")
     diff_lines = list(difflib.unified_diff(expected_lines, lines))
     assert len(diff_lines) == 0, f"DIFF LINES:\n{''.join(diff_lines)}"
 
