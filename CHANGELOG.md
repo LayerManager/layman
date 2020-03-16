@@ -22,6 +22,7 @@
 ## v1.1.8
 2020-03-16
 - Treat attribute names in SLD (aka 'launder'), [#45](https://github.com/jirik/layman/issues/45)
+- Fix Micka's About URL in wait_for_deps
 
 ## v1.1.7
 2020-03-09

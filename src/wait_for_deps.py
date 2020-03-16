@@ -4,7 +4,7 @@ import re
 import sys
 import time
 import traceback
-from urllib.parse import urlparse
+from urllib.parse import urljoin
 
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
@@ -96,7 +96,7 @@ def main():
 
 
     # Micka
-    micka_url = urlparse(settings.CSW_URL)._replace(path="/about").geturl()
+    micka_url = urljoin(settings.CSW_URL, "about")
     wait_for_msg = f"Micka, url={micka_url}"
     print(f"Waiting for {wait_for_msg}")
     while True:
