@@ -25,6 +25,9 @@
 | [hslayers-ng](https://github.com/hslayers/hslayers-ng) | MIT | schema.draft-07.json | prod | src | |
 | [jsonschema](https://github.com/Julian/jsonschema) | MIT | Pipfile | prod | bin | |
 | [redis-py](https://github.com/andymccurdy/redis-py) | MIT | Pipfile | prod | bin | |
+| [lxml](https://lxml.de) | BSD 3-Clause | Dockerfile.dev | prod | bin | |
+| [libxml](http://xmlsoft.org/) | MIT | lxml | prod | bin | |
+| [libxslt](http://xmlsoft.org/libxslt/) | MIT | lxml | prod | bin | |
 | [owslib](https://github.com/geopython/OWSLib) | BSD 3-Clause | Pipfile | prod | bin | |
 | [cacheout](https://github.com/dgilland/cacheout) | MIT | Pipfile | prod | bin | |
 | [requests](http://python-requests.org) | Apache License 2.0 | Pipfile | prod | bin | |

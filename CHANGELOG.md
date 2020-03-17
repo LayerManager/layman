@@ -1,8 +1,7 @@
 # Changelog
 
 ## v1.2.x
-- TODO: Handle 500 error on CSW delete
-
+- Adjust metadata XML instead of using string formatting
 - Rename metadata properties. All metadata-record-related properties have `md_` prefix. Dataset-related properties do not have any special prefix.
 
     |Old name|New name|
@@ -15,6 +14,9 @@
     |`file_identifier`|`md_file_identifier`|
     |`organisation_name`|`md_organisation_name`|
 
+- Add LaymanError 38 (Micka HTTP or connection error)
+- Treat attribute names in SLD (aka 'launder'), [#45](https://github.com/jirik/layman/issues/45)
+- Fix Micka's About URL in wait_for_deps
 - Assert version of Micka on startup.
 - Load data into redis on startup even in Flower.
 - Better handle Micka's HTTP errors, [#43](https://github.com/jirik/layman/issues/43)

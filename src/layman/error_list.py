@@ -36,5 +36,6 @@ ERROR_LIST = {
     34: (400, 'User already reserved username.'),
     35: (409, 'Username already reserved.'),
     36: (409, 'Metadata record already exists.'),
-    37: (400, 'Micka exception.'),
+    37: (400, 'CSW exception.'),
+    38: (400, 'Micka HTTP or connection error.'),
 }
