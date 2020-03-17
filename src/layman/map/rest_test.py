@@ -12,14 +12,22 @@ from flask import url_for
 import sys
 del sys.modules['layman']
 
-from . import MAP_TYPE
+from . import util, MAP_TYPE
 from .micka import csw
 from .filesystem import uuid as map_uuid
 from layman import app, settings, uuid
+from layman import celery as celery_util
 from layman.common.micka import util as micka_common_util
 
 
 num_maps_before_test = 0
+
+
+def wait_till_ready(username, mapname):
+    last_task = util._get_map_task(username, mapname)
+    while last_task is not None and not celery_util.is_task_ready(last_task):
+        time.sleep(0.1)
+        last_task = util._get_map_task(username, mapname)
 
 
 @pytest.fixture(scope="module")

@@ -12,7 +12,7 @@ from layman.layer.filesystem.uuid import get_layer_uuid
 from layman.layer.geoserver.wms import get_wms_proxy
 from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer import LAYER_TYPE
-from layman import settings, patch_mode
+from layman import settings, patch_mode, LaymanError
 from layman.util import url_for_external
 from requests.exceptions import HTTPError, ConnectionError
 from urllib.parse import urljoin
@@ -74,15 +74,23 @@ def delete_layer(username, layername):
     muuid = get_metadata_uuid(uuid)
     if muuid is None:
         return
-    common_util.csw_delete(muuid)
+    try:
+        common_util.csw_delete(muuid)
+    except (HTTPError, ConnectionError):
+        current_app.logger.info(traceback.format_exc())
+        raise LaymanError(38)
 
 
 def csw_insert(username, layername):
     template_path, prop_values = get_template_path_and_values(username, layername)
     record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
-    muuid = common_util.csw_insert({
-        'record': record
-    })
+    try:
+        muuid = common_util.csw_insert({
+            'record': record
+        })
+    except (HTTPError, ConnectionError):
+        current_app.logger.info(traceback.format_exc())
+        raise LaymanError(38)
     return muuid
 
 
