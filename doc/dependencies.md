@@ -23,8 +23,8 @@
 | [chromium](https://www.chromium.org/) | 77+ | BSD and others | Dockerfile | prod | bin | for client-side map rendering and integration testing |
 | [chromedriver](http://chromedriver.chromium.org/) | 77+ | BSD and others | Dockerfile | prod | bin | for client-side map rendering and integration testing |
 | [pipenv](https://pipenv.kennethreitz.org/en/latest/) | 2018.11.26 | MIT | Dockerfile | prod | bin | to install Python dependencies |
-| [node.js](https://pipenv.kennethreitz.org/en/latest/) | 10 | MIT | hslayers/Dockerfile | prod | bin | to run Timgen |
-| [npm](https://www.npmjs.com/get-npm) | 6 | Artistic License 2.0 | hslayers/Dockerfile | prod | bin | to install node.js dependencies |
+| [node.js](https://pipenv.kennethreitz.org/en/latest/) | 10 | MIT | timgen/Dockerfile | prod | bin | to run Timgen |
+| [npm](https://www.npmjs.com/get-npm) | 6 | Artistic License 2.0 | timgen/Dockerfile | prod | bin | to install node.js dependencies |
 | [node.js](https://pipenv.kennethreitz.org/en/latest/) | 12 | MIT | client/docker/Dockerfile | prod | bin | to run Layman Test Client |
 | [npm](https://www.npmjs.com/get-npm) | 6 | Artistic License 2.0 | client/docker/Dockerfile | prod | bin | to install node.js dependencies |
 | [layman-test-client](https://github.com/jirik/layman-test-client) | 1.0.0 | GNU GPL v3 | docker-compose.yml | opt | bin | to demonstrate communication with REST API |
@@ -53,10 +53,10 @@
 ### Node.js dependencies
 | name | license | used by | env | bin or src | purpose |
 | --- | --- | --- | --- | --- | --- |
-| [openlayers](https://openlayers.org/) | BSD 2-Clause | hslayers/package.json | prod | bin | for client-side map rendering in Timgen |
-| [http-server](https://www.npmjs.com/package/http-server) | MIT | hslayers/package.json | prod | bin | as static HTTP server for Timgen |
-| [cors-anywhere](https://www.npmjs.com/package/cors-anywhere) | MIT | hslayers/package.json | prod | bin | for proxying Timgen requests |
-| [file-saver](https://www.npmjs.com/package/file-saver) | MIT | hslayers/package.json | prod | bin | for saving images in Timgen |
+| [openlayers](https://openlayers.org/) | BSD 2-Clause | timgen/package.json | prod | bin | for client-side map rendering in Timgen |
+| [http-server](https://www.npmjs.com/package/http-server) | MIT | timgen/package.json | prod | bin | as static HTTP server for Timgen |
+| [cors-anywhere](https://www.npmjs.com/package/cors-anywhere) | MIT | timgen/package.json | prod | bin | for proxying Timgen requests |
+| [file-saver](https://www.npmjs.com/package/file-saver) | MIT | timgen/package.json | prod | bin | for saving images in Timgen |
 
 ## Other dependencies
 

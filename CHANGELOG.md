@@ -5,6 +5,7 @@
 ### Upgrade requirements
 - Upgrade Micka to [v2020.010](https://github.com/hsrs-cz/Micka/releases/tag/v2020.010).
 - Add [CSW_PROXY_URL](doc/env-settings.md#CSW_PROXY_URL) to distinguish between internal CSW URL for Layman and public CSW URL for clients.
+- Rename host [LAYMAN_TIMGEN_URL](doc/env-settings.md#LAYMAN_TIMGEN_URL) of from `hslayers` to `timgen`.
 
 ### Changes
 - Publish metadata record of [map](doc/models.md#map) to Micka on [POST Maps](doc/rest.md#post-maps).
@@ -31,6 +32,7 @@
 - Assert version of Micka on startup.
 - Load data into redis on startup even in Flower.
 - Better handle Micka's HTTP errors, [#43](https://github.com/jirik/layman/issues/43)
+- Rename hslayers container to timgen (Thumbnail Image Generator)
 
 ## v1.1.8
 2020-03-16

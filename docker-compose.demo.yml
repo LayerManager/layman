@@ -20,7 +20,7 @@ services:
         - ./layman_data:/layman_data
         - ./src/layman_settings_demo.py:/code/src/layman_settings.py
       depends_on:
-        - hslayers
+        - timgen
         - layman_client
         - redis
         - postgresql
@@ -60,16 +60,16 @@ services:
       depends_on:
         - celery_worker
 
-   hslayers:
-      container_name: hslayers
+   timgen:
+      container_name: timgen
       build:
-        context: hslayers
+        context: timgen
         dockerfile: Dockerfile.production
         args:
            - LAYMAN_GS_HOST=${LAYMAN_GS_HOST}
            - LAYMAN_GS_PORT=${LAYMAN_GS_PORT}
            - LAYMAN_SERVER_NAME=${LAYMAN_SERVER_NAME}
-      image: hslayers:latest
+      image: timgen:latest
       user: ${UID_GID}
       command: sh -c "node proxy.js & ./node_modules/.bin/http-server dist/"
       extra_hosts:
