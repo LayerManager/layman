@@ -155,7 +155,7 @@ After providing external dependencies there is time to provide **internal depend
 
 Pipenv is recommended tool for installing **python-level** dependencies. Both Pipfile and Pipfile.lock are located in [`docker/`](docker/) directory.
 
-Npm is recommended tool for installing **node.js-level** dependencies. Both package.json and package-lock.json are located in [`hslayers/`](hslayers/) directory.
+Npm is recommended tool for installing **node.js-level** dependencies. Both package.json and package-lock.json are located in [`timgen/`](timgen/) directory.
 
 Next you need to choose how you deploy Layman. As Layman is Flask application, check Flask's [deployment options](https://flask.palletsprojects.com/en/1.1.x/deploying/). Layman is safe to run with multiple WSGI Flask processes and with multiple Celery worker processes.
 
@@ -167,7 +167,7 @@ Configure Layman using [environment settings](doc/env-settings.md). Demo configu
 - [LTC_SESSION_SECRET](doc/env-settings.md#LTC_SESSION_SECRET)
 
 Last, start layman and necessary services:
-- thumbnail image generator (Timgen, also referred to as hslayers) using npm (see startup command of `hslayers` docker-compose service)
+- thumbnail image generator (Timgen) using npm (see startup command of `timgen` docker-compose service)
 - Layman client using npm (see startup command of `layman_client` docker-compose service)
 - Layman using your deployment server (see startup command of `layman` docker-compose service)
 - Layman celery worker using python (see startup command of `celery_worker` docker-compose service)

@@ -1,19 +1,19 @@
 .PHONY: test
 
 start-demo:
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up --force-recreate postgresql geoserver redis layman celery_worker flower hslayers layman_client nginx
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client nginx
 
 start-demo-d:
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower hslayers layman_client nginx
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client nginx
 
 start-demo-full:
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up --force-recreate postgresql geoserver redis layman celery_worker flower hslayers layman_client micka nginx
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client micka nginx
 
 start-demo-full-d:
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower hslayers layman_client micka nginx
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client micka nginx
 
 start-demo-only-d:
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps layman celery_worker flower hslayers layman_client
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps layman celery_worker flower timgen layman_client
 
 stop-demo:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml stop
@@ -25,7 +25,7 @@ start-demo-full-with-optional-deps-d:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate
 
 build-demo:
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver hslayers
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
 
 deps-start:
 	docker-compose -f docker-compose.deps.yml up --force-recreate -d
@@ -43,15 +43,15 @@ stop-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop
 
 start-dev-only:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower hslayers layman_client
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up layman_dev celery_worker_dev flower hslayers layman_client
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower timgen layman_client
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up layman_dev celery_worker_dev flower timgen layman_client
 
 start-dev-only-d:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower hslayers layman_client
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d layman_dev celery_worker_dev flower hslayers layman_client
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower timgen layman_client
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d layman_dev celery_worker_dev flower timgen layman_client
 
 stop-dev-only:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop layman_dev celery_worker_dev flower hslayers layman_client
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop layman_dev celery_worker_dev flower timgen layman_client
 
 restart-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d layman_dev celery_worker_dev
@@ -110,15 +110,15 @@ reset-data-directories:
 clear-python-cache-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps layman_dev bash /code/src/clear-python-cache.sh
 
-hslayers-build:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build hslayers
+timgen-build:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build timgen
 
-hslayers-restart:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build hslayers
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d hslayers
+timgen-restart:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build timgen
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d timgen
 
-hslayers-bash:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm hslayers sh
+timgen-bash:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm timgen sh
 
 client-build:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_client

@@ -81,8 +81,8 @@ def generate_map_thumbnail(username, mapname):
         'map_def_url': map_file_get_url,
         # 'file_name': tmp_file_name,
     })
-    hslayers_url = f"{settings.LAYMAN_TIMGEN_URL}?{params}"
-    # current_app.logger.info(f"HSLayers URL: {hslayers_url}")
+    timgen_url = f"{settings.LAYMAN_TIMGEN_URL}?{params}"
+    # current_app.logger.info(f"Timgen URL: {timgen_url}")
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -95,7 +95,7 @@ def generate_map_thumbnail(username, mapname):
     )
     chrome.set_window_size(500,500)
 
-    chrome.get(hslayers_url)
+    chrome.get(timgen_url)
     entries = chrome.get_log('browser')
     max_attempts = 40
     attempts = 0

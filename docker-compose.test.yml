@@ -17,7 +17,7 @@ services:
         - ./test.sh:/code/test.sh
       depends_on:
         - celery_worker_test
-        - hslayers
+        - timgen
         - layman_client_test
 
    celery_worker_test:
@@ -40,16 +40,16 @@ services:
         - geoserver
         - micka
 
-   hslayers:
-      container_name: hslayers
+   timgen:
+      container_name: timgen
       build:
-        context: hslayers
+        context: timgen
         dockerfile: Dockerfile.production
         args:
            - LAYMAN_GS_HOST=${LAYMAN_GS_HOST}
            - LAYMAN_GS_PORT=${LAYMAN_GS_PORT}
            - LAYMAN_SERVER_NAME=${LAYMAN_SERVER_NAME}
-      image: hslayers:latest
+      image: timgen:latest
       user: ${UID_GID}
       command: sh -c "node proxy.js & ./node_modules/.bin/http-server dist/"
 #      ports:
