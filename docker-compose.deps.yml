@@ -56,7 +56,9 @@ services:
 
    micka:
       container_name: micka
-      image: jirikcz/micka:micka-4ded0ae-v2.0.0
+      build:
+        context: deps/micka/docker
+        dockerfile: Dockerfile
       command: bash -c "cd /code/src && python3 wait_for_deps.py && /etc/init.d/php7.3-fpm start && nginx -g 'daemon off;'"
       env_file:
         - deps/micka/docker/.env

@@ -135,6 +135,9 @@ client-bash:
 client-bash-root:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm -u root layman_client sh
 
+client-bash-exec:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec layman_client sh
+
 client-bash-exec-root:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec -u root layman_client sh
 
@@ -219,8 +222,17 @@ liferay-stop:
 micka-restart:
 	docker-compose -f docker-compose.deps.yml up --force-recreate --no-deps -d micka
 
+micka-restart-demo:
+	docker-compose -f docker-compose.deps.demo.yml up --force-recreate --no-deps -d micka
+
 micka-bash:
 	docker-compose -f docker-compose.deps.yml exec micka bash
+
+micka-bash-demo:
+	docker-compose -f docker-compose.deps.demo.yml run --rm --no-deps micka bash
+
+micka-bash-exec-demo:
+	docker-compose -f docker-compose.deps.demo.yml exec micka bash
 
 micka-logs:
 	mkdir -p deps/micka/log/micka
@@ -229,6 +241,12 @@ micka-logs:
 	rm -rf deps/micka/log/nginx/*
 	docker cp micka:/var/www/html/Micka/php/log/. deps/micka/log/micka
 	docker cp micka:/var/log/nginx/. deps/micka/log/nginx
+
+nginx-bash:
+	docker-compose -f docker-compose.demo.yml -f docker-compose.deps.demo.yml run --rm --no-deps nginx sh
+
+nginx-restart:
+	docker-compose -f docker-compose.demo.yml -f docker-compose.deps.demo.yml up --force-recreate --no-deps -d nginx
 
 stop-all-docker-containers:
 	docker stop $$(docker ps -q)

@@ -9,7 +9,7 @@ parameters:
             cze = Micka
             eng = Micka
         # URL
-        mickaUrl = http://localhost/micka
+        mickaUrl = http://${MICKA_HOSTPORT}/micka
         # UI theme
         layoutTheme = default
         # UI langauges (must have translation files)

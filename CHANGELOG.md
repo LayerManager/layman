@@ -1,6 +1,17 @@
 # Changelog
 
 ## v1.2.x
+
+### Upgrade requirements
+- Upgrade Micka to [v2020.010](https://github.com/hsrs-cz/Micka/releases/tag/v2020.010).
+- Add [CSW_PROXY_URL](doc/env-settings.md#CSW_PROXY_URL) to distinguish between internal CSW URL for Layman and public CSW URL for clients.
+
+### Changes
+- Publish metadata record of [map](doc/models.md#map) to Micka on [POST Maps](doc/rest.md#post-maps).
+- Add `metatada` info to [GET Map](doc/rest.md#get-map) response.
+- Extend `metatada` info with `identitier` attribute in case of both layer and map.
+- Add documentation of [map metadata properties](doc/metadata.md)
+- Use `metadataStandardName` and `metadataStandardVersion` in metadata templates
 - Adjust metadata XML instead of using string formatting
 - Rename metadata properties. All metadata-record-related properties have `md_` prefix. Dataset-related properties do not have any special prefix.
 
@@ -42,17 +53,6 @@ Prior to 1.1.5, existing usernames, layers and maps **were not imported sometime
 ## v1.1.4
 2020-02-19
 - Better handle Micka's HTTP errors, [#43](https://github.com/jirik/layman/issues/43)
-
-## v1.2.0-alfa1
-2020-01-31
-- Publish metadata record of [map](doc/models.md#map) to Micka on [POST Maps](doc/rest.md#post-maps).
-- Add `metatada` info to [GET Map](doc/rest.md#get-map) response.
-- Extend `metatada` info with `identitier` attribute in case of both layer and map.
-- Add [CSW_PROXY_URL](doc/env-settings.md#CSW_PROXY_URL) to distinguish between internal CSW URL for Layman and public CSW URL for clients.
-- Add documentation of [map metadata properties](doc/metadata.md)
-- Add `date_stamp` metadata property to layer template
-- Use `metadataStandardName` and `metadataStandardVersion` in metadata templates
-- Upgrade Micka
 
 ## v1.1.3
 2020-01-31
