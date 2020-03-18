@@ -122,7 +122,7 @@ However, if you want to run Layman in production, it is strongly recommended to 
 - PostgreSQL 10.0 & PostGIS 2.4
 - GeoServer 2.13.0
 - Redis 4.0
-- Micka 2020.009
+- Micka 2020.010
 
 
 ## Run in production
@@ -132,7 +132,7 @@ When providing **external dependencies**, check their production-related documen
 - [PostgreSQL 10.0](https://www.postgresql.org/docs/10/admin.html) & [PostGIS 2.4](http://postgis.net/docs/manual-2.4/performance_tips.html)
 - [GeoServer 2.13.0](https://docs.geoserver.org/2.13.0/user/production/index.html#production)
 - [Redis 4.0](https://redis.io/topics/admin)
-- [Micka 2020.009](https://github.com/hsrs-cz/Micka/tree/v2020.009), see also [configuration](deps/micka/sample/confs/config.local.neon) of [dockerized Micka](https://github.com/jirik/docker-micka).
+- [Micka v2020.010](https://github.com/hsrs-cz/Micka/releases/tag/v2020.010), see also [configuration](deps/micka/sample/confs/config.local.neon) of [dockerized Micka](https://github.com/jirik/docker-micka).
 
 Within PostgreSQL, you need to provide one database for Layman and one database for Micka. For Layman, you also need to provide one user [LAYMAN_PG_USER](doc/env-settings.md#LAYMAN_PG_USER) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME) database. The user also needs access to `public` schema where PostGIS must be installed.
 
@@ -150,7 +150,8 @@ After providing external dependencies there is time to provide **internal depend
 - [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) utility of [gdal](https://gdal.org/) 2.4+
 - [chromium-browser](https://chromium.org/) 77+ and corresponding version of [chromedriver](https://chromedriver.chromium.org/)
 - [pipenv](https://pipenv.kennethreitz.org/en/latest/)
-- [node.js](https://nodejs.org/) 10+ & npm
+- [node.js](https://nodejs.org/) 10 & npm 6 for running Timgen
+- [node.js](https://nodejs.org/) 12 & npm 6 for running Layman Test Client
 
 Pipenv is recommended tool for installing **python-level** dependencies. Both Pipfile and Pipfile.lock are located in [`docker/`](docker/) directory.
 
@@ -166,7 +167,7 @@ Configure Layman using [environment settings](doc/env-settings.md). Demo configu
 - [LTC_SESSION_SECRET](doc/env-settings.md#LTC_SESSION_SECRET)
 
 Last, start layman and necessary services:
-- thumbnail image generator (TIMGEN, also referred to as hslayers) using npm (see startup command of `hslayers` docker-compose service)
+- thumbnail image generator (Timgen, also referred to as hslayers) using npm (see startup command of `hslayers` docker-compose service)
 - Layman client using npm (see startup command of `layman_client` docker-compose service)
 - Layman using your deployment server (see startup command of `layman` docker-compose service)
 - Layman celery worker using python (see startup command of `celery_worker` docker-compose service)

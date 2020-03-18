@@ -127,5 +127,5 @@ CSW_ORGANISATION_NAME_REQUIRED = os.getenv('CSW_ORGANISATION_NAME_REQUIRED', 'fa
 
 # # tuples like (version, revision)
 MICKA_ACCEPTED_VERSIONS = [
-    ('2020.010', '2020-02-18.01'),
+    ('2020.010', '2020-03-04.01'),
 ]

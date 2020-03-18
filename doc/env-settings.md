@@ -9,7 +9,7 @@ Dotted path to a Python module with Layman settings for Python level.
 Filesystem directory where most of published data is stored, including data about authentication credentials, users, and publications.
 
 ### LAYMAN_SERVER_NAME
-String with internal domain and port `<domain>:<port>` of Layman's main instance (not celery worker). Used by thumbnail image generator (TIMGEN) to call Layman internally. See also [LAYMAN_PROXY_SERVER_NAME](#LAYMAN_PROXY_SERVER_NAME).
+String with internal domain and port `<domain>:<port>` of Layman's main instance (not celery worker). Used by thumbnail image generator (Timgen) to call Layman internally. See also [LAYMAN_PROXY_SERVER_NAME](#LAYMAN_PROXY_SERVER_NAME).
 
 ### LAYMAN_PROXY_SERVER_NAME
 String with public domain and optionally port, e.g. `<domain>` or `<domain>:<port>`.  See also [LAYMAN_SERVER_NAME](#LAYMAN_SERVER_NAME).
@@ -30,7 +30,7 @@ Internal URL of [Layman Test Client](https://github.com/jirik/layman-test-client
 Public URL of [Layman Test Client](https://github.com/jirik/layman-test-client).
 
 ### LAYMAN_TIMGEN_URL
-Internal URL of thumnbail image generator (TIMGEN) used for generating map thumbnails.
+Internal URL of thumnbail image generator (Timgen) used for generating map thumbnails.
 
 ## Layman authentication and authorization
 
@@ -42,6 +42,9 @@ List of dotted paths to Python modules to be used as OAuth2 providers. Paths are
 
 ### LAYMAN_AUTHZ_MODULE
 Dotted path to Python module to be used for authorization. Paths are separated with comma (`,`). See [authorization](security.md#authorization).
+
+### MICKA_HOSTPORT
+String with public domain and optionally port, e.g. `<domain>` or `<domain>:<port>`. Passed as configuration to Micka for demo purposes.
 
 ### OAUTH2_LIFERAY_CLIENT_ID
 Client ID of Layman's Test Client registered as OAuth2 provider at Liferay instance.
