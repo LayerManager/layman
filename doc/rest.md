@@ -7,10 +7,12 @@
 |[Layer](models.md#layer)|`/rest/<username>/layers/<layername>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
 |Layer Thumbnail|`/rest/<username>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
 |Layer Chunk|`/rest/<username>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
+|Layer Metadata Comparison|`/rest/<username>/layers/<layername>/metadata-comparison`|[GET](#get-layer-metadata-comparison) | x | x | x |
 |Maps|`/rest/<username>/maps`|[GET](#get-maps)| [POST](#post-maps) | x | x |
 |[Map](models.md#map)|`/rest/<username>/maps/<mapname>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
 |Map File|`/rest/<username>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
 |Map Thumbnail|`/rest/<username>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
+|Map Metadata Comparison|`/rest/<username>/layers/<layername>/metadata-comparison`|[GET](#get-map-metadata-comparison) | x | x | x |
 |Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | [DELETE](#delete-current-user) |
 
 #### REST path parameters
@@ -258,6 +260,21 @@ Content-Type: `application/json`
 HTTP status code 200 if chunk was successfully saved.
 
 
+### GET Layer Metadata Comparison
+Get comparison of metadata properties among Layman, CSW, WMS and WFS.
+
+#### Request
+No action parameters.
+
+#### Response
+Content-Type: `application/json`
+
+JSON object with one attribute:
+- **metadata_properties**: Dictionary of objects. Key is name of [metadata property](./metadata.md) (e.g. `reference_system`). Value is object with following attributes:
+  - **values**: Dictionary of objects. Key is URL of source ([GET Layer](#get-layer), CSW record, WMS Capabilities, or WFS Capabitilities). Value is any valid JSON (null, number, string, boolean, list, or object) representing value of metadata property. Null means the value is not set.
+  - **equal_or_null**: Boolean. True if all values are considered equal or null, false otherwise.
+
+
 ## Maps
 ### URL
 `/rest/<username>/maps`
@@ -428,6 +445,21 @@ No action parameters.
 Content-Type: `image/png`
 
 PNG image.
+
+
+### GET Map Metadata Comparison
+Get comparison of metadata properties among Layman and CSW.
+
+#### Request
+No action parameters.
+
+#### Response
+Content-Type: `application/json`
+
+JSON object with one attribute:
+- **metadata_properties**: Dictionary of objects. Key is name of [metadata property](./metadata.md) (e.g. `reference_system`). Value is object with following attributes:
+  - **values**: Dictionary of objects. Key is URL of source ([GET Map](#get-map), [GET Map File](#get-map-file), or CSW record). Value is any valid JSON (null, number, string, boolean, list, or object) representing value of metadata property. Null means the value is not set.
+  - **equal_or_null**: Boolean. True if all values are considered equal or null, false otherwise.
 
 
 ## Current User
