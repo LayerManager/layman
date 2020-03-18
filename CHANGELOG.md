@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.2.x
+## v1.2.0
 
 ### Upgrade requirements
 - Upgrade Micka to [v2020.010](https://github.com/hsrs-cz/Micka/releases/tag/v2020.010).
