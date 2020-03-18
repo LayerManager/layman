@@ -78,9 +78,7 @@ Wait until you see something like
 
 Then visit [http://localhost/](). You will see simple web client that interacts with [REST API](doc/rest.md).
 
-To stop running service, press Ctrl+C.
-
-You can start Layman also in background with `make start-demo-full-d` (`d` for detached), and stop it with `stop-demo`.
+To stop running service, run `make stop-demo`.
 
 
 ## Configuration
@@ -101,7 +99,7 @@ When you are switching between different contexts (e.g. between demo and dev), a
 - `.env*` file (check `env_file` properties in `docker-compose.*.yml` file)
 - `layman_settings*` file (check [LAYMAN_SETTINGS_MODULE](doc/env-settings.md#LAYMAN_SETTINGS_MODULE) environment variable in `env*` file)
 
-Also, anytime you change `.env` file, remember to rebuild docker images as some environemnt variables affect build stage of docker images. Particularly these environment settings:
+Also, anytime you change `.env` file, remember to rebuild docker images as some environment variables affect build stage of docker images. Particularly these environment settings:
 - [UID_GID](doc/env-settings.md#UID_GID)
 - [LAYMAN_GS_HOST](doc/env-settings.md#LAYMAN_GS_HOST)
 - [LAYMAN_GS_PORT](doc/env-settings.md#LAYMAN_GS_PORT)
