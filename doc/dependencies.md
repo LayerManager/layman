@@ -27,7 +27,6 @@
 | [npm](https://www.npmjs.com/get-npm) | 6 | Artistic License 2.0 | timgen/Dockerfile | prod | bin | to install node.js dependencies |
 | [node.js](https://pipenv.kennethreitz.org/en/latest/) | 12 | MIT | client/docker/Dockerfile | prod | bin | to run Layman Test Client |
 | [npm](https://www.npmjs.com/get-npm) | 6 | Artistic License 2.0 | client/docker/Dockerfile | prod | bin | to install node.js dependencies |
-| [layman-test-client](https://github.com/jirik/layman-test-client) | 1.0.0 | GNU GPL v3 | docker-compose.yml | opt | bin | to demonstrate communication with REST API |
 | [gunicorn](https://gunicorn.org/) | 19 | MIT | requirements.production.txt | opt | bin | as Flask production server |
 | [nginx](http://nginx.org/) | 1.16 | BSD 2-Clause | docker-compose.yml | opt | bin | as production server |
 
@@ -53,6 +52,7 @@
 ### Node.js dependencies
 | name | license | used by | env | bin or src | purpose |
 | --- | --- | --- | --- | --- | --- |
+| [layman-test-client](https://github.com/jirik/layman-test-client) | GNU GPL v3 | client/docker/Dockerfile | opt | bin | to demonstrate communication with REST API |
 | [openlayers](https://openlayers.org/) | BSD 2-Clause | timgen/package.json | prod | bin | for client-side map rendering in Timgen |
 | [http-server](https://www.npmjs.com/package/http-server) | MIT | timgen/package.json | prod | bin | as static HTTP server for Timgen |
 | [cors-anywhere](https://www.npmjs.com/package/cors-anywhere) | MIT | timgen/package.json | prod | bin | for proxying Timgen requests |
