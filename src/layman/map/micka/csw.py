@@ -15,7 +15,7 @@ from layman.map.filesystem.input_file import get_map_json, unquote_urls
 from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer.geoserver.wms import get_layer_info as wms_get_layer_info
 from layman.layer.micka.csw import get_layer_info as csw_get_layer_info
-from layman.util import url_for_external, USERNAME_ONLY_PATTERN
+from layman.util import url_for, USERNAME_ONLY_PATTERN
 
 
 PATCH_MODE = patch_mode.NO_DELETE
@@ -155,7 +155,7 @@ def get_template_path_and_values(username, mapname):
         abstract=map_json['abstract'] or None,
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
-        identifier=url_for_external('rest_map.get', username=username, mapname=mapname),
+        identifier=url_for('rest_map.get', username=username, mapname=mapname),
         identifier_label=mapname,
         extent=[float(c) for c in map_json['extent']],
         # TODO create config env variable to decide if to set organisation name or not
@@ -209,11 +209,11 @@ def _get_property_values(
             'label': identifier_label,
         },
         'abstract': abstract,
-        'graphic_url': url_for_external('rest_map_thumbnail.get', username=username, mapname=mapname),
+        'graphic_url': url_for('rest_map_thumbnail.get', username=username, mapname=mapname),
         'extent': extent,
 
-        'map_endpoint': escape(url_for_external('rest_map.get', username=username, mapname=mapname)),
-        'map_file_endpoint': escape(url_for_external('rest_map_file.get', username=username, mapname=mapname)),
+        'map_endpoint': escape(url_for('rest_map.get', username=username, mapname=mapname)),
+        'map_file_endpoint': escape(url_for('rest_map_file.get', username=username, mapname=mapname)),
         'operates_on': operates_on,
         'language': language,
         'md_organisation_name': md_organisation_name,

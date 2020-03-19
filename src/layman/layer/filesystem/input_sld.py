@@ -69,3 +69,7 @@ def get_layer_file(username, layername):
     if os.path.exists(sld_path):
         return open(sld_path, 'rb')
     return None
+
+
+def get_metadata_comparison(username, publication_name):
+    pass

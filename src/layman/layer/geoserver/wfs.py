@@ -18,6 +18,7 @@ FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
 
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
+VERSION = '1.0.0'
 
 
 def get_flask_proxy_key(username):
@@ -114,11 +115,15 @@ def clear_cache(username):
     mem_redis.delete(key)
 
 
+def _get_wfs_proxy_url(username):
+    return urljoin(get_gs_proxy_base_url(), username + '/ows')
+
+
 def get_layer_info(username, layername):
     wfs = get_wfs_proxy(username)
     if wfs is None:
         return {}
-    wfs_proxy_url = urljoin(get_gs_proxy_base_url(), username + '/ows')
+    wfs_proxy_url = _get_wfs_proxy_url(username)
 
     wfs_layername = f"{username}:{layername}"
     if wfs_layername not in wfs.contents:
@@ -153,3 +158,59 @@ def get_publication_names(username, publication_type):
 
 def get_publication_uuid(username, publication_type, publication_name):
     return None
+
+
+def get_metadata_comparison(username, layername):
+    wfs = get_wfs_proxy(username)
+    if wfs is None:
+        return {}
+    cap_op = wfs.getOperationByName('GetCapabilities')
+    wfs_url = next(
+        (
+            m.get("url")
+            for m in (cap_op.methods if cap_op else [])
+            if m.get("type").lower() == 'get'
+        ), None
+    )
+    wfs_layername = f"{username}:{layername}"
+    wfs_layer = wfs.contents.get(wfs_layername, None)
+    try:
+        title = wfs_layer.title
+    except:
+        title = None
+    try:
+        abstract = wfs_layer.abstract
+    except:
+        abstract = None
+    try:
+        extent = wfs_layer.boundingBox[:-1]
+    except:
+        extent = None
+    try:
+        crs_list = [int(crs.getcode().split(':')[-1]) for crs in wfs_layer.crsOptions]
+        crs_list.append(4326)
+        crs_list = list(set(crs_list))
+        crs_list.sort()
+        reference_system = crs_list
+    except Exception as e:
+        current_app.logger.error(e)
+        reference_system = None
+    props = {
+        'wfs_url': wfs_url,
+        'title': title,
+        'abstract': abstract,
+        'extent': extent,
+        'reference_system': reference_system,
+    }
+    # current_app.logger.info(f"props:\n{json.dumps(props, indent=2)}")
+    url = get_capabilities_url(username)
+    return {
+        f"{url}": props
+    }
+
+
+def get_capabilities_url(username):
+    url = _get_wfs_proxy_url(username)
+    params = {'SERVICE': 'WFS', 'REQUEST': 'GetCapabilities', 'VERSION': VERSION}
+    url = wms.add_params_to_url(url, params)
+    return url

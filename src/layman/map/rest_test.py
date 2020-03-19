@@ -17,6 +17,7 @@ from .micka import csw
 from .filesystem import uuid as map_uuid
 from layman import app, settings, uuid
 from layman import celery as celery_util
+from layman.util import url_for as url_for_external
 from layman.common.micka import util as micka_common_util
 
 
@@ -201,13 +202,13 @@ def test_post_maps_simple(client):
         resp_json = rv.get_json()
         assert resp_json['name'] == mapname
         assert resp_json['uuid'] == uuid_str
-        assert resp_json['url'] == urllib.parse.urlparse(url_for('rest_map.get', username=username, mapname=mapname)).path
+        assert resp_json['url'] == url_for_external('rest_map.get', username=username, mapname=mapname)
         assert resp_json['title'] == "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
         assert resp_json['description'] == "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce."
         map_file = resp_json['file']
         assert 'status' not in map_file
         assert 'path' in map_file
-        assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
+        assert map_file['url'] == url_for_external('rest_map_file.get', username=username, mapname=mapname)
         thumbnail = resp_json['thumbnail']
         assert 'status' in thumbnail
         assert thumbnail['status'] in ['PENDING', 'STARTED']
@@ -227,7 +228,7 @@ def test_post_maps_simple(client):
         thumbnail = resp_json['thumbnail']
         assert 'status' not in thumbnail
         assert 'path' in thumbnail
-        assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
+        assert thumbnail['url'] == url_for_external('rest_map_thumbnail.get', username=username, mapname=mapname)
 
         rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
         assert rv.status_code == 200
@@ -291,13 +292,13 @@ def test_post_maps_complex(client):
         resp_json = rv.get_json()
         assert resp_json['name'] == mapname
         assert resp_json['uuid'] == uuid_str
-        assert resp_json['url'] == urllib.parse.urlparse(url_for('rest_map.get', username=username, mapname=mapname)).path
+        assert resp_json['url'] == url_for_external('rest_map.get', username=username, mapname=mapname)
         assert resp_json['title'] == title
         assert resp_json['description'] == description
         map_file = resp_json['file']
         assert 'status' not in map_file
         assert 'path' in map_file
-        assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
+        assert map_file['url'] == url_for_external('rest_map_file.get', username=username, mapname=mapname)
         thumbnail = resp_json['thumbnail']
         assert 'status' in thumbnail
         assert thumbnail['status'] in ['PENDING', 'STARTED']
@@ -327,7 +328,7 @@ def test_post_maps_complex(client):
         thumbnail = resp_json['thumbnail']
         assert 'status' not in thumbnail
         assert 'path' in thumbnail
-        assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
+        assert thumbnail['url'] == url_for_external('rest_map_thumbnail.get', username=username, mapname=mapname)
 
     with app.app_context():
         rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
@@ -375,13 +376,13 @@ def test_patch_map(client):
         })
 
         assert resp_json['uuid'] == uuid_str
-        assert resp_json['url'] == urllib.parse.urlparse(url_for('rest_map.get', username=username, mapname=mapname)).path
+        assert resp_json['url'] == url_for_external('rest_map.get', username=username, mapname=mapname)
         assert resp_json['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
         assert resp_json['description'] == "Jiný popis"
         map_file = resp_json['file']
         assert 'status' not in map_file
         assert 'path' in map_file
-        assert map_file['url'] == urllib.parse.urlparse(url_for('rest_map_file.get', username=username, mapname=mapname)).path
+        assert map_file['url'] == url_for_external('rest_map_file.get', username=username, mapname=mapname)
         thumbnail = resp_json['thumbnail']
         assert 'status' in thumbnail
         assert thumbnail['status'] in ['PENDING', 'STARTED']
@@ -401,7 +402,7 @@ def test_patch_map(client):
         thumbnail = resp_json['thumbnail']
         assert 'status' not in thumbnail
         assert 'path' in thumbnail
-        assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
+        assert thumbnail['url'] == url_for_external('rest_map_thumbnail.get', username=username, mapname=mapname)
 
     with app.app_context():
         rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
@@ -597,7 +598,7 @@ def test_map_composed_from_local_layers(client):
         thumbnail = resp_json['thumbnail']
         assert 'status' not in thumbnail
         assert 'path' in thumbnail
-        assert thumbnail['url'] == urllib.parse.urlparse(url_for('rest_map_thumbnail.get', username=username, mapname=mapname)).path
+        assert thumbnail['url'] == url_for_external('rest_map_thumbnail.get', username=username, mapname=mapname)
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{MAP_TYPE}': num_maps_before_test + 2

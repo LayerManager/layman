@@ -6,7 +6,7 @@ import socket
 import time
 from urllib.parse import urljoin, urlencode
 from layman import settings
-from flask import url_for, current_app
+from flask import current_app
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import \
@@ -16,6 +16,7 @@ from . import util
 from layman.common.filesystem import util as common_util
 from . import input_file
 from layman import settings
+from layman.util import url_for
 
 
 MAP_SUBDIR = __name__.split('.')[-1]

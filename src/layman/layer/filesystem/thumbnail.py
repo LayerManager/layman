@@ -2,9 +2,9 @@ import os
 import pathlib
 from urllib.parse import urljoin
 from layman import settings
-from flask import url_for
 
 from layman import patch_mode
+from layman.util import url_for
 from . import util
 from layman.common.filesystem import util as common_util
 from . import input_file
@@ -90,3 +90,7 @@ def generate_layer_thumbnail(username, layername):
     out.write(tn_img.read())
     out.close()
     return tn_img
+
+
+def get_metadata_comparison(username, layername):
+    pass
