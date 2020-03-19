@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.3.x
+- Use absolute URLs in responses of Layer and Map endpoints
+- Add [GET Layer Metadata Comparison](doc/rest.md#get-layer-metadata-comparison) endpoint. 
+
 ## v1.2.0
 
 ### Upgrade requirements

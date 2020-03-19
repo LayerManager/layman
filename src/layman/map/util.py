@@ -9,11 +9,11 @@ import re
 from layman.authn.filesystem import get_authn_info
 from layman.authz import get_publication_access_rights
 from celery import chain
-from flask import current_app, url_for, request, g
+from flask import current_app, request, g
 
 from layman import LaymanError
 from layman import settings
-from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name
+from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name, url_for
 from layman import celery as celery_util
 from . import get_map_sources, MAP_TYPE, get_map_type_def
 from layman.common import redis as redis_util, tasks as tasks_util

@@ -76,3 +76,5 @@ def get_publication_uuid(username, publication_type, publication_name):
     return None
 
 
+def get_metadata_comparison(username, publication_name):
+    pass

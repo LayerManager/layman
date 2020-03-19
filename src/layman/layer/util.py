@@ -3,14 +3,16 @@ import importlib
 import inspect
 import re
 
-from flask import current_app, url_for, request, g
+from flask import current_app, request, g
 
 from layman import LaymanError, patch_mode
 from layman import settings
-from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name
+from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name, url_for
 from layman import celery as celery_util
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def
 from layman.common import redis as redis_util, tasks as tasks_util
+from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals_or_none, prop_equals_strict
+
 
 
 LAYERNAME_RE = USERNAME_RE
@@ -228,3 +230,51 @@ def is_layer_task_ready(username, layername):
 
 
 lock_decorator = redis_util.create_lock_decorator(LAYER_TYPE, 'layername', 19, is_layer_task_ready)
+
+
+def layer_info_to_metadata_properties(info):
+    result = {
+        'title': info['title'],
+        'identifier': {
+            'identifier': info['url'],
+            'label': info['name'],
+        },
+        'abstract': info['description'],
+        'graphic_url': info.get('thumbnail', {}).get('url', None),
+        'wms_url': info.get('wms', {}).get('url', None),
+        'wfs_url': info.get('wfs', {}).get('url', None),
+        'layer_endpoint': info['url'],
+    }
+    return result
+
+
+def get_metadata_comparison(username, layername):
+    layman_info = get_complete_layer_info(cached=True)
+    layman_props = layer_info_to_metadata_properties(layman_info)
+    all_props = {
+        f"{layman_props['layer_endpoint']}": layman_props,
+    }
+    sources = get_sources()
+    partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [username, layername])
+    for pi in partial_infos:
+        if pi is not None:
+            all_props.update(pi)
+
+    prop_names = sorted(list(set([pn for po in all_props.values() for pn in po.keys()])))
+    all_props = {
+        'metadata_properties': {
+            pn: {
+                'values': {
+                    src: prop_object[pn]
+                    for src, prop_object in all_props.items()
+                    if pn in prop_object
+                },
+            }
+            for pn in prop_names
+        }
+    }
+    for pn, po in all_props['metadata_properties'].items():
+        equals_fn = COMMON_PROPERTIES[pn].get('equals_fn', None)
+        po['equal_or_null'] = prop_equals_or_none(po['values'].values(), equals_fn=equals_fn)
+        po['equal'] = prop_equals_strict(list(po['values'].values()), equals_fn=equals_fn)
+    return all_props

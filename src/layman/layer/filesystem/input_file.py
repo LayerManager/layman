@@ -217,3 +217,7 @@ def get_file_name_mappings(file_names, main_file_name, layer_name, output_dir):
             filename_mapping[file_name] = None
             filepath_mapping[file_name] = None
     return (filename_mapping, filepath_mapping)
+
+
+def get_metadata_comparison(username, publication_name):
+    pass

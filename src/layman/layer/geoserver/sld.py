@@ -161,3 +161,7 @@ def create_layer_style(username, layername):
     )
     # app.logger.info(r.text)
     r.raise_for_status()
+
+
+def get_metadata_comparison(username, layername):
+    pass

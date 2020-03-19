@@ -1,4 +1,20 @@
+from flask import current_app
 import json
+
+
+def extent_equals(a, b, limit=0.95):
+    isect = _get_extent_intersetion(a, b)
+    if _is_extent_empty(isect):
+        return False
+
+    a_area = _get_extent_area(a)
+    b_area = _get_extent_area(b)
+    i_area = _get_extent_area(isect)
+
+    similarity = i_area/a_area * i_area/b_area
+    # current_app.logger.info(f"a={a}, b={b}, similarity={similarity}")
+    return similarity >= limit
+
 
 PROPERTIES = {
     'md_file_identifier': {
@@ -40,12 +56,15 @@ PROPERTIES = {
     },
     'extent': {
         'upper_mp': '1',
+        'equals_fn': extent_equals,
     },
     'wms_url': {
         'upper_mp': '1',
+        'equals_fn': lambda a, b: strip_capabilities_params(a) == strip_capabilities_params(b),
     },
     'wfs_url': {
         'upper_mp': '1',
+        'equals_fn': lambda a, b: strip_capabilities_params(a) == strip_capabilities_params(b),
     },
     'layer_endpoint': {
         'upper_mp': '1',
@@ -74,6 +93,11 @@ def prop_equals(value_a, value_b, equals_fn=None):
 def prop_equals_or_none(values, equals_fn=None):
     equals_fn = equals_fn or (lambda a,b: a==b)
     values = [v for v in values if v is not None]
+    return prop_equals_strict(values, equals_fn)
+
+
+def prop_equals_strict(values, equals_fn=None):
+    equals_fn = equals_fn or (lambda a,b: a==b)
     if len(values)<2:
         return True
     result = True
@@ -82,3 +106,42 @@ def prop_equals_or_none(values, equals_fn=None):
         if not result:
             break
     return result
+
+
+def strip_capabilities_params(url):
+    from layman.layer.geoserver.wms import strip_params_from_url
+    return strip_params_from_url(url, ['SERVICE', 'REQUEST', 'VERSION'])
+
+
+def _is_extent_empty(e):
+    return any((c is None for c in e))
+
+
+def _get_extent_area(e):
+    return (e[2] - e[0]) * (e[3] - e[1])
+
+
+def _get_extent_intersetion(a, b):
+    intersection = [None] * 4
+    if _extent_intersects(a, b):
+        if a[0] > b[0]:
+            intersection[0] = a[0]
+        else:
+            intersection[0] = b[0]
+        if a[1] > b[1]:
+            intersection[1] = a[1]
+        else:
+            intersection[1] = b[1]
+        if a[2] < b[2]:
+            intersection[2] = a[2]
+        else:
+            intersection[2] = b[2]
+        if a[3] < b[3]:
+            intersection[3] = a[3]
+        else:
+            intersection[3] = b[3]
+    return intersection
+
+
+def _extent_intersects(a, b):
+    return a[0] <= b[2] and a[2] >= b[0] and a[1] <= b[3] and a[3] >= b[1]

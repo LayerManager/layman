@@ -1,8 +1,8 @@
-from flask import Blueprint, jsonify, request, url_for, g
+from flask import Blueprint, jsonify, request, g
 from flask import current_app as app
 
 from layman.http import LaymanError
-from layman.util import check_username_decorator
+from layman.util import check_username_decorator, url_for
 from layman import settings
 from . import util, LAYER_TYPE
 from .filesystem import input_file, input_sld, input_chunk, uuid

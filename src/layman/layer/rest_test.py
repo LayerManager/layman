@@ -1,4 +1,5 @@
 import io
+import json
 import os
 from multiprocessing import Process
 import requests
@@ -25,6 +26,28 @@ from layman import celery as celery_util
 from .micka import csw
 from layman.common.micka import util as micka_common_util
 
+METADATA_PROPERTIES = {
+    'abstract',
+    'extent',
+    'graphic_url',
+    'identifier',
+    'layer_endpoint',
+    'language',
+    'organisation_name',
+    'publication_date',
+    'reference_system',
+    'scale_denominator',
+    'title',
+    'wfs_url',
+    'wms_url',
+}
+
+METADATA_PROPERTIES_NOT_EQUAL = {
+    'wfs_url',
+    'wms_url',
+}
+
+METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES - METADATA_PROPERTIES_NOT_EQUAL
 
 min_geojson = """
 {
@@ -183,80 +206,90 @@ def test_get_layers_testuser1_v1(client):
     })
 
 
-@pytest.mark.usefixtures('app_context')
 def test_post_layers_simple(client):
-    username = 'testuser1'
-    rest_path = url_for('rest_layers.post', username=username)
-    file_paths = [
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
-    ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
-            'file': files
+    with app.app_context():
+        username = 'testuser1'
+        rest_path = url_for('rest_layers.post', username=username)
+        file_paths = [
+            'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+        ]
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+            rv = client.post(rest_path, data={
+                'file': files
+            })
+            assert rv.status_code == 200
+        finally:
+            for fp in files:
+                fp[0].close()
+
+        layername = 'ne_110m_admin_0_countries'
+
+        last_task = util._get_layer_task(username, layername)
+        assert last_task is not None and not celery_util.is_task_ready(last_task)
+        layer_info = util.get_layer_info(username, layername)
+        keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
+        for key_to_check in keys_to_check:
+                assert 'status' in layer_info[key_to_check]
+
+        # TODO for some reason this hangs forever on get() if run (either with src/layman/authz/read_everyone_write_owner_auth2_test.py::test_authn_map_access_rights or src/layman/authn/oauth2_test.py::test_patch_current_user_without_username) and with src/layman/common/metadata/util.csw_insert
+        # last_task['last'].get()
+        # e.g. python3 -m pytest -W ignore::DeprecationWarning -xsvv src/layman/authn/oauth2_test.py::test_patch_current_user_without_username src/layman/layer/rest_test.py::test_post_layers_simple
+        # this can badly affect also .get(propagate=False) in layman.celery.abort_task_chain
+        # but hopefully this is only related to magic flask&celery test suite
+        wait_till_ready(username, layername)
+
+        layer_info = util.get_layer_info(username, layername)
+        for key_to_check in keys_to_check:
+                assert isinstance(layer_info[key_to_check], str) \
+                       or 'status' not in layer_info[key_to_check]
+
+        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+        wms = wms_proxy(wms_url)
+        assert layername in wms.contents
+
+        from layman.layer import get_layer_type_def
+        from layman.common.filesystem import uuid as common_uuid
+        uuid_filename = common_uuid.get_publication_uuid_file(
+            get_layer_type_def()['type'], username, layername)
+        assert os.path.isfile(uuid_filename)
+        uuid_str = None
+        with open(uuid_filename, "r") as f:
+            uuid_str = f.read().strip()
+        assert uuid.is_valid_uuid(uuid_str)
+        assert settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
+        assert settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
+        assert settings.LAYMAN_REDIS.hexists(
+            uuid.get_user_type_names_key(username, '.'.join(__name__.split('.')[:-1])),
+            layername
+        )
+
+        layer_info = client.get(url_for('rest_layer.get', username=username, layername=layername)).get_json()
+        assert set(layer_info['metadata'].keys()) == {'identifier', 'csw_url', 'record_url'}
+        assert layer_info['metadata']['identifier'] == f"m-{uuid_str}"
+        assert layer_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
+        md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
+        assert layer_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
+        r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
+        r.raise_for_status()
+        assert layername in r.text
+
+        uuid.check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': num_layers_before_test + 1
         })
-        assert rv.status_code == 200
-    finally:
-        for fp in files:
-            fp[0].close()
 
-    layername = 'ne_110m_admin_0_countries'
-
-    last_task = util._get_layer_task(username, layername)
-    assert last_task is not None and not celery_util.is_task_ready(last_task)
-    layer_info = util.get_layer_info(username, layername)
-    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
-    for key_to_check in keys_to_check:
-            assert 'status' in layer_info[key_to_check]
-
-    # TODO for some reason this hangs forever on get() if run (either with src/layman/authz/read_everyone_write_owner_auth2_test.py::test_authn_map_access_rights or src/layman/authn/oauth2_test.py::test_patch_current_user_without_username) and with src/layman/common/metadata/util.csw_insert
-    # last_task['last'].get()
-    # e.g. python3 -m pytest -W ignore::DeprecationWarning -xsvv src/layman/authn/oauth2_test.py::test_patch_current_user_without_username src/layman/layer/rest_test.py::test_post_layers_simple
-    # this can badly affect also .get(propagate=False) in layman.celery.abort_task_chain
-    # but hopefully this is only related to magic flask&celery test suite
-    wait_till_ready(username, layername)
-
-    layer_info = util.get_layer_info(username, layername)
-    for key_to_check in keys_to_check:
-            assert isinstance(layer_info[key_to_check], str) \
-                   or 'status' not in layer_info[key_to_check]
-
-    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
-    wms = wms_proxy(wms_url)
-    assert layername in wms.contents
-
-    from layman.layer import get_layer_type_def
-    from layman.common.filesystem import uuid as common_uuid
-    uuid_filename = common_uuid.get_publication_uuid_file(
-        get_layer_type_def()['type'], username, layername)
-    assert os.path.isfile(uuid_filename)
-    uuid_str = None
-    with open(uuid_filename, "r") as f:
-        uuid_str = f.read().strip()
-    assert uuid.is_valid_uuid(uuid_str)
-    assert settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
-    assert settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
-    assert settings.LAYMAN_REDIS.hexists(
-        uuid.get_user_type_names_key(username, '.'.join(__name__.split('.')[:-1])),
-        layername
-    )
-
-    layer_info = client.get(url_for('rest_layer.get', username=username, layername=layername)).get_json()
-    assert set(layer_info['metadata'].keys()) == {'identifier', 'csw_url', 'record_url'}
-    assert layer_info['metadata']['identifier'] == f"m-{uuid_str}"
-    assert layer_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
-    md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
-    assert layer_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
-    r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
-    r.raise_for_status()
-    assert layername in r.text
-
-    uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 1
-    })
+    with app.app_context():
+        rest_path = url_for('rest_layer_metadata_comparison.get', username=username, layername=layername)
+        rv = client.get(rest_path)
+        assert rv.status_code == 200, rv.get_json()
+        resp_json = rv.get_json()
+        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
+        for k, v in resp_json['metadata_properties'].items():
+            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
 
 
 @pytest.mark.usefixtures('app_context')
@@ -613,26 +646,41 @@ def test_get_layers_testuser1_v2(client):
     })
 
 
-@pytest.mark.usefixtures('app_context')
 def test_patch_layer_title(client):
-    username = 'testuser1'
-    layername = 'ne_110m_admin_0_countries'
-    rest_path = url_for('rest_layer.patch', username=username, layername=layername)
-    rv = client.patch(rest_path, data={
-        'title': "New Title of Countries",
-        'description': "and new description"
-    })
-    assert rv.status_code == 200, rv.get_json()
+    with app.app_context():
+        username = 'testuser1'
+        layername = 'ne_110m_admin_0_countries'
+        rest_path = url_for('rest_layer.patch', username=username, layername=layername)
+        new_title = "New Title of Countries"
+        new_description = "and new description"
+        rv = client.patch(rest_path, data={
+            'title': new_title,
+            'description': new_description,
+        })
+        assert rv.status_code == 200, rv.get_json()
 
-    last_task = util._get_layer_task(username, layername)
-    assert last_task is not None and celery_util.is_task_ready(last_task)
+        last_task = util._get_layer_task(username, layername)
+        assert last_task is not None and celery_util.is_task_ready(last_task)
 
-    resp_json = rv.get_json()
-    assert resp_json['title'] == "New Title of Countries"
-    assert resp_json['description'] == "and new description"
-    uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 4
-    })
+        resp_json = rv.get_json()
+        assert resp_json['title'] == new_title
+        assert resp_json['description'] == new_description
+
+    with app.app_context():
+        rest_path = url_for('rest_layer_metadata_comparison.get', username=username, layername=layername)
+        rv = client.get(rest_path)
+        assert rv.status_code == 200, rv.get_json()
+        resp_json = rv.get_json()
+        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
+        md_equal_or_none_props = METADATA_PROPERTIES_EQUAL - {'title'}
+        md_equal_props = md_equal_or_none_props - {'abstract'}
+        for k, v in resp_json['metadata_properties'].items():
+            assert v['equal_or_null'] == (k in md_equal_or_none_props), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal'] == (k in md_equal_props), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+
+        uuid.check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': num_layers_before_test + 4
+        })
 
 
 @pytest.mark.usefixtures('app_context')

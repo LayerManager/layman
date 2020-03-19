@@ -1,4 +1,5 @@
 from datetime import datetime, date
+import json
 import os
 from functools import partial
 import pathlib
@@ -13,10 +14,10 @@ from layman.layer.geoserver.wms import get_wms_proxy
 from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer import LAYER_TYPE
 from layman import settings, patch_mode, LaymanError
-from layman.util import url_for_external
+from layman.util import url_for
 from requests.exceptions import HTTPError, ConnectionError
 from urllib.parse import urljoin
-
+from lxml import etree as ET
 
 PATCH_MODE = patch_mode.NO_DELETE
 
@@ -109,7 +110,7 @@ def get_template_path_and_values(username, layername):
         abstract=wms_layer.abstract or None,
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
-        identifier=url_for_external('rest_layer.get', username=username, layername=layername),
+        identifier=url_for('rest_layer.get', username=username, layername=layername),
         identifier_label=layername,
         extent=wms_layer.boundingBoxWGS84,
         ows_url=urljoin(get_gs_proxy_base_url(), username + '/ows'),
@@ -153,12 +154,12 @@ def _get_property_values(
             'label': identifier_label,
         },
         'abstract': abstract,
-        'graphic_url': url_for_external('rest_layer_thumbnail.get', username=username, layername=layername),
+        'graphic_url': url_for('rest_layer_thumbnail.get', username=username, layername=layername),
         'extent': extent,
 
         'wms_url': ows_url,
         'wfs_url': ows_url,
-        'layer_endpoint': url_for_external('rest_layer.get', username=username, layername=layername),
+        'layer_endpoint': url_for('rest_layer.get', username=username, layername=layername),
         'scale_denominator': scale_denominator,
         'language': language,
         'md_organisation_name': md_organisation_name,
@@ -285,3 +286,37 @@ METADATA_PROPERTIES = {
         'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='WWW:LINK-1.0-http--link', online_function='information'),
     },
 }
+
+
+def get_metadata_comparison(username, layername):
+    uuid = get_layer_uuid(username, layername)
+    csw = common_util.create_csw()
+    if uuid is None or csw is None:
+        return {}
+    muuid = get_metadata_uuid(uuid)
+    el = common_util.get_record_element_by_id(csw, muuid)
+
+    # current_app.logger.info(f"xml\n{ET.tostring(el)}")
+
+    props = common_util.parse_md_properties(el, [
+        'abstract',
+        'extent',
+        'graphic_url',
+        'identifier',
+        'layer_endpoint',
+        'language',
+        'organisation_name',
+        'publication_date',
+        'reference_system',
+        'scale_denominator',
+        'title',
+        'wfs_url',
+        'wms_url',
+    ], METADATA_PROPERTIES)
+    # current_app.logger.info(f"props:\n{json.dumps(props, indent=2)}")
+    # current_app.logger.info(f"csw.request={csw.request}")
+    url = csw.request.replace(settings.CSW_URL, settings.CSW_PROXY_URL)
+    return {
+        f"{url}": props
+    }
+

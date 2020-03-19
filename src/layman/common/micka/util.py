@@ -226,7 +226,8 @@ def csw_delete(muuid):
 
 def parse_md_properties(file_obj, property_names, publ_properties):
     # print('xml_str', xml_str)
-    root_el = ET.parse(file_obj)
+    root_el = ET.parse(file_obj) if type(file_obj) not in [ET._Element, ET._ElementTree] else file_obj
+    root_is_el = type(root_el) == ET._Element
     # print(f"root_el={root_el}")
     result = {}
     for prop_name in property_names:
@@ -234,7 +235,13 @@ def parse_md_properties(file_obj, property_names, publ_properties):
         micka_prop = publ_properties[prop_name]
         common_prop = COMMON_PROPERTIES[prop_name]
         # print(f"prop['xpath_parent']={prop['xpath_parent']}")
-        parent_el = root_el.xpath(micka_prop['xpath_parent'], namespaces=NAMESPACES)
+        xpath_parent = micka_prop['xpath_parent']
+        if root_is_el:
+            xpath_parent = micka_prop['xpath_parent'].split('/')[2:]
+            xpath_parent.insert(0, '.')
+            xpath_parent = '/'.join(xpath_parent)
+        parent_el = root_el.xpath(xpath_parent, namespaces=NAMESPACES)
+        # print(f"parent_el={parent_el}")
         parent_el = parent_el[0] if parent_el else None
         # print(f"prop['xpath_property']={prop['xpath_property']}")
         prop_els = parent_el.xpath(micka_prop['xpath_property'], namespaces=NAMESPACES) if parent_el is not None else []
@@ -435,3 +442,10 @@ def adjust_operates_on(prop_el, prop_value):
         prop_el.attrib[ET.QName(NAMESPACES['xlink'], 'type')] = 'simple'
     else:
         _add_unknown_reason(prop_el)
+
+
+def get_record_element_by_id(csw, id):
+    csw.getrecordbyid(id=[id], esn='full', outputschema=NAMESPACES['gmd'])
+    xml = csw._exml
+    el = xml.xpath('//gmd:MD_Metadata', namespaces=NAMESPACES)[0]
+    return el

@@ -18,6 +18,7 @@ bp = Blueprint('rest_layer_thumbnail', __name__)
 @authorize
 @check_username_decorator
 @util.check_layername_decorator
+@util.info_decorator
 def before_request():
     pass
 
@@ -25,9 +26,6 @@ def before_request():
 @bp.route('/layers/<layername>/thumbnail', methods=['GET'])
 def get(username, layername):
     app.logger.info(f"GET Layer Thumbnail, user={g.user}")
-
-    # raise exception if layer does not exist
-    util.get_complete_layer_info(username, layername)
 
     thumbnail_info = thumbnail.get_layer_info(username, layername)
     if thumbnail_info:

@@ -13,6 +13,7 @@ from .rest_layers import bp as layers_bp
 from .rest_layer import bp as layer_bp
 from .rest_layer_chunk import bp as layer_chunk_bp
 from .rest_layer_thumbnail import bp as layer_thumbnail_bp
+from .rest_layer_metadata_comparison import bp as layer_metadata_comparison_bp
 
 
 PUBLICATION_TYPES = {
@@ -24,6 +25,7 @@ PUBLICATION_TYPES = {
             layer_bp,
             layer_chunk_bp,
             layer_thumbnail_bp,
+            layer_metadata_comparison_bp,
         ],
         'internal_sources': [ # internal sources to process when new source is published
             'layman.layer.filesystem.uuid',
