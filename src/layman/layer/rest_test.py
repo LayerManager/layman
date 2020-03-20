@@ -683,44 +683,58 @@ def test_patch_layer_title(client):
         })
 
 
-@pytest.mark.usefixtures('app_context')
 def test_patch_layer_style(client):
-    username = 'testuser1'
-    layername = 'ne_110m_admin_0_countries'
-    rest_path = url_for('rest_layer.patch', username=username, layername=layername)
-    sld_path = 'sample/style/generic-blue.xml'
-    assert os.path.isfile(sld_path)
-    rv = client.patch(rest_path, data={
-        'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
-        'title': 'countries in blue'
-    })
-    assert rv.status_code == 200
+    with app.app_context():
+        username = 'testuser1'
+        layername = 'ne_110m_admin_0_countries'
+        rest_path = url_for('rest_layer.patch', username=username, layername=layername)
+        sld_path = 'sample/style/generic-blue.xml'
+        assert os.path.isfile(sld_path)
+        rv = client.patch(rest_path, data={
+            'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
+            'title': 'countries in blue'
+        })
+        assert rv.status_code == 200
 
-    last_task = util._get_layer_task(username, layername)
-    # TODO
-    # Time to generate testing thumbnail is probably shorter than getting & parsing WMS/WFS capabilities documents
-    # so it's finished before PATCH request is completed
-    #
-    # assert last_task is not None and not util._is_task_ready(last_task)
-    # resp_json = rv.get_json()
-    # keys_to_check = ['thumbnail']
-    # for key_to_check in keys_to_check:
-    #         assert 'status' in resp_json[key_to_check]
-    wait_till_ready(username, layername)
-    # last_task['last'].get()
+        last_task = util._get_layer_task(username, layername)
+        # TODO
+        # Time to generate testing thumbnail is probably shorter than getting & parsing WMS/WFS capabilities documents
+        # so it's finished before PATCH request is completed
+        #
+        # assert last_task is not None and not util._is_task_ready(last_task)
+        # resp_json = rv.get_json()
+        # keys_to_check = ['thumbnail']
+        # for key_to_check in keys_to_check:
+        #         assert 'status' in resp_json[key_to_check]
+        wait_till_ready(username, layername)
+        # last_task['last'].get()
 
-    resp_json = rv.get_json()
-    assert resp_json['title'] == "countries in blue"
+        resp_json = rv.get_json()
+        assert resp_json['title'] == "countries in blue"
 
-    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
-    wms = wms_proxy(wms_url)
-    assert layername in wms.contents
-    assert wms[layername].title == 'countries in blue'
-    assert wms[layername].styles[
-        username+':'+layername]['title'] == 'Generic Blue'
-    uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 4
-    })
+        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+        wms = wms_proxy(wms_url)
+        assert layername in wms.contents
+        assert wms[layername].title == 'countries in blue'
+        assert wms[layername].styles[
+            username+':'+layername]['title'] == 'Generic Blue'
+        uuid.check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': num_layers_before_test + 4
+        })
+
+    with app.app_context():
+        rest_path = url_for('rest_layer_metadata_comparison.get', username=username, layername=layername)
+        rv = client.get(rest_path)
+        assert rv.status_code == 200, rv.get_json()
+        resp_json = rv.get_json()
+        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
+        md_equal_or_none_props = METADATA_PROPERTIES_EQUAL - {'title'}
+        md_equal_props = md_equal_or_none_props - {'abstract'}
+        for k, v in resp_json['metadata_properties'].items():
+            assert v['equal_or_null'] == (
+                        k in md_equal_or_none_props), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal'] == (
+                        k in md_equal_props), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
 
 
 @pytest.mark.usefixtures('app_context')
@@ -838,6 +852,20 @@ def test_patch_layer_data(client):
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': num_layers_before_test + 4
         })
+
+    with app.app_context():
+        rest_path = url_for('rest_layer_metadata_comparison.get', username=username, layername=layername)
+        rv = client.get(rest_path)
+        assert rv.status_code == 200, rv.get_json()
+        resp_json = rv.get_json()
+        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
+        md_equal_or_none_props = METADATA_PROPERTIES_EQUAL - {'title'}
+        md_equal_props = md_equal_or_none_props
+        for k, v in resp_json['metadata_properties'].items():
+            assert v['equal_or_null'] == (
+                        k in md_equal_or_none_props), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal'] == (
+                        k in md_equal_props), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
 
 
 @pytest.mark.usefixtures('app_context')
