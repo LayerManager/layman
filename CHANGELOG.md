@@ -2,6 +2,10 @@
 
 ## v1.2.1
 2020-03-20
+### Upgrade requirements
+- Change [CSW_URL](doc/env-settings.md#CSW_URL) from `http://micka:80/csw` to `http://micka:80/micka/csw`
+
+### Changes
 - Fix URL prefix of Micka GUI in Layman v1.2.0, [#49](https://github.com/jirik/layman/issues/49) 
 
 ## v1.2.0
