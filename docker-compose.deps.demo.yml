@@ -63,6 +63,5 @@ services:
         - ./deps/micka/sample/confs/bootstrap.php:/var/www/html/Micka/php/app/bootstrap.php
         - ./deps/micka/sample/confs/config.local.neon.demo-template:/var/www/html/Micka/php/app/config/config.local.neon.demo-template
         - ./deps/micka/sample/confs/default.demo-template:/etc/nginx/sites-available/default.demo-template
-        - ./deps/micka/sample/php/app/router/RouterFactory.php:/var/www/html/Micka/php/app/router/RouterFactory.php
       depends_on:
         - postgresql

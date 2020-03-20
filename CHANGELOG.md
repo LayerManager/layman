@@ -1,6 +1,11 @@
 # Changelog
 
+## v1.2.1
+2020-03-20
+- Fix URL prefix of Micka GUI in Layman v1.2.0, [#49](https://github.com/jirik/layman/issues/49) 
+
 ## v1.2.0
+2020-03-18
 
 ### Upgrade requirements
 - Upgrade Micka to [v2020.010](https://github.com/hsrs-cz/Micka/releases/tag/v2020.010).
