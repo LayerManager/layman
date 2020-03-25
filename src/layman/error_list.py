@@ -38,4 +38,5 @@ ERROR_LIST = {
     36: (409, 'Metadata record already exists.'),
     37: (400, 'CSW exception.'),
     38: (400, 'Micka HTTP or connection error.'),
+    39: (404, 'Metadata record does not exists.'),
 }

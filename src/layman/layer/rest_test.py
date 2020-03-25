@@ -672,11 +672,9 @@ def test_patch_layer_title(client):
         assert rv.status_code == 200, rv.get_json()
         resp_json = rv.get_json()
         assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
-        md_equal_or_none_props = METADATA_PROPERTIES_EQUAL - {'title'}
-        md_equal_props = md_equal_or_none_props - {'abstract'}
         for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (k in md_equal_or_none_props), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
-            assert v['equal'] == (k in md_equal_props), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': num_layers_before_test + 4
@@ -728,13 +726,11 @@ def test_patch_layer_style(client):
         assert rv.status_code == 200, rv.get_json()
         resp_json = rv.get_json()
         assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
-        md_equal_or_none_props = METADATA_PROPERTIES_EQUAL - {'title'}
-        md_equal_props = md_equal_or_none_props - {'abstract'}
         for k, v in resp_json['metadata_properties'].items():
             assert v['equal_or_null'] == (
-                        k in md_equal_or_none_props), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+                        k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
             assert v['equal'] == (
-                        k in md_equal_props), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+                        k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
 
 
 @pytest.mark.usefixtures('app_context')
@@ -859,13 +855,11 @@ def test_patch_layer_data(client):
         assert rv.status_code == 200, rv.get_json()
         resp_json = rv.get_json()
         assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
-        md_equal_or_none_props = METADATA_PROPERTIES_EQUAL - {'title'}
-        md_equal_props = md_equal_or_none_props
         for k, v in resp_json['metadata_properties'].items():
             assert v['equal_or_null'] == (
-                        k in md_equal_or_none_props), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+                        k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
             assert v['equal'] == (
-                        k in md_equal_props), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+                        k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
 
 
 @pytest.mark.usefixtures('app_context')

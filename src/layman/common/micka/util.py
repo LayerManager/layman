@@ -45,44 +45,111 @@ def get_single_prop_els(parent_el, prop_name, publ_properties):
     return single_prop_els, last_prop_el
 
 
-def fill_xml_template(template_path, prop_values, publ_properties):
+def read_xml_tree(template_path):
     with open(template_path, 'r') as template_file:
         xml_str = template_file.read()
     parser = ET.XMLParser(remove_blank_text=True)
-    root_el = ET.fromstring(xml_str.encode('utf-8'), parser=parser)
+    tree = ET.fromstring(xml_str.encode('utf-8'), parser=parser)
+    return tree
+
+
+def fill_xml_template(template_path, prop_values, publ_properties):
+    tree = read_xml_tree(template_path)
+    return fill_xml_template_obj(tree, prop_values, publ_properties)
+
+
+def fill_xml_template_obj(tree_or_el, prop_values, publ_properties):
+    is_el = type(tree_or_el) == ET._Element
+    tmp_tree = None
     for prop_name, prop_value in prop_values.items():
         # print(f'prop_name={prop_name}')
         common_prop = COMMON_PROPERTIES[prop_name]
         micka_prop = publ_properties[prop_name]
-        parent_el = root_el.xpath(micka_prop['xpath_parent'], namespaces=NAMESPACES)[0]
+        xpath_parent = micka_prop['xpath_parent']
+        if is_el:
+            xpath_parent = micka_prop['xpath_parent'].split('/')[2:]
+            xpath_parent.insert(0, '.')
+            xpath_parent = '/'.join(xpath_parent)
+        parent_el = tree_or_el.xpath(xpath_parent, namespaces=NAMESPACES)
+        if len(parent_el) == 0:
+            # print(f"Parent element of property {prop_name} not found, copying from template")
+            xpath_parent_parts = xpath_parent.split('[')[0].split('/')
+            anc_level_distance = 0
+            for idx in reversed(range(len(xpath_parent_parts))):
+                anc_level_distance += 1
+                last_anc_els = tree_or_el.xpath('/'.join(xpath_parent_parts[:idx]), namespaces=NAMESPACES)
+                if len(last_anc_els) > 0:
+                    last_anc_el = last_anc_els[0]
+                    break
+            # print(f"Found ancestor element {last_anc_el.tag}")
+            tmp_tree = tmp_tree or read_xml_tree(os.path.join(os.path.dirname(os.path.realpath(__file__)), './../../layer/micka/record-template.xml'))
+            tmp_parent_el = tmp_tree.xpath(micka_prop['xpath_parent'], namespaces=NAMESPACES)[0]
+            tmp_el_to_copy = tmp_parent_el
+            while anc_level_distance > 1:
+                tmp_el_to_copy = tmp_el_to_copy.getparent()
+                anc_level_distance -= 1
+            tmp_last_anc_el = tmp_el_to_copy.getparent()
+            assert(tmp_last_anc_el.tag == last_anc_el.tag)
+            tmp_prev_sibl = tmp_last_anc_el[tmp_last_anc_el.index(tmp_el_to_copy)-1]
+            prev_sibl = last_anc_el.findall(f"./{tmp_prev_sibl.tag}")[-1]
+            insert_idx = last_anc_el.index(prev_sibl) + 1
+            last_anc_el.insert(insert_idx, deepcopy(tmp_el_to_copy))
+
+            parent_el = tree_or_el.xpath(xpath_parent, namespaces=NAMESPACES)
+        else:
+            pass
+            # print(f"Parent element of property {prop_name} found.")
+
+        assert len(parent_el) > 0, f"Parent element of property {prop_name} not found!"
+        parent_el = parent_el[0]
         single_prop_els, last_prop_el = get_single_prop_els(parent_el, prop_name, publ_properties)
-        assert len(single_prop_els) > 0 or last_prop_el is not None, f"Element of property {prop_name} not found!"
         single_prop_values = [prop_value] if common_prop['upper_mp'] == '1' else prop_value
         all_new_els = []
-        if len(single_prop_els) > len(single_prop_values):
-            for idx in range(len(single_prop_values), len(single_prop_els)):
-                # print(f'Removing node {idx}')
-                e = single_prop_els[idx]
-                e.getparent().remove(e)
-        elif len(single_prop_values) > len(single_prop_els):
-            e = single_prop_els[-1] if single_prop_els else last_prop_el
-            for idx in range(len(single_prop_values) - len(single_prop_els)):
-                pe = e.getparent()
-                # print(f'Adding node {idx}')
-                new_el = deepcopy(e)
-                if not single_prop_els:
-                    all_new_els.append(new_el)
-                pe.insert(pe.index(e)+1, new_el)
+        if len(single_prop_els) > 0 or last_prop_el is not None:
+            assert len(single_prop_els) > 0 or last_prop_el is not None, f"Element of property {prop_name} not found!"
+            if len(single_prop_els) > len(single_prop_values):
+                for idx in range(len(single_prop_values), len(single_prop_els)):
+                    # print(f'Removing node {idx}')
+                    e = single_prop_els[idx]
+                    e.getparent().remove(e)
+            elif len(single_prop_values) > len(single_prop_els):
+                e = single_prop_els[-1] if single_prop_els else last_prop_el
+                for idx in range(len(single_prop_values) - len(single_prop_els)):
+                    pe = e.getparent()
+                    # print(f'Adding node {idx}')
+                    new_el = deepcopy(e)
+                    if not single_prop_els:
+                        all_new_els.append(new_el)
+                    pe.insert(pe.index(e)+1, new_el)
+        else:
+            # print(f"Copying property {prop_name} element from template")
+            tmp_tree = tmp_tree or read_xml_tree(os.path.join(os.path.dirname(os.path.realpath(__file__)), './../../layer/micka/record-template.xml'))
+            tmp_parent_el = tmp_tree.xpath(micka_prop['xpath_parent'], namespaces=NAMESPACES)[0]
+            tmp_fst_prop_el = tmp_parent_el.xpath(micka_prop['xpath_property'].split('[')[0], namespaces=NAMESPACES)[0]
+            # print(f"Found template {prop_name} element {tmp_fst_prop_el.tag}")
+            tmp_fst_prop_el_idx = tmp_parent_el.index(tmp_fst_prop_el)
+            if tmp_fst_prop_el_idx > 0:
+                tmp_prev_sibl = tmp_parent_el[tmp_fst_prop_el_idx-1]
+                prev_sibl = parent_el.findall(f"./{tmp_prev_sibl.tag}")[-1]
+                insert_idx = parent_el.index(prev_sibl)+1
+            else:
+                insert_idx = 0
+            # print(f"Insert Idx of template {prop_name} element: {insert_idx}")
+            for idx in range(len(single_prop_values)):
+                new_el = deepcopy(tmp_fst_prop_el)
+                parent_el.insert(insert_idx, new_el)
+                all_new_els.append(new_el)
         if all_new_els:
             single_prop_els = all_new_els
         else:
             single_prop_els, _ = get_single_prop_els(parent_el, prop_name, publ_properties)
+
         assert len(single_prop_els) == len(single_prop_values), f"{len(single_prop_els)} != {len(single_prop_values)}"
         # print(f"single_prop_values={single_prop_values}")
         for idx, single_prop_el in enumerate(single_prop_els):
             single_prop_value = single_prop_values[idx]
             micka_prop['adjust_property_element'](single_prop_el, single_prop_value)
-    return root_el
+    return tree_or_el
 
 
 def fill_xml_template_as_pretty_str(template_path, prop_values, publ_properties):
@@ -193,6 +260,37 @@ def csw_insert(template_values):
     return muuid
 
 
+def csw_update(template_values):
+    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-update-template.xml')
+    xml_str = fill_template_as_str(template_path, template_values)
+    # print(f"CSW update request=\n{xml_str}")
+    r = requests.post(settings.CSW_URL, auth=settings.CSW_BASIC_AUTHN, data=xml_str.encode('utf-8'))
+    # print(f"CSW update response=\n{r.text}")
+    r.raise_for_status()
+    root_el = ET.fromstring(r.content)
+
+    if root_el.tag == nspath_eval('ows:ExceptionReport', NAMESPACES):
+        if _is_record_does_not_exist_exception(root_el):
+            raise LaymanError(39, data={
+                'response': r.text
+            })
+        else:
+            raise LaymanError(37, data={
+                'response': r.text
+            })
+    assert root_el.tag == nspath_eval('csw:TransactionResponse', NAMESPACES), r.content
+    assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalUpdated', NAMESPACES)).text == "1", r.content
+
+
+def _is_record_does_not_exist_exception(root_el):
+    return len(root_el) == 1 and \
+            root_el[0].tag == nspath_eval('ows:Exception', NAMESPACES) and \
+            "exceptionCode" in root_el[0].attrib and \
+            root_el[0].attrib["exceptionCode"] == 'TransactionFailed' and \
+            len(root_el[0]) == 0 and \
+            root_el[0].text is None
+
+
 def csw_delete(muuid):
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-delete-template.xml')
     template_values = {
@@ -205,16 +303,8 @@ def csw_delete(muuid):
     r.raise_for_status()
     root_el = ET.fromstring(r.content)
 
-    def is_record_does_not_exist_exception(root_el):
-        return len(root_el) == 1 and \
-                root_el[0].tag == nspath_eval('ows:Exception', NAMESPACES) and \
-                "exceptionCode" in root_el[0].attrib and \
-                root_el[0].attrib["exceptionCode"] == 'TransactionFailed' and \
-                len(root_el[0]) == 0 and \
-                root_el[0].text is None
-
     if root_el.tag == nspath_eval('ows:ExceptionReport', NAMESPACES):
-        if is_record_does_not_exist_exception(root_el):
+        if _is_record_does_not_exist_exception(root_el):
             return
         else:
             raise LaymanError(37, data={
@@ -386,24 +476,20 @@ def adjust_extent(prop_el, prop_value):
     if prop_value is not None:
         parser = ET.XMLParser(remove_blank_text=True)
         child_el = ET.fromstring(f"""
-<gmd:EX_Extent xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gco="{NAMESPACES['gco']}">
-    <gmd:geographicElement>
-        <gmd:EX_GeographicBoundingBox>
-            <gmd:westBoundLongitude>
-                <gco:Decimal>{prop_value[0]}</gco:Decimal>
-            </gmd:westBoundLongitude>
-            <gmd:eastBoundLongitude>
-                <gco:Decimal>{prop_value[2]}</gco:Decimal>
-            </gmd:eastBoundLongitude>
-            <gmd:southBoundLatitude>
-                <gco:Decimal>{prop_value[1]}</gco:Decimal>
-            </gmd:southBoundLatitude>
-            <gmd:northBoundLatitude>
-                <gco:Decimal>{prop_value[3]}</gco:Decimal>
-            </gmd:northBoundLatitude>
-        </gmd:EX_GeographicBoundingBox>
-    </gmd:geographicElement>
-</gmd:EX_Extent>
+<gmd:EX_GeographicBoundingBox xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gco="{NAMESPACES['gco']}">
+    <gmd:westBoundLongitude>
+        <gco:Decimal>{prop_value[0]}</gco:Decimal>
+    </gmd:westBoundLongitude>
+    <gmd:eastBoundLongitude>
+        <gco:Decimal>{prop_value[2]}</gco:Decimal>
+    </gmd:eastBoundLongitude>
+    <gmd:southBoundLatitude>
+        <gco:Decimal>{prop_value[1]}</gco:Decimal>
+    </gmd:southBoundLatitude>
+    <gmd:northBoundLatitude>
+        <gco:Decimal>{prop_value[3]}</gco:Decimal>
+    </gmd:northBoundLatitude>
+</gmd:EX_GeographicBoundingBox>
 """, parser=parser)
         prop_el.append(child_el)
     else:
