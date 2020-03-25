@@ -154,7 +154,11 @@ xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/
 
 			<gmd:topicCategory gco:nilReason="unknown" />
 
-			<gmd:extent gco:nilReason="unknown" />
+			<gmd:extent>
+				<gmd:EX_Extent>
+					<gmd:geographicElement gco:nilReason="unknown" />
+				</gmd:EX_Extent>
+			</gmd:extent>
 
 		</gmd:MD_DataIdentification>
 	</gmd:identificationInfo>

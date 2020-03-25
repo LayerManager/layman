@@ -48,6 +48,22 @@ PUBLICATION_TYPES = {
         'layman.common.filesystem': {
             'publications_dir': 'layers'
         },
+        'layman.common.metadata': {
+            'syncable_properties': {
+                'abstract',
+                'extent',
+                'graphic_url',
+                'identifier',
+                'layer_endpoint',
+                'language',
+                'publication_date',
+                'reference_system',
+                'scale_denominator',
+                'title',
+                'wfs_url',
+                'wms_url',
+            }
+        },
     }
 }
 

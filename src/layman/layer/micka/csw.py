@@ -55,8 +55,33 @@ def get_layer_names(username):
 
 
 def update_layer(username, layername, layerinfo):
-    # TODO implement patching layer
-    pass
+    # print(f"update_layer layerinfo['metadata_properties_to_refresh']={layerinfo['metadata_properties_to_refresh']}")
+    if len(layerinfo['metadata_properties_to_refresh']) == 0:
+        return {}
+    uuid = get_layer_uuid(username, layername)
+    csw = common_util.create_csw()
+    if uuid is None or csw is None:
+        return {}
+    muuid = get_metadata_uuid(uuid)
+    el = common_util.get_record_element_by_id(csw, muuid)
+    # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
+
+    _, prop_values = get_template_path_and_values(username, layername)
+    prop_values = {
+        k: v for k, v in prop_values.items()
+        if k in layerinfo['metadata_properties_to_refresh']
+    }
+    el = common_util.fill_xml_template_obj(el, prop_values, METADATA_PROPERTIES)
+    record = ET.tostring(el, encoding='unicode', pretty_print=True)
+    try:
+        muuid = common_util.csw_update({
+            'muuid': muuid,
+            'record': record,
+        })
+    except (HTTPError, ConnectionError):
+        current_app.logger.info(traceback.format_exc())
+        raise LaymanError(38)
+    return muuid
 
 
 def get_publication_names(username, publication_type):
@@ -258,9 +283,9 @@ METADATA_PROPERTIES = {
         'adjust_property_element': common_util.adjust_language,
     },
     'extent': {
-        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification',
-        'xpath_property': './gmd:extent',
-        'xpath_extract': './gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox/*/gco:Decimal/text()',
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent',
+        'xpath_property': './gmd:geographicElement[gmd:EX_GeographicBoundingBox]',
+        'xpath_extract': './gmd:EX_GeographicBoundingBox/*/gco:Decimal/text()',
         'xpath_extract_fn': lambda l: [float(l[0]), float(l[2]), float(l[1]), float(l[3])] if len(l) == 4 else None,
         'adjust_property_element': common_util.adjust_extent,
     },

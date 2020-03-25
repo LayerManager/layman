@@ -1,5 +1,15 @@
 from flask import current_app
 import json
+from layman.util import get_publication_types
+
+
+PUBL_TYPE_DEF_KEY = __name__
+
+
+def get_syncable_prop_names(publ_type):
+    publ_types = get_publication_types()
+    prop_names = publ_types[publ_type][PUBL_TYPE_DEF_KEY]['syncable_properties']
+    return prop_names
 
 
 def extent_equals(a, b, limit=0.95):
@@ -102,7 +112,9 @@ def prop_equals_strict(values, equals_fn=None):
         return True
     result = True
     for idx in range(len(values)-1):
-        result = equals_fn(values[idx], values[idx+1])
+        v1 = values[idx]
+        v2 = values[idx+1]
+        result = v1 is v2 if (v1 is None or v2 is None) else equals_fn(v1, v2)
         if not result:
             break
     return result
