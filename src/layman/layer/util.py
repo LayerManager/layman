@@ -1,4 +1,4 @@
-from functools import wraps
+from functools import wraps, partial
 import importlib
 import inspect
 import re
@@ -10,7 +10,7 @@ from layman import settings
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name, url_for
 from layman import celery as celery_util
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def
-from layman.common import redis as redis_util, tasks as tasks_util
+from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals_or_none, prop_equals_strict
 
 
@@ -278,3 +278,16 @@ def get_metadata_comparison(username, layername):
         po['equal_or_null'] = prop_equals_or_none(po['values'].values(), equals_fn=equals_fn)
         po['equal'] = prop_equals_strict(list(po['values'].values()), equals_fn=equals_fn)
     return all_props
+
+
+get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, LAYER_TYPE)
+
+
+def get_same_prop_names(username, layername):
+    md_comparison = get_metadata_comparison(username, layername)
+    prop_names = get_syncable_prop_names()
+    prop_names = [
+        pn for pn in prop_names
+        if pn in md_comparison['metadata_properties'] and md_comparison['metadata_properties'][pn]['equal']
+    ]
+    return prop_names

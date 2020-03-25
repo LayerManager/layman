@@ -307,9 +307,9 @@ METADATA_PROPERTIES = {
         'adjust_property_element': common_util.adjust_language,
     },
     'extent': {
-        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification',
-        'xpath_property': './srv:extent',
-        'xpath_extract': './gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox/*/gco:Decimal/text()',
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:extent/gmd:EX_Extent',
+        'xpath_property': './gmd:geographicElement[gmd:EX_GeographicBoundingBox]',
+        'xpath_extract': './gmd:EX_GeographicBoundingBox/*/gco:Decimal/text()',
         'xpath_extract_fn': lambda l: [float(l[0]), float(l[2]), float(l[1]), float(l[3])] if len(l) == 4 else None,
         'adjust_property_element': common_util.adjust_extent,
     },

@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request, current_app as app, g
+from copy import deepcopy
 
 from layman.common import redis as redis_util
 from layman.http import LaymanError
@@ -37,7 +38,7 @@ def get(username, layername):
 def patch(username, layername):
     app.logger.info(f"PATCH Layer, user={g.user}")
 
-    info = util.get_complete_layer_info(cached=True)
+    info = deepcopy(util.get_complete_layer_info(cached=True))
 
     # FILE
     use_chunk_upload = False
@@ -97,11 +98,14 @@ def patch(username, layername):
                                            check_crs, ignore_existing_files=True)
 
     if update_info and delete_from != 'layman.layer.filesystem.input_file':
+        same_prop_names = util.get_same_prop_names(username, layername)
+        info['metadata_properties_to_refresh'] = same_prop_names
         util.update_layer(username, layername, info)
 
     layer_result = {}
 
     if delete_from is not None:
+        same_prop_names = info.get('metadata_properties_to_refresh', None) or util.get_same_prop_names(username, layername)
         deleted = util.delete_layer(username, layername, source=delete_from, http_method='patch')
         if sld_file is None:
             try:
@@ -111,12 +115,14 @@ def patch(username, layername):
         if sld_file is not None:
             input_sld.save_layer_file(username, layername, sld_file)
 
+
         task_options = {
             'crs_id': crs_id,
             'description': info['description'],
             'title': info['title'],
             'ensure_user': False,
             'http_method': 'patch',
+            'metadata_properties_to_refresh': same_prop_names
         }
 
         if delete_from == 'layman.layer.filesystem.input_file':

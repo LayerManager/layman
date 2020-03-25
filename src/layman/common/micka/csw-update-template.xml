@@ -1,0 +1,13 @@
+<csw:Transaction xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc" version="2.0.2" service="CSW" xmlns:apiso="http://www.opengis.net/cat/csw/apiso/1.0">
+  <csw:Update>
+    {record}
+    <csw:Constraint version="1.1.0">
+      <ogc:Filter>
+        <ogc:PropertyIsEqualTo>
+          <ogc:PropertyName>apiso:Identifier</ogc:PropertyName>
+          <ogc:Literal>{muuid}</ogc:Literal>
+        </ogc:PropertyIsEqualTo>
+      </ogc:Filter>
+    </csw:Constraint>
+  </csw:Update>
+</csw:Transaction>

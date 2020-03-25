@@ -16,12 +16,17 @@ def refresh_csw_needed(username, layername, task_options):
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_csw(self, username, layername, http_method='post'):
+def refresh_csw(self, username, layername, http_method='post', metadata_properties_to_refresh=None):
+    metadata_properties_to_refresh = metadata_properties_to_refresh or []
     if self.is_aborted():
         raise AbortedException
     # TODO implement also PATCH
     if http_method == 'post':
         csw.csw_insert(username, layername)
+    else:
+        csw.update_layer(username, layername, {
+            'metadata_properties_to_refresh': metadata_properties_to_refresh
+        })
 
     if self.is_aborted():
         csw.delete_layer(username, layername)
