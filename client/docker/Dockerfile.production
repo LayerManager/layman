@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM node:11-alpine
 
 RUN mkdir /code
 WORKDIR /code
@@ -11,7 +11,17 @@ RUN test -n "LAYMAN_CLIENT_VERSION"
 
 RUN wget "https://github.com/jirik/layman-test-client/archive/$LAYMAN_CLIENT_VERSION.tar.gz" -O client.tar.gz && \
     tar -xvf client.tar.gz --strip 1 && \
-    rm client.tar.gz && \
-    npm ci && \
-    npm run build
+    rm client.tar.gz
 
+RUN apk add --no-cache --virtual .gyp \
+        python \
+        make \
+        g++ \
+    && npm ci \
+    && apk del .gyp
+
+ARG LTC_BASEPATH
+RUN test -n "LTC_BASEPATH"
+ENV LTC_BASEPATH=$LTC_BASEPATH
+
+RUN npm run build
