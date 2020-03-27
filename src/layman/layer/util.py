@@ -283,11 +283,13 @@ def get_metadata_comparison(username, layername):
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, LAYER_TYPE)
 
 
-def get_same_prop_names(username, layername):
+def get_same_or_missing_prop_names(username, layername):
     md_comparison = get_metadata_comparison(username, layername)
     prop_names = get_syncable_prop_names()
+    # current_app.logger.info(f'prop_names before filtering: {prop_names}')
     prop_names = [
         pn for pn in prop_names
-        if pn in md_comparison['metadata_properties'] and md_comparison['metadata_properties'][pn]['equal']
+        if (pn in md_comparison['metadata_properties'] and md_comparison['metadata_properties'][pn]['equal']) or (pn not in md_comparison['metadata_properties'])
     ]
+    # current_app.logger.info(f'prop_names after filtering: {prop_names}')
     return prop_names

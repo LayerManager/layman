@@ -98,14 +98,14 @@ def patch(username, layername):
                                            check_crs, ignore_existing_files=True)
 
     if update_info and delete_from != 'layman.layer.filesystem.input_file':
-        same_prop_names = util.get_same_prop_names(username, layername)
-        info['metadata_properties_to_refresh'] = same_prop_names
+        props_to_refresh = util.get_same_or_missing_prop_names(username, layername)
+        info['metadata_properties_to_refresh'] = props_to_refresh
         util.update_layer(username, layername, info)
 
     layer_result = {}
 
     if delete_from is not None:
-        same_prop_names = info.get('metadata_properties_to_refresh', None) or util.get_same_prop_names(username, layername)
+        props_to_refresh = info.get('metadata_properties_to_refresh', None) or util.get_same_or_missing_prop_names(username, layername)
         deleted = util.delete_layer(username, layername, source=delete_from, http_method='patch')
         if sld_file is None:
             try:
@@ -122,7 +122,7 @@ def patch(username, layername):
             'title': info['title'],
             'ensure_user': False,
             'http_method': 'patch',
-            'metadata_properties_to_refresh': same_prop_names
+            'metadata_properties_to_refresh': props_to_refresh
         }
 
         if delete_from == 'layman.layer.filesystem.input_file':

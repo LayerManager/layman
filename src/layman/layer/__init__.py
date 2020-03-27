@@ -56,7 +56,7 @@ PUBLICATION_TYPES = {
                 'identifier',
                 'layer_endpoint',
                 'language',
-                'publication_date',
+                'revision_date',
                 'reference_system',
                 'scale_denominator',
                 'title',
