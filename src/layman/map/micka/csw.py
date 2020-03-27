@@ -266,7 +266,7 @@ METADATA_PROPERTIES = {
         'xpath_property': './gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="publication"]]',
         'xpath_extract': './gmd:CI_Date/gmd:date/gco:Date/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
-        'adjust_property_element': common_util.adjust_date_string_with_type,
+        'adjust_property_element': partial(common_util.adjust_date_string_with_type, date_type='publication'),
     },
     'identifier': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation',

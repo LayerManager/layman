@@ -55,7 +55,7 @@ def get_layer_names(username):
 
 
 def update_layer(username, layername, layerinfo):
-    # print(f"update_layer layerinfo['metadata_properties_to_refresh']={layerinfo['metadata_properties_to_refresh']}")
+    # current_app.logger.info(f"update_layer layerinfo['metadata_properties_to_refresh']={layerinfo['metadata_properties_to_refresh']}")
     if len(layerinfo['metadata_properties_to_refresh']) == 0:
         return {}
     uuid = get_layer_uuid(username, layername)
@@ -66,13 +66,15 @@ def update_layer(username, layername, layerinfo):
     el = common_util.get_record_element_by_id(csw, muuid)
     # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
 
-    _, prop_values = get_template_path_and_values(username, layername)
+    _, prop_values = get_template_path_and_values(username, layername, http_method='patch')
     prop_values = {
         k: v for k, v in prop_values.items()
         if k in layerinfo['metadata_properties_to_refresh']
     }
+    # current_app.logger.info(f"update_layer prop_values={prop_values}")
     el = common_util.fill_xml_template_obj(el, prop_values, METADATA_PROPERTIES)
     record = ET.tostring(el, encoding='unicode', pretty_print=True)
+    # current_app.logger.info(f"update_layer record=\n{record}")
     try:
         muuid = common_util.csw_update({
             'muuid': muuid,
@@ -108,7 +110,7 @@ def delete_layer(username, layername):
 
 
 def csw_insert(username, layername):
-    template_path, prop_values = get_template_path_and_values(username, layername)
+    template_path, prop_values = get_template_path_and_values(username, layername, http_method='post')
     record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
     try:
         muuid = common_util.csw_insert({
@@ -120,11 +122,13 @@ def csw_insert(username, layername):
     return muuid
 
 
-def get_template_path_and_values(username, layername):
+def get_template_path_and_values(username, layername, http_method=None):
+    assert http_method in ['post', 'patch']
     wms = get_wms_proxy(username)
     wms_layer = wms.contents[layername]
     uuid_file_path = get_publication_uuid_file(LAYER_TYPE, username, layername)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
+    revision_date = datetime.now()
 
     unknown_value = 'neznámá hodnota'
     prop_values = _get_property_values(
@@ -134,6 +138,7 @@ def get_template_path_and_values(username, layername):
         title=wms_layer.title,
         abstract=wms_layer.abstract or None,
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
+        revision_date=revision_date.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
         identifier=url_for('rest_layer.get', username=username, layername=layername),
         identifier_label=layername,
@@ -142,6 +147,10 @@ def get_template_path_and_values(username, layername):
         md_organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
         organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
     )
+    if http_method == 'post':
+        prop_values.pop('revision_date', None)
+    elif http_method == 'patch':
+        prop_values.pop('publication_date', None)
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
     return template_path, prop_values
 
@@ -155,6 +164,7 @@ def _get_property_values(
         md_organisation_name=None,
         organisation_name=None,
         publication_date='2007-05-25',
+        revision_date='2008-05-25',
         md_date_stamp='2007-05-25',
         identifier='http://www.env.cz/data/corine/1990',
         identifier_label='MZP-CORINE',
@@ -174,6 +184,7 @@ def _get_property_values(
         'reference_system': epsg_codes,
         'title': title,
         'publication_date': publication_date,
+        'revision_date': revision_date,
         'identifier': {
             'identifier': identifier,
             'label': identifier_label,
@@ -235,7 +246,14 @@ METADATA_PROPERTIES = {
         'xpath_property': './gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="publication"]]',
         'xpath_extract': './gmd:CI_Date/gmd:date/gco:Date/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
-        'adjust_property_element': common_util.adjust_date_string_with_type,
+        'adjust_property_element': partial(common_util.adjust_date_string_with_type, date_type='publication'),
+    },
+    'revision_date': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation',
+        'xpath_property': './gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="revision"]]',
+        'xpath_extract': './gmd:CI_Date/gmd:date/gco:Date/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': partial(common_util.adjust_date_string_with_type, date_type='revision'),
     },
     'identifier': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation',
@@ -332,6 +350,7 @@ def get_metadata_comparison(username, layername):
         'language',
         'organisation_name',
         'publication_date',
+        'revision_date',
         'reference_system',
         'scale_denominator',
         'title',

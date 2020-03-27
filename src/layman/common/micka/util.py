@@ -386,7 +386,8 @@ def adjust_date_string(prop_el, prop_value):
         _add_unknown_reason(prop_el)
 
 
-def adjust_date_string_with_type(prop_el, prop_value):
+def adjust_date_string_with_type(prop_el, prop_value, date_type=None):
+    assert date_type is not None
     _clear_el(prop_el)
     if prop_value is not None:
         parser = ET.XMLParser(remove_blank_text=True)
@@ -396,7 +397,7 @@ def adjust_date_string_with_type(prop_el, prop_value):
         <gco:Date>{escape(prop_value)}</gco:Date>
     </gmd:date>
     <gmd:dateType>
-        <gmd:CI_DateTypeCode codeListValue="publication" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode">publication</gmd:CI_DateTypeCode>
+        <gmd:CI_DateTypeCode codeListValue="{date_type}" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode">{date_type}</gmd:CI_DateTypeCode>
     </gmd:dateType>
 </gmd:CI_Date>
 """, parser=parser)

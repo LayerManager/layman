@@ -52,6 +52,17 @@ XPath for Map
   - multiplicity 1
   - publication date
 
+### revision_date
+XPath for Layer
+- `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue="revision"]/gmd:CI_Date/gmd:date/gco:Date/text()`
+  - multiplicity 1
+  - revision date
+
+XPath for Map
+- `gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue="revision"]/gmd:CI_Date/gmd:date/gco:Date/text()`
+  - multiplicity 1
+  - revision date
+
 ### identifier
 XPath for Layer
 - `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gmx:Anchor/@xlink:href`

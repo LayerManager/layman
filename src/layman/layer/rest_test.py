@@ -36,6 +36,7 @@ METADATA_PROPERTIES = {
     'organisation_name',
     'publication_date',
     'reference_system',
+    'revision_date',
     'scale_denominator',
     'title',
     'wfs_url',
@@ -48,6 +49,15 @@ METADATA_PROPERTIES_NOT_EQUAL = {
 }
 
 METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES - METADATA_PROPERTIES_NOT_EQUAL
+
+METADATA_PROPERTIES_POST_NULL = {
+    'language',
+    'organisation_name',
+    'revision_date',
+    'scale_denominator',
+}
+
+METADATA_PROPERTIES_PATCH_NULL = METADATA_PROPERTIES_POST_NULL - {'revision_date'}
 
 min_geojson = """
 {
@@ -290,6 +300,8 @@ def test_post_layers_simple(client):
         for k, v in resp_json['metadata_properties'].items():
             assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
             assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
+        for p in METADATA_PROPERTIES_POST_NULL:
+            assert all((v is None for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not null: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
 
 
 @pytest.mark.usefixtures('app_context')
@@ -407,29 +419,29 @@ def test_post_layers_shp(client):
     })
 
     # assert metadata file is the same as filled template except for UUID
-    template_path, prop_values = csw.get_template_path_and_values(username, layername)
+    template_path, prop_values = csw.get_template_path_and_values(username, layername, http_method='post')
     xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values, csw.METADATA_PROPERTIES)
     expected_path = 'src/layman/layer/rest_test_filled_template.xml'
     with open(expected_path) as f:
         expected_lines = f.readlines()
     diff_lines = list(difflib.unified_diff([l.decode('utf-8') for l in xml_file_object.readlines()], expected_lines))
-    assert len(diff_lines) == 29, ''.join(diff_lines)
     plus_lines = [l for l in diff_lines if l.startswith('+ ')]
-    assert len(plus_lines) == 3
+    assert len(plus_lines) == 3, ''.join(diff_lines)
     minus_lines = [l for l in diff_lines if l.startswith('- ')]
-    assert len(minus_lines) == 3
+    assert len(minus_lines) == 3, ''.join(diff_lines)
     plus_line = plus_lines[0]
-    assert plus_line == '+    <gco:CharacterString>m-81c0debe-b2ea-4829-9b16-581083b29907</gco:CharacterString>\n'
+    assert plus_line == '+    <gco:CharacterString>m-81c0debe-b2ea-4829-9b16-581083b29907</gco:CharacterString>\n', ''.join(diff_lines)
     minus_line = minus_lines[0]
-    assert minus_line.startswith('-    <gco:CharacterString>m') and minus_line.endswith('</gco:CharacterString>\n')
+    assert minus_line.startswith('-    <gco:CharacterString>m') and minus_line.endswith('</gco:CharacterString>\n'), ''.join(diff_lines)
     plus_line = plus_lines[1]
-    assert plus_line == '+    <gco:Date>2007-05-25</gco:Date>\n'
+    assert plus_line == '+    <gco:Date>2007-05-25</gco:Date>\n', ''.join(diff_lines)
     minus_line = minus_lines[1]
-    assert minus_line.startswith('-    <gco:Date>') and minus_line.endswith('</gco:Date>\n')
+    assert minus_line.startswith('-    <gco:Date>') and minus_line.endswith('</gco:Date>\n'), ''.join(diff_lines)
     plus_line = plus_lines[2]
-    assert plus_line == '+                <gco:Date>2019-12-07</gco:Date>\n'
+    assert plus_line == '+                <gco:Date>2019-12-07</gco:Date>\n', ''.join(diff_lines)
     minus_line = minus_lines[2]
-    assert minus_line.startswith('-                <gco:Date>') and minus_line.endswith('</gco:Date>\n')
+    assert minus_line.startswith('-                <gco:Date>') and minus_line.endswith('</gco:Date>\n'), ''.join(diff_lines)
+    assert len(diff_lines) == 29, ''.join(diff_lines)
 
 
 @pytest.mark.usefixtures('app_context')
@@ -675,6 +687,8 @@ def test_patch_layer_title(client):
         for k, v in resp_json['metadata_properties'].items():
             assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
             assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
+        for p in METADATA_PROPERTIES_PATCH_NULL:
+            assert all((v is None for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not null: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': num_layers_before_test + 4
@@ -731,6 +745,8 @@ def test_patch_layer_style(client):
                         k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
             assert v['equal'] == (
                         k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
+        for p in METADATA_PROPERTIES_PATCH_NULL:
+            assert all((v is None for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not null: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
 
 
 @pytest.mark.usefixtures('app_context')
@@ -860,6 +876,8 @@ def test_patch_layer_data(client):
                         k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
             assert v['equal'] == (
                         k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
+        for p in METADATA_PROPERTIES_PATCH_NULL:
+            assert all((v is None for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not null: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
 
 
 @pytest.mark.usefixtures('app_context')

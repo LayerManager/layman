@@ -46,6 +46,9 @@ PROPERTIES = {
     'publication_date': {
         'upper_mp': '1',
     },
+    'revision_date': {
+        'upper_mp': '1',
+    },
     'identifier': {
         'upper_mp': '1',
     },
