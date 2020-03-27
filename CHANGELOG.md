@@ -1,9 +1,16 @@
 # Changelog
 
 ## v1.3.x
+### Upgrade requirements
+- Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) from `v1.0.0` to `v1.1.1`
+
+### Changes
 - Use absolute URLs in responses of Layer and Map endpoints
 - Add [GET Layer Metadata Comparison](doc/rest.md#get-layer-metadata-comparison) endpoint. 
-- [PATCH Layer](doc/rest.md#patch-layer) updates also CSW metadata. 
+- [PATCH Layer](doc/rest.md#patch-layer) updates also CSW metadata.
+- Add [`revision_date`](doc/metadata.md#revision_date) metadata property
+- Upgrade Layman test client to version 1.1.1
+ 
 
 ## v1.2.1
 2020-03-20

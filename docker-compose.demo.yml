@@ -83,6 +83,7 @@ services:
         dockerfile: docker/Dockerfile.production
         args:
            - LAYMAN_CLIENT_VERSION=${LAYMAN_CLIENT_VERSION}
+           - LTC_BASEPATH=${LTC_BASEPATH}
       image: layman_client:latest
       command: sh -c "npm start"
       env_file:
