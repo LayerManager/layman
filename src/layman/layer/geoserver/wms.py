@@ -19,7 +19,7 @@ FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
 
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
-VERSION = '1.1.1'
+VERSION = '1.3.0'
 
 
 def get_flask_proxy_key(username):
@@ -63,6 +63,7 @@ def get_wms_proxy(username):
                 r.raise_for_status()
                 raise Exception(f'Status code = {r.status_code}')
         else:
+            r.encoding = 'UTF-8'
             result = r.text
         return result
 
@@ -156,7 +157,10 @@ def get_metadata_comparison(username, layername):
     except:
         extent = None
     try:
-        crs_list = [int(crs.split(':')[-1]) for crs in wms_layer.crsOptions]
+        crs_list = [
+            int(crs.split(':')[-1]) for crs in wms_layer.crsOptions
+            if crs.split(':')[0] == 'EPSG'
+        ]
         crs_list.sort()
         reference_system = crs_list
     except Exception as e:

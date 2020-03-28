@@ -18,7 +18,7 @@ FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
 
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
-VERSION = '1.0.0'
+VERSION = '2.0.0'
 
 
 def get_flask_proxy_key(username):
@@ -89,6 +89,7 @@ def get_wfs_proxy(username):
                 r.raise_for_status()
                 raise Exception(f'Status code = {r.status_code}')
         else:
+            r.encoding = 'UTF-8'
             result = r.text
         return result
 

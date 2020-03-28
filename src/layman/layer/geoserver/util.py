@@ -2,6 +2,7 @@ import requests
 from urllib.parse import urljoin, urlparse
 from owslib.wms import WebMapService
 from owslib.wfs import WebFeatureService
+from flask import current_app
 
 from layman.cache.mem import CACHE as MEM_CACHE
 
@@ -49,9 +50,12 @@ def get_feature_type(
     r.raise_for_status()
     return r.json()['featureType']
 
-def wms_proxy(wms_url, xml=None):
+def wms_proxy(wms_url, xml=None, version=None):
+    from layman.layer.geoserver.wms import VERSION
+    version = version or VERSION
     wms_url_path = urlparse(wms_url).path
-    wms = WebMapService(wms_url, xml=xml.encode('utf-8') if xml is not None else xml)
+    # current_app.logger.info(f"xml=\n{xml}")
+    wms = WebMapService(wms_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version)
     for operation in wms.operations:
         # app.logger.info(operation.name)
         for method in operation.methods:
@@ -62,15 +66,21 @@ def wms_proxy(wms_url, xml=None):
             method['url'] = method_url.geturl()
     return wms
 
-def wfs_proxy(wfs_url, xml=None):
+def wfs_proxy(wfs_url, xml=None, version=None):
+    from layman.layer.geoserver.wfs import VERSION
+    version = version or VERSION
     wfs_url_path = urlparse(wfs_url).path
-    wfs = WebFeatureService(wfs_url, xml=xml.encode('utf-8') if xml is not None else xml)
-    for operation in wfs.operations:
-        # app.logger.info(operation.name)
-        for method in operation.methods:
-            method_url = urlparse(method['url'])
-            method_url = method_url._replace(
-                netloc = settings.LAYMAN_GS_HOST + ':' + settings.LAYMAN_GS_PORT,
-                path = wfs_url_path)
-            method['url'] = method_url.geturl()
+    # TODO: https://github.com/geopython/OWSLib/issues/673
+    try:
+        wfs = WebFeatureService(wfs_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version)
+        for operation in wfs.operations:
+            # app.logger.info(operation.name)
+            for method in operation.methods:
+                method_url = urlparse(method['url'])
+                method_url = method_url._replace(
+                    netloc=settings.LAYMAN_GS_HOST + ':' + settings.LAYMAN_GS_PORT,
+                    path=wfs_url_path)
+                method['url'] = method_url.geturl()
+    except AttributeError:
+        wfs = None
     return wfs
