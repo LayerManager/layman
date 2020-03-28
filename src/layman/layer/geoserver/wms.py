@@ -201,8 +201,13 @@ def strip_params_from_url(url, params):
     return url
 
 
-def get_capabilities_url(username):
-    url = _get_wms_proxy_url(username)
+def add_capabilities_params_to_url(url):
     params = {'SERVICE': 'WMS', 'REQUEST': 'GetCapabilities', 'VERSION': VERSION}
     url = add_params_to_url(url, params)
+    return url
+
+
+def get_capabilities_url(username):
+    url = _get_wms_proxy_url(username)
+    url = add_capabilities_params_to_url(url)
     return url

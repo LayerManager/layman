@@ -193,7 +193,7 @@ Shape: String
 
 Example: `"http://localhost:8600/geoserver/testuser1/ows"`
 
-XPath for Layer: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-1.0.0"]/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()`
+XPath for Layer: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-2.0.0-http-get-capabilities"]/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()`
 
 
 ### wms_url
@@ -203,7 +203,7 @@ Shape: String
 
 Example: `"http://localhost:8600/geoserver/testuser1/ows"`
 
-XPath for Layer: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-1.1.1"]/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()`
+XPath for Layer: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-1.3.0-http-get-capabilities"]/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()`
 
 
 ## Metadata properties guessable by Layman
