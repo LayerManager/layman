@@ -81,7 +81,7 @@ def get_wfs_proxy(username):
         r = requests.get(ows_url, params={
             'SERVICE': 'WFS',
             'REQUEST': 'GetCapabilities',
-            'VERSION': '1.0.0',
+            'VERSION': VERSION,
         })
         if r.status_code != 200:
             result = None

@@ -55,7 +55,7 @@ def get_wms_proxy(username):
         r = requests.get(ows_url, params={
             'SERVICE': 'WMS',
             'REQUEST': 'GetCapabilities',
-            'VERSION': '1.1.1',
+            'VERSION': VERSION,
         })
         if r.status_code != 200:
             result = None
