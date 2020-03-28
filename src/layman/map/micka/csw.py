@@ -146,7 +146,6 @@ def get_template_path_and_values(username, mapname):
     map_json = get_map_json(username, mapname)
     operates_on = _map_json_to_operates_on(map_json)
 
-    unknown_value = 'neznámá hodnota'
     template_values = _get_property_values(
         username=username,
         mapname=mapname,
@@ -159,8 +158,8 @@ def get_template_path_and_values(username, mapname):
         identifier_label=mapname,
         extent=[float(c) for c in map_json['extent']],
         # TODO create config env variable to decide if to set organisation name or not
-        md_organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
-        organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
+        md_organisation_name=None,
+        organisation_name=None,
         operates_on=operates_on,
     )
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')

@@ -132,7 +132,6 @@ def get_template_path_and_values(username, layername, http_method=None):
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
     revision_date = datetime.now()
 
-    unknown_value = 'neznámá hodnota'
     prop_values = _get_property_values(
         username=username,
         layername=layername,
@@ -146,8 +145,8 @@ def get_template_path_and_values(username, layername, http_method=None):
         identifier_label=layername,
         extent=wms_layer.boundingBoxWGS84,
         ows_url=urljoin(get_gs_proxy_base_url(), username + '/ows'),
-        md_organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
-        organisation_name=unknown_value if settings.CSW_ORGANISATION_NAME_REQUIRED else None,
+        md_organisation_name=None,
+        organisation_name=None,
     )
     if http_method == 'post':
         prop_values.pop('revision_date', None)

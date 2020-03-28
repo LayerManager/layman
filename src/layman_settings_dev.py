@@ -123,7 +123,6 @@ CSW_URL = os.getenv('CSW_URL', None)
 CSW_PROXY_URL = os.getenv('CSW_PROXY_URL', None)
 CSW_BASIC_AUTHN = None if ':' not in os.getenv('CSW_BASIC_AUTHN', '') else tuple(os.environ['CSW_BASIC_AUTHN'].split(':'))
 CSW_RECORD_URL = os.getenv('CSW_RECORD_URL', None)
-CSW_ORGANISATION_NAME_REQUIRED = os.getenv('CSW_ORGANISATION_NAME_REQUIRED', 'false').lower() == 'true'
 
 # # tuples like (version, revision)
 MICKA_ACCEPTED_VERSIONS = [

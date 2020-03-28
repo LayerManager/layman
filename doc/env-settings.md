@@ -149,9 +149,6 @@ Internal URL of [OGC Catalogue Service v2.0.2](https://www.opengeospatial.org/st
 ### CSW_PROXY_URL
 Public URL of [OGC Catalogue Service v2.0.2](https://www.opengeospatial.org/standards/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
 
-### CSW_ORGANISATION_NAME_REQUIRED
-Set to `true` if organisation name is required by CSW instance.
-
 ## Flask settings
 
 ### FLASK_APP

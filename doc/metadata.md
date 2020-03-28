@@ -3,11 +3,11 @@
 Layman is able to publish partial metadata records to [OGC Catalogue Service](https://www.opengeospatial.org/standards/cat) [Micka](http://micka.bnhelp.cz/). Records are partial because Layman does not know all metadata properties. Below are listed
 - [metadata properties that are known to Layman](#metadata-properties-known-to-layman) 
 - [metadata properties guessable by Layman](#metadata-properties-guessable-by-layman) (not yet implemented) 
-- [metadata properties unknown to Layman](#metadata-properties-unknown-to-layman), that are needed to create metadata record acceptable by Micka. 
+- [metadata properties unknown to Layman](#metadata-properties-unknown-to-layman), that Layman is aware of. 
 
 Although metadata records sent to Micka are partial, they can (and should) be completed using Micka web editor GUI. URL of layer's metadata record leading to Micka's GUI is available in [GET Layer](rest.md#get-layer) response as `metadata.record_url` property. To complete metadata records, just open this URL in browser, log in to micka as editor or admin, and complete the record.
 
-Properties listed below contains XPath expression pointing to specific placement of the property inside metadata document. All listed metadata properties on Micka can be synced with metadata properties provided by Layman, whereas only some properties on Layman can be synced with properties provided by Micka (only `title` and `abstract`). No synchronization is implemented yet.
+Properties listed below contains XPath expression pointing to specific placement of the property inside metadata document. All listed metadata properties on Micka can be synced with metadata properties provided by Layman, whereas only some properties on Layman can be synced with properties provided by Micka (only `abstract`, `extent`, `language`, `reference_system`, `revision_date`, `scale_denominator`, `title`). No synchronization is implemented yet.
 
 
 ## Metadata properties known to Layman
@@ -208,16 +208,6 @@ XPath for Layer: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:
 
 ## Metadata properties guessable by Layman
 
-### scale_denominator
-Multiplicity: 1
-
-Shape: Integer
-
-Example: `25000`
-
-XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/gmd:denominator/gco:Integer/text()`
-
-
 ### language
 Multiplicity: 1
 
@@ -228,6 +218,16 @@ Example: `"cze"`
 XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:language/gmd:LanguageCode/@codeListValue`
 
 XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:language/gmd:LanguageCode/@codeListValue`
+
+
+### scale_denominator
+Multiplicity: 1
+
+Shape: Integer
+
+Example: `25000`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/gmd:denominator/gco:Integer/text()`
 
 
 ## Metadata properties unknown to Layman
