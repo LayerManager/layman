@@ -9,166 +9,249 @@ Although metadata records sent to Micka are partial, they can (and should) be co
 
 Properties listed below contains XPath expression pointing to specific placement of the property inside metadata document. All listed metadata properties on Micka can be synced with metadata properties provided by Layman, whereas only some properties on Layman can be synced with properties provided by Micka (only `title` and `abstract`). No synchronization is implemented yet.
 
+
 ## Metadata properties known to Layman
 
-### md_file_identifier
-XPath for Layer and Map
-- `gmd:MD_Metadata/gmd:fileIdentifier/gco:CharacterString/text()`
-  - multiplicity 1
-  
-### md_date_stamp
-XPath for Layer and Map
-- `gmd:MD_Metadata/gmd:dateStamp/gco:Date/text()`
-  - multiplicity 1
-  
-### reference_system
-XPath for Layer and Map
-- `gmd:MD_Metadata/gmd:referenceSystemInfo`
-  - multiplicity 1..n, one per reference system
-  - `gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor`
-    - multiplicity 1
-    - `@xlink:href`
-      - link to http://www.opengis.net/def/crs/EPSG/0/...
-    - `text()`
-      - EPSG:code
-
-### title
-XPath for Layer
-- `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString/text()`
-  - multiplicity 1
-
-XPath for Map
-- `gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString/text()`
-  - multiplicity 1
-
-### publication_date
-XPath for Layer
-- `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue="publication"]/gmd:CI_Date/gmd:date/gco:Date/text()`
-  - multiplicity 1
-  - publication date
-
-XPath for Map
-- `gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue="publication"]/gmd:CI_Date/gmd:date/gco:Date/text()`
-  - multiplicity 1
-  - publication date
-
-### revision_date
-XPath for Layer
-- `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue="revision"]/gmd:CI_Date/gmd:date/gco:Date/text()`
-  - multiplicity 1
-  - revision date
-
-XPath for Map
-- `gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue="revision"]/gmd:CI_Date/gmd:date/gco:Date/text()`
-  - multiplicity 1
-  - revision date
-
-### identifier
-XPath for Layer
-- `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gmx:Anchor/@xlink:href`
-    - multiplicity 1
-
-XPath for Map
-- `gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gmx:Anchor/@xlink:href`
-    - multiplicity 1
-
 ### abstract
-XPath for Layer
-- `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/(gmd:abstract/gco:CharacterString/text()|gmd:abstract/[@gco:nilReason="unknown"])`
-  - multiplicity 1
+Multiplicity: 1
 
-XPath for Map
-- `gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/(gmd:abstract/gco:CharacterString/text()|gmd:abstract/[@gco:nilReason="unknown"])`
-  - multiplicity 1
+Shape: String
 
-### graphic_url
-XPath for Layer
-- `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString/text()`
-    - multiplicity 1
+Example: `"Klasifikace pokryvu zemského povrchu v rozsahu ČR."`
 
-XPath for Map
-- `gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString/text()`
-    - multiplicity 1
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gco:CharacterString/text()`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:abstract/gco:CharacterString/text()`
+
 
 ### extent
-XPath for Layer
-- `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox`
-    - multiplicity 1
-    - `gmd:westBoundLongitude/gco:Decimal/text()`
-      - multiplicity 1
-    - `gmd:eastBoundLongitude/gco:Decimal/text()`
-      - multiplicity 1
-    - `gmd:southBoundLatitude/gco:Decimal/text()`
-      - multiplicity 1
-    - `gmd:northBoundLatitude/gco:Decimal/text()`
-      - multiplicity 1
+Multiplicity: 1
 
-XPath for Map
-- `gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox`
-    - multiplicity 1
-    - `gmd:westBoundLongitude/gco:Decimal/text()`
-      - multiplicity 1
-    - `gmd:eastBoundLongitude/gco:Decimal/text()`
-      - multiplicity 1
-    - `gmd:southBoundLatitude/gco:Decimal/text()`
-      - multiplicity 1
-    - `gmd:northBoundLatitude/gco:Decimal/text()`
-      - multiplicity 1
+Shape: Array of four numbers `[min latitude, min longitude, max latitude, max longitude]`
 
-### wms_url
-XPath for Layer
-- `gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-1.3.0"]/gmd:linkage/gmd:URL/text()`
-  - multiplicity 1
+Example: `[11.87, 48.12, 19.13, 51.59]`
 
-### wfs_url
-XPath for Layer
-- `gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-2.0.0"]/gmd:linkage/gmd:URL/text()`
-  - multiplicity 1
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement[gmd:EX_GeographicBoundingBox]/gmd:EX_GeographicBoundingBox/*/gco:Decimal/text()`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:extent/gmd:EX_Extent/gmd:geographicElement[gmd:EX_GeographicBoundingBox]/gmd:EX_GeographicBoundingBox/*/gco:Decimal/text()`
+
+
+### graphic_url
+Multiplicity: 1
+
+Shape: String
+
+Example: `"http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries_shp/thumbnail"`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:graphicOverview[gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString]/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString/text()`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:graphicOverview[gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString]/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString/text()`
+
+
+### identifier
+Multiplicity: 1
+
+Shape: Object with keys and values:
+- **identifier**: String. Identifier itself.
+- **label**: String. Identifier label.
+
+Example: 
+```
+{
+    "identifier": "http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries_shp",
+    "label": "ne_110m_admin_0_countries_shp"
+}
+```
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gmx:Anchor/@xlink:href`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gmx:Anchor/@xlink:href`
+
 
 ### layer_endpoint
-XPath for Layer
-- `gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link"]/gmd:linkage/gmd:URL/text()`
-  - multiplicity 1
+Multiplicity: 1
+
+Shape: String
+
+Example: `"http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries_shp"`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link"]/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()`
+
 
 ### map_endpoint
-XPath for Map
-- `gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link"]/gmd:linkage/gmd:URL[contains(text(), '/rest/') and contains(text(), '/maps/') and substring(text(), string-length(text()) - string-length('/file') +1) != '/file']/text()`
-  - multiplicity 1
+Multiplicity: 1
+
+Shape: String
+
+Example: `"http://layman_test_run_1:8000/rest/testuser1/maps/svet"`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link" and gmd:CI_OnlineResource/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue="information"]/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()`
+
 
 ### map_file_endpoint
-XPath for Map
-- `gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link"]/gmd:linkage/gmd:URL[contains(text(), '/rest/') and contains(text(), '/maps/') and substring(text(), string-length(text()) - string-length('/file') +1) = '/file']/text()`
-  - multiplicity 1
+Multiplicity: 1
+
+Shape: String
+
+Example: `"http://layman_test_run_1:8000/rest/testuser1/maps/svet/file"`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link" and gmd:CI_OnlineResource/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue="download"]/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()`
+
+
+### md_date_stamp
+Multiplicity: 1
+
+Shape: String
+
+Example: `"2007-05-25"`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:dateStamp/gco:Date/text()`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:dateStamp/gco:Date/text()`
+
+
+### md_file_identifier
+Multiplicity: 1
+
+Shape: String
+
+Example: `"m-91147a27-1ff4-4242-ba6d-faffb92224c6"`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:fileIdentifier/gco:CharacterString/text()`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:fileIdentifier/gco:CharacterString/text()`
+
+
+### operates_on
+Multiplicity: 1..*
+
+Shape: Object with keys and values:
+- **xlink:href**: String. Link to other metadata record.
+- **xlink:title**: String. Reference title.
+
+Example: 
+```
+{
+    "xlink:title": "http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=m-39cc8994-adbc-427a-8522-569eb7e691b2#_m-39cc8994-adbc-427a-8522-569eb7e691b2",
+    "xlink:href": "hranice"
+}
+```
+
+XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn[@xlink:href]/@xlink:href`
+
+
+### publication_date
+Multiplicity: 1
+
+Shape: String
+
+Example: `"2007-05-25"`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="publication"]]/gmd:CI_Date/gmd:date/gco:Date/text()`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="publication"]]/gmd:CI_Date/gmd:date/gco:Date/text()`
+
+
+### reference_system
+Multiplicity: 1..*
+
+Shape: Array of integers (EPSG codes).
+
+Example: `[3857, 4326]`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:referenceSystemInfo[gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor[starts-with(@xlink:href, "http://www.opengis.net/def/crs/EPSG/0/")]]/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor/@xlink:href`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:referenceSystemInfo[gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor[starts-with(@xlink:href, "http://www.opengis.net/def/crs/EPSG/0/")]]/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor/@xlink:href`
+
+
+### revision_date
+Multiplicity: 1
+
+Shape: String
+
+Example: `"2007-05-25"`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="revision"]]/gmd:CI_Date/gmd:date/gco:Date/text()`
+
+
+### title
+Multiplicity: 1
+
+Shape: String
+
+Example: `"World Countries"`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString/text()`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString/text()`
+
+
+### wfs_url
+Multiplicity: 1
+
+Shape: String
+
+Example: `"http://localhost:8600/geoserver/testuser1/ows"`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-1.0.0"]/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()`
+
+
+### wms_url
+Multiplicity: 1
+
+Shape: String
+
+Example: `"http://localhost:8600/geoserver/testuser1/ows"`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-1.1.1"]/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()`
+
 
 ## Metadata properties guessable by Layman
 
 ### scale_denominator
-XPath for Layer
-- `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/(gmd:denominator/gco:Integer/text()|gmd:denominator/[@gco:nilReason="unknown"])`
-  - multiplicity 1
+Multiplicity: 1
+
+Shape: Integer
+
+Example: `25000`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/gmd:denominator/gco:Integer/text()`
+
 
 ### language
-XPath for Layer
-- `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/(gmd:language/gmd:LanguageCode[@codeList="http://www.loc.gov/standards/iso639-2/"]/@codeListValue|gmd:language/[@gco:nilReason="unknown"])`
-  - multiplicity 1
+Multiplicity: 1
 
-XPath for Map
-- `gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/(gmd:language/gmd:LanguageCode[@codeList="http://www.loc.gov/standards/iso639-2/"]/@codeListValue|gmd:language/[@gco:nilReason="unknown"])`
-  - multiplicity 1
+Shape: String
+
+Example: `"cze"`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:language/gmd:LanguageCode/@codeListValue`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:language/gmd:LanguageCode/@codeListValue`
+
 
 ## Metadata properties unknown to Layman
 
 ### md_organisation_name
-XPath for Layer and Map
-- `gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString/text()`
-  - multiplicity 1
+Multiplicity: 1
+
+Shape: String
+
+Example: `"Ministerstvo životního prostředí ČR"`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString/text()`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString/text()`
+
 
 ### organisation_name
-XPath for Layer
-- `gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString/text()`
-  - multiplicity 1
+Multiplicity: 1
 
-XPath for Map
-- `gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString/text()`
-  - multiplicity 1
+Shape: String
+
+Example: `"Ministerstvo životního prostředí ČR"`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString/text()`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString/text()`
 
