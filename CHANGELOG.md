@@ -10,6 +10,7 @@
 - [PATCH Layer](doc/rest.md#patch-layer) updates also CSW metadata.
 - Add [`revision_date`](doc/metadata.md#revision_date) metadata property
 - Upgrade Layman test client to version 1.1.1
+- Add `metadata.comparison_url` to [GET Layer](doc/rest.md#get-layer) response.
  
 
 ## v1.2.1
@@ -31,8 +32,8 @@
 
 ### Changes
 - Publish metadata record of [map](doc/models.md#map) to Micka on [POST Maps](doc/rest.md#post-maps).
-- Add `metatada` info to [GET Map](doc/rest.md#get-map) response.
-- Extend `metatada` info with `identitier` attribute in case of both layer and map.
+- Add `metadata` info to [GET Map](doc/rest.md#get-map) response.
+- Extend `metadata` info with `identitier` attribute in case of both layer and map.
 - Add documentation of [map metadata properties](doc/metadata.md)
 - Use `metadataStandardName` and `metadataStandardVersion` in metadata templates
 - Adjust metadata XML instead of using string formatting
@@ -97,7 +98,7 @@ Prior to 1.1.5, existing usernames, layers and maps **were not imported sometime
 2019-12-23
 - Publish metadata record of [layer](doc/models.md#layer) to Micka on [POST Layers](doc/rest.md#post-layers). Connection to Micka is configurable using [CSW_*](doc/env-settings.md) environment variables.
 - Delete metadata record of layer from Micka on [DELETE Layer](doc/rest.md#delete-layer).
-- Add `metatada` info to [GET Layer](doc/rest.md#get-layer) response, including CSW URL and metadata record URL.
+- Add `metadata` info to [GET Layer](doc/rest.md#get-layer) response, including CSW URL and metadata record URL.
 - [Documentation of metadata](doc/metadata.md)
 - [LAYMAN_PROXY_SERVER_NAME](doc/env-settings.md#LAYMAN_PROXY_SERVER_NAME) environment variable
 - Do not depend on specific version of chromium-browser and chromedriver
