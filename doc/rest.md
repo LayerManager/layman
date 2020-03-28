@@ -270,8 +270,10 @@ No action parameters.
 Content-Type: `application/json`
 
 JSON object with one attribute:
+- **metadata_sources**: Dictionary of objects. Key is ID of metadata source valid for this JSON only (not persistent in time!). Value is object with following attributes:
+  - **url**: String. URL of the metadata source ([GET Layer](#get-layer), CSW record, WMS Capabilities, or WFS Capabitilities).
 - **metadata_properties**: Dictionary of objects. Key is name of [metadata property](./metadata.md) (e.g. `reference_system`). Value is object with following attributes:
-  - **values**: Dictionary of objects. Key is URL of source ([GET Layer](#get-layer), CSW record, WMS Capabilities, or WFS Capabitilities). Value is any valid JSON (null, number, string, boolean, list, or object) representing value of metadata property. Null means the value is not set.
+  - **values**: Dictionary of objects. Key is ID of metadata source corresponding with `metadata_sources` attribute. Value is any valid JSON (null, number, string, boolean, list, or object) representing value of metadata property. Null means the value is not set.
   - **equal**: Boolean. True if all values are considered equal, false otherwise.
   - **equal_or_null**: Boolean. True if all values are considered equal or null, false otherwise.
 
@@ -458,8 +460,10 @@ No action parameters.
 Content-Type: `application/json`
 
 JSON object with one attribute:
+- **metadata_sources**: Dictionary of objects. Key is ID of metadata source valid for this JSON only (not persistent in time!). Value is object with following attributes:
+  - **url**: String. URL of the metadata source ([GET Map](#get-map), [GET Map File](#get-map-file), or CSW record).
 - **metadata_properties**: Dictionary of objects. Key is name of [metadata property](./metadata.md) (e.g. `reference_system`). Value is object with following attributes:
-  - **values**: Dictionary of objects. Key is URL of source ([GET Map](#get-map), [GET Map File](#get-map-file), or CSW record). Value is any valid JSON (null, number, string, boolean, list, or object) representing value of metadata property. Null means the value is not set.
+  - **values**: Dictionary of objects. Key is ID of metadata source corresponding with `metadata_sources` attribute. Value is any valid JSON (null, number, string, boolean, list, or object) representing value of metadata property. Null means the value is not set.
   - **equal**: Boolean. True if all values are considered equal, false otherwise.
   - **equal_or_null**: Boolean. True if all values are considered equal or null, false otherwise.
 

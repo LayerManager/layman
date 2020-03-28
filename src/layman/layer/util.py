@@ -261,11 +261,21 @@ def get_metadata_comparison(username, layername):
             all_props.update(pi)
 
     prop_names = sorted(list(set([pn for po in all_props.values() for pn in po.keys()])))
+    sources = {
+        f"s{idx+1}": {
+            'url': k
+        }
+        for idx, k in enumerate(sorted(list(all_props.keys())))
+    }
+    src_url_to_idx = {}
+    for k, v in sources.items():
+        src_url_to_idx[v['url']] = k
     all_props = {
+        'metadata_sources': sources,
         'metadata_properties': {
             pn: {
                 'values': {
-                    src: prop_object[pn]
+                    f"{src_url_to_idx[src]}": prop_object[pn]
                     for src, prop_object in all_props.items()
                     if pn in prop_object
                 },
