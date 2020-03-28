@@ -19,6 +19,7 @@ services:
         - ./src:/code/src
         - ./tmp:/code/tmp
         - ./start.sh:/code/start.sh
+        - ./doc:/code/doc
       depends_on:
         - timgen
         - redis
