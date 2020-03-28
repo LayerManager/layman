@@ -13,6 +13,7 @@
 - Upgrade Layman test client to version 1.1.1
 - Add `metadata.comparison_url` to [GET Layer](doc/rest.md#get-layer) response.
 - Environment settings [CSW_ORGANISATION_NAME_REQUIRED](https://github.com/jirik/layman/blob/v1.2.1/doc/env-settings.md#CSW_ORGANISATION_NAME_REQUIRED) is not used anymore as Micka v2020 accepts records without organisation names. 
+- Metadata properties [wms_url](doc/metadata.md#wms_url) and [wfs_url](doc/metadata.md#wfs_url) point directly to GetCapabilities documents. 
  
 
 ## v1.2.1

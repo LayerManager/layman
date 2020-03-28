@@ -10,8 +10,8 @@ from flask import current_app
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util
 from layman.layer.filesystem.uuid import get_layer_uuid
-from layman.layer.geoserver.wms import get_wms_proxy, VERSION as WMS_VERSION
-from layman.layer.geoserver.wfs import VERSION as WFS_VERSION
+from layman.layer.geoserver import wms
+from layman.layer.geoserver import wfs
 from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer import LAYER_TYPE
 from layman import settings, patch_mode, LaymanError
@@ -126,8 +126,8 @@ def csw_insert(username, layername):
 
 def get_template_path_and_values(username, layername, http_method=None):
     assert http_method in ['post', 'patch']
-    wms = get_wms_proxy(username)
-    wms_layer = wms.contents[layername]
+    wmsi = wms.get_wms_proxy(username)
+    wms_layer = wmsi.contents[layername]
     uuid_file_path = get_publication_uuid_file(LAYER_TYPE, username, layername)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
     revision_date = datetime.now()
@@ -194,8 +194,8 @@ def _get_property_values(
         'graphic_url': url_for('rest_layer_thumbnail.get', username=username, layername=layername),
         'extent': extent,
 
-        'wms_url': ows_url,
-        'wfs_url': ows_url,
+        'wms_url': wms.add_capabilities_params_to_url(ows_url),
+        'wfs_url': wfs.add_capabilities_params_to_url(ows_url),
         'layer_endpoint': url_for('rest_layer.get', username=username, layername=layername),
         'scale_denominator': scale_denominator,
         'language': language,
@@ -310,17 +310,17 @@ METADATA_PROPERTIES = {
     },
     'wms_url': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
-        'xpath_property': f'./gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-{WMS_VERSION}"]',
+        'xpath_property': f'./gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-{wms.VERSION}-http-get-capabilities"]',
         'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
-        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol=f'OGC:WMS-{WMS_VERSION}', online_function='download'),
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol=f'OGC:WMS-{wms.VERSION}-http-get-capabilities', online_function='download'),
     },
     'wfs_url': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
-        'xpath_property': f'./gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-{WFS_VERSION}"]',
+        'xpath_property': f'./gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-{wfs.VERSION}-http-get-capabilities"]',
         'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
-        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol=f'OGC:WFS-{WFS_VERSION}', online_function='download'),
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol=f'OGC:WFS-{wfs.VERSION}-http-get-capabilities', online_function='download'),
     },
     'layer_endpoint': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
