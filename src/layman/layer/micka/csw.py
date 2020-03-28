@@ -43,6 +43,7 @@ def get_layer_info(username, layername):
                 'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
                 'record_url': settings.CSW_RECORD_URL.format(identifier=muuid),
+                'comparison_url': url_for('rest_layer_metadata_comparison.get', username=username, layername=layername),
             }
         }
     else:

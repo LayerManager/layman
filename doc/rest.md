@@ -150,6 +150,7 @@ JSON object with following structure:
   - *identifier*: String. Identifier of metadata record in CSW instance.
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.
   - *csw_url*: String. URL of CSW endpoint. It points to CSW endpoint of Micka.
+  - *comparison_url*: String. URL of [GET Layer Metadata Comparison](#get-layer-metadata-comparison).
   - *status*: Status information about metadata import and availability. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 
@@ -371,7 +372,9 @@ JSON object with following structure:
   - *identifier*: String. Identifier of metadata record in CSW instance.
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.
   - *csw_url*: String. URL of CSW endpoint. It points to CSW endpoint of Micka.
+  - *comparison_url*: String. URL of [GET Map Metadata Comparison](#get-map-metadata-comparison).
   - *status*: Status information about metadata import and availability. See [GET Map](#get-map) 
+  - *error*: If status is FAILURE, this may contain error object.
 
 ### PATCH Map
 Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Maps](#post-maps).
