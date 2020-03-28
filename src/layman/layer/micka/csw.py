@@ -10,7 +10,8 @@ from flask import current_app
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util
 from layman.layer.filesystem.uuid import get_layer_uuid
-from layman.layer.geoserver.wms import get_wms_proxy
+from layman.layer.geoserver.wms import get_wms_proxy, VERSION as WMS_VERSION
+from layman.layer.geoserver.wfs import VERSION as WFS_VERSION
 from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer import LAYER_TYPE
 from layman import settings, patch_mode, LaymanError
@@ -310,17 +311,17 @@ METADATA_PROPERTIES = {
     },
     'wms_url': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
-        'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-1.3.0"]',
+        'xpath_property': f'./gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-{WMS_VERSION}"]',
         'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
-        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='OGC:WMS-1.3.0', online_function='download'),
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol=f'OGC:WMS-{WMS_VERSION}', online_function='download'),
     },
     'wfs_url': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
-        'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-2.0.0"]',
+        'xpath_property': f'./gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-{WFS_VERSION}"]',
         'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
-        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='OGC:WFS-2.0.0', online_function='download'),
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol=f'OGC:WFS-{WFS_VERSION}', online_function='download'),
     },
     'layer_endpoint': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
