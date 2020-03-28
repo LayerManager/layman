@@ -162,8 +162,13 @@ def test_num_records(client):
     assert csw is not None, f"{settings.CSW_URL}, {settings.CSW_BASIC_AUTHN}"
     from owslib.fes import PropertyIsEqualTo, PropertyIsLike, BBox
     any_query = PropertyIsLike('apiso:Identifier', '*', wildCard='*')
-    csw.getrecords2(constraints=[any_query], maxrecords=100)
+    csw.getrecords2(constraints=[any_query], maxrecords=100, outputschema="http://www.isotc211.org/2005/gmd")
     assert csw.exceptionreport is None
-    assert len(csw.records) == num_publications
+    url_part = f"://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/"
+    records = {
+        k: r for k, r in csw.records.items()
+        if any((url_part in u for u in [ol.url for ol in r.distribution.online]))
+    }
+    assert len(records) == num_publications
 
 
