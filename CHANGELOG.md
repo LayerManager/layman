@@ -3,6 +3,7 @@
 ## v1.3.x
 ### Upgrade requirements
 - Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) from `v1.0.0` to `v1.1.1`
+- Remove [CSW_ORGANISATION_NAME_REQUIRED](https://github.com/jirik/layman/blob/v1.2.1/doc/env-settings.md#CSW_ORGANISATION_NAME_REQUIRED) from environment settings
 
 ### Changes
 - Use absolute URLs in responses of Layer and Map endpoints
@@ -11,6 +12,7 @@
 - Add [`revision_date`](doc/metadata.md#revision_date) metadata property
 - Upgrade Layman test client to version 1.1.1
 - Add `metadata.comparison_url` to [GET Layer](doc/rest.md#get-layer) response.
+- Environment settings [CSW_ORGANISATION_NAME_REQUIRED](https://github.com/jirik/layman/blob/v1.2.1/doc/env-settings.md#CSW_ORGANISATION_NAME_REQUIRED) is not used anymore as Micka v2020 accepts records without organisation names. 
  
 
 ## v1.2.1
