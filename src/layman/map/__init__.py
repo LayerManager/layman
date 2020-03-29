@@ -14,6 +14,7 @@ from .rest_maps import bp as maps_bp
 from .rest_map import bp as map_bp
 from .rest_map_file import bp as map_file_bp
 from .rest_map_thumbnail import bp as map_thumbnail_bp
+from .rest_map_metadata_comparison import bp as map_metadata_comparison_bp
 
 
 
@@ -27,6 +28,7 @@ PUBLICATION_TYPES = {
             map_bp,
             map_file_bp,
             map_thumbnail_bp,
+            map_metadata_comparison_bp,
         ],
         'internal_sources': [
             'layman.map.filesystem.uuid',
@@ -40,6 +42,21 @@ PUBLICATION_TYPES = {
         ],
         'layman.common.filesystem': {
             'publications_dir': 'maps'
+        },
+        'layman.common.metadata': {
+            'syncable_properties': {
+                'abstract',
+                'extent',
+                'graphic_url',
+                'identifier',
+                'language',
+                'map_endpoint',
+                'map_file_endpoint',
+                'operates_on',
+                'reference_system',
+                'revision_date',
+                'title',
+            }
         },
     }
 }

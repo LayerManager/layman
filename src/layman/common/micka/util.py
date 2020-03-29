@@ -58,11 +58,11 @@ def fill_xml_template(template_path, prop_values, publ_properties):
     return fill_xml_template_obj(tree, prop_values, publ_properties)
 
 
-def fill_xml_template_obj(tree_or_el, prop_values, publ_properties):
+def fill_xml_template_obj(tree_or_el, prop_values, publ_properties, basic_template_path=None):
     is_el = type(tree_or_el) == ET._Element
     tmp_tree = None
     for prop_name, prop_value in prop_values.items():
-        # print(f'prop_name={prop_name}')
+        # current_app.logger.info(f'prop_name={prop_name}')
         common_prop = COMMON_PROPERTIES[prop_name]
         micka_prop = publ_properties[prop_name]
         xpath_parent = micka_prop['xpath_parent']
@@ -72,7 +72,7 @@ def fill_xml_template_obj(tree_or_el, prop_values, publ_properties):
             xpath_parent = '/'.join(xpath_parent)
         parent_el = tree_or_el.xpath(xpath_parent, namespaces=NAMESPACES)
         if len(parent_el) == 0:
-            # print(f"Parent element of property {prop_name} not found, copying from template")
+            # current_app.logger.info(f"Parent element of property {prop_name} not found, copying from template")
             xpath_parent_parts = xpath_parent.split('[')[0].split('/')
             anc_level_distance = 0
             for idx in reversed(range(len(xpath_parent_parts))):
@@ -82,7 +82,7 @@ def fill_xml_template_obj(tree_or_el, prop_values, publ_properties):
                     last_anc_el = last_anc_els[0]
                     break
             # print(f"Found ancestor element {last_anc_el.tag}")
-            tmp_tree = tmp_tree or read_xml_tree(os.path.join(os.path.dirname(os.path.realpath(__file__)), './../../layer/micka/record-template.xml'))
+            tmp_tree = tmp_tree or read_xml_tree(basic_template_path)
             tmp_parent_el = tmp_tree.xpath(micka_prop['xpath_parent'], namespaces=NAMESPACES)[0]
             tmp_el_to_copy = tmp_parent_el
             while anc_level_distance > 1:
@@ -122,8 +122,8 @@ def fill_xml_template_obj(tree_or_el, prop_values, publ_properties):
                         all_new_els.append(new_el)
                     pe.insert(pe.index(e)+1, new_el)
         else:
-            # print(f"Copying property {prop_name} element from template")
-            tmp_tree = tmp_tree or read_xml_tree(os.path.join(os.path.dirname(os.path.realpath(__file__)), './../../layer/micka/record-template.xml'))
+            # current_app.logger.info(f"Copying property {prop_name} element from template")
+            tmp_tree = tmp_tree or read_xml_tree(basic_template_path)
             tmp_parent_el = tmp_tree.xpath(micka_prop['xpath_parent'], namespaces=NAMESPACES)[0]
             tmp_fst_prop_el = tmp_parent_el.xpath(micka_prop['xpath_property'].split('[')[0], namespaces=NAMESPACES)[0]
             # print(f"Found template {prop_name} element {tmp_fst_prop_el.tag}")

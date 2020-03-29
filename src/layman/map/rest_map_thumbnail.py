@@ -18,6 +18,7 @@ bp = Blueprint('rest_map_thumbnail', __name__)
 @authorize
 @check_username_decorator
 @util.check_mapname_decorator
+@util.info_decorator
 def before_request():
     pass
 
@@ -25,9 +26,6 @@ def before_request():
 @bp.route('/maps/<mapname>/thumbnail', methods=['GET'])
 def get(username, mapname):
     app.logger.info(f"GET Map Thumbnail, user={g.user}")
-
-    # raise exception if map does not exist
-    util.get_complete_map_info(username, mapname)
 
     thumbnail_info = thumbnail.get_map_info(username, mapname)
     if thumbnail_info:

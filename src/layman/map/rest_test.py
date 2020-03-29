@@ -1,4 +1,5 @@
 import glob
+import json
 import os
 import urllib
 import time
@@ -19,6 +20,34 @@ from layman import app, settings, uuid
 from layman import celery as celery_util
 from layman.util import url_for as url_for_external
 from layman.common.micka import util as micka_common_util
+
+METADATA_PROPERTIES = {
+    'abstract',
+    'extent',
+    'graphic_url',
+    'identifier',
+    'language',
+    'map_endpoint',
+    'map_file_endpoint',
+    'operates_on',
+    'organisation_name',
+    'publication_date',
+    'reference_system',
+    'revision_date',
+    'title',
+}
+
+METADATA_PROPERTIES_NOT_EQUAL = set()
+
+METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES
+
+METADATA_PROPERTIES_POST_NULL = {
+    'language',
+    'organisation_name',
+    'revision_date',
+}
+
+METADATA_PROPERTIES_PATCH_NULL = METADATA_PROPERTIES_POST_NULL - {'revision_date'}
 
 
 num_maps_before_test = 0
@@ -230,6 +259,7 @@ def test_post_maps_simple(client):
         assert 'path' in thumbnail
         assert thumbnail['url'] == url_for_external('rest_map_thumbnail.get', username=username, mapname=mapname)
 
+    with app.app_context():
         rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
         assert rv.status_code == 200
         resp_json = rv.get_json()
@@ -243,14 +273,28 @@ def test_post_maps_simple(client):
             map_info = client.get(url_for('rest_map.get', username=username,
                                           mapname=mapname)).get_json()
 
-    assert set(map_info['metadata'].keys()) == {'identifier', 'csw_url', 'record_url'}
-    assert map_info['metadata']['identifier'] == f"m-{uuid_str}"
-    assert map_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
-    md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
-    assert map_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
-    r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
-    r.raise_for_status()
-    assert mapname in r.text
+        assert set(map_info['metadata'].keys()) == {'identifier', 'csw_url', 'record_url', 'comparison_url'}
+        assert map_info['metadata']['identifier'] == f"m-{uuid_str}"
+        assert map_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
+        md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
+        assert map_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
+        r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
+        r.raise_for_status()
+        assert mapname in r.text
+
+    with app.app_context():
+        rest_path = url_for('rest_map_metadata_comparison.get', username=username, mapname=mapname)
+        rv = client.get(rest_path)
+        assert rv.status_code == 200, rv.get_json()
+        resp_json = rv.get_json()
+        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
+        for k, v in resp_json['metadata_properties'].items():
+            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
+        for p in METADATA_PROPERTIES_POST_NULL:
+            assert all((v is None for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not null: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+
+
 
 def test_post_maps_complex(client):
     with app.app_context():
@@ -345,6 +389,18 @@ def test_post_maps_complex(client):
         assert groups_json['guest'] == 'w'
         assert len(groups_json) == 1
 
+    with app.app_context():
+        rest_path = url_for('rest_map_metadata_comparison.get', username=username, mapname=mapname)
+        rv = client.get(rest_path)
+        assert rv.status_code == 200, rv.get_json()
+        resp_json = rv.get_json()
+        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
+        for k, v in resp_json['metadata_properties'].items():
+            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
+        for p in METADATA_PROPERTIES_POST_NULL:
+            assert all((v is None for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not null: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+
 
 def test_patch_map(client):
     with app.app_context():
@@ -419,6 +475,7 @@ def test_patch_map(client):
         assert groups_json['guest'] == 'w'
         assert len(groups_json) == 1
 
+    with app.app_context():
         title = 'Nový název'
         rv = client.patch(rest_path, data={
             'title': title,
@@ -441,6 +498,18 @@ def test_patch_map(client):
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{MAP_TYPE}': num_maps_before_test + 2
         })
+
+    with app.app_context():
+        rest_path = url_for('rest_map_metadata_comparison.get', username=username, mapname=mapname)
+        rv = client.get(rest_path)
+        assert rv.status_code == 200, rv.get_json()
+        resp_json = rv.get_json()
+        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
+        for k, v in resp_json['metadata_properties'].items():
+            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
+        for p in METADATA_PROPERTIES_PATCH_NULL:
+            assert all((v is None for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not null: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
 
 
 def test_delete_map(client):
@@ -502,7 +571,7 @@ def test_map_composed_from_local_layers(client):
     # in /var/www/html/Micka/php/app/model/RecordModel.php, line 197 setEditMd2Md INSERT INTO ...
     # probably problem with concurrent CSW insert
     # so report bug to Micka
-    time.sleep(0.2)
+    time.sleep(0.3)
 
     with app.app_context():
         layername2 = 'hranice'
@@ -614,7 +683,7 @@ def test_map_composed_from_local_layers(client):
 
     with app.app_context():
         # assert metadata file is the same as filled template except for UUID and dates
-        template_path, prop_values = csw.get_template_path_and_values(username, mapname)
+        template_path, prop_values = csw.get_template_path_and_values(username, mapname, http_method='post')
         xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values,
                                                                                     csw.METADATA_PROPERTIES)
         expected_path = 'src/layman/map/rest_test_filled_template.xml'
@@ -652,3 +721,14 @@ def test_map_composed_from_local_layers(client):
         minus_line = minus_lines[4]
         assert minus_line.startswith('-      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and minus_line.endswith('" xlink:title="mista" xlink:type="simple"/>\n'), minus_line
 
+    with app.app_context():
+        rest_path = url_for('rest_map_metadata_comparison.get', username=username, mapname=mapname)
+        rv = client.get(rest_path)
+        assert rv.status_code == 200, rv.get_json()
+        resp_json = rv.get_json()
+        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
+        for k, v in resp_json['metadata_properties'].items():
+            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
+        for p in METADATA_PROPERTIES_POST_NULL:
+            assert all((v is None for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not null: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"

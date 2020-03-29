@@ -11,7 +11,7 @@ from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_
 from layman import celery as celery_util
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
-from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals_or_none, prop_equals_strict
+from layman.common import metadata as common_md
 
 
 
@@ -260,34 +260,7 @@ def get_metadata_comparison(username, layername):
         if pi is not None:
             all_props.update(pi)
 
-    prop_names = sorted(list(set([pn for po in all_props.values() for pn in po.keys()])))
-    sources = {
-        f"s{idx+1}": {
-            'url': k
-        }
-        for idx, k in enumerate(sorted(list(all_props.keys())))
-    }
-    src_url_to_idx = {}
-    for k, v in sources.items():
-        src_url_to_idx[v['url']] = k
-    all_props = {
-        'metadata_sources': sources,
-        'metadata_properties': {
-            pn: {
-                'values': {
-                    f"{src_url_to_idx[src]}": prop_object[pn]
-                    for src, prop_object in all_props.items()
-                    if pn in prop_object
-                },
-            }
-            for pn in prop_names
-        }
-    }
-    for pn, po in all_props['metadata_properties'].items():
-        equals_fn = COMMON_PROPERTIES[pn].get('equals_fn', None)
-        po['equal_or_null'] = prop_equals_or_none(po['values'].values(), equals_fn=equals_fn)
-        po['equal'] = prop_equals_strict(list(po['values'].values()), equals_fn=equals_fn)
-    return all_props
+    return common_md.transform_metadata_props_to_comparison(all_props)
 
 
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, LAYER_TYPE)
@@ -296,10 +269,4 @@ get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, LAYER
 def get_same_or_missing_prop_names(username, layername):
     md_comparison = get_metadata_comparison(username, layername)
     prop_names = get_syncable_prop_names()
-    # current_app.logger.info(f'prop_names before filtering: {prop_names}')
-    prop_names = [
-        pn for pn in prop_names
-        if (pn in md_comparison['metadata_properties'] and md_comparison['metadata_properties'][pn]['equal']) or (pn not in md_comparison['metadata_properties'])
-    ]
-    # current_app.logger.info(f'prop_names after filtering: {prop_names}')
-    return prop_names
+    return common_md.get_same_or_missing_prop_names(prop_names, md_comparison)

@@ -34,10 +34,17 @@
 - Maps composed from WMS layers only are fully supported
 - Documented [map publishing](publish-map.md) process 
 - Thumbnail image available
-- Map-related data is named and structured first by username, second by mapname
-  - [REST API](rest.md): `/rest/<username>/maps/<mapname>` 
-  - file system: `/path/to/LAYMAN_DATA_DIR/users/<username>/maps/<mapname>` 
-  
+- Map-related data is named and structured
+  - either by username and layername
+      - [REST API](rest.md): `/rest/<username>/maps/<mapname>` 
+      - file system: `/path/to/LAYMAN_DATA_DIR/users/<username>/maps/<mapname>` 
+  - or by UUID:
+      - Micka: `/record/basic/m-<uuid>`
+- Simple rules
+  - one map file per map
+  - one thumbnail per map
+  - one metadata record per map
+
 ## User
 - User is any person who communicates with Layman REST API through any client.
 - User can be either authenticated, or unauthenticated (i.e. anonymous).

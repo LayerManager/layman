@@ -74,7 +74,8 @@ def update_layer(username, layername, layerinfo):
         if k in layerinfo['metadata_properties_to_refresh']
     }
     # current_app.logger.info(f"update_layer prop_values={prop_values}")
-    el = common_util.fill_xml_template_obj(el, prop_values, METADATA_PROPERTIES)
+    basic_template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), './record-template.xml')
+    el = common_util.fill_xml_template_obj(el, prop_values, METADATA_PROPERTIES, basic_template_path=basic_template_path)
     record = ET.tostring(el, encoding='unicode', pretty_print=True)
     # current_app.logger.info(f"update_layer record=\n{record}")
     try:

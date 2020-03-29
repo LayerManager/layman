@@ -7,13 +7,14 @@
 
 ### Changes
 - Use absolute URLs in responses of Layer and Map endpoints
-- Add [GET Layer Metadata Comparison](doc/rest.md#get-layer-metadata-comparison) endpoint. 
-- [PATCH Layer](doc/rest.md#patch-layer) updates also CSW metadata.
+- Add [GET Layer Metadata Comparison](doc/rest.md#get-layer-metadata-comparison) and [GET Map Metadata Comparison](doc/rest.md#get-map-metadata-comparison) endpoints. 
+- Both [PATCH Layer](doc/rest.md#patch-layer) and [PATCH Map](doc/rest.md#patch-map) update also CSW metadata.
 - Add [`revision_date`](doc/metadata.md#revision_date) metadata property
 - Upgrade Layman test client to version 1.1.1
-- Add `metadata.comparison_url` to [GET Layer](doc/rest.md#get-layer) response.
+- Add `metadata.comparison_url` to [GET Layer](doc/rest.md#get-layer) and [GET Map](doc/rest.md#get-map) responses.
 - Environment settings [CSW_ORGANISATION_NAME_REQUIRED](https://github.com/jirik/layman/blob/v1.2.1/doc/env-settings.md) is not used anymore as Micka v2020 accepts records without organisation names. 
 - Metadata properties [wms_url](doc/metadata.md#wms_url) and [wfs_url](doc/metadata.md#wfs_url) point directly to GetCapabilities documents. 
+- Layman now uses WMS 1.3.0 and WFS 2.0.0 in communication with GeoServer and in CSW metadata records.
  
 
 ## v1.2.1

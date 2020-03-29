@@ -34,7 +34,7 @@ Subsequently, when asynchronous tasks run,
 - vector data files are imported to [PostgreSQL](#postgresql),
 - PostgreSQL table with vector data is registered to and visualization file is saved to [GeoServer](#geoserver),
 - thumbnail file is saved to [filesystem](#filesystem),
-- and metadata record is saved to [PostgreSQL](#postgresql) using Micka's CSW or SOAP API.
+- and metadata record is saved to [PostgreSQL](#postgresql) using Micka's CSW.
 
 When user [patches existing layer](rest.md#patch-layer), data is saved in the same way.
 
@@ -42,12 +42,13 @@ When user [patches existing layer](rest.md#patch-layer), data is saved in the sa
 Information about [maps](models.md#map) includes JSON definition.
 
 When user [publishes new map](rest.md#post-maps)
-- UUID and name is saved to [Redis](#redis) and [filesystem](#filesystem)
+- UUID and name is saved to [Redis](#redis) and [filesystem](#filesystem),
 - JSON file is saved to [filesystem](#filesystem),
 - and asynchronous [tasks](#tasks) are saved in [Redis](#redis).
 
 Subsequently, when asynchronous tasks run,
-- thumbnail file is saved to [filesystem](#filesystem).
+- thumbnail file is saved to [filesystem](#filesystem)
+- and metadata record is saved to [PostgreSQL](#postgresql) using Micka's CSW.
 
 When user [patches existing map](rest.md#patch-map), data is saved in the same way.
 
