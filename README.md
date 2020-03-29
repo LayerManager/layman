@@ -61,7 +61,7 @@ cp .env.demo .env
 make geoserver-reset-default-layman-datadir
 
 # start dockerized containers in background
-make start-demo-full-d
+make start-demo-full
 ```
 Initial startup may take few minutes (download docker images, build it, run it). You are interested in container named `layman`. You can check it's logs with command
 ```bash

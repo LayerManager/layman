@@ -1,27 +1,18 @@
 .PHONY: test
 
 start-demo:
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client nginx
-
-start-demo-d:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client nginx
 
 start-demo-full:
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client micka nginx
-
-start-demo-full-d:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client micka nginx
 
-start-demo-only-d:
+start-demo-only:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps layman celery_worker flower timgen layman_client
 
 stop-demo:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml stop
 
 start-demo-full-with-optional-deps:
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up --force-recreate
-
-start-demo-full-with-optional-deps-d:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate
 
 build-demo:
@@ -34,19 +25,12 @@ deps-stop:
 	docker-compose -f docker-compose.deps.yml stop
 
 start-dev:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate
-
-start-dev-d:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate -d
 
 stop-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop
 
 start-dev-only:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower timgen layman_client
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up layman_dev celery_worker_dev flower timgen layman_client
-
-start-dev-only-d:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower timgen layman_client
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d layman_dev celery_worker_dev flower timgen layman_client
 
