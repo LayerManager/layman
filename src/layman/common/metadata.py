@@ -160,3 +160,43 @@ def _get_extent_intersetion(a, b):
 
 def _extent_intersects(a, b):
     return a[0] <= b[2] and a[2] >= b[0] and a[1] <= b[3] and a[3] >= b[1]
+
+
+def transform_metadata_props_to_comparison(all_props):
+    prop_names = sorted(list(set([pn for po in all_props.values() for pn in po.keys()])))
+    sources = {
+        f"s{idx+1}": {
+            'url': k
+        }
+        for idx, k in enumerate(sorted(list(all_props.keys())))
+    }
+    src_url_to_idx = {}
+    for k, v in sources.items():
+        src_url_to_idx[v['url']] = k
+    all_props = {
+        'metadata_sources': sources,
+        'metadata_properties': {
+            pn: {
+                'values': {
+                    f"{src_url_to_idx[src]}": prop_object[pn]
+                    for src, prop_object in all_props.items()
+                    if pn in prop_object
+                },
+            }
+            for pn in prop_names
+        }
+    }
+    for pn, po in all_props['metadata_properties'].items():
+        equals_fn = PROPERTIES[pn].get('equals_fn', None)
+        po['equal_or_null'] = prop_equals_or_none(po['values'].values(), equals_fn=equals_fn)
+        po['equal'] = prop_equals_strict(list(po['values'].values()), equals_fn=equals_fn)
+    return all_props
+
+
+def get_same_or_missing_prop_names(prop_names, comparison):
+    prop_names = [
+        pn for pn in prop_names
+        if (pn in comparison['metadata_properties'] and comparison['metadata_properties'][pn]['equal']) or (pn not in comparison['metadata_properties'])
+    ]
+    # current_app.logger.info(f'prop_names after filtering: {prop_names}')
+    return prop_names

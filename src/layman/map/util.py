@@ -1,4 +1,4 @@
-from functools import wraps
+from functools import wraps, partial
 import importlib
 import inspect
 import json
@@ -16,7 +16,10 @@ from layman import settings
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name, url_for
 from layman import celery as celery_util
 from . import get_map_sources, MAP_TYPE, get_map_type_def
-from layman.common import redis as redis_util, tasks as tasks_util
+from .filesystem import input_file
+from .micka.csw import map_json_to_operates_on, map_json_to_epsg_codes
+from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
+from layman.common import metadata as common_md
 
 
 MAPNAME_RE = USERNAME_RE
@@ -251,3 +254,66 @@ def get_groups_info(username, mapname):
 
 
 lock_decorator = redis_util.create_lock_decorator(MAP_TYPE, 'mapname', 29, is_map_task_ready)
+
+
+get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, MAP_TYPE)
+
+
+def map_info_to_metadata_properties(info):
+    result = {
+        'title': info['title'],
+        'identifier': {
+            'identifier': info['url'],
+            'label': info['name'],
+        },
+        'abstract': info['description'],
+        'graphic_url': info.get('thumbnail', {}).get('url', None),
+        'map_endpoint': info['url'],
+        'map_file_endpoint': info.get('file', {}).get('url', None),
+    }
+    return result
+
+
+def map_file_to_metadata_properties(map_json):
+    result = {
+        'title': map_json['title'],
+        'abstract': map_json['abstract'],
+        'operates_on': map_json_to_operates_on(map_json),
+        'extent': [float(c) for c in map_json['extent']],
+        'reference_system': map_json_to_epsg_codes(map_json),
+    }
+    return result
+
+
+def get_metadata_comparison(username, mapname):
+    layman_info = get_complete_map_info(cached=True)
+    layman_props = map_info_to_metadata_properties(layman_info)
+    all_props = {
+        f"{layman_props['map_endpoint']}": layman_props,
+    }
+    map_json = get_map_file_json(username, mapname)
+    if map_json:
+        layman_file_props = map_file_to_metadata_properties(map_json)
+        map_file_url = url_for('rest_map_file.get', mapname=mapname, username=username)
+        all_props[map_file_url] = layman_file_props
+    sources = get_sources()
+    partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [username, mapname])
+    for pi in partial_infos:
+        if pi is not None:
+            all_props.update(pi)
+
+    return common_md.transform_metadata_props_to_comparison(all_props)
+
+
+def get_same_or_missing_prop_names(username, mapname):
+    md_comparison = get_metadata_comparison(username, mapname)
+    prop_names = get_syncable_prop_names()
+    return common_md.get_same_or_missing_prop_names(prop_names, md_comparison)
+
+
+def get_map_file_json(username, mapname):
+    map_json = input_file.get_map_json(username, mapname)
+    if map_json is not None:
+        map_json['user'] = get_map_owner_info(username)
+        map_json['groups'] = get_groups_info(username, mapname)
+    return map_json

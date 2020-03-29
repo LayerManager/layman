@@ -16,12 +16,14 @@ def refresh_csw_needed(username, mapname, task_options):
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_csw(self, username, mapname, http_method='post'):
+def refresh_csw(self, username, mapname, http_method='post', metadata_properties_to_refresh=None):
     if self.is_aborted():
         raise AbortedException
     # TODO implement also PATCH
     if http_method == 'post':
         csw.csw_insert(username, mapname)
+    else:
+        csw.patch_map(username, mapname, metadata_properties_to_refresh=metadata_properties_to_refresh)
 
     if self.is_aborted():
         csw.delete_map(username, mapname)

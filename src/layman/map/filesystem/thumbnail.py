@@ -141,3 +141,7 @@ def generate_map_thumbnail(username, mapname):
     with open(file_path, 'wb') as f:
         f.write(base64.b64decode(data_url))
 
+
+def get_metadata_comparison(username, layername):
+    pass
+

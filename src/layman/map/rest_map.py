@@ -65,6 +65,8 @@ def patch(username, mapname):
     else:
         description = info['description']
 
+    props_to_refresh = util.get_same_or_missing_prop_names(username, mapname)
+    metadata_properties_to_refresh = props_to_refresh
     if file is not None:
         thumbnail.delete_map(username, mapname)
         file = FileStorage(
@@ -80,6 +82,7 @@ def patch(username, mapname):
         'description': description,
         'file_changed': file_changed,
         'http_method': 'patch',
+        'metadata_properties_to_refresh': metadata_properties_to_refresh,
     }
 
     util.patch_map(

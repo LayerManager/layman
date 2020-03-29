@@ -7,7 +7,14 @@ Layman is able to publish partial metadata records to [OGC Catalogue Service](ht
 
 Although metadata records sent to Micka are partial, they can (and should) be completed using Micka web editor GUI. URL of layer's metadata record leading to Micka's GUI is available in [GET Layer](rest.md#get-layer) response as `metadata.record_url` property. To complete metadata records, just open this URL in browser, log in to micka as editor or admin, and complete the record.
 
-Properties listed below contains XPath expression pointing to specific placement of the property inside metadata document. All listed metadata properties on Micka can be synced with metadata properties provided by Layman, whereas only some properties on Layman can be synced with properties provided by Micka (only `abstract`, `extent`, `language`, `reference_system`, `revision_date`, `scale_denominator`, `title`). No synchronization is implemented yet.
+Properties listed below contains
+- unique name (as heading)
+- multiplicity of the property (usually 1 or 1..*)
+- shape (type) of the property value
+- example of the property value
+- XPath expressions pointing to specific placement of the property inside metadata document 
+
+On POST requests, Layman automatically creates metadata record using CSW with values of all known and guessable properties. On PATCH requests, Layman also automatically updates metadata record, but only for these metadata properties, whose values were `equal_or_none` in Metadata Comparison response at the time just when PATCH started.
 
 
 ## Metadata properties known to Layman
@@ -172,6 +179,8 @@ Shape: String
 Example: `"2007-05-25"`
 
 XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="revision"]]/gmd:CI_Date/gmd:date/gco:Date/text()`
+
+XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="revision"]]/gmd:CI_Date/gmd:date/gco:Date/text()`
 
 
 ### title

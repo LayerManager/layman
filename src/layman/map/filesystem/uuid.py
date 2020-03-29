@@ -41,3 +41,8 @@ def post_map(username, mapname):
 
 def patch_map(username, mapname):
     pass
+
+
+def get_metadata_comparison(username, layername):
+    pass
+

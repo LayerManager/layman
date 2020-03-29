@@ -45,10 +45,11 @@ Processing chain consists of few steps:
 - import the file to PostgreSQL database as new table into user schema, including geometry transformation to EPSG:3857
 - publish the table as new layer (feature type) within user workspace of GeoServer
 - generate thumbnail image
+- publish metadata record to Micka
 
 If user directory, database schema, GeoServer's worskpace, or GeoServer's datastore does not exist yet, it is created on demand.
 
-Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Layer](#get-layer) and **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, sld).
+Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Layer](#get-layer) and **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, sld, metadata).
 
 It is possible to upload data files asynchronously, which is suitable for large files. This can be done in three steps:
 1. Send POST Layers request with **file** parameter filled by file names that you want to upload
@@ -304,6 +305,7 @@ Processing chain consists of few steps:
 - save file to user directory
 - if needed, update some JSON attributes (`name`, `title`, or `abstract`)
 - generate thumbnail image
+- publish metadata record to Micka
 
 If user directory does not exist yet, it is created on demand.
 
@@ -385,7 +387,8 @@ Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
 Parameters have same meaning as in case of [POST Maps](#post-maps).
 
 Body parameters:
-- *file*, JSON file
+*file*, JSON file
+   - If provided, thumbnail will be deleted and created again using the new file.
    - must be valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema)
 - *title*, string `.+`
    - human readable name of the map

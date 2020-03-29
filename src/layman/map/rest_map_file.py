@@ -18,6 +18,7 @@ bp = Blueprint('rest_map_file', __name__)
 @authorize
 @check_username_decorator
 @util.check_mapname_decorator
+@util.info_decorator
 def before_request():
     pass
 
@@ -26,18 +27,10 @@ def before_request():
 def get(username, mapname):
     app.logger.info(f"GET Map File, user={g.user}")
 
-    # raise exception if map does not exist
-    map_info = util.get_complete_map_info(username, mapname)
+    map_json = util.get_map_file_json(username, mapname)
 
-    if 'path' in map_info['file']:
-        userdir = get_user_dir(username)
-        file_path = map_info['file']['path']
-        file_path = os.path.join(userdir, file_path)
-        with open(file_path) as json_file:
-            data = json.load(json_file)
-            data['user'] = util.get_map_owner_info(username)
-            data['groups'] = util.get_groups_info(username, mapname)
-            return jsonify(data), 200
+    if map_json is not None:
+        return jsonify(map_json), 200
 
     raise LaymanError(27, {'mapname': mapname})
 

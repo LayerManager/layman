@@ -16,6 +16,7 @@ from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer.geoserver.wms import get_layer_info as wms_get_layer_info
 from layman.layer.micka.csw import get_layer_info as csw_get_layer_info
 from layman.util import url_for, USERNAME_ONLY_PATTERN
+from lxml import etree as ET
 
 
 PATCH_MODE = patch_mode.NO_DELETE
@@ -42,6 +43,7 @@ def get_map_info(username, mapname):
                 'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
                 'record_url': settings.CSW_RECORD_URL.format(identifier=muuid),
+                'comparison_url': url_for('rest_map_metadata_comparison.get', username=username, mapname=mapname),
             }
         }
     else:
@@ -80,12 +82,42 @@ def post_map(username, mapname):
     pass
 
 
-def patch_map(username, mapname):
-    pass
+def patch_map(username, mapname, metadata_properties_to_refresh=None):
+    # current_app.logger.info(f"patch_map metadata_properties_to_refresh={metadata_properties_to_refresh}")
+    metadata_properties_to_refresh = metadata_properties_to_refresh or []
+    if len(metadata_properties_to_refresh) == 0:
+        return {}
+    uuid = get_map_uuid(username, mapname)
+    csw = common_util.create_csw()
+    if uuid is None or csw is None:
+        return {}
+    muuid = get_metadata_uuid(uuid)
+    el = common_util.get_record_element_by_id(csw, muuid)
+    # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
+
+    _, prop_values = get_template_path_and_values(username, mapname, http_method='patch')
+    prop_values = {
+        k: v for k, v in prop_values.items()
+        if k in metadata_properties_to_refresh
+    }
+    # current_app.logger.info(f"update_map prop_values={prop_values}")
+    basic_template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), './record-template.xml')
+    el = common_util.fill_xml_template_obj(el, prop_values, METADATA_PROPERTIES, basic_template_path=basic_template_path)
+    record = ET.tostring(el, encoding='unicode', pretty_print=True)
+    # current_app.logger.info(f"update_map record=\n{record}")
+    try:
+        muuid = common_util.csw_update({
+            'muuid': muuid,
+            'record': record,
+        })
+    except (HTTPError, ConnectionError):
+        current_app.logger.info(traceback.format_exc())
+        raise LaymanError(38)
+    return muuid
 
 
 def csw_insert(username, mapname):
-    template_path, prop_values = get_template_path_and_values(username, mapname)
+    template_path, prop_values = get_template_path_and_values(username, mapname, http_method='post')
     record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
     try:
         muuid = common_util.csw_insert({
@@ -97,7 +129,7 @@ def csw_insert(username, mapname):
     return muuid
 
 
-def _map_json_to_operates_on(map_json):
+def map_json_to_operates_on(map_json):
     unquote_urls(map_json)
     gs_url = get_gs_proxy_base_url()
     gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
@@ -140,30 +172,47 @@ def _map_json_to_operates_on(map_json):
     return operates_on
 
 
-def get_template_path_and_values(username, mapname):
+def map_json_to_epsg_codes(map_json):
+    epsg_code = None
+    proj_pattern = re.compile(r'^epsg:(\d+)$', re.IGNORECASE)
+    proj_match = proj_pattern.match(map_json['projection'])
+    if proj_match:
+        epsg_code = int(proj_match.group(1))
+    return [epsg_code] if epsg_code else None
+
+
+def get_template_path_and_values(username, mapname, http_method=None):
+    assert http_method in ['post', 'patch']
     uuid_file_path = get_publication_uuid_file(MAP_TYPE, username, mapname)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
+    revision_date = datetime.now()
     map_json = get_map_json(username, mapname)
-    operates_on = _map_json_to_operates_on(map_json)
+    operates_on = map_json_to_operates_on(map_json)
 
-    template_values = _get_property_values(
+    prop_values = _get_property_values(
         username=username,
         mapname=mapname,
         uuid=get_map_uuid(username, mapname),
         title=map_json['title'],
         abstract=map_json['abstract'] or None,
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
+        revision_date=revision_date.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
         identifier=url_for('rest_map.get', username=username, mapname=mapname),
         identifier_label=mapname,
         extent=[float(c) for c in map_json['extent']],
+        epsg_codes=map_json_to_epsg_codes(map_json),
         # TODO create config env variable to decide if to set organisation name or not
         md_organisation_name=None,
         organisation_name=None,
         operates_on=operates_on,
     )
+    if http_method == 'post':
+        prop_values.pop('revision_date', None)
+    elif http_method == 'patch':
+        prop_values.pop('publication_date', None)
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
-    return template_path, template_values
+    return template_path, prop_values
 
 
 def _get_property_values(
@@ -175,6 +224,7 @@ def _get_property_values(
         md_organisation_name=None,
         organisation_name=None,
         publication_date='2007-05-25',
+        revision_date='2008-05-25',
         md_date_stamp='2007-05-25',
         identifier='http://www.env.cz/data/liberec/admin-cleneni',
         identifier_label='Liberec-AdminUnits',
@@ -203,6 +253,7 @@ def _get_property_values(
         'reference_system': epsg_codes,
         'title': title,
         'publication_date': publication_date,
+        'revision_date': revision_date,
         'identifier': {
             'identifier': identifier,
             'label': identifier_label,
@@ -266,6 +317,13 @@ METADATA_PROPERTIES = {
         'xpath_extract': './gmd:CI_Date/gmd:date/gco:Date/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
         'adjust_property_element': partial(common_util.adjust_date_string_with_type, date_type='publication'),
+    },
+    'revision_date': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation',
+        'xpath_property': './gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="revision"]]',
+        'xpath_extract': './gmd:CI_Date/gmd:date/gco:Date/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': partial(common_util.adjust_date_string_with_type, date_type='revision'),
     },
     'identifier': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation',
@@ -337,3 +395,36 @@ METADATA_PROPERTIES = {
         'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='WWW:LINK-1.0-http--link', online_function='download'),
     },
 }
+
+
+def get_metadata_comparison(username, mapname):
+    uuid = get_map_uuid(username, mapname)
+    csw = common_util.create_csw()
+    if uuid is None or csw is None:
+        return {}
+    muuid = get_metadata_uuid(uuid)
+    el = common_util.get_record_element_by_id(csw, muuid)
+
+    # current_app.logger.info(f"xml\n{ET.tostring(el)}")
+
+    props = common_util.parse_md_properties(el, [
+        'abstract',
+        'extent',
+        'graphic_url',
+        'identifier',
+        'language',
+        'map_endpoint',
+        'map_file_endpoint',
+        'operates_on',
+        'organisation_name',
+        'publication_date',
+        'reference_system',
+        'revision_date',
+        'title',
+    ], METADATA_PROPERTIES)
+    # current_app.logger.info(f"props:\n{json.dumps(props, indent=2)}")
+    # current_app.logger.info(f"csw.request={csw.request}")
+    url = csw.request.replace(settings.CSW_URL, settings.CSW_PROXY_URL)
+    return {
+        f"{url}": props
+    }
