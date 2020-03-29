@@ -476,11 +476,19 @@ def test_patch_map(client):
         assert len(groups_json) == 1
 
     with app.app_context():
+        map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
+    while 'status' in map_info['metadata'] and map_info['metadata']['status'] in ['PENDING', 'STARTED']:
+        time.sleep(0.1)
+        with app.app_context():
+            map_info = client.get(url_for('rest_map.get', username=username,
+                                      mapname=mapname)).get_json()
+
+    with app.app_context():
         title = 'Nový název'
         rv = client.patch(rest_path, data={
             'title': title,
         })
-        assert rv.status_code == 200
+        assert rv.status_code == 200, rv.get_json()
         resp_json = rv.get_json()
         assert resp_json['title'] == "Nový název"
         assert resp_json['description'] == "Jiný popis"
