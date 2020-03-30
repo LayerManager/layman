@@ -2,6 +2,7 @@ import os
 import pathlib
 from urllib.parse import urljoin
 from layman import settings
+from flask import current_app
 
 from layman import patch_mode
 from layman.util import url_for
@@ -66,9 +67,9 @@ def generate_layer_thumbnail(username, layername):
     wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
     from layman.layer.geoserver.util import wms_proxy
     wms = wms_proxy(wms_url)
-    # app.logger.info(list(wms.contents))
-    bbox = list(wms[layername].boundingBox)
-    # app.logger.info(bbox)
+    # current_app.logger.info(list(wms.contents))
+    bbox = list(next(t for t in wms[layername].crs_list if t[4].lower() == 'epsg:3857'))
+    # current_app.logger.info(f"bbox={bbox}")
     min_range = min(bbox[2] - bbox[0], bbox[3] - bbox[1]) / 2
     tn_bbox = (
         (bbox[0] + bbox[2]) / 2 - min_range,

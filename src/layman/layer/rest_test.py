@@ -20,6 +20,7 @@ from .geoserver.util import get_feature_type, wms_proxy
 from layman import app as app
 from layman import settings
 from layman.layer.filesystem import uuid as layer_uuid
+from layman.layer.filesystem.thumbnail import get_layer_thumbnail_path
 from layman import uuid
 from layman.layer import db
 from layman import celery as celery_util
@@ -621,6 +622,9 @@ def test_uppercase_attr(client):
             assert next((
                 a for a in attributes if a['name'] == attr_name
             ), None) is not None
+
+        th_path = get_layer_thumbnail_path(username, layername)
+        assert os.path.getsize(th_path) > 5000
 
     with app.app_context():
         rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
