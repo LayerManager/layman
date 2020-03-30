@@ -75,6 +75,31 @@ def provide_map(client):
         assert rv.status_code == 200
 
 
+def patch_map(client):
+    with app.app_context():
+        username = TEST_USER
+        mapname = TEST_MAP
+        rest_path = url_for('rest_map.patch', username=username, mapname=mapname)
+        file_paths = [
+            'sample/layman.map/full.json',
+        ]
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+            rv = client.patch(rest_path, data={
+                'file': files,
+                'title': 'patched map',
+            })
+            assert rv.status_code == 200
+        finally:
+            for fp in files:
+                fp[0].close()
+
+    wait_till_ready(username, mapname)
+
+
 @pytest.fixture(scope="module")
 def broken_micka():
     server = create_server(MICKA_PORT)
@@ -163,3 +188,10 @@ def test_delete_map_no_micka():
         with app.app_context():
             delete_map(TEST_USER, TEST_MAP)
     assert exc_info.value.code == 38
+
+
+@pytest.mark.usefixtures('provide_map')
+def test_patch_map_without_metadata(client):
+    with app.app_context():
+        delete_map(TEST_USER, TEST_MAP)
+    patch_map(client)

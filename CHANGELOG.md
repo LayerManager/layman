@@ -1,5 +1,12 @@
 # Changelog
 
+
+## v1.3.1
+2020-03-30
+- Post metadata record if no one found during patch, fix #52
+- Use EPSG:3857 bbox when generating thumbnail, fix #53
+
+
 ## v1.3.0
 2020-03-29
 ### Upgrade requirements

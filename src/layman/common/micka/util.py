@@ -534,5 +534,7 @@ def adjust_operates_on(prop_el, prop_value):
 def get_record_element_by_id(csw, id):
     csw.getrecordbyid(id=[id], esn='full', outputschema=NAMESPACES['gmd'])
     xml = csw._exml
-    el = xml.xpath('//gmd:MD_Metadata', namespaces=NAMESPACES)[0]
-    return el
+    els = xml.xpath(f"//gmd:MD_Metadata[gmd:fileIdentifier/gco:CharacterString/text() = '{id}']", namespaces=NAMESPACES)
+    # current_app.logger.info(f"Number of md records id={id}: {len(els)}")
+    result = els[0] if len(els) > 0 else None
+    return result

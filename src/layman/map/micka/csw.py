@@ -93,6 +93,8 @@ def patch_map(username, mapname, metadata_properties_to_refresh=None):
         return {}
     muuid = get_metadata_uuid(uuid)
     el = common_util.get_record_element_by_id(csw, muuid)
+    if el is None:
+        return csw_insert(username, mapname)
     # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
 
     _, prop_values = get_template_path_and_values(username, mapname, http_method='patch')
@@ -404,6 +406,8 @@ def get_metadata_comparison(username, mapname):
         return {}
     muuid = get_metadata_uuid(uuid)
     el = common_util.get_record_element_by_id(csw, muuid)
+    if el is None:
+        return
 
     # current_app.logger.info(f"xml\n{ET.tostring(el)}")
 

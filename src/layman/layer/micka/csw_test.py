@@ -75,6 +75,31 @@ def provide_layer(client):
         assert rv.status_code == 200
 
 
+def patch_layer(client):
+    with app.app_context():
+        username = TEST_USER
+        layername = TEST_LAYER
+        rest_path = url_for('rest_layer.patch', username=username, layername=layername)
+        file_paths = [
+            'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+        ]
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+            rv = client.patch(rest_path, data={
+                'file': files,
+                'title': 'patched layer',
+            })
+            assert rv.status_code == 200
+        finally:
+            for fp in files:
+                fp[0].close()
+
+    wait_till_ready(username, layername)
+
+
 @pytest.fixture(scope="module")
 def broken_micka():
     server = create_server(MICKA_PORT)
@@ -163,3 +188,10 @@ def test_delete_layer_no_micka():
         with app.app_context():
             delete_layer(TEST_USER, TEST_LAYER)
     assert exc_info.value.code == 38
+
+
+@pytest.mark.usefixtures('provide_layer')
+def test_patch_layer_without_metadata(client):
+    with app.app_context():
+        delete_layer(TEST_USER, TEST_LAYER)
+    patch_layer(client)

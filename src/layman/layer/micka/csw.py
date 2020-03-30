@@ -66,6 +66,8 @@ def update_layer(username, layername, layerinfo):
         return {}
     muuid = get_metadata_uuid(uuid)
     el = common_util.get_record_element_by_id(csw, muuid)
+    if el is None:
+        return csw_insert(username, layername)
     # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
 
     _, prop_values = get_template_path_and_values(username, layername, http_method='patch')
@@ -340,6 +342,8 @@ def get_metadata_comparison(username, layername):
         return {}
     muuid = get_metadata_uuid(uuid)
     el = common_util.get_record_element_by_id(csw, muuid)
+    if el is None:
+        return
 
     # current_app.logger.info(f"xml\n{ET.tostring(el)}")
 
