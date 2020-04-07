@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.4.x
+2020-04-??
+- Update Python dependencies
+- Add [`md_language`](doc/metadata.md#md_language) metadata property
+- Guess language metadata props using pycld2 library
+
+
 ## v1.3.3
 2020-04-15
 ### Upgrade requirements
