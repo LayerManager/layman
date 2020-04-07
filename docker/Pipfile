@@ -5,7 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 pytest = "*"
-watchdog = "*"
+watchdog = {extras = ["watchmedo"],version = "*"}
 
 [packages]
 celery = {extras = ["redis"],version = "*"}
@@ -18,7 +18,8 @@ jsonschema = "*"
 flower = "*"
 selenium = "*"
 cacheout = "*"
-kombu = "==4.6.6"
+kombu = "==4.6.8"
+pycld2 = "*"
 
 [requires]
 python_version = "3.6"
