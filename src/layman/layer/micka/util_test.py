@@ -125,6 +125,7 @@ def test_fill_xml_template(client):
 
     xml_file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml', {
         'md_file_identifier': 'm-abc',
+        'md_language': 'eng',
         'md_organisation_name': 'My Metadata Organization',
         'md_date_stamp': '2007-01-22',
         'reference_system': [4326, 5514],

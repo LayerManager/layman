@@ -9,6 +9,7 @@ from flask import current_app
 
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util
+from layman.common import language as common_language
 from layman.layer.filesystem.uuid import get_layer_uuid
 from layman.layer.geoserver import wms
 from layman.layer.geoserver import wfs
@@ -134,6 +135,10 @@ def get_template_path_and_values(username, layername, http_method=None):
     uuid_file_path = get_publication_uuid_file(LAYER_TYPE, username, layername)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
     revision_date = datetime.now()
+    md_language = common_language.get_language_iso639_2(' '.join([
+        wms_layer.title or '',
+        wms_layer.abstract or ''
+    ]))
 
     prop_values = _get_property_values(
         username=username,
@@ -150,11 +155,13 @@ def get_template_path_and_values(username, layername, http_method=None):
         ows_url=urljoin(get_gs_proxy_base_url(), username + '/ows'),
         md_organisation_name=None,
         organisation_name=None,
+        md_language=md_language,
     )
     if http_method == 'post':
         prop_values.pop('revision_date', None)
     elif http_method == 'patch':
         prop_values.pop('publication_date', None)
+        prop_values.pop('md_language', None)
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
     return template_path, prop_values
 
@@ -177,6 +184,7 @@ def _get_property_values(
         epsg_codes=None,
         scale_denominator=None,
         language=None,
+        md_language=None,
 ):
     epsg_codes = epsg_codes or [3857, 4326]
     w, s, e, n = extent or [11.87, 48.12, 19.13, 51.59]
@@ -184,6 +192,7 @@ def _get_property_values(
 
     result = {
         'md_file_identifier': get_metadata_uuid(uuid),
+        'md_language': md_language,
         'md_date_stamp': md_date_stamp,
         'reference_system': epsg_codes,
         'title': title,
@@ -216,6 +225,13 @@ METADATA_PROPERTIES = {
         'xpath_extract': './gco:CharacterString/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
         'adjust_property_element': common_util.adjust_character_string,
+    },
+    'md_language': {
+        'xpath_parent': '/gmd:MD_Metadata',
+        'xpath_property': './gmd:language',
+        'xpath_extract': './gmd:LanguageCode/@codeListValue',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_language,
     },
     'md_organisation_name': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty',
@@ -301,7 +317,7 @@ METADATA_PROPERTIES = {
         'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification',
         'xpath_property': './gmd:language',
         'xpath_extract': './gmd:LanguageCode/@codeListValue',
-        'xpath_extract_fn': lambda l: int(l[0]) if l else None,
+        'xpath_extract_fn': lambda l: l[0] if l else None,
         'adjust_property_element': common_util.adjust_language,
     },
     'extent': {

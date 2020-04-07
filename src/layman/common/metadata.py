@@ -30,6 +30,9 @@ PROPERTIES = {
     'md_file_identifier': {
         'upper_mp': '1',
     },
+    'md_language': {
+        'upper_mp': '1',
+    },
     'md_organisation_name': {
         'upper_mp': '1',
     },

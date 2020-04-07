@@ -129,6 +129,18 @@ XPath for Layer: `/gmd:MD_Metadata/gmd:fileIdentifier/gco:CharacterString/text()
 XPath for Map: `/gmd:MD_Metadata/gmd:fileIdentifier/gco:CharacterString/text()`
 
 
+### md_language
+Guessed from title and description.
+
+Multiplicity: 1
+
+Shape: String
+
+Example: `"cze"`
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:language/gmd:LanguageCode/@codeListValue`
+
+
 ### operates_on
 Multiplicity: 1..*
 
