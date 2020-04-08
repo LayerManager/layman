@@ -26,6 +26,7 @@ from layman.layer import db
 from layman import celery as celery_util
 from .micka import csw
 from layman.common.micka import util as micka_common_util
+from layman.common.metadata import is_empty
 
 METADATA_PROPERTIES = {
     'abstract',
@@ -51,14 +52,13 @@ METADATA_PROPERTIES_NOT_EQUAL = {
 
 METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES - METADATA_PROPERTIES_NOT_EQUAL
 
-METADATA_PROPERTIES_POST_NULL = {
-    'language',
+METADATA_PROPERTIES_POST_EMPTY = {
     'organisation_name',
     'revision_date',
     'scale_denominator',
 }
 
-METADATA_PROPERTIES_PATCH_NULL = METADATA_PROPERTIES_POST_NULL - {'revision_date'}
+METADATA_PROPERTIES_PATCH_EMPTY = METADATA_PROPERTIES_POST_EMPTY - {'revision_date'}
 
 min_geojson = """
 {
@@ -300,10 +300,10 @@ def test_post_layers_simple(client):
         resp_json = rv.get_json()
         assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
         for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
             assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
-        for p in METADATA_PROPERTIES_POST_NULL:
-            assert all((v is None for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not null: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+        for p in METADATA_PROPERTIES_POST_EMPTY:
+            assert all((is_empty(v, p) for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not empty: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
 
 
 @pytest.mark.usefixtures('app_context')
@@ -690,10 +690,10 @@ def test_patch_layer_title(client):
         resp_json = rv.get_json()
         assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
         for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
             assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
-        for p in METADATA_PROPERTIES_PATCH_NULL:
-            assert all((v is None for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not null: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+        for p in METADATA_PROPERTIES_PATCH_EMPTY:
+            assert all((is_empty(v, p) for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not empty: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': num_layers_before_test + 4
@@ -747,11 +747,11 @@ def test_patch_layer_style(client):
         assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
         for k, v in resp_json['metadata_properties'].items():
             assert v['equal_or_null'] == (
-                        k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+                        k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
             assert v['equal'] == (
                         k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
-        for p in METADATA_PROPERTIES_PATCH_NULL:
-            assert all((v is None for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not null: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+        for p in METADATA_PROPERTIES_PATCH_EMPTY:
+            assert all((is_empty(v, p) for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not empty: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
 
 
 @pytest.mark.usefixtures('app_context')
@@ -878,11 +878,11 @@ def test_patch_layer_data(client):
         assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
         for k, v in resp_json['metadata_properties'].items():
             assert v['equal_or_null'] == (
-                        k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_none' value: {k}: {json.dumps(v, indent=2)}"
+                        k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
             assert v['equal'] == (
                         k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
-        for p in METADATA_PROPERTIES_PATCH_NULL:
-            assert all((v is None for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not null: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+        for p in METADATA_PROPERTIES_PATCH_EMPTY:
+            assert all((is_empty(v, p) for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not empty: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
 
 
 @pytest.mark.usefixtures('app_context')

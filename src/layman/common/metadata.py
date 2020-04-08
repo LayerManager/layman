@@ -68,7 +68,10 @@ PROPERTIES = {
         'upper_mp': '1',
     },
     'language': {
-        'upper_mp': '1',
+        'upper_mp': '*',
+        'lower_mp': '1',
+        'equals_fn': lambda a, b: set(a) == set(b),
+        'empty_fn': lambda a: type(a) is list and len(a) == 0,
     },
     'extent': {
         'upper_mp': '1',
@@ -109,6 +112,16 @@ def prop_equals(value_a, value_b, equals_fn=None):
 def prop_equals_or_none(values, equals_fn=None):
     equals_fn = equals_fn or (lambda a,b: a==b)
     values = [v for v in values if v is not None]
+    return prop_equals_strict(values, equals_fn)
+
+
+def prop_equals_or_empty(values, equals_fn=None, empty_fn=None):
+    equals_fn = equals_fn or (lambda a,b: a==b)
+    empty_fn = empty_fn or (lambda a: False)
+    values = [
+        v for v in values
+        if not (v is None or empty_fn(v))
+    ]
     return prop_equals_strict(values, equals_fn)
 
 
@@ -203,3 +216,7 @@ def get_same_or_missing_prop_names(prop_names, comparison):
     ]
     # current_app.logger.info(f'prop_names after filtering: {prop_names}')
     return prop_names
+
+
+def is_empty(v, prop_name):
+    return v is None or PROPERTIES[prop_name].get('empty_fn', lambda _: False)(v)

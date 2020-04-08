@@ -14,7 +14,7 @@ Properties listed below contains
 - example of the property value
 - XPath expressions pointing to specific placement of the property inside metadata document 
 
-On POST requests, Layman automatically creates metadata record using CSW with values of all known and guessable properties. On PATCH requests, Layman also automatically updates metadata record, but only for these metadata properties, whose values were `equal_or_none` in Metadata Comparison response at the time just when PATCH started.
+On POST requests, Layman automatically creates metadata record using CSW with values of all known and guessable properties. On PATCH requests, Layman also automatically updates metadata record, but only for these metadata properties, whose values were `equal` in Metadata Comparison response at the time just when PATCH started.
 
 
 ## Metadata properties known to Layman
@@ -230,11 +230,11 @@ XPath for Layer: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:
 ## Metadata properties guessable by Layman
 
 ### language
-Multiplicity: 1
+Multiplicity: 1..n
 
-Shape: String
+Shape: Array of strings
 
-Example: `"cze"`
+Example: `["cze", "eng"]`
 
 XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:language/gmd:LanguageCode/@codeListValue`
 

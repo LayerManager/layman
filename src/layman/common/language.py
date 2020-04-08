@@ -3,7 +3,7 @@ import pycld2
 
 
 SPLIT_PATTERN = re.compile(r'[\W_]', re.U)
-NUMBER_PATTERN = re.compile(r'^.*\d+.*$')
+IGNORE_PATTERN = re.compile(r'^(.*\d+.*|[A-Z]+|.*[a-z]+[A-Z]+.*)$')
 
 # https://cs.wikipedia.org/wiki/Seznam_kódů_ISO_639-1
 LANGUAGE_CODES = {
@@ -201,20 +201,19 @@ def tokenize(text):
     tokens = SPLIT_PATTERN.split(text)
     tokens = [
         t for t in tokens
-        if len(t) > 0 and not NUMBER_PATTERN.match(t)
+        if len(t) > 0 and not IGNORE_PATTERN.match(t)
     ]
     return tokens
 
 
-def get_language_cld2(text):
+def get_languages_cld2(text):
 
     # text = text.encode("utf-8")
     tokens = tokenize(text)
     # print('tokens', tokens)
     if len(tokens) == 0:
-        return None
+        return []
     text = ' '.join(tokens)
-    result = None
     reliable, text_bytes_found, details = pycld2.detect(text, bestEffort=False)
     # print(reliable, text_bytes_found, details)
 
@@ -222,18 +221,18 @@ def get_language_cld2(text):
         # print('not reliable', reliable, text_bytes_found, details)
         reliable, text_bytes_found, details = pycld2.detect(text, bestEffort=True)
 
-    langs = []
+    result = []
     if reliable:
-        langs = [
+        result = [
             d[1] for d in details
             if d[1] != 'un'
         ]
-    if len(langs) > 0:
-        result = langs[0]
-
     return result
 
 
-def get_language_iso639_2(text):
-    lang = get_language_cld2(text)
-    return LANGUAGE_CODES.get(lang, None)
+def get_languages_iso639_2(text):
+    languages = get_languages_cld2(text)
+    return [
+      LANGUAGE_CODES[l] for l in languages
+      if l in LANGUAGE_CODES
+    ]

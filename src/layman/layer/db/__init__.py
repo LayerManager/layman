@@ -1,7 +1,9 @@
+from collections import defaultdict
 import os
 import psycopg2
 from flask import g
 
+from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
 
@@ -96,7 +98,8 @@ def import_layer_vector_file(username, layername, main_filepath, crs_id):
         pass
     return_code = p.poll()
     if return_code != 0:
-        raise LaymanError(11)
+        pg_error = str(p.stdout.read())
+        raise LaymanError(11, private_data=pg_error)
 
 
 def import_layer_vector_file_async(username, layername, main_filepath,
@@ -150,3 +153,65 @@ def check_new_layername(username, layername, conn_cur=None):
     rows = cur.fetchall()
     if len(rows) > 0:
         raise LaymanError(9, {'db_object_name': layername})
+
+
+def get_text_column_names(username, layername, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+
+    try:
+        cur.execute(f"""
+SELECT QUOTE_IDENT(column_name) AS column_name
+FROM information_schema.columns 
+WHERE table_schema = '{username}' 
+AND table_name = '{layername}'
+AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
+""")
+    except:
+        raise LaymanError(7)
+    rows = cur.fetchall()
+    return [r[0] for r in rows]
+
+
+def get_text_data(username, layername, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+    col_names = get_text_column_names(username, layername, conn_cur=conn_cur)
+    if len(col_names) == 0:
+        return None
+    try:
+        cur.execute(f"""
+select {', '.join(col_names)}
+from {username}.{layername}
+order by ogc_fid
+limit 100
+""")
+    except:
+        raise LaymanError(7)
+    rows = cur.fetchall()
+    col_texts = defaultdict(list)
+    for row in rows:
+        for idx in range(len(col_names)):
+            col_name = col_names[idx]
+            v = row[idx]
+            if v is not None and len(v)>0:
+                col_texts[col_name].append(v)
+    col_texts = [
+        ' '.join(texts)
+        for _, texts in col_texts.items()
+    ]
+    # print(f"result col_texts={col_texts}")
+    return col_texts
+
+
+def get_text_languages(username, layername):
+    texts = get_text_data(username, layername)
+    all_langs = set()
+    for t in texts:
+        # skip short texts
+        if len(t) < 100:
+            continue
+        langs = get_languages_iso639_2(t)
+        if len(langs):
+            lang = langs[0]
+            # print(f"text={t}\nlanguage={lang}")
+            all_langs.add(lang)
+    return sorted(list(all_langs))
