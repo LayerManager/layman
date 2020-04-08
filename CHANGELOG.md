@@ -5,7 +5,8 @@
 2020-04-??
 - Update Python dependencies
 - Add [`md_language`](doc/metadata.md#md_language) metadata property
-- Guess language metadata props using pycld2 library
+- Guess [`md_language`](doc/metadata.md#md_language) and [`language`](doc/metadata.md#language) metadata properties of Layer using pycld2 library
+- Change multiplicity of [`language`](doc/metadata.md#language) metadata property from `1` to `1..n` according to XML Schema
 
 
 ## v1.3.3

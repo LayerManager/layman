@@ -103,7 +103,14 @@ def fill_xml_template_obj(tree_or_el, prop_values, publ_properties, basic_templa
         assert len(parent_el) > 0, f"Parent element of property {prop_name} not found!"
         parent_el = parent_el[0]
         single_prop_els, last_prop_el = get_single_prop_els(parent_el, prop_name, publ_properties)
-        single_prop_values = [prop_value] if common_prop['upper_mp'] == '1' else prop_value
+        if common_prop['upper_mp'] == '1':
+            single_prop_values = [prop_value]
+        elif prop_value is None:
+            single_prop_values = []
+        elif len(prop_value) == 0 and common_prop.get('lower_mp', None) is '1':
+            single_prop_values = [None]
+        else:
+            single_prop_values = prop_value
         all_new_els = []
         if len(single_prop_els) > 0 or last_prop_el is not None:
             assert len(single_prop_els) > 0 or last_prop_el is not None, f"Element of property {prop_name} not found!"

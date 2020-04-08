@@ -99,7 +99,7 @@ def test_parse_md_properties():
         'md_organisation_name': None,
         'organisation_name': None,
         'scale_denominator': None,
-        'language': None,
+        'language': [],
         'reference_system': [4326, 3857],
         'title': 'CORINE - Krajinný pokryv CLC 90',
         'publication_date': '2007-05-25',
@@ -139,7 +139,7 @@ def test_fill_xml_template(client):
         'organisation_name': 'My Organization',
         'graphic_url': 'https://example.com/myimage.png',
         'scale_denominator': None,
-        'language': None,
+        'language': ['cze', 'eng'],
         'extent': [11.87, 48.12, 19.13, 51.59],
         'wms_url': 'https://example.com/wms',
         'wfs_url': 'https://example.com/wfs',
@@ -170,6 +170,7 @@ def test_num_records(client):
         k: r for k, r in csw.records.items()
         if any((url_part in u for u in [ol.url for ol in r.distribution.online]))
     }
-    assert len(records) == num_publications
+    import json
+    assert len(records) == num_publications, f"md_record_ids={json.dumps(list(records.keys()), indent=5)}\npubls={json.dumps(publs_by_type, indent=2)}"
 
 

@@ -175,7 +175,51 @@
           </gmd:equivalentScale>
         </gmd:MD_Resolution>
       </gmd:spatialResolution>
-      <gmd:language gco:nilReason="unknown"/>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="ara" codeList="http://www.loc.gov/standards/iso639-2/">ara</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="ben" codeList="http://www.loc.gov/standards/iso639-2/">ben</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="chi" codeList="http://www.loc.gov/standards/iso639-2/">chi</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="dut" codeList="http://www.loc.gov/standards/iso639-2/">dut</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="eng" codeList="http://www.loc.gov/standards/iso639-2/">eng</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="fre" codeList="http://www.loc.gov/standards/iso639-2/">fre</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="ger" codeList="http://www.loc.gov/standards/iso639-2/">ger</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="gre" codeList="http://www.loc.gov/standards/iso639-2/">gre</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="hin" codeList="http://www.loc.gov/standards/iso639-2/">hin</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="hun" codeList="http://www.loc.gov/standards/iso639-2/">hun</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="jpn" codeList="http://www.loc.gov/standards/iso639-2/">jpn</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="kor" codeList="http://www.loc.gov/standards/iso639-2/">kor</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="pol" codeList="http://www.loc.gov/standards/iso639-2/">pol</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="spa" codeList="http://www.loc.gov/standards/iso639-2/">spa</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
+        <gmd:LanguageCode codeListValue="vie" codeList="http://www.loc.gov/standards/iso639-2/">vie</gmd:LanguageCode>
+      </gmd:language>
       <gmd:characterSet>
         <gmd:MD_CharacterSetCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>
       </gmd:characterSet>

@@ -11,6 +11,7 @@ from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util
 from layman.common import language as common_language
 from layman.layer.filesystem.uuid import get_layer_uuid
+from layman.layer import db
 from layman.layer.geoserver import wms
 from layman.layer.geoserver import wfs
 from layman.layer.geoserver.util import get_gs_proxy_base_url
@@ -135,10 +136,11 @@ def get_template_path_and_values(username, layername, http_method=None):
     uuid_file_path = get_publication_uuid_file(LAYER_TYPE, username, layername)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
     revision_date = datetime.now()
-    md_language = common_language.get_language_iso639_2(' '.join([
+    md_language = next(iter(common_language.get_languages_iso639_2(' '.join([
         wms_layer.title or '',
         wms_layer.abstract or ''
-    ]))
+    ]))), None)
+    languages = db.get_text_languages(username, layername)
 
     prop_values = _get_property_values(
         username=username,
@@ -156,6 +158,7 @@ def get_template_path_and_values(username, layername, http_method=None):
         md_organisation_name=None,
         organisation_name=None,
         md_language=md_language,
+        languages=languages,
     )
     if http_method == 'post':
         prop_values.pop('revision_date', None)
@@ -183,12 +186,13 @@ def _get_property_values(
         ows_url="http://www.env.cz/corine/data/download.zip",
         epsg_codes=None,
         scale_denominator=None,
-        language=None,
+        languages=None,
         md_language=None,
 ):
     epsg_codes = epsg_codes or [3857, 4326]
     w, s, e, n = extent or [11.87, 48.12, 19.13, 51.59]
     extent = [max(w, -180), max(s, -90), min(e, 180), min(n, 90)]
+    languages = languages or []
 
     result = {
         'md_file_identifier': get_metadata_uuid(uuid),
@@ -210,7 +214,7 @@ def _get_property_values(
         'wfs_url': wfs.add_capabilities_params_to_url(ows_url),
         'layer_endpoint': url_for('rest_layer.get', username=username, layername=layername),
         'scale_denominator': scale_denominator,
-        'language': language,
+        'language': languages,
         'md_organisation_name': md_organisation_name,
         'organisation_name': organisation_name,
     }

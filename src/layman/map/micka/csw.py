@@ -1,6 +1,7 @@
 from datetime import datetime, date, timedelta
 from flask import current_app
 from functools import partial
+import json
 import re
 from requests.exceptions import HTTPError, ConnectionError
 import os
@@ -232,12 +233,13 @@ def _get_property_values(
         identifier_label='Liberec-AdminUnits',
         extent=None,  # w, s, e, n
         epsg_codes=None,
-        language=None,
+        languages=None,
         operates_on=None,
 ):
     epsg_codes = epsg_codes or ['3857']
     w, s, e, n = extent or [14.62, 50.58, 15.42, 50.82]
     extent = [max(w, -180), max(s, -90), min(e, 180), min(n, 90)]
+    languages = languages or []
 
     # list of dictionaries, possible keys are 'xlink:title', 'xlink:href', 'uuidref'
     operates_on = operates_on or []
@@ -267,7 +269,7 @@ def _get_property_values(
         'map_endpoint': escape(url_for('rest_map.get', username=username, mapname=mapname)),
         'map_file_endpoint': escape(url_for('rest_map_file.get', username=username, mapname=mapname)),
         'operates_on': operates_on,
-        'language': language,
+        'language': languages,
         'md_organisation_name': md_organisation_name,
         'organisation_name': organisation_name,
     }
