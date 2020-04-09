@@ -1,3 +1,4 @@
+from datetime import date
 import io
 import json
 import os
@@ -26,7 +27,9 @@ from layman.layer import db
 from layman import celery as celery_util
 from .micka import csw
 from layman.common.micka import util as micka_common_util
-from layman.common.metadata import is_empty
+from layman.common.metadata import prop_equals_strict, PROPERTIES
+
+TODAY_DATE = date.today().strftime('%Y-%m-%d')
 
 METADATA_PROPERTIES = {
     'abstract',
@@ -52,14 +55,6 @@ METADATA_PROPERTIES_NOT_EQUAL = {
 
 METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES - METADATA_PROPERTIES_NOT_EQUAL
 
-METADATA_PROPERTIES_POST_EMPTY = {
-    'organisation_name',
-    'revision_date',
-    'scale_denominator',
-}
-
-METADATA_PROPERTIES_PATCH_EMPTY = METADATA_PROPERTIES_POST_EMPTY - {'revision_date'}
-
 min_geojson = """
 {
   "type": "Feature",
@@ -76,6 +71,23 @@ def wait_till_ready(username, layername):
     while last_task is not None and not celery_util.is_task_ready(last_task):
         time.sleep(0.1)
         last_task = util._get_layer_task(username, layername)
+
+
+def check_metadata(client, username, layername, props_equal, expected_values):
+    with app.app_context():
+        rest_path = url_for('rest_layer_metadata_comparison.get', username=username, layername=layername)
+        rv = client.get(rest_path)
+        assert rv.status_code == 200, rv.get_json()
+        resp_json = rv.get_json()
+        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
+        for k, v in resp_json['metadata_properties'].items():
+            assert v['equal_or_null'] == (k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal'] == (k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
+            # print(f"'{k}': {json.dumps(list(v['values'].values())[0], indent=2)},")
+            if k in expected_values:
+                vals = list(v['values'].values())
+                vals.append(expected_values[k])
+                assert prop_equals_strict(vals, equals_fn=PROPERTIES[k].get('equals_fn', None)), f"Property {k} has unexpected values {json.dumps(vals, indent=2)}"
 
 
 @pytest.fixture(scope="module")
@@ -293,17 +305,25 @@ def test_post_layers_simple(client):
             f'{LAYER_TYPE}': num_layers_before_test + 1
         })
 
-    with app.app_context():
-        rest_path = url_for('rest_layer_metadata_comparison.get', username=username, layername=layername)
-        rv = client.get(rest_path)
-        assert rv.status_code == 200, rv.get_json()
-        resp_json = rv.get_json()
-        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
-        for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
-            assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
-        for p in METADATA_PROPERTIES_POST_EMPTY:
-            assert all((is_empty(v, p) for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not empty: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+    expected_md_values = {
+        'abstract': None,
+        'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
+        'graphic_url': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries/thumbnail',
+        'identifier': {
+            'identifier': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries',
+            'label': 'ne_110m_admin_0_countries'
+        },
+        'language': ['eng'],
+        'layer_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries',
+        'organisation_name': None,
+        'publication_date': TODAY_DATE,
+        'reference_system': [3857, 4326],
+        'revision_date': None,
+        'scale_denominator': None,
+        'title': 'ne_110m_admin_0_countries',
+    }
+    check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
+
 
 
 @pytest.mark.usefixtures('app_context')
@@ -472,87 +492,106 @@ def test_post_layers_layer_exists(client):
     })
 
 
-@pytest.mark.usefixtures('app_context')
 def test_post_layers_complex(client):
-    username = 'testuser2'
-    rest_path = url_for('rest_layers.post', username=username)
-    file_paths = [
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
-    ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
-    files = []
-    sld_path = 'sample/style/generic-blue.xml'
-    assert os.path.isfile(sld_path)
-    layername = ''
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
-            'file': files,
-            'name': 'countries',
-            'title': 'staty',
-            'description': 'popis států',
-            'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
-        })
-        assert rv.status_code == 200
+    with app.app_context():
+        username = 'testuser2'
+        rest_path = url_for('rest_layers.post', username=username)
+        file_paths = [
+            'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+        ]
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+        sld_path = 'sample/style/generic-blue.xml'
+        assert os.path.isfile(sld_path)
+        layername = ''
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': 'countries',
+                'title': 'staty',
+                'description': 'popis států',
+                'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
+            })
+            assert rv.status_code == 200
+            resp_json = rv.get_json()
+            # print(resp_json)
+            layername = resp_json[0]['name']
+        finally:
+            for fp in files:
+                fp[0].close()
+
+        last_task = util._get_layer_task(username, layername)
+        assert last_task is not None and not celery_util.is_task_ready(last_task)
+        wait_till_ready(username, layername)
+        # last_task['last'].get()
+        assert celery_util.is_task_ready(last_task)
+
+        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+        wms = wms_proxy(wms_url)
+        assert 'countries' in wms.contents
+        assert wms['countries'].title == 'staty'
+        assert wms['countries'].abstract == 'popis států'
+        assert wms['countries'].styles[
+            username+':countries']['title'] == 'Generic Blue'
+
+        assert layername != ''
+        rest_path = url_for('rest_layer.get', username=username, layername=layername)
+        rv = client.get(rest_path)
+        assert 200 <= rv.status_code < 300
         resp_json = rv.get_json()
         # print(resp_json)
-        layername = resp_json[0]['name']
-    finally:
-        for fp in files:
-            fp[0].close()
+        assert resp_json['title']=='staty'
+        assert resp_json['description']=='popis států'
+        for source in [
+            'wms',
+            'wfs',
+            'thumbnail',
+            'file',
+            'db_table',
+            'metadata',
+        ]:
+            assert 'status' not in resp_json[source]
 
-    last_task = util._get_layer_task(username, layername)
-    assert last_task is not None and not celery_util.is_task_ready(last_task)
-    wait_till_ready(username, layername)
-    # last_task['last'].get()
-    assert celery_util.is_task_ready(last_task)
+        style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                        username + '/styles/' + layername)
+        r = requests.get(style_url + '.sld',
+            auth=settings.LAYMAN_GS_AUTH
+        )
+        r.raise_for_status()
+        sld_file = io.BytesIO(r.content)
+        tree = ET.parse(sld_file)
+        root = tree.getroot()
+        assert root.attrib['version'] == '1.0.0'
 
-    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
-    wms = wms_proxy(wms_url)
-    assert 'countries' in wms.contents
-    assert wms['countries'].title == 'staty'
-    assert wms['countries'].abstract == 'popis států'
-    assert wms['countries'].styles[
-        username+':countries']['title'] == 'Generic Blue'
+        feature_type = get_feature_type(username, 'postgresql', layername)
+        attributes = feature_type['attributes']['attribute']
+        assert next((
+            a for a in attributes if a['name'] == 'sovereignt'
+        ), None) is not None
+        uuid.check_redis_consistency(expected_publ_num_by_type={
+            f'{LAYER_TYPE}': num_layers_before_test + 4
+        })
 
-    assert layername != ''
-    rest_path = url_for('rest_layer.get', username=username, layername=layername)
-    rv = client.get(rest_path)
-    assert 200 <= rv.status_code < 300
-    resp_json = rv.get_json()
-    # print(resp_json)
-    assert resp_json['title']=='staty'
-    assert resp_json['description']=='popis států'
-    for source in [
-        'wms',
-        'wfs',
-        'thumbnail',
-        'file',
-        'db_table',
-        'metadata',
-    ]:
-        assert 'status' not in resp_json[source]
-
-    style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                    username + '/styles/' + layername)
-    r = requests.get(style_url + '.sld',
-        auth=settings.LAYMAN_GS_AUTH
-    )
-    r.raise_for_status()
-    sld_file = io.BytesIO(r.content)
-    tree = ET.parse(sld_file)
-    root = tree.getroot()
-    assert root.attrib['version'] == '1.0.0'
-
-    feature_type = get_feature_type(username, 'postgresql', layername)
-    attributes = feature_type['attributes']['attribute']
-    assert next((
-        a for a in attributes if a['name'] == 'sovereignt'
-    ), None) is not None
-    uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 4
-    })
+    expected_md_values = {
+        'abstract': "popis st\u00e1t\u016f",
+        'extent': [-180.0,-85.60903859383285,180.0,83.64513109859944],
+        'graphic_url': "http://layman_test_run_1:8000/rest/testuser2/layers/countries/thumbnail",
+        'identifier': {
+            "identifier": "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
+            "label": "countries"
+        },
+        'language': ["eng"],
+        'layer_endpoint': "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
+        'organisation_name': None,
+        'publication_date': TODAY_DATE,
+        'reference_system': [3857,4326],
+        'revision_date': None,
+        'scale_denominator': None,
+        'title': "staty",
+    }
+    check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 def test_uppercase_attr(client):
@@ -683,18 +722,26 @@ def test_patch_layer_title(client):
         assert resp_json['title'] == new_title
         assert resp_json['description'] == new_description
 
-    with app.app_context():
-        rest_path = url_for('rest_layer_metadata_comparison.get', username=username, layername=layername)
-        rv = client.get(rest_path)
-        assert rv.status_code == 200, rv.get_json()
-        resp_json = rv.get_json()
-        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
-        for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
-            assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
-        for p in METADATA_PROPERTIES_PATCH_EMPTY:
-            assert all((is_empty(v, p) for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not empty: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+    expected_md_values = {
+        'abstract': "and new description",
+        'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
+        'graphic_url': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries/thumbnail',
+        'identifier': {
+            'identifier': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries',
+            'label': 'ne_110m_admin_0_countries'
+        },
+        'language': ['eng'],
+        'layer_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries',
+        'organisation_name': None,
+        'publication_date': TODAY_DATE,
+        'reference_system': [3857, 4326],
+        'revision_date': TODAY_DATE,
+        'scale_denominator': None,
+        'title': "New Title of Countries",
+    }
+    check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
+    with app.app_context():
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': num_layers_before_test + 4
         })
@@ -739,19 +786,24 @@ def test_patch_layer_style(client):
             f'{LAYER_TYPE}': num_layers_before_test + 4
         })
 
-    with app.app_context():
-        rest_path = url_for('rest_layer_metadata_comparison.get', username=username, layername=layername)
-        rv = client.get(rest_path)
-        assert rv.status_code == 200, rv.get_json()
-        resp_json = rv.get_json()
-        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
-        for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (
-                        k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
-            assert v['equal'] == (
-                        k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
-        for p in METADATA_PROPERTIES_PATCH_EMPTY:
-            assert all((is_empty(v, p) for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not empty: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+    expected_md_values = {
+        'abstract': "and new description",
+        'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
+        'graphic_url': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries/thumbnail',
+        'identifier': {
+            'identifier': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries',
+            'label': 'ne_110m_admin_0_countries'
+        },
+        'language': ['eng'],
+        'layer_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries',
+        'organisation_name': None,
+        'publication_date': TODAY_DATE,
+        'reference_system': [3857, 4326],
+        'revision_date': TODAY_DATE,
+        'scale_denominator': None,
+        'title': 'countries in blue',
+    }
+    check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 @pytest.mark.usefixtures('app_context')
@@ -870,19 +922,24 @@ def test_patch_layer_data(client):
             f'{LAYER_TYPE}': num_layers_before_test + 4
         })
 
-    with app.app_context():
-        rest_path = url_for('rest_layer_metadata_comparison.get', username=username, layername=layername)
-        rv = client.get(rest_path)
-        assert rv.status_code == 200, rv.get_json()
-        resp_json = rv.get_json()
-        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
-        for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (
-                        k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
-            assert v['equal'] == (
-                        k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
-        for p in METADATA_PROPERTIES_PATCH_EMPTY:
-            assert all((is_empty(v, p) for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not empty: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+    expected_md_values = {
+        'abstract': "popis st\u00e1t\u016f",
+        'extent': [-175.22056435043098,-41.29999116752133,179.21664802661394,64.15002486626597],
+        'graphic_url': "http://layman_test_run_1:8000/rest/testuser2/layers/countries/thumbnail",
+        'identifier': {
+            "identifier": "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
+            "label": "countries"
+        },
+        'language': ["eng", 'chi', 'som'],
+        'layer_endpoint': "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
+        'organisation_name': None,
+        'publication_date': TODAY_DATE,
+        'reference_system': [3857,4326],
+        'revision_date': TODAY_DATE,
+        'scale_denominator': None,
+        'title': 'populated places',
+    }
+    check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 @pytest.mark.usefixtures('app_context')
