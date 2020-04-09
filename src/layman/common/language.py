@@ -1,9 +1,19 @@
 import re
 import pycld2
+from layman import settings
 
 
 SPLIT_PATTERN = re.compile(r'[\W_]', re.U)
 IGNORE_PATTERN = re.compile(r'^(.*\d+.*|[A-Z]+|.*[a-z]+[A-Z]+.*)$')
+
+PREFERRED_LANGUAGES = getattr(settings, 'PREFERRED_LANGUAGES', [
+  # https://cs.wikipedia.org/wiki/Seznam_jazyků_podle_počtu_mluvčích
+  'zh', 'es', 'en', 'ar', 'hi', 'bn', 'pt', 'ru', 'ja', 'pa', 'jv', 'ko', 'de', 'fr', 'te', 'mr', 'tr', 'ur', 'vi', 'ta',
+  # other widely-used european languages https://en.wikipedia.org/wiki/Languages_of_Europe
+  'it', 'pl', 'uk', 'ro', 'nl', 'hu', 'sv', 'el', 'cs', 'sr', 'bg', 'hr', 'da', 'fi', 'no', 'sk',
+  # other official EU languages
+  'et', 'ga', 'lv', 'lt', 'mt', 'sl',
+])
 
 # https://cs.wikipedia.org/wiki/Seznam_kódů_ISO_639-1
 LANGUAGE_CODES = {
@@ -214,6 +224,7 @@ def get_languages_cld2(text):
     if len(tokens) == 0:
         return []
     text = ' '.join(tokens)
+    # print(f"text={text}")
     reliable, text_bytes_found, details = pycld2.detect(text, bestEffort=False)
     # print(reliable, text_bytes_found, details)
 
@@ -222,16 +233,29 @@ def get_languages_cld2(text):
         reliable, text_bytes_found, details = pycld2.detect(text, bestEffort=True)
 
     result = []
+    # print(f"get_languages_cld2 reliable={reliable}, details={details}")
     if reliable:
-        result = [
-            d[1] for d in details
+        known_languages = [
+            d for d in details
             if d[1] != 'un'
         ]
+        preferred_languages = [
+          d for d in known_languages
+          if d[1] in PREFERRED_LANGUAGES
+        ]
+        langs = preferred_languages if len(preferred_languages) else known_languages
+        lang_scores = [l[2]*l[3] for l in langs]
+        idx = lang_scores.index(max(lang_scores))
+        result = [langs[idx][1]]
+    # print(f"get_languages_cld2 result={result}")
     return result
 
 
 def get_languages_iso639_2(text):
     languages = get_languages_cld2(text)
+    languages = [l.split('-')[0] for l in languages]
+    # for l in languages:
+    #   assert l in LANGUAGE_CODES, l
     return [
       LANGUAGE_CODES[l] for l in languages
       if l in LANGUAGE_CODES
