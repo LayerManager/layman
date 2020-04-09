@@ -1,19 +1,23 @@
 .PHONY: test
 
 start-demo:
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client nginx
 
 start-demo-full:
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client micka nginx
 
 start-demo-only:
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps layman celery_worker flower timgen layman_client
+
+start-demo-full-with-optional-deps:
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate
 
 stop-demo:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml stop
-
-start-demo-full-with-optional-deps:
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate
 
 build-demo:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
