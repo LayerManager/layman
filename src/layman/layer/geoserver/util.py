@@ -61,8 +61,10 @@ def wms_proxy(wms_url, xml=None, version=None):
         for method in operation.methods:
             method_url = urlparse(method['url'])
             method_url = method_url._replace(
-                netloc = settings.LAYMAN_GS_HOST + ':' + settings.LAYMAN_GS_PORT,
-                path = wms_url_path)
+                netloc=settings.LAYMAN_GS_HOST + ':' + settings.LAYMAN_GS_PORT,
+                path=wms_url_path,
+                scheme='http'
+            )
             method['url'] = method_url.geturl()
     return wms
 
@@ -79,7 +81,9 @@ def wfs_proxy(wfs_url, xml=None, version=None):
                 method_url = urlparse(method['url'])
                 method_url = method_url._replace(
                     netloc=settings.LAYMAN_GS_HOST + ':' + settings.LAYMAN_GS_PORT,
-                    path=wfs_url_path)
+                    path=wfs_url_path,
+                    scheme='http'
+                )
                 method['url'] = method_url.geturl()
     except AttributeError:
         wfs = None
