@@ -166,7 +166,7 @@ def test_populated_places_table(client, populated_places_table):
     col_names = db.get_text_column_names(username, layername)
     assert len(col_names) == 31
     langs = db.get_text_languages(username, layername)
-    assert langs == ['chi', 'eng']
+    assert set(langs) == set(['chi', 'eng', 'rus'])
 
 
 def test_data_language_countries(country_table):
@@ -176,21 +176,22 @@ def test_data_language_countries(country_table):
     assert len(col_names) == 63
     langs = db.get_text_languages(username, layername)
     assert set(langs) == set([
-        'gre',
+        'ara',
+        'ben',
+        'chi',
         'dut',
+        'eng',
         'fre',
+        'ger',
+        'gre',
+        'hin',
         'hun',
         'jpn',
         'kor',
-        'chi',
-        'spa',
-        'ara',
-        'ben',
-        'vie',
-        'ger',
-        'eng',
-        'hin',
         'pol',
+        'rus',
+        'spa',
+        'vie',
     ])
 
 

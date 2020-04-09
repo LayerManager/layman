@@ -216,6 +216,14 @@ def tokenize(text):
     return tokens
 
 
+def get_languages_by_script(text):
+    maxchar = max(text)
+    if u'\u0400' <= maxchar <= u'\u04ff':
+      return ['ru']
+    else:
+      return []
+
+
 def get_languages_cld2(text):
 
     # text = text.encode("utf-8")
@@ -224,13 +232,21 @@ def get_languages_cld2(text):
     if len(tokens) == 0:
         return []
     text = ' '.join(tokens)
-    # print(f"text={text}")
+    # print(f"get_languages_cld2 text={text}")
     reliable, text_bytes_found, details = pycld2.detect(text, bestEffort=False)
     # print(reliable, text_bytes_found, details)
 
     if not reliable:
         # print('not reliable', reliable, text_bytes_found, details)
         reliable, text_bytes_found, details = pycld2.detect(text, bestEffort=True)
+
+    # guess language by script
+    if not reliable:
+        langs = get_languages_by_script(text)
+        best_lang = next((l for l in PREFERRED_LANGUAGES if l in langs), None)
+        # print(f"best_lang={best_lang}")
+        if best_lang is not None:
+          return [best_lang]
 
     result = []
     # print(f"get_languages_cld2 reliable={reliable}, details={details}")
