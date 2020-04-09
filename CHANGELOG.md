@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.3.2
+2020-04-09
+- Request Geoserver through http instead of public scheme, fix #57
+
+
 ## v1.3.1
 2020-03-30
 - Post metadata record if no one found during patch, fix #52
