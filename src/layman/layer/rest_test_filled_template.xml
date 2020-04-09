@@ -215,6 +215,9 @@
         <gmd:LanguageCode codeListValue="pol" codeList="http://www.loc.gov/standards/iso639-2/">pol</gmd:LanguageCode>
       </gmd:language>
       <gmd:language>
+        <gmd:LanguageCode codeListValue="rus" codeList="http://www.loc.gov/standards/iso639-2/">rus</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:language>
         <gmd:LanguageCode codeListValue="spa" codeList="http://www.loc.gov/standards/iso639-2/">spa</gmd:LanguageCode>
       </gmd:language>
       <gmd:language>
