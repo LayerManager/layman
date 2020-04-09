@@ -128,3 +128,5 @@ CSW_RECORD_URL = os.getenv('CSW_RECORD_URL', None)
 MICKA_ACCEPTED_VERSIONS = [
     ('2020.010', '2020-03-04.01'),
 ]
+
+# PREFERRED_LANGUAGES = ['cs', 'en']

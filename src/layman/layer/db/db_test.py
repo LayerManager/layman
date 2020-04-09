@@ -73,6 +73,16 @@ def country2_table(testuser1):
     delete_layer(username, layername)
 
 
+@pytest.fixture()
+def populated_places_table(testuser1):
+    file_path = 'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson'
+    username = testuser1
+    layername = 'ne_110m_populated_places'
+    db.import_layer_vector_file(username, layername, file_path, None)
+    yield username, layername
+    delete_layer(username, layername)
+
+
 def test_abort_import_layer_vector_file(client):
     username = 'testuser1'
     layername = 'ne_10m_admin_0_countries'
@@ -148,6 +158,15 @@ def test_data_language_roads(road_table):
     ])
     langs = db.get_text_languages(username, layername)
     assert langs == ['cze']
+
+
+def test_populated_places_table(client, populated_places_table):
+    username, layername = populated_places_table
+    print(f"username={username}, layername={layername}")
+    col_names = db.get_text_column_names(username, layername)
+    assert len(col_names) == 31
+    langs = db.get_text_languages(username, layername)
+    assert langs == ['chi', 'eng']
 
 
 def test_data_language_countries(country_table):

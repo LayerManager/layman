@@ -930,7 +930,7 @@ def test_patch_layer_data(client):
             "identifier": "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
             "label": "countries"
         },
-        'language': ["eng", 'chi', 'som'],
+        'language': ["eng", 'chi'],
         'layer_endpoint': "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
         'organisation_name': None,
         'publication_date': TODAY_DATE,
