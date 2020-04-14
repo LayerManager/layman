@@ -249,7 +249,9 @@
               "WMS",
               "WFS",
               "Vector",
-              "XYZ"
+              "XYZ",
+              "ArcGISRest",
+              "StaticImage"
             ],
             "examples": [
               "HSLayers.Layer.WMS"
@@ -295,7 +297,7 @@
               "title": "The Items Schema",
               "default": "",
               "examples": [
-                "https%3A%2F%2Fgeoportal.kraj-lbc.cz%2Fcgi-bin%2Fmapserv%3Fmap%3D%2Fdata%2Fgis%2FMapServer%2Fprojects%2Fwms%2Fatlas%2Fpuda.map%26version%3D1.3.0%26service%3DWMS%26request%3DGetLegendGraphic%26sld_version%3D1.1.0%26layer%3Dtridyochrany%26format%3Dimage%2Fpng%26STYLE%3Ddefault"
+                ["https%3A%2F%2Fgeoportal.kraj-lbc.cz%2Fcgi-bin%2Fmapserv%3Fmap%3D%2Fdata%2Fgis%2FMapServer%2Fprojects%2Fwms%2Fatlas%2Fpuda.map%26version%3D1.3.0%26service%3DWMS%26request%3DGetLegendGraphic%26sld_version%3D1.1.0%26layer%3Dtridyochrany%26format%3Dimage%2Fpng%26STYLE%3Ddefault"]
               ],
               "pattern": "^(.*)$"
             }
@@ -387,18 +389,25 @@
             ],
             "pattern": "^(.*)$"
           },
+          "urls": {
+            "$id": "#/properties/layers/items/properties/urls",
+            "type": "array",
+            "title": "Urls array of ArcGISRest service",
+            "description": "Urls array of ArcGISRest service.",
+            "default": "",
+            "examples": [
+              ["https://example.com/arcgis/rest/services/map_pub/MapServer"]
+            ]
+          },
           "params": {
             "$id": "#/properties/layers/items/properties/params",
             "type": "object",
             "title": "The Params Schema",
-            "required": [
-              "LAYERS"
-            ],
             "properties": {
               "LAYERS": {
                 "$id": "#/properties/layers/items/properties/params/properties/LAYERS",
                 "type": "string",
-                "title": "WMS Layer",
+                "title": "WMS Layer. LAYERS parameter is mandatory for WMS services.",
                 "default": "",
                 "examples": [
                   "tridyochrany"
