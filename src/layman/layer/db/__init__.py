@@ -172,17 +172,35 @@ AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
     return [r[0] for r in rows]
 
 
+def get_number_of_features(username, layername, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+
+    try:
+        cur.execute(f"""
+select count(*)
+from {username}.{layername}
+""")
+    except:
+        raise LaymanError(7)
+    rows = cur.fetchall()
+    return rows[0][0]
+
+
 def get_text_data(username, layername, conn_cur=None):
     conn, cur = conn_cur or get_connection_cursor()
     col_names = get_text_column_names(username, layername, conn_cur=conn_cur)
     if len(col_names) == 0:
         return None
+    num_features = get_number_of_features(username, layername, conn_cur=conn_cur)
+    if num_features == 0:
+        return None
+    limit = max(100, num_features//10)
     try:
         cur.execute(f"""
 select {', '.join(col_names)}
 from {username}.{layername}
 order by ogc_fid
-limit 100
+limit {limit}
 """)
     except:
         raise LaymanError(7)
@@ -199,15 +217,15 @@ limit 100
         for _, texts in col_texts.items()
     ]
     # print(f"result col_texts={col_texts}")
-    return col_texts
+    return col_texts, limit
 
 
 def get_text_languages(username, layername):
-    texts = get_text_data(username, layername)
+    texts, num_rows = get_text_data(username, layername)
     all_langs = set()
     for t in texts:
         # skip short texts
-        if len(t) < 100:
+        if len(t) < num_rows:
             continue
         langs = get_languages_iso639_2(t)
         if len(langs):
