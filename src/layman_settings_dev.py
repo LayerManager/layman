@@ -1,5 +1,5 @@
 import os
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 from layman_settings_util import read_clients_dict_from_env
 
 LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
@@ -115,7 +115,7 @@ LAYMAN_REDIS = redis.Redis.from_url(LAYMAN_REDIS_URL, encoding="utf-8", decode_r
 
 LAYMAN_TIMGEN_URL = os.environ['LAYMAN_TIMGEN_URL']
 LAYMAN_CLIENT_URL = os.environ['LAYMAN_CLIENT_URL']
-LAYMAN_CLIENT_PUBLIC_URL = os.getenv('LAYMAN_CLIENT_PUBLIC_URL', None)
+LAYMAN_CLIENT_PUBLIC_URL = os.environ['LAYMAN_CLIENT_PUBLIC_URL']
 LAYMAN_SERVER_NAME = os.environ['LAYMAN_SERVER_NAME']
 LAYMAN_PROXY_SERVER_NAME = os.environ['LAYMAN_PROXY_SERVER_NAME']
 
@@ -128,5 +128,7 @@ CSW_RECORD_URL = os.getenv('CSW_RECORD_URL', None)
 MICKA_ACCEPTED_VERSIONS = [
     ('2020.010', '2020-03-04.01'),
 ]
+
+LAYMAN_PUBLIC_URL_SCHEME = urlparse(LAYMAN_CLIENT_PUBLIC_URL).scheme
 
 # PREFERRED_LANGUAGES = ['cs', 'en']

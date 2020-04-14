@@ -7,6 +7,7 @@ settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
+app.config['PREFERRED_URL_SCHEME'] = settings.LAYMAN_PUBLIC_URL_SCHEME
 
 
 from .http import LaymanError
