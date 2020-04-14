@@ -10,6 +10,8 @@
 - Build Layman as a part of `make start-demo*` commands.
 - Fix demo run without Micka, fix #55
 - Respect public URL scheme in REST API responses, fix #58
+- Show public WMS and WFS URLs in metadata comparison, fix #54
+- Change WFS endpoint from `/ows` to `/wfs`, because `/ows` capabilities pointed to `/wfs`
 
 
 ## v1.3.3

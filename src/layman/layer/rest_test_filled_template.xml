@@ -269,7 +269,7 @@
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>http://localhost:8600/geoserver/testuser1/ows?SERVICE=WFS&amp;REQUEST=GetCapabilities&amp;VERSION=2.0.0</gmd:URL>
+                <gmd:URL>http://localhost:8600/geoserver/testuser1/wfs?SERVICE=WFS&amp;REQUEST=GetCapabilities&amp;VERSION=2.0.0</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gmx:Anchor xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-2.0.0-http-get-capabilities">OGC:WFS-2.0.0-http-get-capabilities</gmx:Anchor>

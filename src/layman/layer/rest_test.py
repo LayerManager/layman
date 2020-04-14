@@ -48,12 +48,7 @@ METADATA_PROPERTIES = {
     'wms_url',
 }
 
-METADATA_PROPERTIES_NOT_EQUAL = {
-    'wfs_url',
-    'wms_url',
-}
-
-METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES - METADATA_PROPERTIES_NOT_EQUAL
+METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES
 
 min_geojson = """
 {
@@ -81,8 +76,8 @@ def check_metadata(client, username, layername, props_equal, expected_values):
         resp_json = rv.get_json()
         assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
         for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
-            assert v['equal'] == (k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
+            assert v['equal_or_null'] == (k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+            assert v['equal'] == (k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
             # print(f"'{k}': {json.dumps(list(v['values'].values())[0], indent=2)},")
             if k in expected_values:
                 vals = list(v['values'].values())

@@ -47,10 +47,23 @@ def delete_layer(username, layername):
     return {}
 
 
+def get_wms_url(username):
+    return urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+
+
+def get_wms_direct(username):
+    ows_url = get_wms_url(username)
+    from .util import wms_direct
+    key = get_flask_proxy_key(username)
+    redis_obj = settings.LAYMAN_REDIS.hgetall(key)
+    string_value = redis_obj['value'] if redis_obj is not None else None
+    return wms_direct(ows_url, xml=string_value)
+
+
 def get_wms_proxy(username):
     key = get_flask_proxy_key(username)
 
-    ows_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+    ows_url = get_wms_url(username)
     def create_string_value():
         r = requests.get(ows_url, params={
             'SERVICE': 'WMS',
@@ -132,7 +145,7 @@ def get_publication_uuid(username, publication_type, publication_name):
 
 
 def get_metadata_comparison(username, layername):
-    wms = get_wms_proxy(username)
+    wms = get_wms_direct(username)
     if wms is None:
         return {}
     cap_op = wms.getOperationByName('GetCapabilities')

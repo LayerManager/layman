@@ -50,12 +50,20 @@ def get_feature_type(
     r.raise_for_status()
     return r.json()['featureType']
 
+
+def wms_direct(wms_url, xml=None, version=None):
+    from layman.layer.geoserver.wms import VERSION
+    version = version or VERSION
+    wms = WebMapService(wms_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version)
+    return wms
+
+
 def wms_proxy(wms_url, xml=None, version=None):
     from layman.layer.geoserver.wms import VERSION
     version = version or VERSION
     wms_url_path = urlparse(wms_url).path
     # current_app.logger.info(f"xml=\n{xml}")
-    wms = WebMapService(wms_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version)
+    wms = wms_direct(wms_url, xml=xml, version=version)
     for operation in wms.operations:
         # app.logger.info(operation.name)
         for method in operation.methods:
@@ -68,13 +76,21 @@ def wms_proxy(wms_url, xml=None, version=None):
             method['url'] = method_url.geturl()
     return wms
 
+
+def wfs_direct(wfs_url, xml=None, version=None):
+    from layman.layer.geoserver.wfs import VERSION
+    version = version or VERSION
+    wfs = WebFeatureService(wfs_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version)
+    return wfs
+
+
 def wfs_proxy(wfs_url, xml=None, version=None):
     from layman.layer.geoserver.wfs import VERSION
     version = version or VERSION
     wfs_url_path = urlparse(wfs_url).path
     # TODO: https://github.com/geopython/OWSLib/issues/673
     try:
-        wfs = WebFeatureService(wfs_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version)
+        wfs = wfs_direct(wfs_url, xml=xml, version=version)
         for operation in wfs.operations:
             # app.logger.info(operation.name)
             for method in operation.methods:
