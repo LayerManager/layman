@@ -73,10 +73,23 @@ def delete_layer(username, layername):
     return {}
 
 
+def get_wfs_url(username):
+    return urljoin(settings.LAYMAN_GS_URL, username + '/wfs')
+
+
+def get_wfs_direct(username):
+    ows_url = get_wfs_url(username)
+    from .util import wfs_direct
+    key = get_flask_proxy_key(username)
+    redis_obj = settings.LAYMAN_REDIS.hgetall(key)
+    string_value = redis_obj['value'] if redis_obj is not None else None
+    return wfs_direct(ows_url, xml=string_value)
+
+
 def get_wfs_proxy(username):
     key = get_flask_proxy_key(username)
 
-    ows_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+    ows_url = get_wfs_url(username)
     def create_string_value():
         r = requests.get(ows_url, params={
             'SERVICE': 'WFS',
@@ -117,7 +130,7 @@ def clear_cache(username):
 
 
 def _get_wfs_proxy_url(username):
-    return urljoin(get_gs_proxy_base_url(), username + '/ows')
+    return urljoin(get_gs_proxy_base_url(), username + '/wfs')
 
 
 def get_layer_info(username, layername):
@@ -162,7 +175,7 @@ def get_publication_uuid(username, publication_type, publication_name):
 
 
 def get_metadata_comparison(username, layername):
-    wfs = get_wfs_proxy(username)
+    wfs = get_wfs_direct(username)
     if wfs is None:
         return {}
     cap_op = wfs.getOperationByName('GetCapabilities')
