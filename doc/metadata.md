@@ -238,8 +238,6 @@ Example: `["cze", "eng"]`
 
 XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:language/gmd:LanguageCode/@codeListValue`
 
-XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:language/gmd:LanguageCode/@codeListValue`
-
 
 ### scale_denominator
 Multiplicity: 1

@@ -233,13 +233,11 @@ def _get_property_values(
         identifier_label='Liberec-AdminUnits',
         extent=None,  # w, s, e, n
         epsg_codes=None,
-        languages=None,
         operates_on=None,
 ):
     epsg_codes = epsg_codes or ['3857']
     w, s, e, n = extent or [14.62, 50.58, 15.42, 50.82]
     extent = [max(w, -180), max(s, -90), min(e, 180), min(n, 90)]
-    languages = languages or []
 
     # list of dictionaries, possible keys are 'xlink:title', 'xlink:href', 'uuidref'
     operates_on = operates_on or []
@@ -269,7 +267,6 @@ def _get_property_values(
         'map_endpoint': escape(url_for('rest_map.get', username=username, mapname=mapname)),
         'map_file_endpoint': escape(url_for('rest_map_file.get', username=username, mapname=mapname)),
         'operates_on': operates_on,
-        'language': languages,
         'md_organisation_name': md_organisation_name,
         'organisation_name': organisation_name,
     }
@@ -360,13 +357,6 @@ METADATA_PROPERTIES = {
         'xpath_extract_fn': lambda l: l[0] if l else None,
         'adjust_property_element': common_util.adjust_graphic_url,
     },
-    'language': {
-        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification',
-        'xpath_property': './gmd:language',
-        'xpath_extract': './gmd:LanguageCode/@codeListValue',
-        'xpath_extract_fn': lambda l: int(l[0]) if l else None,
-        'adjust_property_element': common_util.adjust_language,
-    },
     'extent': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:extent/gmd:EX_Extent',
         'xpath_property': './gmd:geographicElement[gmd:EX_GeographicBoundingBox]',
@@ -418,7 +408,6 @@ def get_metadata_comparison(username, mapname):
         'extent',
         'graphic_url',
         'identifier',
-        'language',
         'map_endpoint',
         'map_file_endpoint',
         'operates_on',

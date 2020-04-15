@@ -27,7 +27,6 @@ METADATA_PROPERTIES = {
     'extent',
     'graphic_url',
     'identifier',
-    'language',
     'map_endpoint',
     'map_file_endpoint',
     'operates_on',
@@ -41,7 +40,6 @@ METADATA_PROPERTIES = {
 METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES
 
 METADATA_PROPERTIES_POST_EMPTY = {
-    'language',
     'organisation_name',
     'revision_date',
 }

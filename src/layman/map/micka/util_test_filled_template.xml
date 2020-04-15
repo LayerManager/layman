@@ -171,7 +171,6 @@
       <srv:serviceType>
         <gco:LocalName codeSpace="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType">Map</gco:LocalName>
       </srv:serviceType>
-      <gmd:language gco:nilReason="unknown"/>
       <srv:extent>
         <gmd:EX_Extent>
           <gmd:geographicElement>
