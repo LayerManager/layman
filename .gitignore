@@ -8,7 +8,6 @@
 **/.pytest_cache
 
 src/layman_settings.py
-src/layman/static/test-client
 
 /deps/*/data
 /deps/*/tmp

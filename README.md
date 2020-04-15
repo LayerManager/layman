@@ -224,7 +224,6 @@ sudo chown -R 1000:1000 layman_data/
 sudo chown -R 1000:1000 layman_data_test/
 sudo chown -R 1000:1000 src/
 sudo chown -R 1000:1000 tmp/
-sudo chown -R 1000:1000 src/layman/static/test-client/
 ```
 and restart layman
 ```bash

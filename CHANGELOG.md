@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.3.3
+2020-04-15
+### Upgrade requirements
+- Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) from `v1.1.1` to `v1.1.2`
+### Changes
+- Upgrade Layman test client to version 1.1.2, fixing reaching `static.css` without authentication
+- Extend map JSON schema with ArcGIS REST API layers and static image layers
+
+
 ## v1.3.2
 2020-04-09
 - Request Geoserver through http instead of public scheme, fix #57
