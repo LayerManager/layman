@@ -40,6 +40,8 @@ Publishing geospatial data online through [REST API](doc/rest.md).
 ```bash
 git clone https://github.com/jirik/layman.git
 cd layman
+# checkout the latest release in current branch
+git checkout $(git describe --abbrev=0 --tags)
 ```
 
 
