@@ -49,7 +49,6 @@ PUBLICATION_TYPES = {
                 'extent',
                 'graphic_url',
                 'identifier',
-                'language',
                 'map_endpoint',
                 'map_file_endpoint',
                 'operates_on',
