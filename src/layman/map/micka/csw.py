@@ -9,6 +9,7 @@ import traceback
 from xml.sax.saxutils import escape, quoteattr
 from layman import settings, patch_mode, LaymanError
 from layman.common.filesystem.uuid import get_publication_uuid_file
+from layman.common import language as common_language
 from layman.common.micka import util as common_util
 from layman.map import MAP_TYPE
 from layman.map.filesystem.uuid import get_map_uuid
@@ -101,7 +102,7 @@ def patch_map(username, mapname, metadata_properties_to_refresh=None):
     _, prop_values = get_template_path_and_values(username, mapname, http_method='patch')
     prop_values = {
         k: v for k, v in prop_values.items()
-        if k in metadata_properties_to_refresh
+        if k in metadata_properties_to_refresh + ['md_date_stamp']
     }
     # current_app.logger.info(f"update_map prop_values={prop_values}")
     basic_template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), './record-template.xml')
@@ -191,6 +192,10 @@ def get_template_path_and_values(username, mapname, http_method=None):
     revision_date = datetime.now()
     map_json = get_map_json(username, mapname)
     operates_on = map_json_to_operates_on(map_json)
+    md_language = next(iter(common_language.get_languages_iso639_2(' '.join([
+        map_json['title'] or '',
+        map_json['abstract'] or ''
+    ]))), None)
 
     prop_values = _get_property_values(
         username=username,
@@ -209,11 +214,10 @@ def get_template_path_and_values(username, mapname, http_method=None):
         md_organisation_name=None,
         organisation_name=None,
         operates_on=operates_on,
+        md_language=md_language,
     )
     if http_method == 'post':
         prop_values.pop('revision_date', None)
-    elif http_method == 'patch':
-        prop_values.pop('publication_date', None)
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
     return template_path, prop_values
 
@@ -234,6 +238,7 @@ def _get_property_values(
         extent=None,  # w, s, e, n
         epsg_codes=None,
         operates_on=None,
+        md_language=None,
 ):
     epsg_codes = epsg_codes or ['3857']
     w, s, e, n = extent or [14.62, 50.58, 15.42, 50.82]
@@ -251,6 +256,7 @@ def _get_property_values(
 
     result = {
         'md_file_identifier': get_metadata_uuid(uuid),
+        'md_language': md_language,
         'md_date_stamp': md_date_stamp,
         'reference_system': epsg_codes,
         'title': title,
@@ -283,6 +289,13 @@ METADATA_PROPERTIES = {
         'xpath_extract': './gco:CharacterString/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
         'adjust_property_element': common_util.adjust_character_string,
+    },
+    'md_language': {
+        'xpath_parent': '/gmd:MD_Metadata',
+        'xpath_property': './gmd:language',
+        'xpath_extract': './gmd:LanguageCode/@codeListValue',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_language,
     },
     'md_organisation_name': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty',

@@ -75,7 +75,7 @@ def update_layer(username, layername, layerinfo):
     _, prop_values = get_template_path_and_values(username, layername, http_method='patch')
     prop_values = {
         k: v for k, v in prop_values.items()
-        if k in layerinfo['metadata_properties_to_refresh']
+        if k in layerinfo['metadata_properties_to_refresh'] + ['md_date_stamp']
     }
     # current_app.logger.info(f"update_layer prop_values={prop_values}")
     basic_template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), './record-template.xml')
@@ -163,9 +163,6 @@ def get_template_path_and_values(username, layername, http_method=None):
     )
     if http_method == 'post':
         prop_values.pop('revision_date', None)
-    elif http_method == 'patch':
-        prop_values.pop('publication_date', None)
-        prop_values.pop('md_language', None)
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
     return template_path, prop_values
 

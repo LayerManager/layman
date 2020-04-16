@@ -1,3 +1,4 @@
+from datetime import date
 import glob
 import json
 import os
@@ -20,7 +21,9 @@ from layman import app, settings, uuid
 from layman import celery as celery_util
 from layman.util import url_for as url_for_external
 from layman.common.micka import util as micka_common_util
-from layman.common.metadata import is_empty
+from layman.common.metadata import prop_equals_strict, PROPERTIES
+
+TODAY_DATE = date.today().strftime('%Y-%m-%d')
 
 METADATA_PROPERTIES = {
     'abstract',
@@ -39,14 +42,6 @@ METADATA_PROPERTIES = {
 
 METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES
 
-METADATA_PROPERTIES_POST_EMPTY = {
-    'organisation_name',
-    'revision_date',
-}
-
-METADATA_PROPERTIES_PATCH_EMPTY = METADATA_PROPERTIES_POST_EMPTY - {'revision_date'}
-
-
 num_maps_before_test = 0
 
 
@@ -55,6 +50,25 @@ def wait_till_ready(username, mapname):
     while last_task is not None and not celery_util.is_task_ready(last_task):
         time.sleep(0.1)
         last_task = util._get_map_task(username, mapname)
+
+
+def check_metadata(client, username, mapname, props_equal, expected_values):
+    with app.app_context():
+        rest_path = url_for('rest_map_metadata_comparison.get', username=username, mapname=mapname)
+        rv = client.get(rest_path)
+        assert rv.status_code == 200, rv.get_json()
+        resp_json = rv.get_json()
+        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
+        # for k, v in resp_json['metadata_properties'].items():
+        #     print(f"'{k}': {json.dumps(list(v['values'].values())[0], indent=2)},")
+        for k, v in resp_json['metadata_properties'].items():
+            assert v['equal_or_null'] == (k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+            assert v['equal'] == (k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+            # print(f"'{k}': {json.dumps(list(v['values'].values())[0], indent=2)},")
+            if k in expected_values:
+                vals = list(v['values'].values())
+                vals.append(expected_values[k])
+                assert prop_equals_strict(vals, equals_fn=PROPERTIES[k].get('equals_fn', None)), f"Property {k} has unexpected values {json.dumps(vals, indent=2)}"
 
 
 @pytest.fixture(scope="module")
@@ -279,17 +293,31 @@ def test_post_maps_simple(client):
         r.raise_for_status()
         assert mapname in r.text
 
-    with app.app_context():
-        rest_path = url_for('rest_map_metadata_comparison.get', username=username, mapname=mapname)
-        rv = client.get(rest_path)
-        assert rv.status_code == 200, rv.get_json()
-        resp_json = rv.get_json()
-        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
-        for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
-            assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}, {json.dumps(resp_json['metadata_sources'], indent=2)}"
-        for p in METADATA_PROPERTIES_POST_EMPTY:
-            assert all((is_empty(v, p) for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not empty: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+    expected_md_values = {
+        'abstract': "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce.",
+        'extent': [
+            14.62,
+            50.58,
+            15.42,
+            50.82
+        ],
+        'graphic_url': "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje/thumbnail",
+        'identifier': {
+            "identifier": "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje",
+            "label": "administrativni_cleneni_libereckeho_kraje"
+        },
+        'map_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje",
+        'map_file_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje/file",
+        'operates_on': [],
+        'organisation_name': None,
+        'publication_date': TODAY_DATE,
+        'reference_system': [
+            3857
+        ],
+        'revision_date': None,
+        'title': "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje",
+    }
+    check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 
@@ -386,17 +414,31 @@ def test_post_maps_complex(client):
         assert groups_json['guest'] == 'w'
         assert len(groups_json) == 1
 
-    with app.app_context():
-        rest_path = url_for('rest_map_metadata_comparison.get', username=username, mapname=mapname)
-        rv = client.get(rest_path)
-        assert rv.status_code == 200, rv.get_json()
-        resp_json = rv.get_json()
-        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
-        for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
-            assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
-        for p in METADATA_PROPERTIES_POST_EMPTY:
-            assert all((is_empty(v, p) for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not empty: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+    expected_md_values = {
+        'abstract': "Libovoln\u00fd popis",
+        'extent': [
+            14.62,
+            50.58,
+            15.42,
+            50.82
+        ],
+        'graphic_url': "http://layman_test_run_1:8000/rest/testuser1/maps/libe/thumbnail",
+        'identifier': {
+            "identifier": "http://layman_test_run_1:8000/rest/testuser1/maps/libe",
+            "label": "libe"
+        },
+        'map_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/libe",
+        'map_file_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/libe/file",
+        'operates_on': [],
+        'organisation_name': None,
+        'publication_date': TODAY_DATE,
+        'reference_system': [
+            3857
+        ],
+        'revision_date': None,
+        'title': "Libereck\u00fd kraj: Administrativn\u00ed \u010dlen\u011bn\u00ed",
+    }
+    check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 def test_patch_map(client):
@@ -504,17 +546,31 @@ def test_patch_map(client):
             f'{MAP_TYPE}': num_maps_before_test + 2
         })
 
-    with app.app_context():
-        rest_path = url_for('rest_map_metadata_comparison.get', username=username, mapname=mapname)
-        rv = client.get(rest_path)
-        assert rv.status_code == 200, rv.get_json()
-        resp_json = rv.get_json()
-        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
-        for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
-            assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
-        for p in METADATA_PROPERTIES_PATCH_EMPTY:
-            assert all((is_empty(v, p) for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not empty: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+    expected_md_values = {
+        'abstract': "Nov\u00fd popis",
+        'extent': [
+            14.623,
+            50.58,
+            15.42,
+            50.82
+        ],
+        'graphic_url': "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje/thumbnail",
+        'identifier': {
+            "identifier": "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje",
+            "label": "administrativni_cleneni_libereckeho_kraje"
+        },
+        'map_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje",
+        'map_file_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje/file",
+        'operates_on': [],
+        'organisation_name': None,
+        'publication_date': TODAY_DATE,
+        'reference_system': [
+            3857
+        ],
+        'revision_date': TODAY_DATE,
+        'title': "Nov\u00fd n\u00e1zev",
+    }
+    check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 def test_delete_map(client):
@@ -567,6 +623,7 @@ def test_map_composed_from_local_layers(client):
                 'name': layername1,
             })
             assert rv.status_code == 200
+            layer1uuid = rv.get_json()[0]['uuid']
         finally:
             for fp in files:
                 fp[0].close()
@@ -593,6 +650,7 @@ def test_map_composed_from_local_layers(client):
                 'name': layername2,
             })
             assert rv.status_code == 200
+            layer2uuid = rv.get_json()[0]['uuid']
         finally:
             for fp in files:
                 fp[0].close()
@@ -726,14 +784,37 @@ def test_map_composed_from_local_layers(client):
         minus_line = minus_lines[4]
         assert minus_line.startswith('-      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and minus_line.endswith('" xlink:title="mista" xlink:type="simple"/>\n'), minus_line
 
-    with app.app_context():
-        rest_path = url_for('rest_map_metadata_comparison.get', username=username, mapname=mapname)
-        rv = client.get(rest_path)
-        assert rv.status_code == 200, rv.get_json()
-        resp_json = rv.get_json()
-        assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
-        for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}"
-            assert v['equal'] == (k in METADATA_PROPERTIES_EQUAL), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}"
-        for p in METADATA_PROPERTIES_POST_EMPTY:
-            assert all((is_empty(v, p) for _,v in resp_json['metadata_properties'][p]['values'].items())), f"Metadata property values is not empty: {p}: {json.dumps(resp_json['metadata_properties'][p], indent=2)}"
+    expected_md_values = {
+        'abstract': "World places and boundaries abstract",
+        'extent': [
+            -35.0,
+            -48.5,
+            179.0,
+            81.5
+        ],
+        'graphic_url': "http://layman_test_run_1:8000/rest/testuser1/maps/svet/thumbnail",
+        'identifier': {
+            "identifier": "http://layman_test_run_1:8000/rest/testuser1/maps/svet",
+            "label": "svet"
+        },
+        'map_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/svet",
+        'map_file_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/svet/file",
+        'operates_on': [
+            {
+                "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{layer2uuid}#_m-{layer2uuid}",
+                "xlink:title": "hranice"
+            },
+            {
+                "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{layer1uuid}#_m-{layer1uuid}",
+                "xlink:title": "mista"
+            }
+        ],
+        'organisation_name': None,
+        'publication_date': TODAY_DATE,
+        'reference_system': [
+            3857
+        ],
+        'revision_date': None,
+        'title': "World places and boundaries",
+    }
+    check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)

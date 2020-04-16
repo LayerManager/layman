@@ -144,6 +144,7 @@ def test_fill_xml_template(client):
         'extent': [-35, -48.5, 179, 81.5],
         'map_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet',
         'map_file_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet/file',
+        'md_language': 'cze',
         'operates_on': [
             {
                 'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-39cc8994-adbc-427a-8522-569eb7e691b2#_m-39cc8994-adbc-427a-8522-569eb7e691b2',
