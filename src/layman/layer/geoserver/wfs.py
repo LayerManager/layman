@@ -34,20 +34,21 @@ def update_layer(username, layername, layerinfo):
         title
     ]
     keywords = list(set(keywords))
+    ftype = {
+        "title": title,
+        "abstract": description,
+        "keywords": {
+            "string": keywords
+        },
+    }
+    ftype = {k:v for k,v in ftype.items() if v is not None}
+    body = {
+        "featureType": ftype
+    }
     r = requests.put(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
                 username + '/datastores/postgresql/featuretypes/'+layername),
-        data=json.dumps(
-            {
-                "featureType": {
-                    "title": title,
-                    "abstract": description,
-                    "keywords": {
-                        "string": keywords
-                    },
-                }
-            }
-        ),
+        data=json.dumps(body),
         headers=headers_json,
         auth=settings.LAYMAN_GS_AUTH
     )
