@@ -314,7 +314,7 @@ def test_post_layers_simple(client):
         'publication_date': TODAY_DATE,
         'reference_system': [3857, 4326],
         'revision_date': None,
-        'scale_denominator': None,
+        'scale_denominator': 100000000,
         'title': 'ne_110m_admin_0_countries',
     }
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
@@ -583,7 +583,7 @@ def test_post_layers_complex(client):
         'publication_date': TODAY_DATE,
         'reference_system': [3857,4326],
         'revision_date': None,
-        'scale_denominator': None,
+        'scale_denominator': 100000000,
         'title': "staty",
     }
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
@@ -731,7 +731,7 @@ def test_patch_layer_title(client):
         'publication_date': TODAY_DATE,
         'reference_system': [3857, 4326],
         'revision_date': TODAY_DATE,
-        'scale_denominator': None,
+        'scale_denominator': 100000000,
         'title': "New Title of Countries",
     }
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
@@ -795,7 +795,7 @@ def test_patch_layer_style(client):
         'publication_date': TODAY_DATE,
         'reference_system': [3857, 4326],
         'revision_date': TODAY_DATE,
-        'scale_denominator': None,
+        'scale_denominator': 100000000,
         'title': 'countries in blue',
     }
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)

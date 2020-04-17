@@ -141,6 +141,7 @@ def get_template_path_and_values(username, layername, http_method=None):
         wms_layer.abstract or ''
     ]))), None)
     languages = db.get_text_languages(username, layername)
+    scale_denominator = db.guess_scale_denominator(username, layername)
 
     prop_values = _get_property_values(
         username=username,
@@ -160,6 +161,7 @@ def get_template_path_and_values(username, layername, http_method=None):
         organisation_name=None,
         md_language=md_language,
         languages=languages,
+        scale_denominator=scale_denominator,
     )
     if http_method == 'post':
         prop_values.pop('revision_date', None)

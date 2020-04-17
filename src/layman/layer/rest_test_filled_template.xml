@@ -170,7 +170,9 @@
         <gmd:MD_Resolution>
           <gmd:equivalentScale>
             <gmd:MD_RepresentativeFraction>
-              <gmd:denominator gco:nilReason="unknown"/>
+              <gmd:denominator>
+                <gco:Integer>100000000</gco:Integer>
+              </gmd:denominator>
             </gmd:MD_RepresentativeFraction>
           </gmd:equivalentScale>
         </gmd:MD_Resolution>
