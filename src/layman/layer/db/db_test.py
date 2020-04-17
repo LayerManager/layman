@@ -64,10 +64,50 @@ def country_table(testuser1):
 
 
 @pytest.fixture()
-def country2_table(testuser1):
+def country110m_table(testuser1):
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
     username = testuser1
-    layername = 'staty2'
+    layername = 'staty110m'
+    db.import_layer_vector_file(username, layername, file_path, None)
+    yield username, layername
+    delete_layer(username, layername)
+
+
+@pytest.fixture()
+def country50m_table(testuser1):
+    file_path = 'tmp/naturalearth/50m/cultural/ne_50m_admin_0_countries.geojson'
+    username = testuser1
+    layername = 'staty50m'
+    db.import_layer_vector_file(username, layername, file_path, None)
+    yield username, layername
+    delete_layer(username, layername)
+
+
+@pytest.fixture()
+def country10m_table(testuser1):
+    file_path = 'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson'
+    username = testuser1
+    layername = 'staty10m'
+    db.import_layer_vector_file(username, layername, file_path, None)
+    yield username, layername
+    delete_layer(username, layername)
+
+
+@pytest.fixture()
+def data200road_table(testuser1):
+    file_path = 'tmp/data200/trans/RoadL.shp'
+    username = testuser1
+    layername = 'data200_road'
+    db.import_layer_vector_file(username, layername, file_path, None)
+    yield username, layername
+    delete_layer(username, layername)
+
+
+@pytest.fixture()
+def sm5building_table(testuser1):
+    file_path = 'tmp/sm5/vektor/Budova.shp'
+    username = testuser1
+    layername = 'sm5_building'
     db.import_layer_vector_file(username, layername, file_path, None)
     yield username, layername
     delete_layer(username, layername)
@@ -197,8 +237,8 @@ def test_data_language_countries(country_table):
 
 
 
-def test_data_language_countries2(country2_table):
-    username, layername = country2_table
+def test_data_language_countries2(country110m_table):
+    username, layername = country110m_table
     # print(f"username={username}, layername={layername}")
     # col_names = db.get_text_column_names(username, layername)
     # print(col_names)
@@ -207,4 +247,19 @@ def test_data_language_countries2(country2_table):
     assert set(langs) == set(['eng'])
 
 
-
+def test_get_most_frequent_lower_distance(client, country110m_table, country50m_table, country10m_table, data200road_table, sm5building_table):
+    username, layername_110m = country110m_table
+    username, layername_50m = country50m_table
+    username, layername_10m = country10m_table
+    username, layername_200k = data200road_table
+    username, layername_5k = sm5building_table
+    sd_110m = db.guess_scale_denominator(username, layername_110m)
+    assert 25000000 <= sd_110m <= 500000000
+    sd_50m = db.guess_scale_denominator(username, layername_50m)
+    assert 10000000 <= sd_50m <= 250000000
+    sd_10m = db.guess_scale_denominator(username, layername_10m)
+    assert 2500000 <= sd_10m <= 50000000
+    sd_200k = db.guess_scale_denominator(username, layername_200k)
+    assert 50000 <= sd_200k <= 1000000
+    sd_5k = db.guess_scale_denominator(username, layername_5k)
+    assert 1000 <= sd_5k <= 25000
