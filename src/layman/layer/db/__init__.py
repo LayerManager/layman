@@ -233,3 +233,233 @@ def get_text_languages(username, layername):
             # print(f"text={t}\nlanguage={lang}")
             all_langs.add(lang)
     return sorted(list(all_langs))
+
+
+def get_most_frequent_lower_distance(username, layername, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+
+    query = f"""
+with t1 as (
+select
+  row_number() over (partition by ogc_fid) AS dump_id,
+  sub_view.*
+from (
+  SELECT
+    ogc_fid, (st_dump(wkb_geometry)).geom as geometry
+  FROM {username}.{layername}
+) sub_view
+order by ST_NPoints(geometry), ogc_fid, dump_id
+limit 5000
+)
+, t2 as (
+select
+  row_number() over (partition by ogc_fid, dump_id) AS ring_id,
+  sub_view.*
+from (
+(
+   SELECT
+    dump_id, ogc_fid, ST_ExteriorRing((ST_DumpRings(geometry)).geom) as geometry
+  FROM t1
+	where st_geometrytype(geometry) = 'ST_Polygon'
+) union all (
+   SELECT
+    dump_id, ogc_fid, geometry
+  FROM t1
+	where st_geometrytype(geometry) = 'ST_LineString'
+)
+) sub_view
+order by ST_NPoints(geometry), ogc_fid, dump_id, ring_id
+limit 5000
+)
+, t2cumsum as (
+select *, --ST_NPoints(geometry),
+  sum(ST_NPoints(geometry)) over (order by ST_NPoints(geometry), ogc_fid, dump_id, ring_id rows between unbounded preceding and current row) as cum_sum_points
+from t2
+)
+, t3 as (
+SELECT ogc_fid, dump_id, ring_id, geometry, generate_series(1, st_npoints(geometry)-1) as point_idx
+FROM t2cumsum
+where cum_sum_points < 50000
+)
+, tdist as (
+SELECT ogc_fid, dump_id, ring_id, ST_PointN(geometry, point_idx), point_idx,
+    st_distance(ST_PointN(geometry, point_idx), ST_PointN(geometry, point_idx+1)) as distance
+FROM t3
+)
+, tstat as (
+select
+count(*) as num_distances,
+percentile_disc(0.1) within group (order by tdist.distance) as p10
+, percentile_disc(0.5) within group (order by tdist.distance) as p50
+--, percentile_disc(0.9) within group (order by tdist.distance) as p90
+from tdist
+)
+, tbounds as (
+select
+    --tstat.*, 
+    ((p50-p10)/10)*tmode.idx+p10 as lower_bound
+    , ((p50-p10)/10)*(tmode.idx+0.5)+p10 as middle
+    , ((p50-p10)/10)*(tmode.idx+1)+p10 as upper_bound
+from tstat, (
+    select generate_series(0, 9) as idx
+) tmode
+order by middle
+)
+, tfreq as (
+select count(*) as freq, tbounds.middle
+from tdist
+inner join tbounds on (tdist.distance >= tbounds.lower_bound and tdist.distance < tbounds.upper_bound)
+group by tbounds.middle
+order by tbounds.middle
+)
+SELECT middle as distance, freq as distance_freq, tstat.num_distances
+from tfreq, tstat
+order by freq desc
+limit 1
+        """
+
+    # print(f"\nget_most_frequent_lower_distance v1\nusername={username}, layername={layername}")
+    # print(query)
+
+    try:
+        cur.execute(query)
+    except:
+        raise LaymanError(7)
+    rows = cur.fetchall()
+    # for row in rows:
+    #     print(f"row={row}")
+    result = None
+    if len(rows) > 0:
+        distance, freq, num_distances = rows[0]
+        if freq/num_distances > 0.03:
+            result = distance
+    return result
+
+
+SCALE_DENOMINATORS = [
+    5000,
+    10000,
+    25000,
+    50000,
+    100000,
+    250000,
+    500000,
+    1000000,
+    2500000,
+    5000000,
+    10000000,
+    25000000,
+    50000000,
+    100000000,
+]
+
+
+def guess_scale_denominator(username, layername):
+    distance = get_most_frequent_lower_distance(username, layername)
+    if distance is not None:
+        coef = 2000 if distance > 100 else 1000
+        sd = min(SCALE_DENOMINATORS, key=lambda x: abs(x - distance*coef))
+    else:
+        sd = None
+    return sd
+
+
+def get_most_frequent_lower_distance2(username, layername, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+
+    query = f"""
+with t1 as (
+select
+  row_number() over (partition by ogc_fid) AS dump_id,
+  sub_view.*
+from (
+  SELECT
+    ogc_fid, (st_dump(wkb_geometry)).geom as geometry
+  FROM {username}.{layername}
+) sub_view
+order by st_area(Box2D(geometry)), ogc_fid, dump_id
+limit 5000
+)
+, t2 as (
+select
+  row_number() over (partition by ogc_fid, dump_id) AS ring_id,
+  sub_view.*
+from (
+(
+   SELECT
+    dump_id, ogc_fid, ST_ExteriorRing((ST_DumpRings(geometry)).geom) as geometry
+  FROM t1
+	where st_geometrytype(geometry) = 'ST_Polygon'
+) union all (
+   SELECT
+    dump_id, ogc_fid, geometry
+  FROM t1
+	where st_geometrytype(geometry) = 'ST_LineString'
+)
+) sub_view
+order by st_area(Box2D(geometry)), ogc_fid, dump_id, ring_id
+limit 5000
+)
+, t2cumsum as (
+select *, --ST_NPoints(geometry),
+  sum(ST_NPoints(geometry)) over (order by ST_NPoints(geometry), ogc_fid, dump_id, ring_id rows between unbounded preceding and current row) as cum_sum_points
+from t2
+)
+, t3 as (
+SELECT ogc_fid, dump_id, ring_id, geometry, generate_series(1, st_npoints(geometry)-1) as point_idx
+FROM t2cumsum
+where cum_sum_points < 50000
+)
+, tdist as (
+SELECT ogc_fid, dump_id, ring_id, ST_PointN(geometry, point_idx), point_idx,
+    st_distance(ST_PointN(geometry, point_idx), ST_PointN(geometry, point_idx+1)) as distance
+FROM t3
+)
+, tstat as (
+select
+count(*) as num_distances,
+percentile_disc(0.1) within group (order by tdist.distance) as p10
+, percentile_disc(0.5) within group (order by tdist.distance) as p50
+--, percentile_disc(0.9) within group (order by tdist.distance) as p90
+from tdist
+)
+, tbounds as (
+select
+    --tstat.*, 
+    ((p50-p10)/10)*tmode.idx+p10 as lower_bound
+    , ((p50-p10)/10)*(tmode.idx+0.5)+p10 as middle
+    , ((p50-p10)/10)*(tmode.idx+1)+p10 as upper_bound
+from tstat, (
+    select generate_series(0, 9) as idx
+) tmode
+order by middle
+)
+, tfreq as (
+select count(*) as freq, tbounds.middle
+from tdist
+inner join tbounds on (tdist.distance >= tbounds.lower_bound and tdist.distance < tbounds.upper_bound)
+group by tbounds.middle
+order by tbounds.middle
+)
+SELECT middle as distance, freq as distance_freq, tstat.num_distances
+from tfreq, tstat
+order by freq desc
+limit 1
+        """
+
+    # print(f"\nget_most_frequent_lower_distance v2\nusername={username}, layername={layername}")
+    # print(query)
+
+    try:
+        cur.execute(query)
+    except:
+        raise LaymanError(7)
+    rows = cur.fetchall()
+    # for row in rows:
+    #     print(f"row={row}")
+    result = None
+    if len(rows) > 0:
+        distance, freq, num_distances = rows[0]
+        if freq/num_distances > 0.03:
+            result = distance
+    return result
