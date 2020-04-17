@@ -378,7 +378,7 @@ def adjust_character_string(prop_el, prop_value):
 def adjust_integer(prop_el, prop_value):
     _clear_el(prop_el)
     if prop_value is not None:
-        child_el = ET.fromstring(f"""<gco:Integer xmlns:gco="{NAMESPACES['gco']}">{escape(str(prop_value))}</gco:CharacterString>""")
+        child_el = ET.fromstring(f"""<gco:Integer xmlns:gco="{NAMESPACES['gco']}">{escape(str(prop_value))}</gco:Integer>""")
         prop_el.append(child_el)
     else:
         _add_unknown_reason(prop_el)
