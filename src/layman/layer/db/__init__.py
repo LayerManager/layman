@@ -1,4 +1,5 @@
 from collections import defaultdict
+import math
 import os
 import psycopg2
 from flask import g
@@ -356,9 +357,13 @@ SCALE_DENOMINATORS = [
 
 def guess_scale_denominator(username, layername):
     distance = get_most_frequent_lower_distance(username, layername)
+    log_sd_list = [math.log10(sd) for sd in SCALE_DENOMINATORS]
     if distance is not None:
         coef = 2000 if distance > 100 else 1000
-        sd = min(SCALE_DENOMINATORS, key=lambda x: abs(x - distance*coef))
+        log_dist = math.log10(distance*coef)
+        sd_log = min(log_sd_list, key=lambda x: abs(x - log_dist))
+        sd_idx = log_sd_list.index(sd_log)
+        sd = SCALE_DENOMINATORS[sd_idx]
     else:
         sd = None
     return sd
