@@ -2,12 +2,11 @@
 
 Layman is able to publish partial metadata records to [OGC Catalogue Service](https://www.opengeospatial.org/standards/cat) [Micka](http://micka.bnhelp.cz/). Records are partial because Layman does not know all metadata properties. Below are listed
 - [metadata properties that are known to Layman](#metadata-properties-known-to-layman) 
-- [metadata properties guessable by Layman](#metadata-properties-guessable-by-layman) (not yet implemented) 
 - [metadata properties unknown to Layman](#metadata-properties-unknown-to-layman), that Layman is aware of. 
 
 Although metadata records sent to Micka are partial, they can (and should) be completed using Micka web editor GUI. URL of layer's metadata record leading to Micka's GUI is available in [GET Layer](rest.md#get-layer) response as `metadata.record_url` property. To complete metadata records, just open this URL in browser, log in to micka as editor or admin, and complete the record.
 
-On POST requests, Layman automatically creates metadata record using CSW with values of all known and guessable properties. On PATCH requests, Layman also automatically updates metadata record, but only for subset of synchronizable metadata properties, whose values were `equal` in Metadata Comparison response at the time just when PATCH started.
+On POST requests, Layman automatically creates metadata record using CSW with values of all known properties. On PATCH requests, Layman also automatically updates metadata record, but only for subset of synchronizable metadata properties, whose values were `equal` in Metadata Comparison response at the time just when PATCH started.
 
 Properties listed below contains
 - unique name (as heading)
@@ -82,6 +81,20 @@ Synchronizable: yes
 XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gmx:Anchor/@xlink:href`
 
 XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gmx:Anchor/@xlink:href`
+
+
+### language
+Guessed from text attributes.
+
+Multiplicity: 1..n
+
+Shape: Array of strings
+
+Example: `["cze", "eng"]`
+
+Synchronizable: yes
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:language/gmd:LanguageCode/@codeListValue`
 
 
 ### layer_endpoint
@@ -226,6 +239,20 @@ XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentificat
 XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="revision"]]/gmd:CI_Date/gmd:date/gco:Date/text()`
 
 
+### scale_denominator
+Guessed from distances between vertices of line and polygon features.
+
+Multiplicity: 1
+
+Shape: Integer
+
+Example: `25000`
+
+Synchronizable: yes
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/gmd:denominator/gco:Integer/text()`
+
+
 ### title
 Multiplicity: 1
 
@@ -262,32 +289,6 @@ Example: `"http://localhost:8600/geoserver/testuser1/ows"`
 Synchronizable: yes
 
 XPath for Layer: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-1.3.0-http-get-capabilities"]/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()`
-
-
-## Metadata properties guessable by Layman
-
-### language
-Multiplicity: 1..n
-
-Shape: Array of strings
-
-Example: `["cze", "eng"]`
-
-Synchronizable: yes
-
-XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:language/gmd:LanguageCode/@codeListValue`
-
-
-### scale_denominator
-Multiplicity: 1
-
-Shape: Integer
-
-Example: `25000`
-
-Synchronizable: yes
-
-XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/gmd:denominator/gco:Integer/text()`
 
 
 ## Metadata properties unknown to Layman
