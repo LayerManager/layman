@@ -1,8 +1,8 @@
 # Changelog
 
 
-## v1.4.x
-2020-04-??
+## v1.4.0
+2020-04-23
 - Update Python dependencies
 - Add [`md_language`](doc/metadata.md#md_language) metadata property
 - Guess metadata properties
@@ -12,7 +12,7 @@
 - Change multiplicity of [`language`](doc/metadata.md#language) metadata property from `1` to `1..n` according to XML Schema
 - Remove [`language`](doc/metadata.md#language) metadata property from Map according to XML Schema
 - Build Layman as a part of `make start-demo*` commands.
-- Fix demo run without Micka, fix #55
+- Run demo without Micka, fix #55
 - Respect public URL scheme in REST API responses, fix #58
 - Show public WMS and WFS URLs in metadata comparison, fix #54
 - Change WFS endpoint from `/ows` to `/wfs`, because `/ows` capabilities pointed to `/wfs`
