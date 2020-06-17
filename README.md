@@ -177,11 +177,11 @@ Suitable for **development only**.
 
 Before the first run:
 ```bash
-# prepare geoserver data directory
-make geoserver-reset-default-layman-datadir
-
 # use dev settings
 cp .env.dev .env
+
+# prepare geoserver data directory
+make geoserver-reset-default-layman-datadir
 
 ```
 
