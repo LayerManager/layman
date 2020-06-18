@@ -122,7 +122,7 @@ However, if you want to run Layman in production, it is strongly recommended to 
 - PostgreSQL 10.0 & PostGIS 2.4
 - GeoServer 2.13.0
 - Redis 4.0
-- Micka 2020.010
+- Micka >=2020.010 and <=2020.014
 
 
 ## Run in production
@@ -132,7 +132,7 @@ When providing **external dependencies**, check their production-related documen
 - [PostgreSQL 10.0](https://www.postgresql.org/docs/10/admin.html) & [PostGIS 2.4](http://postgis.net/docs/manual-2.4/performance_tips.html)
 - [GeoServer 2.13.0](https://docs.geoserver.org/2.13.0/user/production/index.html#production)
 - [Redis 4.0](https://redis.io/topics/admin)
-- [Micka v2020.010](https://github.com/hsrs-cz/Micka/releases/tag/v2020.010), see also [configuration](deps/micka/sample/confs/config.local.neon) of [dockerized Micka](https://github.com/jirik/docker-micka).
+- [Micka v2020.014](https://github.com/hsrs-cz/Micka/releases/tag/v2020.014), see also [configuration](deps/micka/sample/confs/config.local.neon) of [dockerized Micka](https://github.com/jirik/docker-micka).
 
 Within PostgreSQL, you need to provide one database for Layman and one database for Micka. For Layman, you also need to provide one user [LAYMAN_PG_USER](doc/env-settings.md#LAYMAN_PG_USER) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME) database. The user also needs access to `public` schema where PostGIS must be installed.
 
