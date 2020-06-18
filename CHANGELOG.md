@@ -1,6 +1,7 @@
 # Changelog
 
-## v1.5.x
+## v1.5.0
+2020-06-18
 - Metadata records are published in SOAP envelope of CSW and they are published on Micka as "Public".
 - Upgrade Micka to version v2020.014. All versions between v2020.010 and v2020.014 should work well with Layman. If you are running other version than v2020.014, you can now set environment variable [MICKA_ACCEPTED_VERSION](doc/env-settings.md#MICKA_ACCEPTED_VERSION) to your version so that Layman accepts your version on startup. 
 - New environment variable [MICKA_ACCEPTED_VERSION](doc/env-settings.md#MICKA_ACCEPTED_VERSION)
