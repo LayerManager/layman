@@ -231,6 +231,9 @@ micka-bash-demo:
 micka-bash-exec-demo:
 	docker-compose -f docker-compose.deps.demo.yml exec micka bash
 
+micka-build:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build micka
+
 micka-logs:
 	mkdir -p deps/micka/log/micka
 	mkdir -p deps/micka/log/nginx

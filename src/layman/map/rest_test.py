@@ -414,6 +414,15 @@ def test_post_maps_complex(client):
         assert groups_json['guest'] == 'w'
         assert len(groups_json) == 1
 
+    # continue with metadata assertion
+    with app.app_context():
+        map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
+    while 'status' in map_info['metadata'] and map_info['metadata']['status'] in ['PENDING', 'STARTED']:
+        time.sleep(0.1)
+        with app.app_context():
+            map_info = client.get(url_for('rest_map.get', username=username,
+                                      mapname=mapname)).get_json()
+
     expected_md_values = {
         'abstract': "Libovoln\u00fd popis",
         'extent': [

@@ -71,6 +71,7 @@ dibi:
     username: 'docker'
     password: 'docker'
     charset: utf-8
+    persistent: true
     profiler: false
     debugger: false
     lazy: yes
