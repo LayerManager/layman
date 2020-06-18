@@ -127,6 +127,8 @@ CSW_RECORD_URL = os.getenv('CSW_RECORD_URL', None)
 # # tuples like (version, revision)
 MICKA_ACCEPTED_VERSIONS = [
     ('2020.014', '2020-04-15.01'),
+] if ':' not in os.getenv('MICKA_ACCEPTED_VERSION', '') else [
+    tuple(os.environ['MICKA_ACCEPTED_VERSION'].split(':'))
 ]
 
 LAYMAN_PUBLIC_URL_SCHEME = urlparse(LAYMAN_CLIENT_PUBLIC_URL).scheme

@@ -43,9 +43,6 @@ List of dotted paths to Python modules to be used as OAuth2 providers. Paths are
 ### LAYMAN_AUTHZ_MODULE
 Dotted path to Python module to be used for authorization. Paths are separated with comma (`,`). See [authorization](security.md#authorization).
 
-### MICKA_HOSTPORT
-String with public domain and optionally port, e.g. `<domain>` or `<domain>:<port>`. Passed as configuration to Micka for demo purposes.
-
 ### OAUTH2_LIFERAY_CLIENT_ID
 Client ID of Layman's Test Client registered as OAuth2 provider at Liferay instance.
 
@@ -148,6 +145,12 @@ Internal URL of [OGC Catalogue Service v2.0.2](https://www.opengeospatial.org/st
 
 ### CSW_PROXY_URL
 Public URL of [OGC Catalogue Service v2.0.2](https://www.opengeospatial.org/standards/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
+
+### MICKA_ACCEPTED_VERSION
+Version of Micka that Layman will accept on startup encoded as `version:revision`, e.g. `2020.014:2020-04-15.01`. If it is not set, a version defined in [LAYMAN_SETTINGS_MODULE](#LAYMAN_SETTINGS_MODULE) will be accepted.
+
+### MICKA_HOSTPORT
+String with public domain and optionally port, e.g. `<domain>` or `<domain>:<port>`. Passed as configuration to Micka for demo purposes.
 
 ## Flask settings
 

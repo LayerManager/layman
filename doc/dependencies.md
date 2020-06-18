@@ -7,7 +7,7 @@
 | [postgis](https://postgis.net/) | 2.4 | GNU GPL v2 | kartoza/docker-postgis | prod-external | bin | to store vector data effectively |
 | [geoserver](https://github.com/geoserver/geoserver) | 2.13.0 | GNU GPL v2 | kartoza/docker-geoserver | prod-external | bin | to provide WMS/WFS endpoints |
 | [redis](https://redis.io/) | 4.0.11 | BSD 3-Clause | docker-library/redis | prod-external | bin | celery message broker, source of truth for server side |
-| [micka](https://github.com/hsrs-cz/Micka) | [v2020.010](https://github.com/hsrs-cz/Micka/releases/tag/v2020.010) | BSD 3-Clause | jirikcz/micka | prod-external | bin | to provide CSW endpoint |
+| [micka](https://github.com/hsrs-cz/Micka) | [v2020.014](https://github.com/hsrs-cz/Micka/releases/tag/v2020.014) | BSD 3-Clause | jirikcz/micka | prod-external | bin | to provide CSW endpoint |
 | [liferay portal](https://portal.liferay.dev/) | 7.1.3 | GNU GPL v2 | liferay/portal | opt | bin | as OAuth2 provider |
 
 
