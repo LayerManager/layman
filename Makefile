@@ -29,12 +29,14 @@ deps-stop:
 	docker-compose -f docker-compose.deps.yml stop
 
 start-dev:
+	mkdir -p layman_data layman_data_test tmp
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate -d
 
 stop-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop
 
 start-dev-only:
+	mkdir -p layman_data layman_data_test tmp
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower timgen layman_client
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d layman_dev celery_worker_dev flower timgen layman_client
 
@@ -172,9 +174,13 @@ redis-cli-client-standalone-db:
 geoserver-reset-default-layman-datadir:
 	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash /geoserver_code/reset-default-layman-datadir.sh
 
-geoserver-restart:
+geoserver-reset-restart:
 	docker-compose -f docker-compose.deps.yml rm -fsv geoserver
 	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash /geoserver_code/reset-default-layman-datadir.sh
+	docker-compose -f docker-compose.deps.yml up --no-deps -d geoserver
+
+geoserver-restart:
+	docker-compose -f docker-compose.deps.yml rm -fsv geoserver
 	docker-compose -f docker-compose.deps.yml up --no-deps -d geoserver
 
 geoserver-reset-empty-datadir:

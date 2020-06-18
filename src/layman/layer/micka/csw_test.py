@@ -3,13 +3,15 @@ from multiprocessing import Process
 import os
 import pytest
 import time
+import requests
+from urllib.parse import urljoin
 
 import sys
 del sys.modules['layman']
 
 from layman import app as app, LaymanError
 from layman import settings
-from .csw import get_layer_info, delete_layer
+from .csw import get_layer_info, delete_layer, get_metadata_uuid
 from layman.layer.rest_test import wait_till_ready
 
 
@@ -68,7 +70,7 @@ def provide_layer(client):
                 fp[0].close()
 
     wait_till_ready(username, layername)
-    yield
+    yield rv.get_json()[0]
     with app.app_context():
         rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
         rv = client.delete(rest_path)
@@ -195,3 +197,12 @@ def test_patch_layer_without_metadata(client):
     with app.app_context():
         delete_layer(TEST_USER, TEST_LAYER)
     patch_layer(client)
+
+
+def test_public_metadata(provide_layer):
+    uuid = provide_layer['uuid']
+    muuid = get_metadata_uuid(uuid)
+    micka_url = urljoin(settings.CSW_URL, "./")
+    r = requests.get(micka_url)
+    r.raise_for_status()
+    assert muuid in r.text, f"Metadata record {muuid} is not public!"

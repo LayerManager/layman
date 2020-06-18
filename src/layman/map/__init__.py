@@ -30,11 +30,12 @@ PUBLICATION_TYPES = {
             map_thumbnail_bp,
             map_metadata_comparison_bp,
         ],
+        # see also .util.TASKS_TO_MAP_INFO_KEYS
         'internal_sources': [
             'layman.map.filesystem.uuid',
             'layman.map.filesystem.input_file',
             'layman.map.filesystem.thumbnail',
-            'layman.map.micka.csw',
+            'layman.map.micka.soap',
         ],
         'task_modules': [
             'layman.map.filesystem.tasks',

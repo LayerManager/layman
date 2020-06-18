@@ -88,7 +88,7 @@ def get_map_names(username):
 
 TASKS_TO_MAP_INFO_KEYS = {
     'layman.map.filesystem.thumbnail.refresh': ['thumbnail'],
-    'layman.map.micka.csw.refresh': ['metadata'],
+    'layman.map.micka.soap.refresh': ['metadata'],
 }
 
 

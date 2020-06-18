@@ -3,13 +3,15 @@ from multiprocessing import Process
 import os
 import pytest
 import time
+import requests
+from urllib.parse import urljoin
 
 import sys
 del sys.modules['layman']
 
 from layman import app as app, LaymanError
 from layman import settings
-from .csw import get_map_info, delete_map
+from .csw import get_map_info, delete_map, get_metadata_uuid
 from layman.map.rest_test import wait_till_ready
 
 
@@ -68,7 +70,7 @@ def provide_map(client):
                 fp[0].close()
 
     wait_till_ready(username, mapname)
-    yield
+    yield rv.get_json()[0]
     with app.app_context():
         rest_path = url_for('rest_map.delete_map', username=username, mapname=mapname)
         rv = client.delete(rest_path)
@@ -195,3 +197,12 @@ def test_patch_map_without_metadata(client):
     with app.app_context():
         delete_map(TEST_USER, TEST_MAP)
     patch_map(client)
+
+
+def test_public_metadata(provide_map):
+    uuid = provide_map['uuid']
+    muuid = get_metadata_uuid(uuid)
+    micka_url = urljoin(settings.CSW_URL, "./")
+    r = requests.get(micka_url)
+    r.raise_for_status()
+    assert muuid in r.text, f"Metadata record {muuid} is not public!"
