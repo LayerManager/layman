@@ -258,6 +258,9 @@ stop-and-remove-all-docker-containers:
 	docker stop $$(docker ps -q)
 	docker rm $$(docker ps -aq)
 
+remark:
+	remark --frail *.md */*.md */*/*.md
+
 github-purge-cache:
 	if ! [ -f tmp/github-purge.sh ] ; then \
 		curl -o tmp/github-purge.sh -LO https://raw.githubusercontent.com/mpyw/hub-purge/master/hub-purge.sh ; \
