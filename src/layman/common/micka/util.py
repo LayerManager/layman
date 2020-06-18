@@ -20,6 +20,8 @@ NAMESPACES = {
     'gmx': 'http://www.isotc211.org/2005/gmx',
     'xlink': 'http://www.w3.org/1999/xlink',
     'srv': 'http://www.isotc211.org/2005/srv',
+    'soap': 'http://www.w3.org/2003/05/soap-envelope',
+    'hs': 'http://www.hsrs.cz/micka',
 }
 for k, v in NAMESPACES.items():
     ET.register_namespace(k, v)
@@ -229,23 +231,22 @@ def create_csw():
     return csw
 
 
-def csw_insert(template_values):
-    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-insert-template.xml')
-    xml_str = fill_template_as_str(template_path, template_values)
-    # print(f"CSW insert=\n{xml_str}")
+def is_record_exists_exception(root_el):
+    return len(root_el) == 1 and \
+           root_el[0].tag == nspath_eval('ows:Exception', NAMESPACES) and \
+           "exceptionCode" in root_el[0].attrib and \
+           root_el[0].attrib["exceptionCode"] == 'TransactionFailed' and \
+           len(root_el[0]) == 1 and \
+           root_el[0][0].tag == nspath_eval('ows:ExceptionText', NAMESPACES) and \
+           root_el[0][0].text.startswith('Record exists')
+
+
+def base_insert(xml_str):
+    # print(f"Micka insert=\n{xml_str}")
     r = requests.post(settings.CSW_URL, auth=settings.CSW_BASIC_AUTHN, data=xml_str.encode('utf-8'))
-    # print(f"CSW insert response=\n{r.text}")
+    # print(f"Micka insert response=\n{r.text}")
     r.raise_for_status()
     root_el = ET.fromstring(r.content)
-
-    def is_record_exists_exception(root_el):
-        return len(root_el) == 1 and \
-                root_el[0].tag == nspath_eval('ows:Exception', NAMESPACES) and \
-                "exceptionCode" in root_el[0].attrib and \
-                root_el[0].attrib["exceptionCode"] == 'TransactionFailed' and \
-                len(root_el[0]) == 1 and \
-                root_el[0][0].tag == nspath_eval('ows:ExceptionText', NAMESPACES) and \
-                root_el[0][0].text.startswith('Record exists')
 
     if root_el.tag == nspath_eval('ows:ExceptionReport', NAMESPACES):
         if is_record_exists_exception(root_el):
@@ -258,10 +259,30 @@ def csw_insert(template_values):
             raise LaymanError(37, data={
                 'response': r.text
             })
+    return root_el, r
+
+
+def csw_insert(template_values):
+    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-insert-template.xml')
+    xml_str = fill_template_as_str(template_path, template_values)
+    root_el, r = base_insert(xml_str)
     assert root_el.tag == nspath_eval('csw:TransactionResponse', NAMESPACES), r.content
     assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalInserted', NAMESPACES)).text == "1", r.content
 
     muuid_els = root_el.findall(nspath_eval('csw:InsertResult/csw:BriefRecord/dc:identifier', NAMESPACES))
+    assert len(muuid_els) == 1, r.content
+    muuid = muuid_els[0].text
+    return muuid
+
+
+def soap_insert(template_values):
+    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'soap-insert-template.xml')
+    xml_str = fill_template_as_str(template_path, template_values)
+    root_el, r = base_insert(xml_str)
+    assert root_el.tag == nspath_eval('soap:Envelope', NAMESPACES), r.content
+    assert root_el.find(nspath_eval('soap:Body/csw:TransactionResponse/csw:TransactionSummary/csw:totalInserted', NAMESPACES)).text == "1", r.content
+
+    muuid_els = root_el.findall(nspath_eval('soap:Body/csw:TransactionResponse/csw:InsertResult/csw:BriefRecord/dc:identifier', NAMESPACES))
     assert len(muuid_els) == 1, r.content
     muuid = muuid_els[0].text
     return muuid
@@ -277,7 +298,7 @@ def csw_update(template_values):
     root_el = ET.fromstring(r.content)
 
     if root_el.tag == nspath_eval('ows:ExceptionReport', NAMESPACES):
-        if _is_record_does_not_exist_exception(root_el):
+        if is_record_does_not_exist_exception(root_el):
             raise LaymanError(39, data={
                 'response': r.text
             })
@@ -289,7 +310,7 @@ def csw_update(template_values):
     assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalUpdated', NAMESPACES)).text == "1", r.content
 
 
-def _is_record_does_not_exist_exception(root_el):
+def is_record_does_not_exist_exception(root_el):
     return len(root_el) == 1 and \
             root_el[0].tag == nspath_eval('ows:Exception', NAMESPACES) and \
             "exceptionCode" in root_el[0].attrib and \
@@ -311,7 +332,7 @@ def csw_delete(muuid):
     root_el = ET.fromstring(r.content)
 
     if root_el.tag == nspath_eval('ows:ExceptionReport', NAMESPACES):
-        if _is_record_does_not_exist_exception(root_el):
+        if is_record_does_not_exist_exception(root_el):
             return
         else:
             raise LaymanError(37, data={

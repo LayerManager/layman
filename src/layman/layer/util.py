@@ -187,7 +187,7 @@ TASKS_TO_LAYER_INFO_KEYS = {
     'layman.layer.geoserver.wfs.refresh': ['wms', 'wfs'],
     'layman.layer.geoserver.sld.refresh': ['sld'],
     'layman.layer.filesystem.thumbnail.refresh': ['thumbnail'],
-    'layman.layer.micka.csw.refresh': ['metadata'],
+    'layman.layer.micka.soap.refresh': ['metadata'],
 }
 
 

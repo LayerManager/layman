@@ -27,6 +27,7 @@ PUBLICATION_TYPES = {
             layer_thumbnail_bp,
             layer_metadata_comparison_bp,
         ],
+        # see also .util.TASKS_TO_LAYER_INFO_KEYS
         'internal_sources': [ # internal sources to process when new source is published
             'layman.layer.filesystem.uuid',
             'layman.layer.filesystem.input_chunk',
@@ -37,7 +38,7 @@ PUBLICATION_TYPES = {
             'layman.layer.geoserver.wms',
             'layman.layer.geoserver.sld',
             'layman.layer.filesystem.thumbnail',
-            'layman.layer.micka.csw',
+            'layman.layer.micka.soap',
         ],
         'task_modules': [
             'layman.layer.db.tasks',
