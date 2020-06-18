@@ -34,7 +34,7 @@
 | name | license | used by | env | bin or src | purpose |
 | --- | --- | --- | --- | --- | --- |
 | [flask](http://flask.pocoo.org/) | BSD License | Pipfile | prod | bin | to build REST API |
-| [celery](http://www.celeryproject.org/) | BSD 3-Clause | Pipfile | prod | bin | asynchronous task runner |
+| [celery](https://github.com/celery/celery) | BSD 3-Clause | Pipfile | prod | bin | asynchronous task runner |
 | [redis-py](https://github.com/andymccurdy/redis-py) | MIT | Pipfile | prod | bin | |
 | [unidecode](https://github.com/avian2/unidecode) | GNU GPL v2 | Pipfile | prod | bin | |
 | [psycopg2-binary](https://github.com/psycopg/psycopg2) | GNU LGPL | Pipfile | prod | bin | |
