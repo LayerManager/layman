@@ -122,7 +122,7 @@ However, if you want to run Layman in production, it is strongly recommended to 
 - PostgreSQL 10.0 & PostGIS 2.4
 - GeoServer 2.13.0
 - Redis 4.0
-- Micka >=2020.010 and <=2020.014
+- Micka 2020.014 (versions >=2020.010 probably work too)
 
 
 ## Run in production
