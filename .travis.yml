@@ -1,45 +1,73 @@
-sudo: required
+matrix:
+  include:
+    - language: node_js
 
-dist: trusty
+      sudo: required
 
-language: node_js
+      dist: trusty
 
-node_js:
-  - "11"
+      node_js:
+        - "11"
 
-services:
-- docker
+      services:
+      - docker
 
-before_install:
-- sudo rm -f /usr/local/bin/docker-compose
-- curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` > docker-compose
-- chmod +x docker-compose
-- sudo mv docker-compose /usr/local/bin
-- sudo service docker restart
-- docker-compose -v
-- docker -v
+      before_install:
+      - sudo rm -f /usr/local/bin/docker-compose
+      - curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` > docker-compose
+      - chmod +x docker-compose
+      - sudo mv docker-compose /usr/local/bin
+      - sudo service docker restart
+      - docker-compose -v
+      - docker -v
 
-script:
-- make geoserver-reset-default-layman-datadir
-- cp .env.test .env
-- make test
-- npm install --global remark-cli remark-validate-links remark-lint-no-dead-urls
-- remark --frail *.md */*.md */*/*.md
+      script:
+      - make geoserver-reset-default-layman-datadir
+      - cp .env.test .env
+      - make test
+      - npm install --global remark-cli remark-validate-links remark-lint-no-dead-urls
+      - remark --frail *.md */*.md */*/*.md
 
-after_failure:
-- docker logs layman_celery_worker_test_1
-- docker logs timgen
-- docker logs micka
-- git clone https://jirik:${GITHUB_TOKEN}@gist.github.com/3c7f15736f03e8711d5dde8445f6b68d.git
-  travis-artifacts
-- rm -rf travis-artifacts/*
-- cp tmp/artifacts/* travis-artifacts
-- cd travis-artifacts
-- git remote set-url origin https://jirik:${GITHUB_TOKEN}@gist.github.com/3c7f15736f03e8711d5dde8445f6b68d.git
-- git add .
-- git commit -m "Artifacts of build $TRAVIS_BUILD_NUMBER, commit $TRAVIS_COMMIT"
-- git push
+      after_failure:
+      - docker logs layman_celery_worker_test_1
+      - docker logs timgen
+      - docker logs micka
+      - git clone https://jirik:${GITHUB_TOKEN}@gist.github.com/3c7f15736f03e8711d5dde8445f6b68d.git
+        travis-artifacts
+      - rm -rf travis-artifacts/*
+      - cp tmp/artifacts/* travis-artifacts
+      - cd travis-artifacts
+      - git remote set-url origin https://jirik:${GITHUB_TOKEN}@gist.github.com/3c7f15736f03e8711d5dde8445f6b68d.git
+      - git add .
+      - git commit -m "Artifacts of build $TRAVIS_BUILD_NUMBER, commit $TRAVIS_COMMIT"
+      - git push
 
-env:
-  global:
-    secure: rxRvrkqIGE67Okn6kDLqoWc6ysMk+SJIEec3hMIDSFcQeN1GXdwB5pyhQ1hS6WrZXfPVi2Z9zZxTFbRlUuxjAc+BznvKlaksAnCVWWKFrkgVXafqjtio3EJfk4x7Zb5rVthU+HSfY8zABtNQ7rrLcX7As6jdURHNZv6shwksPvLIYLOi5Tu1aUist7nfM/HOs49zJDd2GAGpR1AH5TYhzsoL2jILJ0BK7WT1KRRA93imAyRJppE9kf7MRkE8pq++24XY1nkW22nh1e5DhMPDgERIBIeiT7lvAt5/mhT3pbzHB0+cevIwRttoh5oxiAyO5sKed9HP4Nq9PvYOXkzMkk7J0zydsOf7M9xq64PqSUicyEBoqG7RcFoeDxyoMX363C7+/nfbfju7fn1cq1wle15KHPzwDGweUp3ulLM8nzuFEN+rUhIfrTYXT5DRmVjI50+uBkBFkS/m1FcU8qkxNlcFRCD/W8qeRNb8DLbQhQcQDEyP+cKvzxut+hdYcZGsuT9Mu7X1y7+R4dWXxuAGp9EK6hF4nzNMUTFO401mEkFTcEcXSyYjIWMI54nwQ/QLripIzNWi2zqGBl8l/pgqjB0rZDl74omB4WVslPCjbeNW7lA/LLL5J+JqcqDkBBLiwEVvOK1ucN/gPLMSZLhCCs47dBuZsQ54oLtt5Lngw+Y=
+      env:
+        global:
+          secure: rxRvrkqIGE67Okn6kDLqoWc6ysMk+SJIEec3hMIDSFcQeN1GXdwB5pyhQ1hS6WrZXfPVi2Z9zZxTFbRlUuxjAc+BznvKlaksAnCVWWKFrkgVXafqjtio3EJfk4x7Zb5rVthU+HSfY8zABtNQ7rrLcX7As6jdURHNZv6shwksPvLIYLOi5Tu1aUist7nfM/HOs49zJDd2GAGpR1AH5TYhzsoL2jILJ0BK7WT1KRRA93imAyRJppE9kf7MRkE8pq++24XY1nkW22nh1e5DhMPDgERIBIeiT7lvAt5/mhT3pbzHB0+cevIwRttoh5oxiAyO5sKed9HP4Nq9PvYOXkzMkk7J0zydsOf7M9xq64PqSUicyEBoqG7RcFoeDxyoMX363C7+/nfbfju7fn1cq1wle15KHPzwDGweUp3ulLM8nzuFEN+rUhIfrTYXT5DRmVjI50+uBkBFkS/m1FcU8qkxNlcFRCD/W8qeRNb8DLbQhQcQDEyP+cKvzxut+hdYcZGsuT9Mu7X1y7+R4dWXxuAGp9EK6hF4nzNMUTFO401mEkFTcEcXSyYjIWMI54nwQ/QLripIzNWi2zqGBl8l/pgqjB0rZDl74omB4WVslPCjbeNW7lA/LLL5J+JqcqDkBBLiwEVvOK1ucN/gPLMSZLhCCs47dBuZsQ54oLtt5Lngw+Y=
+    - language: python
+
+      dist: trusty
+
+      python:
+        - "3.6"      # current default Python on Travis CI
+
+      # command to install dependencies
+      install:
+        - pip install flake8 pytest autopep8 pycodestyle pylint pylint-exit
+
+      before_install:
+        - echo -e "machine github.com\n  login $GITHUB_TOKEN" > ~/.netrc
+        - git lfs pull
+
+      # command to run tests
+      script:
+        - pytest
+        # stop the build if there are Python syntax errors or undefined names
+        - flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        - flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        - pycodestyle --count --max-line-length=127 --statistics --exclude=venv ./sort
+        - pylint -f colorized --ignore-patterns=venv -r y ./sort || pylint-exit -efail $?
+        - autopep8 --recursive --in-place --aggressive --aggressive ./sort
+
