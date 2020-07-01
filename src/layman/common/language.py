@@ -219,9 +219,9 @@ def tokenize(text):
 def get_languages_by_script(text):
     maxchar = max(text)
     if u'\u0400' <= maxchar <= u'\u04ff':
-      return ['ru']
+        return ['ru']
     else:
-      return []
+        return []
 
 
 def get_languages_cld2(text):
@@ -246,7 +246,7 @@ def get_languages_cld2(text):
         best_lang = next((l for l in PREFERRED_LANGUAGES if l in langs), None)
         # print(f"best_lang={best_lang}")
         if best_lang is not None:
-          return [best_lang]
+            return [best_lang]
 
     result = []
     # print(f"get_languages_cld2 reliable={reliable}, details={details}")
