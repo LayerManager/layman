@@ -14,6 +14,7 @@ import pytest
 from flask import url_for
 
 import sys
+
 del sys.modules['layman']
 
 from . import util, LAYER_TYPE
@@ -76,13 +77,16 @@ def check_metadata(client, username, layername, props_equal, expected_values):
         resp_json = rv.get_json()
         assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
         for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
-            assert v['equal'] == (k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+            assert v['equal_or_null'] == (
+                        k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+            assert v['equal'] == (
+                        k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
             # print(f"'{k}': {json.dumps(list(v['values'].values())[0], indent=2)},")
             if k in expected_values:
                 vals = list(v['values'].values())
                 vals.append(expected_values[k])
-                assert prop_equals_strict(vals, equals_fn=PROPERTIES[k].get('equals_fn', None)), f"Property {k} has unexpected values {json.dumps(vals, indent=2)}"
+                assert prop_equals_strict(vals, equals_fn=PROPERTIES[k].get('equals_fn',
+                                                                            None)), f"Property {k} has unexpected values {json.dumps(vals, indent=2)}"
 
 
 @pytest.fixture(scope="module")
@@ -132,9 +136,9 @@ def test_wrong_value_of_user(client):
         resp_json = rv.get_json()
         # print('username', username)
         # print(resp_json)
-        assert rv.status_code==400
-        assert resp_json['code']==2
-        assert resp_json['detail']['parameter']=='user'
+        assert rv.status_code == 400
+        assert resp_json['code'] == 2
+        assert resp_json['detail']['parameter'] == 'user'
 
 
 @pytest.mark.usefixtures('app_context')
@@ -146,19 +150,19 @@ def test_wrong_value_of_layername(client):
         resp_json = rv.get_json()
         # print('username', username)
         # print(resp_json)
-        assert rv.status_code==400
-        assert resp_json['code']==2
-        assert resp_json['detail']['parameter']=='layername'
+        assert rv.status_code == 400
+        assert resp_json['code'] == 2
+        assert resp_json['detail']['parameter'] == 'layername'
 
 
 @pytest.mark.usefixtures('app_context')
 def test_no_file(client):
     rv = client.post(url_for('rest_layers.post', username='testuser1'))
-    assert rv.status_code==400
+    assert rv.status_code == 400
     resp_json = rv.get_json()
     # print('resp_json', resp_json)
-    assert resp_json['code']==1
-    assert resp_json['detail']['parameter']=='file'
+    assert resp_json['code'] == 1
+    assert resp_json['detail']['parameter'] == 'file'
 
 
 @pytest.mark.usefixtures('app_context')
@@ -166,7 +170,7 @@ def test_username_schema_conflict(client):
     if len(settings.PG_NON_USER_SCHEMAS) == 0:
         pass
     rv = client.post(url_for('rest_layers.post', username=settings.PG_NON_USER_SCHEMAS[0]))
-    assert rv.status_code==409
+    assert rv.status_code == 409
     resp_json = rv.get_json()
     # print(resp_json)
     assert resp_json['code'] == 35
@@ -206,7 +210,7 @@ def test_layername_db_object_conflict(client):
         })
         assert rv.status_code == 409
         resp_json = rv.get_json()
-        assert resp_json['code']==9
+        assert resp_json['code'] == 9
     finally:
         for fp in files:
             fp[0].close()
@@ -216,7 +220,7 @@ def test_layername_db_object_conflict(client):
 def test_get_layers_testuser1_v1(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username))
-    assert rv.status_code==200
+    assert rv.status_code == 200
     # resp_json = rv.get_json()
     # assert len(resp_json) == 0
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -251,7 +255,7 @@ def test_post_layers_simple(client):
         layer_info = util.get_layer_info(username, layername)
         keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
         for key_to_check in keys_to_check:
-                assert 'status' in layer_info[key_to_check]
+            assert 'status' in layer_info[key_to_check]
 
         # TODO for some reason this hangs forever on get() if run (either with src/layman/authz/read_everyone_write_owner_auth2_test.py::test_authn_map_access_rights or src/layman/authn/oauth2_test.py::test_patch_current_user_without_username) and with src/layman/common/metadata/util.csw_insert
         # last_task['last'].get()
@@ -262,8 +266,8 @@ def test_post_layers_simple(client):
 
         layer_info = util.get_layer_info(username, layername)
         for key_to_check in keys_to_check:
-                assert isinstance(layer_info[key_to_check], str) \
-                       or 'status' not in layer_info[key_to_check]
+            assert isinstance(layer_info[key_to_check], str) \
+                   or 'status' not in layer_info[key_to_check]
 
         wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
         wms = wms_proxy(wms_url)
@@ -291,7 +295,8 @@ def test_post_layers_simple(client):
         assert layer_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
         md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
         assert layer_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
-        assert layer_info['metadata']['comparison_url'] == url_for('rest_layer_metadata_comparison.get', username=username, layername=layername)
+        assert layer_info['metadata']['comparison_url'] == url_for('rest_layer_metadata_comparison.get',
+                                                                   username=username, layername=layername)
         r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
         r.raise_for_status()
         assert layername in r.text
@@ -318,7 +323,6 @@ def test_post_layers_simple(client):
         'title': 'ne_110m_admin_0_countries',
     }
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
-
 
 
 @pytest.mark.usefixtures('app_context')
@@ -384,7 +388,7 @@ def test_post_layers_shp_missing_extensions(client):
         resp_json = rv.get_json()
         # print(resp_json)
         assert rv.status_code == 400
-        assert resp_json['code']==18
+        assert resp_json['code'] == 18
         assert sorted(resp_json['detail']['missing_extensions']) == [
             '.prj', '.shx']
     finally:
@@ -437,7 +441,8 @@ def test_post_layers_shp(client):
 
     # assert metadata file is the same as filled template except for UUID
     template_path, prop_values = csw.get_template_path_and_values(username, layername, http_method='post')
-    xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values, csw.METADATA_PROPERTIES)
+    xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values,
+                                                                                csw.METADATA_PROPERTIES)
     expected_path = 'src/layman/layer/rest_test_filled_template.xml'
     with open(expected_path) as f:
         expected_lines = f.readlines()
@@ -447,9 +452,11 @@ def test_post_layers_shp(client):
     minus_lines = [l for l in diff_lines if l.startswith('- ')]
     assert len(minus_lines) == 3, ''.join(diff_lines)
     plus_line = plus_lines[0]
-    assert plus_line == '+    <gco:CharacterString>m-81c0debe-b2ea-4829-9b16-581083b29907</gco:CharacterString>\n', ''.join(diff_lines)
+    assert plus_line == '+    <gco:CharacterString>m-81c0debe-b2ea-4829-9b16-581083b29907</gco:CharacterString>\n', ''.join(
+        diff_lines)
     minus_line = minus_lines[0]
-    assert minus_line.startswith('-    <gco:CharacterString>m') and minus_line.endswith('</gco:CharacterString>\n'), ''.join(diff_lines)
+    assert minus_line.startswith('-    <gco:CharacterString>m') and minus_line.endswith(
+        '</gco:CharacterString>\n'), ''.join(diff_lines)
     plus_line = plus_lines[1]
     assert plus_line == '+    <gco:Date>2007-05-25</gco:Date>\n', ''.join(diff_lines)
     minus_line = minus_lines[1]
@@ -457,7 +464,8 @@ def test_post_layers_shp(client):
     plus_line = plus_lines[2]
     assert plus_line == '+                <gco:Date>2019-12-07</gco:Date>\n', ''.join(diff_lines)
     minus_line = minus_lines[2]
-    assert minus_line.startswith('-                <gco:Date>') and minus_line.endswith('</gco:Date>\n'), ''.join(diff_lines)
+    assert minus_line.startswith('-                <gco:Date>') and minus_line.endswith('</gco:Date>\n'), ''.join(
+        diff_lines)
     assert len(diff_lines) == 29, ''.join(diff_lines)
 
 
@@ -476,9 +484,9 @@ def test_post_layers_layer_exists(client):
         rv = client.post(rest_path, data={
             'file': files
         })
-        assert rv.status_code==409
+        assert rv.status_code == 409
         resp_json = rv.get_json()
-        assert resp_json['code']==17
+        assert resp_json['code'] == 17
     finally:
         for fp in files:
             fp[0].close()
@@ -529,7 +537,7 @@ def test_post_layers_complex(client):
         assert wms['countries'].title == 'staty'
         assert wms['countries'].abstract == 'popis států'
         assert wms['countries'].styles[
-            username+':countries']['title'] == 'Generic Blue'
+                   username + ':countries']['title'] == 'Generic Blue'
 
         assert layername != ''
         rest_path = url_for('rest_layer.get', username=username, layername=layername)
@@ -537,8 +545,8 @@ def test_post_layers_complex(client):
         assert 200 <= rv.status_code < 300
         resp_json = rv.get_json()
         # print(resp_json)
-        assert resp_json['title']=='staty'
-        assert resp_json['description']=='popis států'
+        assert resp_json['title'] == 'staty'
+        assert resp_json['description'] == 'popis států'
         for source in [
             'wms',
             'wfs',
@@ -550,10 +558,10 @@ def test_post_layers_complex(client):
             assert 'status' not in resp_json[source]
 
         style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                        username + '/styles/' + layername)
+                            username + '/styles/' + layername)
         r = requests.get(style_url + '.sld',
-            auth=settings.LAYMAN_GS_AUTH
-        )
+                         auth=settings.LAYMAN_GS_AUTH
+                         )
         r.raise_for_status()
         sld_file = io.BytesIO(r.content)
         tree = ET.parse(sld_file)
@@ -571,7 +579,7 @@ def test_post_layers_complex(client):
 
     expected_md_values = {
         'abstract': "popis st\u00e1t\u016f",
-        'extent': [-180.0,-85.60903859383285,180.0,83.64513109859944],
+        'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
         'graphic_url': "http://layman_test_run_1:8000/rest/testuser2/layers/countries/thumbnail",
         'identifier': {
             "identifier": "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
@@ -581,7 +589,7 @@ def test_post_layers_complex(client):
         'layer_endpoint': "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
         'organisation_name': None,
         'publication_date': TODAY_DATE,
-        'reference_system': [3857,4326],
+        'reference_system': [3857, 4326],
         'revision_date': None,
         'scale_denominator': 100000000,
         'title': "staty",
@@ -639,10 +647,10 @@ def test_uppercase_attr(client):
             assert 'status' not in resp_json[source], f"{source}: {resp_json[source]}"
 
         style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                        username + '/styles/' + layername)
+                            username + '/styles/' + layername)
         r = requests.get(style_url + '.sld',
-            auth=settings.LAYMAN_GS_AUTH
-        )
+                         auth=settings.LAYMAN_GS_AUTH
+                         )
         r.raise_for_status()
         sld_file = io.BytesIO(r.content)
         tree = ET.parse(sld_file)
@@ -651,7 +659,9 @@ def test_uppercase_attr(client):
 
         feature_type = get_feature_type(username, 'postgresql', layername)
         attributes = feature_type['attributes']['attribute']
-        attr_names = ["id", "dpr_smer_k", "fid_zbg", "silnice", "silnice_bs", "typsil_p", "cislouseku", "jmeno", "typsil_k", "peazkom1", "peazkom2", "peazkom3", "peazkom4", "vym_tahy_k", "vym_tahy_p", "r_indsil7", "kruh_obj_k", "etah1", "etah2", "etah3", "etah4", "kruh_obj_p", "dpr_smer_p"]
+        attr_names = ["id", "dpr_smer_k", "fid_zbg", "silnice", "silnice_bs", "typsil_p", "cislouseku", "jmeno",
+                      "typsil_k", "peazkom1", "peazkom2", "peazkom3", "peazkom4", "vym_tahy_k", "vym_tahy_p",
+                      "r_indsil7", "kruh_obj_k", "etah1", "etah2", "etah3", "etah4", "kruh_obj_p", "dpr_smer_p"]
         for attr_name in attr_names:
             assert next((
                 a for a in attributes if a['name'] == attr_name
@@ -674,7 +684,7 @@ def test_uppercase_attr(client):
 def test_get_layers_testuser1_v2(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username))
-    assert rv.status_code==200
+    assert rv.status_code == 200
     resp_json = rv.get_json()
     # assert len(resp_json) == 3
     layernames = [l['name'] for l in resp_json]
@@ -688,7 +698,7 @@ def test_get_layers_testuser1_v2(client):
     username = 'testuser2'
     rv = client.get(url_for('rest_layers.get', username=username))
     resp_json = rv.get_json()
-    assert rv.status_code==200
+    assert rv.status_code == 200
     assert len(resp_json) == 1
     assert resp_json[0]['name'] == 'countries'
 
@@ -776,7 +786,7 @@ def test_patch_layer_style(client):
         assert layername in wms.contents
         assert wms[layername].title == 'countries in blue'
         assert wms[layername].styles[
-            username+':'+layername]['title'] == 'Generic Blue'
+                   username + ':' + layername]['title'] == 'Generic Blue'
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': num_layers_before_test + 4
         })
@@ -838,10 +848,10 @@ def test_post_layers_sld_1_1_0(client):
     assert wms[layername].title == 'countries_sld_1_1_0'
 
     style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                    username + '/styles/' + layername)
+                        username + '/styles/' + layername)
     r = requests.get(style_url + '.sld',
-        auth=settings.LAYMAN_GS_AUTH
-    )
+                     auth=settings.LAYMAN_GS_AUTH
+                     )
     r.raise_for_status()
     sld_file = io.BytesIO(r.content)
     tree = ET.parse(sld_file)
@@ -894,7 +904,7 @@ def test_patch_layer_data(client):
         resp_json = rv.get_json()
         keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
         for key_to_check in keys_to_check:
-                assert 'status' in resp_json[key_to_check]
+            assert 'status' in resp_json[key_to_check]
         wait_till_ready(username, layername)
         # last_task['last'].get()
 
@@ -919,7 +929,7 @@ def test_patch_layer_data(client):
 
     expected_md_values = {
         'abstract': "popis st\u00e1t\u016f",
-        'extent': [-175.22056435043098,-41.29999116752133,179.21664802661394,64.15002486626597],
+        'extent': [-175.22056435043098, -41.29999116752133, 179.21664802661394, 64.15002486626597],
         'graphic_url': "http://layman_test_run_1:8000/rest/testuser2/layers/countries/thumbnail",
         'identifier': {
             "identifier": "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
@@ -929,7 +939,7 @@ def test_patch_layer_data(client):
         'layer_endpoint': "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
         'organisation_name': None,
         'publication_date': TODAY_DATE,
-        'reference_system': [3857,4326],
+        'reference_system': [3857, 4326],
         'revision_date': TODAY_DATE,
         'scale_denominator': None,
         'title': 'populated places',
@@ -1038,7 +1048,7 @@ def test_post_layers_long_and_delete_it(client):
     layer_info = util.get_layer_info(username, layername)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
     for key_to_check in keys_to_check:
-            assert 'status' in layer_info[key_to_check]
+        assert 'status' in layer_info[key_to_check]
 
     rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
     rv = client.delete(rest_path)
@@ -1111,11 +1121,9 @@ def test_post_layers_zero_length_attribute(client):
 def test_get_layers_testuser2(client):
     username = 'testuser2'
     rv = client.get(url_for('rest_layers.get', username=username))
-    assert rv.status_code==200
+    assert rv.status_code == 200
     resp_json = rv.get_json()
     assert len(resp_json) == 0
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 2
     })
-
-

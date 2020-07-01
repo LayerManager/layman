@@ -9,18 +9,18 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 import sys
+
 del sys.modules['layman']
 
 from layman.map import MAP_TYPE
 from layman import app, settings
 from layman.uuid import check_redis_consistency
 
-
 num_maps_before_test = 0
+
 
 @pytest.fixture(scope="module")
 def client():
-
     # print('before app.test_client()')
     client = app.test_client()
 
@@ -63,7 +63,7 @@ def chrome():
         options=chrome_options,
         desired_capabilities=desired_capabilities,
     )
-    chrome.set_window_size(1000,2000)
+    chrome.set_window_size(1000, 2000)
     yield chrome
     chrome.close()
     chrome.quit()
@@ -78,10 +78,10 @@ def test_post_no_file(client, chrome):
     client_url = settings.LAYMAN_CLIENT_URL
 
     r = requests.get(client_url)
-    assert r.status_code==200
+    assert r.status_code == 200
 
     chrome.get(client_url)
-    chrome.set_window_size(1000,2000)
+    chrome.set_window_size(1000, 2000)
     # chrome.save_screenshot('/code/tmp/test-1.png')
 
     map_tab = chrome.find_elements_by_css_selector('.ui.attached.tabular.menu > a.item:nth-child(2)')
@@ -104,7 +104,8 @@ def test_post_no_file(client, chrome):
 
     # chrome.save_screenshot('/code/tmp/test-3.png')
 
-    resp_msg_div = chrome.find_elements_by_css_selector('div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.negative.message > code')
+    resp_msg_div = chrome.find_elements_by_css_selector(
+        'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.negative.message > code')
     assert len(resp_msg_div) == 1
     resp_msg_div = resp_msg_div[0]
     resp_json = json.loads(resp_msg_div.text)
@@ -117,7 +118,7 @@ def test_post_no_file(client, chrome):
     assert len(severe_entries) == 1
     for entry in severe_entries:
         assert entry['message'].startswith(f'{client_url}rest/{username}/maps?'
-            ) and entry['message'].endswith(
+                                           ) and entry['message'].endswith(
             'Failed to load resource: the server responded with a status of 400 (BAD REQUEST)')
 
     check_redis_consistency(expected_publ_num_by_type={

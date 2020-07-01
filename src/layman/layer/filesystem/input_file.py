@@ -10,9 +10,7 @@ from . import util
 from layman.common.filesystem import util as common_util
 from layman.common.filesystem import input_file as common
 
-
 LAYER_SUBDIR = __name__.split('.')[-1]
-
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
@@ -39,7 +37,7 @@ def delete_layer(username, layername):
 
 def get_layer_info(username, layername):
     input_file_dir = get_layer_input_file_dir(username, layername)
-    pattern = os.path.join(input_file_dir, layername+'.*')
+    pattern = os.path.join(input_file_dir, layername + '.*')
     filenames = glob.glob(pattern)
     main_filename = get_main_file_name(filenames)
     if main_filename is not None:
@@ -63,7 +61,7 @@ def get_layer_names(username):
         return []
     layer_names = [
         subfile for subfile in os.listdir(layersdir)
-            if os.path.isdir(os.path.join(layersdir,subfile))
+        if os.path.isdir(os.path.join(layersdir, subfile))
     ]
 
     return layer_names
@@ -77,12 +75,13 @@ def get_publication_names(username, publication_type):
 
 
 from . import uuid
+
 get_publication_uuid = uuid.get_publication_uuid
 
 
 def get_layer_main_file_path(username, layername):
     input_file_dir = get_layer_input_file_dir(username, layername)
-    pattern = os.path.join(input_file_dir, layername+'.*')
+    pattern = os.path.join(input_file_dir, layername + '.*')
     filenames = glob.glob(pattern)
     return get_main_file_name(filenames)
 
@@ -114,7 +113,7 @@ def check_layer_crs(main_filepath):
     crs = feature_layer.GetSpatialRef()
     crs_auth_name = crs.GetAuthorityName(None)
     crs_code = crs.GetAuthorityCode(None)
-    crs_id = crs_auth_name+":"+crs_code
+    crs_id = crs_auth_name + ":" + crs_code
     if crs_id not in settings.INPUT_SRS_LIST:
         raise LaymanError(4, {'found': crs_id,
                               'supported_values': settings.INPUT_SRS_LIST})
@@ -139,7 +138,7 @@ def check_filenames(username, layername, filenames, check_crs, ignore_existing_f
         if check_crs:
             shp_exts.append('.prj')
         missing_exts = list(filter(
-            lambda e: basename+e not in lower_filenames,
+            lambda e: basename + e not in lower_filenames,
             shp_exts
         ))
         if len(missing_exts) > 0:
@@ -159,7 +158,7 @@ def check_filenames(username, layername, filenames, check_crs, ignore_existing_f
         conflict_paths = [filename_mapping[k]
                           for k, v in filename_mapping.items()
                           if v is not None and os.path.exists(os.path.join(
-                input_file_dir, v))]
+                              input_file_dir, v))]
         if len(conflict_paths) > 0:
             raise LaymanError(3, conflict_paths)
 
