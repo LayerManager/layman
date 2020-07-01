@@ -10,13 +10,14 @@ def test_get_main_file_name():
     filenames = [
         'tmp/countries.zip',
     ]
-    assert get_main_file_name(filenames) == None
+    assert get_main_file_name(filenames) is None
 
     filenames = [
         'tmp/countries_lakes.geojson',
         'tmp/countries.geojson',
     ]
     assert get_main_file_name(filenames) == 'tmp/countries_lakes.geojson'
+
 
 def test_get_main_file_name_shp():
     filenames = [
@@ -38,7 +39,7 @@ def test_get_main_file_name_shp():
         'tmp/countries.shx',
         'tmp/countries.VERSION.txt',
     ]
-    assert get_main_file_name(filenames) == None
+    assert get_main_file_name(filenames) is None
 
     filenames = [
         'tmp/countries.cpg',

@@ -10,7 +10,6 @@ from .filesystem import input_file, input_sld, input_chunk
 from layman.authn import authenticate
 from layman.authz import authorize
 
-
 bp = Blueprint('rest_layer', __name__)
 
 
@@ -95,7 +94,7 @@ def patch(username, layername):
         else:
             filenames = [f.filename for f in files]
         input_file.check_filenames(username, layername, filenames,
-                                           check_crs, ignore_existing_files=True)
+                                   check_crs, ignore_existing_files=True)
 
     if update_info and delete_from != 'layman.layer.filesystem.input_file':
         props_to_refresh = util.get_same_or_missing_prop_names(username, layername)
@@ -105,7 +104,8 @@ def patch(username, layername):
     layer_result = {}
 
     if delete_from is not None:
-        props_to_refresh = info.get('metadata_properties_to_refresh', None) or util.get_same_or_missing_prop_names(username, layername)
+        props_to_refresh = info.get('metadata_properties_to_refresh', None) or util.get_same_or_missing_prop_names(
+            username, layername)
         deleted = util.delete_layer(username, layername, source=delete_from, http_method='patch')
         if sld_file is None:
             try:
@@ -114,7 +114,6 @@ def patch(username, layername):
                 pass
         if sld_file is not None:
             input_sld.save_layer_file(username, layername, sld_file)
-
 
         task_options = {
             'crs_id': crs_id,
@@ -172,5 +171,3 @@ def delete_layer(username, layername):
         'url': info['url'],
         'uuid': info['uuid'],
     }), 200
-
-

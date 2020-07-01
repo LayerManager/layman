@@ -9,8 +9,8 @@ from layman.common.filesystem import util as common_util
 from layman.common.filesystem import input_file as common
 from layman.util import url_for
 
-
 MAP_SUBDIR = __name__.split('.')[-1]
+
 
 def get_map_input_file_dir(username, mapname):
     resumable_dir = os.path.join(util.get_map_dir(username, mapname),
@@ -30,7 +30,7 @@ def delete_map(username, mapname):
 
 def get_map_file(username, mapname):
     input_file_dir = get_map_input_file_dir(username, mapname)
-    mapfile_path = os.path.join(input_file_dir, mapname+'.json')
+    mapfile_path = os.path.join(input_file_dir, mapname + '.json')
     return mapfile_path
 
 
@@ -62,7 +62,7 @@ def get_map_names(username):
         return []
     map_names = [
         subfile for subfile in os.listdir(mapsdir)
-            if os.path.isdir(os.path.join(mapsdir,subfile))
+        if os.path.isdir(os.path.join(mapsdir, subfile))
     ]
 
     return map_names
@@ -76,6 +76,7 @@ def get_publication_names(username, publication_type):
 
 
 from . import uuid
+
 get_publication_uuid = uuid.get_publication_uuid
 
 
@@ -153,4 +154,3 @@ patch_map = post_map
 
 def get_metadata_comparison(username, publication_name):
     pass
-

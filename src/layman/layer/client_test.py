@@ -10,7 +10,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 import sys
-del sys.modules['layman']
 
 from layman.layer.filesystem import input_chunk
 from layman.layer import LAYER_TYPE
@@ -18,11 +17,13 @@ from layman import app, settings
 from layman.uuid import check_redis_consistency
 
 
+del sys.modules['layman']
+
 num_layers_before_test = 0
+
 
 @pytest.fixture(scope="module")
 def client():
-
     # print('before app.test_client()')
     client = app.test_client()
 
@@ -65,7 +66,7 @@ def chrome():
         options=chrome_options,
         desired_capabilities=desired_capabilities,
     )
-    chrome.set_window_size(1000,2000)
+    chrome.set_window_size(1000, 2000)
     yield chrome
     chrome.close()
     chrome.quit()
@@ -89,10 +90,10 @@ def test_post_layers_chunk(client, chrome):
     client_url = settings.LAYMAN_CLIENT_URL
 
     r = requests.get(client_url)
-    assert r.status_code==200
+    assert r.status_code == 200
 
     chrome.get(client_url)
-    chrome.set_window_size(1000,2000)
+    chrome.set_window_size(1000, 2000)
     chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-1.png')
 
     user_input = chrome.find_elements_by_name('user')
@@ -127,7 +128,7 @@ def test_post_layers_chunk(client, chrome):
     max_attempts = 20
     attempts = 1
     while not (r.status_code == 200 and all(
-        'status' not in r.json()[k] for k in keys_to_check
+            'status' not in r.json()[k] for k in keys_to_check
     )):
         # print('waiting')
         time.sleep(0.5)
@@ -146,7 +147,8 @@ def test_post_layers_chunk(client, chrome):
             entry['level'] == 'SEVERE'
             and entry['message'].startswith(
                 f'{client_url}rest/{username}/layers/{layername}/chunk?'
-            ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
+            ) and entry['message'].endswith(
+                'Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(username, layername)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
@@ -173,9 +175,8 @@ def test_patch_layer_chunk(client, chrome):
     domain = f"http://{settings.LAYMAN_SERVER_NAME}"
     client_url = settings.LAYMAN_CLIENT_URL
 
-
     r = requests.get(client_url)
-    assert r.status_code==200
+    assert r.status_code == 200
 
     chrome.get(client_url)
     chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-1.png')
@@ -218,7 +219,7 @@ def test_patch_layer_chunk(client, chrome):
     max_attempts = 20
     attempts = 1
     while not (r.status_code == 200 and all(
-        'status' not in r.json()[k] for k in keys_to_check
+            'status' not in r.json()[k] for k in keys_to_check
     )):
         # print('waiting')
         time.sleep(0.5)
@@ -237,7 +238,8 @@ def test_patch_layer_chunk(client, chrome):
             entry['level'] == 'SEVERE'
             and entry['message'].startswith(
                 f'{client_url}rest/{username}/layers/{layername}/chunk?'
-            ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
+            ) and entry['message'].endswith(
+                'Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(username, layername)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
@@ -245,4 +247,3 @@ def test_patch_layer_chunk(client, chrome):
     check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 1
     })
-

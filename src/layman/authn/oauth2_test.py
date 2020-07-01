@@ -7,6 +7,7 @@ import pytest
 from flask import url_for, Blueprint, jsonify, g, request
 
 import sys
+
 del sys.modules['layman']
 
 from layman.layer import LAYER_TYPE
@@ -16,7 +17,6 @@ from layman import uuid
 from .oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
 from .oauth2 import liferay
 from test.mock.liferay import run
-
 
 LIFERAY_PORT = 8020
 
@@ -421,5 +421,3 @@ def test_patch_current_user_without_username(client):
         access_rights = resp_json['groups']
         assert {'guest'} == set(access_rights.keys())
         assert access_rights['guest'] == 'w'
-
-
