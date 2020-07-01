@@ -109,7 +109,7 @@ def fill_xml_template_obj(tree_or_el, prop_values, publ_properties, basic_templa
             single_prop_values = [prop_value]
         elif prop_value is None:
             single_prop_values = []
-        elif len(prop_value) == 0 and common_prop.get('lower_mp', None) is '1':
+        elif len(prop_value) == 0 and common_prop.get('lower_mp', None) == '1':
             single_prop_values = [None]
         else:
             single_prop_values = prop_value
