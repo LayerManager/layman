@@ -1,6 +1,7 @@
 matrix:
   include:
-    - language: node_js
+    - name: "Integration Test"
+      language: node_js
 
       sudo: required
 
@@ -45,7 +46,9 @@ matrix:
       env:
         global:
           secure: rxRvrkqIGE67Okn6kDLqoWc6ysMk+SJIEec3hMIDSFcQeN1GXdwB5pyhQ1hS6WrZXfPVi2Z9zZxTFbRlUuxjAc+BznvKlaksAnCVWWKFrkgVXafqjtio3EJfk4x7Zb5rVthU+HSfY8zABtNQ7rrLcX7As6jdURHNZv6shwksPvLIYLOi5Tu1aUist7nfM/HOs49zJDd2GAGpR1AH5TYhzsoL2jILJ0BK7WT1KRRA93imAyRJppE9kf7MRkE8pq++24XY1nkW22nh1e5DhMPDgERIBIeiT7lvAt5/mhT3pbzHB0+cevIwRttoh5oxiAyO5sKed9HP4Nq9PvYOXkzMkk7J0zydsOf7M9xq64PqSUicyEBoqG7RcFoeDxyoMX363C7+/nfbfju7fn1cq1wle15KHPzwDGweUp3ulLM8nzuFEN+rUhIfrTYXT5DRmVjI50+uBkBFkS/m1FcU8qkxNlcFRCD/W8qeRNb8DLbQhQcQDEyP+cKvzxut+hdYcZGsuT9Mu7X1y7+R4dWXxuAGp9EK6hF4nzNMUTFO401mEkFTcEcXSyYjIWMI54nwQ/QLripIzNWi2zqGBl8l/pgqjB0rZDl74omB4WVslPCjbeNW7lA/LLL5J+JqcqDkBBLiwEVvOK1ucN/gPLMSZLhCCs47dBuZsQ54oLtt5Lngw+Y=
-    - language: python
+
+    - name: "Flake 8 syntax errors"
+      language: python
 
       dist: trusty
 
@@ -54,7 +57,7 @@ matrix:
 
       # command to install dependencies
       install:
-        - pip install flake8 autopep8 pycodestyle pylint pylint-exit
+        - pip install flake8
 
       before_install:
         - echo -e "machine github.com\n  login $GITHUB_TOKEN" > ~/.netrc
@@ -64,9 +67,85 @@ matrix:
       script:
         # stop the build if there are Python syntax errors or undefined names
         - flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    - name: "Flake 8 full report"
+      language: python
+
+      dist: trusty
+
+      python:
+        - "3.6"      # current default Python on Travis CI
+
+      # command to install dependencies
+      install:
+        - pip install flake8
+
+      before_install:
+        - echo -e "machine github.com\n  login $GITHUB_TOKEN" > ~/.netrc
+        - git lfs pull
+
+      # command to run tests
+      script:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         - flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: "PyCodeStyle"
+      language: python
+
+      dist: trusty
+
+      python:
+        - "3.6"      # current default Python on Travis CI
+
+      # command to install dependencies
+      install:
+        - pip install pycodestyle
+
+      before_install:
+        - echo -e "machine github.com\n  login $GITHUB_TOKEN" > ~/.netrc
+        - git lfs pull
+
+      # command to run tests
+      script:
         - pycodestyle --count --max-line-length=127 --statistics --exclude=venv ./src
+
+    - name: "Pylint"
+      language: python
+
+      dist: trusty
+
+      python:
+        - "3.6"      # current default Python on Travis CI
+
+      # command to install dependencies
+      install:
+        - pip install fpylint pylint-exit
+
+      before_install:
+        - echo -e "machine github.com\n  login $GITHUB_TOKEN" > ~/.netrc
+        - git lfs pull
+
+      # command to run tests
+      script:
         - pylint -f colorized --ignore-patterns=venv -r y --fail-under 4 ./src
+
+    - name: "AutoPEP8"
+      language: python
+
+      dist: trusty
+
+      python:
+        - "3.6"      # current default Python on Travis CI
+
+      # command to install dependencies
+      install:
+        - pip install autopep8
+
+      before_install:
+        - echo -e "machine github.com\n  login $GITHUB_TOKEN" > ~/.netrc
+        - git lfs pull
+
+      # command to run tests
+      script:
         - autopep8 --recursive --in-place --aggressive --aggressive ./src
 
