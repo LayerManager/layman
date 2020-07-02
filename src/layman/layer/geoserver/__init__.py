@@ -199,7 +199,7 @@ def publish_layer_from_db(username, layername, description, title):
 
 
 def get_layman_rules(all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
-    if all_rules == None:
+    if all_rules is None:
         all_rules = get_all_rules()
     re_role = r".*\b" + re.escape(layman_role) + r"\b.*"
     result = {k: v for k, v in all_rules.items() if re.match(re_role, v)}
@@ -207,9 +207,9 @@ def get_layman_rules(all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
 
 
 def get_non_layman_workspaces(all_workspaces=None, layman_rules=None):
-    if all_workspaces == None:
+    if all_workspaces is None:
         all_workspaces = get_all_workspaces()
-    if layman_rules == None:
+    if layman_rules is None:
         layman_rules = get_layman_rules()
     result = [
         ws for ws in all_workspaces
