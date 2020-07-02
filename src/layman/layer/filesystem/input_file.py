@@ -122,8 +122,8 @@ def check_layer_crs(main_filepath):
 def check_filenames(username, layername, filenames, check_crs, ignore_existing_files=False):
     main_filename = get_main_file_name(filenames)
     if main_filename is None:
-        raise LaymanError(2, {'parameter': 'file', 'expected': \
-            'At least one file with any of extensions: ' + \
+        raise LaymanError(2, {'parameter': 'file', 'expected':
+            'At least one file with any of extensions: ' +
             ', '.join(settings.MAIN_FILE_EXTENSIONS)})
     basename, ext = map(
         lambda s: s.lower(),
