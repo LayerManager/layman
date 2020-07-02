@@ -5,6 +5,7 @@ from layman import settings
 from celery.contrib.abortable import AbortableAsyncResult
 from layman.common import redis as redis_util
 
+
 REDIS_CURRENT_TASK_NAMES = f"{__name__}:CURRENT_TASK_NAMES"
 PUBLICATION_TASK_INFOS = f'{__name__}:PUBLICATION_TASK_INFOS'
 TASK_ID_TO_PUBLICATION = f'{__name__}:TASK_ID_TO_PUBLICATION'
@@ -155,11 +156,10 @@ def abort_task(task_info):
 def abort_task_chain(results_by_order, results_by_name=None):
     results_by_name = results_by_name or {}
     task_results = [r for r in results_by_order if not r.ready()]
-    current_app.logger.info(
-        f"Aborting chain of {len(results_by_order)} tasks, {len(task_results)} of them are not yet ready.")
+    current_app.logger.info(f"Aborting chain of {len(results_by_order)} tasks, {len(task_results)} of them are not yet ready.")
 
     for task_result in task_results:
-        task_name = next((k for k, v in results_by_name.items() if v == task_result), None)
+        task_name = next((k for k,v in results_by_name.items() if v == task_result), None)
         current_app.logger.info(
             f'processing result {task_name} {task_result.id} {task_result.state} {task_result.ready()} {task_result.successful()} {task_result.failed()}')
         if task_result.ready():
@@ -169,8 +169,7 @@ def abort_task_chain(results_by_order, results_by_name=None):
         task_result.abort()
         assert task_result.state == 'ABORTED'
         if prev_task_state == 'STARTED':
-            current_app.logger.info(
-                f'waiting for result of {task_name} {task_result.id} with state {task_result.state}')
+            current_app.logger.info(f'waiting for result of {task_name} {task_result.id} with state {task_result.state}')
             # if hangs forever, see comment in src/layman/layer/rest_test.py::test_post_layers_simple
             task_result.get(propagate=False)
         current_app.logger.info(f'aborted result {task_name} {task_result.id} with state {task_result.state}')
@@ -179,12 +178,11 @@ def abort_task_chain(results_by_order, results_by_name=None):
 def abort_task_chain__deprecated(results_by_order, results_by_name=None):
     results_by_name = results_by_name or {}
     task_results = [r for r in results_by_order if not r.ready()]
-    current_app.logger.info(
-        f"Aborting chain of {len(results_by_order)} tasks, {len(task_results)} of the are not yet ready.")
+    current_app.logger.info(f"Aborting chain of {len(results_by_order)} tasks, {len(task_results)} of the are not yet ready.")
     results_to_revoke = []
     results_to_abort = []
     for task_result in reversed(task_results):
-        task_name = next((k for k, v in results_by_name.items() if v == task_result), None)
+        task_name = next((k for k,v in results_by_name.items() if v == task_result), None)
         current_app.logger.info(
             f'processing result {task_name} {task_result.id} {task_result.state} {task_result.ready()} {task_result.successful()} {task_result.failed()}')
         if task_result.ready():
@@ -196,16 +194,14 @@ def abort_task_chain__deprecated(results_by_order, results_by_name=None):
             # HERE IS THE PROBLEM - sometimes, it hangs forever (with the first processed task result)
             # but I was not able to reproduce it for testing (in other words, in test cases it did not hang)
             task_result.revoke()
-            current_app.logger.info(
-                f'result marked as revoked {task_name} {task_result.id} with state {task_result.state}')
+            current_app.logger.info(f'result marked as revoked {task_name} {task_result.id} with state {task_result.state}')
         else:
             results_to_abort.append(task_result)
             current_app.logger.info(f'aborting result {task_name} {task_result.id} with state {task_result.state}')
             task_result.abort()
             assert task_result.state == 'ABORTED'
             if prev_task_state == 'STARTED':
-                current_app.logger.info(
-                    f'waiting for result of {task_name} {task_result.id} with state {task_result.state}')
+                current_app.logger.info(f'waiting for result of {task_name} {task_result.id} with state {task_result.state}')
                 task_result.get(propagate=False)
             current_app.logger.info(f'aborted result {task_name} {task_result.id} with state {task_result.state}')
 
@@ -219,8 +215,7 @@ def abort_task_chain__deprecated(results_by_order, results_by_name=None):
     if last_aborted_task_successful:
         while first_revoked_result.state != 'REVOKED':
             if tries > max_tries:
-                raise Exception(
-                    f"Task was not revoked in {max_tries} tries: {first_revoked_result.task_id}={first_revoked_result.state}")
+                raise Exception(f"Task was not revoked in {max_tries} tries: {first_revoked_result.task_id}={first_revoked_result.state}")
             current_app.logger.info(f'waiting for REVOKED status, try {tries}/{max_tries}')
             time.sleep(0.1)
             tries += 1

@@ -7,12 +7,13 @@ from flask import current_app, request, g
 
 from layman import LaymanError, patch_mode
 from layman import settings
-from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, \
-    to_safe_name, url_for
+from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name, url_for
 from layman import celery as celery_util
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common import metadata as common_md
+
+
 
 LAYERNAME_RE = USERNAME_RE
 
@@ -31,7 +32,6 @@ def check_layername_decorator(f):
         check_layername(request.view_args['layername'])
         result = f(*args, **kwargs)
         return result
-
     return decorated_function
 
 
@@ -46,7 +46,6 @@ def info_decorator(f):
         g.setdefault(FLASK_INFO_KEY, info)
         result = f(*args, **kwargs)
         return result
-
     return decorated_function
 
 
@@ -99,7 +98,7 @@ def get_layer_info(username, layername):
 
     failed = False
     for res in last_task['by_order']:
-        task_name = next(k for k, v in last_task['by_name'].items() if v == res)
+        task_name = next(k for k,v in last_task['by_name'].items() if v == res)
         source_state = {
             'status': res.state if not failed else 'NOT_AVAILABLE'
         }
@@ -197,7 +196,7 @@ def delete_layer(username, layername, source=None, http_method='delete'):
     source_idx = next((
         idx for idx, m in enumerate(sources) if m.__name__ == source
     ), 0)
-    end_idx = None if source_idx == 0 else source_idx - 1
+    end_idx = None if source_idx == 0 else source_idx-1
     sources = sources[:end_idx:-1]
     if http_method == 'patch':
         sources = [

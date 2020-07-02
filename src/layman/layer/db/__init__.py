@@ -163,8 +163,8 @@ def get_text_column_names(username, layername, conn_cur=None):
     try:
         cur.execute(f"""
 SELECT QUOTE_IDENT(column_name) AS column_name
-FROM information_schema.columns
-WHERE table_schema = '{username}'
+FROM information_schema.columns 
+WHERE table_schema = '{username}' 
 AND table_name = '{layername}'
 AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 """)
@@ -299,7 +299,7 @@ from tdist
 )
 , tbounds as (
 select
-    --tstat.*,
+    --tstat.*, 
     ((p50-p10)/10)*tmode.idx+p10 as lower_bound
     , ((p50-p10)/10)*(tmode.idx+0.5)+p10 as middle
     , ((p50-p10)/10)*(tmode.idx+1)+p10 as upper_bound
@@ -433,7 +433,7 @@ from tdist
 )
 , tbounds as (
 select
-    --tstat.*,
+    --tstat.*, 
     ((p50-p10)/10)*tmode.idx+p10 as lower_bound
     , ((p50-p10)/10)*(tmode.idx+0.5)+p10 as middle
     , ((p50-p10)/10)*(tmode.idx+1)+p10 as upper_bound

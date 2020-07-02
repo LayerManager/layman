@@ -79,8 +79,7 @@ def update_layer(username, layername, layerinfo):
     }
     # current_app.logger.info(f"update_layer prop_values={prop_values}")
     basic_template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), './record-template.xml')
-    el = common_util.fill_xml_template_obj(el, prop_values, METADATA_PROPERTIES,
-                                           basic_template_path=basic_template_path)
+    el = common_util.fill_xml_template_obj(el, prop_values, METADATA_PROPERTIES, basic_template_path=basic_template_path)
     record = ET.tostring(el, encoding='unicode', pretty_print=True)
     # current_app.logger.info(f"update_layer record=\n{record}")
     try:
@@ -338,26 +337,21 @@ METADATA_PROPERTIES = {
         'xpath_property': f'./gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-{wms.VERSION}-http-get-capabilities"]',
         'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
-        'adjust_property_element': partial(common_util.adjust_online_url,
-                                           resource_protocol=f'OGC:WMS-{wms.VERSION}-http-get-capabilities',
-                                           online_function='download'),
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol=f'OGC:WMS-{wms.VERSION}-http-get-capabilities', online_function='download'),
     },
     'wfs_url': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
         'xpath_property': f'./gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WFS-{wfs.VERSION}-http-get-capabilities"]',
         'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
-        'adjust_property_element': partial(common_util.adjust_online_url,
-                                           resource_protocol=f'OGC:WFS-{wfs.VERSION}-http-get-capabilities',
-                                           online_function='download'),
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol=f'OGC:WFS-{wfs.VERSION}-http-get-capabilities', online_function='download'),
     },
     'layer_endpoint': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
         'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link"]',
         'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
-        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='WWW:LINK-1.0-http--link',
-                                           online_function='information'),
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='WWW:LINK-1.0-http--link', online_function='information'),
     },
 }
 
@@ -396,3 +390,4 @@ def get_metadata_comparison(username, layername):
     return {
         f"{url}": props
     }
+

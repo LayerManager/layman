@@ -11,7 +11,9 @@ from layman import settings, patch_mode
 from . import util
 from . import input_file
 
+
 LAYER_SUBDIR = __name__.split('.')[-1]
+
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
@@ -35,11 +37,15 @@ def delete_layer(username, layername):
 
 get_layer_info = input_file.get_layer_info
 
+
 get_layer_names = input_file.get_layer_names
+
 
 update_layer = input_file.update_layer
 
+
 get_publication_names = input_file.get_publication_names
+
 
 get_publication_uuid = input_file.get_publication_uuid
 
@@ -97,7 +103,7 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
                 (
                     fi for fi in files_to_upload
                     if fi['input_file'] == filename and fi[
-                    'layman_original_parameter'] == parameter_name
+                        'layman_original_parameter'] == parameter_name
                 ),
                 None
             )
@@ -116,14 +122,14 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
             chunk_path = os.path.join(chunk_dir, chunk_name)
             chunk.save(chunk_path)
             current_app.logger.info('Resumable chunk saved to: %s',
-                                    chunk_path)
+                                     chunk_path)
 
     else:
         raise LaymanError(20)
 
 
 def layer_file_chunk_exists(username, layername, parameter_name, filename,
-                            chunk_number):
+                           chunk_number):
     resumable_dir = get_layer_resumable_dir(username, layername)
     info_path = os.path.join(resumable_dir, 'info.json')
     chunk_dir = os.path.join(resumable_dir, 'chunks')
@@ -135,7 +141,7 @@ def layer_file_chunk_exists(username, layername, parameter_name, filename,
                 (
                     fi for fi in files_to_upload
                     if fi['input_file'] == filename and fi[
-                    'layman_original_parameter'] == parameter_name
+                        'layman_original_parameter'] == parameter_name
                 ),
                 None
             )
@@ -194,7 +200,7 @@ def layer_file_chunk_info(username, layername):
                     target_file.close()
                     settings.LAYMAN_REDIS.hdel(r_key, rh_key)
                     current_app.logger.info('Resumable file saved to: %s',
-                                            target_fp)
+                                             target_fp)
 
             num_files_saved = len([
                 fi for fi in files_to_upload

@@ -7,13 +7,13 @@ import requests
 from urllib.parse import urljoin
 
 import sys
-
 del sys.modules['layman']
 
 from layman import app as app, LaymanError
 from layman import settings
 from .csw import get_layer_info, delete_layer, get_metadata_uuid
 from layman.layer.rest_test import wait_till_ready
+
 
 from test.mock.micka import run
 

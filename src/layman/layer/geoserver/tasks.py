@@ -26,7 +26,7 @@ def refresh_wfs(
         description=None,
         title=None,
         ensure_user=False
-):
+    ):
     if description is None:
         description = layername
     if title is None:
@@ -61,3 +61,4 @@ def refresh_sld(self, username, layername):
     if self.is_aborted():
         sld.delete_layer(username, layername)
         raise AbortedException
+

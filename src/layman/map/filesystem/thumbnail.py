@@ -18,6 +18,7 @@ from . import input_file
 from layman import settings
 from layman.util import url_for
 
+
 MAP_SUBDIR = __name__.split('.')[-1]
 
 
@@ -53,6 +54,7 @@ def patch_map(username, mapname, file_changed=True):
 
 get_publication_names = input_file.get_publication_names
 
+
 get_publication_uuid = input_file.get_publication_uuid
 
 
@@ -65,7 +67,7 @@ get_map_names = input_file.get_map_names
 
 def get_map_thumbnail_path(username, mapname):
     thumbnail_dir = get_map_thumbnail_dir(username, mapname)
-    return os.path.join(thumbnail_dir, mapname + '.png')
+    return os.path.join(thumbnail_dir, mapname+'.png')
 
 
 def post_map(username, mapname):
@@ -92,7 +94,7 @@ def generate_map_thumbnail(username, mapname):
         options=chrome_options,
         desired_capabilities=desired_capabilities,
     )
-    chrome.set_window_size(500, 500)
+    chrome.set_window_size(500,500)
 
     chrome.get(timgen_url)
     entries = chrome.get_log('browser')
@@ -101,7 +103,7 @@ def generate_map_thumbnail(username, mapname):
     while next((
             e for e in entries
             if e['level'] != 'INFO' or (e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message'])
-    ), None) is None and attempts < max_attempts:
+        ), None) is None and attempts < max_attempts:
         current_app.logger.info(f"waiting for entries")
         time.sleep(0.5)
         attempts += 1
@@ -116,8 +118,7 @@ def generate_map_thumbnail(username, mapname):
     chrome.close()
     chrome.quit()
 
-    entry = next((e for e in entries if e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message']),
-                 None)
+    entry = next((e for e in entries if e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message']), None)
     if entry is None:
         return
     match = re.match(r'.*\"dataurl\" \"data:image/png;base64,(.+)\"', entry['message'])
@@ -143,3 +144,4 @@ def generate_map_thumbnail(username, mapname):
 
 def get_metadata_comparison(username, layername):
     pass
+

@@ -5,8 +5,8 @@ from layman.authn.util import login_required
 from layman.authz import authorize
 from .util import get_user_profile, reserve_username
 
-bp = Blueprint('rest_current_user', __name__)
 
+bp = Blueprint('rest_current_user', __name__)
 
 @bp.before_request
 @authenticate
@@ -54,3 +54,5 @@ def delete():
     return jsonify({
         'message': 'Authentication cache flushed'
     }), 200
+
+

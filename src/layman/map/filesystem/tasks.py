@@ -24,3 +24,4 @@ def refresh_thumbnail(self, username, mapname):
     if self.is_aborted():
         thumbnail.delete_map(username, mapname)
         raise AbortedException
+

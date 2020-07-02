@@ -3,10 +3,12 @@ from functools import wraps
 from layman import settings
 from layman import LaymanError
 
+
 PUBLICATION_LOCKS_KEY = f'{__name__}:PUBLICATION_LOCKS'
 
 
 def create_lock_decorator(publication_type, publication_name_key, error_code, is_task_ready_fn):
+
     def lock_decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -26,9 +28,7 @@ def create_lock_decorator(publication_type, publication_name_key, error_code, is
                     unlock_publication(username, publication_type, publication_name)
                 raise e
             return result
-
         return decorated_function
-
     return lock_decorator
 
 
@@ -80,3 +80,5 @@ def check_http_method(username, publication_type, publication_name, error_code):
 def _get_publication_hash(username, publication_type, publication_name):
     hash = f"{username}:{publication_type}:{publication_name}"
     return hash
+
+

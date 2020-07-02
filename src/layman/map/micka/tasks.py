@@ -49,3 +49,5 @@ def refresh_soap(self, username, mapname, http_method='post', metadata_propertie
     if self.is_aborted():
         csw.delete_map(username, mapname)
         raise AbortedException
+
+

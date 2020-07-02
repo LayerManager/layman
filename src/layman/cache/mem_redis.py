@@ -72,7 +72,6 @@ def get(key, create_string_value, mem_value_from_string_value, currently_changin
 
     return value
 
-
 def delete(key):
     MEM_CACHE.delete(key)
     settings.LAYMAN_REDIS.delete(key)

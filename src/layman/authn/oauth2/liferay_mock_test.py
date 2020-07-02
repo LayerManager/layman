@@ -6,7 +6,6 @@ import pytest
 
 from layman import settings
 import sys
-
 del sys.modules['layman']
 
 from test.mock.liferay import run

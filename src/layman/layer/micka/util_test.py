@@ -6,7 +6,6 @@ import filecmp
 import difflib
 
 import sys
-
 del sys.modules['layman']
 
 from layman import uuid
@@ -61,8 +60,7 @@ def test_fill_template(client):
         os.remove(xml_path)
     except OSError:
         pass
-    file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml',
-                                                                      _get_property_values(), METADATA_PROPERTIES)
+    file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml', _get_property_values(), METADATA_PROPERTIES)
     with open(xml_path, 'wb') as out:
         out.write(file_object.read())
 
@@ -78,22 +76,22 @@ def test_parse_md_properties():
     xml_path = 'src/layman/layer/micka/util_test_filled_template.xml'
     with open(xml_path, 'r') as xml_file:
         props = common_util.parse_md_properties(xml_file, [
-            'abstract',
-            'extent',
-            'graphic_url',
-            'identifier',
-            'layer_endpoint',
-            'language',
-            'md_date_stamp',
-            'md_file_identifier',
-            'md_organisation_name',
-            'organisation_name',
-            'publication_date',
-            'reference_system',
-            'scale_denominator',
-            'title',
-            'wfs_url',
-            'wms_url',
+           'abstract',
+           'extent',
+           'graphic_url',
+           'identifier',
+           'layer_endpoint',
+           'language',
+           'md_date_stamp',
+           'md_file_identifier',
+           'md_organisation_name',
+           'organisation_name',
+           'publication_date',
+           'reference_system',
+           'scale_denominator',
+           'title',
+           'wfs_url',
+           'wms_url',
         ], METADATA_PROPERTIES)
     expected = {
         'md_file_identifier': 'm-ca238200-8200-1a23-9399-42c9fca53542',
@@ -119,35 +117,34 @@ def test_parse_md_properties():
     assert set(props.keys()) == set(expected.keys())
     for k in props.keys():
         equals_fn = COMMON_PROPERTIES[k].get('equals_fn', None)
-        assert prop_equals(props[k], expected[k],
-                           equals_fn), f"Values of property {k} do not equal: {props[k]} != {expected[k]}"
+        assert prop_equals(props[k], expected[k], equals_fn), f"Values of property {k} do not equal: {props[k]} != {expected[k]}"
 
 
 @pytest.mark.usefixtures('app_context')
 def test_fill_xml_template(client):
-    xml_file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml',
-                                                                          {
-                                                                              'md_file_identifier': 'm-abc',
-                                                                              'md_language': 'eng',
-                                                                              'md_organisation_name': 'My Metadata Organization',
-                                                                              'md_date_stamp': '2007-01-22',
-                                                                              'reference_system': [4326, 5514],
-                                                                              'title': 'My title',
-                                                                              'publication_date': '2006-12-12',
-                                                                              'identifier': {
-                                                                                  'identifier': 'id-abc',
-                                                                                  'label': 'Dataset ABC',
-                                                                              },
-                                                                              'abstract': None,
-                                                                              'organisation_name': 'My Organization',
-                                                                              'graphic_url': 'https://example.com/myimage.png',
-                                                                              'scale_denominator': None,
-                                                                              'language': ['cze', 'eng'],
-                                                                              'extent': [11.87, 48.12, 19.13, 51.59],
-                                                                              'wms_url': 'https://example.com/wms',
-                                                                              'wfs_url': 'https://example.com/wfs',
-                                                                              'layer_endpoint': 'https://example.com/layer_endpoint',
-                                                                          }, METADATA_PROPERTIES)
+
+    xml_file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml', {
+        'md_file_identifier': 'm-abc',
+        'md_language': 'eng',
+        'md_organisation_name': 'My Metadata Organization',
+        'md_date_stamp': '2007-01-22',
+        'reference_system': [4326, 5514],
+        'title': 'My title',
+        'publication_date': '2006-12-12',
+        'identifier': {
+            'identifier': 'id-abc',
+            'label': 'Dataset ABC',
+        },
+        'abstract': None,
+        'organisation_name': 'My Organization',
+        'graphic_url': 'https://example.com/myimage.png',
+        'scale_denominator': None,
+        'language': ['cze', 'eng'],
+        'extent': [11.87, 48.12, 19.13, 51.59],
+        'wms_url': 'https://example.com/wms',
+        'wfs_url': 'https://example.com/wfs',
+        'layer_endpoint': 'https://example.com/layer_endpoint',
+    }, METADATA_PROPERTIES)
 
     expected_path = 'src/layman/layer/micka/record-template-filled.xml'
     with open(expected_path) as f:
@@ -174,5 +171,6 @@ def test_num_records(client):
         if any((url_part in u for u in [ol.url for ol in r.distribution.online]))
     }
     import json
-    assert len(
-        records) == num_publications, f"md_record_ids={json.dumps(list(records.keys()), indent=5)}\npubls={json.dumps(publs_by_type, indent=2)}"
+    assert len(records) == num_publications, f"md_record_ids={json.dumps(list(records.keys()), indent=5)}\npubls={json.dumps(publs_by_type, indent=2)}"
+
+

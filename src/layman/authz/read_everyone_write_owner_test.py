@@ -6,13 +6,13 @@ import pytest
 from flask import url_for
 
 import sys
-
 del sys.modules['layman']
 
 from layman.layer import LAYER_TYPE
 from layman import app as app
 from layman import settings
 from layman import uuid
+
 
 num_layers_before_test = 0
 
@@ -54,7 +54,7 @@ def client():
 def test_get_access(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username))
-    assert rv.status_code == 200
+    assert rv.status_code==200
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 0
     })

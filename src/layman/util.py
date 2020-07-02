@@ -29,7 +29,7 @@ def slugify(value):
 
 def to_safe_name(unsafe_name, type_name):
     value = slugify(unsafe_name)
-    if len(value) == 0:
+    if len(value)==0:
         value = type_name
     elif re.match(r'^[^a-z].*', value):
         value = f'{type_name}_{value}'
@@ -54,7 +54,6 @@ def check_username_decorator(f):
         check_username(request.view_args['username'])
         result = f(*args, **kwargs)
         return result
-
     return decorated_function
 
 
@@ -171,7 +170,7 @@ def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_cal
     results = []
     for fn in fns:
         res = fn(*args, **{
-            k: v for k, v in kwargs.items()
+            k:v for k, v in kwargs.items()
             if k in fn.__code__.co_varnames
         })
         results.append(res)

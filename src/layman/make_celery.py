@@ -89,3 +89,4 @@ def on_task_postrun(**kwargs):
         publication_name = kwargs['args'][1]
         task_id = kwargs['task_id']
         task_postrun(username, publication_type, publication_name, task_id, task_name, kwargs['state'])
+

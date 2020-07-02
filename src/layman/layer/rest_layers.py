@@ -10,8 +10,8 @@ from layman.authn import authenticate
 from layman.authz import authorize
 from layman.common import redis as redis_util
 
-bp = Blueprint('rest_layers', __name__)
 
+bp = Blueprint('rest_layers', __name__)
 
 @bp.before_request
 @authenticate
@@ -157,3 +157,4 @@ def post(username):
 
     # app.logger.info('uploaded layer '+layername)
     return jsonify([layer_result]), 200
+

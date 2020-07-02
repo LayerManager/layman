@@ -14,7 +14,9 @@ from layman.layer.filesystem import input_file
 from layman.layer.util import is_layer_task_ready
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qs, parse_qsl
 
+
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
+
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = '1.3.0'
@@ -35,7 +37,7 @@ def delete_layer(username, layername):
                 '/layers/' + layername),
         headers=headers_json,
         auth=settings.LAYMAN_GS_AUTH,
-        params={
+        params = {
             'recurse': 'true'
         }
     )
@@ -62,7 +64,6 @@ def get_wms_proxy(username):
     key = get_flask_proxy_key(username)
 
     ows_url = get_wms_url(username)
-
     def create_string_value():
         r = requests.get(ows_url, params={
             'SERVICE': 'WMS',

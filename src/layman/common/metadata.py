@@ -2,6 +2,7 @@ from flask import current_app
 import json
 from layman.util import get_publication_types
 
+
 PUBL_TYPE_DEF_KEY = __name__
 
 
@@ -20,7 +21,7 @@ def extent_equals(a, b, limit=0.95):
     b_area = _get_extent_area(b)
     i_area = _get_extent_area(isect)
 
-    similarity = i_area / a_area * i_area / b_area
+    similarity = i_area/a_area * i_area/b_area
     # current_app.logger.info(f"a={a}, b={b}, similarity={similarity}")
     return similarity >= limit
 
@@ -89,8 +90,7 @@ PROPERTIES = {
     },
     'operates_on': {
         'upper_mp': '*',
-        'equals_fn': lambda a, b: set([json.dumps(ai, sort_keys=True) for ai in a]) == set(
-            [json.dumps(bi, sort_keys=True) for bi in b]),
+        'equals_fn': lambda a, b: set([json.dumps(ai, sort_keys=True) for ai in a]) == set([json.dumps(bi, sort_keys=True) for bi in b]),
     },
     'map_endpoint': {
         'upper_mp': '1',
@@ -102,7 +102,7 @@ PROPERTIES = {
 
 
 def prop_equals(value_a, value_b, equals_fn=None):
-    equals_fn = equals_fn or (lambda a, b: a == b)
+    equals_fn = equals_fn or (lambda a,b: a==b)
     if value_a is None or value_b is None:
         return value_a is value_b
     else:
@@ -110,13 +110,13 @@ def prop_equals(value_a, value_b, equals_fn=None):
 
 
 def prop_equals_or_none(values, equals_fn=None):
-    equals_fn = equals_fn or (lambda a, b: a == b)
+    equals_fn = equals_fn or (lambda a,b: a==b)
     values = [v for v in values if v is not None]
     return prop_equals_strict(values, equals_fn)
 
 
 def prop_equals_or_empty(values, equals_fn=None, empty_fn=None):
-    equals_fn = equals_fn or (lambda a, b: a == b)
+    equals_fn = equals_fn or (lambda a,b: a==b)
     empty_fn = empty_fn or (lambda a: False)
     values = [
         v for v in values
@@ -126,13 +126,13 @@ def prop_equals_or_empty(values, equals_fn=None, empty_fn=None):
 
 
 def prop_equals_strict(values, equals_fn=None):
-    equals_fn = equals_fn or (lambda a, b: a == b)
-    if len(values) < 2:
+    equals_fn = equals_fn or (lambda a,b: a==b)
+    if len(values)<2:
         return True
     result = True
-    for idx in range(len(values) - 1):
+    for idx in range(len(values)-1):
         v1 = values[idx]
-        v2 = values[idx + 1]
+        v2 = values[idx+1]
         result = v1 is v2 if (v1 is None or v2 is None) else equals_fn(v1, v2)
         if not result:
             break
@@ -181,7 +181,7 @@ def _extent_intersects(a, b):
 def transform_metadata_props_to_comparison(all_props):
     prop_names = sorted(list(set([pn for po in all_props.values() for pn in po.keys()])))
     sources = {
-        f"s{idx + 1}": {
+        f"s{idx+1}": {
             'url': k
         }
         for idx, k in enumerate(sorted(list(all_props.keys())))
@@ -212,8 +212,7 @@ def transform_metadata_props_to_comparison(all_props):
 def get_same_or_missing_prop_names(prop_names, comparison):
     prop_names = [
         pn for pn in prop_names
-        if (pn in comparison['metadata_properties'] and comparison['metadata_properties'][pn]['equal']) or (
-                pn not in comparison['metadata_properties'])
+        if (pn in comparison['metadata_properties'] and comparison['metadata_properties'][pn]['equal']) or (pn not in comparison['metadata_properties'])
     ]
     # current_app.logger.info(f'prop_names after filtering: {prop_names}')
     return prop_names

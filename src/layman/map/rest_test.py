@@ -12,7 +12,6 @@ import pytest
 from flask import url_for
 
 import sys
-
 del sys.modules['layman']
 
 from . import util, MAP_TYPE
@@ -63,16 +62,13 @@ def check_metadata(client, username, mapname, props_equal, expected_values):
         # for k, v in resp_json['metadata_properties'].items():
         #     print(f"'{k}': {json.dumps(list(v['values'].values())[0], indent=2)},")
         for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (
-                    k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
-            assert v['equal'] == (
-                    k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+            assert v['equal_or_null'] == (k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+            assert v['equal'] == (k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
             # print(f"'{k}': {json.dumps(list(v['values'].values())[0], indent=2)},")
             if k in expected_values:
                 vals = list(v['values'].values())
                 vals.append(expected_values[k])
-                assert prop_equals_strict(vals, equals_fn=PROPERTIES[k].get('equals_fn',
-                                                                            None)), f"Property {k} has unexpected values {json.dumps(vals, indent=2)}"
+                assert prop_equals_strict(vals, equals_fn=PROPERTIES[k].get('equals_fn', None)), f"Property {k} has unexpected values {json.dumps(vals, indent=2)}"
 
 
 @pytest.fixture(scope="module")
@@ -119,7 +115,7 @@ def test_get_maps_empty(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_maps.get', username=username))
     resp_json = rv.get_json()
-    assert rv.status_code == 200
+    assert rv.status_code==200
     assert len(resp_json) == 0
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{MAP_TYPE}': num_maps_before_test + 0
@@ -135,19 +131,19 @@ def test_wrong_value_of_mapname(client):
         resp_json = rv.get_json()
         # print('username', username)
         # print(resp_json)
-        assert rv.status_code == 400
-        assert resp_json['code'] == 2
-        assert resp_json['detail']['parameter'] == 'mapname'
+        assert rv.status_code==400
+        assert resp_json['code']==2
+        assert resp_json['detail']['parameter']=='mapname'
 
 
 @pytest.mark.usefixtures('app_context')
 def test_no_file(client):
     rv = client.post(url_for('rest_maps.post', username='testuser1'))
-    assert rv.status_code == 400
+    assert rv.status_code==400
     resp_json = rv.get_json()
     # print('resp_json', resp_json)
-    assert resp_json['code'] == 1
-    assert resp_json['detail']['parameter'] == 'file'
+    assert resp_json['code']==1
+    assert resp_json['detail']['parameter']=='file'
 
 
 @pytest.mark.usefixtures('app_context')
@@ -248,8 +244,7 @@ def test_post_maps_simple(client):
         assert resp_json['uuid'] == uuid_str
         assert resp_json['url'] == url_for_external('rest_map.get', username=username, mapname=mapname)
         assert resp_json['title'] == "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
-        assert resp_json[
-                   'description'] == "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce."
+        assert resp_json['description'] == "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce."
         map_file = resp_json['file']
         assert 'status' not in map_file
         assert 'path' in map_file
@@ -325,6 +320,7 @@ def test_post_maps_simple(client):
     check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
+
 def test_post_maps_complex(client):
     with app.app_context():
         username = 'testuser1'
@@ -383,7 +379,7 @@ def test_post_maps_complex(client):
         })
         assert rv.status_code == 400
         resp_json = rv.get_json()
-        assert resp_json['code'] == 29
+        assert resp_json['code']==29
 
     # continue with thumbnail assertion
     with app.app_context():
@@ -392,7 +388,7 @@ def test_post_maps_complex(client):
         time.sleep(0.1)
         with app.app_context():
             map_info = client.get(url_for('rest_map.get', username=username,
-                                          mapname=mapname)).get_json()
+                                      mapname=mapname)).get_json()
 
     with app.app_context():
         rv = client.get(url_for('rest_map.get', username=username, mapname=mapname))
@@ -425,7 +421,7 @@ def test_post_maps_complex(client):
         time.sleep(0.1)
         with app.app_context():
             map_info = client.get(url_for('rest_map.get', username=username,
-                                          mapname=mapname)).get_json()
+                                      mapname=mapname)).get_json()
 
     expected_md_values = {
         'abstract': "Libovoln\u00fd popis",
@@ -501,7 +497,7 @@ def test_patch_map(client):
         time.sleep(0.1)
         with app.app_context():
             map_info = client.get(url_for('rest_map.get', username=username,
-                                          mapname=mapname)).get_json()
+                                      mapname=mapname)).get_json()
 
     with app.app_context():
         rv = client.get(url_for('rest_map.get', username=username, mapname=mapname))
@@ -533,7 +529,7 @@ def test_patch_map(client):
         time.sleep(0.1)
         with app.app_context():
             map_info = client.get(url_for('rest_map.get', username=username,
-                                          mapname=mapname)).get_json()
+                                      mapname=mapname)).get_json()
 
     with app.app_context():
         title = 'Nový název'
@@ -678,7 +674,7 @@ def test_map_composed_from_local_layers(client):
         # print('layer_info1', layer_info)
         with app.app_context():
             layer_info = client.get(url_for('rest_layer.get', username=username, layername=layername1)).get_json()
-        num_attempts += 1
+        num_attempts+=1
     assert num_attempts < max_attempts, f"Max attempts reached, layer1info={layer_info}"
     wms_url1 = layer_info['wms']['url']
 
@@ -690,7 +686,7 @@ def test_map_composed_from_local_layers(client):
         # print('layer_info2', layer_info)
         with app.app_context():
             layer_info = client.get(url_for('rest_layer.get', username=username, layername=layername2)).get_json()
-        num_attempts += 1
+        num_attempts+=1
     assert num_attempts < max_attempts, f"Max attempts reached, layer2info={layer_info}"
     wms_url2 = layer_info['wms']['url']
 
@@ -734,7 +730,7 @@ def test_map_composed_from_local_layers(client):
         time.sleep(0.1)
         with app.app_context():
             map_info = client.get(url_for('rest_map.get', username=username,
-                                          mapname=mapname)).get_json()
+                                      mapname=mapname)).get_json()
 
     with app.app_context():
         rv = client.get(url_for('rest_map.get', username=username, mapname=mapname))
@@ -765,8 +761,7 @@ def test_map_composed_from_local_layers(client):
         expected_path = 'src/layman/map/rest_test_filled_template.xml'
         with open(expected_path) as f:
             expected_lines = f.readlines()
-        diff_lines = list(
-            difflib.unified_diff([l.decode('utf-8') for l in xml_file_object.readlines()], expected_lines))
+        diff_lines = list(difflib.unified_diff([l.decode('utf-8') for l in xml_file_object.readlines()], expected_lines))
         assert len(diff_lines) == 40, ''.join(diff_lines)
         plus_lines = [l for l in diff_lines if l.startswith('+ ')]
         assert len(plus_lines) == 5
@@ -789,22 +784,14 @@ def test_map_composed_from_local_layers(client):
         assert minus_line.startswith('-                <gco:Date>') and minus_line.endswith('</gco:Date>\n')
 
         plus_line = plus_lines[3]
-        assert plus_line.startswith(
-            '+      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and plus_line.endswith(
-            '" xlink:title="hranice" xlink:type="simple"/>\n'), plus_line
+        assert plus_line.startswith('+      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and plus_line.endswith('" xlink:title="hranice" xlink:type="simple"/>\n'), plus_line
         minus_line = minus_lines[3]
-        assert minus_line.startswith(
-            '-      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and minus_line.endswith(
-            '" xlink:title="hranice" xlink:type="simple"/>\n'), minus_line
+        assert minus_line.startswith('-      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and minus_line.endswith('" xlink:title="hranice" xlink:type="simple"/>\n'), minus_line
 
         plus_line = plus_lines[4]
-        assert plus_line.startswith(
-            '+      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and plus_line.endswith(
-            '" xlink:title="mista" xlink:type="simple"/>\n'), plus_line
+        assert plus_line.startswith('+      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and plus_line.endswith('" xlink:title="mista" xlink:type="simple"/>\n'), plus_line
         minus_line = minus_lines[4]
-        assert minus_line.startswith(
-            '-      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and minus_line.endswith(
-            '" xlink:title="mista" xlink:type="simple"/>\n'), minus_line
+        assert minus_line.startswith('-      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and minus_line.endswith('" xlink:title="mista" xlink:type="simple"/>\n'), minus_line
 
     expected_md_values = {
         'abstract': "World places and boundaries abstract",

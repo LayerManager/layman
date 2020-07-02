@@ -10,6 +10,7 @@ from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
 import requests
 from copy import deepcopy
 
+
 NAMESPACES = {
     'csw': 'http://www.opengis.net/cat/csw/2.0.2',
     'ows': 'http://www.opengis.net/ows/1.1',
@@ -90,8 +91,8 @@ def fill_xml_template_obj(tree_or_el, prop_values, publ_properties, basic_templa
                 tmp_el_to_copy = tmp_el_to_copy.getparent()
                 anc_level_distance -= 1
             tmp_last_anc_el = tmp_el_to_copy.getparent()
-            assert (tmp_last_anc_el.tag == last_anc_el.tag)
-            tmp_prev_sibl = tmp_last_anc_el[tmp_last_anc_el.index(tmp_el_to_copy) - 1]
+            assert(tmp_last_anc_el.tag == last_anc_el.tag)
+            tmp_prev_sibl = tmp_last_anc_el[tmp_last_anc_el.index(tmp_el_to_copy)-1]
             prev_sibl = last_anc_el.findall(f"./{tmp_prev_sibl.tag}")[-1]
             insert_idx = last_anc_el.index(prev_sibl) + 1
             last_anc_el.insert(insert_idx, deepcopy(tmp_el_to_copy))
@@ -128,7 +129,7 @@ def fill_xml_template_obj(tree_or_el, prop_values, publ_properties, basic_templa
                     new_el = deepcopy(e)
                     if not single_prop_els:
                         all_new_els.append(new_el)
-                    pe.insert(pe.index(e) + 1, new_el)
+                    pe.insert(pe.index(e)+1, new_el)
         else:
             # current_app.logger.info(f"Copying property {prop_name} element from template")
             tmp_tree = tmp_tree or read_xml_tree(basic_template_path)
@@ -137,9 +138,9 @@ def fill_xml_template_obj(tree_or_el, prop_values, publ_properties, basic_templa
             # print(f"Found template {prop_name} element {tmp_fst_prop_el.tag}")
             tmp_fst_prop_el_idx = tmp_parent_el.index(tmp_fst_prop_el)
             if tmp_fst_prop_el_idx > 0:
-                tmp_prev_sibl = tmp_parent_el[tmp_fst_prop_el_idx - 1]
+                tmp_prev_sibl = tmp_parent_el[tmp_fst_prop_el_idx-1]
                 prev_sibl = parent_el.findall(f"./{tmp_prev_sibl.tag}")[-1]
-                insert_idx = parent_el.index(prev_sibl) + 1
+                insert_idx = parent_el.index(prev_sibl)+1
             else:
                 insert_idx = 0
             # print(f"Insert Idx of template {prop_name} element: {insert_idx}")
@@ -279,11 +280,9 @@ def soap_insert(template_values):
     xml_str = fill_template_as_str(template_path, template_values)
     root_el, r = base_insert(xml_str)
     assert root_el.tag == nspath_eval('soap:Envelope', NAMESPACES), r.content
-    assert root_el.find(nspath_eval('soap:Body/csw:TransactionResponse/csw:TransactionSummary/csw:totalInserted',
-                                    NAMESPACES)).text == "1", r.content
+    assert root_el.find(nspath_eval('soap:Body/csw:TransactionResponse/csw:TransactionSummary/csw:totalInserted', NAMESPACES)).text == "1", r.content
 
-    muuid_els = root_el.findall(
-        nspath_eval('soap:Body/csw:TransactionResponse/csw:InsertResult/csw:BriefRecord/dc:identifier', NAMESPACES))
+    muuid_els = root_el.findall(nspath_eval('soap:Body/csw:TransactionResponse/csw:InsertResult/csw:BriefRecord/dc:identifier', NAMESPACES))
     assert len(muuid_els) == 1, r.content
     muuid = muuid_els[0].text
     return muuid
@@ -313,11 +312,11 @@ def csw_update(template_values):
 
 def is_record_does_not_exist_exception(root_el):
     return len(root_el) == 1 and \
-           root_el[0].tag == nspath_eval('ows:Exception', NAMESPACES) and \
-           "exceptionCode" in root_el[0].attrib and \
-           root_el[0].attrib["exceptionCode"] == 'TransactionFailed' and \
-           len(root_el[0]) == 0 and \
-           root_el[0].text is None
+            root_el[0].tag == nspath_eval('ows:Exception', NAMESPACES) and \
+            "exceptionCode" in root_el[0].attrib and \
+            root_el[0].attrib["exceptionCode"] == 'TransactionFailed' and \
+            len(root_el[0]) == 0 and \
+            root_el[0].text is None
 
 
 def csw_delete(muuid):
@@ -368,8 +367,7 @@ def parse_md_properties(file_obj, property_names, publ_properties):
         # print(f"len(prop_els)={len(prop_els)}")
         prop_values = []
         for prop_el in prop_els:
-            prop_value = micka_prop['xpath_extract_fn'](
-                prop_el.xpath(micka_prop['xpath_extract'], namespaces=NAMESPACES))
+            prop_value = micka_prop['xpath_extract_fn'](prop_el.xpath(micka_prop['xpath_extract'], namespaces=NAMESPACES))
             if prop_value is not None:
                 prop_values.append(prop_value)
         if common_prop['upper_mp'] == '1':
@@ -392,8 +390,7 @@ def _add_unknown_reason(el):
 def adjust_character_string(prop_el, prop_value):
     _clear_el(prop_el)
     if prop_value is not None:
-        child_el = ET.fromstring(
-            f"""<gco:CharacterString xmlns:gco="{NAMESPACES['gco']}">{escape(prop_value)}</gco:CharacterString>""")
+        child_el = ET.fromstring(f"""<gco:CharacterString xmlns:gco="{NAMESPACES['gco']}">{escape(prop_value)}</gco:CharacterString>""")
         prop_el.append(child_el)
     else:
         _add_unknown_reason(prop_el)
@@ -402,8 +399,7 @@ def adjust_character_string(prop_el, prop_value):
 def adjust_integer(prop_el, prop_value):
     _clear_el(prop_el)
     if prop_value is not None:
-        child_el = ET.fromstring(
-            f"""<gco:Integer xmlns:gco="{NAMESPACES['gco']}">{escape(str(prop_value))}</gco:Integer>""")
+        child_el = ET.fromstring(f"""<gco:Integer xmlns:gco="{NAMESPACES['gco']}">{escape(str(prop_value))}</gco:Integer>""")
         prop_el.append(child_el)
     else:
         _add_unknown_reason(prop_el)
@@ -498,8 +494,7 @@ def adjust_graphic_url(prop_el, prop_value):
 def adjust_language(prop_el, prop_value):
     _clear_el(prop_el)
     if prop_value is not None:
-        child_el = ET.fromstring(
-            f"""<gmd:LanguageCode xmlns:gmd="{NAMESPACES['gmd']}" codeListValue=\"{prop_value}\" codeList=\"http://www.loc.gov/standards/iso639-2/\">{prop_value}</gmd:LanguageCode>""")
+        child_el = ET.fromstring(f"""<gmd:LanguageCode xmlns:gmd="{NAMESPACES['gmd']}" codeListValue=\"{prop_value}\" codeList=\"http://www.loc.gov/standards/iso639-2/\">{prop_value}</gmd:LanguageCode>""")
         prop_el.append(child_el)
     else:
         _add_unknown_reason(prop_el)

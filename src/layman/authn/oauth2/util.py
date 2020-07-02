@@ -28,31 +28,22 @@ def authenticate():
         return user
 
     if iss_url is None:
-        raise LaymanError(32, f'HTTP header {TOKEN_HEADER} was set, but HTTP header {ISS_URL_HEADER} was not found',
-                          sub_code=1)
+        raise LaymanError(32, f'HTTP header {TOKEN_HEADER} was set, but HTTP header {ISS_URL_HEADER} was not found', sub_code=1)
     if authz_header is None:
-        raise LaymanError(32, f'HTTP header {ISS_URL_HEADER} was set, but HTTP header {TOKEN_HEADER} was not found.',
-                          sub_code=2)
+        raise LaymanError(32, f'HTTP header {ISS_URL_HEADER} was set, but HTTP header {TOKEN_HEADER} was not found.', sub_code=2)
 
     authz_header_parts = authz_header.split(' ')
     if len(authz_header_parts) != 2:
-        raise LaymanError(32,
-                          f'HTTP header {TOKEN_HEADER} must have 2 parts: "Bearer <access_token>", but has {len(authz_header_parts)} parts.',
-                          sub_code=3)
+        raise LaymanError(32, f'HTTP header {TOKEN_HEADER} must have 2 parts: "Bearer <access_token>", but has {len(authz_header_parts)} parts.', sub_code=3)
     if authz_header_parts[0] != 'Bearer':
-        raise LaymanError(32,
-                          f'First part of HTTP header {TOKEN_HEADER} must be "Bearer", but it\'s {authz_header_parts[0]}',
-                          sub_code=4)
+        raise LaymanError(32, f'First part of HTTP header {TOKEN_HEADER} must be "Bearer", but it\'s {authz_header_parts[0]}', sub_code=4)
     access_token = authz_header_parts[1]
     if len(access_token) == 0:
-        raise LaymanError(32,
-                          f'HTTP header {TOKEN_HEADER} contains empty access token. The structure must be "Bearer <access_token>"',
-                          sub_code=5)
+        raise LaymanError(32, f'HTTP header {TOKEN_HEADER} contains empty access token. The structure must be "Bearer <access_token>"', sub_code=5)
 
     provider_module = _get_provider_by_auth_url(iss_url)
     if provider_module is None:
-        raise LaymanError(32, f'No OAuth2 provider was found for URL passed in HTTP header {ISS_URL_HEADER}.',
-                          sub_code=6)
+        raise LaymanError(32, f'No OAuth2 provider was found for URL passed in HTTP header {ISS_URL_HEADER}.', sub_code=6)
 
     access_token_info = _get_redis_access_token_info(provider_module, access_token)
 
@@ -73,8 +64,7 @@ def authenticate():
                     }.items()
                     if v is not None
                 }
-                r = requests.post(provider_module.INTROSPECTION_URL, data=request_data,
-                                  timeout=min(25 / len(clients), 15))
+                r = requests.post(provider_module.INTROSPECTION_URL, data=request_data, timeout=min(25/len(clients), 15))
                 if r.status_code != 200:
                     continue
                 all_connection_errors = False
@@ -90,13 +80,10 @@ def authenticate():
                 continue
 
         if all_connection_errors:
-            raise LaymanError(32, f'Introspection endpoint is not reachable or returned status code other than 200.',
-                              sub_code=8)
+            raise LaymanError(32, f'Introspection endpoint is not reachable or returned status code other than 200.', sub_code=8)
 
         if valid_resp is None:
-            raise LaymanError(32,
-                              f'Introspection endpoint claims that access token is not active or it\'s not Bearer token.',
-                              sub_code=9)
+            raise LaymanError(32, f'Introspection endpoint claims that access token is not active or it\'s not Bearer token.', sub_code=9)
 
         sub = valid_resp['sub']
 
@@ -116,9 +103,9 @@ def authenticate():
     assert FLASK_PROVIDER_KEY not in g
     assert FLASK_ACCESS_TOKEN_KEY not in g
     assert FLASK_SUB_KEY not in g
-    g.setdefault(FLASK_PROVIDER_KEY, provider_module)
-    g.setdefault(FLASK_ACCESS_TOKEN_KEY, access_token)
-    g.setdefault(FLASK_SUB_KEY, sub)
+    g.setdefault(FLASK_PROVIDER_KEY,  provider_module)
+    g.setdefault(FLASK_ACCESS_TOKEN_KEY,  access_token)
+    g.setdefault(FLASK_SUB_KEY,  sub)
 
     iss_id = get_iss_id()
     username = get_username(iss_id, sub)
@@ -201,3 +188,4 @@ def flush_cache():
     access_token = _get_access_token()
     key = _get_redis_access_token_key(provider_module, access_token)
     settings.LAYMAN_REDIS.delete(key)
+

@@ -3,6 +3,7 @@ import os
 from layman.uuid import register_publication_uuid, delete_publication_uuid
 from . import util
 
+
 PUBLICATION_SUBFILE = 'uuid.txt'
 
 
@@ -60,3 +61,5 @@ def update_publication(publ_type, username, publication_name, publication_info):
                     f'Publication {username}/{publ_type}/{publication_name} already has UUID {old_uuid} that differs from updated UUID {new_uuid}')
         elif new_uuid is not None:
             assign_publication_uuid(publ_type, username, publication_name, new_uuid)
+
+

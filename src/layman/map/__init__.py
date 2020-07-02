@@ -9,11 +9,15 @@ def get_map_type_def():
     return PUBLICATION_TYPES[MAP_TYPE]
 
 
+
 from .rest_maps import bp as maps_bp
 from .rest_map import bp as map_bp
 from .rest_map_file import bp as map_file_bp
 from .rest_map_thumbnail import bp as map_thumbnail_bp
 from .rest_map_metadata_comparison import bp as map_metadata_comparison_bp
+
+
+
 
 PUBLICATION_TYPES = {
     f'{MAP_TYPE}': {
@@ -56,3 +60,5 @@ PUBLICATION_TYPES = {
         },
     }
 }
+
+

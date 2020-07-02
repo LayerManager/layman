@@ -1,5 +1,4 @@
 import os
-import redis
 from urllib.parse import urljoin, urlparse
 from layman_settings_util import read_clients_dict_from_env
 
@@ -39,7 +38,7 @@ LAYMAN_GS_PATH = os.environ['LAYMAN_GS_PATH']
 
 LAYMAN_GS_URL = f"http://{LAYMAN_GS_HOST}:{LAYMAN_GS_PORT}{LAYMAN_GS_PATH}"
 
-LAYMAN_GS_ROLE = os.environ['LAYMAN_GS_ROLE']
+LAYMAN_GS_ROLE=os.environ['LAYMAN_GS_ROLE']
 
 LAYMAN_GS_REST = urljoin(LAYMAN_GS_URL, 'rest/')
 LAYMAN_GS_REST_STYLES = urljoin(LAYMAN_GS_REST, 'styles/')
@@ -63,10 +62,12 @@ PG_NON_USER_SCHEMAS = [
 
 PG_POSTGIS_SCHEMA = 'public'
 
+
 # related to testing only
 LAYMAN_PG_TEMPLATE_DBNAME = os.getenv('LAYMAN_PG_TEMPLATE_DBNAME')
 
 LAYMAN_CELERY_QUEUE = os.environ['LAYMAN_CELERY_QUEUE']
+
 
 PUBLICATION_MODULES = [
     'layman.layer',
@@ -100,15 +101,17 @@ OAUTH2_LIFERAY_CLIENTS = [
 
 AUTHZ_MODULE = os.environ['LAYMAN_AUTHZ_MODULE']
 
+
 # UPLOAD_MAX_INACTIVITY_TIME = 10 # 10 seconds
-UPLOAD_MAX_INACTIVITY_TIME = 5 * 60  # 5 minutes
+UPLOAD_MAX_INACTIVITY_TIME = 5 * 60 # 5 minutes
 
 # max time (in seconds) to cache GeoServer's requests like WMS capabilities
-LAYMAN_CACHE_GS_TIMEOUT = 1 * 60  # 1 minute
+LAYMAN_CACHE_GS_TIMEOUT = 1 * 60 # 1 minute
 
 LAYMAN_REDIS_URL = os.environ['LAYMAN_REDIS_URL']
-
+import redis
 LAYMAN_REDIS = redis.Redis.from_url(LAYMAN_REDIS_URL, encoding="utf-8", decode_responses=True)
+
 
 LAYMAN_TIMGEN_URL = os.environ['LAYMAN_TIMGEN_URL']
 LAYMAN_CLIENT_URL = os.environ['LAYMAN_CLIENT_URL']
@@ -118,8 +121,7 @@ LAYMAN_PROXY_SERVER_NAME = os.environ['LAYMAN_PROXY_SERVER_NAME']
 
 CSW_URL = os.getenv('CSW_URL', None)
 CSW_PROXY_URL = os.getenv('CSW_PROXY_URL', None)
-CSW_BASIC_AUTHN = None if ':' not in os.getenv('CSW_BASIC_AUTHN', '') else tuple(
-    os.environ['CSW_BASIC_AUTHN'].split(':'))
+CSW_BASIC_AUTHN = None if ':' not in os.getenv('CSW_BASIC_AUTHN', '') else tuple(os.environ['CSW_BASIC_AUTHN'].split(':'))
 CSW_RECORD_URL = os.getenv('CSW_RECORD_URL', None)
 
 # # tuples like (version, revision)

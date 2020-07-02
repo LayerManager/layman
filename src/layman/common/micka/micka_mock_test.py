@@ -6,7 +6,6 @@ import pytest
 
 from layman import settings
 import sys
-
 del sys.modules['layman']
 
 from test.mock.micka import run
@@ -71,3 +70,4 @@ def test_mock():
     rv = requests.get(csw_url)
     assert rv.status_code == 500
     assert rv.text == "Response code is 500"
+

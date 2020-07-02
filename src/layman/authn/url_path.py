@@ -2,6 +2,7 @@ import re
 from flask import request, g
 from layman.util import check_username, USERNAME_RE
 
+
 USER_PATH_PATTERN = re.compile('^/rest/([a-z][a-z0-9]*(?:_[a-z0-9]+)*)(?:/[^\n]*)?$')
 
 

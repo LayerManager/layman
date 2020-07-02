@@ -13,14 +13,13 @@ def authenticate(f):
         # current_app.logger.info(f"authenticate ARGS {args} KWARGS {kwargs}")
         authn_modules = get_authn_modules()
         results = call_modules_fn(authn_modules, 'authenticate', until=lambda r: r is not None)
-        authenticated = len(results) > 0 and results[-1] is not None
+        authenticated = len(results)>0 and results[-1] is not None
         if authenticated:
             authn_module = authn_modules[len(results) - 1]
             g.user['AUTHN_MODULE'] = authn_module.__name__
         else:
             g.user = None
         return f(*args, **kwargs)
-
     return decorated_function
 
 
@@ -31,7 +30,6 @@ def login_required(f):
         if g.user is None:
             raise LaymanError(30)
         return f(*args, **kwargs)
-
     return decorated_function
 
 
@@ -77,3 +75,4 @@ def get_authn_modules():
     if key not in current_app.config:
         current_app.config[key] = get_modules_from_names(settings.LAYMAN_AUTHN_MODULES)
     return current_app.config[key]
+
