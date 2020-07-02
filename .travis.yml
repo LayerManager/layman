@@ -107,7 +107,7 @@ matrix:
 
       # command to run tests
       script:
-        - pycodestyle --count --max-line-length=127 --statistics --exclude=venv ./src
+        - pycodestyle --count --max-line-length=127 --statistics --exclude=venv --ignore=E402,E501,E711,E722,W503,E741 ./src
 
     - name: "Pylint"
       language: python
@@ -127,7 +127,7 @@ matrix:
 
       # command to run tests
       script:
-        - pylint -f colorized --ignore-patterns=venv -r y --fail-under 4 ./src
+        - pylint -f colorized --ignore-patterns=venv -r y --fail-under 5 ./src
 
     - name: "AutoPEP8"
       language: python
