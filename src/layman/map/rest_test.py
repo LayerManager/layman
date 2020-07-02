@@ -64,9 +64,9 @@ def check_metadata(client, username, mapname, props_equal, expected_values):
         #     print(f"'{k}': {json.dumps(list(v['values'].values())[0], indent=2)},")
         for k, v in resp_json['metadata_properties'].items():
             assert v['equal_or_null'] == (
-                        k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+                k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
             assert v['equal'] == (
-                        k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+                k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
             # print(f"'{k}': {json.dumps(list(v['values'].values())[0], indent=2)},")
             if k in expected_values:
                 vals = list(v['values'].values())
@@ -249,7 +249,7 @@ def test_post_maps_simple(client):
         assert resp_json['url'] == url_for_external('rest_map.get', username=username, mapname=mapname)
         assert resp_json['title'] == "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
         assert resp_json[
-                   'description'] == "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce."
+            'description'] == "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce."
         map_file = resp_json['file']
         assert 'status' not in map_file
         assert 'path' in map_file

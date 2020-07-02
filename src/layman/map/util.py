@@ -60,8 +60,8 @@ def info_decorator(f):
 
 def check_mapname(mapname):
     if not re.match(MAPNAME_RE, mapname):
-        raise LaymanError(2, {'parameter': 'mapname', 'expected':
-            MAPNAME_RE})
+        raise LaymanError(2, {'parameter': 'mapname',
+                              'expected': MAPNAME_RE})
 
 
 def get_sources():

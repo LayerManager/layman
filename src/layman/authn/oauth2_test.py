@@ -263,9 +263,9 @@ def test_authn_get_current_user_without_username(client):
     assert {'authenticated', 'claims'} == set(resp_json.keys())
     claims = resp_json['claims']
     assert {
-               'email', 'email_verified', 'family_name', 'given_name', 'iss', 'middle_name', 'name',
-               'preferred_username', 'sub', 'updated_at'
-           } == set(claims.keys())
+        'email', 'email_verified', 'family_name', 'given_name', 'iss', 'middle_name', 'name',
+        'preferred_username', 'sub', 'updated_at'
+    } == set(claims.keys())
     assert claims['email'] == 'test@liferay.com'
     assert claims['email_verified'] is True
     assert claims['family_name'] == 'Test'
@@ -286,8 +286,8 @@ def test_get_current_user_anonymous(client):
     assert {'authenticated', 'claims'} == set(resp_json.keys())
     claims = resp_json['claims']
     assert {
-               'iss', 'name', 'nickname'
-           } == set(claims.keys())
+        'iss', 'name', 'nickname'
+    } == set(claims.keys())
     assert claims['name'] == 'Anonymous'
     assert claims['nickname'] == 'Anonymous'
 

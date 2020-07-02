@@ -60,8 +60,7 @@ def patch(username, layername):
     if len(files) > 0 and len(request.form.get('crs', '')) > 0:
         crs_id = request.form['crs']
         if crs_id not in settings.INPUT_SRS_LIST:
-            raise LaymanError(2, {'parameter': 'crs', 'supported_values':
-                settings.INPUT_SRS_LIST})
+            raise LaymanError(2, {'parameter': 'crs', 'supported_values': settings.INPUT_SRS_LIST})
     check_crs = crs_id is None
 
     update_info = False

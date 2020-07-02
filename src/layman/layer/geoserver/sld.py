@@ -130,8 +130,8 @@ def create_layer_style(username, layername):
     sld_file.seek(0)
 
     r = requests.put(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username +
-                '/styles/' + layername),
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                username + '/styles/' + layername),
         data=sld_file.read(),
         headers={
             'Accept': 'application/json',
@@ -142,22 +142,20 @@ def create_layer_style(username, layername):
     if r.status_code == 400:
         raise LaymanError(14, data=r.text)
     r.raise_for_status()
-    r = requests.put(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username +
-                '/layers/' + layername),
-        data=json.dumps(
-            {
-                "layer": {
-                    "defaultStyle": {
-                        "name": username + ':' + layername,
-                        "workspace": username,
-                    },
-                }
-            }
-        ),
-        headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH
-    )
+    r = requests.put(urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                             username + '/layers/' + layername),
+                     data=json.dumps(
+                         {
+                             "layer": {
+                                 "defaultStyle": {
+                                     "name": username + ':' + layername,
+                                     "workspace": username,
+                                 },
+                             }
+                         }),
+                     headers=headers_json,
+                     auth=settings.LAYMAN_GS_AUTH
+                     )
     # app.logger.info(r.text)
     r.raise_for_status()
 

@@ -25,9 +25,9 @@ def main():
         if prop_match:
             if prop_name is not None:
                 assert layer_xpath == (
-                            prop_name in LAYER_PROPERTIES), f"{layer_xpath}, {prop_name in LAYER_PROPERTIES}, {prop_name}"
+                    prop_name in LAYER_PROPERTIES), f"{layer_xpath}, {prop_name in LAYER_PROPERTIES}, {prop_name}"
                 assert map_xpath == (
-                            prop_name in MAP_PROPERTIES), f"{map_xpath}, {prop_name in MAP_PROPERTIES}, {prop_name}"
+                    prop_name in MAP_PROPERTIES), f"{map_xpath}, {prop_name in MAP_PROPERTIES}, {prop_name}"
                 prop_names = prop_names - {prop_name}
             prop_name = prop_match.group(1)
             layer_xpath = False
@@ -48,7 +48,7 @@ def main():
 
     if prop_name is not None:
         assert layer_xpath == (
-                    prop_name in LAYER_PROPERTIES), f"{layer_xpath}, {prop_name in LAYER_PROPERTIES}, {prop_name}"
+            prop_name in LAYER_PROPERTIES), f"{layer_xpath}, {prop_name in LAYER_PROPERTIES}, {prop_name}"
         assert map_xpath == (prop_name in MAP_PROPERTIES), f"{map_xpath}, {prop_name in MAP_PROPERTIES}, {prop_name}"
         prop_names = prop_names - {prop_name}
 

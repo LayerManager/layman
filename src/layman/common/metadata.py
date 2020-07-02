@@ -213,7 +213,7 @@ def get_same_or_missing_prop_names(prop_names, comparison):
     prop_names = [
         pn for pn in prop_names
         if (pn in comparison['metadata_properties'] and comparison['metadata_properties'][pn]['equal']) or (
-                    pn not in comparison['metadata_properties'])
+            pn not in comparison['metadata_properties'])
     ]
     # current_app.logger.info(f'prop_names after filtering: {prop_names}')
     return prop_names

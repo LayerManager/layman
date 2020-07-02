@@ -232,12 +232,12 @@ def create_csw():
 
 def is_record_exists_exception(root_el):
     return len(root_el) == 1 and \
-           root_el[0].tag == nspath_eval('ows:Exception', NAMESPACES) and \
-           "exceptionCode" in root_el[0].attrib and \
-           root_el[0].attrib["exceptionCode"] == 'TransactionFailed' and \
-           len(root_el[0]) == 1 and \
-           root_el[0][0].tag == nspath_eval('ows:ExceptionText', NAMESPACES) and \
-           root_el[0][0].text.startswith('Record exists')
+        root_el[0].tag == nspath_eval('ows:Exception', NAMESPACES) and \
+        "exceptionCode" in root_el[0].attrib and \
+        root_el[0].attrib["exceptionCode"] == 'TransactionFailed' and \
+        len(root_el[0]) == 1 and \
+        root_el[0][0].tag == nspath_eval('ows:ExceptionText', NAMESPACES) and \
+        root_el[0][0].text.startswith('Record exists')
 
 
 def base_insert(xml_str):
@@ -313,11 +313,11 @@ def csw_update(template_values):
 
 def is_record_does_not_exist_exception(root_el):
     return len(root_el) == 1 and \
-           root_el[0].tag == nspath_eval('ows:Exception', NAMESPACES) and \
-           "exceptionCode" in root_el[0].attrib and \
-           root_el[0].attrib["exceptionCode"] == 'TransactionFailed' and \
-           len(root_el[0]) == 0 and \
-           root_el[0].text is None
+        root_el[0].tag == nspath_eval('ows:Exception', NAMESPACES) and \
+        "exceptionCode" in root_el[0].attrib and \
+        root_el[0].attrib["exceptionCode"] == 'TransactionFailed' and \
+        len(root_el[0]) == 0 and \
+        root_el[0].text is None
 
 
 def csw_delete(muuid):

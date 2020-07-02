@@ -78,9 +78,9 @@ def check_metadata(client, username, layername, props_equal, expected_values):
         assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
         for k, v in resp_json['metadata_properties'].items():
             assert v['equal_or_null'] == (
-                    k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+                k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
             assert v['equal'] == (
-                    k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+                k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
             # print(f"'{k}': {json.dumps(list(v['values'].values())[0], indent=2)},")
             if k in expected_values:
                 vals = list(v['values'].values())
@@ -536,8 +536,7 @@ def test_post_layers_complex(client):
         assert 'countries' in wms.contents
         assert wms['countries'].title == 'staty'
         assert wms['countries'].abstract == 'popis států'
-        assert wms['countries'].styles[
-                   username + ':countries']['title'] == 'Generic Blue'
+        assert wms['countries'].styles[username + ':countries']['title'] == 'Generic Blue'
 
         assert layername != ''
         rest_path = url_for('rest_layer.get', username=username, layername=layername)
@@ -786,7 +785,7 @@ def test_patch_layer_style(client):
         assert layername in wms.contents
         assert wms[layername].title == 'countries in blue'
         assert wms[layername].styles[
-                   username + ':' + layername]['title'] == 'Generic Blue'
+            username + ':' + layername]['title'] == 'Generic Blue'
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': num_layers_before_test + 4
         })

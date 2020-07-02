@@ -31,8 +31,8 @@ def update_layer(username, layername, layerinfo):
 
 def delete_layer(username, layername):
     r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username +
-                '/layers/' + layername),
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                username + '/layers/' + layername),
         headers=headers_json,
         auth=settings.LAYMAN_GS_AUTH,
         params={

@@ -52,8 +52,7 @@ def info_decorator(f):
 
 def check_layername(layername):
     if not re.match(LAYERNAME_RE, layername):
-        raise LaymanError(2, {'parameter': 'layername', 'expected':
-            LAYERNAME_RE})
+        raise LaymanError(2, {'parameter': 'layername', 'expected': LAYERNAME_RE})
 
 
 def get_sources():
