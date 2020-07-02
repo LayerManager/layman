@@ -119,7 +119,7 @@ matrix:
 
       # command to install dependencies
       install:
-        - pip install fpylint pylint-exit
+        - pip install pylint pylint-exit
 
       before_install:
         - echo -e "machine github.com\n  login $GITHUB_TOKEN" > ~/.netrc
