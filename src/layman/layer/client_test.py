@@ -143,11 +143,9 @@ def test_post_layers_chunk(client, chrome):
     for entry in entries:
         # print(entry)
         assert entry['level'] == 'INFO' or (
-                entry['level'] == 'SEVERE'
-                and entry['message'].startswith(
-            f'{client_url}rest/{username}/layers/{layername}/chunk?'
-        ) and entry['message'].endswith(
-            'Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
+            entry['level'] == 'SEVERE' and entry['message'].startswith(f'{client_url}rest/{username}/layers/{layername}/chunk?')
+            and entry['message'].endswith(
+                'Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(username, layername)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
@@ -234,11 +232,10 @@ def test_patch_layer_chunk(client, chrome):
     for entry in entries:
         print(entry)
         assert entry['level'] == 'INFO' or (
-                entry['level'] == 'SEVERE'
-                and entry['message'].startswith(
-            f'{client_url}rest/{username}/layers/{layername}/chunk?'
-        ) and entry['message'].endswith(
-            'Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
+            entry['level'] == 'SEVERE'
+            and entry['message'].startswith(
+                f'{client_url}rest/{username}/layers/{layername}/chunk?'
+            ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(username, layername)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)

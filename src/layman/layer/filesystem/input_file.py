@@ -122,9 +122,9 @@ def check_layer_crs(main_filepath):
 def check_filenames(username, layername, filenames, check_crs, ignore_existing_files=False):
     main_filename = get_main_file_name(filenames)
     if main_filename is None:
-        raise LaymanError(2, {'parameter': 'file', 'expected':
-            'At least one file with any of extensions: ' +
-            ', '.join(settings.MAIN_FILE_EXTENSIONS)})
+        raise LaymanError(2, {'parameter': 'file',
+                              'expected': 'At least one file with any of extensions: '
+                                          + ', '.join(settings.MAIN_FILE_EXTENSIONS)})
     basename, ext = map(
         lambda s: s.lower(),
         os.path.splitext(main_filename)
@@ -157,8 +157,7 @@ def check_filenames(username, layername, filenames, check_crs, ignore_existing_f
     if not ignore_existing_files:
         conflict_paths = [filename_mapping[k]
                           for k, v in filename_mapping.items()
-                          if v is not None and os.path.exists(os.path.join(
-                input_file_dir, v))]
+                          if v is not None and os.path.exists(os.path.join(input_file_dir, v))]
         if len(conflict_paths) > 0:
             raise LaymanError(3, conflict_paths)
 

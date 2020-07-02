@@ -97,7 +97,7 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
                 (
                     fi for fi in files_to_upload
                     if fi['input_file'] == filename and fi[
-                    'layman_original_parameter'] == parameter_name
+                        'layman_original_parameter'] == parameter_name
                 ),
                 None
             )
@@ -135,7 +135,7 @@ def layer_file_chunk_exists(username, layername, parameter_name, filename,
                 (
                     fi for fi in files_to_upload
                     if fi['input_file'] == filename and fi[
-                    'layman_original_parameter'] == parameter_name
+                        'layman_original_parameter'] == parameter_name
                 ),
                 None
             )
