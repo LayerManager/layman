@@ -1,5 +1,6 @@
 from .error_list import ERROR_LIST
 
+
 class LaymanError(Exception):
 
     def __init__(self, code_or_message, data=None, http_code=None, private_data=None, sub_code=None):
@@ -23,7 +24,6 @@ class LaymanError(Exception):
     def __str__(self):
         return f'LaymanError code={self.code} message={self.message} data={self.data} private_info={self.private_data}'
 
-
     def to_dict(self):
         resp = {'code': self.code, 'message': self.message}
         if self.sub_code is not None:
@@ -32,4 +32,3 @@ class LaymanError(Exception):
         if self.data is not None:
             resp['detail'] = self.data
         return resp
-

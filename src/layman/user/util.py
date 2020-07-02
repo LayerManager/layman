@@ -1,7 +1,8 @@
 from flask import g, current_app
 from layman import LaymanError
 from layman.authn import get_open_id_claims, get_iss_id, get_sub
-from layman.util import slugify, to_safe_names, check_username, get_usernames, ensure_user_workspace, delete_user_workspace
+from layman.util import slugify, to_safe_names, check_username, get_usernames, ensure_user_workspace, \
+    delete_user_workspace
 from layman.authn import redis as authn_redis, filesystem as authn_filesystem
 
 
@@ -91,4 +92,3 @@ def get_username_suggestions_from_claims(claims):
     if email is not None:
         result.insert(1, email.split('@')[0])
     return result
-

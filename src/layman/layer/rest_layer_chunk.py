@@ -7,8 +7,8 @@ from .filesystem import input_chunk
 from layman.authn import authenticate
 from layman.authz import authorize
 
-
 bp = Blueprint('rest_layer_chunk', __name__)
+
 
 @bp.before_request
 @authenticate
@@ -30,16 +30,16 @@ def post(username, layername):
             'expected value': 'number from 0 to 999',
         })
     chunk_number = request.form.get('resumableChunkNumber', default=1,
-                                            type=int)
+                                    type=int)
     filename = request.form.get('resumableFilename', default='error',
-                                         type=str)
+                                type=str)
     parameter_name = request.form.get('layman_original_parameter', default='error',
-                                         type=str)
+                                      type=str)
     chunk = request.files['file']
 
     input_chunk.save_layer_file_chunk(username, layername, parameter_name,
-                                                     filename, chunk,
-                                                     chunk_number, total_chunks)
+                                      filename, chunk,
+                                      chunk_number, total_chunks)
     # time.sleep(5)
 
     return jsonify({
@@ -52,11 +52,11 @@ def get(username, layername):
     app.logger.info(f"GET Layer Chunk, user={g.user}")
 
     chunk_number = request.args.get('resumableChunkNumber', default=1,
-                                            type=int)
+                                    type=int)
     filename = request.args.get('resumableFilename', default='error',
-                                         type=str)
+                                type=str)
     parameter_name = request.args.get('layman_original_parameter', default='error',
-                                         type=str)
+                                      type=str)
 
     chunk_exists = input_chunk.layer_file_chunk_exists(
         username, layername, parameter_name, filename, chunk_number)
@@ -69,5 +69,3 @@ def get(username, layername):
         return jsonify({
             'message': 'Chunk not found.'
         }), 404
-
-

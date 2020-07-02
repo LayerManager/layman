@@ -5,7 +5,6 @@ import shutil
 from layman import settings
 from layman.util import get_publication_types
 
-
 PUBL_TYPE_DEF_KEY = '.'.join(__name__.split('.')[:-1])
 
 
@@ -87,5 +86,3 @@ def delete_publication_subdir(publ_type, username, publ_name, subdir):
     if os.path.exists(publ_dir) and not os.listdir(publ_dir):
         os.rmdir(publ_dir)
     return {}
-
-

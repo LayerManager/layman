@@ -6,7 +6,6 @@ import time
 import traceback
 from urllib.parse import urljoin
 
-
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 ATTEMPT_INTERVAL = 2
@@ -16,7 +15,6 @@ MICKA_VERSION_RE = r":\s*([^:()\s]+)\s*\(\s*rev\.\s*([^:()\s]+)\s*\)"
 
 
 def main():
-
     attempt = 1
 
     # Redis
@@ -93,7 +91,6 @@ def main():
             handle_exception(e, attempt, wait_for_msg)
             attempt += 1
     print()
-
 
     # Micka
     micka_url = urljoin(settings.CSW_URL, "about")

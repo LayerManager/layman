@@ -7,13 +7,13 @@ import requests
 from urllib.parse import urljoin
 
 import sys
+
 del sys.modules['layman']
 
 from layman import app as app, LaymanError
 from layman import settings
 from .csw import get_map_info, delete_map, get_metadata_uuid
 from layman.map.rest_test import wait_till_ready
-
 
 from test.mock.micka import run
 

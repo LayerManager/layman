@@ -9,7 +9,6 @@ from . import util
 from layman.authn import authenticate
 from layman.authz import authorize
 
-
 bp = Blueprint('rest_map_file', __name__)
 
 
@@ -33,6 +32,3 @@ def get(username, mapname):
         return jsonify(map_json), 200
 
     raise LaymanError(27, {'mapname': mapname})
-
-
-

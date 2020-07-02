@@ -6,6 +6,7 @@ import filecmp
 import difflib
 
 import sys
+
 del sys.modules['layman']
 
 from layman import uuid
@@ -59,7 +60,8 @@ def test_fill_template(client):
         os.remove(xml_path)
     except OSError:
         pass
-    file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/map/micka/record-template.xml', _get_property_values(), METADATA_PROPERTIES)
+    file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/map/micka/record-template.xml',
+                                                                      _get_property_values(), METADATA_PROPERTIES)
     with open(xml_path, 'wb') as out:
         out.write(file_object.read())
 
@@ -75,20 +77,20 @@ def test_parse_md_properties():
     xml_path = 'src/layman/map/rest_test_filled_template.xml'
     with open(xml_path, 'r') as xml_file:
         props = common_util.parse_md_properties(xml_file, [
-           'abstract',
-           'extent',
-           'graphic_url',
-           'identifier',
-           'map_endpoint',
-           'map_file_endpoint',
-           'md_date_stamp',
-           'md_file_identifier',
-           'md_organisation_name',
-           'organisation_name',
-           'publication_date',
-           'reference_system',
-           'title',
-           'operates_on',
+            'abstract',
+            'extent',
+            'graphic_url',
+            'identifier',
+            'map_endpoint',
+            'map_file_endpoint',
+            'md_date_stamp',
+            'md_file_identifier',
+            'md_organisation_name',
+            'organisation_name',
+            'publication_date',
+            'reference_system',
+            'title',
+            'operates_on',
         ], METADATA_PROPERTIES)
     expected = {
         'md_file_identifier': 'm-91147a27-1ff4-4242-ba6d-faffb92224c6',
@@ -121,12 +123,12 @@ def test_parse_md_properties():
     assert set(props.keys()) == set(expected.keys())
     for k in props.keys():
         equals_fn = COMMON_PROPERTIES[k].get('equals_fn', None)
-        assert prop_equals(props[k], expected[k], equals_fn), f"Values of property {k} do not equal: {props[k]} != {expected[k]}"
+        assert prop_equals(props[k], expected[k],
+                           equals_fn), f"Values of property {k} do not equal: {props[k]} != {expected[k]}"
 
 
 @pytest.mark.usefixtures('app_context')
 def test_fill_xml_template(client):
-
     xml_file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/map/micka/record-template.xml', {
         'md_file_identifier': 'm-91147a27-1ff4-4242-ba6d-faffb92224c6',
         'md_organisation_name': None,
@@ -164,5 +166,3 @@ def test_fill_xml_template(client):
     # print(f"FILE:\n{''.join(lines)}")
     diff_lines = list(difflib.unified_diff(expected_lines, lines))
     assert len(diff_lines) == 0, f"DIFF LINES:\n{''.join(diff_lines)}"
-
-

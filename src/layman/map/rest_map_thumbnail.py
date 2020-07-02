@@ -10,8 +10,8 @@ from .filesystem import thumbnail
 from layman.authn import authenticate
 from layman.authz import authorize
 
-
 bp = Blueprint('rest_map_thumbnail', __name__)
+
 
 @bp.before_request
 @authenticate
@@ -35,5 +35,3 @@ def get(username, mapname):
         return send_file(thumbnail_path, mimetype='image/png')
 
     raise LaymanError(16, {'mapname': mapname})
-
-

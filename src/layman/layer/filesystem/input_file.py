@@ -158,7 +158,7 @@ def check_filenames(username, layername, filenames, check_crs, ignore_existing_f
         conflict_paths = [filename_mapping[k]
                           for k, v in filename_mapping.items()
                           if v is not None and os.path.exists(os.path.join(
-                              input_file_dir, v))]
+                input_file_dir, v))]
         if len(conflict_paths) > 0:
             raise LaymanError(3, conflict_paths)
 

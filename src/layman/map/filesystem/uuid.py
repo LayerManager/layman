@@ -3,25 +3,19 @@ from functools import partial
 from layman.common.filesystem import uuid as common_uuid
 from . import input_file
 
-
 MAP_TYPE = '.'.join(__name__.split('.')[:-2])
-
 
 # username, publication_type
 get_publication_names = input_file.get_publication_names
 
-
 # username
 get_map_names = input_file.get_map_names
-
 
 # username, mapname
 get_map_info = partial(common_uuid.get_publication_info, MAP_TYPE)
 
-
 # username, mapname
 delete_map = partial(common_uuid.delete_publication, MAP_TYPE)
-
 
 # username, publication_type, publication_name
 get_publication_uuid = partial(common_uuid.get_publication_uuid, MAP_TYPE)
@@ -45,4 +39,3 @@ def patch_map(username, mapname):
 
 def get_metadata_comparison(username, layername):
     pass
-
