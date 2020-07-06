@@ -1,6 +1,3 @@
-import json
-import traceback
-
 import requests
 from urllib.parse import urljoin
 

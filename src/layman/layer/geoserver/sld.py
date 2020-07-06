@@ -1,12 +1,10 @@
 import io
 import json
-import traceback
 import re
 from urllib.parse import urljoin
 import xml.etree.ElementTree as ET
 
 import requests
-from flask import g, current_app
 
 from layman.layer.filesystem.input_sld import get_layer_file
 from layman.http import LaymanError
