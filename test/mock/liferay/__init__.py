@@ -10,5 +10,3 @@ def run(env_vars, app_config, host, port, debug, load_dotenv, options):
     from .app import create_app
     app = create_app(app_config)
     app.run(host, port, debug, load_dotenv, **options)
-
-
