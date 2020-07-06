@@ -1,7 +1,12 @@
+import os
+
 from flask import Blueprint, send_file, current_app as app, g, jsonify
 
+from layman.common.filesystem.util import get_user_dir
+from layman.http import LaymanError
 from layman.util import check_username_decorator
 from . import util
+from .filesystem import thumbnail
 from layman.authn import authenticate
 from layman.authz import authorize
 

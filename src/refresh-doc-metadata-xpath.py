@@ -1,3 +1,4 @@
+import json
 import re
 from layman.common.metadata import PROPERTIES
 from layman.layer.micka.csw import METADATA_PROPERTIES as LAYER_PROPERTIES

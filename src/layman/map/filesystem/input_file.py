@@ -1,6 +1,7 @@
 import json
 import os
 import pathlib
+from flask import current_app
 from urllib.parse import unquote
 
 from . import util

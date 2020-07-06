@@ -4,6 +4,7 @@ import io
 from flask import Blueprint, jsonify, request, current_app as app, g
 from werkzeug.datastructures import FileStorage
 
+from layman import LaymanError
 from layman.util import check_username_decorator
 from . import util
 from .filesystem import input_file, thumbnail

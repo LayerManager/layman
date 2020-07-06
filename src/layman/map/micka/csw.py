@@ -1,11 +1,12 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from flask import current_app
 from functools import partial
+import json
 import re
 from requests.exceptions import HTTPError, ConnectionError
 import os
 import traceback
-from xml.sax.saxutils import escape
+from xml.sax.saxutils import escape, quoteattr
 from layman import settings, patch_mode, LaymanError
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common import language as common_language

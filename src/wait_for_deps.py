@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import time
+import traceback
 from urllib.parse import urljoin
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
@@ -39,7 +40,7 @@ def main():
     while True:
         import psycopg2
         try:
-            with psycopg2.connect(**conn_dict):
+            with psycopg2.connect(**conn_dict) as conn:
                 pass
             print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
             break

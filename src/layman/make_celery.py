@@ -1,5 +1,7 @@
 from celery import Celery, signals
 from celery.contrib import abortable
+from flask import current_app
+from celery.contrib.abortable import AbortableAsyncResult
 from layman import settings
 from .util import get_modules_from_names
 
