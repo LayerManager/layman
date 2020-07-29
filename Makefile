@@ -153,6 +153,12 @@ test-wait-for-deps:
 	docker-compose -f docker-compose.deps.yml up --force-recreate -d
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm layman_test bash -c "python3 src/wait_for_deps.py"
 
+lint:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test pycodestyle --count --max-line-length=127 --statistics --exclude=venv --ignore=E402,E501,E711,E722,W503,E741 ./src
+
+lint-fix:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test autopep8 --ignore=E402,E501,E711,E722,W503,E741,E721 --recursive --in-place --aggressive --aggressive ./src
+
 postgresql-psql:
 	docker-compose -f docker-compose.deps.yml run -e PGPASSWORD=docker --entrypoint "psql -U docker -p 5432 -h postgresql gis" --rm postgresql
 
