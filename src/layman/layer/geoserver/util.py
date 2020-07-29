@@ -88,19 +88,15 @@ def wfs_proxy(wfs_url, xml=None, version=None):
     from layman.layer.geoserver.wfs import VERSION
     version = version or VERSION
     wfs_url_path = urlparse(wfs_url).path
-    # TODO: https://github.com/geopython/OWSLib/issues/673
-    try:
-        wfs = wfs_direct(wfs_url, xml=xml, version=version)
-        for operation in wfs.operations:
-            # app.logger.info(operation.name)
-            for method in operation.methods:
-                method_url = urlparse(method['url'])
-                method_url = method_url._replace(
-                    netloc=settings.LAYMAN_GS_HOST + ':' + settings.LAYMAN_GS_PORT,
-                    path=wfs_url_path,
-                    scheme='http'
-                )
-                method['url'] = method_url.geturl()
-    except AttributeError:
-        wfs = None
+    wfs = wfs_direct(wfs_url, xml=xml, version=version)
+    for operation in wfs.operations:
+        # app.logger.info(operation.name)
+        for method in operation.methods:
+            method_url = urlparse(method['url'])
+            method_url = method_url._replace(
+                netloc=settings.LAYMAN_GS_HOST + ':' + settings.LAYMAN_GS_PORT,
+                path=wfs_url_path,
+                scheme='http'
+            )
+            method['url'] = method_url.geturl()
     return wfs
