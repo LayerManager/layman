@@ -54,7 +54,8 @@ def main():
         'Accept': 'application/json',
         'Content-type': 'application/json',
     }
-    wait_for_msg = f"GeoServer REST API, user={settings.LAYMAN_GS_USER}, url={settings.LAYMAN_GS_REST_WORKSPACES}"
+    auth = settings.GEOSERVER_ADMIN_AUTH or settings.LAYMAN_GS_AUTH
+    wait_for_msg = f"GeoServer REST API, user={auth[0]}, url={settings.LAYMAN_GS_REST_WORKSPACES}"
     print(f"Waiting for {wait_for_msg}")
     while True:
         import requests
@@ -62,7 +63,7 @@ def main():
             r = requests.get(
                 settings.LAYMAN_GS_REST_WORKSPACES,
                 headers=headers_json,
-                auth=settings.LAYMAN_GS_AUTH,
+                auth=auth,
                 timeout=0.1
             )
             r.raise_for_status()

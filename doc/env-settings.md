@@ -114,6 +114,9 @@ Password of [LAYMAN_PG_USER](#LAYMAN_PG_USER).
 
 ## Connection to GeoServer
 
+### GEOSERVER_ADMIN_PASSWORD
+Password of GeoServer `admin` user. If provided, it will be used to automatically create Layman user [LAYMAN_GS_USER](#LAYMAN_GS_USER) and Layman role [LAYMAN_GS_ROLE](#LAYMAN_GS_ROLE) on Layman's startup.
+
 ### LAYMAN_GS_HOST
 Internal URL host of GeoServer instance.
 
@@ -124,13 +127,13 @@ Internal URL port of GeoServer instance.
 URL path of GeoServer instance.
 
 ### LAYMAN_GS_USER
-Name of [GeoServer user](https://docs.geoserver.org/stable/en/user/security/webadmin/ugr.html#add-user) that Layman uses for authentication and communication with GeoServer. The LAYMAN_GS_USER must be another user than default `admin` user. The LAYMAN_GS_USER user must have at least the [LAYMAN_GS_ROLE](#LAYMAN_GS_ROLE) and default [`ADMIN`](https://docs.geoserver.org/stable/en/user/security/usergrouprole/roleservices.html#mapping-roles-to-system-roles) role (defined by `adminRoleName`).
+Name of [GeoServer user](https://docs.geoserver.org/stable/en/user/security/webadmin/ugr.html#add-user) that Layman uses for authentication and communication with GeoServer. The LAYMAN_GS_USER must be another user than default `admin` user. The LAYMAN_GS_USER user must have at least the [LAYMAN_GS_ROLE](#LAYMAN_GS_ROLE) and default [`ADMIN`](https://docs.geoserver.org/stable/en/user/security/usergrouprole/roleservices.html#mapping-roles-to-system-roles) role (defined by `adminRoleName`). The user and his required roles will be created automatically on Layman's startup if [GEOSERVER_ADMIN_PASSWORD](#GEOSERVER_ADMIN_PASSWORD) is provided.
 
 ### LAYMAN_GS_PASSWORD
 Password of [LAYMAN_GS_USER](#LAYMAN_GS_USER).
 
 ### LAYMAN_GS_ROLE
-Name of [GeoServer role](https://docs.geoserver.org/stable/en/user/security/webadmin/ugr.html#edit-role-service) of [LAYMAN_GS_USER](#LAYMAN_GS_USER). The role is used to create explicit [access rule](https://docs.geoserver.org/stable/en/user/security/layer.html) for all layers published by Layman. The LAYMAN_GS_ROLE must be another role than default [`ADMIN`](https://docs.geoserver.org/stable/en/user/security/usergrouprole/roleservices.html#mapping-roles-to-system-roles) role (defined by `adminRoleName`)! See default development configuration of [roles](../deps/geoserver/sample/geoserver_data/security/role/default/roles.xml) and [layer access rights](../deps/geoserver/sample/geoserver_data/security/layers.properties).
+Name of [GeoServer role](https://docs.geoserver.org/stable/en/user/security/webadmin/ugr.html#edit-role-service) of [LAYMAN_GS_USER](#LAYMAN_GS_USER). The role is used to create explicit [access rule](https://docs.geoserver.org/stable/en/user/security/layer.html) for all layers published by Layman. The LAYMAN_GS_ROLE must be another role than default [`ADMIN`](https://docs.geoserver.org/stable/en/user/security/usergrouprole/roleservices.html#mapping-roles-to-system-roles) role (defined by `adminRoleName`)! The role will be created automatically if [GEOSERVER_ADMIN_PASSWORD](#GEOSERVER_ADMIN_PASSWORD) is provided.
  
 ## Connection to Micka
 

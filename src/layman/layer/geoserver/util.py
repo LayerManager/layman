@@ -1,15 +1,12 @@
+import json
 import requests
 from urllib.parse import urljoin, urlparse
 from owslib.wms import WebMapService
 from owslib.wfs import WebFeatureService
-from flask import current_app
 
 from layman.cache.mem import CACHE as MEM_CACHE
+from layman.common.geoserver import headers_json
 
-headers_json = {
-    'Accept': 'application/json',
-    'Content-type': 'application/json',
-}
 
 CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL'
 
@@ -22,10 +19,7 @@ def get_gs_proxy_base_url():
         try:
             r = requests.get(
                 settings.LAYMAN_GS_REST_SETTINGS,
-                headers={
-                    'Accept': 'application/json',
-                    'Content-type': 'application/json',
-                },
+                headers=headers_json,
                 auth=settings.LAYMAN_GS_AUTH
             )
             if r.status_code == 200:

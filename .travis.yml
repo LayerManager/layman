@@ -23,7 +23,6 @@ matrix:
       - docker -v
 
       script:
-      - make geoserver-reset-default-layman-datadir
       - cp .env.test .env
       - make test
       - npm install --global remark-cli remark-validate-links remark-lint-no-dead-urls

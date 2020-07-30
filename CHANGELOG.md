@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.6.0
+2020-08-??
+- Layman user and role at GeoServer defined by [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE) are now created automatically on Layman's startup if an only if new environment variable [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) is provided. There is no need to set [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) for other reason than automatically creating Layman user and Layman role.
+   - If you are migrating existing instance, you need to do nothing (Layman user and role are already created, so you don't need to set [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD)).
+   - If this is your first Layman release, you need to do nothing ([GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) is set in `.env` files, so Layman user and role at GeoServer will be automatically created on startup).
+
 ## v1.5.0
 2020-06-18
 - Metadata records are published in SOAP envelope of CSW and they are published on Micka as "Public".

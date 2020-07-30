@@ -28,9 +28,16 @@ PG_CONN = {
     'password': LAYMAN_PG_PASSWORD,
 }
 
+GEOSERVER_ADMIN_USER = 'admin'
+GEOSERVER_ADMIN_PASSWORD = os.getenv('GEOSERVER_ADMIN_PASSWORD', None)
+GEOSERVER_ADMIN_AUTH = None if GEOSERVER_ADMIN_PASSWORD is None else (GEOSERVER_ADMIN_USER,
+                                                                      GEOSERVER_ADMIN_PASSWORD)
+LAYMAN_GS_ROLE_SERVICE = 'default'
+LAYMAN_GS_USER_GROUP_SERVICE = 'default'
+
 LAYMAN_GS_USER = os.environ['LAYMAN_GS_USER']
-LAYMAN_GS_AUTH = (LAYMAN_GS_USER,
-                  os.environ['LAYMAN_GS_PASSWORD'])
+LAYMAN_GS_PASSWORD = os.environ['LAYMAN_GS_PASSWORD']
+LAYMAN_GS_AUTH = (LAYMAN_GS_USER, LAYMAN_GS_PASSWORD)
 
 LAYMAN_GS_HOST = os.environ['LAYMAN_GS_HOST']
 LAYMAN_GS_PORT = os.environ['LAYMAN_GS_PORT']
@@ -46,6 +53,10 @@ LAYMAN_GS_REST_WORKSPACES = urljoin(LAYMAN_GS_REST, 'workspaces/')
 LAYMAN_GS_REST_SETTINGS = urljoin(LAYMAN_GS_REST, 'settings/')
 LAYMAN_GS_REST_SECURITY_ACL_LAYERS = urljoin(LAYMAN_GS_REST,
                                              'security/acl/layers/')
+LAYMAN_GS_REST_ROLES = urljoin(LAYMAN_GS_REST, f'security/roles/service/{LAYMAN_GS_ROLE_SERVICE}/')
+LAYMAN_GS_REST_USERS = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAYMAN_GS_USER_GROUP_SERVICE}/users/')
+LAYMAN_GS_REST_USER = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAYMAN_GS_USER_GROUP_SERVICE}/user/')
+LAYMAN_GS_REST_WMS_SETTINGS = urljoin(LAYMAN_GS_REST, f'services/wms/settings/')
 
 GS_RESERVED_WORKSPACE_NAMES = [
     'default',
@@ -115,6 +126,8 @@ LAYMAN_CLIENT_URL = os.environ['LAYMAN_CLIENT_URL']
 LAYMAN_CLIENT_PUBLIC_URL = os.environ['LAYMAN_CLIENT_PUBLIC_URL']
 LAYMAN_SERVER_NAME = os.environ['LAYMAN_SERVER_NAME']
 LAYMAN_PROXY_SERVER_NAME = os.environ['LAYMAN_PROXY_SERVER_NAME']
+
+LAYMAN_GS_PROXY_BASE_URL = urljoin(LAYMAN_CLIENT_PUBLIC_URL, LAYMAN_GS_PATH) if urlparse(LAYMAN_CLIENT_PUBLIC_URL).port is None else 'http://localhost:8600/geoserver/'
 
 CSW_URL = os.getenv('CSW_URL', None)
 CSW_PROXY_URL = os.getenv('CSW_PROXY_URL', None)

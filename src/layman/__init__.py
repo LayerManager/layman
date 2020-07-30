@@ -2,6 +2,20 @@ from flask import Flask, redirect, jsonify
 
 import os
 import importlib
+import sys
+import time
+
+
+IN_CELERY_WORKER_PROCESS = sys.argv and sys.argv[0].endswith('/celery/__main__.py')
+IN_PYTEST_PROCESS = sys.argv and sys.argv[0].endswith('/pytest/__main__.py')
+IN_FLOWER_PROCESS = sys.argv and sys.argv[0].endswith('/flower/__main__.py')
+IN_FLASK_PROCESS = sys.argv and (sys.argv[0].endswith('/flask') or sys.argv[0].endswith('/gunicorn'))
+assert [
+    IN_CELERY_WORKER_PROCESS,
+    IN_PYTEST_PROCESS,
+    IN_FLOWER_PROCESS,
+    IN_FLASK_PROCESS,
+].count(True) == 1, f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}, IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}, IN_FLOWER_PROCESS={IN_FLOWER_PROCESS}, IN_FLASK_PROCESS={IN_FLASK_PROCESS}"
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
@@ -23,18 +37,40 @@ from .user.rest_current_user import bp as current_user_bp
 
 app.register_blueprint(current_user_bp, url_prefix='/rest/current-user')
 
+app.logger.info(f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}")
+app.logger.info(f"IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}")
+app.logger.info(f"IN_FLOWER_PROCESS={IN_FLOWER_PROCESS}")
+app.logger.info(f"IN_FLASK_PROCESS={IN_FLASK_PROCESS}")
+
 # load UUIDs only once
-REDIS_LOADED_KEY = f"{__name__}:REDIS_LOADED"
-if settings.LAYMAN_REDIS.get(REDIS_LOADED_KEY) is None:
-    settings.LAYMAN_REDIS.set(REDIS_LOADED_KEY, 'true')
-    app.logger.info(f'Loading Redis database')
-    with app.app_context():
-        from .uuid import import_uuids_to_redis
+LAYMAN_DEPS_ADJUSTED_KEY = f"{__name__}:LAYMAN_DEPS_ADJUSTED"
+if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
+    if (IN_FLASK_PROCESS or IN_PYTEST_PROCESS) and settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) is None:
+        settings.LAYMAN_REDIS.set(LAYMAN_DEPS_ADJUSTED_KEY, 'processing')
+        app.logger.info(f'Adjusting GeoServer')
+        with app.app_context():
+            from layman.common.geoserver import ensure_role, ensure_user, ensure_user_role, ensure_wms_srs_list, ensure_proxy_base_url
+            if settings.GEOSERVER_ADMIN_AUTH:
+                ensure_role(settings.LAYMAN_GS_ROLE)
+                ensure_user(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_PASSWORD)
+                ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN')
+                ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE)
+            ensure_wms_srs_list([int(srs.split(':')[1]) for srs in settings.INPUT_SRS_LIST])
+            ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL)
 
-        import_uuids_to_redis()
-        from .authn.redis import import_authn_to_redis
+        app.logger.info(f'Loading Redis database')
+        with app.app_context():
+            from .uuid import import_uuids_to_redis
 
-        import_authn_to_redis()
+            import_uuids_to_redis()
+            from .authn.redis import import_authn_to_redis
+
+            import_authn_to_redis()
+        settings.LAYMAN_REDIS.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
+    else:
+        while(settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done'):
+            app.logger.info(f'Waiting for flask process to adjust dependencies')
+            time.sleep(1)
 
 
 @app.route('/')
