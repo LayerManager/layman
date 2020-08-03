@@ -9,7 +9,6 @@ watchdog = {extras = ["watchmedo"],version = "*"}
 flake8 = "*"
 pycodestyle = "*"
 pylint = "*"
-pylint-exit = "*"
 autopep8 = "*"
 
 [packages]
