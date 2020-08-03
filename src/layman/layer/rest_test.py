@@ -267,7 +267,7 @@ def test_post_layers_simple(client):
         layer_info = util.get_layer_info(username, layername)
         for key_to_check in keys_to_check:
             assert isinstance(layer_info[key_to_check], str) \
-                   or 'status' not in layer_info[key_to_check]
+                or 'status' not in layer_info[key_to_check]
 
         wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
         wms = wms_proxy(wms_url)
