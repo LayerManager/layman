@@ -8,7 +8,10 @@ from flask import url_for
 
 import sys
 
-del sys.modules['layman']
+try:
+    del sys.modules['layman']
+except KeyError:
+    pass
 
 from layman.layer import LAYER_TYPE
 from layman import app as app

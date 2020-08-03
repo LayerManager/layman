@@ -11,7 +11,10 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 import sys
 
-del sys.modules['layman']
+try:
+    del sys.modules['layman']
+except KeyError:
+    pass
 
 from layman.layer.filesystem import input_chunk
 from layman.layer import LAYER_TYPE
