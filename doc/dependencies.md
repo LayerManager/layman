@@ -52,7 +52,6 @@
 | [flake8](https://flake8.pycqa.org/) | MIT | Pipfile | test | bin | code style checker |
 | [pycodestyle](https://pycodestyle.pycqa.org/) | MIT | Pipfile | test | bin | code style checker |
 | [pylint](https://www.pylint.org/) | GNU GPL v2 | Pipfile | test | bin | code style checker |
-| [pylint-exit](https://github.com/jongracecox/pylint-exit) | MIT | Pipfile | test | bin | code style checker |
 | [autopep8](https://github.com/hhatto/autopep8) | MIT | Pipfile | test | bin | to automatically fix code style |
 
 ### Node.js dependencies
