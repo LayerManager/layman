@@ -5,27 +5,19 @@ from . import csw
 from layman.common.micka import util as common_util
 from layman import settings, LaymanError
 
-
 get_map_names = csw.get_map_names
-
 
 get_map_info = csw.get_map_info
 
-
 post_map = csw.post_map
-
 
 get_publication_names = csw.get_publication_names
 
-
 get_publication_uuid = csw.get_publication_uuid
-
 
 get_metadata_comparison = csw.get_metadata_comparison
 
-
 patch_map = csw.patch_map
-
 
 delete_map = csw.delete_map
 
@@ -43,5 +35,3 @@ def soap_insert(username, layername):
         current_app.logger.info(traceback.format_exc())
         raise LaymanError(38)
     return muuid
-
-

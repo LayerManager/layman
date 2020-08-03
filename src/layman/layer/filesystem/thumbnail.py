@@ -10,9 +10,7 @@ from . import util
 from layman.common.filesystem import util as common_util
 from . import input_file
 
-
 LAYER_SUBDIR = __name__.split('.')[-1]
-
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
@@ -44,9 +42,7 @@ def get_layer_info(username, layername):
 
 update_layer = input_file.update_layer
 
-
 get_publication_names = input_file.get_publication_names
-
 
 get_publication_uuid = input_file.get_publication_uuid
 
@@ -60,7 +56,7 @@ get_layer_names = input_file.get_layer_names
 
 def get_layer_thumbnail_path(username, layername):
     thumbnail_dir = get_layer_thumbnail_dir(username, layername)
-    return os.path.join(thumbnail_dir, layername+'.png')
+    return os.path.join(thumbnail_dir, layername + '.png')
 
 
 def generate_layer_thumbnail(username, layername):

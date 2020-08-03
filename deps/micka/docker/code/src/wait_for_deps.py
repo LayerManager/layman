@@ -22,7 +22,6 @@ PG_TEMPLATE_DBNAME = os.environ['PG_TEMPLATE_DBNAME']
 INIT_SQL_FILE_PATHS = os.environ['INIT_SQL_FILE_PATHS'].split(',')
 
 
-
 def main():
 
     attempt = 1
@@ -36,7 +35,7 @@ def main():
     while True:
         import psycopg2
         try:
-            with psycopg2.connect(**pg_conn_dict) as conn:
+            with psycopg2.connect(**pg_conn_dict):
                 pass
             print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
             break
@@ -44,8 +43,6 @@ def main():
             handle_exception(e, attempt, wait_for_msg)
             attempt += 1
     print()
-
-
 
     micka_conn_dict = PG_CONN.copy()
     dbname = micka_conn_dict['dbname']

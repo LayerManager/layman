@@ -11,7 +11,6 @@ from .filesystem import input_file, thumbnail
 from layman.authn import authenticate
 from layman.authz import authorize
 
-
 bp = Blueprint('rest_map', __name__)
 
 
@@ -74,7 +73,7 @@ def patch(username, mapname):
             file.filename
         )
         input_file.save_map_files(
-                username, mapname, [file])
+            username, mapname, [file])
 
     file_changed = file is not None
     kwargs = {
@@ -116,4 +115,3 @@ def delete_map(username, mapname):
         'url': info['url'],
         'uuid': info['uuid'],
     }), 200
-

@@ -18,6 +18,7 @@ def test_get_main_file_name():
     ]
     assert get_main_file_name(filenames) == 'tmp/countries_lakes.geojson'
 
+
 def test_get_main_file_name_shp():
     filenames = [
         'tmp/countries.cpg',

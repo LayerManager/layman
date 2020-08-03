@@ -16,5 +16,3 @@ def read_clients_dict_from_env():
         })
         idx += 1
     return client_dicts
-
-

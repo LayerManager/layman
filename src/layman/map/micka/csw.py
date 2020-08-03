@@ -20,7 +20,6 @@ from layman.layer.micka.csw import get_layer_info as csw_get_layer_info
 from layman.util import url_for, USERNAME_ONLY_PATTERN
 from lxml import etree as ET
 
-
 PATCH_MODE = patch_mode.NO_DELETE
 
 
@@ -106,7 +105,8 @@ def patch_map(username, mapname, metadata_properties_to_refresh=None):
     }
     # current_app.logger.info(f"update_map prop_values={prop_values}")
     basic_template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), './record-template.xml')
-    el = common_util.fill_xml_template_obj(el, prop_values, METADATA_PROPERTIES, basic_template_path=basic_template_path)
+    el = common_util.fill_xml_template_obj(el, prop_values, METADATA_PROPERTIES,
+                                           basic_template_path=basic_template_path)
     record = ET.tostring(el, encoding='unicode', pretty_print=True)
     # current_app.logger.info(f"update_map record=\n{record}")
     try:
@@ -392,14 +392,16 @@ METADATA_PROPERTIES = {
         'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link" and gmd:CI_OnlineResource/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue="information"]',
         'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
-        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='WWW:LINK-1.0-http--link', online_function='information'),
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='WWW:LINK-1.0-http--link',
+                                           online_function='information'),
     },
     'map_file_endpoint': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
         'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link" and gmd:CI_OnlineResource/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue="download"]',
         'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
         'xpath_extract_fn': lambda l: l[0] if l else None,
-        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='WWW:LINK-1.0-http--link', online_function='download'),
+        'adjust_property_element': partial(common_util.adjust_online_url, resource_protocol='WWW:LINK-1.0-http--link',
+                                           online_function='download'),
     },
 }
 

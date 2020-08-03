@@ -3,7 +3,6 @@ from layman import settings
 from layman.util import get_usernames_no_cache
 from . import filesystem
 
-
 REDIS_ISSID_SUB_2_USERNAME_KEY = f"{__name__}:ISSID_SUB_2_USERNAME:{{iss_id}}:{{sub}}"
 
 
@@ -37,5 +36,4 @@ def import_authn_to_redis():
         sub = authn_info['sub']
         save_username_reservation(username, iss_id, sub)
         current_app.logger.info(
-                            f'Import authn into redis: username {username}, iss_id {iss_id}, sub {sub}')
-
+            f'Import authn into redis: username {username}, iss_id {iss_id}, sub {sub}')

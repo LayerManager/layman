@@ -7,6 +7,7 @@ import pytest
 from flask import url_for, Blueprint, jsonify, g, request
 
 import sys
+
 del sys.modules['layman']
 
 from layman.layer import LAYER_TYPE
@@ -16,7 +17,6 @@ from layman import uuid
 from .oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
 from .oauth2 import liferay
 from test.mock.liferay import run
-
 
 LIFERAY_PORT = 8020
 
@@ -263,9 +263,9 @@ def test_authn_get_current_user_without_username(client):
     assert {'authenticated', 'claims'} == set(resp_json.keys())
     claims = resp_json['claims']
     assert {
-               'email', 'email_verified', 'family_name', 'given_name', 'iss', 'middle_name', 'name',
-               'preferred_username', 'sub', 'updated_at'
-           } == set(claims.keys())
+        'email', 'email_verified', 'family_name', 'given_name', 'iss', 'middle_name', 'name',
+        'preferred_username', 'sub', 'updated_at'
+    } == set(claims.keys())
     assert claims['email'] == 'test@liferay.com'
     assert claims['email_verified'] is True
     assert claims['family_name'] == 'Test'
@@ -286,8 +286,8 @@ def test_get_current_user_anonymous(client):
     assert {'authenticated', 'claims'} == set(resp_json.keys())
     claims = resp_json['claims']
     assert {
-               'iss', 'name', 'nickname'
-           } == set(claims.keys())
+        'iss', 'name', 'nickname'
+    } == set(claims.keys())
     assert claims['name'] == 'Anonymous'
     assert claims['nickname'] == 'Anonymous'
 
@@ -421,5 +421,3 @@ def test_patch_current_user_without_username(client):
         access_rights = resp_json['groups']
         assert {'guest'} == set(access_rights.keys())
         assert access_rights['guest'] == 'w'
-
-

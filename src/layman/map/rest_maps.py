@@ -12,8 +12,8 @@ from layman.authn import authenticate
 from layman.authz import authorize
 from layman.common import redis as redis_util
 
-
 bp = Blueprint('rest_maps', __name__)
+
 
 @bp.before_request
 @authenticate
@@ -85,25 +85,25 @@ def post(username):
             'name': mapname,
             'url': mapurl,
         }
-    
+
         # register map uuid
         uuid_str = uuid.assign_map_uuid(username, mapname)
         map_result.update({
             'uuid': uuid_str,
         })
-    
+
         file = FileStorage(
             io.BytesIO(json.dumps(file_json).encode()),
             file.filename
         )
         input_file.save_map_files(
-                username, mapname, [file])
-    
+            username, mapname, [file])
+
         kwargs = {
             'title': title,
             'description': description,
         }
-    
+
         util.post_map(
             username,
             mapname,
@@ -120,4 +120,3 @@ def post(username):
 
     # app.logger.info('uploaded map '+mapname)
     return jsonify([map_result]), 200
-

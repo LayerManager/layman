@@ -30,5 +30,3 @@ def get_authn_info(username):
     else:
         result = {}
     return result
-
-

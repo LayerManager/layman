@@ -126,5 +126,3 @@ def get():
     result.update(token_2_profile[access_token])
 
     return jsonify(result), 200
-
-

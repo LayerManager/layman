@@ -13,14 +13,14 @@ from flask import current_app, request, g
 
 from layman import LaymanError
 from layman import settings
-from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, to_safe_name, url_for
+from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, \
+    to_safe_name, url_for
 from layman import celery as celery_util
 from . import get_map_sources, MAP_TYPE, get_map_type_def
 from .filesystem import input_file
 from .micka.csw import map_json_to_operates_on, map_json_to_epsg_codes
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common import metadata as common_md
-
 
 MAPNAME_RE = USERNAME_RE
 
@@ -39,6 +39,7 @@ def check_mapname_decorator(f):
         check_mapname(request.view_args['mapname'])
         result = f(*args, **kwargs)
         return result
+
     return decorated_function
 
 
@@ -53,13 +54,14 @@ def info_decorator(f):
         g.setdefault(FLASK_INFO_KEY, info)
         result = f(*args, **kwargs)
         return result
+
     return decorated_function
 
 
 def check_mapname(mapname):
     if not re.match(MAPNAME_RE, mapname):
-        raise LaymanError(2, {'parameter': 'mapname', 'expected':
-            MAPNAME_RE})
+        raise LaymanError(2, {'parameter': 'mapname',
+                              'expected': MAPNAME_RE})
 
 
 def get_sources():
@@ -105,7 +107,7 @@ def get_map_info(username, mapname):
 
     failed = False
     for res in last_task['by_order']:
-        task_name = next(k for k,v in last_task['by_name'].items() if v == res)
+        task_name = next(k for k, v in last_task['by_name'].items() if v == res)
         source_state = {
             'status': res.state if not failed else 'NOT_AVAILABLE'
         }
@@ -254,7 +256,6 @@ def get_groups_info(username, mapname):
 
 
 lock_decorator = redis_util.create_lock_decorator(MAP_TYPE, 'mapname', 29, is_map_task_ready)
-
 
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, MAP_TYPE)
 

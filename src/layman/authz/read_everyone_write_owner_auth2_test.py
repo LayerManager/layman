@@ -7,6 +7,7 @@ import pytest
 from flask import url_for
 
 import sys
+
 del sys.modules['layman']
 
 from layman.layer import LAYER_TYPE
@@ -16,7 +17,6 @@ from layman import uuid
 from layman.authn.oauth2_test import liferay_mock, active_token_introspection_url, user_profile_url
 from layman.authn.oauth2 import liferay
 from layman.authn.oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
-
 
 num_layers_before_test = 0
 
@@ -70,7 +70,7 @@ def app_context():
 def test_anonymous_get_access(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username))
-    assert rv.status_code==200
+    assert rv.status_code == 200
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 0
     })
@@ -207,9 +207,9 @@ def test_authn_map_access_rights(client):
     # test non-owner access
     with app.app_context():
         rv = client.patch(url_for('rest_map.patch', username=username, mapname=mapname), headers={
-                f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-                f'{TOKEN_HEADER}': 'Bearer test3',
-            }, data={
+            f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+            f'{TOKEN_HEADER}': 'Bearer test3',
+        }, data={
             'title': 'abcd',
         })
         assert rv.status_code == 403

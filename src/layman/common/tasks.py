@@ -55,5 +55,3 @@ def _get_task_signature(username, publ_name, task, task_options, publ_param_name
         queue=settings.LAYMAN_CELERY_QUEUE,
         immutable=True,
     )
-
-

@@ -14,7 +14,6 @@ from layman import settings, patch_mode
 from . import headers_json
 from . import wms
 
-
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
@@ -24,10 +23,10 @@ def update_layer(username, layername, layerinfo):
 
 def delete_layer(username, layername):
     style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                    username + '/styles/' + layername)
+                        username + '/styles/' + layername)
     r = requests.get(style_url + '.sld',
-        auth=settings.LAYMAN_GS_AUTH
-    )
+                     auth=settings.LAYMAN_GS_AUTH
+                     )
     if r.status_code == 404:
         return {}
     else:
@@ -35,13 +34,13 @@ def delete_layer(username, layername):
     sld_file = io.BytesIO(r.content)
 
     r = requests.delete(style_url,
-        headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH,
-        params = {
-            'purge': 'true',
-            'recurse': 'true',
-        }
-    )
+                        headers=headers_json,
+                        auth=settings.LAYMAN_GS_AUTH,
+                        params={
+                            'purge': 'true',
+                            'recurse': 'true',
+                        }
+                        )
     if r.status_code == 404:
         return {}
     else:
@@ -131,8 +130,8 @@ def create_layer_style(username, layername):
     sld_file.seek(0)
 
     r = requests.put(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username +
-                '/styles/' + layername),
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                username + '/styles/' + layername),
         data=sld_file.read(),
         headers={
             'Accept': 'application/json',
@@ -143,22 +142,20 @@ def create_layer_style(username, layername):
     if r.status_code == 400:
         raise LaymanError(14, data=r.text)
     r.raise_for_status()
-    r = requests.put(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username +
-                '/layers/' + layername),
-        data=json.dumps(
-            {
-                "layer": {
-                    "defaultStyle": {
-                        "name": username + ':' + layername,
-                        "workspace": username,
-                    },
-                }
-            }
-        ),
-        headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH
-    )
+    r = requests.put(urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                             username + '/layers/' + layername),
+                     data=json.dumps(
+                         {
+                             "layer": {
+                                 "defaultStyle": {
+                                     "name": username + ':' + layername,
+                                     "workspace": username,
+                                 },
+                             }
+                         }),
+                     headers=headers_json,
+                     auth=settings.LAYMAN_GS_AUTH
+                     )
     # app.logger.info(r.text)
     r.raise_for_status()
 

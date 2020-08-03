@@ -15,6 +15,7 @@ def authorize(f):
         authz_module = get_authz_module()
         call_modules_fn([authz_module], 'authorize')
         return f(*args, **kwargs)
+
     return decorated_function
 
 
@@ -28,5 +29,3 @@ def get_authz_module():
 def get_publication_access_rights(publ_type, username, publication_name):
     authz_module = get_authz_module()
     return authz_module.get_publication_access_rights(publ_type, username, publication_name)
-
-

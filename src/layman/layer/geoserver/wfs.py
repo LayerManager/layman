@@ -16,7 +16,6 @@ from layman.layer.util import is_layer_task_ready
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
 
-
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = '2.0.0'
 
@@ -41,13 +40,13 @@ def update_layer(username, layername, layerinfo):
             "string": keywords
         },
     }
-    ftype = {k:v for k,v in ftype.items() if v is not None}
+    ftype = {k: v for k, v in ftype.items() if v is not None}
     body = {
         "featureType": ftype
     }
     r = requests.put(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                username + '/datastores/postgresql/featuretypes/'+layername),
+                username + '/datastores/postgresql/featuretypes/' + layername),
         data=json.dumps(body),
         headers=headers_json,
         auth=settings.LAYMAN_GS_AUTH
@@ -63,7 +62,7 @@ def delete_layer(username, layername):
                 username + '/datastores/postgresql/featuretypes/' + layername),
         headers=headers_json,
         auth=settings.LAYMAN_GS_AUTH,
-        params = {
+        params={
             'recurse': 'true'
         }
     )
@@ -91,6 +90,7 @@ def get_wfs_proxy(username):
     key = get_flask_proxy_key(username)
 
     ows_url = get_wfs_url(username)
+
     def create_string_value():
         r = requests.get(ows_url, params={
             'SERVICE': 'WFS',

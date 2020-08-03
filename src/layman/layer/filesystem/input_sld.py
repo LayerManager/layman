@@ -7,9 +7,7 @@ from layman import patch_mode
 from . import util
 from . import input_file
 
-
 LAYER_SUBDIR = __name__.split('.')[-1]
-
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
@@ -28,15 +26,11 @@ def ensure_layer_input_sld_dir(username, layername):
 
 get_layer_info = input_file.get_layer_info
 
-
 get_layer_names = input_file.get_layer_names
-
 
 update_layer = input_file.update_layer
 
-
 get_publication_names = input_file.get_publication_names
-
 
 get_publication_uuid = input_file.get_publication_uuid
 
@@ -47,7 +41,7 @@ def delete_layer(username, layername):
 
 def get_file_path(username, layername):
     input_sld_dir = get_layer_input_sld_dir(username, layername)
-    return os.path.join(input_sld_dir, layername+'.sld')
+    return os.path.join(input_sld_dir, layername + '.sld')
 
 
 def save_layer_file(username, layername, sld_file):

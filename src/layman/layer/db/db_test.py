@@ -4,6 +4,7 @@ import pytest
 import time
 
 import sys
+
 del sys.modules['layman']
 
 from layman import app as layman, settings
@@ -128,7 +129,7 @@ def test_abort_import_layer_vector_file(client):
     layername = 'ne_10m_admin_0_countries'
     src_dir = 'tmp/naturalearth/10m/cultural'
     input_file_dir = ensure_layer_input_file_dir(username, layername)
-    filename = layername+'.geojson'
+    filename = layername + '.geojson'
     main_filepath = os.path.join(input_file_dir, filename)
 
     crs_id = None
@@ -139,10 +140,10 @@ def test_abort_import_layer_vector_file(client):
 
     def abort_layer_import():
         p = db.import_layer_vector_file_async(username, layername, main_filepath,
-                                        crs_id)
+                                              crs_id)
         time1 = time.time()
         while p.poll() is None:
-            if(time.time()-time1 > 0.1):
+            if (time.time() - time1 > 0.1):
                 # print('terminating process')
                 p.terminate()
             time.sleep(0.1)
@@ -165,7 +166,7 @@ def test_data_language(client, boundary_table):
     text_data, num_rows = db.get_text_data(username, layername)
     # print(f"num_rows={num_rows}")
     assert len(text_data) == 1
-    assert text_data[0].startswith(' '.join(['International boundary (verify)']*100))
+    assert text_data[0].startswith(' '.join(['International boundary (verify)'] * 100))
     langs = db.get_text_languages(username, layername)
     assert langs == ['eng']
 
@@ -236,7 +237,6 @@ def test_data_language_countries(country_table):
     ])
 
 
-
 def test_data_language_countries2(country110m_table):
     username, layername = country110m_table
     # print(f"username={username}, layername={layername}")
@@ -247,7 +247,8 @@ def test_data_language_countries2(country110m_table):
     assert set(langs) == set(['eng'])
 
 
-def test_get_most_frequent_lower_distance(client, country110m_table, country50m_table, country10m_table, data200road_table, sm5building_table):
+def test_get_most_frequent_lower_distance(client, country110m_table, country50m_table, country10m_table,
+                                          data200road_table, sm5building_table):
     username, layername_110m = country110m_table
     username, layername_50m = country50m_table
     username, layername_10m = country10m_table

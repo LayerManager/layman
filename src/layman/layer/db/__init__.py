@@ -8,7 +8,6 @@ from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
 
-
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 
 
@@ -19,6 +18,7 @@ def create_connection_cursor():
         raise LaymanError(6)
     cursor = connection.cursor()
     return (connection, cursor)
+
 
 def get_connection_cursor():
     key = FLASK_CONN_CUR_KEY
@@ -36,14 +36,14 @@ def get_usernames(conn_cur=None):
     try:
         cur.execute(f"""select schema_name
     from information_schema.schemata
-    where schema_name NOT IN ('{"', '".join(settings.PG_NON_USER_SCHEMAS)}') AND schema_owner = '{settings.LAYMAN_PG_USER}'""")
+    where schema_name NOT IN ('{"', '".join(settings.PG_NON_USER_SCHEMAS)}\
+') AND schema_owner = '{settings.LAYMAN_PG_USER}'""")
     except:
         raise LaymanError(7)
     rows = cur.fetchall()
     return [
         r[0] for r in rows
     ]
-
 
 
 def check_username(username, conn_cur=None):
@@ -62,7 +62,8 @@ def check_username(username, conn_cur=None):
         raise LaymanError(7)
     rows = cur.fetchall()
     if len(rows) > 0:
-        raise LaymanError(35, {'reserved_by': __name__, 'schema': username, 'reason': 'DB schema owned by another than layman user'})
+        raise LaymanError(35, {'reserved_by': __name__, 'schema': username,
+                               'reason': 'DB schema owned by another than layman user'})
 
 
 def ensure_user_workspace(username, conn_cur=None):
@@ -94,7 +95,7 @@ def delete_user_workspace(username, conn_cur=None):
 # def import_layer_vector_file(username, layername, main):
 def import_layer_vector_file(username, layername, main_filepath, crs_id):
     p = import_layer_vector_file_async(username, layername, main_filepath,
-                                    crs_id)
+                                       crs_id)
     while p.poll() is None:
         pass
     return_code = p.poll()
@@ -104,7 +105,7 @@ def import_layer_vector_file(username, layername, main_filepath, crs_id):
 
 
 def import_layer_vector_file_async(username, layername, main_filepath,
-                                    crs_id):
+                                   crs_id):
     # import file to database table
     import subprocess
     pg_conn = ' '.join([f"{k}='{v}'" for k, v in settings.PG_CONN.items()])
@@ -162,8 +163,8 @@ def get_text_column_names(username, layername, conn_cur=None):
     try:
         cur.execute(f"""
 SELECT QUOTE_IDENT(column_name) AS column_name
-FROM information_schema.columns 
-WHERE table_schema = '{username}' 
+FROM information_schema.columns
+WHERE table_schema = '{username}'
 AND table_name = '{layername}'
 AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 """)
@@ -195,7 +196,7 @@ def get_text_data(username, layername, conn_cur=None):
     num_features = get_number_of_features(username, layername, conn_cur=conn_cur)
     if num_features == 0:
         return None
-    limit = max(100, num_features//10)
+    limit = max(100, num_features // 10)
     try:
         cur.execute(f"""
 select {', '.join(col_names)}
@@ -211,7 +212,7 @@ limit {limit}
         for idx in range(len(col_names)):
             col_name = col_names[idx]
             v = row[idx]
-            if v is not None and len(v)>0:
+            if v is not None and len(v) > 0:
                 col_texts[col_name].append(v)
     col_texts = [
         ' '.join(texts)
@@ -261,12 +262,12 @@ from (
    SELECT
     dump_id, ogc_fid, ST_ExteriorRing((ST_DumpRings(geometry)).geom) as geometry
   FROM t1
-	where st_geometrytype(geometry) = 'ST_Polygon'
+    where st_geometrytype(geometry) = 'ST_Polygon'
 ) union all (
    SELECT
     dump_id, ogc_fid, geometry
   FROM t1
-	where st_geometrytype(geometry) = 'ST_LineString'
+    where st_geometrytype(geometry) = 'ST_LineString'
 )
 ) sub_view
 order by ST_NPoints(geometry), ogc_fid, dump_id, ring_id
@@ -274,7 +275,8 @@ limit 5000
 )
 , t2cumsum as (
 select *, --ST_NPoints(geometry),
-  sum(ST_NPoints(geometry)) over (order by ST_NPoints(geometry), ogc_fid, dump_id, ring_id rows between unbounded preceding and current row) as cum_sum_points
+  sum(ST_NPoints(geometry)) over (order by ST_NPoints(geometry), ogc_fid, dump_id, ring_id
+                                  rows between unbounded preceding and current row) as cum_sum_points
 from t2
 )
 , t3 as (
@@ -297,7 +299,7 @@ from tdist
 )
 , tbounds as (
 select
-    --tstat.*, 
+    --tstat.*,
     ((p50-p10)/10)*tmode.idx+p10 as lower_bound
     , ((p50-p10)/10)*(tmode.idx+0.5)+p10 as middle
     , ((p50-p10)/10)*(tmode.idx+1)+p10 as upper_bound
@@ -332,7 +334,7 @@ limit 1
     result = None
     if len(rows) > 0:
         distance, freq, num_distances = rows[0]
-        if freq/num_distances > 0.03:
+        if freq / num_distances > 0.03:
             result = distance
     return result
 
@@ -360,7 +362,7 @@ def guess_scale_denominator(username, layername):
     log_sd_list = [math.log10(sd) for sd in SCALE_DENOMINATORS]
     if distance is not None:
         coef = 2000 if distance > 100 else 1000
-        log_dist = math.log10(distance*coef)
+        log_dist = math.log10(distance * coef)
         sd_log = min(log_sd_list, key=lambda x: abs(x - log_dist))
         sd_idx = log_sd_list.index(sd_log)
         sd = SCALE_DENOMINATORS[sd_idx]
@@ -394,12 +396,12 @@ from (
    SELECT
     dump_id, ogc_fid, ST_ExteriorRing((ST_DumpRings(geometry)).geom) as geometry
   FROM t1
-	where st_geometrytype(geometry) = 'ST_Polygon'
+    where st_geometrytype(geometry) = 'ST_Polygon'
 ) union all (
    SELECT
     dump_id, ogc_fid, geometry
   FROM t1
-	where st_geometrytype(geometry) = 'ST_LineString'
+    where st_geometrytype(geometry) = 'ST_LineString'
 )
 ) sub_view
 order by st_area(Box2D(geometry)), ogc_fid, dump_id, ring_id
@@ -407,7 +409,8 @@ limit 5000
 )
 , t2cumsum as (
 select *, --ST_NPoints(geometry),
-  sum(ST_NPoints(geometry)) over (order by ST_NPoints(geometry), ogc_fid, dump_id, ring_id rows between unbounded preceding and current row) as cum_sum_points
+  sum(ST_NPoints(geometry)) over (order by ST_NPoints(geometry), ogc_fid, dump_id, ring_id
+                                  rows between unbounded preceding and current row) as cum_sum_points
 from t2
 )
 , t3 as (
@@ -430,7 +433,7 @@ from tdist
 )
 , tbounds as (
 select
-    --tstat.*, 
+    --tstat.*,
     ((p50-p10)/10)*tmode.idx+p10 as lower_bound
     , ((p50-p10)/10)*(tmode.idx+0.5)+p10 as middle
     , ((p50-p10)/10)*(tmode.idx+1)+p10 as upper_bound
@@ -465,6 +468,6 @@ limit 1
     result = None
     if len(rows) > 0:
         distance, freq, num_distances = rows[0]
-        if freq/num_distances > 0.03:
+        if freq / num_distances > 0.03:
             result = distance
     return result

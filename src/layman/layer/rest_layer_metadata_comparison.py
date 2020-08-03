@@ -10,8 +10,8 @@ from .filesystem import thumbnail
 from layman.authn import authenticate
 from layman.authz import authorize
 
-
 bp = Blueprint('rest_layer_metadata_comparison', __name__)
+
 
 @bp.before_request
 @authenticate
@@ -30,5 +30,3 @@ def get(username, layername):
     md_props = util.get_metadata_comparison(username, layername)
 
     return jsonify(md_props), 200
-
-
