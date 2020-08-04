@@ -98,7 +98,6 @@ reset-data-directories:
 	docker-compose -f docker-compose.deps.yml rm -fsv
 	sudo rm -rf layman_data layman_data_test deps/*/data
 	mkdir -p layman_data layman_data_test tmp
-	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash /geoserver_code/reset-default-layman-datadir.sh
 
 clear-python-cache-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps layman_dev bash /code/src/clear-python-cache.sh
@@ -177,17 +176,12 @@ redis-cli-client-test-db:
 redis-cli-client-standalone-db:
 	docker-compose -f docker-compose.deps.yml exec redis redis-cli -h redis -p 6379 -n 14
 
-geoserver-reset-default-layman-datadir:
-	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash /geoserver_code/reset-default-layman-datadir.sh
-
-geoserver-reset-restart:
-	docker-compose -f docker-compose.deps.yml rm -fsv geoserver
-	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash /geoserver_code/reset-default-layman-datadir.sh
-	docker-compose -f docker-compose.deps.yml up --no-deps -d geoserver
-
 geoserver-restart:
 	docker-compose -f docker-compose.deps.yml rm -fsv geoserver
 	docker-compose -f docker-compose.deps.yml up --no-deps -d geoserver
+
+geoserver-build:
+	docker-compose -f docker-compose.deps.yml build geoserver
 
 geoserver-reset-empty-datadir:
 	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash /geoserver_code/reset-empty-datadir.sh

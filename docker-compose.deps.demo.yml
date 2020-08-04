@@ -21,12 +21,12 @@ services:
       volumes:
         - ./deps/geoserver/data:/opt/geoserver/data_dir
         - ./deps/geoserver/docker/code:/geoserver_code
-        - ./deps/geoserver/sample:/geoserver_sample
         - ./deps/geoserver/tmp:/geoserver_tmp
       restart: on-failure
       environment:
         - GS_VERSION=2.13.0
       env_file:
+        - .env
         - deps/geoserver/docker/.env
       depends_on:
         - postgresql

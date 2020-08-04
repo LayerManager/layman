@@ -51,10 +51,11 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
         'Accept': 'application/json',
         'Content-type': 'application/json',
     }
+    auth = settings.GEOSERVER_ADMIN_AUTH or settings.LAYMAN_GS_AUTH
     r = requests.get(
         settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
         headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH
+        auth=auth
     )
     r.raise_for_status()
     all_rules = r.json()

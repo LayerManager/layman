@@ -3,7 +3,7 @@ import re
 from urllib.parse import urljoin
 
 import requests
-from flask import g, current_app
+from flask import g, current_app as app
 
 from layman.http import LaymanError
 from layman import settings
@@ -31,8 +31,10 @@ def get_all_workspaces():
             auth=settings.LAYMAN_GS_AUTH
         )
         r.raise_for_status()
-        # app.logger.info(r.text)
-        all_workspaces = r.json()['workspaces']['workspace']
+        if r.json()['workspaces'] == "":
+            all_workspaces = []
+        else:
+            all_workspaces = r.json()['workspaces']['workspace']
         g.setdefault(key, all_workspaces)
 
     return g.get(key)

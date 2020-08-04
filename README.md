@@ -55,12 +55,10 @@ There are following ways how to run Layman:
 
 ## Run demo
 This is the easiest way how to start layman for demonstration purposes. It includes also [external dependencies](#dependencies). However it's not meant for production and it's **not safe** for production. Performance might be also an issue.
+
 ```bash
 # use demo settings
 cp .env.demo .env
-
-# prepare GeoServer data directory with appropriate configuration for Layman
-make geoserver-reset-default-layman-datadir
 
 # start dockerized containers in background
 make start-demo-full
@@ -136,7 +134,7 @@ When providing **external dependencies**, check their production-related documen
 
 Within PostgreSQL, you need to provide one database for Layman and one database for Micka. For Layman, you also need to provide one user [LAYMAN_PG_USER](doc/env-settings.md#LAYMAN_PG_USER) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME) database. The user also needs access to `public` schema where PostGIS must be installed.
 
-Within GeoServer, you need to provide one Layman user [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and one layman role [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE).
+Within GeoServer, you need to provide either admin password [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD), or one Layman user [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and one layman role [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE). If admin password is provided, Layman will create the Layman user and the Layman role automatically.
 
 Within Redis, you need to provide two databases, one for Layman, second for Layman Test Client. Connection strings are defined by [LAYMAN_REDIS_URL](doc/env-settings.md#LAYMAN_REDIS_URL) and [LTC_REDIS_URL](doc/env-settings.md#LTC_REDIS_URL).
 
@@ -179,9 +177,6 @@ Before the first run:
 ```bash
 # use dev settings
 cp .env.dev .env
-
-# prepare geoserver data directory
-make geoserver-reset-default-layman-datadir
 
 ```
 
