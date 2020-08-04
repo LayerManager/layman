@@ -56,7 +56,8 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
                 ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN')
                 ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE)
             ensure_wms_srs_list([int(srs.split(':')[1]) for srs in settings.INPUT_SRS_LIST])
-            ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL)
+            if settings.LAYMAN_GS_PROXY_BASE_URL != '':
+                ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL)
 
         app.logger.info(f'Loading Redis database')
         with app.app_context():

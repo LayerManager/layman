@@ -127,8 +127,7 @@ LAYMAN_CLIENT_PUBLIC_URL = os.environ['LAYMAN_CLIENT_PUBLIC_URL']
 LAYMAN_SERVER_NAME = os.environ['LAYMAN_SERVER_NAME']
 LAYMAN_PROXY_SERVER_NAME = os.environ['LAYMAN_PROXY_SERVER_NAME']
 
-# if port number is set, we expect it's test or dev environment, otherwise it's demo or production
-LAYMAN_GS_PROXY_BASE_URL = urljoin(LAYMAN_CLIENT_PUBLIC_URL, LAYMAN_GS_PATH) if urlparse(LAYMAN_CLIENT_PUBLIC_URL).port is None else 'http://localhost:8600/geoserver/'
+LAYMAN_GS_PROXY_BASE_URL = os.getenv('LAYMAN_GS_PROXY_BASE_URL', urljoin(LAYMAN_CLIENT_PUBLIC_URL, LAYMAN_GS_PATH))
 
 CSW_URL = os.getenv('CSW_URL', None)
 CSW_PROXY_URL = os.getenv('CSW_PROXY_URL', None)
