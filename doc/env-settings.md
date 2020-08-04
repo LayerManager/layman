@@ -136,7 +136,7 @@ Password of [LAYMAN_GS_USER](#LAYMAN_GS_USER).
 Name of [GeoServer role](https://docs.geoserver.org/stable/en/user/security/webadmin/ugr.html#edit-role-service) of [LAYMAN_GS_USER](#LAYMAN_GS_USER). The role is used to create explicit [access rule](https://docs.geoserver.org/stable/en/user/security/layer.html) for all layers published by Layman. The LAYMAN_GS_ROLE must be another role than default [`ADMIN`](https://docs.geoserver.org/stable/en/user/security/usergrouprole/roleservices.html#mapping-roles-to-system-roles) role (defined by `adminRoleName`)! The role will be created automatically if [GEOSERVER_ADMIN_PASSWORD](#GEOSERVER_ADMIN_PASSWORD) is provided.
  
 ### LAYMAN_GS_PROXY_BASE_URL
-GeoServer [Proxy Base URL](https://docs.geoserver.org/stable/en/user/configuration/globalsettings.html). It is automatically set on Layman's startup. If you do not set the variable, value is calculated as [LAYMAN_CLIENT_PUBLIC_URL](doc/env-settings.md#LAYMAN_CLIENT_PUBLIC_URL)+[LAYMAN_GS_PATH](doc/env-settings.md#LAYMAN_GS_PATH). If you set it to empty string, no change of Proxy Base URL will be done on GeoServer side.
+GeoServer [Proxy Base URL](https://docs.geoserver.org/stable/en/user/configuration/globalsettings.html). It is automatically set on Layman's startup. If you do not set the variable, value is calculated as [LAYMAN_CLIENT_PUBLIC_URL](#LAYMAN_CLIENT_PUBLIC_URL)+[LAYMAN_GS_PATH](#LAYMAN_GS_PATH). If you set it to empty string, no change of Proxy Base URL will be done on GeoServer side.
 
 ## Connection to Micka
 
