@@ -289,14 +289,14 @@ def test_post_maps_simple(client):
             map_info = client.get(url_for('rest_map.get', username=username,
                                           mapname=mapname)).get_json()
 
-        assert set(map_info['metadata'].keys()) == {'identifier', 'csw_url', 'record_url', 'comparison_url'}
-        assert map_info['metadata']['identifier'] == f"m-{uuid_str}"
-        assert map_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
-        md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
-        assert map_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
-        r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
-        r.raise_for_status()
-        assert mapname in r.text
+    assert set(map_info['metadata'].keys()) == {'identifier', 'csw_url', 'record_url', 'comparison_url'}
+    assert map_info['metadata']['identifier'] == f"m-{uuid_str}"
+    assert map_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
+    md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
+    assert map_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
+    r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
+    r.raise_for_status()
+    assert mapname in r.text
 
     expected_md_values = {
         'abstract': "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce.",
