@@ -65,6 +65,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
         result = {k: v for k, v in all_rules.items() if re.match(re_role, v)}
         return result
 
+    # TODO consider detecting rules (also) by roles of users with LAYMAN_GS_ROLE
     layman_rules = get_role_rules(all_rules, settings.LAYMAN_GS_ROLE)
     for rule in layman_rules:
         workspace = re.match(r"^([^.]+)\..*", rule).group(1)
@@ -85,6 +86,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
             auth=settings.LAYMAN_GS_AUTH,
         )
         r.raise_for_status()
+    # TODO delete also users with role LAYMAN_GS_ROLE except LAYMAN_GS_USER user (and roles associations, and roles equal to usename.upper() )
 
     # micka
     opts = {} if settings.CSW_BASIC_AUTHN is None else {

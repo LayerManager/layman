@@ -1,5 +1,7 @@
 import json
 import requests
+import secrets
+import string
 from urllib.parse import urljoin
 from flask import current_app as app
 from layman import settings
@@ -68,6 +70,12 @@ def ensure_user(user, password):
     user_exists = next((u for u in users if u['userName'] == user), None) is not None
     if not user_exists:
         app.logger.info(f"User {user} does not exist yet, creating.")
+        if password is None:
+            # generate random password
+            # https://stackoverflow.com/a/23728630
+            password = ''.join(secrets.choice(string.ascii_lowercase + string.digits) for _ in range(32))
+            # we usually don't want to log passwords
+            # app.logger.info(f"User {user}'s automatically generated password is {password}")
         r = requests.post(
             settings.LAYMAN_GS_REST_USERS,
             # TODO https://osgeo-org.atlassian.net/browse/GEOS-8486
@@ -87,6 +95,10 @@ def ensure_user(user, password):
         app.logger.info(f"User {user} already exists")
     user_created = not user_exists
     return user_created
+
+
+def username_to_rolename(username):
+    return f"USER_{username.upper()}"
 
 
 def delete_user(user):

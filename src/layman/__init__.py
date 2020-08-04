@@ -68,6 +68,13 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
 
             import_authn_to_redis()
         settings.LAYMAN_REDIS.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
+
+        app.logger.info(f'Ensuring users')
+        from .util import ensure_user, get_usernames
+        with app.app_context():
+            for username in get_usernames():
+                app.logger.info(f'Ensuring user {username}')
+                ensure_user(username)
     else:
         while(settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done'):
             app.logger.info(f'Waiting for flask process to adjust dependencies')

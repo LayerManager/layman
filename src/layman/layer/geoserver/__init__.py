@@ -7,6 +7,7 @@ from flask import g, current_app as app
 
 from layman.http import LaymanError
 from layman import settings
+from layman.common import geoserver as common
 
 FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
 FLASK_RULES_KEY = f"{__name__}:RULES"
@@ -62,6 +63,7 @@ def check_username(username):
         raise LaymanError(35, {'reserved_by': __name__, 'workspace': username})
     non_layman_workspaces = get_non_layman_workspaces()
     if any(ws['name'] == username for ws in non_layman_workspaces):
+        # TODO maybe rephrase the reason
         raise LaymanError(35, {'reserved_by': __name__, 'reason': 'GeoServer workspace not assigned to LAYMAN_GS_ROLE'})
 
 
@@ -77,6 +79,7 @@ def ensure_user_workspace(username):
         r.raise_for_status()
         r = requests.post(
             settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
+            # TODO consider using user's role instead of settings.LAYMAN_GS_ROLE
             data=json.dumps(
                 {username + '.*.r': settings.LAYMAN_GS_ROLE + ',ROLE_ANONYMOUS'}),
             headers=headers_json,
@@ -160,6 +163,23 @@ def delete_user_db_store(username):
         r.raise_for_status()
 
 
+def ensure_user(username):
+    common.ensure_user(username, None)
+    role = common.username_to_rolename(username)
+    common.ensure_role(role)
+    common.ensure_user_role(username, role)
+    common.ensure_user_role(username, settings.LAYMAN_GS_ROLE)
+    # raise Exception('Not yet implemented')
+
+
+def delete_user(username):
+    role = common.username_to_rolename(username)
+    common.delete_user_role(username, role)
+    common.ensure_user_role(username, settings.LAYMAN_GS_ROLE)
+    common.delete_role(role)
+    common.delete_user(username)
+
+
 def publish_layer_from_db(username, layername, description, title):
     keywords = [
         "features",
@@ -201,6 +221,7 @@ def publish_layer_from_db(username, layername, description, title):
 
 
 def get_layman_rules(all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
+    # TODO consider detecting rules (also) by roles of users with LAYMAN_GS_ROLE
     if all_rules == None:
         all_rules = get_all_rules()
     re_role = r".*\b" + re.escape(layman_role) + r"\b.*"

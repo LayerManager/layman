@@ -99,6 +99,16 @@ def delete_user_workspace(username):
     call_modules_fn(providers, 'delete_user_workspace', [username])
 
 
+def ensure_user(username):
+    providers = get_internal_providers()
+    call_modules_fn(providers, 'ensure_user', [username])
+
+
+def delete_user(username):
+    providers = get_internal_providers()
+    call_modules_fn(providers, 'delete_user', [username])
+
+
 def get_internal_providers():
     key = FLASK_PROVIDERS_KEY
     if key not in current_app.config:

@@ -92,6 +92,14 @@ def delete_user_workspace(username, conn_cur=None):
         raise LaymanError(7)
 
 
+def ensure_user(username):
+    pass
+
+
+def delete_user(username):
+    pass
+
+
 # def import_layer_vector_file(username, layername, main):
 def import_layer_vector_file(username, layername, main_filepath, crs_id):
     p = import_layer_vector_file_async(username, layername, main_filepath,

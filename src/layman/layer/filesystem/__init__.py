@@ -9,5 +9,13 @@ def check_username(username):
     pass
 
 
+def ensure_user(username):
+    pass
+
+
+def delete_user(username):
+    pass
+
+
 def check_new_layername(username, layername):
     pass
