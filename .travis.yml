@@ -46,6 +46,23 @@ matrix:
         global:
           secure: rxRvrkqIGE67Okn6kDLqoWc6ysMk+SJIEec3hMIDSFcQeN1GXdwB5pyhQ1hS6WrZXfPVi2Z9zZxTFbRlUuxjAc+BznvKlaksAnCVWWKFrkgVXafqjtio3EJfk4x7Zb5rVthU+HSfY8zABtNQ7rrLcX7As6jdURHNZv6shwksPvLIYLOi5Tu1aUist7nfM/HOs49zJDd2GAGpR1AH5TYhzsoL2jILJ0BK7WT1KRRA93imAyRJppE9kf7MRkE8pq++24XY1nkW22nh1e5DhMPDgERIBIeiT7lvAt5/mhT3pbzHB0+cevIwRttoh5oxiAyO5sKed9HP4Nq9PvYOXkzMkk7J0zydsOf7M9xq64PqSUicyEBoqG7RcFoeDxyoMX363C7+/nfbfju7fn1cq1wle15KHPzwDGweUp3ulLM8nzuFEN+rUhIfrTYXT5DRmVjI50+uBkBFkS/m1FcU8qkxNlcFRCD/W8qeRNb8DLbQhQcQDEyP+cKvzxut+hdYcZGsuT9Mu7X1y7+R4dWXxuAGp9EK6hF4nzNMUTFO401mEkFTcEcXSyYjIWMI54nwQ/QLripIzNWi2zqGBl8l/pgqjB0rZDl74omB4WVslPCjbeNW7lA/LLL5J+JqcqDkBBLiwEVvOK1ucN/gPLMSZLhCCs47dBuZsQ54oLtt5Lngw+Y=
 
+    - name: "Remark check"
+      language: node_js
+
+      sudo: required
+
+      dist: trusty
+
+      node_js:
+        - "11"
+
+      services:
+      - docker
+
+      script:
+      - npm install --global remark-cli remark-validate-links remark-lint-no-dead-urls
+      - remark --frail *.md */*.md */*/*.md
+
     - name: "Flake 8 syntax errors"
       language: python
 
