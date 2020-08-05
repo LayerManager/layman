@@ -208,7 +208,7 @@ def ensure_proxy_base_url(proxy_base_url):
     current_url = get_proxy_base_url(global_settings=global_settings)
     url_equals = proxy_base_url == current_url
     if not url_equals:
-        global_settings['settings']['proxyBaseUrl'] = proxy_base_url,
+        global_settings['settings']['proxyBaseUrl'] = proxy_base_url
         app.logger.info(f"Current Proxy Base URL {current_url} not equals to requested {proxy_base_url}, changing.")
         r_url = settings.LAYMAN_GS_REST_SETTINGS
         r = requests.put(
