@@ -47,19 +47,16 @@ matrix:
     - name: "Remark check"
       language: node_js
 
-      sudo: required
-
       dist: trusty
 
       node_js:
         - "11"
 
-      services:
-      - docker
+      install:
+        - npm install --global remark-cli remark-validate-links remark-lint-no-dead-urls
 
       script:
-      - npm install --global remark-cli remark-validate-links remark-lint-no-dead-urls
-      - make remark
+        - make remark
 
     - name: "Flake 8 syntax errors"
       language: python
