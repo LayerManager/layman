@@ -61,7 +61,7 @@ matrix:
 
       script:
       - npm install --global remark-cli remark-validate-links remark-lint-no-dead-urls
-      - remark --frail *.md */*.md */*/*.md
+      - make remark
 
     - name: "Flake 8 syntax errors"
       language: python
