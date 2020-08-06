@@ -110,7 +110,7 @@ To enable OAuth2 authentication in Layman, adjust following [environment setting
 - [OAUTH2_LIFERAY_TOKEN_URL](../env-settings.md#OAUTH2_LIFERAY_TOKEN_URL)
 - [OAUTH2_LIFERAY_CALLBACK_URL](../env-settings.md#OAUTH2_LIFERAY_CALLBACK_URL)
 
-Sample values for OAuth2 authentication can be found in [`layman_settings_dev.py`](../../src/layman_settings_dev.py).
+Sample values for OAuth2 authentication can be found in [`layman_settings.py`](../../src/layman_settings.py).
 
 ### Liferay Settings
 Every *client* must be registered in Liferay as *application*, as described in [Liferay documentation](https://portal.liferay.dev/docs/7-1/deploy/-/knowledge_base/d/oauth-2-0#creating-an-application). For LTC, fill in following settings:
