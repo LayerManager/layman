@@ -97,7 +97,6 @@ Files at all three levels are suffixed with strings that indicates what they are
 
 When you are switching between different contexts (e.g. between demo and dev), always check that you are using settings intended for your context, especially
 - `.env*` file (check `env_file` properties in `docker-compose.*.yml` file)
-- `layman_settings*` file (check [LAYMAN_SETTINGS_MODULE](doc/env-settings.md#LAYMAN_SETTINGS_MODULE) environment variable in `env*` file)
 
 Also, anytime you change `.env` file, remember to rebuild docker images as some environment variables affect build stage of docker images. Particularly these environment settings:
 - [UID_GID](doc/env-settings.md#UID_GID)

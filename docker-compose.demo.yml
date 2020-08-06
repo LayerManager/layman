@@ -18,7 +18,7 @@ services:
          - ${EXTRA_HOST2}
       volumes:
         - ./layman_data:/layman_data
-        - ./src/layman_settings_demo.py:/code/src/layman_settings.py
+        - ./src/layman_settings.py:/code/src/layman_settings.py
       depends_on:
         - timgen
         - layman_client
@@ -39,7 +39,7 @@ services:
          - ${EXTRA_HOST2}
       volumes:
         - ./layman_data:/layman_data
-        - ./src/layman_settings_demo.py:/code/src/layman_settings.py
+        - ./src/layman_settings.py:/code/src/layman_settings.py
       depends_on:
         - layman
 
@@ -56,7 +56,7 @@ services:
          - ${EXTRA_HOST2}
       volumes:
         - ./layman_data:/layman_data
-        - ./src/layman_settings_demo.py:/code/src/layman_settings.py
+        - ./src/layman_settings.py:/code/src/layman_settings.py
       depends_on:
         - celery_worker
 
