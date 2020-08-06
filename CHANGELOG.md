@@ -6,7 +6,7 @@
    - If you are migrating existing instance, you need to do nothing (Layman user and role are already created, so you don't need to set [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD)).
    - If this is your first Layman release, you need to do nothing ([GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) is set in `.env` files, so Layman user and role at GeoServer will be automatically created on startup).
 - GeoServer [Proxy Base URL](https://docs.geoserver.org/stable/en/user/configuration/globalsettings.html) is now automatically set on Layman's startup according to [LAYMAN_GS_PROXY_BASE_URL](doc/env-settings.md#LAYMAN_GS_PROXY_BASE_URL). If you do not set the variable, value is calculated as [LAYMAN_CLIENT_PUBLIC_URL](doc/env-settings.md#LAYMAN_CLIENT_PUBLIC_URL)+[LAYMAN_GS_PATH](doc/env-settings.md#LAYMAN_GS_PATH). If you set it to empty string, no change of Proxy Base URL will be done on GeoServer side.
-- Three separate identical settings files (`layman_settings_demo.py`, `layman_settings_dev.py`, `layman_settings_test.py`) were merged into one file `layman_settings.py`. It is needed to change [LAYMAN_SETTINGS_MODULE](doc/env-settings#LAYMAN_SETTINGS_MODULE) in your `.env` file to `layman_settings.py`
+- Three separate identical settings files (`layman_settings_demo.py`, `layman_settings_dev.py`, `layman_settings_test.py`) were merged into one file `layman_settings.py`. It is needed to change [LAYMAN_SETTINGS_MODULE](doc/env-settings.md#LAYMAN_SETTINGS_MODULE) in your `.env` file to `layman_settings.py`
 
 ## v1.5.0
 2020-06-18
