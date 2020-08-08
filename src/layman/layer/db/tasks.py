@@ -33,8 +33,7 @@ def refresh_table(
     if self.is_aborted():
         raise AbortedException
     main_filepath = get_layer_main_file_path(username, layername)
-    p = db.import_layer_vector_file_async(username, layername, main_filepath,
-                                       crs_id)
+    p = db.import_layer_vector_file_async(username, layername, main_filepath, crs_id)
     while p.poll() is None and not self.is_aborted():
         pass
     if self.is_aborted():
