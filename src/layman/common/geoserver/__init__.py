@@ -5,6 +5,7 @@ import string
 from urllib.parse import urljoin
 from flask import current_app as app
 from layman import settings
+from layman.layer import geoserver as layer
 
 
 headers_json = {
@@ -95,6 +96,24 @@ def ensure_user(user, password):
         app.logger.info(f"User {user} already exists")
     user_created = not user_exists
     return user_created
+
+
+def ensure_whole_user(username):
+    ensure_user(username, None)
+    role = username_to_rolename(username)
+    ensure_role(role)
+    ensure_user_role(username, role)
+    ensure_user_role(username, settings.LAYMAN_GS_ROLE)
+    layer.ensure_user_workspace(username)
+
+
+def delete_whole_user(username):
+    role = username_to_rolename(username)
+    layer.delete_user_workspace(username)
+    delete_user_role(username, role)
+    delete_user_role(username, settings.LAYMAN_GS_ROLE)
+    delete_role(role)
+    delete_user(username)
 
 
 def username_to_rolename(username):

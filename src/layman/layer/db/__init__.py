@@ -92,12 +92,12 @@ def delete_user_workspace(username, conn_cur=None):
         raise LaymanError(7)
 
 
-def ensure_user(username):
-    pass
+def ensure_whole_user(username):
+    ensure_user_workspace(username)
 
 
-def delete_user(username):
-    pass
+def delete_whole_user(username):
+    delete_user_workspace(username)
 
 
 # def import_layer_vector_file(username, layername, main):

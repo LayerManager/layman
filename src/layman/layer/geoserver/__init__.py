@@ -61,6 +61,7 @@ def get_all_rules():
 def check_username(username):
     if username in settings.GS_RESERVED_WORKSPACE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'workspace': username})
+    # TODO check also username and role
     non_layman_workspaces = get_non_layman_workspaces()
     if any(ws['name'] == username for ws in non_layman_workspaces):
         # TODO maybe rephrase the reason
@@ -163,21 +164,12 @@ def delete_user_db_store(username):
         r.raise_for_status()
 
 
-def ensure_user(username):
-    common.ensure_user(username, None)
-    role = common.username_to_rolename(username)
-    common.ensure_role(role)
-    common.ensure_user_role(username, role)
-    common.ensure_user_role(username, settings.LAYMAN_GS_ROLE)
-    # raise Exception('Not yet implemented')
+def ensure_whole_user(username):
+    common.ensure_whole_user(username)
 
 
-def delete_user(username):
-    role = common.username_to_rolename(username)
-    common.delete_user_role(username, role)
-    common.ensure_user_role(username, settings.LAYMAN_GS_ROLE)
-    common.delete_role(role)
-    common.delete_user(username)
+def delete_whole_user(username):
+    common.delete_whole_user(username)
 
 
 def publish_layer_from_db(username, layername, description, title):

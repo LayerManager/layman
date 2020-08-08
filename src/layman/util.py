@@ -89,24 +89,14 @@ def get_usernames_no_cache():
     return usernames
 
 
-def ensure_user_workspace(username):
+def ensure_whole_user(username):
     providers = get_internal_providers()
-    call_modules_fn(providers, 'ensure_user_workspace', [username])
+    call_modules_fn(providers, 'ensure_whole_user', [username])
 
 
-def delete_user_workspace(username):
+def delete_whole_user(username):
     providers = get_internal_providers()
-    call_modules_fn(providers, 'delete_user_workspace', [username])
-
-
-def ensure_user(username):
-    providers = get_internal_providers()
-    call_modules_fn(providers, 'ensure_user', [username])
-
-
-def delete_user(username):
-    providers = get_internal_providers()
-    call_modules_fn(providers, 'delete_user', [username])
+    call_modules_fn(providers, 'delete_whole_user', [username])
 
 
 def get_internal_providers():

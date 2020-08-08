@@ -1,6 +1,7 @@
 import os
 import pathlib
 import shutil
+from flask import current_app
 
 from layman import settings
 from layman.util import get_publication_types
@@ -41,6 +42,14 @@ def delete_user_workspace(username):
         os.rmdir(userdir)
     except FileNotFoundError:
         pass
+
+
+def ensure_whole_user(username):
+    ensure_user_workspace(username)
+
+
+def delete_whole_user(username):
+    delete_user_workspace
 
 
 def get_publications_dir(publ_type, username):

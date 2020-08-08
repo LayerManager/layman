@@ -1,12 +1,13 @@
 import json
 import os
+from flask import current_app
 from layman.common.filesystem import util
 
 AUTHN_SUBFILE = 'authn.txt'
 
 
 def save_username_reservation(username, iss_id, sub, claims):
-    util.ensure_user_workspace(username)
+    util.ensure_whole_user(username)
     authn_path = get_authn_file(username)
     assert not os.path.isfile(authn_path)
     with open(authn_path, "w") as authn_file:

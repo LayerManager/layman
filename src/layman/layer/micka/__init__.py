@@ -3,19 +3,11 @@ def get_usernames():
     return []
 
 
-def ensure_user_workspace(username):
+def ensure_whole_user(username):
     pass
 
 
-def delete_user_workspace(username):
-    pass
-
-
-def ensure_user(username):
-    pass
-
-
-def delete_user(username):
+def delete_whole_user(username):
     pass
 
 

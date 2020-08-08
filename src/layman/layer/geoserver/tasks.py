@@ -33,8 +33,7 @@ def refresh_wfs(
     if title is None:
         title = layername
     if ensure_user:
-        geoserver.ensure_user_workspace(username)
-        geoserver.ensure_user(username)
+        geoserver.ensure_whole_user(username)
 
     if self.is_aborted():
         raise AbortedException
