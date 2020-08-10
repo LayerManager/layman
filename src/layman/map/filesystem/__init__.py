@@ -7,9 +7,7 @@ def check_username(username):
     pass
 
 
-def ensure_whole_user(username):
-    common_util.ensure_user_workspace
+ensure_whole_user = common_util.ensure_user_workspace
 
 
-def delete_whole_user(username):
-    common_util.delete_user_workspace
+delete_whole_user = common_util.delete_user_workspace

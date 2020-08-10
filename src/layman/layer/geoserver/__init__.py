@@ -164,12 +164,10 @@ def delete_user_db_store(username):
         r.raise_for_status()
 
 
-def ensure_whole_user(username):
-    common.ensure_whole_user(username)
+ensure_whole_user = common.ensure_whole_user
 
 
-def delete_whole_user(username):
-    common.delete_whole_user(username)
+delete_whole_user = common.delete_whole_user
 
 
 def publish_layer_from_db(username, layername, description, title):

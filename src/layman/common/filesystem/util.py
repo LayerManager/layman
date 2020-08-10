@@ -49,7 +49,7 @@ def ensure_whole_user(username):
 
 
 def delete_whole_user(username):
-    delete_user_workspace
+    delete_user_workspace(username)
 
 
 def get_publications_dir(publ_type, username):
