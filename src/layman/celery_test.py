@@ -96,7 +96,11 @@ def test_single_abortable_task(client):
         for task_result in results
     ]
 
-    time.sleep(1)
+    i = 1
+    while i <= 20 and not (results[0].state == results_copy[0].state == 'STARTED'):
+        print(f"results[0].state={results[0].state}, results_copy[0].state={results_copy[0].state}")
+        time.sleep(0.1)
+        i += 1
 
     assert results[0].state == results_copy[0].state == 'STARTED'
     celery_util.abort_task_chain(results_copy)
