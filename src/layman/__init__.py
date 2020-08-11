@@ -49,7 +49,6 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
         settings.LAYMAN_REDIS.set(LAYMAN_DEPS_ADJUSTED_KEY, 'processing')
         app.logger.info(f'Adjusting GeoServer')
         with app.app_context():
-            # TODO Clear
             from layman.common.geoserver import sync_all_users, ensure_role, ensure_user, ensure_user_role, ensure_wms_srs_list, ensure_proxy_base_url
             if settings.GEOSERVER_ADMIN_AUTH:
                 ensure_role(settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)

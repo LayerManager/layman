@@ -162,6 +162,16 @@ def get_all_workspaces(authz_type):
     return g.get(key)
 
 
+def get_layman_users(authz_type=settings.LAYMAN_GS_AUTH):
+    users = get_users(authz_type)
+    layman_users = set()
+    for user in users:
+        roles = get_user_roles(user, authz_type)
+        if settings.LAYMAN_GS_ROLE in roles:
+            layman_users.add(user)
+    return layman_users
+
+
 def ensure_user_db_store(username, authz_type):
     r = requests.post(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + '/datastores'),
@@ -231,7 +241,7 @@ def ensure_user_workspace(username, authz_type):
 
         ensure_user_data_security(username, 'r', authz_type)
         ensure_user_data_security(username, 'w', authz_type)
-        ensure_user_db_store(username)
+        ensure_user_db_store(username, authz_type)
 
 
 def delete_user_workspace(username, authz_type):

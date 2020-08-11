@@ -22,14 +22,14 @@ headers_xml = {
 }
 
 
-def get_all_rules():
+def get_all_rules(authz_type):
     key = FLASK_RULES_KEY
     if key not in g:
         r = requests.get(
             settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
             # data=json.dumps(payload),
             headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH
+            auth=authz_type
         )
         r.raise_for_status()
         # app.logger.info(r.text)
@@ -42,11 +42,19 @@ def get_all_rules():
 def check_username(username, authz_type=settings.LAYMAN_GS_AUTH):
     if username in settings.GS_RESERVED_WORKSPACE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'workspace': username})
-    # TODO check also username and role
+    # TODO check, that I can check against all users/roles, not only NON-layman ones
+    all_users = common.get_users(authz_type)
+    all_roles = common.get_roles(authz_type)
+    rolename = common.username_to_rolename(username)
+
     non_layman_workspaces = get_non_layman_workspaces(authz_type)
+
+    if username in all_users:
+        raise LaymanError(35, {'reserved_by': __name__, 'reason': f'GeoServer already has user with name {username}'})
+    if rolename in all_roles:
+        raise LaymanError(35, {'reserved_by': __name__, 'reason': f'GeoServer already has role with name {rolename}'})
     if any(ws['name'] == username for ws in non_layman_workspaces):
-        # TODO maybe rephrase the reason
-        raise LaymanError(35, {'reserved_by': __name__, 'reason': 'GeoServer workspace not assigned to LAYMAN_GS_ROLE'})
+        raise LaymanError(35, {'reserved_by': __name__, 'reason': f'GeoServer already has workspace with name {username}'})
 
 
 ensure_whole_user = common.ensure_whole_user
@@ -95,10 +103,10 @@ def publish_layer_from_db(username, layername, description, title):
     wms.clear_cache(username)
 
 
-def get_layman_rules(all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
+def get_layman_rules(authz_type=settings.LAYMAN_GS_AUTH, all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
     # TODO consider detecting rules (also) by roles of users with LAYMAN_GS_ROLE
     if all_rules == None:
-        all_rules = get_all_rules()
+        all_rules = get_all_rules(authz_type)
     re_role = r".*\b" + re.escape(layman_role) + r"\b.*"
     result = {k: v for k, v in all_rules.items() if re.match(re_role, v)}
     return result
@@ -108,7 +116,7 @@ def get_non_layman_workspaces(authz_type, all_workspaces=None, layman_rules=None
     if all_workspaces == None:
         all_workspaces = common.get_all_workspaces(authz_type)
     if layman_rules == None:
-        layman_rules = get_layman_rules()
+        layman_rules = get_layman_rules(authz_type)
     result = [
         ws for ws in all_workspaces
         if next((
@@ -119,18 +127,7 @@ def get_non_layman_workspaces(authz_type, all_workspaces=None, layman_rules=None
     return result
 
 
-def get_layman_workspaces(authz_type):
-    all_workspaces = common.get_all_workspaces(authz_type)
-    non_layman_workspaces = get_non_layman_workspaces(authz_type)
-    layman_workspaces = filter(lambda ws: ws not in non_layman_workspaces,
-                               all_workspaces)
-    return layman_workspaces
-
-
-def get_usernames(authz_type=settings.LAYMAN_GS_AUTH):
-    return [
-        ws['name'] for ws in get_layman_workspaces(authz_type)
-    ]
+get_usernames = common.get_layman_users
 
 
 def check_new_layername(username, layername):
