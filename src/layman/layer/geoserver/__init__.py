@@ -39,11 +39,11 @@ def get_all_rules():
     return g.get(key)
 
 
-def check_username(username):
+def check_username(username, authz_type=settings.LAYMAN_GS_AUTH):
     if username in settings.GS_RESERVED_WORKSPACE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'workspace': username})
     # TODO check also username and role
-    non_layman_workspaces = get_non_layman_workspaces()
+    non_layman_workspaces = get_non_layman_workspaces(authz_type)
     if any(ws['name'] == username for ws in non_layman_workspaces):
         # TODO maybe rephrase the reason
         raise LaymanError(35, {'reserved_by': __name__, 'reason': 'GeoServer workspace not assigned to LAYMAN_GS_ROLE'})
@@ -104,9 +104,9 @@ def get_layman_rules(all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
     return result
 
 
-def get_non_layman_workspaces(all_workspaces=None, layman_rules=None):
+def get_non_layman_workspaces(authz_type, all_workspaces=None, layman_rules=None):
     if all_workspaces == None:
-        all_workspaces = common.get_all_workspaces()
+        all_workspaces = common.get_all_workspaces(authz_type)
     if layman_rules == None:
         layman_rules = get_layman_rules()
     result = [
@@ -119,17 +119,17 @@ def get_non_layman_workspaces(all_workspaces=None, layman_rules=None):
     return result
 
 
-def get_layman_workspaces():
-    all_workspaces = common.get_all_workspaces()
-    non_layman_workspaces = get_non_layman_workspaces()
+def get_layman_workspaces(authz_type):
+    all_workspaces = common.get_all_workspaces(authz_type)
+    non_layman_workspaces = get_non_layman_workspaces(authz_type)
     layman_workspaces = filter(lambda ws: ws not in non_layman_workspaces,
                                all_workspaces)
     return layman_workspaces
 
 
-def get_usernames():
+def get_usernames(authz_type=settings.LAYMAN_GS_AUTH):
     return [
-        ws['name'] for ws in get_layman_workspaces()
+        ws['name'] for ws in get_layman_workspaces(authz_type)
     ]
 
 
