@@ -22,25 +22,6 @@ headers_xml = {
 }
 
 
-def get_all_workspaces():
-    key = FLASK_WORKSPACES_KEY
-    if key not in g:
-        r = requests.get(
-            settings.LAYMAN_GS_REST_WORKSPACES,
-            # data=json.dumps(payload),
-            headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH
-        )
-        r.raise_for_status()
-        if r.json()['workspaces'] == "":
-            all_workspaces = []
-        else:
-            all_workspaces = r.json()['workspaces']['workspace']
-        g.setdefault(key, all_workspaces)
-
-    return g.get(key)
-
-
 def get_all_rules():
     key = FLASK_RULES_KEY
     if key not in g:
@@ -66,102 +47,6 @@ def check_username(username):
     if any(ws['name'] == username for ws in non_layman_workspaces):
         # TODO maybe rephrase the reason
         raise LaymanError(35, {'reserved_by': __name__, 'reason': 'GeoServer workspace not assigned to LAYMAN_GS_ROLE'})
-
-
-def ensure_user_workspace(username):
-    all_workspaces = get_all_workspaces()
-    if not any(ws['name'] == username for ws in all_workspaces):
-        r = requests.post(
-            settings.LAYMAN_GS_REST_WORKSPACES,
-            data=json.dumps({'workspace': {'name': username}}),
-            headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH
-        )
-        r.raise_for_status()
-        r = requests.post(
-            settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
-            # TODO consider using user's role instead of settings.LAYMAN_GS_ROLE
-            data=json.dumps(
-                {username + '.*.r': settings.LAYMAN_GS_ROLE + ',ROLE_ANONYMOUS'}),
-            headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH
-        )
-        r.raise_for_status()
-        ensure_user_db_store(username)
-
-
-def delete_user_workspace(username):
-    delete_user_db_store(username)
-    r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, username + '.*.r'),
-        headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH
-    )
-    if r.status_code != 404:
-        r.raise_for_status()
-    r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username),
-        headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH
-    )
-    if r.status_code != 404:
-        r.raise_for_status()
-
-
-def ensure_user_db_store(username):
-    r = requests.post(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + '/datastores'),
-        data=json.dumps({
-            "dataStore": {
-                "name": "postgresql",
-                "connectionParameters": {
-                    "entry": [
-                        {
-                            "@key": "dbtype",
-                            "$": "postgis"
-                        },
-                        {
-                            "@key": "host",
-                            "$": settings.LAYMAN_PG_HOST
-                        },
-                        {
-                            "@key": "port",
-                            "$": settings.LAYMAN_PG_PORT
-                        },
-                        {
-                            "@key": "database",
-                            "$": settings.LAYMAN_PG_DBNAME
-                        },
-                        {
-                            "@key": "user",
-                            "$": settings.LAYMAN_PG_USER
-                        },
-                        {
-                            "@key": "passwd",
-                            "$": settings.LAYMAN_PG_PASSWORD
-                        },
-                        {
-                            "@key": "schema",
-                            "$": username
-                        },
-                    ]
-                },
-            }
-        }),
-        headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH
-    )
-    r.raise_for_status()
-
-
-def delete_user_db_store(username):
-    r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + f'/datastores/{username}'),
-        headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH
-    )
-    if r.status_code != 404:
-        r.raise_for_status()
 
 
 ensure_whole_user = common.ensure_whole_user
@@ -221,7 +106,7 @@ def get_layman_rules(all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
 
 def get_non_layman_workspaces(all_workspaces=None, layman_rules=None):
     if all_workspaces == None:
-        all_workspaces = get_all_workspaces()
+        all_workspaces = common.get_all_workspaces()
     if layman_rules == None:
         layman_rules = get_layman_rules()
     result = [
@@ -235,7 +120,7 @@ def get_non_layman_workspaces(all_workspaces=None, layman_rules=None):
 
 
 def get_layman_workspaces():
-    all_workspaces = get_all_workspaces()
+    all_workspaces = common.get_all_workspaces()
     non_layman_workspaces = get_non_layman_workspaces()
     layman_workspaces = filter(lambda ws: ws not in non_layman_workspaces,
                                all_workspaces)

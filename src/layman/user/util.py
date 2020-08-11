@@ -24,6 +24,7 @@ def get_user_profile(user_obj):
 
 def reserve_username(username, adjust=False):
     if 'username' in g.user:
+        current_app.logger.info('I reserve_username 1:' + username)
         raise LaymanError(34, {'username': g.user['username']})
     if adjust is not True:
         check_username(username)

@@ -90,6 +90,7 @@ def get_usernames_no_cache():
 
 
 def ensure_whole_user(username):
+    current_app.logger.info('ensure_whole_user:' + username)
     providers = get_internal_providers()
     call_modules_fn(providers, 'ensure_whole_user', [username])
 

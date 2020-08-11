@@ -3,10 +3,14 @@ import requests
 import secrets
 import string
 from urllib.parse import urljoin
-from flask import current_app as app
+from flask import g, current_app as app
 from layman import settings
-from layman.layer import geoserver as layer
+from layman import util as layman_util
+from layman.authz import util as authz
 
+
+FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
+FLASK_RULES_KEY = f"{__name__}:RULES"
 
 headers_json = {
     'Accept': 'application/json',
@@ -21,7 +25,6 @@ def get_roles():
                      auth=settings.GEOSERVER_ADMIN_AUTH
                      )
     r.raise_for_status()
-    # return r.json()['roles']
     return r.json()['roleNames']
 
 
@@ -98,18 +101,179 @@ def ensure_user(user, password):
     return user_created
 
 
+def get_user_data_security_roles(username, type):
+    r = requests.get(
+        settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
+        headers=headers_json,
+        auth=settings.LAYMAN_GS_AUTH
+    )
+    r.raise_for_status()
+    rules = r.json()
+    try:
+        rule = rules[username + '.*.' + type]
+        roles = set(rule.split(','))
+    except KeyError:
+        roles = set()
+    return roles
+
+
+def ensure_user_data_security_roles(username, roles, type):
+    rule = username + '.*.' + type
+    roles_str = ', '.join(roles)
+    r = requests.post(
+        settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
+        data=json.dumps(
+            {rule: roles_str}),
+        headers=headers_json,
+        auth=settings.LAYMAN_GS_AUTH
+    )
+    r.raise_for_status()
+
+
+def ensure_user_data_security(username, type):
+    roles = get_user_data_security_roles(username, type)
+
+    all_roles = authz.get_all_GS_roles(username, type)
+    roles.difference_update(all_roles)
+
+    authz_module = authz.get_authz_module()
+    new_roles = authz_module.get_GS_roles(username, type)
+    roles.update(new_roles)
+
+    ensure_user_data_security_roles(username, roles, type)
+
+
+def get_all_workspaces():
+    key = FLASK_WORKSPACES_KEY
+    if key not in g:
+        r = requests.get(
+            settings.LAYMAN_GS_REST_WORKSPACES,
+            # data=json.dumps(payload),
+            headers=headers_json,
+            auth=settings.LAYMAN_GS_AUTH
+        )
+        r.raise_for_status()
+        if r.json()['workspaces'] == "":
+            all_workspaces = []
+        else:
+            all_workspaces = r.json()['workspaces']['workspace']
+        g.setdefault(key, all_workspaces)
+
+    return g.get(key)
+
+
+def ensure_user_db_store(username):
+    r = requests.post(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + '/datastores'),
+        data=json.dumps({
+            "dataStore": {
+                "name": "postgresql",
+                "connectionParameters": {
+                    "entry": [
+                        {
+                            "@key": "dbtype",
+                            "$": "postgis"
+                        },
+                        {
+                            "@key": "host",
+                            "$": settings.LAYMAN_PG_HOST
+                        },
+                        {
+                            "@key": "port",
+                            "$": settings.LAYMAN_PG_PORT
+                        },
+                        {
+                            "@key": "database",
+                            "$": settings.LAYMAN_PG_DBNAME
+                        },
+                        {
+                            "@key": "user",
+                            "$": settings.LAYMAN_PG_USER
+                        },
+                        {
+                            "@key": "passwd",
+                            "$": settings.LAYMAN_PG_PASSWORD
+                        },
+                        {
+                            "@key": "schema",
+                            "$": username
+                        },
+                    ]
+                },
+            }
+        }),
+        headers=headers_json,
+        auth=settings.LAYMAN_GS_AUTH
+    )
+    r.raise_for_status()
+
+
+def delete_user_db_store(username):
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + f'/datastores/{username}'),
+        headers=headers_json,
+        auth=settings.LAYMAN_GS_AUTH
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+
+def ensure_user_workspace(username):
+    all_workspaces = get_all_workspaces()
+    if not any(ws['name'] == username for ws in all_workspaces):
+        r = requests.post(
+            settings.LAYMAN_GS_REST_WORKSPACES,
+            data=json.dumps({'workspace': {'name': username}}),
+            headers=headers_json,
+            auth=settings.LAYMAN_GS_AUTH
+        )
+        r.raise_for_status()
+
+        ensure_user_data_security(username, 'r')
+        ensure_user_data_security(username, 'w')
+        ensure_user_db_store(username)
+
+
+def delete_user_workspace(username):
+    delete_user_db_store(username)
+
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, username + '.*.r'),
+        headers=headers_json,
+        auth=settings.GEOSERVER_ADMIN_AUTH
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, username + '.*.w'),
+        headers=headers_json,
+        auth=settings.GEOSERVER_ADMIN_AUTH
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username),
+        headers=headers_json,
+        auth=settings.GEOSERVER_ADMIN_AUTH
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+
 def ensure_whole_user(username):
     ensure_user(username, None)
     role = username_to_rolename(username)
     ensure_role(role)
     ensure_user_role(username, role)
     ensure_user_role(username, settings.LAYMAN_GS_ROLE)
-    layer.ensure_user_workspace(username)
+    ensure_user_workspace(username)
 
 
 def delete_whole_user(username):
     role = username_to_rolename(username)
-    layer.delete_user_workspace(username)
+    delete_user_workspace(username)
     delete_user_role(username, role)
     delete_user_role(username, settings.LAYMAN_GS_ROLE)
     delete_role(role)
@@ -141,7 +305,6 @@ def get_user_roles(user):
                      auth=settings.GEOSERVER_ADMIN_AUTH
                      )
     r.raise_for_status()
-    # return r.json()['roles']
     return r.json()['roleNames']
 
 
@@ -255,3 +418,19 @@ def ensure_proxy_base_url(proxy_base_url):
         app.logger.info(f"Current Proxy Base URL {current_url} already corresponds with requested one.")
     url_changed = not url_equals
     return url_changed
+
+
+def get_roles_anyone(username):
+    roles = {'ADMIN', settings.LAYMAN_GS_ROLE, 'ROLE_ANONYMOUS', 'ROLE_AUTHENTICATED'}
+    return roles
+
+
+def get_roles_owner(username):
+    roles = {'ADMIN', username_to_rolename(username)}
+    return roles
+
+
+def sync_all_users():
+    usernames = layman_util.get_usernames()
+    for username in usernames:
+        ensure_whole_user(username)
