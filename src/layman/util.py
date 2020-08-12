@@ -52,10 +52,12 @@ def check_username_decorator(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         username = request.view_args['username']
-        if not re.match(USERNAME_RE, username):
-            raise LaymanError(2, {'parameter': 'user', 'expected': USERNAME_RE})
-        if username not in get_usernames():
-            raise LaymanError(40)
+        if request.method == 'POST':
+            # check username, because the user (workspace) can be created by POST methods
+            check_username(username)
+        else:
+            if username not in get_usernames():
+                raise LaymanError(40)
         result = f(*args, **kwargs)
         return result
 
