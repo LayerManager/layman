@@ -49,13 +49,12 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
         settings.LAYMAN_REDIS.set(LAYMAN_DEPS_ADJUSTED_KEY, 'processing')
         app.logger.info(f'Adjusting GeoServer')
         with app.app_context():
-            from layman.common.geoserver import sync_all_users, ensure_role, ensure_user, ensure_user_role, ensure_wms_srs_list, ensure_proxy_base_url
+            from layman.common.geoserver import ensure_role, ensure_user, ensure_user_role, ensure_wms_srs_list, ensure_proxy_base_url
             if settings.GEOSERVER_ADMIN_AUTH:
                 ensure_role(settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
                 ensure_user(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_PASSWORD, settings.GEOSERVER_ADMIN_AUTH)
                 ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN', settings.GEOSERVER_ADMIN_AUTH)
                 ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
-            sync_all_users(settings.LAYMAN_GS_AUTH)
             ensure_wms_srs_list([int(srs.split(':')[1]) for srs in settings.INPUT_SRS_LIST], settings.LAYMAN_GS_AUTH)
             if settings.LAYMAN_GS_PROXY_BASE_URL != '':
                 ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
@@ -71,7 +70,7 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
         settings.LAYMAN_REDIS.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
 
         app.logger.info(f'Ensuring users')
-        from .util import ensure_whole_user, get_usernames
+        from .util import get_usernames, ensure_whole_user
         with app.app_context():
             for username in get_usernames():
                 app.logger.info(f'Ensuring user {username}')

@@ -438,9 +438,3 @@ def get_roles_anyone(username):
 def get_roles_owner(username):
     roles = {'ADMIN', username_to_rolename(username)}
     return roles
-
-
-def sync_all_users(authz_type):
-    usernames = layman_util.get_usernames()
-    for username in usernames:
-        ensure_whole_user(username, authz_type)
