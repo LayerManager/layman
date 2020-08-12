@@ -58,7 +58,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
                      auth=authz_type
                      )
     r.raise_for_status()
-    all_users = r.json()['users']
+    all_users = [u['userName'] for u in r.json()['users']]
     if settings.LAYMAN_GS_USER in all_users:
         all_users.remove(settings.LAYMAN_GS_USER)
 
@@ -76,19 +76,24 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
                 headers=headers_json,
                 auth=authz_type
             )
-            r.raise_for_status()
+            if r.status_code != 404:
+                r.raise_for_status()
 
             r = requests.delete(
                 urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, user + '.*.w'),
                 headers=headers_json,
                 auth=authz_type
             )
-            r.raise_for_status()
+            if r.status_code != 404:
+                r.raise_for_status()
 
             r = requests.delete(
                 urljoin(settings.LAYMAN_GS_REST_WORKSPACES, user),
                 headers=headers_json,
-                auth=authz_type
+                auth=authz_type,
+                params={
+                    'recurse': 'true'
+                }
             )
             r.raise_for_status()
 
@@ -99,13 +104,6 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
                     auth=authz_type,
                 )
                 r.raise_for_status()
-
-            r = requests.delete(
-                urljoin(settings.LAYMAN_GS_REST_WORKSPACES, user + f'/datastores/{user}'),
-                headers=headers_json,
-                auth=authz_type
-            )
-            r.raise_for_status()
 
             r = requests.delete(
                 urljoin(settings.LAYMAN_GS_REST_USER, user),
