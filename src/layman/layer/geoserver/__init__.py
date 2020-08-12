@@ -60,10 +60,6 @@ def get_all_rules():
 def check_username(username):
     if username in settings.GS_RESERVED_WORKSPACE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'workspace': username})
-    # TODO consider remove / change
-    non_layman_workspaces = get_non_layman_workspaces()
-    if any(ws['name'] == username for ws in non_layman_workspaces):
-        raise LaymanError(35, {'reserved_by': __name__, 'reason': 'GeoServer workspace not assigned to LAYMAN_GS_ROLE'})
 
 
 def ensure_user_workspace(username):

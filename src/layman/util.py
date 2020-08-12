@@ -51,10 +51,11 @@ def to_safe_names(unsafe_names, type_name):
 def check_username_decorator(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # TODO check regexp
-        # check username is in get_usernames
-        # remove check_username call
-        check_username(request.view_args['username'])
+        username = request.view_args['username']
+        if not re.match(USERNAME_RE, username):
+            raise LaymanError(2, {'parameter': 'user', 'expected': USERNAME_RE})
+        if username not in get_usernames():
+            raise LaymanError(40)
         result = f(*args, **kwargs)
         return result
 

@@ -17,6 +17,7 @@ bp = Blueprint('rest_layers', __name__)
 @authenticate
 @authorize
 @check_username_decorator
+# TODO @ensure_user_decorator
 def before_request():
     pass
 
