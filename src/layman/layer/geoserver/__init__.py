@@ -40,20 +40,23 @@ def get_all_rules(authz_type):
 
 
 def check_username(username, authz_type=settings.LAYMAN_GS_AUTH):
-    if username in settings.GS_RESERVED_WORKSPACE_NAMES:
-        raise LaymanError(35, {'reserved_by': __name__, 'workspace': username})
-    # TODO check, that I can check against all users/roles, not only NON-layman ones
-    all_users = common.get_users(authz_type)
-    all_roles = common.get_roles(authz_type)
     rolename = common.username_to_rolename(username)
 
-    non_layman_workspaces = get_non_layman_workspaces(authz_type)
+    if username in settings.GS_RESERVED_WORKSPACE_NAMES:
+        raise LaymanError(35, {'reserved_by': __name__, 'workspace': username})
+
+    if rolename in settings.GS_RESERVED_ROLE_NAMES:
+        raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
+
+    all_users = common.get_users(authz_type)
+    all_roles = common.get_roles(authz_type)
+    workspaces = common.get_all_workspaces(authz_type)
 
     if username in all_users:
         raise LaymanError(35, {'reserved_by': __name__, 'reason': f'GeoServer already has user with name {username}'})
     if rolename in all_roles:
         raise LaymanError(35, {'reserved_by': __name__, 'reason': f'GeoServer already has role with name {rolename}'})
-    if any(ws['name'] == username for ws in non_layman_workspaces):
+    if username in workspaces:
         raise LaymanError(35, {'reserved_by': __name__, 'reason': f'GeoServer already has workspace with name {username}'})
 
 
@@ -103,27 +106,12 @@ def publish_layer_from_db(username, layername, description, title):
     wms.clear_cache(username)
 
 
+# TODO is this method needed? If yes, we should detect rules by users with LAYMAN_GS_ROLE
 def get_layman_rules(authz_type=settings.LAYMAN_GS_AUTH, all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
-    # TODO consider detecting rules (also) by roles of users with LAYMAN_GS_ROLE
     if all_rules == None:
         all_rules = get_all_rules(authz_type)
     re_role = r".*\b" + re.escape(layman_role) + r"\b.*"
     result = {k: v for k, v in all_rules.items() if re.match(re_role, v)}
-    return result
-
-
-def get_non_layman_workspaces(authz_type, all_workspaces=None, layman_rules=None):
-    if all_workspaces == None:
-        all_workspaces = common.get_all_workspaces(authz_type)
-    if layman_rules == None:
-        layman_rules = get_layman_rules(authz_type)
-    result = [
-        ws for ws in all_workspaces
-        if next((
-            k for k in layman_rules
-            if re.match(r"^" + re.escape(ws['name']) + r"\..*", k)
-        ), None) is None
-    ]
     return result
 
 

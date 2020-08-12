@@ -1,4 +1,4 @@
-from . import get_layman_rules, get_non_layman_workspaces
+from . import get_layman_rules
 
 
 def test_get_layman_rules():
@@ -24,26 +24,27 @@ def test_get_layman_rules():
     }
 
 
-def test_get_non_layman_workspaces():
-    layman_rules = {
-        "*.*.w": "GROUP_ADMIN,LAYMAN_ROLE,ADMIN",
-        "acme.*.w": "ADMIN,LAYMAN_ROLE",
-    }
-    all_workspaces = [
-        {
-            "name": "acme",
-            "href": r"http:\/\/geoserver:8080\/geoserver\/rest\/workspaces\/acme.json"
-        },
-        {
-            "name": "acme2",
-            "href": r"http:\/\/geoserver:8080\/geoserver\/rest\/workspaces\/acme2.json"
-        },
-    ]
-    assert get_non_layman_workspaces(all_workspaces, layman_rules) == [
-        {
-            "name": "acme2",
-            "href": r"http:\/\/geoserver:8080\/geoserver\/rest\/workspaces\/acme2.json"
-        },
-    ]
-    layman_rules = {}
-    assert get_non_layman_workspaces(all_workspaces, layman_rules) == all_workspaces
+# TODO not needed anymore, this method does not exists
+# def test_get_non_layman_workspaces():
+#     layman_rules = {
+#         "*.*.w": "GROUP_ADMIN,LAYMAN_ROLE,ADMIN",
+#         "acme.*.w": "ADMIN,LAYMAN_ROLE",
+#     }
+#     all_workspaces = [
+#         {
+#             "name": "acme",
+#             "href": r"http:\/\/geoserver:8080\/geoserver\/rest\/workspaces\/acme.json"
+#         },
+#         {
+#             "name": "acme2",
+#             "href": r"http:\/\/geoserver:8080\/geoserver\/rest\/workspaces\/acme2.json"
+#         },
+#     ]
+#     assert get_non_layman_workspaces(all_workspaces, layman_rules) == [
+#         {
+#             "name": "acme2",
+#             "href": r"http:\/\/geoserver:8080\/geoserver\/rest\/workspaces\/acme2.json"
+#         },
+#     ]
+#     layman_rules = {}
+#     assert get_non_layman_workspaces(all_workspaces, layman_rules) == all_workspaces

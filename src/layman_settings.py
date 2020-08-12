@@ -62,6 +62,13 @@ GS_RESERVED_WORKSPACE_NAMES = [
     'default',
 ]
 
+GS_RESERVED_ROLE_NAMES = [
+    'ROLE_ADMINISTRATOR',
+    'ROLE_GROUP_ADMIN',
+    'ROLE_AUTHENTICATED',
+    'ROLE_ANONYMOUS',
+]
+
 # List of schemas that are owned by LAYMAN_PG_USER, but should not be used
 # by layman.
 # Note: Schemas as public, topology, or pg_catalog are usually owned by
