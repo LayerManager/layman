@@ -54,6 +54,7 @@ def check_username(username, conn_cur=None):
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
 
+    # TODO consider remove / change
     try:
         cur.execute(f"""select catalog_name, schema_name, schema_owner
     from information_schema.schemata

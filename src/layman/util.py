@@ -51,6 +51,9 @@ def to_safe_names(unsafe_names, type_name):
 def check_username_decorator(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        # TODO check regexp
+        # check username is in get_usernames
+        # remove check_username call
         check_username(request.view_args['username'])
         result = f(*args, **kwargs)
         return result
