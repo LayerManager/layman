@@ -66,6 +66,7 @@ def check_username(username, conn_cur=None):
                                'reason': 'DB schema owned by another than layman user'})
 
 
+# consider renaming
 def ensure_user_workspace(username, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()

@@ -30,6 +30,7 @@ def get_user_dir(username):
     return userdir
 
 
+# TODO consider renaming
 def ensure_user_workspace(username):
     userdir = get_user_dir(username)
     pathlib.Path(userdir).mkdir(exist_ok=True, parents=True)
