@@ -30,6 +30,12 @@ token_2_introspection = {
     'test3': {
         'sub': "20141",
     },
+    'test_authz_change1': {
+        'sub': "20142",
+    },
+    'test_authz_change2': {
+        'sub': "20143",
+    },
 }
 token_2_profile = {
     'abc': {
@@ -55,6 +61,22 @@ token_2_profile = {
         "middleName": "",
         "screenName": "test3",
         "userId": "20141",
+    },
+    'test_authz_change1': {
+        "emailAddress": "test_authz_change1@liferay.com",
+        "firstName": "test_authz_change1",
+        "lastName": "test_authz_change1",
+        "middleName": "",
+        "screenName": "test_authz_change1",
+        "userId": "20142",
+    },
+    'test_authz_change2': {
+        "emailAddress": "test_authz_change2@liferay.com",
+        "firstName": "test_authz_change2",
+        "lastName": "test_authz_change2",
+        "middleName": "",
+        "screenName": "test_authz_change2",
+        "userId": "20143",
     },
 }
 

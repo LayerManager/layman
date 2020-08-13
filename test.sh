@@ -62,9 +62,11 @@ fi
 
 mkdir -p tmp/artifacts
 rm -rf tmp/artifacts/*
+mkdir -p tmp/test/run
+rm -rf tmp/test/run/*
 
 python3 src/assert_db.py && python3 src/wait_for_deps.py && python3 src/clear_layman_data.py && python3 -m pytest -W ignore::DeprecationWarning -xvv
-#python3 src/assert_db.py && python3 src/wait_for_deps.py && python3 src/clear_layman_data.py && python3 -m pytest -W ignore::DeprecationWarning -xsvv src/layman/layer/micka/util_test.py
+#python3 src/assert_db.py && python3 src/wait_for_deps.py && python3 src/clear_layman_data.py && python3 -m pytest -W ignore::DeprecationWarning --capture=tee-sys -xvv src/layman/authz_change_test.py
 #python3 src/assert_db.py && python3 src/wait_for_deps.py && python3 src/clear_layman_data.py && python3 -m pytest -W ignore::DeprecationWarning -xsvv src/layman/layer/client_test.py
 #python3 src/assert_db.py && python3 src/wait_for_deps.py && python3 src/clear_layman_data.py && python3 -m pytest -W ignore::DeprecationWarning -xsvv src/layman/layer/rest_test.py::test_post_layers_complex src/layman/layer/rest_test.py::test_patch_layer_data src/layman/layer/rest_test.py::test_patch_layer_concurrent_and_delete_it
 
