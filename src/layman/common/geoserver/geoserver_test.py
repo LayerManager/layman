@@ -17,8 +17,8 @@ def app_context():
 
 @pytest.fixture()
 def gs_user():
-    users = common.get_users()
-    assert TEST_USER not in [u['userName'] for u in users]
+    usernames = common.get_usernames()
+    assert TEST_USER not in usernames
     assert common.ensure_user(TEST_USER, TEST_USER_PASSWORD)
     yield TEST_USER, TEST_USER_PASSWORD
     assert common.delete_user(TEST_USER)
@@ -48,18 +48,18 @@ def test_role_management():
 
 
 def test_user_management():
-    init_users = common.get_users()
+    init_usernames = common.get_usernames()
     new_user = TEST_USER
     new_user_pwd = TEST_USER_PASSWORD
-    assert new_user not in [u['userName'] for u in init_users]
+    assert new_user not in init_usernames
     assert common.ensure_user(new_user, new_user_pwd)
-    users = common.get_users()
-    assert new_user in [u['userName'] for u in users]
-    assert len(init_users) + 1 == len(users)
+    usernames = common.get_usernames()
+    assert new_user in usernames
+    assert len(init_usernames) + 1 == len(usernames)
     assert common.delete_user(new_user)
-    users = common.get_users()
+    usernames = common.get_usernames()
     assert new_user not in [u['userName'] for u in users]
-    assert len(init_users) == len(users)
+    assert len(init_usernames) == len(usernames)
 
 
 def test_user_role_management(gs_user, gs_role):

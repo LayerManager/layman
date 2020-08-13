@@ -90,7 +90,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
             r = requests.delete(
                 urljoin(settings.LAYMAN_GS_REST_WORKSPACES, user),
                 headers=headers_json,
-                auth=auth
+                auth=auth,
                 params={
                     'recurse': 'true'
                 }

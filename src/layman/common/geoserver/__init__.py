@@ -69,7 +69,7 @@ def delete_role(role, auth):
     return role_deleted
 
 
-def get_users(auth):
+def get_usernames(auth):
     r_url = settings.LAYMAN_GS_REST_USERS
     r = requests.get(r_url,
                      headers=headers_json,
@@ -77,12 +77,13 @@ def get_users(auth):
                      )
     r.raise_for_status()
     # app.logger.info(f"users={r.text}")
-    return r.json()['users']
+    usernames = [u['userName'] for u in r.json()['users']]
+    return usernames
 
 
 def ensure_user(user, password, auth):
-    users = get_users(auth)
-    user_exists = next((u for u in users if u['userName'] == user), None) is not None
+    usernames = get_usernames(auth)
+    user_exists = user in usernames
     if not user_exists:
         app.logger.info(f"User {user} does not exist yet, creating.")
         if password is None:
@@ -142,9 +143,10 @@ def ensure_user_data_security_roles(username, roles, type, auth):
 
 
 def ensure_user_data_security(username, type, auth):
-    roles = get_user_data_security_roles(username, type, auth)
+    roles = set(get_user_data_security_roles(username, type, auth))
 
     all_roles = authz.get_all_gs_roles(username, type)
+    app.logger.info(f"username={username}, roles={roles}, all_roles={all_roles}")
     roles.difference_update(all_roles)
 
     authz_module = authz.get_authz_module()
@@ -174,9 +176,9 @@ def get_all_workspaces(auth):
 
 
 def get_layman_users(auth=settings.LAYMAN_GS_AUTH):
-    users = get_users(auth)
+    usernames = get_usernames(auth)
     layman_users = set()
-    for user in [u['userName'] for u in users]:
+    for user in usernames:
         roles = get_user_roles(user, auth)
         if settings.LAYMAN_GS_ROLE in roles:
             layman_users.add(user)
