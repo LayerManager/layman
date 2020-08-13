@@ -193,4 +193,3 @@ def test_authz_change(liferay_mock):
     delete_layer(test_user2, layername2, headers=authn_headers2)
 
     stop_process(layman_process)
-
