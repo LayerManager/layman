@@ -58,16 +58,6 @@ LAYMAN_GS_REST_USERS = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAY
 LAYMAN_GS_REST_USER = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAYMAN_GS_USER_GROUP_SERVICE}/user/')
 LAYMAN_GS_REST_WMS_SETTINGS = urljoin(LAYMAN_GS_REST, f'services/wms/settings/')
 
-GS_RESERVED_WORKSPACE_NAMES = [
-    'default',
-]
-
-GS_RESERVED_ROLE_NAMES = [
-    'ROLE_ADMINISTRATOR',
-    'ROLE_GROUP_ADMIN',
-    'ROLE_AUTHENTICATED',
-    'ROLE_ANONYMOUS',
-]
 
 # List of schemas that are owned by LAYMAN_PG_USER, but should not be used
 # by layman.

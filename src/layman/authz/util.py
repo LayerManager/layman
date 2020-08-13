@@ -33,11 +33,11 @@ def get_publication_access_rights(publ_type, username, publication_name):
     return authz_module.get_publication_access_rights(publ_type, username, publication_name)
 
 
-def get_all_GS_roles(username, type):
+def get_all_gs_roles(username, type):
     roles = set()
-    roles.union(read_everyone_write_everyone.get_GS_roles(username, type))
-    roles.union(read_everyone_write_owner.get_GS_roles(username, type))
+    roles.union(read_everyone_write_everyone.get_gs_roles(username, type))
+    roles.union(read_everyone_write_owner.get_gs_roles(username, type))
 
     authz_module = get_authz_module()
-    roles = roles.difference_update(authz_module.get_GS_roles(username, type))
+    roles = roles.difference_update(authz_module.get_gs_roles(username, type))
     return roles

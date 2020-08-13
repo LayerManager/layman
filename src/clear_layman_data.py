@@ -52,10 +52,10 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
         'Content-type': 'application/json',
     }
 
-    authz_type = settings.GEOSERVER_ADMIN_AUTH or settings.LAYMAN_GS_AUTH
+    auth = settings.GEOSERVER_ADMIN_AUTH or settings.LAYMAN_GS_AUTH
     r = requests.get(settings.LAYMAN_GS_REST_USERS,
                      headers=headers_json,
-                     auth=authz_type
+                     auth=auth
                      )
     r.raise_for_status()
     all_users = [u['userName'] for u in r.json()['users']]
@@ -65,7 +65,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
     for user in all_users:
         r = requests.get(urljoin(settings.LAYMAN_GS_REST_ROLES, f'user/{user}/'),
                          headers=headers_json,
-                         auth=authz_type
+                         auth=auth
                          )
         r.raise_for_status()
         roles = r.json()['roleNames']
@@ -74,7 +74,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
             r = requests.delete(
                 urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, user + '.*.r'),
                 headers=headers_json,
-                auth=authz_type
+                auth=auth
             )
             if r.status_code != 404:
                 r.raise_for_status()
@@ -82,7 +82,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
             r = requests.delete(
                 urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, user + '.*.w'),
                 headers=headers_json,
-                auth=authz_type
+                auth=auth
             )
             if r.status_code != 404:
                 r.raise_for_status()
@@ -90,7 +90,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
             r = requests.delete(
                 urljoin(settings.LAYMAN_GS_REST_WORKSPACES, user),
                 headers=headers_json,
-                auth=authz_type,
+                auth=auth
                 params={
                     'recurse': 'true'
                 }
@@ -101,14 +101,14 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
                 r = requests.delete(
                     urljoin(settings.LAYMAN_GS_REST_ROLES, f'role/{role}/user/{user}/'),
                     headers=headers_json,
-                    auth=authz_type,
+                    auth=auth,
                 )
                 r.raise_for_status()
 
             r = requests.delete(
                 urljoin(settings.LAYMAN_GS_REST_USER, user),
                 headers=headers_json,
-                auth=authz_type,
+                auth=auth,
             )
             r.raise_for_status()
 

@@ -22,14 +22,14 @@ headers_xml = {
 }
 
 
-def get_all_rules(authz_type):
+def get_all_rules(auth):
     key = FLASK_RULES_KEY
     if key not in g:
         r = requests.get(
             settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
             # data=json.dumps(payload),
             headers=headers_json,
-            auth=authz_type
+            auth=auth
         )
         r.raise_for_status()
         # app.logger.info(r.text)
@@ -39,18 +39,18 @@ def get_all_rules(authz_type):
     return g.get(key)
 
 
-def check_username(username, authz_type=settings.LAYMAN_GS_AUTH):
+def check_username(username, auth=settings.LAYMAN_GS_AUTH):
     rolename = common.username_to_rolename(username)
 
-    if username in settings.GS_RESERVED_WORKSPACE_NAMES:
+    if username in common.RESERVED_WORKSPACE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'workspace': username})
 
-    if rolename in settings.GS_RESERVED_ROLE_NAMES:
+    if rolename in common.RESERVED_ROLE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
 
-    all_users = common.get_users(authz_type)
-    all_roles = common.get_roles(authz_type)
-    workspaces = common.get_all_workspaces(authz_type)
+    all_users = common.get_users(auth)
+    all_roles = common.get_roles(auth)
+    workspaces = common.get_all_workspaces(auth)
 
     if username in all_users:
         raise LaymanError(35, {'reserved_by': __name__, 'reason': f'GeoServer already has user with name {username}'})
@@ -107,9 +107,9 @@ def publish_layer_from_db(username, layername, description, title):
 
 
 # TODO is this method needed? If yes, we should detect rules by users with LAYMAN_GS_ROLE
-def get_layman_rules(authz_type=settings.LAYMAN_GS_AUTH, all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
+def get_layman_rules(auth=settings.LAYMAN_GS_AUTH, all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
     if all_rules == None:
-        all_rules = get_all_rules(authz_type)
+        all_rules = get_all_rules(auth)
     re_role = r".*\b" + re.escape(layman_role) + r"\b.*"
     result = {k: v for k, v in all_rules.items() if re.match(re_role, v)}
     return result

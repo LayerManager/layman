@@ -36,7 +36,7 @@ def get_publication_access_rights(publ_type, username, publication_name):
     }
 
 
-def get_GS_roles(username, type):
+def get_gs_roles(username, type):
     if type == 'r':
         roles = gs.get_roles_anyone(username)
     elif type == 'w':

@@ -12,31 +12,42 @@ from layman.authz import util as authz
 FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
 FLASK_RULES_KEY = f"{__name__}:RULES"
 
+RESERVED_WORKSPACE_NAMES = [
+    'default',
+]
+
+RESERVED_ROLE_NAMES = [
+    'ROLE_ADMINISTRATOR',
+    'ROLE_GROUP_ADMIN',
+    'ROLE_AUTHENTICATED',
+    'ROLE_ANONYMOUS',
+]
+
 headers_json = {
     'Accept': 'application/json',
     'Content-type': 'application/json',
 }
 
 
-def get_roles(authz_type):
+def get_roles(auth):
     r_url = settings.LAYMAN_GS_REST_ROLES
     r = requests.get(r_url,
                      headers=headers_json,
-                     auth=authz_type
+                     auth=auth
                      )
     r.raise_for_status()
     return r.json()['roleNames']
 
 
-def ensure_role(role, authz_type):
-    roles = get_roles(authz_type)
+def ensure_role(role, auth):
+    roles = get_roles(auth)
     role_exists = role in roles
     if not role_exists:
         app.logger.info(f"Role {role} does not exist yet, creating.")
         r = requests.post(
             urljoin(settings.LAYMAN_GS_REST_ROLES, 'role/' + role),
             headers=headers_json,
-            auth=authz_type,
+            auth=auth,
         )
         r.raise_for_status()
     else:
@@ -45,11 +56,11 @@ def ensure_role(role, authz_type):
     return role_created
 
 
-def delete_role(role, authz_type):
+def delete_role(role, auth):
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_ROLES, 'role/' + role),
         headers=headers_json,
-        auth=authz_type,
+        auth=auth,
     )
     role_not_exists = r.status_code == 404
     if not role_not_exists:
@@ -58,19 +69,19 @@ def delete_role(role, authz_type):
     return role_deleted
 
 
-def get_users(authz_type):
+def get_users(auth):
     r_url = settings.LAYMAN_GS_REST_USERS
     r = requests.get(r_url,
                      headers=headers_json,
-                     auth=authz_type
+                     auth=auth
                      )
     r.raise_for_status()
     # app.logger.info(f"users={r.text}")
     return r.json()['users']
 
 
-def ensure_user(user, password, authz_type):
-    users = get_users(authz_type)
+def ensure_user(user, password, auth):
+    users = get_users(auth)
     user_exists = next((u for u in users if u['userName'] == user), None) is not None
     if not user_exists:
         app.logger.info(f"User {user} does not exist yet, creating.")
@@ -92,7 +103,7 @@ def ensure_user(user, password, authz_type):
                 },
             }),
             headers=headers_json,
-            auth=authz_type,
+            auth=auth,
         )
         r.raise_for_status()
     else:
@@ -101,11 +112,11 @@ def ensure_user(user, password, authz_type):
     return user_created
 
 
-def get_user_data_security_roles(username, type, authz_type):
+def get_user_data_security_roles(username, type, auth):
     r = requests.get(
         settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
         headers=headers_json,
-        auth=authz_type
+        auth=auth
     )
     r.raise_for_status()
     rules = r.json()
@@ -117,7 +128,7 @@ def get_user_data_security_roles(username, type, authz_type):
     return roles
 
 
-def ensure_user_data_security_roles(username, roles, type, authz_type):
+def ensure_user_data_security_roles(username, roles, type, auth):
     rule = username + '.*.' + type
     roles_str = ', '.join(roles)
     r = requests.post(
@@ -125,32 +136,32 @@ def ensure_user_data_security_roles(username, roles, type, authz_type):
         data=json.dumps(
             {rule: roles_str}),
         headers=headers_json,
-        auth=authz_type
+        auth=auth
     )
     r.raise_for_status()
 
 
-def ensure_user_data_security(username, type, authz_type):
-    roles = get_user_data_security_roles(username, type, authz_type)
+def ensure_user_data_security(username, type, auth):
+    roles = get_user_data_security_roles(username, type, auth)
 
-    all_roles = authz.get_all_GS_roles(username, type)
+    all_roles = authz.get_all_gs_roles(username, type)
     roles.difference_update(all_roles)
 
     authz_module = authz.get_authz_module()
-    new_roles = authz_module.get_GS_roles(username, type)
+    new_roles = authz_module.get_gs_roles(username, type)
     roles.update(new_roles)
 
-    ensure_user_data_security_roles(username, roles, type, authz_type)
+    ensure_user_data_security_roles(username, roles, type, auth)
 
 
-def get_all_workspaces(authz_type):
+def get_all_workspaces(auth):
     key = FLASK_WORKSPACES_KEY
     if key not in g:
         r = requests.get(
             settings.LAYMAN_GS_REST_WORKSPACES,
             # data=json.dumps(payload),
             headers=headers_json,
-            auth=authz_type
+            auth=auth
         )
         r.raise_for_status()
         if r.json()['workspaces'] == "":
@@ -162,17 +173,17 @@ def get_all_workspaces(authz_type):
     return g.get(key)
 
 
-def get_layman_users(authz_type=settings.LAYMAN_GS_AUTH):
-    users = get_users(authz_type)
+def get_layman_users(auth=settings.LAYMAN_GS_AUTH):
+    users = get_users(auth)
     layman_users = set()
-    for user in users:
-        roles = get_user_roles(user, authz_type)
+    for user in [u['userName'] for u in users]:
+        roles = get_user_roles(user, auth)
         if settings.LAYMAN_GS_ROLE in roles:
             layman_users.add(user)
     return layman_users
 
 
-def ensure_user_db_store(username, authz_type):
+def ensure_user_db_store(username, auth):
     r = requests.post(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + '/datastores'),
         data=json.dumps({
@@ -213,44 +224,44 @@ def ensure_user_db_store(username, authz_type):
             }
         }),
         headers=headers_json,
-        auth=authz_type
+        auth=auth
     )
     r.raise_for_status()
 
 
-def delete_user_db_store(username, authz_type):
+def delete_user_db_store(username, auth):
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + f'/datastores/{username}'),
         headers=headers_json,
-        auth=authz_type
+        auth=auth
     )
     if r.status_code != 404:
         r.raise_for_status()
 
 
-def ensure_user_workspace(username, authz_type):
-    all_workspaces = get_all_workspaces(authz_type)
+def ensure_user_workspace(username, auth):
+    all_workspaces = get_all_workspaces(auth)
     if not any(ws['name'] == username for ws in all_workspaces):
         r = requests.post(
             settings.LAYMAN_GS_REST_WORKSPACES,
             data=json.dumps({'workspace': {'name': username}}),
             headers=headers_json,
-            auth=authz_type
+            auth=auth
         )
         r.raise_for_status()
 
-        ensure_user_data_security(username, 'r', authz_type)
-        ensure_user_data_security(username, 'w', authz_type)
-        ensure_user_db_store(username, authz_type)
+        ensure_user_data_security(username, 'r', auth)
+        ensure_user_data_security(username, 'w', auth)
+        ensure_user_db_store(username, auth)
 
 
-def delete_user_workspace(username, authz_type):
-    delete_user_db_store(username, authz_type)
+def delete_user_workspace(username, auth):
+    delete_user_db_store(username, auth)
 
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, username + '.*.r'),
         headers=headers_json,
-        auth=authz_type
+        auth=auth
     )
     if r.status_code != 404:
         r.raise_for_status()
@@ -258,7 +269,7 @@ def delete_user_workspace(username, authz_type):
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, username + '.*.w'),
         headers=headers_json,
-        auth=authz_type
+        auth=auth
     )
     if r.status_code != 404:
         r.raise_for_status()
@@ -266,40 +277,40 @@ def delete_user_workspace(username, authz_type):
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username),
         headers=headers_json,
-        auth=authz_type
+        auth=auth
     )
     if r.status_code != 404:
         r.raise_for_status()
 
 
-def ensure_whole_user(username, authz_type=settings.LAYMAN_GS_AUTH):
-    ensure_user(username, None, authz_type)
+def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
+    ensure_user(username, None, auth)
     role = username_to_rolename(username)
-    ensure_role(role, authz_type)
-    ensure_user_role(username, role, authz_type)
-    ensure_user_role(username, settings.LAYMAN_GS_ROLE, authz_type)
-    ensure_user_workspace(username, authz_type)
+    ensure_role(role, auth)
+    ensure_user_role(username, role, auth)
+    ensure_user_role(username, settings.LAYMAN_GS_ROLE, auth)
+    ensure_user_workspace(username, auth)
 
 
-def delete_whole_user(username, authz_type=settings.LAYMAN_GS_AUTH):
+def delete_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
     role = username_to_rolename(username)
-    delete_user_workspace(username, authz_type)
-    delete_user_role(username, role, authz_type)
-    delete_user_role(username, settings.LAYMAN_GS_ROLE, authz_type)
-    delete_role(role, authz_type)
-    delete_user(username, authz_type)
+    delete_user_workspace(username, auth)
+    delete_user_role(username, role, auth)
+    delete_user_role(username, settings.LAYMAN_GS_ROLE, auth)
+    delete_role(role, auth)
+    delete_user(username, auth)
 
 
 def username_to_rolename(username):
     return f"USER_{username.upper()}"
 
 
-def delete_user(user, authz_type):
+def delete_user(user, auth):
     r_url = urljoin(settings.LAYMAN_GS_REST_USER, user)
     r = requests.delete(
         r_url,
         headers=headers_json,
-        auth=authz_type,
+        auth=auth,
     )
     user_not_exists = r.status_code == 404
     if not user_not_exists:
@@ -308,18 +319,18 @@ def delete_user(user, authz_type):
     return user_deleted
 
 
-def get_user_roles(user, authz_type):
+def get_user_roles(user, auth):
     r_url = urljoin(settings.LAYMAN_GS_REST_ROLES, f'user/{user}/')
     r = requests.get(r_url,
                      headers=headers_json,
-                     auth=authz_type
+                     auth=auth
                      )
     r.raise_for_status()
     return r.json()['roleNames']
 
 
-def ensure_user_role(user, role, authz_type):
-    roles = get_user_roles(user, authz_type)
+def ensure_user_role(user, role, auth):
+    roles = get_user_roles(user, auth)
     association_exists = role in roles
     if not association_exists:
         app.logger.info(f"Role {role} not associated with user {user} yet, associating.")
@@ -327,7 +338,7 @@ def ensure_user_role(user, role, authz_type):
         r = requests.post(
             r_url,
             headers=headers_json,
-            auth=authz_type,
+            auth=auth,
         )
         r.raise_for_status()
     else:
@@ -336,12 +347,12 @@ def ensure_user_role(user, role, authz_type):
     return association_created
 
 
-def delete_user_role(user, role, authz_type):
+def delete_user_role(user, role, auth):
     r_url = urljoin(settings.LAYMAN_GS_REST_ROLES, f'role/{role}/user/{user}/')
     r = requests.delete(
         r_url,
         headers=headers_json,
-        auth=authz_type,
+        auth=auth,
     )
     association_not_exists = r.status_code == 404
     if not association_not_exists:
@@ -350,25 +361,25 @@ def delete_user_role(user, role, authz_type):
     return association_deleted
 
 
-def get_wms_settings(authz_type):
+def get_wms_settings(auth):
     r_url = settings.LAYMAN_GS_REST_WMS_SETTINGS
     r = requests.get(r_url,
                      headers=headers_json,
-                     auth=authz_type,
+                     auth=auth,
                      )
     r.raise_for_status()
     return r.json()['wms']
 
 
-def get_wms_srs_list(authz_type, wms_settings=None):
+def get_wms_srs_list(auth, wms_settings=None):
     if wms_settings is None:
-        wms_settings = get_wms_settings(authz_type)
+        wms_settings = get_wms_settings(auth)
     return wms_settings.get('srs', {}).get('string', [])
 
 
-def ensure_wms_srs_list(srs_list, authz_type):
-    wms_settings = get_wms_settings(authz_type)
-    current_srs_list = get_wms_srs_list(authz_type, wms_settings=wms_settings)
+def ensure_wms_srs_list(srs_list, auth):
+    wms_settings = get_wms_settings(auth)
+    current_srs_list = get_wms_srs_list(auth, wms_settings=wms_settings)
     list_equals = set(current_srs_list) == set(srs_list)
     if not list_equals:
         wms_settings['srs'] = {
@@ -382,7 +393,7 @@ def ensure_wms_srs_list(srs_list, authz_type):
                 'wms': wms_settings,
             }),
             headers=headers_json,
-            auth=authz_type,
+            auth=auth,
         )
         r.raise_for_status()
     else:
@@ -391,25 +402,25 @@ def ensure_wms_srs_list(srs_list, authz_type):
     return list_changed
 
 
-def get_global_settings(authz_type):
+def get_global_settings(auth):
     r_url = settings.LAYMAN_GS_REST_SETTINGS
     r = requests.get(r_url,
                      headers=headers_json,
-                     auth=authz_type,
+                     auth=auth,
                      )
     r.raise_for_status()
     return r.json()['global']
 
 
-def get_proxy_base_url(authz_type, global_settings=None):
+def get_proxy_base_url(auth, global_settings=None):
     if global_settings is None:
-        global_settings = get_global_settings(authz_type)
+        global_settings = get_global_settings(auth)
     return global_settings['settings'].get('proxyBaseUrl', None)
 
 
-def ensure_proxy_base_url(proxy_base_url, authz_type):
-    global_settings = get_global_settings(authz_type)
-    current_url = get_proxy_base_url(authz_type, global_settings=global_settings)
+def ensure_proxy_base_url(proxy_base_url, auth):
+    global_settings = get_global_settings(auth)
+    current_url = get_proxy_base_url(auth, global_settings=global_settings)
     url_equals = proxy_base_url == current_url
     if not url_equals:
         global_settings['settings']['proxyBaseUrl'] = proxy_base_url
@@ -421,7 +432,7 @@ def ensure_proxy_base_url(proxy_base_url, authz_type):
                 'global': global_settings
             }),
             headers=headers_json,
-            auth=authz_type,
+            auth=auth,
         )
         r.raise_for_status()
     else:
