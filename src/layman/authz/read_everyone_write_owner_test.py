@@ -54,7 +54,9 @@ def client():
 def test_get_access(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username))
-    assert rv.status_code == 200
+    assert rv.status_code == 404
+    resp_json = rv.get_json()
+    assert resp_json['code'] == 40
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 0
     })

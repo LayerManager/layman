@@ -51,7 +51,13 @@ def to_safe_names(unsafe_names, type_name):
 def check_username_decorator(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        check_username(request.view_args['username'])
+        username = request.view_args['username']
+        if request.method == 'POST':
+            # check username, because the user (workspace) can be created by POST methods
+            check_username(username)
+        else:
+            if username not in get_usernames():
+                raise LaymanError(40)
         result = f(*args, **kwargs)
         return result
 

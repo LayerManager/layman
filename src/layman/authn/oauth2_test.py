@@ -247,7 +247,9 @@ def test_token_active(client):
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
     })
-    assert rv.status_code == 200
+    assert rv.status_code == 404
+    resp_json = rv.get_json()
+    assert resp_json['code'] == 40
 
 
 @pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url', 'server')

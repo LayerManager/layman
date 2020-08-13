@@ -50,21 +50,6 @@ def check_username(username, conn_cur=None):
     if username in settings.PG_NON_USER_SCHEMAS:
         raise LaymanError(35, {'reserved_by': __name__, 'schema': username})
 
-    if conn_cur is None:
-        conn_cur = get_connection_cursor()
-    conn, cur = conn_cur
-
-    try:
-        cur.execute(f"""select catalog_name, schema_name, schema_owner
-    from information_schema.schemata
-    where schema_owner <> '{settings.LAYMAN_PG_USER}' and schema_name = '{username}'""")
-    except:
-        raise LaymanError(7)
-    rows = cur.fetchall()
-    if len(rows) > 0:
-        raise LaymanError(35, {'reserved_by': __name__, 'schema': username,
-                               'reason': 'DB schema owned by another than layman user'})
-
 
 def ensure_user_workspace(username, conn_cur=None):
     if conn_cur is None:
