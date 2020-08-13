@@ -8,7 +8,8 @@ TEST_USER = 'test_user_abc'
 TEST_USER_PASSWORD = 'test_user_abc_pwd'
 TEST_WMS_SRS_LIST = [3035]
 TEST_PROXY_BASE_URL = 'https://example.com/geoserver/'
-auth = settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS
+auth = settings.LAYMAN_GS_AUTH
+
 
 @pytest.fixture(scope="module", autouse=True)
 def app_context():
