@@ -365,7 +365,7 @@ def test_patch_current_user_without_username(client):
         assert rv.status_code == 409
         r_json = rv.get_json()
         assert r_json['code'] == 35
-#        assert 'detail' not in r_json
+        assert 'detail' not in r_json
 
     # reserve other username by other user
     with app.app_context():
