@@ -113,6 +113,7 @@ def ensure_user(user, password, auth):
     return user_created
 
 
+# TODO rename to get_workspace_security_roles, rename username to workspace
 def get_user_data_security_roles(username, type, auth):
     r = requests.get(
         settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
@@ -129,6 +130,7 @@ def get_user_data_security_roles(username, type, auth):
     return roles
 
 
+# TODO rename to ensure_workspace_security_roles, rename username to workspace
 def ensure_user_data_security_roles(username, roles, type, auth):
     rule = username + '.*.' + type
     roles_str = ', '.join(roles)
