@@ -106,6 +106,14 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
                 r.raise_for_status()
 
             r = requests.delete(
+                urljoin(settings.LAYMAN_GS_REST_ROLES, 'role/' + f"USER_{user.upper()}"),
+                headers=headers_json,
+                auth=auth,
+            )
+            if r.status_code != 404:
+                r.raise_for_status()
+
+            r = requests.delete(
                 urljoin(settings.LAYMAN_GS_REST_USER, user),
                 headers=headers_json,
                 auth=auth,

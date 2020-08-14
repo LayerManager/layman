@@ -60,7 +60,7 @@ def test_user_management():
     assert len(init_usernames) + 1 == len(usernames)
     assert common.delete_user(new_user, auth)
     usernames = common.get_usernames(auth)
-    assert new_user not in [u['userName'] for u in usernames]
+    assert new_user not in usernames
     assert len(init_usernames) == len(usernames)
 
 
