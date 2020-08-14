@@ -73,7 +73,9 @@ def app_context():
 def test_anonymous_get_access(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username))
-    assert rv.status_code == 200
+    assert rv.status_code == 404
+    resp_json = rv.get_json()
+    assert resp_json['code'] == 40
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 0
     })
@@ -115,7 +117,9 @@ def test_authn_get_access(client):
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
     })
-    assert rv.status_code == 200
+    assert rv.status_code == 404
+    resp_json = rv.get_json()
+    assert resp_json['code'] == 40
 
 
 @pytest.mark.usefixtures('app_context', 'active_token_introspection_url')

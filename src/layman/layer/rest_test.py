@@ -168,7 +168,7 @@ def test_no_file(client):
 @pytest.mark.usefixtures('app_context')
 def test_username_schema_conflict(client):
     if len(settings.PG_NON_USER_SCHEMAS) == 0:
-        pass
+        return
     rv = client.post(url_for('rest_layers.post', username=settings.PG_NON_USER_SCHEMAS[0]))
     assert rv.status_code == 409
     resp_json = rv.get_json()
@@ -191,7 +191,6 @@ def test_username_schema_conflict(client):
         assert rv.status_code == 409
         assert resp_json['code'] == 35
         assert resp_json['detail']['reserved_by'] == db.__name__
-        assert resp_json['detail']['reason'] == 'DB schema owned by another than layman user'
 
 
 @pytest.mark.usefixtures('app_context')

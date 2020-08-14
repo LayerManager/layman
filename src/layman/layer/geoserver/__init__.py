@@ -41,23 +41,12 @@ def get_all_rules(auth):
 
 def check_username(username, auth=settings.LAYMAN_GS_AUTH):
     rolename = common.username_to_rolename(username)
-
     if username in common.RESERVED_WORKSPACE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'workspace': username})
 
     if rolename in common.RESERVED_ROLE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
 
-    all_usernames = common.get_usernames(auth)
-    all_roles = common.get_roles(auth)
-    workspaces = common.get_all_workspaces(auth)
-
-    if username in all_usernames:
-        raise LaymanError(35, {'reserved_by': __name__, 'reason': f'GeoServer already has user with name {username}'})
-    if rolename in all_roles:
-        raise LaymanError(35, {'reserved_by': __name__, 'reason': f'GeoServer already has role with name {rolename}'})
-    if username in workspaces:
-        raise LaymanError(35, {'reserved_by': __name__, 'reason': f'GeoServer already has workspace with name {username}'})
 
 
 ensure_whole_user = common.ensure_whole_user

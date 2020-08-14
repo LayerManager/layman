@@ -1,7 +1,8 @@
 from flask import g, request
+import re
 
 from layman import LaymanError
-from layman.authn.url_path import USER_PATH_PATTERN
+USER_PATH_PATTERN = re.compile('^/rest/([a-z][a-z0-9]*(?:_[a-z0-9]+)*)(?:/[^\n]*)?$')
 
 from layman.common import geoserver as gs
 

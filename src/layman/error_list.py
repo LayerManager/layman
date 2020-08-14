@@ -40,4 +40,5 @@ ERROR_LIST = {
     37: (400, 'CSW exception.'),
     38: (400, 'Micka HTTP or connection error.'),
     39: (404, 'Metadata record does not exists.'),
+    40: (404, 'Username does not exist.'),
 }

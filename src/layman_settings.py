@@ -59,13 +59,13 @@ LAYMAN_GS_REST_USER = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAYM
 LAYMAN_GS_REST_WMS_SETTINGS = urljoin(LAYMAN_GS_REST, f'services/wms/settings/')
 
 
-# List of schemas that are owned by LAYMAN_PG_USER, but should not be used
-# by layman.
-# Note: Schemas as public, topology, or pg_catalog are usually owned by
-# 'postgres' user, so it is not necessary to list it here.
+# List of schemas that are not allowed to be used as usernames.
 PG_NON_USER_SCHEMAS = [
     'public',
     'topology',
+    'pg_catalog',
+    'pg_toast',
+    'information_schema',
 ]
 
 PG_POSTGIS_SCHEMA = 'public'
