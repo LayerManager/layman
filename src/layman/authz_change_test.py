@@ -26,6 +26,10 @@ def liferay_mock():
             'ENV': 'development',
             'SERVER_NAME': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}",
             'SESSION_COOKIE_DOMAIN': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}",
+            'OAUTH2_USERS': {
+                'test_authz_change1': None,
+                'test_authz_change2': None,
+            },
         },
         'host': '0.0.0.0',
         'port': LIFERAY_PORT,
@@ -125,14 +129,6 @@ def assert_user_layers(username, layernames):
     assert r.status_code == 200, f"r.status_code={r.status_code}\n{r.text}=r.text"
     layman_names = [li['name'] for li in r.json()]
     assert set(layman_names) == set(layernames), f"{r.text}=r.text"
-
-
-def assert_username_not_yet_used(username):
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
-    r_url = f"{rest_url}/{username}/layers"
-    r = requests.get(r_url)
-    assert r.status_code == 404, f"r.status_code={r.status_code}\n{r.text}=r.text"
-    assert r.json()['code'] == 40
 
 
 def reserve_username(username, headers=None):
