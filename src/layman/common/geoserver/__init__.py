@@ -175,16 +175,6 @@ def get_all_workspaces(auth):
     return g.get(key)
 
 
-def get_layman_users(auth=settings.LAYMAN_GS_AUTH):
-    usernames = get_usernames(auth)
-    layman_users = set()
-    for user in usernames:
-        roles = get_user_roles(user, auth)
-        if settings.LAYMAN_GS_ROLE in roles:
-            layman_users.add(user)
-    return layman_users
-
-
 def ensure_user_db_store(username, auth):
     r = requests.post(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + '/datastores'),

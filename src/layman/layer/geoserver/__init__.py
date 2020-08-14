@@ -8,6 +8,7 @@ from flask import g, current_app as app
 from layman.http import LaymanError
 from layman import settings
 from layman.common import geoserver as common
+from .util import get_layman_users
 
 FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
 FLASK_RULES_KEY = f"{__name__}:RULES"
@@ -94,7 +95,7 @@ def publish_layer_from_db(username, layername, description, title):
     wms.clear_cache(username)
 
 
-get_usernames = common.get_layman_users
+get_usernames = get_layman_users
 
 
 def check_new_layername(username, layername):

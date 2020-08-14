@@ -5,7 +5,7 @@ from owslib.wms import WebMapService
 from owslib.wfs import WebFeatureService
 
 from layman.cache.mem import CACHE as MEM_CACHE
-from layman.common.geoserver import headers_json, get_proxy_base_url
+from layman.common.geoserver import headers_json, get_proxy_base_url, get_usernames, get_user_roles
 
 
 CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL'
@@ -83,3 +83,13 @@ def wfs_proxy(wfs_url, xml=None, version=None):
             )
             method['url'] = method_url.geturl()
     return wfs
+
+
+def get_layman_users(auth=settings.LAYMAN_GS_AUTH):
+    usernames = get_usernames(auth)
+    layman_users = set()
+    for user in usernames:
+        roles = get_user_roles(user, auth)
+        if settings.LAYMAN_GS_ROLE in roles and user != settings.LAYMAN_GS_USER:
+            layman_users.add(user)
+    return layman_users
