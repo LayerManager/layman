@@ -6,6 +6,8 @@ import time
 import requests
 import subprocess
 from test.mock.liferay import run
+from layman import settings
+from layman.common import geoserver
 
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
@@ -15,6 +17,12 @@ LIFERAY_PORT = 8020
 SUBPROCESSES = set()
 ISS_URL_HEADER = 'AuthorizationIssUrl'
 TOKEN_HEADER = 'Authorization'
+
+AUTHN_SETTINGS = {
+    'LAYMAN_AUTHN_MODULES': 'layman.authn.oauth2',
+    'OAUTH2_LIFERAY_INTROSPECTION_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection?is_active=true",
+    'OAUTH2_LIFERAY_USER_PROFILE_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile",
+}
 
 
 @pytest.fixture(scope="module")
@@ -27,8 +35,10 @@ def liferay_mock():
             'SERVER_NAME': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}",
             'SESSION_COOKIE_DOMAIN': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}",
             'OAUTH2_USERS': {
-                'test_authz_change1': None,
-                'test_authz_change2': None,
+                'test_rewe1': None,
+                'test_rewo1': None,
+                'test_rewe_rewo1': None,
+                'test_rewe_rewo2': None,
             },
         },
         'host': '0.0.0.0',
@@ -49,7 +59,7 @@ def liferay_mock():
 
 
 @pytest.fixture(scope="module", autouse=True)
-def stop_subprocesses():
+def clear():
     yield
     while len(SUBPROCESSES) > 0:
         proc = next(iter(SUBPROCESSES))
@@ -141,24 +151,56 @@ def reserve_username(username, headers=None):
     assert claimed_username == username
 
 
-def test_authz_change(liferay_mock):
-    test_user1 = 'test_authz_change1'
+def assert_gs_user_and_roles(username):
+    auth = settings.LAYMAN_GS_AUTH
+    gs_usernames = geoserver.get_usernames(auth)
+    assert username in gs_usernames
+    gs_user_roles = geoserver.get_user_roles(username, auth)
+    user_role = f"USER_{username.upper()}"
+    assert user_role in gs_user_roles
+    assert settings.LAYMAN_GS_ROLE in gs_user_roles
+
+
+def assert_gs_rewe_data_security(username):
+    auth = settings.LAYMAN_GS_AUTH
+    user_role = f"USER_{username.upper()}"
+    gs_roles = geoserver.get_user_data_security_roles(username, 'r', auth)
+    assert settings.LAYMAN_GS_ROLE in gs_roles
+    assert 'ROLE_ANONYMOUS' in gs_roles
+    assert 'ROLE_AUTHENTICATED' in gs_roles
+    gs_roles = geoserver.get_user_data_security_roles(username, 'w', auth)
+    assert settings.LAYMAN_GS_ROLE in gs_roles
+    assert 'ROLE_ANONYMOUS' in gs_roles
+    assert 'ROLE_AUTHENTICATED' in gs_roles
+
+
+def assert_gs_rewo_data_security(username):
+    auth = settings.LAYMAN_GS_AUTH
+    user_role = f"USER_{username.upper()}"
+    gs_roles = geoserver.get_user_data_security_roles(username, 'r', auth)
+    assert settings.LAYMAN_GS_ROLE in gs_roles
+    assert 'ROLE_ANONYMOUS' in gs_roles
+    assert 'ROLE_AUTHENTICATED' in gs_roles
+    gs_roles = geoserver.get_user_data_security_roles(username, 'w', auth)
+    assert user_role in gs_roles
+    assert 'ROLE_ANONYMOUS' not in gs_roles
+    assert 'ROLE_AUTHENTICATED' not in gs_roles
+
+
+def test_rewe(liferay_mock):
+    test_user1 = 'test_rewe1'
     layername1 = 'layer1'
 
-    oauth_settings = {
-        'LAYMAN_AUTHN_MODULES': 'layman.authn.oauth2',
-        'OAUTH2_LIFERAY_INTROSPECTION_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection?is_active=true",
-        'OAUTH2_LIFERAY_USER_PROFILE_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile",
-    }
-
     layman_process = start_layman(dict({
-        'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner',
-    }, **oauth_settings))
+        'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_everyone',
+    }, **AUTHN_SETTINGS))
     authn_headers1 = {
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': f'Bearer {test_user1}',
     }
     reserve_username(test_user1, headers=authn_headers1)
+    assert_gs_user_and_roles(test_user1)
+    assert_gs_rewe_data_security(test_user1)
 
     ln = publish_layer(test_user1, layername1, [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
@@ -166,18 +208,78 @@ def test_authz_change(liferay_mock):
     assert ln == layername1
     assert_user_layers(test_user1, [layername1])
 
+    delete_layer(test_user1, layername1, headers=authn_headers1)
+
     stop_process(layman_process)
 
-    test_user2 = 'test_authz_change2'
+
+def test_rewo(liferay_mock):
+    test_user1 = 'test_rewo1'
+    layername1 = 'layer1'
+    layman_process = start_layman(dict({
+        'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner',
+    }, **AUTHN_SETTINGS))
+    authn_headers2 = {
+        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+        f'{TOKEN_HEADER}': f'Bearer {test_user1}',
+    }
+    reserve_username(test_user1, headers=authn_headers2)
+    assert_gs_user_and_roles(test_user1)
+    assert_gs_rewo_data_security(test_user1)
+
+    ln = publish_layer(test_user1, layername1, [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+    ], headers=authn_headers2)
+    assert ln == layername1
+    assert_user_layers(test_user1, [layername1])
+
+    delete_layer(test_user1, layername1, headers=authn_headers2)
+
+    stop_process(layman_process)
+
+
+def test_rewe_rewo(liferay_mock):
+    test_user1 = 'test_rewe_rewo1'
+    layername1 = 'layer1'
+
+    layman_process = start_layman(dict({
+        'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_everyone',
+    }, **AUTHN_SETTINGS))
+
+    authn_headers1 = {
+        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+        f'{TOKEN_HEADER}': f'Bearer {test_user1}',
+    }
+    reserve_username(test_user1, headers=authn_headers1)
+    assert_gs_user_and_roles(test_user1)
+    assert_gs_rewe_data_security(test_user1)
+
+    ln = publish_layer(test_user1, layername1, [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+    ], headers=authn_headers1)
+    assert ln == layername1
+    assert_user_layers(test_user1, [layername1])
+
+    delete_layer(test_user1, layername1, headers=authn_headers1)
+
+    stop_process(layman_process)
+
+    test_user2 = 'test_rewe_rewo2'
     layername2 = 'layer2'
     layman_process = start_layman(dict({
         'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner',
-    }, **oauth_settings))
+    }, **AUTHN_SETTINGS))
     authn_headers2 = {
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': f'Bearer {test_user2}',
     }
+
+    assert_gs_user_and_roles(test_user1)
+    assert_gs_rewo_data_security(test_user1)
+
     reserve_username(test_user2, headers=authn_headers2)
+    assert_gs_user_and_roles(test_user2)
+    assert_gs_rewo_data_security(test_user2)
 
     ln = publish_layer(test_user2, layername2, [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
@@ -185,7 +287,8 @@ def test_authz_change(liferay_mock):
     assert ln == layername2
     assert_user_layers(test_user2, [layername2])
 
-    delete_layer(test_user1, layername1, headers=authn_headers1)
     delete_layer(test_user2, layername2, headers=authn_headers2)
 
     stop_process(layman_process)
+
+
