@@ -36,7 +36,7 @@ def liferay_mock():
         },
     })
     server.start()
-    time.sleep(1)
+    time.sleep(10)
 
     yield server
 
