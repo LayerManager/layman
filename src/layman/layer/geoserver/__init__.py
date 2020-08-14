@@ -95,15 +95,6 @@ def publish_layer_from_db(username, layername, description, title):
     wms.clear_cache(username)
 
 
-# TODO is this method needed? If yes, we should detect rules by users with LAYMAN_GS_ROLE
-def get_layman_rules(auth=settings.LAYMAN_GS_AUTH, all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
-    if all_rules == None:
-        all_rules = get_all_rules(auth)
-    re_role = r".*\b" + re.escape(layman_role) + r"\b.*"
-    result = {k: v for k, v in all_rules.items() if re.match(re_role, v)}
-    return result
-
-
 get_usernames = common.get_layman_users
 
 

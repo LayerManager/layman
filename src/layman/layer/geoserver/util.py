@@ -16,12 +16,8 @@ from layman import settings
 def get_gs_proxy_base_url():
     proxy_base_url = MEM_CACHE.get(CACHE_GS_PROXY_BASE_URL_KEY)
     if proxy_base_url is None:
-        try:
-            proxy_base_url = get_proxy_base_url()
-        except:
-            pass
-        if proxy_base_url is not None:
-            MEM_CACHE.set(CACHE_GS_PROXY_BASE_URL_KEY, proxy_base_url, ttl=settings.LAYMAN_CACHE_GS_TIMEOUT)
+        proxy_base_url = get_proxy_base_url(settings.LAYMAN_GS_AUTH)
+        MEM_CACHE.set(CACHE_GS_PROXY_BASE_URL_KEY, proxy_base_url, ttl=settings.LAYMAN_CACHE_GS_TIMEOUT)
     return proxy_base_url
 
 

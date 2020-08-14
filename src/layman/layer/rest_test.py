@@ -838,7 +838,8 @@ def test_post_layers_sld_1_1_0(client):
         for fp in files:
             fp[0].close()
 
-    time.sleep(0.5)
+    # TODO improve waiting
+    time.sleep(2)
 
     wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)
