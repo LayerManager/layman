@@ -48,7 +48,6 @@ def check_username(username, auth=settings.LAYMAN_GS_AUTH):
         raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
 
 
-
 ensure_whole_user = common.ensure_whole_user
 
 
