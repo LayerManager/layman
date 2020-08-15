@@ -4,6 +4,7 @@ import importlib
 from multiprocessing import Process
 import time
 import requests
+from requests.exceptions import ConnectionError
 import subprocess
 from test.mock.liferay import run
 from layman import settings
@@ -18,11 +19,28 @@ SUBPROCESSES = set()
 ISS_URL_HEADER = 'AuthorizationIssUrl'
 TOKEN_HEADER = 'Authorization'
 
+AUTHN_INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection?is_active=true"
+
 AUTHN_SETTINGS = {
     'LAYMAN_AUTHN_MODULES': 'layman.authn.oauth2',
-    'OAUTH2_LIFERAY_INTROSPECTION_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection?is_active=true",
+    'OAUTH2_LIFERAY_INTROSPECTION_URL': AUTHN_INTROSPECTION_URL,
     'OAUTH2_LIFERAY_USER_PROFILE_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile",
 }
+
+
+def wait_for_url(url, max_attempts, sleeping_time):
+    attempt = 1
+    while True:
+        # print(f"Waiting for URL {url}, attempt {attempt}")
+        try:
+            r = requests.get(url)
+            break
+        except ConnectionError as e:
+            if attempt == max_attempts:
+                print(f"Max attempts reached")
+                raise e
+            attempt += 1
+        time.sleep(sleeping_time)
 
 
 @pytest.fixture(scope="module")
@@ -50,7 +68,7 @@ def liferay_mock():
         },
     })
     server.start()
-    time.sleep(10)
+    wait_for_url(AUTHN_INTROSPECTION_URL, 20, 0.1)
 
     yield server
 
@@ -78,7 +96,8 @@ def start_layman(env_vars=None):
     layman_process = subprocess.Popen(cmd.split(), shell=False, stdin=None, env=new_env)
 
     SUBPROCESSES.add(layman_process)
-    time.sleep(2)
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest/current-user"
+    wait_for_url(rest_url, 50, 0.1)
     return layman_process
 
 
