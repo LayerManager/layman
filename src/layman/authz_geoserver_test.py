@@ -301,6 +301,8 @@ def test_rewe_rewo(liferay_mock):
     assert_gs_user_and_roles(test_user1)
     assert_gs_rewo_data_security(test_user1)
     assert custom_role in geoserver.get_user_roles(test_user1, auth)
+    assert geoserver.delete_user_role(test_user1, custom_role, auth)
+    assert geoserver.delete_role(custom_role, auth)
 
     reserve_username(test_user2, headers=authn_headers2)
     assert_gs_user_and_roles(test_user2)
