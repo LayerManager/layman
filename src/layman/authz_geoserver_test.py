@@ -272,6 +272,11 @@ def test_rewe_rewo(liferay_mock):
     reserve_username(test_user1, headers=authn_headers1)
     assert_gs_user_and_roles(test_user1)
     assert_gs_rewe_data_security(test_user1)
+    custom_role = 'CUSTOM_ROLE'
+    auth = settings.LAYMAN_GS_AUTH
+    assert geoserver.ensure_role(custom_role, auth)
+    assert geoserver.ensure_user_role(test_user1, custom_role, auth)
+    assert custom_role in geoserver.get_user_roles(test_user1, auth)
 
     ln = publish_layer(test_user1, layername1, [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
@@ -295,6 +300,7 @@ def test_rewe_rewo(liferay_mock):
 
     assert_gs_user_and_roles(test_user1)
     assert_gs_rewo_data_security(test_user1)
+    assert custom_role in geoserver.get_user_roles(test_user1, auth)
 
     reserve_username(test_user2, headers=authn_headers2)
     assert_gs_user_and_roles(test_user2)
