@@ -142,6 +142,40 @@ def publish_layer(username, layername, file_paths, headers=None):
     return layername
 
 
+def patch_layer(username, layername, file_paths, headers=None):
+    headers = headers or {}
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
+
+    r_url = f"{rest_url}/{username}/layers/{layername}"
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        r = requests.patch(r_url, files=[
+            ('file', (os.path.basename(fp), open(fp, 'rb')))
+            for fp in file_paths
+        ], headers=headers)
+        assert r.status_code == 200, r.text
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    r_url = f"{rest_url}/{username}/layers/{layername}"
+    r = requests.get(r_url)
+    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
+    max_attempts = 20
+    attempts = 1
+    while not (r.status_code == 200 and all(
+            'status' not in r.json()[k] for k in keys_to_check
+    )):
+        time.sleep(0.5)
+        r = requests.get(r_url)
+        attempts += 1
+        if attempts > max_attempts:
+            raise Exception('Max attempts reached!')
+    return layername
+
+
 def delete_layer(username, layername, headers=None):
     headers = headers or {}
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
@@ -284,7 +318,6 @@ def test_rewe_rewo(liferay_mock):
     assert ln == layername1
     assert_user_layers(test_user1, [layername1])
 
-    delete_layer(test_user1, layername1, headers=authn_headers1)
 
     stop_process(layman_process)
 
@@ -303,6 +336,13 @@ def test_rewe_rewo(liferay_mock):
     assert custom_role in geoserver.get_user_roles(test_user1, auth)
     assert geoserver.delete_user_role(test_user1, custom_role, auth)
     assert geoserver.delete_role(custom_role, auth)
+    patch_layer(test_user1, layername1, [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+    ], headers=authn_headers1)
+    with pytest.raises(AssertionError):
+        patch_layer(test_user1, layername1, [
+            'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+        ], headers=authn_headers2)
 
     reserve_username(test_user2, headers=authn_headers2)
     assert_gs_user_and_roles(test_user2)
@@ -314,6 +354,15 @@ def test_rewe_rewo(liferay_mock):
     assert ln == layername2
     assert_user_layers(test_user2, [layername2])
 
+    patch_layer(test_user2, layername2, [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+    ], headers=authn_headers2)
+    with pytest.raises(AssertionError):
+        patch_layer(test_user2, layername2, [
+            'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+        ], headers=authn_headers1)
+
+    delete_layer(test_user1, layername1, headers=authn_headers1)
     delete_layer(test_user2, layername2, headers=authn_headers2)
 
     stop_process(layman_process)
