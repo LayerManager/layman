@@ -134,6 +134,17 @@ def get_user_data_security_roles(username, type, auth):
 def ensure_user_data_security_roles(username, roles, type, auth):
     rule = username + '.*.' + type
     roles_str = ', '.join(roles)
+
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
+        data=json.dumps(
+            {rule: roles_str}),
+        headers=headers_json,
+        auth=auth
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
     r = requests.post(
         settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
         data=json.dumps(
@@ -148,7 +159,6 @@ def ensure_user_data_security(username, type, auth):
     roles = set(get_user_data_security_roles(username, type, auth))
 
     all_roles = authz.get_all_gs_roles(username, type)
-    app.logger.info(f"username={username}, roles={roles}, all_roles={all_roles}")
     roles.difference_update(all_roles)
 
     authz_module = authz.get_authz_module()
@@ -243,10 +253,10 @@ def ensure_user_workspace(username, auth):
             auth=auth
         )
         r.raise_for_status()
-
-        ensure_user_data_security(username, 'r', auth)
-        ensure_user_data_security(username, 'w', auth)
         ensure_user_db_store(username, auth)
+
+    ensure_user_data_security(username, 'r', auth)
+    ensure_user_data_security(username, 'w', auth)
 
 
 def delete_user_workspace(username, auth):

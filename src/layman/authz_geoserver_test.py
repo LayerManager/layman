@@ -78,7 +78,7 @@ def start_layman(env_vars=None):
     layman_process = subprocess.Popen(cmd.split(), shell=False, stdin=None, env=new_env)
 
     SUBPROCESSES.add(layman_process)
-    time.sleep(1)
+    time.sleep(2)
     return layman_process
 
 
@@ -290,5 +290,3 @@ def test_rewe_rewo(liferay_mock):
     delete_layer(test_user2, layername2, headers=authn_headers2)
 
     stop_process(layman_process)
-
-
