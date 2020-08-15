@@ -1,13 +1,16 @@
+import logging
 import json
 import requests
 import secrets
 import string
 from urllib.parse import urljoin
-from flask import g, current_app as app
+from flask import g
 from layman import settings
 from layman import util as layman_util
 from layman.authz import util as authz
 
+
+logger = logging.getLogger(__name__)
 
 FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
 FLASK_RULES_KEY = f"{__name__}:RULES"
@@ -43,7 +46,7 @@ def ensure_role(role, auth):
     roles = get_roles(auth)
     role_exists = role in roles
     if not role_exists:
-        app.logger.info(f"Role {role} does not exist yet, creating.")
+        logger.info(f"Role {role} does not exist yet, creating.")
         r = requests.post(
             urljoin(settings.LAYMAN_GS_REST_ROLES, 'role/' + role),
             headers=headers_json,
@@ -51,7 +54,7 @@ def ensure_role(role, auth):
         )
         r.raise_for_status()
     else:
-        app.logger.info(f"Role {role} already exists")
+        logger.info(f"Role {role} already exists")
     role_created = not role_exists
     return role_created
 
@@ -76,7 +79,7 @@ def get_usernames(auth):
                      auth=auth
                      )
     r.raise_for_status()
-    # app.logger.info(f"users={r.text}")
+    # logger.info(f"users={r.text}")
     usernames = [u['userName'] for u in r.json()['users']]
     return usernames
 
@@ -85,13 +88,13 @@ def ensure_user(user, password, auth):
     usernames = get_usernames(auth)
     user_exists = user in usernames
     if not user_exists:
-        app.logger.info(f"User {user} does not exist yet, creating.")
+        logger.info(f"User {user} does not exist yet, creating.")
         if password is None:
             # generate random password
             # https://stackoverflow.com/a/23728630
             password = ''.join(secrets.choice(string.ascii_lowercase + string.digits) for _ in range(32))
             # we usually don't want to log passwords
-            # app.logger.info(f"User {user}'s automatically generated password is {password}")
+            # logger.info(f"User {user}'s automatically generated password is {password}")
         r = requests.post(
             settings.LAYMAN_GS_REST_USERS,
             # TODO https://osgeo-org.atlassian.net/browse/GEOS-8486
@@ -108,7 +111,7 @@ def ensure_user(user, password, auth):
         )
         r.raise_for_status()
     else:
-        app.logger.info(f"User {user} already exists")
+        logger.info(f"User {user} already exists")
     user_created = not user_exists
     return user_created
 
@@ -155,6 +158,7 @@ def ensure_user_data_security_roles(username, roles, type, auth):
     r.raise_for_status()
 
 
+# TODO rename to ensure_workspace_security_roles, rename username to workspace
 def ensure_user_data_security(username, type, auth):
     roles = set(get_user_data_security_roles(username, type, auth))
 
@@ -337,7 +341,7 @@ def ensure_user_role(user, role, auth):
     roles = get_user_roles(user, auth)
     association_exists = role in roles
     if not association_exists:
-        app.logger.info(f"Role {role} not associated with user {user} yet, associating.")
+        logger.info(f"Role {role} not associated with user {user} yet, associating.")
         r_url = urljoin(settings.LAYMAN_GS_REST_ROLES, f'role/{role}/user/{user}/')
         r = requests.post(
             r_url,
@@ -346,7 +350,7 @@ def ensure_user_role(user, role, auth):
         )
         r.raise_for_status()
     else:
-        app.logger.info(f"Role {role} already associated with user {user}")
+        logger.info(f"Role {role} already associated with user {user}")
     association_created = not association_exists
     return association_created
 
@@ -389,7 +393,7 @@ def ensure_wms_srs_list(srs_list, auth):
         wms_settings['srs'] = {
             'string': srs_list,
         },
-        app.logger.info(f"Current SRS list {current_srs_list} not equals to requested {srs_list}, changing.")
+        logger.info(f"Current SRS list {current_srs_list} not equals to requested {srs_list}, changing.")
         r_url = settings.LAYMAN_GS_REST_WMS_SETTINGS
         r = requests.put(
             r_url,
@@ -401,7 +405,7 @@ def ensure_wms_srs_list(srs_list, auth):
         )
         r.raise_for_status()
     else:
-        app.logger.info(f"Current SRS list {current_srs_list} already corresponds with requested one.")
+        logger.info(f"Current SRS list {current_srs_list} already corresponds with requested one.")
     list_changed = not list_equals
     return list_changed
 
@@ -428,7 +432,7 @@ def ensure_proxy_base_url(proxy_base_url, auth):
     url_equals = proxy_base_url == current_url
     if not url_equals:
         global_settings['settings']['proxyBaseUrl'] = proxy_base_url
-        app.logger.info(f"Current Proxy Base URL {current_url} not equals to requested {proxy_base_url}, changing.")
+        logger.info(f"Current Proxy Base URL {current_url} not equals to requested {proxy_base_url}, changing.")
         r_url = settings.LAYMAN_GS_REST_SETTINGS
         r = requests.put(
             r_url,
@@ -440,7 +444,7 @@ def ensure_proxy_base_url(proxy_base_url, auth):
         )
         r.raise_for_status()
     else:
-        app.logger.info(f"Current Proxy Base URL {current_url} already corresponds with requested one.")
+        logger.info(f"Current Proxy Base URL {current_url} already corresponds with requested one.")
     url_changed = not url_equals
     return url_changed
 
