@@ -838,8 +838,10 @@ def test_post_layers_sld_1_1_0(client):
         for fp in files:
             fp[0].close()
 
-    # TODO improve waiting
-    time.sleep(2)
+    layer_info = util.get_layer_info(username, layername)
+    while 'status' in layer_info['wms'] and layer_info['wms']['status'] in ['PENDING', 'STARTED']:
+        time.sleep(0.1)
+        layer_info = util.get_layer_info(username, layername)
 
     wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
     wms = wms_proxy(wms_url)

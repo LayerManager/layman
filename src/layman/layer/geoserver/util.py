@@ -85,6 +85,7 @@ def wfs_proxy(wfs_url, xml=None, version=None):
     return wfs
 
 
+# TODO consider moving
 def get_layman_users(auth=settings.LAYMAN_GS_AUTH):
     usernames = get_usernames(auth)
     layman_users = set()
