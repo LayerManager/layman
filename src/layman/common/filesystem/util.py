@@ -30,14 +30,13 @@ def get_user_dir(username):
     return userdir
 
 
-# TODO consider renaming
-def ensure_user_workspace(username):
+def ensure_user_directory(username):
     userdir = get_user_dir(username)
     pathlib.Path(userdir).mkdir(exist_ok=True, parents=True)
     return userdir
 
 
-def delete_user_workspace(username):
+def delete_user_directory(username):
     userdir = get_user_dir(username)
     try:
         os.rmdir(userdir)
@@ -46,11 +45,11 @@ def delete_user_workspace(username):
 
 
 def ensure_whole_user(username):
-    ensure_user_workspace(username)
+    ensure_user_directory(username)
 
 
 def delete_whole_user(username):
-    delete_user_workspace(username)
+    delete_user_directory(username)
 
 
 def get_publications_dir(publ_type, username):
