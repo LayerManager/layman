@@ -116,8 +116,7 @@ def ensure_user(user, password, auth):
     return user_created
 
 
-# TODO rename to get_workspace_security_roles, rename username to workspace
-def get_user_data_security_roles(username, type, auth):
+def get_workspace_security_roles(workspace, type, auth):
     r = requests.get(
         settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
         headers=headers_json,
@@ -126,16 +125,15 @@ def get_user_data_security_roles(username, type, auth):
     r.raise_for_status()
     rules = r.json()
     try:
-        rule = rules[username + '.*.' + type]
+        rule = rules[workspace + '.*.' + type]
         roles = set(rule.split(','))
     except KeyError:
         roles = set()
     return roles
 
 
-# TODO rename to ensure_workspace_security_roles, rename username to workspace
-def ensure_user_data_security_roles(username, roles, type, auth):
-    rule = username + '.*.' + type
+def ensure_workspace_security_roles(workspace, roles, type, auth):
+    rule = workspace + '.*.' + type
     roles_str = ', '.join(roles)
 
     r = requests.delete(
@@ -158,18 +156,17 @@ def ensure_user_data_security_roles(username, roles, type, auth):
     r.raise_for_status()
 
 
-# TODO rename to ensure_workspace_security_roles, rename username to workspace
-def ensure_user_data_security(username, type, auth):
-    roles = set(get_user_data_security_roles(username, type, auth))
+def ensure_workspace_security(workspace, type, auth):
+    roles = set(get_workspace_security_roles(workspace, type, auth))
 
-    all_roles = authz.get_all_gs_roles(username, type)
+    all_roles = authz.get_all_gs_roles(workspace, type)
     roles.difference_update(all_roles)
 
     authz_module = authz.get_authz_module()
-    new_roles = authz_module.get_gs_roles(username, type)
+    new_roles = authz_module.get_gs_roles(workspace, type)
     roles.update(new_roles)
 
-    ensure_user_data_security_roles(username, roles, type, auth)
+    ensure_workspace_security_roles(workspace, roles, type, auth)
 
 
 def get_all_workspaces(auth):
@@ -259,8 +256,8 @@ def ensure_user_workspace(username, auth):
         r.raise_for_status()
         ensure_user_db_store(username, auth)
 
-    ensure_user_data_security(username, 'r', auth)
-    ensure_user_data_security(username, 'w', auth)
+    ensure_workspace_security(username, 'r', auth)
+    ensure_workspace_security(username, 'w', auth)
 
 
 def delete_user_workspace(username, auth):

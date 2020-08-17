@@ -217,11 +217,11 @@ def assert_gs_user_and_roles(username):
 def assert_gs_rewe_data_security(username):
     auth = settings.LAYMAN_GS_AUTH
     user_role = f"USER_{username.upper()}"
-    gs_roles = geoserver.get_user_data_security_roles(username, 'r', auth)
+    gs_roles = geoserver.get_workspace_security_roles(username, 'r', auth)
     assert settings.LAYMAN_GS_ROLE in gs_roles
     assert 'ROLE_ANONYMOUS' in gs_roles
     assert 'ROLE_AUTHENTICATED' in gs_roles
-    gs_roles = geoserver.get_user_data_security_roles(username, 'w', auth)
+    gs_roles = geoserver.get_workspace_security_roles(username, 'w', auth)
     assert settings.LAYMAN_GS_ROLE in gs_roles
     assert 'ROLE_ANONYMOUS' in gs_roles
     assert 'ROLE_AUTHENTICATED' in gs_roles
@@ -230,11 +230,11 @@ def assert_gs_rewe_data_security(username):
 def assert_gs_rewo_data_security(username):
     auth = settings.LAYMAN_GS_AUTH
     user_role = f"USER_{username.upper()}"
-    gs_roles = geoserver.get_user_data_security_roles(username, 'r', auth)
+    gs_roles = geoserver.get_workspace_security_roles(username, 'r', auth)
     assert settings.LAYMAN_GS_ROLE in gs_roles
     assert 'ROLE_ANONYMOUS' in gs_roles
     assert 'ROLE_AUTHENTICATED' in gs_roles
-    gs_roles = geoserver.get_user_data_security_roles(username, 'w', auth)
+    gs_roles = geoserver.get_workspace_security_roles(username, 'w', auth)
     assert user_role in gs_roles
     assert 'ROLE_ANONYMOUS' not in gs_roles
     assert 'ROLE_AUTHENTICATED' not in gs_roles
