@@ -318,7 +318,6 @@ def test_rewe_rewo(liferay_mock):
     assert ln == layername1
     assert_user_layers(test_user1, [layername1])
 
-
     stop_process(layman_process)
 
     test_user2 = 'test_rewe_rewo2'
