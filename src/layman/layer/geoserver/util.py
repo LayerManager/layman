@@ -83,14 +83,3 @@ def wfs_proxy(wfs_url, xml=None, version=None):
             )
             method['url'] = method_url.geturl()
     return wfs
-
-
-# TODO consider moving
-def get_layman_users(auth=settings.LAYMAN_GS_AUTH):
-    usernames = get_usernames(auth)
-    layman_users = set()
-    for user in usernames:
-        roles = get_user_roles(user, auth)
-        if settings.LAYMAN_GS_ROLE in roles and user != settings.LAYMAN_GS_USER:
-            layman_users.add(user)
-    return layman_users

@@ -324,6 +324,17 @@ def delete_user(user, auth):
     return user_deleted
 
 
+def get_usernames_by_role(role, auth, usernames_to_ignore=None):
+    usernames_to_ignore = usernames_to_ignore or []
+    all_usernames = get_usernames(auth)
+    usernames = set()
+    for user in all_usernames:
+        roles = get_user_roles(user, auth)
+        if role in roles and user not in usernames_to_ignore:
+            usernames.add(user)
+    return usernames
+
+
 def get_user_roles(user, auth):
     r_url = urljoin(settings.LAYMAN_GS_REST_ROLES, f'user/{user}/')
     r = requests.get(r_url,
