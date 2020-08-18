@@ -1129,6 +1129,7 @@ def test_get_layers_testuser2(client):
         f'{LAYER_TYPE}': num_layers_before_test + 2
     })
 
+
 @pytest.mark.usefixtures('app_context')
 def test_layer_with_different_geometry(client):
     username = 'testgeometryuser1'
@@ -1193,7 +1194,7 @@ def test_layer_with_different_geometry(client):
                       data=data_xml,
                       headers=headers_wfs,
                       auth=settings.GEOSERVER_ADMIN_AUTH
-    )
+                      )
     r.raise_for_status()
 
     data_xml2 = '''<?xml version="1.0"?>
@@ -1227,8 +1228,8 @@ def test_layer_with_different_geometry(client):
 </wfs:Transaction>'''
 
     r2 = requests.post('http://geoserver:8080/geoserver/testgeometryuser1/ows?service=WFS&request=Transaction',
-                      data=data_xml2,
-                      headers=headers_wfs,
-                      auth=settings.GEOSERVER_ADMIN_AUTH
-                      )
+                       data=data_xml2,
+                       headers=headers_wfs,
+                       auth=settings.GEOSERVER_ADMIN_AUTH
+                       )
     r2.raise_for_status()
