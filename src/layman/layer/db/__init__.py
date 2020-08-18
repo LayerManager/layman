@@ -106,6 +106,7 @@ def import_layer_vector_file_async(username, layername, main_filepath,
         'ogr2ogr',
         '-t_srs', 'EPSG:3857',
         '-nln', layername,
+        '-nlt', 'GEOMETRY',
         '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
         '-lco', f'SCHEMA={username}',
         # '-clipsrc', '-180', '-85.06', '180', '85.06',
@@ -119,7 +120,6 @@ def import_layer_vector_file_async(username, layername, main_filepath,
         ])
     if os.path.splitext(main_filepath)[1] == '.shp':
         bash_args.extend([
-            '-nlt', 'PROMOTE_TO_MULTI',
             '-lco', 'PRECISION=NO',
         ])
     bash_args.extend([
