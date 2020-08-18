@@ -1128,3 +1128,107 @@ def test_get_layers_testuser2(client):
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 2
     })
+
+@pytest.mark.usefixtures('app_context')
+def test_layer_with_different_geometry(client):
+    username = 'testgeometryuser1'
+    layername = 'layer_with_different_geometry'
+    rest_path = url_for('rest_layers.post', username=username)
+    file_paths = [
+        'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_populate_places.cpg',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_populate_places.dbf',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_populate_places.prj',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_populate_places.README.html',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_populate_places.shp',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_populate_places.shx',
+        # 'tmp/naturalearth/110m/cultural/ne_110m_apopulate_places.VERSION.txt',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        rv = client.post(rest_path, data={
+            'file': files,
+            'name': layername
+        })
+        assert rv.status_code == 200
+    finally:
+        for fp in files:
+            fp[0].close()
+
+    wait_till_ready(username, layername)
+
+    headers_wfs = {
+        'Accept': 'text/xml',
+        'Content-type': 'text/xml',
+    }
+
+    data_xml = '''<?xml version="1.0"?>
+<wfs:Transaction
+   version="2.0.0"
+   service="WFS"
+   xmlns:testgeometryuser1="http://testgeometryuser1"
+   xmlns:fes="http://www.opengis.net/fes/2.0"
+   xmlns:gml="http://www.opengis.net/gml/3.2"
+   xmlns:wfs="http://www.opengis.net/wfs/2.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.opengis.net/wfs/2.0
+                       http://schemas.opengis.net/wfs/2.0/wfs.xsd
+                       http://www.opengis.net/gml/3.2
+                       http://schemas.opengis.net/gml/3.2.1/gml.xsd">
+   <wfs:Insert>
+       <testgeometryuser1:layer_with_different_geometry>
+           <testgeometryuser1:wkb_geometry>
+               <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
+                   <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
+               </gml:Point>
+           </testgeometryuser1:wkb_geometry>
+       </testgeometryuser1:layer_with_different_geometry>
+   </wfs:Insert>
+</wfs:Transaction>'''
+
+    r = requests.post('http://geoserver:8080/geoserver/testgeometryuser1/ows?service=WFS&request=Transaction',
+                      data=data_xml,
+                      headers=headers_wfs,
+                      auth=settings.GEOSERVER_ADMIN_AUTH
+    )
+    r.raise_for_status()
+
+    data_xml2 = '''<?xml version="1.0"?>
+<wfs:Transaction
+   version="2.0.0"
+   service="WFS"
+   xmlns:testgeometryuser1="http://testgeometryuser1"
+   xmlns:fes="http://www.opengis.net/fes/2.0"
+   xmlns:gml="http://www.opengis.net/gml/3.2"
+   xmlns:wfs="http://www.opengis.net/wfs/2.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.opengis.net/wfs/2.0
+                       http://schemas.opengis.net/wfs/2.0/wfs.xsd
+                       http://www.opengis.net/gml/3.2
+                       http://schemas.opengis.net/gml/3.2.1/gml.xsd">
+   <wfs:Insert>
+       <testgeometryuser1:layer_with_different_geometry>
+           <testgeometryuser1:wkb_geometry>
+               <gml:MultiCurve srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
+                   <gml:curveMember>
+                       <gml:LineString>
+                           <gml:posList>3722077.1689 5775850.1007 3751406.9331 5815606.0102 3830548.3984 5781176.5357
+                               3866350.4899 5774848.8358 3880796.9478 5743277.797 3897591.3679 5738418.6547
+                           </gml:posList>
+                       </gml:LineString>
+                   </gml:curveMember>
+               </gml:MultiCurve>
+           </testgeometryuser1:wkb_geometry>
+       </testgeometryuser1:layer_with_different_geometry>
+   </wfs:Insert>
+</wfs:Transaction>'''
+
+    r2 = requests.post('http://geoserver:8080/geoserver/testgeometryuser1/ows?service=WFS&request=Transaction',
+                      data=data_xml2,
+                      headers=headers_wfs,
+                      auth=settings.GEOSERVER_ADMIN_AUTH
+                      )
+    r2.raise_for_status()
