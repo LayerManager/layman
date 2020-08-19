@@ -67,8 +67,6 @@ def check_username_decorator(f):
 def check_username(username):
     if not re.match(USERNAME_RE, username):
         raise LaymanError(2, {'parameter': 'user', 'expected': USERNAME_RE})
-    if username == settings.LAYMAN_GS_USER:
-        raise LaymanError(41, {'username': username})
     providers = get_internal_providers()
     call_modules_fn(providers, 'check_username', [username])
 

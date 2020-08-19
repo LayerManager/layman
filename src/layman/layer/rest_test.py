@@ -143,6 +143,11 @@ def test_wrong_value_of_user(client):
 
 @pytest.mark.usefixtures('app_context')
 def test_layman_gs_user_conflict(client):
+    """Tests that Layman detects that reserved username is in conflict with LAYMAN_GS_USER.
+
+    See https://github.com/jirik/layman/pull/97
+    """
+
     username = settings.LAYMAN_GS_USER
     layername = 'layer1'
     rest_path = url_for('rest_layers.post', username=username)
