@@ -5,7 +5,7 @@
 - [#97](https://github.com/jirik/layman/issues/97) Before v1.6, [reserved `username`](doc/rest.md#patch-current-user) could be the same as LAYMAN_GS_USER. Starting at 1.6, this leads to conflict of two GeoServer users with the same name. This patch release comes with detection of this conflict (Layman error code 41).
    - If you encounter error 41, you can resolve the conflict by following steps:
        - In GeoServer GUI, create new GeoServer user with another name to become new LAYMAN_GS_USER and give him LAYMAN_GS_ROLE and ADMIN roles
-       - In GeoServer GUI, remove the old GeoServer user
+       - In GeoServer GUI, remove the old LAYMAN_GS_USER user
        - Change environment settings LAYMAN_GS_USER and LAYMAN_GS_PASSWORD for the new GeoServer user
        - Restart Layman
 
