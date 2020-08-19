@@ -41,4 +41,5 @@ ERROR_LIST = {
     38: (400, 'Micka HTTP or connection error.'),
     39: (404, 'Metadata record does not exists.'),
     40: (404, 'Username does not exist.'),
+    41: (409, 'Username is in conflict with LAYMAN_GS_USER. You can rename LAYMAN_GS_USER to resolve this conflict.'),
 }

@@ -70,10 +70,11 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
         settings.LAYMAN_REDIS.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
 
         app.logger.info(f'Ensuring users')
-        from .util import get_usernames, ensure_whole_user
+        from .util import get_usernames, ensure_whole_user, check_username
         with app.app_context():
             for username in get_usernames():
                 app.logger.info(f'Ensuring user {username}')
+                check_username(username)
                 ensure_whole_user(username)
     else:
         while(settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done'):
