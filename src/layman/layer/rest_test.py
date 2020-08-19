@@ -142,6 +142,31 @@ def test_wrong_value_of_user(client):
 
 
 @pytest.mark.usefixtures('app_context')
+def test_layman_gs_user_conflict(client):
+    username = settings.LAYMAN_GS_USER
+    layername = 'layer1'
+    rest_path = url_for('rest_layers.post', username=username)
+    file_paths = [
+        'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
+    ]
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        rv = client.post(rest_path, data={
+            'file': files,
+            'name': layername
+        })
+        resp_json = rv.get_json()
+        assert rv.status_code == 409
+        assert resp_json['code'] == 41
+    finally:
+        for fp in files:
+            fp[0].close()
+
+
+@pytest.mark.usefixtures('app_context')
 def test_wrong_value_of_layername(client):
     username = 'testuser1'
     layernames = [' ', '2a', 'ě', ';', '?', 'ABC']
