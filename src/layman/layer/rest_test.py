@@ -1137,13 +1137,6 @@ def test_layer_with_different_geometry(client):
     rest_path = url_for('rest_layers.post', username=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
-        # 'tmp/naturalearth/110m/cultural/ne_110m_populate_places.cpg',
-        # 'tmp/naturalearth/110m/cultural/ne_110m_populate_places.dbf',
-        # 'tmp/naturalearth/110m/cultural/ne_110m_populate_places.prj',
-        # 'tmp/naturalearth/110m/cultural/ne_110m_populate_places.README.html',
-        # 'tmp/naturalearth/110m/cultural/ne_110m_populate_places.shp',
-        # 'tmp/naturalearth/110m/cultural/ne_110m_populate_places.shx',
-        # 'tmp/naturalearth/110m/cultural/ne_110m_apopulate_places.VERSION.txt',
     ]
     for fp in file_paths:
         assert os.path.isfile(fp)
@@ -1160,6 +1153,9 @@ def test_layer_with_different_geometry(client):
             fp[0].close()
 
     wait_till_ready(username, layername)
+
+    url_path_ows = urljoin(urljoin(settings.LAYMAN_GS_URL, username), 'ows?service=WFS&request=Transaction')
+    url_path_wfs = urljoin(urljoin(settings.LAYMAN_GS_URL, username), 'wfs?request=Transaction')
 
     headers_wfs = {
         'Accept': 'text/xml',
@@ -1190,10 +1186,17 @@ def test_layer_with_different_geometry(client):
    </wfs:Insert>
 </wfs:Transaction>'''
 
-    r = requests.post('http://geoserver:8080/geoserver/testgeometryuser1/ows?service=WFS&request=Transaction',
+    r = requests.post(url_path_ows,
                       data=data_xml,
                       headers=headers_wfs,
-                      auth=settings.GEOSERVER_ADMIN_AUTH
+                      auth=settings.LAYMAN_GS_AUTH
+                      )
+    r.raise_for_status()
+
+    r = requests.post(url_path_wfs,
+                      data=data_xml,
+                      headers=headers_wfs,
+                      auth=settings.LAYMAN_GS_AUTH
                       )
     r.raise_for_status()
 
@@ -1227,9 +1230,16 @@ def test_layer_with_different_geometry(client):
    </wfs:Insert>
 </wfs:Transaction>'''
 
-    r2 = requests.post('http://geoserver:8080/geoserver/testgeometryuser1/ows?service=WFS&request=Transaction',
-                       data=data_xml2,
-                       headers=headers_wfs,
-                       auth=settings.GEOSERVER_ADMIN_AUTH
-                       )
-    r2.raise_for_status()
+    r = requests.post(url_path_ows,
+                      data=data_xml2,
+                      headers=headers_wfs,
+                      auth=settings.LAYMAN_GS_AUTH
+                      )
+    r.raise_for_status()
+
+    r = requests.post(url_path_wfs,
+                      data=data_xml2,
+                      headers=headers_wfs,
+                      auth=settings.LAYMAN_GS_AUTH
+                      )
+    r.raise_for_status()
