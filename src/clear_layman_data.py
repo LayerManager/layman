@@ -51,40 +51,74 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
         'Accept': 'application/json',
         'Content-type': 'application/json',
     }
+
     auth = settings.GEOSERVER_ADMIN_AUTH or settings.LAYMAN_GS_AUTH
-    r = requests.get(
-        settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
-        headers=headers_json,
-        auth=auth
-    )
+    r = requests.get(settings.LAYMAN_GS_REST_USERS,
+                     headers=headers_json,
+                     auth=auth
+                     )
     r.raise_for_status()
-    all_rules = r.json()
+    all_users = [u['userName'] for u in r.json()['users']]
+    if settings.LAYMAN_GS_USER in all_users:
+        all_users.remove(settings.LAYMAN_GS_USER)
 
-    def get_role_rules(all_rules, role):
-        re_role = r".*\b" + re.escape(role) + r"\b.*"
-        result = {k: v for k, v in all_rules.items() if re.match(re_role, v)}
-        return result
+    for user in all_users:
+        r = requests.get(urljoin(settings.LAYMAN_GS_REST_ROLES, f'user/{user}/'),
+                         headers=headers_json,
+                         auth=auth
+                         )
+        r.raise_for_status()
+        roles = r.json()['roleNames']
 
-    layman_rules = get_role_rules(all_rules, settings.LAYMAN_GS_ROLE)
-    for rule in layman_rules:
-        workspace = re.match(r"^([^.]+)\..*", rule).group(1)
-        print(f"Deleting GeoServer workspace {workspace}")
-        r = requests.delete(
-            urljoin(settings.LAYMAN_GS_REST_WORKSPACES, workspace),
-            headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH,
-            params={
-                'recurse': 'true'
-            }
-        )
-        r.raise_for_status()
-        print(f"Deleting GeoServer ACL rule {rule}")
-        r = requests.delete(
-            urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
-            headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH,
-        )
-        r.raise_for_status()
+        if settings.LAYMAN_GS_ROLE in roles:
+            r = requests.delete(
+                urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, user + '.*.r'),
+                headers=headers_json,
+                auth=auth
+            )
+            if r.status_code != 404:
+                r.raise_for_status()
+
+            r = requests.delete(
+                urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, user + '.*.w'),
+                headers=headers_json,
+                auth=auth
+            )
+            if r.status_code != 404:
+                r.raise_for_status()
+
+            r = requests.delete(
+                urljoin(settings.LAYMAN_GS_REST_WORKSPACES, user),
+                headers=headers_json,
+                auth=auth,
+                params={
+                    'recurse': 'true'
+                }
+            )
+            r.raise_for_status()
+
+            for role in roles:
+                r = requests.delete(
+                    urljoin(settings.LAYMAN_GS_REST_ROLES, f'role/{role}/user/{user}/'),
+                    headers=headers_json,
+                    auth=auth,
+                )
+                r.raise_for_status()
+
+            r = requests.delete(
+                urljoin(settings.LAYMAN_GS_REST_ROLES, 'role/' + f"USER_{user.upper()}"),
+                headers=headers_json,
+                auth=auth,
+            )
+            if r.status_code != 404:
+                r.raise_for_status()
+
+            r = requests.delete(
+                urljoin(settings.LAYMAN_GS_REST_USER, user),
+                headers=headers_json,
+                auth=auth,
+            )
+            r.raise_for_status()
 
     # micka
     opts = {} if settings.CSW_BASIC_AUTHN is None else {

@@ -197,7 +197,7 @@ def check_redis_consistency(expected_publ_num_by_type=None):
 
     # publication tasks
     task_infos_len = redis.hlen(celery_util.PUBLICATION_TASK_INFOS)
-    assert task_infos_len == len(total_publs)
+    assert task_infos_len == len(total_publs), f"task_infos_len={task_infos_len}, total_publs={total_publs}"
 
     task_names_tuples = [
         h.split(':') for h in redis.smembers(celery_util.REDIS_CURRENT_TASK_NAMES)

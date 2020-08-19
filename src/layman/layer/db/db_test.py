@@ -29,9 +29,9 @@ def client():
 @pytest.fixture(scope="module")
 def testuser1():
     username = 'db_testuser'
-    db.ensure_user_workspace(username)
+    db.ensure_whole_user(username)
     yield username
-    db.delete_user_workspace(username)
+    db.delete_whole_user(username)
 
 
 @pytest.fixture()

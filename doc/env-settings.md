@@ -138,6 +138,12 @@ Name of [GeoServer role](https://docs.geoserver.org/stable/en/user/security/weba
 ### LAYMAN_GS_PROXY_BASE_URL
 GeoServer [Proxy Base URL](https://docs.geoserver.org/stable/en/user/configuration/globalsettings.html). It is automatically set on Layman's startup. If you do not set the variable, value is calculated as [LAYMAN_CLIENT_PUBLIC_URL](#LAYMAN_CLIENT_PUBLIC_URL)+[LAYMAN_GS_PATH](#LAYMAN_GS_PATH). If you set it to empty string, no change of Proxy Base URL will be done on GeoServer side.
 
+### LAYMAN_GS_USER_GROUP_SERVICE
+Name of [user/group service](https://docs.geoserver.org/stable/en/user/security/usergrouprole/usergroupservices.html) used for managing users at GeoServer. If not set (default), the service named `default` is chosen. Usually it's [XML user/group service](https://docs.geoserver.org/stable/en/user/security/usergrouprole/usergroupservices.html#xml-user-group-service).
+
+### LAYMAN_GS_ROLE_SERVICE
+Name of [role service](https://docs.geoserver.org/stable/en/user/security/usergrouprole/roleservices.html) used for managing roles and user-role associations at GeoServer. If not set (default), the service named `default` is chosen. Usually it's [XML user/group service](https://docs.geoserver.org/stable/en/user/security/usergrouprole/roleservices.html#xml-role-service).
+
 ## Connection to Micka
 
 ### CSW_BASIC_AUTHN

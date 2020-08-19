@@ -51,13 +51,13 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
         with app.app_context():
             from layman.common.geoserver import ensure_role, ensure_user, ensure_user_role, ensure_wms_srs_list, ensure_proxy_base_url
             if settings.GEOSERVER_ADMIN_AUTH:
-                ensure_role(settings.LAYMAN_GS_ROLE)
-                ensure_user(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_PASSWORD)
-                ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN')
-                ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE)
-            ensure_wms_srs_list([int(srs.split(':')[1]) for srs in settings.INPUT_SRS_LIST])
+                ensure_role(settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
+                ensure_user(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_PASSWORD, settings.GEOSERVER_ADMIN_AUTH)
+                ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN', settings.GEOSERVER_ADMIN_AUTH)
+                ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
+            ensure_wms_srs_list([int(srs.split(':')[1]) for srs in settings.INPUT_SRS_LIST], settings.LAYMAN_GS_AUTH)
             if settings.LAYMAN_GS_PROXY_BASE_URL != '':
-                ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL)
+                ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
 
         app.logger.info(f'Loading Redis database')
         with app.app_context():
@@ -68,6 +68,13 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
 
             import_authn_to_redis()
         settings.LAYMAN_REDIS.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
+
+        app.logger.info(f'Ensuring users')
+        from .util import get_usernames, ensure_whole_user
+        with app.app_context():
+            for username in get_usernames():
+                app.logger.info(f'Ensuring user {username}')
+                ensure_whole_user(username)
     else:
         while(settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done'):
             app.logger.info(f'Waiting for flask process to adjust dependencies')

@@ -1,9 +1,30 @@
+import logging
 import json
 import requests
+import secrets
+import string
 from urllib.parse import urljoin
-from flask import current_app as app
+from flask import g
 from layman import settings
+from layman import util as layman_util
+from layman.authz import util as authz
 
+
+logger = logging.getLogger(__name__)
+
+FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
+FLASK_RULES_KEY = f"{__name__}:RULES"
+
+RESERVED_WORKSPACE_NAMES = [
+    'default',
+]
+
+RESERVED_ROLE_NAMES = [
+    'ROLE_ADMINISTRATOR',
+    'ROLE_GROUP_ADMIN',
+    'ROLE_AUTHENTICATED',
+    'ROLE_ANONYMOUS',
+]
 
 headers_json = {
     'Accept': 'application/json',
@@ -11,39 +32,38 @@ headers_json = {
 }
 
 
-def get_roles():
+def get_roles(auth):
     r_url = settings.LAYMAN_GS_REST_ROLES
     r = requests.get(r_url,
                      headers=headers_json,
-                     auth=settings.GEOSERVER_ADMIN_AUTH
+                     auth=auth
                      )
     r.raise_for_status()
-    # return r.json()['roles']
     return r.json()['roleNames']
 
 
-def ensure_role(role):
-    roles = get_roles()
+def ensure_role(role, auth):
+    roles = get_roles(auth)
     role_exists = role in roles
     if not role_exists:
-        app.logger.info(f"Role {role} does not exist yet, creating.")
+        logger.info(f"Role {role} does not exist yet, creating.")
         r = requests.post(
             urljoin(settings.LAYMAN_GS_REST_ROLES, 'role/' + role),
             headers=headers_json,
-            auth=settings.GEOSERVER_ADMIN_AUTH,
+            auth=auth,
         )
         r.raise_for_status()
     else:
-        app.logger.info(f"Role {role} already exists")
+        logger.info(f"Role {role} already exists")
     role_created = not role_exists
     return role_created
 
 
-def delete_role(role):
+def delete_role(role, auth):
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_ROLES, 'role/' + role),
         headers=headers_json,
-        auth=settings.GEOSERVER_ADMIN_AUTH,
+        auth=auth,
     )
     role_not_exists = r.status_code == 404
     if not role_not_exists:
@@ -52,22 +72,29 @@ def delete_role(role):
     return role_deleted
 
 
-def get_users():
+def get_usernames(auth):
     r_url = settings.LAYMAN_GS_REST_USERS
     r = requests.get(r_url,
                      headers=headers_json,
-                     auth=settings.GEOSERVER_ADMIN_AUTH
+                     auth=auth
                      )
     r.raise_for_status()
-    # app.logger.info(f"users={r.text}")
-    return r.json()['users']
+    # logger.info(f"users={r.text}")
+    usernames = [u['userName'] for u in r.json()['users']]
+    return usernames
 
 
-def ensure_user(user, password):
-    users = get_users()
-    user_exists = next((u for u in users if u['userName'] == user), None) is not None
+def ensure_user(user, password, auth):
+    usernames = get_usernames(auth)
+    user_exists = user in usernames
     if not user_exists:
-        app.logger.info(f"User {user} does not exist yet, creating.")
+        logger.info(f"User {user} does not exist yet, creating.")
+        if password is None:
+            # generate random password
+            # https://stackoverflow.com/a/23728630
+            password = ''.join(secrets.choice(string.ascii_lowercase + string.digits) for _ in range(32))
+            # we usually don't want to log passwords
+            # logger.info(f"User {user}'s automatically generated password is {password}")
         r = requests.post(
             settings.LAYMAN_GS_REST_USERS,
             # TODO https://osgeo-org.atlassian.net/browse/GEOS-8486
@@ -80,21 +107,215 @@ def ensure_user(user, password):
                 },
             }),
             headers=headers_json,
-            auth=settings.GEOSERVER_ADMIN_AUTH,
+            auth=auth,
         )
         r.raise_for_status()
     else:
-        app.logger.info(f"User {user} already exists")
+        logger.info(f"User {user} already exists")
     user_created = not user_exists
     return user_created
 
 
-def delete_user(user):
+def get_workspace_security_roles(workspace, type, auth):
+    r = requests.get(
+        settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
+        headers=headers_json,
+        auth=auth
+    )
+    r.raise_for_status()
+    rules = r.json()
+    try:
+        rule = rules[workspace + '.*.' + type]
+        roles = set(rule.split(','))
+    except KeyError:
+        roles = set()
+    return roles
+
+
+def ensure_workspace_security_roles(workspace, roles, type, auth):
+    rule = workspace + '.*.' + type
+    roles_str = ', '.join(roles)
+
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
+        data=json.dumps(
+            {rule: roles_str}),
+        headers=headers_json,
+        auth=auth
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+    r = requests.post(
+        settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
+        data=json.dumps(
+            {rule: roles_str}),
+        headers=headers_json,
+        auth=auth
+    )
+    r.raise_for_status()
+
+
+def ensure_workspace_security(workspace, type, auth):
+    roles = set(get_workspace_security_roles(workspace, type, auth))
+
+    all_roles = authz.get_all_gs_roles(workspace, type)
+    roles.difference_update(all_roles)
+
+    authz_module = authz.get_authz_module()
+    new_roles = authz_module.get_gs_roles(workspace, type)
+    roles.update(new_roles)
+
+    ensure_workspace_security_roles(workspace, roles, type, auth)
+
+
+def get_all_workspaces(auth):
+    key = FLASK_WORKSPACES_KEY
+    if key not in g:
+        r = requests.get(
+            settings.LAYMAN_GS_REST_WORKSPACES,
+            # data=json.dumps(payload),
+            headers=headers_json,
+            auth=auth
+        )
+        r.raise_for_status()
+        if r.json()['workspaces'] == "":
+            all_workspaces = []
+        else:
+            all_workspaces = r.json()['workspaces']['workspace']
+        g.setdefault(key, all_workspaces)
+
+    return g.get(key)
+
+
+def ensure_user_db_store(username, auth):
+    r = requests.post(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + '/datastores'),
+        data=json.dumps({
+            "dataStore": {
+                "name": "postgresql",
+                "connectionParameters": {
+                    "entry": [
+                        {
+                            "@key": "dbtype",
+                            "$": "postgis"
+                        },
+                        {
+                            "@key": "host",
+                            "$": settings.LAYMAN_PG_HOST
+                        },
+                        {
+                            "@key": "port",
+                            "$": settings.LAYMAN_PG_PORT
+                        },
+                        {
+                            "@key": "database",
+                            "$": settings.LAYMAN_PG_DBNAME
+                        },
+                        {
+                            "@key": "user",
+                            "$": settings.LAYMAN_PG_USER
+                        },
+                        {
+                            "@key": "passwd",
+                            "$": settings.LAYMAN_PG_PASSWORD
+                        },
+                        {
+                            "@key": "schema",
+                            "$": username
+                        },
+                    ]
+                },
+            }
+        }),
+        headers=headers_json,
+        auth=auth
+    )
+    r.raise_for_status()
+
+
+def delete_user_db_store(username, auth):
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + f'/datastores/{username}'),
+        headers=headers_json,
+        auth=auth
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+
+def ensure_user_workspace(username, auth):
+    all_workspaces = get_all_workspaces(auth)
+    if not any(ws['name'] == username for ws in all_workspaces):
+        r = requests.post(
+            settings.LAYMAN_GS_REST_WORKSPACES,
+            data=json.dumps({'workspace': {'name': username}}),
+            headers=headers_json,
+            auth=auth
+        )
+        r.raise_for_status()
+        ensure_user_db_store(username, auth)
+
+    ensure_workspace_security(username, 'r', auth)
+    ensure_workspace_security(username, 'w', auth)
+
+
+def delete_user_workspace(username, auth):
+    delete_user_db_store(username, auth)
+
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, username + '.*.r'),
+        headers=headers_json,
+        auth=auth
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, username + '.*.w'),
+        headers=headers_json,
+        auth=auth
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username),
+        headers=headers_json,
+        auth=auth
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+
+def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
+    ensure_user(username, None, auth)
+    role = username_to_rolename(username)
+    ensure_role(role, auth)
+    ensure_user_role(username, role, auth)
+    ensure_user_role(username, settings.LAYMAN_GS_ROLE, auth)
+    ensure_user_workspace(username, auth)
+
+
+def delete_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
+    role = username_to_rolename(username)
+    delete_user_workspace(username, auth)
+    delete_user_role(username, role, auth)
+    delete_user_role(username, settings.LAYMAN_GS_ROLE, auth)
+    delete_role(role, auth)
+    delete_user(username, auth)
+
+
+def username_to_rolename(username):
+    return f"USER_{username.upper()}"
+
+
+def delete_user(user, auth):
     r_url = urljoin(settings.LAYMAN_GS_REST_USER, user)
     r = requests.delete(
         r_url,
         headers=headers_json,
-        auth=settings.GEOSERVER_ADMIN_AUTH,
+        auth=auth,
     )
     user_not_exists = r.status_code == 404
     if not user_not_exists:
@@ -103,41 +324,51 @@ def delete_user(user):
     return user_deleted
 
 
-def get_user_roles(user):
+def get_usernames_by_role(role, auth, usernames_to_ignore=None):
+    usernames_to_ignore = usernames_to_ignore or []
+    all_usernames = get_usernames(auth)
+    usernames = set()
+    for user in all_usernames:
+        roles = get_user_roles(user, auth)
+        if role in roles and user not in usernames_to_ignore:
+            usernames.add(user)
+    return usernames
+
+
+def get_user_roles(user, auth):
     r_url = urljoin(settings.LAYMAN_GS_REST_ROLES, f'user/{user}/')
     r = requests.get(r_url,
                      headers=headers_json,
-                     auth=settings.GEOSERVER_ADMIN_AUTH
+                     auth=auth
                      )
     r.raise_for_status()
-    # return r.json()['roles']
     return r.json()['roleNames']
 
 
-def ensure_user_role(user, role):
-    roles = get_user_roles(user)
+def ensure_user_role(user, role, auth):
+    roles = get_user_roles(user, auth)
     association_exists = role in roles
     if not association_exists:
-        app.logger.info(f"Role {role} not associated with user {user} yet, associating.")
+        logger.info(f"Role {role} not associated with user {user} yet, associating.")
         r_url = urljoin(settings.LAYMAN_GS_REST_ROLES, f'role/{role}/user/{user}/')
         r = requests.post(
             r_url,
             headers=headers_json,
-            auth=settings.GEOSERVER_ADMIN_AUTH,
+            auth=auth,
         )
         r.raise_for_status()
     else:
-        app.logger.info(f"Role {role} already associated with user {user}")
+        logger.info(f"Role {role} already associated with user {user}")
     association_created = not association_exists
     return association_created
 
 
-def delete_user_role(user, role):
+def delete_user_role(user, role, auth):
     r_url = urljoin(settings.LAYMAN_GS_REST_ROLES, f'role/{role}/user/{user}/')
     r = requests.delete(
         r_url,
         headers=headers_json,
-        auth=settings.GEOSERVER_ADMIN_AUTH,
+        auth=auth,
     )
     association_not_exists = r.status_code == 404
     if not association_not_exists:
@@ -146,31 +377,31 @@ def delete_user_role(user, role):
     return association_deleted
 
 
-def get_wms_settings():
+def get_wms_settings(auth):
     r_url = settings.LAYMAN_GS_REST_WMS_SETTINGS
     r = requests.get(r_url,
                      headers=headers_json,
-                     auth=settings.LAYMAN_GS_AUTH,
+                     auth=auth,
                      )
     r.raise_for_status()
     return r.json()['wms']
 
 
-def get_wms_srs_list(wms_settings=None):
+def get_wms_srs_list(auth, wms_settings=None):
     if wms_settings is None:
-        wms_settings = get_wms_settings()
+        wms_settings = get_wms_settings(auth)
     return wms_settings.get('srs', {}).get('string', [])
 
 
-def ensure_wms_srs_list(srs_list):
-    wms_settings = get_wms_settings()
-    current_srs_list = get_wms_srs_list(wms_settings=wms_settings)
+def ensure_wms_srs_list(srs_list, auth):
+    wms_settings = get_wms_settings(auth)
+    current_srs_list = get_wms_srs_list(auth, wms_settings=wms_settings)
     list_equals = set(current_srs_list) == set(srs_list)
     if not list_equals:
         wms_settings['srs'] = {
             'string': srs_list,
         },
-        app.logger.info(f"Current SRS list {current_srs_list} not equals to requested {srs_list}, changing.")
+        logger.info(f"Current SRS list {current_srs_list} not equals to requested {srs_list}, changing.")
         r_url = settings.LAYMAN_GS_REST_WMS_SETTINGS
         r = requests.put(
             r_url,
@@ -178,38 +409,38 @@ def ensure_wms_srs_list(srs_list):
                 'wms': wms_settings,
             }),
             headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH,
+            auth=auth,
         )
         r.raise_for_status()
     else:
-        app.logger.info(f"Current SRS list {current_srs_list} already corresponds with requested one.")
+        logger.info(f"Current SRS list {current_srs_list} already corresponds with requested one.")
     list_changed = not list_equals
     return list_changed
 
 
-def get_global_settings():
+def get_global_settings(auth):
     r_url = settings.LAYMAN_GS_REST_SETTINGS
     r = requests.get(r_url,
                      headers=headers_json,
-                     auth=settings.LAYMAN_GS_AUTH,
+                     auth=auth,
                      )
     r.raise_for_status()
     return r.json()['global']
 
 
-def get_proxy_base_url(global_settings=None):
+def get_proxy_base_url(auth, global_settings=None):
     if global_settings is None:
-        global_settings = get_global_settings()
+        global_settings = get_global_settings(auth)
     return global_settings['settings'].get('proxyBaseUrl', None)
 
 
-def ensure_proxy_base_url(proxy_base_url):
-    global_settings = get_global_settings()
-    current_url = get_proxy_base_url(global_settings=global_settings)
+def ensure_proxy_base_url(proxy_base_url, auth):
+    global_settings = get_global_settings(auth)
+    current_url = get_proxy_base_url(auth, global_settings=global_settings)
     url_equals = proxy_base_url == current_url
     if not url_equals:
         global_settings['settings']['proxyBaseUrl'] = proxy_base_url
-        app.logger.info(f"Current Proxy Base URL {current_url} not equals to requested {proxy_base_url}, changing.")
+        logger.info(f"Current Proxy Base URL {current_url} not equals to requested {proxy_base_url}, changing.")
         r_url = settings.LAYMAN_GS_REST_SETTINGS
         r = requests.put(
             r_url,
@@ -217,10 +448,20 @@ def ensure_proxy_base_url(proxy_base_url):
                 'global': global_settings
             }),
             headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH,
+            auth=auth,
         )
         r.raise_for_status()
     else:
-        app.logger.info(f"Current Proxy Base URL {current_url} already corresponds with requested one.")
+        logger.info(f"Current Proxy Base URL {current_url} already corresponds with requested one.")
     url_changed = not url_equals
     return url_changed
+
+
+def get_roles_anyone(username):
+    roles = {settings.LAYMAN_GS_ROLE, 'ROLE_ANONYMOUS', 'ROLE_AUTHENTICATED'}
+    return roles
+
+
+def get_roles_owner(username):
+    roles = {username_to_rolename(username)}
+    return roles

@@ -1,8 +1,7 @@
 from flask import g, current_app
 from layman import LaymanError
 from layman.authn import get_open_id_claims, get_iss_id, get_sub
-from layman.util import slugify, to_safe_names, check_username, get_usernames, ensure_user_workspace, \
-    delete_user_workspace
+from layman.util import slugify, to_safe_names, check_username, get_usernames, ensure_whole_user, delete_whole_user
 from layman.authn import redis as authn_redis, filesystem as authn_filesystem
 
 
@@ -32,11 +31,11 @@ def reserve_username(username, adjust=False):
         if username in usernames:
             raise LaymanError(35)
         try:
-            ensure_user_workspace(username)
+            ensure_whole_user(username)
             claims = get_open_id_claims()
             _save_reservation(username, claims)
         except LaymanError as e:
-            delete_user_workspace(username)
+            delete_whole_user(username)
             raise e
         return
     claims = get_open_id_claims()
@@ -60,12 +59,12 @@ def reserve_username(username, adjust=False):
             if suggestion in usernames:
                 continue
             try:
-                ensure_user_workspace(suggestion)
+                ensure_whole_user(suggestion)
                 username = suggestion
                 _save_reservation(username, claims)
                 break
             except LaymanError:
-                delete_user_workspace(suggestion)
+                delete_whole_user(suggestion)
         if username is not None:
             break
         idx += 1

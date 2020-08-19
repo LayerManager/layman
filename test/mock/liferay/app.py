@@ -10,8 +10,37 @@ TOKEN_HEADER = 'Authorization'
 
 def create_app(app_config):
     app = Flask(__name__)
+    app_config.setdefault('OAUTH2_USERS', {})
     for k, v in app_config.items():
-        app.config[k] = v
+        if k == 'OAUTH2_USERS':
+            tok2is = {}
+            tok2is.update(token_2_introspection)
+            tok2prof = {}
+            tok2prof.update(token_2_profile)
+            u_idx = 30000
+            for username, userdef in v.items():
+                sub = userdef and userdef.get('sub', None) or f"{u_idx}"
+                assert sub not in [
+                    introsp['sub'] for introsp in tok2is.values()
+                ]
+                tok2is[username] = {
+                    'sub': sub
+                }
+                tok2prof[username] = {
+                    "emailAddress": f"{username}@liferay.com",
+                    "firstName": f"{username}",
+                    "lastName": f"{username}",
+                    "middleName": "",
+                    "screenName": f"{username}",
+                    "userId": sub,
+                }
+                if userdef:
+                    tok2prof[username].update(userdef)
+                u_idx += 1
+            app.config['OAUTH2_TOKEN_2_INTROSPECTION'] = tok2is
+            app.config['OAUTH2_TOKEN_2_PROFILE'] = tok2prof
+        else:
+            app.config[k] = v
     app.register_blueprint(introspection_bp, url_prefix='/rest/test-oauth2/')
     app.register_blueprint(user_profile_bp, url_prefix='/rest/test-oauth2/')
     return app
@@ -65,14 +94,14 @@ def post():
     is_active = is_active is not None and is_active.lower() == 'true'
 
     access_token = request.form.get('token')
-    assert access_token in token_2_introspection
+    assert access_token in current_app.config['OAUTH2_TOKEN_2_INTROSPECTION']
     result = {
         "active": is_active, "client_id": "id-353ab09c-f117-f2d5-d3a3-85cfb89e6746", "exp": 1568981517,
         "iat": 1568980917,
         "scope": "liferay-json-web-services.everything.read.userprofile", "sub": "20139", "token_type": "Bearer",
         "username": "Test Test", "company.id": "20099"
     }
-    result.update(token_2_introspection[access_token])
+    result.update(current_app.config['OAUTH2_TOKEN_2_INTROSPECTION'][access_token])
 
     return jsonify(result), 200
 
@@ -80,7 +109,7 @@ def post():
 @user_profile_bp.route('user-profile', methods=['GET'])
 def get():
     access_token = request.headers.get(TOKEN_HEADER).split(' ')[1]
-    assert access_token in token_2_profile
+    assert access_token in current_app.config['OAUTH2_TOKEN_2_PROFILE']
 
     result = {
         "agreedToTermsOfUse": False,
@@ -123,6 +152,6 @@ def get():
         "uuid": "4ef84411-749a-e617-6191-10e0c6a7147b",
         "FLASK_ENV": current_app.config['ENV'],
     }
-    result.update(token_2_profile[access_token])
+    result.update(current_app.config['OAUTH2_TOKEN_2_PROFILE'][access_token])
 
     return jsonify(result), 200

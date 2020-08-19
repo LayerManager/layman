@@ -7,6 +7,7 @@ from flask import g, current_app as app
 
 from layman.http import LaymanError
 from layman import settings
+from layman.common import geoserver as common
 
 FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
 FLASK_RULES_KEY = f"{__name__}:RULES"
@@ -21,33 +22,14 @@ headers_xml = {
 }
 
 
-def get_all_workspaces():
-    key = FLASK_WORKSPACES_KEY
-    if key not in g:
-        r = requests.get(
-            settings.LAYMAN_GS_REST_WORKSPACES,
-            # data=json.dumps(payload),
-            headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH
-        )
-        r.raise_for_status()
-        if r.json()['workspaces'] == "":
-            all_workspaces = []
-        else:
-            all_workspaces = r.json()['workspaces']['workspace']
-        g.setdefault(key, all_workspaces)
-
-    return g.get(key)
-
-
-def get_all_rules():
+def get_all_rules(auth):
     key = FLASK_RULES_KEY
     if key not in g:
         r = requests.get(
             settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
             # data=json.dumps(payload),
             headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH
+            auth=auth
         )
         r.raise_for_status()
         # app.logger.info(r.text)
@@ -57,104 +39,19 @@ def get_all_rules():
     return g.get(key)
 
 
-def check_username(username):
-    if username in settings.GS_RESERVED_WORKSPACE_NAMES:
+def check_username(username, auth=settings.LAYMAN_GS_AUTH):
+    rolename = common.username_to_rolename(username)
+    if username in common.RESERVED_WORKSPACE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'workspace': username})
 
-
-def ensure_user_workspace(username):
-    all_workspaces = get_all_workspaces()
-    if not any(ws['name'] == username for ws in all_workspaces):
-        r = requests.post(
-            settings.LAYMAN_GS_REST_WORKSPACES,
-            data=json.dumps({'workspace': {'name': username}}),
-            headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH
-        )
-        r.raise_for_status()
-        r = requests.post(
-            settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
-            data=json.dumps(
-                {username + '.*.r': settings.LAYMAN_GS_ROLE + ',ROLE_ANONYMOUS'}),
-            headers=headers_json,
-            auth=settings.LAYMAN_GS_AUTH
-        )
-        r.raise_for_status()
-        ensure_user_db_store(username)
+    if rolename in common.RESERVED_ROLE_NAMES:
+        raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
 
 
-def delete_user_workspace(username):
-    delete_user_db_store(username)
-    r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, username + '.*.r'),
-        headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH
-    )
-    if r.status_code != 404:
-        r.raise_for_status()
-    r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username),
-        headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH
-    )
-    if r.status_code != 404:
-        r.raise_for_status()
+ensure_whole_user = common.ensure_whole_user
 
 
-def ensure_user_db_store(username):
-    r = requests.post(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + '/datastores'),
-        data=json.dumps({
-            "dataStore": {
-                "name": "postgresql",
-                "connectionParameters": {
-                    "entry": [
-                        {
-                            "@key": "dbtype",
-                            "$": "postgis"
-                        },
-                        {
-                            "@key": "host",
-                            "$": settings.LAYMAN_PG_HOST
-                        },
-                        {
-                            "@key": "port",
-                            "$": settings.LAYMAN_PG_PORT
-                        },
-                        {
-                            "@key": "database",
-                            "$": settings.LAYMAN_PG_DBNAME
-                        },
-                        {
-                            "@key": "user",
-                            "$": settings.LAYMAN_PG_USER
-                        },
-                        {
-                            "@key": "passwd",
-                            "$": settings.LAYMAN_PG_PASSWORD
-                        },
-                        {
-                            "@key": "schema",
-                            "$": username
-                        },
-                    ]
-                },
-            }
-        }),
-        headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH
-    )
-    r.raise_for_status()
-
-
-def delete_user_db_store(username):
-    r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + f'/datastores/{username}'),
-        headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH
-    )
-    if r.status_code != 404:
-        r.raise_for_status()
+delete_whole_user = common.delete_whole_user
 
 
 def publish_layer_from_db(username, layername, description, title):
@@ -197,41 +94,8 @@ def publish_layer_from_db(username, layername, description, title):
     wms.clear_cache(username)
 
 
-def get_layman_rules(all_rules=None, layman_role=settings.LAYMAN_GS_ROLE):
-    if all_rules == None:
-        all_rules = get_all_rules()
-    re_role = r".*\b" + re.escape(layman_role) + r"\b.*"
-    result = {k: v for k, v in all_rules.items() if re.match(re_role, v)}
-    return result
-
-
-def get_non_layman_workspaces(all_workspaces=None, layman_rules=None):
-    if all_workspaces == None:
-        all_workspaces = get_all_workspaces()
-    if layman_rules == None:
-        layman_rules = get_layman_rules()
-    result = [
-        ws for ws in all_workspaces
-        if next((
-            k for k in layman_rules
-            if re.match(r"^" + re.escape(ws['name']) + r"\..*", k)
-        ), None) is None
-    ]
-    return result
-
-
-def get_layman_workspaces():
-    all_workspaces = get_all_workspaces()
-    non_layman_workspaces = get_non_layman_workspaces()
-    layman_workspaces = filter(lambda ws: ws not in non_layman_workspaces,
-                               all_workspaces)
-    return layman_workspaces
-
-
 def get_usernames():
-    return [
-        ws['name'] for ws in get_layman_workspaces()
-    ]
+    return common.get_usernames_by_role(settings.LAYMAN_GS_ROLE, settings.LAYMAN_GS_AUTH, [settings.LAYMAN_GS_USER])
 
 
 def check_new_layername(username, layername):

@@ -5,7 +5,7 @@ from owslib.wms import WebMapService
 from owslib.wfs import WebFeatureService
 
 from layman.cache.mem import CACHE as MEM_CACHE
-from layman.common.geoserver import headers_json, get_proxy_base_url
+from layman.common.geoserver import headers_json, get_proxy_base_url, get_usernames, get_user_roles
 
 
 CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL'
@@ -16,12 +16,8 @@ from layman import settings
 def get_gs_proxy_base_url():
     proxy_base_url = MEM_CACHE.get(CACHE_GS_PROXY_BASE_URL_KEY)
     if proxy_base_url is None:
-        try:
-            proxy_base_url = get_proxy_base_url()
-        except:
-            pass
-        if proxy_base_url is not None:
-            MEM_CACHE.set(CACHE_GS_PROXY_BASE_URL_KEY, proxy_base_url, ttl=settings.LAYMAN_CACHE_GS_TIMEOUT)
+        proxy_base_url = get_proxy_base_url(settings.LAYMAN_GS_AUTH)
+        MEM_CACHE.set(CACHE_GS_PROXY_BASE_URL_KEY, proxy_base_url, ttl=settings.LAYMAN_CACHE_GS_TIMEOUT)
     return proxy_base_url
 
 

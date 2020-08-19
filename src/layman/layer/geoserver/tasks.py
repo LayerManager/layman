@@ -3,7 +3,8 @@ from celery.utils.log import get_task_logger
 from layman.celery import AbortedException
 from layman import celery_app
 from layman.layer import geoserver
-from . import wms, wfs, sld, ensure_user_workspace
+from . import wms, wfs, sld
+from .. import geoserver
 
 logger = get_task_logger(__name__)
 
@@ -32,7 +33,7 @@ def refresh_wfs(
     if title is None:
         title = layername
     if ensure_user:
-        ensure_user_workspace(username)
+        geoserver.ensure_whole_user(username)
 
     if self.is_aborted():
         raise AbortedException

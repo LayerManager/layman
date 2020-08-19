@@ -4,6 +4,8 @@ import re
 from layman import LaymanError
 USER_PATH_PATTERN = re.compile('^/rest/([a-z][a-z0-9]*(?:_[a-z0-9]+)*)(?:/[^\n]*)?$')
 
+from layman.common import geoserver as gs
+
 
 def authorize():
     if request.method in ['GET']:
@@ -33,3 +35,11 @@ def get_publication_access_rights(publ_type, username, publication_name):
     return {
         'guest': 'r',
     }
+
+
+def get_gs_roles(username, type):
+    if type == 'r':
+        roles = gs.get_roles_anyone(username)
+    elif type == 'w':
+        roles = gs.get_roles_owner(username)
+    return roles

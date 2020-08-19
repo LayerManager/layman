@@ -32,8 +32,8 @@ GEOSERVER_ADMIN_USER = 'admin'
 GEOSERVER_ADMIN_PASSWORD = os.getenv('GEOSERVER_ADMIN_PASSWORD', None)
 GEOSERVER_ADMIN_AUTH = None if GEOSERVER_ADMIN_PASSWORD is None else (GEOSERVER_ADMIN_USER,
                                                                       GEOSERVER_ADMIN_PASSWORD)
-LAYMAN_GS_ROLE_SERVICE = 'default'
-LAYMAN_GS_USER_GROUP_SERVICE = 'default'
+LAYMAN_GS_ROLE_SERVICE = os.getenv('LAYMAN_GS_ROLE_SERVICE', '') or 'default'
+LAYMAN_GS_USER_GROUP_SERVICE = os.getenv('LAYMAN_GS_USER_GROUP_SERVICE', '') or 'default'
 
 LAYMAN_GS_USER = os.environ['LAYMAN_GS_USER']
 LAYMAN_GS_PASSWORD = os.environ['LAYMAN_GS_PASSWORD']
@@ -58,9 +58,6 @@ LAYMAN_GS_REST_USERS = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAY
 LAYMAN_GS_REST_USER = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAYMAN_GS_USER_GROUP_SERVICE}/user/')
 LAYMAN_GS_REST_WMS_SETTINGS = urljoin(LAYMAN_GS_REST, f'services/wms/settings/')
 
-GS_RESERVED_WORKSPACE_NAMES = [
-    'default',
-]
 
 # List of schemas that are not allowed to be used as usernames.
 PG_NON_USER_SCHEMAS = [

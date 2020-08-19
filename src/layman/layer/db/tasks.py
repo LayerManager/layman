@@ -6,7 +6,7 @@ from layman.celery import AbortedException
 from layman.layer.filesystem.input_file import get_layer_main_file_path
 from layman import celery_app
 from layman.http import LaymanError
-from . import import_layer_vector_file_async, ensure_user_workspace
+from .. import db
 from .table import delete_layer
 
 logger = get_task_logger(__name__)
@@ -29,12 +29,11 @@ def refresh_table(
         ensure_user=False
 ):
     if ensure_user:
-        ensure_user_workspace(username)
+        db.ensure_whole_user(username)
     if self.is_aborted():
         raise AbortedException
     main_filepath = get_layer_main_file_path(username, layername)
-    p = import_layer_vector_file_async(username, layername, main_filepath,
-                                       crs_id)
+    p = db.import_layer_vector_file_async(username, layername, main_filepath, crs_id)
     while p.poll() is None and not self.is_aborted():
         pass
     if self.is_aborted():
