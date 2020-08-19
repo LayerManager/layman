@@ -1198,7 +1198,7 @@ def test_layer_with_different_geometry(client):
                       headers=headers_wfs,
                       auth=settings.LAYMAN_GS_AUTH
                       )
-    r.raise_for_status()
+    assert r.status_code == 200, f"HTTP Error {r.status_code}\n{r.text}"
 
     data_xml2 = '''<?xml version="1.0"?>
 <wfs:Transaction
@@ -1235,11 +1235,11 @@ def test_layer_with_different_geometry(client):
                       headers=headers_wfs,
                       auth=settings.LAYMAN_GS_AUTH
                       )
-    r.raise_for_status()
+    assert r.status_code == 200, f"HTTP Error {r.status_code}\n{r.text}"
 
     r = requests.post(url_path_wfs,
                       data=data_xml2,
                       headers=headers_wfs,
                       auth=settings.LAYMAN_GS_AUTH
                       )
-    r.raise_for_status()
+    assert r.status_code == 200, f"HTTP Error {r.status_code}\n{r.text}"
