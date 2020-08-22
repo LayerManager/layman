@@ -18,14 +18,14 @@ def before_request():
     pass
 
 
-#curl -X GET -H "Content-Type: application/json" "http://localhost:8000/rest/wfs-proxy"
+# curl -X GET -H "Content-Type: application/json" "http://localhost:8000/rest/wfs-proxy"
 @bp.route('', methods=['GET'])
 def get():
     app.logger.info(f"GET WFS proxy, user={g.user}")
 
     resp = requests.request(
         method=request.method,
-        url=urljoin(settings.LAYMAN_GS_URL, 'wfs?request=Transaction'),
+        url=urljoin(urljoin(settings.LAYMAN_GS_URL, "test"), 'wfs?request=Transaction'),
         headers={key: value for (key, value) in request.headers if key != 'Host'},
         data=request.get_data(),
         cookies=request.cookies,
