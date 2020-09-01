@@ -1192,11 +1192,11 @@ def test_layer_with_different_geometry(client):
         'Content-type': 'text/xml',
     }
 
-    data_xml = '''<?xml version="1.0"?>
+    data_xml = f'''<?xml version="1.0"?>
 <wfs:Transaction
    version="2.0.0"
    service="WFS"
-   xmlns:testgeometryuser1="http://testgeometryuser1"
+   xmlns:{username}="http://{username}"
    xmlns:fes="http://www.opengis.net/fes/2.0"
    xmlns:gml="http://www.opengis.net/gml/3.2"
    xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -1206,13 +1206,13 @@ def test_layer_with_different_geometry(client):
                        http://www.opengis.net/gml/3.2
                        http://schemas.opengis.net/gml/3.2.1/gml.xsd">
    <wfs:Insert>
-       <testgeometryuser1:layer_with_different_geometry>
-           <testgeometryuser1:wkb_geometry>
+       <{username}:{layername}>
+           <{username}:wkb_geometry>
                <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
                    <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
                </gml:Point>
-           </testgeometryuser1:wkb_geometry>
-       </testgeometryuser1:layer_with_different_geometry>
+           </{username}:wkb_geometry>
+       </{username}:{layername}>
    </wfs:Insert>
 </wfs:Transaction>'''
 
@@ -1230,11 +1230,11 @@ def test_layer_with_different_geometry(client):
                       )
     assert r.status_code == 200, f"HTTP Error {r.status_code}\n{r.text}"
 
-    data_xml2 = '''<?xml version="1.0"?>
+    data_xml2 = f'''<?xml version="1.0"?>
 <wfs:Transaction
    version="2.0.0"
    service="WFS"
-   xmlns:testgeometryuser1="http://testgeometryuser1"
+   xmlns:{username}="http://{username}"
    xmlns:fes="http://www.opengis.net/fes/2.0"
    xmlns:gml="http://www.opengis.net/gml/3.2"
    xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -1244,8 +1244,8 @@ def test_layer_with_different_geometry(client):
                        http://www.opengis.net/gml/3.2
                        http://schemas.opengis.net/gml/3.2.1/gml.xsd">
    <wfs:Insert>
-       <testgeometryuser1:layer_with_different_geometry>
-           <testgeometryuser1:wkb_geometry>
+       <{username}:{layername}>
+           <{username}:wkb_geometry>
                <gml:MultiCurve srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
                    <gml:curveMember>
                        <gml:LineString>
@@ -1255,8 +1255,8 @@ def test_layer_with_different_geometry(client):
                        </gml:LineString>
                    </gml:curveMember>
                </gml:MultiCurve>
-           </testgeometryuser1:wkb_geometry>
-       </testgeometryuser1:layer_with_different_geometry>
+           </{username}:wkb_geometry>
+       </{username}:{layername}>
    </wfs:Insert>
 </wfs:Transaction>'''
 

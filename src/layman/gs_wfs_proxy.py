@@ -1,7 +1,7 @@
 from urllib.parse import urljoin
 import requests
 
-from flask import Blueprint, g, current_app as app, request, Response
+from flask import Blueprint, g, current_app as app, request, Response, jsonify
 
 from layman.authn import authenticate, flush_cache
 from layman.authz import authorize
@@ -18,27 +18,31 @@ def before_request():
     pass
 
 
-# curl -X GET -H "Content-Type: application/json" "http://localhost:8000/rest/wfs-proxy"
+# curl -X GET -H "Accept: text/xml" -H "Content-type: text/xml" --data-binary @wfs-proxy-test.xml "http://localhost:8000/rest/wfs-proxy"
 @bp.route('', methods=['GET'])
 def get():
     app.logger.info(f"GET WFS proxy, user={g.user}")
 
-    resp = requests.request(
-        method=request.method,
-        url=urljoin(urljoin(settings.LAYMAN_GS_URL, "test"), 'wfs?request=Transaction'),
-        headers={key: value for (key, value) in request.headers if key != 'Host'},
-        data=request.get_data(),
-        cookies=request.cookies,
-        allow_redirects=False)
+    username = 'wfs_proxy_test'
+# TODO
+# [x]    1. headers
+# [x]    2. data
+# [x]    3. cookies
+# [x]    4. url
+# [ ]    5. username
+# [ ]    6. auth
 
-    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
-    headers = [(name, value) for (name, value) in resp.raw.headers.items()
-               if name.lower() not in excluded_headers]
+    base_url = urljoin(settings.LAYMAN_GS_URL, username) + '/'
+    url_path_wfs = urljoin(base_url, 'wfs?request=Transaction')
 
-    response = Response(resp.content, resp.status_code, headers)
-    return response
+    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection', 'host']
+    headers = {key: value for (key, value) in request.headers if key.lower() not in excluded_headers}
 
-    # res = json.dumps({"name" : "Růže, byť zvána jinak, voněla by stejně",
-    #                   "složení" : "Kristýna, Jura, Jirka, Des, INDEX"})
-    #
-    # return jsonify(res), 200
+    r = requests.post(url_path_wfs,
+                      data=request.get_data(),
+                      headers=headers,
+                      auth=settings.LAYMAN_GS_AUTH,
+                      cookies=request.cookies,
+                      allow_redirects=False
+                      )
+    return r.text, r.status_code
