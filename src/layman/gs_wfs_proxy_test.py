@@ -70,7 +70,7 @@ def test_rest_get(client):
 
     wait_till_ready(username, layername)
 
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest/wfs-proxy"
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest/wfs-proxy/{username}/wfs?request=Transaction"
     headers = {
         'Accept': 'text/xml',
         'Content-type': 'text/xml',
@@ -100,7 +100,7 @@ def test_rest_get(client):
        </wfs:Insert>
     </wfs:Transaction>'''
 
-    r = requests.get(rest_url,
-                     data=data_xml,
-                     headers=headers)
+    r = requests.post(rest_url,
+                      data=data_xml,
+                      headers=headers)
     assert r.status_code == 200
