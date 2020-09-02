@@ -138,9 +138,6 @@ celery-worker-test-bash:
 
 test:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_dev
-	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
-
-test-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml up --force-recreate --no-deps -d celery_worker_test
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
 
