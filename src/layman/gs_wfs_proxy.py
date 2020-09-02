@@ -19,7 +19,7 @@ def before_request():
 
 @bp.route('/<path:subpath>', methods=['POST', 'GET'])
 def proxy(subpath):
-    app.logger.info(f"GET WFS proxy, user={g.user}")
+    app.logger.info(f"GET WFS proxy, user={g.user}, subppath={subpath}, url={request.url}, request.query_string={request.query_string.decode('UTF-8')}")
 
 # TODO
 # [x]    1. headers
