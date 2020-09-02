@@ -18,10 +18,8 @@ def before_request():
     pass
 
 
-# curl -X GET -H "Accept: text/xml" -H "Content-type: text/xml" --data-binary @wfs-proxy-test.xml "http://localhost:8000/rest/wfs-proxy"
-@bp.route('/<interface>', defaults={'username': None}, methods=['POST','GET'])
-@bp.route('/<username>/<interface>', methods=['POST','GET'])
-def proxy(username, interface):
+@bp.route('/<path:subpath>', methods=['POST', 'GET'])
+def proxy(subpath):
     app.logger.info(f"GET WFS proxy, user={g.user}")
 
 # TODO
@@ -32,17 +30,7 @@ def proxy(username, interface):
 # [x]    5. username
 # [ ]    6. auth
 
-    url = request.url.replace(urljoin(request.host_url, '/rest/wfs-proxy/'), settings.LAYMAN_GS_URL)
-
-    app.logger.info(f"GET WFS proxy, username={username}")
-    app.logger.info(f"GET WFS proxy, interface={interface}")
-    app.logger.info(f"GET WFS proxy, request.host_url={request.host_url}")
-    app.logger.info(f"GET WFS proxy, request.url={request.url}")
-    app.logger.info(f"GET WFS proxy, request.url_root={request.url_root}")
-    app.logger.info(f"GET WFS proxy, request.base_url={request.base_url}")
-    app.logger.info(f"GET WFS proxy, request.endpoint={request.endpoint}")
-    app.logger.info(f"GET WFS proxy, request.host={request.host}")
-    app.logger.info(f"GET WFS proxy, url={url}")
+    url = settings.LAYMAN_GS_URL + subpath + '?' + request.query_string.decode('UTF-8')
 
     response = requests.request(method=request.method,
                                 url=url,
@@ -52,12 +40,10 @@ def proxy(username, interface):
                                 cookies=request.cookies,
                                 allow_redirects=False
                                 )
-    # excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
-    # headers = {key: value for (key, value) in response.headers if key.lower() not in excluded_headers}
+    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+    headers = {key: value for (key, value) in response.headers.items() if key.lower() not in excluded_headers}
 
-    # response = Response(resp.content,
-    #                     resp.status_code,
-    #                     headers)
-    # app.logger.info(f"GET WFS proxy, response.status_code={response.status_code}")
-    # app.logger.info(f"GET WFS proxy, response.data={response.data}")
-    return response.text, response.status_code
+    final_response = Response(response.content,
+                              response.status_code,
+                              headers)
+    return final_response
