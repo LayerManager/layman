@@ -58,6 +58,10 @@ LAYMAN_GS_REST_USERS = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAY
 LAYMAN_GS_REST_USER = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAYMAN_GS_USER_GROUP_SERVICE}/user/')
 LAYMAN_GS_REST_WMS_SETTINGS = urljoin(LAYMAN_GS_REST, f'services/wms/settings/')
 
+LAYMAN_GS_AUTHN_HTTP_HEADER_NAME = 'Layman HTTP header'
+LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE = 'e58e4774e3dc7d6443ad59a8202c5ee0'
+LAYMAN_GS_AUTHN_FILTER_CHAIN_NAME = 'Layman HTTP filter'
+
 
 # List of schemas that are not allowed to be used as usernames.
 PG_NON_USER_SCHEMAS = [

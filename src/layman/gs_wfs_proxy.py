@@ -13,7 +13,6 @@ bp = Blueprint('gs_wfs_proxy_bp', __name__)
 
 @bp.before_request
 @authenticate
-# @authorize
 def before_request():
     pass
 
@@ -30,13 +29,18 @@ def proxy(subpath):
 # [x]    5. username
 # [ ]    6. auth
 
-    url = settings.LAYMAN_GS_URL + subpath + '?' + request.query_string.decode('UTF-8')
 
+    url = settings.LAYMAN_GS_URL + subpath + '?' + request.query_string.decode('UTF-8')
+    headers_req = {key.lower(): value for (key, value) in request.headers if key != 'Host'}
+    if g.user is not None:
+        headers_req[settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE] = g.user
+    # headers_req[settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE] = "layman"
+
+    app.logger.info(f"GET WFS proxy, headers_req={headers_req}")
     response = requests.request(method=request.method,
                                 url=url,
                                 data=request.get_data(),
-                                headers={key: value for (key, value) in request.headers if key != 'Host'},
-                                auth=settings.LAYMAN_GS_AUTH,
+                                headers=headers_req,
                                 cookies=request.cookies,
                                 allow_redirects=False
                                 )

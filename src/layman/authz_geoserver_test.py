@@ -57,6 +57,7 @@ def liferay_mock():
                 'test_rewo1': None,
                 'test_rewe_rewo1': None,
                 'test_rewe_rewo2': None,
+                'testproxy': None,
             },
         },
         'host': '0.0.0.0',
@@ -92,7 +93,9 @@ def start_layman(env_vars=None):
 
     new_env = os.environ.copy()
     new_env.update(**env_vars)
+    new_env['LAYMAN_CELERY_QUEUE'] = 'temporary'
     cmd = f'flask run --host=0.0.0.0 --port={port} --no-reload'
+    # TODO start celery worker
     layman_process = subprocess.Popen(cmd.split(), shell=False, stdin=None, env=new_env)
 
     SUBPROCESSES.add(layman_process)
@@ -102,6 +105,7 @@ def start_layman(env_vars=None):
 
 
 def stop_process(process):
+    # TODO stop celery worker
     process.kill()
     SUBPROCESSES.remove(process)
 
@@ -260,6 +264,8 @@ def test_rewe(liferay_mock):
     ], headers=authn_headers1)
     assert ln == layername1
     assert_user_layers(test_user1, [layername1])
+    assert_gs_user_and_roles(test_user1)
+    assert_gs_rewe_data_security(test_user1)
 
     delete_layer(test_user1, layername1, headers=authn_headers1)
 
@@ -285,6 +291,8 @@ def test_rewo(liferay_mock):
     ], headers=authn_headers2)
     assert ln == layername1
     assert_user_layers(test_user1, [layername1])
+    assert_gs_user_and_roles(test_user1)
+    assert_gs_rewo_data_security(test_user1)
 
     delete_layer(test_user1, layername1, headers=authn_headers2)
 
@@ -317,6 +325,8 @@ def test_rewe_rewo(liferay_mock):
     ], headers=authn_headers1)
     assert ln == layername1
     assert_user_layers(test_user1, [layername1])
+    assert_gs_user_and_roles(test_user1)
+    assert_gs_rewe_data_security(test_user1)
 
     stop_process(layman_process)
 
@@ -352,6 +362,8 @@ def test_rewe_rewo(liferay_mock):
     ], headers=authn_headers2)
     assert ln == layername2
     assert_user_layers(test_user2, [layername2])
+    assert_gs_user_and_roles(test_user2)
+    assert_gs_rewe_data_security(test_user2)
 
     patch_layer(test_user2, layername2, [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
@@ -363,5 +375,79 @@ def test_rewe_rewo(liferay_mock):
 
     delete_layer(test_user1, layername1, headers=authn_headers1)
     delete_layer(test_user2, layername2, headers=authn_headers2)
+
+    stop_process(layman_process)
+
+
+def test_wfs_proxy(liferay_mock):
+    username = 'testproxy'
+    layername1 = 'ne_ccuntries'
+    layman_process = start_layman(dict({
+        'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner',
+        # 'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_everyone',
+    }, **AUTHN_SETTINGS))
+
+    roles = set(geoserver.get_workspace_security_roles("testproxy", "w", settings.LAYMAN_GS_AUTH))
+    print(f"Test1 roles={roles}")
+
+    authn_headers1 = {
+        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+        f'{TOKEN_HEADER}': f'Bearer {username}',
+    }
+    roles = set(geoserver.get_workspace_security_roles("testproxy", "w", settings.LAYMAN_GS_AUTH))
+    print(f"Test2 roles={roles}")
+
+    reserve_username(username, headers=authn_headers1)
+
+    roles = set(geoserver.get_workspace_security_roles("testproxy", "w", settings.LAYMAN_GS_AUTH))
+    print(f"Test3 roles={roles}")
+
+    ln = publish_layer(username, layername1, [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+    ], headers=authn_headers1)
+
+    assert ln == layername1
+
+    roles = set(geoserver.get_workspace_security_roles("testproxy", "w", settings.LAYMAN_GS_AUTH))
+    print(f"Test4 roles={roles}")
+
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
+    headers = {
+        'Accept': 'text/xml',
+        'Content-type': 'text/xml',
+    }
+
+    data_xml = f'''<?xml version="1.0"?>
+    <wfs:Transaction
+       version="2.0.0"
+       service="WFS"
+       xmlns:{username}="http://{username}"
+       xmlns:fes="http://www.opengis.net/fes/2.0"
+       xmlns:gml="http://www.opengis.net/gml/3.2"
+       xmlns:wfs="http://www.opengis.net/wfs/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.opengis.net/wfs/2.0
+                           http://schemas.opengis.net/wfs/2.0/wfs.xsd
+                           http://www.opengis.net/gml/3.2
+                           http://schemas.opengis.net/gml/3.2.1/gml.xsd">
+       <wfs:Insert>
+           <{username}:{layername1}>
+               <{username}:wkb_geometry>
+                   <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
+                       <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
+                   </gml:Point>
+               </{username}:wkb_geometry>
+           </{username}:{layername1}>
+       </wfs:Insert>
+    </wfs:Transaction>'''
+
+    r = requests.post(rest_url,
+                      data=data_xml,
+                      headers=headers)
+    assert r.status_code == 200
+    print(r.text)
+
+    roles = set(geoserver.get_workspace_security_roles("testproxy", "w", settings.LAYMAN_GS_AUTH))
+    print(f"Test5 roles={roles}")
 
     stop_process(layman_process)
