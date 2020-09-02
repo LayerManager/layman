@@ -54,9 +54,11 @@ def test_rest_get(client):
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
     ]
+
     for fp in file_paths:
         assert os.path.isfile(fp)
     files = []
+
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
@@ -70,7 +72,7 @@ def test_rest_get(client):
 
     wait_till_ready(username, layername)
 
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest/wfs-proxy/{username}/wfs?request=Transaction"
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
     headers = {
         'Accept': 'text/xml',
         'Content-type': 'text/xml',
@@ -102,5 +104,10 @@ def test_rest_get(client):
 
     r = requests.post(rest_url,
                       data=data_xml,
+                      headers=headers)
+    assert r.status_code == 200
+
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=GetCapabilities"
+    r = requests.post(rest_url,
                       headers=headers)
     assert r.status_code == 200
