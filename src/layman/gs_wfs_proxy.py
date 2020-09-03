@@ -29,7 +29,6 @@ def proxy(subpath):
 # [x]    5. username
 # [ ]    6. auth
 
-
     url = settings.LAYMAN_GS_URL + subpath + '?' + request.query_string.decode('UTF-8')
     headers_req = {key.lower(): value for (key, value) in request.headers if key != 'Host'}
     if g.user is not None:
