@@ -27,6 +27,8 @@ AUTHN_SETTINGS = {
     'OAUTH2_LIFERAY_USER_PROFILE_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile",
 }
 
+LAYMAN_CELERY_QUEUE = 'temporary'
+
 
 def wait_for_url(url, max_attempts, sleeping_time):
     attempt = 1
@@ -91,23 +93,32 @@ def start_layman(env_vars=None):
     port = settings.LAYMAN_SERVER_NAME.split(':')[1]
     env_vars = env_vars or {}
 
-    new_env = os.environ.copy()
-    new_env.update(**env_vars)
-    new_env['LAYMAN_CELERY_QUEUE'] = 'temporary'
+    layman_env = os.environ.copy()
+    layman_env.update(**env_vars)
+    layman_env['LAYMAN_CELERY_QUEUE'] = LAYMAN_CELERY_QUEUE
     cmd = f'flask run --host=0.0.0.0 --port={port} --no-reload'
-    # TODO start celery worker
-    layman_process = subprocess.Popen(cmd.split(), shell=False, stdin=None, env=new_env)
+    layman_process = subprocess.Popen(cmd.split(), shell=False, stdin=None, env=layman_env)
 
     SUBPROCESSES.add(layman_process)
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest/current-user"
     wait_for_url(rest_url, 50, 0.1)
-    return layman_process
+
+    celery_env = layman_env.copy()
+    celery_env['LAYMAN_SKIP_REDIS_LOADING'] = 'true'
+    cmd = f'python3 -m celery -Q {LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info'
+    celery_process = subprocess.Popen(cmd.split(), shell=False, stdin=None, env=layman_env, cwd='src')
+
+    SUBPROCESSES.add(celery_process)
+
+    return layman_process, celery_process
 
 
 def stop_process(process):
-    # TODO stop celery worker
-    process.kill()
-    SUBPROCESSES.remove(process)
+    if type(process) is not tuple:
+        process = (process,)
+    for proc in process:
+        proc.kill()
+        SUBPROCESSES.remove(proc)
 
 
 def publish_layer(username, layername, file_paths, headers=None):
@@ -363,7 +374,7 @@ def test_rewe_rewo(liferay_mock):
     assert ln == layername2
     assert_user_layers(test_user2, [layername2])
     assert_gs_user_and_roles(test_user2)
-    assert_gs_rewe_data_security(test_user2)
+    assert_gs_rewo_data_security(test_user2)
 
     patch_layer(test_user2, layername2, [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
@@ -381,7 +392,7 @@ def test_rewe_rewo(liferay_mock):
 
 def test_wfs_proxy(liferay_mock):
     username = 'testproxy'
-    layername1 = 'ne_ccuntries'
+    layername1 = 'ne_countries'
     layman_process = start_layman(dict({
         'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner',
         # 'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_everyone',
@@ -415,6 +426,7 @@ def test_wfs_proxy(liferay_mock):
     headers = {
         'Accept': 'text/xml',
         'Content-type': 'text/xml',
+        **authn_headers1,
     }
 
     data_xml = f'''<?xml version="1.0"?>
@@ -444,8 +456,7 @@ def test_wfs_proxy(liferay_mock):
     r = requests.post(rest_url,
                       data=data_xml,
                       headers=headers)
-    assert r.status_code == 200
-    print(r.text)
+    assert r.status_code == 200, r.text
 
     roles = set(geoserver.get_workspace_security_roles("testproxy", "w", settings.LAYMAN_GS_AUTH))
     print(f"Test5 roles={roles}")
