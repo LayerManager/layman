@@ -32,7 +32,7 @@ def proxy(subpath):
     url = settings.LAYMAN_GS_URL + subpath + '?' + request.query_string.decode('UTF-8')
     headers_req = {key.lower(): value for (key, value) in request.headers if key != 'Host'}
     if g.user is not None:
-        headers_req[settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE] = g.user
+        headers_req[settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE] = g.user['username']
     # headers_req[settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE] = "layman"
 
     app.logger.info(f"GET WFS proxy, headers_req={headers_req}")
