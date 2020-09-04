@@ -68,7 +68,7 @@ def main():
     # TODO does not refresh new filter group (only after restart)
     logger.info(f"Resetting GeoServer configuration ...")
     r = requests.post(
-        settings.LAYMAN_GS_REST+'reset',
+        settings.LAYMAN_GS_REST + 'reset',
         headers=headers_json,
         auth=auth,
         timeout=0.1
