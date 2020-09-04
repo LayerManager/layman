@@ -64,7 +64,7 @@ def create_security_filter_group(data_dir, name, filter_names):
     new_chain.attrib['disabled'] = 'false'
     new_chain.attrib['allowSessionCreation'] = 'false'
     new_chain.attrib['ssl'] = 'false'
-    new_chain.attrib['interceptorName'] = 'false'
+    new_chain.attrib['matchHTTPMethod'] = 'false'
     for filter_name in filter_names:
         new_filter = ET.SubElement(new_chain, 'filter')
         new_filter.text = filter_name
