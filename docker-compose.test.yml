@@ -15,6 +15,7 @@ services:
         - ./test:/code/test
         - ./tmp:/code/tmp
         - ./test.sh:/code/test.sh
+        - ./deps/geoserver/data:/geoserver/data_dir
       depends_on:
         - celery_worker_test
         - timgen
