@@ -9,7 +9,8 @@ def wait_for_url(url, max_attempts, sleeping_time):
     while True:
         # print(f"Waiting for URL {url}, attempt {attempt}")
         try:
-            r = requests.get(url)
+            # Just checking the url, no need to store result
+            requests.get(url)
             break
         except ConnectionError as e:
             if attempt == max_attempts:

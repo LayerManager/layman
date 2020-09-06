@@ -9,9 +9,10 @@ import os
 
 del sys.modules['layman']
 
-from layman import app as app
-from layman import settings
-from layman.layer.rest_test import wait_till_ready
+from src.layman import app
+from src.layman import settings
+from src.layman.layer.rest_test import wait_till_ready
+from test import client as client_util
 
 
 @pytest.fixture(scope="module")
@@ -79,29 +80,7 @@ def test_rest_get(client):
         'Content-type': 'text/xml',
     }
 
-    data_xml = f'''<?xml version="1.0"?>
-    <wfs:Transaction
-       version="2.0.0"
-       service="WFS"
-       xmlns:{username}="http://{username}"
-       xmlns:fes="http://www.opengis.net/fes/2.0"
-       xmlns:gml="http://www.opengis.net/gml/3.2"
-       xmlns:wfs="http://www.opengis.net/wfs/2.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.opengis.net/wfs/2.0
-                           http://schemas.opengis.net/wfs/2.0/wfs.xsd
-                           http://www.opengis.net/gml/3.2
-                           http://schemas.opengis.net/gml/3.2.1/gml.xsd">
-       <wfs:Insert>
-           <{username}:{layername}>
-               <{username}:wkb_geometry>
-                   <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
-                       <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
-                   </gml:Point>
-               </{username}:wkb_geometry>
-           </{username}:{layername}>
-       </wfs:Insert>
-    </wfs:Transaction>'''
+    data_xml = client_util.get_wfs_insert_points(username, layername)
 
     # r = requests.post(rest_url,
     #                   data=data_xml,

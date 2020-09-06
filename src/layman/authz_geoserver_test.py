@@ -6,8 +6,7 @@ import requests
 from src.layman import settings
 from src.layman.common import geoserver
 
-from test import process
-from test import client as client_util
+from test import process, client as client_util
 
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
@@ -228,29 +227,7 @@ def test_wfs_proxy(liferay_mock):
         **authn_headers1,
     }
 
-    data_xml = f'''<?xml version="1.0"?>
-    <wfs:Transaction
-       version="2.0.0"
-       service="WFS"
-       xmlns:{username}="http://{username}"
-       xmlns:fes="http://www.opengis.net/fes/2.0"
-       xmlns:gml="http://www.opengis.net/gml/3.2"
-       xmlns:wfs="http://www.opengis.net/wfs/2.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.opengis.net/wfs/2.0
-                           http://schemas.opengis.net/wfs/2.0/wfs.xsd
-                           http://www.opengis.net/gml/3.2
-                           http://schemas.opengis.net/gml/3.2.1/gml.xsd">
-       <wfs:Insert>
-           <{username}:{layername1}>
-               <{username}:wkb_geometry>
-                   <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
-                       <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
-                   </gml:Point>
-               </{username}:wkb_geometry>
-           </{username}:{layername1}>
-       </wfs:Insert>
-    </wfs:Transaction>'''
+    data_xml = client_util.get_wfs_insert_points(username, layername1)
 
     r = requests.post(rest_url,
                       data=data_xml,

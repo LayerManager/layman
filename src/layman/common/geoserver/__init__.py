@@ -146,7 +146,6 @@ def ensure_workspace_security_roles(workspace, roles, type, auth):
     )
     if r.status_code != 404:
         r.raise_for_status()
-    logger.info(f"Ensure_workspace_security_roles1 r.text={r.text}")
 
     r = requests.post(
         settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
@@ -156,7 +155,6 @@ def ensure_workspace_security_roles(workspace, roles, type, auth):
         auth=auth
     )
     r.raise_for_status()
-    logger.info(f"Ensure_workspace_security_roles2 r.text={r.text}")
 
 
 def ensure_workspace_security(workspace, type, auth):
@@ -170,10 +168,8 @@ def ensure_workspace_security(workspace, type, auth):
     new_roles = authz_module.get_gs_roles(workspace, type)
     roles.update(new_roles)
 
-    logger.info(f"Ensure_workspace_security workspace={workspace}, type={type}, roles={roles}")
     ensure_workspace_security_roles(workspace, roles, type, auth)
     roles_after = set(get_workspace_security_roles(workspace, type, auth))
-    logger.info(f"Ensure_workspace_security roles_after={roles_after}")
 
 
 def get_all_workspaces(auth):
