@@ -2,18 +2,22 @@
 
 start-demo:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_gs_auth.py"
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client nginx
 
 start-demo-full:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_gs_auth.py"
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client micka nginx
 
 start-demo-only:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_gs_auth.py"
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps layman celery_worker flower timgen layman_client
 
 start-demo-full-with-optional-deps:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_gs_auth.py"
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate
 
 stop-demo:
@@ -30,6 +34,7 @@ deps-stop:
 
 start-dev:
 	mkdir -p layman_data layman_data_test tmp
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_gs_auth.py"
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate -d
 
 stop-dev:
@@ -38,6 +43,7 @@ stop-dev:
 start-dev-only:
 	mkdir -p layman_data layman_data_test tmp
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower timgen layman_client
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_gs_auth.py"
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d layman_dev celery_worker_dev flower timgen layman_client
 
 stop-dev-only:
@@ -139,17 +145,12 @@ celery-worker-test-bash:
 test:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build layman_test
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml rm -f layman_test
-	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run -d --no-deps -u root layman_test bash -c "cd src && python3 -B setup_gs_auth.py"
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_gs_auth.py"
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml up --force-recreate --no-deps -d celery_worker_test
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
 
 test-bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm layman_test bash
-
-test-wait-for-deps:
-	docker-compose -f docker-compose.deps.yml rm -fsv
-	docker-compose -f docker-compose.deps.yml up --force-recreate -d
-	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm layman_test bash -c "python3 src/wait_for_deps.py"
 
 lint:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "flake8 --count --select=E9,F63,F7,F82 --show-source --statistics ./src && pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,E711,E722,W503,E741 ./src"

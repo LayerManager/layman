@@ -21,6 +21,7 @@ services:
         - ./start.sh:/code/start.sh
         - ./doc:/code/doc
         - ./deps/geoserver/data:/geoserver/data_dir
+        - ./deps/geoserver/sample/geoserver_data:/geoserver/initial_data_dir
       depends_on:
         - timgen
         - redis
