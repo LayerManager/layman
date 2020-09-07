@@ -1,5 +1,5 @@
 <basicAuthentication>
-  <id>52857278:13c7ffd66a8:-7ffb</id>
+  <id>-64351010:174679fa7a2:-7ff1</id>
   <name>basic</name>
   <className>org.geoserver.security.filter.GeoServerBasicAuthenticationFilter</className>
   <useRememberMe>true</useRememberMe>
