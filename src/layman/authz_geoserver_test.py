@@ -3,8 +3,8 @@ import pytest
 import importlib
 import requests
 
-from src.layman import settings
-from src.layman.common import geoserver
+from layman import settings
+from layman.common import geoserver
 
 from test import process, client as client_util
 

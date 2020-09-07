@@ -9,9 +9,9 @@ import os
 
 del sys.modules['layman']
 
-from src.layman import app
-from src.layman import settings
-from src.layman.layer.rest_test import wait_till_ready
+from layman import app
+from layman import settings
+from layman.layer.rest_test import wait_till_ready
 from test import client as client_util
 
 

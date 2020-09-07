@@ -2,7 +2,7 @@ import time
 import requests
 import os
 
-from src.layman import settings
+from layman import settings
 
 
 ISS_URL_HEADER = 'AuthorizationIssUrl'
@@ -44,19 +44,6 @@ def publish_layer(username, layername, file_paths, headers=None):
             fp[0].close()
 
     wait_for_rest(f"{rest_url}/{username}/layers/{layername}", 20, 0.5)
-    # r_url = f"{rest_url}/{username}/layers/{layername}"
-    # r = requests.get(r_url)
-    # keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
-    # max_attempts = 20
-    # attempts = 1
-    # while not (r.status_code == 200 and all(
-    #         'status' not in r.json()[k] for k in keys_to_check
-    # )):
-    #     time.sleep(0.5)
-    #     r = requests.get(r_url)
-    #     attempts += 1
-    #     if attempts > max_attempts:
-    #         raise Exception('Max attempts reached!')
     return layername
 
 
@@ -79,19 +66,6 @@ def patch_layer(username, layername, file_paths, headers=None):
             fp[0].close()
 
     wait_for_rest(f"{rest_url}/{username}/layers/{layername}", 20, 0.5)
-    # r_url = f"{rest_url}/{username}/layers/{layername}"
-    # r = requests.get(r_url)
-    # keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
-    # max_attempts = 20
-    # attempts = 1
-    # while not (r.status_code == 200 and all(
-    #         'status' not in r.json()[k] for k in keys_to_check
-    # )):
-    #     time.sleep(0.5)
-    #     r = requests.get(r_url)
-    #     attempts += 1
-    #     if attempts > max_attempts:
-    #         raise Exception('Max attempts reached!')
     return layername
 
 

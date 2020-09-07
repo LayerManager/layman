@@ -19,33 +19,7 @@ MAX_ATTEMPTS = 60
 
 
 def main():
-    attempt = 1
-
-    # Wait for GeoServer
-    headers_json = {
-        'Accept': 'application/json',
-        'Content-type': 'application/json',
-    }
-    auth = settings.GEOSERVER_ADMIN_AUTH or settings.LAYMAN_GS_AUTH
-    wait_for_msg = f"GeoServer REST API, user={auth[0]}, url={settings.LAYMAN_GS_REST_WORKSPACES}"
-    print(f"Waiting for {wait_for_msg}")
-    while True:
-        try:
-            r = requests.get(
-                settings.LAYMAN_GS_REST_WORKSPACES,
-                headers=headers_json,
-                auth=auth,
-                timeout=0.1
-            )
-            r.raise_for_status()
-            print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
-            break
-        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
-            handle_exception(e, attempt, wait_for_msg)
-            attempt += 1
-    print(f"settings.GEOSERVER_DATADIR={settings.GEOSERVER_DATADIR}")
-
-    assert os.path.exists(settings.GEOSERVER_DATADIR)
+    gs_authn.ensure_data_dir(settings.GEOSERVER_DATADIR, settings.GEOSERVER_INITIAL_DATADIR)
 
     gs_authn.ensure_request_header_authn(
         settings.GEOSERVER_DATADIR,
@@ -54,6 +28,7 @@ def main():
         settings.LAYMAN_GS_USER_GROUP_SERVICE,
         settings.LAYMAN_GS_ROLE_SERVICE
     )
+
     # TODO ensure the filter to be inserted before 'default' filter group
     gs_authn.ensure_security_filter_group(
         settings.GEOSERVER_DATADIR,
@@ -64,28 +39,6 @@ def main():
             'anonymous',
         ]
     )
-
-    # TODO does not refresh new filter group (only after restart)
-    logger.info(f"Resetting GeoServer configuration ...")
-    r = requests.post(
-        settings.LAYMAN_GS_REST + 'reset',
-        headers=headers_json,
-        auth=auth,
-        timeout=0.1
-    )
-    r.raise_for_status()
-    logger.info(f"Resetting GeoServer configuration finished.")
-
-    # TODO raises Error for some reason
-    # logger.info(f"Reloading GeoServer configuration ...")
-    # r = requests.post(
-    #     settings.LAYMAN_GS_REST+'reload',
-    #     headers=headers_json,
-    #     auth=auth,
-    #     timeout=0.1
-    # )
-    # r.raise_for_status()
-    # logger.info(f"Reloading GeoServer configuration finished.")
 
 
 def handle_exception(e, attempt, wait_for_msg=None):

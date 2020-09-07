@@ -1,8 +1,9 @@
 import logging
+from distutils.dir_util import copy_tree
+
 from lxml import etree as ET
 import os
 import pathlib
-import sys
 
 logger = logging.getLogger(__name__)
 
@@ -22,14 +23,14 @@ def create_request_header_authn(data_dir, name, attribute, user_group_service, r
     pathlib.Path(os.path.dirname(file_path)).mkdir(parents=True, exist_ok=True)
     with open(file_path, "x") as f:
         f.write(f'''<requestHeaderAuthentication>
-          <id>-7ae6319c:1744eafb853:-7f6d</id>
-          <name>{name}</name>
-          <className>org.geoserver.security.filter.GeoServerRequestHeaderAuthenticationFilter</className>
-          <roleSource class="org.geoserver.security.config.PreAuthenticatedUserNameFilterConfig$PreAuthenticatedUserNameRoleSource">RoleService</roleSource>
-          <userGroupServiceName>{user_group_service}</userGroupServiceName>
-          <roleServiceName>{role_service}</roleServiceName>
-          <principalHeaderAttribute>{attribute}</principalHeaderAttribute>
-        </requestHeaderAuthentication>''')
+  <id>-7ae6319c:1744eafb853:-7f6d</id>
+  <name>{name}</name>
+  <className>org.geoserver.security.filter.GeoServerRequestHeaderAuthenticationFilter</className>
+  <roleSource class="org.geoserver.security.config.PreAuthenticatedUserNameFilterConfig$PreAuthenticatedUserNameRoleSource">RoleService</roleSource>
+  <userGroupServiceName>{user_group_service}</userGroupServiceName>
+  <roleServiceName>{role_service}</roleServiceName>
+  <principalHeaderAttribute>{attribute}</principalHeaderAttribute>
+</requestHeaderAuthentication>''')
 
 
 def get_authn(data_dir, name):
@@ -82,3 +83,8 @@ def ensure_security_filter_group(data_dir, name, filter_names):
         create_security_filter_group(data_dir, name, filter_names)
     group_created = not group_exists
     return group_created
+
+
+def ensure_data_dir(data_dir, data_dir_initial):
+    if not os.listdir(data_dir):
+        copy_tree(data_dir_initial, data_dir)
