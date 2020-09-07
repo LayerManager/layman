@@ -140,6 +140,13 @@ def test_wfs_proxy(liferay_mock):
                       headers=headers)
     assert r.status_code == 200, r.text
 
+    # Testing, that user1 is able to write his own layer through general WFS endpoint
+    general_rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
+    r = requests.post(general_rest_url,
+                      data=data_xml,
+                      headers=headers)
+    assert r.status_code == 200, r.text
+
     # Testing, that user2 is not able to write to layer of user1
     authn_headers2 = {
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
@@ -157,7 +164,14 @@ def test_wfs_proxy(liferay_mock):
     r = requests.post(rest_url,
                       data=data_xml,
                       headers=headers2)
-    assert r.status_code == 400
+    assert r.status_code == 400, r.text
+
+    # Testing, that user2 is not able to write user1's layer through general WFS endpoint
+    general_rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
+    r = requests.post(general_rest_url,
+                      data=data_xml,
+                      headers=headers2)
+    assert r.status_code == 400, r.text
 
     # Test anonymous
     headers3 = {
@@ -168,7 +182,7 @@ def test_wfs_proxy(liferay_mock):
     r = requests.post(rest_url,
                       data=data_xml,
                       headers=headers3)
-    assert r.status_code == 400
+    assert r.status_code == 400, r.text
 
     # Test fraud header
     headers4 = {
@@ -177,10 +191,9 @@ def test_wfs_proxy(liferay_mock):
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: username,
     }
 
-    print(headers4)
     r = requests.post(rest_url,
                       data=data_xml,
                       headers=headers4)
-    assert r.status_code == 400
+    assert r.status_code == 400, r.text
 
     process.stop_process(layman_process)
