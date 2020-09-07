@@ -17,9 +17,13 @@ from layman.layer import LAYER_TYPE
 from layman import app as app
 from layman import settings
 from layman import uuid
-from layman.authn.oauth2_test import liferay_mock, active_token_introspection_url, user_profile_url
+from test import process
+from layman.authn.oauth2_test import active_token_introspection_url, user_profile_url
 from layman.authn.oauth2 import liferay
 from layman.authn.oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
+
+
+liferay_mock = process.liferay_mock
 
 num_layers_before_test = 0
 
