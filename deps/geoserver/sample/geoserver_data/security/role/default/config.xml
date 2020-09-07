@@ -1,5 +1,5 @@
 <roleService>
-  <id>-64351010:174679fa7a2:-7ff2</id>
+  <id>5e9e93a5:1746839bd32:-7ff2</id>
   <name>default</name>
   <className>org.geoserver.security.xml.XMLRoleService</className>
   <fileName>roles.xml</fileName>
