@@ -102,7 +102,7 @@ matrix:
       # command to run tests
       script:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        - flake8 --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics ./src
+        - flake8 --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics ./src ./test
 
     - name: "PyCodeStyle"
       language: python
@@ -128,7 +128,7 @@ matrix:
 #E722 do not use bare 'except'
 #W503 Line break occurred before a binary operator
 #E741 ambiguous variable name 'l'
-        - pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,E711,E722,W503,E741 ./src
+        - pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,E711,E722,W503,E741 ./src ./test
 
     - name: "Pylint"
       language: python
@@ -148,7 +148,7 @@ matrix:
 
       # command to run tests
       script:
-        - pylint -f colorized -r y --fail-under 5 ./src
+        - pylint -f colorized -r y --fail-under 5 ./src ./test
 
     - name: "AutoPEP8"
       language: python
@@ -168,5 +168,5 @@ matrix:
 
       # command to run tests
       script:
-        - autopep8 --recursive --diff --aggressive --aggressive --exit-code --ignore=E402,E501,E711,E722,W503,E741,E721 ./src
+        - autopep8 --recursive --diff --aggressive --aggressive --exit-code --ignore=E402,E501,E711,E722,W503,E741,E721 ./src ./test
 
