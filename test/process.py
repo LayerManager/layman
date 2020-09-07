@@ -16,6 +16,12 @@ AUTHN_INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{
 
 LAYMAN_CELERY_QUEUE = 'temporary'
 
+AUTHN_SETTINGS = {
+    'LAYMAN_AUTHN_MODULES': 'layman.authn.oauth2',
+    'OAUTH2_LIFERAY_INTROSPECTION_URL': AUTHN_INTROSPECTION_URL,
+    'OAUTH2_LIFERAY_USER_PROFILE_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile",
+}
+
 
 @pytest.fixture(scope="module")
 def liferay_mock():

@@ -12,7 +12,17 @@ del sys.modules['layman']
 from layman import app
 from layman import settings
 from layman.layer.rest_test import wait_till_ready
-from test import client as client_util
+from test import process, client as client_util
+
+liferay_mock = process.liferay_mock
+
+LIFERAY_PORT = process.LIFERAY_PORT
+
+ISS_URL_HEADER = client_util.ISS_URL_HEADER
+TOKEN_HEADER = client_util.TOKEN_HEADER
+
+AUTHN_INTROSPECTION_URL = process.AUTHN_INTROSPECTION_URL
+AUTHN_SETTINGS = process.AUTHN_SETTINGS
 
 
 @pytest.fixture(scope="module")
@@ -82,10 +92,10 @@ def test_rest_get(client):
 
     data_xml = client_util.get_wfs_insert_points(username, layername)
 
-    # r = requests.post(rest_url,
-    #                   data=data_xml,
-    #                   headers=headers)
-    # assert r.status_code == 200
+    r = requests.post(rest_url,
+                      data=data_xml,
+                      headers=headers)
+    assert r.status_code == 200
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=GetCapabilities"
     r = requests.post(rest_url,

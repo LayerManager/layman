@@ -18,13 +18,9 @@ LIFERAY_PORT = process.LIFERAY_PORT
 ISS_URL_HEADER = client_util.ISS_URL_HEADER
 TOKEN_HEADER = client_util.TOKEN_HEADER
 
-AUTHN_INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection?is_active=true"
+AUTHN_INTROSPECTION_URL = process.AUTHN_INTROSPECTION_URL
 
-AUTHN_SETTINGS = {
-    'LAYMAN_AUTHN_MODULES': 'layman.authn.oauth2',
-    'OAUTH2_LIFERAY_INTROSPECTION_URL': AUTHN_INTROSPECTION_URL,
-    'OAUTH2_LIFERAY_USER_PROFILE_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile",
-}
+AUTHN_SETTINGS = process.AUTHN_SETTINGS
 
 
 def assert_gs_user_and_roles(username):
@@ -262,6 +258,19 @@ def test_wfs_proxy(liferay_mock):
     r = requests.post(rest_url,
                       data=data_xml,
                       headers=headers3)
+    assert r.status_code == 400
+
+    # Test fraud header
+    headers4 = {
+        'Accept': 'text/xml',
+        'Content-type': 'text/xml',
+        settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: username,
+    }
+
+    print(headers4)
+    r = requests.post(rest_url,
+                      data=data_xml,
+                      headers=headers4)
     assert r.status_code == 400
 
     process.stop_process(layman_process)

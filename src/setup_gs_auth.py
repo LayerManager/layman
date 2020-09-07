@@ -1,10 +1,8 @@
 import importlib
 import logging
 import os
-import requests
 import sys
-import time
-import traceback
+
 from geoserver import authn as gs_authn
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
@@ -29,7 +27,6 @@ def main():
         settings.LAYMAN_GS_ROLE_SERVICE
     )
 
-    # TODO ensure the filter to be inserted before 'default' filter group
     gs_authn.ensure_security_filter_group(
         settings.GEOSERVER_DATADIR,
         settings.LAYMAN_GS_AUTHN_FILTER_NAME,
@@ -39,22 +36,6 @@ def main():
             'anonymous',
         ]
     )
-
-
-def handle_exception(e, attempt, wait_for_msg=None):
-    if attempt < MAX_ATTEMPTS:
-        msg_end = f"Waiting {ATTEMPT_INTERVAL} seconds before next attempt."
-    else:
-        msg_end = "Max attempts reached!"
-    # print(f"Attempt {attempt}/{MAX_ATTEMPTS} failed:")
-    # print(e)
-    # print(msg_end)
-    # traceback.print_exc()
-    if attempt >= MAX_ATTEMPTS:
-        logger.warning(f"Reaching max attempts when waiting for {wait_for_msg}")
-        sys.exit(1)
-        # raise e
-    time.sleep(ATTEMPT_INTERVAL)
 
 
 if __name__ == "__main__":

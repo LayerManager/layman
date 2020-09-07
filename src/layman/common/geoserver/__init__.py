@@ -169,7 +169,6 @@ def ensure_workspace_security(workspace, type, auth):
     roles.update(new_roles)
 
     ensure_workspace_security_roles(workspace, roles, type, auth)
-    roles_after = set(get_workspace_security_roles(workspace, type, auth))
 
 
 def get_all_workspaces(auth):

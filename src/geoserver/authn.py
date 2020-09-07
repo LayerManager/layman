@@ -70,7 +70,6 @@ def create_security_filter_group(data_dir, name, filter_names):
         new_filter = ET.SubElement(new_chain, 'filter')
         new_filter.text = filter_name
     filter_chain = security_xml.find(f"//filterChain")
-    # TODO enable inserting before other specific filter group
     filter_chain.insert(0, new_chain)
     security_path = os.path.join(data_dir, 'security/config.xml')
     security_xml.write(security_path)
