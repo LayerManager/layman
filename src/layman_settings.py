@@ -1,4 +1,5 @@
 import os
+import re
 from urllib.parse import urljoin, urlparse
 from layman_settings_util import read_clients_dict_from_env
 
@@ -61,7 +62,10 @@ LAYMAN_GS_REST_USER = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAYM
 LAYMAN_GS_REST_WMS_SETTINGS = urljoin(LAYMAN_GS_REST, f'services/wms/settings/')
 
 LAYMAN_GS_AUTHN_HTTP_HEADER_NAME = 'laymanHttpHeader'
-LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE = 'e58e4774e3dc7d6443ad59a8202c5ee0'
+LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE = os.environ['LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE']
+assert re.match("[a-z][a-z0-9]*", LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE), "Only lowercase characters and numbers " \
+                                                                          "should be used for " \
+                                                                          "LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE. "
 LAYMAN_GS_AUTHN_FILTER_NAME = 'laymanHttpFilter'
 
 

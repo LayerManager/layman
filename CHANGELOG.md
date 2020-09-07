@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.7.0
+2020-09-??
+### Upgrade requirements
+- [#65](https://github.com/jirik/layman/issues/65) Set environment variable [LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE](doc/env-settings.md#LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE).
+### Changes
+- [#65](https://github.com/jirik/layman/issues/65) 
+
 ## v1.6.1
 2020-08-19
 - [#97](https://github.com/jirik/layman/issues/97) Before v1.6, [reserved `username`](doc/rest.md#patch-current-user) could be the same as LAYMAN_GS_USER. Starting at 1.6, this leads to conflict of two GeoServer users with the same name. This patch release comes with detection of this conflict (Layman error code 41).
