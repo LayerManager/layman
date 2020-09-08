@@ -167,6 +167,22 @@ AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
     return [r[0] for r in rows]
 
 
+def get_all_column_names(username, layername, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+
+    try:
+        cur.execute(f"""
+SELECT QUOTE_IDENT(column_name) AS column_name
+FROM information_schema.columns
+WHERE table_schema = '{username}'
+AND table_name = '{layername}'
+""")
+    except:
+        raise LaymanError(7)
+    rows = cur.fetchall()
+    return [r[0] for r in rows]
+
+
 def get_number_of_features(username, layername, conn_cur=None):
     conn, cur = conn_cur or get_connection_cursor()
 
@@ -464,3 +480,48 @@ limit 1
         if freq / num_distances > 0.03:
             result = distance
     return result
+
+
+def is_attrib(username, layername, attribute, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+
+    try:
+        cur.execute(f"""
+    SELECT count('a')
+    FROM information_schema.columns
+    WHERE table_schema = '{username}'
+      AND table_name = '{layername}'
+      and column_name = '{attribute}'
+    """)
+    except:
+        raise LaymanError(7)
+    rows = cur.fetchall()
+    return rows[0][0]
+
+
+def add_attrib(username, layername, attribute, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+
+    try:
+        cur.execute(f"""
+ALTER TABLE {username}.{layername}
+ADD COLUMN {attribute} VARCHAR(1024);
+commit;
+    """)
+    except:
+        raise LaymanError(7)
+
+
+def ensure_attribute(attrib):
+    attrib_exist = is_attrib(attrib[0],
+                             attrib[1],
+                             attrib[2])
+    if attrib_exist == 0:
+        add_attrib(attrib[0],
+                   attrib[1],
+                   attrib[2])
+
+
+def ensure_attributes(attributes):
+    for attrib in attributes:
+        ensure_attribute(attrib)

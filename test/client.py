@@ -104,7 +104,7 @@ def get_wfs_insert_points(username, layername):
         <wfs:Transaction
            version="2.0.0"
            service="WFS"
-           xmlns:{username}="http://{username}"
+           xmlns:{username}="{username}"
            xmlns:fes="http://www.opengis.net/fes/2.0"
            xmlns:gml="http://www.opengis.net/gml/3.2"
            xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -130,7 +130,7 @@ def get_wfs_insert_lines(username, layername):
     <wfs:Transaction
        version="2.0.0"
        service="WFS"
-       xmlns:{username}="http://{username}"
+       xmlns:{username}="{username}"
        xmlns:fes="http://www.opengis.net/fes/2.0"
        xmlns:gml="http://www.opengis.net/gml/3.2"
        xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -155,3 +155,44 @@ def get_wfs_insert_lines(username, layername):
            </{username}:{layername}>
        </wfs:Insert>
     </wfs:Transaction>'''
+
+
+def get_wfs_insert_points_new_attr(username, layername, attr_name):
+    return f'''<?xml version="1.0"?>
+<wfs:Transaction
+   version="2.0.0"
+   service="WFS"
+   xmlns:{username}="{username}"
+   xmlns:fes="http://www.opengis.net/fes/2.0"
+   xmlns:gml="http://www.opengis.net/gml/3.2"
+   xmlns:wfs="http://www.opengis.net/wfs/2.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.opengis.net/wfs/2.0
+                       http://schemas.opengis.net/wfs/2.0/wfs.xsd
+                       http://www.opengis.net/gml/3.2
+                       http://schemas.opengis.net/gml/3.2.1/gml.xsd">
+   <wfs:Insert>
+       <{username}:{layername}>
+           <{username}:wkb_geometry>
+               <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
+                   <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
+               </gml:Point>
+           </{username}:wkb_geometry>
+           <{username}:name>New name</{username}:name>
+           <{username}:labelrank>3</{username}:labelrank>
+           <{username}:{attr_name}>some value</{username}:{attr_name}>
+       </{username}:{layername}>
+   </wfs:Insert>
+   <wfs:Insert>
+       <{username}:{layername}>
+           <{username}:wkb_geometry>
+               <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
+                   <gml:pos>1.42108004308E7 2678415.5977</gml:pos>
+               </gml:Point>
+           </{username}:wkb_geometry>
+           <{username}:name>New name2</{username}:name>
+           <{username}:labelrank>4</{username}:labelrank>
+           <{username}:{attr_name}>some value</{username}:{attr_name}>
+       </{username}:{layername}>
+   </wfs:Insert>
+</wfs:Transaction>'''

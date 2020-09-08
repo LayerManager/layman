@@ -12,6 +12,7 @@ del sys.modules['layman']
 from layman import app
 from layman import settings
 from layman.layer.rest_test import wait_till_ready
+from layman.layer import db
 from test import process, client as client_util
 
 liferay_mock = process.liferay_mock
@@ -55,29 +56,7 @@ def test_rest_get(client):
     username = 'wfs_proxy_test'
     layername = 'layer_wfs_proxy_test'
 
-    with app.app_context():
-        rest_path = url_for('rest_layers.post', username=username)
-
-        file_paths = [
-            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
-        ]
-
-        for fp in file_paths:
-            assert os.path.isfile(fp)
-        files = []
-
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
-                'file': files,
-                'name': layername
-            })
-            assert rv.status_code == 200
-        finally:
-            for fp in files:
-                fp[0].close()
-
-    wait_till_ready(username, layername)
+    setup_layer_flask(username, layername, client)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
     headers = {
@@ -102,7 +81,22 @@ def test_rest_get(client):
     with app.app_context():
         rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
         client.delete(rest_path)
-        assert rv.status_code == 200
+        assert r.status_code == 200
+
+
+def get_auth_header(username, iss_url_header, token_header):
+    return {f'{iss_url_header}': 'http://localhost:8082/o/oauth2/authorize',
+            f'{token_header}': f'Bearer {username}',
+            }
+
+
+def setup_user_layer(username, layername, authn_headers):
+    client_util.reserve_username(username, headers=authn_headers)
+    ln = client_util.publish_layer(username, layername, [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+    ], headers=authn_headers)
+
+    assert ln == layername
 
 
 def test_wfs_proxy(liferay_mock):
@@ -114,17 +108,9 @@ def test_wfs_proxy(liferay_mock):
         'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner',
     }, **AUTHN_SETTINGS))
 
-    authn_headers1 = {
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-        f'{TOKEN_HEADER}': f'Bearer {username}',
-    }
+    authn_headers1 = get_auth_header(username, ISS_URL_HEADER, TOKEN_HEADER)
 
-    client_util.reserve_username(username, headers=authn_headers1)
-    ln = client_util.publish_layer(username, layername1, [
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
-    ], headers=authn_headers1)
-
-    assert ln == layername1
+    setup_user_layer(username, layername1, authn_headers1)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
     headers = {
@@ -148,10 +134,7 @@ def test_wfs_proxy(liferay_mock):
     assert r.status_code == 200, r.text
 
     # Testing, that user2 is not able to write to layer of user1
-    authn_headers2 = {
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-        f'{TOKEN_HEADER}': f'Bearer {username2}',
-    }
+    authn_headers2 = get_auth_header(username2, ISS_URL_HEADER, TOKEN_HEADER)
 
     headers2 = {
         'Accept': 'text/xml',
@@ -197,3 +180,56 @@ def test_wfs_proxy(liferay_mock):
     assert r.status_code == 400, r.text
 
     process.stop_process(layman_process)
+
+
+def setup_layer_flask(username, layername, client):
+    with app.app_context():
+        rest_path = url_for('rest_layers.post', username=username)
+
+        file_paths = [
+            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
+        ]
+
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': layername
+            })
+            assert rv.status_code == 200
+        finally:
+            for fp in files:
+                fp[0].close()
+
+    wait_till_ready(username, layername)
+
+
+def test_missing_attribute(client):
+    username = 'testmissingattr'
+    layername = 'inexisting_attribute_layer'
+    attr_name = 'inexisting_attribute_attr'
+
+    setup_layer_flask(username, layername, client)
+
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
+    headers = {
+        'Accept': 'text/xml',
+        'Content-type': 'text/xml',
+    }
+
+    data_xml = client_util.get_wfs_insert_points_new_attr(username, layername, attr_name)
+
+    with app.app_context():
+        attributes = db.get_all_column_names(username, layername)
+        assert attr_name not in attributes, attributes
+
+        r = client.post(rest_url,
+                        data=data_xml,
+                        headers=headers)
+        attributes = db.get_all_column_names(username, layername)
+        assert attr_name in attributes, attributes
+    assert r.status_code == 200
