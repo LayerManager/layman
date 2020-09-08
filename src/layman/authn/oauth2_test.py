@@ -16,37 +16,11 @@ from layman import settings
 from layman import uuid
 from .oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
 from .oauth2 import liferay
-from test.mock.liferay import run
-
-LIFERAY_PORT = 8020
+from test import process
 
 
-@pytest.fixture(scope="module")
-def liferay_mock():
-    server = Process(target=run, kwargs={
-        'env_vars': {
-        },
-        'app_config': {
-            'ENV': 'development',
-            'SERVER_NAME': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}",
-            'SESSION_COOKIE_DOMAIN': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}",
-        },
-        'host': '0.0.0.0',
-        'port': LIFERAY_PORT,
-        'debug': True,  # preserve error log in HTTP responses
-        'load_dotenv': False,
-        'options': {
-            'use_reloader': False,
-        },
-    })
-    server.start()
-    time.sleep(1)
-
-    yield server
-
-    server.terminate()
-    server.join()
-
+liferay_mock = process.liferay_mock
+LIFERAY_PORT = process.LIFERAY_PORT
 
 num_layers_before_test = 0
 
@@ -80,7 +54,7 @@ def inactive_token_introspection_url(liferay_mock):
 @pytest.fixture()
 def active_token_introspection_url(liferay_mock):
     introspection_url = liferay.INTROSPECTION_URL
-    liferay.INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection?is_active=true"
+    liferay.INTROSPECTION_URL = process.AUTHN_INTROSPECTION_URL
     yield
     liferay.INTROSPECTION_URL = introspection_url
 

@@ -1,4 +1,5 @@
 import os
+import re
 from urllib.parse import urljoin, urlparse
 from layman_settings_util import read_clients_dict_from_env
 
@@ -32,6 +33,8 @@ GEOSERVER_ADMIN_USER = 'admin'
 GEOSERVER_ADMIN_PASSWORD = os.getenv('GEOSERVER_ADMIN_PASSWORD', None)
 GEOSERVER_ADMIN_AUTH = None if GEOSERVER_ADMIN_PASSWORD is None else (GEOSERVER_ADMIN_USER,
                                                                       GEOSERVER_ADMIN_PASSWORD)
+GEOSERVER_DATADIR = '/geoserver/data_dir'
+GEOSERVER_INITIAL_DATADIR = '/geoserver/initial_data_dir'
 LAYMAN_GS_ROLE_SERVICE = os.getenv('LAYMAN_GS_ROLE_SERVICE', '') or 'default'
 LAYMAN_GS_USER_GROUP_SERVICE = os.getenv('LAYMAN_GS_USER_GROUP_SERVICE', '') or 'default'
 
@@ -57,6 +60,13 @@ LAYMAN_GS_REST_ROLES = urljoin(LAYMAN_GS_REST, f'security/roles/service/{LAYMAN_
 LAYMAN_GS_REST_USERS = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAYMAN_GS_USER_GROUP_SERVICE}/users/')
 LAYMAN_GS_REST_USER = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAYMAN_GS_USER_GROUP_SERVICE}/user/')
 LAYMAN_GS_REST_WMS_SETTINGS = urljoin(LAYMAN_GS_REST, f'services/wms/settings/')
+
+LAYMAN_GS_AUTHN_HTTP_HEADER_NAME = 'laymanHttpHeader'
+LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE = os.environ['LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE']
+assert re.match("[a-z][a-z0-9]*", LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE), "Only lowercase characters and numbers " \
+                                                                          "should be used for " \
+                                                                          "LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE. "
+LAYMAN_GS_AUTHN_FILTER_NAME = 'laymanHttpFilter'
 
 
 # List of schemas that are not allowed to be used as usernames.

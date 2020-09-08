@@ -19,6 +19,8 @@ services:
       volumes:
         - ./layman_data:/layman_data
         - ./src/layman_settings.py:/code/src/layman_settings.py
+        - ./deps/geoserver/data:/geoserver/data_dir
+        - ./deps/geoserver/sample/geoserver_data:/geoserver/initial_data_dir
       depends_on:
         - timgen
         - layman_client

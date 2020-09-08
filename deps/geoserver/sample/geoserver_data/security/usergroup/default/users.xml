@@ -1,9 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<userRegistry version="1.0" xmlns="http://www.geoserver.org/security/users">
-    <users>
-        <user enabled="true" name="admin" password="digest1:D9miJH/hVgfxZJscMafEtbtliG0ROxhLfsznyWfG38X2pda2JOSV4POi55PQI4tw"/>
-        <user enabled="true" name="layman" password="plain:laymanpwd"/>
-        <user enabled="true" name="layman_test" password="plain:laymanpwd"/>
-    </users>
-    <groups/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<userRegistry xmlns="http://www.geoserver.org/security/users" version="1.0">
+<users>
+<user enabled="true" name="admin" password="crypt1:bHOwqXMSjDVIDVWgYH13h9qhUUEqE5+A"/>
+</users>
+<groups/>
 </userRegistry>

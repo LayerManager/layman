@@ -30,6 +30,8 @@ from .micka import csw
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 
+from test import client as client_util
+
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
 
 METADATA_PROPERTIES = {
@@ -1192,29 +1194,7 @@ def test_layer_with_different_geometry(client):
         'Content-type': 'text/xml',
     }
 
-    data_xml = '''<?xml version="1.0"?>
-<wfs:Transaction
-   version="2.0.0"
-   service="WFS"
-   xmlns:testgeometryuser1="http://testgeometryuser1"
-   xmlns:fes="http://www.opengis.net/fes/2.0"
-   xmlns:gml="http://www.opengis.net/gml/3.2"
-   xmlns:wfs="http://www.opengis.net/wfs/2.0"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://www.opengis.net/wfs/2.0
-                       http://schemas.opengis.net/wfs/2.0/wfs.xsd
-                       http://www.opengis.net/gml/3.2
-                       http://schemas.opengis.net/gml/3.2.1/gml.xsd">
-   <wfs:Insert>
-       <testgeometryuser1:layer_with_different_geometry>
-           <testgeometryuser1:wkb_geometry>
-               <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
-                   <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
-               </gml:Point>
-           </testgeometryuser1:wkb_geometry>
-       </testgeometryuser1:layer_with_different_geometry>
-   </wfs:Insert>
-</wfs:Transaction>'''
+    data_xml = client_util.get_wfs_insert_points(username, layername)
 
     r = requests.post(url_path_ows,
                       data=data_xml,
@@ -1230,35 +1210,7 @@ def test_layer_with_different_geometry(client):
                       )
     assert r.status_code == 200, f"HTTP Error {r.status_code}\n{r.text}"
 
-    data_xml2 = '''<?xml version="1.0"?>
-<wfs:Transaction
-   version="2.0.0"
-   service="WFS"
-   xmlns:testgeometryuser1="http://testgeometryuser1"
-   xmlns:fes="http://www.opengis.net/fes/2.0"
-   xmlns:gml="http://www.opengis.net/gml/3.2"
-   xmlns:wfs="http://www.opengis.net/wfs/2.0"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://www.opengis.net/wfs/2.0
-                       http://schemas.opengis.net/wfs/2.0/wfs.xsd
-                       http://www.opengis.net/gml/3.2
-                       http://schemas.opengis.net/gml/3.2.1/gml.xsd">
-   <wfs:Insert>
-       <testgeometryuser1:layer_with_different_geometry>
-           <testgeometryuser1:wkb_geometry>
-               <gml:MultiCurve srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
-                   <gml:curveMember>
-                       <gml:LineString>
-                           <gml:posList>3722077.1689 5775850.1007 3751406.9331 5815606.0102 3830548.3984 5781176.5357
-                               3866350.4899 5774848.8358 3880796.9478 5743277.797 3897591.3679 5738418.6547
-                           </gml:posList>
-                       </gml:LineString>
-                   </gml:curveMember>
-               </gml:MultiCurve>
-           </testgeometryuser1:wkb_geometry>
-       </testgeometryuser1:layer_with_different_geometry>
-   </wfs:Insert>
-</wfs:Transaction>'''
+    data_xml2 = client_util.get_wfs_insert_lines(username, layername)
 
     r = requests.post(url_path_ows,
                       data=data_xml2,

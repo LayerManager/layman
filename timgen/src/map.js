@@ -64,9 +64,9 @@ export const adjust_map_url = (requested_url) => {
 
 const adjust_layer_url = (requested_url) => {
   requested_url = decodeURIComponent(requested_url);
-  if(config.LAYMAN_GS_HOSTPORT && requested_url.startsWith(`http://localhost:8600`)) {
+  if(config.LAYMAN_GS_HOSTPORT && requested_url.startsWith(`http://localhost:8000`)) {
     const old = requested_url;
-    requested_url = requested_url.replace(`http://localhost:8600`, `http://${config.LAYMAN_GS_HOSTPORT}`);
+    requested_url = requested_url.replace(`http://localhost:8000`, `http://${config.LAYMAN_GS_HOSTPORT}`);
     console.log(`replaced layer URL ${old} with ${requested_url}`);
   }
   return proxify(requested_url);

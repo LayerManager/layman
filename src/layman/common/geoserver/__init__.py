@@ -136,6 +136,7 @@ def ensure_workspace_security_roles(workspace, roles, type, auth):
     rule = workspace + '.*.' + type
     roles_str = ', '.join(roles)
 
+    logger.info(f"Ensure_workspace_security_roles workspace={workspace}, type={type}, roles={roles}, rule={rule}, roles_str={roles_str}")
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
         data=json.dumps(
@@ -157,6 +158,7 @@ def ensure_workspace_security_roles(workspace, roles, type, auth):
 
 
 def ensure_workspace_security(workspace, type, auth):
+    logger.info(f"Ensure_workspace_security workspace={workspace}, type={type}, auth={auth}")
     roles = set(get_workspace_security_roles(workspace, type, auth))
 
     all_roles = authz.get_all_gs_roles(workspace, type)
