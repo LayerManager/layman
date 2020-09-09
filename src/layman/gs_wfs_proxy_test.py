@@ -211,7 +211,7 @@ def setup_layer_flask(username, layername, client):
 def test_missing_attribute(client):
     username = 'testmissingattr'
     layername = 'inexisting_attribute_layer'
-    attr_name = 'inexisting_attribute_attr'
+    attr_names = ['inexisting_attribute_attr', 'inexisting_attribute_attr1a']
 
     setup_layer_flask(username, layername, client)
 
@@ -221,15 +221,32 @@ def test_missing_attribute(client):
         'Content-type': 'text/xml',
     }
 
-    data_xml = client_util.get_wfs_insert_points_new_attr(username, layername, attr_name)
+    def wfs_post(username, layername, attr_names):
+        with app.app_context():
+            old_attributes = db.get_all_column_names(username, layername)
+            for attr_name in attr_names:
+                assert attr_name not in old_attributes, f"old_attributes={old_attributes}, attr_name={attr_name}"
 
-    with app.app_context():
-        attributes = db.get_all_column_names(username, layername)
-        assert attr_name not in attributes, attributes
+            r = client.post(rest_url,
+                            data=data_xml,
+                            headers=headers)
+            new_attributes = db.get_all_column_names(username, layername)
+            for attr_name in attr_names:
+                assert attr_name in new_attributes, f"new_attributes={new_attributes}, attr_name={attr_name}"
+            assert set(attr_names).union(set(old_attributes)) == set(new_attributes)
+        assert r.status_code == 200
 
-        r = client.post(rest_url,
-                        data=data_xml,
-                        headers=headers)
-        attributes = db.get_all_column_names(username, layername)
-        assert attr_name in attributes, attributes
-    assert r.status_code == 200
+    data_xml = client_util.get_wfs_insert_points_new_attr(username, layername, attr_names)
+    wfs_post(username, layername, attr_names)
+
+    attr_names2 = ['inexisting_attribute_attr2']
+    data_xml = client_util.get_wfs_update_points_new_attr(username, layername, attr_names2)
+    wfs_post(username, layername, attr_names2)
+
+    attr_names3 = ['inexisting_attribute_attr3']
+    data_xml = client_util.get_wfs_update_points_new_attr(username, layername, attr_names3, with_attr_namespace=True)
+    wfs_post(username, layername, attr_names3)
+
+    attr_names4 = ['inexisting_attribute_attr4']
+    data_xml = client_util.get_wfs_update_points_new_attr(username, layername, attr_names4, with_filter=True)
+    wfs_post(username, layername, attr_names4)

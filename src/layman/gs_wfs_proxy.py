@@ -27,7 +27,7 @@ def check_xml_for_attribute(data_xml):
         for layer in action:
             layer_qname = ET.QName(layer)
             ws_namespace = layer_qname.namespace
-            ws_match = re.match(r"^http://("+USERNAME_ONLY_PATTERN+")$", ws_namespace)
+            ws_match = re.match(r"^http://(" + USERNAME_ONLY_PATTERN + ")$", ws_namespace)
             if ws_match:
                 ws_name = ws_match.group(1)
             else:
