@@ -215,7 +215,7 @@ def test_missing_attribute(client):
 
     setup_layer_flask(username, layername, client)
 
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
     headers = {
         'Accept': 'text/xml',
         'Content-type': 'text/xml',
@@ -234,7 +234,7 @@ def test_missing_attribute(client):
             for attr_name in attr_names:
                 assert attr_name in new_attributes, f"new_attributes={new_attributes}, attr_name={attr_name}"
             assert set(attr_names).union(set(old_attributes)) == set(new_attributes)
-        assert r.status_code == 200
+        assert r.status_code == 200, r.get_data()
 
     data_xml = client_util.get_wfs_insert_points_new_attr(username, layername, attr_names)
     wfs_post(username, layername, attr_names)
@@ -250,3 +250,7 @@ def test_missing_attribute(client):
     attr_names4 = ['inexisting_attribute_attr4']
     data_xml = client_util.get_wfs_update_points_new_attr(username, layername, attr_names4, with_filter=True)
     wfs_post(username, layername, attr_names4)
+
+    attr_names5 = ['inexisting_attribute_attr5']
+    data_xml = client_util.get_wfs_replace_points_new_attr(username, layername, attr_names5)
+    wfs_post(username, layername, attr_names5)

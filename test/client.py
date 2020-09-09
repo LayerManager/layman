@@ -239,3 +239,56 @@ def get_wfs_update_points_new_attr(
            {filter_xml}
        </wfs:Update>
     </wfs:Transaction>'''
+
+
+def get_wfs_replace_points_new_attr(username, layername, attr_names):
+    attr_xml = ' '.join([
+        f"<{username}:{attr_name}>some value</{username}:{attr_name}>"
+        for attr_name in attr_names
+    ])
+    return f'''<?xml version="1.0"?>
+<wfs:Transaction
+   version="2.0.0"
+   service="WFS"
+   xmlns:{username}="http://{username}"
+   xmlns:fes="http://www.opengis.net/fes/2.0"
+   xmlns:gml="http://www.opengis.net/gml/3.2"
+   xmlns:wfs="http://www.opengis.net/wfs/2.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.opengis.net/wfs/2.0
+                       http://schemas.opengis.net/wfs/2.0/wfs.xsd
+                       http://www.opengis.net/gml/3.2
+                       http://schemas.opengis.net/gml/3.2.1/gml.xsd">
+   <wfs:Replace>
+       <{username}:{layername}>
+           <{username}:wkb_geometry>
+               <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
+                   <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
+               </gml:Point>
+           </{username}:wkb_geometry>
+           <{username}:name>New name</{username}:name>
+           <{username}:labelrank>3</{username}:labelrank>
+           {attr_xml}
+       </{username}:{layername}>
+       <fes:Filter>
+          <fes:ResourceId rid="{layername}.1"/>
+       </fes:Filter>
+   </wfs:Replace>
+   <wfs:Replace>
+       <{username}:{layername}>
+           <{username}:wkb_geometry>
+               <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
+                   <gml:pos>1.42108004308E7 2678415.5977</gml:pos>
+               </gml:Point>
+           </{username}:wkb_geometry>
+           <{username}:name>New name2</{username}:name>
+           <{username}:labelrank>4</{username}:labelrank>
+           {attr_xml}
+       </{username}:{layername}>
+       <fes:Filter>
+          <fes:ResourceId rid="{layername}.2"/>
+       </fes:Filter>
+   </wfs:Replace>
+</wfs:Transaction>'''
+
+
