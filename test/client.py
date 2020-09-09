@@ -104,7 +104,7 @@ def get_wfs_insert_points(username, layername):
         <wfs:Transaction
            version="2.0.0"
            service="WFS"
-           xmlns:{username}="{username}"
+           xmlns:{username}="http://{username}"
            xmlns:fes="http://www.opengis.net/fes/2.0"
            xmlns:gml="http://www.opengis.net/gml/3.2"
            xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -130,7 +130,7 @@ def get_wfs_insert_lines(username, layername):
     <wfs:Transaction
        version="2.0.0"
        service="WFS"
-       xmlns:{username}="{username}"
+       xmlns:{username}="http://{username}"
        xmlns:fes="http://www.opengis.net/fes/2.0"
        xmlns:gml="http://www.opengis.net/gml/3.2"
        xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -162,7 +162,7 @@ def get_wfs_insert_points_new_attr(username, layername, attr_name):
 <wfs:Transaction
    version="2.0.0"
    service="WFS"
-   xmlns:{username}="{username}"
+   xmlns:{username}="http://{username}"
    xmlns:fes="http://www.opengis.net/fes/2.0"
    xmlns:gml="http://www.opengis.net/gml/3.2"
    xmlns:wfs="http://www.opengis.net/wfs/2.0"
