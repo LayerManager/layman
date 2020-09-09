@@ -15,6 +15,7 @@ from layman.common import redis as redis_util, tasks as tasks_util, metadata as 
 from layman.common import metadata as common_md
 
 LAYERNAME_RE = USERNAME_RE
+ATTRNAME_RE = USERNAME_RE
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'

@@ -1,3 +1,4 @@
+import re
 import requests
 from lxml import etree as ET
 
@@ -6,6 +7,9 @@ from flask import Blueprint, g, current_app as app, request, Response
 from layman.authn import authenticate
 from layman import settings
 from layman.layer import db
+from layman.layer.util import LAYERNAME_RE, ATTRNAME_RE
+from layman.util import USERNAME_ONLY_PATTERN
+
 
 bp = Blueprint('gs_wfs_proxy_bp', __name__)
 
@@ -21,11 +25,28 @@ def check_xml_for_attribute(data_xml):
     attribs = set()
     for action in xml_data:
         for layer in action:
+            layer_qname = ET.QName(layer)
+            ws_namespace = layer_qname.namespace
+            ws_match = re.match(r"^http://("+USERNAME_ONLY_PATTERN+")$", ws_namespace)
+            if ws_match:
+                ws_name = ws_match.group(1)
+            else:
+                continue
+            layer_name = layer_qname.localname
+            layer_match = re.match(LAYERNAME_RE, layer_name)
+            if not layer_match:
+                continue
             for attrib in layer:
-                # TODO getting username is not safe
-                attribs.add((ET.QName(attrib).namespace,
-                             ET.QName(layer).localname,
-                             ET.QName(attrib).localname))
+                attrib_qname = ET.QName(attrib)
+                if attrib_qname.namespace != layer_qname.namespace:
+                    continue
+                attrib_name = attrib_qname.localname
+                attrib_match = re.match(ATTRNAME_RE, attrib_name)
+                if not attrib_match:
+                    continue
+                attribs.add((ws_name,
+                             layer_name,
+                             attrib_name))
 
     app.logger.info(f"GET WFS check_xml_for_attribute attribs={attribs}")
     db.ensure_attributes(attribs)
