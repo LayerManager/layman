@@ -32,23 +32,53 @@ def check_xml_for_attribute(data_xml):
 
         attribs = set()
         for action in xml_data:
-            for layer in action:
-                layer_qname = ET.QName(layer)
-                ws_namespace = layer_qname.namespace
-                ws_match = re.match(r"^http://(" + USERNAME_ONLY_PATTERN + ")$", ws_namespace)
+            if ET.QName(action).localname in ('Insert', 'Replace'):
+                for layer in action:
+                    layer_qname = ET.QName(layer)
+                    ws_namespace = layer_qname.namespace
+                    ws_match = re.match(r"^http://(" + USERNAME_ONLY_PATTERN + ")$", ws_namespace)
+                    if ws_match:
+                        ws_name = ws_match.group(1)
+                    else:
+                        continue
+                    layer_name = layer_qname.localname
+                    layer_match = re.match(LAYERNAME_RE, layer_name)
+                    if not layer_match:
+                        continue
+                    for attrib in layer:
+                        attrib_qname = ET.QName(attrib)
+                        if attrib_qname.namespace != layer_qname.namespace:
+                            continue
+                        attrib_name = attrib_qname.localname
+                        attrib_match = re.match(ATTRNAME_RE, attrib_name)
+                        if not attrib_match:
+                            continue
+                        attribs.add((ws_name,
+                                     layer_name,
+                                     attrib_name))
+            elif ET.QName(action).localname in ('Update'):
+                layer_qname = action.get('typeName').split(':')
+                ws_namespace = layer_qname[0]
+                ws_match = re.match(r"^(" + USERNAME_ONLY_PATTERN + ")$", ws_namespace)
                 if ws_match:
                     ws_name = ws_match.group(1)
                 else:
                     continue
-                layer_name = layer_qname.localname
+                layer_name = layer_qname[1]
                 layer_match = re.match(LAYERNAME_RE, layer_name)
                 if not layer_match:
                     continue
-                for attrib in layer:
-                    attrib_qname = ET.QName(attrib)
-                    if attrib_qname.namespace != layer_qname.namespace:
-                        continue
-                    attrib_name = attrib_qname.localname
+                properties = action.xpath('wfs:Property/wfs:ValueReference', namespaces=xml_data.nsmap)
+                for prop in properties:
+                    split_text = prop.text.split(':')
+                    # No namespace in element text
+                    if len(split_text) == 1:
+                        attrib_name = split_text[0]
+                    # There is namespace in element text
+                    elif len(split_text) == 2:
+                        if split_text[0] != ws_namespace:
+                            continue
+                        attrib_name = split_text[1]
                     attrib_match = re.match(ATTRNAME_RE, attrib_name)
                     if not attrib_match:
                         continue
