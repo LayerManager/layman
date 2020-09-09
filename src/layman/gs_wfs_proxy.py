@@ -58,8 +58,9 @@ def check_xml_for_attribute(data_xml):
 
         app.logger.info(f"GET WFS check_xml_for_attribute attribs={attribs}")
         if attribs:
-            db.ensure_attributes(attribs)
-            gs_reset(settings.LAYMAN_GS_AUTH)
+            created_attributes = db.ensure_attributes(attribs)
+            if created_attributes:
+                gs_reset(settings.LAYMAN_GS_AUTH)
 
     except BaseException as err:
         app.logger.warning(f"WFS Proxy: error={err}, trace={traceback.format_exc()}")

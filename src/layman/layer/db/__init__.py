@@ -522,3 +522,4 @@ def ensure_attributes(attributes):
     missing_attributes = get_missing_attributes(attributes, conn_cur)
     if missing_attributes:
         create_attributes(missing_attributes, conn_cur)
+    return missing_attributes
