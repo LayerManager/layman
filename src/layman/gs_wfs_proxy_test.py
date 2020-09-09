@@ -225,26 +225,29 @@ def test_missing_attribute(client):
 
     def wfs_post(username, layername, data_xml, attr_names):
         with app.app_context():
-            old_attributes = db.get_all_column_names(username, layername)
+            wfs_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+            old_db_attributes = db.get_all_column_names(username, layername)
             for attr_name in attr_names:
-                assert attr_name not in old_attributes, f"old_attributes={old_attributes}, attr_name={attr_name}"
+                assert attr_name not in old_db_attributes, f"old_db_attributes={old_db_attributes}, attr_name={attr_name}"
+            wfs = wfs_proxy(wfs_url)
+            layer_schema = wfs.get_schema(f"{username}:{layername}")
+            old_wfs_properties = sorted(layer_schema['properties'].keys())
 
             r = client.post(rest_url,
                             data=data_xml,
                             headers=headers)
             assert r.status_code == 200, f"{r.get_data()}"
-            new_attributes = db.get_all_column_names(username, layername)
+            new_db_attributes = db.get_all_column_names(username, layername)
             for attr_name in attr_names:
-                assert attr_name in new_attributes, f"new_attributes={new_attributes}, attr_name={attr_name}"
-            assert set(attr_names).union(set(old_attributes)) == set(new_attributes)
+                assert attr_name in new_db_attributes, f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
+            assert set(attr_names).union(set(old_db_attributes)) == set(new_db_attributes)
 
-            wfs_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
             wfs = wfs_proxy(wfs_url)
-            assert f"{username}:{layername}" in wfs.contents
             layer_schema = wfs.get_schema(f"{username}:{layername}")
             new_wfs_properties = sorted(layer_schema['properties'].keys())
             for attr_name in attr_names:
                 assert attr_name in new_wfs_properties, f"new_wfs_properties={new_wfs_properties}, attr_name={attr_name}"
+            assert set(attr_names).union(set(old_wfs_properties)) == set(new_wfs_properties)
 
     data_xml = client_util.get_wfs_insert_points_new_attr(username, layername, attr_names)
     wfs_post(username, layername, data_xml, attr_names)
