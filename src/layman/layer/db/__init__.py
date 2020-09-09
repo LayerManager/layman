@@ -503,7 +503,8 @@ from (""" + "\n union all\n".join([f"select '{username}' username, '{layername}'
 where c.column_name is null"""
 
     try:
-        cur.execute(query)
+        if attributes:
+            cur.execute(query)
     except:
         raise LaymanError(7)
 
@@ -519,4 +520,5 @@ where c.column_name is null"""
 def ensure_attributes(attributes):
     conn_cur = get_connection_cursor()
     missing_attributes = get_missing_attributes(attributes, conn_cur)
-    create_attributes(missing_attributes, conn_cur)
+    if missing_attributes:
+        create_attributes(missing_attributes, conn_cur)

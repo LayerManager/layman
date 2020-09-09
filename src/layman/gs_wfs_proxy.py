@@ -56,7 +56,8 @@ def check_xml_for_attribute(data_xml):
                                  attrib_name))
 
         app.logger.info(f"GET WFS check_xml_for_attribute attribs={attribs}")
-        db.ensure_attributes(attribs)
+        if attribs:
+            db.ensure_attributes(attribs)
     except BaseException as err:
         app.logger.warning(f"WFS Proxy: error={err}, trace={traceback.format_exc()}")
 
