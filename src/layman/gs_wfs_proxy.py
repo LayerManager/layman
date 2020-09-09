@@ -11,6 +11,7 @@ from layman import settings
 from layman.layer import db
 from layman.layer.util import LAYERNAME_RE, ATTRNAME_RE
 from layman.util import USERNAME_ONLY_PATTERN
+from layman.common.geoserver import reset as gs_reset
 
 
 bp = Blueprint('gs_wfs_proxy_bp', __name__)
@@ -58,6 +59,8 @@ def check_xml_for_attribute(data_xml):
         app.logger.info(f"GET WFS check_xml_for_attribute attribs={attribs}")
         if attribs:
             db.ensure_attributes(attribs)
+            gs_reset(settings.LAYMAN_GS_AUTH)
+
     except BaseException as err:
         app.logger.warning(f"WFS Proxy: error={err}, trace={traceback.format_exc()}")
 

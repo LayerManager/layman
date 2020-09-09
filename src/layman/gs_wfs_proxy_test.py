@@ -3,6 +3,7 @@ import requests
 import time
 from flask import url_for
 import pytest
+from urllib.parse import urljoin
 
 import sys
 import os
@@ -14,6 +15,7 @@ from layman import settings
 from layman.layer.rest_test import wait_till_ready
 from layman.layer import db
 from test import process, client as client_util
+from layman.layer.geoserver.util import wfs_proxy
 
 liferay_mock = process.liferay_mock
 
@@ -230,11 +232,19 @@ def test_missing_attribute(client):
             r = client.post(rest_url,
                             data=data_xml,
                             headers=headers)
+            assert r.status_code == 200, f"{r.get_data()}"
             new_attributes = db.get_all_column_names(username, layername)
             for attr_name in attr_names:
                 assert attr_name in new_attributes, f"new_attributes={new_attributes}, attr_name={attr_name}"
             assert set(attr_names).union(set(old_attributes)) == set(new_attributes)
-        assert r.status_code == 200, r.get_data()
+
+            wfs_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+            wfs = wfs_proxy(wfs_url)
+            assert f"{username}:{layername}" in wfs.contents
+            layer_schema = wfs.get_schema(f"{username}:{layername}")
+            new_wfs_properties = sorted(layer_schema['properties'].keys())
+            for attr_name in attr_names:
+                assert attr_name in new_wfs_properties, f"new_wfs_properties={new_wfs_properties}, attr_name={attr_name}"
 
     data_xml = client_util.get_wfs_insert_points_new_attr(username, layername, attr_names)
     wfs_post(username, layername, data_xml, attr_names)

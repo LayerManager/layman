@@ -467,3 +467,13 @@ def get_roles_anyone(username):
 def get_roles_owner(username):
     roles = {username_to_rolename(username)}
     return roles
+
+
+def reset(auth):
+    logger.info(f"Resetting GeoServer")
+    r_url = settings.LAYMAN_GS_REST + 'reset'
+    r = requests.post(r_url,
+                      headers=headers_json,
+                      auth=auth
+                      )
+    r.raise_for_status()
