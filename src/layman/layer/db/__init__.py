@@ -2,7 +2,7 @@ from collections import defaultdict
 import math
 import os
 import psycopg2
-from flask import g
+from flask import g, app
 
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
@@ -482,46 +482,41 @@ limit 1
     return result
 
 
-def is_attrib(username, layername, attribute, conn_cur=None):
+def create_attributes(attributes, conn_cur=None):
     conn, cur = conn_cur or get_connection_cursor()
-
+    query = "\n".join([f"""ALTER TABLE {username}.{layername} ADD COLUMN {attrname} VARCHAR(1024);""" for username, layername, attrname in attributes]) + "\n COMMIT;"
     try:
-        cur.execute(f"""
-    SELECT count('a')
-    FROM information_schema.columns
-    WHERE table_schema = '{username}'
-      AND table_name = '{layername}'
-      and column_name = '{attribute}'
-    """)
+        cur.execute(query)
     except:
         raise LaymanError(7)
+
+
+def get_missing_attributes(attributes, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+
+    # Find all triples which do not already exist
+    query = f"""select attribs.*
+from (""" + "\n union all\n".join([f"select '{username}' username, '{layername}' layername, '{attrname}' attrname" for username, layername, attrname in attributes]) + """) attribs left join
+    information_schema.columns c on c.table_schema = attribs.username
+                                and c.table_name = attribs.layername
+                                and c.column_name = attribs.attrname
+where c.column_name is null"""
+
+    try:
+        cur.execute(query)
+    except:
+        raise LaymanError(7)
+
+    missing_attributes = set()
     rows = cur.fetchall()
-    return rows[0][0]
-
-
-def add_attrib(username, layername, attribute, conn_cur=None):
-    conn, cur = conn_cur or get_connection_cursor()
-
-    try:
-        cur.execute(f"""
-ALTER TABLE {username}.{layername}
-ADD COLUMN {attribute} VARCHAR(1024);
-commit;
-    """)
-    except:
-        raise LaymanError(7)
-
-
-def ensure_attribute(attrib):
-    attrib_exist = is_attrib(attrib[0],
-                             attrib[1],
-                             attrib[2])
-    if attrib_exist == 0:
-        add_attrib(attrib[0],
-                   attrib[1],
-                   attrib[2])
+    for row in rows:
+        missing_attributes.add((row[0],
+                                row[1],
+                                row[2]))
+    return missing_attributes
 
 
 def ensure_attributes(attributes):
-    for attrib in attributes:
-        ensure_attribute(attrib)
+    conn_cur = get_connection_cursor()
+    missing_attributes = get_missing_attributes(attributes, conn_cur)
+    create_attributes(missing_attributes, conn_cur)

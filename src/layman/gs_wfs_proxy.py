@@ -1,4 +1,6 @@
 import re
+import traceback
+
 import requests
 from lxml import etree as ET
 
@@ -21,35 +23,42 @@ def before_request():
 
 
 def check_xml_for_attribute(data_xml):
-    xml_data = ET.XML(data_xml)
-    attribs = set()
-    for action in xml_data:
-        for layer in action:
-            layer_qname = ET.QName(layer)
-            ws_namespace = layer_qname.namespace
-            ws_match = re.match(r"^http://(" + USERNAME_ONLY_PATTERN + ")$", ws_namespace)
-            if ws_match:
-                ws_name = ws_match.group(1)
-            else:
-                continue
-            layer_name = layer_qname.localname
-            layer_match = re.match(LAYERNAME_RE, layer_name)
-            if not layer_match:
-                continue
-            for attrib in layer:
-                attrib_qname = ET.QName(attrib)
-                if attrib_qname.namespace != layer_qname.namespace:
-                    continue
-                attrib_name = attrib_qname.localname
-                attrib_match = re.match(ATTRNAME_RE, attrib_name)
-                if not attrib_match:
-                    continue
-                attribs.add((ws_name,
-                             layer_name,
-                             attrib_name))
+    try:
+        xml_data = ET.XML(data_xml)
+        if xml_data.get('version')[0:4] != "2.0." or xml_data.get('service').upper() != "WFS":
+            app.logger.warning(f"WFS Proxy: only xml version 2.0 and WFS service are supported. Request only redirected. Version={xml_data.get('version')}, service={xml_data.get('service')}")
+            return
 
-    app.logger.info(f"GET WFS check_xml_for_attribute attribs={attribs}")
-    db.ensure_attributes(attribs)
+        attribs = set()
+        for action in xml_data:
+            for layer in action:
+                layer_qname = ET.QName(layer)
+                ws_namespace = layer_qname.namespace
+                ws_match = re.match(r"^http://(" + USERNAME_ONLY_PATTERN + ")$", ws_namespace)
+                if ws_match:
+                    ws_name = ws_match.group(1)
+                else:
+                    continue
+                layer_name = layer_qname.localname
+                layer_match = re.match(LAYERNAME_RE, layer_name)
+                if not layer_match:
+                    continue
+                for attrib in layer:
+                    attrib_qname = ET.QName(attrib)
+                    if attrib_qname.namespace != layer_qname.namespace:
+                        continue
+                    attrib_name = attrib_qname.localname
+                    attrib_match = re.match(ATTRNAME_RE, attrib_name)
+                    if not attrib_match:
+                        continue
+                    attribs.add((ws_name,
+                                 layer_name,
+                                 attrib_name))
+
+        app.logger.info(f"GET WFS check_xml_for_attribute attribs={attribs}")
+        db.ensure_attributes(attribs)
+    except BaseException as err:
+        app.logger.warning(f"WFS Proxy: error={err}, trace={traceback.format_exc()}")
 
 
 @bp.route('/<path:subpath>', methods=['POST', 'GET'])
