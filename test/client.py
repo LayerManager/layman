@@ -217,8 +217,8 @@ def get_wfs_update_points_new_attr(
            </wfs:Property>"""
         for attr_name in attr_names
     ])
-    filter_xml = """<fes:Filter>
-              <fes:ResourceId rid="{username}.1010"/>
+    filter_xml = f"""<fes:Filter>
+              <fes:ResourceId rid="{layername}.1"/>
            </fes:Filter>
     """ if with_filter else ''
     return f'''<?xml version="1.0"?>
@@ -290,5 +290,3 @@ def get_wfs_replace_points_new_attr(username, layername, attr_names):
        </fes:Filter>
    </wfs:Replace>
 </wfs:Transaction>'''
-
-
