@@ -350,7 +350,6 @@ def test_missing_attribute_authz(liferay_mock):
         'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner',
     }, **AUTHN_SETTINGS))
 
-
     setup_user_layer(username, layername1, authn_headers1)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
