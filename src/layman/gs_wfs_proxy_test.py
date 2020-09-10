@@ -182,6 +182,8 @@ def test_wfs_proxy(liferay_mock):
                       headers=headers4)
     assert r.status_code == 400, r.text
 
+    client_util.delete_layer(username, layername1, headers)
+
     process.stop_process(layman_process)
 
 
@@ -294,10 +296,13 @@ def test_missing_attribute(client):
                                                  )
     wfs_post(username, attr_names_complex, data_xml)
 
+    client_util.delete_layer(username, layername)
+    client_util.delete_layer(username, layername2)
+
 
 def test_missing_attribute_authz(liferay_mock):
     username = 'testmissingattr_authz'
-    layername1 = 'ne_countries'
+    layername1 = 'testmissingattr_authz_layer'
     username2 = 'testmissingattr_authz2'
 
     def do_test(wfs_query, attribute_names):
@@ -361,5 +366,7 @@ def test_missing_attribute_authz(liferay_mock):
     attr_names = ['inexisting_attribute_auth3', 'inexisting_attribute_auth4']
     data_xml = data_wfs.get_wfs_update_points_new_attr(username, layername1, attr_names)
     do_test(data_xml, attr_names)
+
+    client_util.delete_layer(username, layername1, headers1)
 
     process.stop_process(layman_process)
