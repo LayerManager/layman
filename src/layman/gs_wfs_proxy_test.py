@@ -87,9 +87,9 @@ def test_rest_get(client):
         assert r.status_code == 200
 
 
-def get_auth_header(username, iss_url_header, token_header):
-    return {f'{iss_url_header}': 'http://localhost:8082/o/oauth2/authorize',
-            f'{token_header}': f'Bearer {username}',
+def get_auth_header(username):
+    return {f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+            f'{TOKEN_HEADER}': f'Bearer {username}',
             }
 
 
@@ -111,7 +111,7 @@ def test_wfs_proxy(liferay_mock):
         'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner',
     }, **AUTHN_SETTINGS))
 
-    authn_headers1 = get_auth_header(username, ISS_URL_HEADER, TOKEN_HEADER)
+    authn_headers1 = get_auth_header(username)
 
     setup_user_layer(username, layername1, authn_headers1)
 
@@ -137,7 +137,7 @@ def test_wfs_proxy(liferay_mock):
     assert r.status_code == 200, r.text
 
     # Testing, that user2 is not able to write to layer of user1
-    authn_headers2 = get_auth_header(username2, ISS_URL_HEADER, TOKEN_HEADER)
+    authn_headers2 = get_auth_header(username2)
 
     headers2 = {
         'Accept': 'text/xml',
@@ -233,6 +233,7 @@ def test_missing_attribute(client):
             old_db_attributes = {}
             old_wfs_properties = {}
             for layername, attr_names in attr_names_list:
+                # test that all attr_names are not yet presented in DB table
                 old_db_attributes[layername] = db.get_all_column_names(username, layername)
                 for attr_name in attr_names:
                     assert attr_name not in old_db_attributes[layername], f"old_db_attributes={old_db_attributes[layername]}, attr_name={attr_name}"
@@ -248,11 +249,13 @@ def test_missing_attribute(client):
             new_db_attributes = {}
             new_wfs_properties = {}
             for layername, attr_names in attr_names_list:
+                # test that exactly all attr_names were created in DB table
                 new_db_attributes[layername] = db.get_all_column_names(username, layername)
                 for attr_name in attr_names:
                     assert attr_name in new_db_attributes[layername], f"new_db_attributes={new_db_attributes[layername]}, attr_name={attr_name}"
                 assert set(attr_names).union(set(old_db_attributes[layername])) == set(new_db_attributes[layername])
 
+                # test that exactly all attr_names were distinguished also in WFS feature type
                 wfs = wfs_proxy(wfs_url)
                 layer_schema = wfs.get_schema(f"{username}:{layername}")
                 new_wfs_properties[layername] = sorted(layer_schema['properties'].keys())
@@ -305,6 +308,19 @@ def test_missing_attribute_authz(liferay_mock):
     layername1 = 'testmissingattr_authz_layer'
     username2 = 'testmissingattr_authz2'
 
+    authn_headers1 = get_auth_header(username)
+    authn_headers2 = get_auth_header(username2)
+    headers1 = {
+        'Accept': 'text/xml',
+        'Content-type': 'text/xml',
+        **authn_headers1,
+    }
+    headers2 = {
+        'Accept': 'text/xml',
+        'Content-type': 'text/xml',
+        **authn_headers2,
+    }
+
     def do_test(wfs_query, attribute_names):
         # Test, that unauthorized user will not cause new attribute
         with app.app_context():
@@ -334,26 +350,12 @@ def test_missing_attribute_authz(liferay_mock):
         'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner',
     }, **AUTHN_SETTINGS))
 
-    authn_headers1 = get_auth_header(username, ISS_URL_HEADER, TOKEN_HEADER)
 
     setup_user_layer(username, layername1, authn_headers1)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
 
     # Testing, that user2 is not able to write to layer of user1
-    authn_headers2 = get_auth_header(username2, ISS_URL_HEADER, TOKEN_HEADER)
-
-    headers1 = {
-        'Accept': 'text/xml',
-        'Content-type': 'text/xml',
-        **authn_headers1,
-    }
-
-    headers2 = {
-        'Accept': 'text/xml',
-        'Content-type': 'text/xml',
-        **authn_headers2,
-    }
 
     client_util.reserve_username(username2, headers=authn_headers2)
 

@@ -482,28 +482,28 @@ limit 1
     return result
 
 
-def create_attributes(attributes, conn_cur=None):
+def create_string_attributes(attribute_tuples, conn_cur=None):
     conn, cur = conn_cur or get_connection_cursor()
-    query = "\n".join([f"""ALTER TABLE {username}.{layername} ADD COLUMN {attrname} VARCHAR(1024);""" for username, layername, attrname in attributes]) + "\n COMMIT;"
+    query = "\n".join([f"""ALTER TABLE {username}.{layername} ADD COLUMN {attrname} VARCHAR(1024);""" for username, layername, attrname in attribute_tuples]) + "\n COMMIT;"
     try:
         cur.execute(query)
     except:
         raise LaymanError(7)
 
 
-def get_missing_attributes(attributes, conn_cur=None):
+def get_missing_attributes(attribute_tuples, conn_cur=None):
     conn, cur = conn_cur or get_connection_cursor()
 
     # Find all triples which do not already exist
     query = f"""select attribs.*
-from (""" + "\n union all\n".join([f"select '{username}' username, '{layername}' layername, '{attrname}' attrname" for username, layername, attrname in attributes]) + """) attribs left join
+from (""" + "\n union all\n".join([f"select '{username}' username, '{layername}' layername, '{attrname}' attrname" for username, layername, attrname in attribute_tuples]) + """) attribs left join
     information_schema.columns c on c.table_schema = attribs.username
                                 and c.table_name = attribs.layername
                                 and c.column_name = attribs.attrname
 where c.column_name is null"""
 
     try:
-        if attributes:
+        if attribute_tuples:
             cur.execute(query)
     except:
         raise LaymanError(7)
@@ -517,9 +517,9 @@ where c.column_name is null"""
     return missing_attributes
 
 
-def ensure_attributes(attributes):
+def ensure_attributes(attribute_tuples):
     conn_cur = get_connection_cursor()
-    missing_attributes = get_missing_attributes(attributes, conn_cur)
+    missing_attributes = get_missing_attributes(attribute_tuples, conn_cur)
     if missing_attributes:
-        create_attributes(missing_attributes, conn_cur)
+        create_string_attributes(missing_attributes, conn_cur)
     return missing_attributes
