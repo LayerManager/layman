@@ -29,6 +29,7 @@ from layman import celery as celery_util
 from .micka import csw
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
+from test.data import wfs as data_wfs
 
 from test import client as client_util
 
@@ -1194,7 +1195,7 @@ def test_layer_with_different_geometry(client):
         'Content-type': 'text/xml',
     }
 
-    data_xml = client_util.get_wfs_insert_points(username, layername)
+    data_xml = data_wfs.get_wfs_insert_points(username, layername)
 
     r = requests.post(url_path_ows,
                       data=data_xml,
@@ -1210,7 +1211,7 @@ def test_layer_with_different_geometry(client):
                       )
     assert r.status_code == 200, f"HTTP Error {r.status_code}\n{r.text}"
 
-    data_xml2 = client_util.get_wfs_insert_lines(username, layername)
+    data_xml2 = data_wfs.get_wfs_insert_lines(username, layername)
 
     r = requests.post(url_path_ows,
                       data=data_xml2,

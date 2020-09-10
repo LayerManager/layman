@@ -15,6 +15,7 @@ from layman import settings
 from layman.layer.rest_test import wait_till_ready
 from layman.layer import db
 from test import process, client as client_util
+from test.data import wfs as data_wfs
 from layman.layer.geoserver.util import wfs_proxy
 
 liferay_mock = process.liferay_mock
@@ -66,7 +67,7 @@ def test_rest_get(client):
         'Content-type': 'text/xml',
     }
 
-    data_xml = client_util.get_wfs_insert_points(username, layername)
+    data_xml = data_wfs.get_wfs_insert_points(username, layername)
 
     with app.app_context():
         r = client.post(rest_url,
@@ -121,7 +122,7 @@ def test_wfs_proxy(liferay_mock):
         **authn_headers1,
     }
 
-    data_xml = client_util.get_wfs_insert_points(username, layername1)
+    data_xml = data_wfs.get_wfs_insert_points(username, layername1)
 
     r = requests.post(rest_url,
                       data=data_xml,
@@ -213,9 +214,11 @@ def setup_layer_flask(username, layername, client):
 def test_missing_attribute(client):
     username = 'testmissingattr'
     layername = 'inexisting_attribute_layer'
+    layername2 = 'inexisting_attribute_layer2'
     attr_names = ['inexisting_attribute_attr', 'inexisting_attribute_attr1a']
 
     setup_layer_flask(username, layername, client)
+    setup_layer_flask(username, layername2, client)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
     headers = {
@@ -223,47 +226,70 @@ def test_missing_attribute(client):
         'Content-type': 'text/xml',
     }
 
-    def wfs_post(username, layername, data_xml, attr_names):
+    def wfs_post(username, attr_names_list, data_xml):
         with app.app_context():
             wfs_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
-            old_db_attributes = db.get_all_column_names(username, layername)
-            for attr_name in attr_names:
-                assert attr_name not in old_db_attributes, f"old_db_attributes={old_db_attributes}, attr_name={attr_name}"
-            wfs = wfs_proxy(wfs_url)
-            layer_schema = wfs.get_schema(f"{username}:{layername}")
-            old_wfs_properties = sorted(layer_schema['properties'].keys())
+            old_db_attributes = {}
+            old_wfs_properties = {}
+            for layername, attr_names in attr_names_list:
+                old_db_attributes[layername] = db.get_all_column_names(username, layername)
+                for attr_name in attr_names:
+                    assert attr_name not in old_db_attributes[layername], f"old_db_attributes={old_db_attributes[layername]}, attr_name={attr_name}"
+                wfs = wfs_proxy(wfs_url)
+                layer_schema = wfs.get_schema(f"{username}:{layername}")
+                old_wfs_properties[layername] = sorted(layer_schema['properties'].keys())
 
             r = client.post(rest_url,
                             data=data_xml,
                             headers=headers)
             assert r.status_code == 200, f"{r.get_data()}"
-            new_db_attributes = db.get_all_column_names(username, layername)
-            for attr_name in attr_names:
-                assert attr_name in new_db_attributes, f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
-            assert set(attr_names).union(set(old_db_attributes)) == set(new_db_attributes)
 
-            wfs = wfs_proxy(wfs_url)
-            layer_schema = wfs.get_schema(f"{username}:{layername}")
-            new_wfs_properties = sorted(layer_schema['properties'].keys())
-            for attr_name in attr_names:
-                assert attr_name in new_wfs_properties, f"new_wfs_properties={new_wfs_properties}, attr_name={attr_name}"
-            assert set(attr_names).union(set(old_wfs_properties)) == set(new_wfs_properties)
+            new_db_attributes = {}
+            new_wfs_properties = {}
+            for layername, attr_names in attr_names_list:
+                new_db_attributes[layername] = db.get_all_column_names(username, layername)
+                for attr_name in attr_names:
+                    assert attr_name in new_db_attributes[layername], f"new_db_attributes={new_db_attributes[layername]}, attr_name={attr_name}"
+                assert set(attr_names).union(set(old_db_attributes[layername])) == set(new_db_attributes[layername])
 
-    data_xml = client_util.get_wfs_insert_points_new_attr(username, layername, attr_names)
-    wfs_post(username, layername, data_xml, attr_names)
+                wfs = wfs_proxy(wfs_url)
+                layer_schema = wfs.get_schema(f"{username}:{layername}")
+                new_wfs_properties[layername] = sorted(layer_schema['properties'].keys())
+                for attr_name in attr_names:
+                    assert attr_name in new_wfs_properties[layername], f"new_wfs_properties={new_wfs_properties[layername]}, attr_name={attr_name}"
+                assert set(attr_names).union(set(old_wfs_properties[layername])) == set(new_wfs_properties[layername]),\
+                    set(new_wfs_properties[layername]).difference(set(attr_names).union(set(old_wfs_properties[layername])))
+
+    data_xml = data_wfs.get_wfs_insert_points_new_attr(username, layername, attr_names)
+    wfs_post(username, [(layername, attr_names)], data_xml)
 
     attr_names2 = ['inexisting_attribute_attr2']
-    data_xml = client_util.get_wfs_update_points_new_attr(username, layername, attr_names2)
-    wfs_post(username, layername, data_xml, attr_names2)
+    data_xml = data_wfs.get_wfs_update_points_new_attr(username, layername, attr_names2)
+    wfs_post(username, [(layername, attr_names2)], data_xml)
 
     attr_names3 = ['inexisting_attribute_attr3']
-    data_xml = client_util.get_wfs_update_points_new_attr(username, layername, attr_names3, with_attr_namespace=True)
-    wfs_post(username, layername, data_xml, attr_names3)
+    data_xml = data_wfs.get_wfs_update_points_new_attr(username, layername, attr_names3, with_attr_namespace=True)
+    wfs_post(username, [(layername, attr_names3)], data_xml)
 
     attr_names4 = ['inexisting_attribute_attr4']
-    data_xml = client_util.get_wfs_update_points_new_attr(username, layername, attr_names4, with_filter=True)
-    wfs_post(username, layername, data_xml, attr_names4)
+    data_xml = data_wfs.get_wfs_update_points_new_attr(username, layername, attr_names4, with_filter=True)
+    wfs_post(username, [(layername, attr_names4)], data_xml)
 
     attr_names5 = ['inexisting_attribute_attr5']
-    data_xml = client_util.get_wfs_replace_points_new_attr(username, layername, attr_names5)
-    wfs_post(username, layername, data_xml, attr_names5)
+    data_xml = data_wfs.get_wfs_replace_points_new_attr(username, layername, attr_names5)
+    wfs_post(username, [(layername, attr_names5)], data_xml)
+
+    attr_names_i1 = ['inexisting_attribute_attr_complex_i1']
+    attr_names_i2 = ['inexisting_attribute_attr_complex_i2']
+    attr_names_u = ['inexisting_attribute_attr_complex_u']
+    attr_names_r = ['inexisting_attribute_attr_complex_r']
+    attr_names_complex = [(layername, attr_names_i1 + attr_names_r), (layername2, attr_names_i2 + attr_names_u)]
+    data_xml = data_wfs.get_wfs_complex_new_attr(username=username,
+                                                 layername1=layername,
+                                                 layername2=layername2,
+                                                 attr_names_insert1=attr_names_i1,
+                                                 attr_names_insert2=attr_names_i2,
+                                                 attr_names_update=attr_names_u,
+                                                 attr_names_replace=attr_names_r
+                                                 )
+    wfs_post(username, attr_names_complex, data_xml)

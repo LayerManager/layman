@@ -40,18 +40,24 @@ def check_xml_for_attribute(data_xml):
                     if ws_match:
                         ws_name = ws_match.group(1)
                     else:
+                        app.logger.warning(f"WFS Proxy: skipping due to wrong namespace name. Namespace={ws_namespace}")
                         continue
                     layer_name = layer_qname.localname
                     layer_match = re.match(LAYERNAME_RE, layer_name)
                     if not layer_match:
+                        app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={layer_name}")
                         continue
                     for attrib in layer:
                         attrib_qname = ET.QName(attrib)
-                        if attrib_qname.namespace != layer_qname.namespace:
+                        if attrib_qname.namespace != ws_namespace:
+                            app.logger.warning(f"WFS Proxy: skipping due to different namespace in layer and in "
+                                               f"attribute. Layer namespace={ws_namespace}, a"
+                                               f"ttribute namespace={attrib_qname.namespace}")
                             continue
                         attrib_name = attrib_qname.localname
                         attrib_match = re.match(ATTRNAME_RE, attrib_name)
                         if not attrib_match:
+                            app.logger.warning(f"WFS Proxy: skipping due to wrong attribute name. Attribute name={attrib_name}")
                             continue
                         attribs.add((ws_name,
                                      layer_name,
@@ -63,10 +69,12 @@ def check_xml_for_attribute(data_xml):
                 if ws_match:
                     ws_name = ws_match.group(1)
                 else:
+                    app.logger.warning(f"WFS Proxy: skipping due to wrong namespace name. Namespace={ws_namespace}")
                     continue
                 layer_name = layer_qname[1]
                 layer_match = re.match(LAYERNAME_RE, layer_name)
                 if not layer_match:
+                    app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={layer_name}")
                     continue
                 properties = action.xpath('wfs:Property/wfs:ValueReference', namespaces=xml_data.nsmap)
                 for prop in properties:
@@ -81,6 +89,8 @@ def check_xml_for_attribute(data_xml):
                         attrib_name = split_text[1]
                     attrib_match = re.match(ATTRNAME_RE, attrib_name)
                     if not attrib_match:
+                        app.logger.warning(f"WFS Proxy: skipping due to wrong attribute name."
+                                           f"Attribute name={attrib_name}")
                         continue
                     attribs.add((ws_name,
                                  layer_name,
