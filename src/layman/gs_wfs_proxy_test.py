@@ -215,7 +215,6 @@ def test_missing_attribute(client):
     username = 'testmissingattr'
     layername = 'inexisting_attribute_layer'
     layername2 = 'inexisting_attribute_layer2'
-    attr_names = ['inexisting_attribute_attr', 'inexisting_attribute_attr1a']
 
     setup_layer_flask(username, layername, client)
     setup_layer_flask(username, layername2, client)
@@ -260,6 +259,7 @@ def test_missing_attribute(client):
                 assert set(attr_names).union(set(old_wfs_properties[layername])) == set(new_wfs_properties[layername]),\
                     set(new_wfs_properties[layername]).difference(set(attr_names).union(set(old_wfs_properties[layername])))
 
+    attr_names = ['inexisting_attribute_attr', 'inexisting_attribute_attr1a']
     data_xml = data_wfs.get_wfs_insert_points_new_attr(username, layername, attr_names)
     wfs_post(username, [(layername, attr_names)], data_xml)
 
@@ -293,3 +293,73 @@ def test_missing_attribute(client):
                                                  attr_names_replace=attr_names_r
                                                  )
     wfs_post(username, attr_names_complex, data_xml)
+
+
+def test_missing_attribute_authz(liferay_mock):
+    username = 'testmissingattr_authz'
+    layername1 = 'ne_countries'
+    username2 = 'testmissingattr_authz2'
+
+    def do_test(wfs_query, attribute_names):
+        # Test, that unauthorized user will not cause new attribute
+        with app.app_context():
+            old_db_attributes = db.get_all_column_names(username, layername1)
+        for attr_name in attribute_names:
+            assert attr_name not in old_db_attributes, f"old_db_attributes={old_db_attributes}, attr_name={attr_name}"
+        r = requests.post(rest_url,
+                          data=wfs_query,
+                          headers=headers2)
+        assert r.status_code == 400, r.text
+        with app.app_context():
+            new_db_attributes = db.get_all_column_names(username, layername1)
+        for attr_name in attribute_names:
+            assert attr_name not in new_db_attributes, f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
+
+        # Test, that authorized user will cause new attribute
+        r = requests.post(rest_url,
+                          data=wfs_query,
+                          headers=headers1)
+        assert r.status_code == 200, r.text
+        with app.app_context():
+            new_db_attributes = db.get_all_column_names(username, layername1)
+        for attr_name in attribute_names:
+            assert attr_name in new_db_attributes, f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
+
+    layman_process = process.start_layman(dict({
+        'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner',
+    }, **AUTHN_SETTINGS))
+
+    authn_headers1 = get_auth_header(username, ISS_URL_HEADER, TOKEN_HEADER)
+
+    setup_user_layer(username, layername1, authn_headers1)
+
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
+
+    # Testing, that user2 is not able to write to layer of user1
+    authn_headers2 = get_auth_header(username2, ISS_URL_HEADER, TOKEN_HEADER)
+
+    headers1 = {
+        'Accept': 'text/xml',
+        'Content-type': 'text/xml',
+        **authn_headers1,
+    }
+
+    headers2 = {
+        'Accept': 'text/xml',
+        'Content-type': 'text/xml',
+        **authn_headers2,
+    }
+
+    client_util.reserve_username(username2, headers=authn_headers2)
+
+    # INSERT
+    attr_names = ['inexisting_attribute_auth1', 'inexisting_attribute_auth2']
+    data_xml = data_wfs.get_wfs_insert_points_new_attr(username, layername1, attr_names)
+    do_test(data_xml, attr_names)
+
+    # UPDATE
+    attr_names = ['inexisting_attribute_auth3', 'inexisting_attribute_auth4']
+    data_xml = data_wfs.get_wfs_update_points_new_attr(username, layername1, attr_names)
+    do_test(data_xml, attr_names)
+
+    process.stop_process(layman_process)
