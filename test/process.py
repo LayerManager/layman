@@ -39,6 +39,8 @@ def liferay_mock():
                 'test_rewe_rewo2': None,
                 'testproxy': None,
                 'testproxy2': None,
+                'testmissingattr_authz': None,
+                'testmissingattr_authz2': None,
             },
         },
         'host': '0.0.0.0',

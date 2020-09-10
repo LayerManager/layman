@@ -12,6 +12,8 @@ from layman.layer import db
 from layman.layer.util import LAYERNAME_RE, ATTRNAME_RE
 from layman.util import USERNAME_ONLY_PATTERN
 from layman.common.geoserver import reset as gs_reset
+from layman.layer import LAYER_TYPE
+from layman.authz import util as authz
 
 
 bp = Blueprint('gs_wfs_proxy_bp', __name__)
@@ -30,6 +32,7 @@ def check_xml_for_attribute(data_xml):
             app.logger.warning(f"WFS Proxy: only xml version 2.0 and WFS service are supported. Request only redirected. Version={xml_data.get('version')}, service={xml_data.get('service')}")
             return
 
+        authz_module = authz.get_authz_module()
         attribs = set()
         for action in xml_data:
             if ET.QName(action).localname in ('Insert', 'Replace'):
@@ -46,6 +49,9 @@ def check_xml_for_attribute(data_xml):
                     layer_match = re.match(LAYERNAME_RE, layer_name)
                     if not layer_match:
                         app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={layer_name}")
+                        continue
+                    if not authz_module.can_i_edit(LAYER_TYPE, ws_name, layer_name):
+                        print(f"Can not edit. ws_namespace={ws_name}")
                         continue
                     for attrib in layer:
                         attrib_qname = ET.QName(attrib)
@@ -75,6 +81,9 @@ def check_xml_for_attribute(data_xml):
                 layer_match = re.match(LAYERNAME_RE, layer_name)
                 if not layer_match:
                     app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={layer_name}")
+                    continue
+                if not authz_module.can_i_edit(LAYER_TYPE, ws_name, layer_name):
+                    print(f"Can not edit. ws_namespace={ws_namespace}")
                     continue
                 properties = action.xpath('wfs:Property/wfs:ValueReference', namespaces=xml_data.nsmap)
                 for prop in properties:

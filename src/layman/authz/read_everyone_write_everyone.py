@@ -22,3 +22,7 @@ def get_gs_roles(username, type):
     elif type == 'w':
         roles = gs.get_roles_anyone(username)
     return roles
+
+
+def can_i_edit(publ_type, username, publication_name):
+    return True
