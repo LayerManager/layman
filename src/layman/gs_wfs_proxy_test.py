@@ -67,7 +67,7 @@ def test_rest_get(client):
         'Content-type': 'text/xml',
     }
 
-    data_xml = data_wfs.get_wfs_insert_points(username, layername)
+    data_xml = data_wfs.get_wfs20_insert_points(username, layername)
 
     with app.app_context():
         r = client.post(rest_url,
@@ -122,7 +122,7 @@ def test_wfs_proxy(liferay_mock):
         **authn_headers1,
     }
 
-    data_xml = data_wfs.get_wfs_insert_points(username, layername1)
+    data_xml = data_wfs.get_wfs20_insert_points(username, layername1)
 
     r = requests.post(rest_url,
                       data=data_xml,
@@ -265,23 +265,23 @@ def test_missing_attribute(client):
                     set(new_wfs_properties[layername]).difference(set(attr_names).union(set(old_wfs_properties[layername])))
 
     attr_names = ['inexisting_attribute_attr', 'inexisting_attribute_attr1a']
-    data_xml = data_wfs.get_wfs_insert_points_new_attr(username, layername, attr_names)
+    data_xml = data_wfs.get_wfs20_insert_points_new_attr(username, layername, attr_names)
     wfs_post(username, [(layername, attr_names)], data_xml)
 
     attr_names2 = ['inexisting_attribute_attr2']
-    data_xml = data_wfs.get_wfs_update_points_new_attr(username, layername, attr_names2)
+    data_xml = data_wfs.get_wfs20_update_points_new_attr(username, layername, attr_names2)
     wfs_post(username, [(layername, attr_names2)], data_xml)
 
     attr_names3 = ['inexisting_attribute_attr3']
-    data_xml = data_wfs.get_wfs_update_points_new_attr(username, layername, attr_names3, with_attr_namespace=True)
+    data_xml = data_wfs.get_wfs20_update_points_new_attr(username, layername, attr_names3, with_attr_namespace=True)
     wfs_post(username, [(layername, attr_names3)], data_xml)
 
     attr_names4 = ['inexisting_attribute_attr4']
-    data_xml = data_wfs.get_wfs_update_points_new_attr(username, layername, attr_names4, with_filter=True)
+    data_xml = data_wfs.get_wfs20_update_points_new_attr(username, layername, attr_names4, with_filter=True)
     wfs_post(username, [(layername, attr_names4)], data_xml)
 
     attr_names5 = ['inexisting_attribute_attr5']
-    data_xml = data_wfs.get_wfs_replace_points_new_attr(username, layername, attr_names5)
+    data_xml = data_wfs.get_wfs20_replace_points_new_attr(username, layername, attr_names5)
     wfs_post(username, [(layername, attr_names5)], data_xml)
 
     attr_names_i1 = ['inexisting_attribute_attr_complex_i1']
@@ -289,30 +289,30 @@ def test_missing_attribute(client):
     attr_names_u = ['inexisting_attribute_attr_complex_u']
     attr_names_r = ['inexisting_attribute_attr_complex_r']
     attr_names_complex = [(layername, attr_names_i1 + attr_names_r), (layername2, attr_names_i2 + attr_names_u)]
-    data_xml = data_wfs.get_wfs_complex_new_attr(username=username,
-                                                 layername1=layername,
-                                                 layername2=layername2,
-                                                 attr_names_insert1=attr_names_i1,
-                                                 attr_names_insert2=attr_names_i2,
-                                                 attr_names_update=attr_names_u,
-                                                 attr_names_replace=attr_names_r
-                                                 )
+    data_xml = data_wfs.get_wfs20_complex_new_attr(username=username,
+                                                   layername1=layername,
+                                                   layername2=layername2,
+                                                   attr_names_insert1=attr_names_i1,
+                                                   attr_names_insert2=attr_names_i2,
+                                                   attr_names_update=attr_names_u,
+                                                   attr_names_replace=attr_names_r
+                                                   )
     wfs_post(username, attr_names_complex, data_xml)
 
     attr_names6 = ['inexisting_attribute_attr6']
-    data_xml = data_wfs.get_wfs_insert_points_new_attr_wfs10(username, layername, attr_names6)
+    data_xml = data_wfs.get_wfs10_insert_points_new_attr(username, layername, attr_names6)
     wfs_post(username, [(layername, attr_names6)], data_xml)
 
     attr_names7 = ['inexisting_attribute_attr7']
-    data_xml = data_wfs.get_wfs_insert_points_new_attr_wfs11(username, layername, attr_names7)
+    data_xml = data_wfs.get_wfs11_insert_points_new_attr(username, layername, attr_names7)
     wfs_post(username, [(layername, attr_names7)], data_xml)
 
     attr_names8 = ['inexisting_attribute_attr8']
-    data_xml = data_wfs.get_wfs_update_points_new_attr10(username, layername, attr_names8, with_attr_namespace=True)
+    data_xml = data_wfs.get_wfs10_update_points_new(username, layername, attr_names8, with_attr_namespace=True)
     wfs_post(username, [(layername, attr_names8)], data_xml)
 
     attr_names9 = ['inexisting_attribute_attr9']
-    data_xml = data_wfs.get_wfs_update_points_new_attr10(username, layername, attr_names9, with_filter=True)
+    data_xml = data_wfs.get_wfs10_update_points_new(username, layername, attr_names9, with_filter=True)
     wfs_post(username, [(layername, attr_names9)], data_xml)
 
     client_util.delete_layer(username, layername)
@@ -376,12 +376,12 @@ def test_missing_attribute_authz(liferay_mock):
 
     # INSERT
     attr_names = ['inexisting_attribute_auth1', 'inexisting_attribute_auth2']
-    data_xml = data_wfs.get_wfs_insert_points_new_attr(username, layername1, attr_names)
+    data_xml = data_wfs.get_wfs20_insert_points_new_attr(username, layername1, attr_names)
     do_test(data_xml, attr_names)
 
     # UPDATE
     attr_names = ['inexisting_attribute_auth3', 'inexisting_attribute_auth4']
-    data_xml = data_wfs.get_wfs_update_points_new_attr(username, layername1, attr_names)
+    data_xml = data_wfs.get_wfs20_update_points_new_attr(username, layername1, attr_names)
     do_test(data_xml, attr_names)
 
     client_util.delete_layer(username, layername1, headers1)

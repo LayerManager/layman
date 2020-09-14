@@ -1,4 +1,4 @@
-def get_wfs_insert_points(username, layername):
+def get_wfs20_insert_points(username, layername):
     return f'''<?xml version="1.0"?>
         <wfs:Transaction
            version="2.0.0"
@@ -24,7 +24,7 @@ def get_wfs_insert_points(username, layername):
         </wfs:Transaction>'''
 
 
-def get_wfs_insert_lines(username, layername):
+def get_wfs20_insert_lines(username, layername):
     return f'''<?xml version="1.0"?>
     <wfs:Transaction
        version="2.0.0"
@@ -56,7 +56,7 @@ def get_wfs_insert_lines(username, layername):
     </wfs:Transaction>'''
 
 
-def get_wfs_insert_points_new_attr(username, layername, attr_names):
+def get_wfs20_insert_points_new_attr(username, layername, attr_names):
     attr_xml = ' '.join([
         f"<{username}:{attr_name}>some value</{username}:{attr_name}>"
         for attr_name in attr_names
@@ -101,7 +101,7 @@ def get_wfs_insert_points_new_attr(username, layername, attr_names):
 </wfs:Transaction>'''
 
 
-def get_wfs_insert_points_new_attr_wfs10(username, layername, attr_names):
+def get_wfs10_insert_points_new_attr(username, layername, attr_names):
     attr_xml = ' '.join([
         f"<{username}:{attr_name}>some value</{username}:{attr_name}>"
         for attr_name in attr_names
@@ -134,7 +134,7 @@ def get_wfs_insert_points_new_attr_wfs10(username, layername, attr_names):
 </wfs:Transaction>'''
 
 
-def get_wfs_insert_points_new_attr_wfs11(username, layername, attr_names):
+def get_wfs11_insert_points_new_attr(username, layername, attr_names):
     attr_xml = ' '.join([
         f"<{username}:{attr_name}>some value</{username}:{attr_name}>"
         for attr_name in attr_names
@@ -173,7 +173,7 @@ def get_wfs_insert_points_new_attr_wfs11(username, layername, attr_names):
 </wfs:Transaction>'''
 
 
-def get_wfs_update_points_new_attr(
+def get_wfs20_update_points_new_attr(
         username,
         layername,
         attr_names,
@@ -212,7 +212,7 @@ def get_wfs_update_points_new_attr(
     </wfs:Transaction>'''
 
 
-def get_wfs_update_points_new_attr10(
+def get_wfs10_update_points_new(
         username,
         layername,
         attr_names,
@@ -251,7 +251,7 @@ def get_wfs_update_points_new_attr10(
     </wfs:Transaction>'''
 
 
-def get_wfs_replace_points_new_attr(username, layername, attr_names):
+def get_wfs20_replace_points_new_attr(username, layername, attr_names):
     attr_xml = ' '.join([
         f"<{username}:{attr_name}>some value</{username}:{attr_name}>"
         for attr_name in attr_names
@@ -302,13 +302,13 @@ def get_wfs_replace_points_new_attr(username, layername, attr_names):
 </wfs:Transaction>'''
 
 
-def get_wfs_complex_new_attr(username,
-                             layername1,
-                             layername2,
-                             attr_names_insert1,
-                             attr_names_insert2,
-                             attr_names_update,
-                             attr_names_replace):
+def get_wfs20_complex_new_attr(username,
+                               layername1,
+                               layername2,
+                               attr_names_insert1,
+                               attr_names_insert2,
+                               attr_names_update,
+                               attr_names_replace):
     with_attr_namespace = True
     attr_xml_insert1 = ' '.join([
         f"<{username}:{attr_name}>some value</{username}:{attr_name}>"
