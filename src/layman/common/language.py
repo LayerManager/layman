@@ -242,7 +242,7 @@ def get_languages_cld2(text):
     # guess language by script
     if not reliable:
         langs = get_languages_by_script(text)
-        best_lang = next((l for l in PREFERRED_LANGUAGES if l in langs), None)
+        best_lang = next((lang for lang in PREFERRED_LANGUAGES if lang in langs), None)
         # print(f"best_lang={best_lang}")
         if best_lang is not None:
             return [best_lang]
@@ -259,7 +259,7 @@ def get_languages_cld2(text):
             if d[1] in PREFERRED_LANGUAGES
         ]
         langs = preferred_languages if len(preferred_languages) else known_languages
-        lang_scores = [l[2] * l[3] for l in langs]
+        lang_scores = [lang[2] * lang[3] for lang in langs]
         idx = lang_scores.index(max(lang_scores))
         result = [langs[idx][1]]
     # print(f"get_languages_cld2 result={result}")
@@ -268,10 +268,9 @@ def get_languages_cld2(text):
 
 def get_languages_iso639_2(text):
     languages = get_languages_cld2(text)
-    languages = [l.split('-')[0] for l in languages]
+    languages = [lang.split('-')[0] for lang in languages]
     # for l in languages:
     #   assert l in LANGUAGE_CODES, l
     return [
-        LANGUAGE_CODES[l] for l in languages
-        if l in LANGUAGE_CODES
+        LANGUAGE_CODES[lang] for lang in languages if lang in LANGUAGE_CODES
     ]

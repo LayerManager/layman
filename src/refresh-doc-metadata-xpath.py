@@ -55,8 +55,8 @@ def main():
     assert len(prop_names) == 0
 
     with open(path_to_doc, 'w') as f:
-        for l in md_lines_out:
-            f.write(l)
+        for line in md_lines_out:
+            f.write(line)
 
 
 if __name__ == "__main__":

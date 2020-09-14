@@ -191,15 +191,15 @@ def get_metadata_comparison(username, layername):
     wfs_layer = wfs.contents.get(wfs_layername, None)
     try:
         title = wfs_layer.title
-    except:
+    except BaseException:
         title = None
     try:
         abstract = wfs_layer.abstract
-    except:
+    except BaseException:
         abstract = None
     try:
         extent = wfs_layer.boundingBox[:-1]
-    except:
+    except BaseException:
         extent = None
     try:
         crs_list = [int(crs.getcode().split(':')[-1]) for crs in wfs_layer.crsOptions]

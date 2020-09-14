@@ -158,15 +158,15 @@ def get_metadata_comparison(username, layername):
     wms_layer = wms.contents.get(layername, None)
     try:
         title = wms_layer.title
-    except:
+    except BaseException:
         title = None
     try:
         abstract = wms_layer.abstract
-    except:
+    except BaseException:
         abstract = None
     try:
         extent = wms_layer.boundingBoxWGS84
-    except:
+    except BaseException:
         extent = None
     try:
         crs_list = [

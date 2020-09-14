@@ -766,11 +766,11 @@ def test_map_composed_from_local_layers(client):
         with open(expected_path) as f:
             expected_lines = f.readlines()
         diff_lines = list(
-            difflib.unified_diff([l.decode('utf-8') for l in xml_file_object.readlines()], expected_lines))
+            difflib.unified_diff([line.decode('utf-8') for line in xml_file_object.readlines()], expected_lines))
         assert len(diff_lines) == 40, ''.join(diff_lines)
-        plus_lines = [l for l in diff_lines if l.startswith('+ ')]
+        plus_lines = [line for line in diff_lines if line.startswith('+ ')]
         assert len(plus_lines) == 5
-        minus_lines = [l for l in diff_lines if l.startswith('- ')]
+        minus_lines = [line for line in diff_lines if line.startswith('- ')]
         assert len(minus_lines) == 5
 
         plus_line = plus_lines[0]

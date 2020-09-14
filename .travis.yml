@@ -124,11 +124,8 @@ matrix:
       script:
 #E402 module level import not at top of file
 #E501 line too long (619 > 127 characters)
-#E711 comparison to None should be 'if cond is None:'
-#E722 do not use bare 'except'
 #W503 Line break occurred before a binary operator
-#E741 ambiguous variable name 'l'
-        - pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,E711,E722,W503,E741 ./src ./test
+        - pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,W503 ./src ./test
 
     - name: "Pylint"
       language: python
@@ -168,5 +165,5 @@ matrix:
 
       # command to run tests
       script:
-        - autopep8 --recursive --diff --aggressive --aggressive --exit-code --ignore=E402,E501,E711,E722,W503,E741,E721 ./src ./test
+        - autopep8 --recursive --diff --aggressive --aggressive --exit-code --ignore=E402,E501,W503,E741 ./src ./test
 
