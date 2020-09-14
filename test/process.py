@@ -95,7 +95,7 @@ def start_layman(env_vars=None):
 
 
 def stop_process(process):
-    if type(process) is not tuple:
+    if not isinstance(process, tuple):
         process = (process,)
     for proc in process:
         proc.kill()

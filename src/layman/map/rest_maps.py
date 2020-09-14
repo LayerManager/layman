@@ -27,8 +27,7 @@ def before_request():
 def get(username):
     app.logger.info(f"GET Maps, user={g.user}")
 
-    mapnames = util.get_map_names(username)
-    mapnames.sort()
+    mapnames = sorted(util.get_map_names(username))
 
     infos = [
         {
