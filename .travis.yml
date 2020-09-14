@@ -165,5 +165,5 @@ matrix:
 
       # command to run tests
       script:
-        - autopep8 --recursive --diff --aggressive --aggressive --exit-code --ignore=E402,E501,W503,E741 ./src ./test
+        - autopep8 --recursive --diff --aggressive --aggressive --exit-code --ignore=E402,E501,W503 ./src ./test
 
