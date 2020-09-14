@@ -173,6 +173,44 @@ def get_wfs11_insert_points_new_attr(username, layername, attr_names):
 </wfs:Transaction>'''
 
 
+def get_wfs11_insert_polygon_new_attr(username, layername, attr_names):
+    attr_xml = ' '.join([
+        f"<{attr_name}>some value</{attr_name}>"
+        for attr_name in attr_names
+    ])
+    return f'''<?xml version="1.0"?>
+<wfs:Transaction
+   version="1.1.0"
+   service="WFS"
+   xmlns:fes="http://www.opengis.net/fes/2.0"
+   xmlns:gml="http://www.opengis.net/gml/3.2"
+   xmlns:wfs="http://www.opengis.net/wfs/2.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.opengis.net/wfs/2.0
+                       http://schemas.opengis.net/wfs/2.0/wfs.xsd
+                       http://www.opengis.net/gml/3.2
+                       http://schemas.opengis.net/gml/3.2.1/gml.xsd">
+   <wfs:Insert>
+       <{layername} xmlns="http://{username}">
+           <wkb_geometry>
+           <gml:MultiLineString srsName="http://www.opengis.net/gml/srs/epsg.xml#4326">
+               <gml:lineStringMember>
+                   <gml:LineString>
+                       <gml:coordinates decimal="." cs="," ts=" ">
+   494475.71056415,5433016.8189323 494982.70115662,5435041.95096618
+                       </gml:coordinates>
+                   </gml:LineString>
+               </gml:lineStringMember>
+           </gml:MultiLineString>
+           </wkb_geometry>
+           <name>New name</name>
+           <labelrank>3</labelrank>
+           {attr_xml}
+       </{layername}>
+   </wfs:Insert>
+</wfs:Transaction>'''
+
+
 def get_wfs20_update_points_new_attr(
         username,
         layername,

@@ -76,9 +76,7 @@ def extract_attributes_from_wfs_t_update(action, authz_module, xml_tree, major_v
     if not authz_module.can_i_edit(LAYER_TYPE, ws_name, layer_name):
         app.logger.warning(f"Can not edit. ws_namespace={ws_namespace}")
         return attribs
-    print(f"Major version =!{major_version}!")
     value_ref_string = "Name" if major_version == "1" else "ValueReference"
-    print(f"value_ref_string ={value_ref_string}")
     properties = action.xpath('wfs:Property/wfs:' + value_ref_string, namespaces=xml_tree.nsmap)
     for prop in properties:
         split_text = prop.text.split(':')

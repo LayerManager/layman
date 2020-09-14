@@ -315,6 +315,10 @@ def test_missing_attribute(client):
     data_xml = data_wfs.get_wfs10_update_points_new(username, layername, attr_names9, with_filter=True)
     wfs_post(username, [(layername, attr_names9)], data_xml)
 
+    attr_names10 = ['inexisting_attribute_attr10']
+    data_xml = data_wfs.get_wfs11_insert_polygon_new_attr(username, layername, attr_names10)
+    wfs_post(username, [(layername, attr_names10)], data_xml)
+
     client_util.delete_layer(username, layername)
     client_util.delete_layer(username, layername2)
 
