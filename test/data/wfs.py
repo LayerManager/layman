@@ -155,9 +155,15 @@ def get_wfs_insert_points_new_attr_wfs11(username, layername, attr_names):
    <wfs:Insert>
        <{username}:{layername}>
            <{username}:wkb_geometry>
-               <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
-                   <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
-               </gml:Point>
+           <gml:MultiLineString srsName="http://www.opengis.net/gml/srs/epsg.xml#4326">
+               <gml:lineStringMember>
+                   <gml:LineString>
+                       <gml:coordinates decimal="." cs="," ts=" ">
+   494475.71056415,5433016.8189323 494982.70115662,5435041.95096618
+                       </gml:coordinates>
+                   </gml:LineString>
+               </gml:lineStringMember>
+           </gml:MultiLineString>
            </{username}:wkb_geometry>
            <{username}:name>New name</{username}:name>
            <{username}:labelrank>3</{username}:labelrank>
