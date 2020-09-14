@@ -28,8 +28,10 @@ def before_request():
 def ensure_wfs_t_attributes(binary_data):
     try:
         xml_tree = ET.XML(binary_data)
-        if xml_tree.get('version')[0:4] != "2.0." or xml_tree.get('service').upper() != "WFS":
-            app.logger.warning(f"WFS Proxy: only xml version 2.0 and WFS service are supported. Request only redirected. Version={xml_tree.get('version')}, service={xml_tree.get('service')}")
+        version = xml_tree.get('version')[0:4]
+        if version not in ["2.0.", "1.0.", "1.1."] or xml_tree.get('service').upper() != "WFS":
+            app.logger.warning(f"WFS Proxy: only xml version 2.0, 1.1, 1.0 and WFS service are supported. Request "
+                               f"only redirected. Version={xml_tree.get('version')}, service={xml_tree.get('service')}")
             return
 
         authz_module = authz.get_authz_module()
@@ -40,7 +42,10 @@ def ensure_wfs_t_attributes(binary_data):
                 extracted_attribs = extract_attributes_from_wfs_t_insert_replace(action, authz_module)
                 attribs.update(extracted_attribs)
             elif action_qname.localname in ('Update'):
-                extracted_attribs = extract_attributes_from_wfs_t_update(action, authz_module, xml_tree)
+                extracted_attribs = extract_attributes_from_wfs_t_update(action,
+                                                                         authz_module,
+                                                                         xml_tree,
+                                                                         major_version=version[0:1])
                 attribs.update(extracted_attribs)
 
         app.logger.info(f"GET WFS check_xml_for_attribute attribs={attribs}")
@@ -53,7 +58,7 @@ def ensure_wfs_t_attributes(binary_data):
         app.logger.warning(f"WFS Proxy: error={err}, trace={traceback.format_exc()}")
 
 
-def extract_attributes_from_wfs_t_update(action, authz_module, xml_tree):
+def extract_attributes_from_wfs_t_update(action, authz_module, xml_tree, major_version="2"):
     attribs = set()
     layer_qname = action.get('typeName').split(':')
     ws_namespace = layer_qname[0]
@@ -71,7 +76,10 @@ def extract_attributes_from_wfs_t_update(action, authz_module, xml_tree):
     if not authz_module.can_i_edit(LAYER_TYPE, ws_name, layer_name):
         app.logger.warning(f"Can not edit. ws_namespace={ws_namespace}")
         return attribs
-    properties = action.xpath('wfs:Property/wfs:ValueReference', namespaces=xml_tree.nsmap)
+    print(f"Major version =!{major_version}!")
+    value_ref_string = "Name" if major_version == "1" else "ValueReference"
+    print(f"value_ref_string ={value_ref_string}")
+    properties = action.xpath('wfs:Property/wfs:' + value_ref_string, namespaces=xml_tree.nsmap)
     for prop in properties:
         split_text = prop.text.split(':')
         # No namespace in element text

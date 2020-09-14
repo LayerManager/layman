@@ -299,6 +299,22 @@ def test_missing_attribute(client):
                                                  )
     wfs_post(username, attr_names_complex, data_xml)
 
+    attr_names6 = ['inexisting_attribute_attr6']
+    data_xml = data_wfs.get_wfs_insert_points_new_attr_wfs10(username, layername, attr_names6)
+    wfs_post(username, [(layername, attr_names6)], data_xml)
+
+    attr_names7 = ['inexisting_attribute_attr7']
+    data_xml = data_wfs.get_wfs_insert_points_new_attr_wfs11(username, layername, attr_names7)
+    wfs_post(username, [(layername, attr_names7)], data_xml)
+
+    attr_names8 = ['inexisting_attribute_attr8']
+    data_xml = data_wfs.get_wfs_update_points_new_attr10(username, layername, attr_names8, with_attr_namespace=True)
+    wfs_post(username, [(layername, attr_names8)], data_xml)
+
+    attr_names9 = ['inexisting_attribute_attr9']
+    data_xml = data_wfs.get_wfs_update_points_new_attr10(username, layername, attr_names9, with_filter=True)
+    wfs_post(username, [(layername, attr_names9)], data_xml)
+
     client_util.delete_layer(username, layername)
     client_util.delete_layer(username, layername2)
 

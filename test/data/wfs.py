@@ -101,6 +101,72 @@ def get_wfs_insert_points_new_attr(username, layername, attr_names):
 </wfs:Transaction>'''
 
 
+def get_wfs_insert_points_new_attr_wfs10(username, layername, attr_names):
+    attr_xml = ' '.join([
+        f"<{username}:{attr_name}>some value</{username}:{attr_name}>"
+        for attr_name in attr_names
+    ])
+    return f'''<?xml version="1.0"?>
+<wfs:Transaction
+   version="1.0.0"
+   service="WFS"
+   xmlns:{username}="http://{username}"
+   xmlns:fes="http://www.opengis.net/fes/2.0"
+   xmlns:gml="http://www.opengis.net/gml/3.2"
+   xmlns:wfs="http://www.opengis.net/wfs/2.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.opengis.net/wfs/2.0
+                       http://schemas.opengis.net/wfs/2.0/wfs.xsd
+                       http://www.opengis.net/gml/3.2
+                       http://schemas.opengis.net/gml/3.2.1/gml.xsd">
+   <wfs:Insert>
+       <{username}:{layername}>
+           <{username}:wkb_geometry>
+               <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
+                   <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
+               </gml:Point>
+           </{username}:wkb_geometry>
+           <{username}:name>New name</{username}:name>
+           <{username}:labelrank>3</{username}:labelrank>
+           {attr_xml}
+       </{username}:{layername}>
+   </wfs:Insert>
+</wfs:Transaction>'''
+
+
+def get_wfs_insert_points_new_attr_wfs11(username, layername, attr_names):
+    attr_xml = ' '.join([
+        f"<{username}:{attr_name}>some value</{username}:{attr_name}>"
+        for attr_name in attr_names
+    ])
+    return f'''<?xml version="1.0"?>
+<wfs:Transaction
+   version="1.1.0"
+   service="WFS"
+   xmlns:{username}="http://{username}"
+   xmlns:fes="http://www.opengis.net/fes/2.0"
+   xmlns:gml="http://www.opengis.net/gml/3.2"
+   xmlns:wfs="http://www.opengis.net/wfs/2.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.opengis.net/wfs/2.0
+                       http://schemas.opengis.net/wfs/2.0/wfs.xsd
+                       http://www.opengis.net/gml/3.2
+                       http://schemas.opengis.net/gml/3.2.1/gml.xsd">
+   <wfs:Insert>
+       <{username}:{layername}>
+           <{username}:wkb_geometry>
+               <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
+                   <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
+               </gml:Point>
+           </{username}:wkb_geometry>
+           <{username}:name>New name</{username}:name>
+           <{username}:labelrank>3</{username}:labelrank>
+           {attr_xml}
+       </{username}:{layername}>
+   </wfs:Insert>
+</wfs:Transaction>'''
+
+
 def get_wfs_update_points_new_attr(
         username,
         layername,
@@ -123,6 +189,45 @@ def get_wfs_update_points_new_attr(
     return f'''<?xml version="1.0"?>
     <wfs:Transaction
        version="2.0.0"
+       service="WFS"
+       xmlns:{username}="http://{username}"
+       xmlns:fes="http://www.opengis.net/fes/2.0"
+       xmlns:gml="http://www.opengis.net/gml/3.2"
+       xmlns:wfs="http://www.opengis.net/wfs/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.opengis.net/wfs/2.0
+                           http://schemas.opengis.net/wfs/2.0/wfs.xsd
+                           http://www.opengis.net/gml/3.2
+                           http://schemas.opengis.net/gml/3.2.1/gml.xsd">
+       <wfs:Update typeName="{username}:{layername}">
+           {attr_xml}
+           {filter_xml}
+       </wfs:Update>
+    </wfs:Transaction>'''
+
+
+def get_wfs_update_points_new_attr10(
+        username,
+        layername,
+        attr_names,
+        with_attr_namespace=False,
+        with_filter=False,
+):
+    attr_prefix = f"{username}:" if with_attr_namespace else ''
+    attr_xml = ' '.join([
+        f"""<wfs:Property>
+               <wfs:Name>{attr_prefix}{attr_name}</wfs:Name>
+               <wfs:Value>some value</wfs:Value>
+           </wfs:Property>"""
+        for attr_name in attr_names
+    ])
+    filter_xml = f"""<fes:Filter>
+              <fes:FeatureId fid="{layername}.1"/>
+           </fes:Filter>
+    """ if with_filter else ''
+    return f'''<?xml version="1.0"?>
+    <wfs:Transaction
+       version="1.0.0"
        service="WFS"
        xmlns:{username}="http://{username}"
        xmlns:fes="http://www.opengis.net/fes/2.0"
