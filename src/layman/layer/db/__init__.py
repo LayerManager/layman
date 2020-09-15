@@ -2,7 +2,7 @@ from collections import defaultdict
 import math
 import os
 import psycopg2
-from flask import g
+from flask import g, app
 
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
@@ -160,6 +160,22 @@ FROM information_schema.columns
 WHERE table_schema = '{username}'
 AND table_name = '{layername}'
 AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
+""")
+    except:
+        raise LaymanError(7)
+    rows = cur.fetchall()
+    return [r[0] for r in rows]
+
+
+def get_all_column_names(username, layername, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+
+    try:
+        cur.execute(f"""
+SELECT QUOTE_IDENT(column_name) AS column_name
+FROM information_schema.columns
+WHERE table_schema = '{username}'
+AND table_name = '{layername}'
 """)
     except:
         raise LaymanError(7)
@@ -464,3 +480,46 @@ limit 1
         if freq / num_distances > 0.03:
             result = distance
     return result
+
+
+def create_string_attributes(attribute_tuples, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+    query = "\n".join([f"""ALTER TABLE {username}.{layername} ADD COLUMN {attrname} VARCHAR(1024);""" for username, layername, attrname in attribute_tuples]) + "\n COMMIT;"
+    try:
+        cur.execute(query)
+    except:
+        raise LaymanError(7)
+
+
+def get_missing_attributes(attribute_tuples, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+
+    # Find all triples which do not already exist
+    query = f"""select attribs.*
+from (""" + "\n union all\n".join([f"select '{username}' username, '{layername}' layername, '{attrname}' attrname" for username, layername, attrname in attribute_tuples]) + """) attribs left join
+    information_schema.columns c on c.table_schema = attribs.username
+                                and c.table_name = attribs.layername
+                                and c.column_name = attribs.attrname
+where c.column_name is null"""
+
+    try:
+        if attribute_tuples:
+            cur.execute(query)
+    except:
+        raise LaymanError(7)
+
+    missing_attributes = set()
+    rows = cur.fetchall()
+    for row in rows:
+        missing_attributes.add((row[0],
+                                row[1],
+                                row[2]))
+    return missing_attributes
+
+
+def ensure_attributes(attribute_tuples):
+    conn_cur = get_connection_cursor()
+    missing_attributes = get_missing_attributes(attribute_tuples, conn_cur)
+    if missing_attributes:
+        create_string_attributes(missing_attributes, conn_cur)
+    return missing_attributes
