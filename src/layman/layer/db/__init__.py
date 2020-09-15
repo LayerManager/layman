@@ -177,7 +177,7 @@ FROM information_schema.columns
 WHERE table_schema = '{username}'
 AND table_name = '{layername}'
 """)
-    except:
+    except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
     return [r[0] for r in rows]
@@ -487,7 +487,7 @@ def create_string_attributes(attribute_tuples, conn_cur=None):
     query = "\n".join([f"""ALTER TABLE {username}.{layername} ADD COLUMN {attrname} VARCHAR(1024);""" for username, layername, attrname in attribute_tuples]) + "\n COMMIT;"
     try:
         cur.execute(query)
-    except:
+    except BaseException:
         raise LaymanError(7)
 
 
@@ -505,7 +505,7 @@ where c.column_name is null"""
     try:
         if attribute_tuples:
             cur.execute(query)
-    except:
+    except BaseException:
         raise LaymanError(7)
 
     missing_attributes = set()
