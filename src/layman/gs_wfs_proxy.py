@@ -86,12 +86,15 @@ def extract_attributes_from_wfs_t_update(action, authz_module, xml_tree, major_v
         # There is namespace in element text
         elif len(split_text) == 2:
             if split_text[0] != ws_namespace:
+                app.logger.warning(f"WFS Proxy: skipping due to different namespace in layer and in "
+                                   f"property. Layer namespace={ws_namespace}, "
+                                   f"property namespace={split_text[0]}")
                 continue
             attrib_name = split_text[1]
         attrib_match = re.match(ATTRNAME_RE, attrib_name)
         if not attrib_match:
-            app.logger.warning(f"WFS Proxy: skipping due to wrong attribute name."
-                               f"Attribute name={attrib_name}")
+            app.logger.warning(f"WFS Proxy: skipping due to wrong attribute name. "
+                               f"Property={attrib_name}")
             continue
         attribs.add((ws_name,
                      layer_name,
@@ -122,13 +125,13 @@ def extract_attributes_from_wfs_t_insert_replace(action, authz_module):
             attrib_qname = ET.QName(attrib)
             if attrib_qname.namespace != ws_namespace:
                 app.logger.warning(f"WFS Proxy: skipping due to different namespace in layer and in "
-                                   f"attribute. Layer namespace={ws_namespace}, a"
-                                   f"ttribute namespace={attrib_qname.namespace}")
+                                   f"property. Layer namespace={ws_namespace}, "
+                                   f"property namespace={attrib_qname.namespace}")
                 continue
             attrib_name = attrib_qname.localname
             attrib_match = re.match(ATTRNAME_RE, attrib_name)
             if not attrib_match:
-                app.logger.warning(f"WFS Proxy: skipping due to wrong attribute name. Attribute name={attrib_name}")
+                app.logger.warning(f"WFS Proxy: skipping due to wrong property name. Property name={attrib_name}")
                 continue
             attribs.add((ws_name,
                          layer_name,
