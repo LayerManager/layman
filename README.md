@@ -11,11 +11,10 @@ Publishing geospatial data online through [REST API](doc/rest.md).
 - Asynchronous processing
 - Each vector dataset is automatically imported into PostGIS database
 - Provides URL endpoints
-  - [Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms)
-  - [Web Feature Service (WFS)](https://www.opengeospatial.org/standards/wfs)
-  - [Catalogue Service (CSW)](https://www.opengeospatial.org/standards/cat)
-  - thumbnail image
-- Documented [REST API](doc/rest.md)
+  - [REST API](doc/rest.md)
+  - [Web Map Service (WMS)](doc/endpoints.md#web-map-service)
+  - [Web Feature Service (WFS)](doc/endpoints.md#web-feature-service)
+  - [Catalogue Service (CSW)](doc/endpoints.md#catalogue-service)
 - Documented [security system](doc/security.md)
 - Documented [data storage](doc/data-storage.md)
 - Configurable by environment variables
