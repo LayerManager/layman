@@ -54,7 +54,20 @@ def delete_layer(username, layername):
 
 
 def get_layer_info(username, layername):
-    return {}
+    url = settings.LAYMAN_GS_REST + f'workspaces/{username}/styles/{layername}.xml'
+    print(f"Get layer url={url}")
+    r = requests.get(url)
+    print(f"Get layer r={r.status_code}, {r.text}")
+    if r.status_code == 200:
+        info = {
+            'sld': {
+                'url': url
+            },
+        }
+    else:
+        info = {}
+    print(f"Get layer info={info}")
+    return info
 
 
 def get_layer_names(username):
