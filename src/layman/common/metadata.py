@@ -70,7 +70,7 @@ PROPERTIES = {
         'upper_mp': '*',
         'lower_mp': '1',
         'equals_fn': lambda a, b: set(a) == set(b),
-        'empty_fn': lambda a: type(a) is list and len(a) == 0,
+        'empty_fn': lambda a: isinstance(a, list) and len(a) == 0,
     },
     'extent': {
         'upper_mp': '1',

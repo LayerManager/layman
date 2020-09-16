@@ -14,7 +14,7 @@ FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 def create_connection_cursor():
     try:
         connection = psycopg2.connect(**settings.PG_CONN)
-    except:
+    except BaseException:
         raise LaymanError(6)
     cursor = connection.cursor()
     return (connection, cursor)
@@ -38,7 +38,7 @@ def get_usernames(conn_cur=None):
     from information_schema.schemata
     where schema_name NOT IN ('{"', '".join(settings.PG_NON_USER_SCHEMAS)}\
 ') AND schema_owner = '{settings.LAYMAN_PG_USER}'""")
-    except:
+    except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
     return [
@@ -60,7 +60,7 @@ def ensure_user_schema(username, conn_cur=None):
         cur.execute(
             f"""CREATE SCHEMA IF NOT EXISTS "{username}" AUTHORIZATION {settings.LAYMAN_PG_USER}""")
         conn.commit()
-    except:
+    except BaseException:
         raise LaymanError(7)
 
 
@@ -73,7 +73,7 @@ def delete_user_schema(username, conn_cur=None):
         cur.execute(
             f"""DROP SCHEMA IF EXISTS "{username}" RESTRICT""")
         conn.commit()
-    except:
+    except BaseException:
         raise LaymanError(7)
 
 
@@ -143,7 +143,7 @@ def check_new_layername(username, layername, conn_cur=None):
     FROM   pg_class c
     JOIN   pg_namespace n ON n.oid = c.relnamespace
     WHERE  n.nspname IN ('{username}', '{settings.PG_POSTGIS_SCHEMA}') AND c.relname='{layername}'""")
-    except:
+    except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
     if len(rows) > 0:
@@ -161,7 +161,7 @@ WHERE table_schema = '{username}'
 AND table_name = '{layername}'
 AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 """)
-    except:
+    except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
     return [r[0] for r in rows]
@@ -177,7 +177,7 @@ FROM information_schema.columns
 WHERE table_schema = '{username}'
 AND table_name = '{layername}'
 """)
-    except:
+    except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
     return [r[0] for r in rows]
@@ -191,7 +191,7 @@ def get_number_of_features(username, layername, conn_cur=None):
 select count(*)
 from {username}.{layername}
 """)
-    except:
+    except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
     return rows[0][0]
@@ -213,7 +213,7 @@ from {username}.{layername}
 order by ogc_fid
 limit {limit}
 """)
-    except:
+    except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
     col_texts = defaultdict(list)
@@ -335,7 +335,7 @@ limit 1
 
     try:
         cur.execute(query)
-    except:
+    except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
     # for row in rows:
@@ -469,7 +469,7 @@ limit 1
 
     try:
         cur.execute(query)
-    except:
+    except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
     # for row in rows:
@@ -487,7 +487,7 @@ def create_string_attributes(attribute_tuples, conn_cur=None):
     query = "\n".join([f"""ALTER TABLE {username}.{layername} ADD COLUMN {attrname} VARCHAR(1024);""" for username, layername, attrname in attribute_tuples]) + "\n COMMIT;"
     try:
         cur.execute(query)
-    except:
+    except BaseException:
         raise LaymanError(7)
 
 
@@ -505,7 +505,7 @@ where c.column_name is null"""
     try:
         if attribute_tuples:
             cur.execute(query)
-    except:
+    except BaseException:
         raise LaymanError(7)
 
     missing_attributes = set()

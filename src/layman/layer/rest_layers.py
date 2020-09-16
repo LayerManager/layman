@@ -25,8 +25,7 @@ def before_request():
 def get(username):
     app.logger.info(f"GET Layers, user={g.user}")
 
-    layernames = util.get_layer_names(username)
-    layernames.sort()
+    layernames = sorted(util.get_layer_names(username))
 
     infos = [
         {

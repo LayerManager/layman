@@ -162,7 +162,7 @@ def test_fill_xml_template(client):
     expected_path = 'src/layman/map/micka/record-template-filled.xml'
     with open(expected_path) as f:
         expected_lines = f.readlines()
-    lines = [l.decode('utf-8') for l in xml_file_object.readlines()]
+    lines = [line.decode('utf-8') for line in xml_file_object.readlines()]
     # print(f"FILE:\n{''.join(lines)}")
     diff_lines = list(difflib.unified_diff(expected_lines, lines))
     assert len(diff_lines) == 0, f"DIFF LINES:\n{''.join(diff_lines)}"

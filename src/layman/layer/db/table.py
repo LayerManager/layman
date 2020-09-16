@@ -21,7 +21,7 @@ WHERE schemaname = '{username}'
     AND tablename = '{layername}'
     AND tableowner = '{settings.LAYMAN_PG_USER}'
 """)
-    except:
+    except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
     if len(rows) > 0:
@@ -43,7 +43,7 @@ def get_layer_names(username, conn_cur=None):
     WHERE schemaname = '{username}'
         AND tableowner = '{settings.LAYMAN_PG_USER}'
     """)
-    except:
+    except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
     layer_names = list(map(lambda row: row[0], rows))
@@ -60,7 +60,7 @@ def delete_layer(username, layername, conn_cur=None):
     try:
         cur.execute(query)
         conn.commit()
-    except:
+    except BaseException:
         raise LaymanError(7)
 
 

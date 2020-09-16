@@ -191,21 +191,20 @@ def get_metadata_comparison(username, layername):
     wfs_layer = wfs.contents.get(wfs_layername, None)
     try:
         title = wfs_layer.title
-    except:
+    except BaseException:
         title = None
     try:
         abstract = wfs_layer.abstract
-    except:
+    except BaseException:
         abstract = None
     try:
         extent = wfs_layer.boundingBox[:-1]
-    except:
+    except BaseException:
         extent = None
     try:
         crs_list = [int(crs.getcode().split(':')[-1]) for crs in wfs_layer.crsOptions]
         crs_list.append(4326)
-        crs_list = list(set(crs_list))
-        crs_list.sort()
+        crs_list = sorted(list(set(crs_list)))
         reference_system = crs_list
     except Exception as e:
         current_app.logger.error(e)

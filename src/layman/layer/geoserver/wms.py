@@ -158,22 +158,21 @@ def get_metadata_comparison(username, layername):
     wms_layer = wms.contents.get(layername, None)
     try:
         title = wms_layer.title
-    except:
+    except BaseException:
         title = None
     try:
         abstract = wms_layer.abstract
-    except:
+    except BaseException:
         abstract = None
     try:
         extent = wms_layer.boundingBoxWGS84
-    except:
+    except BaseException:
         extent = None
     try:
-        crs_list = [
+        crs_list = sorted([
             int(crs.split(':')[-1]) for crs in wms_layer.crsOptions
             if crs.split(':')[0] == 'EPSG'
-        ]
-        crs_list.sort()
+        ])
         reference_system = crs_list
     except Exception as e:
         current_app.logger.error(e)

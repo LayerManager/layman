@@ -478,10 +478,10 @@ def test_post_layers_shp(client):
     expected_path = 'src/layman/layer/rest_test_filled_template.xml'
     with open(expected_path) as f:
         expected_lines = f.readlines()
-    diff_lines = list(difflib.unified_diff([l.decode('utf-8') for l in xml_file_object.readlines()], expected_lines))
-    plus_lines = [l for l in diff_lines if l.startswith('+ ')]
+    diff_lines = list(difflib.unified_diff([line.decode('utf-8') for line in xml_file_object.readlines()], expected_lines))
+    plus_lines = [line for line in diff_lines if line.startswith('+ ')]
     assert len(plus_lines) == 3, ''.join(diff_lines)
-    minus_lines = [l for l in diff_lines if l.startswith('- ')]
+    minus_lines = [line for line in diff_lines if line.startswith('- ')]
     assert len(minus_lines) == 3, ''.join(diff_lines)
     plus_line = plus_lines[0]
     assert plus_line == '+    <gco:CharacterString>m-81c0debe-b2ea-4829-9b16-581083b29907</gco:CharacterString>\n', ''.join(
@@ -718,7 +718,7 @@ def test_get_layers_testuser1_v2(client):
     assert rv.status_code == 200
     resp_json = rv.get_json()
     # assert len(resp_json) == 3
-    layernames = [l['name'] for l in resp_json]
+    layernames = [layer['name'] for layer in resp_json]
     for ln in [
         'countries_concurrent',
         'ne_110m_admin_0_countries',

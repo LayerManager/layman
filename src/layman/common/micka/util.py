@@ -60,7 +60,7 @@ def fill_xml_template(template_path, prop_values, publ_properties):
 
 
 def fill_xml_template_obj(tree_or_el, prop_values, publ_properties, basic_template_path=None):
-    is_el = type(tree_or_el) == ET._Element
+    is_el = isinstance(tree_or_el, ET._Element)
     tmp_tree = None
     for prop_name, prop_value in prop_values.items():
         # current_app.logger.info(f'prop_name={prop_name}')
@@ -346,7 +346,7 @@ def csw_delete(muuid):
 def parse_md_properties(file_obj, property_names, publ_properties):
     # print('xml_str', xml_str)
     root_el = ET.parse(file_obj) if type(file_obj) not in [ET._Element, ET._ElementTree] else file_obj
-    root_is_el = type(root_el) == ET._Element
+    root_is_el = isinstance(root_el, ET._Element)
     # print(f"root_el={root_el}")
     result = {}
     for prop_name in property_names:
