@@ -98,3 +98,10 @@ def stop_process(process):
     for proc in process:
         proc.kill()
         SUBPROCESSES.remove(proc)
+
+
+@pytest.fixture(scope="module")
+def layman_fixture():
+    layman_process = start_layman()
+    yield layman_process
+    stop_process(layman_process)
