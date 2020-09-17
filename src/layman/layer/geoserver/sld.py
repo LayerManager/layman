@@ -54,11 +54,11 @@ def delete_layer(username, layername):
 
 
 def get_layer_info(username, layername):
-    url = settings.LAYMAN_GS_REST + f'workspaces/{username}/styles/{layername}.xml'
-    print(f"Get layer url={url}")
-    r = requests.get(url)
-    print(f"Get layer r={r.status_code}, {r.text}")
+    test_url = settings.LAYMAN_GS_REST + f'workspaces/{username}/styles/{layername}.xml'
+
+    r = requests.get(test_url, auth=settings.LAYMAN_GS_AUTH)
     if r.status_code == 200:
+        url = 'http://' + settings.LAYMAN_SERVER_NAME + f'/rest/{username}/styles/{layername}.xml'
         info = {
             'sld': {
                 'url': url
@@ -66,7 +66,7 @@ def get_layer_info(username, layername):
         }
     else:
         info = {}
-    print(f"Get layer info={info}")
+
     return info
 
 
@@ -174,4 +174,8 @@ def create_layer_style(username, layername):
 
 
 def get_metadata_comparison(username, layername):
+    pass
+
+
+def get_style(username, layername):
     pass
