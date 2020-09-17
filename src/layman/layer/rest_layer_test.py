@@ -32,6 +32,6 @@ def test_sld_value(layman_fixture):
     assert r_get.status_code == 200, r_get.json()
 
     r_del = requests.delete(sld_url)
-    assert r_del.status_code == 405, r_del.json()
+    assert r_del.status_code != 200, r_del.json()
 
     client_util.delete_layer(username, layername)
