@@ -196,4 +196,6 @@ def test_wfs_proxy(liferay_mock):
                       headers=headers4)
     assert r.status_code == 400, r.text
 
+    client_util.delete_layer(username, layername1, headers)
+
     process.stop_process(layman_process)

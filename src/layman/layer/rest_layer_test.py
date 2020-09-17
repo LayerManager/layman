@@ -21,7 +21,6 @@ def test_sld_value(layman_fixture):
         layer_url = url_for('rest_layer.get', username=username, layername=layername)
     r = requests.get(layer_url)
     assert r.status_code == 200, r.json()
-    print(f"Text:{r.text}")
     resp_json = r.json()
 
     assert "sld" in resp_json, r.json()
@@ -29,8 +28,10 @@ def test_sld_value(layman_fixture):
 
     sld_url = resp_json["sld"]["url"]
 
-    r = requests.get(sld_url)
-    assert r.status_code == 200, r.json()
+    r_get = requests.get(sld_url)
+    assert r_get.status_code == 200, r_get.json()
 
-    r = requests.delete(sld_url)
-    assert r.status_code != 200, r.json()
+    r_del = requests.delete(sld_url)
+    assert r_del.status_code == 405, r_del.json()
+
+    client_util.delete_layer(username, layername)
