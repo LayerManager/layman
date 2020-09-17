@@ -37,4 +37,3 @@ def get(username, style_name):
                               headers)
 
     return final_response
-
