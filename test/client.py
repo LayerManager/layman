@@ -6,6 +6,8 @@ from multiprocessing import Process
 
 from layman import settings
 from layman import app
+from layman.layer.rest_test import wait_till_ready
+from layman.util import url_for
 
 
 ISS_URL_HEADER = 'AuthorizationIssUrl'
@@ -48,6 +50,32 @@ def publish_layer(username, layername, file_paths, headers=None):
 
     wait_for_rest(f"{rest_url}/{username}/layers/{layername}", 20, 0.5, layer_keys_to_check)
     return layername
+
+
+def setup_layer_flask(username, layername, client):
+    with app.app_context():
+        rest_path = url_for('rest_layers.post', username=username)
+
+        file_paths = [
+            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
+        ]
+
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': layername
+            })
+            assert rv.status_code == 200
+        finally:
+            for fp in files:
+                fp[0].close()
+
+    wait_till_ready(username, layername)
 
 
 def patch_layer(username, layername, file_paths, headers=None):
@@ -100,7 +128,7 @@ def reserve_username(username, headers=None):
     assert claimed_username == username
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def client():
     client = app.test_client()
 

@@ -1,22 +1,20 @@
-from multiprocessing import Process
 import requests
-import time
-from flask import url_for
-import pytest
 from urllib.parse import urljoin
+from multiprocessing import Process
+import pytest
+import time
 
 import sys
-import os
 
 del sys.modules['layman']
 
 from layman import app
 from layman import settings
-from layman.layer.rest_test import wait_till_ready
 from layman.layer import db
 from test import process, client as client_util
 from test.data import wfs as data_wfs
 from layman.layer.geoserver.util import wfs_proxy
+from layman.util import url_for
 
 liferay_mock = process.liferay_mock
 
@@ -29,37 +27,14 @@ AUTHN_INTROSPECTION_URL = process.AUTHN_INTROSPECTION_URL
 AUTHN_SETTINGS = process.AUTHN_SETTINGS
 
 
-@pytest.fixture()
-def client():
-    # print('before app.test_client()')
-    client = app.test_client()
-
-    # print('before Process(target=app.run, kwargs={...')
-    server = Process(target=app.run, kwargs={
-        'host': '0.0.0.0',
-        'port': settings.LAYMAN_SERVER_NAME.split(':')[1],
-        'debug': False,
-    })
-    # print('before server.start()')
-    server.start()
-    time.sleep(1)
-
-    app.config['TESTING'] = True
-    app.config['DEBUG'] = True
-    app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
-    app.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
-
-    yield client
-
-    server.terminate()
-    server.join()
+client = client_util.client
 
 
 def test_rest_get(client):
     username = 'wfs_proxy_test'
     layername = 'layer_wfs_proxy_test'
 
-    setup_layer_flask(username, layername, client)
+    client_util.setup_layer_flask(username, layername, client)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
     headers = {
@@ -113,7 +88,12 @@ def test_wfs_proxy(liferay_mock):
 
     authn_headers1 = get_auth_header(username)
 
-    setup_user_layer(username, layername1, authn_headers1)
+    client_util.reserve_username(username, headers=authn_headers1)
+    ln = client_util.publish_layer(username, layername1, [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
+    ], headers=authn_headers1)
+
+    assert ln == layername1
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
     headers = {
@@ -187,39 +167,13 @@ def test_wfs_proxy(liferay_mock):
     process.stop_process(layman_process)
 
 
-def setup_layer_flask(username, layername, client):
-    with app.app_context():
-        rest_path = url_for('rest_layers.post', username=username)
-
-        file_paths = [
-            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
-        ]
-
-        for fp in file_paths:
-            assert os.path.isfile(fp)
-        files = []
-
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
-                'file': files,
-                'name': layername
-            })
-            assert rv.status_code == 200
-        finally:
-            for fp in files:
-                fp[0].close()
-
-    wait_till_ready(username, layername)
-
-
 def test_missing_attribute(client):
     username = 'testmissingattr'
     layername = 'inexisting_attribute_layer'
     layername2 = 'inexisting_attribute_layer2'
 
-    setup_layer_flask(username, layername, client)
-    setup_layer_flask(username, layername2, client)
+    client_util.setup_layer_flask(username, layername, client)
+    client_util.setup_layer_flask(username, layername2, client)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
     headers = {

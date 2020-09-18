@@ -15,10 +15,7 @@ def test_sld_value(client):
     username = 'test_layer_sld_user'
     layername = 'test_layer_sld_layer'
 
-    file_paths = [
-        'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
-    ]
-    client_util.publish_layer(username, layername, file_paths)
+    client_util.setup_layer_flask(username, layername, client)
 
     with app.app_context():
         layer_url = url_for('rest_layer.get', username=username, layername=layername)
