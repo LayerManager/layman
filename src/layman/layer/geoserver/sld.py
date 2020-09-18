@@ -54,9 +54,7 @@ def delete_layer(username, layername):
 
 
 def get_layer_info(username, layername):
-    test_url = settings.LAYMAN_GS_REST + f'workspaces/{username}/styles/{layername}.xml'
-
-    r = requests.get(test_url, auth=settings.LAYMAN_GS_AUTH)
+    r = get_default_style(username, layername)
     if r.status_code == 200:
         url = 'http://' + settings.LAYMAN_SERVER_NAME + f'/rest/{username}/styles/{layername}.xml'
         info = {
@@ -177,5 +175,14 @@ def get_metadata_comparison(username, layername):
     pass
 
 
-def get_style(username, layername):
-    pass
+def get_style(username, stylename):
+    test_url = settings.LAYMAN_GS_REST + f'workspaces/{username}/styles/{stylename}'
+
+    r = requests.get(test_url,
+                     auth=settings.LAYMAN_GS_AUTH,
+                     headers=headers_json)
+    return r
+
+
+def get_default_style(username, layername):
+    return get_style(username, layername + ".xml")

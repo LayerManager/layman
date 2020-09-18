@@ -36,8 +36,7 @@ def publish_layer(username, layername, file_paths, headers=None):
     try:
         r = requests.post(r_url,
                           files=[('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths],
-                          data={'name': layername,
-                                },
+                          data={'name': layername,},
                           headers=headers)
         assert r.status_code == 200, r.text
     finally:

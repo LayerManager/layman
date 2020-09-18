@@ -146,6 +146,7 @@ JSON object with following structure:
   - *error*: If status is FAILURE, this may contain error object.
 - *sld*
   - **status**: Status information about publishing SLD. See [GET Layer](#get-layer) **wms** property for meaning.
+  - *url*: String. URL of layer default style. In the end, it points to [GET /rest/workspaces/{workspace}/styles/{style}](https://docs.geoserver.org/stable/en/api/#1.0.0/styles.yaml), through Lyaman's proxy, which take care about authorization.
   - *error*: If status is FAILURE, this may contain error object.
 - *metadata*
   - *identifier*: String. Identifier of metadata record in CSW instance.

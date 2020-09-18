@@ -7,6 +7,7 @@
 ### Changes
 - [#65](https://github.com/jirik/layman/issues/65) [WFS endpoint](doc/rest.md#get-layer) accepts same [authentication](doc/security.md#authentication) credentials (e.g. [OAuth2 headers](doc/oauth2/index.md#request-layman-rest-api)) as Layman REST API endpoints. It's implemented using Layman's WFS proxy. This proxy authenticates the user and send user identification to GeoServer. In combination with changes in v1.6.0, Layman's [`read-everyone-write-owner` authorization](doc/security.md#authorization) (when active) is propagated to GeoServer and user can change only hers layers.
 - [#65](https://github.com/jirik/layman/issues/65) Layman automatically setup [HTTP authentication attribute](https://docs.geoserver.org/stable/en/user/security/tutorials/httpheaderproxy/index.html) and chain filter at startup. Secret value of this attribute can be changed in [LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE](doc/env-settings.md#LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE) and is used by Layman's WFS proxy.
+- [#96](https://github.com/jirik/layman/issues/96) New attribute sld.url is added to [GET Layer endpoint](doc/rest.md#GET Layer). URL of layer default style. In the end, it points to [GET /rest/workspaces/{workspace}/styles/{style}](https://docs.geoserver.org/stable/en/api/#1.0.0/styles.yaml), through Lyaman's proxy, which take care about authorization.
 
 ## v1.6.1
 2020-08-19
