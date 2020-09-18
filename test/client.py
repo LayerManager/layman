@@ -1,8 +1,11 @@
-import time
 import requests
 import os
+import pytest
+import time
+from multiprocessing import Process
 
 from layman import settings
+from layman import app
 
 
 ISS_URL_HEADER = 'AuthorizationIssUrl'
@@ -95,3 +98,26 @@ def reserve_username(username, headers=None):
     assert r.status_code == 200, r.text
     claimed_username = r.json()['username']
     assert claimed_username == username
+
+
+@pytest.fixture(scope="module")
+def client():
+    client = app.test_client()
+
+    server = Process(target=app.run, kwargs={
+        'host': '0.0.0.0',
+        'port': settings.LAYMAN_SERVER_NAME.split(':')[1],
+        'debug': False,
+    })
+    server.start()
+    time.sleep(1)
+
+    app.config['TESTING'] = True
+    app.config['DEBUG'] = True
+    app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
+    app.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
+
+    yield client
+
+    server.terminate()
+    server.join()
