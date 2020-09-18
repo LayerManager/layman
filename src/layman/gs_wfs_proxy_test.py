@@ -390,6 +390,4 @@ def test_missing_attribute_authz(liferay_mock):
 
     client_util.delete_layer(username, layername1, headers1)
 
-    client_util.delete_layer(username, layername1, headers)
-
     process.stop_process(layman_process)
