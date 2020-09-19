@@ -53,9 +53,9 @@ def get_layer_info(username, layername):
         return {}
 
 
-def get_layer_names(username):
+def get_layer_infos(username):
     # TODO consider reading layer names from all Micka's metadata records by linkage URL
-    return []
+    return {}
 
 
 def update_layer(username, layername, layerinfo):
