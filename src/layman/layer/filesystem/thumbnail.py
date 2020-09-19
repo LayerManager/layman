@@ -51,7 +51,7 @@ def delete_layer(username, layername):
     util.delete_layer_subdir(username, layername, LAYER_SUBDIR)
 
 
-get_layer_names = input_file.get_layer_names
+get_layer_infos = input_file.get_layer_infos
 
 
 def get_layer_thumbnail_path(username, layername):

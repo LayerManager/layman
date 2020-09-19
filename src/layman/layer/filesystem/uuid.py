@@ -10,7 +10,7 @@ LAYER_TYPE = '.'.join(__name__.split('.')[:-2])
 
 get_publication_names = input_file.get_publication_names
 
-get_layer_names = input_file.get_layer_names
+get_layer_infos = input_file.get_layer_infos
 
 get_layer_info = partial(common_uuid.get_publication_info, LAYER_TYPE)
 

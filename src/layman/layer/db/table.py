@@ -32,7 +32,7 @@ WHERE schemaname = '{username}'
         return {}
 
 
-def get_layer_names(username, conn_cur=None):
+def get_layer_infos(username, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
@@ -46,8 +46,10 @@ def get_layer_names(username, conn_cur=None):
     except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
-    layer_names = list(map(lambda row: row[0], rows))
-    return layer_names
+    layer_infos = {}
+    for row in rows:
+        layer_infos[row[0]] = {"name": row[0]}
+    return layer_infos
 
 
 def delete_layer(username, layername, conn_cur=None):
@@ -68,7 +70,11 @@ def get_publication_names(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
-    return get_layer_names(username)
+    infos = get_layer_infos(username)
+    layer_names = set()
+    for info in infos:
+        layer_names.add(info)
+    return list(layer_names)
 
 
 def get_publication_uuid(username, publication_type, publication_name):

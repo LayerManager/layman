@@ -113,7 +113,7 @@ def get_wfs_proxy(username):
         return wfs_proxy
 
     def currently_changing():
-        layernames = input_file.get_layer_names(username)
+        layernames = input_file.get_layer_infos(username)
         result = any((
             not is_layer_task_ready(username, layername)
             for layername in layernames
@@ -152,15 +152,16 @@ def get_layer_info(username, layername):
     }
 
 
-def get_layer_names(username):
+def get_layer_infos(username):
     wfs = get_wfs_proxy(username)
     if wfs is None:
         result = []
     else:
-        result = [
-            wfs_layername.split(':')[1]
+        result = {
+            wfs_layername.split(':')[1]: {"name": wfs_layername.split(':')[1],
+                                          "title": wfs.contents[wfs_layername].title}
             for wfs_layername in [*wfs.contents]
-        ]
+        }
     return result
 
 
@@ -168,7 +169,11 @@ def get_publication_names(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
-    return get_layer_names(username)
+    infos = get_layer_infos(username)
+    layer_names = set()
+    for info in infos:
+        layer_names.add(info)
+    return list(layer_names)
 
 
 def get_publication_uuid(username, publication_type, publication_name):

@@ -26,7 +26,7 @@ def ensure_layer_input_sld_dir(username, layername):
 
 get_layer_info = input_file.get_layer_info
 
-get_layer_names = input_file.get_layer_names
+get_layer_infos = input_file.get_layer_infos
 
 update_layer = input_file.update_layer
 

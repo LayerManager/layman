@@ -1,8 +1,13 @@
-import time
 import requests
 import os
+import pytest
+import time
+from multiprocessing import Process
 
 from layman import settings
+from layman import app
+from layman.layer.rest_test import wait_till_ready
+from layman.util import url_for
 
 
 ISS_URL_HEADER = 'AuthorizationIssUrl'
@@ -97,3 +102,52 @@ def reserve_username(username, headers=None):
     assert r.status_code == 200, r.text
     claimed_username = r.json()['username']
     assert claimed_username == username
+
+
+def setup_layer_flask(username, layername, client):
+    with app.app_context():
+        rest_path = url_for('rest_layers.post', username=username)
+
+        file_paths = [
+            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
+        ]
+
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': layername
+            })
+            assert rv.status_code == 200
+        finally:
+            for fp in files:
+                fp[0].close()
+
+    wait_till_ready(username, layername)
+
+
+@pytest.fixture()
+def client():
+    client = app.test_client()
+
+    server = Process(target=app.run, kwargs={
+        'host': '0.0.0.0',
+        'port': settings.LAYMAN_SERVER_NAME.split(':')[1],
+        'debug': False,
+    })
+    server.start()
+    time.sleep(1)
+
+    app.config['TESTING'] = True
+    app.config['DEBUG'] = True
+    app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
+    app.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
+
+    yield client
+
+    server.terminate()
+    server.join()

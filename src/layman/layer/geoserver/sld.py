@@ -57,8 +57,8 @@ def get_layer_info(username, layername):
     return {}
 
 
-def get_layer_names(username):
-    return []
+def get_layer_infos(username):
+    return {}
 
 
 def get_publication_names(username, publication_type):

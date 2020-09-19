@@ -85,7 +85,7 @@ def get_wms_proxy(username):
         return wms_proxy
 
     def currently_changing():
-        layernames = input_file.get_layer_names(username)
+        layernames = input_file.get_layer_infos(username)
         result = any((
             not is_layer_task_ready(username, layername)
             for layername in layernames
@@ -122,13 +122,15 @@ def get_layer_info(username, layername):
     }
 
 
-def get_layer_names(username):
+def get_layer_infos(username):
     wms = get_wms_proxy(username)
     if wms is None:
         result = []
     else:
-        result = [*wms.contents]
-
+        result = {}
+        for layer in [*wms.contents]:
+            result[layer] = {"name": layer,
+                             "title": wms.contents[layer].title}
     return result
 
 
@@ -136,7 +138,11 @@ def get_publication_names(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown publication type {publication_type}')
 
-    return get_layer_names(username)
+    infos = get_layer_infos(username)
+    layer_names = set()
+    for info in infos:
+        layer_names.add(info)
+    return list(layer_names)
 
 
 def get_publication_uuid(username, publication_type, publication_name):

@@ -70,14 +70,13 @@ def get_providers():
     return current_app.config[key]
 
 
-def get_layer_names(username):
+def get_layer_infos(username):
     sources = get_sources()
-    results = call_modules_fn(sources, 'get_layer_names', [username])
-    layernames = []
+    results = call_modules_fn(sources, 'get_layer_infos', [username])
+    layer_infos = {}
     for r in results:
-        layernames += r
-    layernames = list(set(layernames))
-    return layernames
+        layer_infos.update(r)
+    return layer_infos
 
 
 def check_new_layername(username, layername):

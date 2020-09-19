@@ -55,14 +55,14 @@ def get_layer_info(username, layername):
         return {}
 
 
-def get_layer_names(username):
+def get_layer_infos(username):
     layersdir = util.get_layers_dir(username)
     if not os.path.exists(layersdir):
-        return []
-    layer_names = [
-        subfile for subfile in os.listdir(layersdir)
+        return dict()
+    layer_names = {
+        subfile: {"name": subfile} for subfile in os.listdir(layersdir)
         if os.path.isdir(os.path.join(layersdir, subfile))
-    ]
+    }
 
     return layer_names
 
@@ -71,7 +71,11 @@ def get_publication_names(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
-    return get_layer_names(username)
+    infos = get_layer_infos(username)
+    layer_names = set()
+    for info in infos:
+        layer_names.add(info)
+    return list(layer_names)
 
 
 from . import uuid
