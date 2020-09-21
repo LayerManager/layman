@@ -6,6 +6,7 @@
 |Layers|`/rest/<username>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | x |
 |[Layer](models.md#layer)|`/rest/<username>/layers/<layername>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
 |Layer Thumbnail|`/rest/<username>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
+|Layer Style|`/rest/<username>/layers/<layername>/style`|[GET](#get-layer-style)| x | x | x |
 |Layer Chunk|`/rest/<username>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
 |Layer Metadata Comparison|`/rest/<username>/layers/<layername>/metadata-comparison`|[GET](#get-layer-metadata-comparison) | x | x | x |
 |Maps|`/rest/<username>/maps`|[GET](#get-maps)| [POST](#post-maps) | x | x |
@@ -216,6 +217,18 @@ No action parameters.
 Content-Type: `image/png`
 
 PNG image.
+
+
+## Layer Style
+### URL
+`/rest/<username>/layers/<layername>/style`
+### GET Layer Style
+Get default style of the layer in XML format. Request is redirected to GeoServer [/rest/workspaces/{workspace}/styles/{style}](https://docs.geoserver.org/latest/en/api/#1.0.0/styles.yaml). Anybody can call GET, nobody can call any other method. 
+
+#### Request
+No action parameters.
+#### Response
+Content-Type: `Application/xml`
 
 
 ## Layer Chunk

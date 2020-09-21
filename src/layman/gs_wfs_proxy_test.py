@@ -1,20 +1,17 @@
 import requests
 from urllib.parse import urljoin
-from multiprocessing import Process
-import pytest
-import time
 
 import sys
+
 
 del sys.modules['layman']
 
 from layman import app
 from layman import settings
 from layman.layer import db
-from test import process, client as client_util
+from test import process, process_client as client_util, flask_client
 from test.data import wfs as data_wfs
 from layman.layer.geoserver.util import wfs_proxy
-from layman.util import url_for
 
 liferay_mock = process.liferay_mock
 
@@ -27,14 +24,14 @@ AUTHN_INTROSPECTION_URL = process.AUTHN_INTROSPECTION_URL
 AUTHN_SETTINGS = process.AUTHN_SETTINGS
 
 
-client = client_util.client
+client = flask_client.client
 
 
 def test_rest_get(client):
     username = 'wfs_proxy_test'
     layername = 'layer_wfs_proxy_test'
 
-    client_util.setup_layer_flask(username, layername, client)
+    flask_client.publish_layer(username, layername, client)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
     headers = {
@@ -57,9 +54,7 @@ def test_rest_get(client):
     assert r.status_code == 200
 
     with app.app_context():
-        rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
-        client.delete(rest_path)
-        assert r.status_code == 200
+        flask_client.delete_layer(username, layername, client)
 
 
 def get_auth_header(username):
@@ -172,8 +167,8 @@ def test_missing_attribute(client):
     layername = 'inexisting_attribute_layer'
     layername2 = 'inexisting_attribute_layer2'
 
-    client_util.setup_layer_flask(username, layername, client)
-    client_util.setup_layer_flask(username, layername2, client)
+    flask_client.publish_layer(username, layername, client)
+    flask_client.publish_layer(username, layername2, client)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
     headers = {
@@ -273,8 +268,8 @@ def test_missing_attribute(client):
     data_xml = data_wfs.get_wfs11_insert_polygon_new_attr(username, layername, attr_names10)
     wfs_post(username, [(layername, attr_names10)], data_xml)
 
-    client_util.delete_layer(username, layername)
-    client_util.delete_layer(username, layername2)
+    flask_client.delete_layer(username, layername, client)
+    flask_client.delete_layer(username, layername2, client)
 
 
 def test_missing_attribute_authz(liferay_mock):

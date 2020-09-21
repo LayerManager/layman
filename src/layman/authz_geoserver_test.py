@@ -6,7 +6,7 @@ import requests
 from layman import settings
 from layman.common import geoserver
 
-from test import process, client as client_util
+from test import process, process_client as client_util
 
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
