@@ -155,7 +155,7 @@ def get_layer_info(username, layername):
 def get_layer_infos(username):
     wfs = get_wfs_proxy(username)
     if wfs is None:
-        result = []
+        result = {}
     else:
         result = {
             wfs_layername.split(':')[1]: {"name": wfs_layername.split(':')[1],
@@ -170,10 +170,8 @@ def get_publication_names(username, publication_type):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
     infos = get_layer_infos(username)
-    layer_names = set()
-    for info in infos:
-        layer_names.add(info)
-    return list(layer_names)
+    layer_names = list(set(sorted([info for info in infos])))
+    return layer_names
 
 
 def get_publication_uuid(username, publication_type, publication_name):
