@@ -124,13 +124,12 @@ def get_layer_info(username, layername):
 
 def get_layer_infos(username):
     wms = get_wms_proxy(username)
-    if wms is None:
-        result = []
-    else:
-        result = {}
-        for layer in [*wms.contents]:
-            result[layer] = {"name": layer,
-                             "title": wms.contents[layer].title}
+    result = {}
+    if wms is not None:
+        for layername in list(wms.contents):
+            result[layername] = {"name": layername,
+                                 "title": wms.contents[layername].title}
+
     return result
 
 
@@ -139,10 +138,8 @@ def get_publication_names(username, publication_type):
         raise Exception(f'Unknown publication type {publication_type}')
 
     infos = get_layer_infos(username)
-    layer_names = set()
-    for info in infos:
-        layer_names.add(info)
-    return list(layer_names)
+    layer_names = list(set(sorted([info for info in infos])))
+    return layer_names
 
 
 def get_publication_uuid(username, publication_type, publication_name):

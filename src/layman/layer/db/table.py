@@ -71,10 +71,8 @@ def get_publication_names(username, publication_type):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
     infos = get_layer_infos(username)
-    layer_names = set()
-    for info in infos:
-        layer_names.add(info)
-    return list(layer_names)
+    layer_names = list(set(sorted([info for info in infos])))
+    return layer_names
 
 
 def get_publication_uuid(username, publication_type, publication_name):

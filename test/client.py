@@ -4,10 +4,12 @@ import pytest
 import time
 from multiprocessing import Process
 
+from layman.map import util
 from layman import settings
 from layman import app
 from layman.layer.rest_test import wait_till_ready
 from layman.util import url_for
+from layman import celery as celery_util
 
 
 ISS_URL_HEADER = 'AuthorizationIssUrl'
@@ -104,7 +106,9 @@ def reserve_username(username, headers=None):
     assert claimed_username == username
 
 
-def setup_layer_flask(username, layername, client):
+def setup_layer_flask(username, layername, client, layertitle=None):
+    if layertitle is None:
+        layertitle = layername
     with app.app_context():
         rest_path = url_for('rest_layers.post', username=username)
 
@@ -120,7 +124,8 @@ def setup_layer_flask(username, layername, client):
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
             rv = client.post(rest_path, data={
                 'file': files,
-                'name': layername
+                'name': layername,
+                'title': layertitle
             })
             assert rv.status_code == 200
         finally:
@@ -128,6 +133,42 @@ def setup_layer_flask(username, layername, client):
                 fp[0].close()
 
     wait_till_ready(username, layername)
+
+
+def wait_till_map_ready(username, mapname):
+    last_task = util._get_map_task(username, mapname)
+    while last_task is not None and not celery_util.is_task_ready(last_task):
+        time.sleep(0.1)
+        last_task = util._get_map_task(username, mapname)
+
+
+def setup_map_flask(username, mapname, client, maptitle=None):
+    if maptitle is None:
+        maptitle = mapname
+    with app.app_context():
+        rest_path = url_for('rest_maps.post', username=username)
+
+        file_paths = [
+            'sample/layman.map/full.json',
+        ]
+
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': mapname,
+                'title': maptitle
+            })
+            assert rv.status_code == 200
+        finally:
+            for fp in files:
+                fp[0].close()
+
+    wait_till_map_ready(username, mapname)
 
 
 @pytest.fixture()
