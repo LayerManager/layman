@@ -13,12 +13,12 @@ client = flask_client.client
 def test_sld_value(client):
     username = 'test_layer_sld_user'
     layername = 'test_layer_sld_layer'
-    style_url = f'http://{settings.LAYMAN_SERVER_NAME}/rest/{username}/layers/{layername}/style'
 
     flask_client.publish_layer(username, layername, client)
 
     with app.app_context():
         layer_url = url_for('rest_layer.get', username=username, layername=layername)
+        style_url = url_for('rest_layer_style.get', username=username, layername=layername)
         r = client.get(layer_url)
     assert r.status_code == 200, r.get_json()
     resp_json = r.get_json()

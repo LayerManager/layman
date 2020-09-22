@@ -13,6 +13,7 @@ from layman.http import LaymanError
 from layman import settings, patch_mode
 from . import headers_json, headers_xml
 from . import wms
+from ...util import url_for
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
@@ -56,7 +57,7 @@ def delete_layer(username, layername):
 def get_layer_info(username, layername):
     r = get_style_response(username, layername, headers_xml, settings.LAYMAN_GS_AUTH)
     if r.status_code == 200:
-        url = f'http://{settings.LAYMAN_SERVER_NAME}/rest/{username}/layers/{layername}/style'
+        url = url_for('rest_layer_style.get', username=username, layername=layername)
         info = {
             'sld': {
                 'url': url
