@@ -56,7 +56,7 @@ def delete_layer(username, layername):
 def get_layer_info(username, layername):
     r = get_style_response(username, layername, headers_xml, settings.LAYMAN_GS_AUTH)
     if r.status_code == 200:
-        url = 'http://' + settings.LAYMAN_SERVER_NAME + f'/rest/{username}/layers/{layername}/style'
+        url = f'http://{settings.LAYMAN_SERVER_NAME}/rest/{username}/layers/{layername}/style'
         info = {
             'sld': {
                 'url': url
@@ -176,11 +176,11 @@ def get_metadata_comparison(username, layername):
 
 
 def get_style_response(username, stylename, headers=None, auth=None):
-    test_url = settings.LAYMAN_GS_REST + f'workspaces/{username}/styles/{stylename}'
-
     if headers is None:
         headers = headers_xml
-    r = requests.get(test_url,
+    url = settings.LAYMAN_GS_REST + f'workspaces/{username}/styles/{stylename}'
+
+    r = requests.get(url,
                      auth=auth,
                      headers=headers)
     return r

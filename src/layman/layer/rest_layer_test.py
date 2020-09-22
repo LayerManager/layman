@@ -2,7 +2,7 @@ import sys
 
 del sys.modules['layman']
 
-from layman import app
+from layman import app, settings
 from test import flask_client
 from layman.util import url_for
 
@@ -13,6 +13,7 @@ client = flask_client.client
 def test_sld_value(client):
     username = 'test_layer_sld_user'
     layername = 'test_layer_sld_layer'
+    style_url = f'http://{settings.LAYMAN_SERVER_NAME}/rest/{username}/layers/{layername}/style'
 
     flask_client.publish_layer(username, layername, client)
 
@@ -27,6 +28,7 @@ def test_sld_value(client):
     assert "status" not in resp_json["sld"], r.get_json()
 
     sld_url = resp_json["sld"]["url"]
+    assert sld_url == style_url, (r.get_json(), sld_url)
 
     with app.app_context():
         r_get = client.get(sld_url)

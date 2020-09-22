@@ -77,16 +77,16 @@ def test_wfs_proxy(liferay_mock):
     layername1 = 'ne_countries'
     username2 = 'testproxy2'
 
-    layman_process = process.start_layman(dict({
-        'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner',
-    }, **AUTHN_SETTINGS))
+    layman_process = process.start_layman(dict({'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner', },
+                                               **AUTHN_SETTINGS))
 
     authn_headers1 = get_auth_header(username)
 
     client_util.reserve_username(username, headers=authn_headers1)
-    ln = client_util.publish_layer(username, layername1, [
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
-    ], headers=authn_headers1)
+    ln = client_util.publish_layer(username,
+                                   layername1,
+                                   ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+                                   headers=authn_headers1)
 
     assert ln == layername1
 
@@ -319,7 +319,12 @@ def test_missing_attribute_authz(liferay_mock):
         'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner',
     }, **AUTHN_SETTINGS))
 
-    setup_user_layer(username, layername1, authn_headers1)
+    client_util.reserve_username(username, headers=authn_headers1)
+    ln = client_util.publish_layer(username,
+                                   layername1,
+                                   ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+                                   headers=authn_headers1)
+    assert ln == layername1
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
 

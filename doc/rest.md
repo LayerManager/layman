@@ -146,7 +146,7 @@ JSON object with following structure:
   - *status*: Status information about DB import and availability of the table. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **sld**
-  - **url**: String. URL of layer default style. In the end, it points to [GET /rest/workspaces/{workspace}/styles/{style}](https://docs.geoserver.org/stable/en/api/#1.0.0/styles.yaml), through Lyaman's proxy, which take care about authorization.
+  - **url**: String. URL of layer default style. It points to [GET Layer Style](#get-layer-style).
   - *status*: Status information about publishing SLD. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *metadata*
