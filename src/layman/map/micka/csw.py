@@ -51,9 +51,9 @@ def get_map_info(username, mapname):
         return {}
 
 
-def get_map_names(username):
+def get_map_infos(username):
     # TODO consider reading map names from all Micka's metadata records by linkage URL
-    return []
+    return {}
 
 
 def get_publication_names(username, publication_type):

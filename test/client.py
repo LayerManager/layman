@@ -87,6 +87,15 @@ def delete_layer(username, layername, headers=None):
     assert r.status_code == 200, r.text
 
 
+def delete_map(username, mapname, headers=None):
+    headers = headers or {}
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
+
+    r_url = f"{rest_url}/{username}/maps/{mapname}"
+    r = requests.delete(r_url, headers=headers)
+    assert r.status_code == 200, r.text
+
+
 def assert_user_layers(username, layernames):
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
     r_url = f"{rest_url}/{username}/layers"

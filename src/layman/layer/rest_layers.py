@@ -29,12 +29,12 @@ def get(username):
 
     infos = [
         {
-            'name': layer_infos[layer_name]["name"],
-            'title': layer_infos[layer_name]["title"],
-            'url': url_for('rest_layer.get', layername=layer_name, username=username),
-            'uuid': uuid.get_layer_uuid(username, layer_name),
+            'name': info["name"],
+            'title': info["title"],
+            'url': url_for('rest_layer.get', layername=name, username=username),
+            'uuid': info["uuid"],
         }
-        for layer_name in layer_infos
+        for (name, info) in layer_infos.items()
     ]
     return jsonify(infos), 200
 

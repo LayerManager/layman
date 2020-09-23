@@ -157,11 +157,8 @@ def get_layer_infos(username):
     if wfs is None:
         result = {}
     else:
-        result = {
-            wfs_layername.split(':')[1]: {"name": wfs_layername.split(':')[1],
-                                          "title": wfs.contents[wfs_layername].title}
-            for wfs_layername in [*wfs.contents]
-        }
+        result = {name.split(':')[1]: {"name": name.split(':')[1],
+                                       "title": info.title} for (name, info) in wfs.contents.items()}
     return result
 
 

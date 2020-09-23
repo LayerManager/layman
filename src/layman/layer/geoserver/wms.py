@@ -126,10 +126,12 @@ def get_layer_infos(username):
     wms = get_wms_proxy(username)
     result = {}
     if wms is not None:
-        for layername in list(wms.contents):
-            result[layername] = {"name": layername,
-                                 "title": wms.contents[layername].title}
+        # for (name, info) in wms.contents.items():
+        #     result[name] = {"name": name,
+        #                     "title": wms.contents[name].title}
 
+        result = {name: {"name": name,
+                         "title": info.title} for (name, info) in wms.contents.items()}
     return result
 
 

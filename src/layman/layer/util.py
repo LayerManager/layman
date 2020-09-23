@@ -74,8 +74,13 @@ def get_layer_infos(username):
     sources = get_sources()
     results = call_modules_fn(sources, 'get_layer_infos', [username])
     layer_infos = {}
-    for r in results:
-        layer_infos.update(r)
+    # TODO maybe, those two cycles can be done at once
+    for source in results:
+        for (name, info) in source.items():
+            if layer_infos.get(name) is None:
+                layer_infos[name] = info
+            else:
+                layer_infos[name].update(info)
     return layer_infos
 
 

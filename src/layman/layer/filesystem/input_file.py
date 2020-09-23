@@ -59,12 +59,12 @@ def get_layer_infos(username):
     layersdir = util.get_layers_dir(username)
     if not os.path.exists(layersdir):
         return dict()
-    layer_names = {
+    layer_infos = {
         subfile: {"name": subfile} for subfile in os.listdir(layersdir)
         if os.path.isdir(os.path.join(layersdir, subfile))
     }
 
-    return layer_names
+    return layer_infos
 
 
 def get_publication_names(username, publication_type):
