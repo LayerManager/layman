@@ -13,6 +13,7 @@ from layman.cache import mem_redis
 from layman.layer.filesystem import input_file
 from layman.layer.util import is_layer_task_ready
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qs, parse_qsl
+from layman.common import util as layman_util
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
 
@@ -126,10 +127,6 @@ def get_layer_infos(username):
     wms = get_wms_proxy(username)
     result = {}
     if wms is not None:
-        # for (name, info) in wms.contents.items():
-        #     result[name] = {"name": name,
-        #                     "title": wms.contents[name].title}
-
         result = {name: {"name": name,
                          "title": info.title} for (name, info) in wms.contents.items()}
     return result
@@ -140,7 +137,7 @@ def get_publication_names(username, publication_type):
         raise Exception(f'Unknown publication type {publication_type}')
 
     infos = get_layer_infos(username)
-    layer_names = list(set(sorted([info for info in infos])))
+    layer_names = layman_util.get_names_from_infos(infos)
     return layer_names
 
 

@@ -11,6 +11,8 @@ from flask import g, current_app
 from layman.layer.filesystem.input_sld import get_layer_file
 from layman.http import LaymanError
 from layman import settings, patch_mode
+from layman.common import util as layman_util
+from . import headers_json
 from . import headers_json, headers_xml
 from . import wms
 from ...util import url_for
@@ -75,9 +77,11 @@ def get_layer_infos(username):
 
 def get_publication_names(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
-        raise Exception(f'Unknown pyblication type {publication_type}')
+        raise Exception(f'Unknown publication type {publication_type}')
 
-    return []
+    infos = get_layer_infos(username)
+    layer_names = layman_util.get_names_from_infos(infos)
+    return layer_names
 
 
 def get_publication_uuid(username, publication_type, publication_name):
