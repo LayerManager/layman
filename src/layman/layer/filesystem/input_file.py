@@ -9,6 +9,7 @@ from layman import settings, patch_mode
 from . import util
 from layman.common.filesystem import util as common_util
 from layman.common.filesystem import input_file as common
+from layman.common import util as layman_util
 
 LAYER_SUBDIR = __name__.split('.')[-1]
 
@@ -57,13 +58,10 @@ def get_layer_info(username, layername):
 
 def get_layer_infos(username):
     layersdir = util.get_layers_dir(username)
-    if not os.path.exists(layersdir):
-        return dict()
-    layer_infos = {
-        subfile: {"name": subfile} for subfile in os.listdir(layersdir)
-        if os.path.isdir(os.path.join(layersdir, subfile))
-    }
-
+    layer_infos = {}
+    if os.path.exists(layersdir):
+        layer_infos = {subfile: {"name": subfile}
+                       for subfile in os.listdir(layersdir) if os.path.isdir(os.path.join(layersdir, subfile))}
     return layer_infos
 
 
@@ -72,7 +70,7 @@ def get_publication_names(username, publication_type):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
     infos = get_layer_infos(username)
-    layer_names = list(set(sorted([info for info in infos])))
+    layer_names = layman_util.get_names_from_infos(infos)
     return layer_names
 
 

@@ -21,6 +21,7 @@ from layman.util import url_for
 from requests.exceptions import HTTPError, ConnectionError
 from urllib.parse import urljoin
 from lxml import etree as ET
+from layman.common import util as layman_util
 
 PATCH_MODE = patch_mode.NO_DELETE
 
@@ -98,7 +99,9 @@ def get_publication_names(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
-    return []
+    infos = get_layer_infos(username)
+    layer_names = layman_util.get_names_from_infos(infos)
+    return layer_names
 
 
 def get_publication_uuid(username, publication_type, publication_name):

@@ -1,6 +1,7 @@
 from . import get_connection_cursor
 from layman import settings, patch_mode
 from layman.http import LaymanError
+from layman.common import util as layman_util
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
@@ -71,7 +72,7 @@ def get_publication_names(username, publication_type):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
     infos = get_layer_infos(username)
-    layer_names = list(set(sorted([info for info in infos])))
+    layer_names = layman_util.get_names_from_infos(infos)
     return layer_names
 
 

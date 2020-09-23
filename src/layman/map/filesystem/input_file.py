@@ -8,6 +8,7 @@ from . import util
 from layman.common.filesystem import util as common_util
 from layman.common.filesystem import input_file as common
 from layman.util import url_for
+from layman.common import util as layman_util
 
 MAP_SUBDIR = __name__.split('.')[-1]
 
@@ -64,7 +65,6 @@ def get_map_infos(username):
             info = get_map_info(username, name)
             map_infos[name] = {"name": name,
                                "title": info["title"]}
-    print(map_infos)
     return map_infos
 
 
@@ -73,7 +73,7 @@ def get_publication_names(username, publication_type):
         raise Exception(f'Unknown publication type {publication_type}')
 
     infos = get_map_infos(username)
-    map_names = list(set(sorted([info for info in infos])))
+    map_names = layman_util.get_names_from_infos(infos)
     return map_names
 
 

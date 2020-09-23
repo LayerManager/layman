@@ -87,11 +87,11 @@ def test_get_layer_infos(client):
 
         for module in modules:
             layer_infos = module["method_infos"](username)
-            assert layer_infos == module["result_infos"],\
-                   (module["name"], module["method_infos"].__module__, layer_infos)
+            assert layer_infos == module["result_infos"], \
+                (module["name"], module["method_infos"].__module__, layer_infos)
             publication_names = module["method_publications"](username, "layman.layer")
-            assert publication_names == module["result_publications"],\
-                   (module["name"], module["method_publications"].__module__, publication_names)
+            assert publication_names == module["result_publications"], \
+                (module["name"], module["method_publications"].__module__, publication_names)
 
         # util
         layer_infos = util.get_layer_infos(username)
