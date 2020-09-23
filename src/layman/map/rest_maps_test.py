@@ -53,10 +53,10 @@ def test_get_map_infos(client):
         for module in modules:
             map_infos = module["method_infos"](username)
             assert map_infos == module["result_infos"],\
-                   (module["name"], module["method_infos"].__module__, map_infos)
+                (module["name"], module["method_infos"].__module__, map_infos)
             publication_names = module["method_publications"](username, "layman.map")
             assert publication_names == module["result_publications"],\
-                   (module["name"], module["method_publications"].__module__, publication_names)
+                (module["name"], module["method_publications"].__module__, publication_names)
 
         map_infos = util.get_map_infos(username)
         assert map_infos == result_infos_all, map_infos
