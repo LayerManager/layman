@@ -60,7 +60,7 @@ def delete_map(username, mapname):
     util.delete_map_subdir(username, mapname, MAP_SUBDIR)
 
 
-get_map_names = input_file.get_map_names
+get_map_infos = input_file.get_map_infos
 
 
 def get_map_thumbnail_path(username, mapname):

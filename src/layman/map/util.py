@@ -78,14 +78,18 @@ def get_providers():
     return current_app.config[key]
 
 
-def get_map_names(username):
+def get_map_infos(username):
     sources = get_sources()
-    results = call_modules_fn(sources, 'get_map_names', [username])
-    mapnames = []
-    for r in results:
-        mapnames += r
-    mapnames = list(set(mapnames))
-    return mapnames
+    results = call_modules_fn(sources, 'get_map_infos', [username])
+    map_infos = {}
+    # TODO maybe, those two cycles can be done at once
+    for source in results:
+        for (name, info) in source.items():
+            if map_infos.get(name) is None:
+                map_infos[name] = info
+            else:
+                map_infos[name].update(info)
+    return map_infos
 
 
 TASKS_TO_MAP_INFO_KEYS = {

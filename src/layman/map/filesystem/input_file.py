@@ -56,23 +56,25 @@ def get_map_info(username, mapname):
         return {}
 
 
-def get_map_names(username):
+def get_map_infos(username):
     mapsdir = util.get_maps_dir(username)
-    if not os.path.exists(mapsdir):
-        return []
-    map_names = [
-        subfile for subfile in os.listdir(mapsdir)
-        if os.path.isdir(os.path.join(mapsdir, subfile))
-    ]
-
-    return map_names
+    map_infos = {}
+    if os.path.exists(mapsdir):
+        for name in os.listdir(mapsdir):
+            info = get_map_info(username, name)
+            map_infos[name] = {"name": name,
+                               "title": info["title"]}
+    print(map_infos)
+    return map_infos
 
 
 def get_publication_names(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown publication type {publication_type}')
 
-    return get_map_names(username)
+    infos = get_map_infos(username)
+    map_names = list(set(sorted([info for info in infos])))
+    return map_names
 
 
 from . import uuid
