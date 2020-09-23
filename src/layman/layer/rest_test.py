@@ -31,7 +31,7 @@ from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from test.data import wfs as data_wfs
 
-from test import client as client_util
+from test import process_client as client_util
 
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
 

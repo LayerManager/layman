@@ -11,8 +11,9 @@ from flask import g, current_app
 from layman.layer.filesystem.input_sld import get_layer_file
 from layman.http import LaymanError
 from layman import settings, patch_mode
-from . import headers_json
+from . import headers_json, headers_xml
 from . import wms
+from ...util import url_for
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
@@ -54,7 +55,18 @@ def delete_layer(username, layername):
 
 
 def get_layer_info(username, layername):
-    return {}
+    r = get_style_response(username, layername, headers_xml, settings.LAYMAN_GS_AUTH)
+    if r.status_code == 200:
+        url = url_for('rest_layer_style.get', username=username, layername=layername)
+        info = {
+            'sld': {
+                'url': url
+            },
+        }
+    else:
+        info = {}
+
+    return info
 
 
 def get_layer_names(username):
@@ -162,3 +174,14 @@ def create_layer_style(username, layername):
 
 def get_metadata_comparison(username, layername):
     pass
+
+
+def get_style_response(username, stylename, headers=None, auth=None):
+    if headers is None:
+        headers = headers_xml
+    url = settings.LAYMAN_GS_REST + f'workspaces/{username}/styles/{stylename}'
+
+    r = requests.get(url,
+                     auth=auth,
+                     headers=headers)
+    return r
