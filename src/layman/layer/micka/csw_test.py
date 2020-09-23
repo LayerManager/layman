@@ -13,9 +13,9 @@ del sys.modules['layman']
 from layman import app as app, LaymanError
 from layman import settings
 from .csw import get_layer_info, delete_layer, get_metadata_uuid
-from layman.layer.rest_test import wait_till_ready
 
 from test.mock.micka import run
+from test.flask_client import wait_till_layer_ready
 
 MICKA_PORT = 8020
 
@@ -69,7 +69,7 @@ def provide_layer(client):
             for fp in files:
                 fp[0].close()
 
-    wait_till_ready(username, layername)
+    wait_till_layer_ready(username, layername)
     yield rv.get_json()[0]
     with app.app_context():
         rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
@@ -99,7 +99,7 @@ def patch_layer(client):
             for fp in files:
                 fp[0].close()
 
-    wait_till_ready(username, layername)
+    wait_till_layer_ready(username, layername)
 
 
 @pytest.fixture(scope="module")

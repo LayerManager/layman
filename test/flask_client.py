@@ -4,12 +4,15 @@ from multiprocessing.context import Process
 
 import pytest
 
-from layman import app, settings
-from layman.layer.rest_test import wait_till_ready
+from layman import app, settings, celery as celery_util
+from layman.layer import util as util_layer
+from layman.map import util as util_map
 from layman.util import url_for
 
 
-def publish_layer(username, layername, client):
+def publish_layer(username, layername, client, title=None):
+    if title is None:
+        title = layername
     with app.app_context():
         rest_path = url_for('rest_layers.post', username=username)
 
@@ -25,14 +28,15 @@ def publish_layer(username, layername, client):
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
             rv = client.post(rest_path, data={
                 'file': files,
-                'name': layername
+                'name': layername,
+                'title': title
             })
             assert rv.status_code == 200
         finally:
             for fp in files:
                 fp[0].close()
 
-    wait_till_ready(username, layername)
+    wait_till_layer_ready(username, layername)
 
 
 @pytest.fixture()
@@ -65,3 +69,55 @@ def delete_layer(username, layername, client, headers=None):
     r_url = f"{rest_url}/{username}/layers/{layername}"
     r = client.delete(r_url, headers=headers)
     assert r.status_code == 200, r.text
+
+
+def delete_map(username, mapname, client, headers=None):
+    headers = headers or {}
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
+
+    r_url = f"{rest_url}/{username}/maps/{mapname}"
+    r = client.delete(r_url, headers=headers)
+    assert r.status_code == 200, r.text
+
+
+def publish_map(username, mapname, client, maptitle=None):
+    if maptitle is None:
+        maptitle = mapname
+    with app.app_context():
+        rest_path = url_for('rest_maps.post', username=username)
+
+        file_paths = [
+            'sample/layman.map/full.json',
+        ]
+
+        for fp in file_paths:
+            assert os.path.isfile(fp)
+        files = []
+
+        try:
+            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+            rv = client.post(rest_path, data={
+                'file': files,
+                'name': mapname,
+                'title': maptitle
+            })
+            assert rv.status_code == 200
+        finally:
+            for fp in files:
+                fp[0].close()
+
+    wait_till_map_ready(username, mapname)
+
+
+def wait_till_map_ready(username, name):
+    last_task = util_map._get_map_task(username, name)
+    while last_task is not None and not celery_util.is_task_ready(last_task):
+        time.sleep(0.1)
+        last_task = util_map._get_map_task(username, name)
+
+
+def wait_till_layer_ready(username, layername):
+    last_task = util_layer._get_layer_task(username, layername)
+    while last_task is not None and not celery_util.is_task_ready(last_task):
+        time.sleep(0.1)
+        last_task = util_layer._get_layer_task(username, layername)

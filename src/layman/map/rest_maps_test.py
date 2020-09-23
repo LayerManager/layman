@@ -7,7 +7,7 @@ from .filesystem import input_file, uuid, thumbnail
 from .micka import soap
 from . import util
 from layman.util import url_for
-from test import client as client_util
+from test import flask_client as client_util
 
 client = client_util.client
 
@@ -17,7 +17,7 @@ def test_get_map_infos(client):
     mapname = 'test_get_map_infos_layer'
     maptitle = "Test get map infos - map title íářžý"
 
-    client_util.setup_map_flask(username, mapname, client, maptitle)
+    client_util.publish_map(username, mapname, client, maptitle)
 
     result_infos_name = {mapname: {'name': mapname}}
     result_infos_name_title = {mapname: {'name': mapname, 'title': maptitle}}
@@ -61,7 +61,7 @@ def test_get_map_infos(client):
         map_infos = util.get_map_infos(username)
         assert map_infos == result_infos_all, map_infos
 
-    client_util.delete_map(username, mapname)
+    client_util.delete_map(username, mapname, client)
 
 
 def test_get_map(client):
@@ -69,7 +69,7 @@ def test_get_map(client):
     mapname = 'test_get_map_infos_layer'
     maptitle = "Test get map infos - map title íářžý"
 
-    client_util.setup_map_flask(username, mapname, client, maptitle)
+    client_util.publish_map(username, mapname, client, maptitle)
 
     with app.app_context():
         # maps.GET
@@ -77,4 +77,4 @@ def test_get_map(client):
         assert rv.status_code == 200, rv.json
         assert rv.json[0]["name"] == mapname, rv.json
 
-    client_util.delete_map(username, mapname)
+    client_util.delete_map(username, mapname, client)

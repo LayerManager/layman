@@ -9,7 +9,7 @@ from .geoserver import wfs, wms, sld
 from .micka import soap
 from . import util
 from layman.util import url_for
-from test import client as client_util
+from test import flask_client as client_util
 
 client = client_util.client
 
@@ -19,7 +19,7 @@ def test_get_layer_infos(client):
     layername = 'test_get_layer_infos_layer'
     layertitle = "Test get layer infos - layer íářžý"
 
-    client_util.setup_layer_flask(username, layername, client, layertitle)
+    client_util.publish_layer(username, layername, client, layertitle)
 
     result_infos_name = {layername: {'name': layername}}
     result_infos_name_title = {layername: {'name': layername,
@@ -97,7 +97,7 @@ def test_get_layer_infos(client):
         layer_infos = util.get_layer_infos(username)
         assert layer_infos == result_infos_all, layer_infos
 
-    client_util.delete_layer(username, layername)
+    client_util.delete_layer(username, layername, client)
 
 
 def test_get_layer_title(client):
@@ -105,7 +105,7 @@ def test_get_layer_title(client):
     layername = 'test_get_layer_infos_layer'
     layertitle = "Test get layer infos - layer íářžý"
 
-    client_util.setup_layer_flask(username, layername, client, layertitle)
+    client_util.publish_layer(username, layername, client, layertitle)
 
     with app.app_context():
         # layers.GET
@@ -114,4 +114,4 @@ def test_get_layer_title(client):
         assert rv.json[0]["name"] == layername, rv.json
         assert rv.json[0]["title"] == layertitle, rv.json
 
-    client_util.delete_layer(username, layername)
+    client_util.delete_layer(username, layername, client)
