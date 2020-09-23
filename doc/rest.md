@@ -90,6 +90,7 @@ Content-Type: `application/json`
 
 JSON array of objects representing posted layers with following structure:
 - **name**: String. Name of the layer.
+- **title**: String.
 - **uuid**: String. UUID of the layer.
 - **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
 - *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. Each object represents one file that server expects to be subsequently uploaded using [POST Layer Chunk](#post-layer-chunk). Each object has following properties:
@@ -334,6 +335,7 @@ Content-Type: `application/json`
 
 JSON array of objects representing posted maps with following structure:
 - **name**: String. Name of the map.
+- **title**: String.
 - **uuid**: String. UUID of the map.
 - **url**: String. URL of the map. It points to [GET Map](#get-map).
 

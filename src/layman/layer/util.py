@@ -6,7 +6,7 @@ import re
 from flask import current_app, request, g
 
 from layman import LaymanError, patch_mode
-from layman import settings
+from layman.common import util as layman_util
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, \
     to_safe_name, url_for
 from layman import celery as celery_util
@@ -73,15 +73,7 @@ def get_providers():
 def get_layer_infos(username):
     sources = get_sources()
     results = call_modules_fn(sources, 'get_layer_infos', [username])
-    layer_infos = {}
-    # TODO maybe, those two cycles can be done at once
-    for source in results:
-        for (name, info) in source.items():
-            if layer_infos.get(name) is None:
-                layer_infos[name] = info
-            else:
-                layer_infos[name].update(info)
-    return layer_infos
+    return layman_util.merge_infos(results)
 
 
 def check_new_layername(username, layername):
