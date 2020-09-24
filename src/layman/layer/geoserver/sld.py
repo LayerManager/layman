@@ -80,8 +80,7 @@ def get_publication_names(username, publication_type):
         raise Exception(f'Unknown publication type {publication_type}')
 
     infos = get_layer_infos(username)
-    layer_names = layman_util.get_names_from_infos(infos)
-    return layer_names
+    return list(infos)
 
 
 def get_publication_uuid(username, publication_type, publication_name):

@@ -27,6 +27,8 @@ def get(username):
 
     layer_infos = util.get_layer_infos(username)
 
+    sorted_infos = sorted(layer_infos.items(), key=lambda x: x[0])
+
     infos = [
         {
             'name': info["name"],
@@ -34,7 +36,7 @@ def get(username):
             'url': url_for('rest_layer.get', layername=name, username=username),
             'uuid': info["uuid"],
         }
-        for (name, info) in layer_infos.items()
+        for (name, info) in sorted_infos
     ]
     return jsonify(infos), 200
 

@@ -62,8 +62,7 @@ def get_publication_names(username, publication_type):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
     infos = get_map_infos(username)
-    map_names = layman_util.get_names_from_infos(infos)
-    return map_names
+    return list(infos)
 
 
 def get_publication_uuid(username, publication_type, publication_name):

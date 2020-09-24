@@ -102,16 +102,23 @@ def test_get_layer_infos(client):
 
 def test_get_layer_title(client):
     username = 'test_get_layer_infos_user'
-    layername = 'test_get_layer_infos_layer'
-    layertitle = "Test get layer infos - layer íářžý"
+    layers = [("c_test_get_layer_infos_layer", "C Test get layer infos - map layer íářžý"),
+              ("a_test_get_layer_infos_layer", "A Test get layer infos - map layer íářžý"),
+              ("b_test_get_layer_infos_layer", "B Test get layer infos - map layer íářžý")
+              ]
+    sorted_layers = sorted(layers)
 
-    client_util.publish_layer(username, layername, client, layertitle)
+    for (name, title) in layers:
+        client_util.publish_layer(username, name, client, title)
 
     with app.app_context():
         # layers.GET
         rv = client.get(url_for('rest_layers.get', username=username))
         assert rv.status_code == 200, rv.json
-        assert rv.json[0]["name"] == layername, rv.json
-        assert rv.json[0]["title"] == layertitle, rv.json
 
-    client_util.delete_layer(username, layername, client)
+        for i in range(0, len(sorted_layers) - 1):
+            assert rv.json[i]["name"] == sorted_layers[i][0]
+            assert rv.json[i]["title"] == sorted_layers[i][1]
+
+    for (name, title) in layers:
+        client_util.delete_layer(username, name, client)

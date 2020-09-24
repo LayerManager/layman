@@ -64,17 +64,25 @@ def test_get_map_infos(client):
     client_util.delete_map(username, mapname, client)
 
 
-def test_get_map(client):
+def test_get_map_title(client):
     username = 'test_get_map_infos_user'
-    mapname = 'test_get_map_infos_layer'
-    maptitle = "Test get map infos - map title íářžý"
+    maps = [("c_test_get_map_infos_map", "C Test get map infos - map title íářžý"),
+            ("a_test_get_map_infos_map", "A Test get map infos - map title íářžý"),
+            ("b_test_get_map_infos_map", "B Test get map infos - map title íářžý")
+            ]
+    sorted_maps = sorted(maps)
 
-    client_util.publish_map(username, mapname, client, maptitle)
+    for (name, title) in maps:
+        client_util.publish_map(username, name, client, title)
 
     with app.app_context():
         # maps.GET
         rv = client.get(url_for('rest_maps.get', username=username))
         assert rv.status_code == 200, rv.json
-        assert rv.json[0]["name"] == mapname, rv.json
 
-    client_util.delete_map(username, mapname, client)
+        for i in range(0, len(sorted_maps) - 1):
+            assert rv.json[i]["name"] == sorted_maps[i][0]
+            assert rv.json[i]["title"] == sorted_maps[i][1]
+
+    for (name, title) in maps:
+        client_util.delete_map(username, name, client)

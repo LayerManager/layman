@@ -29,13 +29,15 @@ def get(username):
 
     mapinfos = util.get_map_infos(username)
 
+    sorted_infos = sorted(mapinfos.items(), key=lambda x: x[0])
     infos = [
         {
             'name': name,
+            'title': info['title'],
             'url': url_for('rest_map.get', mapname=name, username=name),
-            'uuid': uuid.get_map_uuid(username, name),
+            'uuid': info['uuid'],
         }
-        for (name, info) in mapinfos.items()
+        for (name, info) in sorted_infos
     ]
     return jsonify(infos), 200
 
