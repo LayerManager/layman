@@ -6,7 +6,7 @@ import re
 from flask import current_app, request, g
 
 from layman import LaymanError, patch_mode
-from layman import settings
+from layman.common import util as layman_util
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, \
     to_safe_name, url_for
 from layman import celery as celery_util
@@ -70,14 +70,10 @@ def get_providers():
     return current_app.config[key]
 
 
-def get_layer_names(username):
+def get_layer_infos(username):
     sources = get_sources()
-    results = call_modules_fn(sources, 'get_layer_names', [username])
-    layernames = []
-    for r in results:
-        layernames += r
-    layernames = list(set(layernames))
-    return layernames
+    results = call_modules_fn(sources, 'get_layer_infos', [username])
+    return layman_util.merge_infos(results)
 
 
 def check_new_layername(username, layername):

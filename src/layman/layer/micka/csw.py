@@ -21,6 +21,7 @@ from layman.util import url_for
 from requests.exceptions import HTTPError, ConnectionError
 from urllib.parse import urljoin
 from lxml import etree as ET
+from layman.common import util as layman_util
 
 PATCH_MODE = patch_mode.NO_DELETE
 
@@ -53,9 +54,9 @@ def get_layer_info(username, layername):
         return {}
 
 
-def get_layer_names(username):
+def get_layer_infos(username):
     # TODO consider reading layer names from all Micka's metadata records by linkage URL
-    return []
+    return {}
 
 
 def update_layer(username, layername, layerinfo):
@@ -98,7 +99,8 @@ def get_publication_names(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
-    return []
+    infos = get_layer_infos(username)
+    return list(infos)
 
 
 def get_publication_uuid(username, publication_type, publication_name):

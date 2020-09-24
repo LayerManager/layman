@@ -5,7 +5,7 @@ from . import csw
 from layman.common.micka import util as common_util
 from layman import settings, LaymanError
 
-get_map_names = csw.get_map_names
+get_map_infos = csw.get_map_infos
 
 get_map_info = csw.get_map_info
 

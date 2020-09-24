@@ -7,13 +7,14 @@ import requests
 import time
 import xml.etree.ElementTree as ET
 from urllib.parse import urljoin
-import filecmp
 import difflib
 
 import pytest
 from flask import url_for
 
 import sys
+
+from test.flask_client import wait_till_layer_ready
 
 del sys.modules['layman']
 
@@ -30,8 +31,6 @@ from .micka import csw
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from test.data import wfs as data_wfs
-
-from test import process_client as client_util
 
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
 
@@ -63,13 +62,6 @@ min_geojson = """
 """
 
 num_layers_before_test = 0
-
-
-def wait_till_ready(username, layername):
-    last_task = util._get_layer_task(username, layername)
-    while last_task is not None and not celery_util.is_task_ready(last_task):
-        time.sleep(0.1)
-        last_task = util._get_layer_task(username, layername)
 
 
 def check_metadata(client, username, layername, props_equal, expected_values):
@@ -294,7 +286,7 @@ def test_post_layers_simple(client):
         # e.g. python3 -m pytest -W ignore::DeprecationWarning -xsvv src/layman/authn/oauth2_test.py::test_patch_current_user_without_username src/layman/layer/rest_test.py::test_post_layers_simple
         # this can badly affect also .get(propagate=False) in layman.celery.abort_task_chain
         # but hopefully this is only related to magic flask&celery test suite
-        wait_till_ready(username, layername)
+        wait_till_layer_ready(username, layername)
 
         layer_info = util.get_layer_info(username, layername)
         for key_to_check in keys_to_check:
@@ -461,7 +453,7 @@ def test_post_layers_shp(client):
 
     last_task = util._get_layer_task(username, layername)
     assert last_task is not None and not celery_util.is_task_ready(last_task)
-    wait_till_ready(username, layername)
+    wait_till_layer_ready(username, layername)
     # last_task['last'].get()
 
     wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
@@ -559,7 +551,7 @@ def test_post_layers_complex(client):
 
         last_task = util._get_layer_task(username, layername)
         assert last_task is not None and not celery_util.is_task_ready(last_task)
-        wait_till_ready(username, layername)
+        wait_till_layer_ready(username, layername)
         # last_task['last'].get()
         assert celery_util.is_task_ready(last_task)
 
@@ -657,7 +649,7 @@ def test_uppercase_attr(client):
 
         last_task = util._get_layer_task(username, layername)
         assert last_task is not None and not celery_util.is_task_ready(last_task)
-        wait_till_ready(username, layername)
+        wait_till_layer_ready(username, layername)
         # last_task['last'].get()
         assert celery_util.is_task_ready(last_task)
 
@@ -806,7 +798,7 @@ def test_patch_layer_style(client):
         # keys_to_check = ['thumbnail']
         # for key_to_check in keys_to_check:
         #         assert 'status' in resp_json[key_to_check]
-        wait_till_ready(username, layername)
+        wait_till_layer_ready(username, layername)
         # last_task['last'].get()
 
         resp_json = rv.get_json()
@@ -939,7 +931,7 @@ def test_patch_layer_data(client):
         keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
         for key_to_check in keys_to_check:
             assert 'status' in resp_json[key_to_check]
-        wait_till_ready(username, layername)
+        wait_till_layer_ready(username, layername)
         # last_task['last'].get()
 
     with app.app_context():
@@ -1185,7 +1177,7 @@ def test_layer_with_different_geometry(client):
         for fp in files:
             fp[0].close()
 
-    wait_till_ready(username, layername)
+    wait_till_layer_ready(username, layername)
 
     url_path_ows = urljoin(urljoin(settings.LAYMAN_GS_URL, username), 'ows?service=WFS&request=Transaction')
     url_path_wfs = urljoin(urljoin(settings.LAYMAN_GS_URL, username), 'wfs?request=Transaction')

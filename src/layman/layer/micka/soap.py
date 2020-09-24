@@ -9,7 +9,7 @@ PATCH_MODE = csw.PATCH_MODE
 
 get_layer_info = csw.get_layer_info
 
-get_layer_names = csw.get_layer_names
+get_layer_infos = csw.get_layer_infos
 
 update_layer = csw.update_layer
 

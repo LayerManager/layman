@@ -18,6 +18,7 @@ from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer.geoserver.wms import get_layer_info as wms_get_layer_info
 from layman.layer.micka.csw import get_layer_info as csw_get_layer_info
 from layman.util import url_for, USERNAME_ONLY_PATTERN
+from layman.common import util as layman_util
 from lxml import etree as ET
 
 PATCH_MODE = patch_mode.NO_DELETE
@@ -51,16 +52,17 @@ def get_map_info(username, mapname):
         return {}
 
 
-def get_map_names(username):
+def get_map_infos(username):
     # TODO consider reading map names from all Micka's metadata records by linkage URL
-    return []
+    return {}
 
 
 def get_publication_names(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
-    return []
+    infos = get_map_infos(username)
+    return list(infos)
 
 
 def get_publication_uuid(username, publication_type, publication_name):

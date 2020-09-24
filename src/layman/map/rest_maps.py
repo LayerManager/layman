@@ -27,15 +27,17 @@ def before_request():
 def get(username):
     app.logger.info(f"GET Maps, user={g.user}")
 
-    mapnames = sorted(util.get_map_names(username))
+    mapinfos = util.get_map_infos(username)
 
+    sorted_infos = sorted(mapinfos.items(), key=lambda x: x[0])
     infos = [
         {
-            'name': mapname,
-            'url': url_for('rest_map.get', mapname=mapname, username=username),
-            'uuid': uuid.get_map_uuid(username, mapname),
+            'name': name,
+            'title': info['title'],
+            'url': url_for('rest_map.get', mapname=name, username=name),
+            'uuid': info['uuid'],
         }
-        for mapname in mapnames
+        for (name, info) in sorted_infos
     ]
     return jsonify(infos), 200
 

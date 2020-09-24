@@ -13,6 +13,7 @@ from layman.cache import mem_redis
 from layman.layer.filesystem import input_file
 from layman.layer.util import is_layer_task_ready
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qs, parse_qsl
+from layman.common import util as layman_util
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
 
@@ -85,10 +86,10 @@ def get_wms_proxy(username):
         return wms_proxy
 
     def currently_changing():
-        layernames = input_file.get_layer_names(username)
+        layerinfos = input_file.get_layer_infos(username)
         result = any((
             not is_layer_task_ready(username, layername)
-            for layername in layernames
+            for layername in layerinfos
         ))
         return result
 
@@ -122,13 +123,12 @@ def get_layer_info(username, layername):
     }
 
 
-def get_layer_names(username):
+def get_layer_infos(username):
     wms = get_wms_proxy(username)
-    if wms is None:
-        result = []
-    else:
-        result = [*wms.contents]
-
+    result = {}
+    if wms is not None:
+        result = {name: {"name": name,
+                         "title": info.title} for (name, info) in wms.contents.items()}
     return result
 
 
@@ -136,7 +136,8 @@ def get_publication_names(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown publication type {publication_type}')
 
-    return get_layer_names(username)
+    infos = get_layer_infos(username)
+    return list(infos)
 
 
 def get_publication_uuid(username, publication_type, publication_name):

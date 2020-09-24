@@ -12,7 +12,7 @@ from celery import chain
 from flask import current_app, request, g
 
 from layman import LaymanError
-from layman import settings
+from layman.common import util as layman_util
 from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, \
     to_safe_name, url_for
 from layman import celery as celery_util
@@ -78,14 +78,10 @@ def get_providers():
     return current_app.config[key]
 
 
-def get_map_names(username):
+def get_map_infos(username):
     sources = get_sources()
-    results = call_modules_fn(sources, 'get_map_names', [username])
-    mapnames = []
-    for r in results:
-        mapnames += r
-    mapnames = list(set(mapnames))
-    return mapnames
+    results = call_modules_fn(sources, 'get_map_infos', [username])
+    return layman_util.merge_infos(results)
 
 
 TASKS_TO_MAP_INFO_KEYS = {

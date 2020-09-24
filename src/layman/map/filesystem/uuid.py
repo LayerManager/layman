@@ -8,9 +8,6 @@ MAP_TYPE = '.'.join(__name__.split('.')[:-2])
 # username, publication_type
 get_publication_names = input_file.get_publication_names
 
-# username
-get_map_names = input_file.get_map_names
-
 # username, mapname
 get_map_info = partial(common_uuid.get_publication_info, MAP_TYPE)
 
@@ -19,6 +16,13 @@ delete_map = partial(common_uuid.delete_publication, MAP_TYPE)
 
 # username, publication_type, publication_name
 get_publication_uuid = partial(common_uuid.get_publication_uuid, MAP_TYPE)
+
+
+def get_map_infos(username):
+    infos = input_file.get_map_infos(username)
+    for name in infos:
+        infos[name]['uuid'] = get_map_uuid(username, name)
+    return infos
 
 
 def get_map_uuid(username, mapname):

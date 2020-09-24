@@ -25,15 +25,18 @@ def before_request():
 def get(username):
     app.logger.info(f"GET Layers, user={g.user}")
 
-    layernames = sorted(util.get_layer_names(username))
+    layer_infos = util.get_layer_infos(username)
+
+    sorted_infos = sorted(layer_infos.items(), key=lambda x: x[0])
 
     infos = [
         {
-            'name': layername,
-            'url': url_for('rest_layer.get', layername=layername, username=username),
-            'uuid': uuid.get_layer_uuid(username, layername),
+            'name': info["name"],
+            'title': info["title"],
+            'url': url_for('rest_layer.get', layername=name, username=username),
+            'uuid': info["uuid"],
         }
-        for layername in layernames
+        for (name, info) in sorted_infos
     ]
     return jsonify(infos), 200
 
