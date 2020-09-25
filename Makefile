@@ -145,7 +145,7 @@ celery-worker-test-bash:
 test:
 	mkdir -p tmp
 	if [ "$$(docker images -q layman_dev 2> /dev/null)" = "" ]; then \
-		docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build layman_dev ; \
+		docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_dev ; \
 	fi;
 	if [ "$$(docker images -q timgen 2> /dev/null)" = "" ]; then \
 		docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build timgen ; \
