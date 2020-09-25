@@ -147,6 +147,7 @@ test:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_dev
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml rm -f layman_test
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps -u root layman_test bash -c "cd src && python3 -B setup_gs_auth.py"
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps -u root layman_test bash -c "bash ensure-test-data.sh"
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml up --force-recreate --no-deps -d celery_worker_test
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
 
