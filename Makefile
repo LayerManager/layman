@@ -143,6 +143,7 @@ celery-worker-test-bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm celery_worker_test bash
 
 test:
+	mkdir -p tmp
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_dev
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml rm -f layman_test
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps -u root layman_test bash -c "cd src && python3 -B setup_gs_auth.py"

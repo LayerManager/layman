@@ -19,8 +19,6 @@ services:
         - ./deps/geoserver/sample/geoserver_data:/geoserver/initial_data_dir
       depends_on:
         - celery_worker_test
-        - timgen
-        - layman_client_test
 
    celery_worker_test:
       image: layman_dev:latest
@@ -41,6 +39,8 @@ services:
         - postgresql
         - geoserver
         - micka
+        - timgen
+        - layman_client_test
 
    timgen:
       container_name: timgen
