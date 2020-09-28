@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 bash src/clear-python-cache.sh
 
 
