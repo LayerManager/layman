@@ -9,10 +9,6 @@ from . import util
 
 bp = Blueprint('rest_layer_style', __name__)
 
-headers_xml = {
-    'Accept': 'application/xml',
-    'Content-type': 'application/xml',
-}
 
 
 @bp.before_request
@@ -31,8 +27,7 @@ def get(username, layername):
 
     response = sld.get_style_response(username,
                                       layername,
-                                      headers_xml,
-                                      settings.LAYMAN_GS_AUTH)
+                                      auth=settings.LAYMAN_GS_AUTH)
 
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = {key: value for (key, value) in response.headers.items() if key.lower() not in excluded_headers}
