@@ -7,6 +7,7 @@
     - If you are running Layman with development settings, run also `make client-build`.
 ### Changes
 - Test Client contains also GET Layer Style endpoint.
+- Return real SLD style in GET Layer Style instead of just metadata
 - [#109](https://github.com/jirik/layman/issues/109) Handle records without title in GET Layers / GET Maps
 
 ## v1.7.0
