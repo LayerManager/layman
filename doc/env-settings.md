@@ -145,7 +145,7 @@ Name of [user/group service](https://docs.geoserver.org/stable/en/user/security/
 Name of [role service](https://docs.geoserver.org/stable/en/user/security/usergrouprole/roleservices.html) used for managing roles and user-role associations at GeoServer. If not set (default), the service named `default` is chosen. Usually it's [XML user/group service](https://docs.geoserver.org/stable/en/user/security/usergrouprole/roleservices.html#xml-role-service).
 
 ### LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE
-Secret value of [GeoServer HTTP authentication request header attribute](https://docs.geoserver.org/stable/en/user/security/tutorials/httpheaderproxy/index.html) used for WFS proxy. Only lowercase characters and numbers should be used.
+Secret value of [GeoServer HTTP authentication request header attribute](https://docs.geoserver.org/stable/en/user/security/tutorials/httpheaderproxy/index.html) used for WFS proxy. Only combination of lowercase characters and numbers must be used for the value. If you change an existing value, you have to change it also in GeoServer GUI manually.
 
 ## Connection to Micka
 

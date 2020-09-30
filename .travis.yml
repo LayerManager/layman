@@ -145,7 +145,7 @@ matrix:
 
       # command to run tests
       script:
-        - pylint -f colorized -r y --fail-under 6.7 --disable=missing-docstring ./src ./test
+        - pylint -f colorized -r y --fail-under 6.8 --disable=missing-docstring ./src ./test
 
     - name: "AutoPEP8"
       language: python

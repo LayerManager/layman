@@ -102,6 +102,7 @@ clear-data-dev:
 
 reset-data-directories:
 	docker-compose -f docker-compose.deps.yml rm -fsv
+	docker volume rm layman_redis-data
 	sudo rm -rf layman_data layman_data_test deps/*/data
 	mkdir -p layman_data layman_data_test tmp
 
