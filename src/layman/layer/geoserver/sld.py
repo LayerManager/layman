@@ -13,11 +13,15 @@ from layman.http import LaymanError
 from layman import settings, patch_mode
 from layman.common import util as layman_util
 from . import headers_json
-from . import headers_json, headers_xml
 from . import wms
 from ...util import url_for
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
+
+headers_sld = {
+    'Accept': 'application/vnd.ogc.sld+xml',
+    'Content-type': 'application/xml',
+}
 
 
 def update_layer(username, layername, layerinfo):
@@ -57,7 +61,7 @@ def delete_layer(username, layername):
 
 
 def get_layer_info(username, layername):
-    r = get_style_response(username, layername, headers_xml, settings.LAYMAN_GS_AUTH)
+    r = get_style_response(username, layername, headers_sld, settings.LAYMAN_GS_AUTH)
     if r.status_code == 200:
         url = url_for('rest_layer_style.get', username=username, layername=layername)
         info = {
@@ -181,7 +185,7 @@ def get_metadata_comparison(username, layername):
 
 def get_style_response(username, stylename, headers=None, auth=None):
     if headers is None:
-        headers = headers_xml
+        headers = headers_sld
     url = settings.LAYMAN_GS_REST + f'workspaces/{username}/styles/{stylename}'
 
     r = requests.get(url,

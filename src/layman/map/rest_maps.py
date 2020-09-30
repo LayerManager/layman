@@ -33,7 +33,7 @@ def get(username):
     infos = [
         {
             'name': name,
-            'title': info['title'],
+            'title': info.get("title", None),
             'url': url_for('rest_map.get', mapname=name, username=name),
             'uuid': info['uuid'],
         }
