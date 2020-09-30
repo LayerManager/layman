@@ -23,6 +23,7 @@ headers_sld = {
     'Content-type': 'application/xml',
 }
 
+
 def update_layer(username, layername, layerinfo):
     pass
 

@@ -10,7 +10,6 @@ from . import util
 bp = Blueprint('rest_layer_style', __name__)
 
 
-
 @bp.before_request
 @authenticate
 @authorize
