@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.7.1
+2020-09-30
+### Upgrade requirements
+- Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.3.0`
+    - If you are running Layman with development settings, run also `make client-build`.
+### Changes
+- Test Client contains also GET Layer Style endpoint.
+- [#109](https://github.com/jirik/layman/issues/109) Handle records without title in GET Layers / GET Maps
+
 ## v1.7.0
 2020-09-30
 ### Upgrade requirements
