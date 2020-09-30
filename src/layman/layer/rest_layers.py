@@ -32,7 +32,7 @@ def get(username):
     infos = [
         {
             'name': info["name"],
-            'title': info["title"],
+            'title': info.get("title", None),
             'url': url_for('rest_layer.get', layername=name, username=username),
             'uuid': info["uuid"],
         }
