@@ -5,6 +5,7 @@
 ### Upgrade requirements
 - [#65](https://github.com/jirik/layman/issues/65) Set environment variable [LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE](doc/env-settings.md#LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE). Only combination of lowercase characters and numbers must be used for the value.
 - [#101](https://github.com/jirik/layman/issues/101) Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) from `v1.1.2` to `v1.2.0`
+    - If you are running Layman with development settings, run also `make client-build`.
 ### Changes
 - [#65](https://github.com/jirik/layman/issues/65) [WFS endpoint](doc/rest.md#get-layer) accepts same [authentication](doc/security.md#authentication) credentials (e.g. [OAuth2 headers](doc/oauth2/index.md#request-layman-rest-api)) as Layman REST API endpoints. It's implemented using Layman's WFS proxy. This proxy authenticates the user and send user identification to GeoServer. In combination with changes in v1.6.0, Layman's [`read-everyone-write-owner` authorization](doc/security.md#authorization) (when active) is propagated to GeoServer and user can change only hers layers.
 - [#88](https://github.com/jirik/layman/issues/88) Attribute **title** was added to REST endpoints [GET Layers](doc/rest.md#get-layers) and [GET Maps](doc/rest.md#get-maps).
