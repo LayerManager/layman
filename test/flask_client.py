@@ -4,8 +4,9 @@ from multiprocessing.context import Process
 
 import pytest
 
-from layman import app, settings, celery as celery_util
+from layman import app, settings, celery as celery_util, uuid
 from layman.layer import util as util_layer
+from layman.layer import LAYER_TYPE
 from layman.map import util as util_map
 from layman.util import url_for
 
@@ -58,6 +59,10 @@ def client():
 
     yield client
 
+    with app.app_context() as ctx:
+        publs_by_type = uuid.check_redis_consistency()
+        global num_layers_before_test
+        num_layers_before_test = len(publs_by_type[LAYER_TYPE])
     server.terminate()
     server.join()
 
@@ -77,12 +82,12 @@ def delete_map(username, mapname, client, headers=None):
 
     r_url = f"{rest_url}/{username}/maps/{mapname}"
     r = client.delete(r_url, headers=headers)
-    assert r.status_code == 200, r.text
+    assert r.status_code == 200
 
 
-def publish_map(username, mapname, client, maptitle=None):
-    if maptitle is None:
-        maptitle = mapname
+def publish_map(username, mapname, client, maptitle=None, headers=None):
+    maptitle = maptitle or mapname
+    headers = headers or {}
     with app.app_context():
         rest_path = url_for('rest_maps.post', username=username)
 
@@ -96,11 +101,12 @@ def publish_map(username, mapname, client, maptitle=None):
 
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
-                'file': files,
-                'name': mapname,
-                'title': maptitle
-            })
+            rv = client.post(rest_path,
+                             data={'file': files,
+                                   'name': mapname,
+                                   'title': maptitle,
+                                   },
+                             headers=headers)
             assert rv.status_code == 200
         finally:
             for fp in files:
