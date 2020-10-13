@@ -1,6 +1,6 @@
 from flask import current_app
 from layman import settings
-from layman.util import get_usernames_no_cache
+from layman.util import get_usernames
 from . import filesystem
 
 REDIS_ISSID_SUB_2_USERNAME_KEY = f"{__name__}:ISSID_SUB_2_USERNAME:{{iss_id}}:{{sub}}"
@@ -26,7 +26,7 @@ def _get_issid_sub_2_username_key(iss_id, sub):
 def import_authn_to_redis():
     current_app.logger.info('Importing authn to REDIS')
 
-    usernames = get_usernames_no_cache()
+    usernames = get_usernames(use_cache=False)
 
     for username in usernames:
         authn_info = filesystem.get_authn_info(username)

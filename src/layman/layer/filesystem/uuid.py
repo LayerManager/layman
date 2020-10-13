@@ -8,8 +8,6 @@ PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 LAYER_TYPE = '.'.join(__name__.split('.')[:-2])
 
-get_publication_names = input_file.get_publication_names
-
 get_layer_info = partial(common_uuid.get_publication_info, LAYER_TYPE)
 
 delete_layer = partial(common_uuid.delete_publication, LAYER_TYPE)
@@ -21,6 +19,14 @@ def get_layer_infos(username):
     infos = input_file.get_layer_infos(username)
     for name in infos:
         infos[name]['uuid'] = get_layer_uuid(username, name)
+    return infos
+
+
+def get_publication_infos(username, publication_type):
+    if publication_type != '.'.join(__name__.split('.')[:-2]):
+        raise Exception(f'Unknown pyblication type {publication_type}')
+
+    infos = get_layer_infos(username)
     return infos
 
 

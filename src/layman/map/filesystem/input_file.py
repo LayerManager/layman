@@ -68,12 +68,12 @@ def get_map_infos(username):
     return map_infos
 
 
-def get_publication_names(username, publication_type):
+def get_publication_infos(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown publication type {publication_type}')
 
     infos = get_map_infos(username)
-    return list(infos)
+    return infos
 
 
 from . import uuid

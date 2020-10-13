@@ -31,23 +31,23 @@ def test_get_map_infos(client):
             {'name': 'filesystem.input_file',
              'method_infos': input_file.get_map_infos,
              'result_infos': result_infos_name_title,
-             'method_publications': input_file.get_publication_names,
-             'result_publications': result_publication_name},
+             'method_publications': input_file.get_publication_infos,
+             'result_publications': result_infos_name_title},
             {'name': 'filesystem.uuid',
              'method_infos': uuid.get_map_infos,
              'result_infos': result_infos_all,
-             'method_publications': uuid.get_publication_names,
-             'result_publications': result_publication_name},
+             'method_publications': uuid.get_publication_infos,
+             'result_publications': result_infos_all},
             {'name': 'filesystem.thumbnail',
              'method_infos': thumbnail.get_map_infos,
              'result_infos': result_infos_name_title,
-             'method_publications': thumbnail.get_publication_names,
-             'result_publications': result_publication_name},
+             'method_publications': thumbnail.get_publication_infos,
+             'result_publications': result_infos_name_title},
             {'name': 'micka.soap',
              'method_infos': soap.get_map_infos,
              'result_infos': {},
-             'method_publications': soap.get_publication_names,
-             'result_publications': []}
+             'method_publications': soap.get_publication_infos,
+             'result_publications': {}}
         ]
 
         for module in modules:

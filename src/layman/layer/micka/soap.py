@@ -13,7 +13,7 @@ get_layer_infos = csw.get_layer_infos
 
 update_layer = csw.update_layer
 
-get_publication_names = csw.get_publication_names
+get_publication_infos = csw.get_publication_infos
 
 get_publication_uuid = csw.get_publication_uuid
 

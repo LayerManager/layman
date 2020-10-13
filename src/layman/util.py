@@ -71,23 +71,17 @@ def check_username(username):
     call_modules_fn(providers, 'check_username', [username])
 
 
-def get_usernames():
-    providers = get_internal_providers()
-    results = call_modules_fn(providers, 'get_usernames')
-    usernames = []
-    for r in results:
-        usernames += r
-    usernames = list(set(usernames))
-    return usernames
-
-
-def get_usernames_no_cache():
-    all_sources = []
-    for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
-        for type_def in publ_module.PUBLICATION_TYPES.values():
-            all_sources += type_def['internal_sources']
-    providers = get_providers_from_source_names(all_sources)
-    results = call_modules_fn(providers, 'get_usernames')
+def get_usernames(use_cache=True):
+    if use_cache:
+        providers = get_internal_providers()
+        results = call_modules_fn(providers, 'get_usernames')
+    else:
+        all_sources = []
+        for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
+            for type_def in publ_module.PUBLICATION_TYPES.values():
+                all_sources += type_def['internal_sources']
+        providers = get_providers_from_source_names(all_sources)
+        results = call_modules_fn(providers, 'get_usernames')
     usernames = []
     for r in results:
         usernames += r

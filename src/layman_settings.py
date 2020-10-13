@@ -69,6 +69,9 @@ assert re.match("[a-z][a-z0-9]*", LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE), "Only 
 LAYMAN_GS_AUTHN_FILTER_NAME = 'laymanHttpFilter'
 
 
+# Name of schema, where Layman stores data about publication, users, ...
+PG_LAYMAN_SCHEMA = 'layman'
+
 # List of schemas that are not allowed to be used as usernames.
 PG_NON_USER_SCHEMAS = [
     'public',
@@ -76,6 +79,7 @@ PG_NON_USER_SCHEMAS = [
     'pg_catalog',
     'pg_toast',
     'information_schema',
+    PG_LAYMAN_SCHEMA,
 ]
 
 PG_POSTGIS_SCHEMA = 'public'

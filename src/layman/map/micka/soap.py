@@ -11,7 +11,7 @@ get_map_info = csw.get_map_info
 
 post_map = csw.post_map
 
-get_publication_names = csw.get_publication_names
+get_publication_infos = csw.get_publication_infos
 
 get_publication_uuid = csw.get_publication_uuid
 
