@@ -59,4 +59,3 @@ def run_statement_many(query, data, conn_cur=None):
         conn.commit()
     except BaseException:
         raise LaymanError(7)
-

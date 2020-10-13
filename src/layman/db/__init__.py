@@ -14,7 +14,7 @@ def migrate_users_with_publications():
     everyone_can_write = get_publication_access_rights('', '', '')["guest"] == "w"
     insert_users_sql = f'''insert into {DB_SCHEMA}.users (username) values (%s) returning ID;'''
 
-    insert_publications_sql = f'''insert into {DB_SCHEMA}.publications 
+    insert_publications_sql = f'''insert into {DB_SCHEMA}.publications
     (id_user, name, title, type, uuid, everyone_can_read, everyone_can_write) values
     (%s, %s, %s, %s, %s, %s, %s);'''
 
