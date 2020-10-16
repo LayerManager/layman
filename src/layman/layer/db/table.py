@@ -6,6 +6,14 @@ from layman.common import util as layman_util
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
+def post_layer(username, layername):
+    pass
+
+
+def patch_layer(username, layername):
+    pass
+
+
 def update_layer(username, layername, layerinfo):
     pass
 

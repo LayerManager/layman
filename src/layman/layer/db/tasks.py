@@ -1,6 +1,5 @@
-import time
-
 from celery.utils.log import get_task_logger
+from flask import current_app as app
 
 from layman.celery import AbortedException
 from layman.layer.filesystem.input_file import get_layer_main_file_path
@@ -8,6 +7,7 @@ from layman import celery_app
 from layman.http import LaymanError
 from .. import db
 from .table import delete_layer
+
 
 logger = get_task_logger(__name__)
 

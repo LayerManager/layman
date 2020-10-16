@@ -24,6 +24,14 @@ headers_sld = {
 }
 
 
+def post_layer(username, layername):
+    pass
+
+
+def patch_layer(username, layername):
+    pass
+
+
 def update_layer(username, layername, layerinfo):
     pass
 

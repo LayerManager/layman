@@ -126,6 +126,7 @@ def post(username):
         layer_result.update({
             'uuid': uuid_str,
         })
+        task_options.update({'uuid': uuid_str,})
 
         # save files
         input_sld.save_layer_file(username, layername, sld_file)

@@ -32,6 +32,14 @@ def update_layer(username, layername, layerinfo):
     pass
 
 
+def post_layer(username, layername):
+    pass
+
+
+def patch_layer(username, layername):
+    pass
+
+
 def delete_layer(username, layername):
     util.delete_layer_subdir(username, layername, LAYER_SUBDIR)
 

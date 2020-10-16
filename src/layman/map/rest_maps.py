@@ -103,6 +103,7 @@ def post(username):
         kwargs = {
             'title': title,
             'description': description,
+            'uuid': uuid_str,
         }
 
         util.post_map(

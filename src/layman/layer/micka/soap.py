@@ -22,6 +22,14 @@ delete_layer = csw.delete_layer
 get_metadata_comparison = csw.get_metadata_comparison
 
 
+def post_layer(username, layername):
+    pass
+
+
+def patch_layer(username, layername):
+    pass
+
+
 def soap_insert(username, layername):
     template_path, prop_values = csw.get_template_path_and_values(username, layername, http_method='post')
     record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, csw.METADATA_PROPERTIES)

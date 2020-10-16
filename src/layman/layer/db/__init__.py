@@ -7,6 +7,7 @@ from flask import g, app
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
+from layman.db import users as users_util
 
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 
@@ -79,10 +80,12 @@ def delete_user_schema(username, conn_cur=None):
 
 def ensure_whole_user(username):
     ensure_user_schema(username)
+    users_util.ensure_user(username)
 
 
 def delete_whole_user(username):
     delete_user_schema(username)
+    users_util.delete_user(username)
 
 
 # def import_layer_vector_file(username, layername, main):

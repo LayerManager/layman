@@ -32,6 +32,7 @@ PUBLICATION_TYPES = {
             'layman.map.filesystem.input_file',
             'layman.map.filesystem.thumbnail',
             'layman.map.micka.soap',
+            'layman.map.db.metadb',
         ],
         'task_modules': [
             'layman.map.filesystem.tasks',
@@ -52,6 +53,7 @@ PUBLICATION_TYPES = {
                 'reference_system',
                 'revision_date',
                 'title',
+                'uuid',
             }
         },
     }

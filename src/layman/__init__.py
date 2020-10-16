@@ -35,7 +35,7 @@ for bp in get_blueprints():
 
 from .user.rest_current_user import bp as current_user_bp
 from .gs_wfs_proxy import bp as gs_wfs_proxy_bp
-from .db import ensure_schema
+from . import db as db_util
 
 app.register_blueprint(current_user_bp, url_prefix='/rest/current-user')
 app.register_blueprint(gs_wfs_proxy_bp, url_prefix='/geoserver')
@@ -80,7 +80,8 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
                 check_username(username)
                 ensure_whole_user(username)
 
-            ensure_schema()
+            db_util.check_schema_name()
+            db_util.ensure_schema()
     else:
         while(settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done'):
             app.logger.info(f'Waiting for flask process to adjust dependencies')

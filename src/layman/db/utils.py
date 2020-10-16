@@ -1,7 +1,7 @@
 from flask import g
 import psycopg2
 
-from layman import settings
+from layman import settings, app
 from layman.http import LaymanError
 
 
@@ -34,6 +34,7 @@ def run_query(query, data=None, conn_cur=None):
         rows = cur.fetchall()
         conn.commit()
     except BaseException:
+        app.logger.error(f"run_query, query={query}, data={data}")
         raise LaymanError(7)
 
     return rows
@@ -47,6 +48,7 @@ def run_statement(query, data=None, conn_cur=None):
         cur.execute(query, data)
         conn.commit()
     except BaseException:
+        app.logger.error(f"run_query, query={query}, data={data}")
         raise LaymanError(7)
 
 
@@ -58,4 +60,5 @@ def run_statement_many(query, data, conn_cur=None):
         cur.executemany(query, data)
         conn.commit()
     except BaseException:
+        app.logger.error(f"run_query, query={query}, data={data}")
         raise LaymanError(7)

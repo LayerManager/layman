@@ -1,7 +1,7 @@
 from layman.db.utils import run_query, run_statement
 from layman.util import get_usernames, get_modules_from_names, call_modules_fn
 from layman.common.util import merge_infos
-from layman import settings, app
+from layman import settings, app, LaymanError
 from layman.authz.util import get_publication_access_rights
 from layman.db import model
 
@@ -9,14 +9,23 @@ from layman.db import model
 DB_SCHEMA = settings.PG_LAYMAN_SCHEMA
 
 
-def migrate_users_with_publications():
-    everyone_can_read = model.BOOLEAN_TRUE
-    everyone_can_write = get_publication_access_rights('', '', '')["guest"] == "w"
-    insert_users_sql = f'''insert into {DB_SCHEMA}.users (username) values (%s) returning ID;'''
+def get_default_everyone_can_read():
+    return model.BOOLEAN_TRUE
 
+
+def get_default_everyone_can_write():
+    return get_publication_access_rights('', '', '')["guest"] == "w"
+
+
+def migrate_users_with_publications():
+    everyone_can_read = get_default_everyone_can_read()
+    everyone_can_write = get_default_everyone_can_write()
+
+    insert_users_sql = f'''insert into {DB_SCHEMA}.users (username) values (%s) returning ID;'''
     insert_publications_sql = f'''insert into {DB_SCHEMA}.publications
     (id_user, name, title, type, uuid, everyone_can_read, everyone_can_write) values
-    (%s, %s, %s, %s, %s, %s, %s);'''
+    (%s, %s, %s, %s, %s, %s, %s);
+'''
 
     usernames = get_usernames(use_cache=False)
 
@@ -36,6 +45,12 @@ def migrate_users_with_publications():
                                                             info.get("uuid"),
                                                             everyone_can_read,
                                                             everyone_can_write,))
+
+
+def check_schema_name():
+    usernames = get_usernames(use_cache=False)
+    if DB_SCHEMA in usernames:
+        raise LaymanError(42, {'username': DB_SCHEMA})
 
 
 def ensure_schema():

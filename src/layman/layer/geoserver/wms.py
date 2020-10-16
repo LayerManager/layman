@@ -25,6 +25,14 @@ def get_flask_proxy_key(username):
     return FLASK_PROXY_KEY.format(username=username)
 
 
+def post_layer(username, layername):
+    pass
+
+
+def patch_layer(username, layername):
+    pass
+
+
 def update_layer(username, layername, layerinfo):
     clear_cache(username)
     pass

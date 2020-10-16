@@ -5,6 +5,8 @@ import requests
 
 from layman import settings
 from layman.common import geoserver
+from layman.layer.db import metadb
+from layman import app
 
 from test import process, process_client as client_util
 
@@ -175,6 +177,8 @@ def test_rewe_rewo(liferay_mock):
     ln = client_util.publish_layer(test_user2, layername2, [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ], headers=authn_headers2)
+    with app.app_context():
+        app.logger.info(f'metadb.get_layer_infos(test_user2)={metadb.get_layer_infos(test_user2)}')
     assert ln == layername2
     client_util.assert_user_layers(test_user2, [layername2])
     assert_gs_user_and_roles(test_user2)

@@ -40,6 +40,7 @@ PUBLICATION_TYPES = {
             'layman.layer.geoserver.sld',
             'layman.layer.filesystem.thumbnail',
             'layman.layer.micka.soap',
+            'layman.layer.db.metadb',
         ],
         'task_modules': [
             'layman.layer.db.tasks',
@@ -64,6 +65,8 @@ PUBLICATION_TYPES = {
                 'title',
                 'wfs_url',
                 'wms_url',
+                'everyone_can_read',
+                'everyone_can_write',
             }
         },
     }

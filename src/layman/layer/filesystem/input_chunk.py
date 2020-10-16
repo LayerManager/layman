@@ -44,6 +44,14 @@ get_publication_infos = input_file.get_publication_infos
 get_publication_uuid = input_file.get_publication_uuid
 
 
+def post_layer(username, layername):
+    pass
+
+
+def patch_layer(username, layername):
+    pass
+
+
 def save_layer_files_str(username, layername, files_str, check_crs):
     filenames = files_str
     main_filename = input_file.get_main_file_name(filenames)
