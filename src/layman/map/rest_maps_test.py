@@ -5,7 +5,8 @@ del sys.modules['layman']
 from layman import app
 from .filesystem import input_file, uuid, thumbnail
 from .micka import soap
-from . import util
+from .db import metadb
+from . import util, MAP_TYPE
 from layman.util import url_for
 from test import flask_client as client_util
 
@@ -24,39 +25,53 @@ def test_get_map_infos(client):
     result_publication_name = [mapname]
 
     with app.app_context():
+        result_infos_name_title_uuid = {mapname: {'name': mapname,
+                                                  'title': maptitle,
+                                                  'uuid': uuid.get_map_uuid(username, mapname)}}
         result_infos_all = {mapname: {'name': mapname,
                                       'title': maptitle,
-                                      'uuid': uuid.get_map_uuid(username, mapname)}}
+                                      'uuid': uuid.get_map_uuid(username, mapname),
+                                      'type': MAP_TYPE,
+                                      'everyone_can_read': True,
+                                      'everyone_can_write': True,
+                                      'can_read_users': None,
+                                      'can_write_users': None,
+                                      }}
         modules = [
+            {'name': 'db.metadb',
+             'method_infos': metadb.get_map_infos,
+             'result_infos': result_infos_all,
+             'method_publications': metadb.get_publication_infos,
+             },
             {'name': 'filesystem.input_file',
              'method_infos': input_file.get_map_infos,
              'result_infos': result_infos_name_title,
              'method_publications': input_file.get_publication_infos,
-             'result_publications': result_infos_name_title},
+             },
             {'name': 'filesystem.uuid',
              'method_infos': uuid.get_map_infos,
-             'result_infos': result_infos_all,
+             'result_infos': result_infos_name_title_uuid,
              'method_publications': uuid.get_publication_infos,
-             'result_publications': result_infos_all},
+             },
             {'name': 'filesystem.thumbnail',
              'method_infos': thumbnail.get_map_infos,
              'result_infos': result_infos_name_title,
              'method_publications': thumbnail.get_publication_infos,
-             'result_publications': result_infos_name_title},
+             },
             {'name': 'micka.soap',
              'method_infos': soap.get_map_infos,
              'result_infos': {},
              'method_publications': soap.get_publication_infos,
-             'result_publications': {}}
+             },
         ]
 
         for module in modules:
             map_infos = module["method_infos"](username)
             assert map_infos == module["result_infos"],\
                 (module["name"], module["method_infos"].__module__, map_infos)
-            publication_names = module["method_publications"](username, "layman.map")
-            assert publication_names == module["result_publications"],\
-                (module["name"], module["method_publications"].__module__, publication_names)
+            publication_infos = module["method_publications"](username, "layman.map")
+            assert publication_infos == module["result_infos"],\
+                (module["name"], module["method_publications"].__module__, publication_infos)
 
         map_infos = util.get_map_infos(username)
         assert map_infos == result_infos_all, map_infos

@@ -9,6 +9,7 @@ from .filesystem import input_file, input_sld, input_chunk, uuid
 from layman.authn import authenticate
 from layman.authz import authorize
 from layman.common import redis as redis_util
+from .db import metadb
 
 bp = Blueprint('rest_layers', __name__)
 
@@ -25,7 +26,7 @@ def before_request():
 def get(username):
     app.logger.info(f"GET Layers, user={g.user}")
 
-    layer_infos = util.get_layer_infos(username)
+    layer_infos = metadb.get_layer_infos(username)
 
     sorted_infos = sorted(layer_infos.items(), key=lambda x: x[0])
 
@@ -126,7 +127,7 @@ def post(username):
         layer_result.update({
             'uuid': uuid_str,
         })
-        task_options.update({'uuid': uuid_str,})
+        task_options.update({'uuid': uuid_str, })
 
         # save files
         input_sld.save_layer_file(username, layername, sld_file)

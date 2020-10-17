@@ -12,7 +12,7 @@ ON CONFLICT (username) DO update SET username = EXCLUDED.username returning id;"
 
 
 def delete_user(username):
-    sql = f"delete from {DB_SCHEMA}.users where name = %s;"
+    sql = f"delete from {DB_SCHEMA}.users where username = %s;"
     utils.run_statement(sql, (username, ))
 
 

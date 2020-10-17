@@ -164,6 +164,5 @@ truncate table "{settings.PG_LAYMAN_SCHEMA}".users cascade;
     conn.commit()
 
 
-
 if __name__ == "__main__":
     main()

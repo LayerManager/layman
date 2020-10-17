@@ -1,9 +1,13 @@
-from layman.db import publications as pub_util
+from layman.db import publications as pubs_util
 from .. import MAP_TYPE
 
 
+def get_map_infos(username):
+    return pubs_util.get_publication_infos(username, MAP_TYPE)
+
+
 def get_map_info(username, mapname):
-    maps = pub_util.get_publication_infos(username, MAP_TYPE)
+    maps = pubs_util.get_publication_infos(username, MAP_TYPE)
     if mapname in maps:
         info = maps[mapname]
     else:
@@ -20,7 +24,7 @@ def patch_map(username,
                "everyone_can_read": True,
                "everyone_can_write": True,
                }
-    pub_util.update_publication(username, db_info)
+    pubs_util.update_publication(username, db_info)
 
 
 def post_map(username, mapname, uuid, title):
@@ -32,11 +36,15 @@ def post_map(username, mapname, uuid, title):
                "everyone_can_read": True,
                "everyone_can_write": True,
                }
-    pub_util.insert_publication(username, db_info)
+    pubs_util.insert_publication(username, db_info)
 
 
-get_publication_infos = pub_util.get_publication_infos
+get_publication_infos = pubs_util.get_publication_infos
 
 
 def delete_map(username, mapname):
-    pub_util.delete_publication(username, mapname, MAP_TYPE)
+    pubs_util.delete_publication(username, mapname, MAP_TYPE)
+
+
+def get_metadata_comparison(username, publication_name):
+    pass

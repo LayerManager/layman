@@ -11,6 +11,7 @@ from .filesystem import input_file, uuid
 from layman.authn import authenticate
 from layman.authz import authorize
 from layman.common import redis as redis_util
+from .db import metadb
 
 bp = Blueprint('rest_maps', __name__)
 
@@ -27,7 +28,7 @@ def before_request():
 def get(username):
     app.logger.info(f"GET Maps, user={g.user}")
 
-    mapinfos = util.get_map_infos(username)
+    mapinfos = metadb.get_map_infos(username)
 
     sorted_infos = sorted(mapinfos.items(), key=lambda x: x[0])
     infos = [

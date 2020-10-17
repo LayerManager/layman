@@ -31,7 +31,7 @@ from const c inner join
                           and (   p.type = c.pub_type
                                or c.pub_type is null)
 ;"""
-    values = utils.run_query(sql, (username, pub_type, ))
+    values = utils.run_query(sql, (username, pub_type,))
     infos = {layername: {'name': layername,
                          'title': title,
                          'uuid': uuid,
@@ -39,9 +39,10 @@ from const c inner join
                          'everyone_can_read': everyone_can_read,
                          'everyone_can_write': everyone_can_write,
                          'can_read_users': can_read_users,
-                         'can_write_users': can_write_users}
-             for username, type, layername, title, uuid, everyone_can_read, everyone_can_write,
-                 can_read_users, can_write_users in values}
+                         'can_write_users': can_write_users,
+                         }
+             for username, type, layername, title, uuid, everyone_can_read, everyone_can_write, can_read_users, can_write_users
+             in values}
     return infos
 
 
