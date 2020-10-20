@@ -14,7 +14,7 @@ from flask import url_for
 
 import sys
 
-from test.flask_client import wait_till_layer_ready
+from test.flask_client import wait_till_layer_ready, publish_layer, delete_layer
 
 del sys.modules['layman']
 
@@ -166,16 +166,17 @@ def test_layman_gs_user_conflict(client):
             fp[0].close()
 
 
-@pytest.mark.usefixtures('app_context')
 def test_wrong_value_of_layername(client):
-    username = 'testuser1'
+    username = 'test_wrong_value_of_layername_user'
+    layername = 'layer1'
+    publish_layer(username, layername, client)
+    delete_layer(username, layername, client)
     layernames = [' ', '2a', 'ě', ';', '?', 'ABC']
     for layername in layernames:
-        rv = client.get(url_for('rest_layer.get', username=username, layername=layername))
+        with app.app_context():
+            rv = client.get(url_for('rest_layer.get', username=username, layername=layername))
         resp_json = rv.get_json()
-        # print('username', username)
-        # print(resp_json)
-        assert rv.status_code == 400
+        assert rv.status_code == 400, resp_json
         assert resp_json['code'] == 2
         assert resp_json['detail']['parameter'] == 'layername'
 
@@ -242,10 +243,12 @@ def test_layername_db_object_conflict(client):
 
 @pytest.mark.usefixtures('app_context')
 def test_get_layers_testuser1_v1(client):
-    username = 'testuser1'
+    username = 'test_get_layers_testuser1_v1_user'
+    layername = 'layer1'
+    publish_layer(username, layername, client)
+    delete_layer(username, layername, client)
     rv = client.get(url_for('rest_layers.get', username=username))
-    assert rv.status_code == 200
-    # resp_json = rv.get_json()
+    assert rv.status_code == 200, rv.get_json()
     # assert len(resp_json) == 0
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 0
