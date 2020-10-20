@@ -65,7 +65,6 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
 
         with app.app_context():
             db_util.check_schema_name()
-        with app.app_context():
             db_util.ensure_schema()
 
         app.logger.info(f'Loading Redis database')

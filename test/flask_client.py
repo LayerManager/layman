@@ -67,7 +67,8 @@ def delete_layer(username, layername, client, headers=None):
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
 
     r_url = f"{rest_url}/{username}/layers/{layername}"
-    r = client.delete(r_url, headers=headers)
+    with app.app_context():
+        r = client.delete(r_url, headers=headers)
     assert r.status_code == 200, (r.status_code, r.get_json())
 
 
@@ -76,7 +77,8 @@ def delete_map(username, mapname, client, headers=None):
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
 
     r_url = f"{rest_url}/{username}/maps/{mapname}"
-    r = client.delete(r_url, headers=headers)
+    with app.app_context():
+        r = client.delete(r_url, headers=headers)
     assert r.status_code == 200, (r.status_code, r.get_json())
 
 
