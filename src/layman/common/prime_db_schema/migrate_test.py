@@ -13,102 +13,73 @@ client = client_util.client
 
 def test_recreate_schema(client):
     username = 'test_recreate_schema_user1'
-    with app.app_context():
-        client_util.publish_layer(username, 'test_recreate_schema_layer1', client)
-    with app.app_context():
-        client_util.publish_map(username, 'test_recreate_schema_map1', client)
+    client_util.publish_layer(username, 'test_recreate_schema_layer1', client)
+    client_util.publish_map(username, 'test_recreate_schema_map1', client)
 
     with app.app_context():
         run_statement(model.DROP_SCHEMA_SQL)
         ensure_schema()
 
-    with app.app_context():
-        client_util.delete_layer(username, 'test_recreate_schema_layer1', client)
-    with app.app_context():
-        client_util.delete_map(username, 'test_recreate_schema_map1', client)
+    client_util.delete_layer(username, 'test_recreate_schema_layer1', client)
+    client_util.delete_map(username, 'test_recreate_schema_map1', client)
 
     with app.app_context():
         pubs = layer_util.get_layer_infos(username)
         assert len(pubs) == 0
-    with app.app_context():
         pubs = map_util.get_map_infos(username)
         assert len(pubs) == 0
 
 
 def test_schema(client):
     username = 'migration_test_user1'
-    with app.app_context():
-        client_util.publish_layer(username, 'migration_test_layer1', client)
-    with app.app_context():
-        client_util.publish_map(username, 'migration_test_map1', client)
+    client_util.publish_layer(username, 'migration_test_layer1', client)
+    client_util.publish_map(username, 'migration_test_map1', client)
 
     with app.app_context():
         run_statement(model.DROP_SCHEMA_SQL)
-
-    with app.app_context():
         ensure_schema()
-
-    with app.app_context():
         users = run_query(f'select count(*) from {DB_SCHEMA}.users;')
         assert users[0][0] == len(util.get_usernames())
 
-    with app.app_context():
-        client_util.delete_layer(username, 'migration_test_layer1', client)
-    with app.app_context():
-        client_util.delete_map(username, 'migration_test_map1', client)
+    client_util.delete_layer(username, 'migration_test_layer1', client)
+    client_util.delete_map(username, 'migration_test_map1', client)
 
     with app.app_context():
         pubs = layer_util.get_layer_infos(username)
         assert len(pubs) == 0
-    with app.app_context():
         pubs = map_util.get_map_infos(username)
         assert len(pubs) == 0
 
 
 def test_steps(client):
     username = 'migration_test_user2'
-    with app.app_context():
-        client_util.publish_layer(username, 'migration_test_layer2', client)
-    with app.app_context():
-        client_util.publish_map(username, 'migration_test_map2', client)
+    client_util.publish_layer(username, 'migration_test_layer2', client)
+    client_util.publish_map(username, 'migration_test_map2', client)
 
     with app.app_context():
         run_statement(model.DROP_SCHEMA_SQL)
-
-    with app.app_context():
         exists_schema = run_query(model.EXISTS_SCHEMA_SQL)
-    assert exists_schema[0][0] == 0
-    with app.app_context():
+        assert exists_schema[0][0] == 0
+
         run_statement(model.CREATE_SCHEMA_SQL)
-    with app.app_context():
         exists_schema = run_query(model.EXISTS_SCHEMA_SQL)
-    assert exists_schema[0][0] == 1
+        assert exists_schema[0][0] == 1
 
-    with app.app_context():
         exists_right_types = run_query(f'select count(*) from {DB_SCHEMA}.right_types;')
-    assert exists_right_types[0][0] == 0
-    with app.app_context():
+        assert exists_right_types[0][0] == 0
         run_statement(model.setup_codelists_data())
-    with app.app_context():
         exists_right_types = run_query(f'select count(*) from {DB_SCHEMA}.right_types;')
         assert exists_right_types[0][0] == 2
 
-    with app.app_context():
         exists_users = run_query(f'select count(*) from {DB_SCHEMA}.users;')
         assert exists_users[0][0] == 0
-    with app.app_context():
         exists_pubs = run_query(f'select count(*) from {DB_SCHEMA}.publications;')
         assert exists_pubs[0][0] == 0
-    with app.app_context():
         migrate_users_and_publications()
-    with app.app_context():
         exists_users = run_query(f'select count(*) from {DB_SCHEMA}.users;')
         assert exists_users[0][0] > 0
-    with app.app_context():
         exists_pubs = run_query(f'select count(*) from {DB_SCHEMA}.publications;')
         assert exists_pubs[0][0] > 0
 
-    with app.app_context():
-        client_util.delete_layer(username, 'migration_test_layer2', client)
-    with app.app_context():
-        client_util.delete_map(username, 'migration_test_map2', client)
+    client_util.delete_layer(username, 'migration_test_layer2', client)
+    client_util.delete_map(username, 'migration_test_map2', client)

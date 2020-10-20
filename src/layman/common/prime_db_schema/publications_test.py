@@ -65,7 +65,7 @@ def test_post_layer(client):
         pubs = publications.get_publication_infos(username, LAYER_TYPE)
         assert pubs.get(layername) is None
 
-        client_util.delete_layer(username, layername, client)
+    client_util.delete_layer(username, layername, client)
 
 
 def test_post_map(client):
@@ -120,7 +120,7 @@ def test_post_map(client):
         pubs = publications.get_publication_infos(username, MAP_TYPE)
         assert pubs.get(mapname) is None
 
-        client_util.delete_map(username, mapname, client)
+    client_util.delete_map(username, mapname, client)
 
 
 def test_select_publications(client):
@@ -129,9 +129,10 @@ def test_select_publications(client):
     mapname = 'test_select_publications_map1'
     with app.app_context():
         users.ensure_user(username)
-        client_util.publish_layer(username, layername, client)
-        client_util.publish_map(username, mapname, client)
+    client_util.publish_layer(username, layername, client)
+    client_util.publish_map(username, mapname, client)
 
+    with app.app_context():
         pubs = publications.get_publication_infos(username, LAYER_TYPE)
         assert len(pubs) == 1
         pubs = publications.get_publication_infos(username, MAP_TYPE)
@@ -141,8 +142,9 @@ def test_select_publications(client):
         pubs = publications.get_publication_infos()
         assert len(pubs) >= 2
 
-        client_util.delete_layer(username, layername, client)
-        client_util.delete_map(username, mapname, client)
+    client_util.delete_layer(username, layername, client)
+    client_util.delete_map(username, mapname, client)
 
+    with app.app_context():
         pubs = publications.get_publication_infos(username)
         assert pubs.get(layername) is None

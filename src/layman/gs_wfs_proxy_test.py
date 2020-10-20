@@ -53,8 +53,7 @@ def test_rest_get(client):
                         headers=headers)
     assert r.status_code == 200
 
-    with app.app_context():
-        flask_client.delete_layer(username, layername, client)
+    flask_client.delete_layer(username, layername, client)
 
 
 def get_auth_header(username):
