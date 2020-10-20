@@ -169,6 +169,7 @@ def test_layman_gs_user_conflict(client):
 def test_wrong_value_of_layername(client):
     username = 'test_wrong_value_of_layername_user'
     layername = 'layer1'
+    # publish and delete layer to ensure that username exists
     publish_layer(username, layername, client)
     delete_layer(username, layername, client)
     layernames = [' ', '2a', 'ě', ';', '?', 'ABC']
@@ -245,6 +246,7 @@ def test_layername_db_object_conflict(client):
 def test_get_layers_testuser1_v1(client):
     username = 'test_get_layers_testuser1_v1_user'
     layername = 'layer1'
+    # publish and delete layer to ensure that username exists
     publish_layer(username, layername, client)
     delete_layer(username, layername, client)
     rv = client.get(url_for('rest_layers.get', username=username))
