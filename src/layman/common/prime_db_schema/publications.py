@@ -45,8 +45,6 @@ from const c inner join
 
 
 def insert_publication(username, info):
-    # TODO get_user_infos should be enough
-    # user_id = users.get_user_infos(username)[username]["id"]
     user_id = users.ensure_user(username)
     insert_publications_sql = f'''insert into {DB_SCHEMA}.publications as p
         (id_user, name, title, type, uuid, everyone_can_read, everyone_can_write) values
