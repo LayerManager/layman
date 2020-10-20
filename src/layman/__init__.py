@@ -51,11 +51,6 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
     if (IN_FLASK_PROCESS or IN_PYTEST_PROCESS) and settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) is None:
         settings.LAYMAN_REDIS.set(LAYMAN_DEPS_ADJUSTED_KEY, 'processing')
 
-        with app.app_context():
-            db_util.check_schema_name()
-        with app.app_context():
-            db_util.ensure_schema()
-
         app.logger.info(f'Adjusting GeoServer')
         with app.app_context():
             from layman.common.geoserver import ensure_role, ensure_user, ensure_user_role, ensure_wms_srs_list, ensure_proxy_base_url
@@ -67,6 +62,11 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
             ensure_wms_srs_list([int(srs.split(':')[1]) for srs in settings.INPUT_SRS_LIST], settings.LAYMAN_GS_AUTH)
             if settings.LAYMAN_GS_PROXY_BASE_URL != '':
                 ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
+
+        with app.app_context():
+            db_util.check_schema_name()
+        with app.app_context():
+            db_util.ensure_schema()
 
         app.logger.info(f'Loading Redis database')
         with app.app_context():
