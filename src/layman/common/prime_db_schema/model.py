@@ -1,7 +1,7 @@
 from layman import settings
 from layman.util import get_modules_from_names
 
-DB_SCHEMA = settings.PG_LAYMAN_SCHEMA
+DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 RIGHT_WRITE = 'write'
 RIGHT_READ = 'read'
 

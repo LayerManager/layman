@@ -35,7 +35,7 @@ for bp in get_blueprints():
 
 from .user.rest_current_user import bp as current_user_bp
 from .gs_wfs_proxy import bp as gs_wfs_proxy_bp
-from . import db as db_util
+from .common import prime_db_schema as db_util
 
 app.register_blueprint(current_user_bp, url_prefix='/rest/current-user')
 app.register_blueprint(gs_wfs_proxy_bp, url_prefix='/geoserver')
@@ -50,6 +50,12 @@ LAYMAN_DEPS_ADJUSTED_KEY = f"{__name__}:LAYMAN_DEPS_ADJUSTED"
 if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
     if (IN_FLASK_PROCESS or IN_PYTEST_PROCESS) and settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) is None:
         settings.LAYMAN_REDIS.set(LAYMAN_DEPS_ADJUSTED_KEY, 'processing')
+
+        with app.app_context():
+            db_util.check_schema_name()
+        with app.app_context():
+            db_util.ensure_schema()
+
         app.logger.info(f'Adjusting GeoServer')
         with app.app_context():
             from layman.common.geoserver import ensure_role, ensure_user, ensure_user_role, ensure_wms_srs_list, ensure_proxy_base_url
@@ -80,8 +86,6 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
                 check_username(username)
                 ensure_whole_user(username)
 
-            db_util.check_schema_name()
-            db_util.ensure_schema()
     else:
         while(settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done'):
             app.logger.info(f'Waiting for flask process to adjust dependencies')

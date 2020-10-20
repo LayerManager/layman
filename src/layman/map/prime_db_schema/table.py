@@ -1,4 +1,4 @@
-from layman.db import publications as pubs_util
+from ...common.prime_db_schema import publications as pubs_util
 from .. import MAP_TYPE
 
 
@@ -17,24 +17,35 @@ def get_map_info(username, mapname):
 
 def patch_map(username,
               mapname,
-              title=None):
+              title=None,
+              can_read=None,
+              can_write=None):
+    can_read = can_read or set()
+    can_write = can_write or set()
     db_info = {"name": mapname,
                "title": title,
                "publ_type_name": MAP_TYPE,
-               "everyone_can_read": True,
-               "everyone_can_write": True,
+               "can_read": can_read,
+               "can_write": can_write,
                }
     pubs_util.update_publication(username, db_info)
 
 
-def post_map(username, mapname, uuid, title):
+def post_map(username,
+             mapname,
+             uuid,
+             title,
+             can_read=None,
+             can_write=None):
+    can_read = can_read or set()
+    can_write = can_write or set()
     # store into Layman DB
     db_info = {"name": mapname,
                "title": title,
                "publ_type_name": MAP_TYPE,
                "uuid": uuid,
-               "everyone_can_read": True,
-               "everyone_can_write": True,
+               "can_read": can_read,
+               "can_write": can_write,
                }
     pubs_util.insert_publication(username, db_info)
 

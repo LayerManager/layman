@@ -34,13 +34,13 @@ PUBLICATION_TYPES = {
             'layman.layer.filesystem.input_chunk',
             'layman.layer.filesystem.input_file',
             'layman.layer.filesystem.input_sld',
+            'layman.layer.prime_db_schema.table',
             'layman.layer.db.table',
             'layman.layer.geoserver.wfs',
             'layman.layer.geoserver.wms',
             'layman.layer.geoserver.sld',
             'layman.layer.filesystem.thumbnail',
             'layman.layer.micka.soap',
-            'layman.layer.db.metadb',
         ],
         'task_modules': [
             'layman.layer.db.tasks',
@@ -65,8 +65,6 @@ PUBLICATION_TYPES = {
                 'title',
                 'wfs_url',
                 'wms_url',
-                'everyone_can_read',
-                'everyone_can_write',
             }
         },
     }

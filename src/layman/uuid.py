@@ -29,7 +29,6 @@ def import_uuids_to_redis():
                 for r in results:
                     pubnames += r.keys()
                 pubnames = list(set(pubnames))
-                current_app.logger.info(f'import_uuids_to_redis: pubnames={pubnames}')
 
                 for publ_name in pubnames:
                     results = call_modules_fn(sources, 'get_publication_uuid',

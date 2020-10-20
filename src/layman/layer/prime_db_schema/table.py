@@ -1,7 +1,5 @@
-from flask import current_app as app
-
-from layman.db import publications as pubs_util
-from .. import LAYER_TYPE
+from layman.common.prime_db_schema import publications as pubs_util
+from layman.layer import LAYER_TYPE
 from layman import patch_mode
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
@@ -32,23 +30,21 @@ def delete_layer(username, layername):
 def update_layer(username,
                  layername,
                  layerinfo):
-    db_info = {"name": layername,
-               "title": layerinfo.get('title'),
-               "publ_type_name": LAYER_TYPE,
-               "everyone_can_read": True,
-               "everyone_can_write": True,
-               }
-    pubs_util.update_publication(username, db_info)
+    pass
 
 
 def patch_layer(username,
                 layername,
-                title=None):
+                title=None,
+                can_read=None,
+                can_write=None):
+    can_read = can_read or set()
+    can_write = can_write or set()
     db_info = {"name": layername,
                "title": title,
                "publ_type_name": LAYER_TYPE,
-               "everyone_can_read": True,
-               "everyone_can_write": True,
+               "can_read": can_read,
+               "can_write": can_write,
                }
     pubs_util.update_publication(username, db_info)
 
@@ -56,13 +52,17 @@ def patch_layer(username,
 def post_layer(username,
                layername,
                title=None,
-               uuid=None):
+               uuid=None,
+               can_read=None,
+               can_write=None):
+    can_read = can_read or set()
+    can_write = can_write or set()
     db_info = {"name": layername,
                "title": title,
                "publ_type_name": LAYER_TYPE,
                "uuid": uuid,
-               "everyone_can_read": True,
-               "everyone_can_write": True,
+               "can_read": can_read,
+               "can_write": can_write,
                }
     pubs_util.insert_publication(username, db_info)
 

@@ -3,7 +3,8 @@ import sys
 del sys.modules['layman']
 
 from layman import app
-from .db import table, metadb
+from .db import table
+from .prime_db_schema import table as prime_table
 from .filesystem import input_file, uuid, input_sld, input_chunk, thumbnail
 from .geoserver import wfs, wms, sld
 from .micka import soap
@@ -32,10 +33,8 @@ def test_get_layer_infos(client):
                                         'title': layertitle,
                                         'uuid': uuid.get_layer_uuid(username, layername),
                                         'type': LAYER_TYPE,
-                                        'everyone_can_read': True,
-                                        'everyone_can_write': True,
-                                        'can_read_users': None,
-                                        'can_write_users': None,
+                                        # 'can_read': set(),
+                                        # 'can_write': set(),
                                         }}
         modules = [
             {'name': 'db.table',
@@ -43,10 +42,10 @@ def test_get_layer_infos(client):
              'result_infos': result_infos_name,
              'method_publications': table.get_publication_infos,
              },
-            {'name': 'db.metadb',
-             'method_infos': metadb.get_layer_infos,
+            {'name': 'prime_table.table',
+             'method_infos': prime_table.get_layer_infos,
              'result_infos': result_infos_all,
-             'method_publications': metadb.get_publication_infos,
+             'method_publications': prime_table.get_publication_infos,
              },
             {'name': 'filesystem.input_file',
              'method_infos': input_file.get_layer_infos,

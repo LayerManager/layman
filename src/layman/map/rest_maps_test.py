@@ -5,7 +5,7 @@ del sys.modules['layman']
 from layman import app
 from .filesystem import input_file, uuid, thumbnail
 from .micka import soap
-from .db import metadb
+from .prime_db_schema import table as prime_table
 from . import util, MAP_TYPE
 from layman.util import url_for
 from test import flask_client as client_util
@@ -32,16 +32,14 @@ def test_get_map_infos(client):
                                       'title': maptitle,
                                       'uuid': uuid.get_map_uuid(username, mapname),
                                       'type': MAP_TYPE,
-                                      'everyone_can_read': True,
-                                      'everyone_can_write': True,
-                                      'can_read_users': None,
-                                      'can_write_users': None,
+                                      # 'can_read': set(),
+                                      # 'can_write': set(),
                                       }}
         modules = [
-            {'name': 'db.metadb',
-             'method_infos': metadb.get_map_infos,
+            {'name': 'prime_table.table',
+             'method_infos': prime_table.get_map_infos,
              'result_infos': result_infos_all,
-             'method_publications': metadb.get_publication_infos,
+             'method_publications': prime_table.get_publication_infos,
              },
             {'name': 'filesystem.input_file',
              'method_infos': input_file.get_map_infos,

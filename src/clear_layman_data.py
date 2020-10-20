@@ -157,9 +157,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
     conn.autocommit = True
     cur = conn.cursor()
     cur.execute(f"""
-truncate table "{settings.PG_LAYMAN_SCHEMA}".rights cascade;
-truncate table "{settings.PG_LAYMAN_SCHEMA}".publications cascade;
-truncate table "{settings.PG_LAYMAN_SCHEMA}".users cascade;
+DROP SCHEMA IF EXISTS "{settings.LAYMAN_PRIME_SCHEMA}" CASCADE;
 """)
     conn.commit()
 

@@ -6,7 +6,7 @@ import os
 from src.layman import settings
 
 from test.mock.liferay import run
-from test import utils
+from test import util
 
 
 SUBPROCESSES = set()
@@ -52,7 +52,7 @@ def liferay_mock():
         },
     })
     server.start()
-    utils.wait_for_url(AUTHN_INTROSPECTION_URL, 20, 0.1)
+    util.wait_for_url(AUTHN_INTROSPECTION_URL, 20, 0.1)
 
     yield server
 
@@ -82,7 +82,7 @@ def start_layman(env_vars=None):
 
     SUBPROCESSES.add(layman_process)
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest/current-user"
-    utils.wait_for_url(rest_url, 50, 0.1)
+    util.wait_for_url(rest_url, 50, 0.1)
 
     celery_env = layman_env.copy()
     celery_env['LAYMAN_SKIP_REDIS_LOADING'] = 'true'

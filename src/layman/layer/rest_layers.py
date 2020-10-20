@@ -9,7 +9,7 @@ from .filesystem import input_file, input_sld, input_chunk, uuid
 from layman.authn import authenticate
 from layman.authz import authorize
 from layman.common import redis as redis_util
-from .db import metadb
+from .prime_db_schema import table
 
 bp = Blueprint('rest_layers', __name__)
 
@@ -26,7 +26,7 @@ def before_request():
 def get(username):
     app.logger.info(f"GET Layers, user={g.user}")
 
-    layer_infos = metadb.get_layer_infos(username)
+    layer_infos = table.get_layer_infos(username)
 
     sorted_infos = sorted(layer_infos.items(), key=lambda x: x[0])
 

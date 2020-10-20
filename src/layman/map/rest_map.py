@@ -4,13 +4,11 @@ import io
 from flask import Blueprint, jsonify, request, current_app as app, g
 from werkzeug.datastructures import FileStorage
 
-from layman import LaymanError
 from layman.util import check_username_decorator
-from . import util, MAP_TYPE
+from . import util
 from .filesystem import input_file, thumbnail
 from layman.authn import authenticate
 from layman.authz import authorize
-from layman.db import publications as db_util
 
 bp = Blueprint('rest_map', __name__)
 
@@ -108,8 +106,6 @@ def delete_map(username, mapname):
     util.abort_map_tasks(username, mapname)
 
     util.delete_map(username, mapname)
-
-    db_util.delete_publication(username, mapname, MAP_TYPE)
 
     app.logger.info('DELETE Map done')
 

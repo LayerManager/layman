@@ -3,7 +3,7 @@ from test.flask_client import client
 from layman import settings, app as app
 from . import users as user_util
 
-DB_SCHEMA = settings.PG_LAYMAN_SCHEMA
+DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
 def test_get_user_infos(client):
