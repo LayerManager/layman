@@ -205,7 +205,7 @@ def test_missing_attribute(liferay_mock):
             r = requests.post(rest_url,
                               data=data_xml,
                               headers=headers)
-            assert r.status_code == 200, f"{r.get_data()}"
+            assert r.status_code == 200, f"r.status_code={r.status_code}\n{r.text}"
 
             new_db_attributes = {}
             new_wfs_properties = {}
