@@ -66,7 +66,9 @@ def extract_attributes_from_wfs_t_update(action, authz_module, xml_tree, major_v
     if ws_match:
         ws_name = ws_match.group(1)
     else:
-        app.logger.warning(f"WFS Proxy: skipping due to wrong namespace name. Namespace={ws_namespace}")
+        if ws_namespace not in ['http://www.opengis.net/fes/2.0', 'http://www.opengis.net/ogc']:
+            app.logger.warning(
+                f"WFS Proxy: skipping due to wrong namespace name. Namespace={ws_namespace}, action={ET.QName(action)}")
         return attribs
     layer_name = layer_qname[1]
     layer_match = re.match(LAYERNAME_RE, layer_name)
@@ -111,7 +113,8 @@ def extract_attributes_from_wfs_t_insert_replace(action, authz_module):
         if ws_match:
             ws_name = ws_match.group(1)
         else:
-            app.logger.warning(f"WFS Proxy: skipping due to wrong namespace name. Namespace={ws_namespace}")
+            if ws_namespace not in ['http://www.opengis.net/fes/2.0', 'http://www.opengis.net/ogc']:
+                app.logger.warning(f"WFS Proxy: skipping due to wrong namespace name. Namespace={ws_namespace}, action={ET.QName(action)}")
             continue
         layer_name = layer_qname.localname
         layer_match = re.match(LAYERNAME_RE, layer_name)
