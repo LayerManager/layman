@@ -155,7 +155,7 @@ def get_wfs11_insert_points_new_attr(username, layername, attr_names):
    <wfs:Insert>
        <{username}:{layername}>
            <{username}:wkb_geometry>
-           <gml:MultiLineString srsName="http://www.opengis.net/gml/srs/epsg.xml#4326">
+           <gml:MultiLineString srsName="http://www.opengis.net/gml/srs/epsg.xml#3857">
                <gml:lineStringMember>
                    <gml:LineString>
                        <gml:coordinates decimal="." cs="," ts=" ">
@@ -193,7 +193,7 @@ def get_wfs11_insert_polygon_new_attr(username, layername, attr_names):
    <wfs:Insert>
        <{layername} xmlns="http://{username}">
            <wkb_geometry>
-           <gml:MultiLineString srsName="http://www.opengis.net/gml/srs/epsg.xml#4326">
+           <gml:MultiLineString srsName="http://www.opengis.net/gml/srs/epsg.xml#3857">
                <gml:lineStringMember>
                    <gml:LineString>
                        <gml:coordinates decimal="." cs="," ts=" ">
