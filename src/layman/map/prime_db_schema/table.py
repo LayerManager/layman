@@ -6,6 +6,11 @@ def get_map_infos(username):
     return pubs_util.get_publication_infos(username, MAP_TYPE)
 
 
+def get_publication_uuid(username, publication_type, publication_name):
+    infos = pubs_util.get_publication_infos(username, publication_type)
+    return infos.get(publication_name).get("uuid")
+
+
 def get_map_info(username, mapname):
     maps = pubs_util.get_publication_infos(username, MAP_TYPE)
     if mapname in maps:
