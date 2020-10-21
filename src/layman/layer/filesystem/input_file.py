@@ -32,6 +32,14 @@ def update_layer(username, layername, layerinfo):
     pass
 
 
+def post_layer(username, layername):
+    pass
+
+
+def patch_layer(username, layername):
+    pass
+
+
 def delete_layer(username, layername):
     util.delete_layer_subdir(username, layername, LAYER_SUBDIR)
 
@@ -65,12 +73,12 @@ def get_layer_infos(username):
     return layer_infos
 
 
-def get_publication_names(username, publication_type):
+def get_publication_infos(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
     infos = get_layer_infos(username)
-    return list(infos)
+    return infos
 
 
 from . import uuid

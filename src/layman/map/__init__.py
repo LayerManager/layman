@@ -29,6 +29,7 @@ PUBLICATION_TYPES = {
         # see also .util.TASKS_TO_MAP_INFO_KEYS
         'internal_sources': [
             'layman.map.filesystem.uuid',
+            'layman.map.prime_db_schema.table',
             'layman.map.filesystem.input_file',
             'layman.map.filesystem.thumbnail',
             'layman.map.micka.soap',

@@ -1,9 +1,16 @@
 from . import get_connection_cursor
 from layman import settings, patch_mode
 from layman.http import LaymanError
-from layman.common import util as layman_util
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
+
+
+def post_layer(username, layername):
+    pass
+
+
+def patch_layer(username, layername):
+    pass
 
 
 def update_layer(username, layername, layerinfo):
@@ -67,12 +74,12 @@ def delete_layer(username, layername, conn_cur=None):
         raise LaymanError(7)
 
 
-def get_publication_names(username, publication_type):
+def get_publication_infos(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
     infos = get_layer_infos(username)
-    return list(infos)
+    return infos
 
 
 def get_publication_uuid(username, publication_type, publication_name):

@@ -161,6 +161,10 @@ def update_layer(username, layername, layerinfo):
 
 
 def post_layer(username, layername, task_options, start_at):
+    # sync processing
+    sources = get_sources()
+    call_modules_fn(sources, 'post_layer', [username, layername], kwargs=task_options)
+
     post_tasks = tasks_util.get_task_methods(get_layer_type_def(), username, layername, task_options, start_at)
     post_chain = tasks_util.get_chain_of_methods(username, layername, post_tasks, task_options, 'layername')
     # res = post_chain.apply_async()
@@ -170,6 +174,10 @@ def post_layer(username, layername, task_options, start_at):
 
 
 def patch_layer(username, layername, task_options, start_at):
+    # sync processing
+    sources = get_sources()
+    call_modules_fn(sources, 'patch_layer', [username, layername], kwargs=task_options)
+
     patch_tasks = tasks_util.get_task_methods(get_layer_type_def(), username, layername, task_options, start_at)
     patch_chain = tasks_util.get_chain_of_methods(username, layername, patch_tasks, task_options, 'layername')
     # res = patch_chain.apply_async()

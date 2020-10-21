@@ -30,9 +30,17 @@ get_layer_infos = input_file.get_layer_infos
 
 update_layer = input_file.update_layer
 
-get_publication_names = input_file.get_publication_names
+get_publication_infos = input_file.get_publication_infos
 
 get_publication_uuid = input_file.get_publication_uuid
+
+
+def post_layer(username, layername):
+    pass
+
+
+def patch_layer(username, layername):
+    pass
 
 
 def delete_layer(username, layername):

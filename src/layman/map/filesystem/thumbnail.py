@@ -51,7 +51,7 @@ def patch_map(username, mapname, file_changed=True):
         post_map(username, mapname)
 
 
-get_publication_names = input_file.get_publication_names
+get_publication_infos = input_file.get_publication_infos
 
 get_publication_uuid = input_file.get_publication_uuid
 

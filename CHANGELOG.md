@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.18.0
+ 2020-12-??
+### Upgrade requirements
+### Changes
+- [#28](https://github.com/jirik/layman/issues/28) New environment variable [LAYMAN_PRIME_SCHEMA](doc/env-settings.md#LAYMAN_PRIME_SCHEMA). 
+
 ## v1.7.2
 2020-11-09
 ### Changes

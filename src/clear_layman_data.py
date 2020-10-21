@@ -152,6 +152,15 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
             print(f"Deleting metadata record {record_id}")
             csw.transaction(ttype='delete', typename='gmd:MD_Metadata', identifier=record_id)
 
+    # Layman DB
+    conn = psycopg2.connect(**settings.PG_CONN)
+    conn.autocommit = True
+    cur = conn.cursor()
+    cur.execute(f"""
+DROP SCHEMA IF EXISTS "{settings.LAYMAN_PRIME_SCHEMA}" CASCADE;
+""")
+    conn.commit()
+
 
 if __name__ == "__main__":
     main()
