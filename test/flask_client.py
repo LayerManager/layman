@@ -32,7 +32,7 @@ def publish_layer(username, layername, client, title=None):
                 'name': layername,
                 'title': title
             })
-            assert rv.status_code == 200
+            assert rv.status_code == 200, (rv.status_code, rv.get_json())
         finally:
             for fp in files:
                 fp[0].close()
@@ -72,8 +72,9 @@ def delete_layer(username, layername, client, headers=None):
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
 
     r_url = f"{rest_url}/{username}/layers/{layername}"
-    r = client.delete(r_url, headers=headers)
-    assert r.status_code == 200, r.text
+    with app.app_context():
+        r = client.delete(r_url, headers=headers)
+    assert r.status_code == 200, (r.status_code, r.get_json())
 
 
 def delete_map(username, mapname, client, headers=None):
@@ -81,8 +82,9 @@ def delete_map(username, mapname, client, headers=None):
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
 
     r_url = f"{rest_url}/{username}/maps/{mapname}"
-    r = client.delete(r_url, headers=headers)
-    assert r.status_code == 200
+    with app.app_context():
+        r = client.delete(r_url, headers=headers)
+    assert r.status_code == 200, (r.status_code, r.get_json())
 
 
 def publish_map(username, mapname, client, maptitle=None, headers=None):
@@ -107,7 +109,7 @@ def publish_map(username, mapname, client, maptitle=None, headers=None):
                                    'title': maptitle,
                                    },
                              headers=headers)
-            assert rv.status_code == 200
+            assert rv.status_code == 200, (rv.status_code, rv.get_json())
         finally:
             for fp in files:
                 fp[0].close()

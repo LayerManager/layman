@@ -8,7 +8,7 @@ from layman import celery as celery_util
 from layman.common import redis as redis_util
 from redis import WatchError
 from . import settings
-from .util import get_usernames_no_cache, get_modules_from_names, get_providers_from_source_names, call_modules_fn
+from .util import get_usernames, get_modules_from_names, get_providers_from_source_names, call_modules_fn
 
 UUID_SET_KEY = f'{__name__}:UUID_SET'
 UUID_METADATA_KEY = f'{__name__}:UUID_METADATA:{{uuid}}'
@@ -17,17 +17,17 @@ USER_TYPE_NAMES_KEY = f'{__name__}:USER_TYPE_NAMES:{{username}}:{{publication_ty
 
 def import_uuids_to_redis():
     current_app.logger.info('Importing UUIDs to REDIS')
-    usernames = get_usernames_no_cache()
+    usernames = get_usernames(use_cache=False)
 
     for username in usernames:
         for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
             for type_def in publ_module.PUBLICATION_TYPES.values():
                 publ_type_name = type_def['type']
                 sources = get_modules_from_names(type_def['internal_sources'])
-                results = call_modules_fn(sources, 'get_publication_names', [username, publ_type_name])
+                results = call_modules_fn(sources, 'get_publication_infos', [username, publ_type_name])
                 pubnames = []
                 for r in results:
-                    pubnames += r
+                    pubnames += r.keys()
                 pubnames = list(set(pubnames))
 
                 for publ_name in pubnames:
@@ -149,9 +149,9 @@ def check_redis_consistency(expected_publ_num_by_type=None):
                 publ_type_name = type_def['type']
                 sources = get_modules_from_names(type_def['internal_sources'])
                 pubnames = []
-                results = call_modules_fn(sources, 'get_publication_names', [username, publ_type_name])
+                results = call_modules_fn(sources, 'get_publication_infos', [username, publ_type_name])
                 for r in results:
-                    pubnames += r
+                    pubnames += r.keys()
                 pubnames = list(set(pubnames))
                 # print(f'username {username}, publ_type_name {publ_type_name}, pubnames {pubnames}')
                 num_total_publs += len(pubnames)

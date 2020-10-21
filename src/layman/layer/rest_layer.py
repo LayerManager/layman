@@ -5,7 +5,7 @@ from layman.common import redis as redis_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator
 from layman import settings
-from . import util, LAYER_TYPE
+from . import util
 from .filesystem import input_file, input_sld, input_chunk
 from layman.authn import authenticate
 from layman.authz import authorize

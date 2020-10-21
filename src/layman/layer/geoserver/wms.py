@@ -25,6 +25,14 @@ def get_flask_proxy_key(username):
     return FLASK_PROXY_KEY.format(username=username)
 
 
+def post_layer(username, layername):
+    pass
+
+
+def patch_layer(username, layername):
+    pass
+
+
 def update_layer(username, layername, layerinfo):
     clear_cache(username)
     pass
@@ -132,12 +140,12 @@ def get_layer_infos(username):
     return result
 
 
-def get_publication_names(username, publication_type):
+def get_publication_infos(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown publication type {publication_type}')
 
     infos = get_layer_infos(username)
-    return list(infos)
+    return infos
 
 
 def get_publication_uuid(username, publication_type, publication_name):

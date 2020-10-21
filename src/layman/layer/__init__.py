@@ -31,6 +31,7 @@ PUBLICATION_TYPES = {
         # see also .util.TASKS_TO_LAYER_INFO_KEYS
         'internal_sources': [  # internal sources to process when new source is published
             'layman.layer.filesystem.uuid',
+            'layman.layer.prime_db_schema.table',
             'layman.layer.filesystem.input_chunk',
             'layman.layer.filesystem.input_file',
             'layman.layer.filesystem.input_sld',

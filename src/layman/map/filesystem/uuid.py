@@ -5,9 +5,6 @@ from . import input_file
 
 MAP_TYPE = '.'.join(__name__.split('.')[:-2])
 
-# username, publication_type
-get_publication_names = input_file.get_publication_names
-
 # username, mapname
 get_map_info = partial(common_uuid.get_publication_info, MAP_TYPE)
 
@@ -23,6 +20,13 @@ def get_map_infos(username):
     for name in infos:
         infos[name]['uuid'] = get_map_uuid(username, name)
     return infos
+
+
+def get_publication_infos(username, publication_type):
+    if publication_type != '.'.join(__name__.split('.')[:-2]):
+        raise Exception(f'Unknown pyblication type {publication_type}')
+
+    return get_map_infos(username)
 
 
 def get_map_uuid(username, mapname):
