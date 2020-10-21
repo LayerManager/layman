@@ -181,9 +181,9 @@ def test_missing_attribute(liferay_mock):
                                    headers=authn_headers)
     assert ln == layername
     ln2 = client_util.publish_layer(username,
-                                   layername2,
-                                   ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
-                                   headers=authn_headers)
+                                    layername2,
+                                    ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+                                    headers=authn_headers)
     assert ln2 == layername2
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
