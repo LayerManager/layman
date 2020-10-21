@@ -35,10 +35,12 @@ for bp in get_blueprints():
 
 from .user.rest_current_user import bp as current_user_bp
 from .gs_wfs_proxy import bp as gs_wfs_proxy_bp
+from .user.rest_users import bp as users_bp
 from .common import prime_db_schema as db_util
 
 app.register_blueprint(current_user_bp, url_prefix='/rest/current-user')
 app.register_blueprint(gs_wfs_proxy_bp, url_prefix='/geoserver')
+app.register_blueprint(users_bp, url_prefix=f'/{settings.REST_USERS_PREFIX}')
 
 app.logger.info(f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}")
 app.logger.info(f"IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}")

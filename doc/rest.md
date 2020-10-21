@@ -14,6 +14,7 @@
 |Map File|`/rest/<username>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
 |Map Thumbnail|`/rest/<username>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
 |Map Metadata Comparison|`/rest/<username>/layers/<layername>/metadata-comparison`|[GET](#get-map-metadata-comparison) | x | x | x |
+|Users|`/rest/users`|[GET](#get-users)| x | x | x |
 |Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | [DELETE](#delete-current-user) |
 
 #### REST path parameters
@@ -489,6 +490,25 @@ JSON object with one attribute:
   - **equal**: Boolean. True if all values are considered equal, false otherwise.
   - **equal_or_null**: Boolean. True if all values are considered equal or null, false otherwise.
 
+
+## Users
+### URL
+`/rest/users`
+
+### GET Users
+
+#### Request.
+No action parameters.
+
+#### Response
+Content-Type: `application/json`
+
+JSON array of objects representing available layers with following structure:
+- **username**: String. Username of the user.
+- **given_name**: String. Given name of the user.
+- **family_name**: String. Family name of the user
+- **middle_name**: String. Middle name of the user
+- **name**: String. Whole name of the user (given_name + middle_name + family_name).
 
 ## Current User
 ### URL

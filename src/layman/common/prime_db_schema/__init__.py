@@ -2,6 +2,7 @@ from layman.util import get_usernames, get_modules_from_names, call_modules_fn
 from layman.common.util import merge_infos
 from layman import settings, app, LaymanError
 from layman.authz.util import get_publication_access_rights
+from layman.authn.filesystem import get_authn_info
 from layman.common.prime_db_schema import publications, model, users
 from layman.common.prime_db_schema.util import run_query, run_statement
 
@@ -21,7 +22,8 @@ def migrate_users_and_publications():
     usernames = get_usernames(use_cache=False)
 
     for username in usernames:
-        users.ensure_user(username)
+        userinfo = get_authn_info(username)
+        users.ensure_user(username, userinfo)
         for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
             for type_def in publ_module.PUBLICATION_TYPES.values():
                 publ_type_name = type_def['type']

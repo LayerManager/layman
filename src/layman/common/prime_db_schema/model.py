@@ -100,6 +100,13 @@ CREATE TABLE {DB_SCHEMA}.users
 (
     id integer NOT NULL DEFAULT nextval('{DB_SCHEMA}.users_id_seq'::regclass),
     username VARCHAR(256) COLLATE pg_catalog."default" not null,
+    given_name VARCHAR(256) COLLATE pg_catalog."default",
+    family_name VARCHAR(256) COLLATE pg_catalog."default",
+    middle_name VARCHAR(256) COLLATE pg_catalog."default",
+    name VARCHAR(256) COLLATE pg_catalog."default",
+    email VARCHAR(1024) COLLATE pg_catalog."default",
+    issuer_id VARCHAR(256) COLLATE pg_catalog."default",
+    sub VARCHAR(256) COLLATE pg_catalog."default",
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_username_key UNIQUE (username)
 )

@@ -1,7 +1,7 @@
 import test.flask_client as client_util
 
 from layman import settings, app as app
-from . import ensure_schema, migrate_users_and_publications, model, publications
+from . import ensure_schema, migrate_users_and_publications, model, publications as pub_util, users as user_util
 from .util import run_query, run_statement
 from layman import util
 from layman.layer import util as layer_util
@@ -32,17 +32,24 @@ def test_recreate_schema(client):
 
 def test_schema(client):
     username = 'migration_test_user1'
-    client_util.publish_layer(username, 'migration_test_layer1', client)
-    client_util.publish_map(username, 'migration_test_map1', client)
+    layername = 'migration_test_layer1'
+    mapname = 'migration_test_map1'
+    client_util.publish_layer(username, layername, client)
+    client_util.publish_map(username, mapname, client)
 
     with app.app_context():
         run_statement(model.DROP_SCHEMA_SQL)
         ensure_schema()
         users = run_query(f'select count(*) from {DB_SCHEMA}.users;')
         assert users[0][0] == len(util.get_usernames())
+        user_infos = user_util.get_user_infos()
+        assert username in user_infos
+        pub_infos = pub_util.get_publication_infos(username)
+        assert layername in pub_infos
+        assert mapname in pub_infos
 
-    client_util.delete_layer(username, 'migration_test_layer1', client)
-    client_util.delete_map(username, 'migration_test_map1', client)
+    client_util.delete_layer(username, layername, client)
+    client_util.delete_map(username, mapname, client)
 
     with app.app_context():
         pubs = layer_util.get_layer_infos(username)

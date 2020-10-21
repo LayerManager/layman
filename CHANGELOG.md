@@ -5,6 +5,7 @@
 ### Upgrade requirements
 ### Changes
 - [#28](https://github.com/jirik/layman/issues/28) New environment variable [LAYMAN_PRIME_SCHEMA](doc/env-settings.md#LAYMAN_PRIME_SCHEMA). 
+- [#28](https://github.com/jirik/layman/issues/28) New REST endpoint [GET Users](doc/rest.md#get-users). 
 
 ## v1.7.1
 2020-09-30
