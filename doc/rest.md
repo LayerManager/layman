@@ -504,7 +504,7 @@ No action parameters.
 #### Response
 Content-Type: `application/json`
 
-JSON array of objects representing available layers with following structure:
+JSON array of objects representing users of Layman with following structure:
 - **username**: String. Username of the user.
 - **given_name**: String. Given name of the user.
 - **family_name**: String. Family name of the user
