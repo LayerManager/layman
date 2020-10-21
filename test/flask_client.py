@@ -9,6 +9,7 @@ from layman.layer import util as util_layer
 from layman.layer import LAYER_TYPE
 from layman.map import util as util_map
 from layman.util import url_for
+from test.util import wait_for_url
 
 
 def publish_layer(username, layername, client, title=None):
@@ -50,7 +51,8 @@ def client():
         'debug': False,
     })
     server.start()
-    time.sleep(1)
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest/current-user"
+    wait_for_url(rest_url, 50, 0.1)
 
     app.config['TESTING'] = True
     app.config['DEBUG'] = True
