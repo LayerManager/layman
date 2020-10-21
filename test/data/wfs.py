@@ -111,12 +111,11 @@ def get_wfs10_insert_points_new_attr(username, layername, attr_names):
    version="1.0.0"
    service="WFS"
    xmlns:{username}="http://{username}"
-   xmlns:fes="http://www.opengis.net/fes/2.0"
    xmlns:gml="http://www.opengis.net/gml/3.2"
-   xmlns:wfs="http://www.opengis.net/wfs/2.0"
+   xmlns:wfs="http://www.opengis.net/wfs"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://www.opengis.net/wfs/2.0
-                       http://schemas.opengis.net/wfs/2.0/wfs.xsd
+   xsi:schemaLocation="http://www.opengis.net/wfs
+                       http://schemas.opengis.net/wfs/1.0.0/wfs.xsd
                        http://www.opengis.net/gml/3.2
                        http://schemas.opengis.net/gml/3.2.1/gml.xsd">
    <wfs:Insert>
@@ -144,12 +143,11 @@ def get_wfs11_insert_points_new_attr(username, layername, attr_names):
    version="1.1.0"
    service="WFS"
    xmlns:{username}="http://{username}"
-   xmlns:fes="http://www.opengis.net/fes/2.0"
    xmlns:gml="http://www.opengis.net/gml/3.2"
-   xmlns:wfs="http://www.opengis.net/wfs/2.0"
+   xmlns:wfs="http://www.opengis.net/wfs"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://www.opengis.net/wfs/2.0
-                       http://schemas.opengis.net/wfs/2.0/wfs.xsd
+   xsi:schemaLocation="http://www.opengis.net/wfs
+                       http://schemas.opengis.net/wfs/1.1.0/wfs.xsd
                        http://www.opengis.net/gml/3.2
                        http://schemas.opengis.net/gml/3.2.1/gml.xsd">
    <wfs:Insert>
@@ -182,12 +180,11 @@ def get_wfs11_insert_polygon_new_attr(username, layername, attr_names):
 <wfs:Transaction
    version="1.1.0"
    service="WFS"
-   xmlns:fes="http://www.opengis.net/fes/2.0"
    xmlns:gml="http://www.opengis.net/gml/3.2"
-   xmlns:wfs="http://www.opengis.net/wfs/2.0"
+   xmlns:wfs="http://www.opengis.net/wfs"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://www.opengis.net/wfs/2.0
-                       http://schemas.opengis.net/wfs/2.0/wfs.xsd
+   xsi:schemaLocation="http://www.opengis.net/wfs
+                       http://schemas.opengis.net/wfs/1.1.0/wfs.xsd
                        http://www.opengis.net/gml/3.2
                        http://schemas.opengis.net/gml/3.2.1/gml.xsd">
    <wfs:Insert>
@@ -265,21 +262,21 @@ def get_wfs10_update_points_new(
            </wfs:Property>"""
         for attr_name in attr_names
     ])
-    filter_xml = f"""<fes:Filter>
-              <fes:FeatureId fid="{layername}.1"/>
-           </fes:Filter>
+    filter_xml = f"""<ogc:Filter>
+              <ogc:GmlObjectId gml:id="{layername}.1"/>
+           </ogc:Filter>
     """ if with_filter else ''
     return f'''<?xml version="1.0"?>
     <wfs:Transaction
        version="1.0.0"
        service="WFS"
        xmlns:{username}="http://{username}"
-       xmlns:fes="http://www.opengis.net/fes/2.0"
        xmlns:gml="http://www.opengis.net/gml/3.2"
-       xmlns:wfs="http://www.opengis.net/wfs/2.0"
+       xmlns:ogc="http://www.opengis.net/ogc"
+       xmlns:wfs="http://www.opengis.net/wfs"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.opengis.net/wfs/2.0
-                           http://schemas.opengis.net/wfs/2.0/wfs.xsd
+       xsi:schemaLocation="http://www.opengis.net/wfs
+                           http://schemas.opengis.net/wfs/1.0.0/wfs.xsd
                            http://www.opengis.net/gml/3.2
                            http://schemas.opengis.net/gml/3.2.1/gml.xsd">
        <wfs:Update typeName="{username}:{layername}">
