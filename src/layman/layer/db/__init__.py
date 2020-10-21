@@ -2,11 +2,12 @@ from collections import defaultdict
 import math
 import os
 import psycopg2
-from flask import g, app
+from flask import g
 
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
+from layman.common.prime_db_schema import users as users_util
 
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 

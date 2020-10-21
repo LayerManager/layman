@@ -69,6 +69,12 @@ assert re.match("[a-z][a-z0-9]*", LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE), "Only 
 LAYMAN_GS_AUTHN_FILTER_NAME = 'laymanHttpFilter'
 
 
+# Name of schema, where Layman stores data about publication, users, ...
+LAYMAN_PRIME_SCHEMA = os.environ['LAYMAN_PRIME_SCHEMA']
+assert re.match("[a-z_][a-z0-9_]*", LAYMAN_PRIME_SCHEMA), "Only lowercase characters, numbers and underscore " \
+                                                          "should be used for " \
+                                                          "PG_PRIME_SCHEMA. "
+
 # List of schemas that are not allowed to be used as usernames.
 PG_NON_USER_SCHEMAS = [
     'public',
@@ -76,9 +82,13 @@ PG_NON_USER_SCHEMAS = [
     'pg_catalog',
     'pg_toast',
     'information_schema',
+    LAYMAN_PRIME_SCHEMA,
 ]
 
 PG_POSTGIS_SCHEMA = 'public'
+
+# Name of "everyone" role in rights
+RIGHTS_EVERYONE_ROLE = "EVERYONE"
 
 # related to testing only
 LAYMAN_PG_TEMPLATE_DBNAME = os.getenv('LAYMAN_PG_TEMPLATE_DBNAME')

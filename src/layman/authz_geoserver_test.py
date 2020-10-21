@@ -1,7 +1,6 @@
 import os
 import pytest
 import importlib
-import requests
 
 from layman import settings
 from layman.common import geoserver
