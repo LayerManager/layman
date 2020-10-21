@@ -15,6 +15,7 @@ LIFERAY_PORT = 8020
 AUTHN_INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection?is_active=true"
 
 LAYMAN_CELERY_QUEUE = 'temporary'
+LAYMAN_REDIS_URL = 'redis://redis:6379/12'
 
 AUTHN_SETTINGS = {
     'LAYMAN_AUTHN_MODULES': 'layman.authn.oauth2',
@@ -70,13 +71,16 @@ def clear():
 
 def start_layman(env_vars=None):
     # first flush redis DB
-    settings.LAYMAN_REDIS.flushdb()
+    import redis
+    rds = redis.Redis.from_url(LAYMAN_REDIS_URL, encoding="utf-8", decode_responses=True)
+    rds.flushdb()
     port = settings.LAYMAN_SERVER_NAME.split(':')[1]
     env_vars = env_vars or {}
 
     layman_env = os.environ.copy()
     layman_env.update(**env_vars)
     layman_env['LAYMAN_CELERY_QUEUE'] = LAYMAN_CELERY_QUEUE
+    layman_env['LAYMAN_REDIS_URL'] = LAYMAN_REDIS_URL
     cmd = f'flask run --host=0.0.0.0 --port={port} --no-reload'
     layman_process = subprocess.Popen(cmd.split(), shell=False, stdin=None, env=layman_env)
 
