@@ -496,6 +496,7 @@ JSON object with one attribute:
 `/rest/users`
 
 ### GET Users
+Get list of registered users.
 
 #### Request.
 No action parameters.

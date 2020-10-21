@@ -26,7 +26,6 @@ from layman.layer.filesystem import uuid as layer_uuid
 from layman.layer.filesystem.thumbnail import get_layer_thumbnail_path
 from layman import uuid
 from layman.layer import db
-from layman.common.prime_db_schema import users
 from layman import celery as celery_util
 from .micka import csw
 from layman.common.micka import util as micka_common_util
@@ -202,7 +201,7 @@ def test_username_schema_conflict(client):
     resp_json = rv.get_json()
     # print(resp_json)
     assert resp_json['code'] == 35
-    assert resp_json['detail']['reserved_by'] in (db.__name__, users.__name__)
+    assert resp_json['detail']['reserved_by'] in db.__name__
     assert 'reason' not in resp_json['detail']
     for schema_name in [
         'pg_catalog',
@@ -218,7 +217,7 @@ def test_username_schema_conflict(client):
         # print(resp_json)
         assert rv.status_code == 409
         assert resp_json['code'] == 35
-        assert resp_json['detail']['reserved_by'] in (db.__name__, users.__name__)
+        assert resp_json['detail']['reserved_by'] in db.__name__
 
 
 @pytest.mark.usefixtures('app_context')
