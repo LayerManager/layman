@@ -155,9 +155,11 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
     return complete_info
 
 
-def update_layer(username, layername, layerinfo):
+def update_layer(username, layername, task_options, stop_at):
     sources = get_sources()
-    call_modules_fn(sources, 'update_layer', [username, layername, layerinfo])
+    stop_idx = next((idx for idx, s in enumerate(sources) if s.__name__ == stop_at), len(sources))
+    sources = sources[:stop_idx]
+    call_modules_fn(sources, 'update_layer', [username, layername], kwargs=task_options)
 
 
 def post_layer(username, layername, task_options, start_at):

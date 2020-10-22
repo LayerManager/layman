@@ -13,7 +13,7 @@ def patch_layer(username, layername):
     pass
 
 
-def update_layer(username, layername, layerinfo):
+def update_layer(username, layername):
     pass
 
 

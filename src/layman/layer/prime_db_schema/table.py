@@ -28,8 +28,7 @@ def delete_layer(username, layername):
 
 
 def update_layer(username,
-                 layername,
-                 layerinfo):
+                 layername):
     pass
 
 

@@ -50,9 +50,9 @@ def assign_publication_uuid(publ_type, username, publication_name, uuid_str=None
     return uuid_str
 
 
-def update_publication(publ_type, username, publication_name, publication_info):
-    if 'uuid' in publication_info:
-        new_uuid = publication_info['uuid']
+def update_publication(publ_type, username, publication_name, uuid=None):
+    if uuid:
+        new_uuid = uuid
         old_uuid = get_publication_uuid(publ_type, username, publ_type, publication_name)
         if old_uuid is not None:
             if old_uuid != new_uuid:

@@ -28,7 +28,7 @@ def ensure_layer_input_file_dir(username, layername):
     return input_file_dir
 
 
-def update_layer(username, layername, layerinfo):
+def update_layer(username, layername):
     pass
 
 

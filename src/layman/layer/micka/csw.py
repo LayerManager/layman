@@ -59,9 +59,9 @@ def get_layer_infos(username):
     return {}
 
 
-def update_layer(username, layername, layerinfo):
-    # current_app.logger.info(f"update_layer layerinfo['metadata_properties_to_refresh']={layerinfo['metadata_properties_to_refresh']}")
-    if len(layerinfo['metadata_properties_to_refresh']) == 0:
+def update_layer(username, layername, metadata_properties_to_refresh):
+    # current_app.logger.info(f"update_layer metadata_properties_to_refresh={metadata_properties_to_refresh}")
+    if len(metadata_properties_to_refresh) == 0:
         return {}
     uuid = get_layer_uuid(username, layername)
     csw = common_util.create_csw()
@@ -76,7 +76,7 @@ def update_layer(username, layername, layerinfo):
     _, prop_values = get_template_path_and_values(username, layername, http_method='patch')
     prop_values = {
         k: v for k, v in prop_values.items()
-        if k in layerinfo['metadata_properties_to_refresh'] + ['md_date_stamp']
+        if k in metadata_properties_to_refresh + ['md_date_stamp']
     }
     # current_app.logger.info(f"update_layer prop_values={prop_values}")
     basic_template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), './record-template.xml')

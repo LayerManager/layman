@@ -33,9 +33,7 @@ def patch_layer(username, layername):
     pass
 
 
-def update_layer(username, layername, layerinfo):
-    title = layerinfo['title']
-    description = layerinfo['description']
+def update_layer(username, layername, title, description):
     keywords = [
         "features",
         layername,
