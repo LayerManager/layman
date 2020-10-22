@@ -18,6 +18,8 @@ from layman.layer.filesystem import input_chunk
 from layman import celery as celery_util
 from layman.common import tasks as tasks_util
 
+from layman.common.prime_db_schema import workspaces
+
 min_geojson = """
 {
   "type": "Feature",

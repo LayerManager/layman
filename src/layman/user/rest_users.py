@@ -16,7 +16,7 @@ def before_request():
     pass
 
 
-@bp.route('/', methods=['GET'])
+@bp.route('', methods=['GET'])
 def get():
     app.logger.info(f"GET Users, user={g.user}")
 

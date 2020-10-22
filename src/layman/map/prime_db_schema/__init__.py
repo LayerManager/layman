@@ -1,7 +1,9 @@
-from layman.common.prime_db_schema import users as users_util
+from layman.common import prime_db_schema
 
 
-get_usernames = users_util.get_usernames
-check_username = users_util.check_username
-ensure_whole_user = users_util.ensure_user
-delete_whole_user = users_util.delete_user
+get_usernames = prime_db_schema.get_usernames
+check_username = prime_db_schema.check_username
+check_new_layername = prime_db_schema.check_new_layername
+delete_whole_user = prime_db_schema.delete_whole_user
+ensure_whole_user = prime_db_schema.ensure_whole_user
+check_username = prime_db_schema.check_username

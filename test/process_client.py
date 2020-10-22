@@ -24,8 +24,12 @@ def wait_for_rest(url, max_attempts, sleeping_time, keys_to_check):
             raise Exception('Max attempts reached!')
 
 
-def publish_layer(username, layername, file_paths, headers=None):
+def publish_layer(username,
+                  layername,
+                  file_paths=None,
+                  headers=None):
     headers = headers or {}
+    file_paths = file_paths or ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
 
     r_url = f"{rest_url}/{username}/layers"

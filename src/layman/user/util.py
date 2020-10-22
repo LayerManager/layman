@@ -23,6 +23,7 @@ def get_user_profile(user_obj):
 
 
 def reserve_username(username, adjust=False):
+    print(f"reserve_username: ##################### name={username}")
     if 'username' in g.user:
         raise LaymanError(34, {'username': g.user['username']})
     if adjust is not True:

@@ -69,6 +69,15 @@ CREATE SEQUENCE {DB_SCHEMA}.users_id_seq
 ALTER SEQUENCE {DB_SCHEMA}.users_id_seq
     OWNER TO {settings.LAYMAN_PG_USER};
 
+CREATE SEQUENCE {DB_SCHEMA}.workspaces_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+ALTER SEQUENCE {DB_SCHEMA}.workspaces_id_seq
+    OWNER TO {settings.LAYMAN_PG_USER};
+
 CREATE SEQUENCE {DB_SCHEMA}.rights_id_seq
     INCREMENT 1
     START 1
@@ -96,10 +105,19 @@ CREATE TABLE {DB_SCHEMA}.right_types
 )
 TABLESPACE pg_default;
 
+CREATE TABLE {DB_SCHEMA}.workspaces
+(
+    id integer NOT NULL DEFAULT nextval('{DB_SCHEMA}.workspaces_id_seq'::regclass),
+    name VARCHAR(256) COLLATE pg_catalog."default",
+    CONSTRAINT workspaces_pkey PRIMARY KEY (id),
+    CONSTRAINT workspaces_name_key UNIQUE (name)
+)
+TABLESPACE pg_default;
+
 CREATE TABLE {DB_SCHEMA}.users
 (
     id integer NOT NULL DEFAULT nextval('{DB_SCHEMA}.users_id_seq'::regclass),
-    username VARCHAR(256) COLLATE pg_catalog."default" not null,
+    id_workspace integer REFERENCES {DB_SCHEMA}.workspaces (id),
     given_name VARCHAR(256) COLLATE pg_catalog."default",
     family_name VARCHAR(256) COLLATE pg_catalog."default",
     middle_name VARCHAR(256) COLLATE pg_catalog."default",
@@ -108,14 +126,14 @@ CREATE TABLE {DB_SCHEMA}.users
     issuer_id VARCHAR(256) COLLATE pg_catalog."default",
     sub VARCHAR(256) COLLATE pg_catalog."default",
     CONSTRAINT users_pkey PRIMARY KEY (id),
-    CONSTRAINT users_username_key UNIQUE (username)
+    CONSTRAINT users_workspace_key UNIQUE (id_workspace)
 )
 TABLESPACE pg_default;
 
 CREATE TABLE {DB_SCHEMA}.publications
 (
     id integer NOT NULL DEFAULT nextval('{DB_SCHEMA}.publications_id_seq'::regclass),
-    id_user integer NOT NULL REFERENCES {DB_SCHEMA}.users (id),
+    id_workspace integer REFERENCES {DB_SCHEMA}.workspaces (id),
     name VARCHAR(256) COLLATE pg_catalog."default" not null,
     title VARCHAR(256) COLLATE pg_catalog."default" not null,
     type VARCHAR(64) COLLATE pg_catalog."default" not null references {DB_SCHEMA}.publication_types (name),
@@ -124,7 +142,7 @@ CREATE TABLE {DB_SCHEMA}.publications
     everyone_can_write boolean not null,
     constraint publications_pkey primary key (id),
     constraint publications_uuid_key unique (uuid),
-    constraint publications_name_type_key unique (id_user, type, name)
+    constraint publications_name_type_key unique (id_workspace, type, name)
 )
 TABLESPACE pg_default;
 
