@@ -35,15 +35,12 @@ def get_layer_uuid(username, layername):
 
 assign_layer_uuid = partial(common_uuid.assign_publication_uuid, LAYER_TYPE)
 
-update_layer = partial(common_uuid.update_publication, LAYER_TYPE)
-
 
 def post_layer(username, layername):
     pass
 
 
-def patch_layer(username, layername):
-    pass
+patch_layer = partial(common_uuid.update_publication, LAYER_TYPE)
 
 
 def get_metadata_comparison(username, publication_name):

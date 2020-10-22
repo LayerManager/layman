@@ -29,11 +29,7 @@ def post_layer(username, layername):
     pass
 
 
-def patch_layer(username, layername):
-    pass
-
-
-def update_layer(username, layername, title, description):
+def patch_layer(username, layername, title, description):
     keywords = [
         "features",
         layername,

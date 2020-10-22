@@ -136,11 +136,11 @@ def patch(username, layername):
                 input_file.save_layer_files(
                     username, layername, files, check_crs)
 
-    util.update_layer(username, layername, kwargs, delete_from)
     util.patch_layer(
         username,
         layername,
         kwargs,
+        delete_from,
         'layman.layer.filesystem.input_chunk' if use_chunk_upload else delete_from
     )
 

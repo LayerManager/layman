@@ -13,10 +13,6 @@ def patch_layer(username, layername):
     pass
 
 
-def update_layer(username, layername):
-    pass
-
-
 def get_layer_info(username, layername, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()

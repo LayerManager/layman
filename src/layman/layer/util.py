@@ -155,19 +155,12 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
     return complete_info
 
 
-def update_layer(username, layername, task_options, stop_at):
-    sources = get_sources()
-    stop_idx = next((idx for idx, s in enumerate(sources) if s.__name__ == stop_at), len(sources))
-    sources = sources[:stop_idx]
-    call_modules_fn(sources, 'update_layer', [username, layername], kwargs=task_options)
-
-
-def post_layer(username, layername, task_options, start_at):
+def post_layer(username, layername, task_options, start_async_at):
     # sync processing
     sources = get_sources()
     call_modules_fn(sources, 'post_layer', [username, layername], kwargs=task_options)
 
-    post_tasks = tasks_util.get_task_methods(get_layer_type_def(), username, layername, task_options, start_at)
+    post_tasks = tasks_util.get_task_methods(get_layer_type_def(), username, layername, task_options, start_async_at)
     post_chain = tasks_util.get_chain_of_methods(username, layername, post_tasks, task_options, 'layername')
     # res = post_chain.apply_async()
     res = post_chain()
@@ -175,12 +168,14 @@ def post_layer(username, layername, task_options, start_at):
     celery_util.set_publication_task_info(username, LAYER_TYPE, layername, post_tasks, res)
 
 
-def patch_layer(username, layername, task_options, start_at):
+def patch_layer(username, layername, task_options, stop_sync_at, start_async_at):
     # sync processing
     sources = get_sources()
+    stop_idx = next((idx for idx, s in enumerate(sources) if s.__name__ == stop_sync_at), len(sources))
+    sources = sources[:stop_idx]
     call_modules_fn(sources, 'patch_layer', [username, layername], kwargs=task_options)
 
-    patch_tasks = tasks_util.get_task_methods(get_layer_type_def(), username, layername, task_options, start_at)
+    patch_tasks = tasks_util.get_task_methods(get_layer_type_def(), username, layername, task_options, start_async_at)
     patch_chain = tasks_util.get_chain_of_methods(username, layername, patch_tasks, task_options, 'layername')
     # res = patch_chain.apply_async()
     res = patch_chain()

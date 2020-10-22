@@ -27,11 +27,6 @@ def delete_layer(username, layername):
     pubs_util.delete_publication(username, layername, LAYER_TYPE)
 
 
-def update_layer(username,
-                 layername):
-    pass
-
-
 def patch_layer(username,
                 layername,
                 title=None,

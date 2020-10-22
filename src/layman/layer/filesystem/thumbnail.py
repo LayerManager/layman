@@ -40,8 +40,6 @@ def get_layer_info(username, layername):
     return {}
 
 
-update_layer = input_file.update_layer
-
 get_publication_infos = input_file.get_publication_infos
 
 get_publication_uuid = input_file.get_publication_uuid
