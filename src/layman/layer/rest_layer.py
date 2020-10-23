@@ -37,7 +37,11 @@ def get(username, layername):
 def patch(username, layername):
     app.logger.info(f"PATCH Layer, user={g.user}")
 
-    info = deepcopy(util.get_complete_layer_info(cached=True))
+    info = util.get_complete_layer_info(cached=True)
+    kwargs = {
+        'title': info.get('title', info['name']),
+        'description': info.get('description', ''),
+    }
 
     # FILE
     use_chunk_upload = False
@@ -67,12 +71,12 @@ def patch(username, layername):
 
     # TITLE
     if len(request.form.get('title', '')) > 0:
-        info['title'] = request.form['title']
+        kwargs['title'] = request.form['title']
         update_info = True
 
     # DESCRIPTION
     if len(request.form.get('description', '')) > 0:
-        info['description'] = request.form['description']
+        kwargs['description'] = request.form['description']
         update_info = True
 
     # SLD
@@ -95,16 +99,12 @@ def patch(username, layername):
         input_file.check_filenames(username, layername, filenames,
                                    check_crs, ignore_existing_files=True)
 
-    if update_info and delete_from != 'layman.layer.filesystem.input_file':
-        props_to_refresh = util.get_same_or_missing_prop_names(username, layername)
-        info['metadata_properties_to_refresh'] = props_to_refresh
-        util.update_layer(username, layername, info)
+    props_to_refresh = util.get_same_or_missing_prop_names(username, layername)
+    kwargs['metadata_properties_to_refresh'] = props_to_refresh
 
     layer_result = {}
 
     if delete_from is not None:
-        props_to_refresh = info.get('metadata_properties_to_refresh', None) or util.get_same_or_missing_prop_names(
-            username, layername)
         deleted = util.delete_layer(username, layername, source=delete_from, http_method='patch')
         if sld_file is None:
             try:
@@ -114,14 +114,12 @@ def patch(username, layername):
         if sld_file is not None:
             input_sld.save_layer_file(username, layername, sld_file)
 
-        task_options = {
+        kwargs.update({
             'crs_id': crs_id,
-            'description': info['description'],
-            'title': info['title'],
             'ensure_user': False,
             'http_method': 'patch',
             'metadata_properties_to_refresh': props_to_refresh
-        }
+        })
 
         if delete_from == 'layman.layer.filesystem.input_file':
 
@@ -131,19 +129,20 @@ def patch(username, layername):
                 layer_result.update({
                     'files_to_upload': files_to_upload,
                 })
-                task_options.update({
+                kwargs.update({
                     'check_crs': check_crs,
                 })
             else:
                 input_file.save_layer_files(
                     username, layername, files, check_crs)
 
-        util.patch_layer(
-            username,
-            layername,
-            task_options,
-            'layman.layer.filesystem.input_chunk' if use_chunk_upload else delete_from
-        )
+    util.patch_layer(
+        username,
+        layername,
+        kwargs,
+        delete_from,
+        'layman.layer.filesystem.input_chunk' if use_chunk_upload else delete_from
+    )
 
     app.logger.info('PATCH Layer changes done')
     info = util.get_complete_layer_info(username, layername)
