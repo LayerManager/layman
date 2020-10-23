@@ -54,7 +54,6 @@ def insert_publication(username, info):
 returning id
 ;'''
 
-    print(f'insert_publication username={username}, info={info}')
     data = (id_workspace,
             info.get("name"),
             info.get("title"),
