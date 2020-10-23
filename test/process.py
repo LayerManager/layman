@@ -87,7 +87,7 @@ def start_layman(env_vars=None):
 
     SUBPROCESSES.add(layman_process)
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest/current-user"
-    util.wait_for_url(rest_url, 50, 0.1)
+    util.wait_for_url(rest_url, 200, 0.1)
 
     celery_env = layman_env.copy()
     celery_env['LAYMAN_SKIP_REDIS_LOADING'] = 'true'
