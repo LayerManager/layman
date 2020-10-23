@@ -30,12 +30,7 @@ def post_layer(username, layername):
 
 
 def patch_layer(username, layername):
-    pass
-
-
-def update_layer(username, layername, layerinfo):
     clear_cache(username)
-    pass
 
 
 def delete_layer(username, layername):

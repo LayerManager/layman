@@ -7,7 +7,7 @@ from requests.exceptions import HTTPError, ConnectionError
 import os
 import traceback
 from xml.sax.saxutils import escape, quoteattr
-from layman import settings, patch_mode, LaymanError
+from layman import settings, LaymanError
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common import language as common_language
 from layman.common.micka import util as common_util
@@ -20,8 +20,6 @@ from layman.layer.micka.csw import get_layer_info as csw_get_layer_info
 from layman.util import url_for, USERNAME_ONLY_PATTERN
 from layman.common import util as layman_util
 from lxml import etree as ET
-
-PATCH_MODE = patch_mode.NO_DELETE
 
 
 def get_metadata_uuid(uuid):

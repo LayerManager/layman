@@ -32,10 +32,6 @@ def patch_layer(username, layername):
     pass
 
 
-def update_layer(username, layername, layerinfo):
-    pass
-
-
 def delete_layer(username, layername):
     style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
                         username + '/styles/' + layername)

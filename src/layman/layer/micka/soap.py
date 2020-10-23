@@ -11,8 +11,6 @@ get_layer_info = csw.get_layer_info
 
 get_layer_infos = csw.get_layer_infos
 
-update_layer = csw.update_layer
-
 get_publication_infos = csw.get_publication_infos
 
 get_publication_uuid = csw.get_publication_uuid
@@ -26,8 +24,7 @@ def post_layer(username, layername):
     pass
 
 
-def patch_layer(username, layername):
-    pass
+patch_layer = csw.patch_layer
 
 
 def soap_insert(username, layername):

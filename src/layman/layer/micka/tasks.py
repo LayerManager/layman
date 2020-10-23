@@ -23,9 +23,7 @@ def refresh_csw(self, username, layername, http_method='post', metadata_properti
     if http_method == 'post':
         csw.csw_insert(username, layername)
     else:
-        csw.update_layer(username, layername, {
-            'metadata_properties_to_refresh': metadata_properties_to_refresh
-        })
+        csw.patch_layer(username, layername, metadata_properties_to_refresh)
 
     if self.is_aborted():
         csw.delete_layer(username, layername)
@@ -48,9 +46,7 @@ def refresh_soap(self, username, layername, http_method='post', metadata_propert
     if http_method == 'post':
         soap.soap_insert(username, layername)
     else:
-        csw.update_layer(username, layername, {
-            'metadata_properties_to_refresh': metadata_properties_to_refresh
-        })
+        csw.patch_layer(username, layername, metadata_properties_to_refresh)
 
     if self.is_aborted():
         csw.delete_layer(username, layername)
