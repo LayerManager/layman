@@ -40,7 +40,8 @@ def post_layer(username, layername):
     pass
 
 
-patch_layer = partial(common_uuid.update_publication, LAYER_TYPE)
+def patch_layer(username, layername):
+    pass
 
 
 def get_metadata_comparison(username, publication_name):
