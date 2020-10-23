@@ -12,7 +12,7 @@ def test_get_workspace_infos(client):
 
 
 def test_ensure_workspace(client):
-    username = 'test_ensure_user'
+    username = 'test_ensure_workspace_user'
 
     with app.app_context():
         id_workspace = workspace_util.ensure_workspace(username)

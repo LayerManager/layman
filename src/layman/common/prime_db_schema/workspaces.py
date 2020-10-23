@@ -14,7 +14,7 @@ def ensure_workspace(name):
 
 
 def delete_workspace(name):
-    sql = f"delete from {DB_SCHEMA}.workspaces where username = %s;"
+    sql = f"delete from {DB_SCHEMA}.workspaces where name = %s;"
     util.run_statement(sql, (name,))
 
 
