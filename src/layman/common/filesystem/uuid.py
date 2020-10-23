@@ -48,15 +48,3 @@ def assign_publication_uuid(publ_type, username, publication_name, uuid_str=None
     with open(uuid_path, "w") as uuid_file:
         uuid_file.write(uuid_str)
     return uuid_str
-
-
-def update_publication(publ_type, username, publication_name, publication_info):
-    if 'uuid' in publication_info:
-        new_uuid = publication_info['uuid']
-        old_uuid = get_publication_uuid(publ_type, username, publ_type, publication_name)
-        if old_uuid is not None:
-            if old_uuid != new_uuid:
-                raise Exception(
-                    f'Publication {username}/{publ_type}/{publication_name} already has UUID {old_uuid} that differs from updated UUID {new_uuid}')
-        elif new_uuid is not None:
-            assign_publication_uuid(publ_type, username, publication_name, new_uuid)
