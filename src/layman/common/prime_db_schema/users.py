@@ -37,7 +37,7 @@ select u.id,
        u.email,
        u.issuer_id,
        u.sub
-from {DB_SCHEMA}.workspaces w left join
+from {DB_SCHEMA}.workspaces w inner join
      {DB_SCHEMA}.users u on w.id = u.id_workspace inner join
      const c on (   c.username = w.name
                  or c.username is null)

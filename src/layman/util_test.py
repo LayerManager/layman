@@ -16,6 +16,7 @@ def test_slugify():
 
 def test_check_username_rest_prefix():
     with app.app_context():
-        with pytest.raises(LaymanError):
-            for username in settings.RESERVED_USERNAMES:
+        for username in settings.RESERVED_USERNAMES:
+            with pytest.raises(LaymanError) as exc_info:
                 util.check_username_rest_prefix(username)
+            assert exc_info.value.code == 38

@@ -8,9 +8,9 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 def test_get_user_infos(client):
     with app.app_context():
-        users = user_util.get_user_infos()
-        users = user_util.get_user_infos('test2')
-        users = user_util.get_user_infos('asůldghwíeghsdlkfj')
+        user_util.get_user_infos()
+        user_util.get_user_infos('test2')
+        user_util.get_user_infos('asůldghwíeghsdlkfj')
 
 
 def test_ensure_user(client):
