@@ -18,22 +18,22 @@ def test_source_methods():
     methods_to_call = {
         'layman.layer': {
             get_modules_from_names: {
-                         'get_layer_infos',
-                         'get_publication_uuid',
-                         'get_layer_info',
-                         'delete_layer',
-                         'patch_layer',
-                         'post_layer',
-                         'get_publication_infos',
-                         'get_metadata_comparison',
-                         },
+                'get_layer_infos',
+                'get_publication_uuid',
+                'get_layer_info',
+                'delete_layer',
+                'patch_layer',
+                'post_layer',
+                'get_publication_infos',
+                'get_metadata_comparison',
+            },
             get_providers_from_source_names: {
-                         'get_usernames',
-                         'check_username',
-                         'ensure_whole_user',
-                         'delete_whole_user',
-                         'check_new_layername',
-                         },
+                'get_usernames',
+                'check_username',
+                'ensure_whole_user',
+                'delete_whole_user',
+                'check_new_layername',
+            },
         },
         'layman.map': {
             get_modules_from_names: {
