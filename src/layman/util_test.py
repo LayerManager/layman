@@ -16,7 +16,8 @@ def test_slugify():
 
 def test_check_username_rest_prefix():
     with app.app_context():
-        for username in settings.RESERVED_USERNAMES:
+        for username in settings.RESERVED_WORKSPACE_NAMES:
             with pytest.raises(LaymanError) as exc_info:
-                util.check_username_rest_prefix(username)
-            assert exc_info.value.code == 43
+                util.check_reserved_workspace_names(username)
+            assert exc_info.value.code == 35
+            assert exc_info.value.data['reserved_by'] == 'RESERVED_WORKSPACE_NAMES'

@@ -65,15 +65,15 @@ def check_username_decorator(f):
     return decorated_function
 
 
-def check_username_rest_prefix(username):
-    if username in settings.RESERVED_USERNAMES:
-        raise LaymanError(43, {'username': username})
+def check_reserved_workspace_names(workspace_name):
+    if workspace_name in settings.RESERVED_WORKSPACE_NAMES:
+        raise LaymanError(35, {'reserved_by': 'RESERVED_WORKSPACE_NAMES', 'workspace': workspace_name})
 
 
 def check_username(username):
     if not re.match(USERNAME_RE, username):
         raise LaymanError(2, {'parameter': 'user', 'expected': USERNAME_RE})
-    check_username_rest_prefix(username)
+    check_reserved_workspace_names(username)
     providers = get_internal_providers()
     call_modules_fn(providers, 'check_username', [username])
 
