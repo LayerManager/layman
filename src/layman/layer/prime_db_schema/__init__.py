@@ -6,4 +6,3 @@ check_username = prime_db_schema.check_username
 check_new_layername = prime_db_schema.check_new_layername
 delete_whole_user = prime_db_schema.delete_whole_user
 ensure_whole_user = prime_db_schema.ensure_whole_user
-check_username = prime_db_schema.check_username

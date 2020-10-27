@@ -1,7 +1,6 @@
 from layman.common.prime_db_schema import users as users_util, workspaces as workspaces_util
 
 get_usernames = workspaces_util.get_workspace_names
-check_username = users_util.check_username
 
 
 def check_new_layername(username, layername):
