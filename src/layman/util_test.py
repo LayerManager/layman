@@ -14,7 +14,7 @@ def test_slugify():
         '01_stanice_vodnich_toku_26_4_2017_voda'
 
 
-def test_check_username_rest_prefix():
+def test_check_reserved_workspace_names():
     with app.app_context():
         for username in settings.RESERVED_WORKSPACE_NAMES:
             with pytest.raises(LaymanError) as exc_info:
