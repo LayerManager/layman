@@ -1,3 +1,4 @@
+import importlib
 from . import app as app, settings
 from .util import slugify, get_modules_from_names, get_providers_from_source_names
 from test import process
@@ -21,7 +22,7 @@ def assert_module_methods(module, methods):
                 f'Module {module.__name__} does not have {method} method.')
 
 
-def test_source_methods():
+def test_publication_interface_methods():
     processes = process.start_layman()
 
     publication_source_methods = {
@@ -37,47 +38,61 @@ def test_source_methods():
         'delete_whole_user',
     }
 
+    provider_modules_getter = get_providers_from_source_names
+    source_modules_getter = get_modules_from_names
+
     # In future, also parameters can be tested
-    provider_methods_by_type = {
-        'layman.layer': publication_provider_methods.union({
-            'check_new_layername',
-        }),
-        'layman.map': publication_provider_methods,
-    }
+    interfaces = [
+        {
+            'publication_type': 'layman.layer',
+            'modules_getter': provider_modules_getter,
+            'methods': publication_provider_methods.union({
+                'check_new_layername',
+            }),
+        },
+        {
+            'publication_type': 'layman.map',
+            'modules_getter': provider_modules_getter,
+            'methods': publication_provider_methods,
+        },
+        {
+            'publication_type': 'layman.layer',
+            'modules_getter': source_modules_getter,
+            'methods': publication_source_methods.union({
+                'get_layer_infos',
+                'get_layer_info',
+                'delete_layer',
+                'patch_layer',
+                'post_layer',
+            }),
+        },
+        {
+            'publication_type': 'layman.map',
+            'modules_getter': source_modules_getter,
+            'methods': publication_source_methods.union({
+                'get_map_infos',
+                'get_map_info',
+                'patch_map',
+                'post_map',
+                'delete_map',
+            }),
+        },
+    ]
 
-    source_methods_by_type = {
-        'layman.layer': publication_source_methods.union({
-            'get_layer_infos',
-            'get_layer_info',
-            'delete_layer',
-            'patch_layer',
-            'post_layer',
-        }),
-        'layman.map': publication_source_methods.union({
-            'get_map_infos',
-            'get_map_info',
-            'patch_map',
-            'post_map',
-            'delete_map',
-        }),
-    }
+    module_getters = [provider_modules_getter, source_modules_getter]
+    for modules_getter in module_getters:
+        assert set(settings.PUBLICATION_MODULES) == set([
+            interface['publication_type'] for interface in interfaces
+            if modules_getter == interface['modules_getter']
+        ])
 
-    assert set(settings.PUBLICATION_MODULES) == provider_methods_by_type.keys()
-    assert set(settings.PUBLICATION_MODULES) == source_methods_by_type.keys()
-
-    for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
-        for type_def in publ_module.PUBLICATION_TYPES.values():
-            with app.app_context():
-                publ_type = type_def['type']
-
-                provider_modules = get_providers_from_source_names(type_def['internal_sources'])
-                provider_methods = provider_methods_by_type[publ_type]
-                for provider_module in provider_modules:
-                    assert_module_methods(provider_module, provider_methods)
-
-                source_modules = get_modules_from_names(type_def['internal_sources'])
-                source_methods = source_methods_by_type[publ_type]
-                for source_module in source_modules:
-                    assert_module_methods(source_module, source_methods)
+    for interface in interfaces:
+        publ_module = importlib.import_module(interface['publication_type'])
+        type_def = publ_module.PUBLICATION_TYPES[interface['publication_type']]
+        with app.app_context():
+            modules = interface['modules_getter'](type_def['internal_sources'])
+            methods = interface['methods']
+            for module in modules:
+                assert_module_methods(module, methods)
 
     process.stop_process(processes)
