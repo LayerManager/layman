@@ -1,5 +1,7 @@
+import pytest
 import importlib
-from . import app as app, settings
+
+from . import app as app, settings, LaymanError, util
 from .util import slugify, get_modules_from_names, get_providers_from_source_names
 from test import process
 
@@ -13,6 +15,15 @@ def test_slugify():
         '01_stanice_vodnich_toku_26_4_2017_voda'
 
 
+def test_check_reserved_workspace_names():
+    with app.app_context():
+        for username in settings.RESERVED_WORKSPACE_NAMES:
+            with pytest.raises(LaymanError) as exc_info:
+                util.check_reserved_workspace_names(username)
+            assert exc_info.value.code == 35
+            assert exc_info.value.data['reserved_by'] == 'RESERVED_WORKSPACE_NAMES'
+
+            
 def assert_module_methods(module, methods):
     for method in methods:
         # print(f'test_module_methods: module={module.__name__}, method={method}')

@@ -5,7 +5,7 @@ from layman.layer.filesystem import uuid as layer_uuid
 from layman.layer import LAYER_TYPE
 from layman.map.filesystem import uuid as map_uuid
 from layman.map import MAP_TYPE
-from . import publications, users
+from . import publications, workspaces
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 ROLE_EVERYONE = publications.ROLE_EVERYONE
@@ -19,7 +19,7 @@ def test_post_layer(client):
     layertitle = 'test_post_layer_layer Title'
     layertitle2 = 'test_post_layer_layer Title2'
     with app.app_context():
-        users.ensure_user(username)
+        workspaces.ensure_workspace(username)
         uuid_str = layer_uuid.assign_layer_uuid(username, layername)
         db_info = {"name": layername,
                    "title": layertitle,
@@ -74,7 +74,7 @@ def test_post_map(client):
     maptitle = 'test_post_map_map Title'
     maptitle2 = 'test_post_map_map Title2'
     with app.app_context():
-        users.ensure_user(username)
+        workspaces.ensure_workspace(username)
         uuid_str = map_uuid.assign_map_uuid(username, mapname)
         db_info = {"name": mapname,
                    "title": maptitle,
@@ -127,8 +127,6 @@ def test_select_publications(client):
     username = 'test_select_publications_user1'
     layername = 'test_select_publications_layer1'
     mapname = 'test_select_publications_map1'
-    with app.app_context():
-        users.ensure_user(username)
     client_util.publish_layer(username, layername, client)
     client_util.publish_map(username, mapname, client)
 

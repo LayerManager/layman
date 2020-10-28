@@ -5,7 +5,6 @@ import importlib
 import sys
 import time
 
-
 IN_CELERY_WORKER_PROCESS = sys.argv and sys.argv[0].endswith('/celery/__main__.py')
 IN_PYTEST_PROCESS = sys.argv and sys.argv[0].endswith('/pytest/__main__.py')
 IN_FLOWER_PROCESS = sys.argv and sys.argv[0].endswith('/flower/__main__.py')
@@ -35,10 +34,11 @@ for bp in get_blueprints():
 
 from .user.rest_current_user import bp as current_user_bp
 from .gs_wfs_proxy import bp as gs_wfs_proxy_bp
-from .common import prime_db_schema as db_util
+from .user.rest_users import bp as users_bp
 
 app.register_blueprint(current_user_bp, url_prefix='/rest/current-user')
 app.register_blueprint(gs_wfs_proxy_bp, url_prefix='/geoserver')
+app.register_blueprint(users_bp, url_prefix=f'/rest/{settings.REST_USERS_PREFIX}')
 
 app.logger.info(f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}")
 app.logger.info(f"IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}")
@@ -64,8 +64,11 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
                 ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
 
         with app.app_context():
-            db_util.check_schema_name()
-            db_util.ensure_schema()
+            import layman.common.prime_db_schema.schema_initialization as prime_db_schema
+            prime_db_schema.check_schema_name(settings.LAYMAN_PRIME_SCHEMA)
+            prime_db_schema.ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
+                                          app,
+                                          settings.PUBLICATION_MODULES)
 
         app.logger.info(f'Loading Redis database')
         with app.app_context():
