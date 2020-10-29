@@ -115,7 +115,7 @@ def publish_map(username,
                 access_rights=None,
                 ):
     headers = headers or {}
-    file_paths = file_paths or ['sample/layman.map/full.json',]
+    file_paths = file_paths or ['sample/layman.map/full.json', ]
     access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
     r_url = f"{rest_url}/{username}/maps"

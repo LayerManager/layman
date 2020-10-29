@@ -39,7 +39,7 @@ from const c inner join
                                   or c.workspace_name is null) inner join
      {DB_SCHEMA}.publications p on p.id_workspace = w.id
                            and (   p.type = c.pub_type
-                                or c.pub_type is null) left join 
+                                or c.pub_type is null) left join
      {DB_SCHEMA}.users u on u.id_workspace = w.id
 ;"""
     values = util.run_query(sql, (workspace_name,
@@ -101,8 +101,7 @@ def check_publication_info(workspace_name, info):
                                'publication_name': info.get("name"),
                                'access_rights': {
                                    'read': info['access_rights']['read'],
-                                   'write': info['access_rights']['write'],
-                                   },
+                                   'write': info['access_rights']['write'], },
                                'message': exc_info.data,
                                })
 
