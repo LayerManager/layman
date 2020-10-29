@@ -21,8 +21,6 @@ def test_recreate_schema(ensure_layman):
     process_client.publish_map(username, 'test_recreate_schema_map1')
 
     with app.app_context():
-        # TODO Why the sleep is need?
-        time.sleep(5)
 
         run_statement(model.DROP_SCHEMA_SQL)
         ensure_schema(settings.LAYMAN_PRIME_SCHEMA,

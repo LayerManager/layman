@@ -12,7 +12,7 @@ ISS_URL_HEADER = 'AuthorizationIssUrl'
 TOKEN_HEADER = 'Authorization'
 
 layer_keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
-map_keys_to_check = ['thumbnail', 'file',]
+map_keys_to_check = ['thumbnail', 'file', 'metadata']
 
 
 def wait_for_rest(url, max_attempts, sleeping_time, keys_to_check):
