@@ -40,7 +40,6 @@ def publish_layer(username,
     title = title or layername
     headers = headers or {}
     file_paths = file_paths or ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
-    access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
 

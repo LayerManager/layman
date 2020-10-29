@@ -1,5 +1,5 @@
 import logging
-import pytest
+import time
 
 from test import process, process_client
 
@@ -15,13 +15,15 @@ ensure_layman = process.ensure_layman
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.usefixtures('ensure_layman')
-def test_recreate_schema():
+def test_recreate_schema(ensure_layman):
     username = 'test_recreate_schema_user1'
     process_client.publish_layer(username, 'test_recreate_schema_layer1')
     process_client.publish_map(username, 'test_recreate_schema_map1')
 
     with app.app_context():
+        # TODO Why the sleep is need?
+        time.sleep(5)
+
         run_statement(model.DROP_SCHEMA_SQL)
         ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
                       settings.PUBLICATION_MODULES,
@@ -35,15 +37,18 @@ def test_recreate_schema():
         assert len(pubs) == 0
 
 
-@pytest.mark.usefixtures('ensure_layman')
-def test_schema():
+def test_schema(ensure_layman):
     username = 'migration_test_user1'
     layername = 'migration_test_layer1'
     mapname = 'migration_test_map1'
     process_client.publish_layer(username, layername)
     process_client.publish_map(username, mapname)
 
+
     with app.app_context():
+        # TODO Why the sleep is need?
+        time.sleep(5)
+
         run_statement(model.DROP_SCHEMA_SQL)
         ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
                       settings.PUBLICATION_MODULES,
@@ -65,13 +70,14 @@ def test_schema():
         assert len(pubs) == 0
 
 
-@pytest.mark.usefixtures('ensure_layman')
-def test_steps():
+def test_steps(ensure_layman):
     username = 'migration_test_user2'
     process_client.publish_layer(username, 'migration_test_layer2')
     process_client.publish_map(username, 'migration_test_map2')
 
     with app.app_context():
+        # TODO Why the sleep is need?
+        time.sleep(5)
         run_statement(model.DROP_SCHEMA_SQL)
         exists_schema = run_query(model.EXISTS_SCHEMA_SQL)
         assert exists_schema[0][0] == 0
