@@ -9,7 +9,7 @@ from layman.util import check_username_decorator, url_for
 from . import util, MAP_TYPE
 from .filesystem import input_file, uuid
 from layman.authn import authenticate
-from layman.authz import authorize, util as authz_util
+from layman.authz import authorize
 from layman.common import redis as redis_util
 from .prime_db_schema import table
 
@@ -37,7 +37,6 @@ def get(username):
             'title': info.get("title", None),
             'url': url_for('rest_map.get', mapname=name, username=name),
             'uuid': info['uuid'],
-            'access_rights': info['access_rights'],
         }
         for (name, info) in sorted_infos
     ]
@@ -102,16 +101,17 @@ def post(username):
         input_file.save_map_files(
             username, mapname, [file])
 
-        actor_name = g.user and g.user["username"]
+        access_rights_read = {x.strip() for x in request.form['access_rights.read'].split(',')}
+        access_rights_write = {x.strip() for x in request.form['access_rights.write'].split(',')}
 
         kwargs = {
             'title': title,
             'description': description,
             'uuid': uuid_str,
-            'actor_name': actor_name
+            'access_rights': {'read': access_rights_read,
+                              'write': access_rights_write,
+                              }
         }
-
-        authz_util.setup_post_access_rights(request.form, kwargs, actor_name)
 
         util.post_map(
             username,

@@ -43,5 +43,5 @@ ERROR_LIST = {
     40: (404, 'Username does not exist.'),
     41: (409, 'Username is in conflict with LAYMAN_GS_USER. To resolve this conflict, you can create new GeoServer user with another name to become new LAYMAN_GS_USER, give him LAYMAN_GS_ROLE and ADMIN roles, remove the old LAYMAN_GS_USER user at GeoServer, change environment settings LAYMAN_GS_USER and LAYMAN_GS_PASSWORD, and restart Layman'),
     42: (409, 'LAYMAN_PRIME_SCHEMA is in conflict with existing username.'),
-    43: (400, 'Wrong access rights.')
+    43: (400, 'Wrong access right.')
 }

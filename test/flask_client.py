@@ -16,8 +16,10 @@ def publish_layer(username,
                   layername,
                   client,
                   title=None,
+                  access_rights=None,
                   ):
     title = title or layername
+    access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
 
     with app.app_context():
         rest_path = url_for('rest_layers.post', username=username)
@@ -36,6 +38,8 @@ def publish_layer(username,
                 'file': files,
                 'name': layername,
                 'title': title,
+                'access_rights.read': access_rights['read'],
+                'access_rights.write': access_rights['write'],
             })
             assert rv.status_code == 200, (rv.status_code, rv.get_json())
         finally:
@@ -99,9 +103,11 @@ def publish_map(username,
                 client,
                 maptitle=None,
                 headers=None,
+                access_rights=None,
                 ):
     maptitle = maptitle or mapname
     headers = headers or {}
+    access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
     with app.app_context():
         rest_path = url_for('rest_maps.post', username=username)
 
@@ -119,6 +125,8 @@ def publish_map(username,
                              data={'file': files,
                                    'name': mapname,
                                    'title': maptitle,
+                                   'access_rights.read': access_rights['read'],
+                                   'access_rights.write': access_rights['write'],
                                    },
                              headers=headers)
             assert rv.status_code == 200, (rv.status_code, rv.get_json())

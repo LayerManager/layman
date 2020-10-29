@@ -1,7 +1,10 @@
+from test import process, process_client
+
 from layman import settings, app as app
 from . import users as user_util, workspaces as workspace_util
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
+ensure_layman = process.ensure_layman
 
 
 def test_get_user_infos(ensure_layman):

@@ -1,5 +1,9 @@
+from test import process, process_client
+
 from layman import app as app
 from . import users as user_util, workspaces as workspace_util, ensure_whole_user
+
+ensure_layman = process.ensure_layman
 
 
 def test_get_workspace_infos(ensure_layman):
