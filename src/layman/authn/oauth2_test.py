@@ -380,3 +380,7 @@ def test_patch_current_user_without_username(client):
         access_rights = resp_json['groups']
         assert {'guest'} == set(access_rights.keys())
         assert access_rights['guest'] == 'w'
+
+    flask_client.delete_map(username,
+                            mapname,
+                            client)

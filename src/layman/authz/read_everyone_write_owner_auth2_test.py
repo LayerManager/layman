@@ -211,3 +211,8 @@ def test_authn_map_access_rights(client):
         resp_json = rv.get_json()
         assert resp_json['code'] == 30
         assert resp_json['detail']['username'] in [None, 'test3']
+
+    flask_client.delete_map(username,
+                            mapname,
+                            client,
+                            headers=headers)

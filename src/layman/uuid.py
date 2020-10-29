@@ -162,7 +162,7 @@ def check_redis_consistency(expected_publ_num_by_type=None):
     redis = settings.LAYMAN_REDIS
     user_publ_keys = redis.keys(':'.join(USER_TYPE_NAMES_KEY.split(':')[:2]) + ':*')
     uuid_keys = redis.keys(':'.join(UUID_METADATA_KEY.split(':')[:2]) + ':*')
-    assert num_total_publs == len(uuid_keys), f"total_publs: {total_publs}"
+    assert num_total_publs == len(uuid_keys), f"total_publs={total_publs}, uuid_keys={uuid_keys}"
 
     total_publs_by_type = defaultdict(list)
     for publ in total_publs:
