@@ -189,7 +189,7 @@ def test_wrong_value_of_layername(client):
 @pytest.mark.usefixtures('app_context')
 def test_no_file(client):
     rv = client.post(url_for('rest_layers.post', username='testuser1'),
-    )
+                     )
     assert rv.status_code == 400
     resp_json = rv.get_json()
     # print('resp_json', resp_json)
