@@ -40,9 +40,6 @@ List of dotted paths to Python modules to be used for authentication. Paths are 
 ### LAYMAN_AUTHN_OAUTH2_PROVIDERS
 List of dotted paths to Python modules to be used as OAuth2 providers. Paths are separated with comma (`,`). See [OAuth2](oauth2/index.md).
 
-### LAYMAN_AUTHZ_MODULE
-Dotted path to Python module to be used for authorization. Paths are separated with comma (`,`). See [authorization](security.md#authorization).
-
 ### OAUTH2_LIFERAY_CLIENT_ID
 Client ID of Layman's Test Client registered as OAuth2 provider at Liferay instance.
 

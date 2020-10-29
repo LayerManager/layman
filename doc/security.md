@@ -19,16 +19,12 @@ Currently there are two authentication options:
 
 Authorization (**authz**) decides if authenticated [user](models.md#user) has permissions to perform the request to [REST API](rest.md).
 
-Authorization is performed by single authorization module controlled by [`AUTHZ_MODULE`](../src/layman_settings.py) setting. When authentication is finished, security system calls authorization module that either passes or raises an exception "Unauthorised access" returned as HTTP Error 403.
+Authorization is performed by single authorization module. When authentication is finished, security system calls authorization module that either passes or raises an exception "Unauthorised access" returned as HTTP Error 403.
 
-There are two types of operations used in permissions:
+Access to the following REST API endpoints is configurable:
+- [Layers](rest.md#overview) and nested endpoints 
+- [Maps](rest.md#overview) and nested endpoints 
+
+To control access to these endpoints, authorization module uses so called **access rights**. There are following types of access rights:
 - **read**: includes all `GET` requests
 - **write**: includes all `POST`, `PUT`, `PATCH`, `DELETE` requests
-
-Currently there are two authorization modules implemented:
-
-| name | description |
-| --- | --- |
-| [read everyone, write everyone](../src/layman/authz/read_everyone_write_everyone.py) | everyone including anonymous user is able to **read** and **write** to anybody`s workspace |
-| [read everyone, write owner](../src/layman/authz/read_everyone_write_owner.py) | everyone including anonymous user is able to **read** anybody`s workspace, but only user that owns the workspace is able to **write** |
-
