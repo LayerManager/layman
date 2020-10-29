@@ -97,6 +97,11 @@ def post(username):
     if 'sld' in request.files and not request.files['sld'].filename == '':
         sld_file = request.files['sld']
 
+    if not request.form.get('access_rights.read'):
+        raise LaymanError(1, {'parameter': 'access_rights.read'})
+    if not request.form.get('access_rights.write'):
+        raise LaymanError(1, {'parameter': 'access_rights.write'})
+
     access_rights_read = {x.strip() for x in request.form['access_rights.read'].split(',')}
     access_rights_write = {x.strip() for x in request.form['access_rights.write'].split(',')}
 

@@ -15,7 +15,7 @@ select w.name as workspace_name,
        p.type,
        p.name,
        p.title,
-       p.uuid,
+       p.uuid::text,
        (select concat(case when u.id is not null then w.name || ', ' end,
                       string_agg(w2.name, ', '),
                       case when p.everyone_can_read then c.everyone_role || ', ' end
@@ -50,8 +50,8 @@ from const c inner join
                          'title': title,
                          'uuid': uuid,
                          'type': type,
-                         'access_rights.read': can_read_users.split(', '),
-                         'access_rights.write': can_write_users.split(', ')
+                         'access_rights': {'read': can_read_users,
+                                           'write': can_write_users}
                          }
              for workspace_name, type, layername, title, uuid, can_read_users, can_write_users
              in values}
