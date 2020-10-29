@@ -40,17 +40,13 @@ def post_map(username,
              mapname,
              uuid,
              title,
-             can_read=None,
-             can_write=None):
-    can_read = can_read or set()
-    can_write = can_write or set()
+             access_rights):
     # store into Layman DB
     db_info = {"name": mapname,
                "title": title,
                "publ_type_name": MAP_TYPE,
                "uuid": uuid,
-               "can_read": can_read,
-               "can_write": can_write,
+               "access_rights": access_rights,
                }
     pubs_util.insert_publication(username, db_info)
 

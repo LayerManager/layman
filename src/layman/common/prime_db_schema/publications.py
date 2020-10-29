@@ -92,15 +92,17 @@ def check_rights_axioms(can_read, can_write, actor_name):
 
 def check_publication_info(workspace_name, info):
     try:
-        check_rights_axioms(info.get("can_read"),
-                            info.get("can_write"),
+        check_rights_axioms(info['access_rights']['read'],
+                            info['access_rights']['write'],
                             info.get("actor_name"),
                             )
     except LaymanError as exc_info:
         raise LaymanError(43, {'workspace_name': workspace_name,
                                'publication_name': info.get("name"),
-                               'can_read': info.get("can_read"),
-                               'can_write': info.get("can_write"),
+                               'access_rights': {
+                                   'read': info['access_rights']['read'],
+                                   'write': info['access_rights']['write'],
+                                   },
                                'message': exc_info.data,
                                })
 
@@ -120,8 +122,8 @@ returning id
             info.get("title"),
             info.get("publ_type_name"),
             info.get("uuid"),
-            ROLE_EVERYONE in info.get("can_read"),
-            ROLE_EVERYONE in info.get("can_write"),
+            ROLE_EVERYONE in info['access_rights']['read'],
+            ROLE_EVERYONE in info['access_rights']['write'],
             )
     pub_id = util.run_query(insert_publications_sql, data)
 
