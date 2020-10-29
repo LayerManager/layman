@@ -50,8 +50,8 @@ from const c inner join
                          'title': title,
                          'uuid': uuid,
                          'type': type,
-                         'can_read': can_read_users.split(', '),
-                         'can_write': can_write_users.split(', ')
+                         'access_rights.read': can_read_users.split(', '),
+                         'access_rights.write': can_write_users.split(', ')
                          }
              for workspace_name, type, layername, title, uuid, can_read_users, can_write_users
              in values}
