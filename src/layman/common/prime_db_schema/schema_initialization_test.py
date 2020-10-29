@@ -41,7 +41,6 @@ def test_schema(ensure_layman):
     process_client.publish_layer(username, layername)
     process_client.publish_map(username, mapname)
 
-
     with app.app_context():
         run_statement(model.DROP_SCHEMA_SQL)
         ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
