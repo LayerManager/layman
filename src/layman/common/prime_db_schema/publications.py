@@ -1,4 +1,5 @@
 import logging
+import psycopg2.extras
 
 from . import util, workspaces, users
 from layman import settings, LaymanError
@@ -7,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 ROLE_EVERYONE = settings.RIGHTS_EVERYONE_ROLE
+psycopg2.extras.register_uuid()
 
 
 def get_publication_infos(workspace_name=None, pub_type=None):

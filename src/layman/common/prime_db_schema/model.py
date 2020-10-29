@@ -137,7 +137,7 @@ CREATE TABLE {DB_SCHEMA}.publications
     name VARCHAR(256) COLLATE pg_catalog."default" not null,
     title VARCHAR(256) COLLATE pg_catalog."default" not null,
     type VARCHAR(64) COLLATE pg_catalog."default" not null references {DB_SCHEMA}.publication_types (name),
-    uuid VARCHAR(256) COLLATE pg_catalog."default" not null,
+    uuid uuid not null,
     everyone_can_read boolean not null,
     everyone_can_write boolean not null,
     constraint publications_pkey primary key (id),
