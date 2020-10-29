@@ -34,6 +34,7 @@ def migrate_users_and_publications(modules, role_everyone):
                                 "title": info.get("title"),
                                 "publ_type_name": publ_type_name,
                                 "uuid": info["uuid"],
+                                "actor_name": workspace_name,
                                 "access_rights": {"read": roles,
                                                   "write": roles,
                                                   }
