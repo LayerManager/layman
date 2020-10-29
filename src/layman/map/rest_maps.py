@@ -101,10 +101,16 @@ def post(username):
         input_file.save_map_files(
             username, mapname, [file])
 
+        access_rights_read = {x.strip() for x in request.form['access_rights.read'].split(',')}
+        access_rights_write = {x.strip() for x in request.form['access_rights.write'].split(',')}
+
         kwargs = {
             'title': title,
             'description': description,
             'uuid': uuid_str,
+            'access_rights': {'read': access_rights_read,
+                              'write': access_rights_write,
+                              }
         }
 
         util.post_map(

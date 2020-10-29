@@ -36,9 +36,7 @@ from .user.rest_current_user import bp as current_user_bp
 from .gs_wfs_proxy import bp as gs_wfs_proxy_bp
 from .user.rest_users import bp as users_bp
 
-app.register_blueprint(current_user_bp, url_prefix='/rest/current-user')
 app.register_blueprint(gs_wfs_proxy_bp, url_prefix='/geoserver')
-app.register_blueprint(users_bp, url_prefix=f'/rest/{settings.REST_USERS_PREFIX}')
 
 app.logger.info(f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}")
 app.logger.info(f"IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}")
@@ -67,8 +65,8 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
             import layman.common.prime_db_schema.schema_initialization as prime_db_schema
             prime_db_schema.check_schema_name(settings.LAYMAN_PRIME_SCHEMA)
             prime_db_schema.ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
-                                          app,
-                                          settings.PUBLICATION_MODULES)
+                                          settings.PUBLICATION_MODULES,
+                                          settings.RIGHTS_EVERYONE_ROLE)
 
         app.logger.info(f'Loading Redis database')
         with app.app_context():
@@ -92,6 +90,9 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
         while(settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done'):
             app.logger.info(f'Waiting for flask process to adjust dependencies')
             time.sleep(1)
+
+app.register_blueprint(current_user_bp, url_prefix='/rest/current-user')
+app.register_blueprint(users_bp, url_prefix=f'/rest/{settings.REST_USERS_PREFIX}')
 
 
 @app.route('/')

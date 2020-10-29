@@ -376,6 +376,8 @@ def test_patch_current_user_without_username(client):
             rv = client.post(rest_path, data={
                 'file': files,
                 'name': mapname,
+                'can_read': f"{settings.RIGHTS_EVERYONE_ROLE}, ",
+                'can_write': f"{settings.RIGHTS_EVERYONE_ROLE}, ",
             })
             assert rv.status_code == 200
             resp_json = rv.get_json()

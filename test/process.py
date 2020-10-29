@@ -2,12 +2,15 @@ import pytest
 from multiprocessing import Process
 import subprocess
 import os
+import logging
 
 from src.layman import settings
 
 from test.mock.liferay import run
 from test import util
 
+
+logger = logging.getLogger(__name__)
 
 SUBPROCESSES = set()
 LIFERAY_PORT = 8020
@@ -68,6 +71,15 @@ def clear():
     while len(SUBPROCESSES) > 0:
         proc = next(iter(SUBPROCESSES))
         stop_process(proc)
+
+
+@pytest.fixture(scope="module")
+def ensure_layman():
+    print(f'\nEnsure layman is starting')
+    processes = start_layman()
+    yield
+    stop_process(processes)
+    print(f'\nEnsure layman is ending')
 
 
 def start_layman(env_vars=None):

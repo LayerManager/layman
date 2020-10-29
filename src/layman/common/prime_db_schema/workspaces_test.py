@@ -1,17 +1,19 @@
-from test.flask_client import client
+from test import process, process_client
 
 from layman import app as app
 from . import users as user_util, workspaces as workspace_util, ensure_whole_user
 
+ensure_layman = process.ensure_layman
 
-def test_get_workspace_infos(client):
+
+def test_get_workspace_infos(ensure_layman):
     with app.app_context():
         workspace_util.get_workspace_infos()
         workspace_util.get_workspace_infos('test2')
         workspace_util.get_workspace_infos('asůldghwíeghsdlkfj')
 
 
-def test_ensure_workspace(client):
+def test_ensure_workspace(ensure_layman):
     username = 'test_ensure_workspace_user'
 
     with app.app_context():

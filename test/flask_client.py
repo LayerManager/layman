@@ -12,9 +12,15 @@ from layman.util import url_for
 from test.util import wait_for_url
 
 
-def publish_layer(username, layername, client, title=None):
-    if title is None:
-        title = layername
+def publish_layer(username,
+                  layername,
+                  client,
+                  title=None,
+                  access_rights=None,
+                  ):
+    title = title or layername
+    access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
+
     with app.app_context():
         rest_path = url_for('rest_layers.post', username=username)
 
@@ -31,7 +37,9 @@ def publish_layer(username, layername, client, title=None):
             rv = client.post(rest_path, data={
                 'file': files,
                 'name': layername,
-                'title': title
+                'title': title,
+                'access_rights.read': access_rights['read'],
+                'access_rights.write': access_rights['write'],
             })
             assert rv.status_code == 200, (rv.status_code, rv.get_json())
         finally:
@@ -89,9 +97,16 @@ def delete_map(username, mapname, client, headers=None):
     assert r.status_code == 200, (r.status_code, r.get_json())
 
 
-def publish_map(username, mapname, client, maptitle=None, headers=None):
+def publish_map(username,
+                mapname,
+                client,
+                maptitle=None,
+                headers=None,
+                access_rights=None,
+                ):
     maptitle = maptitle or mapname
     headers = headers or {}
+    access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
     with app.app_context():
         rest_path = url_for('rest_maps.post', username=username)
 
@@ -109,6 +124,8 @@ def publish_map(username, mapname, client, maptitle=None, headers=None):
                              data={'file': files,
                                    'name': mapname,
                                    'title': maptitle,
+                                   'access_rights.read': access_rights['read'],
+                                   'access_rights.write': access_rights['write'],
                                    },
                              headers=headers)
             assert rv.status_code == 200, (rv.status_code, rv.get_json())

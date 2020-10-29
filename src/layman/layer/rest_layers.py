@@ -97,12 +97,18 @@ def post(username):
     if 'sld' in request.files and not request.files['sld'].filename == '':
         sld_file = request.files['sld']
 
+    access_rights_read = {x.strip() for x in request.form['access_rights.read'].split(',')}
+    access_rights_write = {x.strip() for x in request.form['access_rights.write'].split(',')}
+
     task_options = {
         'crs_id': crs_id,
         'description': description,
         'title': title,
         'ensure_user': True,
         'check_crs': False,
+        'access_rights': {'read': access_rights_read,
+                          'write': access_rights_write,
+                          }
     }
 
     layerurl = url_for('rest_layer.get', layername=layername, username=username)
