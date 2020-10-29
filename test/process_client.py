@@ -64,6 +64,7 @@ def publish_layer(username,
                 fp[0].close()
 
     wait_for_rest(f"{rest_url}/{username}/layers/{layername}", 20, 0.5, layer_keys_to_check)
+    # wait_for_rest(f"{rest_url}/{username}/layers/{layername}", 20, 0.5, layer_keys_to_check)
     return layername
 
 

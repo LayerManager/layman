@@ -1,5 +1,4 @@
 import logging
-import time
 
 from test import process, process_client
 
