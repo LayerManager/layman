@@ -12,7 +12,6 @@ from layman.authn import authenticate
 from layman.authz import authorize
 from layman.common import redis as redis_util
 from .prime_db_schema import table
-from layman import settings
 
 bp = Blueprint('rest_maps', __name__)
 
@@ -102,21 +101,8 @@ def post(username):
         input_file.save_map_files(
             username, mapname, [file])
 
-        if not request.form.get('access_rights.read'):
-            if g.user:
-                access_rights_read = {f'{g.user["username"]}'}
-            else:
-                access_rights_read = {f'{settings.RIGHTS_EVERYONE_ROLE}'}
-        else:
-            access_rights_read = {x.strip() for x in request.form['access_rights.read'].split(',')}
-
-        if not request.form.get('access_rights.write'):
-            if g.user:
-                access_rights_write = {f'{g.user["username"]}'}
-            else:
-                access_rights_write = {f'{settings.RIGHTS_EVERYONE_ROLE}'}
-        else:
-            access_rights_write = {x.strip() for x in request.form['access_rights.write'].split(',')}
+        access_rights_read = {x.strip() for x in request.form['access_rights.read'].split(',')}
+        access_rights_write = {x.strip() for x in request.form['access_rights.write'].split(',')}
 
         kwargs = {
             'title': title,
@@ -124,8 +110,7 @@ def post(username):
             'uuid': uuid_str,
             'access_rights': {'read': access_rights_read,
                               'write': access_rights_write,
-                              },
-            'actor_name': g.user and g.user["username"],
+                              }
         }
 
         util.post_map(

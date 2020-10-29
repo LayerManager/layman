@@ -7,14 +7,14 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 ensure_layman = process.ensure_layman
 
 
-def test_get_user_infos():
+def test_get_user_infos(ensure_layman):
     with app.app_context():
         user_util.get_user_infos()
         user_util.get_user_infos('test2')
         user_util.get_user_infos('asůldghwíeghsdlkfj')
 
 
-def test_ensure_user():
+def test_ensure_user(ensure_layman):
     username = 'test_ensure_user'
     userinfo = {"iss_id": 'mock_test',
                 "sub": '1',

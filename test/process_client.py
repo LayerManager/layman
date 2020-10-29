@@ -39,6 +39,7 @@ def publish_layer(username,
     title = title or layername
     headers = headers or {}
     file_paths = file_paths or ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
+    access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
 
@@ -50,10 +51,9 @@ def publish_layer(username,
         try:
             data = {'name': layername,
                     'title': title,
+                    'access_rights.read': access_rights['read'],
+                    'access_rights.write': access_rights['write'],
                     }
-            if access_rights:
-                data.update({"access_rights.read": access_rights['read']})
-                data.update({"access_rights.write": access_rights['write']})
             r = requests.post(r_url,
                               files=[('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths],
                               data=data,
@@ -151,7 +151,7 @@ def publish_map(username,
                 access_rights=None,
                 ):
     headers = headers or {}
-    file_paths = file_paths or ['sample/layman.map/full.json', ]
+    file_paths = file_paths or ['sample/layman.map/full.json',]
     access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
     r_url = f"{rest_url}/{username}/maps"
@@ -161,13 +161,12 @@ def publish_map(username,
             assert os.path.isfile(fp)
         files = []
         try:
-            data = {'name': mapname, }
-            if access_rights:
-                data.update({"access_rights.read": access_rights['read']})
-                data.update({"access_rights.write": access_rights['write']})
             r = requests.post(r_url,
                               files=[('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths],
-                              data=data,
+                              data={'name': mapname,
+                                    'access_rights.read': access_rights['read'],
+                                    'access_rights.write': access_rights['write'],
+                                    },
                               headers=headers)
             assert r.status_code == 200, r.text
         finally:
