@@ -18,19 +18,19 @@ select w.name as workspace_name,
        p.name,
        p.title,
        p.uuid::text,
-       (select concat(case when u.id is not null then w.name || ', ' end,
-                      string_agg(w2.name, ', '),
-                      case when p.everyone_can_read then c.everyone_role || ', ' end
-                      )
+       (select rtrim(concat(case when u.id is not null then w.name || ', ' end,
+                            string_agg(w2.name, ', ') || ', ',
+                            case when p.everyone_can_read then c.everyone_role || ', ' end
+                            ), ', ')
         from {DB_SCHEMA}.rights r inner join
              {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
              {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
         where r.id_publication = p.id
           and r.type = 'read') can_read_users,
-       (select concat(case when u.id is not null then w.name || ', ' end,
-                      string_agg(w2.name, ', '),
-                      case when p.everyone_can_read then c.everyone_role || ', ' end
-                      )
+       (select rtrim(concat(case when u.id is not null then w.name || ', ' end,
+                            string_agg(w2.name, ', ') || ', ',
+                            case when p.everyone_can_read then c.everyone_role || ', ' end
+                            ), ', ')
         from {DB_SCHEMA}.rights r inner join
              {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
              {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace

@@ -32,6 +32,8 @@ from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from test.data import wfs as data_wfs
 
+from test import flask_client
+
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
 
 METADATA_PROPERTIES = {
@@ -156,7 +158,9 @@ def test_layman_gs_user_conflict(client):
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
             'file': files,
-            'name': layername
+            'name': layername,
+            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         resp_json = rv.get_json()
         assert rv.status_code == 409
@@ -184,7 +188,8 @@ def test_wrong_value_of_layername(client):
 
 @pytest.mark.usefixtures('app_context')
 def test_no_file(client):
-    rv = client.post(url_for('rest_layers.post', username='testuser1'))
+    rv = client.post(url_for('rest_layers.post', username='testuser1'),
+    )
     assert rv.status_code == 400
     resp_json = rv.get_json()
     # print('resp_json', resp_json)
@@ -232,7 +237,9 @@ def test_layername_db_object_conflict(client):
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(url_for('rest_layers.post', username='testuser1'), data={
             'file': files,
-            'name': 'spatial_ref_sys'
+            'name': 'spatial_ref_sys',
+            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 409
         resp_json = rv.get_json()
@@ -260,6 +267,7 @@ def test_get_layers_testuser1_v1(client):
 def test_post_layers_simple(client):
     with app.app_context():
         username = 'testuser1'
+
         rest_path = url_for('rest_layers.post', username=username)
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
@@ -270,7 +278,9 @@ def test_post_layers_simple(client):
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
             rv = client.post(rest_path, data={
-                'file': files
+                'file': files,
+                'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+                'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
             })
             assert rv.status_code == 200
         finally:
@@ -370,6 +380,8 @@ def test_post_layers_concurrent(client):
         rv = client.post(rest_path, data={
             'file': files,
             'name': layername,
+            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 200
     finally:
@@ -412,7 +424,9 @@ def test_post_layers_shp_missing_extensions(client):
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
             'file': files,
-            'name': 'ne_110m_admin_0_countries_shp'
+            'name': 'ne_110m_admin_0_countries_shp',
+            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         resp_json = rv.get_json()
         # print(resp_json)
@@ -449,7 +463,9 @@ def test_post_layers_shp(client):
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
             'file': files,
-            'name': layername
+            'name': layername,
+            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 200
     finally:
@@ -511,7 +527,9 @@ def test_post_layers_layer_exists(client):
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
-            'file': files
+            'file': files,
+            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 409
         resp_json = rv.get_json()
@@ -544,6 +562,8 @@ def test_post_layers_complex(client):
                 'name': 'countries',
                 'title': 'staty',
                 'description': 'popis států',
+                'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+                'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
                 'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
             })
             assert rv.status_code == 200
@@ -643,6 +663,8 @@ def test_uppercase_attr(client):
             rv = client.post(rest_path, data={
                 'file': files,
                 'name': layername,
+                'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+                'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
                 'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
             })
             assert rv.status_code == 200
@@ -858,6 +880,8 @@ def test_post_layers_sld_1_1_0(client):
         rv = client.post(rest_path, data={
             'file': files,
             'name': layername,
+            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
             'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
         })
         assert rv.status_code == 200
@@ -1063,7 +1087,9 @@ def test_post_layers_long_and_delete_it(client):
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
-            'file': files
+            'file': files,
+            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 200
     finally:
@@ -1124,7 +1150,9 @@ def test_post_layers_zero_length_attribute(client):
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
-            'file': files
+            'file': files,
+            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 200
     finally:
@@ -1175,7 +1203,9 @@ def test_layer_with_different_geometry(client):
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
             'file': files,
-            'name': layername
+            'name': layername,
+            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 200
     finally:
