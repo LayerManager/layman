@@ -20,11 +20,12 @@ def test_post_layer(ensure_layman):
 
     with app.app_context():
         workspaces.ensure_workspace(username)
-        uuid_str = uuid.uuid4()
+        uuid_orig = uuid.uuid4()
+        uuid_str = str(uuid_orig)
         db_info = {"name": layername,
                    "title": layertitle,
                    "publ_type_name": LAYER_TYPE,
-                   "uuid": uuid_str,
+                   "uuid": uuid_orig,
                    "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
                                      "write": {settings.RIGHTS_EVERYONE_ROLE, },
                                      }
@@ -33,7 +34,7 @@ def test_post_layer(ensure_layman):
         pubs = publications.get_publication_infos(username, LAYER_TYPE)
         assert pubs.get(layername).get('name') == layername
         assert pubs.get(layername).get('title') == layertitle
-        assert pubs.get(layername).get('uuid') == uuid_str
+        assert pubs.get(layername).get('uuid') == str(uuid_str)
         # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(layername).get('can_read')
         # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(layername).get('can_write')
 
@@ -79,11 +80,12 @@ def test_post_map(ensure_layman):
 
     with app.app_context():
         workspaces.ensure_workspace(username)
-        uuid_str = uuid.uuid4()
+        uuid_orig = uuid.uuid4()
+        uuid_str = str(uuid_orig)
         db_info = {"name": mapname,
                    "title": maptitle,
                    "publ_type_name": MAP_TYPE,
-                   "uuid": uuid_str,
+                   "uuid": uuid_orig,
                    "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
                                      "write": {settings.RIGHTS_EVERYONE_ROLE, },
                                      }

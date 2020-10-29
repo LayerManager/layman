@@ -477,3 +477,4 @@ def reset(auth):
                       auth=auth
                       )
     r.raise_for_status()
+    logger.info(f"Resetting GeoServer done")
