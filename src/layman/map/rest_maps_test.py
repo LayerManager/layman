@@ -8,7 +8,7 @@ from .micka import soap
 from .prime_db_schema import table as prime_table
 from . import util, MAP_TYPE
 from layman.util import url_for
-from test import flask_client as client_util, util as test_util
+from test import flask_client as client_util
 
 client = client_util.client
 
@@ -20,7 +20,9 @@ def test_get_map_infos(client):
 
     client_util.publish_map(username, mapname, client, maptitle)
 
+    result_infos_name = {mapname: {'name': mapname}}
     result_infos_name_title = {mapname: {'name': mapname, 'title': maptitle}}
+    result_publication_name = [mapname]
 
     with app.app_context():
         result_infos_name_title_uuid = {mapname: {'name': mapname,
@@ -30,14 +32,19 @@ def test_get_map_infos(client):
                                       'title': maptitle,
                                       'uuid': uuid.get_map_uuid(username, mapname),
                                       'type': MAP_TYPE,
-                                      'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                        'write': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                        }
                                       }}
+        result_infos_db = {mapname: {'name': mapname,
+                                     'title': maptitle,
+                                     'uuid': uuid.get_map_uuid(username, mapname),
+                                     'type': MAP_TYPE,
+                                     'access_rights': {'read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+                                                       'write': f'{settings.RIGHTS_EVERYONE_ROLE}',
+                                                       }
+                                     }}
         modules = [
             {'name': 'prime_table.table',
              'method_infos': prime_table.get_map_infos,
-             'result_infos': result_infos_all,
+             'result_infos': result_infos_db,
              'method_publications': prime_table.get_publication_infos,
              },
             {'name': 'filesystem.input_file',
@@ -64,13 +71,14 @@ def test_get_map_infos(client):
 
         for module in modules:
             map_infos = module["method_infos"](username)
-            test_util.assert_same_infos(map_infos, module["result_infos"], module)
-
-            publication_infos = module["method_publications"](username, MAP_TYPE)
-            test_util.assert_same_infos(publication_infos, module["result_infos"], module)
+            assert map_infos == module["result_infos"],\
+                (module["name"], module["method_infos"].__module__, map_infos)
+            publication_infos = module["method_publications"](username, "layman.map")
+            assert publication_infos == module["result_infos"],\
+                (module["name"], module["method_publications"].__module__, publication_infos)
 
         map_infos = util.get_map_infos(username)
-        test_util.assert_same_infos(map_infos, result_infos_all)
+        assert map_infos == result_infos_db, map_infos
 
     client_util.delete_map(username, mapname, client)
 

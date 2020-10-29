@@ -1,11 +1,10 @@
 import pytest
+import uuid
 
 from test import process, process_client
 
 from layman import settings, app as app, LaymanError
-from layman.layer.filesystem import uuid as layer_uuid
 from layman.layer import LAYER_TYPE
-from layman.map.filesystem import uuid as map_uuid
 from layman.map import MAP_TYPE
 from . import publications, workspaces, users
 
@@ -21,11 +20,12 @@ def test_post_layer(ensure_layman):
 
     with app.app_context():
         workspaces.ensure_workspace(username)
-        uuid_str = layer_uuid.assign_layer_uuid(username, layername)
+        uuid_orig = uuid.uuid4()
+        uuid_str = str(uuid_orig)
         db_info = {"name": layername,
                    "title": layertitle,
                    "publ_type_name": LAYER_TYPE,
-                   "uuid": uuid_str,
+                   "uuid": uuid_orig,
                    "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
                                      "write": {settings.RIGHTS_EVERYONE_ROLE, },
                                      }
@@ -34,7 +34,7 @@ def test_post_layer(ensure_layman):
         pubs = publications.get_publication_infos(username, LAYER_TYPE)
         assert pubs.get(layername).get('name') == layername
         assert pubs.get(layername).get('title') == layertitle
-        assert pubs.get(layername).get('uuid') == uuid_str
+        assert pubs.get(layername).get('uuid') == str(uuid_str)
         # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(layername).get('can_read')
         # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(layername).get('can_write')
 
@@ -71,8 +71,6 @@ def test_post_layer(ensure_layman):
         pubs = publications.get_publication_infos(username, LAYER_TYPE)
         assert pubs.get(layername) is None
 
-    process_client.delete_layer(username, layername)
-
 
 def test_post_map(ensure_layman):
     username = 'test_post_map_username'
@@ -82,11 +80,12 @@ def test_post_map(ensure_layman):
 
     with app.app_context():
         workspaces.ensure_workspace(username)
-        uuid_str = map_uuid.assign_map_uuid(username, mapname)
+        uuid_orig = uuid.uuid4()
+        uuid_str = str(uuid_orig)
         db_info = {"name": mapname,
                    "title": maptitle,
                    "publ_type_name": MAP_TYPE,
-                   "uuid": uuid_str,
+                   "uuid": uuid_orig,
                    "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
                                      "write": {settings.RIGHTS_EVERYONE_ROLE, },
                                      }
@@ -131,8 +130,6 @@ def test_post_map(ensure_layman):
         publications.delete_publication(username, mapname, MAP_TYPE)
         pubs = publications.get_publication_infos(username, MAP_TYPE)
         assert pubs.get(mapname) is None
-
-    process_client.delete_map(username, mapname)
 
 
 def test_select_publications(ensure_layman):
