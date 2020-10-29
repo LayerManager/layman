@@ -265,6 +265,7 @@ def test_get_layers_testuser1_v1(client):
 def test_post_layers_simple(client):
     with app.app_context():
         username = 'testuser1'
+
         rest_path = url_for('rest_layers.post', username=username)
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
