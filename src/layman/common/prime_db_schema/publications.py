@@ -1,7 +1,7 @@
 import logging
 import psycopg2.extras
 
-from . import util, workspaces, users
+from . import util, workspaces, users, rights
 from layman import settings, LaymanError
 
 logger = logging.getLogger(__name__)
@@ -13,7 +13,8 @@ psycopg2.extras.register_uuid()
 
 def get_publication_infos(workspace_name=None, pub_type=None):
     sql = f"""with const as (select %s workspace_name, %s pub_type, %s everyone_role)
-select w.name as workspace_name,
+select p.id as id_publication,
+       w.name as workspace_name,
        p.type,
        p.name,
        p.title,
@@ -48,14 +49,15 @@ from const c inner join
                                   pub_type,
                                   ROLE_EVERYONE,
                                   ))
-    infos = {layername: {'name': layername,
+    infos = {layername: {'id': id_publication,
+                         'name': layername,
                          'title': title,
                          'uuid': uuid,
                          'type': type,
                          'access_rights': {'read': can_read_users,
                                            'write': can_write_users}
                          }
-             for workspace_name, type, layername, title, uuid, can_read_users, can_write_users
+             for id_publication, workspace_name, type, layername, title, uuid, can_read_users, can_write_users
              in values}
     return infos
 
@@ -105,7 +107,17 @@ def check_publication_info(workspace_name, info):
                                    'read': info['access_rights']['read'],
                                    'write': info['access_rights']['write'], },
                                'message': exc_info.data,
+                               'actor_name': info.get("actor_name"),
                                })
+
+
+def clear_roles(users_list, workspace_name):
+    result_list = users_list.copy()
+    result_list.discard(ROLE_EVERYONE)
+    user_info = users.get_user_infos(workspace_name)
+    if user_info:
+        result_list.discard(workspace_name)
+    return result_list
 
 
 def insert_publication(workspace_name, info):
@@ -126,9 +138,16 @@ returning id
             ROLE_EVERYONE in info['access_rights']['read'],
             ROLE_EVERYONE in info['access_rights']['write'],
             )
-    pub_id = util.run_query(insert_publications_sql, data)
+    pub_id = util.run_query(insert_publications_sql, data)[0][0]
 
-    # TODO insert rights into rights table
+    read_users = clear_roles(info['access_rights']['read'], workspace_name)
+    write_users = clear_roles(info['access_rights']['write'], workspace_name)
+    rights.insert_rights(pub_id,
+                         read_users,
+                         'read')
+    rights.insert_rights(pub_id,
+                         write_users,
+                         'write')
     return pub_id
 
 
@@ -160,6 +179,8 @@ returning id
 def delete_publication(username, name, type):
     workspace_info = workspaces.get_workspace_infos(username).get(username)
     if workspace_info:
+        id_publication = get_publication_infos(username, type)[name]["id"]
+        rights.delete_rights(id_publication)
         id_workspace = workspace_info["id"]
         sql = f"""delete from {DB_SCHEMA}.publications p where p.id_workspace = %s and p.name = %s and p.type = %s;"""
         util.run_statement(sql, (id_workspace,

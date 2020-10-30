@@ -35,8 +35,6 @@ def test_post_layer(ensure_layman):
         assert pubs.get(layername).get('name') == layername
         assert pubs.get(layername).get('title') == layertitle
         assert pubs.get(layername).get('uuid') == str(uuid_str)
-        # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(layername).get('can_read')
-        # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(layername).get('can_write')
 
         db_info = {"name": layername,
                    "title": layertitle2,
@@ -50,8 +48,7 @@ def test_post_layer(ensure_layman):
         assert pubs.get(layername).get('name') == layername
         assert pubs.get(layername).get('title') == layertitle2
         assert pubs.get(layername).get('uuid') == uuid_str
-        # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(layername).get('can_read')
-        # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(layername).get('can_write')
+
         db_info = {"name": layername,
                    "title": layertitle,
                    "publ_type_name": LAYER_TYPE,
@@ -64,8 +61,6 @@ def test_post_layer(ensure_layman):
         assert pubs.get(layername).get('name') == layername
         assert pubs.get(layername).get('title') == layertitle
         assert pubs.get(layername).get('uuid') == uuid_str
-        # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(layername).get('can_read')
-        # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(layername).get('can_write')
 
         publications.delete_publication(username, layername, LAYER_TYPE)
         pubs = publications.get_publication_infos(username, LAYER_TYPE)
@@ -95,8 +90,6 @@ def test_post_map(ensure_layman):
         assert pubs.get(mapname).get('name') == mapname
         assert pubs.get(mapname).get('title') == maptitle
         assert pubs.get(mapname).get('uuid') == uuid_str
-        # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(mapname).get('can_read')
-        # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(mapname).get('can_write')
 
         db_info = {"name": mapname,
                    "title": maptitle2,
@@ -110,8 +103,7 @@ def test_post_map(ensure_layman):
         assert pubs.get(mapname).get('name') == mapname
         assert pubs.get(mapname).get('title') == maptitle2
         assert pubs.get(mapname).get('uuid') == uuid_str
-        # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(mapname).get('can_read')
-        # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(mapname).get('can_write')
+
         db_info = {"name": mapname,
                    "title": maptitle,
                    "publ_type_name": MAP_TYPE,
@@ -124,8 +116,6 @@ def test_post_map(ensure_layman):
         assert pubs.get(mapname).get('name') == mapname
         assert pubs.get(mapname).get('title') == maptitle
         assert pubs.get(mapname).get('uuid') == uuid_str
-        # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(mapname).get('can_read')
-        # assert settings.RIGHTS_EVERYONE_ROLE in pubs.get(mapname).get('can_write')
 
         publications.delete_publication(username, mapname, MAP_TYPE)
         pubs = publications.get_publication_infos(username, MAP_TYPE)
@@ -172,9 +162,9 @@ def test_only_valid_names(ensure_layman):
                 }
 
     with app.app_context():
-        id_workspace = workspaces.ensure_workspace(workspace_name)
+        workspaces.ensure_workspace(workspace_name)
         id_workspace_user = workspaces.ensure_workspace(username)
-        user_id = users.ensure_user(id_workspace_user, userinfo)
+        users.ensure_user(id_workspace_user, userinfo)
 
         publications.only_valid_names(set())
         publications.only_valid_names({username, })
@@ -276,3 +266,142 @@ def test_i_can_still_write(ensure_layman):
     with pytest.raises(LaymanError) as exc_info:
         publications.i_can_still_write(username, {workspace_name, })
         assert exc_info.value.code == 43
+
+
+def test_clear_roles(ensure_layman):
+    workspace_name = 'test_clear_roles_workspace'
+    username = 'test_clear_roles_user'
+    userinfo = {"iss_id": 'mock_test',
+                "sub": '1',
+                "claims": {"email": "test@liferay.com",
+                           "name": "test ensure user",
+                           "given_name": "test",
+                           "family_name": "user",
+                           "middle_name": "ensure",
+                           }
+                }
+
+    with app.app_context():
+        workspaces.ensure_workspace(workspace_name)
+        id_workspace_user = workspaces.ensure_workspace(username)
+        users.ensure_user(id_workspace_user, userinfo)
+
+        list = publications.clear_roles({username, }, workspace_name)
+        assert list == {username, }, list
+
+        list = publications.clear_roles({username, workspace_name, }, workspace_name)
+        assert list == {username, workspace_name, }, list
+
+        list = publications.clear_roles({username, }, username)
+        assert list == set(), list
+
+        list = publications.clear_roles({username, workspace_name, }, username)
+        assert list == {workspace_name, }, list
+
+        list = publications.clear_roles({username, settings.RIGHTS_EVERYONE_ROLE, }, workspace_name)
+        assert list == {username, }, list
+
+        list = publications.clear_roles({username, settings.RIGHTS_EVERYONE_ROLE, }, username)
+        assert list == set(), list
+
+
+def case_test_insert_rights(username,
+                            publication_info_original,
+                            access_rights,
+                            read_to_test,
+                            write_to_test,
+                            ):
+    publication_info = publication_info_original.copy()
+    publication_info.update({"access_rights": access_rights})
+    if users.get_user_infos(username):
+        publication_info.update({"actor_name": username})
+    publications.insert_publication(username, publication_info)
+    pubs = publications.get_publication_infos(username, publication_info["publ_type_name"])
+    assert pubs[publication_info["name"]]["access_rights"]["read"] == read_to_test
+    assert pubs[publication_info["name"]]["access_rights"]["write"] == write_to_test
+    publications.delete_publication(username, publication_info["name"], publication_info["publ_type_name"])
+
+
+def test_insert_rights(ensure_layman):
+    workspace_name = 'test_insert_rights_workspace'
+    username = 'test_insert_rights_user'
+    username2 = 'test_insert_rights_user2'
+    userinfo = {"iss_id": 'mock_test',
+                "sub": '1',
+                "claims": {"email": "test@liferay.com",
+                           "name": "test ensure user",
+                           "given_name": "test",
+                           "family_name": "user",
+                           "middle_name": "ensure",
+                           }
+                }
+    publication_name = 'test_insert_rights_publication_name'
+    publication_title = 'test_insert_rights_publication_title'
+    publication_type = MAP_TYPE
+
+    with app.app_context():
+        workspaces.ensure_workspace(workspace_name)
+        id_workspace_user = workspaces.ensure_workspace(username)
+        users.ensure_user(id_workspace_user, userinfo)
+        id_workspace_user2 = workspaces.ensure_workspace(username2)
+        users.ensure_user(id_workspace_user2, userinfo)
+
+        publication_info = {"name": publication_name,
+                            "title": publication_title,
+                            "publ_type_name": publication_type,
+                            "uuid": uuid.uuid4(),
+                            }
+
+        case_test_insert_rights(username,
+                                publication_info,
+                                {"read": {username, },
+                                 "write": {username, },
+                                 },
+                                f'{username}',
+                                f'{username}',
+                                )
+
+        case_test_insert_rights(username,
+                                publication_info,
+                                {"read": {settings.RIGHTS_EVERYONE_ROLE, },
+                                 "write": {settings.RIGHTS_EVERYONE_ROLE, },
+                                 },
+                                f'{username}, {settings.RIGHTS_EVERYONE_ROLE}',
+                                f'{username}, {settings.RIGHTS_EVERYONE_ROLE}',
+                                )
+
+        case_test_insert_rights(username,
+                                publication_info,
+                                {"read": {settings.RIGHTS_EVERYONE_ROLE, username, },
+                                 "write": {settings.RIGHTS_EVERYONE_ROLE, username, },
+                                 },
+                                f'{username}, {settings.RIGHTS_EVERYONE_ROLE}',
+                                f'{username}, {settings.RIGHTS_EVERYONE_ROLE}',
+                                )
+
+        case_test_insert_rights(username,
+                                publication_info,
+                                {"read": {username, username2, },
+                                 "write": {username, username2, },
+                                 },
+                                f'{username}, {username2}',
+                                f'{username}, {username2}',
+                                )
+
+        case_test_insert_rights(workspace_name,
+                                publication_info,
+                                {"read": {settings.RIGHTS_EVERYONE_ROLE, username, },
+                                 "write": {settings.RIGHTS_EVERYONE_ROLE, username, },
+                                 },
+                                f'{username}, {settings.RIGHTS_EVERYONE_ROLE}',
+                                f'{username}, {settings.RIGHTS_EVERYONE_ROLE}',
+                                )
+
+        case_test_insert_rights(workspace_name,
+                                publication_info,
+                                {"read": {settings.RIGHTS_EVERYONE_ROLE, },
+                                 "write": {settings.RIGHTS_EVERYONE_ROLE, },
+                                 },
+                                f'{settings.RIGHTS_EVERYONE_ROLE}',
+                                f'{settings.RIGHTS_EVERYONE_ROLE}',
+                                )
