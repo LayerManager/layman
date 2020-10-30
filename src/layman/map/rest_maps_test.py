@@ -71,13 +71,18 @@ def test_get_map_infos(client):
 
         for module in modules:
             map_infos = module["method_infos"](username)
+            if map_infos and map_infos[mapname] and map_infos[mapname].get("id"):
+                del map_infos[mapname]["id"]
             assert map_infos == module["result_infos"],\
                 (module["name"], module["method_infos"].__module__, map_infos)
             publication_infos = module["method_publications"](username, "layman.map")
+            if publication_infos and publication_infos[mapname] and publication_infos[mapname].get("id"):
+                del publication_infos[mapname]["id"]
             assert publication_infos == module["result_infos"],\
                 (module["name"], module["method_publications"].__module__, publication_infos)
 
         map_infos = util.get_map_infos(username)
+        del map_infos[mapname]["id"]
         assert map_infos == result_infos_db, map_infos
 
     client_util.delete_map(username, mapname, client)

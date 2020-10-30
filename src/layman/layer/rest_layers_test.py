@@ -102,14 +102,19 @@ def test_get_layer_infos(client):
 
         for module in modules:
             layer_infos = module["method_infos"](username)
+            if layer_infos and layer_infos[layername] and layer_infos[layername].get("id"):
+                del layer_infos[layername]["id"]
             assert layer_infos == module["result_infos"], \
                 (module["name"], module["method_infos"].__module__, layer_infos)
             publication_infos = module["method_publications"](username, "layman.layer")
+            if publication_infos and publication_infos[layername] and publication_infos[layername].get("id"):
+                del publication_infos[layername]["id"]
             assert publication_infos == module["result_infos"], \
                 (module["name"], module["method_publications"].__module__, publication_infos)
 
         # util
         layer_infos = util.get_layer_infos(username)
+        del layer_infos[layername]["id"]
         assert layer_infos == result_infos_db, layer_infos
 
     client_util.delete_layer(username, layername, client)

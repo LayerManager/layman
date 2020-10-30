@@ -14,9 +14,9 @@ def insert_rights(id_publication,
     insert_sql = f'''insert into {DB_SCHEMA}.rights (id_user, id_publication, type)
         select u.id,
                %s,
-			   %s
+               %s
         from {DB_SCHEMA}.users u inner join
-		     {DB_SCHEMA}.workspaces w on w.id = u.id_workspace
+             {DB_SCHEMA}.workspaces w on w.id = u.id_workspace
         where w.name = %s
 returning id
 ;'''
