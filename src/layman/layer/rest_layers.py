@@ -7,7 +7,7 @@ from layman import settings
 from . import util, LAYER_TYPE
 from .filesystem import input_file, input_sld, input_chunk, uuid
 from layman.authn import authenticate
-from layman.authz import authorize, util as authz_util
+from layman.authz import authorize_decorator, util as authz_util
 from layman.common import redis as redis_util
 from .prime_db_schema import table
 
@@ -16,7 +16,7 @@ bp = Blueprint('rest_layers', __name__)
 
 @bp.before_request
 @authenticate
-@authorize
+@authorize_decorator
 @check_username_decorator
 def before_request():
     pass

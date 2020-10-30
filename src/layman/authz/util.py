@@ -22,10 +22,7 @@ def authorize(f):
 
 
 def get_authz_module():
-    key = FLASK_MODULE_KEY
-    if key not in current_app.config:
-        current_app.config[key] = importlib.import_module(settings.AUTHZ_MODULE)
-    return current_app.config[key]
+    return None
 
 
 def get_publication_access_rights(publ_type, username, publication_name):

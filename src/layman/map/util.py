@@ -13,7 +13,7 @@ from flask import current_app, request, g
 
 from layman import LaymanError
 from layman.common import util as layman_util
-from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, \
+from layman.util import call_modules_fn, get_providers_from_source_names, get_modules_from_names, \
     to_safe_name, url_for
 from layman import celery as celery_util
 from . import get_map_sources, MAP_TYPE, get_map_type_def
@@ -21,8 +21,11 @@ from .filesystem import input_file
 from .micka.csw import map_json_to_operates_on, map_json_to_epsg_codes
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common import metadata as common_md
+from layman.common.util import PUBLICATION_NAME_PATTERN
 
-MAPNAME_RE = USERNAME_RE
+
+MAPNAME_RE = PUBLICATION_NAME_PATTERN
+
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'

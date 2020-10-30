@@ -8,14 +8,14 @@ from layman.util import check_username_decorator
 from . import util
 from .filesystem import thumbnail
 from layman.authn import authenticate
-from layman.authz import authorize
+from layman.authz import authorize_decorator
 
 bp = Blueprint('rest_map_metadata_comparison', __name__)
 
 
 @bp.before_request
 @authenticate
-@authorize
+@authorize_decorator
 @check_username_decorator
 @util.check_mapname_decorator
 @util.info_decorator

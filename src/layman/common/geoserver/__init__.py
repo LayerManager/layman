@@ -6,8 +6,7 @@ import string
 from urllib.parse import urljoin
 from flask import g
 from layman import settings
-from layman import util as layman_util
-from layman.authz import util as authz
+from layman import authz
 
 
 logger = logging.getLogger(__name__)
@@ -164,8 +163,7 @@ def ensure_workspace_security(workspace, type, auth):
     all_roles = authz.get_all_gs_roles(workspace, type)
     roles.difference_update(all_roles)
 
-    authz_module = authz.get_authz_module()
-    new_roles = authz_module.get_gs_roles(workspace, type)
+    new_roles = authz.get_gs_roles(workspace, type)
     roles.update(new_roles)
 
     ensure_workspace_security_roles(workspace, roles, type, auth)

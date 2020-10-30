@@ -9,7 +9,7 @@ from layman.util import check_username_decorator, url_for
 from . import util, MAP_TYPE
 from .filesystem import input_file, uuid
 from layman.authn import authenticate
-from layman.authz import authorize, util as authz_util
+from layman.authz import authorize_decorator, util as authz_util
 from layman.common import redis as redis_util
 from .prime_db_schema import table
 
@@ -18,7 +18,7 @@ bp = Blueprint('rest_maps', __name__)
 
 @bp.before_request
 @authenticate
-@authorize
+@authorize_decorator
 @check_username_decorator
 def before_request():
     pass
