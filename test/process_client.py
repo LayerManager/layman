@@ -52,8 +52,6 @@ def publish_layer(username,
         try:
             data = {'name': layername,
                     'title': title,
-                    'access_rights.read': access_rights['read'],
-                    'access_rights.write': access_rights['write'],
                     }
             r = requests.post(r_url,
                               files=[('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths],
