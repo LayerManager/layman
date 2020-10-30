@@ -38,8 +38,6 @@ def publish_layer(username,
                 'file': files,
                 'name': layername,
                 'title': title,
-                'access_rights.read': access_rights['read'],
-                'access_rights.write': access_rights['write'],
             })
             assert rv.status_code == 200, (rv.status_code, rv.get_json())
         finally:
@@ -125,8 +123,6 @@ def publish_map(username,
                              data={'file': files,
                                    'name': mapname,
                                    'title': maptitle,
-                                   'access_rights.read': access_rights['read'],
-                                   'access_rights.write': access_rights['write'],
                                    },
                              headers=headers)
             assert rv.status_code == 200, (rv.status_code, rv.get_json())
