@@ -74,7 +74,7 @@ def test_post_forbidden_access(client):
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
-            'file': files
+            'file': files,
         })
         assert rv.status_code == 403
         resp_json = rv.get_json()

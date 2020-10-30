@@ -98,7 +98,7 @@ def test_anonymous_post_access(client):
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
-            'file': files
+            'file': files,
         })
         assert rv.status_code == 403
         resp_json = rv.get_json()
@@ -139,7 +139,7 @@ def test_authn_post_access_without_username(client):
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
-            'file': files
+            'file': files,
         }, headers={
             f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
             f'{TOKEN_HEADER}': 'Bearer abc',

@@ -40,13 +40,16 @@ def post_map(username,
              mapname,
              uuid,
              title,
-             access_rights):
+             access_rights,
+             actor_name,
+             ):
     # store into Layman DB
     db_info = {"name": mapname,
                "title": title,
                "publ_type_name": MAP_TYPE,
                "uuid": uuid,
                "access_rights": access_rights,
+               "actor_name": actor_name,
                }
     pubs_util.insert_publication(username, db_info)
 

@@ -51,8 +51,6 @@ def publish_layer(username,
         try:
             data = {'name': layername,
                     'title': title,
-                    'access_rights.read': access_rights['read'],
-                    'access_rights.write': access_rights['write'],
                     }
             r = requests.post(r_url,
                               files=[('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths],
@@ -129,8 +127,6 @@ def publish_map(username,
             r = requests.post(r_url,
                               files=[('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths],
                               data={'name': mapname,
-                                    'access_rights.read': access_rights['read'],
-                                    'access_rights.write': access_rights['write'],
                                     },
                               headers=headers)
             assert r.status_code == 200, r.text

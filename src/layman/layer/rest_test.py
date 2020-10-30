@@ -8,13 +8,14 @@ import time
 import xml.etree.ElementTree as ET
 from urllib.parse import urljoin
 import difflib
+import logging
 
 import pytest
 from flask import url_for
 
 import sys
 
-from test.flask_client import wait_till_layer_ready, publish_layer, delete_layer
+from test import flask_client
 
 del sys.modules['layman']
 
@@ -32,7 +33,7 @@ from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from test.data import wfs as data_wfs
 
-from test import flask_client
+logger = logging.getLogger(__name__)
 
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
 
@@ -159,8 +160,6 @@ def test_layman_gs_user_conflict(client):
         rv = client.post(rest_path, data={
             'file': files,
             'name': layername,
-            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         resp_json = rv.get_json()
         assert rv.status_code == 409
@@ -174,8 +173,8 @@ def test_wrong_value_of_layername(client):
     username = 'test_wrong_value_of_layername_user'
     layername = 'layer1'
     # publish and delete layer to ensure that username exists
-    publish_layer(username, layername, client)
-    delete_layer(username, layername, client)
+    flask_client.publish_layer(username, layername, client)
+    flask_client.delete_layer(username, layername, client)
     layernames = [' ', '2a', 'ě', ';', '?', 'ABC']
     for layername in layernames:
         with app.app_context():
@@ -238,8 +237,6 @@ def test_layername_db_object_conflict(client):
         rv = client.post(url_for('rest_layers.post', username='testuser1'), data={
             'file': files,
             'name': 'spatial_ref_sys',
-            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 409
         resp_json = rv.get_json()
@@ -254,8 +251,8 @@ def test_get_layers_testuser1_v1(client):
     username = 'test_get_layers_testuser1_v1_user'
     layername = 'layer1'
     # publish and delete layer to ensure that username exists
-    publish_layer(username, layername, client)
-    delete_layer(username, layername, client)
+    flask_client.publish_layer(username, layername, client)
+    flask_client.delete_layer(username, layername, client)
     rv = client.get(url_for('rest_layers.get', username=username))
     assert rv.status_code == 200, rv.get_json()
     # assert len(resp_json) == 0
@@ -279,8 +276,6 @@ def test_post_layers_simple(client):
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
             rv = client.post(rest_path, data={
                 'file': files,
-                'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-                'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
             })
             assert rv.status_code == 200
         finally:
@@ -301,7 +296,7 @@ def test_post_layers_simple(client):
         # e.g. python3 -m pytest -W ignore::DeprecationWarning -xsvv src/layman/authn/oauth2_test.py::test_patch_current_user_without_username src/layman/layer/rest_test.py::test_post_layers_simple
         # this can badly affect also .get(propagate=False) in layman.celery.abort_task_chain
         # but hopefully this is only related to magic flask&celery test suite
-        wait_till_layer_ready(username, layername)
+        flask_client.wait_till_layer_ready(username, layername)
 
         layer_info = util.get_layer_info(username, layername)
         for key_to_check in keys_to_check:
@@ -380,8 +375,6 @@ def test_post_layers_concurrent(client):
         rv = client.post(rest_path, data={
             'file': files,
             'name': layername,
-            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 200
     finally:
@@ -425,8 +418,6 @@ def test_post_layers_shp_missing_extensions(client):
         rv = client.post(rest_path, data={
             'file': files,
             'name': 'ne_110m_admin_0_countries_shp',
-            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         resp_json = rv.get_json()
         # print(resp_json)
@@ -464,8 +455,6 @@ def test_post_layers_shp(client):
         rv = client.post(rest_path, data={
             'file': files,
             'name': layername,
-            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 200
     finally:
@@ -474,7 +463,7 @@ def test_post_layers_shp(client):
 
     last_task = util._get_layer_task(username, layername)
     assert last_task is not None and not celery_util.is_task_ready(last_task)
-    wait_till_layer_ready(username, layername)
+    flask_client.wait_till_layer_ready(username, layername)
     # last_task['last'].get()
 
     wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
@@ -528,8 +517,6 @@ def test_post_layers_layer_exists(client):
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
             'file': files,
-            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 409
         resp_json = rv.get_json()
@@ -562,8 +549,6 @@ def test_post_layers_complex(client):
                 'name': 'countries',
                 'title': 'staty',
                 'description': 'popis států',
-                'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-                'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
                 'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
             })
             assert rv.status_code == 200
@@ -576,7 +561,7 @@ def test_post_layers_complex(client):
 
         last_task = util._get_layer_task(username, layername)
         assert last_task is not None and not celery_util.is_task_ready(last_task)
-        wait_till_layer_ready(username, layername)
+        flask_client.wait_till_layer_ready(username, layername)
         # last_task['last'].get()
         assert celery_util.is_task_ready(last_task)
 
@@ -663,8 +648,6 @@ def test_uppercase_attr(client):
             rv = client.post(rest_path, data={
                 'file': files,
                 'name': layername,
-                'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-                'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
                 'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
             })
             assert rv.status_code == 200
@@ -676,7 +659,7 @@ def test_uppercase_attr(client):
 
         last_task = util._get_layer_task(username, layername)
         assert last_task is not None and not celery_util.is_task_ready(last_task)
-        wait_till_layer_ready(username, layername)
+        flask_client.wait_till_layer_ready(username, layername)
         # last_task['last'].get()
         assert celery_util.is_task_ready(last_task)
 
@@ -825,7 +808,7 @@ def test_patch_layer_style(client):
         # keys_to_check = ['thumbnail']
         # for key_to_check in keys_to_check:
         #         assert 'status' in resp_json[key_to_check]
-        wait_till_layer_ready(username, layername)
+        flask_client.wait_till_layer_ready(username, layername)
         # last_task['last'].get()
 
         resp_json = rv.get_json()
@@ -880,8 +863,6 @@ def test_post_layers_sld_1_1_0(client):
         rv = client.post(rest_path, data={
             'file': files,
             'name': layername,
-            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
             'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
         })
         assert rv.status_code == 200
@@ -960,7 +941,7 @@ def test_patch_layer_data(client):
         keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
         for key_to_check in keys_to_check:
             assert 'status' in resp_json[key_to_check]
-        wait_till_layer_ready(username, layername)
+        flask_client.wait_till_layer_ready(username, layername)
         # last_task['last'].get()
 
     with app.app_context():
@@ -1002,7 +983,7 @@ def test_patch_layer_data(client):
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
-@pytest.mark.usefixtures('app_context')
+# @pytest.mark.usefixtures('app_context')
 def test_patch_layer_concurrent_and_delete_it(client):
     with app.app_context():
         username = 'testuser2'
@@ -1088,8 +1069,6 @@ def test_post_layers_long_and_delete_it(client):
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
             'file': files,
-            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 200
     finally:
@@ -1151,8 +1130,6 @@ def test_post_layers_zero_length_attribute(client):
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
             'file': files,
-            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 200
     finally:
@@ -1204,15 +1181,13 @@ def test_layer_with_different_geometry(client):
         rv = client.post(rest_path, data={
             'file': files,
             'name': layername,
-            'access_rights.read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-            'access_rights.write': f'{settings.RIGHTS_EVERYONE_ROLE}',
         })
         assert rv.status_code == 200
     finally:
         for fp in files:
             fp[0].close()
 
-    wait_till_layer_ready(username, layername)
+    flask_client.wait_till_layer_ready(username, layername)
 
     url_path_ows = urljoin(urljoin(settings.LAYMAN_GS_URL, username), 'ows?service=WFS&request=Transaction')
     url_path_wfs = urljoin(urljoin(settings.LAYMAN_GS_URL, username), 'wfs?request=Transaction')

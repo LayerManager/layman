@@ -45,12 +45,14 @@ def post_layer(username,
                access_rights,
                title,
                uuid,
+               actor_name,
                ):
     db_info = {"name": layername,
                "title": title,
                "publ_type_name": LAYER_TYPE,
                "uuid": uuid,
                "access_rights": access_rights,
+               "actor_name": actor_name,
                }
     pubs_util.insert_publication(username, db_info)
 

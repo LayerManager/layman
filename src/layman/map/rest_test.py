@@ -163,7 +163,7 @@ def test_post_maps_invalid_file(client):
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
-            'file': files
+            'file': files,
         })
         assert rv.status_code == 400
         resp_json = rv.get_json()
@@ -189,7 +189,7 @@ def test_post_maps_invalid_json(client):
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
-            'file': files
+            'file': files,
         })
         assert rv.status_code == 400
         resp_json = rv.get_json()
@@ -221,7 +221,7 @@ def test_post_maps_simple(client):
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
             rv = client.post(rest_path, data={
-                'file': files
+                'file': files,
             })
             assert rv.status_code == 200
             resp_json = rv.get_json()
