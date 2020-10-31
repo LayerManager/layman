@@ -405,3 +405,27 @@ def test_insert_rights(ensure_layman):
                                 f'{settings.RIGHTS_EVERYONE_ROLE}',
                                 f'{settings.RIGHTS_EVERYONE_ROLE}',
                                 )
+
+
+def test_publications_same_name(ensure_layman):
+    publ_name = 'test_publications_same_name_publ'
+    username = 'test_publications_same_name_user'
+    username2 = 'test_publications_same_name_user2'
+
+    process_client.publish_layer(username, publ_name)
+    process_client.publish_map(username, publ_name)
+    process_client.publish_layer(username2, publ_name)
+    process_client.publish_map(username2, publ_name)
+
+    with app.app_context():
+        pubs = publications.get_publication_infos(username)
+        assert len(pubs) == 2
+        pubs = publications.get_publication_infos(username2)
+        assert len(pubs) == 2
+        pubs = publications.get_publication_infos()
+        assert len(pubs) >= 4
+
+    process_client.delete_layer(username, publ_name)
+    process_client.delete_map(username, publ_name)
+    process_client.delete_layer(username2, publ_name)
+    process_client.delete_map(username2, publ_name)
