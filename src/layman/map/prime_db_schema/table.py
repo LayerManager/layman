@@ -3,18 +3,19 @@ from .. import MAP_TYPE
 
 
 def get_map_infos(username):
-    return pubs_util.get_publication_infos(username, MAP_TYPE)
+    result = {mapname: map_info for (username_value, mapname, type), map_info in pubs_util.get_publication_infos(username, MAP_TYPE).items()}
+    return result
 
 
 def get_publication_uuid(username, publication_type, publication_name):
     infos = pubs_util.get_publication_infos(username, publication_type)
-    return infos.get(publication_name).get("uuid")
+    return infos.get((username, publication_name, publication_type)).get("uuid")
 
 
 def get_map_info(username, mapname):
     maps = pubs_util.get_publication_infos(username, MAP_TYPE)
-    if mapname in maps:
-        info = maps[mapname]
+    if (username, mapname, MAP_TYPE) in maps:
+        info = maps[(username, mapname, MAP_TYPE)]
     else:
         info = {}
     return info
@@ -54,7 +55,12 @@ def post_map(username,
     pubs_util.insert_publication(username, db_info)
 
 
-get_publication_infos = pubs_util.get_publication_infos
+def get_publication_infos(username, publication_type):
+    if publication_type != '.'.join(__name__.split('.')[:-2]):
+        raise Exception(f'Unknown pyblication type {publication_type}')
+
+    infos = get_map_infos(username)
+    return infos
 
 
 def delete_map(username, mapname):

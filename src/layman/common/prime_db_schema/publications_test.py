@@ -32,9 +32,9 @@ def test_post_layer(ensure_layman):
                    }
         publications.insert_publication(username, db_info)
         pubs = publications.get_publication_infos(username, LAYER_TYPE)
-        assert pubs.get(layername).get('name') == layername
-        assert pubs.get(layername).get('title') == layertitle
-        assert pubs.get(layername).get('uuid') == str(uuid_str)
+        assert pubs[(username, layername, LAYER_TYPE)].get('name') == layername
+        assert pubs[(username, layername, LAYER_TYPE)].get('title') == layertitle
+        assert pubs[(username, layername, LAYER_TYPE)].get('uuid') == str(uuid_str)
 
         db_info = {"name": layername,
                    "title": layertitle2,
@@ -45,9 +45,9 @@ def test_post_layer(ensure_layman):
                    }
         publications.update_publication(username, db_info)
         pubs = publications.get_publication_infos(username, LAYER_TYPE)
-        assert pubs.get(layername).get('name') == layername
-        assert pubs.get(layername).get('title') == layertitle2
-        assert pubs.get(layername).get('uuid') == uuid_str
+        assert pubs[(username, layername, LAYER_TYPE)].get('name') == layername
+        assert pubs[(username, layername, LAYER_TYPE)].get('title') == layertitle2
+        assert pubs[(username, layername, LAYER_TYPE)].get('uuid') == uuid_str
 
         db_info = {"name": layername,
                    "title": layertitle,
@@ -58,13 +58,13 @@ def test_post_layer(ensure_layman):
                    }
         publications.update_publication(username, db_info)
         pubs = publications.get_publication_infos(username, LAYER_TYPE)
-        assert pubs.get(layername).get('name') == layername
-        assert pubs.get(layername).get('title') == layertitle
-        assert pubs.get(layername).get('uuid') == uuid_str
+        assert pubs[(username, layername, LAYER_TYPE)].get('name') == layername
+        assert pubs[(username, layername, LAYER_TYPE)].get('title') == layertitle
+        assert pubs[(username, layername, LAYER_TYPE)].get('uuid') == uuid_str
 
         publications.delete_publication(username, layername, LAYER_TYPE)
         pubs = publications.get_publication_infos(username, LAYER_TYPE)
-        assert pubs.get(layername) is None
+        assert pubs.get((username, layername, LAYER_TYPE)) is None
 
 
 def test_post_map(ensure_layman):
@@ -87,9 +87,9 @@ def test_post_map(ensure_layman):
                    }
         publications.insert_publication(username, db_info)
         pubs = publications.get_publication_infos(username, MAP_TYPE)
-        assert pubs.get(mapname).get('name') == mapname
-        assert pubs.get(mapname).get('title') == maptitle
-        assert pubs.get(mapname).get('uuid') == uuid_str
+        assert pubs[(username, mapname, MAP_TYPE)].get('name') == mapname
+        assert pubs[(username, mapname, MAP_TYPE)].get('title') == maptitle
+        assert pubs[(username, mapname, MAP_TYPE)].get('uuid') == uuid_str
 
         db_info = {"name": mapname,
                    "title": maptitle2,
@@ -100,9 +100,9 @@ def test_post_map(ensure_layman):
                    }
         publications.update_publication(username, db_info)
         pubs = publications.get_publication_infos(username, MAP_TYPE)
-        assert pubs.get(mapname).get('name') == mapname
-        assert pubs.get(mapname).get('title') == maptitle2
-        assert pubs.get(mapname).get('uuid') == uuid_str
+        assert pubs[(username, mapname, MAP_TYPE)].get('name') == mapname
+        assert pubs[(username, mapname, MAP_TYPE)].get('title') == maptitle2
+        assert pubs[(username, mapname, MAP_TYPE)].get('uuid') == uuid_str
 
         db_info = {"name": mapname,
                    "title": maptitle,
@@ -113,13 +113,13 @@ def test_post_map(ensure_layman):
                    }
         publications.update_publication(username, db_info)
         pubs = publications.get_publication_infos(username, MAP_TYPE)
-        assert pubs.get(mapname).get('name') == mapname
-        assert pubs.get(mapname).get('title') == maptitle
-        assert pubs.get(mapname).get('uuid') == uuid_str
+        assert pubs[(username, mapname, MAP_TYPE)].get('name') == mapname
+        assert pubs[(username, mapname, MAP_TYPE)].get('title') == maptitle
+        assert pubs[(username, mapname, MAP_TYPE)].get('uuid') == uuid_str
 
         publications.delete_publication(username, mapname, MAP_TYPE)
         pubs = publications.get_publication_infos(username, MAP_TYPE)
-        assert pubs.get(mapname) is None
+        assert pubs.get((username, mapname, MAP_TYPE)) is None
 
 
 def test_select_publications(ensure_layman):
@@ -145,7 +145,7 @@ def test_select_publications(ensure_layman):
 
     with app.app_context():
         pubs = publications.get_publication_infos(username)
-        assert pubs.get(layername) is None
+        assert len(pubs) == 0, pubs
 
 
 def test_only_valid_names(ensure_layman):
@@ -317,8 +317,8 @@ def case_test_insert_rights(username,
         publication_info.update({"actor_name": username})
     publications.insert_publication(username, publication_info)
     pubs = publications.get_publication_infos(username, publication_info["publ_type_name"])
-    assert pubs[publication_info["name"]]["access_rights"]["read"] == read_to_test
-    assert pubs[publication_info["name"]]["access_rights"]["write"] == write_to_test
+    assert pubs[(username, publication_info["name"], publication_info["publ_type_name"])]["access_rights"]["read"] == read_to_test
+    assert pubs[(username, publication_info["name"], publication_info["publ_type_name"])]["access_rights"]["write"] == write_to_test
     publications.delete_publication(username, publication_info["name"], publication_info["publ_type_name"])
 
 

@@ -3,6 +3,8 @@ import logging
 from test import process, process_client
 
 from layman import settings, app as app, util
+from layman.layer import LAYER_TYPE
+from layman.map import MAP_TYPE
 from . import model, publications as pub_util, workspaces as workspaces_util
 from .schema_initialization import migrate_users_and_publications, ensure_schema
 from .util import run_query, run_statement
@@ -51,8 +53,8 @@ def test_schema(ensure_layman):
         user_infos = workspaces_util.get_workspace_infos(username)
         assert username in user_infos
         pub_infos = pub_util.get_publication_infos(username)
-        assert layername in pub_infos
-        assert mapname in pub_infos
+        assert (username, layername, LAYER_TYPE) in pub_infos
+        assert (username, mapname, MAP_TYPE) in pub_infos
 
     process_client.delete_layer(username, layername)
     process_client.delete_map(username, mapname)

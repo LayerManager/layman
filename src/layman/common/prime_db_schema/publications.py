@@ -49,14 +49,16 @@ from const c inner join
                                   pub_type,
                                   ROLE_EVERYONE,
                                   ))
-    infos = {layername: {'id': id_publication,
-                         'name': layername,
-                         'title': title,
-                         'uuid': uuid,
-                         'type': type,
-                         'access_rights': {'read': can_read_users,
-                                           'write': can_write_users}
-                         }
+    infos = {(workspace_name,
+              layername,
+              type,): {'id': id_publication,
+                       'name': layername,
+                       'title': title,
+                       'uuid': uuid,
+                       'type': type,
+                       'access_rights': {'read': can_read_users,
+                                         'write': can_write_users}
+                       }
              for id_publication, workspace_name, type, layername, title, uuid, can_read_users, can_write_users
              in values}
     return infos
@@ -176,10 +178,10 @@ returning id
     return pub_id
 
 
-def delete_publication(username, name, type):
-    workspace_info = workspaces.get_workspace_infos(username).get(username)
+def delete_publication(workspace_name, name, type):
+    workspace_info = workspaces.get_workspace_infos(workspace_name).get(workspace_name)
     if workspace_info:
-        id_publication = get_publication_infos(username, type)[name]["id"]
+        id_publication = get_publication_infos(workspace_name, type)[(workspace_name, name, type)]["id"]
         rights.delete_rights(id_publication)
         id_workspace = workspace_info["id"]
         sql = f"""delete from {DB_SCHEMA}.publications p where p.id_workspace = %s and p.name = %s and p.type = %s;"""
@@ -187,4 +189,4 @@ def delete_publication(username, name, type):
                                  name,
                                  type,))
     else:
-        logger.warning(f'Deleting publication for NON existing workspace. workspace_name={username}, pub_name={name}, type={type}')
+        logger.warning(f'Deleting publication for NON existing workspace. workspace_name={workspace_name}, pub_name={name}, type={type}')

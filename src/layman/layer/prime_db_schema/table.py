@@ -6,18 +6,19 @@ PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
 def get_layer_infos(username):
-    return pubs_util.get_publication_infos(username, LAYER_TYPE)
+    result = {layername: layer_info for (username_value, layername, type), layer_info in pubs_util.get_publication_infos(username, LAYER_TYPE).items()}
+    return result
 
 
 def get_publication_uuid(username, publication_type, publication_name):
     infos = pubs_util.get_publication_infos(username, publication_type)
-    return infos.get(publication_name).get("uuid")
+    return infos.get((username, publication_name, publication_type)).get("uuid")
 
 
 def get_layer_info(username, layername):
     layers = pubs_util.get_publication_infos(username, LAYER_TYPE)
-    if layername in layers:
-        info = layers[layername]
+    if (username, layername, LAYER_TYPE) in layers:
+        info = layers[(username, layername, LAYER_TYPE)]
     else:
         info = {}
     return info
@@ -57,7 +58,12 @@ def post_layer(username,
     pubs_util.insert_publication(username, db_info)
 
 
-get_publication_infos = pubs_util.get_publication_infos
+def get_publication_infos(username, publication_type):
+    if publication_type != '.'.join(__name__.split('.')[:-2]):
+        raise Exception(f'Unknown pyblication type {publication_type}')
+
+    infos = get_layer_infos(username)
+    return infos
 
 
 def get_metadata_comparison(username, publication_name):
