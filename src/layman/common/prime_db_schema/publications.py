@@ -12,8 +12,6 @@ psycopg2.extras.register_uuid()
 
 
 def get_publication_infos(workspace_name=None, pub_type=None):
-    # TODO if two layers with the same name exists, only one is returned in result (if workspace_name and pub_type are None)
-    # TODO same for map and layer with the same name
     sql = f"""with const as (select %s workspace_name, %s pub_type, %s everyone_role)
 select p.id as id_publication,
        w.name as workspace_name,

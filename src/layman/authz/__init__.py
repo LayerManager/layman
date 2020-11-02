@@ -1,3 +1,5 @@
+import json
+from flask import after_this_request
 from functools import wraps
 from layman.common.prime_db_schema import workspaces, users, publications
 from . import util
@@ -27,8 +29,9 @@ SINGLE_PUBLICATION_PATH_PATTERN = re.compile(
 from layman.common import geoserver as gs
 
 
-def authorize(request_path, request_method, actor_name):
+def parse_request_path(request_path):
     workspace = None
+    publication_type = None
     publication_type_url_prefix = None
     publication_name = None
     m = MULTI_PUBLICATION_PATH_PATTERN.match(request_path)
@@ -38,20 +41,25 @@ def authorize(request_path, request_method, actor_name):
         workspace = m.group('workspace')
         publication_type_url_prefix = m.group('publication_type')
         publication_name = m.groupdict().get('publication_name', None)
+    if publication_type_url_prefix:
+        # TODO get it using settings.PUBLICATION_MODULES
+        publication_type = {
+            'layers': 'layman.layer',
+            'maps': 'layman.map',
+        }[publication_type_url_prefix]
+    if workspace in settings.RESERVED_WORKSPACE_NAMES:
+        workspace = None
+    return (workspace, publication_type, publication_name)
 
-    if workspace is None or workspace in settings.RESERVED_WORKSPACE_NAMES:
+
+def authorize(workspace, publication_type, publication_name, request_method, actor_name):
+    if workspace is None:
         raise Exception(f"Authorization module is unable to authorize path {request_path}")
 
     is_multi_publication_request = not publication_name
-    # TODO get it using settings.PUBLICATION_MODULES
-    publication_type = {
-        'layers': 'layman.layer',
-        'maps': 'layman.map',
-    }[publication_type_url_prefix]
 
     if is_multi_publication_request:
         if request_method in ['GET']:
-            # TODO somehow filter out publications actor does not have read access to
             return
         elif request_method in ['POST']:
             if actor_name == workspace:
@@ -65,7 +73,9 @@ def authorize(request_path, request_method, actor_name):
         else:
             raise LaymanError(31, {'method': request_method})
     else:
-        publ_info = publications.get_publication_infos(workspace, publication_type).get(publication_name)
+        publ_info = publications.get_publication_infos(workspace, publication_type).get(
+            (workspace, publication_name, publication_type)
+        )
         publ_exists = bool(publ_info)
         if not publ_exists:
             # TODO raise 404 not found
@@ -88,6 +98,25 @@ def authorize(request_path, request_method, actor_name):
                 return
         else:
             raise LaymanError(31, {'method': request_method})
+
+
+def authorize_after_multi_get_request(workspace, actor_name, response):
+    # print(f"authorize_after_request, status_code = {response.status_code}, workspace={workspace}, actor_name={actor_name}")
+    if response.status_code == 200:
+        publication_infos = publications.get_publication_infos(workspace_name=workspace)
+        # print(f"authorize_after_request, publication_infos = {publication_infos}")
+        safe_uuids = [
+            publication_info['uuid'] for publication_info in publication_infos.values()
+            if is_user_in_access_rule(actor_name, publication_info['access_rights']['read'])
+        ]
+        # print(f"authorize_after_request, safe_uuids = {safe_uuids}")
+        publications_json = json.loads(response.get_data())
+        publications_json = [
+            publication_json for publication_json in publications_json
+            if publication_json['uuid'] in safe_uuids
+        ]
+        response.set_data(json.dumps(publications_json))
+    return response
 
 
 def get_publication_access_rights(publ_type, username, publication_name):
@@ -127,8 +156,19 @@ def authorize_decorator(f):
     def decorated_function(*args, **kwargs):
         # print(f"authorize ARGS {args} KWARGS {kwargs}")
         req_path = request.script_root + request.path
-        authorize(req_path, request.method, g.user and g.user['username'])
+        (workspace, publication_type, publication_name) = parse_request_path(req_path)
+        if workspace is None or publication_type is None:
+            raise Exception(f"Authorization module is unable to authorize path {req_path}")
+        actor_name = g.user and g.user['username']
+        authorize(workspace, publication_type, publication_name, request.method, actor_name)
+        if workspace and publication_type and not publication_name and request.method == 'GET':
+            @after_this_request
+            def authorize_after_request_tmp(response):
+                return authorize_after_multi_get_request(workspace, actor_name, response)
         return f(*args, **kwargs)
 
     return decorated_function
 
+
+# TODO re-think
+get_all_gs_roles = util.get_all_gs_roles

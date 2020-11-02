@@ -215,3 +215,9 @@ def reserve_username(username, headers=None):
     assert r.status_code == 200, r.text
     claimed_username = r.json()['username']
     assert claimed_username == username
+
+
+def get_authz_headers(username):
+    return {f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+            f'{TOKEN_HEADER}': f'Bearer {username}',
+            }
