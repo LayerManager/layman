@@ -29,18 +29,13 @@ def test_get_layer_infos(client):
     with app.app_context():
         result_infos_name_uuid = {layername: {'name': layername,
                                               'uuid': uuid.get_layer_uuid(username, layername)}}
-        result_infos_db = {layername: {'name': layername,
-                                       'title': layertitle,
-                                       'uuid': uuid.get_layer_uuid(username, layername),
-                                       'type': LAYER_TYPE,
-                                       'access_rights': {'read': f'{settings.RIGHTS_EVERYONE_ROLE}',
-                                                         'write': f'{settings.RIGHTS_EVERYONE_ROLE}',
-                                                         }
-                                       }}
         result_infos_all = {layername: {'name': layername,
                                         'title': layertitle,
                                         'uuid': uuid.get_layer_uuid(username, layername),
                                         'type': LAYER_TYPE,
+                                        'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE, },
+                                                          'write': {settings.RIGHTS_EVERYONE_ROLE, },
+                                                          }
                                         }}
         modules = [
             {'name': 'db.table',
@@ -50,7 +45,7 @@ def test_get_layer_infos(client):
              },
             {'name': 'prime_table.table',
              'method_infos': prime_table.get_layer_infos,
-             'result_infos': result_infos_db,
+             'result_infos': result_infos_all,
              'method_publications': prime_table.get_publication_infos,
              },
             {'name': 'filesystem.input_file',
@@ -102,15 +97,20 @@ def test_get_layer_infos(client):
 
         for module in modules:
             layer_infos = module["method_infos"](username)
+            if layer_infos and layer_infos[layername] and layer_infos[layername].get("id"):
+                del layer_infos[layername]["id"]
             assert layer_infos == module["result_infos"], \
                 (module["name"], module["method_infos"].__module__, layer_infos)
             publication_infos = module["method_publications"](username, "layman.layer")
+            if publication_infos and publication_infos[layername] and publication_infos[layername].get("id"):
+                del publication_infos[layername]["id"]
             assert publication_infos == module["result_infos"], \
                 (module["name"], module["method_publications"].__module__, publication_infos)
 
         # util
         layer_infos = util.get_layer_infos(username)
-        assert layer_infos == result_infos_db, layer_infos
+        del layer_infos[layername]["id"]
+        assert layer_infos == result_infos_all, layer_infos
 
     client_util.delete_layer(username, layername, client)
 

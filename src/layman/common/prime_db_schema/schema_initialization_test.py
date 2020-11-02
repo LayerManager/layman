@@ -1,4 +1,5 @@
 import logging
+import pytest
 
 from test import process, process_client
 
@@ -14,7 +15,8 @@ ensure_layman = process.ensure_layman
 logger = logging.getLogger(__name__)
 
 
-def test_recreate_schema(ensure_layman):
+@pytest.mark.usefixtures('ensure_layman')
+def test_recreate_schema():
     username = 'test_recreate_schema_user1'
     process_client.publish_layer(username, 'test_recreate_schema_layer1')
     process_client.publish_map(username, 'test_recreate_schema_map1')
@@ -33,7 +35,8 @@ def test_recreate_schema(ensure_layman):
         assert len(pubs) == 0
 
 
-def test_schema(ensure_layman):
+@pytest.mark.usefixtures('ensure_layman')
+def test_schema():
     username = 'migration_test_user1'
     layername = 'migration_test_layer1'
     mapname = 'migration_test_map1'
@@ -62,7 +65,8 @@ def test_schema(ensure_layman):
         assert len(pubs) == 0
 
 
-def test_steps(ensure_layman):
+@pytest.mark.usefixtures('ensure_layman')
+def test_steps():
     username = 'migration_test_user2'
     process_client.publish_layer(username, 'migration_test_layer2')
     process_client.publish_map(username, 'migration_test_map2')

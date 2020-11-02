@@ -8,7 +8,7 @@ from layman.util import check_username_decorator
 from . import util
 from .filesystem import input_file, thumbnail
 from layman.authn import authenticate
-from layman.authz import authorize, util as authz_util
+from layman.authz import authorize
 
 bp = Blueprint('rest_map', __name__)
 
@@ -28,6 +28,9 @@ def get(username, mapname):
     app.logger.info(f"GET Map, user={g.user}")
 
     info = util.get_complete_map_info(cached=True)
+    info["access_rights"].update({"read": ", ".join(info["access_rights"]["read"])})
+    info["access_rights"].update({"write": ", ".join(info["access_rights"]["write"])})
+
     return jsonify(info), 200
 
 
@@ -83,7 +86,15 @@ def patch(username, mapname):
         'actor_name': g.user and g.user["username"],
     }
 
-    authz_util.setup_patch_access_rights(request.form, kwargs)
+    if request.form.get('access_rights.read') or request.form.get('access_rights.write'):
+        kwargs['access_rights'] = dict()
+        if request.form.get('access_rights.read'):
+            access_rights_read = {x.strip() for x in request.form['access_rights.read'].split(',')}
+            kwargs['access_rights']["read"] = access_rights_read
+
+        if request.form.get('access_rights.write'):
+            access_rights_write = {x.strip() for x in request.form['access_rights.write'].split(',')}
+            kwargs['access_rights']["write"] = access_rights_write
 
     util.patch_map(
         username,
@@ -93,6 +104,9 @@ def patch(username, mapname):
     )
 
     info = util.get_complete_map_info(username, mapname)
+    info["access_rights"].update({"read": ", ".join(info["access_rights"]["read"])})
+    info["access_rights"].update({"write": ", ".join(info["access_rights"]["write"])})
+
     return jsonify(info), 200
 
 

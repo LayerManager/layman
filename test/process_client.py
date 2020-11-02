@@ -53,6 +53,9 @@ def publish_layer(username,
             data = {'name': layername,
                     'title': title,
                     }
+            if access_rights:
+                data.update({"access_rights.read": access_rights['read']})
+                data.update({"access_rights.write": access_rights['write']})
             r = requests.post(r_url,
                               files=[('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths],
                               data=data,
@@ -72,6 +75,7 @@ def patch_layer(username,
                 layername,
                 file_paths=None,
                 headers=None,
+                access_rights=None,
                 ):
     headers = headers or {}
     file_paths = file_paths or []
@@ -85,6 +89,10 @@ def patch_layer(username,
     try:
         files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
         data = dict()
+        if access_rights and access_rights.get('read'):
+            data.update({"access_rights.read": access_rights['read']})
+        if access_rights and access_rights.get('write'):
+            data.update({"access_rights.write": access_rights['write']})
 
         r = requests.patch(r_url,
                            files=files,
@@ -106,6 +114,7 @@ def patch_layer(username,
 def patch_map(username,
               mapname,
               headers=None,
+              access_rights=None,
               ):
     headers = headers or {}
 
@@ -113,6 +122,10 @@ def patch_map(username,
         r_url = url_for('rest_map.patch', username=username, mapname=mapname)
 
     data = dict()
+    if access_rights and access_rights.get('read'):
+        data.update({"access_rights.read": access_rights['read']})
+    if access_rights and access_rights.get('write'):
+        data.update({"access_rights.write": access_rights['write']})
 
     r = requests.patch(r_url,
                        headers=headers,
@@ -156,10 +169,10 @@ def publish_map(username,
     files = []
     try:
         files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
-        data = {'name': mapname,
-                'access_rights.read': access_rights['read'],
-                'access_rights.write': access_rights['write'],
-                }
+        data = {'name': mapname, }
+        if access_rights:
+            data.update({"access_rights.read": access_rights['read']})
+            data.update({"access_rights.write": access_rights['write']})
         r = requests.post(r_url,
                           files=files,
                           data=data,

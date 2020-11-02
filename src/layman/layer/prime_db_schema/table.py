@@ -6,23 +6,27 @@ PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
 def get_layer_infos(username):
-    result = {layername: layer_info for (username_value, type, layername), layer_info in pubs_util.get_publication_infos(username, LAYER_TYPE).items()}
+    result = {layername: layer_info for (username_value, layername, type), layer_info in pubs_util.get_publication_infos(username, LAYER_TYPE).items()}
     return result
 
 
 def get_publication_uuid(username, publication_type, publication_name):
     infos = pubs_util.get_publication_infos(username, publication_type)
-    return infos.get((username, publication_type, publication_name), dict()).get("uuid")
+    return infos.get((username, publication_name, publication_type))\
+        and infos.get((username, publication_name, publication_type)).get("uuid")
 
 
 def get_layer_info(username, layername):
     layers = pubs_util.get_publication_infos(username, LAYER_TYPE)
-    info = layers.get((username, LAYER_TYPE, layername), dict())
+    if (username, layername, LAYER_TYPE) in layers:
+        info = layers[(username, layername, LAYER_TYPE)]
+    else:
+        info = {}
     return info
 
 
-def delete_layer(username, layer_name):
-    return pubs_util.delete_publication(username, LAYER_TYPE, layer_name)
+def delete_layer(username, layername):
+    pubs_util.delete_publication(username, layername, LAYER_TYPE)
 
 
 def patch_layer(username,
