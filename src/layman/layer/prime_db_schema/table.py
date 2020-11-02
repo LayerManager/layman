@@ -12,7 +12,8 @@ def get_layer_infos(username):
 
 def get_publication_uuid(username, publication_type, publication_name):
     infos = pubs_util.get_publication_infos(username, publication_type)
-    return infos.get((username, publication_name, publication_type)).get("uuid")
+    return infos.get((username, publication_name, publication_type))\
+        and infos.get((username, publication_name, publication_type)).get("uuid")
 
 
 def get_layer_info(username, layername):
@@ -30,14 +31,16 @@ def delete_layer(username, layername):
 
 def patch_layer(username,
                 layername,
+                actor_name,
                 title=None,
                 access_rights=None):
     db_info = {"name": layername,
                "title": title,
                "publ_type_name": LAYER_TYPE,
+               "actor_name": actor_name,
                }
     if access_rights:
-        db_info.update(**access_rights)
+        db_info['access_rights'] = access_rights
     pubs_util.update_publication(username, db_info)
 
 
