@@ -198,13 +198,13 @@ def delete_map(username, mapname, headers=None):
     assert r.status_code == 200, r.text
 
 
-def assert_user_layers(username, layernames):
+def assert_user_layers(username, layernames, headers=None):
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
     r_url = f"{rest_url}/{username}/layers"
-    r = requests.get(r_url)
-    assert r.status_code == 200, f"r.status_code={r.status_code}\n{r.text}=r.text"
+    r = requests.get(r_url, headers=headers)
+    assert r.status_code == 200, f"r.status_code={r.status_code}\nr.text={r.text}"
     layman_names = [li['name'] for li in r.json()]
-    assert set(layman_names) == set(layernames), f"{r.text}=r.text"
+    assert set(layman_names) == set(layernames), f"Layers {layernames} not equal to {r.text}"
 
 
 def reserve_username(username, headers=None):
