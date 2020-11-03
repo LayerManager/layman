@@ -1,5 +1,5 @@
 import pytest
-from layman import app
+from layman import app, settings
 from flask import g
 from . import authorize_decorator, parse_request_path, MULTI_PUBLICATION_PATH_PATTERN, SINGLE_PUBLICATION_PATH_PATTERN
 from test import process, process_client
@@ -78,11 +78,14 @@ def test_authorize_decorator(liferay_mock):
 
     process_client.reserve_username(username, headers=user_authz_headers)
 
-    # TODO add also layer with rights for EVERYONE
     process_client.publish_layer(username, layername, headers=user_authz_headers)
-
     process_client.assert_user_layers(username, [layername], headers=user_authz_headers)
-
     process_client.assert_user_layers(username, [])
+
+    process_client.patch_layer(username, layername, headers=user_authz_headers, access_rights={
+        'read': settings.RIGHTS_EVERYONE_ROLE,
+    })
+    process_client.assert_user_layers(username, [layername], headers=user_authz_headers)
+    process_client.assert_user_layers(username, [layername])
 
     process.stop_process(layman_process)
