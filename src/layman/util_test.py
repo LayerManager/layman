@@ -23,7 +23,7 @@ def test_check_reserved_workspace_names():
             assert exc_info.value.code == 35
             assert exc_info.value.data['reserved_by'] == 'RESERVED_WORKSPACE_NAMES'
 
-            
+
 def assert_module_methods(module, methods):
     for method in methods:
         # print(f'test_module_methods: module={module.__name__}, method={method}')
