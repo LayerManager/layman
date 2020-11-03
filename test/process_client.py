@@ -16,15 +16,16 @@ layer_keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata'
 map_keys_to_check = ['thumbnail', 'file', 'metadata']
 
 
-def wait_for_rest(url, max_attempts, sleeping_time, keys_to_check):
-    r = requests.get(url)
+def wait_for_rest(url, max_attempts, sleeping_time, keys_to_check, headers=None):
+    headers = headers or None
+    r = requests.get(url, headers=headers)
 
     attempts = 1
     while not (r.status_code == 200 and all(
             'status' not in r.json()[k] for k in keys_to_check
     )):
         time.sleep(sleeping_time)
-        r = requests.get(url)
+        r = requests.get(url, headers=headers)
         attempts += 1
         if attempts > max_attempts:
             raise Exception('Max attempts reached!')

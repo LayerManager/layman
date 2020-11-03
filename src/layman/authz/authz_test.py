@@ -1,5 +1,5 @@
 import pytest
-from layman import app, settings
+from layman import app, settings, LaymanError
 from flask import g
 from . import authorize_decorator, parse_request_path, MULTI_PUBLICATION_PATH_PATTERN, SINGLE_PUBLICATION_PATH_PATTERN
 from test import process, process_client
@@ -63,9 +63,12 @@ def test_authorize_accepts_path():
         assert m, f"{req_path} {SINGLE_PUBLICATION_PATH_PATTERN}"
         (workspace, publication_type, publication_name) = parse_request_path(req_path)
         assert workspace and publication_type and publication_name, f"Parsing {req_path} returns {(workspace, publication_type, publication_name)}"
+        # ensure that raised exception is LaymanError, not Exception "Authorization module is unable to authorize path ..."
         with app.test_request_context(req_path):
             g.user = None
-            mock_method()
+            with pytest.raises(Exception) as exc_info:
+                mock_method()
+            assert type(exc_info.value) == LaymanError
 
 
 def test_authorize_decorator(liferay_mock):

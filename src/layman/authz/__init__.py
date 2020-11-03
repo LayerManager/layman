@@ -58,6 +58,11 @@ def authorize(workspace, publication_type, publication_name, request_method, act
 
     is_multi_publication_request = not publication_name
 
+    publication_not_found_code = {
+        'layman.layer': 15,
+        'layman.map': 26,
+    }[publication_type]
+
     if is_multi_publication_request:
         if request_method in ['GET']:
             return
@@ -70,6 +75,8 @@ def authorize(workspace, publication_type, publication_name, request_method, act
                         can_user_create_public_workspace(actor_name)  # or can be created by actor
                     ) and can_user_publish_in_public_workspace(actor_name)):  # actor can publish there
                 return
+            else:
+                raise LaymanError(30)
         else:
             raise LaymanError(31, {'method': request_method})
     else:
@@ -78,24 +85,20 @@ def authorize(workspace, publication_type, publication_name, request_method, act
         )
         publ_exists = bool(publ_info)
         if not publ_exists:
-            # TODO raise 404 not found
-            return
+            raise LaymanError(publication_not_found_code)
         user_can_read = is_user_in_access_rule(actor_name, publ_info['access_rights']['read'])
         if request_method in ['GET']:
             if user_can_read:
                 return
             else:
-                # TODO raise 404 not found
-                return
+                raise LaymanError(publication_not_found_code)
         elif request_method in ['POST', 'PUT', 'PATCH', 'DELETE']:
             if is_user_in_access_rule(actor_name, publ_info['access_rights']['write']):
                 return
             elif user_can_read:
-                # TODO raise now write access
-                return
+                raise LaymanError(30)
             else:
-                # TODO raise 404 not found
-                return
+                raise LaymanError(publication_not_found_code)
         else:
             raise LaymanError(31, {'method': request_method})
 
