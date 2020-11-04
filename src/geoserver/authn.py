@@ -61,7 +61,8 @@ def create_security_filter_group(data_dir, name, filter_names):
     new_chain.attrib['class'] = 'org.geoserver.security.ServiceLoginFilterChain'
     new_chain.attrib['interceptorName'] = 'interceptor'
     new_chain.attrib['exceptionTranslationName'] = 'exception'
-    new_chain.attrib['path'] = '/**/wfs'
+    # TODO think about migration
+    new_chain.attrib['path'] = '/**/wfs,/**/wms,/**/ows'
     new_chain.attrib['disabled'] = 'false'
     new_chain.attrib['allowSessionCreation'] = 'false'
     new_chain.attrib['ssl'] = 'false'

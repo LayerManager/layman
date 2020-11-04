@@ -28,6 +28,7 @@ def wait_for_rest(url, max_attempts, sleeping_time, keys_to_check, headers=None)
         r = requests.get(url, headers=headers)
         attempts += 1
         if attempts > max_attempts:
+            logger.error(f"r.status_code={r.status_code}\nrltest={r.text}")
             raise Exception('Max attempts reached!')
 
 
