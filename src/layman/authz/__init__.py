@@ -162,7 +162,7 @@ def authorize_decorator(f):
         (workspace, publication_type, publication_name) = parse_request_path(req_path)
         if workspace is None or publication_type is None:
             raise Exception(f"Authorization module is unable to authorize path {req_path}")
-        actor_name = g.user and g.user['username']
+        actor_name = g.user and g.user.get('username')
         authorize(workspace, publication_type, publication_name, request.method, actor_name)
         if workspace and publication_type and not publication_name and request.method == 'GET':
             @after_this_request
