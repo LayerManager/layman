@@ -17,7 +17,7 @@ from layman.layer import LAYER_TYPE
 from layman import app as app
 from layman import settings
 from layman import uuid
-from test import process
+from test import process, flask_client
 from layman.authn.oauth2_test import active_token_introspection_url, user_profile_url
 from layman.authn.oauth2 import liferay
 from layman.authn.oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
@@ -98,7 +98,7 @@ def test_anonymous_post_access(client):
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
-            'file': files
+            'file': files,
         })
         assert rv.status_code == 403
         resp_json = rv.get_json()
@@ -139,7 +139,7 @@ def test_authn_post_access_without_username(client):
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
         rv = client.post(rest_path, data={
-            'file': files
+            'file': files,
         }, headers={
             f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
             f'{TOKEN_HEADER}': 'Bearer abc',
@@ -181,30 +181,14 @@ def test_authn_map_access_rights(client):
 
     # insert map
     mapname = 'map2'
-    with app.app_context():
-        rest_path = url_for('rest_maps.post', username=username)
-        file_paths = [
-            'sample/layman.map/full.json',
-        ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
-        files = []
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, headers={
-                f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-                f'{TOKEN_HEADER}': 'Bearer test2',
-            }, data={
-                'file': files,
-                'name': mapname,
-            })
-            resp_json = rv.get_json()
-            # print(resp_json)
-            assert rv.status_code == 200
-            assert resp_json[0]['name'] == mapname
-        finally:
-            for fp in files:
-                fp[0].close()
+    headers = {
+        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+        f'{TOKEN_HEADER}': 'Bearer test2',
+    }
+    flask_client.publish_map(username,
+                             mapname,
+                             client,
+                             headers=headers)
 
     # test map metadata
     with app.app_context():
@@ -227,3 +211,8 @@ def test_authn_map_access_rights(client):
         resp_json = rv.get_json()
         assert resp_json['code'] == 30
         assert resp_json['detail']['username'] in [None, 'test3']
+
+    flask_client.delete_map(username,
+                            mapname,
+                            client,
+                            headers=headers)
