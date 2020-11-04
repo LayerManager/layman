@@ -40,7 +40,7 @@ def test_rest_get(client):
         r = client.post(rest_url,
                         data=data_xml,
                         headers=headers)
-    assert r.status_code == 200
+    assert r.status_code == 200, r.data
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=GetCapabilities"
     with app.app_context():

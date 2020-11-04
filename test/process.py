@@ -4,7 +4,7 @@ import subprocess
 import os
 import logging
 
-from src.layman import settings
+from layman import settings
 
 from test.mock.liferay import run
 from test import util

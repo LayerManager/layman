@@ -38,7 +38,7 @@ def refresh_wfs(
 
     if self.is_aborted():
         raise AbortedException
-    geoserver.publish_layer_from_db(username, layername, description, title)
+    geoserver.publish_layer_from_db(username, layername, description, title, access_rights)
 
     if self.is_aborted():
         wms.delete_layer(username, layername)

@@ -57,7 +57,7 @@ ensure_whole_user = common.ensure_whole_user
 delete_whole_user = common.delete_whole_user
 
 
-def publish_layer_from_db(username, layername, description, title):
+def publish_layer_from_db(username, layername, description, title, access_rights):
     keywords = [
         "features",
         layername,
@@ -95,6 +95,11 @@ def publish_layer_from_db(username, layername, description, title):
     from . import wfs
     wfs.clear_cache(username)
     wms.clear_cache(username)
+
+    security_read_roles = common.layman_roles_to_geoserver_roles(access_rights['read'])
+    common.ensure_layer_security_roles(username, layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
+    security_write_roles = common.layman_roles_to_geoserver_roles(access_rights['write'])
+    common.ensure_layer_security_roles(username, layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
 
 
 def get_usernames():

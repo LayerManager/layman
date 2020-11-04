@@ -175,6 +175,15 @@ def delete_security_roles(rule, auth):
         r.raise_for_status()
 
 
+def layman_roles_to_geoserver_roles(layman_roles):
+    geoserver_roles = set(layman_roles)
+    geoserver_roles.add(settings.LAYMAN_GS_ROLE)
+    if settings.RIGHTS_EVERYONE_ROLE in geoserver_roles:
+        geoserver_roles.discard(settings.RIGHTS_EVERYONE_ROLE)
+        geoserver_roles.add('ROLE_ANONYMOUS')
+    return geoserver_roles
+
+
 def ensure_workspace_security(workspace, type, auth):
     logger.info(f"Ensure_workspace_security workspace={workspace}, type={type}, auth={auth}")
     roles = set(get_workspace_security_roles(workspace, type, auth))
@@ -300,6 +309,7 @@ def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
     ensure_role(role, auth)
     ensure_user_role(username, role, auth)
     ensure_user_role(username, settings.LAYMAN_GS_ROLE, auth)
+    # TODO consider changing workspace rules
     ensure_user_workspace(username, auth)
 
 

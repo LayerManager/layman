@@ -13,7 +13,7 @@ from layman import settings, patch_mode
 from layman.cache import mem_redis
 from layman.layer.filesystem import input_file
 from layman.layer.util import is_layer_task_ready
-from layman.common import util as layman_util
+from layman.common import geoserver as common_geoserver
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
 
@@ -73,6 +73,9 @@ def delete_layer(username, layername):
         r.raise_for_status()
     clear_cache(username)
     wms.clear_cache(username)
+
+    common_geoserver.delete_security_roles(f"{username}.{layername}.r", settings.LAYMAN_GS_AUTH)
+    common_geoserver.delete_security_roles(f"{username}.{layername}.w", settings.LAYMAN_GS_AUTH)
     return {}
 
 
