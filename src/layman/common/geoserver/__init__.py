@@ -175,12 +175,14 @@ def delete_security_roles(rule, auth):
         r.raise_for_status()
 
 
-def layman_roles_to_geoserver_roles(layman_roles):
-    geoserver_roles = set(layman_roles)
+def layman_users_to_geoserver_roles(layman_users):
+    geoserver_roles = set()
+    for layman_user in layman_users:
+        if layman_user == settings.RIGHTS_EVERYONE_ROLE:
+            geoserver_roles.add('ROLE_ANONYMOUS')
+        else:
+            geoserver_roles.add(username_to_rolename(layman_user))
     geoserver_roles.add(settings.LAYMAN_GS_ROLE)
-    if settings.RIGHTS_EVERYONE_ROLE in geoserver_roles:
-        geoserver_roles.discard(settings.RIGHTS_EVERYONE_ROLE)
-        geoserver_roles.add('ROLE_ANONYMOUS')
     return geoserver_roles
 
 

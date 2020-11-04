@@ -96,9 +96,9 @@ def publish_layer_from_db(username, layername, description, title, access_rights
     wfs.clear_cache(username)
     wms.clear_cache(username)
 
-    security_read_roles = common.layman_roles_to_geoserver_roles(access_rights['read'])
+    security_read_roles = common.layman_users_to_geoserver_roles(access_rights['read'])
     common.ensure_layer_security_roles(username, layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
-    security_write_roles = common.layman_roles_to_geoserver_roles(access_rights['write'])
+    security_write_roles = common.layman_users_to_geoserver_roles(access_rights['write'])
     common.ensure_layer_security_roles(username, layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
 
 
