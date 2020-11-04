@@ -65,7 +65,7 @@ from const c inner join
 
 
 def only_valid_names(users_list):
-    usernames_for_chesk = set(users_list).copy()
+    usernames_for_chesk = users_list.copy()
     usernames_for_chesk.discard(ROLE_EVERYONE)
     for username in usernames_for_chesk:
         info = users.get_user_infos(username)
@@ -102,8 +102,10 @@ def check_rights_axioms(can_read,
                         can_read_old=None,
                         can_write_old=None):
     if can_read:
+        can_read = set(can_read)
         only_valid_names(can_read)
     if can_write:
+        can_write = set(can_write)
         only_valid_names(can_write)
         owner_can_still_write(owner, can_write)
         at_least_one_can_write(can_write)
