@@ -187,8 +187,7 @@ def test_wrong_value_of_layername(client):
 
 @pytest.mark.usefixtures('app_context')
 def test_no_file(client):
-    rv = client.post(url_for('rest_layers.post', username='testuser1'),
-                     )
+    rv = client.post(url_for('rest_layers.post', username='testuser1'))
     assert rv.status_code == 400
     resp_json = rv.get_json()
     # print('resp_json', resp_json)
@@ -264,7 +263,6 @@ def test_get_layers_testuser1_v1(client):
 def test_post_layers_simple(client):
     with app.app_context():
         username = 'testuser1'
-
         rest_path = url_for('rest_layers.post', username=username)
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
@@ -983,7 +981,6 @@ def test_patch_layer_data(client):
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
-# @pytest.mark.usefixtures('app_context')
 def test_patch_layer_concurrent_and_delete_it(client):
     with app.app_context():
         username = 'testuser2'
