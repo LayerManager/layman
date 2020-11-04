@@ -37,6 +37,8 @@ from test import flask_client
 logger = logging.getLogger(__name__)
 
 
+logger = logging.getLogger(__name__)
+
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
 
 METADATA_PROPERTIES = {
