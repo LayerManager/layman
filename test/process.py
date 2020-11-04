@@ -22,7 +22,6 @@ LAYMAN_REDIS_URL = 'redis://redis:6379/12'
 
 AUTHN_SETTINGS = {
     'LAYMAN_AUTHN_MODULES': 'layman.authn.oauth2',
-    'LAYMAN_AUTHN_OAUTH2_PROVIDERS': 'layman.authn.oauth2.liferay',
     'OAUTH2_LIFERAY_INTROSPECTION_URL': AUTHN_INTROSPECTION_URL,
     'OAUTH2_LIFERAY_USER_PROFILE_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile",
 }
