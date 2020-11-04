@@ -26,7 +26,8 @@ def refresh_wfs(
         layername,
         description=None,
         title=None,
-        ensure_user=False
+        ensure_user=False,
+        access_rights=None,
 ):
     if description is None:
         description = layername

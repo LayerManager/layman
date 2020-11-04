@@ -65,7 +65,7 @@ from const c inner join
 
 
 def only_valid_names(users_list):
-    usernames_for_chesk = users_list.copy()
+    usernames_for_chesk = set(users_list).copy()
     usernames_for_chesk.discard(ROLE_EVERYONE)
     for username in usernames_for_chesk:
         info = users.get_user_infos(username)
