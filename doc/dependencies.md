@@ -22,10 +22,10 @@
 | [gdal](http://www.gdal.org/) | 2.4.0 | MIT License | geographicags/docker-gdal2 | prod | bin | to import vector files into DB |
 | [chromium](https://www.chromium.org/) | 77+ | BSD and others | Dockerfile | prod | bin | for client-side map rendering and integration testing |
 | [chromedriver](http://chromedriver.chromium.org/) | 77+ | BSD and others | Dockerfile | prod | bin | for client-side map rendering and integration testing |
-| [pipenv](https://pipenv.kennethreitz.org/en/latest/) | 2018.11.26 | MIT | Dockerfile | prod | bin | to install Python dependencies |
-| [node.js](https://pipenv.kennethreitz.org/en/latest/) | 10 | MIT | timgen/Dockerfile | prod | bin | to run Timgen |
+| [pipenv](https://pipenv.pypa.io/en/latest/) | 2018.11.26 | MIT | Dockerfile | prod | bin | to install Python dependencies |
+| [node.js](https://nodejs.org/) | 10 | MIT | timgen/Dockerfile | prod | bin | to run Timgen |
 | [npm](https://www.npmjs.com/get-npm) | 6 | Artistic License 2.0 | timgen/Dockerfile | prod | bin | to install node.js dependencies |
-| [node.js](https://pipenv.kennethreitz.org/en/latest/) | 12 | MIT | client/docker/Dockerfile | prod | bin | to run Layman Test Client |
+| [node.js](https://nodejs.org/) | 12 | MIT | client/docker/Dockerfile | prod | bin | to run Layman Test Client |
 | [npm](https://www.npmjs.com/get-npm) | 6 | Artistic License 2.0 | client/docker/Dockerfile | prod | bin | to install node.js dependencies |
 | [gunicorn](https://gunicorn.org/) | 19 | MIT | requirements.production.txt | opt | bin | as Flask production server |
 | [nginx](http://nginx.org/) | 1.16 | BSD 2-Clause | docker-compose.yml | opt | bin | as production server |
@@ -38,7 +38,7 @@
 | [redis-py](https://github.com/andymccurdy/redis-py) | MIT | Pipfile | prod | bin | |
 | [unidecode](https://github.com/avian2/unidecode) | GNU GPL v2 | Pipfile | prod | bin | |
 | [psycopg2-binary](https://github.com/psycopg/psycopg2) | GNU LGPL | Pipfile | prod | bin | |
-| [requests](http://python-requests.org) | Apache License 2.0 | Pipfile | prod | bin | |
+| [requests](https://requests.readthedocs.io/) | Apache License 2.0 | Pipfile | prod | bin | |
 | [owslib](https://github.com/geopython/OWSLib) | BSD 3-Clause | Pipfile | prod | bin | |
 | [jsonschema](https://github.com/Julian/jsonschema) | MIT | Pipfile | prod | bin | |
 | [flower](https://github.com/mher/flower) | BSD 3-Clause | Pipfile | prod | bin | to monitor celery tasks |
@@ -67,7 +67,7 @@
 
 | name | license | used by | env | bin or src | purpose |
 | --- | --- | --- | --- | --- | --- |
-| [python3-pip](https://pipenv.kennethreitz.org/en/latest/) | MIT | Dockerfile | prod | bin | for installing pipenv and gunicorn |
+| [python3-pip](https://packages.debian.org/jessie/python3-pip) | MIT | Dockerfile | prod | bin | for installing pipenv and gunicorn |
 | [hslayers-ng](https://github.com/hslayers/hslayers-ng) | MIT | schema.draft-07.json | prod | src | |
 | [libxml](http://xmlsoft.org/) | MIT | python3-lxml | prod | bin | |
 | [libxslt](http://xmlsoft.org/libxslt/) | MIT | python3-lxml | prod | bin | |
