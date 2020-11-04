@@ -15,7 +15,7 @@ from layman import settings
 from .csw import get_layer_info, delete_layer, get_metadata_uuid
 
 from test.mock.micka import run
-from test.flask_client import wait_till_layer_ready
+from test import flask_client
 
 MICKA_PORT = 8020
 
@@ -48,39 +48,22 @@ TEST_LAYER = 'ne_110m_admin_0_countries'
 
 @pytest.fixture()
 def provide_layer(client):
-    with app.app_context():
-        username = TEST_USER
-        layername = TEST_LAYER
-        rest_path = url_for('rest_layers.post', username=username)
-        file_paths = [
-            'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
-        ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
-        files = []
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
-                'file': files,
-                'name': layername,
-            })
-            assert rv.status_code == 200
-        finally:
-            for fp in files:
-                fp[0].close()
+    username = TEST_USER
+    layername = TEST_LAYER
+    response = flask_client.publish_layer(username,
+                                          layername,
+                                          client,)
+    yield response
 
-    wait_till_layer_ready(username, layername)
-    yield rv.get_json()[0]
-    with app.app_context():
-        rest_path = url_for('rest_layer.delete_layer', username=username, layername=layername)
-        rv = client.delete(rest_path)
-        assert rv.status_code == 200
+    flask_client.delete_layer(username,
+                              layername,
+                              client,)
 
 
 def patch_layer(client):
+    username = TEST_USER
+    layername = TEST_LAYER
     with app.app_context():
-        username = TEST_USER
-        layername = TEST_LAYER
         rest_path = url_for('rest_layer.patch', username=username, layername=layername)
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
@@ -99,7 +82,7 @@ def patch_layer(client):
             for fp in files:
                 fp[0].close()
 
-    wait_till_layer_ready(username, layername)
+    flask_client.wait_till_layer_ready(username, layername)
 
 
 @pytest.fixture(scope="module")

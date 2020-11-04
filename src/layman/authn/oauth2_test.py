@@ -16,7 +16,7 @@ from layman import settings
 from layman import uuid
 from .oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
 from .oauth2 import liferay
-from test import process
+from test import process, flask_client
 
 
 liferay_mock = process.liferay_mock
@@ -363,26 +363,9 @@ def test_patch_current_user_without_username(client):
     exp_email = 'test2@liferay.com'
     exp_name = 'Test Test'
     mapname = 'map1'
-    with app.app_context():
-        rest_path = url_for('rest_maps.post', username=username)
-        file_paths = [
-            'sample/layman.map/full.json',
-        ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
-        files = []
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
-                'file': files,
-                'name': mapname,
-            })
-            assert rv.status_code == 200
-            resp_json = rv.get_json()
-            assert resp_json[0]['name'] == mapname
-        finally:
-            for fp in files:
-                fp[0].close()
+    flask_client.publish_map(username,
+                             mapname,
+                             client)
 
     with app.app_context():
         rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
@@ -397,3 +380,7 @@ def test_patch_current_user_without_username(client):
         access_rights = resp_json['groups']
         assert {'guest'} == set(access_rights.keys())
         assert access_rights['guest'] == 'w'
+
+    flask_client.delete_map(username,
+                            mapname,
+                            client)
