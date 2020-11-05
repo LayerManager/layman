@@ -68,7 +68,7 @@ def test_authorize_accepts_path():
             g.user = None
             with pytest.raises(Exception) as exc_info:
                 mock_method()
-            assert type(exc_info.value) == LaymanError
+            assert isinstance(exc_info.value, LaymanError)
 
 
 def test_authorize_decorator(liferay_mock):

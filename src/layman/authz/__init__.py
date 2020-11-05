@@ -53,9 +53,6 @@ def parse_request_path(request_path):
 
 
 def authorize(workspace, publication_type, publication_name, request_method, actor_name):
-    if workspace is None:
-        raise Exception(f"Authorization module is unable to authorize path {request_path}")
-
     is_multi_publication_request = not publication_name
 
     publication_not_found_code = {
@@ -69,11 +66,11 @@ def authorize(workspace, publication_type, publication_name, request_method, act
         elif request_method in ['POST']:
             if actor_name == workspace:
                 return
-            elif ((not users.get_user_infos(workspace)) and  # public workspace
-                    (
-                        workspaces.get_workspace_infos(workspace) or  # either exists
-                        can_user_create_public_workspace(actor_name)  # or can be created by actor
-                    ) and can_user_publish_in_public_workspace(actor_name)):  # actor can publish there
+            elif ((not users.get_user_infos(workspace))  # public workspace
+                    and (
+                        workspaces.get_workspace_infos(workspace)  # either exists
+                        or can_user_create_public_workspace(actor_name)  # or can be created by actor
+            ) and can_user_publish_in_public_workspace(actor_name)):  # actor can publish there
                 return
             else:
                 raise LaymanError(30)  # unauthorized request
@@ -138,7 +135,7 @@ def get_gs_roles(username, type):
 
 def is_user_in_access_rule(username, access_rule_names):
     return settings.RIGHTS_EVERYONE_ROLE in access_rule_names \
-           or (username and username in access_rule_names)
+        or (username and username in access_rule_names)
 
 
 def can_user_publish_in_public_workspace(username):
