@@ -4,6 +4,7 @@ import os
 import logging
 
 from layman import settings, app
+from layman.util import url_for
 from layman.layer.geoserver import wfs, wms
 
 logger = logging.getLogger(__name__)
@@ -39,30 +40,33 @@ def publish_layer(username,
     title = title or layername
     headers = headers or {}
     file_paths = file_paths or ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
-    access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
-
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
 
     with app.app_context():
-        r_url = f"{rest_url}/{username}/layers"
-        for fp in file_paths:
-            assert os.path.isfile(fp)
-        files = []
-        try:
-            data = {'name': layername,
-                    'title': title,
-                    }
-            r = requests.post(r_url,
-                              files=[('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths],
-                              data=data,
-                              headers=headers)
-            assert r.status_code == 200, r.text
-        finally:
-            for fp in files:
-                fp[0].close()
+        r_url = url_for('rest_layers.post', username=username)
 
-    wait_for_rest(f"{rest_url}/{username}/layers/{layername}", 20, 0.5, layer_keys_to_check)
-    # wait_for_rest(f"{rest_url}/{username}/layers/{layername}", 20, 0.5, layer_keys_to_check)
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
+        data = {'name': layername,
+                'title': title,
+                }
+        if access_rights:
+            data["access_rights.read"] = access_rights['read']
+            data["access_rights.write"] = access_rights['write']
+        r = requests.post(r_url,
+                          files=files,
+                          data=data,
+                          headers=headers)
+        assert r.status_code == 200, r.text
+    finally:
+        for fp in files:
+            fp[1][1].close()
+
+    with app.app_context():
+        url = url_for('rest_layer.get', username=username, layername=layername)
+    wait_for_rest(url, 20, 0.5, layer_keys_to_check)
     return layername
 
 
@@ -73,32 +77,34 @@ def patch_layer(username,
                 access_rights=None,
                 ):
     headers = headers or {}
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
-    r_url = f"{rest_url}/{username}/layers/{layername}"
     file_paths = file_paths or []
 
     with app.app_context():
-        for fp in file_paths:
-            assert os.path.isfile(fp)
-        files = []
-        try:
-            data = dict()
-            if access_rights and access_rights.get('read'):
-                data.update({"access_rights.read": access_rights['read']})
-            if access_rights and access_rights.get('write'):
-                data.update({"access_rights.write": access_rights['write']})
+        r_url = url_for('rest_layer.patch', username=username, layername=layername)
 
-            r = requests.patch(r_url,
-                               files=[('file', (os.path.basename(fp), open(fp, 'rb')))
-                                      for fp in file_paths],
-                               headers=headers,
-                               data=data)
-            assert r.status_code == 200, r.text
-        finally:
-            for fp in files:
-                fp[0].close()
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
+        data = dict()
+        if access_rights and access_rights.get('read'):
+            data["access_rights.read"] = access_rights['read']
+        if access_rights and access_rights.get('write'):
+            data["access_rights.write"] = access_rights['write']
 
-    wait_for_rest(f"{rest_url}/{username}/layers/{layername}", 20, 0.5, layer_keys_to_check)
+        r = requests.patch(r_url,
+                           files=files,
+                           headers=headers,
+                           data=data)
+        assert r.status_code == 200, r.text
+    finally:
+        for fp in files:
+            fp[1][1].close()
+
+    with app.app_context():
+        url = url_for('rest_layer.get', username=username, layername=layername)
+    wait_for_rest(url, 20, 0.5, layer_keys_to_check)
     wfs.clear_cache(username)
     wms.clear_cache(username)
     return layername
@@ -110,22 +116,24 @@ def patch_map(username,
               access_rights=None,
               ):
     headers = headers or {}
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
-    r_url = f"{rest_url}/{username}/maps/{mapname}"
 
     with app.app_context():
-        data = dict()
-        if access_rights and access_rights.get('read'):
-            data.update({"access_rights.read": access_rights['read']})
-        if access_rights and access_rights.get('write'):
-            data.update({"access_rights.write": access_rights['write']})
+        r_url = url_for('rest_map.patch', username=username, mapname=mapname)
 
-        r = requests.patch(r_url,
-                           headers=headers,
-                           data=data)
-        assert r.status_code == 200, r.text
+    data = dict()
+    if access_rights and access_rights.get('read'):
+        data["access_rights.read"] = access_rights['read']
+    if access_rights and access_rights.get('write'):
+        data["access_rights.write"] = access_rights['write']
 
-    wait_for_rest(f"{rest_url}/{username}/maps/{mapname}", 20, 0.5, map_keys_to_check)
+    r = requests.patch(r_url,
+                       headers=headers,
+                       data=data)
+    assert r.status_code == 200, r.text
+
+    with app.app_context():
+        url = url_for('rest_map.get', username=username, mapname=mapname)
+    wait_for_rest(url, 20, 0.5, map_keys_to_check)
     wfs.clear_cache(username)
     wms.clear_cache(username)
     return mapname
@@ -133,12 +141,11 @@ def patch_map(username,
 
 def delete_layer(username, layername, headers=None):
     headers = headers or {}
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
 
-    r_url = f"{rest_url}/{username}/layers/{layername}"
     with app.app_context():
-        r = requests.delete(r_url, headers=headers)
-        assert r.status_code == 200, r.text
+        r_url = url_for('rest_layer.delete_layer', username=username, layername=layername)
+    r = requests.delete(r_url, headers=headers)
+    assert r.status_code == 200, r.text
     wfs.clear_cache(username)
     wms.clear_cache(username)
 
@@ -150,38 +157,44 @@ def publish_map(username,
                 access_rights=None,
                 ):
     headers = headers or {}
-    file_paths = file_paths or ['sample/layman.map/full.json',]
+    file_paths = file_paths or ['sample/layman.map/full.json', ]
     access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
-    r_url = f"{rest_url}/{username}/maps"
 
     with app.app_context():
-        for fp in file_paths:
-            assert os.path.isfile(fp)
-        files = []
-        try:
-            r = requests.post(r_url,
-                              files=[('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths],
-                              data={'name': mapname,
-                                    },
-                              headers=headers)
-            assert r.status_code == 200, r.text
-        finally:
-            for fp in files:
-                fp[0].close()
+        r_url = url_for('rest_maps.post', username=username)
 
-    wait_for_rest(f"{rest_url}/{username}/maps/{mapname}", 20, 0.5, map_keys_to_check)
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
+        data = {'name': mapname, }
+        if access_rights:
+            data["access_rights.read"] = access_rights['read']
+            data["access_rights.write"] = access_rights['write']
+        r = requests.post(r_url,
+                          files=files,
+                          data=data,
+                          headers=headers)
+        assert r.status_code == 200, r.text
+    finally:
+        for fp in files:
+            fp[1][1].close()
+
+    with app.app_context():
+        url = url_for('rest_map.get', username=username, mapname=mapname)
+    wait_for_rest(url, 20, 0.5, map_keys_to_check)
     return mapname
 
 
 def delete_map(username, mapname, headers=None):
     headers = headers or {}
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
 
-    r_url = f"{rest_url}/{username}/maps/{mapname}"
     with app.app_context():
-        r = requests.delete(r_url, headers=headers)
-        assert r.status_code == 200, r.text
+        r_url = url_for('rest_map.delete_map', username=username, mapname=mapname)
+
+    r = requests.delete(r_url, headers=headers)
+    assert r.status_code == 200, r.text
 
 
 def assert_user_layers(username, layernames):

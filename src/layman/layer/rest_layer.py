@@ -8,7 +8,7 @@ from layman import settings
 from . import util
 from .filesystem import input_file, input_sld, input_chunk
 from layman.authn import authenticate
-from layman.authz import authorize
+from layman.authz import authorize, util as authz_util
 
 bp = Blueprint('rest_layer', __name__)
 
@@ -28,9 +28,6 @@ def get(username, layername):
     app.logger.info(f"GET Layer, user={g.user}")
 
     info = util.get_complete_layer_info(cached=True)
-    info["access_rights"].update({"read": ", ".join(info["access_rights"]["read"])})
-    info["access_rights"].update({"write": ", ".join(info["access_rights"]["write"])})
-
     return jsonify(info), 200
 
 
@@ -139,15 +136,7 @@ def patch(username, layername):
                     username, layername, files, check_crs)
     kwargs.update({'actor_name': g.user and g.user["username"]})
 
-    if request.form.get('access_rights.read') or request.form.get('access_rights.write'):
-        kwargs['access_rights'] = dict()
-        if request.form.get('access_rights.read'):
-            access_rights_read = {x.strip() for x in request.form['access_rights.read'].split(',')}
-            kwargs['access_rights']["read"] = access_rights_read
-
-        if request.form.get('access_rights.write'):
-            access_rights_write = {x.strip() for x in request.form['access_rights.write'].split(',')}
-            kwargs['access_rights']["write"] = access_rights_write
+    authz_util.setup_patch_access_rights(request.form, kwargs)
 
     util.patch_layer(
         username,
@@ -160,9 +149,6 @@ def patch(username, layername):
     app.logger.info('PATCH Layer changes done')
     info = util.get_complete_layer_info(username, layername)
     info.update(layer_result)
-    info["access_rights"].update({"read": ", ".join(info["access_rights"]["read"])})
-    info["access_rights"].update({"write": ", ".join(info["access_rights"]["write"])})
-
     return jsonify(info), 200
 
 

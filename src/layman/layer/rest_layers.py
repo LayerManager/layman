@@ -7,7 +7,7 @@ from layman import settings
 from . import util, LAYER_TYPE
 from .filesystem import input_file, input_sld, input_chunk, uuid
 from layman.authn import authenticate
-from layman.authz import authorize
+from layman.authz import authorize, util as authz_util
 from layman.common import redis as redis_util
 from .prime_db_schema import table
 
@@ -36,6 +36,7 @@ def get(username):
             'title': info.get("title", None),
             'url': url_for('rest_layer.get', layername=name, username=username),
             'uuid': info["uuid"],
+            'access_rights': info['access_rights'],
         }
         for (name, info) in sorted_infos
     ]
@@ -97,21 +98,7 @@ def post(username):
     if 'sld' in request.files and not request.files['sld'].filename == '':
         sld_file = request.files['sld']
 
-    if not request.form.get('access_rights.read'):
-        if g.user:
-            access_rights_read = {f'{g.user["username"]}'}
-        else:
-            access_rights_read = {f'{settings.RIGHTS_EVERYONE_ROLE}'}
-    else:
-        access_rights_read = {x.strip() for x in request.form['access_rights.read'].split(',')}
-
-    if not request.form.get('access_rights.write'):
-        if g.user:
-            access_rights_write = {f'{g.user["username"]}'}
-        else:
-            access_rights_write = {f'{settings.RIGHTS_EVERYONE_ROLE}'}
-    else:
-        access_rights_write = {x.strip() for x in request.form['access_rights.write'].split(',')}
+    actor_name = g.user and g.user["username"]
 
     task_options = {
         'crs_id': crs_id,
@@ -119,11 +106,10 @@ def post(username):
         'title': title,
         'ensure_user': True,
         'check_crs': False,
-        'access_rights': {'read': access_rights_read,
-                          'write': access_rights_write,
-                          },
-        'actor_name': g.user and g.user["username"],
+        'actor_name': actor_name,
     }
+
+    authz_util.setup_post_access_rights(request.form, task_options, actor_name)
 
     layerurl = url_for('rest_layer.get', layername=layername, username=username)
 

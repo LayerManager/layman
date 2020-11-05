@@ -3,21 +3,18 @@ from .. import MAP_TYPE
 
 
 def get_map_infos(username):
-    result = {mapname: map_info for (username_value, mapname, type), map_info in pubs_util.get_publication_infos(username, MAP_TYPE).items()}
+    result = {mapname: map_info for (username_value, type, mapname), map_info in pubs_util.get_publication_infos(username, MAP_TYPE).items()}
     return result
 
 
 def get_publication_uuid(username, publication_type, publication_name):
     infos = pubs_util.get_publication_infos(username, publication_type)
-    return infos.get((username, publication_name, publication_type)).get("uuid")
+    return infos.get((username, publication_type, publication_name), dict()).get("uuid")
 
 
 def get_map_info(username, mapname):
     maps = pubs_util.get_publication_infos(username, MAP_TYPE)
-    if (username, mapname, MAP_TYPE) in maps:
-        info = maps[(username, mapname, MAP_TYPE)]
-    else:
-        info = {}
+    info = maps.get((username, MAP_TYPE, mapname), dict())
     return info
 
 
@@ -62,8 +59,8 @@ def get_publication_infos(username, publication_type):
     return infos
 
 
-def delete_map(username, mapname):
-    pubs_util.delete_publication(username, mapname, MAP_TYPE)
+def delete_map(username, map_name):
+    return pubs_util.delete_publication(username, MAP_TYPE, map_name)
 
 
 def get_metadata_comparison(username, publication_name):
