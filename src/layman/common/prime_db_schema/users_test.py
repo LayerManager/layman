@@ -7,6 +7,7 @@ from test import process
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 ensure_layman = process.ensure_layman
 
+
 @pytest.mark.usefixtures('ensure_layman')
 def test_get_user_infos():
     with app.app_context():
