@@ -90,5 +90,6 @@ def test_authorize_decorator(liferay_mock):
     })
     process_client.assert_user_layers(username, [layername], headers=user_authz_headers)
     process_client.assert_user_layers(username, [layername])
+    process_client.delete_layer(username, layername, headers=user_authz_headers)
 
     process.stop_process(layman_process)

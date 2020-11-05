@@ -11,9 +11,18 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from layman.layer.filesystem import input_chunk
 from layman import settings
 
-from test import process
+from test import process, process_client
 
 ensure_layman = process.ensure_layman
+
+username = 'testuser1'
+layername = 'country_chunks'
+
+
+@pytest.fixture(scope="module")
+def clear_country_chunks():
+    yield
+    process_client.delete_layer(username, layername)
 
 
 @pytest.fixture(scope="module")
@@ -33,11 +42,9 @@ def chrome():
     chrome.quit()
 
 
-@pytest.mark.usefixtures('ensure_layman')
+@pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
 def test_post_layers_chunk(chrome):
 
-    username = 'testuser1'
-    layername = 'country_chunks'
     file_paths = list(map(lambda fp: os.path.join(os.getcwd(), fp), [
         'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
@@ -111,10 +118,8 @@ def test_post_layers_chunk(chrome):
     assert not process.LAYMAN_REDIS.exists(total_chunks_key)
 
 
-@pytest.mark.usefixtures('ensure_layman')
+@pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
 def test_patch_layer_chunk(chrome):
-    username = 'testuser1'
-    layername = 'country_chunks'
 
     pattern = os.path.join(os.getcwd(), 'tmp/naturalearth/110m/cultural/*')
     file_paths = glob.glob(pattern)
