@@ -1,17 +1,22 @@
-from test.flask_client import client
+import pytest
 
 from layman import app as app
 from . import users as user_util, workspaces as workspace_util, ensure_whole_user
+from test import process
+
+ensure_layman = process.ensure_layman
 
 
-def test_get_workspace_infos(client):
+@pytest.mark.usefixtures('ensure_layman')
+def test_get_workspace_infos():
     with app.app_context():
         workspace_util.get_workspace_infos()
         workspace_util.get_workspace_infos('test2')
         workspace_util.get_workspace_infos('asůldghwíeghsdlkfj')
 
 
-def test_ensure_workspace(client):
+@pytest.mark.usefixtures('ensure_layman')
+def test_ensure_workspace():
     username = 'test_ensure_workspace_user'
 
     with app.app_context():
