@@ -6,25 +6,23 @@ PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
 def get_layer_infos(username):
-    return pubs_util.get_publication_infos(username, LAYER_TYPE)
+    result = {layername: layer_info for (username_value, type, layername), layer_info in pubs_util.get_publication_infos(username, LAYER_TYPE).items()}
+    return result
 
 
 def get_publication_uuid(username, publication_type, publication_name):
     infos = pubs_util.get_publication_infos(username, publication_type)
-    return infos.get(publication_name).get("uuid")
+    return infos.get((username, publication_type, publication_name), dict()).get("uuid")
 
 
 def get_layer_info(username, layername):
     layers = pubs_util.get_publication_infos(username, LAYER_TYPE)
-    if layername in layers:
-        info = layers[layername]
-    else:
-        info = {}
+    info = layers.get((username, LAYER_TYPE, layername), dict())
     return info
 
 
-def delete_layer(username, layername):
-    pubs_util.delete_publication(username, layername, LAYER_TYPE)
+def delete_layer(username, layer_name):
+    return pubs_util.delete_publication(username, LAYER_TYPE, layer_name)
 
 
 def patch_layer(username,
@@ -61,7 +59,12 @@ def post_layer(username,
     pubs_util.insert_publication(username, db_info)
 
 
-get_publication_infos = pubs_util.get_publication_infos
+def get_publication_infos(username, publication_type):
+    if publication_type != '.'.join(__name__.split('.')[:-2]):
+        raise Exception(f'Unknown pyblication type {publication_type}')
+
+    infos = get_layer_infos(username)
+    return infos
 
 
 def get_metadata_comparison(username, publication_name):

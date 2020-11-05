@@ -3,20 +3,18 @@ from .. import MAP_TYPE
 
 
 def get_map_infos(username):
-    return pubs_util.get_publication_infos(username, MAP_TYPE)
+    result = {mapname: map_info for (username_value, type, mapname), map_info in pubs_util.get_publication_infos(username, MAP_TYPE).items()}
+    return result
 
 
 def get_publication_uuid(username, publication_type, publication_name):
     infos = pubs_util.get_publication_infos(username, publication_type)
-    return infos.get(publication_name).get("uuid")
+    return infos.get((username, publication_type, publication_name), dict()).get("uuid")
 
 
 def get_map_info(username, mapname):
     maps = pubs_util.get_publication_infos(username, MAP_TYPE)
-    if mapname in maps:
-        info = maps[mapname]
-    else:
-        info = {}
+    info = maps.get((username, MAP_TYPE, mapname), dict())
     return info
 
 
@@ -55,11 +53,16 @@ def post_map(username,
     pubs_util.insert_publication(username, db_info)
 
 
-get_publication_infos = pubs_util.get_publication_infos
+def get_publication_infos(username, publication_type):
+    if publication_type != '.'.join(__name__.split('.')[:-2]):
+        raise Exception(f'Unknown pyblication type {publication_type}')
+
+    infos = get_map_infos(username)
+    return infos
 
 
-def delete_map(username, mapname):
-    pubs_util.delete_publication(username, mapname, MAP_TYPE)
+def delete_map(username, map_name):
+    return pubs_util.delete_publication(username, MAP_TYPE, map_name)
 
 
 def get_metadata_comparison(username, publication_name):

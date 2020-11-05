@@ -1,134 +1,93 @@
-import test.flask_client as client_util
+import pytest
+import uuid
+
+from test import process, process_client
 
 from layman import settings, app as app
-from layman.layer.filesystem import uuid as layer_uuid
 from layman.layer import LAYER_TYPE
-from layman.map.filesystem import uuid as map_uuid
 from layman.map import MAP_TYPE
 from . import publications, workspaces
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
-ROLE_EVERYONE = publications.ROLE_EVERYONE
+ensure_layman = process.ensure_layman
 
-client = client_util.client
-
-
-def test_post_layer(client):
-    username = 'test_post_layer_username'
-    layername = 'test_post_layer_layer'
-    layertitle = 'test_post_layer_layer Title'
-    layertitle2 = 'test_post_layer_layer Title2'
-    with app.app_context():
-        workspaces.ensure_workspace(username)
-        uuid_str = layer_uuid.assign_layer_uuid(username, layername)
-        db_info = {"name": layername,
-                   "title": layertitle,
-                   "publ_type_name": LAYER_TYPE,
-                   "uuid": uuid_str,
-                   "can_read": (ROLE_EVERYONE, ),
-                   "can_write": (ROLE_EVERYONE, ),
-                   }
-        publications.insert_publication(username, db_info)
-        pubs = publications.get_publication_infos(username, LAYER_TYPE)
-        assert pubs.get(layername).get('name') == layername
-        assert pubs.get(layername).get('title') == layertitle
-        assert pubs.get(layername).get('uuid') == uuid_str
-        # assert ROLE_EVERYONE in pubs.get(layername).get('can_read')
-        # assert ROLE_EVERYONE in pubs.get(layername).get('can_write')
-
-        db_info = {"name": layername,
-                   "title": layertitle2,
-                   "publ_type_name": LAYER_TYPE,
-                   "can_read": set(),
-                   "can_write": set(),
-                   }
-        publications.update_publication(username, db_info)
-        pubs = publications.get_publication_infos(username, LAYER_TYPE)
-        assert pubs.get(layername).get('name') == layername
-        assert pubs.get(layername).get('title') == layertitle2
-        assert pubs.get(layername).get('uuid') == uuid_str
-        # assert ROLE_EVERYONE not in pubs.get(layername).get('can_read')
-        # assert ROLE_EVERYONE not in pubs.get(layername).get('can_write')
-        db_info = {"name": layername,
-                   "title": layertitle,
-                   "publ_type_name": LAYER_TYPE,
-                   }
-        publications.update_publication(username, db_info)
-        pubs = publications.get_publication_infos(username, LAYER_TYPE)
-        assert pubs.get(layername).get('name') == layername
-        assert pubs.get(layername).get('title') == layertitle
-        assert pubs.get(layername).get('uuid') == uuid_str
-        # assert ROLE_EVERYONE not in pubs.get(layername).get('can_read')
-        # assert ROLE_EVERYONE not in pubs.get(layername).get('can_write')
-
-        publications.delete_publication(username, layername, LAYER_TYPE)
-        pubs = publications.get_publication_infos(username, LAYER_TYPE)
-        assert pubs.get(layername) is None
-
-    client_util.delete_layer(username, layername, client)
+userinfo = {"iss_id": 'mock_test',
+            "sub": '1',
+            "claims": {"email": "test@liferay.com",
+                       "name": "test ensure user",
+                       "given_name": "test",
+                       "family_name": "user",
+                       "middle_name": "ensure",
+                       }
+            }
 
 
-def test_post_map(client):
-    username = 'test_post_map_username'
-    mapname = 'test_post_map_map'
-    maptitle = 'test_post_map_map Title'
-    maptitle2 = 'test_post_map_map Title2'
-    with app.app_context():
-        workspaces.ensure_workspace(username)
-        uuid_str = map_uuid.assign_map_uuid(username, mapname)
-        db_info = {"name": mapname,
-                   "title": maptitle,
-                   "publ_type_name": MAP_TYPE,
-                   "uuid": uuid_str,
-                   "can_read": (ROLE_EVERYONE, ),
-                   "can_write": (ROLE_EVERYONE, ),
-                   }
-        publications.insert_publication(username, db_info)
-        pubs = publications.get_publication_infos(username, MAP_TYPE)
-        assert pubs.get(mapname).get('name') == mapname
-        assert pubs.get(mapname).get('title') == maptitle
-        assert pubs.get(mapname).get('uuid') == uuid_str
-        # assert ROLE_EVERYONE in pubs.get(mapname).get('can_read')
-        # assert ROLE_EVERYONE in pubs.get(mapname).get('can_write')
+@pytest.mark.usefixtures('ensure_layman')
+def test_publication_basic():
+    def publications_by_type(prefix,
+                             publication_type,
+                             ):
+        username = prefix + '_username'
+        publication_name = prefix + '_pub_name'
+        publication_title = prefix + '_pub_ Title'
+        publication_title2 = prefix + '_pub_ Title2'
 
-        db_info = {"name": mapname,
-                   "title": maptitle2,
-                   "publ_type_name": MAP_TYPE,
-                   "can_read": set(),
-                   "can_write": set(),
-                   }
-        publications.update_publication(username, db_info)
-        pubs = publications.get_publication_infos(username, MAP_TYPE)
-        assert pubs.get(mapname).get('name') == mapname
-        assert pubs.get(mapname).get('title') == maptitle2
-        assert pubs.get(mapname).get('uuid') == uuid_str
-        # assert ROLE_EVERYONE not in pubs.get(mapname).get('can_read')
-        # assert ROLE_EVERYONE not in pubs.get(mapname).get('can_write')
-        db_info = {"name": mapname,
-                   "title": maptitle,
-                   "publ_type_name": MAP_TYPE,
-                   }
-        publications.update_publication(username, db_info)
-        pubs = publications.get_publication_infos(username, MAP_TYPE)
-        assert pubs.get(mapname).get('name') == mapname
-        assert pubs.get(mapname).get('title') == maptitle
-        assert pubs.get(mapname).get('uuid') == uuid_str
-        # assert ROLE_EVERYONE not in pubs.get(mapname).get('can_read')
-        # assert ROLE_EVERYONE not in pubs.get(mapname).get('can_write')
+        with app.app_context():
+            workspaces.ensure_workspace(username)
+            uuid_orig = uuid.uuid4()
+            uuid_str = str(uuid_orig)
+            db_info = {"name": publication_name,
+                       "title": publication_title,
+                       "publ_type_name": publication_type,
+                       "uuid": uuid_orig,
+                       "actor_name": username,
+                       }
+            publications.insert_publication(username, db_info)
+            pubs = publications.get_publication_infos(username, publication_type)
+            assert pubs[(username, publication_type, publication_name)].get('name') == publication_name
+            assert pubs[(username, publication_type, publication_name)].get('title') == publication_title
+            assert pubs[(username, publication_type, publication_name)].get('uuid') == str(uuid_str)
 
-        publications.delete_publication(username, mapname, MAP_TYPE)
-        pubs = publications.get_publication_infos(username, MAP_TYPE)
-        assert pubs.get(mapname) is None
+            db_info = {"name": publication_name,
+                       "title": publication_title2,
+                       "actor_name": username,
+                       "publ_type_name": publication_type,
+                       }
+            publications.update_publication(username, db_info)
+            pubs = publications.get_publication_infos(username, publication_type)
+            assert pubs[(username, publication_type, publication_name)].get('name') == publication_name
+            assert pubs[(username, publication_type, publication_name)].get('title') == publication_title2
+            assert pubs[(username, publication_type, publication_name)].get('uuid') == uuid_str
 
-    client_util.delete_map(username, mapname, client)
+            db_info = {"name": publication_name,
+                       "title": publication_title,
+                       "actor_name": username,
+                       "publ_type_name": publication_type,
+                       }
+            publications.update_publication(username, db_info)
+            pubs = publications.get_publication_infos(username, publication_type)
+            assert pubs[(username, publication_type, publication_name)].get('name') == publication_name
+            assert pubs[(username, publication_type, publication_name)].get('title') == publication_title
+            assert pubs[(username, publication_type, publication_name)].get('uuid') == uuid_str
+
+            publications.delete_publication(username, publication_type, publication_name)
+            pubs = publications.get_publication_infos(username, publication_type)
+            assert pubs.get((username, publication_type, publication_name)) is None
+
+    publications_by_type('test_publication_basic_layer',
+                         LAYER_TYPE)
+    publications_by_type('test_publication_basic_map',
+                         MAP_TYPE)
 
 
-def test_select_publications(client):
+@pytest.mark.usefixtures('ensure_layman')
+def test_select_publications():
     username = 'test_select_publications_user1'
     layername = 'test_select_publications_layer1'
     mapname = 'test_select_publications_map1'
-    client_util.publish_layer(username, layername, client)
-    client_util.publish_map(username, mapname, client)
+
+    process_client.publish_layer(username, layername)
+    process_client.publish_map(username, mapname)
 
     with app.app_context():
         pubs = publications.get_publication_infos(username, LAYER_TYPE)
@@ -140,9 +99,9 @@ def test_select_publications(client):
         pubs = publications.get_publication_infos()
         assert len(pubs) >= 2
 
-    client_util.delete_layer(username, layername, client)
-    client_util.delete_map(username, mapname, client)
+    process_client.delete_layer(username, layername)
+    process_client.delete_map(username, mapname)
 
     with app.app_context():
         pubs = publications.get_publication_infos(username)
-        assert pubs.get(layername) is None
+        assert len(pubs) == 0, pubs
