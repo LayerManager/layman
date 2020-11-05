@@ -9,10 +9,9 @@ from layman.util import check_username_decorator, url_for
 from . import util, MAP_TYPE
 from .filesystem import input_file, uuid
 from layman.authn import authenticate
-from layman.authz import authorize
+from layman.authz import authorize, util as authz_util
 from layman.common import redis as redis_util
 from .prime_db_schema import table
-from layman import settings
 
 bp = Blueprint('rest_maps', __name__)
 
@@ -38,6 +37,7 @@ def get(username):
             'title': info.get("title", None),
             'url': url_for('rest_map.get', mapname=name, username=name),
             'uuid': info['uuid'],
+            'access_rights': info['access_rights'],
         }
         for (name, info) in sorted_infos
     ]
@@ -102,31 +102,16 @@ def post(username):
         input_file.save_map_files(
             username, mapname, [file])
 
-        if not request.form.get('access_rights.read'):
-            if g.user:
-                access_rights_read = {f'{g.user["username"]}'}
-            else:
-                access_rights_read = {f'{settings.RIGHTS_EVERYONE_ROLE}'}
-        else:
-            access_rights_read = {x.strip() for x in request.form['access_rights.read'].split(',')}
-
-        if not request.form.get('access_rights.write'):
-            if g.user:
-                access_rights_write = {f'{g.user["username"]}'}
-            else:
-                access_rights_write = {f'{settings.RIGHTS_EVERYONE_ROLE}'}
-        else:
-            access_rights_write = {x.strip() for x in request.form['access_rights.write'].split(',')}
+        actor_name = g.user and g.user["username"]
 
         kwargs = {
             'title': title,
             'description': description,
             'uuid': uuid_str,
-            'access_rights': {'read': access_rights_read,
-                              'write': access_rights_write,
-                              },
-            'actor_name': g.user and g.user["username"],
+            'actor_name': actor_name
         }
+
+        authz_util.setup_post_access_rights(request.form, kwargs, actor_name)
 
         util.post_map(
             username,

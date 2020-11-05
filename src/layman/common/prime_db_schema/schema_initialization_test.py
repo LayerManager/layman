@@ -1,8 +1,11 @@
 import logging
+import pytest
 
 from test import process, process_client
 
 from layman import settings, app as app, util
+from layman.layer import LAYER_TYPE
+from layman.map import MAP_TYPE
 from . import model, publications as pub_util, workspaces as workspaces_util
 from .schema_initialization import migrate_users_and_publications, ensure_schema
 from .util import run_query, run_statement
@@ -14,7 +17,8 @@ ensure_layman = process.ensure_layman
 logger = logging.getLogger(__name__)
 
 
-def test_recreate_schema(ensure_layman):
+@pytest.mark.usefixtures('ensure_layman')
+def test_recreate_schema():
     username = 'test_recreate_schema_user1'
     process_client.publish_layer(username, 'test_recreate_schema_layer1')
     process_client.publish_map(username, 'test_recreate_schema_map1')
@@ -36,13 +40,13 @@ def test_recreate_schema(ensure_layman):
         assert len(pubs) == 0
 
 
-def test_schema(ensure_layman):
+@pytest.mark.usefixtures('ensure_layman')
+def test_schema():
     username = 'migration_test_user1'
     layername = 'migration_test_layer1'
     mapname = 'migration_test_map1'
     process_client.publish_layer(username, layername)
     process_client.publish_map(username, mapname)
-
 
     with app.app_context():
         # TODO Why the sleep is need?
@@ -58,8 +62,8 @@ def test_schema(ensure_layman):
         user_infos = workspaces_util.get_workspace_infos(username)
         assert username in user_infos
         pub_infos = pub_util.get_publication_infos(username)
-        assert layername in pub_infos
-        assert mapname in pub_infos
+        assert (username, LAYER_TYPE, layername) in pub_infos
+        assert (username, MAP_TYPE, mapname) in pub_infos
 
     process_client.delete_layer(username, layername)
     process_client.delete_map(username, mapname)
@@ -69,7 +73,8 @@ def test_schema(ensure_layman):
         assert len(pubs) == 0
 
 
-def test_steps(ensure_layman):
+@pytest.mark.usefixtures('ensure_layman')
+def test_steps():
     username = 'migration_test_user2'
     process_client.publish_layer(username, 'migration_test_layer2')
     process_client.publish_map(username, 'migration_test_map2')

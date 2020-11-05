@@ -16,10 +16,8 @@ def publish_layer(username,
                   layername,
                   client,
                   title=None,
-                  access_rights=None,
                   ):
     title = title or layername
-    access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
 
     with app.app_context():
         rest_path = url_for('rest_layers.post', username=username)
@@ -101,11 +99,9 @@ def publish_map(username,
                 client,
                 maptitle=None,
                 headers=None,
-                access_rights=None,
                 ):
     maptitle = maptitle or mapname
     headers = headers or {}
-    access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
     with app.app_context():
         rest_path = url_for('rest_maps.post', username=username)
 
