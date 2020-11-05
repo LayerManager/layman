@@ -210,8 +210,7 @@ def reserve_username(username, headers=None):
     headers = headers or {}
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
     r_url = f"{rest_url}/current-user?adjust_username=true"
-    with app.app_context():
-        r = requests.patch(r_url, headers=headers)
-        assert r.status_code == 200, r.text
-        claimed_username = r.json()['username']
-        assert claimed_username == username
+    r = requests.patch(r_url, headers=headers)
+    assert r.status_code == 200, r.text
+    claimed_username = r.json()['username']
+    assert claimed_username == username
