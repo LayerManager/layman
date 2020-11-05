@@ -69,22 +69,21 @@ def authorize(workspace, publication_type, publication_name, request_method, act
         elif request_method in ['POST']:
             if actor_name == workspace:
                 return
-            elif ((not users.get_user_infos(workspace).get(workspace)) and  # public workspace
+            elif ((not users.get_user_infos(workspace)) and  # public workspace
                     (
-                        workspaces.get_workspace_infos(workspace).get(workspace) or  # either exists
+                        workspaces.get_workspace_infos(workspace) or  # either exists
                         can_user_create_public_workspace(actor_name)  # or can be created by actor
                     ) and can_user_publish_in_public_workspace(actor_name)):  # actor can publish there
                 return
             else:
-                raise LaymanError(30)
+                raise LaymanError(30)  # unauthorized request
         else:
-            raise LaymanError(31, {'method': request_method})
+            raise LaymanError(31, {'method': request_method})  # unsupported method
     else:
         publ_info = publications.get_publication_infos(workspace, publication_type).get(
             (workspace, publication_name, publication_type)
         )
-        publ_exists = bool(publ_info)
-        if not publ_exists:
+        if not publ_info:
             raise LaymanError(publication_not_found_code)
         user_can_read = is_user_in_access_rule(actor_name, publ_info['access_rights']['read'])
         if request_method in ['GET']:
@@ -96,16 +95,17 @@ def authorize(workspace, publication_type, publication_name, request_method, act
             if is_user_in_access_rule(actor_name, publ_info['access_rights']['write']):
                 return
             elif user_can_read:
-                raise LaymanError(30)
+                raise LaymanError(30)  # unauthorized request
             else:
                 raise LaymanError(publication_not_found_code)
         else:
-            raise LaymanError(31, {'method': request_method})
+            raise LaymanError(31, {'method': request_method})  # unsupported method
 
 
 def authorize_after_multi_get_request(workspace, actor_name, response):
     # print(f"authorize_after_request, status_code = {response.status_code}, workspace={workspace}, actor_name={actor_name}")
     if response.status_code == 200:
+        # TODO when GET Layers will return also access rights, use access rights from response to filter publications
         publication_infos = publications.get_publication_infos(workspace_name=workspace)
         # print(f"authorize_after_request, publication_infos = {publication_infos}")
         safe_uuids = [
@@ -163,6 +163,7 @@ def authorize_decorator(f):
         if workspace is None or publication_type is None:
             raise Exception(f"Authorization module is unable to authorize path {req_path}")
         actor_name = g.user and g.user.get('username')
+        # raises exception in case of unauthorized request
         authorize(workspace, publication_type, publication_name, request.method, actor_name)
         if workspace and publication_type and not publication_name and request.method == 'GET':
             @after_this_request

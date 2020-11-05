@@ -133,6 +133,8 @@ GRANT_PUBLISH_IN_PUBLIC_WORKSPACE = {
     name for name in os.environ['GRANT_PUBLISH_IN_PUBLIC_WORKSPACE'].split(',')
     if name
 }
+# TODO assert that GRANT_CREATE_PUBLIC_WORKSPACE is subset of (or equal to) GRANT_PUBLISH_IN_PUBLIC_WORKSPACE
+# write it also to documentation
 
 # UPLOAD_MAX_INACTIVITY_TIME = 10 # 10 seconds
 UPLOAD_MAX_INACTIVITY_TIME = 5 * 60  # 5 minutes
