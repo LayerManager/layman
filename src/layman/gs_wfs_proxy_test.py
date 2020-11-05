@@ -1,5 +1,6 @@
 import requests
 from urllib.parse import urljoin
+from owslib.feature.schema import get_schema as get_wfs_schema
 
 from layman import app
 from layman import settings
@@ -7,6 +8,7 @@ from layman.layer import db
 from test import process, process_client as client_util, flask_client
 from test.data import wfs as data_wfs
 from layman.layer.geoserver.util import wfs_proxy
+from layman.layer.geoserver import wfs as geoserver_wfs
 
 liferay_mock = process.liferay_mock
 
@@ -177,26 +179,20 @@ def test_missing_attribute(liferay_mock):
                                    layername,
                                    ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
                                    headers=authn_headers,
-                                   access_rights={
-                                       'read': settings.RIGHTS_EVERYONE_ROLE,
-                                       'write': settings.RIGHTS_EVERYONE_ROLE,
-                                   })
+                                   )
     assert ln == layername
     ln2 = client_util.publish_layer(username,
                                     layername2,
                                     ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
                                     headers=authn_headers,
-                                    access_rights={
-                                        'read': settings.RIGHTS_EVERYONE_ROLE,
-                                        'write': settings.RIGHTS_EVERYONE_ROLE,
-                                    })
+                                    )
     assert ln2 == layername2
 
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
+    wfs_t_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
 
     def wfs_post(username, attr_names_list, data_xml):
         with app.app_context():
-            wfs_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+            wfs_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs"
             old_db_attributes = {}
             old_wfs_properties = {}
             for layername, attr_names in attr_names_list:
@@ -204,11 +200,12 @@ def test_missing_attribute(liferay_mock):
                 old_db_attributes[layername] = db.get_all_column_names(username, layername)
                 for attr_name in attr_names:
                     assert attr_name not in old_db_attributes[layername], f"old_db_attributes={old_db_attributes[layername]}, attr_name={attr_name}"
-                wfs = wfs_proxy(wfs_url)
-                layer_schema = wfs.get_schema(f"{username}:{layername}")
+                # TODO https://github.com/geopython/OWSLib/issues/709#issuecomment-722302377
+                layer_schema = get_wfs_schema(
+                    wfs_url, typename=f"{username}:{layername}", version=geoserver_wfs.VERSION, headers=authn_headers)
                 old_wfs_properties[layername] = sorted(layer_schema['properties'].keys())
 
-            r = requests.post(rest_url,
+            r = requests.post(wfs_t_url,
                               data=data_xml,
                               headers=headers)
             assert r.status_code == 200, f"r.status_code={r.status_code}\n{r.text}"
@@ -223,8 +220,9 @@ def test_missing_attribute(liferay_mock):
                 assert set(attr_names).union(set(old_db_attributes[layername])) == set(new_db_attributes[layername])
 
                 # test that exactly all attr_names were distinguished also in WFS feature type
-                wfs = wfs_proxy(wfs_url)
-                layer_schema = wfs.get_schema(f"{username}:{layername}")
+                # TODO https://github.com/geopython/OWSLib/issues/709#issuecomment-722302377
+                layer_schema = get_wfs_schema(
+                    wfs_url, typename=f"{username}:{layername}", version=geoserver_wfs.VERSION, headers=authn_headers)
                 new_wfs_properties[layername] = sorted(layer_schema['properties'].keys())
                 for attr_name in attr_names:
                     assert attr_name in new_wfs_properties[layername], f"new_wfs_properties={new_wfs_properties[layername]}, attr_name={attr_name}"
