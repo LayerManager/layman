@@ -12,7 +12,11 @@ from layman.util import url_for
 from test.util import wait_for_url
 
 
-def publish_layer(username, layername, client, title=None):
+def publish_layer(username,
+                  layername,
+                  client,
+                  title=None,
+                  ):
     title = title or layername
     with app.app_context():
         rest_path = url_for('rest_layers.post', username=username)
@@ -89,7 +93,12 @@ def delete_map(username, mapname, client, headers=None):
     assert r.status_code == 200, (r.status_code, r.get_json())
 
 
-def publish_map(username, mapname, client, maptitle=None, headers=None):
+def publish_map(username,
+                mapname,
+                client,
+                maptitle=None,
+                headers=None,
+                ):
     maptitle = maptitle or mapname
     headers = headers or {}
     with app.app_context():

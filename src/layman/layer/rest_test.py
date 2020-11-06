@@ -32,8 +32,10 @@ from .micka import csw
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from test.data import wfs as data_wfs
+from test import flask_client
 
 logger = logging.getLogger(__name__)
+
 
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
 
