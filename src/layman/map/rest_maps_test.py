@@ -20,7 +20,9 @@ def test_get_map_infos(client):
 
     client_util.publish_map(username, mapname, client, maptitle)
 
+    result_infos_name = {mapname: {'name': mapname}}
     result_infos_name_title = {mapname: {'name': mapname, 'title': maptitle}}
+    result_publication_name = [mapname]
 
     with app.app_context():
         result_infos_name_title_uuid = {mapname: {'name': mapname,

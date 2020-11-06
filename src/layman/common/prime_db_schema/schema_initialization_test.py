@@ -24,9 +24,6 @@ def test_recreate_schema():
     process_client.publish_map(username, 'test_recreate_schema_map1')
 
     with app.app_context():
-        # TODO Why the sleep is need?
-        time.sleep(5)
-
         run_statement(model.DROP_SCHEMA_SQL)
         ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
                       settings.PUBLICATION_MODULES,
@@ -49,9 +46,6 @@ def test_schema():
     process_client.publish_map(username, mapname)
 
     with app.app_context():
-        # TODO Why the sleep is need?
-        time.sleep(5)
-
         run_statement(model.DROP_SCHEMA_SQL)
         ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
                       settings.PUBLICATION_MODULES,
@@ -80,8 +74,6 @@ def test_steps():
     process_client.publish_map(username, 'migration_test_map2')
 
     with app.app_context():
-        # TODO Why the sleep is need?
-        time.sleep(5)
         run_statement(model.DROP_SCHEMA_SQL)
         exists_schema = run_query(model.EXISTS_SCHEMA_SQL)
         assert exists_schema[0][0] == 0
