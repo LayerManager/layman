@@ -158,7 +158,6 @@ def publish_map(username,
                 ):
     headers = headers or {}
     file_paths = file_paths or ['sample/layman.map/full.json', ]
-    access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
 
     with app.app_context():
         r_url = url_for('rest_maps.post', username=username)
