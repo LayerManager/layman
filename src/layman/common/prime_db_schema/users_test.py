@@ -8,7 +8,6 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 ensure_layman = process.ensure_layman
 
 
-@pytest.mark.usefixtures('ensure_layman')
 def test_get_user_infos():
     with app.app_context():
         user_util.get_user_infos()
@@ -16,7 +15,6 @@ def test_get_user_infos():
         user_util.get_user_infos('asůldghwíeghsdlkfj')
 
 
-@pytest.mark.usefixtures('ensure_layman')
 def test_ensure_user():
     username = 'test_ensure_user'
     userinfo = {"iss_id": 'mock_test',

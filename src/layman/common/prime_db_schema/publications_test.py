@@ -22,7 +22,6 @@ userinfo = {"iss_id": 'mock_test',
             }
 
 
-@pytest.mark.usefixtures('ensure_layman')
 def test_publication_basic():
     def publications_by_type(prefix,
                              publication_type,

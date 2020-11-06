@@ -76,8 +76,8 @@ returning id
             info.get("title"),
             info.get("publ_type_name"),
             info.get("uuid"),
-            ROLE_EVERYONE in set(),
-            ROLE_EVERYONE in set(),
+            True,
+            True,
             )
     pub_id = util.run_query(insert_publications_sql, data)[0][0]
 
@@ -97,8 +97,8 @@ def update_publication(workspace_name, info):
     ;'''
 
     data = (info.get("title"),
-            ROLE_EVERYONE in set(),
-            ROLE_EVERYONE in set(),
+            True,
+            True,
             id_workspace,
             info.get("name"),
             info.get("publ_type_name"),

@@ -2,12 +2,8 @@ import pytest
 
 from layman import app as app
 from . import users as user_util, workspaces as workspace_util, ensure_whole_user
-from test import process
-
-ensure_layman = process.ensure_layman
 
 
-@pytest.mark.usefixtures('ensure_layman')
 def test_get_workspace_infos():
     with app.app_context():
         workspace_util.get_workspace_infos()
@@ -15,7 +11,6 @@ def test_get_workspace_infos():
         workspace_util.get_workspace_infos('asůldghwíeghsdlkfj')
 
 
-@pytest.mark.usefixtures('ensure_layman')
 def test_ensure_workspace():
     username = 'test_ensure_workspace_user'
 
