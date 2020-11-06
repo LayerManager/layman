@@ -17,9 +17,9 @@ bp = Blueprint('rest_maps', __name__)
 
 
 @bp.before_request
+@check_username_decorator
 @authenticate
 @authorize_decorator
-@check_username_decorator
 def before_request():
     pass
 

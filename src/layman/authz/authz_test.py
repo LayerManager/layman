@@ -30,7 +30,7 @@ def test_authorize_assert_wrong_path():
         with app.test_request_context(wrong_path):
             with pytest.raises(Exception) as exc_info:
                 mock_method()
-            assert str(exc_info.value) == f"Authorization module is unable to authorize path {wrong_path}"
+            assert str(exc_info.value) == f"Authorization module is unable to authorize path {wrong_path}", exc_info.traceback
 
 
 def test_authorize_accepts_path():
@@ -51,7 +51,9 @@ def test_authorize_accepts_path():
         assert workspace and publication_type and not publication_name, f"Parsing {req_path} returns {(workspace, publication_type, publication_name)}"
         with app.test_request_context(req_path):
             g.user = None
-            mock_method()
+            with pytest.raises(Exception) as exc_info:
+                mock_method()
+            assert isinstance(exc_info.value, LaymanError)
 
     single_paths = [
         '/rest/user_a/layers/abc',

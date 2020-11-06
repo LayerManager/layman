@@ -53,12 +53,7 @@ def check_username_decorator(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         username = request.view_args['username']
-        if request.method == 'POST':
-            # check username, because the user (workspace) can be created by POST methods
-            check_username(username)
-        else:
-            if username not in get_usernames():
-                raise LaymanError(40)
+        check_username(username, pattern_only=True)
         result = f(*args, **kwargs)
         return result
 
@@ -70,9 +65,11 @@ def check_reserved_workspace_names(workspace_name):
         raise LaymanError(35, {'reserved_by': 'RESERVED_WORKSPACE_NAMES', 'workspace': workspace_name})
 
 
-def check_username(username):
+def check_username(username, pattern_only=False):
     if not re.match(USERNAME_PATTERN, username):
         raise LaymanError(2, {'parameter': 'user', 'expected': USERNAME_PATTERN})
+    if pattern_only:
+        return
     check_reserved_workspace_names(username)
     providers = get_internal_providers()
     call_modules_fn(providers, 'check_username', [username])

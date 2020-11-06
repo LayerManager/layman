@@ -11,10 +11,10 @@ bp = Blueprint('rest_layer_chunk', __name__)
 
 
 @bp.before_request
-@authenticate
-@authorize_decorator
 @check_username_decorator
 @util.check_layername_decorator
+@authenticate
+@authorize_decorator
 def before_request():
     pass
 

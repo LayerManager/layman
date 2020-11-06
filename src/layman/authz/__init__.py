@@ -3,6 +3,7 @@ from flask import after_this_request
 from functools import wraps
 from layman.common.prime_db_schema import workspaces, users, publications
 from . import util
+from layman import util as layman_util
 
 
 from flask import g, request
@@ -62,21 +63,28 @@ def authorize(workspace, publication_type, publication_name, request_method, act
 
     if is_multi_publication_request:
         if request_method in ['GET']:
+            if not workspaces.get_workspace_infos(workspace):
+                raise LaymanError(40)  # User not found
             return
         elif request_method in ['POST']:
             if actor_name == workspace:
                 return
-            elif ((not users.get_user_infos(workspace))  # public workspace
-                    and (
-                        workspaces.get_workspace_infos(workspace)  # either exists
-                        or can_user_create_public_workspace(actor_name)  # or can be created by actor
-            ) and can_user_publish_in_public_workspace(actor_name)):  # actor can publish there
-                return
+            elif ((not users.get_user_infos(workspace)) and  # public workspace
+                    can_user_publish_in_public_workspace(actor_name)):  # actor can publish in public workspace
+                if workspaces.get_workspace_infos(workspace):  # workspaces exists
+                    return
+                elif can_user_create_public_workspace(actor_name):  # workspaces can be created by actor
+                    # raises exception if new workspace is not correct
+                    layman_util.check_username(workspace)
+                else:
+                    raise LaymanError(30)  # unauthorized request
             else:
                 raise LaymanError(30)  # unauthorized request
         else:
             raise LaymanError(31, {'method': request_method})  # unsupported method
     else:
+        if not workspaces.get_workspace_infos(workspace):
+            raise LaymanError(40)  # User not found
         publ_info = publications.get_publication_infos(workspace, publication_type).get(
             (workspace, publication_name, publication_type)
         )

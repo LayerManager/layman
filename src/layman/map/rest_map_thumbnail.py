@@ -14,10 +14,10 @@ bp = Blueprint('rest_map_thumbnail', __name__)
 
 
 @bp.before_request
-@authenticate
-@authorize_decorator
 @check_username_decorator
 @util.check_mapname_decorator
+@authenticate
+@authorize_decorator
 @util.info_decorator
 def before_request():
     pass
