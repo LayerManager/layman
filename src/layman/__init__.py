@@ -67,8 +67,8 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
             import layman.common.prime_db_schema.schema_initialization as prime_db_schema
             prime_db_schema.check_schema_name(settings.LAYMAN_PRIME_SCHEMA)
             prime_db_schema.ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
-                                          app,
-                                          settings.PUBLICATION_MODULES)
+                                          settings.PUBLICATION_MODULES,
+                                          settings.RIGHTS_EVERYONE_ROLE)
 
         app.logger.info(f'Loading Redis database')
         with app.app_context():
