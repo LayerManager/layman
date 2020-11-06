@@ -1,19 +1,21 @@
-from test.flask_client import client
+import pytest
 
 from layman import settings, app as app
 from . import users as user_util, workspaces as workspace_util
+from test import process
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
+ensure_layman = process.ensure_layman
 
 
-def test_get_user_infos(client):
+def test_get_user_infos():
     with app.app_context():
         user_util.get_user_infos()
         user_util.get_user_infos('test2')
         user_util.get_user_infos('asůldghwíeghsdlkfj')
 
 
-def test_ensure_user(client):
+def test_ensure_user():
     username = 'test_ensure_user'
     userinfo = {"iss_id": 'mock_test',
                 "sub": '1',
