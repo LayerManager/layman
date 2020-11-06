@@ -34,6 +34,7 @@ def publish_layer(username,
                   layername,
                   file_paths=None,
                   headers=None,
+                  access_rights=None,
                   title=None,
                   ):
     title = title or layername
@@ -51,6 +52,9 @@ def publish_layer(username,
         data = {'name': layername,
                 'title': title,
                 }
+        if access_rights:
+            data["access_rights.read"] = access_rights['read']
+            data["access_rights.write"] = access_rights['write']
         r = requests.post(r_url,
                           files=files,
                           data=data,
@@ -70,6 +74,7 @@ def patch_layer(username,
                 layername,
                 file_paths=None,
                 headers=None,
+                access_rights=None,
                 ):
     headers = headers or {}
     file_paths = file_paths or []
@@ -83,6 +88,10 @@ def patch_layer(username,
     try:
         files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
         data = dict()
+        if access_rights and access_rights.get('read'):
+            data["access_rights.read"] = access_rights['read']
+        if access_rights and access_rights.get('write'):
+            data["access_rights.write"] = access_rights['write']
 
         r = requests.patch(r_url,
                            files=files,
@@ -104,6 +113,7 @@ def patch_layer(username,
 def patch_map(username,
               mapname,
               headers=None,
+              access_rights=None,
               ):
     headers = headers or {}
 
@@ -111,6 +121,10 @@ def patch_map(username,
         r_url = url_for('rest_map.patch', username=username, mapname=mapname)
 
     data = dict()
+    if access_rights and access_rights.get('read'):
+        data["access_rights.read"] = access_rights['read']
+    if access_rights and access_rights.get('write'):
+        data["access_rights.write"] = access_rights['write']
 
     r = requests.patch(r_url,
                        headers=headers,
@@ -140,9 +154,11 @@ def publish_map(username,
                 mapname,
                 file_paths=None,
                 headers=None,
+                access_rights=None,
                 ):
     headers = headers or {}
     file_paths = file_paths or ['sample/layman.map/full.json', ]
+    access_rights = access_rights or {'read': settings.RIGHTS_EVERYONE_ROLE, 'write': settings.RIGHTS_EVERYONE_ROLE}
 
     with app.app_context():
         r_url = url_for('rest_maps.post', username=username)
@@ -153,6 +169,9 @@ def publish_map(username,
     try:
         files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
         data = {'name': mapname, }
+        if access_rights:
+            data["access_rights.read"] = access_rights['read']
+            data["access_rights.write"] = access_rights['write']
         r = requests.post(r_url,
                           files=files,
                           data=data,

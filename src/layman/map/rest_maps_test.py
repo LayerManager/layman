@@ -2,7 +2,7 @@ import sys
 
 del sys.modules['layman']
 
-from layman import app
+from layman import app, settings
 from .filesystem import input_file, uuid, thumbnail
 from .micka import soap
 from .prime_db_schema import table as prime_table
@@ -32,8 +32,9 @@ def test_get_map_infos(client):
                                       'title': maptitle,
                                       'uuid': uuid.get_map_uuid(username, mapname),
                                       'type': MAP_TYPE,
-                                      # 'can_read': set(),
-                                      # 'can_write': set(),
+                                      'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                        'write': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                        }
                                       }}
         modules = [
             {'name': 'prime_table.table',
