@@ -140,3 +140,14 @@ def wait_till_layer_ready(username, layername):
     while last_task is not None and not celery_util.is_task_ready(last_task):
         time.sleep(0.1)
         last_task = util_layer._get_layer_task(username, layername)
+
+
+def ensure_workspace(workspace, client):
+    with app.app_context():
+        r = client.get(url_for('rest_layers.post', username=workspace))
+    if r.status_code == 404 and r.get_json()['code'] == 40:
+        tmp_layername = 'tmp_layername'
+        publish_layer(workspace, tmp_layername, client)
+        delete_layer(workspace, tmp_layername, client)
+    elif r.status_code != 200:
+        raise Exception(r.data)
