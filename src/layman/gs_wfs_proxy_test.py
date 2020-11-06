@@ -1,11 +1,6 @@
 import requests
 from urllib.parse import urljoin
 
-import sys
-
-
-del sys.modules['layman']
-
 from layman import app
 from layman import settings
 from layman.layer import db
