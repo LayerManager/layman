@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.7.2
+2020-11-09
+### Changes
+- [#133](https://github.com/jirik/layman/issues/133) Attribute `url` of [GET Maps](doc/rest.md#get-maps) response was repaired. Previously, it incorrectly used map name instead of username in the URL path.
+
 ## v1.7.1
 2020-09-30
 ### Upgrade requirements
