@@ -52,8 +52,9 @@ def publish_layer(username,
         data = {'name': layername,
                 'title': title,
                 }
-        if access_rights:
+        if access_rights and access_rights.get('read'):
             data["access_rights.read"] = access_rights['read']
+        if access_rights and access_rights.get('write'):
             data["access_rights.write"] = access_rights['write']
         r = requests.post(r_url,
                           files=files,
@@ -168,8 +169,9 @@ def publish_map(username,
     try:
         files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
         data = {'name': mapname, }
-        if access_rights:
+        if access_rights and access_rights.get('read'):
             data["access_rights.read"] = access_rights['read']
+        if access_rights and access_rights.get('write'):
             data["access_rights.write"] = access_rights['write']
         r = requests.post(r_url,
                           files=files,
