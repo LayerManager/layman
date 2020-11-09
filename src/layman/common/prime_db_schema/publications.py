@@ -107,9 +107,9 @@ def update_publication(workspace_name, info):
     id_workspace = workspaces.get_workspace_infos(workspace_name)[workspace_name]["id"]
     right_type_list = ['read', 'write']
 
-    access_rights_det = dict()
+    access_rights_changes = dict()
     for right_type in right_type_list:
-        access_rights_det[right_type] = {
+        access_rights_changes[right_type] = {
             'EVERYONE': None,
             'add': set(),
             'remove': set(),
@@ -121,17 +121,17 @@ def update_publication(workspace_name, info):
                                                                   info["publ_type_name"],
                                                                   info["name"],)]
         for right_type in right_type_list:
-            access_rights_det[right_type]['username_list_old'] = info_old["access_rights"][right_type]
-            info["access_rights"][right_type + "_old"] = access_rights_det[right_type]['username_list_old']
+            access_rights_changes[right_type]['username_list_old'] = info_old["access_rights"][right_type]
+            info["access_rights"][right_type + "_old"] = access_rights_changes[right_type]['username_list_old']
 
         for right_type in right_type_list:
             if info['access_rights'].get(right_type):
                 usernames_list = info["access_rights"].get(right_type)
-                access_rights_det[right_type]['EVERYONE'] = ROLE_EVERYONE in usernames_list
+                access_rights_changes[right_type]['EVERYONE'] = ROLE_EVERYONE in usernames_list
                 usernames_list_clear = clear_roles(usernames_list, workspace_name)
-                usernames_old_list_clear = clear_roles(access_rights_det[right_type]['username_list_old'], workspace_name)
-                access_rights_det[right_type]['add'] = usernames_list_clear.difference(usernames_old_list_clear)
-                access_rights_det[right_type]['remove'] = usernames_old_list_clear.difference(usernames_list_clear)
+                usernames_old_list_clear = clear_roles(access_rights_changes[right_type]['username_list_old'], workspace_name)
+                access_rights_changes[right_type]['add'] = usernames_list_clear.difference(usernames_old_list_clear)
+                access_rights_changes[right_type]['remove'] = usernames_old_list_clear.difference(usernames_list_clear)
 
     update_publications_sql = f'''update {DB_SCHEMA}.publications set
     title = coalesce(%s, title),
@@ -144,8 +144,8 @@ returning id
 ;'''
 
     data = (info.get("title"),
-            access_rights_det['read']['EVERYONE'],
-            access_rights_det['write']['EVERYONE'],
+            access_rights_changes['read']['EVERYONE'],
+            access_rights_changes['write']['EVERYONE'],
             id_workspace,
             info.get("name"),
             info.get("publ_type_name"),
@@ -153,8 +153,8 @@ returning id
     pub_id = util.run_query(update_publications_sql, data)[0][0]
 
     for right_type in right_type_list:
-        rights.insert_rights(pub_id, access_rights_det[right_type]['add'], right_type)
-        rights.remove_rights(pub_id, access_rights_det[right_type]['remove'], right_type)
+        rights.insert_rights(pub_id, access_rights_changes[right_type]['add'], right_type)
+        rights.remove_rights(pub_id, access_rights_changes[right_type]['remove'], right_type)
 
     return pub_id
 
