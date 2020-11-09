@@ -109,10 +109,11 @@ def update_publication(workspace_name, info):
 
     access_rights_det = dict()
     for right_type in right_type_list:
-        access_rights_det[right_type] = dict()
-        access_rights_det[right_type]['EVERYONE'] = None
-        access_rights_det[right_type]['add'] = set()
-        access_rights_det[right_type]['remove'] = set()
+        access_rights_det[right_type] = {
+            'EVERYONE': None,
+            'add': set(),
+            'remove': set(),
+        }
 
     if info.get("access_rights") and (info["access_rights"].get("read") or info["access_rights"].get("write")):
         info_old = get_publication_infos(workspace_name,
