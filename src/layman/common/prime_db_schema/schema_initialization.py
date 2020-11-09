@@ -19,6 +19,10 @@ def migrate_users_and_publications(modules, role_everyone):
         if userinfo:
             # It is personal workspace
             users.ensure_user(id_workspace, userinfo)
+            roles = {workspace_name, }
+        else:
+            # It is public workspace, so all publications are available to everybody
+            roles = {role_everyone, }
         for publ_module in get_modules_from_names(modules):
             for type_def in publ_module.PUBLICATION_TYPES.values():
                 publ_type_name = type_def['type']
@@ -30,8 +34,10 @@ def migrate_users_and_publications(modules, role_everyone):
                                 "title": info.get("title"),
                                 "publ_type_name": publ_type_name,
                                 "uuid": info["uuid"],
-                                "can_read": set(),
-                                "can_write": set(),
+                                "actor_name": workspace_name,
+                                "access_rights": {"read": {role_everyone, },
+                                                  "write": roles,
+                                                  }
                                 }
                     publications.insert_publication(workspace_name, pub_info)
 

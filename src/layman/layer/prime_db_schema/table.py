@@ -27,34 +27,32 @@ def delete_layer(username, layer_name):
 
 def patch_layer(username,
                 layername,
+                actor_name,
                 title=None,
-                can_read=None,
-                can_write=None):
-    can_read = can_read or set()
-    can_write = can_write or set()
+                access_rights=None):
     db_info = {"name": layername,
                "title": title,
                "publ_type_name": LAYER_TYPE,
-               "can_read": can_read,
-               "can_write": can_write,
+               "actor_name": actor_name,
                }
+    if access_rights:
+        db_info['access_rights'] = access_rights
     pubs_util.update_publication(username, db_info)
 
 
 def post_layer(username,
                layername,
-               title=None,
-               uuid=None,
-               can_read=None,
-               can_write=None):
-    can_read = can_read or set()
-    can_write = can_write or set()
+               access_rights,
+               title,
+               uuid,
+               actor_name,
+               ):
     db_info = {"name": layername,
                "title": title,
                "publ_type_name": LAYER_TYPE,
                "uuid": uuid,
-               "can_read": can_read,
-               "can_write": can_write,
+               "access_rights": access_rights,
+               "actor_name": actor_name,
                }
     pubs_util.insert_publication(username, db_info)
 

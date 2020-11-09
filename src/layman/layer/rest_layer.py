@@ -8,7 +8,7 @@ from layman import settings
 from . import util
 from .filesystem import input_file, input_sld, input_chunk
 from layman.authn import authenticate
-from layman.authz import authorize
+from layman.authz import authorize, util as authz_util
 
 bp = Blueprint('rest_layer', __name__)
 
@@ -135,6 +135,9 @@ def patch(username, layername):
             else:
                 input_file.save_layer_files(
                     username, layername, files, check_crs)
+    kwargs.update({'actor_name': g.user and g.user["username"]})
+
+    authz_util.setup_patch_access_rights(request.form, kwargs)
 
     util.patch_layer(
         username,

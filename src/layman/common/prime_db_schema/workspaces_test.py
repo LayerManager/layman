@@ -1,5 +1,3 @@
-import pytest
-
 from layman import app as app
 from . import users as user_util, workspaces as workspace_util, ensure_whole_user
 
