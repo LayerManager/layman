@@ -114,7 +114,6 @@ def test_select_publications():
         pubs = publications.get_publication_infos(username)
         assert len(pubs) == 0, pubs
 
-
 def test_clear_roles():
     workspace_name = 'test_clear_roles_workspace'
     username = 'test_clear_roles_user'

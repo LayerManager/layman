@@ -99,3 +99,21 @@ def test_get_map_title(client):
 
     for (name, title) in maps:
         client_util.delete_map(username, name, client)
+
+
+def test_get_maps(client):
+    username = 'test_get_maps_user'
+    mapname = 'test_get_maps_map'
+
+    client_util.publish_map(username, mapname, client)
+
+    with app.app_context():
+        # maps.GET
+        rv = client.get(url_for('rest_maps.get', username=username))
+        assert rv.status_code == 200, rv.json
+
+    assert rv.json[0]['name'] == mapname
+    assert rv.json[0]['title'] == mapname
+    assert rv.json[0]['url'] == f"http://{settings.LAYMAN_SERVER_NAME}/rest/{username}/maps/{mapname}"
+
+    client_util.delete_map(username, mapname, client)
