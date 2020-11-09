@@ -6,7 +6,7 @@
 ### Changes
 - [#28](https://github.com/jirik/layman/issues/28) New environment variable [LAYMAN_PRIME_SCHEMA](doc/env-settings.md#LAYMAN_PRIME_SCHEMA). 
 - [#28](https://github.com/jirik/layman/issues/28) New REST endpoint [GET Users](doc/rest.md#get-users) with list of all users registered in Layman.
-- [#28](https://github.com/jirik/layman/issues/28) New attribute `access_rights` added to [GET Layers](doc/rest.md#get-layers), [GET Layer](doc/rest.md#get-layer), [GET Maps](doc/rest.md#get-maps) and [GET Map](doc/rest.md#get-map) responses. New attributes `access_rights.read` and `access_rights.write` added to [POST Layers](doc/rest.md#post-layers), [PATCH Layer](doc/rest.md#patch-layer), [POST Maps](doc/rest.md#post-maps) and [PATCH Map](doc/rest.md#patch-map) requests.
+- [#28](https://github.com/jirik/layman/issues/28) New attribute `access_rights` added to [GET Layers](doc/rest.md#get-layers), [GET Layer](doc/rest.md#get-layer), [GET Maps](doc/rest.md#get-maps) and [GET Map](doc/rest.md#get-map) responses. New parameters `access_rights.read` and `access_rights.write` added to [POST Layers](doc/rest.md#post-layers), [PATCH Layer](doc/rest.md#patch-layer), [POST Maps](doc/rest.md#post-maps) and [PATCH Map](doc/rest.md#patch-map) requests.
 
 ## v1.7.2
 2020-11-09
