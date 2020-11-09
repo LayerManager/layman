@@ -67,6 +67,12 @@ URL of Liferay OAuth2 Introspection endpoint.
 ### OAUTH2_LIFERAY_USER_PROFILE_URL
 URL of Liferay User Profile endpoint.
 
+### GRANT_CREATE_PUBLIC_WORKSPACE
+List of [users](models.md#user) and [roles](models.md#role) giving them permission to create new [public workspace](models.md#public-workspace).
+
+### GRANT_PUBLISH_IN_PUBLIC_WORKSPACE
+List of [users](models.md#user) and [roles](models.md#role) giving them permission to publish new [publication](models.md#publication) in [public workspace](models.md#public-workspace).
+
 ## Layman Test Client Settings
 
 ### LTC_BASEPATH

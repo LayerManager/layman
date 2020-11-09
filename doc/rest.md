@@ -40,8 +40,8 @@ JSON array of objects representing available layers with following structure:
 - **uuid**: String. UUID of the layer.
 - **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
 - **access_rights**:
-  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#roles) with [read access](./security.md#Authorization).
-  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#roles) with [write access](./security.md#Authorization).
+  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
+  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 
 ### POST Layers
 Publish vector data file as new layer of WMS and WFS.
@@ -91,10 +91,10 @@ Body parameters:
    - by default default SLD style of GeoServer is used
    - uploading of additional style files, e.g. point-symbol images or fonts is not supported
 - *access_rights.read*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#roles) separated by comma (`,`)
+   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
    - these users or/and roles will get [read access](./security.md#Authorization) to this publication
 - *access_rights.write*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#roles) separated by comma (`,`)
+   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
    - these users or/and roles will get [write access](./security.md#Authorization) to this publication
 
 #### Response
@@ -168,8 +168,8 @@ JSON object with following structure:
   - *status*: Status information about metadata import and availability. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **access_rights**:
-  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#roles) with [read access](./security.md#Authorization).
-  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#roles) with [write access](./security.md#Authorization).
+  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
+  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 
 ### PATCH Layer
 Update information about existing layer. First, it deletes sources of the layer, and then it publishes them again with new parameters. The processing chain is similar to [POST Layers](#post-layers).
@@ -198,10 +198,10 @@ Body parameters:
 - *sld*, SLD file
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 - *access_rights.read*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#roles) separated by comma (`,`)
+   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
    - these users or/and roles will get [read access](./security.md#Authorization) to this publication
 - *access_rights.write*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#roles) separated by comma (`,`)
+   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
    - these users or/and roles will get [write access](./security.md#Authorization) to this publication
 
 #### Response
@@ -332,8 +332,8 @@ JSON array of objects representing available maps with following structure:
 - **uuid**: String. UUID of the map.
 - **url**: String. URL of the map. It points to [GET Map](#get-map).
 - **access_rights**:
-  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#roles) with [read access](./security.md#Authorization).
-  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#roles) with [write access](./security.md#Authorization).
+  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
+  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 
 ### POST Maps
 Publish new map composition. Accepts JSON valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema) used by [Hslayers-ng](https://github.com/hslayers/hslayers-ng).
@@ -367,10 +367,10 @@ Body parameters:
 - *description*
    - by default it is either `abstract` attribute of JSON root object or empty string
 - *access_rights.read*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#roles) separated by comma (`,`)
+   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
    - these users or/and roles will get [read access](./security.md#Authorization) to this publication
 - *access_rights.write*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#roles) separated by comma (`,`)
+   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
    - these users or/and roles will get [write access](./security.md#Authorization) to this publication
 
 #### Response
@@ -422,8 +422,8 @@ JSON object with following structure:
   - *status*: Status information about metadata import and availability. See [GET Map](#get-map) 
   - *error*: If status is FAILURE, this may contain error object.
 - **access_rights**:
-  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#roles) with [read access](./security.md#Authorization).
-  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#roles) with [write access](./security.md#Authorization).
+  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
+  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 
 ### PATCH Map
 Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Maps](#post-maps).
@@ -443,10 +443,10 @@ Body parameters:
 - *description*, string `.+`
    - by default it is either `abstract` attribute of JSON root object or empty string
 - *access_rights.read*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#roles) separated by comma (`,`)
+   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
    - these users or/and roles will get [read access](./security.md#Authorization) to this publication
 - *access_rights.write*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#roles) separated by comma (`,`)
+   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
    - these users or/and roles will get [write access](./security.md#Authorization) to this publication
 
 #### Response
