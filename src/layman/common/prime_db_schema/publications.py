@@ -64,6 +64,79 @@ from const c inner join
     return infos
 
 
+def only_valid_names(users_list):
+    usernames_for_chesk = users_list.copy()
+    usernames_for_chesk.discard(ROLE_EVERYONE)
+    for username in usernames_for_chesk:
+        info = users.get_user_infos(username)
+        if not info:
+            raise LaymanError(43, {f'Not existing username. Username={username}'})
+
+
+def at_least_one_can_write(can_write):
+    if not can_write:
+        raise LaymanError(43, {f'At least one user have to have write rights.'})
+
+
+def who_can_write_can_read(can_read, can_write):
+    if ROLE_EVERYONE not in can_read and set(can_write).difference(can_read):
+        raise LaymanError(43, {f'All users who have write rights have to have also read rights. Who is missing={set(can_write).difference(can_read)}'})
+
+
+def i_can_still_write(actor_name, can_write):
+    if ROLE_EVERYONE not in can_write and actor_name not in can_write:
+        raise LaymanError(43, {f'After the operation, the actor has to have write right.'})
+
+
+def owner_can_still_write(owner,
+                          can_write,
+                          ):
+    if owner and ROLE_EVERYONE not in can_write and owner not in can_write:
+        raise LaymanError(43, {f'Owner of the personal workspace have to keep write right.'})
+
+
+def check_rights_axioms(can_read,
+                        can_write,
+                        actor_name,
+                        owner,
+                        can_read_old=None,
+                        can_write_old=None):
+    if can_read:
+        only_valid_names(can_read)
+    if can_write:
+        only_valid_names(can_write)
+        owner_can_still_write(owner, can_write)
+        at_least_one_can_write(can_write)
+        i_can_still_write(actor_name, can_write)
+    if can_read or can_write:
+        can_read_check = can_read or can_read_old
+        can_write_check = can_write or can_write_old
+        who_can_write_can_read(can_read_check, can_write_check)
+
+
+def check_publication_info(workspace_name, info):
+    owner_info = users.get_user_infos(workspace_name).get(workspace_name)
+    info["owner"] = owner_info and owner_info["username"]
+    try:
+        check_rights_axioms(info['access_rights'].get('read'),
+                            info['access_rights'].get('write'),
+                            info["actor_name"],
+                            info["owner"],
+                            info['access_rights'].get('read_old'),
+                            info['access_rights'].get('write_old'),
+                            )
+    except LaymanError as exc_info:
+        raise LaymanError(43, {'workspace_name': workspace_name,
+                               'publication_name': info.get("name"),
+                               'access_rights': {
+                                   'read': info['access_rights'].get('read'),
+                                   'write': info['access_rights'].get('write'), },
+                               'actor_name': info.get("actor_name"),
+                               'owner': info["owner"],
+                               'message': exc_info.data,
+                               })
+
+
 def clear_roles(users_list, workspace_name):
     result_set = set(users_list)
     result_set.discard(ROLE_EVERYONE)
@@ -75,6 +148,7 @@ def clear_roles(users_list, workspace_name):
 
 def insert_publication(workspace_name, info):
     id_workspace = workspaces.ensure_workspace(workspace_name)
+    check_publication_info(workspace_name, info)
 
     insert_publications_sql = f'''insert into {DB_SCHEMA}.publications as p
         (id_workspace, name, title, type, uuid, everyone_can_read, everyone_can_write) values
@@ -123,6 +197,7 @@ def update_publication(workspace_name, info):
         for right_type in right_type_list:
             access_rights_changes[right_type]['username_list_old'] = info_old["access_rights"][right_type]
             info["access_rights"][right_type + "_old"] = access_rights_changes[right_type]['username_list_old']
+        check_publication_info(workspace_name, info)
 
         for right_type in right_type_list:
             if info['access_rights'].get(right_type):
