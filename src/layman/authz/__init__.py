@@ -86,7 +86,7 @@ def authorize(workspace, publication_type, publication_name, request_method, act
         if not workspaces.get_workspace_infos(workspace):
             raise LaymanError(40)  # User not found
         publ_info = publications.get_publication_infos(workspace, publication_type).get(
-            (workspace, publication_name, publication_type)
+            (workspace, publication_type, publication_name)
         )
         if not publ_info:
             raise LaymanError(publication_not_found_code)
