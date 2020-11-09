@@ -7,7 +7,7 @@ from layman import settings
 from . import util, LAYER_TYPE
 from .filesystem import input_file, input_sld, input_chunk, uuid
 from layman.authn import authenticate
-from layman.authz import authorize
+from layman.authz import authorize, util as authz_util
 from layman.common import redis as redis_util
 from .prime_db_schema import table
 
@@ -36,6 +36,7 @@ def get(username):
             'title': info.get("title", None),
             'url': url_for('rest_layer.get', layername=name, username=username),
             'uuid': info["uuid"],
+            'access_rights': info['access_rights'],
         }
         for (name, info) in sorted_infos
     ]
@@ -97,13 +98,18 @@ def post(username):
     if 'sld' in request.files and not request.files['sld'].filename == '':
         sld_file = request.files['sld']
 
+    actor_name = g.user and g.user["username"]
+
     task_options = {
         'crs_id': crs_id,
         'description': description,
         'title': title,
         'ensure_user': True,
         'check_crs': False,
+        'actor_name': actor_name,
     }
+
+    authz_util.setup_post_access_rights(request.form, task_options, actor_name)
 
     layerurl = url_for('rest_layer.get', layername=layername, username=username)
 

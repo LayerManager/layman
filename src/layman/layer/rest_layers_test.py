@@ -2,7 +2,7 @@ import sys
 
 del sys.modules['layman']
 
-from layman import app
+from layman import app, settings
 from .db import table
 from .prime_db_schema import table as prime_table
 from .filesystem import input_file, uuid, input_sld, input_chunk, thumbnail
@@ -33,8 +33,9 @@ def test_get_layer_infos(client):
                                         'title': layertitle,
                                         'uuid': uuid.get_layer_uuid(username, layername),
                                         'type': LAYER_TYPE,
-                                        # 'can_read': set(),
-                                        # 'can_write': set(),
+                                        'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                          'write': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                          }
                                         }}
         modules = [
             {'name': 'db.table',

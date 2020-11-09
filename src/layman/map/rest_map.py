@@ -8,7 +8,7 @@ from layman.util import check_username_decorator
 from . import util
 from .filesystem import input_file, thumbnail
 from layman.authn import authenticate
-from layman.authz import authorize
+from layman.authz import authorize, util as authz_util
 
 bp = Blueprint('rest_map', __name__)
 
@@ -81,7 +81,10 @@ def patch(username, mapname):
         'file_changed': file_changed,
         'http_method': 'patch',
         'metadata_properties_to_refresh': metadata_properties_to_refresh,
+        'actor_name': g.user and g.user["username"],
     }
+
+    authz_util.setup_patch_access_rights(request.form, kwargs)
 
     util.patch_map(
         username,
