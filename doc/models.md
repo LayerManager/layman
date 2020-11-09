@@ -57,6 +57,12 @@
 - Username can re reserved by [PATCH Current User](rest.md#patch-current-user)
 - Anonymous user has no username
 
+## Roles
+- Role is any group of users. One user can be assigned to multiple roles.
+- Each role is identified by name that is unique among all roles.
+- The name is upper-case (in contrast with [username](#username)).
+- Roles can be used for assigning access rights.
+
 ## Workspace
 - Workspace is group of Layman REST API endpoints whose URL path starts with the same `username` (i. e. `/rest/<username>`)
 - User represented by the `username` is considered as **owner** of the workspace
