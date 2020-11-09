@@ -477,6 +477,71 @@ def test_update_rights():
                                 [username, settings.RIGHTS_EVERYONE_ROLE, ],
                                 )
 
+        with pytest.raises(LaymanError) as exc_info:
+            case_test_update_rights(username,
+                                    publication_insert_info,
+                                    {"access_rights": {"read": {username2, },
+                                                       "write": {username2, },
+                                                       },
+                                     'actor_name': username2},
+                                    [username, username2, ],
+                                    [username, username2, ],
+                                    )
+            assert exc_info.value.code == 43
+
+        with pytest.raises(LaymanError) as exc_info:
+            case_test_update_rights(username,
+                                    publication_insert_info,
+                                    {"access_rights": {"read": {username, },
+                                                       },
+                                     'actor_name': username},
+                                    [username, username2, ],
+                                    [username, username2, ],
+                                    )
+            assert exc_info.value.code == 43
+
+        with pytest.raises(LaymanError) as exc_info:
+            case_test_update_rights(username,
+                                    publication_insert_info,
+                                    {"access_rights": {"read": {username, },
+                                                       },
+                                     'actor_name': username},
+                                    [username, username2, ],
+                                    [username, username2, ],
+                                    )
+            assert exc_info.value.code == 43
+
+        case_test_update_rights(username,
+                                publication_insert_info,
+                                {"access_rights": {"read": {username, },
+                                                   "write": {username, },
+                                                   },
+                                 'actor_name': username},
+                                [username, ],
+                                [username, ],
+                                )
+        with pytest.raises(LaymanError) as exc_info:
+            case_test_update_rights(username,
+                                    publication_insert_info,
+                                    {"access_rights": {"write": {username, username2, },
+                                                       },
+                                     'actor_name': username},
+                                    [username, username2, ],
+                                    [username, username2, username2, ],
+                                    )
+            assert exc_info.value.code == 43
+
+        with pytest.raises(LaymanError) as exc_info:
+            case_test_update_rights(username,
+                                    publication_insert_info,
+                                    {"access_rights": {"write": {settings.RIGHTS_EVERYONE_ROLE, },
+                                                       },
+                                     'actor_name': username},
+                                    [username, username2, ],
+                                    [settings.RIGHTS_EVERYONE_ROLE, ],
+                                    )
+            assert exc_info.value.code == 43
+
         publications.delete_publication(username, publication_insert_info["publ_type_name"], publication_insert_info["name"])
 
 
