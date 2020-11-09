@@ -355,7 +355,10 @@ def test_patch_current_user_without_username():
     exp_email = 'test2@liferay.com'
     exp_name = 'Test Test'
     mapname = 'map1'
-    process_client.publish_map(workspace, mapname, headers=test2_authn_headers)
+    # TODO remove EVERYONE
+    process_client.publish_map(workspace, mapname, headers=test2_authn_headers, access_rights={
+        'read': 'EVERYONE',
+    })
 
     with app.app_context():
         rest_path = url_for('rest_map_file.get', username=workspace, mapname=mapname)
