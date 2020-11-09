@@ -69,8 +69,8 @@ def authorize(workspace, publication_type, publication_name, request_method, act
         elif request_method in ['POST']:
             if actor_name == workspace:
                 return
-            elif ((not users.get_user_infos(workspace)) and  # public workspace
-                    can_user_publish_in_public_workspace(actor_name)):  # actor can publish in public workspace
+            elif ((not users.get_user_infos(workspace))  # public workspace
+                    and can_user_publish_in_public_workspace(actor_name)):  # actor can publish in public workspace
                 if workspaces.get_workspace_infos(workspace):  # workspaces exists
                     return
                 elif can_user_create_public_workspace(actor_name):  # workspaces can be created by actor
