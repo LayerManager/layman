@@ -116,6 +116,10 @@ def ensure_user(user, password, auth):
 
 
 def get_workspace_security_roles(workspace, type, auth):
+    return get_pattern_security_roles(workspace + '.*.' + type, auth)
+
+
+def get_pattern_security_roles(pattern, auth):
     r = requests.get(
         settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
         headers=headers_json,
@@ -124,7 +128,7 @@ def get_workspace_security_roles(workspace, type, auth):
     r.raise_for_status()
     rules = r.json()
     try:
-        rule = rules[workspace + '.*.' + type]
+        rule = rules[pattern]
         roles = set(rule.split(','))
     except KeyError:
         roles = set()

@@ -50,6 +50,7 @@ def liferay_mock():
                 'testmissingattr_authz': None,
                 'testmissingattr_authz2': None,
                 'test_authorize_decorator_user': None,
+                'test_patch_gs_access_rights_user': None,
             },
         },
         'host': '0.0.0.0',

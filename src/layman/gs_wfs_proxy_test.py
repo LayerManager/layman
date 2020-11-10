@@ -1,13 +1,12 @@
 import requests
-from urllib.parse import urljoin
 from owslib.feature.schema import get_schema as get_wfs_schema
 
 from layman import app
 from layman import settings
 from layman.layer import db
+from test.process_client import get_authz_headers
 from test import process, process_client as client_util, flask_client
 from test.data import wfs as data_wfs
-from layman.layer.geoserver.util import wfs_proxy
 from layman.layer.geoserver import wfs as geoserver_wfs
 
 liferay_mock = process.liferay_mock
