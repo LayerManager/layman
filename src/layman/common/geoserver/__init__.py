@@ -182,7 +182,6 @@ def layman_users_to_geoserver_roles(layman_users):
             geoserver_roles.add('ROLE_ANONYMOUS')
         else:
             geoserver_roles.add(username_to_rolename(layman_user))
-    geoserver_roles.add(settings.LAYMAN_GS_ROLE)
     return geoserver_roles
 
 
