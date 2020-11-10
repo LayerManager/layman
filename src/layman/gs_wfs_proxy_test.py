@@ -52,12 +52,6 @@ def test_rest_get(client):
     flask_client.delete_layer(username, layername, client)
 
 
-def get_auth_header(username):
-    return {f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-            f'{TOKEN_HEADER}': f'Bearer {username}',
-            }
-
-
 def setup_user_layer(username, layername, authn_headers):
     client_util.reserve_username(username, headers=authn_headers)
     ln = client_util.publish_layer(username, layername, [
@@ -166,7 +160,7 @@ def test_missing_attribute(liferay_mock):
     layername2 = 'inexisting_attribute_layer2'
 
     layman_process = process.start_layman(AUTHN_SETTINGS)
-    authn_headers = get_auth_header(username)
+    authn_headers = get_authz_headers(username)
     headers = {
         'Accept': 'text/xml',
         'Content-type': 'text/xml',
@@ -294,8 +288,8 @@ def test_missing_attribute_authz(liferay_mock):
     layername1 = 'testmissingattr_authz_layer'
     username2 = 'testmissingattr_authz2'
 
-    authn_headers1 = get_auth_header(username)
-    authn_headers2 = get_auth_header(username2)
+    authn_headers1 = get_authz_headers(username)
+    authn_headers2 = get_authz_headers(username2)
     headers1 = {
         'Accept': 'text/xml',
         'Content-type': 'text/xml',
