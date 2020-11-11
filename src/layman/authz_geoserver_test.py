@@ -1,4 +1,3 @@
-import os
 import pytest
 import importlib
 
@@ -7,8 +6,6 @@ from layman.common import geoserver
 
 from test import process, process_client as client_util
 
-
-settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 liferay_mock = process.liferay_mock
 

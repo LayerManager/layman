@@ -69,7 +69,7 @@ def publish_layer(username,
 
     with app.app_context():
         url = url_for('rest_layer.get', username=username, layername=layername)
-    wait_for_rest(url, 20, 0.5, layer_keys_to_check, headers=headers)
+    wait_for_rest(url, 30, 0.5, layer_keys_to_check, headers=headers)
     return layername
 
 
@@ -107,7 +107,7 @@ def patch_layer(username,
 
     with app.app_context():
         url = url_for('rest_layer.get', username=username, layername=layername)
-    wait_for_rest(url, 20, 0.5, layer_keys_to_check, headers=headers)
+    wait_for_rest(url, 30, 0.5, layer_keys_to_check, headers=headers)
     wfs.clear_cache(username)
     wms.clear_cache(username)
     return layername
@@ -136,7 +136,7 @@ def patch_map(username,
 
     with app.app_context():
         url = url_for('rest_map.get', username=username, mapname=mapname)
-    wait_for_rest(url, 20, 0.5, map_keys_to_check, headers=headers)
+    wait_for_rest(url, 30, 0.5, map_keys_to_check, headers=headers)
     wfs.clear_cache(username)
     wms.clear_cache(username)
     return mapname
@@ -186,7 +186,7 @@ def publish_map(username,
 
     with app.app_context():
         url = url_for('rest_map.get', username=username, mapname=mapname)
-    wait_for_rest(url, 20, 0.5, map_keys_to_check, headers=headers)
+    wait_for_rest(url, 30, 0.5, map_keys_to_check, headers=headers)
     return mapname
 
 
