@@ -32,20 +32,7 @@ def assert_gs_user_and_roles(username):
     assert settings.LAYMAN_GS_ROLE in gs_user_roles
 
 
-def assert_gs_rewe_data_security(username):
-    auth = settings.LAYMAN_GS_AUTH
-    user_role = f"USER_{username.upper()}"
-    gs_roles = geoserver.get_workspace_security_roles(username, 'r', auth)
-    assert settings.LAYMAN_GS_ROLE in gs_roles
-    assert 'ROLE_ANONYMOUS' in gs_roles
-    assert 'ROLE_AUTHENTICATED' in gs_roles
-    gs_roles = geoserver.get_workspace_security_roles(username, 'w', auth)
-    assert settings.LAYMAN_GS_ROLE in gs_roles
-    assert 'ROLE_ANONYMOUS' in gs_roles
-    assert 'ROLE_AUTHENTICATED' in gs_roles
-
-
-def assert_gs_rewo_data_security(username):
+def assert_gs_workspace_data_security(username):
     auth = settings.LAYMAN_GS_AUTH
     user_role = f"USER_{username.upper()}"
     gs_roles = geoserver.get_workspace_security_roles(username, 'r', auth)
@@ -54,39 +41,98 @@ def assert_gs_rewo_data_security(username):
     assert 'ROLE_AUTHENTICATED' in gs_roles
     gs_roles = geoserver.get_workspace_security_roles(username, 'w', auth)
     assert user_role in gs_roles
-    assert 'ROLE_ANONYMOUS' not in gs_roles
-    assert 'ROLE_AUTHENTICATED' not in gs_roles
 
 
-def test_rewe(liferay_mock):
-    pass
-    # todo adjust for new authz module
+def assert_gs_layer_data_security(username,
+                                  layername,
+                                  expected_roles):
+    auth = settings.LAYMAN_GS_AUTH
+    for right_type in ['read', 'write']:
+        gs_expected_roles = geoserver.layman_users_to_geoserver_roles(expected_roles[right_type].split(','))
+        gs_roles = geoserver.get_pattern_security_roles(f'{username}.{layername}.{right_type[0]}', auth)
+        assert gs_expected_roles == gs_roles
 
-    # test_user1 = 'test_rewe1'
-    # layername1 = 'layer1'
+
+def case_test_gs_rules(username,
+                       layername,
+                       authn_headers,
+                       roles_post,
+                       roles_patch_list):
+    ln = client_util.publish_layer(username,
+                                   layername,
+                                   access_rights=roles_post,
+                                   headers=authn_headers)
+    assert ln == layername
+    client_util.assert_user_layers(username, [layername], authn_headers)
+    assert_gs_user_and_roles(username)
+    assert_gs_workspace_data_security(username)
+    assert_gs_layer_data_security(username, layername, roles_post)
+
+    for roles_patch in roles_patch_list:
+        ln = client_util.patch_layer(username,
+                                     layername,
+                                     access_rights=roles_patch,
+                                     headers=authn_headers)
+        assert ln == layername
+        client_util.assert_user_layers(username, [layername], authn_headers)
+        assert_gs_user_and_roles(username)
+        assert_gs_workspace_data_security(username)
+        assert_gs_layer_data_security(username, layername, roles_patch)
+
+    client_util.delete_layer(username, layername, headers=authn_headers)
+
+
+def test_gs_rules(liferay_mock):
+    username = 'test_gs_rules_user'
+    layername1 = 'test_gs_rules_layer'
+
+    layman_process = process.start_layman(dict(**AUTHN_SETTINGS))
+    authn_headers1 = {
+        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+        f'{TOKEN_HEADER}': f'Bearer {username}',
+    }
+    client_util.reserve_username(username, headers=authn_headers1)
+    assert_gs_user_and_roles(username)
+    assert_gs_workspace_data_security(username)
+
+    case_test_gs_rules(username,
+                       layername1,
+                       authn_headers1,
+                       {'read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+                        'write': f'{settings.RIGHTS_EVERYONE_ROLE}'},
+                       [{'read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+                         'write': f'{settings.RIGHTS_EVERYONE_ROLE}'}, ],
+                       )
+
+    case_test_gs_rules(username,
+                       layername1,
+                       authn_headers1,
+                       {'read': f'{username}',
+                        'write': f'{username}'},
+                       [{'read': f'{username}',
+                         'write': f'{username}'}, ],
+                       )
+
+    # TODO
+    # case_test_gs_rules(username,
+    #                    layername1,
+    #                    authn_headers1,
+    #                    {'read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+    #                     'write': f'{settings.RIGHTS_EVERYONE_ROLE}'},
+    #                    [{'read': f'{username}',
+    #                      'write': f'{username}'}, ],
+    #                    )
     #
-    # layman_process = process.start_layman(dict({
-    #     'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_everyone',
-    # }, **AUTHN_SETTINGS))
-    # authn_headers1 = {
-    #     f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-    #     f'{TOKEN_HEADER}': f'Bearer {test_user1}',
-    # }
-    # client_util.reserve_username(test_user1, headers=authn_headers1)
-    # assert_gs_user_and_roles(test_user1)
-    # assert_gs_rewe_data_security(test_user1)
-    #
-    # ln = client_util.publish_layer(test_user1, layername1, [
-    #     'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
-    # ], headers=authn_headers1)
-    # assert ln == layername1
-    # client_util.assert_user_layers(test_user1, [layername1])
-    # assert_gs_user_and_roles(test_user1)
-    # assert_gs_rewe_data_security(test_user1)
-    #
-    # client_util.delete_layer(test_user1, layername1, headers=authn_headers1)
-    #
-    # process.stop_process(layman_process)
+    # case_test_gs_rules(username,
+    #                    layername1,
+    #                    authn_headers1,
+    #                    {'read': f'{username}',
+    #                     'write': f'{username}'},
+    #                    [{'read': f'{settings.RIGHTS_EVERYONE_ROLE}',
+    #                      'write': f'{settings.RIGHTS_EVERYONE_ROLE}'}, ],
+    #                    )
+
+    process.stop_process(layman_process)
 
 
 def test_rewo(liferay_mock):

@@ -40,10 +40,7 @@ def liferay_mock():
             'SERVER_NAME': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}",
             'SESSION_COOKIE_DOMAIN': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}",
             'OAUTH2_USERS': {
-                'test_rewe1': None,
-                'test_rewo1': None,
-                'test_rewe_rewo1': None,
-                'test_rewe_rewo2': None,
+                'test_gs_rules_user': None,
                 'testproxy': None,
                 'testproxy2': None,
                 'testmissingattr': None,

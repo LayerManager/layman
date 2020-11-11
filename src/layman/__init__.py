@@ -64,6 +64,7 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
                 ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
 
         with app.app_context():
+            # app.logger.info(f'Ensure prime DB schema')
             import layman.common.prime_db_schema.schema_initialization as prime_db_schema
             prime_db_schema.check_schema_name(settings.LAYMAN_PRIME_SCHEMA)
             prime_db_schema.ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
@@ -92,6 +93,10 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
         while(settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done'):
             app.logger.info(f'Waiting for flask process to adjust dependencies')
             time.sleep(1)
+
+
+app.register_blueprint(users_bp, url_prefix=f'/rest/{settings.REST_USERS_PREFIX}')
+app.register_blueprint(current_user_bp, url_prefix='/rest/current-user')
 
 
 @app.route('/')
