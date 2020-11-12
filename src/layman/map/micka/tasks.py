@@ -16,13 +16,13 @@ def refresh_csw_needed(username, mapname, task_options):
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_csw(self, username, mapname, http_method='post', metadata_properties_to_refresh=None):
+def refresh_csw(self, username, mapname, http_method='post', metadata_properties_to_refresh=None, actor_name=None):
     if self.is_aborted():
         raise AbortedException
     if http_method == 'post':
-        csw.csw_insert(username, mapname)
+        csw.csw_insert(username, mapname, actor_name=actor_name)
     else:
-        csw.patch_map(username, mapname, metadata_properties_to_refresh=metadata_properties_to_refresh)
+        csw.patch_map(username, mapname, metadata_properties_to_refresh=metadata_properties_to_refresh, actor_name=actor_name)
 
     if self.is_aborted():
         csw.delete_map(username, mapname)
@@ -38,13 +38,13 @@ def refresh_soap_needed(username, mapname, task_options):
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_soap(self, username, mapname, http_method='post', metadata_properties_to_refresh=None):
+def refresh_soap(self, username, mapname, http_method='post', metadata_properties_to_refresh=None, actor_name=None):
     if self.is_aborted():
         raise AbortedException
     if http_method == 'post':
-        soap.soap_insert(username, mapname)
+        soap.soap_insert(username, mapname, actor_name=actor_name)
     else:
-        csw.patch_map(username, mapname, metadata_properties_to_refresh=metadata_properties_to_refresh)
+        csw.patch_map(username, mapname, metadata_properties_to_refresh=metadata_properties_to_refresh, actor_name=actor_name)
 
     if self.is_aborted():
         csw.delete_map(username, mapname)

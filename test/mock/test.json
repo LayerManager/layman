@@ -1,0 +1,148 @@
+{
+  'metadata_properties': {
+    'abstract': {
+      'equal': True,
+      'equal_or_null': True,
+      'values': {
+        's1': 'World places and boundaries abstract',
+        's2': 'World places and boundaries abstract',
+        's3': 'World places and boundaries abstract'
+      }
+    },
+    'extent': {
+      'equal': True,
+      'equal_or_null': True,
+      'values': {
+        's2': [
+          -35.0,
+          -48.5,
+          179.0,
+          81.5
+        ],
+        's3': [
+          -35.0,
+          -48.5,
+          179.0,
+          81.5
+        ]
+      }
+    },
+    'graphic_url': {
+      'equal': True,
+      'equal_or_null': True,
+      'values': {
+        's1': 'http://layman_test_run_1:8000/rest/test_map_with_unauthorized_layer_user1/maps/test_map_with_unauthorized_layer_map1/thumbnail',
+        's3': 'http://layman_test_run_1:8000/rest/test_map_with_unauthorized_layer_user1/maps/test_map_with_unauthorized_layer_map1/thumbnail'
+      }
+    },
+    'identifier': {
+      'equal': True,
+      'equal_or_null': True,
+      'values': {
+        's1': {
+          'identifier': 'http://layman_test_run_1:8000/rest/test_map_with_unauthorized_layer_user1/maps/test_map_with_unauthorized_layer_map1',
+          'label': 'test_map_with_unauthorized_layer_map1'
+        },
+        's3': {
+          'identifier': 'http://layman_test_run_1:8000/rest/test_map_with_unauthorized_layer_user1/maps/test_map_with_unauthorized_layer_map1',
+          'label': 'test_map_with_unauthorized_layer_map1'
+        }
+      }
+    },
+    'map_endpoint': {
+      'equal': True,
+      'equal_or_null': True,
+      'values': {
+        's1': 'http://layman_test_run_1:8000/rest/test_map_with_unauthorized_layer_user1/maps/test_map_with_unauthorized_layer_map1',
+        's3': 'http://layman_test_run_1:8000/rest/test_map_with_unauthorized_layer_user1/maps/test_map_with_unauthorized_layer_map1'
+      }
+    },
+    'map_file_endpoint': {
+      'equal': True,
+      'equal_or_null': True,
+      'values': {
+        's1': 'http://layman_test_run_1:8000/rest/test_map_with_unauthorized_layer_user1/maps/test_map_with_unauthorized_layer_map1/file',
+        's3': 'http://layman_test_run_1:8000/rest/test_map_with_unauthorized_layer_user1/maps/test_map_with_unauthorized_layer_map1/file'
+      }
+    },
+    'operates_on': {
+      'equal': True,
+      'equal_or_null': True,
+      'values': {
+        's2': [
+          {
+            'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-74f3a0a0-22ad-46ac-b803-b5247a10899c#_m-74f3a0a0-22ad-46ac-b803-b5247a10899c',
+            'xlink:title': 'test_map_with_unauthorized_layer_layer1'
+          },
+          {
+            'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-f76e4ebf-ea1d-4e50-9647-913fb41c022b#_m-f76e4ebf-ea1d-4e50-9647-913fb41c022b',
+            'xlink:title': 'test_map_with_unauthorized_layer_layer2'
+          }
+        ],
+        's3': [
+          {
+            'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-74f3a0a0-22ad-46ac-b803-b5247a10899c#_m-74f3a0a0-22ad-46ac-b803-b5247a10899c',
+            'xlink:title': 'test_map_with_unauthorized_layer_layer1'
+          },
+          {
+            'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-f76e4ebf-ea1d-4e50-9647-913fb41c022b#_m-f76e4ebf-ea1d-4e50-9647-913fb41c022b',
+            'xlink:title': 'test_map_with_unauthorized_layer_layer2'
+          }
+        ]
+      }
+    },
+    'organisation_name': {
+      'equal': True,
+      'equal_or_null': True,
+      'values': {
+        's3': None
+      }
+    },
+    'publication_date': {
+      'equal': True,
+      'equal_or_null': True,
+      'values': {
+        's3': '2020-11-10'
+      }
+    },
+    'reference_system': {
+      'equal': True,
+      'equal_or_null': True,
+      'values': {
+        's2': [
+          3857
+        ],
+        's3': [
+          3857
+        ]
+      }
+    },
+    'revision_date': {
+      'equal': True,
+      'equal_or_null': True,
+      'values': {
+        's3': None
+      }
+    },
+    'title': {
+      'equal': True,
+      'equal_or_null': True,
+      'values': {
+        's1': 'World places and boundaries',
+        's2': 'World places and boundaries',
+        's3': 'World places and boundaries'
+      }
+    }
+  },
+  'metadata_sources': {
+    's1': {
+      'url': 'http://layman_test_run_1:8000/rest/test_map_with_unauthorized_layer_user1/maps/test_map_with_unauthorized_layer_map1'
+    },
+    's2': {
+      'url': 'http://layman_test_run_1:8000/rest/test_map_with_unauthorized_layer_user1/maps/test_map_with_unauthorized_layer_map1/file'
+    },
+    's3': {
+      'url': 'http://localhost:3080/csw?service=CSW&version=2.0.2&request=GetRecordById&outputFormat=application%2Fxml&outputSchema=http%3A%2F%2Fwww.isotc211.org%2F2005%2Fgmd&elementsetname=full&id=m-ea1260fd-9389-4dd4-b6f8-3e6c8b34818d'
+    }
+  }
+}
