@@ -152,4 +152,14 @@ def test_gs_rules(liferay_mock):
                          'write': f'{username}'}, ],
                        )
 
+    case_test_gs_rules(username,
+                       layername1,
+                       authn_headers1,
+                       {'read': f'{username}',
+                        'write': f'{username}'},
+                       [None],
+                       [{'read': f'{username}',
+                         'write': f'{username}'}, ],
+                       )
+
     process.stop_process(layman_process)
