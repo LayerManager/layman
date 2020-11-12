@@ -154,6 +154,13 @@ def can_user_create_public_workspace(username):
     return is_user_in_access_rule(username, settings.GRANT_CREATE_PUBLIC_WORKSPACE)
 
 
+def can_user_read_publication(username, workspace, publication_type, publication_name):
+    publ_info = publications.get_publication_infos(workspace_name=workspace, pub_type=publication_type).get(
+        (workspace, publication_type, publication_name)
+    )
+    return publ_info and is_user_in_access_rule(username, publ_info['access_rights']['read'])
+
+
 def can_i_edit(publ_type, username, publication_name):
     # TODO consider functionality
     return g.user is not None and g.user['username'] == username

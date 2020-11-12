@@ -17,8 +17,9 @@ from layman.map.filesystem.input_file import get_map_json, unquote_urls
 from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer.geoserver.wms import get_layer_info as wms_get_layer_info
 from layman.layer.micka.csw import get_layer_info as csw_get_layer_info
+from layman.layer import LAYER_TYPE
 from layman.util import url_for, USERNAME_ONLY_PATTERN
-from layman.common import util as layman_util
+from layman import authz
 from lxml import etree as ET
 
 
@@ -91,7 +92,7 @@ def post_map(username, mapname):
     pass
 
 
-def patch_map(username, mapname, metadata_properties_to_refresh=None):
+def patch_map(username, mapname, metadata_properties_to_refresh=None, actor_name=None):
     # current_app.logger.info(f"patch_map metadata_properties_to_refresh={metadata_properties_to_refresh}")
     metadata_properties_to_refresh = metadata_properties_to_refresh or []
     if len(metadata_properties_to_refresh) == 0:
@@ -103,10 +104,10 @@ def patch_map(username, mapname, metadata_properties_to_refresh=None):
     muuid = get_metadata_uuid(uuid)
     el = common_util.get_record_element_by_id(csw, muuid)
     if el is None:
-        return csw_insert(username, mapname)
+        return csw_insert(username, mapname, actor_name=actor_name)
     # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
 
-    _, prop_values = get_template_path_and_values(username, mapname, http_method='patch')
+    _, prop_values = get_template_path_and_values(username, mapname, http_method='patch', actor_name=actor_name)
     prop_values = {
         k: v for k, v in prop_values.items()
         if k in metadata_properties_to_refresh + ['md_date_stamp']
@@ -128,8 +129,8 @@ def patch_map(username, mapname, metadata_properties_to_refresh=None):
     return muuid
 
 
-def csw_insert(username, mapname):
-    template_path, prop_values = get_template_path_and_values(username, mapname, http_method='post')
+def csw_insert(username, mapname, actor_name):
+    template_path, prop_values = get_template_path_and_values(username, mapname, http_method='post', actor_name=actor_name)
     record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
     try:
         muuid = common_util.csw_insert({
@@ -141,7 +142,7 @@ def csw_insert(username, mapname):
     return muuid
 
 
-def map_json_to_operates_on(map_json):
+def map_json_to_operates_on(map_json, operates_on_muuids_filter=None, editor=None):
     unquote_urls(map_json)
     gs_url = get_gs_proxy_base_url()
     gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
@@ -175,6 +176,11 @@ def map_json_to_operates_on(map_json):
         if not (layer_metadata and layer_wms):
             continue
         layer_muuid = layer_metadata['metadata']['identifier']
+        if operates_on_muuids_filter is not None:
+            if layer_muuid not in operates_on_muuids_filter:
+                continue
+        elif not authz.can_user_read_publication(editor, layer_username, LAYER_TYPE, layername):
+            continue
         layer_title = layer_wms['title']
         layer_csw_url = f"{csw_url}?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID={layer_muuid}#_{layer_muuid}"
         operates_on.append({
@@ -193,13 +199,13 @@ def map_json_to_epsg_codes(map_json):
     return [epsg_code] if epsg_code else None
 
 
-def get_template_path_and_values(username, mapname, http_method=None):
+def get_template_path_and_values(username, mapname, http_method=None, actor_name=None):
     assert http_method in ['post', 'patch']
     uuid_file_path = get_publication_uuid_file(MAP_TYPE, username, mapname)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
     revision_date = datetime.now()
     map_json = get_map_json(username, mapname)
-    operates_on = map_json_to_operates_on(map_json)
+    operates_on = map_json_to_operates_on(map_json, editor=actor_name)
     md_language = next(iter(common_language.get_languages_iso639_2(' '.join([
         map_json['title'] or '',
         map_json['abstract'] or ''

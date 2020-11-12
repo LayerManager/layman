@@ -5,6 +5,7 @@ from io import BytesIO
 from owslib.csw import CatalogueServiceWeb
 from xml.sax.saxutils import escape
 from lxml import etree as ET
+import urllib.parse as urlparse
 from layman import settings, LaymanError
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
 import requests
@@ -571,3 +572,15 @@ def get_record_element_by_id(csw, id):
     # current_app.logger.info(f"Number of md records id={id}: {len(els)}")
     result = els[0] if len(els) > 0 else None
     return result
+
+
+def get_muuid_from_operates_on_link(operates_on_link):
+    link_url = urlparse.urlparse(operates_on_link)
+    return urlparse.parse_qs(link_url.query)['ID'][0]
+
+
+def operates_on_values_to_muuids(operates_on_values):
+    return [
+        get_muuid_from_operates_on_link(operates_on['xlink:href'])
+        for operates_on in operates_on_values
+    ]

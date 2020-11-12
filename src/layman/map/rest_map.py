@@ -81,7 +81,7 @@ def patch(username, mapname):
         'file_changed': file_changed,
         'http_method': 'patch',
         'metadata_properties_to_refresh': metadata_properties_to_refresh,
-        'actor_name': g.user and g.user["username"],
+        'actor_name': g.user and g.user.get("username"),
     }
 
     authz_util.setup_patch_access_rights(request.form, kwargs)
