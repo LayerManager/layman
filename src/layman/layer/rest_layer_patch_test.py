@@ -126,7 +126,8 @@ def case_test_gs_rules(username,
                              )
 
 
-def test_access_rights(liferay_mock):
+@pytest.mark.usefixture('liferay_mock')
+def test_access_rights():
     username = 'test_gs_rules_user'
     layername1 = 'test_gs_rules_layer'
 
