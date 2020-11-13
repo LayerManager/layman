@@ -49,7 +49,7 @@ def assert_gs_layer_data_security(username,
         gs_expected_roles = geoserver.layman_users_to_geoserver_roles(expected_roles[right_type])
         gs_roles = geoserver.get_pattern_security_roles(f'{username}.{layername}.{right_type[0]}', auth)
         assert gs_expected_roles == gs_roles\
-               or ('ROLE_ANONYMOUS' in gs_expected_roles and 'ROLE_ANONYMOUS' in gs_roles), right_type
+            or ('ROLE_ANONYMOUS' in gs_expected_roles and 'ROLE_ANONYMOUS' in gs_roles), right_type
 
 
 def assert_layman_layer_access_rights(username,
