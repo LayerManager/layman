@@ -15,11 +15,8 @@ from layman.map import MAP_TYPE
 from layman.map.filesystem.uuid import get_map_uuid
 from layman.map.filesystem.input_file import get_map_json, unquote_urls
 from layman.layer.geoserver.util import get_gs_proxy_base_url
-from layman.layer.geoserver.wms import get_layer_info as wms_get_layer_info
-from layman.layer.micka.csw import get_layer_info as csw_get_layer_info
 from layman.layer import LAYER_TYPE
-from layman.util import url_for, USERNAME_ONLY_PATTERN
-from layman import authz
+from layman.util import url_for, USERNAME_ONLY_PATTERN, get_publication_info
 from lxml import etree as ET
 
 
@@ -171,17 +168,24 @@ def map_json_to_operates_on(map_json, operates_on_muuids_filter=None, editor=Non
     operates_on = []
     csw_url = settings.CSW_PROXY_URL
     for (layer_username, layername) in layman_layer_names:
-        layer_metadata = csw_get_layer_info(layer_username, layername)
-        layer_wms = wms_get_layer_info(layer_username, layername)
-        if not (layer_metadata and layer_wms):
-            continue
-        layer_muuid = layer_metadata['metadata']['identifier']
+        layer_md_info = get_publication_info(layer_username, LAYER_TYPE, layername, context={
+            'sources_filter': 'layman.layer.micka.soap',
+        })
+        layer_muuid = layer_md_info.get('metadata', {}).get('identifier')
         if operates_on_muuids_filter is not None:
             if layer_muuid not in operates_on_muuids_filter:
                 continue
-        elif not authz.can_user_read_publication(editor, layer_username, LAYER_TYPE, layername):
-            continue
-        layer_title = layer_wms['title']
+            layer_wms_info = get_publication_info(layer_username, LAYER_TYPE, layername, context={
+                'sources_filter': 'layman.layer.geoserver.wms',
+            })
+        else:
+            layer_wms_info = get_publication_info(layer_username, LAYER_TYPE, layername, context={
+                'sources_filter': 'layman.layer.geoserver.wms',
+                'actor_name': editor,
+            })
+            if not (layer_muuid and layer_wms_info):
+                continue
+        layer_title = layer_wms_info['title']
         layer_csw_url = f"{csw_url}?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID={layer_muuid}#_{layer_muuid}"
         operates_on.append({
             'xlink:title': layer_title,
