@@ -205,3 +205,44 @@ def url_for(endpoint, **values):
     else:
         result = flask_url_for(endpoint, **values, _external=True)
     return result
+
+
+def get_publication_info(workspace, publ_type, publ_name, context=None):
+    from layman import authz
+    from layman.common.prime_db_schema import publications
+    from layman.layer import util as layer_util, LAYER_TYPE
+    from layman.map import util as map_util, MAP_TYPE
+    context = context or {}
+
+    # TODO adjust when get_publication_info is implemented on sources
+    sources = {
+        LAYER_TYPE: layer_util.get_sources,
+        MAP_TYPE: map_util.get_sources,
+    }[publ_type]()
+    if 'sources_filter' in context:
+        sources = [
+            s for s in sources if s.__name__ in context['sources_filter']
+        ]
+
+    # TODO adjust when get_publication_info is implemented on sources
+    info_method = {
+        LAYER_TYPE: 'get_layer_info',
+        MAP_TYPE: 'get_map_info',
+    }[publ_type]
+    partial_infos = call_modules_fn(sources, info_method, [workspace, publ_name])
+
+    result = {}
+    for pi in partial_infos:
+        result.update(pi)
+
+    if 'actor_name' in context:
+        actor = context['actor_name']
+        read_access_users = result.get('access_rights', {}).get('read')
+        if not read_access_users:
+            read_access_users = publications.get_publication_infos(workspace, publ_type).get(
+                (workspace, publ_type, publ_name)
+            )['access_rights']['read']
+        if not authz.is_user_in_access_rule(actor, read_access_users):
+            result = {}
+
+    return result
