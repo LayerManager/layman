@@ -126,16 +126,13 @@ def case_test_gs_rules(username,
                              )
 
 
-@pytest.mark.usefixture('liferay_mock')
-def test_access_rights():
+def test_access_rights(liferay_mock):
     username = 'test_gs_rules_user'
     layername1 = 'test_gs_rules_layer'
 
-    layman_process = process.start_layman(dict(**AUTHN_SETTINGS))
-    authn_headers1 = {
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-        f'{TOKEN_HEADER}': f'Bearer {username}',
-    }
+    layman_process = process.start_layman(AUTHN_SETTINGS)
+    authn_headers1 = client_util.get_authz_headers(username)
+
     client_util.reserve_username(username, headers=authn_headers1)
     assert_gs_user_and_roles(username)
     assert_gs_workspace_data_security(username)
