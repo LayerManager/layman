@@ -1,4 +1,6 @@
 import pytest
+import json
+
 from layman import app, settings, LaymanError
 from flask import g
 from . import authorize_decorator, parse_request_path, MULTI_PUBLICATION_PATH_PATTERN, SINGLE_PUBLICATION_PATH_PATTERN
@@ -95,3 +97,103 @@ def test_authorize_decorator(liferay_mock):
     process_client.delete_layer(username, layername, headers=user_authz_headers)
 
     process.stop_process(layman_process)
+
+
+def test_public_workspace_variable(liferay_mock):
+    def case_test_public_workspace_variable(create_public_workspace,
+                                            publish_in_public_workspace,
+                                            workspace_name,
+                                            layername,
+                                            authz_headers,
+                                            user_can_create,
+                                            anonymous_can_publish,
+                                            anonymous_can_create,
+                                            ):
+        def can_not_publish(workspace_name,
+                            layername,
+                            authz_headers=None,
+                            ):
+            r = process_client.publish_layer(workspace_name,
+                                             layername,
+                                             headers=authz_headers,
+                                             assert_status=False)
+            assert r.status_code == 403
+            details = json.loads(r.text)
+            assert details['code'] == 30
+            assert details['message'] == "Unauthorized access"
+
+        workspace_name2 = workspace_name + '2'
+        layername2 = layername + '2'
+        env_vars['GRANT_CREATE_PUBLIC_WORKSPACE'] = create_public_workspace
+        env_vars['GRANT_PUBLISH_IN_PUBLIC_WORKSPACE'] = publish_in_public_workspace
+        layman_process = process.start_layman(env_vars)
+
+        if user_can_create:
+            process_client.publish_layer(workspace_name, layername, headers=authz_headers)
+            if anonymous_can_publish:
+                process_client.publish_layer(workspace_name, layername2)
+                process_client.delete_layer(workspace_name, layername2)
+            process_client.delete_layer(workspace_name, layername, headers=authz_headers)
+        else:
+            can_not_publish(workspace_name, layername, authz_headers)
+
+        if anonymous_can_create:
+            process_client.publish_layer(workspace_name2, layername)
+            process_client.delete_layer(workspace_name2, layername)
+        else:
+            can_not_publish(workspace_name2, layername)
+
+        process.stop_process(layman_process)
+
+    layername = 'test_public_workspace_variable_layer'
+    username = 'test_public_workspace_variable_user'
+    workspace_name = 'test_public_workspace_variable_workspace'
+
+    user_authz_headers = process_client.get_authz_headers(username)
+    env_vars = dict(process.AUTHN_SETTINGS)
+
+    layman_process = process.start_layman(env_vars)
+    process_client.reserve_username(username, headers=user_authz_headers)
+    process.stop_process(layman_process)
+
+    ############################################
+    # I have to have different workspace name each time, as I tested also creation of new workspace
+    case_test_public_workspace_variable('EVERYONE',
+                                        'EVERYONE',
+                                        workspace_name + 'ee',
+                                        layername,
+                                        user_authz_headers,
+                                        True,
+                                        True,
+                                        True,
+                                        )
+
+    case_test_public_workspace_variable(username,
+                                        username,
+                                        workspace_name + 'uu',
+                                        layername,
+                                        user_authz_headers,
+                                        True,
+                                        False,
+                                        False,
+                                        )
+
+    case_test_public_workspace_variable('',
+                                        '',
+                                        workspace_name + 'xx',
+                                        layername,
+                                        user_authz_headers,
+                                        False,
+                                        False,
+                                        False,
+                                        )
+
+    case_test_public_workspace_variable(username,
+                                        'EVERYONE',
+                                        workspace_name + 'ue',
+                                        layername,
+                                        user_authz_headers,
+                                        True,
+                                        True,
+                                        False,
+                                        )

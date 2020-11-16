@@ -38,6 +38,7 @@ def publish_layer(username,
                   headers=None,
                   access_rights=None,
                   title=None,
+                  assert_status=True,
                   ):
     title = title or layername
     headers = headers or {}
@@ -62,14 +63,19 @@ def publish_layer(username,
                           files=files,
                           data=data,
                           headers=headers)
-        assert r.status_code == 200, r.text
+        if assert_status:
+            assert r.status_code == 200, r.text
+
     finally:
         for fp in files:
             fp[1][1].close()
 
     with app.app_context():
         url = url_for('rest_layer.get', username=username, layername=layername)
-    wait_for_rest(url, 30, 0.5, layer_keys_to_check, headers=headers)
+    if assert_status:
+        wait_for_rest(url, 30, 0.5, layer_keys_to_check, headers=headers)
+    else:
+        return r
     return layername
 
 
