@@ -82,6 +82,8 @@ def test_publication_basic():
             pubs = publications.get_publication_infos(username, publication_type)
             assert pubs.get((username, publication_type, publication_name)) is None
 
+            workspaces.delete_workspace(username)
+
     publications_by_type('test_publication_basic_layer',
                          LAYER_TYPE)
     publications_by_type('test_publication_basic_map',
@@ -113,6 +115,7 @@ def test_select_publications():
     with app.app_context():
         pubs = publications.get_publication_infos(username)
         assert len(pubs) == 0, pubs
+        workspaces.delete_workspace(username)
 
 
 def test_only_valid_names():
@@ -145,6 +148,9 @@ def test_only_valid_names():
         with pytest.raises(LaymanError) as exc_info:
             publications.only_valid_names({settings.RIGHTS_EVERYONE_ROLE, 'skaljgdalskfglshfgd', })
             assert exc_info.value.code == 43
+
+        users.delete_user(username)
+        workspaces.delete_workspace(workspace_name)
 
 
 def test_at_least_one_can_write():
@@ -273,6 +279,9 @@ def test_clear_roles():
         list = publications.clear_roles({username, settings.RIGHTS_EVERYONE_ROLE, }, username)
         assert list == set(), list
 
+        users.delete_user(username)
+        workspaces.delete_workspace(workspace_name)
+
 
 def assert_access_rights(workspace_name,
                          publication_name,
@@ -378,6 +387,10 @@ def test_insert_rights():
                                 [settings.RIGHTS_EVERYONE_ROLE, ],
                                 [settings.RIGHTS_EVERYONE_ROLE, ],
                                 )
+
+        users.delete_user(username)
+        users.delete_user(username2)
+        workspaces.delete_workspace(workspace_name)
 
 
 def test_update_rights():
@@ -543,6 +556,9 @@ def test_update_rights():
             assert exc_info.value.code == 43
 
         publications.delete_publication(username, publication_insert_info["publ_type_name"], publication_insert_info["name"])
+        users.delete_user(username)
+        users.delete_user(username2)
+        workspaces.delete_workspace(workspace_name)
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -568,72 +584,3 @@ def test_publications_same_name():
     process_client.delete_map(username, publ_name)
     process_client.delete_layer(username2, publ_name)
     process_client.delete_map(username2, publ_name)
-
-
-@pytest.mark.usefixtures('ensure_layman')
-def test_rights_by_rest():
-    def test_by_type(prefix,
-                     publication_type,
-                     publish_method,
-                     patch_method,
-                     delete_method):
-        workspace_name = prefix + '_workspace'
-        username = prefix + '_user'
-        username2 = prefix + '_user2'
-        publication_name = prefix + '_publication'
-
-        with app.app_context():
-            workspaces.ensure_workspace(workspace_name)
-            id_workspace_user = workspaces.ensure_workspace(username)
-            users.ensure_user(id_workspace_user, userinfo)
-            id_workspace_user2 = workspaces.ensure_workspace(username2)
-            users.ensure_user(id_workspace_user2, userinfo)
-
-            publish_method(workspace_name,
-                           publication_name,
-                           access_rights={'read': f'{settings.RIGHTS_EVERYONE_ROLE}, {username2}',
-                                          'write': f'{settings.RIGHTS_EVERYONE_ROLE}, {username2}'})
-            info = publications.get_publication_infos(workspace_name, publication_type)[
-                (workspace_name, publication_type, publication_name)]
-            assert info['access_rights']['read'] == [username2, settings.RIGHTS_EVERYONE_ROLE]
-            assert info['access_rights']['write'] == [username2, settings.RIGHTS_EVERYONE_ROLE]
-
-            patch_method(workspace_name,
-                         publication_name,
-                         access_rights={'read': f'{settings.RIGHTS_EVERYONE_ROLE}'})
-            info = publications.get_publication_infos(workspace_name, publication_type)[
-                (workspace_name, publication_type, publication_name)]
-            assert info['access_rights']['read'] == [settings.RIGHTS_EVERYONE_ROLE]
-            assert info['access_rights']['write'] == [username2, settings.RIGHTS_EVERYONE_ROLE]
-
-            patch_method(workspace_name,
-                         publication_name,
-                         access_rights={'write': f'{settings.RIGHTS_EVERYONE_ROLE}'})
-            info = publications.get_publication_infos(workspace_name, publication_type)[
-                (workspace_name, publication_type, publication_name)]
-            assert info['access_rights']['read'] == [settings.RIGHTS_EVERYONE_ROLE]
-            assert info['access_rights']['write'] == [settings.RIGHTS_EVERYONE_ROLE]
-
-            patch_method(workspace_name,
-                         publication_name,
-                         access_rights={'read': f'{settings.RIGHTS_EVERYONE_ROLE}, {username}',
-                                        'write': f'{settings.RIGHTS_EVERYONE_ROLE}, {username}'})
-            info = publications.get_publication_infos(workspace_name, publication_type)[
-                (workspace_name, publication_type, publication_name)]
-            assert info['access_rights']['read'] == [username, settings.RIGHTS_EVERYONE_ROLE]
-            assert info['access_rights']['write'] == [username, settings.RIGHTS_EVERYONE_ROLE]
-
-            delete_method(workspace_name, publication_name)
-
-    test_by_type('test_rest_layer_rights',
-                 LAYER_TYPE,
-                 process_client.publish_layer,
-                 process_client.patch_layer,
-                 process_client.delete_layer,
-                 )
-    test_by_type('test_rest_map_rights',
-                 MAP_TYPE,
-                 process_client.publish_map,
-                 process_client.patch_map,
-                 process_client.delete_map,
-                 )

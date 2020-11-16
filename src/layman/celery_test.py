@@ -9,14 +9,12 @@ import sys
 
 del sys.modules['layman']
 
-from layman.layer import LAYER_TYPE
 from layman import app as app, celery_app
-from layman import settings
-from layman import uuid
 from layman.layer import util as layer_util
 from layman.layer.filesystem import input_chunk
 from layman import celery as celery_util
 from layman.common import tasks as tasks_util
+from test import flask_client
 
 min_geojson = """
 {
@@ -28,38 +26,7 @@ min_geojson = """
 
 num_layers_before_test = 0
 
-
-@pytest.fixture(scope="module")
-def client():
-    # print('before app.test_client()')
-    client = app.test_client()
-
-    # print('before Process(target=app.run, kwargs={...')
-    server = Process(target=app.run, kwargs={
-        'host': '0.0.0.0',
-        'port': settings.LAYMAN_SERVER_NAME.split(':')[1],
-        'debug': False,
-    })
-    # print('before server.start()')
-    server.start()
-    time.sleep(1)
-
-    app.config['TESTING'] = True
-    app.config['DEBUG'] = True
-    app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
-    app.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
-
-    # print('before app.app_context()')
-    with app.app_context() as ctx:
-        publs_by_type = uuid.check_redis_consistency()
-        global num_layers_before_test
-        num_layers_before_test = len(publs_by_type[LAYER_TYPE])
-        yield client
-
-    # print('before server.terminate()')
-    server.terminate()
-    # print('before server.join()')
-    server.join()
+client = flask_client.client
 
 
 def test_single_abortable_task(client):
@@ -83,7 +50,8 @@ def test_single_abortable_task(client):
     filenames = ['abc.geojson']
     username = 'test_abort_user'
     layername = 'test_abort_layer'
-    files_to_upload = input_chunk.save_layer_files_str(username, layername, filenames, check_crs)
+    with app.app_context():
+        files_to_upload = input_chunk.save_layer_files_str(username, layername, filenames, check_crs)
     task_chain = chain(*[
         tasks_util._get_task_signature(username, layername, t, task_options, 'layername')
         for t in tasks
@@ -103,10 +71,12 @@ def test_single_abortable_task(client):
         i += 1
 
     assert results[0].state == results_copy[0].state == 'STARTED'
-    celery_util.abort_task_chain(results_copy)
+    with app.app_context():
+        celery_util.abort_task_chain(results_copy)
     # first one is failure, because it throws AbortedException
     assert results[0].state == results_copy[0].state == 'FAILURE'
-    layer_util.delete_layer(username, layername)
+    with app.app_context():
+        layer_util.delete_layer(username, layername)
 
 
 def test_abortable_task_chain(client):
@@ -132,7 +102,8 @@ def test_abortable_task_chain(client):
     filenames = ['abc.geojson']
     username = 'test_abort_user'
     layername = 'test_abort_layer2'
-    files_to_upload = input_chunk.save_layer_files_str(username, layername, filenames, check_crs)
+    with app.app_context():
+        files_to_upload = input_chunk.save_layer_files_str(username, layername, filenames, check_crs)
     task_chain = chain(*[
         tasks_util._get_task_signature(username, layername, t, task_options, 'layername')
         for t in tasks
@@ -157,10 +128,12 @@ def test_abortable_task_chain(client):
     assert results[1].state == results_copy[1].state == 'PENDING'
     assert results[2].state == results_copy[2].state == 'PENDING'
 
-    celery_util.abort_task_chain(results_copy)
+    with app.app_context():
+        celery_util.abort_task_chain(results_copy)
     # first one is failure, because it throws AbortedException
     assert results[0].state == results_copy[0].state == 'FAILURE'
     # second one (and all others) was revoked, but it was not started at all because of previous failure, so it's pending for ever
     assert results[1].state == results_copy[1].state == 'ABORTED'
     assert results[2].state == results_copy[2].state == 'ABORTED'
-    layer_util.delete_layer(username, layername)
+    with app.app_context():
+        layer_util.delete_layer(username, layername)

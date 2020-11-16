@@ -16,14 +16,12 @@ def publish_layer(username,
                   layername,
                   client,
                   title=None,
+                  file_paths=None,
                   ):
     title = title or layername
+    file_paths = file_paths or ['tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson', ]
     with app.app_context():
         rest_path = url_for('rest_layers.post', username=username)
-
-        file_paths = [
-            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
-        ]
 
         for fp in file_paths:
             assert os.path.isfile(fp)

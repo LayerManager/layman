@@ -29,7 +29,7 @@ def post_layer(username, layername):
     pass
 
 
-def patch_layer(username, layername, title, description):
+def patch_layer(username, layername, title, description, access_rights=None):
     keywords = [
         "features",
         layername,
@@ -57,6 +57,14 @@ def patch_layer(username, layername, title, description):
     r.raise_for_status()
     clear_cache(username)
     wms.clear_cache(username)
+
+    if access_rights and access_rights.get('read'):
+        security_read_roles = common_geoserver.layman_users_to_geoserver_roles(access_rights['read'])
+        common_geoserver.ensure_layer_security_roles(username, layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
+
+    if access_rights and access_rights.get('write'):
+        security_write_roles = common_geoserver.layman_users_to_geoserver_roles(access_rights['write'])
+        common_geoserver.ensure_layer_security_roles(username, layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
 
 
 def delete_layer(username, layername):

@@ -8,6 +8,7 @@ from flask import g, current_app as app
 from layman.http import LaymanError
 from layman import settings
 from layman.common import geoserver as common
+from layman.layer.prime_db_schema import table as prime_db_schema
 
 FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
 FLASK_RULES_KEY = f"{__name__}:RULES"
@@ -96,14 +97,17 @@ def publish_layer_from_db(username, layername, description, title, access_rights
     wfs.clear_cache(username)
     wms.clear_cache(username)
 
-    # TODO we need test that on PATCH Layer when file is set, but access_rights not, that access_rights will survive
-    # they probably won't, because access_rights are deleted with Layer, but new access rights were not send with PATCH
-    if access_rights and access_rights.get('read'):
-        security_read_roles = common.layman_users_to_geoserver_roles(access_rights['read'])
-        common.ensure_layer_security_roles(username, layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
-    if access_rights and access_rights.get('write'):
-        security_write_roles = common.layman_users_to_geoserver_roles(access_rights['write'])
-        common.ensure_layer_security_roles(username, layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
+    if not access_rights or not access_rights.get('read') or not access_rights.get('write'):
+        layer_info = prime_db_schema.get_layer_info(username, layername)
+
+    read_roles = (access_rights and access_rights.get('read')) or layer_info['access_rights']['read']
+    write_roles = (access_rights and access_rights.get('write')) or layer_info['access_rights']['write']
+
+    security_read_roles = common.layman_users_to_geoserver_roles(read_roles)
+    common.ensure_layer_security_roles(username, layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
+
+    security_write_roles = common.layman_users_to_geoserver_roles(write_roles)
+    common.ensure_layer_security_roles(username, layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
 
 
 def get_usernames():

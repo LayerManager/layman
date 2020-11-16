@@ -116,6 +116,10 @@ def ensure_user(user, password, auth):
 
 
 def get_workspace_security_roles(workspace, type, auth):
+    return get_pattern_security_roles(workspace + '.*.' + type, auth)
+
+
+def get_pattern_security_roles(pattern, auth):
     r = requests.get(
         settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
         headers=headers_json,
@@ -124,7 +128,7 @@ def get_workspace_security_roles(workspace, type, auth):
     r.raise_for_status()
     rules = r.json()
     try:
-        rule = rules[workspace + '.*.' + type]
+        rule = rules[pattern]
         roles = set(rule.split(','))
     except KeyError:
         roles = set()
@@ -182,7 +186,6 @@ def layman_users_to_geoserver_roles(layman_users):
             geoserver_roles.add('ROLE_ANONYMOUS')
         else:
             geoserver_roles.add(username_to_rolename(layman_user))
-    geoserver_roles.add(settings.LAYMAN_GS_ROLE)
     return geoserver_roles
 
 

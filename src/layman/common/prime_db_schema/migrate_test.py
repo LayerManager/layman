@@ -19,9 +19,9 @@ logger = logging.getLogger(__name__)
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_recreate_schema():
-    username = 'test_recreate_schema_user1'
-    process_client.publish_layer(username, 'test_recreate_schema_layer1')
-    process_client.publish_map(username, 'test_recreate_schema_map1')
+    username = 'test_recreate_schema_user'
+    process_client.publish_layer(username, 'test_recreate_schema_layer')
+    process_client.publish_map(username, 'test_recreate_schema_map')
 
     with app.app_context():
         run_statement(model.DROP_SCHEMA_SQL)
@@ -29,8 +29,8 @@ def test_recreate_schema():
                       settings.PUBLICATION_MODULES,
                       settings.RIGHTS_EVERYONE_ROLE)
 
-    process_client.delete_layer(username, 'test_recreate_schema_layer1')
-    process_client.delete_map(username, 'test_recreate_schema_map1')
+    process_client.delete_layer(username, 'test_recreate_schema_layer')
+    process_client.delete_map(username, 'test_recreate_schema_map')
 
     with app.app_context():
         pubs = pub_util.get_publication_infos(username)
@@ -39,9 +39,9 @@ def test_recreate_schema():
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_schema():
-    username = 'migration_test_user1'
-    layername = 'migration_test_layer1'
-    mapname = 'migration_test_map1'
+    username = 'test_schema_user'
+    layername = 'test_schema_layer'
+    mapname = 'test_schema_map'
     process_client.publish_layer(username, layername)
     process_client.publish_map(username, mapname)
 
@@ -69,9 +69,9 @@ def test_schema():
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_steps():
-    username = 'migration_test_user2'
-    process_client.publish_layer(username, 'migration_test_layer2')
-    process_client.publish_map(username, 'migration_test_map2')
+    username = 'test_steps_user'
+    process_client.publish_layer(username, 'test_steps_layer')
+    process_client.publish_map(username, 'test_steps_map')
 
     with app.app_context():
         run_statement(model.DROP_SCHEMA_SQL)
@@ -98,5 +98,5 @@ def test_steps():
         exists_pubs = run_query(f'select count(*) from {DB_SCHEMA}.publications;')
         assert exists_pubs[0][0] > 0
 
-    process_client.delete_layer(username, 'migration_test_layer2')
-    process_client.delete_map(username, 'migration_test_map2')
+    process_client.delete_layer(username, 'test_steps_layer')
+    process_client.delete_map(username, 'test_steps_map')
