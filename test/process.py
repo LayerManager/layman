@@ -50,6 +50,7 @@ def liferay_mock():
                 'test_patch_gs_access_rights_user': None,
                 'test_map_with_unauthorized_layer_user1': None,
                 'test_map_with_unauthorized_layer_user2': None,
+                'test_public_workspace_variable_user': None,
             },
         },
         'host': '0.0.0.0',
