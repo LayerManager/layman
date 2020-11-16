@@ -174,6 +174,7 @@ def publish_map(username,
                 file_paths=None,
                 headers=None,
                 access_rights=None,
+                assert_status=True,
                 ):
     headers = headers or {}
     file_paths = file_paths or ['sample/layman.map/full.json', ]
@@ -195,14 +196,18 @@ def publish_map(username,
                           files=files,
                           data=data,
                           headers=headers)
-        assert r.status_code == 200, r.text
+        if assert_status:
+            assert r.status_code == 200, r.text
     finally:
         for fp in files:
             fp[1][1].close()
 
     with app.app_context():
         url = url_for('rest_map.get', username=username, mapname=mapname)
-    wait_for_rest(url, 30, 0.5, map_keys_to_check, headers=headers)
+    if assert_status:
+        wait_for_rest(url, 30, 0.5, map_keys_to_check, headers=headers)
+    else:
+        return r
     return mapname
 
 
