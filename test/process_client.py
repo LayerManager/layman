@@ -159,6 +159,19 @@ def delete_layer(username, layername, headers=None):
     wms.clear_cache(username)
 
 
+def get_layer(username, layername, headers=None, assert_status=True,):
+    headers = headers or {}
+
+    with app.app_context():
+        r_url = url_for('rest_layer.get', username=username, layername=layername)
+    r = requests.get(r_url, headers=headers)
+    if assert_status:
+        assert r.status_code == 200, r.text
+        return r.json()
+    else:
+        return r
+
+
 def publish_map(username,
                 mapname,
                 file_paths=None,
@@ -218,6 +231,23 @@ def assert_user_layers(username, layernames, headers=None):
     assert r.status_code == 200, f"r.status_code={r.status_code}\nr.text={r.text}"
     layman_names = [li['name'] for li in r.json()]
     assert set(layman_names) == set(layernames), f"Layers {layernames} not equal to {r.text}"
+
+
+def assert_user_maps(username, mapnames, headers=None):
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
+    r_url = f"{rest_url}/{username}/maps"
+    r = requests.get(r_url, headers=headers)
+    assert r.status_code == 200, f"r.status_code={r.status_code}\nr.text={r.text}"
+    layman_names = [li['name'] for li in r.json()]
+    assert set(layman_names) == set(mapnames), f"Maps {mapnames} not equal to {r.text}"
+
+
+def get_map_metadata_comparison(username, mapname, headers=None):
+    with app.app_context():
+        r_url = url_for('rest_map_metadata_comparison.get', mapname=mapname, username=username)
+    r = requests.get(r_url, headers=headers)
+    assert r.status_code == 200, f"r.status_code={r.status_code}\nr.text={r.text}"
+    return r.json()
 
 
 def reserve_username(username, headers=None):
