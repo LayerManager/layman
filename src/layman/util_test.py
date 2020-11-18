@@ -5,6 +5,8 @@ from . import app as app, settings, LaymanError, util
 from .util import slugify, get_modules_from_names, get_providers_from_source_names
 from test import process
 
+ensure_layman = process.ensure_layman
+
 
 def test_slugify():
     assert slugify('Brno-město') == 'brno_mesto'
@@ -33,9 +35,8 @@ def assert_module_methods(module, methods):
                 f'Module {module.__name__} does not have {method} method.')
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_publication_interface_methods():
-    processes = process.start_layman()
-
     publication_source_methods = {
         'get_publication_uuid',
         'get_publication_infos',
@@ -105,5 +106,3 @@ def test_publication_interface_methods():
             methods = interface['methods']
             for module in modules:
                 assert_module_methods(module, methods)
-
-    process.stop_process(processes)
