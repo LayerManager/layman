@@ -22,8 +22,10 @@ ON CONFLICT (id_workspace) DO update SET id_workspace = EXCLUDED.id_workspace re
 
 
 def delete_user(username):
-    sql = f"delete from {DB_SCHEMA}.users where username = %s;"
-    util.run_statement(sql, (username,))
+    sql = f"delete from {DB_SCHEMA}.users where id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);"
+    deleted = util.run_statement(sql, (username,))
+    if deleted:
+        workspaces.delete_workspace(username)
 
 
 def get_user_infos(username=None):

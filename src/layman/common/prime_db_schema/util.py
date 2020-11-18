@@ -46,7 +46,10 @@ def run_statement(query, data=None, conn_cur=None):
     conn, cur = conn_cur
     try:
         cur.execute(query, data)
+        rows = cur.rowcount
         conn.commit()
     except BaseException as exc:
         app.logger.error(f"run_query, query={query}, data={data}, exc={exc}")
         raise LaymanError(7)
+
+    return rows
