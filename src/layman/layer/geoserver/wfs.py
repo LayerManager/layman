@@ -81,15 +81,21 @@ def get_wfs_url(username):
 
 
 def get_wfs_direct(username):
+    headers = {
+        settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
+    }
     ows_url = get_wfs_url(username)
     from .util import wfs_direct
     key = get_flask_proxy_key(username)
     redis_obj = settings.LAYMAN_REDIS.hgetall(key)
     string_value = redis_obj['value'] if redis_obj is not None else None
-    return wfs_direct(ows_url, xml=string_value)
+    return wfs_direct(ows_url, xml=string_value, headers=headers)
 
 
 def get_wfs_proxy(username):
+    headers = {
+        settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
+    }
     key = get_flask_proxy_key(username)
 
     ows_url = get_wfs_url(username)
@@ -99,7 +105,7 @@ def get_wfs_proxy(username):
             'SERVICE': 'WFS',
             'REQUEST': 'GetCapabilities',
             'VERSION': VERSION,
-        })
+        }, headers=headers)
         if r.status_code != 200:
             result = None
             if r.status_code != 404:
@@ -112,7 +118,7 @@ def get_wfs_proxy(username):
 
     def mem_value_from_string_value(string_value):
         from .util import wfs_proxy
-        wfs_proxy = wfs_proxy(ows_url, xml=string_value)
+        wfs_proxy = wfs_proxy(ows_url, xml=string_value, headers=headers)
         return wfs_proxy
 
     def currently_changing():

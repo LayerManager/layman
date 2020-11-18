@@ -54,15 +54,21 @@ def get_wms_url(username):
 
 
 def get_wms_direct(username):
+    headers = {
+        settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
+    }
     ows_url = get_wms_url(username)
     from .util import wms_direct
     key = get_flask_proxy_key(username)
     redis_obj = settings.LAYMAN_REDIS.hgetall(key)
     string_value = redis_obj['value'] if redis_obj is not None else None
-    return wms_direct(ows_url, xml=string_value)
+    return wms_direct(ows_url, xml=string_value, headers=headers)
 
 
 def get_wms_proxy(username):
+    headers = {
+        settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
+    }
     key = get_flask_proxy_key(username)
 
     ows_url = get_wms_url(username)
@@ -72,7 +78,7 @@ def get_wms_proxy(username):
             'SERVICE': 'WMS',
             'REQUEST': 'GetCapabilities',
             'VERSION': VERSION,
-        })
+        }, headers=headers)
         if r.status_code != 200:
             result = None
             if r.status_code != 404:
@@ -85,7 +91,7 @@ def get_wms_proxy(username):
 
     def mem_value_from_string_value(string_value):
         from .util import wms_proxy
-        wms_proxy = wms_proxy(ows_url, xml=string_value)
+        wms_proxy = wms_proxy(ows_url, xml=string_value, headers=headers)
         return wms_proxy
 
     def currently_changing():

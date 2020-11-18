@@ -1,5 +1,6 @@
 import os
 import pathlib
+import requests
 from urllib.parse import urljoin
 from layman import settings
 from flask import current_app
@@ -66,9 +67,12 @@ def get_layer_thumbnail_path(username, layername):
 
 
 def generate_layer_thumbnail(username, layername):
+    headers = {
+        settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
+    }
     wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
     from layman.layer.geoserver.util import wms_proxy
-    wms = wms_proxy(wms_url)
+    wms = wms_proxy(wms_url, headers=headers)
     # current_app.logger.info(list(wms.contents))
     bbox = list(next(t for t in wms[layername].crs_list if t[4].lower() == 'epsg:3857'))
     # current_app.logger.info(f"bbox={bbox}")
@@ -79,20 +83,37 @@ def generate_layer_thumbnail(username, layername):
         (bbox[0] + bbox[2]) / 2 + min_range,
         (bbox[1] + bbox[3]) / 2 + min_range,
     )
-    tn_img = wms.getmap(
-        layers=[layername],
-        srs='EPSG:3857',
-        bbox=tn_bbox,
-        size=(300, 300),
-        format='image/png',
-        transparent=True,
-    )
+    # TODO https://github.com/geopython/OWSLib/issues/709
+    # tn_img = wms.getmap(
+    #     layers=[layername],
+    #     srs='EPSG:3857',
+    #     bbox=tn_bbox,
+    #     size=(300, 300),
+    #     format='image/png',
+    #     transparent=True,
+    # )
     ensure_layer_thumbnail_dir(username, layername)
     tn_path = get_layer_thumbnail_path(username, layername)
-    out = open(tn_path, 'wb')
-    out.write(tn_img.read())
-    out.close()
-    return tn_img
+    # out = open(tn_path, 'wb')
+    # out.write(tn_img.read())
+    # out.close()
+
+    from layman.layer.geoserver.wms import VERSION
+    r = requests.get(wms_url, params={
+        'SERVICE': 'WMS',
+        'REQUEST': 'GetMap',
+        'VERSION': VERSION,
+        'LAYERS': layername,
+        'CRS': 'EPSG:3857',
+        'BBOX': ','.join([str(c) for c in tn_bbox]),
+        'WIDTH': 300,
+        'HEIGHT': 300,
+        'FORMAT': 'image/png',
+        'TRANSPARENT': 'TRUE',
+    }, headers=headers)
+    r.raise_for_status()
+    with open(tn_path, "wb") as out_file:
+        out_file.write(r.content)
 
 
 def get_metadata_comparison(username, layername):
