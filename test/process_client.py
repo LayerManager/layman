@@ -16,17 +16,19 @@ layer_keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata'
 map_keys_to_check = ['thumbnail', 'file', 'metadata']
 
 
-def wait_for_rest(url, max_attempts, sleeping_time, keys_to_check):
-    r = requests.get(url)
+def wait_for_rest(url, max_attempts, sleeping_time, keys_to_check, headers=None):
+    headers = headers or None
+    r = requests.get(url, headers=headers)
 
     attempts = 1
     while not (r.status_code == 200 and all(
             'status' not in r.json()[k] for k in keys_to_check
     )):
         time.sleep(sleeping_time)
-        r = requests.get(url)
+        r = requests.get(url, headers=headers)
         attempts += 1
         if attempts > max_attempts:
+            logger.error(f"r.status_code={r.status_code}\nrltest={r.text}")
             raise Exception('Max attempts reached!')
 
 
@@ -105,7 +107,7 @@ def patch_layer(username,
 
     with app.app_context():
         url = url_for('rest_layer.get', username=username, layername=layername)
-    wait_for_rest(url, 20, 0.5, layer_keys_to_check)
+    wait_for_rest(url, 30, 0.5, layer_keys_to_check, headers=headers)
     wfs.clear_cache(username)
     wms.clear_cache(username)
     return layername
@@ -134,7 +136,7 @@ def patch_map(username,
 
     with app.app_context():
         url = url_for('rest_map.get', username=username, mapname=mapname)
-    wait_for_rest(url, 20, 0.5, map_keys_to_check)
+    wait_for_rest(url, 30, 0.5, map_keys_to_check, headers=headers)
     wfs.clear_cache(username)
     wms.clear_cache(username)
     return mapname
@@ -198,13 +200,13 @@ def delete_map(username, mapname, headers=None):
     assert r.status_code == 200, r.text
 
 
-def assert_user_layers(username, layernames):
+def assert_user_layers(username, layernames, headers=None):
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
     r_url = f"{rest_url}/{username}/layers"
-    r = requests.get(r_url)
-    assert r.status_code == 200, f"r.status_code={r.status_code}\n{r.text}=r.text"
+    r = requests.get(r_url, headers=headers)
+    assert r.status_code == 200, f"r.status_code={r.status_code}\nr.text={r.text}"
     layman_names = [li['name'] for li in r.json()]
-    assert set(layman_names) == set(layernames), f"{r.text}=r.text"
+    assert set(layman_names) == set(layernames), f"Layers {layernames} not equal to {r.text}"
 
 
 def reserve_username(username, headers=None):
@@ -215,3 +217,9 @@ def reserve_username(username, headers=None):
     assert r.status_code == 200, r.text
     claimed_username = r.json()['username']
     assert claimed_username == username
+
+
+def get_authz_headers(username):
+    return {f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+            f'{TOKEN_HEADER}': f'Bearer {username}',
+            }
