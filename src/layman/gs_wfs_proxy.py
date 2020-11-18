@@ -9,7 +9,7 @@ from flask import Blueprint, g, current_app as app, request, Response
 from layman.authn import authenticate
 from layman import settings
 from layman.layer import db
-from layman.layer.util import LAYERNAME_RE, ATTRNAME_RE
+from layman.layer.util import LAYERNAME_PATTERN, ATTRNAME_PATTERN
 from layman.util import USERNAME_ONLY_PATTERN
 from layman.common.geoserver import reset as gs_reset
 from layman.layer import LAYER_TYPE
@@ -71,7 +71,7 @@ def extract_attributes_from_wfs_t_update(action, authz_module, xml_tree, major_v
                 f"WFS Proxy: skipping due to wrong namespace name. Namespace={ws_namespace}, action={ET.QName(action)}")
         return attribs
     layer_name = layer_qname[1]
-    layer_match = re.match(LAYERNAME_RE, layer_name)
+    layer_match = re.match(LAYERNAME_PATTERN, layer_name)
     if not layer_match:
         app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={layer_name}")
         return attribs
@@ -93,7 +93,7 @@ def extract_attributes_from_wfs_t_update(action, authz_module, xml_tree, major_v
                                    f"property namespace={split_text[0]}")
                 continue
             attrib_name = split_text[1]
-        attrib_match = re.match(ATTRNAME_RE, attrib_name)
+        attrib_match = re.match(ATTRNAME_PATTERN, attrib_name)
         if not attrib_match:
             app.logger.warning(f"WFS Proxy: skipping due to wrong attribute name. "
                                f"Property={attrib_name}")
@@ -117,7 +117,7 @@ def extract_attributes_from_wfs_t_insert_replace(action, authz_module):
                 app.logger.warning(f"WFS Proxy: skipping due to wrong namespace name. Namespace={ws_namespace}, action={ET.QName(action)}")
             continue
         layer_name = layer_qname.localname
-        layer_match = re.match(LAYERNAME_RE, layer_name)
+        layer_match = re.match(LAYERNAME_PATTERN, layer_name)
         if not layer_match:
             app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={layer_name}")
             continue
@@ -132,7 +132,7 @@ def extract_attributes_from_wfs_t_insert_replace(action, authz_module):
                                    f"property namespace={attrib_qname.namespace}")
                 continue
             attrib_name = attrib_qname.localname
-            attrib_match = re.match(ATTRNAME_RE, attrib_name)
+            attrib_match = re.match(ATTRNAME_PATTERN, attrib_name)
             if not attrib_match:
                 app.logger.warning(f"WFS Proxy: skipping due to wrong property name. Property name={attrib_name}")
                 continue

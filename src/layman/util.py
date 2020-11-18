@@ -13,7 +13,7 @@ from layman.http import LaymanError
 
 USERNAME_ONLY_PATTERN = r"[a-z][a-z0-9]*(?:_[a-z0-9]+)*"
 
-USERNAME_RE = r"^" + USERNAME_ONLY_PATTERN + r"$"
+USERNAME_PATTERN = r"^" + USERNAME_ONLY_PATTERN + r"$"
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_PUBLICATION_TYPES_KEY = f'{__name__}:PUBLICATION_TYPES'
@@ -71,8 +71,8 @@ def check_reserved_workspace_names(workspace_name):
 
 
 def check_username(username):
-    if not re.match(USERNAME_RE, username):
-        raise LaymanError(2, {'parameter': 'user', 'expected': USERNAME_RE})
+    if not re.match(USERNAME_PATTERN, username):
+        raise LaymanError(2, {'parameter': 'user', 'expected': USERNAME_PATTERN})
     check_reserved_workspace_names(username)
     providers = get_internal_providers()
     call_modules_fn(providers, 'check_username', [username])

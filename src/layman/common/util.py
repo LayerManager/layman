@@ -1,4 +1,9 @@
 from collections import defaultdict
+from layman.util import USERNAME_PATTERN, USERNAME_ONLY_PATTERN
+
+
+PUBLICATION_NAME_ONLY_PATTERN = USERNAME_ONLY_PATTERN
+PUBLICATION_NAME_PATTERN = USERNAME_PATTERN
 
 
 def merge_infos(infos):
