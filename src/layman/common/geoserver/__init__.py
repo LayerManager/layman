@@ -117,6 +117,10 @@ def ensure_user(user, password, auth):
 
 
 def get_workspace_security_roles(workspace, type, auth):
+    return get_security_roles(workspace + '.*.' + type, auth)
+
+
+def get_security_roles(rule, auth):
     r = requests.get(
         settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
         headers=headers_json,
@@ -125,18 +129,17 @@ def get_workspace_security_roles(workspace, type, auth):
     r.raise_for_status()
     rules = r.json()
     try:
-        rule = rules[workspace + '.*.' + type]
-        roles = set(rule.split(','))
+        roles_string = rules[rule]
+        roles = set(roles_string.split(','))
     except KeyError:
         roles = set()
     return roles
 
 
-def ensure_workspace_security_roles(workspace, roles, type, auth):
-    rule = workspace + '.*.' + type
+def ensure_security_roles(rule, roles, auth):
     roles_str = ', '.join(roles)
 
-    logger.info(f"Ensure_workspace_security_roles workspace={workspace}, type={type}, roles={roles}, rule={rule}, roles_str={roles_str}")
+    logger.info(f"Ensure_security_roles rule={rule}, roles={roles}, roles_str={roles_str}")
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
         data=json.dumps(
@@ -157,6 +160,11 @@ def ensure_workspace_security_roles(workspace, roles, type, auth):
     r.raise_for_status()
 
 
+def ensure_workspace_security_roles(workspace, roles, type, auth):
+    rule = workspace + '.*.' + type
+    ensure_security_roles(rule, roles, auth)
+
+
 def ensure_workspace_security(workspace, type, auth):
     logger.info(f"Ensure_workspace_security workspace={workspace}, type={type}, auth={auth}")
     roles = set(get_workspace_security_roles(workspace, type, auth))
@@ -169,6 +177,16 @@ def ensure_workspace_security(workspace, type, auth):
     roles.update(new_roles)
 
     ensure_workspace_security_roles(workspace, roles, type, auth)
+
+
+def delete_security_roles(rule, auth):
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
+        headers=headers_json,
+        auth=auth,
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
 
 
 def get_all_workspaces(auth):
@@ -265,21 +283,8 @@ def ensure_user_workspace(username, auth):
 def delete_user_workspace(username, auth):
     delete_user_db_store(username, auth)
 
-    r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, username + '.*.r'),
-        headers=headers_json,
-        auth=auth
-    )
-    if r.status_code != 404:
-        r.raise_for_status()
-
-    r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, username + '.*.w'),
-        headers=headers_json,
-        auth=auth
-    )
-    if r.status_code != 404:
-        r.raise_for_status()
+    delete_security_roles(username + '.*.r', auth)
+    delete_security_roles(username + '.*.w', auth)
 
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username),
