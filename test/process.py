@@ -2,9 +2,10 @@ import pytest
 from multiprocessing import Process
 import subprocess
 import os
+import redis
 import logging
 
-from src.layman import settings
+from layman import settings
 
 from test.mock.liferay import run
 from test import util
@@ -19,6 +20,8 @@ AUTHN_INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{
 
 LAYMAN_CELERY_QUEUE = 'temporary'
 LAYMAN_REDIS_URL = 'redis://redis:6379/12'
+LAYMAN_REDIS = redis.Redis.from_url(LAYMAN_REDIS_URL, encoding="utf-8", decode_responses=True)
+
 
 AUTHN_SETTINGS = {
     'LAYMAN_AUTHN_MODULES': 'layman.authn.oauth2',
@@ -84,9 +87,7 @@ def ensure_layman():
 
 def start_layman(env_vars=None):
     # first flush redis DB
-    import redis
-    rds = redis.Redis.from_url(LAYMAN_REDIS_URL, encoding="utf-8", decode_responses=True)
-    rds.flushdb()
+    LAYMAN_REDIS.flushdb()
     port = settings.LAYMAN_SERVER_NAME.split(':')[1]
     env_vars = env_vars or {}
 
