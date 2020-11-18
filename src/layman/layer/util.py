@@ -7,15 +7,16 @@ from flask import current_app, request, g
 
 from layman import LaymanError, patch_mode
 from layman.common import util as layman_util
-from layman.util import USERNAME_RE, call_modules_fn, get_providers_from_source_names, get_modules_from_names, \
+from layman.util import call_modules_fn, get_providers_from_source_names, get_modules_from_names, \
     to_safe_name, url_for
 from layman import celery as celery_util
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common import metadata as common_md
+from layman.common.util import PUBLICATION_NAME_PATTERN
 
-LAYERNAME_RE = USERNAME_RE
-ATTRNAME_RE = USERNAME_RE
+LAYERNAME_PATTERN = PUBLICATION_NAME_PATTERN
+ATTRNAME_PATTERN = PUBLICATION_NAME_PATTERN
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
@@ -52,8 +53,8 @@ def info_decorator(f):
 
 
 def check_layername(layername):
-    if not re.match(LAYERNAME_RE, layername):
-        raise LaymanError(2, {'parameter': 'layername', 'expected': LAYERNAME_RE})
+    if not re.match(LAYERNAME_PATTERN, layername):
+        raise LaymanError(2, {'parameter': 'layername', 'expected': LAYERNAME_PATTERN})
 
 
 def get_sources():
