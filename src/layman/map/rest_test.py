@@ -732,7 +732,7 @@ def test_map_composed_from_local_layers(client):
 
     with app.app_context():
         map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
-    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] in ['PENDING', 'STARTED']:
+    while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] in ['PENDING', 'STARTED', 'SUCCESS']:
         time.sleep(0.1)
         with app.app_context():
             map_info = client.get(url_for('rest_map.get', username=username,
