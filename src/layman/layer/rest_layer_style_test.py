@@ -18,8 +18,8 @@ def test_get_layer_style(client):
 
     with app.app_context():
         rest_url = url_for('rest_layer_style.get', username=username, layername=layername)
-        rv = requests.get(rest_url)
+        rv = client.get(rest_url)
         assert rv.status_code == 200, rv.text
-        xml_tree = ET.fromstring(rv.content)
+        xml_tree = ET.fromstring(rv.get_data())
         assert ET.QName(xml_tree) == "{http://www.opengis.net/sld}StyledLayerDescriptor", rv.text
-        client_util.delete_layer(username, layername, client)
+    client_util.delete_layer(username, layername, client)
