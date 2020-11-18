@@ -59,6 +59,12 @@ token_2_introspection = {
     'test3': {
         'sub': "20141",
     },
+    'test_patch_current_user_user1': {
+        'sub': "20142",
+    },
+    'test_patch_current_user_user2': {
+        'sub': "20143",
+    },
 }
 token_2_profile = {
     'abc': {
@@ -85,6 +91,22 @@ token_2_profile = {
         "screenName": "test3",
         "userId": "20141",
     },
+    'test_patch_current_user_user1': {
+        "emailAddress": "test_patch_current_user_user1@liferay.com",
+        "firstName": "Test",
+        "lastName": "Test",
+        "middleName": "",
+        "screenName": "test_patch_current_user_user1",
+        "userId": "20142",
+    },
+    'test_patch_current_user_user2': {
+        "emailAddress": "test_patch_current_user_user2@liferay.com",
+        "firstName": "Test",
+        "lastName": "Test",
+        "middleName": "",
+        "screenName": "test_patch_current_user_user2",
+        "userId": "20143",
+    },
 }
 
 
@@ -94,7 +116,7 @@ def post():
     is_active = is_active is not None and is_active.lower() == 'true'
 
     access_token = request.form.get('token')
-    assert access_token in current_app.config['OAUTH2_TOKEN_2_INTROSPECTION']
+    assert access_token in current_app.config['OAUTH2_TOKEN_2_INTROSPECTION'], f"access_token={access_token}, current_app.config['OAUTH2_TOKEN_2_INTROSPECTION']={current_app.config['OAUTH2_TOKEN_2_INTROSPECTION']}"
     result = {
         "active": is_active, "client_id": "id-353ab09c-f117-f2d5-d3a3-85cfb89e6746", "exp": 1568981517,
         "iat": 1568980917,
