@@ -30,7 +30,7 @@ select p.id as id_publication,
           and r.type = 'read') can_read_users,
        (select rtrim(concat(case when u.id is not null then w.name || ',' end,
                             string_agg(w2.name, ',') || ',',
-                            case when p.everyone_can_read then c.everyone_role || ',' end
+                            case when p.everyone_can_write then c.everyone_role || ',' end
                             ), ',')
         from {DB_SCHEMA}.rights r inner join
              {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
