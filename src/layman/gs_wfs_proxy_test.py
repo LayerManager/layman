@@ -4,6 +4,7 @@ from urllib.parse import urljoin
 from layman import app
 from layman import settings
 from layman.layer import db
+from test.process_client import get_authz_headers
 from test import process, process_client as client_util, flask_client
 from test.data import wfs as data_wfs
 from layman.layer.geoserver.util import wfs_proxy
@@ -40,7 +41,7 @@ def test_rest_get(client):
         r = client.post(rest_url,
                         data=data_xml,
                         headers=headers)
-    assert r.status_code == 200
+    assert r.status_code == 200, r.data
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=GetCapabilities"
     with app.app_context():
@@ -49,12 +50,6 @@ def test_rest_get(client):
     assert r.status_code == 200
 
     flask_client.delete_layer(username, layername, client)
-
-
-def get_auth_header(username):
-    return {f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-            f'{TOKEN_HEADER}': f'Bearer {username}',
-            }
 
 
 def setup_user_layer(username, layername, authn_headers):
@@ -74,12 +69,11 @@ def test_wfs_proxy(liferay_mock):
     layman_process = process.start_layman(dict({'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner', },
                                                **AUTHN_SETTINGS))
 
-    authn_headers1 = get_auth_header(username)
+    authn_headers1 = get_authz_headers(username)
 
     client_util.reserve_username(username, headers=authn_headers1)
     ln = client_util.publish_layer(username,
                                    layername1,
-                                   ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
                                    headers=authn_headers1)
 
     assert ln == layername1
@@ -106,7 +100,7 @@ def test_wfs_proxy(liferay_mock):
     assert r.status_code == 200, r.text
 
     # Testing, that user2 is not able to write to layer of user1
-    authn_headers2 = get_auth_header(username2)
+    authn_headers2 = get_authz_headers(username2)
 
     headers2 = {
         'Accept': 'text/xml',
@@ -162,7 +156,7 @@ def test_missing_attribute(liferay_mock):
     layername2 = 'inexisting_attribute_layer2'
 
     layman_process = process.start_layman(AUTHN_SETTINGS)
-    authn_headers = get_auth_header(username)
+    authn_headers = get_authz_headers(username)
     headers = {
         'Accept': 'text/xml',
         'Content-type': 'text/xml',
@@ -173,12 +167,14 @@ def test_missing_attribute(liferay_mock):
     ln = client_util.publish_layer(username,
                                    layername,
                                    ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
-                                   headers=authn_headers)
+                                   headers=authn_headers,
+                                   )
     assert ln == layername
     ln2 = client_util.publish_layer(username,
                                     layername2,
                                     ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
-                                    headers=authn_headers)
+                                    headers=authn_headers,
+                                    )
     assert ln2 == layername2
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
@@ -286,8 +282,8 @@ def test_missing_attribute_authz(liferay_mock):
     layername1 = 'testmissingattr_authz_layer'
     username2 = 'testmissingattr_authz2'
 
-    authn_headers1 = get_auth_header(username)
-    authn_headers2 = get_auth_header(username2)
+    authn_headers1 = get_authz_headers(username)
+    authn_headers2 = get_authz_headers(username2)
     headers1 = {
         'Accept': 'text/xml',
         'Content-type': 'text/xml',
