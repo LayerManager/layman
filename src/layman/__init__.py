@@ -64,7 +64,7 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
                 ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
 
         with app.app_context():
-            import layman.common.prime_db_schema.schema_initialization as prime_db_schema
+            from .common.prime_db_schema import schema_initialization as prime_db_schema
             prime_db_schema.check_schema_name(settings.LAYMAN_PRIME_SCHEMA)
             prime_db_schema.ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
                                           settings.PUBLICATION_MODULES,

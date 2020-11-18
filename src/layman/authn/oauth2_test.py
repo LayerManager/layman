@@ -1,10 +1,11 @@
 from multiprocessing import Process
 import os
+import requests
 import shutil
 import time
 
 import pytest
-from flask import url_for, Blueprint, jsonify, g, request
+from layman.util import url_for
 
 import sys
 
@@ -16,7 +17,7 @@ from layman import settings
 from layman import uuid
 from .oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
 from .oauth2 import liferay
-from test import process, flask_client
+from test import process, process_client
 
 
 liferay_mock = process.liferay_mock
@@ -83,7 +84,7 @@ def client():
     yield client
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def server():
     server = Process(target=app.run, kwargs={
         'host': '0.0.0.0',
@@ -277,110 +278,99 @@ def test_patch_current_user_anonymous(client):
     assert resp_json['code'] == 30
 
 
-@pytest.mark.usefixtures('active_token_introspection_url', 'user_profile_url', 'server')
-def test_patch_current_user_without_username(client):
+@pytest.mark.usefixtures('active_token_introspection_url', 'user_profile_url')
+def test_patch_current_user_without_username():
+
+    layman_process = process.start_layman(process.AUTHN_SETTINGS)
+
+    username1 = 'test_patch_current_user_user1'
+    username2 = 'test_patch_current_user_user2'
+
+    user1_authn_headers = process_client.get_authz_headers(username1)
+    user2_authn_headers = process_client.get_authz_headers(username2)
+
     # reserve username
     with app.app_context():
         rest_path = url_for('rest_current_user.patch', adjust_username='true')
-        rv = client.patch(rest_path, headers={
-            f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-            f'{TOKEN_HEADER}': 'Bearer test2',
-        })
-        assert rv.status_code == 200
+    r = requests.patch(rest_path, headers=user1_authn_headers)
+    assert r.status_code == 200, r.text
 
     # check if it was reserved
     with app.app_context():
         rest_path = url_for('rest_current_user.get')
-        rv = client.get(rest_path, headers={
-            f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-            f'{TOKEN_HEADER}': 'Bearer test2',
-        })
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
-        assert resp_json['authenticated'] is True
-        assert 'username' in resp_json
-        exp_username = 'test2'
-        exp_sub = '20140'
-        assert resp_json['username'] == exp_username
-        assert resp_json['claims']['sub'] == exp_sub
+    r = requests.get(rest_path, headers=user1_authn_headers)
+    assert r.status_code == 200, r.text
+    resp_json = r.json()
+    assert resp_json['authenticated'] is True
+    assert 'username' in resp_json
+    exp_username = username1
+    exp_sub = '20142'
+    assert resp_json['username'] == exp_username
+    assert resp_json['claims']['sub'] == exp_sub
 
-        iss_id = liferay.__name__
-        from layman.authn.redis import _get_issid_sub_2_username_key
-        rds_key = _get_issid_sub_2_username_key(iss_id, exp_sub)
-        rds = settings.LAYMAN_REDIS
-        assert rds.get(rds_key) == exp_username
+    iss_id = liferay.__name__
+    from layman.authn.redis import _get_issid_sub_2_username_key
+    rds_key = _get_issid_sub_2_username_key(iss_id, exp_sub)
+    rds = process.LAYMAN_REDIS
+    assert rds.get(rds_key) == exp_username
 
-        from layman.authn.filesystem import get_authn_info
-        authn_info = get_authn_info(exp_username)
-        assert authn_info['iss_id'] == iss_id
-        assert authn_info['sub'] == exp_sub
+    from layman.authn.filesystem import get_authn_info
+    authn_info = get_authn_info(exp_username)
+    assert authn_info['iss_id'] == iss_id
+    assert authn_info['sub'] == exp_sub
 
     # re-reserve username
     with app.app_context():
         rest_path = url_for('rest_current_user.patch', adjust_username='true')
-        rv = client.patch(rest_path, headers={
-            f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-            f'{TOKEN_HEADER}': 'Bearer test2',
-        })
-        assert rv.status_code == 400
-        r_json = rv.get_json()
-        assert r_json['code'] == 34
-        assert r_json['detail']['username'] == exp_username
+    r = requests.patch(rest_path, headers=user1_authn_headers)
+    assert r.status_code == 400, r.text
+    r_json = r.json()
+    assert r_json['code'] == 34
+    assert r_json['detail']['username'] == exp_username
 
     # reserve same username by other user
     with app.app_context():
         rest_path = url_for('rest_current_user.patch')
-        rv = client.patch(rest_path, data={
-            'username': exp_username,
-        }, headers={
-            f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-            f'{TOKEN_HEADER}': 'Bearer test3',
-        })
-        assert rv.status_code == 409
-        r_json = rv.get_json()
-        assert r_json['code'] == 35
-        assert 'detail' not in r_json
+    r = requests.patch(rest_path, data={
+        'username': exp_username,
+    }, headers=user2_authn_headers)
+    assert r.status_code == 409, r.text
+    r_json = r.json()
+    assert r_json['code'] == 35
+    assert 'detail' not in r_json
 
     # reserve other username by other user
     with app.app_context():
-        exp_username2 = 'test3'
-        exp_sub2 = '20141'
         rest_path = url_for('rest_current_user.patch')
-        rv = client.patch(rest_path, data={
-            'username': exp_username2,
-        }, headers={
-            f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
-            f'{TOKEN_HEADER}': 'Bearer test3',
-        })
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
-        assert 'username' in resp_json
-        assert resp_json['username'] == exp_username2
-        assert resp_json['claims']['sub'] == exp_sub2
+    exp_username2 = 'test_patch_current_user_user2'
+    exp_sub2 = '20143'
+    r = requests.patch(rest_path, data={
+        'username': exp_username2,
+    }, headers=user2_authn_headers)
+    assert r.status_code == 200, r.text
+    resp_json = r.json()
+    assert 'username' in resp_json
+    assert resp_json['username'] == exp_username2
+    assert resp_json['claims']['sub'] == exp_sub2
 
     # test map metadata
-    username = exp_username
-    exp_email = 'test2@liferay.com'
+    workspace = exp_username
+    exp_email = exp_username + '@liferay.com'
     exp_name = 'Test Test'
     mapname = 'map1'
-    flask_client.publish_map(username,
-                             mapname,
-                             client)
+    process_client.publish_map(workspace, mapname, headers=user1_authn_headers)
 
     with app.app_context():
-        rv = client.get(url_for('rest_map_file.get', username=username, mapname=mapname))
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
-        assert resp_json['name'] == mapname
-        user_info = resp_json['user']
-        assert {'email', 'name'} == set(user_info.keys())
-        assert user_info['name'] == exp_name
-        assert user_info['email'] == exp_email
-        # read_everyone_write_everyone
-        access_rights = resp_json['groups']
-        assert {'guest'} == set(access_rights.keys())
-        assert access_rights['guest'] == 'w'
+        rest_path = url_for('rest_map_file.get', username=workspace, mapname=mapname)
+    r = requests.get(rest_path)
+    assert r.status_code == 200, r.text
+    resp_json = r.json()
+    assert resp_json['name'] == mapname
+    user_info = resp_json['user']
+    assert {'email', 'name'} == set(user_info.keys())
+    assert user_info['name'] == exp_name
+    assert user_info['email'] == exp_email
 
-    flask_client.delete_map(username,
-                            mapname,
-                            client)
+    process_client.delete_map(workspace, mapname, headers=user1_authn_headers)
+
+    process.stop_process(layman_process)
