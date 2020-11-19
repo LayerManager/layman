@@ -1,3 +1,4 @@
+import pytest
 import requests
 from urllib.parse import urljoin
 
@@ -8,6 +9,9 @@ from test.process_client import get_authz_headers
 from test import process, process_client as client_util, flask_client
 from test.data import wfs as data_wfs
 from layman.layer.geoserver.util import wfs_proxy
+from layman.layer.geoserver.util import wms_direct
+from layman.common.geoserver import get_layer_thumbnail, get_layer_square_bbox
+from layman.util import url_for
 
 liferay_mock = process.liferay_mock
 
@@ -146,6 +150,40 @@ def test_wfs_proxy(liferay_mock):
     assert r.status_code == 400, r.text
 
     client_util.delete_layer(username, layername1, headers)
+
+    process.stop_process(layman_process)
+
+
+@pytest.mark.usefixtures('liferay_mock')
+@pytest.mark.parametrize('service_endpoint', ['ows', 'wms'])
+def test_wms_ows_proxy(service_endpoint):
+    username = 'test_wms_ows_proxy_user'
+    layername = 'test_wms_ows_proxy_layer'
+
+    authn_headers = get_authz_headers(username)
+
+    layman_process = process.start_layman(dict({'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner', },
+                                               **AUTHN_SETTINGS))
+
+    client_util.ensure_reserved_username(username, headers=authn_headers)
+    ln = client_util.publish_layer(username, layername, headers=authn_headers)
+
+    assert ln == layername
+
+    with app.app_context():
+        wms_url = url_for('gs_wfs_proxy_bp.proxy', subpath=username + '/' + service_endpoint)
+
+    wms = wms_direct(wms_url, headers=authn_headers)
+
+    # current_app.logger.info(list(wms.contents))
+    tn_bbox = get_layer_square_bbox(wms, layername)
+
+    from layman.layer.geoserver.wms import VERSION
+    r = get_layer_thumbnail(wms_url, layername, tn_bbox, headers=authn_headers, wms_version=VERSION)
+    r.raise_for_status()
+    assert 'image' in r.headers['content-type']
+
+    client_util.delete_layer(username, layername, headers=authn_headers)
 
     process.stop_process(layman_process)
 

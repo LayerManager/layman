@@ -72,17 +72,10 @@ def generate_layer_thumbnail(username, layername):
     }
     wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
     from layman.layer.geoserver.util import wms_proxy
+    from layman.common.geoserver import get_layer_thumbnail, get_layer_square_bbox
     wms = wms_proxy(wms_url, headers=headers)
     # current_app.logger.info(list(wms.contents))
-    bbox = list(next(t for t in wms[layername].crs_list if t[4].lower() == 'epsg:3857'))
-    # current_app.logger.info(f"bbox={bbox}")
-    min_range = min(bbox[2] - bbox[0], bbox[3] - bbox[1]) / 2
-    tn_bbox = (
-        (bbox[0] + bbox[2]) / 2 - min_range,
-        (bbox[1] + bbox[3]) / 2 - min_range,
-        (bbox[0] + bbox[2]) / 2 + min_range,
-        (bbox[1] + bbox[3]) / 2 + min_range,
-    )
+    tn_bbox = get_layer_square_bbox(wms, layername)
     # TODO https://github.com/geopython/OWSLib/issues/709
     # tn_img = wms.getmap(
     #     layers=[layername],
@@ -99,18 +92,7 @@ def generate_layer_thumbnail(username, layername):
     # out.close()
 
     from layman.layer.geoserver.wms import VERSION
-    r = requests.get(wms_url, params={
-        'SERVICE': 'WMS',
-        'REQUEST': 'GetMap',
-        'VERSION': VERSION,
-        'LAYERS': layername,
-        'CRS': 'EPSG:3857',
-        'BBOX': ','.join([str(c) for c in tn_bbox]),
-        'WIDTH': 300,
-        'HEIGHT': 300,
-        'FORMAT': 'image/png',
-        'TRANSPARENT': 'TRUE',
-    }, headers=headers)
+    r = get_layer_thumbnail(wms_url, layername, tn_bbox, headers=headers, wms_version=VERSION)
     r.raise_for_status()
     with open(tn_path, "wb") as out_file:
         out_file.write(r.content)
