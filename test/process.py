@@ -49,6 +49,7 @@ def liferay_mock():
                 'testmissingattr': None,
                 'testmissingattr_authz': None,
                 'testmissingattr_authz2': None,
+                'test_wms_ows_proxy_user': None,
             },
         },
         'host': '0.0.0.0',
