@@ -483,3 +483,32 @@ def reset(auth):
                       )
     r.raise_for_status()
     logger.info(f"Resetting GeoServer done")
+
+
+def get_layer_square_bbox(owslib_wms, layername):
+    bbox = list(next(t for t in owslib_wms[layername].crs_list if t[4].lower() == 'epsg:3857'))
+    # current_app.logger.info(f"bbox={bbox}")
+    min_range = min(bbox[2] - bbox[0], bbox[3] - bbox[1]) / 2
+    square_bbox = (
+        (bbox[0] + bbox[2]) / 2 - min_range,
+        (bbox[1] + bbox[3]) / 2 - min_range,
+        (bbox[0] + bbox[2]) / 2 + min_range,
+        (bbox[1] + bbox[3]) / 2 + min_range,
+    )
+    return square_bbox
+
+
+def get_layer_thumbnail(wms_url, layername, bbox, headers=None, wms_version='1.3.0'):
+    r = requests.get(wms_url, params={
+        'SERVICE': 'WMS',
+        'REQUEST': 'GetMap',
+        'VERSION': wms_version,
+        'LAYERS': layername,
+        'CRS': 'EPSG:3857',
+        'BBOX': ','.join([str(c) for c in bbox]),
+        'WIDTH': 300,
+        'HEIGHT': 300,
+        'FORMAT': 'image/png',
+        'TRANSPARENT': 'TRUE',
+    }, headers=headers)
+    return r

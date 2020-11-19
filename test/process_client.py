@@ -252,12 +252,33 @@ def get_map_metadata_comparison(username, mapname, headers=None):
 
 def reserve_username(username, headers=None):
     headers = headers or {}
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
-    r_url = f"{rest_url}/current-user?adjust_username=true"
-    r = requests.patch(r_url, headers=headers)
-    assert r.status_code == 200, r.text
+    with app.app_context():
+        r_url = url_for('rest_current_user.patch')
+    data = {
+        'username': username,
+    }
+    r = requests.patch(r_url, headers=headers, data=data)
+    r.raise_for_status()
     claimed_username = r.json()['username']
     assert claimed_username == username
+
+
+def get_current_user(headers=None):
+    headers = headers or {}
+    with app.app_context():
+        r_url = url_for('rest_current_user.get')
+    r = requests.get(r_url, headers=headers)
+    r.raise_for_status()
+    return r.json()
+
+
+def ensure_reserved_username(username, headers=None):
+    headers = headers or {}
+    current_user = get_current_user(headers=headers)
+    if 'username' not in current_user:
+        reserve_username(username, headers=headers)
+    else:
+        assert current_user['username'] == username
 
 
 def get_authz_headers(username):
