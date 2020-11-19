@@ -35,7 +35,10 @@ Internal URL of thumnbail image generator (Timgen) used for generating map thumb
 ## Layman authentication and authorization
 
 ### LAYMAN_AUTHN_MODULES
-List of dotted paths to Python modules to be used for authentication. Paths are separated with comma (`,`). See [authentication](security.md#authentication).
+List of dotted paths to Python modules to be used for authentication. Paths are separated with comma (`,`). Authentication module `layman.authn.http_header` is required by Layman for internal purposes, so even if LAYMAN_AUTHN_MODULES does not contain `layman.authn.http_header` value, the value is appended automatically. See [authentication](security.md#authentication).
+
+### LAYMAN_AUTHN_HTTP_HEADER_NAME
+Secret name of HTTP header used for authentication internally (e.g. when generating private map thumbnail). Only combination of lowercase characters and numbers must be used for the value. At demo configuration, the HTTP header is automatically removed by Nginx on every request to Layman REST API or to GeoServer WMS/WFS/OWS.
 
 ### LAYMAN_AUTHN_OAUTH2_PROVIDERS
 List of dotted paths to Python modules to be used as OAuth2 providers. Paths are separated with comma (`,`). See [OAuth2](oauth2/index.md).
