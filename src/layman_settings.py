@@ -66,7 +66,8 @@ LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE = os.environ['LAYMAN_GS_AUTHN_HTTP_HEADER_
 assert re.match("[a-z][a-z0-9]*", LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE), "Only lowercase characters and numbers " \
                                                                           "should be used for " \
                                                                           "LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE. "
-LAYMAN_GS_AUTHN_FILTER_NAME = 'laymanHttpFilter'
+LAYMAN_GS_AUTHN_FILTER_NAME = 'laymanHttpFilter_v2'
+LAYMAN_GS_AUTHN_FILTER_NAME_OLD = ['laymanHttpFilter']
 
 
 # Name of schema, where Layman stores data about publication, users, ...
