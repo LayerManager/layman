@@ -3,6 +3,7 @@
 ## v1.18.0
  2020-12-??
 ### Upgrade requirements
+- Set environment variable [LAYMAN_AUTHN_HTTP_HEADER_NAME](doc/env-settings.md#LAYMAN_AUTHN_HTTP_HEADER_NAME). Only combination of lowercase characters and numbers must be used for the value.
 ### Changes
 - [#28](https://github.com/jirik/layman/issues/28) New environment variable [LAYMAN_PRIME_SCHEMA](doc/env-settings.md#LAYMAN_PRIME_SCHEMA). 
 - [#28](https://github.com/jirik/layman/issues/28) New REST endpoint [GET Users](doc/rest.md#get-users) with list of all users registered in Layman.
