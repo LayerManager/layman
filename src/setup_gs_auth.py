@@ -27,6 +27,11 @@ def main():
         settings.LAYMAN_GS_ROLE_SERVICE
     )
 
+    gs_authn.remove_security_filter_groups(
+        settings.GEOSERVER_DATADIR,
+        settings.LAYMAN_GS_AUTHN_FILTER_NAME_OLD,
+    )
+
     gs_authn.ensure_security_filter_group(
         settings.GEOSERVER_DATADIR,
         settings.LAYMAN_GS_AUTHN_FILTER_NAME,

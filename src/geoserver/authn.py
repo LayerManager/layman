@@ -75,6 +75,18 @@ def create_security_filter_group(data_dir, name, filter_names):
     security_xml.write(security_path)
 
 
+def remove_security_filter_groups(data_dir, names):
+    logger.info(f"Deleting Authentication Filter groups '{names}'")
+    security_xml = get_security(data_dir)
+
+    for name in names:
+        filter = security_xml.find(f'//filterChain/filters[@name="{name}"]')
+        if filter:
+            filter.getparent().remove(filter)
+    security_path = os.path.join(data_dir, 'security/config.xml')
+    security_xml.write(security_path)
+
+
 def ensure_security_filter_group(data_dir, name, filter_names):
     logger.info(f"Ensuring Authentication Filter group '{name}' with filters {','.join(filter_names)}")
     group_exists = get_security_filter_group(data_dir, name) is not None
