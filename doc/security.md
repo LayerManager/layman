@@ -9,11 +9,13 @@ Layman`s security uses two well-known concepts:
 
 Authentication (**authn**) is the process of obtaining and ensuring identity of [user](models.md#user) from incoming request to [REST API](rest.md).
 
-Authentication is performed by chain of zero or more authentication modules controlled by [`LAYMAN_AUTHN_MODULES`](../src/layman_settings.py) setting. When request comes to REST API, security system calls authentication modules one by one (one module at a time), until one module ensures user identity or until there is no module left. If no module ensured user`s identity, user is considered as **anonymous** user.
+Authentication is performed by chain of zero or more authentication modules controlled by [LAYMAN_AUTHN_MODULES](env-settings.md#LAYMAN_AUTHN_MODULES) environment variable. When request comes to REST API, security system calls authentication modules one by one (one module at a time), until one module ensures user identity or until there is no module left. If no module ensured user`s identity, user is considered as **anonymous** user.
 
-Currently there are two authentication options:
-- use no authentication module, so every user is considered as **anonymous**
-- **OAuth2** module ([`'layman.authn.oauth2'`](../src/layman/authn/oauth2)) with Liferay as authorization server. See separate [OAuth2 documentation](oauth2/index.md).
+Currently there is one optional authentication module:
+- **OAuth2** module [`layman.authn.oauth2`](../src/layman/authn/oauth2) with Liferay as authorization server. See separate [OAuth2 documentation](oauth2/index.md).
+
+There is also one internal authentication module:
+- **HTTP Header** module [`layman.authn.http_header`](../src/layman/authn/http_header). This module is required by Layman for internal purposes, so even if LAYMAN_AUTHN_MODULES does not contain `layman.authn.http_header` value, the value is appended automatically.
 
 ## Authorization
 

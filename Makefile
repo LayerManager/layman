@@ -94,6 +94,9 @@ bash-exec:
 bash-demo:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm layman bash
 
+bash-demo-exec:
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml exec layman bash
+
 bash-demo-root:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm -u root layman bash
 
@@ -261,6 +264,9 @@ micka-logs:
 
 nginx-bash:
 	docker-compose -f docker-compose.demo.yml -f docker-compose.deps.demo.yml run --rm --no-deps nginx sh
+
+nginx-bash-exec:
+	docker-compose -f docker-compose.demo.yml -f docker-compose.deps.demo.yml exec nginx sh
 
 nginx-restart:
 	docker-compose -f docker-compose.demo.yml -f docker-compose.deps.demo.yml up --force-recreate --no-deps -d nginx
