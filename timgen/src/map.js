@@ -34,7 +34,6 @@ import ol_source_ImageWMS from 'ol/source/ImageWMS';
 import ol_source_TileWMS from 'ol/source/TileWMS';
 import ol_layer_Image from 'ol/layer/Image';
 import ol_layer_Tile from 'ol/layer/Tile';
-import * as config from './../config';
 
 const json_to_extent = (value) => {
   if (typeof value === 'string') {
@@ -51,47 +50,50 @@ const proxify = (requested_url) => {
 };
 
 
-export const adjust_map_url = (requested_url) => {
-  requested_url = decodeURIComponent(requested_url);
-  if(config.LAYMAN_SERVER_NAME && requested_url.startsWith(`http://localhost:8000`)) {
+export const adjust_map_url = (requested_url, layman_public_url, layman_url) => {
+  if(layman_public_url && layman_url && requested_url.startsWith(layman_public_url)) {
     const old = requested_url;
-    requested_url = requested_url.replace(`http://localhost:8000`, `http://${config.LAYMAN_SERVER_NAME}`);
+    requested_url = requested_url.replace(layman_public_url, layman_url);
     console.log(`replaced map URL ${old} with ${requested_url}`);
   }
   return proxify(requested_url);
 };
 
 
-const adjust_layer_url = (requested_url) => {
-  requested_url = decodeURIComponent(requested_url);
-  if(config.LAYMAN_GS_HOSTPORT && requested_url.startsWith(`http://localhost:8000`)) {
+const adjust_layer_url = (requested_url, gs_public_url, gs_url) => {
+  if(gs_public_url && gs_url && requested_url.startsWith(gs_public_url)) {
     const old = requested_url;
-    requested_url = requested_url.replace(`http://localhost:8000`, `http://${config.LAYMAN_GS_HOSTPORT}`);
+    requested_url = requested_url.replace(gs_public_url, gs_url);
     console.log(`replaced layer URL ${old} with ${requested_url}`);
   }
   return proxify(requested_url);
 };
 
 
-const proxify_layer_loader = (layer, tiled) => {
+const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
   const source = layer.getSource();
-  if (tiled) {
-    const tile_url_function = source.getTileUrlFunction();
-    source.setTileUrlFunction((b, c, d) => {
-      // console.log('setTileUrlFunction')
-      const requested_url = tile_url_function(b, c, d);
-      return adjust_layer_url(requested_url);
-    });
-  } else {
-    source.setImageLoadFunction((image, requested_url) => {
-      // console.log('setImageLoadFunction', requested_url, proxify(requested_url));
-      image.getImage().src = adjust_layer_url(requested_url);
+
+  const load_fn = (tile_or_img, image_url) => {
+    image_url = adjust_layer_url(image_url, gs_public_url, gs_url);
+    fetch(image_url, {
+      headers,
+    }).then(res => {
+      return res.blob();
+    }).then(blob => {
+      const data_url = URL.createObjectURL(blob);
+      tile_or_img.getImage().src = data_url;
     })
+  };
+
+  if (tiled) {
+    source.setTileLoadFunction(load_fn);
+  } else {
+    source.setImageLoadFunction(load_fn);
   }
 };
 
 
-const json_to_wms_layer = layer_json => {
+const json_to_wms_layer = (layer_json, gs_public_url, gs_url, headers) => {
   const source_class = layer_json.singleTile ? ol_source_ImageWMS : ol_source_TileWMS;
   const layer_class = layer_json.singleTile ? ol_layer_Image : ol_layer_Tile;
   const params = layer_json.params;
@@ -126,16 +128,16 @@ const json_to_wms_layer = layer_json => {
     })
   });
   new_layer.setVisible(layer_json.visibility);
-  proxify_layer_loader(new_layer, !layer_json.singleTile);
+  proxify_layer_loader(new_layer, !layer_json.singleTile, gs_public_url, gs_url, headers);
   return new_layer;
 
 };
 
 
-const json_to_layer = layer_json => {
+const json_to_layer = (layer_json, gs_public_url, gs_url, headers) => {
   switch (layer_json.className) {
     case "HSLayers.Layer.WMS":
-      return json_to_wms_layer(layer_json);
+      return json_to_wms_layer(layer_json, gs_public_url, gs_url, headers);
       break;
     // case 'OpenLayers.Layer.Vector':
     //   return configParsers.createVectorLayer(layer_json);
@@ -147,17 +149,20 @@ const json_to_layer = layer_json => {
 };
 
 
-const json_to_layers = layers_json => {
+const json_to_layers = (layers_json, gs_public_url, gs_url, headers) => {
   if (layers_json.data) {
     layers_json = layers_json.data;
   }
-  return layers_json.map(lj => json_to_layer(lj));
+  return layers_json.map(lj => json_to_layer(lj, gs_public_url, gs_url, headers));
 };
 
 
 export const json_to_map = ({
-                           map_json,
-                         }) => {
+                              map_json,
+                              gs_url,
+                              gs_public_url,
+                              headers,
+                            }) => {
 
   const ol_map = new ol_Map({
     target: 'map',
@@ -185,7 +190,7 @@ export const json_to_map = ({
     constrainResolution: false
   });
 
-  const layers = json_to_layers(map_json.layers);
+  const layers = json_to_layers(map_json.layers, gs_public_url, gs_url, headers);
   layers.forEach(layer => {
     ol_map.addLayer(layer);
   });
