@@ -1,9 +1,16 @@
 # Changelog
 
-## v1.18.0
+## v1.8.0
  2020-12-??
 ### Upgrade requirements
 - Set environment variable [LAYMAN_AUTHN_HTTP_HEADER_NAME](doc/env-settings.md#LAYMAN_AUTHN_HTTP_HEADER_NAME). Only combination of lowercase characters and numbers must be used for the value.
+- Replace LAYMAN_AUTHZ_MODULE environment variable with [GRANT_CREATE_PUBLIC_WORKSPACE](doc/env-settings.md#GRANT_CREATE_PUBLIC_WORKSPACE) and [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](doc/env-settings.md#GRANT_PUBLISH_IN_PUBLIC_WORKSPACE). The following settings correspond with behaviour of previously used LAYMAN_AUTHZ_MODULE:
+   - `LAYMAN_AUTHZ_MODULE=layman.authz.read_everyone_write_everyone` (variable to remove)
+      - `GRANT_CREATE_PUBLIC_WORKSPACE=EVERYONE` (new variable)
+      - `GRANT_PUBLISH_IN_PUBLIC_WORKSPACE=EVERYONE` (new variable)
+   - `LAYMAN_AUTHZ_MODULE=layman.authz.read_everyone_write_owner` (variable to remove)
+      - `GRANT_CREATE_PUBLIC_WORKSPACE=` (new variable)
+      - `GRANT_PUBLISH_IN_PUBLIC_WORKSPACE=` (new variable)
 ### Changes
 - [#28](https://github.com/jirik/layman/issues/28) New environment variable [LAYMAN_PRIME_SCHEMA](doc/env-settings.md#LAYMAN_PRIME_SCHEMA). 
 - [#28](https://github.com/jirik/layman/issues/28) New REST endpoint [GET Users](doc/rest.md#get-users) with list of all users registered in Layman.

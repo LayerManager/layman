@@ -6,8 +6,7 @@ import string
 from urllib.parse import urljoin
 from flask import g
 from layman import settings
-from layman import util as layman_util
-from layman.authz import util as authz
+from layman import authz
 
 
 logger = logging.getLogger(__name__)
@@ -165,18 +164,9 @@ def ensure_workspace_security_roles(workspace, roles, type, auth):
     ensure_security_roles(rule, roles, auth)
 
 
-def ensure_workspace_security(workspace, type, auth):
-    logger.info(f"Ensure_workspace_security workspace={workspace}, type={type}, auth={auth}")
-    roles = set(get_workspace_security_roles(workspace, type, auth))
-
-    all_roles = authz.get_all_gs_roles(workspace, type)
-    roles.difference_update(all_roles)
-
-    authz_module = authz.get_authz_module()
-    new_roles = authz_module.get_gs_roles(workspace, type)
-    roles.update(new_roles)
-
-    ensure_workspace_security_roles(workspace, roles, type, auth)
+def ensure_layer_security_roles(workspace, layername, roles, type, auth):
+    rule = f"{workspace}.{layername}.{type}"
+    ensure_security_roles(rule, roles, auth)
 
 
 def delete_security_roles(rule, auth):
@@ -187,6 +177,16 @@ def delete_security_roles(rule, auth):
     )
     if r.status_code != 404:
         r.raise_for_status()
+
+
+def layman_users_to_geoserver_roles(layman_users):
+    geoserver_roles = set()
+    for layman_user in layman_users:
+        if layman_user == settings.RIGHTS_EVERYONE_ROLE:
+            geoserver_roles.add('ROLE_ANONYMOUS')
+        else:
+            geoserver_roles.add(username_to_rolename(layman_user))
+    return geoserver_roles
 
 
 def get_all_workspaces(auth):
@@ -275,9 +275,6 @@ def ensure_user_workspace(username, auth):
         )
         r.raise_for_status()
         ensure_user_db_store(username, auth)
-
-    ensure_workspace_security(username, 'r', auth)
-    ensure_workspace_security(username, 'w', auth)
 
 
 def delete_user_workspace(username, auth):

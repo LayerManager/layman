@@ -8,16 +8,16 @@ from layman import settings, authn
 from . import util
 from .filesystem import input_file, input_sld, input_chunk
 from layman.authn import authenticate
-from layman.authz import authorize, util as authz_util
+from layman.authz import authorize_decorator, util as authz_util
 
 bp = Blueprint('rest_layer', __name__)
 
 
 @bp.before_request
-@authenticate
-@authorize
 @check_username_decorator
 @util.check_layername_decorator
+@authenticate
+@authorize_decorator
 @util.info_decorator
 def before_request():
     pass

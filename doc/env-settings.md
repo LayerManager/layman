@@ -43,9 +43,6 @@ Secret name of HTTP header used for authentication internally (e.g. when generat
 ### LAYMAN_AUTHN_OAUTH2_PROVIDERS
 List of dotted paths to Python modules to be used as OAuth2 providers. Paths are separated with comma (`,`). See [OAuth2](oauth2/index.md).
 
-### LAYMAN_AUTHZ_MODULE
-Dotted path to Python module to be used for authorization. Paths are separated with comma (`,`). See [authorization](security.md#authorization).
-
 ### OAUTH2_LIFERAY_CLIENT_ID
 Client ID of Layman's Test Client registered as OAuth2 provider at Liferay instance.
 
@@ -72,6 +69,12 @@ URL of Liferay OAuth2 Introspection endpoint.
 
 ### OAUTH2_LIFERAY_USER_PROFILE_URL
 URL of Liferay User Profile endpoint.
+
+### GRANT_CREATE_PUBLIC_WORKSPACE
+List of [users](models.md#user) and [roles](models.md#role) giving them permission to create new [public workspace](models.md#public-workspace). It must be subset of (or equal to) GRANT_PUBLISH_IN_PUBLIC_WORKSPACE.
+
+### GRANT_PUBLISH_IN_PUBLIC_WORKSPACE
+List of [users](models.md#user) and [roles](models.md#role) giving them permission to publish new [publication](models.md#publication) in [public workspace](models.md#public-workspace).
 
 ## Layman Test Client Settings
 

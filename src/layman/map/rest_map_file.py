@@ -7,16 +7,16 @@ from layman.util import check_username_decorator
 from layman.common.filesystem.util import get_user_dir
 from . import util
 from layman.authn import authenticate
-from layman.authz import authorize
+from layman.authz import authorize_decorator
 
 bp = Blueprint('rest_map_file', __name__)
 
 
 @bp.before_request
-@authenticate
-@authorize
 @check_username_decorator
 @util.check_mapname_decorator
+@authenticate
+@authorize_decorator
 @util.info_decorator
 def before_request():
     pass

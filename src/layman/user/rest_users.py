@@ -2,16 +2,13 @@ from flask import Blueprint, jsonify, g
 
 from layman.common.prime_db_schema import users
 from layman.authn import authenticate
-from layman.authz import authorize
-from layman.util import check_username_decorator
-from layman import settings, app
+from layman import app
 
 bp = Blueprint('rest_users', __name__)
 
 
 @bp.before_request
 @authenticate
-@authorize
 def before_request():
     pass
 

@@ -8,6 +8,7 @@ from flask import g, current_app as app
 from layman.http import LaymanError
 from layman import settings
 from layman.common import geoserver as common
+from layman.layer.prime_db_schema import table as prime_db_schema
 
 FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
 FLASK_RULES_KEY = f"{__name__}:RULES"
@@ -57,7 +58,7 @@ ensure_whole_user = common.ensure_whole_user
 delete_whole_user = common.delete_whole_user
 
 
-def publish_layer_from_db(username, layername, description, title):
+def publish_layer_from_db(username, layername, description, title, access_rights):
     keywords = [
         "features",
         layername,
@@ -95,6 +96,18 @@ def publish_layer_from_db(username, layername, description, title):
     from . import wfs
     wfs.clear_cache(username)
     wms.clear_cache(username)
+
+    if not access_rights or not access_rights.get('read') or not access_rights.get('write'):
+        layer_info = prime_db_schema.get_layer_info(username, layername)
+
+    read_roles = (access_rights and access_rights.get('read')) or layer_info['access_rights']['read']
+    write_roles = (access_rights and access_rights.get('write')) or layer_info['access_rights']['write']
+
+    security_read_roles = common.layman_users_to_geoserver_roles(read_roles)
+    common.ensure_layer_security_roles(username, layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
+
+    security_write_roles = common.layman_users_to_geoserver_roles(write_roles)
+    common.ensure_layer_security_roles(username, layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
 
 
 def get_usernames():
