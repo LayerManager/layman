@@ -1,5 +1,5 @@
 from flask import g, current_app
-from layman import LaymanError, settings
+from layman import LaymanError, settings, authn
 from layman.authn import get_open_id_claims, get_iss_id, get_sub
 from layman.util import slugify, to_safe_names, check_username, get_usernames, ensure_whole_user, delete_whole_user
 from layman.authn import redis as authn_redis, filesystem as authn_filesystem, prime_db_schema as authn_prime_db_schema
@@ -23,8 +23,9 @@ def get_user_profile(user_obj):
 
 
 def reserve_username(username, adjust=False):
-    if 'username' in g.user:
-        raise LaymanError(34, {'username': g.user['username']})
+    current_username = authn.get_authn_username()
+    if current_username:
+        raise LaymanError(34, {'username': current_username})
     if adjust is not True:
         check_username(username)
         usernames = get_usernames()

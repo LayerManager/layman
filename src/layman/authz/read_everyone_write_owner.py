@@ -1,6 +1,7 @@
 from flask import g, request
 import re
 
+from layman import authn
 from layman import LaymanError
 USER_PATH_PATTERN = re.compile('^/rest/([a-z][a-z0-9]*(?:_[a-z0-9]+)*)(?:/[^\n]*)?$')
 
@@ -16,7 +17,7 @@ def authorize():
     if g.user is None:
         raise LaymanError(30, 'authenticated as anonymous user')
 
-    username = g.user.get('username', None)
+    username = authn.get_authn_username()
     if request.method == 'POST' and username is None:
         raise LaymanError(33)
 
@@ -45,5 +46,5 @@ def get_gs_roles(username, type):
     return roles
 
 
-def can_i_edit(publ_type, username, publication_name):
-    return g.user is not None and g.user['username'] == username
+def can_i_edit(publ_type, workspace, publication_name):
+    return authn.get_authn_username() == workspace
