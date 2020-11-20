@@ -3,7 +3,7 @@ from flask import current_app as app
 
 from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
-from layman import settings
+from layman import settings, authn
 from . import util, LAYER_TYPE
 from .filesystem import input_file, input_sld, input_chunk, uuid
 from layman.authn import authenticate
@@ -98,7 +98,7 @@ def post(username):
     if 'sld' in request.files and not request.files['sld'].filename == '':
         sld_file = request.files['sld']
 
-    actor_name = g.user and g.user["username"]
+    actor_name = authn.get_authn_username()
 
     task_options = {
         'crs_id': crs_id,
