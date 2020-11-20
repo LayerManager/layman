@@ -7,6 +7,7 @@ from lxml import etree as ET
 from flask import Blueprint, g, current_app as app, request, Response
 
 from layman.authn import authenticate
+from layman import authn
 from layman import settings
 from layman.layer import db
 from layman.layer.util import LAYERNAME_PATTERN, ATTRNAME_PATTERN
@@ -149,8 +150,9 @@ def proxy(subpath):
     url = settings.LAYMAN_GS_URL + subpath + '?' + request.query_string.decode('UTF-8')
     headers_req = {key.lower(): value for (key, value) in request.headers if key.lower() not in ['host', settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE.lower()]}
     data = request.get_data()
-    if g.user is not None:
-        headers_req[settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE] = g.user['username']
+    authn_username = authn.get_authn_username()
+    if authn_username:
+        headers_req[settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE] = authn_username
 
     app.logger.info(f"GET WFS proxy, headers_req={headers_req}, url={url}")
     if data is not None and len(data) > 0:

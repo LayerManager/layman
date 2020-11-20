@@ -8,6 +8,7 @@ from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
 from . import util, MAP_TYPE
 from .filesystem import input_file, uuid
+from layman import authn
 from layman.authn import authenticate
 from layman.authz import authorize, util as authz_util
 from layman.common import redis as redis_util
@@ -102,7 +103,7 @@ def post(username):
         input_file.save_map_files(
             username, mapname, [file])
 
-        actor_name = g.user and g.user["username"]
+        actor_name = authn.get_authn_username()
 
         kwargs = {
             'title': title,
