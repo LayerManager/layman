@@ -109,18 +109,10 @@ def authorize(workspace, publication_type, publication_name, request_method, act
 def authorize_after_multi_get_request(workspace, actor_name, response):
     # print(f"authorize_after_request, status_code = {response.status_code}, workspace={workspace}, actor_name={actor_name}")
     if response.status_code == 200:
-        # TODO when GET Layers will return also access rights, use access rights from response to filter publications
-        publication_infos = publications.get_publication_infos(workspace_name=workspace)
-        # print(f"authorize_after_request, publication_infos = {publication_infos}")
-        safe_uuids = [
-            publication_info['uuid'] for publication_info in publication_infos.values()
-            if is_user_in_access_rule(actor_name, publication_info['access_rights']['read'])
-        ]
-        # print(f"authorize_after_request, safe_uuids = {safe_uuids}")
         publications_json = json.loads(response.get_data())
         publications_json = [
             publication_json for publication_json in publications_json
-            if publication_json['uuid'] in safe_uuids
+            if is_user_in_access_rule(actor_name, publication_json['access_rights']['read'])
         ]
         response.set_data(json.dumps(publications_json))
     return response
