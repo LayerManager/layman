@@ -34,6 +34,7 @@ PUBLICATION_TYPES = {
             'layman.map.filesystem.thumbnail',
             'layman.map.micka.soap',
         ],
+        'access_rights_source': 'layman.map.prime_db_schema.table',
         'task_modules': [
             'layman.map.filesystem.tasks',
             'layman.map.micka.tasks',

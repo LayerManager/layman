@@ -50,6 +50,8 @@ def liferay_mock():
                 'testmissingattr_authz': None,
                 'testmissingattr_authz2': None,
                 'test_wms_ows_proxy_user': None,
+                'test_get_publication_info_user': None,
+                'test_get_publication_info_without_user': None,
             },
         },
         'host': '0.0.0.0',
@@ -75,6 +77,16 @@ def clear():
     while len(SUBPROCESSES) > 0:
         proc = next(iter(SUBPROCESSES))
         stop_process(proc)
+
+
+@pytest.fixture(scope="module")
+def ensure_auth_layman():
+    print(f'\nEnsure Layman with authentication is starting')
+    processes = start_layman(dict({'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner', },
+                                  **AUTHN_SETTINGS))
+    yield
+    stop_process(processes)
+    print(f'\nEnsure Layman with authentication is ending')
 
 
 @pytest.fixture(scope="module")

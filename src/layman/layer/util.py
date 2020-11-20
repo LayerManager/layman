@@ -7,7 +7,7 @@ from flask import current_app, request, g
 
 from layman import LaymanError, patch_mode
 from layman.common import util as layman_util
-from layman.util import call_modules_fn, get_providers_from_source_names, get_modules_from_names, \
+from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for
 from layman import celery as celery_util
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def
@@ -60,7 +60,7 @@ def check_layername(layername):
 def get_sources():
     key = FLASK_SOURCES_KEY
     if key not in current_app.config:
-        current_app.config[key] = get_modules_from_names(get_layer_sources())
+        current_app.config[key] = get_internal_sources(LAYER_TYPE)
     return current_app.config[key]
 
 
