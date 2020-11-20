@@ -416,6 +416,7 @@ def test_post_maps_complex(client):
         assert user_json['name'] == username
         assert user_json['email'] == ''
         assert len(user_json) == 2
+        assert 'groups' not in resp_json
 
     # continue with metadata assertion
     with app.app_context():
@@ -522,6 +523,7 @@ def test_patch_map(client):
         assert user_json['name'] == username
         assert user_json['email'] == ''
         assert len(user_json) == 2
+        assert 'groups' not in resp_json
 
     with app.app_context():
         map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()
