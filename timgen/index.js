@@ -5,8 +5,18 @@ import { saveAs } from 'file-saver';
 // const map_def_url = 'https://raw.githubusercontent.com/jirik/layman/1252fad2677f55182478c2206f47fbacb922fb97/sample/layman.map/full.json';
 
 const url_params = new URLSearchParams(window.location.search);
-const map_def_url = url_params.get('map_def_url');
-const file_name = url_params.get('file_name');
+const get_url_param = (param_name) => {
+  return url_params.get(param_name) ? decodeURIComponent(url_params.get(param_name)) : null;
+}
+
+const layman_url = get_url_param('layman_url');
+const layman_public_url = get_url_param('layman_public_url');
+const gs_url = get_url_param('gs_url');
+const gs_public_url = get_url_param('gs_public_url');
+const map_def_url = get_url_param('map_def_url');
+const proxy_header = url_params.get('proxy_header') || null;
+const editor = url_params.get('editor') || null;
+const file_name = url_params.get('file_name') || null;
 
 
 const main = async () => {
@@ -15,8 +25,16 @@ const main = async () => {
     return;
   }
 
-  const map_json = await fetch(adjust_map_url(map_def_url))
-      .then(response => {
+  const headers = {};
+  if(proxy_header && editor) {
+    headers[proxy_header] = editor;
+  }
+  const map_json = await fetch(
+      adjust_map_url(map_def_url, layman_public_url, layman_url),
+      {
+        headers,
+      },
+  ).then(response => {
             if (response.status !== 200) {
               throw Error(`Cannot read composition ${map_def_url}`);
             }
@@ -25,6 +43,9 @@ const main = async () => {
       );
   const ol_map = json_to_map({
     map_json,
+    gs_url,
+    gs_public_url,
+    headers,
   });
 
   ol_map.once('rendercomplete', (event) => {

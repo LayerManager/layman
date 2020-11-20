@@ -5,7 +5,6 @@ WORKDIR /code
 
 ADD .babelrc \
     index.html \
-    config.js \
     index.js \
     package.json \
     package-lock.json \
@@ -15,18 +14,5 @@ ADD .babelrc \
 ADD src /code/src
 
 RUN npm ci
-
-ARG LAYMAN_GS_HOST
-ARG LAYMAN_GS_PORT
-ARG LAYMAN_SERVER_NAME
-
-# https://stackoverflow.com/a/42144033
-RUN test -n "$LAYMAN_GS_HOST"
-RUN test -n "$LAYMAN_GS_PORT"
-RUN test -n "$LAYMAN_SERVER_NAME"
-
-ENV LAYMAN_GS_HOST $LAYMAN_GS_HOST
-ENV LAYMAN_GS_PORT $LAYMAN_GS_PORT
-ENV LAYMAN_SERVER_NAME $LAYMAN_SERVER_NAME
 
 RUN npm run build
