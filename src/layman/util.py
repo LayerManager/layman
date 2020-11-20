@@ -208,3 +208,41 @@ def url_for(endpoint, **values):
     else:
         result = flask_url_for(endpoint, **values, _external=True)
     return result
+
+
+def get_internal_sources(publ_type):
+    return get_modules_from_names(get_publication_types()[publ_type]['internal_sources'])
+
+
+def get_publication_info(workspace, publ_type, publ_name, context=None):
+    from layman import authz
+    from layman.layer import LAYER_TYPE
+    from layman.map import MAP_TYPE
+    context = context or {}
+
+    sources = get_internal_sources(publ_type)
+    if 'sources_filter' in context:
+        sources_names = context['sources_filter'].split(',')
+        if 'actor_name' in context:
+            sources_names.append(get_publication_types()[publ_type]['access_rights_source'])
+        sources = [
+            s for s in sources if s.__name__ in sources_names
+        ]
+
+    info_method = {
+        LAYER_TYPE: 'get_layer_info',
+        MAP_TYPE: 'get_map_info',
+    }[publ_type]
+    partial_infos = call_modules_fn(sources, info_method, [workspace, publ_name])
+
+    result = {}
+    for pi in partial_infos:
+        result.update(pi)
+
+    if 'actor_name' in context:
+        actor = context['actor_name']
+        read_access_users = result.get('access_rights').get('read')
+        if not authz.is_user_in_access_rule(actor, read_access_users):
+            result = {}
+
+    return result
