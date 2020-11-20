@@ -42,6 +42,7 @@ PUBLICATION_TYPES = {
             'layman.layer.filesystem.thumbnail',
             'layman.layer.micka.soap',
         ],
+        'access_rights_source': 'layman.layer.prime_db_schema.table',
         'task_modules': [
             'layman.layer.db.tasks',
             'layman.layer.filesystem.tasks',
