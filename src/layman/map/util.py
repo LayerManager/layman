@@ -7,7 +7,6 @@ import os
 import re
 
 from layman.authn.filesystem import get_authn_info
-from layman.authz import get_publication_access_rights
 from celery import chain
 from flask import current_app, request, g
 
@@ -251,11 +250,6 @@ def get_map_owner_info(username):
     return result
 
 
-def get_groups_info(username, mapname):
-    result = get_publication_access_rights(MAP_TYPE, username, mapname)
-    return result
-
-
 lock_decorator = redis_util.create_lock_decorator(MAP_TYPE, 'mapname', 29, is_map_task_ready)
 
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, MAP_TYPE)
@@ -322,5 +316,5 @@ def get_map_file_json(username, mapname):
     map_json = input_file.get_map_json(username, mapname)
     if map_json is not None:
         map_json['user'] = get_map_owner_info(username)
-        map_json['groups'] = get_groups_info(username, mapname)
+        map_json.pop("groups", None)
     return map_json
