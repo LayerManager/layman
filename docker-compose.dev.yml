@@ -71,10 +71,6 @@ services:
       build:
         context: timgen
         dockerfile: Dockerfile.production
-        args:
-           - LAYMAN_GS_HOST=${LAYMAN_GS_HOST}
-           - LAYMAN_GS_PORT=${LAYMAN_GS_PORT}
-           - LAYMAN_SERVER_NAME=${LAYMAN_SERVER_NAME}
       image: timgen:latest
       user: ${UID_GID}
       command: sh -c "node proxy.js & ./node_modules/.bin/http-server dist/"

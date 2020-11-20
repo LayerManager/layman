@@ -72,16 +72,21 @@ def post_map(username, mapname):
     pass
 
 
-def generate_map_thumbnail(username, mapname):
-    map_file_get_url = f'/rest/{username}/maps/{mapname}/file'
+def generate_map_thumbnail(username, mapname, editor):
+    map_file_get_url = url_for('rest_map_file.get', username=username, mapname=mapname)
 
-    map_file_get_url = f"http://{settings.LAYMAN_SERVER_NAME}{map_file_get_url}"
     params = urlencode({
         'map_def_url': map_file_get_url,
+        'layman_url': f"http://{settings.LAYMAN_SERVER_NAME}/",
+        'layman_public_url': f"{settings.LAYMAN_PUBLIC_URL_SCHEME}://{settings.LAYMAN_PROXY_SERVER_NAME}/",
+        'gs_url': f"http://{settings.LAYMAN_SERVER_NAME}{settings.LAYMAN_GS_PATH}",
+        'gs_public_url': f"{settings.LAYMAN_GS_PROXY_BASE_URL}",
+        'editor': editor or '',
+        'proxy_header': settings.LAYMAN_AUTHN_HTTP_HEADER_NAME,
         # 'file_name': tmp_file_name,
     })
     timgen_url = f"{settings.LAYMAN_TIMGEN_URL}?{params}"
-    # current_app.logger.info(f"Timgen URL: {timgen_url}")
+    current_app.logger.info(f"Timgen URL: {timgen_url}")
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")
