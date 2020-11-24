@@ -136,6 +136,15 @@ def test_access_rights():
     case_test_gs_rules(username,
                        layername1,
                        authn_headers1,
+                       {'read': {settings.RIGHTS_EVERYONE_ROLE, username},
+                        'write': {settings.RIGHTS_EVERYONE_ROLE, username}},
+                       [{'read': {settings.RIGHTS_EVERYONE_ROLE, username},
+                         'write': {settings.RIGHTS_EVERYONE_ROLE, username}, }],
+                       )
+
+    case_test_gs_rules(username,
+                       layername1,
+                       authn_headers1,
                        {'read': {username},
                         'write': {username}, },
                        [{'read': {username},
