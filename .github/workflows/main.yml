@@ -19,7 +19,7 @@ jobs:
       - uses: BSFishy/pip-action@v1
         with:
           packages: |
-            pycodestyle,
+            pycodestyle
             autopep8
 
       - name: Random echo
