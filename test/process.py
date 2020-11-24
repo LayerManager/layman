@@ -119,7 +119,7 @@ def start_layman(env_vars=None):
 
     celery_env = layman_env.copy()
     celery_env['LAYMAN_SKIP_REDIS_LOADING'] = 'true'
-    cmd = f'python3 -m celery -Q {LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info'
+    cmd = f'python3 -m celery -Q {LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info --concurrency=4'
     celery_process = subprocess.Popen(cmd.split(), shell=False, stdin=None, env=layman_env, cwd='src')
 
     SUBPROCESSES.add(celery_process)
