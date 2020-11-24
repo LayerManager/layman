@@ -74,7 +74,7 @@ URL of Liferay User Profile endpoint.
 List of [users](models.md#user) and [roles](models.md#role) giving them permission to create new [public workspace](models.md#public-workspace). It must be subset of (or equal to) GRANT_PUBLISH_IN_PUBLIC_WORKSPACE.
 
 ### GRANT_PUBLISH_IN_PUBLIC_WORKSPACE
-List of [users](models.md#user) and [roles](models.md#role) giving them permission to publish new [publication](models.md#publication) in [public workspace](models.md#public-workspace).
+List of [users](models.md#user) and [roles](models.md#role) giving them permission to publish new [publication](models.md#publication) in already created [public workspace](models.md#public-workspace).
 
 ## Layman Test Client Settings
 
