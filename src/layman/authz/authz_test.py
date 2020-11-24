@@ -3,7 +3,7 @@ import json
 
 from layman import app, settings, LaymanError
 from flask import g
-from . import authorize_decorator, parse_request_path, MULTI_PUBLICATION_PATH_PATTERN, SINGLE_PUBLICATION_PATH_PATTERN
+from . import authorize_publications_decorator, parse_request_path, MULTI_PUBLICATION_PATH_PATTERN, SINGLE_PUBLICATION_PATH_PATTERN
 from test import process, process_client
 
 
@@ -22,7 +22,7 @@ def test_authorize_assert_wrong_path():
         '/rest/users/maps/map',
     ]
 
-    @authorize_decorator
+    @authorize_publications_decorator
     def mock_method():
         pass
 
@@ -37,7 +37,7 @@ def test_authorize_assert_wrong_path():
 
 def test_authorize_accepts_path():
 
-    @authorize_decorator
+    @authorize_publications_decorator
     def mock_method():
         pass
 

@@ -150,7 +150,7 @@ def can_i_edit(publ_type, workspace, publication_name):
     return can_user_write_publication(actor_name, workspace, publ_type, publication_name)
 
 
-def authorize_decorator(f):
+def authorize_publications_decorator(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         # print(f"authorize ARGS {args} KWARGS {kwargs}")

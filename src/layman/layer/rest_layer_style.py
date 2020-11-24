@@ -1,7 +1,7 @@
 from flask import Blueprint, current_app as app, g, Response
 
 from layman.authn import authenticate
-from layman.authz import authorize_decorator
+from layman.authz import authorize_publications_decorator
 from layman.layer.geoserver import sld
 from layman.util import check_username_decorator
 from layman import settings
@@ -14,7 +14,7 @@ bp = Blueprint('rest_layer_style', __name__)
 @check_username_decorator
 @util.check_layername_decorator
 @authenticate
-@authorize_decorator
+@authorize_publications_decorator
 @util.info_decorator
 def before_request():
     pass

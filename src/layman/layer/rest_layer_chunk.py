@@ -5,7 +5,7 @@ from layman.util import check_username_decorator
 from . import util
 from .filesystem import input_chunk
 from layman.authn import authenticate
-from layman.authz import authorize_decorator
+from layman.authz import authorize_publications_decorator
 
 bp = Blueprint('rest_layer_chunk', __name__)
 
@@ -14,7 +14,7 @@ bp = Blueprint('rest_layer_chunk', __name__)
 @check_username_decorator
 @util.check_layername_decorator
 @authenticate
-@authorize_decorator
+@authorize_publications_decorator
 def before_request():
     pass
 

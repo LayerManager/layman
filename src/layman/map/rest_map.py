@@ -9,7 +9,7 @@ from . import util
 from .filesystem import input_file, thumbnail
 from layman import authn
 from layman.authn import authenticate
-from layman.authz import authorize_decorator, util as authz_util
+from layman.authz import authorize_publications_decorator, util as authz_util
 
 bp = Blueprint('rest_map', __name__)
 
@@ -18,7 +18,7 @@ bp = Blueprint('rest_map', __name__)
 @check_username_decorator
 @util.check_mapname_decorator
 @authenticate
-@authorize_decorator
+@authorize_publications_decorator
 @util.info_decorator
 def before_request():
     pass
