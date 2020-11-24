@@ -49,6 +49,8 @@ def liferay_mock():
                 'testmissingattr': None,
                 'testmissingattr_authz': None,
                 'testmissingattr_authz2': None,
+                'test_map_with_unauthorized_layer_user1': None,
+                'test_map_with_unauthorized_layer_user2': None,
                 'test_wms_ows_proxy_user': None,
                 'test_get_publication_info_user': None,
                 'test_get_publication_info_without_user': None,
