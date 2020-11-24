@@ -34,11 +34,16 @@ def assert_gs_layer_data_security(username,
                                   layername,
                                   expected_roles):
     auth = settings.LAYMAN_GS_AUTH
+    with app.app_context():
+        is_personal_workspace = users.get_user_infos(username)
+    owner_and_everyone_roles = geoserver.layman_users_to_geoserver_roles({username, settings.RIGHTS_EVERYONE_ROLE})
+    owner_role_set = geoserver.layman_users_to_geoserver_roles({username})
     for right_type in ['read', 'write']:
         gs_expected_roles = geoserver.layman_users_to_geoserver_roles(expected_roles[right_type])
         gs_roles = geoserver.get_security_roles(f'{username}.{layername}.{right_type[0]}', auth)
         assert gs_expected_roles == gs_roles\
-            or ('ROLE_ANONYMOUS' in gs_expected_roles and 'ROLE_ANONYMOUS' in gs_roles), right_type
+            or (is_personal_workspace
+                and gs_expected_roles == owner_and_everyone_roles == gs_roles.union(owner_role_set)), right_type
 
 
 def assert_layman_layer_access_rights(username,
