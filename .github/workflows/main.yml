@@ -17,6 +17,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - uses: BSFishy/pip-action@v1
+        with:
+          packages: |
 
       - name: Random echo
         run: echo "Random text message."
