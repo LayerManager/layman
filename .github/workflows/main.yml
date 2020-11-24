@@ -25,9 +25,9 @@ jobs:
       - name: Random echo
         run: echo "Random text message."
 
+      - name: Run autopep8
+        run: autopep8 --recursive --diff --aggressive --aggressive --exit-code --ignore=E402,E501,W503 ./src ./test
 
       - name: Run pycodestyle
         run: pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,W503 ./src ./test
 
-      - name: Run autopep8
-        run: autopep8 --recursive --diff --aggressive --aggressive --exit-code --ignore=E402,E501,W503 ./src ./test
