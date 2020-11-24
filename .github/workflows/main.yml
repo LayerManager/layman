@@ -26,13 +26,52 @@ jobs:
       - run: npm install --global remark-cli remark-validate-links remark-lint-no-dead-urls
       - run: make remark
 
-  # This workflow contains a single job called "build"
+  "Flake 8 syntax errors":
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      # see https://github.com/BSFishy/pip-action
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: |
+            flake8
+
+      - name: Run flake8
+          # stop the build if there are Python syntax errors or undefined names
+          #    E9 tests are about Python syntax errors usually raised because flake8 can not build an Abstract Syntax Tree (AST). Often these issues are a sign of unused code or code that has not been ported to Python 3. These would be compile-time errors in a compiled language but in a dynamic language like Python they result in the script halting/crashing on the user.
+          #    F63 tests are usually about the confusion between identity and equality in Python. Use ==/!= to compare str, bytes, and int literals is the classic case. These are areas where a == b is True but a is b is False (or vice versa).
+          #    F7 tests logic errors and syntax errors in type hints
+          #    F82 tests are almost always undefined names which are usually a sign of a typo, missing imports, or code that has not been ported to Python 3. These also would be compile-time errors in a compiled language but in Python a NameError is raised which will halt/crash the script on the user.
+        run: flake8 --count --select=E9,F63,F7,F82 --show-source --statistics ./src
+
+  "Flake 8 full report":
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      # see https://github.com/BSFishy/pip-action
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: |
+            flake8
+
+      - name: Run flake8
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        run: flake8 --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics ./src ./test
+
   PyCodeStyle:
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
         with:
@@ -44,35 +83,23 @@ jobs:
           packages: |
             pycodestyle
 
-      - name: Random echo
-        run: echo "Random text message."
-
-      - name: Install autopep8
-        run: pip install autopep8
-
-      - name: Install pycodestyle
-        run: pip install pycodestyle
-
-      - name: Run autopep8
-        run: autopep8 --recursive --diff --aggressive --aggressive --exit-code --ignore=E402,E501,W503 ./src ./test
-
       - name: Run pycodestyle
         run: pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,W503 ./src ./test
 
-  Pylint:
-
+  AutoPEP8:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v1
+      - uses: actions/setup-python@v1
         with:
           python-version: 3.8
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pylint
-      - name: Analysing the code with pylint
-        run: |
-          pylint -f colorized -r y --fail-under 6.8 --disable=missing-docstring ./src ./test
+
+      # see https://github.com/BSFishy/pip-action
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: |
+            autopep8
+
+      - name: Run autopep8
+        run: autopep8 --recursive --diff --aggressive --aggressive --exit-code --ignore=E402,E501,W503 ./src ./test
