@@ -10,6 +10,7 @@ from test import process, process_client as client_util
 
 
 liferay_mock = process.liferay_mock
+ensure_auth_layman = process.ensure_auth_layman
 LIFERAY_PORT = process.LIFERAY_PORT
 
 ISS_URL_HEADER = client_util.ISS_URL_HEADER
@@ -58,7 +59,7 @@ def assert_layman_layer_access_rights(username,
     assert set(access_rights['write']) == roles_to_test['write']
 
 
-def case_test_gs_rules_inner(username,
+def case_test_gs_rules(username,
                              layername,
                              authn_headers,
                              roles_post=None,
@@ -97,105 +98,84 @@ def case_test_gs_rules_inner(username,
     client_util.delete_layer(username, layername, headers=authn_headers)
 
 
-def case_test_gs_rules(username,
-                       layername,
-                       authn_headers,
-                       roles_post,
-                       roles_patch_list,
-                       ):
-    case_test_gs_rules_inner(username,
-                             layername,
-                             authn_headers,
-                             roles_post,
-                             roles_patch_list,
-                             )
-    case_test_gs_rules_inner(username,
-                             layername,
-                             authn_headers,
-                             roles_post,
-                             roles_patch_list,
-                             True,
-                             )
+username = 'test_gs_rules_user'
+layername1 = 'test_gs_rules_layer'
 
 
-@pytest.mark.usefixtures('liferay_mock')
-def test_access_rights():
-    username = 'test_gs_rules_user'
-    layername1 = 'test_gs_rules_layer'
-
-    layman_process = process.start_layman(AUTHN_SETTINGS)
+@pytest.fixture(scope="module")
+def ensure_user(liferay_mock, ensure_auth_layman):
     authn_headers1 = client_util.get_authz_headers(username)
 
     client_util.reserve_username(username, headers=authn_headers1)
     assert_gs_user_and_roles(username)
 
-    case_test_gs_rules(username,
-                       layername1,
-                       authn_headers1,
-                       {'read': {settings.RIGHTS_EVERYONE_ROLE},
-                        'write': {settings.RIGHTS_EVERYONE_ROLE}, },
-                       [{'read': {settings.RIGHTS_EVERYONE_ROLE},
-                         'write': {settings.RIGHTS_EVERYONE_ROLE}, }],
-                       )
+
+def generate_test_parameters():
+    defs_without_use_file = [
+        (
+            {'read': {settings.RIGHTS_EVERYONE_ROLE},
+             'write': {settings.RIGHTS_EVERYONE_ROLE}, },
+            [{'read': {settings.RIGHTS_EVERYONE_ROLE},
+              'write': {settings.RIGHTS_EVERYONE_ROLE}, }],
+        ),
+        (
+            {'read': {settings.RIGHTS_EVERYONE_ROLE, username},
+             'write': {settings.RIGHTS_EVERYONE_ROLE, username}},
+            [{'read': {settings.RIGHTS_EVERYONE_ROLE, username},
+              'write': {settings.RIGHTS_EVERYONE_ROLE, username}, }],
+        ),
+        (
+            {'read': {username},
+             'write': {username}, },
+            [{'read': {username},
+              'write': {username}, }],
+        ),
+        (
+            {'read': {settings.RIGHTS_EVERYONE_ROLE},
+             'write': {settings.RIGHTS_EVERYONE_ROLE}, },
+            [{'read': {username},
+              'write': {username}, }],
+        ),
+        (
+            {'read': {username},
+             'write': {username}, },
+            [{'read': {settings.RIGHTS_EVERYONE_ROLE},
+              'write': {settings.RIGHTS_EVERYONE_ROLE}, }],
+        ),
+        (
+            {'read': {settings.RIGHTS_EVERYONE_ROLE},
+             'write': {settings.RIGHTS_EVERYONE_ROLE}, },
+            [{'write': {username}}, ],
+        ),
+        (
+            {'read': {username},
+             'write': {username}, },
+            [{'read': {settings.RIGHTS_EVERYONE_ROLE}}, ],
+        ),
+        (
+            {'read': {username},
+             'write': {username}, },
+            [],
+        ),
+    ]
+    return [
+        t + (False,) for t in defs_without_use_file
+    ] + [
+        t + (True,) for t in defs_without_use_file
+    ]
+
+
+@pytest.mark.usefixtures('liferay_mock')
+@pytest.mark.usefixtures('ensure_auth_layman')
+@pytest.mark.usefixtures('ensure_user')
+@pytest.mark.parametrize("post_access_rights, patch_access_rights_list, use_file", generate_test_parameters())
+def test_access_rights(post_access_rights, patch_access_rights_list, use_file):
+
+    authn_headers1 = client_util.get_authz_headers(username)
 
     case_test_gs_rules(username,
                        layername1,
                        authn_headers1,
-                       {'read': {settings.RIGHTS_EVERYONE_ROLE, username},
-                        'write': {settings.RIGHTS_EVERYONE_ROLE, username}},
-                       [{'read': {settings.RIGHTS_EVERYONE_ROLE, username},
-                         'write': {settings.RIGHTS_EVERYONE_ROLE, username}, }],
-                       )
-
-    case_test_gs_rules(username,
-                       layername1,
-                       authn_headers1,
-                       {'read': {username},
-                        'write': {username}, },
-                       [{'read': {username},
-                         'write': {username}, }],
-                       )
-
-    case_test_gs_rules(username,
-                       layername1,
-                       authn_headers1,
-                       {'read': {settings.RIGHTS_EVERYONE_ROLE},
-                        'write': {settings.RIGHTS_EVERYONE_ROLE}, },
-                       [{'read': {username},
-                         'write': {username}, }],
-                       )
-
-    case_test_gs_rules(username,
-                       layername1,
-                       authn_headers1,
-                       {'read': {username},
-                        'write': {username}, },
-                       [{'read': {settings.RIGHTS_EVERYONE_ROLE},
-                         'write': {settings.RIGHTS_EVERYONE_ROLE}, }],
-                       )
-
-    case_test_gs_rules(username,
-                       layername1,
-                       authn_headers1,
-                       {'read': {settings.RIGHTS_EVERYONE_ROLE},
-                        'write': {settings.RIGHTS_EVERYONE_ROLE}, },
-                       [{'write': {username}}, ],
-                       )
-
-    case_test_gs_rules(username,
-                       layername1,
-                       authn_headers1,
-                       {'read': {username},
-                        'write': {username}, },
-                       [{'read': {settings.RIGHTS_EVERYONE_ROLE}}, ],
-                       )
-
-    case_test_gs_rules(username,
-                       layername1,
-                       authn_headers1,
-                       {'read': {username},
-                        'write': {username}, },
-                       [],
-                       )
-
-    process.stop_process(layman_process)
+                       roles_post=post_access_rights,
+                       roles_patch_list=patch_access_rights_list,
+                       use_file=use_file)
