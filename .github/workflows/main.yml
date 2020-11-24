@@ -21,7 +21,5 @@ jobs:
           packages: |
             pycodestyle
 
-      - name: Pip
-        run: pip install pycodestyle
       - name: Run pycodestyle
-        run: pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,W503 ./src ./test
+        run: ./pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,W503 ./src ./test
