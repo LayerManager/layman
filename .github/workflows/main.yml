@@ -28,7 +28,7 @@ jobs:
       - run: npm install --global remark-cli remark-validate-links remark-lint-no-dead-urls
       - run: make remark
 
-  "Flake 8 syntax errors":
+  Flake_8_syntax_errors:
     runs-on: ubuntu-latest
 
     steps:
@@ -51,7 +51,7 @@ jobs:
           #    F82 tests are almost always undefined names which are usually a sign of a typo, missing imports, or code that has not been ported to Python 3. These also would be compile-time errors in a compiled language but in Python a NameError is raised which will halt/crash the script on the user.
         run: flake8 --count --select=E9,F63,F7,F82 --show-source --statistics ./src
 
-  "Flake 8 full report":
+  Flake_8_full_report:
     runs-on: ubuntu-latest
 
     steps:
