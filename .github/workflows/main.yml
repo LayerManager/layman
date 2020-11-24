@@ -21,5 +21,9 @@ jobs:
           packages: |
             pycodestyle
 
+      - name: Random echo
+        run: echo "Random text message."
+
+
       - name: Run pycodestyle
-        run: ./pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,W503 ./src ./test
+        run: pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,W503 ./src ./test
