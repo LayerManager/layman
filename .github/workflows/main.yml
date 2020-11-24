@@ -17,13 +17,15 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - uses: BSFishy/pip-action@v1
-        with:
-          packages: |
-            pycodestyle
-            autopep8
 
       - name: Random echo
         run: echo "Random text message."
+
+      - name: Install autopep8
+        run: pip install autopep8
+
+      - name: Install pycodestyle
+        run: pip install pycodestyle
 
       - name: Run autopep8
         run: autopep8 --recursive --diff --aggressive --aggressive --exit-code --ignore=E402,E501,W503 ./src ./test
