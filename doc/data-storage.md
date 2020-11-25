@@ -19,14 +19,14 @@ Data stores:
 ### Users
 Information about users includes their names, contacts, and authentication credentials.
 
-When user [reserves his username](rest.md#patch-current-user), names, contacts and other relevant metadata are [obtained from authorization provider](oauth2/index.md#fetch-user-related-metadata) and saved to [filesystem](#filesystem) and [Redis](#redis).
+When user [reserves his username](rest.md#patch-current-user), names, contacts and other relevant metadata are [obtained from authorization provider](oauth2/index.md#fetch-user-related-metadata) and saved to [filesystem](#filesystem), [Redis](#redis) and [PostgreSQL](#postgresql).
 
 ### Layers
 Information about [layers](models.md#layer) includes vector data and visualization.
 
 When user [publishes new layer](rest.md#post-layers)
 - UUID and name is saved to [Redis](#redis) and [filesystem](#filesystem),
-- UUID, name and title is saved to [PostgreSQL](#postgresql),
+- UUID, name, title and access rights are to [PostgreSQL](#postgresql),
 - vector data files and visualization file is saved to [filesystem](#filesystem) (if uploaded [synchronously](async-file-upload.md)),
 - and asynchronous [tasks](#tasks) are saved in [Redis](#redis).
 
@@ -44,7 +44,7 @@ Information about [maps](models.md#map) includes JSON definition.
 
 When user [publishes new map](rest.md#post-maps)
 - UUID and name is saved to [Redis](#redis) and [filesystem](#filesystem),
-- UUID, name and title is saved to [PostgreSQL](#postgresql),
+- UUID, name, title and access rights are saved to [PostgreSQL](#postgresql),
 - JSON file is saved to [filesystem](#filesystem),
 - and asynchronous [tasks](#tasks) are saved in [Redis](#redis).
 
@@ -78,7 +78,7 @@ Filesystem is used as persistent data store, so data survives Layman restart.
  
 ### PostgreSQL
 Layman uses directly **one database** specified by [LAYMAN_PG_DBNAME](env-settings.md#LAYMAN_PG_DBNAME) to store
-- general information about users, workspaces, and publications in schema specified by [LAYMAN_PRIME_SCHEMA](env-settings.md#LAYMAN_PRIME_SCHEMA),
+- general information about users, workspaces, and publications including access rights in schema specified by [LAYMAN_PRIME_SCHEMA](env-settings.md#LAYMAN_PRIME_SCHEMA),
 - vector layer data.
 
 Vector layer data is organized in schemas and tables:
