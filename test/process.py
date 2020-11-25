@@ -4,6 +4,7 @@ import subprocess
 import os
 import redis
 import logging
+import time
 
 from layman import settings
 
@@ -133,3 +134,4 @@ def stop_process(process):
     for proc in process:
         proc.kill()
         SUBPROCESSES.remove(proc)
+    time.sleep(1)
