@@ -20,9 +20,9 @@ def test_get_layer_style():
 
     with app.app_context():
         rest_url = url_for('rest_layer_style.get', username=username, layername=layername)
-        rv = requests.get(rest_url)
-        assert rv.status_code == 200, rv.text
-        # lxml does not support importing from utf8 string
-        xml_tree = ET.fromstring(bytes(rv.text, encoding='utf8'))
-        assert ET.QName(xml_tree) == "{http://www.opengis.net/sld}StyledLayerDescriptor", rv.text
+    rv = requests.get(rest_url)
+    assert rv.status_code == 200, rv.text
+    # lxml does not support importing from utf8 string
+    xml_tree = ET.fromstring(bytes(rv.text, encoding='utf8'))
+    assert ET.QName(xml_tree) == "{http://www.opengis.net/sld}StyledLayerDescriptor", rv.text
     process_client.delete_layer(username, layername)
