@@ -60,11 +60,11 @@ def assert_layman_layer_access_rights(username,
 
 
 def case_test_gs_rules(username,
-                             layername,
-                             authn_headers,
-                             roles_post=None,
-                             roles_patch_list=None,
-                             use_file=False):
+                       layername,
+                       authn_headers,
+                       roles_post=None,
+                       roles_patch_list=None,
+                       use_file=False):
     roles_post = roles_post or {'read': f'{username}',
                                 'write': f'{username}'}
     roles_patch_list = roles_patch_list or []
@@ -103,72 +103,61 @@ layername1 = 'test_gs_rules_layer'
 
 
 @pytest.fixture(scope="module")
-def ensure_user(liferay_mock, ensure_auth_layman):
+def ensure_user():
     authn_headers1 = client_util.get_authz_headers(username)
 
     client_util.reserve_username(username, headers=authn_headers1)
     assert_gs_user_and_roles(username)
 
 
-def generate_test_parameters():
-    defs_without_use_file = [
-        (
-            {'read': {settings.RIGHTS_EVERYONE_ROLE},
-             'write': {settings.RIGHTS_EVERYONE_ROLE}, },
-            [{'read': {settings.RIGHTS_EVERYONE_ROLE},
-              'write': {settings.RIGHTS_EVERYONE_ROLE}, }],
-        ),
-        (
-            {'read': {settings.RIGHTS_EVERYONE_ROLE, username},
-             'write': {settings.RIGHTS_EVERYONE_ROLE, username}},
-            [{'read': {settings.RIGHTS_EVERYONE_ROLE, username},
-              'write': {settings.RIGHTS_EVERYONE_ROLE, username}, }],
-        ),
-        (
-            {'read': {username},
-             'write': {username}, },
-            [{'read': {username},
-              'write': {username}, }],
-        ),
-        (
-            {'read': {settings.RIGHTS_EVERYONE_ROLE},
-             'write': {settings.RIGHTS_EVERYONE_ROLE}, },
-            [{'read': {username},
-              'write': {username}, }],
-        ),
-        (
-            {'read': {username},
-             'write': {username}, },
-            [{'read': {settings.RIGHTS_EVERYONE_ROLE},
-              'write': {settings.RIGHTS_EVERYONE_ROLE}, }],
-        ),
-        (
-            {'read': {settings.RIGHTS_EVERYONE_ROLE},
-             'write': {settings.RIGHTS_EVERYONE_ROLE}, },
-            [{'write': {username}}, ],
-        ),
-        (
-            {'read': {username},
-             'write': {username}, },
-            [{'read': {settings.RIGHTS_EVERYONE_ROLE}}, ],
-        ),
-        (
-            {'read': {username},
-             'write': {username}, },
-            [],
-        ),
-    ]
-    return [
-        t + (False,) for t in defs_without_use_file
-    ] + [
-        t + (True,) for t in defs_without_use_file
-    ]
-
-
-@pytest.mark.usefixtures('liferay_mock')
-@pytest.mark.usefixtures('ensure_auth_layman')
-@pytest.mark.usefixtures('ensure_user')
-@pytest.mark.parametrize("post_access_rights, patch_access_rights_list, use_file", generate_test_parameters())
+@pytest.mark.usefixtures('liferay_mock', 'ensure_auth_layman', 'ensure_user')
+@pytest.mark.parametrize("post_access_rights, patch_access_rights_list", [
+    (
+        {'read': {settings.RIGHTS_EVERYONE_ROLE},
+         'write': {settings.RIGHTS_EVERYONE_ROLE}, },
+        [{'read': {settings.RIGHTS_EVERYONE_ROLE},
+          'write': {settings.RIGHTS_EVERYONE_ROLE}, }],
+    ),
+    (
+        {'read': {settings.RIGHTS_EVERYONE_ROLE, username},
+         'write': {settings.RIGHTS_EVERYONE_ROLE, username}},
+        [{}],
+    ),
+    (
+        {'read': {username},
+         'write': {username}, },
+        [{'read': {username},
+          'write': {username}, }],
+    ),
+    (
+        {'read': {settings.RIGHTS_EVERYONE_ROLE},
+         'write': {settings.RIGHTS_EVERYONE_ROLE}, },
+        [{'read': {username},
+          'write': {username}, }],
+    ),
+    (
+        {'read': {username},
+         'write': {username}, },
+        [{'read': {settings.RIGHTS_EVERYONE_ROLE},
+          'write': {settings.RIGHTS_EVERYONE_ROLE}, }],
+    ),
+    (
+        {'read': {settings.RIGHTS_EVERYONE_ROLE},
+         'write': {settings.RIGHTS_EVERYONE_ROLE}, },
+        [{'write': {username}}, ],
+    ),
+    (
+        {'read': {username},
+         'write': {username}, },
+        [{'read': {settings.RIGHTS_EVERYONE_ROLE}}, ],
+    ),
+    (
+        {'read': {username},
+         'write': {username}, },
+        [],
+    ),
+])
+@pytest.mark.parametrize("use_file", [False, True])
 def test_access_rights(post_access_rights, patch_access_rights_list, use_file):
 
     authn_headers1 = client_util.get_authz_headers(username)
