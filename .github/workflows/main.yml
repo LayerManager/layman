@@ -12,12 +12,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: View versions
+          docker -v
+          docker-compose -v
+
       - name: Run tests
         run: |
-         cp .env.test .env
-         docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql
-         docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build micka geoserver
-         make test
+          cp .env.test .env
+          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql
+          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build micka geoserver
+          make test
 
   ReMark:
     runs-on: ubuntu-latest
