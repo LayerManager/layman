@@ -1,0 +1,30 @@
+name: IntegrationTests
+
+on: [push]
+
+jobs:
+  IntegrationTests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: View versions
+        run: |
+          docker -v
+          docker-compose -v
+
+      - name: Build
+        run: |
+          cp .env.test .env
+          docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_dev
+          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql
+          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel
+
+      - name: Download test data
+        run: |
+          mkdir -p tmp
+          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh"
+
+      - name: Run tests
+        run: |
+          make test
