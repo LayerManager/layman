@@ -7,15 +7,6 @@ on: [push]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  Echo:
-    runs-on: ubuntu-latest
-    steps:
-      - name: View versions
-        run: |
-          docker -v
-          docker-compose -v
-
-
   IntegrationTests:
     runs-on: ubuntu-latest
     steps:
@@ -26,13 +17,13 @@ jobs:
           docker -v
           docker-compose -v
 
+      - name: Build
+        run: |
+          cp .env.test .env
+          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build
+
       - name: Run tests
         run: |
-          docker -v
-          docker-compose -v
-          cp .env.test .env
-          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql
-          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build micka geoserver
           make test
 
   ReMark:
