@@ -6,9 +6,9 @@ import requests
 from flask import g, current_app as app
 
 from layman.http import LaymanError
-from layman import settings
+from layman import settings, util as layman_util
 from layman.common import geoserver as common
-from layman.layer.prime_db_schema import table as prime_db_schema
+from layman.layer import LAYER_TYPE
 
 FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
 FLASK_RULES_KEY = f"{__name__}:RULES"
@@ -98,7 +98,7 @@ def publish_layer_from_db(username, layername, description, title, access_rights
     wms.clear_cache(username)
 
     if not access_rights or not access_rights.get('read') or not access_rights.get('write'):
-        layer_info = prime_db_schema.get_layer_info(username, layername)
+        layer_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'sources_filter': 'layman.layer.prime_db_schema.table', })
 
     read_roles = (access_rights and access_rights.get('read')) or layer_info['access_rights']['read']
     write_roles = (access_rights and access_rights.get('write')) or layer_info['access_rights']['write']
