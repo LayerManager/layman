@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, current_app as app, g
 from copy import deepcopy
 
-import layman.common.rest
+from layman.common import rest as rest_util
 from layman.common import redis as redis_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator
@@ -9,7 +9,7 @@ from layman import settings, authn
 from . import util
 from .filesystem import input_file, input_sld, input_chunk
 from layman.authn import authenticate
-from layman.authz import authorize_publications_decorator, util as authz_util
+from layman.authz import authorize_publications_decorator
 
 bp = Blueprint('rest_layer', __name__)
 
@@ -138,7 +138,7 @@ def patch(username, layername):
                     username, layername, files, check_crs)
     kwargs.update({'actor_name': authn.get_authn_username()})
 
-    layman.common.rest.setup_patch_access_rights(request.form, kwargs)
+    rest_util.setup_patch_access_rights(request.form, kwargs)
 
     util.patch_layer(
         username,

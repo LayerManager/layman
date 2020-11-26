@@ -4,14 +4,14 @@ import io
 from flask import Blueprint, jsonify, request, current_app as app, g
 from werkzeug.datastructures import FileStorage
 
-import layman.common.rest
+from layman.common import rest as rest_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
 from . import util, MAP_TYPE
 from .filesystem import input_file, uuid
 from layman import authn
 from layman.authn import authenticate
-from layman.authz import authorize_publications_decorator, util as authz_util
+from layman.authz import authorize_publications_decorator
 from layman.common import redis as redis_util
 from .prime_db_schema import table
 
@@ -113,7 +113,7 @@ def post(username):
             'actor_name': actor_name
         }
 
-        layman.common.rest.setup_post_access_rights(request.form, kwargs, actor_name)
+        rest_util.setup_post_access_rights(request.form, kwargs, actor_name)
 
         util.post_map(
             username,
