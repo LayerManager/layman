@@ -6,7 +6,7 @@ from layman import app
 from layman import settings
 from layman.layer import db
 from test.process_client import get_authz_headers
-from test import process, process_client as client_util, flask_client
+from test import process, process_client as client_util
 from test.data import wfs as data_wfs
 from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.layer.geoserver.util import wms_direct
@@ -24,14 +24,13 @@ AUTHN_INTROSPECTION_URL = process.AUTHN_INTROSPECTION_URL
 AUTHN_SETTINGS = process.AUTHN_SETTINGS
 
 
-client = flask_client.client
-
-
-def test_rest_get(client):
+def test_rest_get():
     username = 'wfs_proxy_test'
     layername = 'layer_wfs_proxy_test'
 
-    flask_client.publish_layer(username, layername, client)
+    layman_process = process.start_layman()
+
+    client_util.publish_layer(username, layername)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
     headers = {
@@ -42,18 +41,19 @@ def test_rest_get(client):
     data_xml = data_wfs.get_wfs20_insert_points(username, layername)
 
     with app.app_context():
-        r = client.post(rest_url,
-                        data=data_xml,
-                        headers=headers)
+        r = requests.post(rest_url,
+                          data=data_xml,
+                          headers=headers)
     assert r.status_code == 200, r.data
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=GetCapabilities"
     with app.app_context():
-        r = client.post(rest_url,
-                        headers=headers)
+        r = requests.post(rest_url,
+                          headers=headers)
     assert r.status_code == 200
 
-    flask_client.delete_layer(username, layername, client)
+    client_util.delete_layer(username, layername)
+    process.stop_process(layman_process)
 
 
 def setup_user_layer(username, layername, authn_headers):
