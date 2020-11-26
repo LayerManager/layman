@@ -5,9 +5,9 @@ from layman.common.prime_db_schema import workspaces, users, publications
 from layman import util as layman_util
 
 
-from flask import g, request
+from flask import request
 
-from layman import LaymanError, settings
+from layman import LaymanError, settings, authn
 from layman.common.rest import parse_request_path
 
 
@@ -105,7 +105,7 @@ def can_user_write_publication(username, workspace, publication_type, publicatio
 
 
 def can_i_edit(publ_type, workspace, publication_name):
-    actor_name = g.user and g.user.get('username')
+    actor_name = authn.get_authn_username()
     return can_user_write_publication(actor_name, workspace, publ_type, publication_name)
 
 
@@ -117,7 +117,7 @@ def authorize_publications_decorator(f):
         (workspace, publication_type, publication_name) = parse_request_path(req_path)
         if workspace is None or publication_type is None:
             raise Exception(f"Authorization module is unable to authorize path {req_path}")
-        actor_name = g.user and g.user.get('username')
+        actor_name = authn.get_authn_username()
         # raises exception in case of unauthorized request
         authorize(workspace, publication_type, publication_name, request.method, actor_name)
         if workspace and publication_type and not publication_name and request.method == 'GET':
