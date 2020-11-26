@@ -3,79 +3,55 @@ import json
 
 from layman import app, settings, LaymanError
 from flask import g
-from . import authorize_publications_decorator, parse_request_path, MULTI_PUBLICATION_PATH_PATTERN, SINGLE_PUBLICATION_PATH_PATTERN
+from . import authorize_publications_decorator
+from ..common.rest import parse_request_path, MULTI_PUBLICATION_PATH_PATTERN, SINGLE_PUBLICATION_PATH_PATTERN
 from test import process, process_client
 
 
 liferay_mock = process.liferay_mock
 
 
-def test_authorize_assert_wrong_path():
-    wrong_paths = [
-        '/rest/layers',
-        '/rest/layers/abc',
-        '/rest/username/abc',
-        '/rest/username/publications',
-        '/rest/username/publications/blablabla',
-        '/rest/username/publications/blablabla/da',
-        '/rest/users/layers',
-        '/rest/users/maps/map',
-    ]
-
-    @authorize_publications_decorator
-    def mock_method():
-        pass
-
-    for wrong_path in wrong_paths:
-        (workspace, publication_type, publication_name) = parse_request_path(wrong_path)
-        assert not workspace or not publication_type, f"Parsing {wrong_path} returns {(workspace, publication_type, publication_name)}"
-        with app.test_request_context(wrong_path):
-            with pytest.raises(Exception) as exc_info:
-                mock_method()
-            assert str(exc_info.value) == f"Authorization module is unable to authorize path {wrong_path}", exc_info.traceback
+@authorize_publications_decorator
+def mock_method():
+    pass
 
 
-def test_authorize_accepts_path():
-
-    @authorize_publications_decorator
-    def mock_method():
-        pass
-
-    multi_paths = [
-        '/rest/user_a/layers',
-        '/rest/user_a/layers/',
-        '/rest/user_a/maps/',
-    ]
-    for req_path in multi_paths:
-        m = MULTI_PUBLICATION_PATH_PATTERN.match(req_path)
-        assert m, {req_path}
-        (workspace, publication_type, publication_name) = parse_request_path(req_path)
-        assert workspace and publication_type and not publication_name, f"Parsing {req_path} returns {(workspace, publication_type, publication_name)}"
-        with app.test_request_context(req_path):
-            g.user = None
-            with pytest.raises(Exception) as exc_info:
-                mock_method()
-            assert isinstance(exc_info.value, LaymanError)
-
-    single_paths = [
-        '/rest/user_a/layers/abc',
-        '/rest/user_a/layers/some_layer/some/nested/endpoint',
-        '/rest/user_a/maps/a_map',
-    ]
-    for req_path in single_paths:
-        m = SINGLE_PUBLICATION_PATH_PATTERN.match(req_path)
-        assert m, f"{req_path} {SINGLE_PUBLICATION_PATH_PATTERN}"
-        (workspace, publication_type, publication_name) = parse_request_path(req_path)
-        assert workspace and publication_type and publication_name, f"Parsing {req_path} returns {(workspace, publication_type, publication_name)}"
-        # ensure that raised exception is LaymanError, not Exception "Authorization module is unable to authorize path ..."
-        with app.test_request_context(req_path):
-            g.user = None
-            with pytest.raises(Exception) as exc_info:
-                mock_method()
-            assert isinstance(exc_info.value, LaymanError)
+@pytest.mark.parametrize('request_path', [
+    '/rest/layers',
+    '/rest/layers/abc',
+    '/rest/username/abc',
+    '/rest/username/publications',
+    '/rest/username/publications/blablabla',
+    '/rest/username/publications/blablabla/da',
+    '/rest/users/layers',
+    '/rest/users/maps/map',
+])
+def test_authorize_publications_decorator_does_not_accept_path(request_path):
+    (workspace, publication_type, publication_name) = parse_request_path(request_path)
+    assert not workspace or not publication_type, f"Parsing {request_path} returns {(workspace, publication_type, publication_name)}"
+    with app.test_request_context(request_path):
+        with pytest.raises(Exception) as exc_info:
+            mock_method()
+        assert str(exc_info.value) == f"Authorization module is unable to authorize path {request_path}", exc_info.traceback
 
 
-def test_authorize_decorator(liferay_mock):
+@pytest.mark.parametrize('request_path', [
+    '/rest/user_a/layers',
+    '/rest/user_a/layers/',
+    '/rest/user_a/maps/',
+    '/rest/user_a/layers/abc',
+    '/rest/user_a/layers/some_layer/some/nested/endpoint',
+    '/rest/user_a/maps/a_map',
+])
+def test_authorize_publications_decorator_accepts_path(request_path):
+    with app.test_request_context(request_path):
+        g.user = None
+        with pytest.raises(Exception) as exc_info:
+            mock_method()
+        assert isinstance(exc_info.value, LaymanError)
+
+
+def test_authorize_publications_decorator_on_rest_api(liferay_mock):
     layername = 'test_authorize_decorator_layer'
     username = 'test_authorize_decorator_user'
 

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, current_app as app, g
 from copy import deepcopy
 
+import layman.common.rest
 from layman.common import redis as redis_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator
@@ -137,7 +138,7 @@ def patch(username, layername):
                     username, layername, files, check_crs)
     kwargs.update({'actor_name': authn.get_authn_username()})
 
-    authz_util.setup_patch_access_rights(request.form, kwargs)
+    layman.common.rest.setup_patch_access_rights(request.form, kwargs)
 
     util.patch_layer(
         username,

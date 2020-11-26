@@ -4,6 +4,7 @@ import io
 from flask import Blueprint, jsonify, request, current_app as app, g
 from werkzeug.datastructures import FileStorage
 
+import layman.common.rest
 from layman.util import check_username_decorator
 from . import util
 from .filesystem import input_file, thumbnail
@@ -85,7 +86,7 @@ def patch(username, mapname):
         'actor_name': authn.get_authn_username(),
     }
 
-    authz_util.setup_patch_access_rights(request.form, kwargs)
+    layman.common.rest.setup_patch_access_rights(request.form, kwargs)
 
     util.patch_map(
         username,

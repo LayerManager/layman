@@ -6,50 +6,9 @@ from layman import util as layman_util
 
 
 from flask import g, request
-import re
 
 from layman import LaymanError, settings
-from layman.util import USERNAME_ONLY_PATTERN
-from layman.common.util import PUBLICATION_NAME_ONLY_PATTERN
-
-
-def _get_multi_publication_path_pattern():
-    workspace_pattern = r"(?P<workspace>" + USERNAME_ONLY_PATTERN + r")"
-    # TODO generate layers|maps automatically from blueprints using settings.PUBLICATION_MODULES
-    publ_type_pattern = r"(?P<publication_type>layers|maps)"
-    return "^/rest/" + workspace_pattern + "/" + publ_type_pattern
-
-
-MULTI_PUBLICATION_PATH_PATTERN = re.compile(_get_multi_publication_path_pattern() + r"/?$")
-SINGLE_PUBLICATION_PATH_PATTERN = re.compile(
-    _get_multi_publication_path_pattern() + r"/(?P<publication_name>" + PUBLICATION_NAME_ONLY_PATTERN + r")(?:/.*)?$"
-)
-
-
-from layman.common import geoserver as gs
-
-
-def parse_request_path(request_path):
-    workspace = None
-    publication_type = None
-    publication_type_url_prefix = None
-    publication_name = None
-    m = MULTI_PUBLICATION_PATH_PATTERN.match(request_path)
-    if not m:
-        m = SINGLE_PUBLICATION_PATH_PATTERN.match(request_path)
-    if m:
-        workspace = m.group('workspace')
-        publication_type_url_prefix = m.group('publication_type')
-        publication_name = m.groupdict().get('publication_name', None)
-    if publication_type_url_prefix:
-        # TODO get it using settings.PUBLICATION_MODULES
-        publication_type = {
-            'layers': 'layman.layer',
-            'maps': 'layman.map',
-        }[publication_type_url_prefix]
-    if workspace in settings.RESERVED_WORKSPACE_NAMES:
-        workspace = None
-    return (workspace, publication_type, publication_name)
+from layman.common.rest import parse_request_path
 
 
 def authorize(workspace, publication_type, publication_name, request_method, actor_name):

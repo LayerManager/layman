@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, g
 from flask import current_app as app
 
+import layman.common.rest
 from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
 from layman import settings, authn
@@ -109,7 +110,7 @@ def post(username):
         'actor_name': actor_name,
     }
 
-    authz_util.setup_post_access_rights(request.form, task_options, actor_name)
+    layman.common.rest.setup_post_access_rights(request.form, task_options, actor_name)
 
     layerurl = url_for('rest_layer.get', layername=layername, username=username)
 
