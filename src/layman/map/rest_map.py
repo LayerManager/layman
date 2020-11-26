@@ -4,21 +4,22 @@ import io
 from flask import Blueprint, jsonify, request, current_app as app, g
 from werkzeug.datastructures import FileStorage
 
+from layman.common import rest as rest_util
 from layman.util import check_username_decorator
 from . import util
 from .filesystem import input_file, thumbnail
 from layman import authn
 from layman.authn import authenticate
-from layman.authz import authorize, util as authz_util
+from layman.authz import authorize_publications_decorator
 
 bp = Blueprint('rest_map', __name__)
 
 
 @bp.before_request
-@authenticate
-@authorize
 @check_username_decorator
 @util.check_mapname_decorator
+@authenticate
+@authorize_publications_decorator
 @util.info_decorator
 def before_request():
     pass
@@ -85,7 +86,7 @@ def patch(username, mapname):
         'actor_name': authn.get_authn_username(),
     }
 
-    authz_util.setup_patch_access_rights(request.form, kwargs)
+    rest_util.setup_patch_access_rights(request.form, kwargs)
 
     util.patch_map(
         username,

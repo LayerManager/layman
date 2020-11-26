@@ -8,16 +8,16 @@ from layman.util import check_username_decorator
 from . import util
 from .filesystem import thumbnail
 from layman.authn import authenticate
-from layman.authz import authorize
+from layman.authz import authorize_publications_decorator
 
 bp = Blueprint('rest_layer_metadata_comparison', __name__)
 
 
 @bp.before_request
-@authenticate
-@authorize
 @check_username_decorator
 @util.check_layername_decorator
+@authenticate
+@authorize_publications_decorator
 @util.info_decorator
 def before_request():
     pass

@@ -362,7 +362,7 @@ def test_patch_current_user_without_username():
 
     with app.app_context():
         rest_path = url_for('rest_map_file.get', username=workspace, mapname=mapname)
-    r = requests.get(rest_path)
+    r = requests.get(rest_path, headers=user1_authn_headers)
     assert r.status_code == 200, r.text
     resp_json = r.json()
     assert resp_json['name'] == mapname

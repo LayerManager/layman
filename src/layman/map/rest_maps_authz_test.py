@@ -36,6 +36,12 @@ def test_map_with_unauthorized_layer(liferay_mock):
     process_client.publish_layer(username1, layername1, headers=user1_authz_headers)
     process_client.publish_layer(username2, layername2, headers=user2_authz_headers)
 
+    # assert users have access only to their own layer
+    process_client.assert_user_layers(username1, [layername1], headers=user1_authz_headers)
+    process_client.assert_user_layers(username1, [], headers=user2_authz_headers)
+    process_client.assert_user_layers(username2, [layername2], headers=user2_authz_headers)
+    process_client.assert_user_layers(username2, [], headers=user1_authz_headers)
+
     # publish map composed of layers of both users, read for everyone
     process_client.publish_map(
         username1,

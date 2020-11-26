@@ -13,7 +13,7 @@ from layman import settings, patch_mode
 from layman.cache import mem_redis
 from layman.layer.filesystem import input_file
 from layman.layer.util import is_layer_task_ready
-from layman.common import util as layman_util
+from layman.common import geoserver as common_geoserver
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
 
@@ -29,7 +29,7 @@ def post_layer(username, layername):
     pass
 
 
-def patch_layer(username, layername, title, description):
+def patch_layer(username, layername, title, description, access_rights=None):
     keywords = [
         "features",
         layername,
@@ -58,6 +58,14 @@ def patch_layer(username, layername, title, description):
     clear_cache(username)
     wms.clear_cache(username)
 
+    if access_rights and access_rights.get('read'):
+        security_read_roles = common_geoserver.layman_users_to_geoserver_roles(access_rights['read'])
+        common_geoserver.ensure_layer_security_roles(username, layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
+
+    if access_rights and access_rights.get('write'):
+        security_write_roles = common_geoserver.layman_users_to_geoserver_roles(access_rights['write'])
+        common_geoserver.ensure_layer_security_roles(username, layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
+
 
 def delete_layer(username, layername):
     r = requests.delete(
@@ -73,6 +81,9 @@ def delete_layer(username, layername):
         r.raise_for_status()
     clear_cache(username)
     wms.clear_cache(username)
+
+    common_geoserver.delete_security_roles(f"{username}.{layername}.r", settings.LAYMAN_GS_AUTH)
+    common_geoserver.delete_security_roles(f"{username}.{layername}.w", settings.LAYMAN_GS_AUTH)
     return {}
 
 

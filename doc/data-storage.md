@@ -19,13 +19,14 @@ Data stores:
 ### Users
 Information about users includes their names, contacts, and authentication credentials.
 
-When user [reserves his username](rest.md#patch-current-user), names, contacts and other relevant metadata are [obtained from authorization provider](oauth2/index.md#fetch-user-related-metadata) and saved to [filesystem](#filesystem) and [Redis](#redis).
+When user [reserves his username](rest.md#patch-current-user), names, contacts and other relevant metadata are [obtained from authorization provider](oauth2/index.md#fetch-user-related-metadata) and saved to [filesystem](#filesystem), [Redis](#redis) and [PostgreSQL](#postgresql).
 
 ### Layers
 Information about [layers](models.md#layer) includes vector data and visualization.
 
 When user [publishes new layer](rest.md#post-layers)
 - UUID and name is saved to [Redis](#redis) and [filesystem](#filesystem),
+- UUID, name, title and access rights are to [PostgreSQL](#postgresql),
 - vector data files and visualization file is saved to [filesystem](#filesystem) (if uploaded [synchronously](async-file-upload.md)),
 - and asynchronous [tasks](#tasks) are saved in [Redis](#redis).
 
@@ -43,6 +44,7 @@ Information about [maps](models.md#map) includes JSON definition.
 
 When user [publishes new map](rest.md#post-maps)
 - UUID and name is saved to [Redis](#redis) and [filesystem](#filesystem),
+- UUID, name, title and access rights are saved to [PostgreSQL](#postgresql),
 - JSON file is saved to [filesystem](#filesystem),
 - and asynchronous [tasks](#tasks) are saved in [Redis](#redis).
 
@@ -63,7 +65,7 @@ Data is saved in LAYMAN_REDIS_URL database. Keys are prefixed with
 - Layman python module name that saved the data, followed by `:`, e.g. `layman.layer.geoserver:` or `layman:`
 - other strings, e.g. `celery`, `_kombu`, or `unacked` in case of Celery task data.
 
-Redis is used as temporary data store. When Layman stops, data persists in Redis, however on each startup Layman flushes the Redis database and imports user-related data and publication-related data from [filesystem](#filesystem). It means that any [task-related](#tasks) data is lost on startup. This can be controlled by LAYMAN_SKIP_REDIS_LOADING.
+Redis is used as temporary data store. When Layman stops, data persists in Redis, however on each startup Layman flushes the Redis database and imports user-related data and publication-related data from [filesystem](#filesystem). It means that any [task-related](#tasks) data is lost on startup. This can be controlled by [LAYMAN_SKIP_REDIS_LOADING](env-settings.md#LAYMAN_SKIP_REDIS_LOADING).
 
 ### Filesystem
 Data is saved to LAYMAN_DATA_DIR directory.
@@ -75,13 +77,15 @@ Data is saved to LAYMAN_DATA_DIR directory.
 Filesystem is used as persistent data store, so data survives Layman restart.
  
 ### PostgreSQL
-Layman uses directly one PostgreSQL database LAYMAN_PG_DBNAME to store vector layer data.
+Layman uses directly **one database** specified by [LAYMAN_PG_DBNAME](env-settings.md#LAYMAN_PG_DBNAME) to store
+- general information about users, workspaces, and publications including access rights in schema specified by [LAYMAN_PRIME_SCHEMA](env-settings.md#LAYMAN_PRIME_SCHEMA),
+- vector layer data.
 
-**[User schema](https://www.postgresql.org/docs/9.1/ddl-schemas.html)** is created for every user who reserved username. Name of user schema is always the same as username. Every user-related information is saved in this schema.
+Vector layer data is organized in schemas and tables:
+- **[User schema](https://www.postgresql.org/docs/9.1/ddl-schemas.html)** is created for every user who reserved username. Name of user schema is always the same as username.
+- **[Table](https://www.postgresql.org/docs/9.1/sql-createtable.html)** is created in user schema for each layer the user published. Name of the table is the same as layername. The table contains data from vector data files.
 
-**[Table](https://www.postgresql.org/docs/9.1/sql-createtable.html)** is created in user schema for each layer the user published. Name of the table is the same as layername. Every layer-related information is saved in tha table. The table contains data from vector data files.
-
-Second PostgreSQL database is used by Micka to store metadata records. The database including its structure is completely managed by Micka. By default, it's named `hsrs_micka6`.
+**Second database** is used by Micka to store metadata records. The database including its structure is completely managed by Micka. By default, it's named `hsrs_micka6`.
 
 PostgreSQL is used as persistent data store, so data survives Layman restart.
 
