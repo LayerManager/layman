@@ -125,7 +125,7 @@ def test_access_rights(post_access_rights, patch_access_rights_list, use_file):
     authn_headers = client_util.get_authz_headers(username)
 
     post_access_rights = post_access_rights or {'read': f'{username}',
-                                'write': f'{username}'}
+                                                'write': f'{username}'}
     patch_access_rights_list = patch_access_rights_list or []
     roles_to_test = post_access_rights.copy()
 
