@@ -59,51 +59,13 @@ def assert_layman_layer_access_rights(username,
     assert set(access_rights['write']) == roles_to_test['write']
 
 
-def case_test_gs_rules(username,
-                       layername,
-                       authn_headers,
-                       roles_post=None,
-                       roles_patch_list=None,
-                       use_file=False):
-    roles_post = roles_post or {'read': f'{username}',
-                                'write': f'{username}'}
-    roles_patch_list = roles_patch_list or []
-    roles_to_test = roles_post.copy()
-
-    ln = client_util.publish_layer(username,
-                                   layername,
-                                   access_rights={key: ','.join(value) for key, value in roles_post.items()},
-                                   headers=authn_headers)
-    assert ln == layername
-    client_util.assert_user_layers(username, [layername], authn_headers)
-    assert_gs_user_and_roles(username)
-    assert_gs_layer_data_security(username, layername, roles_to_test)
-    assert_layman_layer_access_rights(username, layername, roles_to_test)
-
-    for roles_patch in roles_patch_list:
-        for right_type in ['read', 'write']:
-            if roles_patch.get(right_type):
-                roles_to_test[right_type] = roles_patch[right_type]
-        ln = client_util.patch_layer(username,
-                                     layername,
-                                     access_rights={key: ','.join(value) for key, value in roles_patch.items()},
-                                     headers=authn_headers,
-                                     file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'] if use_file else None)
-        assert ln == layername
-        client_util.assert_user_layers(username, [layername], authn_headers)
-        assert_gs_user_and_roles(username)
-        assert_gs_layer_data_security(username, layername, roles_to_test)
-        assert_layman_layer_access_rights(username, layername, roles_to_test)
-
-    client_util.delete_layer(username, layername, headers=authn_headers)
-
-
 username = 'test_gs_rules_user'
-layername1 = 'test_gs_rules_layer'
+layername = 'test_gs_rules_layer'
 
 
 @pytest.fixture(scope="module")
 def ensure_user():
+    # needs liferay_mock and ensure_auth_layman fixtures
     authn_headers1 = client_util.get_authz_headers(username)
 
     client_util.reserve_username(username, headers=authn_headers1)
@@ -160,11 +122,37 @@ def ensure_user():
 @pytest.mark.parametrize("use_file", [False, True])
 def test_access_rights(post_access_rights, patch_access_rights_list, use_file):
 
-    authn_headers1 = client_util.get_authz_headers(username)
+    authn_headers = client_util.get_authz_headers(username)
 
-    case_test_gs_rules(username,
-                       layername1,
-                       authn_headers1,
-                       roles_post=post_access_rights,
-                       roles_patch_list=patch_access_rights_list,
-                       use_file=use_file)
+    post_access_rights = post_access_rights or {'read': f'{username}',
+                                                'write': f'{username}'}
+    patch_access_rights_list = patch_access_rights_list or []
+    roles_to_test = post_access_rights.copy()
+
+    ln = client_util.publish_layer(username,
+                                   layername,
+                                   access_rights={key: ','.join(value) for key, value in post_access_rights.items()},
+                                   headers=authn_headers)
+    assert ln == layername
+    client_util.assert_user_layers(username, [layername], authn_headers)
+    assert_gs_user_and_roles(username)
+    assert_gs_layer_data_security(username, layername, roles_to_test)
+    assert_layman_layer_access_rights(username, layername, roles_to_test)
+
+    for patch_access_rights in patch_access_rights_list:
+        for right_type in ['read', 'write']:
+            if patch_access_rights.get(right_type):
+                roles_to_test[right_type] = patch_access_rights[right_type]
+        ln = client_util.patch_layer(username,
+                                     layername,
+                                     access_rights={key: ','.join(value) for key, value in patch_access_rights.items()},
+                                     headers=authn_headers,
+                                     file_paths=[
+                                         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'] if use_file else None)
+        assert ln == layername
+        client_util.assert_user_layers(username, [layername], authn_headers)
+        assert_gs_user_and_roles(username)
+        assert_gs_layer_data_security(username, layername, roles_to_test)
+        assert_layman_layer_access_rights(username, layername, roles_to_test)
+
+    client_util.delete_layer(username, layername, headers=authn_headers)
