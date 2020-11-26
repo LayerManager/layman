@@ -8,7 +8,7 @@ from layman import settings, authn
 from . import util, LAYER_TYPE
 from .filesystem import input_file, input_sld, input_chunk, uuid
 from layman.authn import authenticate
-from layman.authz import authorize_publications_decorator, util as authz_util
+from layman.authz import authorize_publications_decorator
 from layman.common import redis as redis_util
 from .prime_db_schema import table
 

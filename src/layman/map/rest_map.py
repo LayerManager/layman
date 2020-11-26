@@ -10,7 +10,7 @@ from . import util
 from .filesystem import input_file, thumbnail
 from layman import authn
 from layman.authn import authenticate
-from layman.authz import authorize_publications_decorator, util as authz_util
+from layman.authz import authorize_publications_decorator
 
 bp = Blueprint('rest_map', __name__)
 

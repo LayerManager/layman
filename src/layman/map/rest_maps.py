@@ -11,7 +11,7 @@ from . import util, MAP_TYPE
 from .filesystem import input_file, uuid
 from layman import authn
 from layman.authn import authenticate
-from layman.authz import authorize_publications_decorator, util as authz_util
+from layman.authz import authorize_publications_decorator
 from layman.common import redis as redis_util
 from .prime_db_schema import table
 

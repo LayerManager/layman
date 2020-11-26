@@ -9,7 +9,7 @@ from layman import settings, authn
 from . import util
 from .filesystem import input_file, input_sld, input_chunk
 from layman.authn import authenticate
-from layman.authz import authorize_publications_decorator, util as authz_util
+from layman.authz import authorize_publications_decorator
 
 bp = Blueprint('rest_layer', __name__)
 
