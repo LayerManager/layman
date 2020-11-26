@@ -52,18 +52,22 @@ def test_authorize_publications_decorator_accepts_path(request_path):
 
 class TestRestApiClass:
     layername = 'test_authorize_decorator_layer'
+    mapname = 'test_authorize_decorator_map'
     username = 'test_authorize_decorator_user'
     authz_headers = process_client.get_authz_headers(username)
 
     @pytest.fixture(scope="class")
-    def provide_user_and_layer(self):
+    def provide_publications(self):
         username = self.username
         authz_headers = self.authz_headers
         layername = self.layername
+        mapname = self.mapname
         process_client.ensure_reserved_username(username, headers=authz_headers)
         process_client.publish_layer(username, layername, headers=authz_headers)
+        process_client.publish_map(username, mapname, headers=authz_headers)
         yield
         process_client.delete_layer(username, layername, headers=authz_headers)
+        process_client.delete_map(username, mapname, headers=authz_headers)
 
     @pytest.fixture(scope="class")
     def provide_layman(self):
@@ -89,21 +93,30 @@ class TestRestApiClass:
         return {li['name'] for li in r_json} == {TestRestApiClass.layername}
 
     @staticmethod
-    def has_no_layer(r_json):
+    def has_single_map(r_json):
+        return {li['name'] for li in r_json} == {TestRestApiClass.mapname}
+
+    @staticmethod
+    def has_no_publication(r_json):
         return {li['name'] for li in r_json} == set()
 
     @pytest.mark.parametrize(
         "rest_action, url_for_params, authz_status_code, authz_response, unauthz_status_code, unauthz_response",
         [
-            ('rest_layers.get', {}, 200, has_single_layer.__func__, 200, has_no_layer.__func__),
+            ('rest_layers.get', {}, 200, has_single_layer.__func__, 200, has_no_publication.__func__),
             ('rest_layer.get', {'layername': layername}, 200, None, 404, 15),
             ('rest_layer_metadata_comparison.get', {'layername': layername}, 200, None, 404, 15),
             ('rest_layer_style.get', {'layername': layername}, 200, None, 404, 15),
             ('rest_layer_thumbnail.get', {'layername': layername}, 200, None, 404, 15),
             ('rest_layer_chunk.get', {'layername': layername}, 400, 20, 404, 15),
+            ('rest_maps.get', {}, 200, has_single_map.__func__, 200, has_no_publication.__func__),
+            ('rest_map.get', {'mapname': mapname}, 200, None, 404, 26),
+            ('rest_map_file.get', {'mapname': mapname}, 200, None, 404, 26),
+            ('rest_map_metadata_comparison.get', {'mapname': mapname}, 200, None, 404, 26),
+            ('rest_map_thumbnail.get', {'mapname': mapname}, 200, None, 404, 26),
         ],
     )
-    @pytest.mark.usefixtures('liferay_mock', 'provide_layman', 'provide_user_and_layer')
+    @pytest.mark.usefixtures('liferay_mock', 'provide_layman', 'provide_publications')
     def test_authorize_publications_decorator_on_rest_api(
             self,
             rest_action,
@@ -115,14 +128,22 @@ class TestRestApiClass:
     ):
         username = self.username
         authz_headers = self.authz_headers
-        layername = self.layername
+        patch_method = None
+        publ_name = None
+        if '_layer' in rest_action:
+            patch_method = process_client.patch_layer
+            publ_name = self.layername
+        elif '_map' in rest_action:
+            patch_method = process_client.patch_map
+            publ_name = self.mapname
+        assert publ_name
 
         url_for_params['username'] = username
 
         with app.app_context():
             rest_url = url_for(rest_action, **url_for_params)
 
-        process_client.patch_layer(username, layername, headers=authz_headers, access_rights={
+        patch_method(username, publ_name, headers=authz_headers, access_rights={
             'read': username,
             'write': username,
         })
@@ -131,7 +152,7 @@ class TestRestApiClass:
         r = requests.get(rest_url)
         self.assert_response(r, unauthz_status_code, unauthz_response)
 
-        process_client.patch_layer(username, layername, headers=authz_headers, access_rights={
+        patch_method(username, publ_name, headers=authz_headers, access_rights={
             'read': settings.RIGHTS_EVERYONE_ROLE,
             'write': settings.RIGHTS_EVERYONE_ROLE,
         })
