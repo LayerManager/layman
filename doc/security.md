@@ -21,16 +21,29 @@ There is also one internal authentication module:
 
 Authorization (**authz**) decides if authenticated [user](models.md#user) has permissions to perform the request to [REST API](rest.md).
 
-Authorization is performed by single authorization module controlled by [`AUTHZ_MODULE`](../src/layman_settings.py) setting. When authentication is finished, security system calls authorization module that either passes or raises an exception "Unauthorised access" returned as HTTP Error 403.
+Authorization is performed by single authorization module. When authentication is finished, security system calls authorization module that either passes or raises an exception.
 
-There are two types of operations used in permissions:
-- **read**: includes all `GET` requests
-- **write**: includes all `POST`, `PUT`, `PATCH`, `DELETE` requests
+### Access to single-publication endpoints
+Access to single-publication REST API endpoints is configurable by users. These endpoints are:
+- [Layer](rest.md#overview) and nested endpoints 
+- [Map](rest.md#overview) and nested endpoints 
 
-Currently there are two authorization modules implemented:
+To control access to these endpoints, authorization module uses so called **access rights**. There are following types of access rights:
+- **read**: grants `GET` HTTP requests
+- **write**: grants `POST`, `PUT`, `PATCH`, and `DELETE` HTTP requests
 
-| name | description |
-| --- | --- |
-| [read everyone, write everyone](../src/layman/authz/read_everyone_write_everyone.py) | everyone including anonymous user is able to **read** and **write** to anybody`s workspace |
-| [read everyone, write owner](../src/layman/authz/read_everyone_write_owner.py) | everyone including anonymous user is able to **read** anybody`s workspace, but only user that owns the workspace is able to **write** |
+Both read and write access rights contain list of user names or roles. Currently, Layman accepts following roles:
+- EVERYONE: every user including anonymous
+
+Users listed in access rights, either directly or indirectly through roles, are granted to perform related HTTP actions.
+
+Access rights are set by [POST Layers](rest.md#post-layers) request and can be changed by [PATCH Layer](rest.md#patch-layer) request (analogically for maps). 
+
+### Access to multi-publication endpoints
+Access to **multi-publication REST API endpoints**, e.g. [Layers](rest.md#overview) and [Maps](rest.md#overview), is treated by following rules:
+- Everyone can send [GET Layers](rest.md#get-layers) request to any workspace, receiving only publications he has read access to.
+- Every authenticated user can send [POST Layers](rest.md#post-layers) to his own [personal workspace](models.md#personal-workspace).
+- Everyone can send [POST Layers](rest.md#post-layers) to any [public workspace](models.md#public-workspace) if and only if he is listed in [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](env-settings.md#GRANT_PUBLISH_IN_PUBLIC_WORKSPACE) (directly or through role). Furthermore, automatic creation of not-yet-existing [public workspace](models.md#public-workspace) on [POST Layers](rest.md#post-layers) is controlled by [GRANT_CREATE_PUBLIC_WORKSPACE](env-settings.md#GRANT_CREATE_PUBLIC_WORKSPACE).
+
+It's analogical for maps.
 

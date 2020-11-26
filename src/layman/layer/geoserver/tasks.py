@@ -26,7 +26,8 @@ def refresh_wfs(
         layername,
         description=None,
         title=None,
-        ensure_user=False
+        ensure_user=False,
+        access_rights=None,
 ):
     if description is None:
         description = layername
@@ -37,7 +38,7 @@ def refresh_wfs(
 
     if self.is_aborted():
         raise AbortedException
-    geoserver.publish_layer_from_db(username, layername, description, title)
+    geoserver.publish_layer_from_db(username, layername, description, title, access_rights)
 
     if self.is_aborted():
         wms.delete_layer(username, layername)

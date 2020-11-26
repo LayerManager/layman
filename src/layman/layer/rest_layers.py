@@ -1,13 +1,14 @@
 from flask import Blueprint, jsonify, request, g
 from flask import current_app as app
 
+from layman.common import rest as rest_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
 from layman import settings, authn
 from . import util, LAYER_TYPE
 from .filesystem import input_file, input_sld, input_chunk, uuid
 from layman.authn import authenticate
-from layman.authz import authorize, util as authz_util
+from layman.authz import authorize_publications_decorator
 from layman.common import redis as redis_util
 from .prime_db_schema import table
 
@@ -15,9 +16,9 @@ bp = Blueprint('rest_layers', __name__)
 
 
 @bp.before_request
-@authenticate
-@authorize
 @check_username_decorator
+@authenticate
+@authorize_publications_decorator
 def before_request():
     pass
 
@@ -109,7 +110,7 @@ def post(username):
         'actor_name': actor_name,
     }
 
-    authz_util.setup_post_access_rights(request.form, task_options, actor_name)
+    rest_util.setup_post_access_rights(request.form, task_options, actor_name)
 
     layerurl = url_for('rest_layer.get', layername=layername, username=username)
 

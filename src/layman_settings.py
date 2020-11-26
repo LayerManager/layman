@@ -133,7 +133,16 @@ OAUTH2_LIFERAY_CLIENTS = [
     if len(d['id']) > 0
 ]
 
-AUTHZ_MODULE = os.environ['LAYMAN_AUTHZ_MODULE']
+GRANT_CREATE_PUBLIC_WORKSPACE = {
+    name for name in os.environ['GRANT_CREATE_PUBLIC_WORKSPACE'].split(',')
+    if name
+}
+GRANT_PUBLISH_IN_PUBLIC_WORKSPACE = {
+    name for name in os.environ['GRANT_PUBLISH_IN_PUBLIC_WORKSPACE'].split(',')
+    if name
+}
+if RIGHTS_EVERYONE_ROLE not in GRANT_PUBLISH_IN_PUBLIC_WORKSPACE:
+    assert not GRANT_CREATE_PUBLIC_WORKSPACE.difference(GRANT_PUBLISH_IN_PUBLIC_WORKSPACE)
 
 # UPLOAD_MAX_INACTIVITY_TIME = 10 # 10 seconds
 UPLOAD_MAX_INACTIVITY_TIME = 5 * 60  # 5 minutes

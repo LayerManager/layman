@@ -1,14 +1,14 @@
 import pytest
 import requests
-from urllib.parse import urljoin
+from owslib.feature.schema import get_schema as get_wfs_schema
 
 from layman import app
 from layman import settings
 from layman.layer import db
 from test.process_client import get_authz_headers
-from test import process, process_client as client_util, flask_client
+from test import process, process_client as client_util
 from test.data import wfs as data_wfs
-from layman.layer.geoserver.util import wfs_proxy
+from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.layer.geoserver.util import wms_direct
 from layman.common.geoserver import get_layer_thumbnail, get_layer_square_bbox
 from layman.util import url_for
@@ -24,14 +24,13 @@ AUTHN_INTROSPECTION_URL = process.AUTHN_INTROSPECTION_URL
 AUTHN_SETTINGS = process.AUTHN_SETTINGS
 
 
-client = flask_client.client
-
-
-def test_rest_get(client):
+def test_rest_get():
     username = 'wfs_proxy_test'
     layername = 'layer_wfs_proxy_test'
 
-    flask_client.publish_layer(username, layername, client)
+    layman_process = process.start_layman()
+
+    client_util.publish_layer(username, layername)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
     headers = {
@@ -42,18 +41,19 @@ def test_rest_get(client):
     data_xml = data_wfs.get_wfs20_insert_points(username, layername)
 
     with app.app_context():
-        r = client.post(rest_url,
-                        data=data_xml,
-                        headers=headers)
+        r = requests.post(rest_url,
+                          data=data_xml,
+                          headers=headers)
     assert r.status_code == 200, r.data
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=GetCapabilities"
     with app.app_context():
-        r = client.post(rest_url,
-                        headers=headers)
+        r = requests.post(rest_url,
+                          headers=headers)
     assert r.status_code == 200
 
-    flask_client.delete_layer(username, layername, client)
+    client_util.delete_layer(username, layername)
+    process.stop_process(layman_process)
 
 
 def setup_user_layer(username, layername, authn_headers):
@@ -70,8 +70,7 @@ def test_wfs_proxy(liferay_mock):
     layername1 = 'ne_countries'
     username2 = 'testproxy2'
 
-    layman_process = process.start_layman(dict({'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner', },
-                                               **AUTHN_SETTINGS))
+    layman_process = process.start_layman(dict(**AUTHN_SETTINGS))
 
     authn_headers1 = get_authz_headers(username)
 
@@ -162,8 +161,7 @@ def test_wms_ows_proxy(service_endpoint):
 
     authn_headers = get_authz_headers(username)
 
-    layman_process = process.start_layman(dict({'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner', },
-                                               **AUTHN_SETTINGS))
+    layman_process = process.start_layman(AUTHN_SETTINGS)
 
     client_util.ensure_reserved_username(username, headers=authn_headers)
     ln = client_util.publish_layer(username, layername, headers=authn_headers)
@@ -215,11 +213,11 @@ def test_missing_attribute(liferay_mock):
                                     )
     assert ln2 == layername2
 
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
+    wfs_t_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
 
     def wfs_post(username, attr_names_list, data_xml):
         with app.app_context():
-            wfs_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+            wfs_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs"
             old_db_attributes = {}
             old_wfs_properties = {}
             for layername, attr_names in attr_names_list:
@@ -227,11 +225,11 @@ def test_missing_attribute(liferay_mock):
                 old_db_attributes[layername] = db.get_all_column_names(username, layername)
                 for attr_name in attr_names:
                     assert attr_name not in old_db_attributes[layername], f"old_db_attributes={old_db_attributes[layername]}, attr_name={attr_name}"
-                wfs = wfs_proxy(wfs_url)
-                layer_schema = wfs.get_schema(f"{username}:{layername}")
+                layer_schema = get_wfs_schema(
+                    wfs_url, typename=f"{username}:{layername}", version=geoserver_wfs.VERSION, headers=authn_headers)
                 old_wfs_properties[layername] = sorted(layer_schema['properties'].keys())
 
-            r = requests.post(rest_url,
+            r = requests.post(wfs_t_url,
                               data=data_xml,
                               headers=headers)
             assert r.status_code == 200, f"r.status_code={r.status_code}\n{r.text}"
@@ -246,8 +244,8 @@ def test_missing_attribute(liferay_mock):
                 assert set(attr_names).union(set(old_db_attributes[layername])) == set(new_db_attributes[layername])
 
                 # test that exactly all attr_names were distinguished also in WFS feature type
-                wfs = wfs_proxy(wfs_url)
-                layer_schema = wfs.get_schema(f"{username}:{layername}")
+                layer_schema = get_wfs_schema(
+                    wfs_url, typename=f"{username}:{layername}", version=geoserver_wfs.VERSION, headers=authn_headers)
                 new_wfs_properties[layername] = sorted(layer_schema['properties'].keys())
                 for attr_name in attr_names:
                     assert attr_name in new_wfs_properties[layername], f"new_wfs_properties={new_wfs_properties[layername]}, attr_name={attr_name}"
@@ -358,9 +356,7 @@ def test_missing_attribute_authz(liferay_mock):
         for attr_name in attribute_names:
             assert attr_name in new_db_attributes, f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
 
-    layman_process = process.start_layman(dict({
-        'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner',
-    }, **AUTHN_SETTINGS))
+    layman_process = process.start_layman(dict(**AUTHN_SETTINGS))
 
     client_util.reserve_username(username, headers=authn_headers1)
     ln = client_util.publish_layer(username,

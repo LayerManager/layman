@@ -483,9 +483,7 @@ Notice that some JSON properties are automatically updated by layman, so file ob
    - **name** set to `<username>` in URL of this endpoint
    - **email** set to email of the owner, or empty string if not known
    - other properties will be deleted
-- **groups** updated on the fly during this request:
-   - **guest** set to `"w"` (because Layman is not yet connected to any authorization system and all REST endpoints are accessible to anyone)
-   - other properties will be deleted
+- **groups** are removed
 
 #### Request
 No action parameters.
