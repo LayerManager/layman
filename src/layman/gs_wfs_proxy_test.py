@@ -14,6 +14,7 @@ from layman.common.geoserver import get_layer_thumbnail, get_layer_square_bbox
 from layman.util import url_for
 
 liferay_mock = process.liferay_mock
+ensure_layman = process.ensure_layman
 
 LIFERAY_PORT = process.LIFERAY_PORT
 
@@ -24,11 +25,10 @@ AUTHN_INTROSPECTION_URL = process.AUTHN_INTROSPECTION_URL
 AUTHN_SETTINGS = process.AUTHN_SETTINGS
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_rest_get():
     username = 'wfs_proxy_test'
     layername = 'layer_wfs_proxy_test'
-
-    layman_process = process.start_layman()
 
     client_util.publish_layer(username, layername)
 
@@ -53,7 +53,6 @@ def test_rest_get():
     assert r.status_code == 200
 
     client_util.delete_layer(username, layername)
-    process.stop_process(layman_process)
 
 
 def setup_user_layer(username, layername, authn_headers):
@@ -65,12 +64,11 @@ def setup_user_layer(username, layername, authn_headers):
     assert ln == layername
 
 
-def test_wfs_proxy(liferay_mock):
+@pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
+def test_wfs_proxy():
     username = 'testproxy'
     layername1 = 'ne_countries'
     username2 = 'testproxy2'
-
-    layman_process = process.start_layman(dict(**AUTHN_SETTINGS))
 
     authn_headers1 = get_authz_headers(username)
 
@@ -150,18 +148,14 @@ def test_wfs_proxy(liferay_mock):
 
     client_util.delete_layer(username, layername1, headers)
 
-    process.stop_process(layman_process)
 
-
-@pytest.mark.usefixtures('liferay_mock')
+@pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
 @pytest.mark.parametrize('service_endpoint', ['ows', 'wms'])
 def test_wms_ows_proxy(service_endpoint):
     username = 'test_wms_ows_proxy_user'
     layername = 'test_wms_ows_proxy_layer'
 
     authn_headers = get_authz_headers(username)
-
-    layman_process = process.start_layman(AUTHN_SETTINGS)
 
     client_util.ensure_reserved_username(username, headers=authn_headers)
     ln = client_util.publish_layer(username, layername, headers=authn_headers)
@@ -183,15 +177,13 @@ def test_wms_ows_proxy(service_endpoint):
 
     client_util.delete_layer(username, layername, headers=authn_headers)
 
-    process.stop_process(layman_process)
 
-
-def test_missing_attribute(liferay_mock):
+@pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
+def test_missing_attribute():
     username = 'testmissingattr'
     layername = 'inexisting_attribute_layer'
     layername2 = 'inexisting_attribute_layer2'
 
-    layman_process = process.start_layman(AUTHN_SETTINGS)
     authn_headers = get_authz_headers(username)
     headers = {
         'Accept': 'text/xml',
@@ -310,10 +302,9 @@ def test_missing_attribute(liferay_mock):
     client_util.delete_layer(username, layername, headers)
     client_util.delete_layer(username, layername2, headers)
 
-    process.stop_process(layman_process)
 
-
-def test_missing_attribute_authz(liferay_mock):
+@pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
+def test_missing_attribute_authz():
     username = 'testmissingattr_authz'
     layername1 = 'testmissingattr_authz_layer'
     username2 = 'testmissingattr_authz2'
@@ -356,8 +347,6 @@ def test_missing_attribute_authz(liferay_mock):
         for attr_name in attribute_names:
             assert attr_name in new_db_attributes, f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
 
-    layman_process = process.start_layman(dict(**AUTHN_SETTINGS))
-
     client_util.reserve_username(username, headers=authn_headers1)
     ln = client_util.publish_layer(username,
                                    layername1,
@@ -382,5 +371,3 @@ def test_missing_attribute_authz(liferay_mock):
     do_test(data_xml, attr_names)
 
     client_util.delete_layer(username, layername1, headers1)
-
-    process.stop_process(layman_process)

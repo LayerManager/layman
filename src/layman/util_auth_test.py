@@ -7,7 +7,7 @@ from layman.map import MAP_TYPE
 from test import process, process_client
 
 
-ensure_auth_layman = process.ensure_auth_layman
+ensure_layman = process.ensure_layman
 liferay_mock = process.liferay_mock
 
 layer = 'test_get_publication_info_layer'
@@ -46,7 +46,7 @@ def prep_test_get_publication_info():
     (LAYER_TYPE, layer, {'sources_filter': 'layman.layer.micka.soap'}, {'metadata', }, {'name', 'title', 'access_rights', 'uuid', 'file', }),
     (MAP_TYPE, map, {'sources_filter': 'layman.map.filesystem.thumbnail'}, {'thumbnail'}, {'name', 'title', 'access_rights', 'uuid', 'file', 'metadata', }),
 ])
-@pytest.mark.usefixtures('ensure_auth_layman', 'liferay_mock', 'prep_test_get_publication_info')
+@pytest.mark.usefixtures('ensure_layman', 'liferay_mock', 'prep_test_get_publication_info')
 def test_get_publication_info(pub_type,
                               pub_name,
                               context,

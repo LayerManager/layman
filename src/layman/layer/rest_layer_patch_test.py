@@ -10,7 +10,7 @@ from test import process, process_client as client_util
 
 
 liferay_mock = process.liferay_mock
-ensure_auth_layman = process.ensure_auth_layman
+ensure_layman = process.ensure_layman
 LIFERAY_PORT = process.LIFERAY_PORT
 
 ISS_URL_HEADER = client_util.ISS_URL_HEADER
@@ -72,7 +72,7 @@ def ensure_user():
     assert_gs_user_and_roles(username)
 
 
-@pytest.mark.usefixtures('liferay_mock', 'ensure_auth_layman', 'ensure_user')
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'ensure_user')
 @pytest.mark.parametrize("post_access_rights, patch_access_rights_list", [
     (
         {'read': {settings.RIGHTS_EVERYONE_ROLE},
