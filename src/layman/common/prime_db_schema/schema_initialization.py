@@ -42,11 +42,14 @@ def migrate_users_and_publications(modules, role_everyone):
                     publications.insert_publication(workspace_name, pub_info)
 
 
+def schema_exists():
+    return db_util.run_query(model.EXISTS_SCHEMA_SQL)[0][0] > 0
+
+
 def ensure_schema(db_schema,
                   modules,
                   role_everyone):
-    exists_schema = db_util.run_query(model.EXISTS_SCHEMA_SQL)
-    if exists_schema[0][0] == 0:
+    if not schema_exists():
         db_util.run_statement(model.CREATE_SCHEMA_SQL)
         db_util.run_statement(model.setup_codelists_data())
         migrate_users_and_publications(modules, role_everyone)

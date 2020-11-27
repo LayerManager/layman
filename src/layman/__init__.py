@@ -64,11 +64,8 @@ if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
                 ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
 
         with app.app_context():
-            from .common.prime_db_schema import schema_initialization as prime_db_schema
-            prime_db_schema.check_schema_name(settings.LAYMAN_PRIME_SCHEMA)
-            prime_db_schema.ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
-                                          settings.PUBLICATION_MODULES,
-                                          settings.RIGHTS_EVERYONE_ROLE)
+            from . import upgrade
+            upgrade.upgrade()
 
         app.logger.info(f'Loading Redis database')
         with app.app_context():

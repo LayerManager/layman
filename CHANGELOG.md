@@ -16,6 +16,8 @@
 - [#28](https://github.com/jirik/layman/issues/28) New environment variable [LAYMAN_PRIME_SCHEMA](doc/env-settings.md#LAYMAN_PRIME_SCHEMA). 
 - [#28](https://github.com/jirik/layman/issues/28) New REST endpoint [GET Users](doc/rest.md#get-users) with list of all users registered in Layman.
 - [#28](https://github.com/jirik/layman/issues/28) New attribute `access_rights` added to [GET Layers](doc/rest.md#get-layers), [GET Layer](doc/rest.md#get-layer), [GET Maps](doc/rest.md#get-maps) and [GET Map](doc/rest.md#get-map) responses. New parameters `access_rights.read` and `access_rights.write` added to [POST Layers](doc/rest.md#post-layers), [PATCH Layer](doc/rest.md#patch-layer), [POST Maps](doc/rest.md#post-maps) and [PATCH Map](doc/rest.md#patch-map) requests.
+- [#28](https://github.com/jirik/layman/issues/28) At first start of Layman, access rights are set so [that only owner of the workspace can read or edit them](doc/security.md#Authorization) for publications in [private workspaces](doc/models.md#Workspace) and [that anyone can read or edit](doc/security.md#Authorization) for publications in [public workspaces](doc/models.md#Workspace).
+- [#28](https://github.com/jirik/layman/issues/28) Security rules on GeoServer on [workspace level (workspace.*.r/w)]((https://docs.geoserver.org/stable/en/user/security/layer.html)) are deleted on first Layman start and replaced with security rules on [layer level (workspace.layername.r/w)](https://docs.geoserver.org/stable/en/user/security/layer.html) according to rules on Layman side.
 
 ## v1.7.2
 2020-11-09
