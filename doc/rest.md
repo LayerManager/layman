@@ -74,6 +74,7 @@ Body parameters:
       - ShapeFile files (at least three files: .shp, .shx, .dbf)
       - file names, i.e. array of strings
    - if file names are provided, files must be uploaded subsequently using [POST Layer Chunk](#post-layer-chunk)
+   - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
 - *name*, string
    - computer-friendly identifier of the layer
    - must be unique among all layers of one workspace
@@ -191,6 +192,7 @@ Body parameters:
       - ShapeFile files (at least three files: .shp, .shx, .dbf)
       - file names, i.e. array of strings
    - if file names are provided, files must be uploaded subsequently using [POST Layer Chunk](#post-layer-chunk)
+   - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
 - *title*
 - *description*
 - *crs*, string `EPSG:3857` or `EPSG:4326`
