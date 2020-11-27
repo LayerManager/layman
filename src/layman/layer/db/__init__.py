@@ -202,10 +202,10 @@ def get_text_data(username, layername, conn_cur=None):
     conn, cur = conn_cur or get_connection_cursor()
     col_names = get_text_column_names(username, layername, conn_cur=conn_cur)
     if len(col_names) == 0:
-        return None
+        return [], 0
     num_features = get_number_of_features(username, layername, conn_cur=conn_cur)
     if num_features == 0:
-        return None
+        return [], 0
     limit = max(100, num_features // 10)
     try:
         cur.execute(f"""
