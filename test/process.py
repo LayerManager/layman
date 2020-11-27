@@ -83,19 +83,9 @@ def clear():
 
 
 @pytest.fixture(scope="module")
-def ensure_auth_layman():
-    print(f'\nEnsure Layman with authentication is starting')
-    processes = start_layman(dict({'LAYMAN_AUTHZ_MODULE': 'layman.authz.read_everyone_write_owner', },
-                                  **AUTHN_SETTINGS))
-    yield
-    stop_process(processes)
-    print(f'\nEnsure Layman with authentication is ending')
-
-
-@pytest.fixture(scope="module")
 def ensure_layman():
     print(f'\nEnsure layman is starting')
-    processes = start_layman()
+    processes = start_layman(AUTHN_SETTINGS)
     yield
     stop_process(processes)
     print(f'\nEnsure layman is ending')

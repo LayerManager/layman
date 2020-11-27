@@ -21,6 +21,7 @@ from test import process, process_client
 
 
 liferay_mock = process.liferay_mock
+ensure_layman = process.ensure_layman
 LIFERAY_PORT = process.LIFERAY_PORT
 
 num_layers_before_test = 0
@@ -278,10 +279,8 @@ def test_patch_current_user_anonymous(client):
     assert resp_json['code'] == 30
 
 
-@pytest.mark.usefixtures('active_token_introspection_url', 'user_profile_url')
+@pytest.mark.usefixtures('active_token_introspection_url', 'user_profile_url', 'ensure_layman')
 def test_patch_current_user_without_username():
-
-    layman_process = process.start_layman(process.AUTHN_SETTINGS)
 
     username1 = 'test_patch_current_user_user1'
     username2 = 'test_patch_current_user_user2'
@@ -372,5 +371,3 @@ def test_patch_current_user_without_username():
     assert user_info['email'] == exp_email
 
     process_client.delete_map(workspace, mapname, headers=user1_authn_headers)
-
-    process.stop_process(layman_process)
