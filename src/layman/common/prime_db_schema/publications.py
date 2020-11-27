@@ -70,29 +70,29 @@ def only_valid_names(users_list):
     for username in usernames_for_chesk:
         info = users.get_user_infos(username)
         if not info:
-            raise LaymanError(43, {f'Not existing username. Username={username}'})
+            raise LaymanError(43, f'Not existing username. Username={username}')
 
 
 def at_least_one_can_write(can_write):
     if not can_write:
-        raise LaymanError(43, {f'At least one user have to have write rights.'})
+        raise LaymanError(43, f'At least one user have to have write rights.')
 
 
 def who_can_write_can_read(can_read, can_write):
     if ROLE_EVERYONE not in can_read and set(can_write).difference(can_read):
-        raise LaymanError(43, {f'All users who have write rights have to have also read rights. Who is missing={set(can_write).difference(can_read)}'})
+        raise LaymanError(43, f'All users who have write rights have to have also read rights. Who is missing={set(can_write).difference(can_read)}')
 
 
 def i_can_still_write(actor_name, can_write):
     if ROLE_EVERYONE not in can_write and actor_name not in can_write:
-        raise LaymanError(43, {f'After the operation, the actor has to have write right.'})
+        raise LaymanError(43, f'After the operation, the actor has to have write right.')
 
 
 def owner_can_still_write(owner,
                           can_write,
                           ):
     if owner and ROLE_EVERYONE not in can_write and owner not in can_write:
-        raise LaymanError(43, {f'Owner of the personal workspace have to keep write right.'})
+        raise LaymanError(43, f'Owner of the personal workspace have to keep write right.')
 
 
 def check_rights_axioms(can_read,
