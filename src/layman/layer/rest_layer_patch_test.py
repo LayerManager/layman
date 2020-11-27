@@ -11,7 +11,6 @@ from test import process, process_client as client_util
 
 liferay_mock = process.liferay_mock
 ensure_layman = process.ensure_layman
-LIFERAY_PORT = process.LIFERAY_PORT
 
 ISS_URL_HEADER = client_util.ISS_URL_HEADER
 TOKEN_HEADER = client_util.TOKEN_HEADER
