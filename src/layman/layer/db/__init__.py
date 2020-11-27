@@ -1,4 +1,5 @@
 from collections import defaultdict
+import json
 import math
 import os
 import psycopg2
@@ -523,3 +524,34 @@ def ensure_attributes(attribute_tuples):
     if missing_attributes:
         create_string_attributes(missing_attributes, conn_cur)
     return missing_attributes
+
+
+def get_bbox(username, layername, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+
+    try:
+        cur.execute(f"""
+select ST_AsGeoJSON(ST_Extent(wkb_geometry))
+from {username}.{layername}
+""")
+    except BaseException:
+        raise LaymanError(7)
+    rows = cur.fetchall()
+    result = rows[0][0]
+    if result is not None:
+        result = json.loads(result)
+    if isinstance(result, dict):
+        if result['type'] == 'Point':
+            result = result['coordinates'] + result['coordinates']
+        elif result['type'] == 'Polygon':
+            result = [
+                min([c[0] for c in result['coordinates']]),
+                min([c[1] for c in result['coordinates']]),
+                max([c[0] for c in result['coordinates']]),
+                max([c[1] for c in result['coordinates']]),
+            ]
+        else:
+            raise Exception(f"Unknown BBox type {result['type']}")
+    elif result is not None:
+        raise Exception(f"Unknown BBox result {result}")
+    return result

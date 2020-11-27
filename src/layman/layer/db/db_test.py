@@ -124,6 +124,26 @@ def populated_places_table(testuser1):
     delete_layer(username, layername)
 
 
+@pytest.fixture()
+def empty_table(testuser1):
+    file_path = 'sample/layman.layer/empty.shp'
+    username = testuser1
+    layername = 'empty'
+    db.import_layer_vector_file(username, layername, file_path, None)
+    yield username, layername
+    delete_layer(username, layername)
+
+
+@pytest.fixture()
+def single_point_table(testuser1):
+    file_path = 'sample/layman.layer/single_point.shp'
+    username = testuser1
+    layername = 'single_point'
+    db.import_layer_vector_file(username, layername, file_path, None)
+    yield username, layername
+    delete_layer(username, layername)
+
+
 def test_abort_import_layer_vector_file(client):
     username = 'testuser1'
     layername = 'ne_10m_admin_0_countries'
@@ -269,3 +289,15 @@ def test_get_most_frequent_lower_distance(client, country110m_table, country50m_
     sd_5k = db.guess_scale_denominator(username, layername_5k)
     assert 1000 <= sd_5k <= 25000
     assert sd_5k == 5000
+
+
+def test_empty_table_bbox(client, empty_table):
+    username, layername = empty_table
+    bbox = db.get_bbox(username, layername)
+    assert bbox is None
+
+
+def test_single_point_table_bbox(client, single_point_table):
+    username, layername = single_point_table
+    bbox = db.get_bbox(username, layername)
+    assert bbox[0] == bbox[2] and bbox[1] == bbox[3], bbox
