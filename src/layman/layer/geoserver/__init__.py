@@ -8,6 +8,7 @@ from flask import g, current_app as app
 from layman.http import LaymanError
 from layman import settings
 from layman.common import geoserver as common
+from layman.layer import db as db_source
 
 FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
 FLASK_RULES_KEY = f"{__name__}:RULES"
@@ -64,28 +65,38 @@ def publish_layer_from_db(username, layername, description, title):
         title
     ]
     keywords = list(set(keywords))
+    feature_type_def = {
+        "name": layername,
+        "title": title,
+        "abstract": description,
+        "keywords": {
+            "string": keywords
+        },
+        "srs": "EPSG:3857",
+        "projectionPolicy": "FORCE_DECLARED",
+        "enabled": True,
+        "store": {
+            "@class": "dataStore",
+            "name": username + ":postgresql",
+        },
+    }
+    db_bbox = db_source.get_bbox(username, layername)
+    if db_bbox is None:
+        # world
+        native_bbox = {
+            "minx": -20026376.39,
+            "miny": -20048966.10,
+            "maxx": 20026376.39,
+            "maxy": 20048966.10,
+            "crs": "EPSG:3857",
+        }
+        feature_type_def['nativeBoundingBox'] = native_bbox
     r = requests.post(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
                 username + '/datastores/postgresql/featuretypes/'),
-        data=json.dumps(
-            {
-                "featureType": {
-                    "name": layername,
-                    "title": title,
-                    "abstract": description,
-                    "keywords": {
-                        "string": keywords
-                    },
-                    "srs": "EPSG:3857",
-                    "projectionPolicy": "FORCE_DECLARED",
-                    "enabled": True,
-                    "store": {
-                        "@class": "dataStore",
-                        "name": username + ":postgresql",
-                    },
-                }
-            }
-        ),
+        data=json.dumps({
+            "featureType": feature_type_def
+        }),
         headers=headers_json,
         auth=settings.LAYMAN_GS_AUTH
     )
