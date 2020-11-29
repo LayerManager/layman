@@ -46,7 +46,8 @@ def publish_layer(username, layername, file_paths, headers=None):
     return layername
 
 
-def patch_layer(username, layername, file_paths, headers=None):
+def patch_layer(username, layername, file_paths=None, headers=None, title=None):
+    file_paths = file_paths or []
     headers = headers or {}
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
 
@@ -55,10 +56,13 @@ def patch_layer(username, layername, file_paths, headers=None):
         assert os.path.isfile(fp)
     files = []
     try:
+        data = dict()
+        if title:
+            data['title'] = title
         r = requests.patch(r_url, files=[
             ('file', (os.path.basename(fp), open(fp, 'rb')))
             for fp in file_paths
-        ], headers=headers)
+        ], headers=headers, data=data)
         assert r.status_code == 200, r.text
     finally:
         for fp in files:
