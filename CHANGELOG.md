@@ -19,6 +19,12 @@
 - [#28](https://github.com/jirik/layman/issues/28) At first start of Layman, access rights are set so [that everyone can read and only owner of the workspace can edit them](doc/security.md#Authorization) for publications in [personal workspaces](doc/models.md#personal-workspace) and [that anyone can read or edit](doc/security.md#Authorization) for publications in [public workspaces](doc/models.md#public-workspace).
 - [#28](https://github.com/jirik/layman/issues/28) Security rules on GeoServer on [workspace level (workspace.*.r/w)](https://docs.geoserver.org/stable/en/user/security/layer.html) are deleted on first Layman start and replaced with security rules on [layer level (workspace.layername.r/w)](https://docs.geoserver.org/stable/en/user/security/layer.html) according to rules on Layman side.
 
+## v1.7.3
+2020-11-30
+### Changes
+- If published [layer](doc/models.md#layer) has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World. This happens on [POST Layers](doc/rest.md#post-layers) and [PATCH Layer](doc/rest.md#patch-layer).
+- [#40](https://github.com/jirik/layman/issues/40) Enable to upload empty ShapeFile.
+
 ## v1.7.2
 2020-11-09
 ### Changes
