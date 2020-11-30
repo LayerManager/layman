@@ -84,6 +84,7 @@ def patch_layer(username,
                 file_paths=None,
                 headers=None,
                 access_rights=None,
+                title=None,
                 ):
     headers = headers or {}
     file_paths = file_paths or []
@@ -101,6 +102,8 @@ def patch_layer(username,
             data["access_rights.read"] = access_rights['read']
         if access_rights and access_rights.get('write'):
             data["access_rights.write"] = access_rights['write']
+        if title:
+            data['title'] = title
 
         r = requests.patch(r_url,
                            files=files,
