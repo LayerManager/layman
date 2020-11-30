@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.7.3
+2020-11-30
+### Changes
+- If published [layer](doc/models.md#layer) has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World. This happens on [POST Layers](doc/rest.md#post-layers) and [PATCH Layer](doc/rest.md#patch-layer).
+- [#40](https://github.com/jirik/layman/issues/40) Enable to upload empty ShapeFile.
+
 ## v1.7.2
 2020-11-09
 ### Changes
