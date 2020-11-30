@@ -17,6 +17,12 @@
 - [#28](https://github.com/jirik/layman/issues/28) New REST endpoint [GET Users](doc/rest.md#get-users) with list of all users registered in Layman.
 - [#28](https://github.com/jirik/layman/issues/28) New attribute `access_rights` added to [GET Layers](doc/rest.md#get-layers), [GET Layer](doc/rest.md#get-layer), [GET Maps](doc/rest.md#get-maps) and [GET Map](doc/rest.md#get-map) responses. New parameters `access_rights.read` and `access_rights.write` added to [POST Layers](doc/rest.md#post-layers), [PATCH Layer](doc/rest.md#patch-layer), [POST Maps](doc/rest.md#post-maps) and [PATCH Map](doc/rest.md#patch-map) requests.
 
+## v1.7.3
+2020-11-30
+### Changes
+- If published [layer](doc/models.md#layer) has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World. This happens on [POST Layers](doc/rest.md#post-layers) and [PATCH Layer](doc/rest.md#patch-layer).
+- [#40](https://github.com/jirik/layman/issues/40) Enable to upload empty ShapeFile.
+
 ## v1.7.2
 2020-11-09
 ### Changes
