@@ -19,31 +19,54 @@ There is also one internal authentication module:
 
 ## Authorization
 
-Authorization (**authz**) decides if authenticated [user](models.md#user) has permissions to perform the request to [REST API](rest.md).
+Authorization (**authz**) decides if authenticated [user](models.md#user) has permissions to perform the request to publication using [REST API](rest.md), [WMS](endpoints.md#web-map-service) and [WFS](endpoints.md#web-feature-service).
 
-Authorization is performed by single authorization module. When authentication is finished, security system calls authorization module that either passes or raises an exception.
+Authorization of **REST API** is performed by Layman itself. When authentication is finished, authorization module either allows request to be processed, raises an exception, or denies presence of requested publication. The behaviour depends on
+- requested endpoint and action
+- authenticated user
+- [access rights of requested publication](#publication-access-rights)
 
-### Access to single-publication endpoints
-Access to single-publication REST API endpoints is configurable by users. These endpoints are:
-- [Layer](rest.md#overview) and nested endpoints 
-- [Map](rest.md#overview) and nested endpoints 
+Authorization of **WMS** and **WFS** is performed by Layman and GeoServer. On Layman, there are two important mechanisms:
+- [synchronization of authorization-related data to GeoServer](data-storage.md#geoserver)
+- Layman's authentication proxy that is placed in front of GeoServer's [WMS](endpoints.md#web-map-service) and [WFS](endpoints.md#web-feature-service) endpoints
 
-To control access to these endpoints, authorization module uses so called **access rights**. There are following types of access rights:
-- **read**: grants `GET` HTTP requests
-- **write**: grants `POST`, `PUT`, `PATCH`, and `DELETE` HTTP requests
+Thanks to these mechanisms, GeoServer knows who is asking and if he can read/write requested layer.
 
-Both read and write access rights contain list of user names or roles. Currently, Layman accepts following roles:
-- EVERYONE: every user including anonymous
+### Publication Access Rights
+Access rights enable user to control access to publications. Access to each publication is controlled by two access rights:
+- **read**
+   - grants `GET` HTTP requests to [single-publication REST API endpoints](#access-to-single-publication-endpoints)
+   - grants presence of layer in response to `GET` HTTP requests in [multi-publication REST API endpoints](#access-to-multi-publication-endpoints)
+   - grants presence of layer and its features in WMS and WFS responses 
+- **write**
+   - grants `POST`, `PATCH`, and `DELETE` HTTP requests to [single-publication REST API endpoints](#access-to-single-publication-endpoints)
+   - grants deleting the publication by `DELETE` HTTP request to [multi-publication REST API endpoints](#access-to-multi-publication-endpoints)
+   - grants WFS-T requests to the layer
 
-Users listed in access rights, either directly or indirectly through roles, are granted to perform related HTTP actions.
+Both read and write access rights contain list of [user names](models.md#username) or [role names](models.md#role). Currently, Layman accepts following roles:
+- `EVERYONE`: every user including anonymous (unauthenticated)
+
+Users listed in access rights, either directly or indirectly through roles, are granted to perform described actions.
 
 Access rights are set by [POST Layers](rest.md#post-layers) request and can be changed by [PATCH Layer](rest.md#patch-layer) request (analogically for maps). 
 
-### Access to multi-publication endpoints
-Access to **multi-publication REST API endpoints**, e.g. [Layers](rest.md#overview) and [Maps](rest.md#overview), is treated by following rules:
-- Everyone can send [GET Layers](rest.md#get-layers) request to any workspace, receiving only publications he has read access to.
+#### Access to single-publication endpoints
+Single-publication endpoints are:
+- [Layer](rest.md#overview) and nested endpoints 
+- [Map](rest.md#overview) and nested endpoints 
+
+Access to these endpoints is completely controlled by [access rights](#publication-access-rights). 
+
+#### Access to multi-publication endpoints
+Multi-publication endpoints are:
+- [Layers](rest.md#overview) 
+- [Maps](rest.md#overview) 
+
+Access is treated by following rules:
 - Every authenticated user can send [POST Layers](rest.md#post-layers) to his own [personal workspace](models.md#personal-workspace).
-- Everyone can send [POST Layers](rest.md#post-layers) to any [public workspace](models.md#public-workspace) if and only if he is listed in [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](env-settings.md#GRANT_PUBLISH_IN_PUBLIC_WORKSPACE) (directly or through role). Furthermore, automatic creation of not-yet-existing [public workspace](models.md#public-workspace) on [POST Layers](rest.md#post-layers) is controlled by [GRANT_CREATE_PUBLIC_WORKSPACE](env-settings.md#GRANT_CREATE_PUBLIC_WORKSPACE).
+- Everyone can send [POST Layers](rest.md#post-layers) to any existing [public workspace](models.md#public-workspace) if and only if she is listed in [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](env-settings.md#GRANT_PUBLISH_IN_PUBLIC_WORKSPACE) (directly or through role).
+- Everyone can send [POST Layers](rest.md#post-layers) to any not-yet-existing [public workspace](models.md#public-workspace) if and only if she is listed in [GRANT_CREATE_PUBLIC_WORKSPACE](env-settings.md#GRANT_CREATE_PUBLIC_WORKSPACE) (directly or through role). Such action leads to creation of the public workspace.
+- Everyone can send [GET Layers](rest.md#get-layers) request to any workspace, receiving only publications she has read access to.
 - Everyone can send [DELETE Layers](rest.md#delete-layers) request to any workspace, deleting only publications she has write access to.
 
 It's analogical for maps.

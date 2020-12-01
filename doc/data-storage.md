@@ -19,7 +19,7 @@ Data stores:
 ### Users
 Information about users includes their names, contacts, and authentication credentials.
 
-When user [reserves his username](rest.md#patch-current-user), names, contacts and other relevant metadata are [obtained from authorization provider](oauth2/index.md#fetch-user-related-metadata) and saved to [filesystem](#filesystem), [Redis](#redis) and [PostgreSQL](#postgresql).
+When user [reserves his username](rest.md#patch-current-user), names, contacts and other relevant metadata are [obtained from authorization provider](oauth2/index.md#fetch-user-related-metadata) and saved to [filesystem](#filesystem), [Redis](#redis), [PostgreSQL](#postgresql), and [GeoServer](#geoserver).
 
 ### Layers
 Information about [layers](models.md#layer) includes vector data and visualization.
@@ -33,7 +33,7 @@ When user [publishes new layer](rest.md#post-layers)
 Subsequently, when asynchronous tasks run,
 - vector data file chunks and completed vector data files are saved to [filesystem](#filesystem) (if sent [asynchronously](async-file-upload.md)),
 - vector data files are imported to [PostgreSQL](#postgresql),
-- PostgreSQL table with vector data is registered to and visualization file is saved to [GeoServer](#geoserver),
+- PostgreSQL table with vector data is registered to, access rights are synchronized to, and visualization file is saved to [GeoServer](#geoserver),
 - thumbnail file is saved to [filesystem](#filesystem),
 - and metadata record is saved to [PostgreSQL](#postgresql) using Micka's CSW.
 
@@ -70,9 +70,9 @@ Redis is used as temporary data store. When Layman stops, data persists in Redis
 ### Filesystem
 Data is saved to LAYMAN_DATA_DIR directory.
 
-**User directory** is created in LAYMAN_DATA_DIR directory for every user who reserved username. Name of the user directory is the same as username. Every user-related information is saved in user directory.
+**User directory** is created in LAYMAN_DATA_DIR directory for every user who reserved username. Name of the user directory is the same as username. User-related information is saved in user directory.
 
-**Publication directory** is created inside user directory for each publication (e.g. map or layer) the user published. Name of the publication directory is the same as name of the publication (e.g. layername or mapname). Every publication-related information is saved in publication directory.
+**Publication directory** is created inside user directory for each publication (e.g. map or layer) the user published. Name of the publication directory is the same as name of the publication (e.g. layername or mapname). Publication-related information is saved in publication directory.
 
 Filesystem is used as persistent data store, so data survives Layman restart.
  
@@ -90,8 +90,12 @@ Vector layer data is organized in schemas and tables:
 PostgreSQL is used as persistent data store, so data survives Layman restart.
 
 ### GeoServer
-**[User workspace](https://docs.geoserver.org/stable/en/user/data/webadmin/workspaces.html)** is created and **[PostgreSQL datastore](https://docs.geoserver.org/latest/en/user/data/app-schema/data-stores.html#postgis)** is registered for every user who reserved username. Name of user workspace is always the same as username, name of the datastore is `postgresql`. Every user-related information (including PostgreSQL datastore) is saved in user workspace. Besides workspace and datastore, explicit **[access rule](https://docs.geoserver.org/stable/en/user/security/layer.html)** for all layers in user workspace is created. The rule looks like `<workspace>.*.r=<LAYMAN_GS_ROLE>,ROLE_ANONYMOUS`.
- 
-**[Feature type](https://docs.geoserver.org/stable/en/user/rest/api/featuretypes.html)** and **[layer](https://docs.geoserver.org/stable/en/user/data/webadmin/layers.html)** is registered in user PostgreSQL datastore and **[style](https://docs.geoserver.org/latest/en/user/styling/webadmin/index.html)** is created in user workspace for each layer the user published. Name of these three models are the same as layername. Every layer-related information is saved in one or more of these three models. Feature type points to appropriate PostgreSQL table. Style contains visualization file.
+**[User](https://docs.geoserver.org/stable/en/user/security/webadmin/ugr.html)** and **[role](https://docs.geoserver.org/stable/en/user/security/webadmin/ugr.html)** are created for every [user](models.md#user) who reserved [username](models.md#username). User name on GeoServer is the same as username on Layman. Role name is composed a `USER_<upper-cased username>`.
+
+**[Workspace](https://docs.geoserver.org/stable/en/user/data/webadmin/workspaces.html)** is created and **[PostgreSQL datastore](https://docs.geoserver.org/latest/en/user/data/app-schema/data-stores.html#postgis)** is registered for every [workspace](models.md#workspace) (both personal and public). Name of the workspace is always the same on GeoServer as on Layman. Name of the datastore is `postgresql`. Every workspace-related information (including PostgreSQL datastore) is saved inside workspace.
+
+**[Feature type](https://docs.geoserver.org/stable/en/user/rest/api/featuretypes.html)** and **[layer](https://docs.geoserver.org/stable/en/user/data/webadmin/layers.html)** are registered in workspace PostgreSQL datastore and **[style](https://docs.geoserver.org/latest/en/user/styling/webadmin/index.html)** is created in workspace for each layer published on Layman. Name of these three models are the same as layername. Feature type points to appropriate PostgreSQL table. Style contains visualization file.
+
+Two **[access rules](https://docs.geoserver.org/stable/en/user/security/layer.html)** are created for each layer published on Layman, one for [read access right](security.md#publication-access-rights), one for [write access right](security.md#publication-access-rights). Every username from Layman's access right is represented by user's role name (i.e. `USER_<upper-cased username>`). Role `EVERYONE` is represented as `ROLE_ANONYMOUS` on GeoServer.
 
 GeoServer is used as persistent data store, so data survives Layman restart.
