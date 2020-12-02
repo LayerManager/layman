@@ -272,3 +272,46 @@ def get_publication_infos(workspace, publ_type, context=None):
                 result[name] = info
 
     return result
+
+
+def delete_publications(user,
+                        publ_type,
+                        error_code,
+                        is_task_ready_fn,
+                        abort_publication_fn,
+                        delete_publication_fn,
+                        method,
+                        url_path,
+                        publ_param,
+                        ):
+    from layman.common import redis as redis_util
+    from layman import authn
+    actor_name = authn.get_authn_username()
+    whole_infos = get_publication_infos(user, publ_type, {'actor_name': actor_name, 'access_type': 'write'})
+
+    for publication in whole_infos:
+        redis_util.create_lock(user, publ_type, publication, error_code, method)
+        try:
+            abort_publication_fn(user, publication)
+            delete_publication_fn(user, publication)
+            if is_task_ready_fn(user, publication):
+                redis_util.unlock_publication(user, publ_type, publication)
+        except Exception as e:
+            try:
+                if is_task_ready_fn(user, publication):
+                    redis_util.unlock_publication(user, publ_type, publication)
+            finally:
+                redis_util.unlock_publication(user, publ_type, publication)
+            raise e
+
+    infos = [
+        {
+            'name': info["name"],
+            'title': info.get("title", None),
+            'url': url_for(**{'endpoint': url_path, publ_param: name, 'username': user}),
+            'uuid': info["uuid"],
+            'access_rights': info['access_rights'],
+        }
+        for (name, info) in whole_infos.items()
+    ]
+    return jsonify(infos)

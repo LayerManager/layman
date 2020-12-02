@@ -1,7 +1,6 @@
 import sys
 import pytest
 import requests
-import json
 
 del sys.modules['layman']
 

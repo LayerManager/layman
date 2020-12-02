@@ -20,7 +20,7 @@ def authorize(workspace, publication_type, publication_name, request_method, act
     }[publication_type]
 
     if is_multi_publication_request:
-        if request_method in ['GET']:
+        if request_method in ['GET', 'DELETE']:
             if not workspaces.get_workspace_infos(workspace):
                 raise LaymanError(40)  # User not found
             return

@@ -55,6 +55,8 @@ def liferay_mock():
                 'test_wms_ows_proxy_user': None,
                 'test_get_publication_info_user': None,
                 'test_get_publication_info_without_user': None,
+                'test_delete_publications_owner': None,
+                'test_delete_publications_deleter': None,
                 'test_get_publication_infos_user_owner': None,
             },
         },
