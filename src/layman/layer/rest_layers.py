@@ -4,7 +4,7 @@ from flask import current_app as app
 from layman.common import rest as rest_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
-from layman import settings, authn
+from layman import settings, authn, util as layman_util
 from . import util, LAYER_TYPE
 from .filesystem import input_file, input_sld, input_chunk, uuid
 from layman.authn import authenticate
@@ -167,3 +167,20 @@ def post(username):
 
     # app.logger.info('uploaded layer '+layername)
     return jsonify([layer_result]), 200
+
+
+@bp.route('/layers', methods=['DELETE'])
+def delete(username):
+    app.logger.info(f"DELETE Layers, user={g.user}")
+
+    infos = layman_util.delete_publications(username,
+                                            LAYER_TYPE,
+                                            19,
+                                            util.is_layer_task_ready,
+                                            util.abort_layer_tasks,
+                                            util.delete_layer,
+                                            request.method,
+                                            'rest_layer.get',
+                                            'layername',
+                                            )
+    return infos, 200

@@ -44,6 +44,7 @@ Access to **multi-publication REST API endpoints**, e.g. [Layers](rest.md#overvi
 - Everyone can send [GET Layers](rest.md#get-layers) request to any workspace, receiving only publications he has read access to.
 - Every authenticated user can send [POST Layers](rest.md#post-layers) to his own [personal workspace](models.md#personal-workspace).
 - Everyone can send [POST Layers](rest.md#post-layers) to any [public workspace](models.md#public-workspace) if and only if he is listed in [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](env-settings.md#GRANT_PUBLISH_IN_PUBLIC_WORKSPACE) (directly or through role). Furthermore, automatic creation of not-yet-existing [public workspace](models.md#public-workspace) on [POST Layers](rest.md#post-layers) is controlled by [GRANT_CREATE_PUBLIC_WORKSPACE](env-settings.md#GRANT_CREATE_PUBLIC_WORKSPACE).
+- Everyone can send [DELETE Layers](rest.md#delete-layers) request to any workspace, deleting only publications she has write access to.
 
 It's analogical for maps.
 

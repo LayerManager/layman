@@ -3,13 +3,13 @@
 ## Overview
 |Endpoint|URL|GET|POST|PATCH|DELETE|
 |---|---|---|---|---|---|
-|Layers|`/rest/<username>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | x |
+|Layers|`/rest/<username>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | [DELETE](#delete-layers) |
 |[Layer](models.md#layer)|`/rest/<username>/layers/<layername>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
 |Layer Thumbnail|`/rest/<username>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
 |Layer Style|`/rest/<username>/layers/<layername>/style`|[GET](#get-layer-style)| x | x | x |
 |Layer Chunk|`/rest/<username>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
 |Layer Metadata Comparison|`/rest/<username>/layers/<layername>/metadata-comparison`|[GET](#get-layer-metadata-comparison) | x | x | x |
-|Maps|`/rest/<username>/maps`|[GET](#get-maps)| [POST](#post-maps) | x | x |
+|Maps|`/rest/<username>/maps`|[GET](#get-maps)| [POST](#post-maps) | x | [DELETE](#delete-maps) |
 |[Map](models.md#map)|`/rest/<username>/maps/<mapname>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
 |Map File|`/rest/<username>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
 |Map Thumbnail|`/rest/<username>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
@@ -109,6 +109,23 @@ JSON array of objects representing posted layers with following structure:
    - **file**: name of the file, equal to one of file name from **file** parameter
    - **layman_original_parameter**: name of the request parameter that contained the file name; currently, the only possible value is `file`
 
+### DELETE Layers
+Delete existing layers and all associated sources, including vector data file and DB table for all layers in the workspace. It is possible to delete layers, whose publication process is still running. In such case, the publication process is aborted safely. Only layers on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
+
+#### Request
+No action parameters.
+
+#### Response
+Content-Type: `application/json`
+
+JSON array of objects representing deleted layers:
+- **name**: String. Former name of the layer.
+- **title**: String. Former title of the layer.
+- **uuid**: String. Former UUID of the layer.
+- **url**: String. Former URL of the layer. It points to [GET Layer](#get-layer).
+- **access_rights**:
+  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with former [read access](./security.md#Authorization).
+  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with former [write access](./security.md#Authorization).
 
 ## Layer
 ### URL
@@ -383,6 +400,23 @@ JSON array of objects representing posted maps with following structure:
 - **uuid**: String. UUID of the map.
 - **url**: String. URL of the map. It points to [GET Map](#get-map).
 
+### DELETE Maps
+Delete existing maps and all associated sources, including map-composition JSON file and map thumbnail for all mapss in the workspace. Only maps on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
+
+#### Request
+No action parameters.
+
+#### Response
+Content-Type: `application/json`
+
+JSON array of objects representing deleted maps:
+- **name**: String. Former name of the map.
+- **title**: String. Former title of the map.
+- **uuid**: String. Former UUID of the map.
+- **url**: String. Former URL of the map. It points to [GET Map](#get-map).
+- **access_rights**:
+  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with former [read access](./security.md#Authorization).
+  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with former [write access](./security.md#Authorization).
 
 ## Map
 ### URL

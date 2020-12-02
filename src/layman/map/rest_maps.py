@@ -9,7 +9,7 @@ from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
 from . import util, MAP_TYPE
 from .filesystem import input_file, uuid
-from layman import authn
+from layman import authn, util as layman_util
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 from layman.common import redis as redis_util
@@ -131,3 +131,21 @@ def post(username):
 
     # app.logger.info('uploaded map '+mapname)
     return jsonify([map_result]), 200
+
+
+@bp.route('/maps', methods=['DELETE'])
+def delete(username):
+    app.logger.info(f"DELETE Maps, user={g.user}")
+
+    infos = layman_util.delete_publications(username,
+                                            MAP_TYPE,
+                                            29,
+                                            util.is_map_task_ready,
+                                            util.abort_map_tasks,
+                                            util.delete_map,
+                                            request.method,
+                                            'rest_map.get',
+                                            'mapname',
+                                            )
+
+    return infos, 200
