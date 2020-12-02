@@ -55,6 +55,7 @@ def liferay_mock():
                 'test_wms_ows_proxy_user': None,
                 'test_get_publication_info_user': None,
                 'test_get_publication_info_without_user': None,
+                'test_get_publication_infos_user_owner': None,
             },
         },
         'host': '0.0.0.0',

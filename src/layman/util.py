@@ -5,7 +5,7 @@ import re
 import unicodedata
 from collections import OrderedDict
 
-from flask import current_app, request, url_for as flask_url_for
+from flask import current_app, request, url_for as flask_url_for, jsonify
 from unidecode import unidecode
 
 from layman import settings
@@ -241,5 +241,34 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
         read_access_users = result.get('access_rights').get('read')
         if not authz.is_user_in_access_rule(actor, read_access_users):
             result = {}
+
+    return result
+
+
+def get_publication_infos(workspace, publ_type, context=None):
+    from layman import authz
+    from layman.common import util as common_util
+    from layman.layer import LAYER_TYPE
+    from layman.map import MAP_TYPE
+    context = context or {}
+
+    sources_names = get_publication_types()[publ_type]['access_rights_source']
+    sources = get_modules_from_names([sources_names])
+
+    info_method = {
+        LAYER_TYPE: 'get_layer_infos',
+        MAP_TYPE: 'get_map_infos',
+    }[publ_type]
+
+    partial_infos = call_modules_fn(sources, info_method, [workspace])
+    infos = common_util.merge_infos(partial_infos)
+
+    result = {}
+    if 'actor_name' in context:
+        actor = context['actor_name']
+        access_type = context['access_type']
+        for (name, info) in infos.items():
+            if authz.is_user_in_access_rule(actor, info.get('access_rights').get(access_type)):
+                result[name] = info
 
     return result
