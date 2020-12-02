@@ -1,4 +1,7 @@
 import sys
+import pytest
+import requests
+import json
 
 del sys.modules['layman']
 
@@ -10,17 +13,19 @@ from .geoserver import wfs, wms, sld
 from .micka import soap
 from . import util, LAYER_TYPE
 from layman.util import url_for
-from test import flask_client as client_util, util as test_util
+from test import process, process_client, util as test_util
 
-client = client_util.client
+ensure_layman = process.ensure_layman
+liferay_mock = process.liferay_mock
 
 
-def test_get_layer_infos(client):
+@pytest.mark.usefixtures('ensure_layman')
+def test_get_layer_infos():
     username = 'test_get_layer_infos_user'
     layername = 'test_get_layer_infos_layer'
     layertitle = "Test get layer infos - layer íářžý"
 
-    client_util.publish_layer(username, layername, client, layertitle)
+    process_client.publish_layer(username, layername, title=layertitle)
 
     result_infos_name = {layername: {'name': layername}}
     result_infos_name_title = {layername: {'name': layername,
@@ -106,10 +111,11 @@ def test_get_layer_infos(client):
         layer_infos = util.get_layer_infos(username)
         test_util.assert_same_infos(layer_infos, result_infos_all)
 
-    client_util.delete_layer(username, layername, client)
+    process_client.delete_layer(username, layername)
 
 
-def test_get_layer_title(client):
+@pytest.mark.usefixtures('ensure_layman')
+def test_get_layer_title():
     username = 'test_get_layer_infos_user'
     layers = [("c_test_get_layer_infos_layer", "C Test get layer infos - map layer íářžý"),
               ("a_test_get_layer_infos_layer", "A Test get layer infos - map layer íářžý"),
@@ -118,16 +124,17 @@ def test_get_layer_title(client):
     sorted_layers = sorted(layers)
 
     for (name, title) in layers:
-        client_util.publish_layer(username, name, client, title)
+        process_client.publish_layer(username, name, title=title)
 
+    # layers.GET
     with app.app_context():
-        # layers.GET
-        rv = client.get(url_for('rest_layers.get', username=username))
-        assert rv.status_code == 200, rv.json
+        url = url_for('rest_layers.get', username=username)
+    rv = requests.get(url)
+    assert rv.status_code == 200, rv.text
 
-        for i in range(0, len(sorted_layers) - 1):
-            assert rv.json[i]["name"] == sorted_layers[i][0]
-            assert rv.json[i]["title"] == sorted_layers[i][1]
+    for i in range(0, len(sorted_layers) - 1):
+        assert rv.json()[i]["name"] == sorted_layers[i][0]
+        assert rv.json()[i]["title"] == sorted_layers[i][1]
 
     for (name, title) in layers:
-        client_util.delete_layer(username, name, client)
+        process_client.delete_layer(username, name)
