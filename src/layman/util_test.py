@@ -3,9 +3,11 @@ import importlib
 
 from . import app as app, settings, LaymanError, util
 from .util import slugify, get_modules_from_names, get_providers_from_source_names
-from test import process
+from test import process, process_client
+from layman.layer import LAYER_TYPE
 
 ensure_layman = process.ensure_layman
+liferay_mock = process.liferay_mock
 
 
 def test_slugify():
@@ -106,3 +108,43 @@ def test_publication_interface_methods():
             methods = interface['methods']
             for module in modules:
                 assert_module_methods(module, methods)
+
+
+class TestGetPublicationInfosClass:
+    layer_both = 'test_get_publication_infos_layer_both'
+    layer_read = 'test_get_publication_infos_layer_read'
+    layer_none = 'test_get_publication_infos_layer_none'
+    owner = 'test_get_publication_infos_user_owner'
+    actor = 'test_get_publication_infos_user_actor'
+    authz_headers_owner = process_client.get_authz_headers(owner)
+    authz_headers_actor = process_client.get_authz_headers(actor)
+
+    @pytest.fixture(scope="class")
+    def provide_publications(self):
+        username = self.owner
+        authz_headers = self.authz_headers_owner
+        layer_both = self.layer_both
+        layer_read = self.layer_read
+        layer_none = self.layer_none
+        process_client.ensure_reserved_username(username, headers=authz_headers)
+        process_client.publish_layer(username, layer_both, headers=authz_headers, access_rights={'read': 'EVERYONE', 'write': 'EVERYONE'})
+        process_client.publish_layer(username, layer_read, headers=authz_headers, access_rights={'read': 'EVERYONE', 'write': username})
+        process_client.publish_layer(username, layer_none, headers=authz_headers, access_rights={'read': username, 'write': username})
+        yield
+        process_client.delete_layer(username, layer_both, headers=authz_headers)
+        process_client.delete_layer(username, layer_read, headers=authz_headers)
+        process_client.delete_layer(username, layer_none, headers=authz_headers)
+
+    @pytest.mark.parametrize('publ_type, context, expected_publications', [
+        (LAYER_TYPE, {'actor_name': actor, 'access_type': 'read'}, {layer_both, layer_read},),
+        (LAYER_TYPE, {'actor_name': actor, 'access_type': 'write'}, {layer_both},),
+    ], )
+    @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_publications')
+    def test_get_publication_infos(self,
+                                   publ_type,
+                                   context,
+                                   expected_publications):
+        with app.app_context():
+            infos = util.get_publication_infos(self.owner, publ_type, context)
+        publ_set = set(infos.keys())
+        assert publ_set == expected_publications, publ_set
