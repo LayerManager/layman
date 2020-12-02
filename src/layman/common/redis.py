@@ -6,14 +6,18 @@ from layman import LaymanError
 PUBLICATION_LOCKS_KEY = f'{__name__}:PUBLICATION_LOCKS'
 
 
+def create_lock(username, publication_type, publication_name, error_code, method):
+    check_http_method(username, publication_type, publication_name, error_code)
+    lock_publication(username, publication_type, publication_name, method)
+
+
 def create_lock_decorator(publication_type, publication_name_key, error_code, is_task_ready_fn):
     def lock_decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             username = request.view_args['username']
             publication_name = request.view_args[publication_name_key]
-            check_http_method(username, publication_type, publication_name, error_code)
-            lock_publication(username, publication_type, publication_name, request.method)
+            create_lock(username, publication_type, publication_name, error_code, request.method)
             try:
                 result = f(*args, **kwargs)
                 if is_task_ready_fn(username, publication_name):
