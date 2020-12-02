@@ -19,9 +19,8 @@ class TestPublicWorkspaceClass:
         user_authz_headers = self.user_authz_headers
         env_vars = dict(process.AUTHN_SETTINGS)
 
-        layman_process = process.start_layman(env_vars)
+        layman_process = process.ensure_layman_function(env_vars)
         process_client.reserve_username(username, headers=user_authz_headers)
-        process.stop_process(layman_process)
         yield
 
     @pytest.mark.usefixtures('liferay_mock', 'setup_test_public_workspace_variable')
@@ -72,7 +71,7 @@ class TestPublicWorkspaceClass:
         env_vars = dict(process.AUTHN_SETTINGS)
         env_vars['GRANT_CREATE_PUBLIC_WORKSPACE'] = create_public_workspace
         env_vars['GRANT_PUBLISH_IN_PUBLIC_WORKSPACE'] = publish_in_public_workspace
-        layman_process = process.start_layman(env_vars)
+        process.ensure_layman_function(env_vars)
 
         if user_can_create:
             publish_method(workspace_name, publication_name, headers=authz_headers)
@@ -88,5 +87,3 @@ class TestPublicWorkspaceClass:
             delete_method(workspace_name2, publication_name)
         else:
             can_not_publish(workspace_name2, publication_name, publish_method)
-
-        process.stop_process(layman_process)

@@ -30,6 +30,10 @@ AUTHN_SETTINGS = {
     'OAUTH2_LIFERAY_USER_PROFILE_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile",
 }
 
+LAYMAN_SETTING = {}
+LAYMAN_DEFAULT_SETTINGS = AUTHN_SETTINGS
+LAYMAN_START_COUNT = 0
+
 
 @pytest.fixture(scope="module")
 def liferay_mock():
@@ -78,25 +82,47 @@ def liferay_mock():
     server.join()
 
 
-@pytest.fixture(scope="module", autouse=True)
 def clear():
-    yield
     while len(SUBPROCESSES) > 0:
         proc = next(iter(SUBPROCESSES))
         stop_process(proc)
 
 
-@pytest.fixture(scope="module")
-def ensure_layman():
-    print(f'\nEnsure layman is starting')
-    processes = start_layman(AUTHN_SETTINGS)
+@pytest.fixture(scope='session', autouse=True)
+def ensure_layman_session():  # TODO mám podezření že se to nikdy nepouští. Potřebujeme to kvůli clear() na konci
+    print(f'\nensure_layman_session is starting')
+    ensure_layman_function(LAYMAN_DEFAULT_SETTINGS)
     yield
-    stop_process(processes)
-    print(f'\nEnsure layman is ending')
+    clear()
+    global LAYMAN_START_COUNT
+    print(f'\nensure_layman_session is ending - {LAYMAN_START_COUNT}')
 
 
+@pytest.mark.usefixtures('ensure_layman_session')
+def ensure_layman_function(env_vars):
+    print(f'Ensure Layman is starting with settings={env_vars}')
+    global LAYMAN_SETTING
+    if LAYMAN_SETTING != env_vars:
+        print(f'\nReally starting Layman LAYMAN_SETTING={LAYMAN_SETTING}, settings={env_vars}')
+        clear()
+        start_layman(env_vars)
+        LAYMAN_SETTING = env_vars
+
+
+@pytest.fixture(scope="function")
+def ensure_layman():
+    print(f'\nensure_layman_fixture is starting - {LAYMAN_START_COUNT}')
+    ensure_layman_function(LAYMAN_DEFAULT_SETTINGS)
+    yield
+    print(f'\nensure_layman_fixture is ending - {LAYMAN_START_COUNT}')
+
+
+# TODO myslim, ze je zbytecne vypinat a zapinat i redis a celery
 def start_layman(env_vars=None):
     # first flush redis DB
+    print(f'\nstart_layman: Really starting Layman')
+    global LAYMAN_START_COUNT
+    LAYMAN_START_COUNT = LAYMAN_START_COUNT + 1
     LAYMAN_REDIS.flushdb()
     port = settings.LAYMAN_SERVER_NAME.split(':')[1]
     env_vars = env_vars or {}
@@ -114,7 +140,7 @@ def start_layman(env_vars=None):
 
     celery_env = layman_env.copy()
     celery_env['LAYMAN_SKIP_REDIS_LOADING'] = 'true'
-    cmd = f'python3 -m celery -Q {LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info --concurrency=4'
+    cmd = f'python3 -m celery -Q {LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info --concurrency=2'
     celery_process = subprocess.Popen(cmd.split(), shell=False, stdin=None, env=layman_env, cwd='src')
 
     SUBPROCESSES.add(celery_process)
