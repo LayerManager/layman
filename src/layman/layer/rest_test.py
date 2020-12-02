@@ -15,8 +15,6 @@ from flask import url_for
 
 import sys
 
-from test import flask_client
-
 del sys.modules['layman']
 
 from . import util, LAYER_TYPE
@@ -32,9 +30,10 @@ from .micka import csw
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from test.data import wfs as data_wfs
-from test import flask_client
+from test import flask_client, process, process_client
 
 logger = logging.getLogger(__name__)
+ensure_layman = process.ensure_layman
 
 
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
@@ -1165,29 +1164,14 @@ def test_get_layers_testuser2(client):
     })
 
 
-@pytest.mark.usefixtures('app_context')
-def test_layer_with_different_geometry(client):
+@pytest.mark.usefixtures('ensure_layman')
+def test_layer_with_different_geometry():
     username = 'testgeometryuser1'
     layername = 'layer_with_different_geometry'
-    rest_path = url_for('rest_layers.post', username=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
     ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
-            'file': files,
-            'name': layername,
-        })
-        assert rv.status_code == 200
-    finally:
-        for fp in files:
-            fp[0].close()
-
-    flask_client.wait_till_layer_ready(username, layername)
+    process_client.publish_layer(username, layername, file_paths=file_paths)
 
     url_path_ows = urljoin(urljoin(settings.LAYMAN_GS_URL, username), 'ows?service=WFS&request=Transaction')
     url_path_wfs = urljoin(urljoin(settings.LAYMAN_GS_URL, username), 'wfs?request=Transaction')
