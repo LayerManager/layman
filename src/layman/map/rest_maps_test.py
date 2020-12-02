@@ -1,4 +1,7 @@
 import sys
+import pytest
+import requests
+import json
 
 del sys.modules['layman']
 
@@ -8,21 +11,21 @@ from .micka import soap
 from .prime_db_schema import table as prime_table
 from . import util, MAP_TYPE
 from layman.util import url_for
-from test import flask_client as client_util, util as test_util
+from test import process, process_client, util as test_util
 
-client = client_util.client
+ensure_layman = process.ensure_layman
+liferay_mock = process.liferay_mock
 
 
-def test_get_map_infos(client):
+@pytest.mark.usefixtures('ensure_layman')
+def test_get_map_infos():
     username = 'test_get_map_infos_user'
     mapname = 'test_get_map_infos_layer'
     maptitle = "Test get map infos - map title íářžý"
 
-    client_util.publish_map(username, mapname, client, maptitle)
+    process_client.publish_map(username, mapname, title=maptitle)
 
-    result_infos_name = {mapname: {'name': mapname}}
     result_infos_name_title = {mapname: {'name': mapname, 'title': maptitle}}
-    result_publication_name = [mapname]
 
     with app.app_context():
         result_infos_name_title_uuid = {mapname: {'name': mapname,
@@ -74,10 +77,11 @@ def test_get_map_infos(client):
         map_infos = util.get_map_infos(username)
         test_util.assert_same_infos(map_infos, result_infos_all)
 
-    client_util.delete_map(username, mapname, client)
+    process_client.delete_map(username, mapname)
 
 
-def test_get_map_title(client):
+@pytest.mark.usefixtures('ensure_layman')
+def test_get_map_title():
     username = 'test_get_map_infos_user'
     maps = [("c_test_get_map_infos_map", "C Test get map infos - map title íářžý"),
             ("a_test_get_map_infos_map", "A Test get map infos - map title íářžý"),
@@ -86,34 +90,37 @@ def test_get_map_title(client):
     sorted_maps = sorted(maps)
 
     for (name, title) in maps:
-        client_util.publish_map(username, name, client, title)
+        process_client.publish_map(username, name, title=title)
 
     with app.app_context():
-        # maps.GET
-        rv = client.get(url_for('rest_maps.get', username=username))
-        assert rv.status_code == 200, rv.json
+        url_get = url_for('rest_maps.get', username=username)
+    # maps.GET
+    rv = requests.get(url_get)
+    assert rv.status_code == 200, rv.json()
 
-        for i in range(0, len(sorted_maps) - 1):
-            assert rv.json[i]["name"] == sorted_maps[i][0]
-            assert rv.json[i]["title"] == sorted_maps[i][1]
+    for i in range(0, len(sorted_maps) - 1):
+        assert rv.json()[i]["name"] == sorted_maps[i][0]
+        assert rv.json()[i]["title"] == sorted_maps[i][1]
 
     for (name, title) in maps:
-        client_util.delete_map(username, name, client)
+        process_client.delete_map(username, name)
 
 
-def test_get_maps(client):
+@pytest.mark.usefixtures('ensure_layman')
+def test_get_maps():
     username = 'test_get_maps_user'
     mapname = 'test_get_maps_map'
 
-    client_util.publish_map(username, mapname, client)
+    process_client.publish_map(username, mapname, title=mapname)
 
     with app.app_context():
-        # maps.GET
-        rv = client.get(url_for('rest_maps.get', username=username))
-        assert rv.status_code == 200, rv.json
+        url_get = url_for('rest_maps.get', username=username)
+    # maps.GET
+    rv = requests.get(url_get)
+    assert rv.status_code == 200, rv.json()
 
-    assert rv.json[0]['name'] == mapname
-    assert rv.json[0]['title'] == mapname
-    assert rv.json[0]['url'] == f"http://{settings.LAYMAN_SERVER_NAME}/rest/{username}/maps/{mapname}"
+    assert rv.json()[0]['name'] == mapname
+    assert rv.json()[0]['title'] == mapname
+    assert rv.json()[0]['url'] == f"http://{settings.LAYMAN_SERVER_NAME}/rest/{username}/maps/{mapname}"
 
-    client_util.delete_map(username, mapname, client)
+    process_client.delete_map(username, mapname)
