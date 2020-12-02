@@ -181,6 +181,7 @@ def publish_map(username,
                 headers=None,
                 access_rights=None,
                 assert_status=True,
+                title=None
                 ):
     headers = headers or {}
     file_paths = file_paths or ['sample/layman.map/full.json', ]
@@ -198,6 +199,8 @@ def publish_map(username,
             data["access_rights.read"] = access_rights['read']
         if access_rights and access_rights.get('write'):
             data["access_rights.write"] = access_rights['write']
+        if title:
+            data['title'] = title
         r = requests.post(r_url,
                           files=files,
                           data=data,
