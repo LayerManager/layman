@@ -22,6 +22,10 @@ patch_map = csw.patch_map
 delete_map = csw.delete_map
 
 
+def pre_post_publication_check(username, layername):
+    pass
+
+
 def soap_insert(username, layername, actor_name=None):
     template_path, prop_values = csw.get_template_path_and_values(username, layername, http_method='post', actor_name=actor_name)
     record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, csw.METADATA_PROPERTIES)

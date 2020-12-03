@@ -43,6 +43,7 @@ def test_publication_interface_methods():
         'get_publication_uuid',
         'get_publication_infos',
         'get_metadata_comparison',
+        'pre_post_publication_check',
     }
 
     publication_provider_methods = {

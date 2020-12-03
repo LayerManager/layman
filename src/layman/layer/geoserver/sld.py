@@ -24,6 +24,10 @@ headers_sld = {
 }
 
 
+def pre_post_publication_check(username, layername):
+    pass
+
+
 def post_layer(username, layername):
     pass
 

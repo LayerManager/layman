@@ -40,6 +40,15 @@ def patch_layer(username,
     pubs_util.update_publication(username, db_info)
 
 
+def pre_post_publication_check(username, layername, access_rights, actor_name,):
+    db_info = {"name": layername,
+               "publ_type_name": LAYER_TYPE,
+               "access_rights": access_rights,
+               "actor_name": actor_name,
+               }
+    pubs_util.check_publication_info(username, db_info)
+
+
 def post_layer(username,
                layername,
                access_rights,

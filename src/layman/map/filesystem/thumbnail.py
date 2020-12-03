@@ -68,6 +68,10 @@ def get_map_thumbnail_path(username, mapname):
     return os.path.join(thumbnail_dir, mapname + '.png')
 
 
+def pre_post_publication_check(username, layername):
+    pass
+
+
 def post_map(username, mapname):
     pass
 

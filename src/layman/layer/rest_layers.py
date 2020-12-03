@@ -111,6 +111,10 @@ def post(username):
     }
 
     rest_util.setup_post_access_rights(request.form, task_options, actor_name)
+    util.pre_post_publication_check(username,
+                                    layername,
+                                    task_options,
+                                    )
 
     layerurl = url_for('rest_layer.get', layername=layername, username=username)
 
