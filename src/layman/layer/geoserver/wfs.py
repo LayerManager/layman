@@ -25,7 +25,7 @@ def get_flask_proxy_key(username):
     return FLASK_PROXY_KEY.format(username=username)
 
 
-def pre_post_publication_check(username, layername):
+def pre_publication_action_check(username, layername):
     pass
 
 

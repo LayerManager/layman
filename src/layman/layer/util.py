@@ -156,10 +156,10 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
     return complete_info
 
 
-def pre_post_publication_check(username, layername, task_options):
+def pre_publication_action_check(username, layername, task_options):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'pre_post_publication_check', [username, layername], kwargs=task_options)
+    call_modules_fn(sources, 'pre_publication_action_check', [username, layername], kwargs=task_options)
 
 
 def post_layer(username, layername, task_options, start_async_at):

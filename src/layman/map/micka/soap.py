@@ -22,7 +22,7 @@ patch_map = csw.patch_map
 delete_map = csw.delete_map
 
 
-def pre_post_publication_check(username, layername):
+def pre_publication_action_check(username, layername):
     pass
 
 

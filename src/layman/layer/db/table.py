@@ -5,7 +5,7 @@ from layman.http import LaymanError
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
-def pre_post_publication_check(username, layername):
+def pre_publication_action_check(username, layername):
     pass
 
 

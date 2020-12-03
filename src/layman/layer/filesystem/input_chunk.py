@@ -42,7 +42,7 @@ get_publication_infos = input_file.get_publication_infos
 get_publication_uuid = input_file.get_publication_uuid
 
 
-def pre_post_publication_check(username, layername):
+def pre_publication_action_check(username, layername):
     pass
 
 

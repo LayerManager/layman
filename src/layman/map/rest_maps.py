@@ -100,10 +100,10 @@ def post(username):
         }
 
         rest_util.setup_post_access_rights(request.form, kwargs, actor_name)
-        util.pre_post_publication_check(username,
-                                        mapname,
-                                        kwargs,
-                                        )
+        util.pre_publication_action_check(username,
+                                          mapname,
+                                          kwargs,
+                                          )
         # register map uuid
         uuid_str = uuid.assign_map_uuid(username, mapname)
         kwargs['uuid'] = uuid_str

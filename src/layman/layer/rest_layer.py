@@ -139,6 +139,10 @@ def patch(username, layername):
     kwargs.update({'actor_name': authn.get_authn_username()})
 
     rest_util.setup_patch_access_rights(request.form, kwargs)
+    util.pre_publication_action_check(username,
+                                      layername,
+                                      kwargs,
+                                      )
 
     util.patch_layer(
         username,
