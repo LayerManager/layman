@@ -87,6 +87,10 @@ def patch(username, mapname):
     }
 
     rest_util.setup_patch_access_rights(request.form, kwargs)
+    util.pre_publication_action_check(username,
+                                      mapname,
+                                      kwargs,
+                                      )
 
     util.patch_map(
         username,

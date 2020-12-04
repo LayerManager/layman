@@ -20,6 +20,10 @@ delete_layer = csw.delete_layer
 get_metadata_comparison = csw.get_metadata_comparison
 
 
+def pre_publication_action_check(username, layername):
+    pass
+
+
 def post_layer(username, layername):
     pass
 

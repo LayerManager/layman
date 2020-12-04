@@ -139,6 +139,10 @@ def unquote_urls(map_json):
     return map_json
 
 
+def pre_publication_action_check(username, layername):
+    pass
+
+
 def post_map(username, mapname, description, title):
     map_file_path = get_map_file(username, mapname)
     with open(map_file_path, 'r') as map_file:
