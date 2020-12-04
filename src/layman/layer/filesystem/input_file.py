@@ -28,6 +28,10 @@ def ensure_layer_input_file_dir(username, layername):
     return input_file_dir
 
 
+def pre_publication_action_check(username, layername):
+    pass
+
+
 def post_layer(username, layername):
     pass
 

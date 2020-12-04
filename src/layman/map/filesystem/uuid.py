@@ -37,6 +37,10 @@ def get_map_uuid(username, mapname):
 assign_map_uuid = partial(common_uuid.assign_publication_uuid, MAP_TYPE)
 
 
+def pre_publication_action_check(username, layername):
+    pass
+
+
 def post_map(username, mapname):
     pass
 

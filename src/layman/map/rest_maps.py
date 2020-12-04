@@ -91,8 +91,23 @@ def post(username):
             'url': mapurl,
         }
 
+        actor_name = authn.get_authn_username()
+
+        kwargs = {
+            'title': title,
+            'description': description,
+            'actor_name': actor_name
+        }
+
+        rest_util.setup_post_access_rights(request.form, kwargs, actor_name)
+        util.pre_publication_action_check(username,
+                                          mapname,
+                                          kwargs,
+                                          )
         # register map uuid
         uuid_str = uuid.assign_map_uuid(username, mapname)
+        kwargs['uuid'] = uuid_str
+
         map_result.update({
             'uuid': uuid_str,
         })
@@ -103,17 +118,6 @@ def post(username):
         )
         input_file.save_map_files(
             username, mapname, [file])
-
-        actor_name = authn.get_authn_username()
-
-        kwargs = {
-            'title': title,
-            'description': description,
-            'uuid': uuid_str,
-            'actor_name': actor_name
-        }
-
-        rest_util.setup_post_access_rights(request.form, kwargs, actor_name)
 
         util.post_map(
             username,

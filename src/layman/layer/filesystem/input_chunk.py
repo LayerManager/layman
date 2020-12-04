@@ -42,6 +42,10 @@ get_publication_infos = input_file.get_publication_infos
 get_publication_uuid = input_file.get_publication_uuid
 
 
+def pre_publication_action_check(username, layername):
+    pass
+
+
 def post_layer(username, layername):
     pass
 
