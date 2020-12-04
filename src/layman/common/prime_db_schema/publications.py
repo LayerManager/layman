@@ -237,12 +237,15 @@ returning id
 def delete_publication(workspace_name, type, name):
     workspace_info = workspaces.get_workspace_infos(workspace_name).get(workspace_name)
     if workspace_info:
-        id_publication = get_publication_infos(workspace_name, type)[(workspace_name, type, name)]["id"]
-        rights.delete_rights_for_publication(id_publication)
-        id_workspace = workspace_info["id"]
-        sql = f"""delete from {DB_SCHEMA}.publications p where p.id_workspace = %s and p.name = %s and p.type = %s;"""
-        util.run_statement(sql, (id_workspace,
-                                 name,
-                                 type,))
+        id_publication = get_publication_infos(workspace_name, type).get((workspace_name, type, name), dict()).get("id")
+        if id_publication:
+            rights.delete_rights_for_publication(id_publication)
+            id_workspace = workspace_info["id"]
+            sql = f"""delete from {DB_SCHEMA}.publications p where p.id_workspace = %s and p.name = %s and p.type = %s;"""
+            util.run_statement(sql, (id_workspace,
+                                     name,
+                                     type,))
+        else:
+            logger.warning(f'Deleting NON existing publication. workspace_name={workspace_name}, type={type}, pub_name={name}')
     else:
-        logger.warning(f'Deleting publication for NON existing workspace. workspace_name={workspace_name}, pub_name={name}, type={type}')
+        logger.warning(f'Deleting publication for NON existing workspace. workspace_name={workspace_name}, type={type}, pub_name={name}')
