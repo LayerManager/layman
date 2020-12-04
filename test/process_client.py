@@ -85,6 +85,7 @@ def patch_layer(username,
                 headers=None,
                 access_rights=None,
                 title=None,
+                assert_status=True,
                 ):
     headers = headers or {}
     file_paths = file_paths or []
@@ -109,16 +110,20 @@ def patch_layer(username,
                            files=files,
                            headers=headers,
                            data=data)
-        assert r.status_code == 200, r.text
+        if assert_status:
+            assert r.status_code == 200, r.text
     finally:
         for fp in files:
             fp[1][1].close()
 
     with app.app_context():
         url = url_for('rest_layer.get', username=username, layername=layername)
-    wait_for_rest(url, 30, 0.5, layer_keys_to_check, headers=headers)
+    if assert_status:
+        wait_for_rest(url, 30, 0.5, layer_keys_to_check, headers=headers)
     wfs.clear_cache(username)
     wms.clear_cache(username)
+    if not assert_status:
+        return r
     return layername
 
 
@@ -126,6 +131,7 @@ def patch_map(username,
               mapname,
               headers=None,
               access_rights=None,
+              assert_status=True,
               ):
     headers = headers or {}
 
@@ -141,13 +147,17 @@ def patch_map(username,
     r = requests.patch(r_url,
                        headers=headers,
                        data=data)
-    assert r.status_code == 200, r.text
+    if assert_status:
+        assert r.status_code == 200, r.text
 
     with app.app_context():
         url = url_for('rest_map.get', username=username, mapname=mapname)
-    wait_for_rest(url, 30, 0.5, map_keys_to_check, headers=headers)
+    if assert_status:
+        wait_for_rest(url, 30, 0.5, map_keys_to_check, headers=headers)
     wfs.clear_cache(username)
     wms.clear_cache(username)
+    if not assert_status:
+        return r
     return mapname
 
 
