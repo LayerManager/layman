@@ -19,6 +19,8 @@ def get_user_profile(user_obj):
     result = {k: v for k, v in result.items() if v is not None}
     claims = get_open_id_claims().copy()
     result['claims'] = claims
+    if result['claims'].get('preferred_username'):
+        result['claims']['screen_name'] = result['claims']['preferred_username']
     return result
 
 
