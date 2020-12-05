@@ -118,6 +118,7 @@ CREATE TABLE {DB_SCHEMA}.users
 (
     id integer NOT NULL DEFAULT nextval('{DB_SCHEMA}.users_id_seq'::regclass),
     id_workspace integer REFERENCES {DB_SCHEMA}.workspaces (id),
+    preferred_username VARCHAR(256) COLLATE pg_catalog."default",
     given_name VARCHAR(256) COLLATE pg_catalog."default",
     family_name VARCHAR(256) COLLATE pg_catalog."default",
     middle_name VARCHAR(256) COLLATE pg_catalog."default",

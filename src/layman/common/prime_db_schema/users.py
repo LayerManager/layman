@@ -5,10 +5,11 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
 def ensure_user(id_workspace, userinfo):
-    sql = f"""insert into {DB_SCHEMA}.users (id_workspace, given_name, family_name, middle_name, name, email, issuer_id, sub)
-values (%s, %s, %s, %s, %s, %s, %s, %s)
+    sql = f"""insert into {DB_SCHEMA}.users (id_workspace, preferred_username, given_name, family_name, middle_name, name, email, issuer_id, sub)
+values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
 ON CONFLICT (id_workspace) DO update SET id_workspace = EXCLUDED.id_workspace returning id;"""
     data = (id_workspace,
+            userinfo["claims"]["preferred_username"],
             userinfo["claims"]["given_name"],
             userinfo["claims"]["family_name"],
             userinfo["claims"]["middle_name"],
@@ -32,6 +33,7 @@ def get_user_infos(username=None):
     sql = f"""with const as (select %s username)
 select u.id,
        w.name username,
+       u.preferred_username,
        u.given_name,
        u.family_name,
        u.middle_name,
@@ -48,6 +50,7 @@ order by w.name asc
     values = util.run_query(sql, (username,))
     result = {username: {"id": user_id,
                          "username": username,
+                         "preferred_username": preferred_username,
                          "given_name": given_name,
                          "family_name": family_name,
                          "middle_name": middle_name,
@@ -55,7 +58,7 @@ order by w.name asc
                          "email": email,
                          "issuer_id": issuer_id,
                          "sub": sub,
-                         } for user_id, username, given_name, family_name, middle_name, name, email, issuer_id, sub in values}
+                         } for user_id, username, preferred_username, given_name, family_name, middle_name, name, email, issuer_id, sub in values}
     return result
 
 
