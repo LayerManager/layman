@@ -15,6 +15,7 @@ def test_get_users():
     userinfo = {"iss_id": 'mock_test',
                 "sub": '1',
                 "claims": {"email": "test@liferay.com",
+                           "preferred_username": 'test_preferred',
                            "name": "test ensure user",
                            "given_name": "test",
                            "family_name": "user",

@@ -28,6 +28,7 @@ def test_http_header():
                 'iss_id': 'test_http_header_issuer',
                 'sub': username,
                 'claims': {
+                    'preferred_username': username,
                     'given_name': username,
                     'family_name': username,
                     'middle_name': username,
