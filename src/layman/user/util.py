@@ -91,5 +91,5 @@ def get_username_suggestions_from_claims(claims):
     ]
     email = claims.get('email', None)
     if email is not None:
-        result.insert(1, email.split('@')[0])
+        result.append(email.split('@')[0])
     return result
