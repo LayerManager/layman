@@ -576,6 +576,7 @@ Content-Type: `application/json`
 
 JSON array of objects representing users of Layman with following structure:
 - **username**: String. Username of the user.
+- **screen_name**: String. Screen name of the user.
 - **given_name**: String. Given name of the user.
 - **family_name**: String. Family name of the user
 - **middle_name**: String. Middle name of the user

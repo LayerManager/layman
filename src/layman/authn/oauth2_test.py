@@ -242,7 +242,7 @@ def test_authn_get_current_user_without_username(client):
     claims = resp_json['claims']
     assert {
         'email', 'email_verified', 'family_name', 'given_name', 'iss', 'middle_name', 'name',
-        'preferred_username', 'sub', 'updated_at'
+        'preferred_username', 'sub', 'updated_at', 'screen_name'
     } == set(claims.keys())
     assert claims['email'] == 'test@liferay.com'
     assert claims['email_verified'] is True
@@ -251,6 +251,7 @@ def test_authn_get_current_user_without_username(client):
     assert claims['middle_name'] == ''
     assert claims['name'] == 'Test Test'
     assert claims['preferred_username'] == 'test'
+    assert claims['screen_name'] == 'test'
     assert claims['sub'] == '20139'
 
 
@@ -260,14 +261,14 @@ def test_get_current_user_anonymous(client):
     rv = client.get(rest_path)
     assert rv.status_code == 200
     resp_json = rv.get_json()
-    assert resp_json['authenticated'] is False
-    assert {'authenticated', 'claims'} == set(resp_json.keys())
+    assert resp_json['authenticated'] is False, resp_json
+    assert {'authenticated', 'claims'} == set(resp_json.keys()), resp_json
     claims = resp_json['claims']
     assert {
         'iss', 'name', 'nickname'
-    } == set(claims.keys())
-    assert claims['name'] == 'Anonymous'
-    assert claims['nickname'] == 'Anonymous'
+    } == set(claims.keys()), claims
+    assert claims['name'] == 'Anonymous', claims
+    assert claims['nickname'] == 'Anonymous', claims
 
 
 @pytest.mark.usefixtures('app_context')

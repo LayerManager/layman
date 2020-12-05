@@ -21,6 +21,7 @@ def get():
     infos = [
         {
             "username": username,
+            "screen_name": info.get("preferred_username"),
             "given_name": info.get("given_name"),
             "family_name": info.get("family_name"),
             "middle_name": info.get("middle_name"),
