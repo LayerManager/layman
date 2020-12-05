@@ -302,7 +302,7 @@ def test_patch_current_user_without_username():
     resp_json = r.json()
     assert resp_json['authenticated'] is True
     assert 'username' in resp_json
-    exp_username = username1
+    exp_username = 'test_patch_current_user_user1_screen_name'
     exp_sub = '20142'
     assert resp_json['username'] == exp_username
     assert resp_json['claims']['sub'] == exp_sub
@@ -354,8 +354,8 @@ def test_patch_current_user_without_username():
 
     # test map metadata
     workspace = exp_username
-    exp_email = exp_username + '@liferay.com'
-    exp_name = 'Test Test'
+    exp_email = 'test_patch_current_user_user1_email' + '@liferay.com'
+    exp_name = 'FirstName MiddleName LastName'
     mapname = 'map1'
     process_client.publish_map(workspace, mapname, headers=user1_authn_headers)
 

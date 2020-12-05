@@ -92,11 +92,11 @@ token_2_profile = {
         "userId": "20141",
     },
     'test_patch_current_user_user1': {
-        "emailAddress": "test_patch_current_user_user1@liferay.com",
-        "firstName": "Test",
-        "lastName": "Test",
-        "middleName": "",
-        "screenName": "test_patch_current_user_user1",
+        "emailAddress": "test_patch_current_user_user1_email@liferay.com",
+        "firstName": "FirstName",
+        "lastName": "LastName",
+        "middleName": "MiddleName",
+        "screenName": "test_patch_current_user_user1 screen name",
         "userId": "20142",
     },
     'test_patch_current_user_user2': {
