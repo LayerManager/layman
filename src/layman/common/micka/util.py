@@ -574,6 +574,19 @@ def get_record_element_by_id(csw, id):
     return result
 
 
+def get_number_of_records(record_id, use_authn):
+    authn = settings.CSW_BASIC_AUTHN if use_authn else None
+    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-number-of-records-template.xml')
+    xml_str = fill_template_as_str(template_path, {'record_id': record_id})
+
+    r = requests.post(settings.CSW_URL, auth=authn, data=xml_str)
+    r.raise_for_status()
+    parser = ET.XMLParser(remove_blank_text=True)
+    tree = ET.fromstring(r.text.encode('utf-8'), parser=parser)
+    num_records = int(tree.xpath("/csw:GetRecordsResponse/csw:SearchResults/@numberOfRecordsMatched", namespaces=NAMESPACES)[0])
+    return num_records
+
+
 def get_muuid_from_operates_on_link(operates_on_link):
     link_url = urlparse.urlparse(operates_on_link)
     return urlparse.parse_qs(link_url.query)['ID'][0]
