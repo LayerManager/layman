@@ -38,13 +38,13 @@ def refresh_soap_needed(username, mapname, task_options):
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_soap(self, username, mapname, http_method='post', metadata_properties_to_refresh=None, actor_name=None):
+def refresh_soap(self, username, mapname, http_method='post', metadata_properties_to_refresh=None, actor_name=None, access_rights=None):
     if self.is_aborted():
         raise AbortedException
     if http_method == 'post':
-        soap.soap_insert(username, mapname, actor_name=actor_name)
+        soap.soap_insert(username, mapname, access_rights=access_rights, actor_name=actor_name)
     else:
-        csw.patch_map(username, mapname, metadata_properties_to_refresh=metadata_properties_to_refresh, actor_name=actor_name)
+        soap.patch_map(username, mapname, metadata_properties_to_refresh=metadata_properties_to_refresh, actor_name=actor_name, access_rights=access_rights)
 
     if self.is_aborted():
         csw.delete_map(username, mapname)

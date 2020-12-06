@@ -58,6 +58,7 @@ def liferay_mock():
                 'test_delete_publications_owner': None,
                 'test_delete_publications_deleter': None,
                 'test_get_publication_infos_user_owner': None,
+                'test_rest_soap_user': None,
             },
         },
         'host': '0.0.0.0',

@@ -39,14 +39,14 @@ def refresh_soap_needed(username, layername, task_options):
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_soap(self, username, layername, http_method='post', metadata_properties_to_refresh=None):
+def refresh_soap(self, username, layername, http_method='post', metadata_properties_to_refresh=None, access_rights=None):
     metadata_properties_to_refresh = metadata_properties_to_refresh or []
     if self.is_aborted():
         raise AbortedException
     if http_method == 'post':
-        soap.soap_insert(username, layername)
+        soap.soap_insert(username, layername, access_rights)
     else:
-        csw.patch_layer(username, layername, metadata_properties_to_refresh)
+        soap.patch_layer(username, layername, metadata_properties_to_refresh, access_rights)
 
     if self.is_aborted():
         csw.delete_layer(username, layername)

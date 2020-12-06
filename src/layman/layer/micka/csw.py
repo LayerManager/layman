@@ -59,7 +59,7 @@ def get_layer_infos(username):
     return {}
 
 
-def patch_layer(username, layername, metadata_properties_to_refresh):
+def patch_layer(username, layername, metadata_properties_to_refresh, actor_name=None):
     # current_app.logger.info(f"patch_layer metadata_properties_to_refresh={metadata_properties_to_refresh}")
     if len(metadata_properties_to_refresh) == 0:
         return {}
