@@ -16,6 +16,44 @@ layer_keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata'
 map_keys_to_check = ['thumbnail', 'file', 'metadata']
 
 
+LAYER_TYPE = 'layman.layer'
+MAP_TYPE = 'layman.map'
+
+
+PUBLICATION_TYPES = [
+    LAYER_TYPE,
+    MAP_TYPE,
+]
+
+
+def get_post_publications_method(publ_type):
+    return {
+        LAYER_TYPE: publish_layer,
+        MAP_TYPE: publish_map,
+    }[publ_type]
+
+
+def get_patch_publication_method(publ_type):
+    return {
+        LAYER_TYPE: patch_layer,
+        MAP_TYPE: patch_map,
+    }[publ_type]
+
+
+def get_get_publication_method(publ_type):
+    return {
+        LAYER_TYPE: get_layer,
+        MAP_TYPE: get_map,
+    }[publ_type]
+
+
+def get_delete_publication_method(publ_type):
+    return {
+        LAYER_TYPE: delete_layer,
+        MAP_TYPE: delete_map,
+    }[publ_type]
+
+
 def wait_for_rest(url, max_attempts, sleeping_time, keys_to_check, headers=None):
     headers = headers or None
     r = requests.get(url, headers=headers)
@@ -183,6 +221,53 @@ def get_layer(username, layername, headers=None, assert_status=True,):
         return r.json()
     else:
         return r
+
+
+def get_layers(workspace, headers=None, assert_status=True,):
+    headers = headers or {}
+
+    with app.app_context():
+        r_url = url_for('rest_layers.get', username=workspace)
+    r = requests.get(r_url, headers=headers)
+    if assert_status:
+        assert r.status_code == 200, r.text
+        return r.json()
+    else:
+        return r
+
+
+def get_map(username, mapname, headers=None, assert_status=True, ):
+    headers = headers or {}
+
+    with app.app_context():
+        r_url = url_for('rest_map.get', username=username, mapname=mapname)
+    r = requests.get(r_url, headers=headers)
+    if assert_status:
+        assert r.status_code == 200, r.text
+        return r.json()
+    else:
+        return r
+
+
+def ensure_layer(username,
+                 layername,
+                 headers=None,
+                 access_rights=None,
+                 ):
+    headers = headers or {}
+    r = get_layers(username, headers=headers, assert_status=False)
+    layer_obj = next((layer for layer in r.json() if layer['name'] == layername), None)
+    if r.status_code == 200 and layer_obj:
+        patch_needed = False
+        if access_rights is not None:
+            if 'read' in access_rights and set(access_rights['read'].split(',')) != set(layer_obj['access_rights']['read']):
+                patch_needed = True
+            if 'write' in access_rights and set(access_rights['write'].split(',')) != set(layer_obj['access_rights']['write']):
+                patch_needed = True
+        if patch_needed:
+            patch_layer(username, layername, access_rights=access_rights, headers=headers)
+    else:
+        publish_layer(username, layername, access_rights=access_rights, headers=headers)
 
 
 def publish_map(username,
