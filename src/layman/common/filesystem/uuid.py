@@ -32,7 +32,7 @@ def get_publication_uuid(publ_type, username, publication_type, publication_name
     else:
         with open(uuid_path, "r") as uuid_file:
             uuid_str = uuid_file.read().strip()
-            return uuid_str
+        return uuid_str
 
 
 def get_publication_uuid_file(publ_type, username, publication_name):

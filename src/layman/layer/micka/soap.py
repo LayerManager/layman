@@ -1,8 +1,7 @@
 from flask import current_app
-from requests.exceptions import HTTPError, ConnectionError
-import traceback
 from . import csw
-from layman import settings, LaymanError
+from .. import LAYER_TYPE
+from layman import settings, LaymanError, authz
 from layman.common.micka import util as common_util
 
 PATCH_MODE = csw.PATCH_MODE
@@ -28,19 +27,20 @@ def post_layer(username, layername):
     pass
 
 
-patch_layer = csw.patch_layer
+def patch_layer(username, layername, metadata_properties_to_refresh, access_rights=None):
+    common_util.patch_publication_by_soap(workspace=username,
+                                          publ_type=LAYER_TYPE,
+                                          publ_name=layername,
+                                          metadata_properties_to_refresh=metadata_properties_to_refresh,
+                                          actor_name=None,
+                                          access_rights=access_rights,
+                                          csw_source=csw,
+                                          csw_patch_method=csw.patch_layer,
+                                          soap_insert_method=soap_insert,
+                                          )
 
 
-def soap_insert(username, layername):
+def soap_insert(username, layername, access_rights, actor_name=None):
+    is_public = authz.is_user_in_access_rule(settings.RIGHTS_EVERYONE_ROLE, access_rights['read'])
     template_path, prop_values = csw.get_template_path_and_values(username, layername, http_method='post')
-    record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, csw.METADATA_PROPERTIES)
-    try:
-        muuid = common_util.soap_insert({
-            'record': record,
-            'edit_user': settings.CSW_BASIC_AUTHN[0],
-            'read_user': settings.CSW_BASIC_AUTHN[0],
-        })
-    except (HTTPError, ConnectionError):
-        current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38)
-    return muuid
+    common_util.soap_insert_record_from_template(template_path, prop_values, csw.METADATA_PROPERTIES, is_public)

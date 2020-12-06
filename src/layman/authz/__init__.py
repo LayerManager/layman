@@ -127,3 +127,11 @@ def authorize_publications_decorator(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+def complete_access_rights(access_rights_to_complete, full_access_rights):
+    access_rights_to_complete = access_rights_to_complete or {}
+    for right_type in ['read', 'write']:
+        if right_type not in access_rights_to_complete:
+            access_rights_to_complete[right_type] = full_access_rights[right_type]
+    return access_rights_to_complete

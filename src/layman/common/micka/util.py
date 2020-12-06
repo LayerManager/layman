@@ -1,13 +1,18 @@
 import os
+import time
+
 from owslib.util import nspath_eval
 from flask import g, current_app
 from io import BytesIO
 from owslib.csw import CatalogueServiceWeb
+from requests.exceptions import HTTPError, ConnectionError
 from xml.sax.saxutils import escape
 from lxml import etree as ET
 import urllib.parse as urlparse
-from layman import settings, LaymanError
+import traceback
+from layman import settings, LaymanError, authz
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
+from layman.util import get_publication_info, get_publication_types
 import requests
 from copy import deepcopy
 
@@ -287,6 +292,21 @@ def soap_insert(template_values):
         nspath_eval('soap:Body/csw:TransactionResponse/csw:InsertResult/csw:BriefRecord/dc:identifier', NAMESPACES))
     assert len(muuid_els) == 1, r.content
     muuid = muuid_els[0].text
+    return muuid
+
+
+def soap_insert_record_from_template(template_path, prop_values, metadata_properties, is_public):
+    record = fill_xml_template_as_pretty_str(template_path, prop_values, metadata_properties)
+    try:
+        muuid = soap_insert({
+            'public': '1' if is_public else '0',
+            'record': record,
+            'edit_user': settings.CSW_BASIC_AUTHN[0],
+            'read_user': settings.CSW_BASIC_AUTHN[0],
+        })
+    except (HTTPError, ConnectionError):
+        current_app.logger.info(traceback.format_exc())
+        raise LaymanError(38)
     return muuid
 
 
@@ -597,3 +617,46 @@ def operates_on_values_to_muuids(operates_on_values):
         get_muuid_from_operates_on_link(operates_on['xlink:href'])
         for operates_on in operates_on_values
     ]
+
+
+def is_soap_visibility_change_needed(muuid, access_rights):
+    maybe_needed = access_rights is not None and 'read' in access_rights
+    if maybe_needed:
+        new_is_public = authz.is_user_in_access_rule(settings.RIGHTS_EVERYONE_ROLE, access_rights['read'])
+        old_is_public = get_number_of_records(muuid, False) > 0
+        needed = new_is_public != old_is_public
+    else:
+        needed = False
+    return needed
+
+
+def patch_publication_by_soap(workspace,
+                              publ_type,
+                              publ_name,
+                              metadata_properties_to_refresh,
+                              actor_name,
+                              access_rights,
+                              csw_source,
+                              csw_patch_method,
+                              soap_insert_method):
+    publ_info = get_publication_info(workspace, publ_type, publ_name, context={
+        'sources_filter': get_publication_types()[publ_type]['access_rights_source'],
+    })
+    uuid = publ_info.get('uuid')
+
+    csw_instance = create_csw()
+    if uuid is None or csw_instance is None:
+        return
+    muuid = csw_source.get_metadata_uuid(uuid)
+    num_records = get_number_of_records(muuid, True)
+    if num_records == 0:
+        full_access_rights = authz.complete_access_rights(access_rights, publ_info['access_rights'])
+        soap_insert_method(workspace, publ_name, full_access_rights, actor_name)
+    else:
+        use_soap = is_soap_visibility_change_needed(muuid, access_rights)
+        if use_soap:
+            csw_delete(muuid)
+            time.sleep(1)
+            soap_insert_method(workspace, publ_name, access_rights, actor_name)
+        else:
+            csw_patch_method(workspace, publ_name, metadata_properties_to_refresh, actor_name)

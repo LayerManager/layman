@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
 <soap:Header xmlns:hs="http://www.hsrs.cz/micka">
-    <hs:Public>1</hs:Public>
+    <hs:Public>{public}</hs:Public>
     <hs:Edit>{edit_user}</hs:Edit>
     <hs:Read>{read_user}</hs:Read>
 </soap:Header>
