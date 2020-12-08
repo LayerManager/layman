@@ -3,28 +3,28 @@
 ## Overview
 |Endpoint|URL|GET|POST|PATCH|DELETE|
 |---|---|---|---|---|---|
-|Layers|`/rest/<username>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | [DELETE](#delete-layers) |
-|[Layer](models.md#layer)|`/rest/<username>/layers/<layername>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
-|Layer Thumbnail|`/rest/<username>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
-|Layer Style|`/rest/<username>/layers/<layername>/style`|[GET](#get-layer-style)| x | x | x |
-|Layer Chunk|`/rest/<username>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
-|Layer Metadata Comparison|`/rest/<username>/layers/<layername>/metadata-comparison`|[GET](#get-layer-metadata-comparison) | x | x | x |
-|Maps|`/rest/<username>/maps`|[GET](#get-maps)| [POST](#post-maps) | x | [DELETE](#delete-maps) |
-|[Map](models.md#map)|`/rest/<username>/maps/<mapname>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
-|Map File|`/rest/<username>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
-|Map Thumbnail|`/rest/<username>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
-|Map Metadata Comparison|`/rest/<username>/layers/<layername>/metadata-comparison`|[GET](#get-map-metadata-comparison) | x | x | x |
+|Layers|`/rest/<workspace_name>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | [DELETE](#delete-layers) |
+|[Layer](models.md#layer)|`/rest/<workspace_name>/layers/<layername>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
+|Layer Thumbnail|`/rest/<workspace_name>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
+|Layer Style|`/rest/<workspace_name>/layers/<layername>/style`|[GET](#get-layer-style)| x | x | x |
+|Layer Chunk|`/rest/<workspace_name>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
+|Layer Metadata Comparison|`/rest/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-layer-metadata-comparison) | x | x | x |
+|Maps|`/rest/<workspace_name>/maps`|[GET](#get-maps)| [POST](#post-maps) | x | [DELETE](#delete-maps) |
+|[Map](models.md#map)|`/rest/<workspace_name>/maps/<mapname>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
+|Map File|`/rest/<workspace_name>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
+|Map Thumbnail|`/rest/<workspace_name>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
+|Map Metadata Comparison|`/rest/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-map-metadata-comparison) | x | x | x |
 |Users|`/rest/users`|[GET](#get-users)| x | x | x |
 |Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | [DELETE](#delete-current-user) |
 
 #### REST path parameters
-- **username**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
-   - string identifying [user](models.md) that owns the [workspace](models.md)
+- **workspace_name**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
+   - string identifying [workspace](models.md#workspace)
 
 
 ## Layers
 ### URL
-`/rest/<username>/layers`
+`/rest/<workspace_name>/layers`
 
 ### GET Layers
 Get list of published layers.
@@ -40,8 +40,8 @@ JSON array of objects representing available layers with following structure:
 - **uuid**: String. UUID of the layer.
 - **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
 - **access_rights**:
-  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
-  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
+  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization). If value is not specified, current user will be set if logged in, otherwise role EVERYONE.
+  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization). If value is not specified, only owner of workspace will be set for [personal workspaces](models.md#personal-workspace) and role EVERYONE for [public workspaces](models.md#public-workspace). If value is not specified, current user will be set if logged in, otherwise role EVERYONE.
 
 ### POST Layers
 Publish vector data file as new layer of WMS and WFS.
@@ -52,6 +52,7 @@ Processing chain consists of few steps:
 - publish the table as new layer (feature type) within user workspace of GeoServer
 - generate thumbnail image
 - publish metadata record to Micka
+- save basic information (name, title, access_rights) into PostgreSQL
 
 If user directory, database schema, GeoServer's workspace, or GeoServer's datastore does not exist yet, it is created on demand.
 
@@ -129,7 +130,7 @@ JSON array of objects representing deleted layers:
 
 ## Layer
 ### URL
-`/rest/<username>/layers/<layername>`
+`/rest/<workspace_name>/layers/<layername>`
 
 #### Endpoint path parameters
 - **layername**
@@ -246,7 +247,7 @@ JSON object representing deleted layer:
 
 ## Layer Thumbnail
 ### URL
-`/rest/<username>/layers/<layername>/thumbnail`
+`/rest/<workspace_name>/layers/<layername>/thumbnail`
 ### GET Layer Thumbnail
 Get thumbnail of the layer in PNG format, 300x300 px, transparent background.
 
@@ -260,7 +261,7 @@ PNG image.
 
 ## Layer Style
 ### URL
-`/rest/<username>/layers/<layername>/style`
+`/rest/<workspace_name>/layers/<layername>/style`
 ### GET Layer Style
 Get default style of the layer in XML format. Request is redirected to GeoServer [/rest/workspaces/{workspace}/styles/{style}](https://docs.geoserver.org/latest/en/api/#1.0.0/styles.yaml). Anybody can call GET, nobody can call any other method. 
 
@@ -281,7 +282,7 @@ The endpoint is activated after [POST Layers](#post-layers) or [PATCH Layer](#pa
 - layer is deleted
 
 ### URL
-`/rest/<username>/layers/<layername>/chunk`
+`/rest/<workspace_name>/layers/<layername>/chunk`
 ### GET Layer Chunk
 Test if file chunk is already uploaded on the server.
 
@@ -335,7 +336,7 @@ JSON object with one attribute:
 
 ## Maps
 ### URL
-`/rest/<username>/maps`
+`/rest/<workspace_name>/maps`
 
 ### GET Maps
 Get list of published maps (map compositions).
@@ -363,6 +364,7 @@ Processing chain consists of few steps:
 - if needed, update some JSON attributes (`name`, `title`, or `abstract`)
 - generate thumbnail image
 - publish metadata record to Micka
+- save basic information (name, title, access_rights) into PostgreSQL
 
 If user directory does not exist yet, it is created on demand.
 
@@ -420,7 +422,7 @@ JSON array of objects representing deleted maps:
 
 ## Map
 ### URL
-`/rest/<username>/maps/<mapname>`
+`/rest/<workspace_name>/maps/<mapname>`
 
 #### Endpoint path parameters
 - **mapname**
@@ -507,7 +509,7 @@ JSON object representing deleted map:
 
 ## Map File
 ### URL
-`/rest/<username>/maps/<mapname>/file`
+`/rest/<workspace_name>/maps/<mapname>/file`
 ### GET Map File
 Get JSON file describing the map valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema).
 
@@ -516,7 +518,7 @@ Notice that some JSON properties are automatically updated by layman, so file ob
 - **title** obtained from [POST Maps](#post-maps) or [PATCH Map](#patch-map) as `title`
 - **abstract** obtained from [POST Maps](#post-maps) or [PATCH Map](#patch-map) as `description`
 - **user** updated on the fly during this request:
-   - **name** set to `<username>` in URL of this endpoint
+   - **name** set to `<workspace_name>` in URL of this endpoint
    - **email** set to email of the owner, or empty string if not known
    - other properties will be deleted
 - **groups** are removed
@@ -531,7 +533,7 @@ JSON file describing the map valid against [map-composition schema](https://gith
 
 ## Map Thumbnail
 ### URL
-`/rest/<username>/maps/<mapname>/thumbnail`
+`/rest/<workspace_name>/maps/<mapname>/thumbnail`
 ### GET Map Thumbnail
 Get thumbnail of the map in PNG format, 300x300 px, transparent background.
 
