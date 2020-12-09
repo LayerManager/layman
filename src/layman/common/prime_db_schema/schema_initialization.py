@@ -31,7 +31,7 @@ def migrate_users_and_publications(modules, role_everyone):
                 pubs = merge_infos(results)
                 for name, info in pubs.items():
                     pub_info = {"name": name,
-                                "title": info.get("title"),
+                                "title": info.get("title", name),
                                 "publ_type_name": publ_type_name,
                                 "uuid": info["uuid"],
                                 "actor_name": workspace_name,
@@ -50,9 +50,13 @@ def ensure_schema(db_schema,
                   modules,
                   role_everyone):
     if not schema_exists():
-        db_util.run_statement(model.CREATE_SCHEMA_SQL)
-        db_util.run_statement(model.setup_codelists_data())
-        migrate_users_and_publications(modules, role_everyone)
+        try:
+            db_util.run_statement(model.CREATE_SCHEMA_SQL)
+            db_util.run_statement(model.setup_codelists_data())
+            migrate_users_and_publications(modules, role_everyone)
+        except BaseException as exc:
+            db_util.run_statement(model.DROP_SCHEMA_SQL, conn_cur=db_util.create_connection_cursor())
+            raise exc
     else:
         logger.info(f"Layman DB schema already exists, schema_name={db_schema}")
 

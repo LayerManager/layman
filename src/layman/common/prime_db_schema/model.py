@@ -134,7 +134,7 @@ TABLESPACE pg_default;
 CREATE TABLE {DB_SCHEMA}.publications
 (
     id integer NOT NULL DEFAULT nextval('{DB_SCHEMA}.publications_id_seq'::regclass),
-    id_workspace integer REFERENCES {DB_SCHEMA}.workspaces (id),
+    id_workspace integer REFERENCES {DB_SCHEMA}.workspaces (id) not null,
     name VARCHAR(256) COLLATE pg_catalog."default" not null,
     title VARCHAR(256) COLLATE pg_catalog."default" not null,
     type VARCHAR(64) COLLATE pg_catalog."default" not null references {DB_SCHEMA}.publication_types (name),
