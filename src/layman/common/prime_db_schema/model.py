@@ -108,7 +108,7 @@ TABLESPACE pg_default;
 CREATE TABLE {DB_SCHEMA}.workspaces
 (
     id integer NOT NULL DEFAULT nextval('{DB_SCHEMA}.workspaces_id_seq'::regclass),
-    name VARCHAR(256) COLLATE pg_catalog."default",
+    name VARCHAR(256) COLLATE pg_catalog."default" not null,
     CONSTRAINT workspaces_pkey PRIMARY KEY (id),
     CONSTRAINT workspaces_name_key UNIQUE (name)
 )
@@ -117,15 +117,15 @@ TABLESPACE pg_default;
 CREATE TABLE {DB_SCHEMA}.users
 (
     id integer NOT NULL DEFAULT nextval('{DB_SCHEMA}.users_id_seq'::regclass),
-    id_workspace integer REFERENCES {DB_SCHEMA}.workspaces (id),
+    id_workspace integer REFERENCES {DB_SCHEMA}.workspaces (id) not null,
     preferred_username VARCHAR(256) COLLATE pg_catalog."default",
     given_name VARCHAR(256) COLLATE pg_catalog."default",
     family_name VARCHAR(256) COLLATE pg_catalog."default",
     middle_name VARCHAR(256) COLLATE pg_catalog."default",
     name VARCHAR(256) COLLATE pg_catalog."default",
-    email VARCHAR(1024) COLLATE pg_catalog."default",
-    issuer_id VARCHAR(256) COLLATE pg_catalog."default",
-    sub VARCHAR(256) COLLATE pg_catalog."default",
+    email VARCHAR(1024) COLLATE pg_catalog."default" not null,
+    issuer_id VARCHAR(256) COLLATE pg_catalog."default" not null,
+    sub VARCHAR(256) COLLATE pg_catalog."default" not null,
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_workspace_key UNIQUE (id_workspace)
 )
