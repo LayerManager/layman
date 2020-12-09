@@ -1,5 +1,5 @@
 # layman
-[![Build Status](https://travis-ci.org/jirik/layman.svg?branch=master)](https://travis-ci.org/jirik/layman)
+![IntegrationTests](https://github.com/jirik/layman/workflows/IntegrationTests/badge.svg?branch=master)
 
 Publishing geospatial data online through [REST API](doc/rest.md).
 
