@@ -11,9 +11,9 @@ start-demo-full:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client micka nginx
 
 start-demo-only:
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_gs_auth.py"
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps layman celery_worker flower timgen layman_client
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps layman celery_worker flower timgen layman_client nginx
 
 start-demo-full-with-optional-deps:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
