@@ -62,7 +62,7 @@ cp .env.demo .env
 # start dockerized containers in background
 make start-demo-full
 ```
-Initial startup may take few minutes (download docker images, build it, run it). You are interested in container named `layman`. You can check it's logs with command
+Initial startup may take few minutes (download docker images, build it, run it). You are interested in container named `layman`. You can check its logs with command
 ```bash
 docker logs -f layman
 ```
@@ -75,7 +75,7 @@ Wait until you see something like
 [2019-10-30 13:45:36 +0000] [12] [INFO] Booting worker with pid: 12
 ```
 
-Then visit [http://localhost/](). You will see simple web client that interacts with [REST API](doc/rest.md).
+Then visit [http://localhost/](http://localhost/). You will see simple web client that interacts with [REST API](doc/rest.md).
 
 To stop running service, run `make stop-demo`.
 
@@ -106,7 +106,7 @@ Also, anytime you change `.env` file, remember to rebuild docker images as some 
 
 
 ## Dependencies
-Layman has [many dependencies](doc/dependencies.md). Most of them is shipped with Layman. However there are some **external dependencies** that should be treated carefully:
+Layman has [many dependencies](doc/dependencies.md). Most of them are shipped with Layman. However there are some **external dependencies** that should be treated carefully:
 - PostgreSQL & PostGIS
 - GeoServer
 - Redis
@@ -193,9 +193,20 @@ layman       |  * Restarting with stat
 layman       |  * Debugger is active!
 layman       |  * Debugger PIN: 103-830-055
 ```
+in log of `layman_dev` container:
+```bash
+# see logs from Layman 
+docker logs -f layman_dev
+```
+
 Then visit [http://localhost:8000/](http://localhost:8000/). You will see simple web client that interacts with [REST API](doc/rest.md).
 
-To stop running service, press Ctrl+C.
+To stop running service run:
+```bash
+# stop all needed dockerized containers 
+make stop-dev
+```
+
 
 
 ### Mount some volumes as non-root user
