@@ -4,6 +4,7 @@ import os
 import importlib
 import sys
 import time
+from redis import WatchError
 
 IN_CELERY_WORKER_PROCESS = sys.argv and sys.argv[0].endswith('/celery/__main__.py')
 IN_PYTEST_PROCESS = sys.argv and sys.argv[0].endswith('/pytest/__main__.py')
@@ -47,48 +48,70 @@ app.logger.info(f"IN_FLASK_PROCESS={IN_FLASK_PROCESS}")
 
 # load UUIDs only once
 LAYMAN_DEPS_ADJUSTED_KEY = f"{__name__}:LAYMAN_DEPS_ADJUSTED"
-if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
-    if (IN_FLASK_PROCESS or IN_PYTEST_PROCESS) and settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) is None:
-        settings.LAYMAN_REDIS.set(LAYMAN_DEPS_ADJUSTED_KEY, 'processing')
 
-        app.logger.info(f'Adjusting GeoServer')
-        with app.app_context():
-            from layman.common.geoserver import ensure_role, ensure_user, ensure_user_role, ensure_wms_srs_list, ensure_proxy_base_url
-            if settings.GEOSERVER_ADMIN_AUTH:
-                ensure_role(settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
-                ensure_user(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_PASSWORD, settings.GEOSERVER_ADMIN_AUTH)
-                ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN', settings.GEOSERVER_ADMIN_AUTH)
-                ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
-            ensure_wms_srs_list([int(srs.split(':')[1]) for srs in settings.INPUT_SRS_LIST], settings.LAYMAN_GS_AUTH)
-            if settings.LAYMAN_GS_PROXY_BASE_URL != '':
-                ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
+with settings.LAYMAN_REDIS.pipeline() as pipe:
+    wait_for_other_process = False
+    try:
+        pipe.watch(LAYMAN_DEPS_ADJUSTED_KEY)
 
-        with app.app_context():
-            from . import upgrade
-            upgrade.upgrade()
+        if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
+            pipe.multi()
+            rds_key_value = settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY)
+            if (IN_FLASK_PROCESS or IN_PYTEST_PROCESS) and rds_key_value is None:
+                pipe.set(LAYMAN_DEPS_ADJUSTED_KEY, 'processing')
+                pipe.execute()
 
-        app.logger.info(f'Loading Redis database')
-        with app.app_context():
-            from .uuid import import_uuids_to_redis
+                app.logger.info(f'Adjusting GeoServer')
+                with app.app_context():
+                    from layman.common.geoserver import ensure_role, ensure_user, ensure_user_role, ensure_wms_srs_list, ensure_proxy_base_url
 
-            import_uuids_to_redis()
-            from .authn.redis import import_authn_to_redis
+                    if settings.GEOSERVER_ADMIN_AUTH:
+                        ensure_role(settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
+                        ensure_user(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_PASSWORD, settings.GEOSERVER_ADMIN_AUTH)
+                        ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN', settings.GEOSERVER_ADMIN_AUTH)
+                        ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
+                    ensure_wms_srs_list([int(srs.split(':')[1]) for srs in settings.INPUT_SRS_LIST], settings.LAYMAN_GS_AUTH)
+                    if settings.LAYMAN_GS_PROXY_BASE_URL != '':
+                        ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
 
-            import_authn_to_redis()
-        settings.LAYMAN_REDIS.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
+                with app.app_context():
+                    from . import upgrade
 
-        app.logger.info(f'Ensuring users')
-        from .util import get_usernames, ensure_whole_user, check_username
-        with app.app_context():
-            for username in get_usernames():
-                app.logger.info(f'Ensuring user {username}')
-                check_username(username)
-                ensure_whole_user(username)
+                    upgrade.upgrade()
 
-    else:
-        while(settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done'):
-            app.logger.info(f'Waiting for flask process to adjust dependencies')
+                app.logger.info(f'Loading Redis database')
+                with app.app_context():
+                    from .uuid import import_uuids_to_redis
+
+                    import_uuids_to_redis()
+                    from .authn.redis import import_authn_to_redis
+
+                    import_authn_to_redis()
+                app.logger.info(f'Ensuring users')
+                from .util import get_usernames, ensure_whole_user, check_username
+
+                with app.app_context():
+                    for username in get_usernames():
+                        app.logger.info(f'  Ensuring user {username}')
+                        check_username(username)
+                        ensure_whole_user(username)
+
+                pipe.multi()
+                pipe.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
+                pipe.execute()
+
+            else:
+                wait_for_other_process = True
+    except WatchError:
+        app.logger.info(f"WatchError during layman's startup")
+        wait_for_other_process = True
+
+    if wait_for_other_process:
+        while (settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done'):
+            app.logger.info(f'Waiting for Layman in other process to initialize dependencies')
             time.sleep(1)
+
+app.logger.info(f'Layman successfully started!')
 
 
 @app.route('/')
