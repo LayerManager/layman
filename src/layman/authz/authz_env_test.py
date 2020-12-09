@@ -24,6 +24,10 @@ class TestPublicWorkspaceClass:
         yield
 
     @pytest.mark.usefixtures('liferay_mock', 'setup_test_public_workspace_variable')
+    @pytest.mark.parametrize("publish_method, delete_method, workspace_suffix", [
+        (process_client.publish_layer, process_client.delete_layer, '_layer',),
+        (process_client.publish_map, process_client.delete_map, '_map',),
+    ])
     @pytest.mark.parametrize(
         "create_public_workspace, publish_in_public_workspace, workspace_prefix, publication_name, authz_headers,"
         "user_can_create, anonymous_can_publish, anonymous_can_create,",
@@ -34,10 +38,6 @@ class TestPublicWorkspaceClass:
             (username, 'EVERYONE', workspace_name + 'ue', publication_name, user_authz_headers, True, True, False,),
         ],
     )
-    @pytest.mark.parametrize("publish_method, delete_method, workspace_suffix", [
-        (process_client.publish_layer, process_client.delete_layer, '_layer',),
-        (process_client.publish_map, process_client.delete_map, '_map',),
-    ])
     def test_public_workspace_variable(self,
                                        create_public_workspace,
                                        publish_in_public_workspace,

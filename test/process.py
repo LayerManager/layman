@@ -104,7 +104,7 @@ def ensure_layman_function(env_vars):
     global LAYMAN_SETTING
     if LAYMAN_SETTING != env_vars:
         print(f'\nReally starting Layman LAYMAN_SETTING={LAYMAN_SETTING}, settings={env_vars}')
-        clear()
+        clear()  # Tady by bylo asi lepší volat stop_process
         start_layman(env_vars)
         LAYMAN_SETTING = env_vars
 
@@ -117,7 +117,6 @@ def ensure_layman():
     print(f'\nensure_layman_fixture is ending - {LAYMAN_START_COUNT}')
 
 
-# TODO myslim, ze je zbytecne vypinat a zapinat i redis a celery
 def start_layman(env_vars=None):
     # first flush redis DB
     print(f'\nstart_layman: Really starting Layman')
@@ -140,12 +139,12 @@ def start_layman(env_vars=None):
 
     celery_env = layman_env.copy()
     celery_env['LAYMAN_SKIP_REDIS_LOADING'] = 'true'
-    cmd = f'python3 -m celery -Q {LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info --concurrency=2'
+    cmd = f'python3 -m celery -Q {LAYMAN_CELERY_QUEUE} -A layman.celery_app worker --loglevel=info --concurrency=4'
     celery_process = subprocess.Popen(cmd.split(), shell=False, stdin=None, env=layman_env, cwd='src')
 
     SUBPROCESSES.add(celery_process)
 
-    return layman_process, celery_process
+    return layman_process, celery_process  # TODO vracení tuple se mi zdá nepraktické, navrhuji buď seznam nebo slovník
 
 
 def stop_process(process):
