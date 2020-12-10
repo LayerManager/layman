@@ -25,7 +25,7 @@ def test_http_header():
         prime_db_schema.ensure_whole_user(
             username,
             {
-                'iss_id': 'test_http_header_issuer',
+                'issuer_id': 'test_http_header_issuer',
                 'sub': username,
                 'claims': {
                     'preferred_username': username,

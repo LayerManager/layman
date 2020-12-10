@@ -15,7 +15,7 @@ ON CONFLICT (id_workspace) DO update SET id_workspace = EXCLUDED.id_workspace re
             userinfo["claims"]["middle_name"],
             userinfo["claims"]["name"],
             userinfo["claims"]["email"],
-            userinfo["iss_id"],
+            userinfo["issuer_id"],
             userinfo["sub"],
             )
     ids = util.run_query(sql, data)
@@ -29,8 +29,18 @@ def delete_user(username):
         workspaces.delete_workspace(username)
 
 
-def get_user_infos(username=None):
-    sql = f"""with const as (select %s username)
+def get_user_infos(username=None,
+                   iss_sub=None):
+    assert not (username and iss_sub)
+    iss_sub = iss_sub or dict()
+
+    join_clause = '1 = 1'
+    if username:
+        join_clause = 'c.username = w.name'
+    elif iss_sub:
+        join_clause = 'c.issuer_id = u.issuer_id and c.sub = u.sub'
+
+    sql = f"""with const as (select %s username, %s issuer_id, %s sub)
 select u.id,
        w.name username,
        u.preferred_username,
@@ -43,11 +53,11 @@ select u.id,
        u.sub
 from {DB_SCHEMA}.workspaces w inner join
      {DB_SCHEMA}.users u on w.id = u.id_workspace inner join
-     const c on (   c.username = w.name
-                 or c.username is null)
+     const c on (""" + join_clause + """)
 order by w.name asc
 ;"""
-    values = util.run_query(sql, (username,))
+    params = (username, iss_sub.get('issuer_id'), iss_sub.get('sub'))
+    values = util.run_query(sql, params)
     result = {username: {"id": user_id,
                          "username": username,
                          "preferred_username": preferred_username,
