@@ -127,7 +127,8 @@ CREATE TABLE {DB_SCHEMA}.users
     issuer_id VARCHAR(256) COLLATE pg_catalog."default" not null,
     sub VARCHAR(256) COLLATE pg_catalog."default" not null,
     CONSTRAINT users_pkey PRIMARY KEY (id),
-    CONSTRAINT users_workspace_key UNIQUE (id_workspace)
+    CONSTRAINT users_workspace_key UNIQUE (id_workspace),
+    CONSTRAINT users_issuer_sub_key UNIQUE (issuer_id, sub)
 )
 TABLESPACE pg_default;
 

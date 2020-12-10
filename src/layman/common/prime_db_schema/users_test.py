@@ -10,11 +10,32 @@ def test_get_user_infos():
         user_util.get_user_infos('test2')
         user_util.get_user_infos('asůldghwíeghsdlkfj')
 
+    username = 'test_ensure_user'
+    iss_sub = {'issuer_id': 'mock_test_users_test',
+               'sub': '5'}
+    userinfo = {**iss_sub,
+                "claims": {"email": "test@liferay.com",
+                           "name": "test ensure user",
+                           "preferred_username": 'test_preferred',
+                           "given_name": "test",
+                           "family_name": "user",
+                           "middle_name": "ensure",
+                           }
+                }
+    with app.app_context():
+        id_workspace = workspace_util.ensure_workspace(username)
+        user_id = user_util.ensure_user(id_workspace, userinfo)
+
+        user_infos = user_util.get_user_infos(username)
+        assert {username} == user_infos.keys()
+        user_infos = user_util.get_user_infos(iss_sub=iss_sub)
+        assert {username} == user_infos.keys()
+
 
 def test_ensure_user():
     username = 'test_ensure_user'
-    userinfo = {"iss_id": 'mock_test',
-                "sub": '1',
+    userinfo = {"issuer_id": 'mock_test_users_test',
+                "sub": '10',
                 "claims": {"email": "test@liferay.com",
                            "name": "test ensure user",
                            "preferred_username": 'test_preferred',
@@ -34,8 +55,8 @@ def test_ensure_user():
 def test_delete_user():
     user = 'test_delete_user_user'
     workspace = 'test_delete_user_workspace'
-    userinfo = {"iss_id": 'mock_test',
-                "sub": '1',
+    userinfo = {"issuer_id": 'mock_test_users_test',
+                "sub": '20',
                 "claims": {"email": "test@liferay.com",
                            "preferred_username": 'test_preferred',
                            "name": "test ensure user",

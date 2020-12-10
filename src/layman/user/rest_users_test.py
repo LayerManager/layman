@@ -12,7 +12,7 @@ ensure_layman = process.ensure_layman
 @pytest.mark.usefixtures('ensure_layman')
 def test_get_users():
     username = 'test_get_users_user'
-    userinfo = {"iss_id": 'mock_test',
+    userinfo = {"issuer_id": 'mock_test_rest_user_test',
                 "sub": '1',
                 "claims": {"email": "test@liferay.com",
                            "preferred_username": 'test_preferred',

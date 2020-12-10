@@ -18,6 +18,15 @@ def migrate_users_and_publications(modules, role_everyone):
         id_workspace = workspaces.ensure_workspace(workspace_name)
         if userinfo:
             # It is personal workspace
+            iss_sub_infos = users.get_user_infos(iss_sub={'issuer_id': userinfo["iss_id"],
+                                                          'sub': userinfo["sub"]})
+            if iss_sub_infos:
+                username_in_conflict, iss_sub_info = iss_sub_infos.popitem()
+                raise LaymanError(f"Two workspaces are registered as private workspaces of the same user. To migrate successfully, choose which workspace should be the only private workspace of the user, delete authn.txt file from the other workspace, and restart layman. The other workspace becomes public.", data={
+                    'user': iss_sub_info,
+                    'workspaces': [workspace_name, username_in_conflict]
+                })
+            userinfo['issuer_id'] = userinfo['iss_id']
             users.ensure_user(id_workspace, userinfo)
             roles = {workspace_name, }
         else:

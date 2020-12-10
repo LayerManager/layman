@@ -11,16 +11,15 @@ from . import publications, workspaces, users
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 ensure_layman = process.ensure_layman
 
-userinfo = {"iss_id": 'mock_test',
-            "sub": '1',
-            "claims": {"email": "test@liferay.com",
-                       "preferred_username": 'test_preferred',
-                       "name": "test ensure user",
-                       "given_name": "test",
-                       "family_name": "user",
-                       "middle_name": "ensure",
-                       }
-            }
+userinfo_baseline = {"issuer_id": 'mock_test_publications_test',
+                     "claims": {"email": "test@liferay.com",
+                                "preferred_username": 'test_preferred',
+                                "name": "test ensure user",
+                                "given_name": "test",
+                                "family_name": "user",
+                                "middle_name": "ensure",
+                                }
+                     }
 
 
 def test_publication_basic():
@@ -126,6 +125,8 @@ def test_only_valid_names():
     with app.app_context():
         workspaces.ensure_workspace(workspace_name)
         id_workspace_user = workspaces.ensure_workspace(username)
+        userinfo = userinfo_baseline.copy()
+        userinfo['sub'] = '10'
         users.ensure_user(id_workspace_user, userinfo)
 
         publications.only_valid_names(set())
@@ -260,6 +261,8 @@ def test_clear_roles():
     with app.app_context():
         workspaces.ensure_workspace(workspace_name)
         id_workspace_user = workspaces.ensure_workspace(username)
+        userinfo = userinfo_baseline.copy()
+        userinfo['sub'] = '20'
         users.ensure_user(id_workspace_user, userinfo)
 
         list = publications.clear_roles({username, }, workspace_name)
@@ -324,8 +327,12 @@ def test_insert_rights():
     with app.app_context():
         workspaces.ensure_workspace(workspace_name)
         id_workspace_user = workspaces.ensure_workspace(username)
+        userinfo = userinfo_baseline.copy()
+        userinfo['sub'] = '30'
         users.ensure_user(id_workspace_user, userinfo)
         id_workspace_user2 = workspaces.ensure_workspace(username2)
+        userinfo = userinfo_baseline.copy()
+        userinfo['sub'] = '40'
         users.ensure_user(id_workspace_user2, userinfo)
 
         publication_info = {"name": publication_name,
@@ -435,8 +442,12 @@ def test_update_rights():
     with app.app_context():
         workspaces.ensure_workspace(workspace_name)
         id_workspace_user = workspaces.ensure_workspace(username)
+        userinfo = userinfo_baseline.copy()
+        userinfo['sub'] = '50'
         users.ensure_user(id_workspace_user, userinfo)
         id_workspace_user2 = workspaces.ensure_workspace(username2)
+        userinfo = userinfo_baseline.copy()
+        userinfo['sub'] = '60'
         users.ensure_user(id_workspace_user2, userinfo)
 
         publications.insert_publication(username, publication_insert_info)
