@@ -64,4 +64,4 @@ def ensure_schema(db_schema,
 def check_schema_name(db_schema):
     usernames = global_get_workspaces(use_cache=False, skip_modules=('layman.map.prime_db_schema', 'layman.layer.prime_db_schema',))
     if db_schema in usernames:
-        raise LaymanError(42, {'username': db_schema})
+        raise LaymanError(42, {'workspace': db_schema})

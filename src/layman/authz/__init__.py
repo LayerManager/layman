@@ -22,7 +22,7 @@ def authorize(workspace, publication_type, publication_name, request_method, act
     if is_multi_publication_request:
         if request_method in ['GET', 'DELETE']:
             if not workspaces.get_workspace_infos(workspace):
-                raise LaymanError(40)  # User not found
+                raise LaymanError(40)  # Workspace not found
             return
         elif request_method in ['POST']:
             if actor_name == workspace:
@@ -42,7 +42,7 @@ def authorize(workspace, publication_type, publication_name, request_method, act
             raise LaymanError(31, {'method': request_method})  # unsupported method
     else:
         if not workspaces.get_workspace_infos(workspace):
-            raise LaymanError(40)  # User not found
+            raise LaymanError(40)  # Workspace not found
         publ_info = publications.get_publication_infos(workspace, publication_type).get(
             (workspace, publication_type, publication_name)
         )
