@@ -537,6 +537,7 @@ from {username}.{layername}
     except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
+    conn.commit()
     result = rows[0][0]
     if result is not None:
         result = json.loads(result)
