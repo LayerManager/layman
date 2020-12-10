@@ -70,7 +70,7 @@ def only_valid_names(users_list):
     for username in usernames_for_chesk:
         info = users.get_user_infos(username)
         if not info:
-            raise LaymanError(43, f'Not existing username. Username={username}')
+            raise LaymanError(43, f'Not existing workspace. Workspace={username}')
 
 
 def at_least_one_can_write(can_write):
