@@ -11,7 +11,7 @@ settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 ATTEMPT_INTERVAL = 2
 MAX_ATTEMPTS = 60
 
-MICKA_VERSION_RE = r":\s*([^:()\s]+)\s*\(\s*rev\.\s*([^:()\s]+)\s*\)"
+MICKA_VERSION_RE = r"\s*([^:()\s]+)\s*\(\s*rev\.\s*([^:()\s]+)\s*\)"
 
 
 def main():
