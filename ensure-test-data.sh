@@ -13,7 +13,7 @@ mkdir -p tmp/sm5/vektor/jtsk
 ne_110m_cultural=tmp/naturalearth/110m_cultural.zip
 if ! [ -f $ne_110m_cultural ]; then
   # https://github.com/nvkelso/natural-earth-vector/issues/434
-  curl -L -o $ne_110m_cultural -e "https://www.naturalearthdata.com/downloads/110m-cultural-vectors/" "https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/110m_cultural.zip"
+  curl -L -o $ne_110m_cultural -e "https://www.naturalearthdata.com/downloads/110m-cultural-vectors/" "https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/110m_cultural.zip" || curl -L -o $ne_110m_cultural "https://hosting.scalablemap.com/layman/naturalearth/110m_cultural.zip"
   unzip -q $ne_110m_cultural -d tmp/naturalearth/110m/cultural
 fi
 
