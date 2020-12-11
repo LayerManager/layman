@@ -1,9 +1,11 @@
 # Changelog
 
 ## v1.8.0
- 2020-12-??
+ 2020-12-14
 ### Upgrade requirements
 - Set environment variable [LAYMAN_AUTHN_HTTP_HEADER_NAME](doc/env-settings.md#LAYMAN_AUTHN_HTTP_HEADER_NAME). Only combination of lowercase characters and numbers must be used for the value.
+- Set environment variable [LAYMAN_PRIME_SCHEMA](doc/env-settings.md#LAYMAN_PRIME_SCHEMA). It is the name of the DB schema, so it is subject to the [restrictions given by PostgreSQL](https://www.postgresql.org/docs/9.2/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS):
+    - `must begin with a letter (a-z, but also letters with diacritical marks and non-Latin letters) or an underscore (_). Subsequent characters in an identifier or key word can be letters, underscores, digits (0-9)`
 - Replace LAYMAN_AUTHZ_MODULE environment variable with [GRANT_CREATE_PUBLIC_WORKSPACE](doc/env-settings.md#GRANT_CREATE_PUBLIC_WORKSPACE) and [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](doc/env-settings.md#GRANT_PUBLISH_IN_PUBLIC_WORKSPACE). The following settings correspond best with behaviour of previously used LAYMAN_AUTHZ_MODULE:
    - `LAYMAN_AUTHZ_MODULE=layman.authz.read_everyone_write_everyone` (variable to remove)
       - `GRANT_CREATE_PUBLIC_WORKSPACE=EVERYONE` (new variable)
@@ -11,6 +13,9 @@
    - `LAYMAN_AUTHZ_MODULE=layman.authz.read_everyone_write_owner` (variable to remove)
       - `GRANT_CREATE_PUBLIC_WORKSPACE=` (new variable)
       - `GRANT_PUBLISH_IN_PUBLIC_WORKSPACE=` (new variable)
+- All users have to have different `iss_id` and `sub`. Duplicities will be tested at first Layman start, reported when found and stop Layman initialization. To migrate successfully, choose which workspace should be the only private workspace of the user, delete authn.txt file from the other workspace, and restart layman. The other workspace becomes public.
+- Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.4.1`
+    - If you are running Layman with development settings, run also `make client-build`.
 ### Changes
 - Attribute `groups` is no longer returned in [GET Map File](doc/rest.md#get-map-file) response.
 - [#28](https://github.com/jirik/layman/issues/28) New environment variable [LAYMAN_PRIME_SCHEMA](doc/env-settings.md#LAYMAN_PRIME_SCHEMA). 
@@ -21,6 +26,8 @@
 - [#161](https://github.com/jirik/layman/issues/161) New method DELETE was implemented for endpoints [DELETE Maps](doc/rest.md#delete-maps) and [DELETE Layers](doc/rest.md#delete-layers).
 - [#178](https://github.com/jirik/layman/issues/178) New attribute `screen_name` is part of response for [GET Users](doc/rest.md#get-users) and [Get Current User](doc/rest.md#get-current-user).
 - [#178](https://github.com/jirik/layman/issues/178) LifeRay attribute `screen_name` is preferred for creating username in Layman. Previously it was first part of email.
+- We started to distinguish [`workspace`](doc/models.md#workspace) as "directory", where publications are stored, and [`user`](doc/models.md#user) as representation of person in Layman system. We changed documentation and Layman Test Client to more in line with this distinction.
+- [#28](https://github.com/jirik/layman/issues/28) [WMS endpoint](doc/endpoints.md#web-map-service) accepts same [authentication](doc/security.md#authentication) credentials (e.g. [OAuth2 headers](doc/oauth2/index.md#request-layman-rest-api)) as Layman REST API endpoints. It's implemented using Layman's WFS proxy. This proxy authenticates the user and send user identification to GeoServer.
 
 ## v1.7.3
 2020-11-30
@@ -50,7 +57,7 @@
 - [#101](https://github.com/jirik/layman/issues/101) Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) from `v1.1.2` to `v1.2.0`
     - If you are running Layman with development settings, run also `make client-build`.
 ### Changes
-- [#65](https://github.com/jirik/layman/issues/65) [WFS endpoint](doc/rest.md#get-layer) accepts same [authentication](doc/security.md#authentication) credentials (e.g. [OAuth2 headers](doc/oauth2/index.md#request-layman-rest-api)) as Layman REST API endpoints. It's implemented using Layman's WFS proxy. This proxy authenticates the user and send user identification to GeoServer. In combination with changes in v1.6.0, Layman's [`read-everyone-write-owner` authorization](doc/security.md#authorization) (when active) is propagated to GeoServer and user can change only hers layers.
+- [#65](https://github.com/jirik/layman/issues/65) [WFS endpoint](doc/endpoints.md#web-feature-service) accepts same [authentication](doc/security.md#authentication) credentials (e.g. [OAuth2 headers](doc/oauth2/index.md#request-layman-rest-api)) as Layman REST API endpoints. It's implemented using Layman's WFS proxy. This proxy authenticates the user and send user identification to GeoServer. In combination with changes in v1.6.0, Layman's [`read-everyone-write-owner` authorization](doc/security.md#authorization) (when active) is propagated to GeoServer and user can change only hers layers.
 - [#88](https://github.com/jirik/layman/issues/88) Attribute **title** was added to REST endpoints [GET Layers](doc/rest.md#get-layers) and [GET Maps](doc/rest.md#get-maps).
 - [#95](https://github.com/jirik/layman/issues/95) When calling WFS Transaction, Layman will automatically create missing attributes in DB before redirecting request to GeoServer. Each missing attribute is created as `VARCHAR(1024)`. Works for WFS-T 1.0, 1.1 and 2.0, actions Insert, Update and Replace. If creating attribute fails for any reason, warning is logged and request is redirected nevertheless.
 - [#96](https://github.com/jirik/layman/issues/96) New REST API endpoint [Layer Style](doc/rest.md#get-layer-style) is created, which returns Layer default SLD. New attribute ```sld.url``` is added to [GET Layer endpoint](doc/rest.md#get-layer), where URL of Layer default SLD can be obtained. It points to above mentioned [Layer Style](doc/rest.md#get-layer-style).
