@@ -22,7 +22,8 @@ layername = 'country_chunks'
 @pytest.fixture(scope="module")
 def clear_country_chunks():
     yield
-    process_client.delete_layer(username, layername)
+    r = process_client.delete_layer(username, layername, assert_status=False)
+    assert r.status_code == 200 or r.status_code == 404
 
 
 @pytest.fixture(scope="module")
@@ -62,7 +63,7 @@ def test_post_layers_chunk(chrome):
     chrome.set_window_size(1000, 2000)
     chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-1.png')
 
-    user_input = chrome.find_elements_by_name('user')
+    user_input = chrome.find_elements_by_name('Workspace')
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
@@ -146,7 +147,7 @@ def test_patch_layer_chunk(chrome):
     button.click()
     chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-2.png')
 
-    user_input = chrome.find_elements_by_name('user')
+    user_input = chrome.find_elements_by_name('Workspace')
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()

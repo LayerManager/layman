@@ -199,15 +199,20 @@ def patch_map(username,
     return mapname
 
 
-def delete_layer(username, layername, headers=None):
+def delete_layer(username, layername, headers=None, assert_status=True):
     headers = headers or {}
 
     with app.app_context():
         r_url = url_for('rest_layer.delete_layer', username=username, layername=layername)
     r = requests.delete(r_url, headers=headers)
-    assert r.status_code == 200, r.text
+    if assert_status:
+        assert r.status_code == 200, r.text
+        result = r.json()
+    else:
+        result = r
     wfs.clear_cache(username)
     wms.clear_cache(username)
+    return result
 
 
 def get_layer(username, layername, headers=None, assert_status=True,):
