@@ -47,14 +47,14 @@ JSON array of objects representing available layers with following structure:
 Publish vector data file as new layer of WMS and WFS.
 
 Processing chain consists of few steps:
-- save file to user directory within Layman data directory
-- import the file to PostgreSQL database as new table into user schema, including geometry transformation to EPSG:3857
-- publish the table as new layer (feature type) within user workspace of GeoServer
+- save file to workspace directory within Layman data directory
+- import the file to PostgreSQL database as new table into workspace schema, including geometry transformation to EPSG:3857
+- publish the table as new layer (feature type) within appropriate workspace of GeoServer
 - generate thumbnail image
 - publish metadata record to Micka
 - save basic information (name, title, access_rights) into PostgreSQL
 
-If user directory, database schema, GeoServer's workspace, or GeoServer's datastore does not exist yet, it is created on demand.
+If workspace directory, database schema, GeoServer's workspace, or GeoServer's datastore does not exist yet, it is created on demand.
 
 Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Layer](#get-layer) and **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, sld, metadata).
 
@@ -146,13 +146,13 @@ No action parameters.
 Content-Type: `application/json`
 
 JSON object with following structure:
-- **name**: String. Layername used for identification within Layman user workspace. It can be also used for identifying layer within WMS and WFS endpoints.
+- **name**: String. Layername used for identification within given [workspace](models.md#workspace). It can be also used for identifying layer within WMS and WFS endpoints.
 - **uuid**: String. UUID of the layer.
 - **url**: String. URL pointing to this endpoint.
 - **title**: String.
 - **description**: String.
 - **wms**
-  - *url*: String. URL of WMS endpoint. It points to WMS endpoint of GeoServer user workspace.
+  - *url*: String. URL of WMS endpoint. It points to WMS endpoint of appropriate GeoServer workspace.
   - *status*: Status information about GeoServer import and availability of WMS layer. No status object means the source is available. Usual state values are
     - PENDING: publishing of this source is queued, but it did not start yet
     - STARTED: publishing of this source is in process
@@ -160,7 +160,7 @@ JSON object with following structure:
     - NOT_AVAILABLE: source is not available, e.g. because publishing process failed
   - *error*: If status is FAILURE, this may contain error object.
 - **wfs**
-  - *url*: String. URL of WFS endpoint. It points to WFS endpoint of GeoServer user workspace.
+  - *url*: String. URL of WFS endpoint. It points to WFS endpoint of appropriate GeoServer workspace.
   - *status*: Status information about GeoServer import and availability of WFS feature type. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
@@ -168,11 +168,11 @@ JSON object with following structure:
   - *status*: Status information about generating and availability of thumbnail. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **file**
-  - *path*: String. Path to input vector data file that was imported to the DB table. Path is relative to user directory.
+  - *path*: String. Path to input vector data file that was imported to the DB table. Path is relative to workspace directory.
   - *status*: Status information about saving and availability of files. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **db_table**
-  - **name**: String. DB table name within PostgreSQL user schema. This table is used as GeoServer source of layer.
+  - **name**: String. DB table name within PostgreSQL workspace schema. This table is used as GeoServer source of layer.
   - *status*: Status information about DB import and availability of the table. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **sld**
@@ -360,13 +360,13 @@ Publish new map composition. Accepts JSON valid against [map-composition schema]
 
 Processing chain consists of few steps:
 - validate JSON file against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema)
-- save file to user directory
+- save file to workspace directory
 - if needed, update some JSON attributes (`name`, `title`, or `abstract`)
 - generate thumbnail image
 - publish metadata record to Micka
 - save basic information (name, title, access_rights) into PostgreSQL
 
-If user directory does not exist yet, it is created on demand.
+If workspace directory does not exist yet, it is created on demand.
 
 #### Request
 Content-Type: `multipart/form-data`
@@ -445,7 +445,7 @@ JSON object with following structure:
 - **description**: String. Taken from `abstract` attribute of JSON root object.
 - **file**
   - *url*: String. URL of map-composition JSON file. It points to [GET Map File](#get-map-file).
-  - *path*: String. Path to map-composition JSON file, relative to user directory.
+  - *path*: String. Path to map-composition JSON file, relative to workspace directory.
   - *status*: Status information about availability of file. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**

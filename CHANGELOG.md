@@ -20,7 +20,7 @@
 - [#28](https://github.com/jirik/layman/issues/28) Security rules on GeoServer on [workspace level (workspace.*.r/w)](https://docs.geoserver.org/stable/en/user/security/layer.html) are deleted on first Layman start and replaced with security rules on [layer level (workspace.layername.r/w)](https://docs.geoserver.org/stable/en/user/security/layer.html) according to rules on Layman side.
 - [#161](https://github.com/jirik/layman/issues/161) New method DELETE was implemented for endpoints [DELETE Maps](doc/rest.md#delete-maps) and [DELETE Layers](doc/rest.md#delete-layers).
 - [#178](https://github.com/jirik/layman/issues/178) New attribute `screen_name` is part of response for [GET Users](doc/rest.md#get-users) and [Get Current User](doc/rest.md#get-current-user).
-- [#178](https://github.com/jirik/layman/issues/178) LifeRay attribute `screen_name` is preferred for creating username in Layman. Previously was first part of email.
+- [#178](https://github.com/jirik/layman/issues/178) LifeRay attribute `screen_name` is preferred for creating username in Layman. Previously it was first part of email.
 
 ## v1.7.3
 2020-11-30

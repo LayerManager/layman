@@ -19,7 +19,7 @@ Data stores:
 ### Users
 Information about users includes their names, contacts, and authentication credentials.
 
-When user [reserves his username](rest.md#patch-current-user), names, contacts and other relevant metadata are [obtained from authorization provider](oauth2/index.md#fetch-user-related-metadata) and saved to [filesystem](#filesystem), [Redis](#redis), [PostgreSQL](#postgresql), and [GeoServer](#geoserver).
+When user [reserves his username](rest.md#patch-current-user), names, contacts and other relevant metadata are [obtained from authorization provider](oauth2/index.md#fetch-user-related-metadata) and saved to [filesystem](#filesystem), [Redis](#redis), [PostgreSQL](#postgresql), and [GeoServer](#geoserver). User's [personal workspace](models.md#personal-workspace) is created too.
 
 ### Layers
 Information about [layers](models.md#layer) includes vector data and visualization.
