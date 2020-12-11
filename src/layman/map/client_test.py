@@ -89,7 +89,7 @@ def test_post_no_file(client, chrome):
     map_tab = map_tab[0]
     map_tab.click()
 
-    user_input = chrome.find_elements_by_name('user')
+    user_input = chrome.find_elements_by_name('Workspace')
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
