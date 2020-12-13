@@ -26,6 +26,7 @@
 - [#28](https://github.com/jirik/layman/issues/28) At first start of Layman, access rights of existing publications are set in following way:
     - [everyone can read and only owner of the workspace can edit](doc/security.md#Authorization) publications in [personal workspaces](doc/models.md#personal-workspace)
     - [anyone can read or edit](doc/security.md#Authorization) publications in [public workspaces](doc/models.md#public-workspace).
+- [#28](https://github.com/jirik/layman/issues/28) Default [access rights](doc/security.md#publication-access-rights) (both read and write) of newly created publications are set to current authenticated user, or EVERYONE if published by anonymous.
 - [#28](https://github.com/jirik/layman/issues/28) At first start of Layman, security rules on GeoServer on [workspace level (workspace.*.r/w)](https://docs.geoserver.org/stable/en/user/security/layer.html) are deleted and replaced with security rules on [layer level (workspace.layername.r/w)](https://docs.geoserver.org/stable/en/user/security/layer.html) according to rules on Layman side.
 - [#28](https://github.com/jirik/layman/issues/28) Only publications with [read access](doc/security.md#publication-access-rights) for EVERYONE are published to Micka as public.
 - [#28](https://github.com/jirik/layman/issues/28) New REST endpoint [GET Users](doc/rest.md#get-users) with list of all users registered in Layman. This new endpoint was added to Test Client into tab "Others".

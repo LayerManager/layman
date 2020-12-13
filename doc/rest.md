@@ -51,7 +51,7 @@ Processing chain consists of few steps:
 - import the file to PostgreSQL database as new table into workspace schema, including geometry transformation to EPSG:3857
 - publish the table as new layer (feature type) within appropriate workspace of GeoServer
 - generate thumbnail image
-- publish metadata record to Micka
+- publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
 - save basic information (name, title, access_rights) into PostgreSQL
 
 If workspace directory, database schema, GeoServer's workspace, or GeoServer's datastore does not exist yet, it is created on demand.
@@ -93,11 +93,11 @@ Body parameters:
    - by default default SLD style of GeoServer is used
    - uploading of additional style files, e.g. point-symbol images or fonts is not supported
 - *access_rights.read*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [read access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
+   - default value is current authenticated user, or EVERYONE if published by anonymous
 - *access_rights.write*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [write access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [write access](./security.md#publication-access-rights) to this publication
+   - default value is current authenticated user, or EVERYONE if published by anonymous
 
 #### Response
 Content-Type: `application/json`
@@ -218,11 +218,9 @@ Body parameters:
 - *sld*, SLD file
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 - *access_rights.read*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [read access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
 - *access_rights.write*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [write access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [write access](./security.md#publication-access-rights) to this publication
 
 #### Response
 Content-Type: `application/json`
@@ -363,7 +361,7 @@ Processing chain consists of few steps:
 - save file to workspace directory
 - if needed, update some JSON attributes (`name`, `title`, or `abstract`)
 - generate thumbnail image
-- publish metadata record to Micka
+- publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
 - save basic information (name, title, access_rights) into PostgreSQL
 
 If workspace directory does not exist yet, it is created on demand.
@@ -388,11 +386,11 @@ Body parameters:
 - *description*
    - by default it is either `abstract` attribute of JSON root object or empty string
 - *access_rights.read*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [read access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
+   - default value is current authenticated user, or EVERYONE if published by anonymous
 - *access_rights.write*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [write access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [write access](./security.md#publication-access-rights) to this publication
+   - default value is current authenticated user, or EVERYONE if published by anonymous
 
 #### Response
 Content-Type: `application/json`
@@ -481,11 +479,9 @@ Body parameters:
 - *description*, string `.+`
    - by default it is either `abstract` attribute of JSON root object or empty string
 - *access_rights.read*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [read access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
 - *access_rights.write*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [write access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [write access](./security.md#publication-access-rights) to this publication
 
 #### Response
 Content-Type: `application/json`
