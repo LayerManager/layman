@@ -40,8 +40,8 @@ JSON array of objects representing available layers with following structure:
 - **uuid**: String. UUID of the layer.
 - **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
 - **access_rights**:
-  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization). If value is not specified, current user will be set if logged in, otherwise role EVERYONE.
-  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization). If value is not specified, only owner of workspace will be set for [personal workspaces](models.md#personal-workspace) and role EVERYONE for [public workspaces](models.md#public-workspace). If value is not specified, current user will be set if logged in, otherwise role EVERYONE.
+  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
+  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 
 ### POST Layers
 Publish vector data file as new layer of WMS and WFS.
