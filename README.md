@@ -69,10 +69,7 @@ docker logs -f layman
 Wait until you see something like
 ```
 
-[2019-10-30 13:45:36 +0000] [1] [INFO] Starting gunicorn 19.9.0
-[2019-10-30 13:45:36 +0000] [1] [INFO] Listening at: http://0.0.0.0:8000 (1)
-[2019-10-30 13:45:36 +0000] [1] [INFO] Using worker: sync
-[2019-10-30 13:45:36 +0000] [12] [INFO] Booting worker with pid: 12
+[2019-10-30 13:45:36 +0000] [12] [INFO] Layman successfully started!
 ```
 
 Then visit [http://localhost/](http://localhost/). You will see simple web client that interacts with [REST API](doc/rest.md).
@@ -185,13 +182,7 @@ make start-dev
 ```
 Initial startup may take few minutes (download docker images, build it, run it). Wait until you see something like
 ```
-layman       |  * Serving Flask app "src/layman/layman.py" (lazy loading)
-layman       |  * Environment: development
-layman       |  * Debug mode: on
-layman       |  * Running on http://0.0.0.0:8000/ (Press CTRL+C to quit)
-layman       |  * Restarting with stat
-layman       |  * Debugger is active!
-layman       |  * Debugger PIN: 103-830-055
+[2020-12-13 09:57:00,968] INFO in __init__: Layman successfully started!
 ```
 in log of `layman_dev` container:
 ```bash
