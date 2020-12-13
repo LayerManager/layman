@@ -15,6 +15,7 @@
 - Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.4.1`
     - If you are running Layman with development settings, run also `make client-build`.
 - Starting version 1.8, each user can have zero or one [personal workspaces](doc/models.md#personal-workspace), not more. Layman automatically checks this at first start. If any user with two workspaces is found, it is reported and Layman initialization is stopped. In such case, choose which one of reported workspaces should be the only personal workspace of the user, delete authn.txt file from the other workspace, and restart layman. The other workspace becomes public.
+- If you are running Layman with development settings, run also `make timgen-build`.
 ### Changes
 - We started to strictly distinguish [workspace](doc/models.md#workspace) as place, where publications are stored, and [user](doc/models.md#user) as representation of person in Layman system. This change was reflected in following places:
     - In REST API documentation, `username` was replaced with `workspace_name`. It's not breaking change, as it's only naming of part of URL path. 
