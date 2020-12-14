@@ -3,28 +3,28 @@
 ## Overview
 |Endpoint|URL|GET|POST|PATCH|DELETE|
 |---|---|---|---|---|---|
-|Layers|`/rest/<username>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | [DELETE](#delete-layers) |
-|[Layer](models.md#layer)|`/rest/<username>/layers/<layername>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
-|Layer Thumbnail|`/rest/<username>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
-|Layer Style|`/rest/<username>/layers/<layername>/style`|[GET](#get-layer-style)| x | x | x |
-|Layer Chunk|`/rest/<username>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
-|Layer Metadata Comparison|`/rest/<username>/layers/<layername>/metadata-comparison`|[GET](#get-layer-metadata-comparison) | x | x | x |
-|Maps|`/rest/<username>/maps`|[GET](#get-maps)| [POST](#post-maps) | x | [DELETE](#delete-maps) |
-|[Map](models.md#map)|`/rest/<username>/maps/<mapname>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
-|Map File|`/rest/<username>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
-|Map Thumbnail|`/rest/<username>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
-|Map Metadata Comparison|`/rest/<username>/layers/<layername>/metadata-comparison`|[GET](#get-map-metadata-comparison) | x | x | x |
+|Layers|`/rest/<workspace_name>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | [DELETE](#delete-layers) |
+|[Layer](models.md#layer)|`/rest/<workspace_name>/layers/<layername>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
+|Layer Thumbnail|`/rest/<workspace_name>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
+|Layer Style|`/rest/<workspace_name>/layers/<layername>/style`|[GET](#get-layer-style)| x | x | x |
+|Layer Chunk|`/rest/<workspace_name>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
+|Layer Metadata Comparison|`/rest/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-layer-metadata-comparison) | x | x | x |
+|Maps|`/rest/<workspace_name>/maps`|[GET](#get-maps)| [POST](#post-maps) | x | [DELETE](#delete-maps) |
+|[Map](models.md#map)|`/rest/<workspace_name>/maps/<mapname>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
+|Map File|`/rest/<workspace_name>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
+|Map Thumbnail|`/rest/<workspace_name>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
+|Map Metadata Comparison|`/rest/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-map-metadata-comparison) | x | x | x |
 |Users|`/rest/users`|[GET](#get-users)| x | x | x |
 |Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | [DELETE](#delete-current-user) |
 
 #### REST path parameters
-- **username**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
-   - string identifying [user](models.md) that owns the [workspace](models.md)
+- **workspace_name**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
+   - string identifying [workspace](models.md#workspace)
 
 
 ## Layers
 ### URL
-`/rest/<username>/layers`
+`/rest/<workspace_name>/layers`
 
 ### GET Layers
 Get list of published layers.
@@ -47,13 +47,14 @@ JSON array of objects representing available layers with following structure:
 Publish vector data file as new layer of WMS and WFS.
 
 Processing chain consists of few steps:
-- save file to user directory within Layman data directory
-- import the file to PostgreSQL database as new table into user schema, including geometry transformation to EPSG:3857
-- publish the table as new layer (feature type) within user workspace of GeoServer
+- save file to workspace directory within Layman data directory
+- import the file to PostgreSQL database as new table into workspace schema, including geometry transformation to EPSG:3857
+- publish the table as new layer (feature type) within appropriate workspace of GeoServer
 - generate thumbnail image
-- publish metadata record to Micka
+- publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
+- save basic information (name, title, access_rights) into PostgreSQL
 
-If user directory, database schema, GeoServer's workspace, or GeoServer's datastore does not exist yet, it is created on demand.
+If workspace directory, database schema, GeoServer's workspace, or GeoServer's datastore does not exist yet, it is created on demand.
 
 Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Layer](#get-layer) and **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, sld, metadata).
 
@@ -92,11 +93,11 @@ Body parameters:
    - by default default SLD style of GeoServer is used
    - uploading of additional style files, e.g. point-symbol images or fonts is not supported
 - *access_rights.read*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [read access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
+   - default value is current authenticated user, or EVERYONE if published by anonymous
 - *access_rights.write*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [write access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [write access](./security.md#publication-access-rights) to this publication
+   - default value is current authenticated user, or EVERYONE if published by anonymous
 
 #### Response
 Content-Type: `application/json`
@@ -129,7 +130,7 @@ JSON array of objects representing deleted layers:
 
 ## Layer
 ### URL
-`/rest/<username>/layers/<layername>`
+`/rest/<workspace_name>/layers/<layername>`
 
 #### Endpoint path parameters
 - **layername**
@@ -145,13 +146,13 @@ No action parameters.
 Content-Type: `application/json`
 
 JSON object with following structure:
-- **name**: String. Layername used for identification within Layman user workspace. It can be also used for identifying layer within WMS and WFS endpoints.
+- **name**: String. Layername used for identification within given [workspace](models.md#workspace). It can be also used for identifying layer within WMS and WFS endpoints.
 - **uuid**: String. UUID of the layer.
 - **url**: String. URL pointing to this endpoint.
 - **title**: String.
 - **description**: String.
 - **wms**
-  - *url*: String. URL of WMS endpoint. It points to WMS endpoint of GeoServer user workspace.
+  - *url*: String. URL of WMS endpoint. It points to WMS endpoint of appropriate GeoServer workspace.
   - *status*: Status information about GeoServer import and availability of WMS layer. No status object means the source is available. Usual state values are
     - PENDING: publishing of this source is queued, but it did not start yet
     - STARTED: publishing of this source is in process
@@ -159,7 +160,7 @@ JSON object with following structure:
     - NOT_AVAILABLE: source is not available, e.g. because publishing process failed
   - *error*: If status is FAILURE, this may contain error object.
 - **wfs**
-  - *url*: String. URL of WFS endpoint. It points to WFS endpoint of GeoServer user workspace.
+  - *url*: String. URL of WFS endpoint. It points to WFS endpoint of appropriate GeoServer workspace.
   - *status*: Status information about GeoServer import and availability of WFS feature type. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
@@ -167,11 +168,11 @@ JSON object with following structure:
   - *status*: Status information about generating and availability of thumbnail. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **file**
-  - *path*: String. Path to input vector data file that was imported to the DB table. Path is relative to user directory.
+  - *path*: String. Path to input vector data file that was imported to the DB table. Path is relative to workspace directory.
   - *status*: Status information about saving and availability of files. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **db_table**
-  - **name**: String. DB table name within PostgreSQL user schema. This table is used as GeoServer source of layer.
+  - **name**: String. DB table name within PostgreSQL workspace schema. This table is used as GeoServer source of layer.
   - *status*: Status information about DB import and availability of the table. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **sld**
@@ -217,11 +218,9 @@ Body parameters:
 - *sld*, SLD file
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 - *access_rights.read*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [read access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
 - *access_rights.write*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [write access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [write access](./security.md#publication-access-rights) to this publication
 
 #### Response
 Content-Type: `application/json`
@@ -246,7 +245,7 @@ JSON object representing deleted layer:
 
 ## Layer Thumbnail
 ### URL
-`/rest/<username>/layers/<layername>/thumbnail`
+`/rest/<workspace_name>/layers/<layername>/thumbnail`
 ### GET Layer Thumbnail
 Get thumbnail of the layer in PNG format, 300x300 px, transparent background.
 
@@ -260,7 +259,7 @@ PNG image.
 
 ## Layer Style
 ### URL
-`/rest/<username>/layers/<layername>/style`
+`/rest/<workspace_name>/layers/<layername>/style`
 ### GET Layer Style
 Get default style of the layer in XML format. Request is redirected to GeoServer [/rest/workspaces/{workspace}/styles/{style}](https://docs.geoserver.org/latest/en/api/#1.0.0/styles.yaml). Anybody can call GET, nobody can call any other method. 
 
@@ -281,7 +280,7 @@ The endpoint is activated after [POST Layers](#post-layers) or [PATCH Layer](#pa
 - layer is deleted
 
 ### URL
-`/rest/<username>/layers/<layername>/chunk`
+`/rest/<workspace_name>/layers/<layername>/chunk`
 ### GET Layer Chunk
 Test if file chunk is already uploaded on the server.
 
@@ -335,7 +334,7 @@ JSON object with one attribute:
 
 ## Maps
 ### URL
-`/rest/<username>/maps`
+`/rest/<workspace_name>/maps`
 
 ### GET Maps
 Get list of published maps (map compositions).
@@ -359,12 +358,13 @@ Publish new map composition. Accepts JSON valid against [map-composition schema]
 
 Processing chain consists of few steps:
 - validate JSON file against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema)
-- save file to user directory
+- save file to workspace directory
 - if needed, update some JSON attributes (`name`, `title`, or `abstract`)
 - generate thumbnail image
-- publish metadata record to Micka
+- publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
+- save basic information (name, title, access_rights) into PostgreSQL
 
-If user directory does not exist yet, it is created on demand.
+If workspace directory does not exist yet, it is created on demand.
 
 #### Request
 Content-Type: `multipart/form-data`
@@ -386,11 +386,11 @@ Body parameters:
 - *description*
    - by default it is either `abstract` attribute of JSON root object or empty string
 - *access_rights.read*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [read access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
+   - default value is current authenticated user, or EVERYONE if published by anonymous
 - *access_rights.write*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [write access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [write access](./security.md#publication-access-rights) to this publication
+   - default value is current authenticated user, or EVERYONE if published by anonymous
 
 #### Response
 Content-Type: `application/json`
@@ -420,7 +420,7 @@ JSON array of objects representing deleted maps:
 
 ## Map
 ### URL
-`/rest/<username>/maps/<mapname>`
+`/rest/<workspace_name>/maps/<mapname>`
 
 #### Endpoint path parameters
 - **mapname**
@@ -443,7 +443,7 @@ JSON object with following structure:
 - **description**: String. Taken from `abstract` attribute of JSON root object.
 - **file**
   - *url*: String. URL of map-composition JSON file. It points to [GET Map File](#get-map-file).
-  - *path*: String. Path to map-composition JSON file, relative to user directory.
+  - *path*: String. Path to map-composition JSON file, relative to workspace directory.
   - *status*: Status information about availability of file. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
@@ -479,11 +479,9 @@ Body parameters:
 - *description*, string `.+`
    - by default it is either `abstract` attribute of JSON root object or empty string
 - *access_rights.read*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [read access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
 - *access_rights.write*, string
-   - array of names of [users](./models.md#user) and [roles](./models.md#role) separated by comma (`,`)
-   - these users or/and roles will get [write access](./security.md#Authorization) to this publication
+   - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [write access](./security.md#publication-access-rights) to this publication
 
 #### Response
 Content-Type: `application/json`
@@ -507,7 +505,7 @@ JSON object representing deleted map:
 
 ## Map File
 ### URL
-`/rest/<username>/maps/<mapname>/file`
+`/rest/<workspace_name>/maps/<mapname>/file`
 ### GET Map File
 Get JSON file describing the map valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema).
 
@@ -516,7 +514,7 @@ Notice that some JSON properties are automatically updated by layman, so file ob
 - **title** obtained from [POST Maps](#post-maps) or [PATCH Map](#patch-map) as `title`
 - **abstract** obtained from [POST Maps](#post-maps) or [PATCH Map](#patch-map) as `description`
 - **user** updated on the fly during this request:
-   - **name** set to `<username>` in URL of this endpoint
+   - **name** set to `<workspace_name>` in URL of this endpoint
    - **email** set to email of the owner, or empty string if not known
    - other properties will be deleted
 - **groups** are removed
@@ -531,7 +529,7 @@ JSON file describing the map valid against [map-composition schema](https://gith
 
 ## Map Thumbnail
 ### URL
-`/rest/<username>/maps/<mapname>/thumbnail`
+`/rest/<workspace_name>/maps/<mapname>/thumbnail`
 ### GET Map Thumbnail
 Get thumbnail of the map in PNG format, 300x300 px, transparent background.
 

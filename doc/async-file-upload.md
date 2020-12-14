@@ -28,7 +28,7 @@ You need some HTML form for user to choose files he wants to publish and fill so
 </form>
 ```
 
-Now, if you add `target="/rest/some_username/layers" method="POST" enctype="multipart/form-data"` to the `form` element and let user click on Submit button, the browser will send everything to server **synchronously**. To do it **asynchronously**, you need to add some extra logic. 
+Now, if you add `target="/rest/some_workspace_name/layers" method="POST" enctype="multipart/form-data"` to the `form` element and let user click on Submit button, the browser will send everything to server **synchronously**. To do it **asynchronously**, you need to add some extra logic. 
 
 ## JavaScript
 
@@ -79,7 +79,7 @@ const onFormSubmit = (event) => {
   }
 
   // send POST Layers request with form data
-  fetch('/rest/some_username/layers', {
+  fetch('/rest/some_workspace_name/layers', {
     method: 'POST',
     body: form_data,
   }).then(r => {
@@ -106,7 +106,7 @@ const onFormSubmit = (event) => {
 
       // set up resumable.js instance
       const resumable = new Resumable({
-        target: `/rest/some_username/layers/${layername}/chunk`,
+        target: `/rest/some_workspace_name/layers/${layername}/chunk`,
         query: {
           'layman_original_parameter': 'file'
         },

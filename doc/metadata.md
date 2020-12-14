@@ -52,7 +52,7 @@ Multiplicity: 1
 
 Shape: String
 
-Example: `"http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries_shp/thumbnail"`
+Example: `"http://layman_test_run_1:8000/rest/workspace1/layers/ne_110m_admin_0_countries_shp/thumbnail"`
 
 Synchronizable: yes
 
@@ -102,7 +102,7 @@ Multiplicity: 1
 
 Shape: String
 
-Example: `"http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries_shp"`
+Example: `"http://layman_test_run_1:8000/rest/workspace1/layers/ne_110m_admin_0_countries_shp"`
 
 Synchronizable: yes
 
@@ -114,7 +114,7 @@ Multiplicity: 1
 
 Shape: String
 
-Example: `"http://layman_test_run_1:8000/rest/testuser1/maps/svet"`
+Example: `"http://layman_test_run_1:8000/rest/workspace1/maps/svet"`
 
 Synchronizable: yes
 
@@ -126,7 +126,7 @@ Multiplicity: 1
 
 Shape: String
 
-Example: `"http://layman_test_run_1:8000/rest/testuser1/maps/svet/file"`
+Example: `"http://layman_test_run_1:8000/rest/workspace1/maps/svet/file"`
 
 Synchronizable: yes
 
@@ -272,7 +272,7 @@ Multiplicity: 1
 
 Shape: String
 
-Example: `"http://localhost:8600/geoserver/testuser1/ows"`
+Example: `"http://localhost:8600/geoserver/workspace1/ows"`
 
 Synchronizable: yes
 
@@ -284,7 +284,7 @@ Multiplicity: 1
 
 Shape: String
 
-Example: `"http://localhost:8600/geoserver/testuser1/ows"`
+Example: `"http://localhost:8600/geoserver/workspace1/ows"`
 
 Synchronizable: yes
 

@@ -81,7 +81,7 @@ The fetch should happen regularly during end-user session to test if authenticat
  
 
 ### Reserve Username
-Immediately after the first [fetch of user-related metadata](#fetch-user-related-metadata), *client* should check if **username** was already reserved for authenticated end-user (response to [GET Current User](../rest.md#get-current-user) contains `username`) or not (response does not contains `username`). If username was not reserved yet, it is recommended to reserve it as soon as possible, because it's required when user wants to publish any data.
+Immediately after the first [fetch of user-related metadata](#fetch-user-related-metadata), *client* should check if **username** was already reserved for authenticated end-user (response to [GET Current User](../rest.md#get-current-user) contains `username`) or not (response does not contains `username`). If username was not reserved yet, it is recommended to reserve it as soon as possible, because it's required when user wants to publish any data to his [personal workspace](../models.md#personal-workspace).
 
 Username is reserved by [PATCH Current User](../rest.md#patch-current-user). Username can be either generated automatically (this approach is used by LTC) or set manually; this is controlled by `adjust_username` parameter.
 

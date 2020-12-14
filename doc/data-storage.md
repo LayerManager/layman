@@ -19,7 +19,7 @@ Data stores:
 ### Users
 Information about users includes their names, contacts, and authentication credentials.
 
-When user [reserves his username](rest.md#patch-current-user), names, contacts and other relevant metadata are [obtained from authorization provider](oauth2/index.md#fetch-user-related-metadata) and saved to [filesystem](#filesystem), [Redis](#redis), [PostgreSQL](#postgresql), and [GeoServer](#geoserver).
+When user [reserves his username](rest.md#patch-current-user), names, contacts and other relevant metadata are [obtained from authorization provider](oauth2/index.md#fetch-user-related-metadata) and saved to [filesystem](#filesystem), [Redis](#redis), [PostgreSQL](#postgresql), and [GeoServer](#geoserver). User's [personal workspace](models.md#personal-workspace) is created too.
 
 ### Layers
 Information about [layers](models.md#layer) includes vector data and visualization.
@@ -70,9 +70,9 @@ Redis is used as temporary data store. When Layman stops, data persists in Redis
 ### Filesystem
 Data is saved to LAYMAN_DATA_DIR directory.
 
-**User directory** is created in LAYMAN_DATA_DIR directory for every user who reserved username. Name of the user directory is the same as username. User-related information is saved in user directory.
+**Workspace directory** is created in LAYMAN_DATA_DIR directory for every created [workspace](models.md#workspace). Name of the workspace directory is the same as workspace name. User-related information is saved in the root of [personal workspace](models.md#personal-workspace) directory.
 
-**Publication directory** is created inside user directory for each publication (e.g. map or layer) the user published. Name of the publication directory is the same as name of the publication (e.g. layername or mapname). Publication-related information is saved in publication directory.
+**Publication directory** is created inside workspace directory for each publication (e.g. map or layer) the user published. Name of the publication directory is the same as name of the publication (e.g. layername or mapname). Publication-related information is saved in publication directory.
 
 Filesystem is used as persistent data store, so data survives Layman restart.
  
@@ -82,8 +82,8 @@ Layman uses directly **one database** specified by [LAYMAN_PG_DBNAME](env-settin
 - vector layer data.
 
 Vector layer data is organized in schemas and tables:
-- **[User schema](https://www.postgresql.org/docs/9.1/ddl-schemas.html)** is created for every user who reserved username. Name of user schema is always the same as username.
-- **[Table](https://www.postgresql.org/docs/9.1/sql-createtable.html)** is created in user schema for each layer the user published. Name of the table is the same as layername. The table contains data from vector data files.
+- **[Workspace schema](https://www.postgresql.org/docs/9.1/ddl-schemas.html)** is created for every created [workspace](models.md#workspace). Name of workspace schema is always the same as workspace name.
+- **[Table](https://www.postgresql.org/docs/9.1/sql-createtable.html)** is created in workspace schema for each published layer. Name of the table is the same as layername. The table contains data from vector data files.
 
 **Second database** is used by Micka to store metadata records. The database including its structure is completely managed by Micka. By default, it's named `hsrs_micka6`.
 

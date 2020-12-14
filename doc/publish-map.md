@@ -18,7 +18,7 @@ Then save the file to Layman using [POST Maps](rest.md#post-maps) endpoint. Well
 - [POST Multiple Multipart-Encoded Files](https://requests.readthedocs.io/en/master/user/advanced/#post-multiple-multipart-encoded-files)
 
 In response of [POST Maps](rest.md#post-maps) you will obtain
- - `name` of the map unique within user's maps
+ - `name` of the map unique within all maps in used [workspace](models.md#workspace)
  - `url` of the map pointing to [GET Map](rest.md#get-map)
  
  Later on, you can
@@ -40,7 +40,7 @@ In QGIS, you need to implement following steps.
 First, publish each layer whose data source is local ShapeFile or GeoJSON as WMS layer using [POST Layers](rest.md#post-layers) endpoint. Do not forget to respect supported projection (see `crs` input parameter). Also set `sld` parameter to layer style, otherwise the data file will be displayed with default GeoServer style.
 
 In response of [POST Layers](rest.md#post-layers) you will obtain
- - `name` of the layer unique within user's layers
+ - `name` of the layer unique within all layers in used [workspace](models.md#workspace)
  - `url` of the layer pointing to [GET Layer](rest.md#get-layer)
  
 In response of [GET Layer](rest.md#get-layer) you will obtain among others URL of WMS endpoint of the layer (`wms/url`). Together with `name` of the layer you have now enough information to represent the original local vector file as WMS layer.

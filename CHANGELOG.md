@@ -1,27 +1,53 @@
 # Changelog
 
 ## v1.8.0
- 2020-12-??
+ 2020-12-14
 ### Upgrade requirements
-- Set environment variable [LAYMAN_AUTHN_HTTP_HEADER_NAME](doc/env-settings.md#LAYMAN_AUTHN_HTTP_HEADER_NAME). Only combination of lowercase characters and numbers must be used for the value.
+- Set environment variable [LAYMAN_AUTHN_HTTP_HEADER_NAME](doc/env-settings.md#LAYMAN_AUTHN_HTTP_HEADER_NAME) that serves as a secret. Only combination of lowercase characters and numbers must be used for the value.
+- Set environment variable [LAYMAN_PRIME_SCHEMA](doc/env-settings.md#LAYMAN_PRIME_SCHEMA). It is the name of the DB schema, so it is subject to the [restrictions given by PostgreSQL](https://www.postgresql.org/docs/9.2/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS). We recommend  value `_prime_schema` if possible.
 - Replace LAYMAN_AUTHZ_MODULE environment variable with [GRANT_CREATE_PUBLIC_WORKSPACE](doc/env-settings.md#GRANT_CREATE_PUBLIC_WORKSPACE) and [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](doc/env-settings.md#GRANT_PUBLISH_IN_PUBLIC_WORKSPACE). The following settings correspond best with behaviour of previously used LAYMAN_AUTHZ_MODULE:
-   - `LAYMAN_AUTHZ_MODULE=layman.authz.read_everyone_write_everyone` (variable to remove)
-      - `GRANT_CREATE_PUBLIC_WORKSPACE=EVERYONE` (new variable)
-      - `GRANT_PUBLISH_IN_PUBLIC_WORKSPACE=EVERYONE` (new variable)
    - `LAYMAN_AUTHZ_MODULE=layman.authz.read_everyone_write_owner` (variable to remove)
       - `GRANT_CREATE_PUBLIC_WORKSPACE=` (new variable)
       - `GRANT_PUBLISH_IN_PUBLIC_WORKSPACE=` (new variable)
+   - `LAYMAN_AUTHZ_MODULE=layman.authz.read_everyone_write_everyone` (variable to remove)
+      - `GRANT_CREATE_PUBLIC_WORKSPACE=EVERYONE` (new variable)
+      - `GRANT_PUBLISH_IN_PUBLIC_WORKSPACE=EVERYONE` (new variable)
+- Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.4.1`
+    - If you are running Layman with development settings, run also `make client-build`.
+- Starting version 1.8, each user can have zero or one [personal workspaces](doc/models.md#personal-workspace), not more (in other words, one Liferay account can be linked with zero or one personal workspaces). Layman automatically checks this at first start. If two workspace linked to single user are fond, they are reported and Layman initialization is stopped. In such case, choose which one of reported workspaces should be the only personal workspace of the user, delete authn.txt file from the other workspace, and restart layman. The other workspace becomes public.
+- If you are running Layman with development settings, run also `make timgen-build`.
 ### Changes
+- We started to strictly distinguish [workspace](doc/models.md#workspace) as place, where publications are stored, and [user](doc/models.md#user) as representation of person in Layman system. This change was reflected in following places:
+    - In REST API documentation, `username` was replaced with `workspace_name`. It's not breaking change, as it's only naming of part of URL path. 
+    - Error messages and data, as well as Layman Test Client, also distinguishes workspace and user/username.
+- Each workspace is now either [personal](doc/models.md#personal-workspace), or [public](doc/models.md#public-workspace). Personal workspace is automatically created when user reserves his username. Creation of and posting new publication to public workspaces is controlled by [GRANT_CREATE_PUBLIC_WORKSPACE](doc/env-settings.md#GRANT_CREATE_PUBLIC_WORKSPACE) and [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](doc/env-settings.md#GRANT_PUBLISH_IN_PUBLIC_WORKSPACE).
+- [#28](https://github.com/jirik/layman/issues/28) It is possible to control also [read access](doc/security.md#publication-access-rights) to any publication per user.
+   - New attribute `access_rights` added to [GET Layers](doc/rest.md#get-layers), [GET Layer](doc/rest.md#get-layer), [GET Maps](doc/rest.md#get-maps) and [GET Map](doc/rest.md#get-map) responses.
+   - New parameters `access_rights.read` and `access_rights.write` added to [POST Layers](doc/rest.md#post-layers), [PATCH Layer](doc/rest.md#patch-layer), [POST Maps](doc/rest.md#post-maps) and [PATCH Map](doc/rest.md#patch-map) requests. These new parameters are added to Test Client GUI.
+   - Default values of access rights parameters (both read and write) of newly created publications are set to current authenticated user, or EVERYONE if published by anonymous.
+- [#28](https://github.com/jirik/layman/issues/28) At first start of Layman, access rights of existing publications are set in following way:
+    - [everyone can read and only owner of the workspace can edit](doc/security.md#Authorization) publications in [personal workspaces](doc/models.md#personal-workspace)
+    - [anyone can read or edit](doc/security.md#Authorization) publications in [public workspaces](doc/models.md#public-workspace).
+    - Security rules on GeoServer on [workspace level (workspace.*.r/w)](https://docs.geoserver.org/stable/en/user/security/layer.html) are deleted and replaced with security rules on [layer level (workspace.layername.r/w)](https://docs.geoserver.org/stable/en/user/security/layer.html) according to rules on Layman side.
+- [#28](https://github.com/jirik/layman/issues/28) Only publications with [read access](doc/security.md#publication-access-rights) for EVERYONE are published to Micka as public.
+- [#28](https://github.com/jirik/layman/issues/28) New REST endpoint [GET Users](doc/rest.md#get-users) with list of all users registered in Layman. This new endpoint was added to Test Client into tab "Others".
+- [#28](https://github.com/jirik/layman/issues/28) [WMS endpoint](doc/endpoints.md#web-map-service) accepts same [authentication](doc/security.md#authentication) credentials (e.g. [OAuth2 headers](doc/oauth2/index.md#request-layman-rest-api)) as Layman REST API endpoints. It's implemented using Layman's WFS proxy. This proxy authenticates the user and send user identification to GeoServer.
+- [#161](https://github.com/jirik/layman/issues/161) New method DELETE was implemented for endpoints [DELETE Maps](doc/rest.md#delete-maps) and [DELETE Layers](doc/rest.md#delete-layers).
+- [#178](https://github.com/jirik/layman/issues/178) New attribute `screen_name` is part of response for [GET Users](doc/rest.md#get-users) and [Get Current User](doc/rest.md#get-current-user).
+- [#178](https://github.com/jirik/layman/issues/178) LifeRay attribute `screen_name` is preferred for creating username in Layman. Previously it was first part of email.
 - Attribute `groups` is no longer returned in [GET Map File](doc/rest.md#get-map-file) response.
 - [#28](https://github.com/jirik/layman/issues/28) New environment variable [LAYMAN_PRIME_SCHEMA](doc/env-settings.md#LAYMAN_PRIME_SCHEMA). 
-- [#28](https://github.com/jirik/layman/issues/28) New REST endpoint [GET Users](doc/rest.md#get-users) with list of all users registered in Layman. This new endpoint was added to Test Client into tab "Others".
-- [#28](https://github.com/jirik/layman/issues/28) New attribute `access_rights` added to [GET Layers](doc/rest.md#get-layers), [GET Layer](doc/rest.md#get-layer), [GET Maps](doc/rest.md#get-maps) and [GET Map](doc/rest.md#get-map) responses. New parameters `access_rights.read` and `access_rights.write` added to [POST Layers](doc/rest.md#post-layers), [PATCH Layer](doc/rest.md#patch-layer), [POST Maps](doc/rest.md#post-maps) and [PATCH Map](doc/rest.md#patch-map) requests. These new parameters are added to Test Client GUI.
-- [#28](https://github.com/jirik/layman/issues/28) At first start of Layman, access rights are set so [that everyone can read and only owner of the workspace can edit them](doc/security.md#Authorization) for publications in [personal workspaces](doc/models.md#personal-workspace) and [that anyone can read or edit](doc/security.md#Authorization) for publications in [public workspaces](doc/models.md#public-workspace).
-- [#28](https://github.com/jirik/layman/issues/28) Security rules on GeoServer on [workspace level (workspace.*.r/w)](https://docs.geoserver.org/stable/en/user/security/layer.html) are deleted on first Layman start and replaced with security rules on [layer level (workspace.layername.r/w)](https://docs.geoserver.org/stable/en/user/security/layer.html) according to rules on Layman side.
-- [#161](https://github.com/jirik/layman/issues/161) New method DELETE was implemented for endpoints [DELETE Maps](doc/rest.md#delete-maps) and [DELETE Layers](doc/rest.md#delete-layers).
+
+## v1.7.4
+2020-12-14
+### Changes
+- [#175](https://github.com/jirik/layman/issues/175) Fix posting new layer caused by [v1.7.3](#v173).
 
 ## v1.7.3
 2020-11-30
+### :warning: Attention :warning:
+There is a critical bug in this release, posting new layer breaks Layman: https://github.com/jirik/layman/issues/175 It's solved in [v1.7.4](#v174).
+
 ### Changes
 - If published [layer](doc/models.md#layer) has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World. This happens on [POST Layers](doc/rest.md#post-layers) and [PATCH Layer](doc/rest.md#patch-layer).
 - [#40](https://github.com/jirik/layman/issues/40) Enable to upload empty ShapeFile.
@@ -48,7 +74,7 @@
 - [#101](https://github.com/jirik/layman/issues/101) Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) from `v1.1.2` to `v1.2.0`
     - If you are running Layman with development settings, run also `make client-build`.
 ### Changes
-- [#65](https://github.com/jirik/layman/issues/65) [WFS endpoint](doc/rest.md#get-layer) accepts same [authentication](doc/security.md#authentication) credentials (e.g. [OAuth2 headers](doc/oauth2/index.md#request-layman-rest-api)) as Layman REST API endpoints. It's implemented using Layman's WFS proxy. This proxy authenticates the user and send user identification to GeoServer. In combination with changes in v1.6.0, Layman's [`read-everyone-write-owner` authorization](doc/security.md#authorization) (when active) is propagated to GeoServer and user can change only hers layers.
+- [#65](https://github.com/jirik/layman/issues/65) [WFS endpoint](doc/endpoints.md#web-feature-service) accepts same [authentication](doc/security.md#authentication) credentials (e.g. [OAuth2 headers](doc/oauth2/index.md#request-layman-rest-api)) as Layman REST API endpoints. It's implemented using Layman's WFS proxy. This proxy authenticates the user and send user identification to GeoServer. In combination with changes in v1.6.0, Layman's [`read-everyone-write-owner` authorization](doc/security.md#authorization) (when active) is propagated to GeoServer and user can change only hers layers.
 - [#88](https://github.com/jirik/layman/issues/88) Attribute **title** was added to REST endpoints [GET Layers](doc/rest.md#get-layers) and [GET Maps](doc/rest.md#get-maps).
 - [#95](https://github.com/jirik/layman/issues/95) When calling WFS Transaction, Layman will automatically create missing attributes in DB before redirecting request to GeoServer. Each missing attribute is created as `VARCHAR(1024)`. Works for WFS-T 1.0, 1.1 and 2.0, actions Insert, Update and Replace. If creating attribute fails for any reason, warning is logged and request is redirected nevertheless.
 - [#96](https://github.com/jirik/layman/issues/96) New REST API endpoint [Layer Style](doc/rest.md#get-layer-style) is created, which returns Layer default SLD. New attribute ```sld.url``` is added to [GET Layer endpoint](doc/rest.md#get-layer), where URL of Layer default SLD can be obtained. It points to above mentioned [Layer Style](doc/rest.md#get-layer-style).
