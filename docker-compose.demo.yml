@@ -10,7 +10,7 @@ services:
            - UID_GID
       image: layman:latest
       user: ${UID_GID}
-      command: bash -c "python3 src/layman_flush_redis.py && python3 src/wait_for_deps.py && cd src && gunicorn --timeout 120 -w 2 -b 0.0.0.0:8000 layman:app"
+      command: bash -c "python3 src/layman_flush_redis.py && python3 src/wait_for_deps.py && cd src && gunicorn --timeout 300 -w 2 -b 0.0.0.0:8000 layman:app"
       env_file:
          - .env
       extra_hosts:
