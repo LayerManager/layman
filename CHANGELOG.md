@@ -1,7 +1,15 @@
 # Changelog
 
+## v1.7.4
+2020-12-14
+### Changes
+- [#175](https://github.com/jirik/layman/issues/175) Fix posting new layer caused by [v1.7.3](#v173).
+
 ## v1.7.3
 2020-11-30
+### :warning: Attention :warning:
+There is a critical bug in this release, posting new layer breaks Layman: https://github.com/jirik/layman/issues/175 It's solved in [v1.7.4](#v174).
+
 ### Changes
 - If published [layer](doc/models.md#layer) has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World. This happens on [POST Layers](doc/rest.md#post-layers) and [PATCH Layer](doc/rest.md#patch-layer).
 - [#40](https://github.com/jirik/layman/issues/40) Enable to upload empty ShapeFile.
