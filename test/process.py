@@ -82,19 +82,12 @@ def liferay_mock():
     server.join()
 
 
-def clear():
-    while len(SUBPROCESSES) > 0:
-        proc = next(iter(SUBPROCESSES))
-        stop_process(proc)
-
-
 @pytest.fixture(scope='session', autouse=True)
-def ensure_layman_session():  # TODO mám podezření že se to nikdy nepouští. Potřebujeme to kvůli clear() na konci
+def ensure_layman_session():
     print(f'\nensure_layman_session is starting')
     ensure_layman_function(LAYMAN_DEFAULT_SETTINGS)
     yield
-    clear()
-    global LAYMAN_START_COUNT
+    stop_process(list(SUBPROCESSES))
     print(f'\nensure_layman_session is ending - {LAYMAN_START_COUNT}')
 
 
@@ -104,7 +97,7 @@ def ensure_layman_function(env_vars):
     global LAYMAN_SETTING
     if LAYMAN_SETTING != env_vars:
         print(f'\nReally starting Layman LAYMAN_SETTING={LAYMAN_SETTING}, settings={env_vars}')
-        clear()  # Tady by bylo asi lepší volat stop_process
+        stop_process(list(SUBPROCESSES))
         start_layman(env_vars)
         LAYMAN_SETTING = env_vars
 
@@ -114,14 +107,13 @@ def ensure_layman():
     print(f'\nensure_layman_fixture is starting - {LAYMAN_START_COUNT}')
     ensure_layman_function(LAYMAN_DEFAULT_SETTINGS)
     yield
-    print(f'\nensure_layman_fixture is ending - {LAYMAN_START_COUNT}')
 
 
 def start_layman(env_vars=None):
-    # first flush redis DB
-    print(f'\nstart_layman: Really starting Layman')
     global LAYMAN_START_COUNT
     LAYMAN_START_COUNT = LAYMAN_START_COUNT + 1
+    print(f'\nstart_layman: Really starting Layman for the {LAYMAN_START_COUNT}th time.')
+    # first flush redis DB
     LAYMAN_REDIS.flushdb()
     port = settings.LAYMAN_SERVER_NAME.split(':')[1]
     env_vars = env_vars or {}
@@ -144,12 +136,12 @@ def start_layman(env_vars=None):
 
     SUBPROCESSES.add(celery_process)
 
-    return layman_process, celery_process  # TODO vracení tuple se mi zdá nepraktické, navrhuji buď seznam nebo slovník
+    return [layman_process, celery_process, ]
 
 
 def stop_process(process):
-    if not isinstance(process, tuple):
-        process = (process,)
+    if not isinstance(process, list):
+        process = {process, }
     for proc in process:
         proc.kill()
         SUBPROCESSES.remove(proc)
