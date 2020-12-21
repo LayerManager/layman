@@ -15,7 +15,7 @@ from test import util
 logger = logging.getLogger(__name__)
 
 SUBPROCESSES = set()
-LIFERAY_PORT = 8020
+LIFERAY_PORT = 8030
 
 AUTHN_INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection?is_active=true"
 
@@ -35,7 +35,7 @@ LAYMAN_DEFAULT_SETTINGS = AUTHN_SETTINGS
 LAYMAN_START_COUNT = 0
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def liferay_mock():
     server = Process(target=run, kwargs={
         'env_vars': {

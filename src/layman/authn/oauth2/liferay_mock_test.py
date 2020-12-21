@@ -12,8 +12,8 @@ del sys.modules['layman']
 from test.mock.liferay import run
 from .util import TOKEN_HEADER, ISS_URL_HEADER
 
-PORT1 = 8020
-PORT2 = 8021
+PORT1 = 8031
+PORT2 = 8032
 
 
 def create_server(port, env='development'):
