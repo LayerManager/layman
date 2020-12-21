@@ -1212,3 +1212,4 @@ def test_layer_with_different_geometry():
                       auth=settings.LAYMAN_GS_AUTH
                       )
     assert r.status_code == 200, f"HTTP Error {r.status_code}\n{r.text}"
+    process_client.delete_layer(username, layername)
