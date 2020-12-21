@@ -80,7 +80,7 @@ def publish_layer(username,
                   ):
     title = title or layername
     headers = headers or {}
-    file_paths = file_paths or ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
+    file_paths = file_paths or ['sample/layman.layer/small_layer.geojson']
 
     with app.app_context():
         r_url = url_for('rest_layers.post', username=username)
@@ -284,7 +284,7 @@ def publish_map(username,
                 title=None
                 ):
     headers = headers or {}
-    file_paths = file_paths or ['sample/layman.map/full.json', ]
+    file_paths = file_paths or ['sample/layman.map/small_map.json', ]
 
     with app.app_context():
         r_url = url_for('rest_maps.post', username=username)
