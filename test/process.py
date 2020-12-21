@@ -30,6 +30,10 @@ AUTHN_SETTINGS = {
     'OAUTH2_LIFERAY_USER_PROFILE_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile",
 }
 
+LAYMAN_SETTING = {}
+LAYMAN_DEFAULT_SETTINGS = AUTHN_SETTINGS
+LAYMAN_START_COUNT = 0
+
 
 @pytest.fixture(scope="module")
 def liferay_mock():
@@ -78,24 +82,33 @@ def liferay_mock():
     server.join()
 
 
-@pytest.fixture(scope="module", autouse=True)
-def clear():
+@pytest.fixture(scope='session', autouse=True)
+def ensure_layman_session():
+    print(f'\n\nEnsure_layman_session is starting\n\n')
     yield
-    while len(SUBPROCESSES) > 0:
-        proc = next(iter(SUBPROCESSES))
-        stop_process(proc)
+    stop_process(list(SUBPROCESSES))
+    print(f'\n\nEnsure_layman_session is ending - {LAYMAN_START_COUNT}\n\n')
 
 
-@pytest.fixture(scope="module")
+def ensure_layman_function(env_vars):
+    global LAYMAN_SETTING
+    if LAYMAN_SETTING != env_vars:
+        print(f'\nReally starting Layman LAYMAN_SETTING={LAYMAN_SETTING}, settings={env_vars}')
+        stop_process(list(SUBPROCESSES))
+        start_layman(env_vars)
+        LAYMAN_SETTING = env_vars
+
+
+@pytest.fixture(scope="function")
 def ensure_layman():
-    print(f'\nEnsure layman is starting')
-    processes = start_layman(AUTHN_SETTINGS)
+    ensure_layman_function(LAYMAN_DEFAULT_SETTINGS)
     yield
-    stop_process(processes)
-    print(f'\nEnsure layman is ending')
 
 
 def start_layman(env_vars=None):
+    global LAYMAN_START_COUNT
+    LAYMAN_START_COUNT = LAYMAN_START_COUNT + 1
+    print(f'\nstart_layman: Really starting Layman for the {LAYMAN_START_COUNT}th time.')
     # first flush redis DB
     LAYMAN_REDIS.flushdb()
     port = settings.LAYMAN_SERVER_NAME.split(':')[1]
@@ -119,12 +132,12 @@ def start_layman(env_vars=None):
 
     SUBPROCESSES.add(celery_process)
 
-    return layman_process, celery_process
+    return [layman_process, celery_process, ]
 
 
 def stop_process(process):
-    if not isinstance(process, tuple):
-        process = (process,)
+    if not isinstance(process, list):
+        process = {process, }
     for proc in process:
         proc.kill()
         SUBPROCESSES.remove(proc)
