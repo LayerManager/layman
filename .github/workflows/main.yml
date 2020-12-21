@@ -28,3 +28,25 @@ jobs:
       - name: Run tests
         run: |
           make test
+
+      - name: Save logs to files
+        if: failure()
+        run: |
+          mkdir logs
+          docker logs layman_celery_worker_test_1 > logs/log_celery_worker.txt
+          docker logs timgen > logs/log_timgen.txt
+          docker logs micka > logs/log_micka.txt
+
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test_logs
+          path: logs
+
+      - name: Upload artifacts
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test_artifacts
+          path: tmp/artifacts/
