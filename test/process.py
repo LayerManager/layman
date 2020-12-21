@@ -15,7 +15,7 @@ from test import util
 logger = logging.getLogger(__name__)
 
 SUBPROCESSES = set()
-LIFERAY_PORT = 8020
+LIFERAY_PORT = 8030
 
 AUTHN_INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection?is_active=true"
 
@@ -35,7 +35,7 @@ LAYMAN_DEFAULT_SETTINGS = AUTHN_SETTINGS
 LAYMAN_START_COUNT = 0
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def liferay_mock():
     server = Process(target=run, kwargs={
         'env_vars': {
@@ -84,16 +84,13 @@ def liferay_mock():
 
 @pytest.fixture(scope='session', autouse=True)
 def ensure_layman_session():
-    print(f'\nensure_layman_session is starting')
-    ensure_layman_function(LAYMAN_DEFAULT_SETTINGS)
+    print(f'\n\nEnsure_layman_session is starting\n\n')
     yield
     stop_process(list(SUBPROCESSES))
-    print(f'\nensure_layman_session is ending - {LAYMAN_START_COUNT}')
+    print(f'\n\nEnsure_layman_session is ending - {LAYMAN_START_COUNT}\n\n')
 
 
-@pytest.mark.usefixtures('ensure_layman_session')
 def ensure_layman_function(env_vars):
-    print(f'Ensure Layman is starting with settings={env_vars}')
     global LAYMAN_SETTING
     if LAYMAN_SETTING != env_vars:
         print(f'\nReally starting Layman LAYMAN_SETTING={LAYMAN_SETTING}, settings={env_vars}')
@@ -104,7 +101,6 @@ def ensure_layman_function(env_vars):
 
 @pytest.fixture(scope="function")
 def ensure_layman():
-    print(f'\nensure_layman_fixture is starting - {LAYMAN_START_COUNT}')
     ensure_layman_function(LAYMAN_DEFAULT_SETTINGS)
     yield
 

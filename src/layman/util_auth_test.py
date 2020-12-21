@@ -16,7 +16,7 @@ user_owner = 'test_get_publication_info_user'
 user_without_rights = 'test_get_publication_info_without_user'
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def prep_test_get_publication_info():
 
     auth_header_owner = process_client.get_authz_headers(user_owner)
