@@ -24,6 +24,9 @@ def authenticate():
     user = None
     iss_url = request.headers.get(ISS_URL_HEADER, None)
     authz_header = request.headers.get(TOKEN_HEADER, None)
+    if authz_header is not None and iss_url is None and len(_get_provider_modules()) == 1:
+        iss_url = _get_provider_modules()[0].AUTH_URLS[0]
+        current_app.logger.info(f"\nusing default iss_url={iss_url}")
     if iss_url is None and authz_header is None:
         return user
 
