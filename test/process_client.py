@@ -2,6 +2,8 @@ import time
 import requests
 import os
 import logging
+from functools import partial
+from collections import namedtuple
 
 from layman import settings, app
 from layman.util import url_for
@@ -26,32 +28,36 @@ PUBLICATION_TYPES = [
 ]
 
 
-def get_post_publications_method(publ_type):
-    return {
-        LAYER_TYPE: publish_layer,
-        MAP_TYPE: publish_map,
-    }[publ_type]
-
-
-def get_patch_publication_method(publ_type):
-    return {
-        LAYER_TYPE: patch_layer,
-        MAP_TYPE: patch_map,
-    }[publ_type]
-
-
-def get_get_publication_method(publ_type):
-    return {
-        LAYER_TYPE: get_layer,
-        MAP_TYPE: get_map,
-    }[publ_type]
-
-
-def get_delete_publication_method(publ_type):
-    return {
-        LAYER_TYPE: delete_layer,
-        MAP_TYPE: delete_map,
-    }[publ_type]
+PublicationTypeDef = namedtuple('PublicationTypeDef', ['url_param_name',
+                                                       'post_url',
+                                                       'patch_url',
+                                                       'get_list_url',
+                                                       'get_url',
+                                                       'delete_url',
+                                                       'delete_multi_url',
+                                                       'keys_to_check',
+                                                       'source_path'])
+PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
+                                                      'rest_maps.post',
+                                                      'rest_map.patch',
+                                                      'rest_maps.get',
+                                                      'rest_map.get',
+                                                      'rest_map.delete_map',
+                                                      'rest_maps.delete',
+                                                      map_keys_to_check,
+                                                      'sample/layman.map/small_map.json',
+                                                      ),
+                         LAYER_TYPE: PublicationTypeDef('layername',
+                                                        'rest_layers.post',
+                                                        'rest_layer.patch',
+                                                        'rest_layers.get',
+                                                        'rest_layer.get',
+                                                        'rest_layer.delete_layer',
+                                                        'rest_layers.delete',
+                                                        layer_keys_to_check,
+                                                        'sample/layman.layer/small_layer.geojson',
+                                                        ),
+                         }
 
 
 def wait_for_rest(url, max_attempts, sleeping_time, keys_to_check, headers=None):
@@ -70,66 +76,23 @@ def wait_for_rest(url, max_attempts, sleeping_time, keys_to_check, headers=None)
             raise Exception('Max attempts reached!')
 
 
-def publish_layer(username,
-                  layername,
-                  file_paths=None,
-                  headers=None,
-                  access_rights=None,
-                  title=None,
-                  assert_status=True,
-                  ):
-    title = title or layername
-    headers = headers or {}
-    file_paths = file_paths or ['sample/layman.layer/small_layer.geojson']
-
-    with app.app_context():
-        r_url = url_for('rest_layers.post', username=username)
-
-    for fp in file_paths:
-        assert os.path.isfile(fp)
-    files = []
-    try:
-        files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
-        data = {'name': layername,
-                'title': title,
-                }
-        if access_rights and access_rights.get('read'):
-            data["access_rights.read"] = access_rights['read']
-        if access_rights and access_rights.get('write'):
-            data["access_rights.write"] = access_rights['write']
-        r = requests.post(r_url,
-                          files=files,
-                          data=data,
-                          headers=headers)
-        if assert_status:
-            assert r.status_code == 200, r.text
-
-    finally:
-        for fp in files:
-            fp[1][1].close()
-
-    with app.app_context():
-        url = url_for('rest_layer.get', username=username, layername=layername)
-    if assert_status:
-        wait_for_rest(url, 30, 0.5, layer_keys_to_check, headers=headers)
-    else:
-        return r
-    return layername
-
-
-def patch_layer(username,
-                layername,
-                file_paths=None,
-                headers=None,
-                access_rights=None,
-                title=None,
-                assert_status=True,
-                ):
+def patch_publication(publication_type,
+                      username,
+                      name,
+                      file_paths=None,
+                      headers=None,
+                      access_rights=None,
+                      title=None,
+                      assert_status=True,
+                      ):
     headers = headers or {}
     file_paths = file_paths or []
+    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
-        r_url = url_for('rest_layer.patch', username=username, layername=layername)
+        r_url = url_for(publication_type_def.patch_url,
+                        username=username,
+                        **{publication_type_def.url_param_name: name})
 
     for fp in file_paths:
         assert os.path.isfile(fp)
@@ -155,55 +118,131 @@ def patch_layer(username,
             fp[1][1].close()
 
     with app.app_context():
-        url = url_for('rest_layer.get', username=username, layername=layername)
+        url = url_for(publication_type_def.get_url,
+                      username=username,
+                      **{publication_type_def.url_param_name: name})
     if assert_status:
-        wait_for_rest(url, 30, 0.5, layer_keys_to_check, headers=headers)
+        wait_for_rest(url, 30, 0.5, publication_type_def.keys_to_check, headers=headers)
     wfs.clear_cache(username)
     wms.clear_cache(username)
     if not assert_status:
         return r
-    return layername
+    return name
 
 
-def patch_map(username,
-              mapname,
-              headers=None,
-              access_rights=None,
-              assert_status=True,
-              ):
+def ensure_publication(publication_type,
+                       username,
+                       name,
+                       headers=None,
+                       access_rights=None,
+                       ):
     headers = headers or {}
 
+    r = get_publications(username, headers=headers, assert_status=False)
+    publication_obj = next((publication for publication in r.json() if publication['name'] == name), None)
+    if r.status_code == 200 and publication_obj:
+        patch_needed = False
+        if access_rights is not None:
+            if 'read' in access_rights and set(access_rights['read'].split(',')) != set(publication_obj['access_rights']['read']):
+                patch_needed = True
+            if 'write' in access_rights and set(access_rights['write'].split(',')) != set(publication_obj['access_rights']['write']):
+                patch_needed = True
+        if patch_needed:
+            patch_publication(username, name, access_rights=access_rights, headers=headers)
+    else:
+        publish_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
+
+
+def publish_publication(publication_type,
+                        username,
+                        name,
+                        file_paths=None,
+                        headers=None,
+                        access_rights=None,
+                        title=None,
+                        assert_status=True,
+                        ):
+    title = title or name
+    headers = headers or {}
+    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
+    file_paths = file_paths or [publication_type_def.source_path, ]
+
     with app.app_context():
-        r_url = url_for('rest_map.patch', username=username, mapname=mapname)
+        r_url = url_for(publication_type_def.post_url, username=username)
 
-    data = dict()
-    if access_rights and access_rights.get('read'):
-        data["access_rights.read"] = access_rights['read']
-    if access_rights and access_rights.get('write'):
-        data["access_rights.write"] = access_rights['write']
+    for fp in file_paths:
+        assert os.path.isfile(fp)
+    files = []
+    try:
+        files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
+        data = {'name': name,
+                'title': title,
+                }
+        if access_rights and access_rights.get('read'):
+            data["access_rights.read"] = access_rights['read']
+        if access_rights and access_rights.get('write'):
+            data["access_rights.write"] = access_rights['write']
+        r = requests.post(r_url,
+                          files=files,
+                          data=data,
+                          headers=headers)
+        if assert_status:
+            assert r.status_code == 200, r.text
 
-    r = requests.patch(r_url,
-                       headers=headers,
-                       data=data)
+    finally:
+        for fp in files:
+            fp[1][1].close()
+
+    with app.app_context():
+        url = url_for(publication_type_def.get_url,
+                      username=username,
+                      **{publication_type_def.url_param_name: name})
+    if assert_status:
+        wait_for_rest(url, 30, 0.5, publication_type_def.keys_to_check, headers=headers)
+    else:
+        return r
+    return name
+
+
+def get_publications(publication_type, workspace, headers=None, assert_status=True,):
+    headers = headers or {}
+    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
+
+    with app.app_context():
+        r_url = url_for(publication_type_def.get_list_url, username=workspace)
+    r = requests.get(r_url, headers=headers)
     if assert_status:
         assert r.status_code == 200, r.text
-
-    with app.app_context():
-        url = url_for('rest_map.get', username=username, mapname=mapname)
-    if assert_status:
-        wait_for_rest(url, 30, 0.5, map_keys_to_check, headers=headers)
-    wfs.clear_cache(username)
-    wms.clear_cache(username)
-    if not assert_status:
+        return r.json()
+    else:
         return r
-    return mapname
 
 
-def delete_layer(username, layername, headers=None, assert_status=True):
+def get_publication(publication_type, username, name, headers=None, assert_status=True,):
     headers = headers or {}
+    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
-        r_url = url_for('rest_layer.delete_layer', username=username, layername=layername)
+        r_url = url_for(publication_type_def.get_url,
+                        username=username,
+                        **{publication_type_def.url_param_name: name})
+    r = requests.get(r_url, headers=headers)
+    if assert_status:
+        assert r.status_code == 200, r.text
+        return r.json()
+    else:
+        return r
+
+
+def delete_publication(publication_type, username, name, headers=None, assert_status=True):
+    headers = headers or {}
+    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
+
+    with app.app_context():
+        r_url = url_for(publication_type_def.delete_url,
+                        username=username,
+                        **{publication_type_def.url_param_name: name})
+
     r = requests.delete(r_url, headers=headers)
     if assert_status:
         assert r.status_code == 200, r.text
@@ -215,119 +254,40 @@ def delete_layer(username, layername, headers=None, assert_status=True):
     return result
 
 
-def get_layer(username, layername, headers=None, assert_status=True,):
+def delete_publications(publication_type, username, headers=None, assert_status=True):
     headers = headers or {}
+    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
-        r_url = url_for('rest_layer.get', username=username, layername=layername)
-    r = requests.get(r_url, headers=headers)
-    if assert_status:
-        assert r.status_code == 200, r.text
-        return r.json()
-    else:
-        return r
-
-
-def get_layers(workspace, headers=None, assert_status=True,):
-    headers = headers or {}
-
-    with app.app_context():
-        r_url = url_for('rest_layers.get', username=workspace)
-    r = requests.get(r_url, headers=headers)
-    if assert_status:
-        assert r.status_code == 200, r.text
-        return r.json()
-    else:
-        return r
-
-
-def get_map(username, mapname, headers=None, assert_status=True, ):
-    headers = headers or {}
-
-    with app.app_context():
-        r_url = url_for('rest_map.get', username=username, mapname=mapname)
-    r = requests.get(r_url, headers=headers)
-    if assert_status:
-        assert r.status_code == 200, r.text
-        return r.json()
-    else:
-        return r
-
-
-def ensure_layer(username,
-                 layername,
-                 headers=None,
-                 access_rights=None,
-                 ):
-    headers = headers or {}
-    r = get_layers(username, headers=headers, assert_status=False)
-    layer_obj = next((layer for layer in r.json() if layer['name'] == layername), None)
-    if r.status_code == 200 and layer_obj:
-        patch_needed = False
-        if access_rights is not None:
-            if 'read' in access_rights and set(access_rights['read'].split(',')) != set(layer_obj['access_rights']['read']):
-                patch_needed = True
-            if 'write' in access_rights and set(access_rights['write'].split(',')) != set(layer_obj['access_rights']['write']):
-                patch_needed = True
-        if patch_needed:
-            patch_layer(username, layername, access_rights=access_rights, headers=headers)
-    else:
-        publish_layer(username, layername, access_rights=access_rights, headers=headers)
-
-
-def publish_map(username,
-                mapname,
-                file_paths=None,
-                headers=None,
-                access_rights=None,
-                assert_status=True,
-                title=None
-                ):
-    headers = headers or {}
-    file_paths = file_paths or ['sample/layman.map/small_map.json', ]
-
-    with app.app_context():
-        r_url = url_for('rest_maps.post', username=username)
-
-    for fp in file_paths:
-        assert os.path.isfile(fp)
-    files = []
-    try:
-        files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
-        data = {'name': mapname, }
-        if access_rights and access_rights.get('read'):
-            data["access_rights.read"] = access_rights['read']
-        if access_rights and access_rights.get('write'):
-            data["access_rights.write"] = access_rights['write']
-        if title:
-            data['title'] = title
-        r = requests.post(r_url,
-                          files=files,
-                          data=data,
-                          headers=headers)
-        if assert_status:
-            assert r.status_code == 200, r.text
-    finally:
-        for fp in files:
-            fp[1][1].close()
-
-    with app.app_context():
-        url = url_for('rest_map.get', username=username, mapname=mapname)
-    if assert_status:
-        wait_for_rest(url, 30, 0.5, map_keys_to_check, headers=headers)
-    else:
-        return r
-    return mapname
-
-
-def delete_map(username, mapname, headers=None):
-    headers = headers or {}
-
-    with app.app_context():
-        r_url = url_for('rest_map.delete_map', username=username, mapname=mapname)
+        r_url = url_for(publication_type_def.delete_multi_url,
+                        username=username,
+                        )
 
     r = requests.delete(r_url, headers=headers)
-    assert r.status_code == 200, r.text
+    if assert_status:
+        assert r.status_code == 200, r.text
+        result = r.json()
+    else:
+        result = r
+    wfs.clear_cache(username)
+    wms.clear_cache(username)
+    return result
+
+
+ensure_layer = partial(ensure_publication, LAYER_TYPE)
+ensure_map = partial(ensure_publication, MAP_TYPE)
+publish_map = partial(publish_publication, MAP_TYPE)
+publish_layer = partial(publish_publication, LAYER_TYPE)
+patch_map = partial(patch_publication, MAP_TYPE)
+patch_layer = partial(patch_publication, LAYER_TYPE)
+get_map = partial(get_publication, MAP_TYPE)
+get_layer = partial(get_publication, LAYER_TYPE)
+get_maps = partial(get_publications, MAP_TYPE)
+get_layers = partial(get_publications, LAYER_TYPE)
+delete_map = partial(delete_publication, MAP_TYPE)
+delete_layer = partial(delete_publication, LAYER_TYPE)
+delete_maps = partial(delete_publications, MAP_TYPE)
+delete_layers = partial(delete_publications, LAYER_TYPE)
 
 
 def assert_user_layers(username, layernames, headers=None):
