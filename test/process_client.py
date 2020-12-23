@@ -234,6 +234,18 @@ def get_publication(publication_type, username, name, headers=None, assert_statu
         return r
 
 
+def finish_delete(username, url, headers, assert_status):
+    r = requests.delete(url, headers=headers)
+    if assert_status:
+        assert r.status_code == 200, r.text
+        result = r.json()
+    else:
+        result = r
+    wfs.clear_cache(username)
+    wms.clear_cache(username)
+    return result
+
+
 def delete_publication(publication_type, username, name, headers=None, assert_status=True):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
@@ -243,15 +255,7 @@ def delete_publication(publication_type, username, name, headers=None, assert_st
                         username=username,
                         **{publication_type_def.url_param_name: name})
 
-    r = requests.delete(r_url, headers=headers)
-    if assert_status:
-        assert r.status_code == 200, r.text
-        result = r.json()
-    else:
-        result = r
-    wfs.clear_cache(username)
-    wms.clear_cache(username)
-    return result
+    return finish_delete(username, r_url, headers, assert_status)
 
 
 def delete_publications(publication_type, username, headers=None, assert_status=True):
@@ -263,15 +267,7 @@ def delete_publications(publication_type, username, headers=None, assert_status=
                         username=username,
                         )
 
-    r = requests.delete(r_url, headers=headers)
-    if assert_status:
-        assert r.status_code == 200, r.text
-        result = r.json()
-    else:
-        result = r
-    wfs.clear_cache(username)
-    wms.clear_cache(username)
-    return result
+    return finish_delete(username, r_url, headers, assert_status)
 
 
 ensure_layer = partial(ensure_publication, LAYER_TYPE)
