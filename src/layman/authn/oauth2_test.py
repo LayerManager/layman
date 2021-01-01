@@ -115,18 +115,6 @@ def test_two_clients():
 
 
 @pytest.mark.usefixtures('app_context')
-def test_no_iss_url_header(client):
-    username = 'testuser1'
-    rv = client.get(url_for('rest_layers.get', username=username), headers={
-        f'{TOKEN_HEADER}': 'abc'
-    })
-    assert rv.status_code == 403
-    resp_json = rv.get_json()
-    assert resp_json['code'] == 32
-    assert resp_json['sub_code'] == 1
-
-
-@pytest.mark.usefixtures('app_context')
 def test_no_auth_header(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers={
@@ -138,91 +126,124 @@ def test_no_auth_header(client):
     assert resp_json['sub_code'] == 2
 
 
-@pytest.mark.usefixtures('app_context')
-def test_auth_header_one_part(client):
-    username = 'testuser1'
-    rv = client.get(url_for('rest_layers.get', username=username), headers={
+@pytest.mark.parametrize('headers', [
+    {
         f'{ISS_URL_HEADER}': 'abc',
         f'{TOKEN_HEADER}': 'abc',
-    })
+    }, {
+        f'{TOKEN_HEADER}': 'abc',
+    }
+])
+@pytest.mark.usefixtures('app_context')
+def test_auth_header_one_part(client, headers):
+    username = 'testuser1'
+    rv = client.get(url_for('rest_layers.get', username=username), headers=headers)
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
     assert resp_json['sub_code'] == 3
 
 
-@pytest.mark.usefixtures('app_context')
-def test_auth_header_bad_first_part(client):
-    username = 'testuser1'
-    rv = client.get(url_for('rest_layers.get', username=username), headers={
+@pytest.mark.parametrize('headers', [
+    {
         f'{ISS_URL_HEADER}': 'abc',
         f'{TOKEN_HEADER}': 'abc abc',
-    })
+    }, {
+        f'{TOKEN_HEADER}': 'abc abc',
+    }
+])
+@pytest.mark.usefixtures('app_context')
+def test_auth_header_bad_first_part(client, headers):
+    username = 'testuser1'
+    rv = client.get(url_for('rest_layers.get', username=username), headers=headers)
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
     assert resp_json['sub_code'] == 4
 
 
-@pytest.mark.usefixtures('app_context')
-def test_auth_header_no_access_token(client):
-    username = 'testuser1'
-    rv = client.get(url_for('rest_layers.get', username=username), headers={
+@pytest.mark.parametrize('headers', [
+    {
         f'{ISS_URL_HEADER}': 'abc',
         f'{TOKEN_HEADER}': 'Bearer ',
-    })
+    }, {
+        f'{TOKEN_HEADER}': 'Bearer ',
+    }
+])
+@pytest.mark.usefixtures('app_context')
+def test_auth_header_no_access_token(client, headers):
+    username = 'testuser1'
+    rv = client.get(url_for('rest_layers.get', username=username), headers=headers)
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
     assert resp_json['sub_code'] == 5
 
 
-@pytest.mark.usefixtures('app_context')
-def test_no_provider_found(client):
-    username = 'testuser1'
-    rv = client.get(url_for('rest_layers.get', username=username), headers={
+@pytest.mark.parametrize('headers', [
+    {
         f'{ISS_URL_HEADER}': 'abc',
         f'{TOKEN_HEADER}': 'Bearer abc',
-    })
+    }
+])
+@pytest.mark.usefixtures('app_context')
+def test_no_provider_found(client, headers):
+    username = 'testuser1'
+    rv = client.get(url_for('rest_layers.get', username=username), headers=headers)
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
     assert resp_json['sub_code'] == 6
 
 
-@pytest.mark.usefixtures('app_context', 'unexisting_introspection_url')
-def test_unexisting_introspection_url(client):
-    username = 'testuser1'
-    rv = client.get(url_for('rest_layers.get', username=username), headers={
+@pytest.mark.parametrize('headers', [
+    {
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
-    })
+    }, {
+        f'{TOKEN_HEADER}': 'Bearer abc',
+    }
+])
+@pytest.mark.usefixtures('app_context', 'unexisting_introspection_url')
+def test_unexisting_introspection_url(client, headers):
+    username = 'testuser1'
+    rv = client.get(url_for('rest_layers.get', username=username), headers=headers)
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
     assert resp_json['sub_code'] == 8
 
 
-@pytest.mark.usefixtures('app_context', 'inactive_token_introspection_url', 'server')
-def test_token_inactive(client):
-    username = 'testuser1'
-    rv = client.get(url_for('rest_layers.get', username=username), headers={
+@pytest.mark.parametrize('headers', [
+    {
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
-    })
+    }, {
+        f'{TOKEN_HEADER}': 'Bearer abc',
+    }
+])
+@pytest.mark.usefixtures('app_context', 'inactive_token_introspection_url', 'server')
+def test_token_inactive(client, headers):
+    username = 'testuser1'
+    rv = client.get(url_for('rest_layers.get', username=username), headers=headers)
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
     assert resp_json['sub_code'] == 9
 
 
-@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'server')
-def test_token_active(client):
-    username = 'testuser1'
-    rv = client.get(url_for('rest_layers.get', username=username), headers={
+@pytest.mark.parametrize('headers', [
+    {
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
-    })
+    }, {
+        f'{TOKEN_HEADER}': 'Bearer abc',
+    }
+])
+@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'server')
+def test_token_active(client, headers):
+    username = 'testuser1'
+    rv = client.get(url_for('rest_layers.get', username=username), headers=headers)
     assert rv.status_code == 404
     resp_json = rv.get_json()
     assert resp_json['code'] == 40
