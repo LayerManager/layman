@@ -130,6 +130,10 @@ def patch_publication(publication_type,
     return name
 
 
+patch_map = partial(patch_publication, MAP_TYPE)
+patch_layer = partial(patch_publication, LAYER_TYPE)
+
+
 def ensure_publication(publication_type,
                        username,
                        name,
@@ -138,7 +142,7 @@ def ensure_publication(publication_type,
                        ):
     headers = headers or {}
 
-    r = get_publications(username, headers=headers, assert_status=False)
+    r = get_publications(publication_type, username, headers=headers, assert_status=False)
     publication_obj = next((publication for publication in r.json() if publication['name'] == name), None)
     if r.status_code == 200 and publication_obj:
         patch_needed = False
@@ -148,9 +152,13 @@ def ensure_publication(publication_type,
             if 'write' in access_rights and set(access_rights['write'].split(',')) != set(publication_obj['access_rights']['write']):
                 patch_needed = True
         if patch_needed:
-            patch_publication(username, name, access_rights=access_rights, headers=headers)
+            patch_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
     else:
         publish_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
+
+
+ensure_layer = partial(ensure_publication, LAYER_TYPE)
+ensure_map = partial(ensure_publication, MAP_TYPE)
 
 
 def publish_publication(publication_type,
@@ -204,6 +212,10 @@ def publish_publication(publication_type,
     return name
 
 
+publish_map = partial(publish_publication, MAP_TYPE)
+publish_layer = partial(publish_publication, LAYER_TYPE)
+
+
 def get_publications(publication_type, workspace, headers=None, assert_status=True,):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
@@ -216,6 +228,10 @@ def get_publications(publication_type, workspace, headers=None, assert_status=Tr
         return r.json()
     else:
         return r
+
+
+get_maps = partial(get_publications, MAP_TYPE)
+get_layers = partial(get_publications, LAYER_TYPE)
 
 
 def get_publication(publication_type, username, name, headers=None, assert_status=True,):
@@ -232,6 +248,10 @@ def get_publication(publication_type, username, name, headers=None, assert_statu
         return r.json()
     else:
         return r
+
+
+get_map = partial(get_publication, MAP_TYPE)
+get_layer = partial(get_publication, LAYER_TYPE)
 
 
 def finish_delete(username, url, headers, assert_status):
@@ -258,6 +278,10 @@ def delete_publication(publication_type, username, name, headers=None, assert_st
     return finish_delete(username, r_url, headers, assert_status)
 
 
+delete_map = partial(delete_publication, MAP_TYPE)
+delete_layer = partial(delete_publication, LAYER_TYPE)
+
+
 def delete_publications(publication_type, username, headers=None, assert_status=True):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
@@ -270,38 +294,19 @@ def delete_publications(publication_type, username, headers=None, assert_status=
     return finish_delete(username, r_url, headers, assert_status)
 
 
-ensure_layer = partial(ensure_publication, LAYER_TYPE)
-ensure_map = partial(ensure_publication, MAP_TYPE)
-publish_map = partial(publish_publication, MAP_TYPE)
-publish_layer = partial(publish_publication, LAYER_TYPE)
-patch_map = partial(patch_publication, MAP_TYPE)
-patch_layer = partial(patch_publication, LAYER_TYPE)
-get_map = partial(get_publication, MAP_TYPE)
-get_layer = partial(get_publication, LAYER_TYPE)
-get_maps = partial(get_publications, MAP_TYPE)
-get_layers = partial(get_publications, LAYER_TYPE)
-delete_map = partial(delete_publication, MAP_TYPE)
-delete_layer = partial(delete_publication, LAYER_TYPE)
 delete_maps = partial(delete_publications, MAP_TYPE)
 delete_layers = partial(delete_publications, LAYER_TYPE)
 
 
-def assert_user_layers(username, layernames, headers=None):
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
-    r_url = f"{rest_url}/{username}/layers"
-    r = requests.get(r_url, headers=headers)
-    assert r.status_code == 200, f"r.status_code={r.status_code}\nr.text={r.text}"
-    layman_names = [li['name'] for li in r.json()]
-    assert set(layman_names) == set(layernames), f"Layers {layernames} not equal to {r.text}"
+def assert_user_publications(publication_type, workspace, expected_publication_names, headers=None):
+    r = get_publications(publication_type, workspace, headers)
+    publication_names = [li['name'] for li in r]
+    assert set(publication_names) == set(expected_publication_names),\
+        f"Publications {expected_publication_names} not equal to {r.text}. publication_type={publication_type}"
 
 
-def assert_user_maps(username, mapnames, headers=None):
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest"
-    r_url = f"{rest_url}/{username}/maps"
-    r = requests.get(r_url, headers=headers)
-    assert r.status_code == 200, f"r.status_code={r.status_code}\nr.text={r.text}"
-    layman_names = [li['name'] for li in r.json()]
-    assert set(layman_names) == set(mapnames), f"Maps {mapnames} not equal to {r.text}"
+assert_user_layers = partial(assert_user_publications, LAYER_TYPE)
+assert_user_maps = partial(assert_user_publications, MAP_TYPE)
 
 
 def get_map_metadata_comparison(username, mapname, headers=None):

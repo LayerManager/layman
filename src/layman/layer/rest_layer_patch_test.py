@@ -62,12 +62,12 @@ username = 'test_gs_rules_user'
 layername = 'test_gs_rules_layer'
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="class")
 def ensure_user():
     # needs liferay_mock and ensure_layman fixtures
     authn_headers1 = client_util.get_authz_headers(username)
 
-    client_util.reserve_username(username, headers=authn_headers1)
+    client_util.ensure_reserved_username(username, headers=authn_headers1)
     assert_gs_user_and_roles(username)
 
 
