@@ -11,7 +11,7 @@ class TestDeletePublicationsClass:
     authn_headers_owner = process_client.get_authz_headers(owner)
     authn_headers_deleter = process_client.get_authz_headers(deleter)
 
-    @pytest.fixture()
+    @pytest.fixture(scope="class")
     def provide_data(self):
         process_client.ensure_reserved_username(self.owner, self.authn_headers_owner)
         process_client.ensure_reserved_username(self.deleter, self.authn_headers_deleter)

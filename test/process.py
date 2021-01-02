@@ -99,7 +99,7 @@ def ensure_layman_function(env_vars):
         LAYMAN_SETTING = env_vars
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="class")
 def ensure_layman():
     ensure_layman_function(LAYMAN_DEFAULT_SETTINGS)
     yield

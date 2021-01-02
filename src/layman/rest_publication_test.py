@@ -53,9 +53,9 @@ class TestSoapClass:
     access_rights_rewo = {'read': f"{username},EVERYONE", 'write': f"{username}"}
     access_rights_rewe = {'read': f"{username},EVERYONE", 'write': f"{username},EVERYONE"}
 
-    @pytest.fixture()
+    @pytest.fixture(scope='class')
     def reserve_username(self):
-        process_client.ensure_reserved_username(self.username, headers=self.authz_headers)
+        process_client.reserve_username(self.username, headers=self.authz_headers)
         yield
 
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'reserve_username')
