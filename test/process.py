@@ -99,8 +99,15 @@ def ensure_layman_function(env_vars):
         LAYMAN_SETTING = env_vars
 
 
+# If you need fixture with different scope, create new fixture with such scope
 @pytest.fixture(scope="class")
 def ensure_layman():
+    ensure_layman_function(LAYMAN_DEFAULT_SETTINGS)
+    yield
+
+
+@pytest.fixture(scope="module")
+def ensure_layman_module():
     ensure_layman_function(LAYMAN_DEFAULT_SETTINGS)
     yield
 

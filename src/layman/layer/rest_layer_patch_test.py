@@ -1,5 +1,4 @@
 import pytest
-import importlib
 
 from layman import settings, app
 from layman.common import geoserver
@@ -10,7 +9,7 @@ from test import process, process_client as client_util
 
 
 liferay_mock = process.liferay_mock
-ensure_layman = process.ensure_layman
+ensure_layman_module = process.ensure_layman_module
 
 ISS_URL_HEADER = client_util.ISS_URL_HEADER
 TOKEN_HEADER = client_util.TOKEN_HEADER
@@ -62,7 +61,7 @@ username = 'test_gs_rules_user'
 layername = 'test_gs_rules_layer'
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def ensure_user():
     # needs liferay_mock and ensure_layman fixtures
     authn_headers1 = client_util.get_authz_headers(username)
@@ -71,7 +70,7 @@ def ensure_user():
     assert_gs_user_and_roles(username)
 
 
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'ensure_user')
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman_module', 'ensure_user')
 @pytest.mark.parametrize("post_access_rights, patch_access_rights_list", [
     (
         {'read': {settings.RIGHTS_EVERYONE_ROLE},
