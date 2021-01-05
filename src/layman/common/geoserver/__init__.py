@@ -483,16 +483,6 @@ def ensure_proxy_base_url(proxy_base_url, auth):
     return url_changed
 
 
-def get_roles_anyone(username):
-    roles = {settings.LAYMAN_GS_ROLE, 'ROLE_ANONYMOUS', 'ROLE_AUTHENTICATED'}
-    return roles
-
-
-def get_roles_owner(username):
-    roles = {username_to_rolename(username)}
-    return roles
-
-
 def reset(auth):
     logger.info(f"Resetting GeoServer")
     r_url = settings.LAYMAN_GS_REST + 'reset'
