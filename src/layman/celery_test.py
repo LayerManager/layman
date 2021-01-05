@@ -76,7 +76,7 @@ def test_single_abortable_task(client):
     # first one is failure, because it throws AbortedException
     assert results[0].state == results_copy[0].state == 'FAILURE'
     with app.app_context():
-        layer_util.delete_layer(username, layername)
+        input_chunk.delete_layer(username, layername)
 
 
 def test_abortable_task_chain(client):
@@ -136,4 +136,4 @@ def test_abortable_task_chain(client):
     assert results[1].state == results_copy[1].state == 'ABORTED'
     assert results[2].state == results_copy[2].state == 'ABORTED'
     with app.app_context():
-        layer_util.delete_layer(username, layername)
+        input_chunk.delete_layer(username, layername)
