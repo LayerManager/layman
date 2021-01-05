@@ -47,28 +47,12 @@ def publish_layer(username,
 def client():
     client = app.test_client()
 
-    server = Process(target=app.run, kwargs={
-        'host': '0.0.0.0',
-        'port': settings.LAYMAN_SERVER_NAME.split(':')[1],
-        'debug': False,
-    })
-    server.start()
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/rest/current-user"
-    wait_for_url(rest_url, 50, 0.1)
-
     app.config['TESTING'] = True
     app.config['DEBUG'] = True
     app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
     app.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
 
     yield client
-
-    with app.app_context() as ctx:
-        publs_by_type = uuid.check_redis_consistency()
-        global num_layers_before_test
-        num_layers_before_test = len(publs_by_type[LAYER_TYPE])
-    server.terminate()
-    server.join()
 
 
 def delete_layer(username, layername, client, headers=None):

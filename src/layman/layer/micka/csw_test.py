@@ -102,27 +102,12 @@ def client():
     # print('before app.test_client()')
     client = app.test_client()
 
-    # print('before Process(target=app.run, kwargs={...')
-    server = Process(target=app.run, kwargs={
-        'host': '0.0.0.0',
-        'port': settings.LAYMAN_SERVER_NAME.split(':')[1],
-        'debug': False,
-    })
-    # print('before server.start()')
-    server.start()
-    time.sleep(1)
-
     app.config['TESTING'] = True
     app.config['DEBUG'] = True
     app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
     app.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
 
     yield client
-
-    # print('before server.terminate()')
-    server.terminate()
-    # print('before server.join()')
-    server.join()
 
 
 @pytest.fixture()
@@ -147,7 +132,7 @@ def no_micka_url():
     settings.CSW_URL = csw_url
 
 
-@pytest.mark.usefixtures('provide_layer', 'broken_micka_url')
+@pytest.mark.usefixtures('ensure_layman', 'provide_layer', 'broken_micka_url')
 def test_delete_layer_broken_micka():
     with pytest.raises(LaymanError) as exc_info:
         with app.app_context():
@@ -167,7 +152,7 @@ def test_get_layer_info_no_micka():
     assert layer_info == {}
 
 
-@pytest.mark.usefixtures('provide_layer', 'no_micka_url')
+@pytest.mark.usefixtures('ensure_layman', 'provide_layer', 'no_micka_url')
 def test_delete_layer_no_micka():
     with pytest.raises(LaymanError) as exc_info:
         with app.app_context():
@@ -175,13 +160,14 @@ def test_delete_layer_no_micka():
     assert exc_info.value.code == 38
 
 
-@pytest.mark.usefixtures('provide_layer')
+@pytest.mark.usefixtures('ensure_layman', 'provide_layer')
 def test_patch_layer_without_metadata(client):
     with app.app_context():
         delete_layer(TEST_USER, TEST_LAYER)
     patch_layer(client)
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_public_metadata(provide_layer):
     uuid = provide_layer['uuid']
     muuid = get_metadata_uuid(uuid)
