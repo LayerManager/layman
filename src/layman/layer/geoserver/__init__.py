@@ -30,7 +30,8 @@ def get_all_rules(auth):
             settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
             # data=json.dumps(payload),
             headers=headers_json,
-            auth=auth
+            auth=auth,
+            timeout=5,
         )
         r.raise_for_status()
         # app.logger.info(r.text)
@@ -98,6 +99,7 @@ def publish_layer_from_db(username, layername, description, title, access_rights
                       }),
                       headers=headers_json,
                       auth=settings.LAYMAN_GS_AUTH,
+                      timeout=5,
                       )
     r.raise_for_status()
     # current_app.logger.info(f'publish_layer_from_db before clear_cache {username}')

@@ -45,7 +45,8 @@ def delete_layer(username, layername):
         auth=settings.LAYMAN_GS_AUTH,
         params={
             'recurse': 'true'
-        }
+        },
+        timeout=5,
     )
     if r.status_code != 404:
         r.raise_for_status()
@@ -82,7 +83,7 @@ def get_wms_proxy(username):
             'SERVICE': 'WMS',
             'REQUEST': 'GetCapabilities',
             'VERSION': VERSION,
-        }, headers=headers)
+        }, headers=headers, timeout=5,)
         if r.status_code != 200:
             result = None
             if r.status_code != 404:
