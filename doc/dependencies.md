@@ -44,7 +44,8 @@
 | [flower](https://github.com/mher/flower) | BSD 3-Clause | Pipfile | prod | bin | to monitor celery tasks |
 | [selenium](https://www.chromium.org/) | Apache License 2.0 | Dockerfile | prod | bin | for client-side map rendering and integration testing |
 | [cacheout](https://github.com/dgilland/cacheout) | MIT | Pipfile | prod | bin | |
-| [kombu](https://github.com/celery/kombu) | BSD 3-Clause | Pipfile | prod | bin | messaging for celery |
+| [kombu](https://github.com/celery/kombu) | BSD 3-Clause | Pipfile | prod | bin | messaging for celery, direct dependency only for version |
+| [pyproj](https://pypi.org/project/pyproj/) | MIT | Pipfile | prod | bin | Python interface to PROJ (cartographic projections and coordinate transformations library), direct dependency only for version |
 | [pycld2](https://github.com/aboSamoor/pycld2) | Apache License 2.0 | Pipfile | prod | bin | detecting language for metadata |
 | [lxml](https://lxml.de) | BSD 3-Clause | python3-lxml | prod | bin | |
 | [watchdog](https://github.com/gorakhargosh/watchdog) | Apache License 2.0 | Pipfile | dev | bin | |
@@ -53,6 +54,8 @@
 | [pycodestyle](https://pycodestyle.pycqa.org/) | MIT | Pipfile | test | bin | code style checker |
 | [pylint](https://www.pylint.org/) | GNU GPL v2 | Pipfile | test | bin | code style checker |
 | [autopep8](https://github.com/hhatto/autopep8) | MIT | Pipfile | test | bin | to automatically fix code style |
+| [pytest-rerunfailures](https://github.com/pytest-dev/pytest-rerunfailures) | MPL | Pipfile | test | bin | to automatically rerun flaky tests |
+| [pytest-timeout](https://pypi.org/project/pytest-timeout/) | MIT | Pipfile | test | bin | to automatically stop tests after given timeout |
 
 ### Node.js dependencies
 | name | license | used by | env | bin or src | purpose |

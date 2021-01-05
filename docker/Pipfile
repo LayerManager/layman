@@ -10,9 +10,11 @@ flake8 = "*"
 pycodestyle = "*"
 pylint = "*"
 autopep8 = "*"
+pytest-rerunfailures = "*"
+pytest-timeout = "*"
 
 [packages]
-celery = {extras = ["redis"],version = "*"}
+celery = {extras = ["redis"],version = "<5.0.0"}
 flask = "*"
 unidecode = "*"
 psycopg2-binary = "*"
@@ -23,6 +25,7 @@ flower = "*"
 selenium = "*"
 cacheout = "*"
 kombu = "==4.6.10"
+pyproj = "<3.0.0"
 pycld2 = "*"
 
 [requires]
