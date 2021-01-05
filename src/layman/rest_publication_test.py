@@ -1,11 +1,8 @@
 import pytest
 import json
 
-from test import process, process_client
+from test import process_client
 from layman.common.micka import util as micka_util
-
-ensure_layman = process.ensure_layman
-liferay_mock = process.liferay_mock
 
 
 @pytest.mark.parametrize('publ_type', process_client.PUBLICATION_TYPES)

@@ -4,9 +4,6 @@ import requests
 from layman import app, settings
 from layman.util import url_for
 from layman.common.prime_db_schema import ensure_whole_user
-from test import process
-
-ensure_layman = process.ensure_layman
 
 
 @pytest.mark.usefixtures('ensure_layman')

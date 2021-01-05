@@ -1,7 +1,7 @@
 import logging
 import pytest
 
-from test import process, process_client
+from test import process_client
 
 from layman import settings, app as app, util
 from layman.layer import LAYER_TYPE
@@ -12,7 +12,6 @@ from .util import run_query, run_statement
 
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
-ensure_layman = process.ensure_layman
 
 logger = logging.getLogger(__name__)
 

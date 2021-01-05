@@ -1,8 +1,5 @@
 import pytest
-from test import process, process_client
-
-ensure_layman = process.ensure_layman
-liferay_mock = process.liferay_mock
+from test import process_client
 
 
 class TestDeletePublicationsClass:

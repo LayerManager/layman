@@ -6,21 +6,12 @@ from layman import app
 from layman import settings
 from layman.layer import db
 from test.process_client import get_authz_headers
-from test import process, process_client as client_util
+from test import process_client as client_util
 from test.data import wfs as data_wfs
 from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.layer.geoserver.util import wms_direct
 from layman.common.geoserver import get_layer_thumbnail, get_layer_square_bbox
 from layman.util import url_for
-
-liferay_mock = process.liferay_mock
-ensure_layman = process.ensure_layman
-
-ISS_URL_HEADER = client_util.ISS_URL_HEADER
-TOKEN_HEADER = client_util.TOKEN_HEADER
-
-AUTHN_INTROSPECTION_URL = process.AUTHN_INTROSPECTION_URL
-AUTHN_SETTINGS = process.AUTHN_SETTINGS
 
 
 @pytest.mark.usefixtures('ensure_layman')

@@ -10,10 +10,7 @@ from .micka import soap
 from .prime_db_schema import table as prime_table
 from . import util, MAP_TYPE
 from layman.util import url_for
-from test import process, process_client, util as test_util
-
-ensure_layman = process.ensure_layman
-liferay_mock = process.liferay_mock
+from test import process_client, util as test_util
 
 
 @pytest.mark.usefixtures('ensure_layman')

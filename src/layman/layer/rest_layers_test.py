@@ -12,10 +12,7 @@ from .geoserver import wfs, wms, sld
 from .micka import soap
 from . import util, LAYER_TYPE
 from layman.util import url_for
-from test import process, process_client, util as test_util
-
-ensure_layman = process.ensure_layman
-liferay_mock = process.liferay_mock
+from test import process_client, util as test_util
 
 
 @pytest.mark.usefixtures('ensure_layman')

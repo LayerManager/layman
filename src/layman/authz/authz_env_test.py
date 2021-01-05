@@ -4,9 +4,6 @@ import pytest
 from test import process, process_client
 
 
-liferay_mock = process.liferay_mock
-
-
 class TestPublicWorkspaceClass:
     publication_name = 'test_public_workspace_variable_publication'
     username = 'test_public_workspace_variable_user'

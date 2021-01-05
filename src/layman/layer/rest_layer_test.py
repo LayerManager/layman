@@ -6,10 +6,8 @@ import json
 del sys.modules['layman']
 
 from layman import app
-from test import process, process_client
+from test import process_client
 from layman.util import url_for
-
-ensure_layman = process.ensure_layman
 
 
 @pytest.mark.usefixtures('ensure_layman')
