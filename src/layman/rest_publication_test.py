@@ -52,13 +52,24 @@ class TestSoapClass:
     access_rights_rowo = {'read': f"{username}", 'write': f"{username}"}
     access_rights_rewo = {'read': f"{username},EVERYONE", 'write': f"{username}"}
     access_rights_rewe = {'read': f"{username},EVERYONE", 'write': f"{username},EVERYONE"}
+    publication_type = None
+    publication_name = None
 
     @pytest.fixture(scope='class')
     def reserve_username(self):
-        process_client.reserve_username(self.username, headers=self.authz_headers)
+        process_client.ensure_reserved_username(self.username, headers=self.authz_headers)
         yield
 
-    @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'reserve_username')
+    @pytest.fixture()
+    def clear_data(self):
+        yield
+        process_client.delete_publication(self.publication_type,
+                                          self.username,
+                                          self.publication_name,
+                                          headers=self.authz_headers)
+
+    @pytest.mark.flaky(reruns=5, reruns_delay=2)
+    @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'reserve_username', 'clear_data')
     @pytest.mark.parametrize('params_and_expected_list', [
         # (input access rights, expected public visibility of metadata record)
         [(access_rights_rowo, False), (access_rights_rewe, True)],
@@ -74,6 +85,8 @@ class TestSoapClass:
         post_method = process_client.publish_publication
         patch_method = process_client.patch_publication
         publ_name = f"{publ_name_prefix}{publ_type.split('.')[-1]}"
+        self.publication_type = publ_type
+        self.publication_name = publ_name
 
         for idx, (access_rights, anonymous_visibility) in enumerate(params_and_expected_list):
             write_method = patch_method if idx > 0 else post_method
@@ -90,8 +103,3 @@ class TestSoapClass:
             anon_number_of_records = micka_util.get_number_of_records(publ_muuid, use_authn=False)
             assert bool(anon_number_of_records) == anonymous_visibility, \
                 f"muuid={publ_muuid}, access_rights={access_rights}, number_of_records={anon_number_of_records}"
-
-        process_client.delete_publication(publ_type,
-                                          username,
-                                          publ_name,
-                                          headers=authz_headers)
