@@ -20,8 +20,6 @@ from .oauth2 import liferay
 from test import process, process_client
 
 
-liferay_mock = process.liferay_mock
-ensure_layman = process.ensure_layman
 LIFERAY_PORT = process.LIFERAY_PORT
 
 num_layers_before_test = 0

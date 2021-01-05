@@ -5,11 +5,7 @@ from layman import app, settings, LaymanError
 from layman.util import url_for
 from flask import g
 from . import authorize_publications_decorator
-from test import process, process_client
-
-
-liferay_mock = process.liferay_mock
-ensure_layman = process.ensure_layman
+from test import process_client
 
 
 @authorize_publications_decorator

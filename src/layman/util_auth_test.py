@@ -4,11 +4,8 @@ from . import util, app
 
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
-from test import process, process_client
+from test import process_client
 
-
-ensure_layman = process.ensure_layman
-liferay_mock = process.liferay_mock
 
 layer = 'test_get_publication_info_layer'
 map = 'test_get_publication_info_map'

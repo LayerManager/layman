@@ -1,7 +1,7 @@
 import pytest
 import uuid
 
-from test import process, process_client
+from test import process_client
 
 from layman import settings, app as app, LaymanError
 from layman.layer import LAYER_TYPE
@@ -9,7 +9,6 @@ from layman.map import MAP_TYPE
 from . import publications, workspaces, users
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
-ensure_layman = process.ensure_layman
 
 userinfo_baseline = {"issuer_id": 'mock_test_publications_test',
                      "claims": {"email": "test@liferay.com",

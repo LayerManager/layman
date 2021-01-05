@@ -4,11 +4,8 @@ import requests
 from owslib.wms import WebMapService
 from layman import settings
 from layman.layer.geoserver import wms as gs_wms
-from test import process, process_client
+from test import process_client
 from test.data import wfs as wfs_data_util
-
-
-ensure_layman = process.ensure_layman
 
 
 def get_shp_file_paths(shp_file_path):

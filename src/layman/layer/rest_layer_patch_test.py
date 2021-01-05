@@ -5,18 +5,7 @@ from layman.common import geoserver
 from layman.layer.prime_db_schema import table as prime_db_schema
 from layman.common.prime_db_schema import users
 
-from test import process, process_client as client_util
-
-
-liferay_mock = process.liferay_mock
-ensure_layman_module = process.ensure_layman_module
-
-ISS_URL_HEADER = client_util.ISS_URL_HEADER
-TOKEN_HEADER = client_util.TOKEN_HEADER
-
-AUTHN_INTROSPECTION_URL = process.AUTHN_INTROSPECTION_URL
-
-AUTHN_SETTINGS = process.AUTHN_SETTINGS
+from test import process_client as client_util
 
 
 def assert_gs_user_and_roles(username):

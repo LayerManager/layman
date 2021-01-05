@@ -3,11 +3,8 @@ import importlib
 
 from . import app as app, settings, LaymanError, util
 from .util import slugify, get_modules_from_names, get_providers_from_source_names
-from test import process, process_client
+from test import process_client
 from layman.layer import LAYER_TYPE
-
-ensure_layman = process.ensure_layman
-liferay_mock = process.liferay_mock
 
 
 def test_slugify():

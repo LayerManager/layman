@@ -4,9 +4,7 @@ from lxml import etree as ET
 
 from layman import app
 from layman.util import url_for
-from test import process, process_client
-
-ensure_layman = process.ensure_layman
+from test import process_client
 
 
 @pytest.mark.usefixtures('ensure_layman')

@@ -1,10 +1,7 @@
 import pytest
-from test import process, process_client
+from test import process_client
 from layman import settings, app
 from layman.common import prime_db_schema
-
-
-ensure_layman = process.ensure_layman
 
 
 @pytest.mark.usefixtures('ensure_layman')

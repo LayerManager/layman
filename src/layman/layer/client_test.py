@@ -13,8 +13,6 @@ from layman import settings
 
 from test import process, process_client
 
-ensure_layman = process.ensure_layman
-
 username = 'testuser1'
 layername = 'country_chunks'
 

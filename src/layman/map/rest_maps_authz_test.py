@@ -1,8 +1,6 @@
 import json
 import pytest
-from test import process, process_client
-liferay_mock = process.liferay_mock
-ensure_layman = process.ensure_layman
+from test import process_client
 
 
 def assert_operates_on(workspace, mapname, expected_layers, authz_headers):
