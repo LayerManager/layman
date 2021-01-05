@@ -11,6 +11,7 @@ FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 def create_connection_cursor():
     try:
         connection = psycopg2.connect(**settings.PG_CONN)
+        connection.set_session(autocommit=True)
     except BaseException:
         raise LaymanError(6)
     cursor = connection.cursor()
