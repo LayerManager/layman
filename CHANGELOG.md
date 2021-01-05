@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.9.0
+ 2021-01-??
+- One of [OAuth2 HTTP headers](doc/oauth2/index.md#request-layman-rest-api), `AuthorizationIssUrl`, is optional if and only if there is only one OAuth2 authorization server registered at Layman. The header was mandatory before 1.9 in any case.
+
 ## v1.8.0
  2020-12-14
 ### Upgrade requirements
