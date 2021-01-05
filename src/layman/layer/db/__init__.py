@@ -249,9 +249,7 @@ def get_text_languages(username, layername):
     return sorted(list(all_langs))
 
 
-def get_most_frequent_lower_distance(username, layername, conn_cur=None):
-    conn, cur = conn_cur or get_connection_cursor()
-
+def get_most_frequent_lower_distance_query(username, layername, order_by_methods):
     query = f"""
 with t1 as (
 select
@@ -260,9 +258,9 @@ select
 from (
   SELECT
     ogc_fid, (st_dump(wkb_geometry)).geom as geometry
-  FROM {username}.{layername}
+  FROM {{username}}.{{layername}}
 ) sub_view
-order by ST_NPoints(geometry), ogc_fid, dump_id
+order by {{order_by_prefix}}geometry{{order_by_suffix}}, ogc_fid, dump_id
 limit 5000
 )
 , t2 as (
@@ -282,7 +280,7 @@ from (
     where st_geometrytype(geometry) = 'ST_LineString'
 )
 ) sub_view
-order by ST_NPoints(geometry), ogc_fid, dump_id, ring_id
+order by {{order_by_prefix}}geometry{{order_by_suffix}}, ogc_fid, dump_id, ring_id
 limit 5000
 )
 , t2cumsum as (
@@ -331,7 +329,25 @@ SELECT middle as distance, freq as distance_freq, tstat.num_distances
 from tfreq, tstat
 order by freq desc
 limit 1
-        """
+    """
+
+    order_by_prefix = ''.join([f"{method}(" for method in order_by_methods])
+    order_by_suffix = ')' * len(order_by_methods)
+
+    query = query.format(username=username,
+                         layername=layername,
+                         order_by_prefix=order_by_prefix,
+                         order_by_suffix=order_by_suffix,
+                         )
+    return query
+
+
+def get_most_frequent_lower_distance(username, layername, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+
+    query = get_most_frequent_lower_distance_query(username, layername, [
+        'ST_NPoints'
+    ])
 
     # print(f"\nget_most_frequent_lower_distance v1\nusername={username}, layername={layername}")
     # print(query)
@@ -386,86 +402,9 @@ def guess_scale_denominator(username, layername):
 def get_most_frequent_lower_distance2(username, layername, conn_cur=None):
     conn, cur = conn_cur or get_connection_cursor()
 
-    query = f"""
-with t1 as (
-select
-  row_number() over (partition by ogc_fid) AS dump_id,
-  sub_view.*
-from (
-  SELECT
-    ogc_fid, (st_dump(wkb_geometry)).geom as geometry
-  FROM {username}.{layername}
-) sub_view
-order by st_area(Box2D(geometry)), ogc_fid, dump_id
-limit 5000
-)
-, t2 as (
-select
-  row_number() over (partition by ogc_fid, dump_id) AS ring_id,
-  sub_view.*
-from (
-(
-   SELECT
-    dump_id, ogc_fid, ST_ExteriorRing((ST_DumpRings(geometry)).geom) as geometry
-  FROM t1
-    where st_geometrytype(geometry) = 'ST_Polygon'
-) union all (
-   SELECT
-    dump_id, ogc_fid, geometry
-  FROM t1
-    where st_geometrytype(geometry) = 'ST_LineString'
-)
-) sub_view
-order by st_area(Box2D(geometry)), ogc_fid, dump_id, ring_id
-limit 5000
-)
-, t2cumsum as (
-select *, --ST_NPoints(geometry),
-  sum(ST_NPoints(geometry)) over (order by ST_NPoints(geometry), ogc_fid, dump_id, ring_id
-                                  rows between unbounded preceding and current row) as cum_sum_points
-from t2
-)
-, t3 as (
-SELECT ogc_fid, dump_id, ring_id, geometry, generate_series(1, st_npoints(geometry)-1) as point_idx
-FROM t2cumsum
-where cum_sum_points < 50000
-)
-, tdist as (
-SELECT ogc_fid, dump_id, ring_id, ST_PointN(geometry, point_idx), point_idx,
-    st_distance(ST_PointN(geometry, point_idx), ST_PointN(geometry, point_idx+1)) as distance
-FROM t3
-)
-, tstat as (
-select
-count(*) as num_distances,
-percentile_disc(0.1) within group (order by tdist.distance) as p10
-, percentile_disc(0.5) within group (order by tdist.distance) as p50
---, percentile_disc(0.9) within group (order by tdist.distance) as p90
-from tdist
-)
-, tbounds as (
-select
-    --tstat.*,
-    ((p50-p10)/10)*tmode.idx+p10 as lower_bound
-    , ((p50-p10)/10)*(tmode.idx+0.5)+p10 as middle
-    , ((p50-p10)/10)*(tmode.idx+1)+p10 as upper_bound
-from tstat, (
-    select generate_series(0, 9) as idx
-) tmode
-order by middle
-)
-, tfreq as (
-select count(*) as freq, tbounds.middle
-from tdist
-inner join tbounds on (tdist.distance >= tbounds.lower_bound and tdist.distance < tbounds.upper_bound)
-group by tbounds.middle
-order by tbounds.middle
-)
-SELECT middle as distance, freq as distance_freq, tstat.num_distances
-from tfreq, tstat
-order by freq desc
-limit 1
-        """
+    query = get_most_frequent_lower_distance_query(username, layername, [
+        'st_area', 'Box2D'
+    ])
 
     # print(f"\nget_most_frequent_lower_distance v2\nusername={username}, layername={layername}")
     # print(query)
