@@ -35,7 +35,8 @@ def get_roles(auth):
     r_url = settings.LAYMAN_GS_REST_ROLES
     r = requests.get(r_url,
                      headers=headers_json,
-                     auth=auth
+                     auth=auth,
+                     timeout=5,
                      )
     r.raise_for_status()
     return r.json()['roleNames']
@@ -50,6 +51,7 @@ def ensure_role(role, auth):
             urljoin(settings.LAYMAN_GS_REST_ROLES, 'role/' + role),
             headers=headers_json,
             auth=auth,
+            timeout=5,
         )
         r.raise_for_status()
     else:
@@ -63,6 +65,7 @@ def delete_role(role, auth):
         urljoin(settings.LAYMAN_GS_REST_ROLES, 'role/' + role),
         headers=headers_json,
         auth=auth,
+        timeout=5,
     )
     role_not_exists = r.status_code == 404
     if not role_not_exists:
@@ -75,7 +78,8 @@ def get_usernames(auth):
     r_url = settings.LAYMAN_GS_REST_USERS
     r = requests.get(r_url,
                      headers=headers_json,
-                     auth=auth
+                     auth=auth,
+                     timeout=5,
                      )
     r.raise_for_status()
     # logger.info(f"users={r.text}")
@@ -107,6 +111,7 @@ def ensure_user(user, password, auth):
             }),
             headers=headers_json,
             auth=auth,
+            timeout=5,
         )
         r.raise_for_status()
     else:
@@ -123,7 +128,8 @@ def get_security_roles(rule, auth):
     r = requests.get(
         settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
         headers=headers_json,
-        auth=auth
+        auth=auth,
+        timeout=5,
     )
     r.raise_for_status()
     rules = r.json()
@@ -144,7 +150,8 @@ def ensure_security_roles(rule, roles, auth):
         data=json.dumps(
             {rule: roles_str}),
         headers=headers_json,
-        auth=auth
+        auth=auth,
+        timeout=5,
     )
     if r.status_code != 404:
         r.raise_for_status()
@@ -154,7 +161,8 @@ def ensure_security_roles(rule, roles, auth):
         data=json.dumps(
             {rule: roles_str}),
         headers=headers_json,
-        auth=auth
+        auth=auth,
+        timeout=5,
     )
     r.raise_for_status()
 
@@ -174,6 +182,7 @@ def delete_security_roles(rule, auth):
         urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
         headers=headers_json,
         auth=auth,
+        timeout=5,
     )
     if r.status_code != 404:
         r.raise_for_status()
@@ -196,7 +205,8 @@ def get_all_workspaces(auth):
             settings.LAYMAN_GS_REST_WORKSPACES,
             # data=json.dumps(payload),
             headers=headers_json,
-            auth=auth
+            auth=auth,
+            timeout=5,
         )
         r.raise_for_status()
         if r.json()['workspaces'] == "":
@@ -249,7 +259,8 @@ def ensure_user_db_store(username, auth):
             }
         }),
         headers=headers_json,
-        auth=auth
+        auth=auth,
+        timeout=5,
     )
     r.raise_for_status()
 
@@ -258,7 +269,8 @@ def delete_user_db_store(username, auth):
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + f'/datastores/{username}'),
         headers=headers_json,
-        auth=auth
+        auth=auth,
+        timeout=5,
     )
     if r.status_code != 404:
         r.raise_for_status()
@@ -271,7 +283,8 @@ def ensure_user_workspace(username, auth):
             settings.LAYMAN_GS_REST_WORKSPACES,
             data=json.dumps({'workspace': {'name': username}}),
             headers=headers_json,
-            auth=auth
+            auth=auth,
+            timeout=5,
         )
         r.raise_for_status()
         ensure_user_db_store(username, auth)
@@ -286,7 +299,8 @@ def delete_user_workspace(username, auth):
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username),
         headers=headers_json,
-        auth=auth
+        auth=auth,
+        timeout=5,
     )
     if r.status_code != 404:
         r.raise_for_status()
@@ -320,6 +334,7 @@ def delete_user(user, auth):
         r_url,
         headers=headers_json,
         auth=auth,
+        timeout=5,
     )
     user_not_exists = r.status_code == 404
     if not user_not_exists:
@@ -343,7 +358,8 @@ def get_user_roles(user, auth):
     r_url = urljoin(settings.LAYMAN_GS_REST_ROLES, f'user/{user}/')
     r = requests.get(r_url,
                      headers=headers_json,
-                     auth=auth
+                     auth=auth,
+                     timeout=5,
                      )
     r.raise_for_status()
     return r.json()['roleNames']
@@ -359,6 +375,7 @@ def ensure_user_role(user, role, auth):
             r_url,
             headers=headers_json,
             auth=auth,
+            timeout=5,
         )
         r.raise_for_status()
     else:
@@ -373,6 +390,7 @@ def delete_user_role(user, role, auth):
         r_url,
         headers=headers_json,
         auth=auth,
+        timeout=5,
     )
     association_not_exists = r.status_code == 404
     if not association_not_exists:
@@ -386,6 +404,7 @@ def get_wms_settings(auth):
     r = requests.get(r_url,
                      headers=headers_json,
                      auth=auth,
+                     timeout=5,
                      )
     r.raise_for_status()
     return r.json()['wms']
@@ -414,6 +433,7 @@ def ensure_wms_srs_list(srs_list, auth):
             }),
             headers=headers_json,
             auth=auth,
+            timeout=5,
         )
         r.raise_for_status()
     else:
@@ -427,6 +447,7 @@ def get_global_settings(auth):
     r = requests.get(r_url,
                      headers=headers_json,
                      auth=auth,
+                     timeout=5,
                      )
     r.raise_for_status()
     return r.json()['global']
@@ -453,6 +474,7 @@ def ensure_proxy_base_url(proxy_base_url, auth):
             }),
             headers=headers_json,
             auth=auth,
+            timeout=5,
         )
         r.raise_for_status()
     else:
@@ -476,7 +498,8 @@ def reset(auth):
     r_url = settings.LAYMAN_GS_REST + 'reset'
     r = requests.post(r_url,
                       headers=headers_json,
-                      auth=auth
+                      auth=auth,
+                      timeout=5,
                       )
     r.raise_for_status()
     logger.info(f"Resetting GeoServer done")
@@ -507,5 +530,5 @@ def get_layer_thumbnail(wms_url, layername, bbox, headers=None, wms_version='1.3
         'HEIGHT': 300,
         'FORMAT': 'image/png',
         'TRANSPARENT': 'TRUE',
-    }, headers=headers)
+    }, headers=headers, timeout=5,)
     return r

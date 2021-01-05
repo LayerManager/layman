@@ -248,7 +248,10 @@ def is_record_exists_exception(root_el):
 
 def base_insert(xml_str):
     # print(f"Micka insert=\n{xml_str}")
-    r = requests.post(settings.CSW_URL, auth=settings.CSW_BASIC_AUTHN, data=xml_str.encode('utf-8'))
+    r = requests.post(settings.CSW_URL,
+                      auth=settings.CSW_BASIC_AUTHN,
+                      data=xml_str.encode('utf-8'),
+                      timeout=5,)
     # print(f"Micka insert response=\n{r.text}")
     r.raise_for_status()
     root_el = ET.fromstring(r.content)
@@ -314,7 +317,11 @@ def csw_update(template_values):
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-update-template.xml')
     xml_str = fill_template_as_str(template_path, template_values)
     # print(f"CSW update request=\n{xml_str}")
-    r = requests.post(settings.CSW_URL, auth=settings.CSW_BASIC_AUTHN, data=xml_str.encode('utf-8'))
+    r = requests.post(settings.CSW_URL,
+                      auth=settings.CSW_BASIC_AUTHN,
+                      data=xml_str.encode('utf-8'),
+                      timeout=5,
+                      )
     # print(f"CSW update response=\n{r.text}")
     r.raise_for_status()
     root_el = ET.fromstring(r.content)
@@ -348,7 +355,11 @@ def csw_delete(muuid):
     }
     xml_str = fill_template_as_str(template_path, template_values)
     # print(f"CSW delete request=\n{xml_str}")
-    r = requests.post(settings.CSW_URL, auth=settings.CSW_BASIC_AUTHN, data=xml_str.encode('utf-8'))
+    r = requests.post(settings.CSW_URL,
+                      auth=settings.CSW_BASIC_AUTHN,
+                      data=xml_str.encode('utf-8'),
+                      timeout=5,
+                      )
     # print(f"CSW delete response=\n{r.text}")
     r.raise_for_status()
     root_el = ET.fromstring(r.content)
@@ -599,7 +610,11 @@ def get_number_of_records(record_id, use_authn):
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-number-of-records-template.xml')
     xml_str = fill_template_as_str(template_path, {'record_id': record_id})
 
-    r = requests.post(settings.CSW_URL, auth=authn, data=xml_str)
+    r = requests.post(settings.CSW_URL,
+                      auth=authn,
+                      data=xml_str,
+                      timeout=5,
+                      )
     r.raise_for_status()
     parser = ET.XMLParser(remove_blank_text=True)
     tree = ET.fromstring(r.text.encode('utf-8'), parser=parser)

@@ -56,7 +56,8 @@ def patch_layer(username, layername, title, description, access_rights=None):
                 username + '/datastores/postgresql/featuretypes/' + layername),
         data=json.dumps(body),
         headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH
+        auth=settings.LAYMAN_GS_AUTH,
+        timeout=5,
     )
     r.raise_for_status()
     clear_cache(username)
@@ -79,7 +80,8 @@ def delete_layer(username, layername):
         auth=settings.LAYMAN_GS_AUTH,
         params={
             'recurse': 'true'
-        }
+        },
+        timeout=5,
     )
     if r.status_code != 404:
         r.raise_for_status()
@@ -120,7 +122,7 @@ def get_wfs_proxy(username):
             'SERVICE': 'WFS',
             'REQUEST': 'GetCapabilities',
             'VERSION': VERSION,
-        }, headers=headers)
+        }, headers=headers, timeout=5,)
         if r.status_code != 200:
             result = None
             if r.status_code != 404:

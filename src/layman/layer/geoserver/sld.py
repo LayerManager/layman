@@ -40,7 +40,8 @@ def delete_layer(username, layername):
     style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
                         username + '/styles/' + layername)
     r = requests.get(style_url + '.sld',
-                     auth=settings.LAYMAN_GS_AUTH
+                     auth=settings.LAYMAN_GS_AUTH,
+                     timeout=5,
                      )
     if r.status_code == 404:
         return {}
@@ -54,7 +55,8 @@ def delete_layer(username, layername):
                         params={
                             'purge': 'true',
                             'recurse': 'true',
-                        }
+                        },
+                        timeout=5,
                         )
     if r.status_code == 404:
         return {}
@@ -110,7 +112,8 @@ def create_layer_style(username, layername):
     if sld_file is None:
         r = requests.get(
             urljoin(settings.LAYMAN_GS_REST_STYLES, 'generic.sld'),
-            auth=settings.LAYMAN_GS_AUTH
+            auth=settings.LAYMAN_GS_AUTH,
+            timeout=5,
         )
         r.raise_for_status()
         sld_file = io.BytesIO(r.content)
@@ -132,7 +135,8 @@ def create_layer_style(username, layername):
             }
         ),
         headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH
+        auth=settings.LAYMAN_GS_AUTH,
+        timeout=5,
     )
     r.raise_for_status()
     # app.logger.info(sld_file.read())
@@ -164,7 +168,8 @@ def create_layer_style(username, layername):
             'Accept': 'application/json',
             'Content-type': sld_content_type,
         },
-        auth=settings.LAYMAN_GS_AUTH
+        auth=settings.LAYMAN_GS_AUTH,
+        timeout=5,
     )
     if r.status_code == 400:
         raise LaymanError(14, data=r.text)
@@ -181,7 +186,8 @@ def create_layer_style(username, layername):
                              }
                          }),
                      headers=headers_json,
-                     auth=settings.LAYMAN_GS_AUTH
+                     auth=settings.LAYMAN_GS_AUTH,
+                     timeout=5,
                      )
     # app.logger.info(r.text)
     r.raise_for_status()
@@ -198,5 +204,7 @@ def get_style_response(username, stylename, headers=None, auth=None):
 
     r = requests.get(url,
                      auth=auth,
-                     headers=headers)
+                     headers=headers,
+                     timeout=5,
+                     )
     return r
