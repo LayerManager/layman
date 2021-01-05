@@ -81,16 +81,6 @@ def client():
     # print('before app.test_client()')
     client = app.test_client()
 
-    # print('before Process(target=app.run, kwargs={...')
-    server = Process(target=app.run, kwargs={
-        'host': '0.0.0.0',
-        'port': settings.LAYMAN_SERVER_NAME.split(':')[1],
-        'debug': False,
-    })
-    # print('before server.start()')
-    server.start()
-    time.sleep(1)
-
     app.config['TESTING'] = True
     app.config['DEBUG'] = True
     app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
@@ -103,11 +93,6 @@ def client():
         num_maps_before_test = len(publs_by_type[MAP_TYPE])
     yield client
 
-    # print('before server.terminate()')
-    server.terminate()
-    # print('before server.join()')
-    server.join()
-
 
 @pytest.fixture()
 def app_context():
@@ -115,6 +100,7 @@ def app_context():
         yield ctx
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_get_maps_empty(client):
     username = 'testuser1'
     flask_client.ensure_workspace(username, client)
@@ -128,7 +114,7 @@ def test_get_maps_empty(client):
         })
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_wrong_value_of_mapname(client):
     username = 'testuser1'
     mapnames = [' ', '2a', 'ě', ';', '?', 'ABC']
@@ -142,7 +128,7 @@ def test_wrong_value_of_mapname(client):
         assert resp_json['detail']['parameter'] == 'mapname'
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_no_file(client):
     rv = client.post(url_for('rest_maps.post', username='testuser1'))
     assert rv.status_code == 400
@@ -152,7 +138,7 @@ def test_no_file(client):
     assert resp_json['detail']['parameter'] == 'file'
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_maps_invalid_file(client):
     username = 'testuser1'
     rest_path = url_for('rest_maps.post', username=username)
@@ -178,7 +164,7 @@ def test_post_maps_invalid_file(client):
             fp[0].close()
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_maps_invalid_json(client):
     username = 'testuser1'
     rest_path = url_for('rest_maps.post', username=username)
@@ -208,6 +194,7 @@ def test_post_maps_invalid_json(client):
     })
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_post_maps_simple(client):
     with app.app_context():
         username = 'testuser1'
@@ -327,6 +314,7 @@ def test_post_maps_simple(client):
     check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_post_maps_complex(client):
     with app.app_context():
         username = 'testuser1'
@@ -454,6 +442,7 @@ def test_post_maps_complex(client):
     check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_patch_map(client):
     with app.app_context():
         username = 'testuser1'
@@ -584,6 +573,7 @@ def test_patch_map(client):
     check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_delete_map(client):
     with app.app_context():
         username = 'testuser1'
@@ -615,6 +605,7 @@ def test_delete_map(client):
         })
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_map_composed_from_local_layers(client):
     with app.app_context():
         username = 'testuser1'

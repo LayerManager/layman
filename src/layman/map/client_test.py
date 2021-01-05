@@ -24,16 +24,6 @@ def client():
     # print('before app.test_client()')
     client = app.test_client()
 
-    # print('before Process(target=app.run, kwargs={...')
-    server = Process(target=app.run, kwargs={
-        'host': '0.0.0.0',
-        'port': settings.LAYMAN_SERVER_NAME.split(':')[1],
-        'debug': False,
-    })
-    # print('before server.start()')
-    server.start()
-    time.sleep(1)
-
     app.config['TESTING'] = True
     app.config['DEBUG'] = True
     app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
@@ -45,11 +35,6 @@ def client():
         global num_maps_before_test
         num_maps_before_test = len(publs_by_type[MAP_TYPE])
         yield client
-
-    # print('before server.terminate()')
-    server.terminate()
-    # print('before server.join()')
-    server.join()
 
 
 @pytest.fixture(scope="module")
@@ -69,6 +54,7 @@ def chrome():
     chrome.quit()
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_post_no_file(client, chrome):
     check_redis_consistency(expected_publ_num_by_type={
         f'{MAP_TYPE}': num_maps_before_test

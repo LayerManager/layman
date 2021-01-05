@@ -92,16 +92,6 @@ def client():
     # print('before app.test_client()')
     client = app.test_client()
 
-    # print('before Process(target=app.run, kwargs={...')
-    server = Process(target=app.run, kwargs={
-        'host': '0.0.0.0',
-        'port': settings.LAYMAN_SERVER_NAME.split(':')[1],
-        'debug': False,
-    })
-    # print('before server.start()')
-    server.start()
-    time.sleep(1)
-
     app.config['TESTING'] = True
     app.config['DEBUG'] = True
     app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
@@ -114,11 +104,6 @@ def client():
         num_layers_before_test = len(publs_by_type[LAYER_TYPE])
     yield client
 
-    # print('before server.terminate()')
-    server.terminate()
-    # print('before server.join()')
-    server.join()
-
 
 @pytest.fixture()
 def app_context():
@@ -126,7 +111,7 @@ def app_context():
         yield ctx
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_wrong_value_of_user(client):
     usernames = [' ', '2a', 'ě', ';', '?', 'ABC']
     for username in usernames:
@@ -139,7 +124,7 @@ def test_wrong_value_of_user(client):
         assert resp_json['detail']['parameter'] == 'user'
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_layman_gs_user_conflict(client):
     """Tests that Layman detects that reserved username is in conflict with LAYMAN_GS_USER.
 
@@ -169,6 +154,7 @@ def test_layman_gs_user_conflict(client):
             fp[0].close()
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_wrong_value_of_layername(client):
     username = 'test_wrong_value_of_layername_user'
     layername = 'layer1'
@@ -185,7 +171,7 @@ def test_wrong_value_of_layername(client):
         assert resp_json['detail']['parameter'] == 'layername'
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_no_file(client):
     rv = client.post(url_for('rest_layers.post', username='testuser1'))
     assert rv.status_code == 400
@@ -195,7 +181,7 @@ def test_no_file(client):
     assert resp_json['detail']['parameter'] == 'file'
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_username_schema_conflict(client):
     if len(settings.PG_NON_USER_SCHEMAS) == 0:
         return
@@ -223,7 +209,7 @@ def test_username_schema_conflict(client):
         assert resp_json['detail']['reserved_by'] == db.__name__
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_layername_db_object_conflict(client):
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
@@ -245,7 +231,7 @@ def test_layername_db_object_conflict(client):
             fp[0].close()
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_get_layers_testuser1_v1(client):
     username = 'test_get_layers_testuser1_v1_user'
     layername = 'layer1'
@@ -260,6 +246,7 @@ def test_get_layers_testuser1_v1(client):
     })
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_post_layers_simple(client):
     with app.app_context():
         username = 'testuser1'
@@ -400,7 +387,7 @@ def test_post_layers_concurrent(client):
     })
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_shp_missing_extensions(client):
     username = 'testuser1'
     rest_path = url_for('rest_layers.post', username=username)
@@ -432,7 +419,7 @@ def test_post_layers_shp_missing_extensions(client):
     })
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_shp(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries_shp'
@@ -502,7 +489,7 @@ def test_post_layers_shp(client):
     assert len(diff_lines) == 29, ''.join(diff_lines)
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_layer_exists(client):
     username = 'testuser1'
     rest_path = url_for('rest_layers.post', username=username)
@@ -528,6 +515,7 @@ def test_post_layers_layer_exists(client):
     })
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_post_layers_complex(client):
     with app.app_context():
         username = 'testuser2'
@@ -629,6 +617,7 @@ def test_post_layers_complex(client):
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_uppercase_attr(client):
     with app.app_context():
         username = 'testuser2'
@@ -712,7 +701,7 @@ def test_uppercase_attr(client):
         })
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_get_layers_testuser1_v2(client):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username))
@@ -739,6 +728,7 @@ def test_get_layers_testuser1_v2(client):
     })
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_patch_layer_title(client):
     with app.app_context():
         username = 'testuser1'
@@ -784,6 +774,7 @@ def test_patch_layer_title(client):
         })
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_patch_layer_style(client):
     with app.app_context():
         username = 'testuser1'
@@ -843,7 +834,7 @@ def test_patch_layer_style(client):
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_sld_1_1_0(client):
     username = 'testuser1'
     layername = 'countries_sld_1_1_0'
@@ -911,6 +902,7 @@ def test_post_layers_sld_1_1_0(client):
     })
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_patch_layer_data(client):
     with app.app_context():
         username = 'testuser2'
@@ -982,6 +974,7 @@ def test_patch_layer_data(client):
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
+@pytest.mark.usefixtures('ensure_layman')
 def test_patch_layer_concurrent_and_delete_it(client):
     with app.app_context():
         username = 'testuser2'
@@ -1053,7 +1046,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
         })
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_long_and_delete_it(client):
     username = 'testuser1'
     rest_path = url_for('rest_layers.post', username=username)
@@ -1096,7 +1089,7 @@ def test_post_layers_long_and_delete_it(client):
     })
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_delete_layer(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
@@ -1114,7 +1107,7 @@ def test_delete_layer(client):
     assert resp_json['code'] == 15
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_zero_length_attribute(client):
     username = 'testuser1'
     rest_path = url_for('rest_layers.post', username=username)
@@ -1151,7 +1144,7 @@ def test_post_layers_zero_length_attribute(client):
     })
 
 
-@pytest.mark.usefixtures('app_context')
+@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_get_layers_testuser2(client):
     username = 'testuser2'
     rv = client.get(url_for('rest_layers.get', username=username))

@@ -84,22 +84,6 @@ def client():
 
 
 @pytest.fixture()
-def server():
-    server = Process(target=app.run, kwargs={
-        'host': '0.0.0.0',
-        'port': settings.LAYMAN_SERVER_NAME.split(':')[1],
-        'debug': False,
-    })
-    server.start()
-    time.sleep(1)
-
-    yield server
-
-    server.terminate()
-    server.join()
-
-
-@pytest.fixture()
 def app_context():
     with app.app_context() as ctx:
         yield ctx
@@ -220,7 +204,7 @@ def test_unexisting_introspection_url(client, headers):
         f'{TOKEN_HEADER}': 'Bearer abc',
     }
 ])
-@pytest.mark.usefixtures('app_context', 'inactive_token_introspection_url', 'server')
+@pytest.mark.usefixtures('app_context', 'inactive_token_introspection_url', 'ensure_layman')
 def test_token_inactive(client, headers):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers=headers)
@@ -238,7 +222,7 @@ def test_token_inactive(client, headers):
         f'{TOKEN_HEADER}': 'Bearer abc',
     }
 ])
-@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'server')
+@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'ensure_layman')
 def test_token_active(client, headers):
     username = 'testuser1'
     rv = client.get(url_for('rest_layers.get', username=username), headers=headers)
@@ -247,7 +231,7 @@ def test_token_active(client, headers):
     assert resp_json['code'] == 40
 
 
-@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url', 'server')
+@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url', 'ensure_layman')
 def test_authn_get_current_user_without_username(client):
     rest_path = url_for('rest_current_user.get')
     rv = client.get(rest_path, headers={
