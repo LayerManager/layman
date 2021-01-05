@@ -87,8 +87,11 @@ jobs:
           packages: |
             pylint
 
+      - name: Get version
+        run: pylint --version
+
       - name: Run pylint
-        run: pylint -f colorized -r y --fail-under 6.8 --disable=missing-docstring ./src ./test
+        run: pylint -f colorized -r y --fail-under 6.8 --disable=missing-docstring --max-line-length=127 ./src ./test
 
   AutoPEP8:
     runs-on: ubuntu-latest
