@@ -1,11 +1,11 @@
+from urllib.parse import urljoin
 import logging
 import requests
-from urllib.parse import urljoin
 
 from layman import app, settings
+from layman.common import geoserver
 from layman.common.prime_db_schema import schema_initialization
 from layman.layer.util import get_layer_infos
-from layman.common import geoserver
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ def upgrade_1_8():
                                             settings.RIGHTS_EVERYONE_ROLE)
 
         logger.info(f'  Ensuring users')
-        from .util import get_usernames, ensure_whole_user, check_username
+        from ..util import get_usernames, ensure_whole_user, check_username
         all_usernames = get_usernames()
         for username in all_usernames:
             logger.info(f'    Ensuring user {username}')
@@ -56,10 +56,3 @@ def upgrade_1_8():
                 for type in ['read', 'write']:
                     security_read_roles = geoserver.layman_users_to_geoserver_roles(info['access_rights'][type])
                     geoserver.ensure_layer_security_roles(username, layer, security_read_roles, type[0], settings.LAYMAN_GS_AUTH)
-
-
-def upgrade():
-    logger.info(f'Checking all upgrades')
-    if older_than_1_8():
-        upgrade_1_8()
-    logger.info(f'Checking all upgrades DONE')
