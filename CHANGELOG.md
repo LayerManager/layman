@@ -2,6 +2,12 @@
 
 ## v1.9.0
  2021-01-??
+### Upgrade requirements
+- Set environment variable [LAYMAN_OUTPUT_SRS_LIST](doc/env-settings.md#LAYMAN_OUTPUT_SRS_LIST) that contains list of EPSG codes that will appear as output spatial reference systems in both WMS and WFS. Choose any EPSG codes you need and add two mandatory systems `4326` and `3857`.
+   - Sample SRS list for World: `4326,3857`
+   - Sample SRS list for Czech Republic: `4326,3857,5514,102067,32633,32634`
+   - Sample SRS list for Latvia: `4326,3857,3059`
+### Changes
 - One of [OAuth2 HTTP headers](doc/oauth2/index.md#request-layman-rest-api), `AuthorizationIssUrl`, is optional if and only if there is only one OAuth2 authorization server registered at Layman. The header was mandatory in 1.8.0 and sooner.
 
 ## v1.8.1
