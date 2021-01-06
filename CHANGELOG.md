@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.8.1
+ 2021-01-06
+### Upgrade notes
+- The fix of [#200](https://github.com/jirik/layman/issues/200) affects only newly posted or patched layers. To fix access rights on existing layers, you can either wait for 1.9 release (2021-01-15), or manually add ROLE_AUTHENTICATED for every [layer security rule](https://docs.geoserver.org/stable/en/user/security/layer.html) which already contains ROLE_ANONYMOUS.
+### Changes
+- [#200](https://github.com/jirik/layman/issues/200) Access rights EVERYONE is correctly propagated to GeoServer also for authenticated users. Only newly posted or patched layers are affected by the fix.
+- One of [OAuth2 HTTP headers](doc/oauth2/index.md#request-layman-rest-api), `AuthorizationIssUrl`, is optional if and only if there is only one OAuth2 authorization server registered at Layman. The header was mandatory before 1.8.1 in any case.
+
 ## v1.8.0
  2020-12-14
 ### Upgrade requirements
