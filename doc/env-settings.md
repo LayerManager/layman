@@ -32,6 +32,12 @@ Public URL of [Layman Test Client](https://github.com/jirik/layman-test-client).
 ### LAYMAN_TIMGEN_URL
 Internal URL of thumnbail image generator (Timgen) used for generating map thumbnails.
 
+### LAYMAN_OUTPUT_SRS_LIST
+List of [EPSG codes](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) that will be supported as output spatial reference systems in both WMS and WFS. Value consists of integer codes separated by comma (`,`). If the list does not contain codes [4326](https://epsg.io/4326) and [3857](https://epsg.io/3857), they are appended by Layman automatically.
+   - Sample SRS list for World: `4326,3857`
+   - Sample SRS list for Czech Republic: `4326,3857,5514,102067,32633,32634`
+   - Sample SRS list for Latvia: `4326,3857,3059`
+
 ## Layman authentication and authorization
 
 ### LAYMAN_AUTHN_MODULES
