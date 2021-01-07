@@ -10,7 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 DATA_MIGRATIONS = [
-    ((1, 9, 0), [upgrade_v1_9.initialize_data_versioning, ]),
+    ((1, 9, 0), [upgrade_v1_9.initialize_data_versioning,
+                 upgrade_v1_9.geoserver_everyone_rights_repair]),
 ]
 
 
