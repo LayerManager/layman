@@ -16,6 +16,7 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 logger = logging.getLogger(__name__)
 
 
+@pytest.mark.timeout(20)
 @pytest.mark.usefixtures('ensure_layman')
 def test_recreate_schema():
     username = 'test_recreate_schema_user'
