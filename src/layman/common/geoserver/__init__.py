@@ -496,6 +496,18 @@ def reset(auth):
     logger.info(f"Resetting GeoServer done")
 
 
+def reload(auth):
+    logger.info(f"Reloading GeoServer")
+    r_url = settings.LAYMAN_GS_REST + 'reload'
+    r = requests.post(r_url,
+                      headers=headers_json,
+                      auth=auth,
+                      timeout=5,
+                      )
+    r.raise_for_status()
+    logger.info(f"Reloading GeoServer done")
+
+
 def get_layer_square_bbox(owslib_wms, layername):
     bbox = list(next(t for t in owslib_wms[layername].crs_list if t[4].lower() == 'epsg:3857'))
     # current_app.logger.info(f"bbox={bbox}")
