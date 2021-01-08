@@ -1,4 +1,3 @@
-from flask import url_for
 import pytest
 
 from layman import settings, app
@@ -6,6 +5,7 @@ from layman.common import geoserver
 from layman.layer.prime_db_schema import table as prime_db_schema
 from layman.common.prime_db_schema import users
 from layman.layer.geoserver.util import wms_direct
+from layman.util import url_for
 
 from test import process_client as client_util
 
@@ -70,12 +70,7 @@ def ensure_user():
         assert_gs_user_and_roles(tmp_username)
 
 
-@pytest.fixture(scope="module")
-def app_config():
-    app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
-
-
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman_module', 'ensure_user', 'app_config')
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman_module', 'ensure_user')
 @pytest.mark.parametrize("access_rights_and_expected_list", [
     [
         {'read': {settings.RIGHTS_EVERYONE_ROLE},
