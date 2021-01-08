@@ -4,8 +4,7 @@ from layman import settings, app
 from layman.common import geoserver
 from layman.layer.prime_db_schema import table as prime_db_schema
 from layman.common.prime_db_schema import users
-from layman.layer.geoserver.util import wms_direct
-from layman.util import url_for
+from test import geoserver_client
 
 from test import process_client as client_util
 
@@ -49,9 +48,7 @@ def assert_layman_layer_access_rights(username,
 
 
 def assert_wms_access(workspace, authn_headers, expected_layers):
-    with app.app_context():
-        wms_url = url_for('gs_wfs_proxy_bp.proxy', subpath=workspace + '/' + 'wms')
-    wms = wms_direct(wms_url, headers=authn_headers)
+    wms = geoserver_client.get_wms_capabilities(workspace, headers=authn_headers)
     assert set(wms.contents) == set(expected_layers)
 
 

@@ -6,12 +6,10 @@ from layman import app
 from layman import settings
 from layman.layer import db
 from test.process_client import get_authz_headers
-from test import process_client as client_util
+from test import process_client as client_util, geoserver_client
 from test.data import wfs as data_wfs
 from layman.layer.geoserver import wfs as geoserver_wfs
-from layman.layer.geoserver.util import wms_direct
 from layman.common.geoserver import get_layer_thumbnail, get_layer_square_bbox
-from layman.util import url_for
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -33,7 +31,7 @@ def test_rest_get():
         r = requests.post(rest_url,
                           data=data_xml,
                           headers=headers)
-    assert r.status_code == 200, r.data
+    assert r.status_code == 200, r.text
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=GetCapabilities"
     with app.app_context():
@@ -151,10 +149,9 @@ def test_wms_ows_proxy(service_endpoint):
 
     assert ln == layername
 
-    with app.app_context():
-        wms_url = url_for('gs_wfs_proxy_bp.proxy', subpath=username + '/' + service_endpoint)
+    wms_url = geoserver_client.get_wms_url(username, service_endpoint)
 
-    wms = wms_direct(wms_url, headers=authn_headers)
+    wms = geoserver_client.get_wms_capabilities(username, service_endpoint, headers=authn_headers)
 
     # current_app.logger.info(list(wms.contents))
     tn_bbox = get_layer_square_bbox(wms, layername)

@@ -1,8 +1,6 @@
 import pytest
-from layman import settings, app
-from layman.util import url_for
-from test import process, process_client
-from layman.layer.geoserver.util import wms_direct, wfs_direct
+from layman import settings
+from test import process, process_client, geoserver_client
 
 
 LAYERS_TO_DELETE_AFTER_TEST = []
@@ -46,9 +44,7 @@ def test_custom_srs_list(delete_layer_after_test):
 
 
 def assert_wms_output_srs_list(workspace, layername, expected_output_srs_list):
-    with app.app_context():
-        wms_url = url_for('gs_wfs_proxy_bp.proxy', subpath=workspace + '/' + 'ows')
-    wms = wms_direct(wms_url)
+    wms = geoserver_client.get_wms_capabilities(workspace)
     assert layername in wms.contents
     wms_layer = wms.contents[layername]
     for expected_output_srs in expected_output_srs_list:
@@ -56,9 +52,7 @@ def assert_wms_output_srs_list(workspace, layername, expected_output_srs_list):
 
 
 def assert_wfs_output_srs_list(workspace, layername, expected_output_srs_list):
-    with app.app_context():
-        wfs_url = url_for('gs_wfs_proxy_bp.proxy', subpath=workspace + '/' + 'wfs')
-    wfs = wfs_direct(wfs_url)
+    wfs = geoserver_client.get_wfs_capabilities(workspace)
     full_layername = f"{workspace}:{layername}"
     assert full_layername in wfs.contents
     wfs_layer = wfs.contents[full_layername]
