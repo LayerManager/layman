@@ -60,6 +60,7 @@ LAYMAN_GS_REST_ROLES = urljoin(LAYMAN_GS_REST, f'security/roles/service/{LAYMAN_
 LAYMAN_GS_REST_USERS = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAYMAN_GS_USER_GROUP_SERVICE}/users/')
 LAYMAN_GS_REST_USER = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAYMAN_GS_USER_GROUP_SERVICE}/user/')
 LAYMAN_GS_REST_WMS_SETTINGS = urljoin(LAYMAN_GS_REST, f'services/wms/settings/')
+LAYMAN_GS_REST_WFS_SETTINGS = urljoin(LAYMAN_GS_REST, f'services/wfs/settings/')
 
 LAYMAN_GS_AUTHN_HTTP_HEADER_NAME = 'laymanHttpHeader'
 LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE = os.environ['LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE']
