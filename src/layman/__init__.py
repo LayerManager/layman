@@ -63,16 +63,21 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
 
                 app.logger.info(f'Adjusting GeoServer')
                 with app.app_context():
-                    from layman.common.geoserver import ensure_role, ensure_user, ensure_user_role, ensure_wms_srs_list, ensure_proxy_base_url
+                    from layman.common import geoserver as gs
 
                     if settings.GEOSERVER_ADMIN_AUTH:
-                        ensure_role(settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
-                        ensure_user(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_PASSWORD, settings.GEOSERVER_ADMIN_AUTH)
-                        ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN', settings.GEOSERVER_ADMIN_AUTH)
-                        ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
-                    ensure_wms_srs_list([int(srs.split(':')[1]) for srs in settings.INPUT_SRS_LIST], settings.LAYMAN_GS_AUTH)
+                        gs.ensure_role(settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
+                        gs.ensure_user(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_PASSWORD, settings.GEOSERVER_ADMIN_AUTH)
+                        gs.ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN', settings.GEOSERVER_ADMIN_AUTH)
+                        gs.ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
+                    any_srs_list_changed = False
+                    for service in gs.SERVICE_TYPES:
+                        service_srs_list_changed = gs.ensure_service_srs_list(service, settings.LAYMAN_OUTPUT_SRS_LIST, settings.LAYMAN_GS_AUTH)
+                        any_srs_list_changed = service_srs_list_changed or any_srs_list_changed
+                    if any_srs_list_changed:
+                        gs.reload(settings.LAYMAN_GS_AUTH)
                     if settings.LAYMAN_GS_PROXY_BASE_URL != '':
-                        ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
+                        gs.ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
 
                 with app.app_context():
                     from . import upgrade

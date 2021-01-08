@@ -21,7 +21,6 @@ def delete_layer_after_test():
         process_client.delete_layer(workspace, layername)
 
 
-@pytest.mark.xfail(reason="Not yet implemented")
 def test_custom_srs_list(delete_layer_after_test):
     workspace = 'test_custom_srs_list_workspace'
     layername = 'test_custom_srs_list_layer'

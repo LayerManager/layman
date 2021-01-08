@@ -6,7 +6,7 @@ from layman import settings
 TEST_ROLE = 'test_role_abc'
 TEST_USER = 'test_user_abc'
 TEST_USER_PASSWORD = 'test_user_abc_pwd'
-TEST_WMS_SRS_LIST = [3035]
+TEST_SERVICE_SRS_LIST = [3035, 4326]
 TEST_PROXY_BASE_URL = 'https://example.com/geoserver/'
 auth = settings.LAYMAN_GS_AUTH
 
@@ -79,16 +79,17 @@ def test_user_role_management(gs_user, gs_role):
     assert len(init_user_roles) == len(user_roles)
 
 
-def test_wms_srs_list_management():
-    init_wms_srs_list = common.get_wms_srs_list(auth)
-    new_wms_srs_list = TEST_WMS_SRS_LIST
-    assert set(init_wms_srs_list) != set(new_wms_srs_list)
-    assert common.ensure_wms_srs_list(new_wms_srs_list, auth)
-    wms_srs_list = common.get_wms_srs_list(auth)
-    assert set(wms_srs_list) == set(new_wms_srs_list)
-    assert common.ensure_wms_srs_list(init_wms_srs_list, auth)
-    wms_srs_list = common.get_wms_srs_list(auth)
-    assert set(wms_srs_list) == set(init_wms_srs_list)
+@pytest.mark.parametrize('service', common.SERVICE_TYPES)
+def test_service_srs_list_management(service):
+    init_service_srs_list = common.get_service_srs_list(service, auth)
+    new_service_srs_list = TEST_SERVICE_SRS_LIST
+    assert set(init_service_srs_list) != set(new_service_srs_list)
+    assert common.ensure_service_srs_list(service, new_service_srs_list, auth)
+    service_srs_list = common.get_service_srs_list(service, auth)
+    assert set(service_srs_list) == set(new_service_srs_list)
+    assert common.ensure_service_srs_list(service, init_service_srs_list, auth)
+    service_srs_list = common.get_service_srs_list(service, auth)
+    assert set(service_srs_list) == set(init_service_srs_list)
 
 
 def test_proxy_base_url_management():

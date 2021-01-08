@@ -1,12 +1,13 @@
 import logging
 import json
+from functools import partial
+
 import requests
 import secrets
 import string
 from urllib.parse import urljoin
 from flask import g
 from layman import settings
-from layman import authz
 
 
 logger = logging.getLogger(__name__)
@@ -29,6 +30,14 @@ headers_json = {
     'Accept': 'application/json',
     'Content-type': 'application/json',
 }
+
+WMS_SERVICE_TYPE = 'wms'
+WFS_SERVICE_TYPE = 'wfs'
+
+SERVICE_TYPES = [
+    WMS_SERVICE_TYPE,
+    WFS_SERVICE_TYPE,
+]
 
 
 def get_roles(auth):
@@ -400,37 +409,54 @@ def delete_user_role(user, role, auth):
     return association_deleted
 
 
-def get_wms_settings(auth):
-    r_url = settings.LAYMAN_GS_REST_WMS_SETTINGS
+def get_service_url(service):
+    return {
+        WMS_SERVICE_TYPE: settings.LAYMAN_GS_REST_WMS_SETTINGS,
+        WFS_SERVICE_TYPE: settings.LAYMAN_GS_REST_WFS_SETTINGS,
+    }[service]
+
+
+def get_service_settings(service, auth):
+    r_url = get_service_url(service)
     r = requests.get(r_url,
                      headers=headers_json,
                      auth=auth,
                      timeout=5,
                      )
     r.raise_for_status()
-    return r.json()['wms']
+    return r.json()[service]
 
 
-def get_wms_srs_list(auth, wms_settings=None):
-    if wms_settings is None:
-        wms_settings = get_wms_settings(auth)
-    return wms_settings.get('srs', {}).get('string', [])
+get_wms_settings = partial(get_service_settings, WMS_SERVICE_TYPE)
+get_wfs_settings = partial(get_service_settings, WFS_SERVICE_TYPE)
 
 
-def ensure_wms_srs_list(srs_list, auth):
-    wms_settings = get_wms_settings(auth)
-    current_srs_list = get_wms_srs_list(auth, wms_settings=wms_settings)
-    list_equals = set(current_srs_list) == set(srs_list)
-    if not list_equals:
-        wms_settings['srs'] = {
+def get_service_srs_list(service, auth, service_settings=None):
+    if service_settings is None:
+        service_settings = get_service_settings(service, auth)
+    return service_settings.get('srs', {}).get('string', [])
+
+
+get_wms_srs_list = partial(get_service_srs_list, WMS_SERVICE_TYPE)
+# Maybe it's needed to call /reload after the change in WFS SRS list
+get_wfs_srs_list = partial(get_service_srs_list, WFS_SERVICE_TYPE)
+
+
+def ensure_service_srs_list(service, srs_list, auth):
+    # Maybe it's needed to call /reload after the change in WFS SRS list
+    service_settings = get_service_settings(service, auth)
+    current_srs_list = get_service_srs_list(service, auth, service_settings=service_settings)
+    list_change = set(current_srs_list) != set(srs_list)
+    if list_change:
+        service_settings['srs'] = {
             'string': srs_list,
         },
-        logger.info(f"Current SRS list {current_srs_list} not equals to requested {srs_list}, changing.")
-        r_url = settings.LAYMAN_GS_REST_WMS_SETTINGS
+        logger.info(f"Service {service}: Current SRS list {current_srs_list} not equals to requested {srs_list}, changing.")
+        r_url = get_service_url(service)
         r = requests.put(
             r_url,
             data=json.dumps({
-                'wms': wms_settings,
+                service: service_settings,
             }),
             headers=headers_json,
             auth=auth,
@@ -438,9 +464,12 @@ def ensure_wms_srs_list(srs_list, auth):
         )
         r.raise_for_status()
     else:
-        logger.info(f"Current SRS list {current_srs_list} already corresponds with requested one.")
-    list_changed = not list_equals
-    return list_changed
+        logger.info(f"Service {service}: Current SRS list {current_srs_list} already corresponds with requested one.")
+    return list_change
+
+
+ensure_wms_srs_list = partial(ensure_service_srs_list, WMS_SERVICE_TYPE)
+ensure_wfs_srs_list = partial(ensure_service_srs_list, WFS_SERVICE_TYPE)
 
 
 def get_global_settings(auth):
