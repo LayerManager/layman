@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, current_app as app, g
 
 from layman.http import LaymanError
 from layman.util import check_username_decorator
-from . import util
+from . import util, LAYER_REST_PATH_NAME
 from .filesystem import input_chunk
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
@@ -19,7 +19,7 @@ def before_request():
     pass
 
 
-@bp.route("/layers/<layername>/chunk", methods=['POST'])
+@bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/chunk", methods=['POST'])
 def post(username, layername):
     app.logger.info(f"POST Layer Chunk, user={g.user}")
 
@@ -47,7 +47,7 @@ def post(username, layername):
     }), 200
 
 
-@bp.route("/layers/<layername>/chunk", methods=['GET'])
+@bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/chunk", methods=['GET'])
 def get(username, layername):
     app.logger.info(f"GET Layer Chunk, user={g.user}")
 

@@ -5,7 +5,7 @@ from layman.common import rest as rest_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
 from layman import settings, authn, util as layman_util
-from . import util, LAYER_TYPE
+from . import util, LAYER_TYPE, LAYER_REST_PATH_NAME
 from .filesystem import input_file, input_sld, input_chunk, uuid
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
@@ -23,7 +23,7 @@ def before_request():
     pass
 
 
-@bp.route('/layers', methods=['GET'])
+@bp.route(f"/{LAYER_REST_PATH_NAME}", methods=['GET'])
 def get(username):
     app.logger.info(f"GET Layers, user={g.user}")
 
@@ -44,7 +44,7 @@ def get(username):
     return jsonify(infos), 200
 
 
-@bp.route('/layers', methods=['POST'])
+@bp.route(f"/{LAYER_REST_PATH_NAME}", methods=['POST'])
 def post(username):
     app.logger.info(f"POST Layers, user={g.user}")
 
@@ -173,7 +173,7 @@ def post(username):
     return jsonify([layer_result]), 200
 
 
-@bp.route('/layers', methods=['DELETE'])
+@bp.route(f"/{LAYER_REST_PATH_NAME}", methods=['DELETE'])
 def delete(username):
     app.logger.info(f"DELETE Layers, user={g.user}")
 

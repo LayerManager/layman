@@ -6,7 +6,7 @@ from layman.common import redis as redis_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator
 from layman import settings, authn
-from . import util
+from . import util, LAYER_REST_PATH_NAME
 from .filesystem import input_file, input_sld, input_chunk
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
@@ -24,7 +24,7 @@ def before_request():
     pass
 
 
-@bp.route('/layers/<layername>', methods=['GET'])
+@bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['GET'])
 def get(username, layername):
     app.logger.info(f"GET Layer, user={g.user}")
 
@@ -33,7 +33,7 @@ def get(username, layername):
     return jsonify(info), 200
 
 
-@bp.route('/layers/<layername>', methods=['PATCH'])
+@bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['PATCH'])
 @util.lock_decorator
 def patch(username, layername):
     app.logger.info(f"PATCH Layer, user={g.user}")
@@ -159,7 +159,7 @@ def patch(username, layername):
     return jsonify(info), 200
 
 
-@bp.route('/layers/<layername>', methods=['DELETE'])
+@bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['DELETE'])
 @util.lock_decorator
 def delete_layer(username, layername):
     app.logger.info(f"DELETE Layer, user={g.user}")

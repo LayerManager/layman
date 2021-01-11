@@ -7,7 +7,7 @@ from werkzeug.datastructures import FileStorage
 from layman.common import rest as rest_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
-from . import util, MAP_TYPE
+from . import util, MAP_TYPE, MAP_REST_PATH_NAME
 from .filesystem import input_file, uuid
 from layman import authn, util as layman_util
 from layman.authn import authenticate
@@ -26,7 +26,7 @@ def before_request():
     pass
 
 
-@bp.route('/maps', methods=['GET'])
+@bp.route(f"/{MAP_REST_PATH_NAME}", methods=['GET'])
 def get(username):
     app.logger.info(f"GET Maps, user={g.user}")
 
@@ -46,7 +46,7 @@ def get(username):
     return jsonify(infos), 200
 
 
-@bp.route('/maps', methods=['POST'])
+@bp.route(f"/{MAP_REST_PATH_NAME}", methods=['POST'])
 def post(username):
     app.logger.info(f"POST Maps, user={g.user}")
 
@@ -137,7 +137,7 @@ def post(username):
     return jsonify([map_result]), 200
 
 
-@bp.route('/maps', methods=['DELETE'])
+@bp.route(f"/{MAP_REST_PATH_NAME}", methods=['DELETE'])
 def delete(username):
     app.logger.info(f"DELETE Maps, user={g.user}")
 
