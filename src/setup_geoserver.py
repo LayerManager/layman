@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-from geoserver import authn as gs_authn
+from geoserver import authn as gs_authn, epsg_properties
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
@@ -16,7 +16,7 @@ ATTEMPT_INTERVAL = 2
 MAX_ATTEMPTS = 60
 
 
-def main():
+def setup_authn():
     gs_authn.ensure_data_dir(settings.GEOSERVER_DATADIR, settings.GEOSERVER_INITIAL_DATADIR)
 
     gs_authn.ensure_request_header_authn(
@@ -41,6 +41,11 @@ def main():
             'anonymous',
         ]
     )
+
+
+def main():
+    setup_authn()
+    epsg_properties.setup_epsg(settings.GEOSERVER_DATADIR, set(settings.LAYMAN_OUTPUT_SRS_LIST))
 
 
 if __name__ == "__main__":
