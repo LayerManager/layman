@@ -2,20 +2,46 @@ import re
 
 from layman import settings
 from .util import PUBLICATION_NAME_ONLY_PATTERN
-from layman.util import USERNAME_ONLY_PATTERN
+from layman.util import USERNAME_ONLY_PATTERN, get_publication_types
 
 
 def _get_multi_publication_path_pattern():
     workspace_pattern = r"(?P<workspace>" + USERNAME_ONLY_PATTERN + r")"
-    # TODO generate layers|maps automatically from blueprints using settings.PUBLICATION_MODULES
-    publ_type_pattern = r"(?P<publication_type>layers|maps)"
+    publ_type_names = [publ_type['rest_path_name'] for publ_type in get_publication_types().values()]
+    publ_type_pattern = r"(?P<publication_type>" + "|".join(publ_type_names) + r")"
     return "^/rest/" + workspace_pattern + "/" + publ_type_pattern
 
 
-MULTI_PUBLICATION_PATH_PATTERN = re.compile(_get_multi_publication_path_pattern() + r"/?$")
-SINGLE_PUBLICATION_PATH_PATTERN = re.compile(
-    _get_multi_publication_path_pattern() + r"/(?P<publication_name>" + PUBLICATION_NAME_ONLY_PATTERN + r")(?:/.*)?$"
-)
+_MULTI_PUBLICATION_PATH_PATTERN = None
+_SINGLE_PUBLICATION_PATH_PATTERN = None
+_URL_NAME_TO_PUBLICATION_TYPE = None
+
+
+def get_multipublication_path_pattern():
+    global _MULTI_PUBLICATION_PATH_PATTERN
+    if _MULTI_PUBLICATION_PATH_PATTERN is None:
+        _MULTI_PUBLICATION_PATH_PATTERN = re.compile(_get_multi_publication_path_pattern() + r"/?$")
+    return _MULTI_PUBLICATION_PATH_PATTERN
+
+
+def get_singlepublication_path_pattern():
+    global _SINGLE_PUBLICATION_PATH_PATTERN
+    if _SINGLE_PUBLICATION_PATH_PATTERN is None:
+        _SINGLE_PUBLICATION_PATH_PATTERN = re.compile(
+            _get_multi_publication_path_pattern()
+            + r"/(?P<publication_name>" + PUBLICATION_NAME_ONLY_PATTERN + r")(?:/.*)?$"
+        )
+    return _SINGLE_PUBLICATION_PATH_PATTERN
+
+
+def get_url_name_to_publication_type():
+    global _URL_NAME_TO_PUBLICATION_TYPE
+    if _URL_NAME_TO_PUBLICATION_TYPE is None:
+        _URL_NAME_TO_PUBLICATION_TYPE = {
+            publ_type['rest_path_name']: publ_type
+            for publ_type in get_publication_types().values()
+        }
+    return _URL_NAME_TO_PUBLICATION_TYPE
 
 
 def parse_request_path(request_path):
@@ -23,19 +49,15 @@ def parse_request_path(request_path):
     publication_type = None
     publication_type_url_prefix = None
     publication_name = None
-    m = MULTI_PUBLICATION_PATH_PATTERN.match(request_path)
+    m = get_multipublication_path_pattern().match(request_path)
     if not m:
-        m = SINGLE_PUBLICATION_PATH_PATTERN.match(request_path)
+        m = get_singlepublication_path_pattern().match(request_path)
     if m:
         workspace = m.group('workspace')
         publication_type_url_prefix = m.group('publication_type')
         publication_name = m.groupdict().get('publication_name', None)
     if publication_type_url_prefix:
-        # TODO get it using settings.PUBLICATION_MODULES
-        publication_type = {
-            'layers': 'layman.layer',
-            'maps': 'layman.map',
-        }[publication_type_url_prefix]
+        publication_type = get_url_name_to_publication_type()[publication_type_url_prefix]['type']
     if workspace in settings.RESERVED_WORKSPACE_NAMES:
         workspace = None
         publication_type = None

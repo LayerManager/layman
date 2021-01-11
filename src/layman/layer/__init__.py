@@ -23,6 +23,7 @@ PUBLICATION_TYPES = {
     f'{LAYER_TYPE}': {
         'type': LAYER_TYPE,  # unique type name, same as dict key
         'module': __name__,  # name of module that defines the type
+        'rest_path_name': LAYER_REST_PATH_NAME,
         'blueprints': [  # blueprints to register
             layers_bp,
             layer_bp,

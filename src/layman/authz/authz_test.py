@@ -43,7 +43,7 @@ def test_authorize_publications_decorator_accepts_path(request_path):
         g.user = None
         with pytest.raises(Exception) as exc_info:
             mock_method()
-        assert isinstance(exc_info.value, LaymanError)
+        assert isinstance(exc_info.value, LaymanError), exc_info.traceback
 
 
 class TestRestApiClass:
