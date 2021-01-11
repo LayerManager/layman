@@ -38,7 +38,6 @@ def assert_module_methods(module, methods):
 def test_publication_interface_methods():
     publication_source_methods = {
         'get_publication_uuid',
-        'get_publication_infos',
         'get_metadata_comparison',
         'pre_publication_action_check',
     }
@@ -71,7 +70,6 @@ def test_publication_interface_methods():
             'publication_type': 'layman.layer',
             'modules_getter': source_modules_getter,
             'methods': publication_source_methods.union({
-                'get_layer_infos',
                 'get_layer_info',
                 'delete_layer',
                 'patch_layer',
@@ -82,7 +80,6 @@ def test_publication_interface_methods():
             'publication_type': 'layman.map',
             'modules_getter': source_modules_getter,
             'methods': publication_source_methods.union({
-                'get_map_infos',
                 'get_map_info',
                 'patch_map',
                 'post_map',
@@ -144,5 +141,5 @@ class TestGetPublicationInfosClass:
                                    expected_publications):
         with app.app_context():
             infos = util.get_publication_infos(self.owner, publ_type, context)
-        publ_set = set(infos.keys())
+        publ_set = set([publication_name for (workspace, publication_type, publication_name) in infos.keys()])
         assert publ_set == expected_publications, publ_set

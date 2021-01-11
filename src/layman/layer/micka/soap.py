@@ -8,10 +8,6 @@ PATCH_MODE = csw.PATCH_MODE
 
 get_layer_info = csw.get_layer_info
 
-get_layer_infos = csw.get_layer_infos
-
-get_publication_infos = csw.get_publication_infos
-
 get_publication_uuid = csw.get_publication_uuid
 
 delete_layer = csw.delete_layer

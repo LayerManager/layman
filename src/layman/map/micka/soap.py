@@ -2,16 +2,11 @@ from flask import current_app
 from . import csw
 from .. import MAP_TYPE
 from layman.common.micka import util as common_util
-from layman import settings, LaymanError, authz
-from layman.map.filesystem.uuid import get_map_uuid
-
-get_map_infos = csw.get_map_infos
+from layman import settings, authz
 
 get_map_info = csw.get_map_info
 
 post_map = csw.post_map
-
-get_publication_infos = csw.get_publication_infos
 
 get_publication_uuid = csw.get_publication_uuid
 

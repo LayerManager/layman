@@ -4,8 +4,7 @@ import pathlib
 import re
 import socket
 import time
-from urllib.parse import urljoin, urlencode
-from layman import settings
+from urllib.parse import urlencode
 from flask import current_app
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -51,16 +50,11 @@ def patch_map(username, mapname, file_changed=True):
         post_map(username, mapname)
 
 
-get_publication_infos = input_file.get_publication_infos
-
 get_publication_uuid = input_file.get_publication_uuid
 
 
 def delete_map(username, mapname):
     util.delete_map_subdir(username, mapname, MAP_SUBDIR)
-
-
-get_map_infos = input_file.get_map_infos
 
 
 def get_map_thumbnail_path(username, mapname):

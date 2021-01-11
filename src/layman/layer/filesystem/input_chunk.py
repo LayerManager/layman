@@ -35,10 +35,6 @@ def delete_layer(username, layername):
 
 get_layer_info = input_file.get_layer_info
 
-get_layer_infos = input_file.get_layer_infos
-
-get_publication_infos = input_file.get_publication_infos
-
 get_publication_uuid = input_file.get_publication_uuid
 
 

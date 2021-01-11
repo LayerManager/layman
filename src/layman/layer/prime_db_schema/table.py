@@ -5,11 +5,6 @@ from layman import patch_mode
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
-def get_layer_infos(username):
-    result = {layername: layer_info for (username_value, type, layername), layer_info in pubs_util.get_publication_infos(username, LAYER_TYPE).items()}
-    return result
-
-
 def get_publication_uuid(username, publication_type, publication_name):
     infos = pubs_util.get_publication_infos(username, publication_type)
     return infos.get((username, publication_type, publication_name), dict()).get("uuid")
@@ -80,8 +75,9 @@ def get_publication_infos(username, publication_type):
     if publication_type != '.'.join(__name__.split('.')[:-2]):
         raise Exception(f'Unknown pyblication type {publication_type}')
 
-    infos = get_layer_infos(username)
-    return infos
+    result = {layername: layer_info for (username_value, type, layername), layer_info in
+              pubs_util.get_publication_infos(username, LAYER_TYPE).items()}
+    return result
 
 
 def get_metadata_comparison(username, publication_name):

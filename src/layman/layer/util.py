@@ -71,12 +71,6 @@ def get_providers():
     return current_app.config[key]
 
 
-def get_layer_infos(username):
-    sources = get_sources()
-    results = call_modules_fn(sources, 'get_layer_infos', [username])
-    return layman_util.merge_infos(results)
-
-
 def check_new_layername(username, layername):
     check_layername(layername)
     providers = get_providers()

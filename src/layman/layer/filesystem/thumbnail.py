@@ -41,8 +41,6 @@ def get_layer_info(username, layername):
     return {}
 
 
-get_publication_infos = input_file.get_publication_infos
-
 get_publication_uuid = input_file.get_publication_uuid
 
 
@@ -60,9 +58,6 @@ def patch_layer(username, layername):
 
 def delete_layer(username, layername):
     util.delete_layer_subdir(username, layername, LAYER_SUBDIR)
-
-
-get_layer_infos = input_file.get_layer_infos
 
 
 def get_layer_thumbnail_path(username, layername):

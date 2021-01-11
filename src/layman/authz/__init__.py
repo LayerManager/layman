@@ -1,7 +1,7 @@
 import json
 from flask import after_this_request
 from functools import wraps
-from layman.common.prime_db_schema import workspaces, users, publications
+from layman.common.prime_db_schema import workspaces, users
 from layman import util as layman_util
 
 
@@ -43,7 +43,7 @@ def authorize(workspace, publication_type, publication_name, request_method, act
     else:
         if not workspaces.get_workspace_infos(workspace):
             raise LaymanError(40)  # Workspace not found
-        publ_info = publications.get_publication_infos(workspace, publication_type).get(
+        publ_info = layman_util.get_publication_infos(workspace, publication_type).get(
             (workspace, publication_type, publication_name)
         )
         if not publ_info:
@@ -91,14 +91,14 @@ def can_user_create_public_workspace(username):
 
 
 def can_user_read_publication(username, workspace, publication_type, publication_name):
-    publ_info = publications.get_publication_infos(workspace_name=workspace, pub_type=publication_type).get(
+    publ_info = layman_util.get_publication_infos(workspace=workspace, publ_type=publication_type).get(
         (workspace, publication_type, publication_name)
     )
     return publ_info and is_user_in_access_rule(username, publ_info['access_rights']['read'])
 
 
 def can_user_write_publication(username, workspace, publication_type, publication_name):
-    publ_info = publications.get_publication_infos(workspace_name=workspace, pub_type=publication_type).get(
+    publ_info = layman_util.get_publication_infos(workspace=workspace, publ_type=publication_type).get(
         (workspace, publication_type, publication_name)
     )
     return publ_info and is_user_in_access_rule(username, publ_info['access_rights']['write'])

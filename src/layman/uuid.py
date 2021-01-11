@@ -8,7 +8,7 @@ from layman import celery as celery_util
 from layman.common import redis as redis_util
 from redis import WatchError
 from . import settings
-from .util import get_usernames, get_modules_from_names, get_providers_from_source_names, call_modules_fn
+from layman.common.prime_db_schema import publications
 
 UUID_SET_KEY = f'{__name__}:UUID_SET'
 UUID_METADATA_KEY = f'{__name__}:UUID_METADATA:{{uuid}}'
@@ -17,38 +17,15 @@ USER_TYPE_NAMES_KEY = f'{__name__}:USER_TYPE_NAMES:{{username}}:{{publication_ty
 
 def import_uuids_to_redis():
     current_app.logger.info('Importing UUIDs to REDIS')
-    usernames = get_usernames(use_cache=False)
 
-    for username in usernames:
-        for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
-            for type_def in publ_module.PUBLICATION_TYPES.values():
-                publ_type_name = type_def['type']
-                sources = get_modules_from_names(type_def['internal_sources'])
-                results = call_modules_fn(sources, 'get_publication_infos', [username, publ_type_name])
-                pubnames = []
-                for r in results:
-                    pubnames += r.keys()
-                pubnames = list(set(pubnames))
+    infos = publications.get_publication_infos()
+    for (workspace, publication_type, publication_name), info in infos.items():
+        register_publication_uuid(workspace, publication_type,
+                                  publication_name, info["uuid"],
+                                  ignore_duplicate=True)
 
-                for publ_name in pubnames:
-                    results = call_modules_fn(sources, 'get_publication_uuid',
-                                              [username, publ_type_name, publ_name])
-                    uuid_str = None
-                    for maybe_uuid in results:
-                        if not isinstance(maybe_uuid, str):
-                            continue
-                        try:
-                            UUID(maybe_uuid)
-                            uuid_str = maybe_uuid
-                        except ValueError:
-                            continue
-                    if uuid_str is not None:
-                        register_publication_uuid(username, publ_type_name,
-                                                  publ_name, uuid_str,
-                                                  ignore_duplicate=True)
-
-                        current_app.logger.info(
-                            f'Import publication into redis: user {username}, type {publ_type_name}, name {publ_name}, uuid {uuid_str}')
+        current_app.logger.info(
+            f'Import publication into redis: workspace {workspace}, type {publication_type}, name {publication_name}, uuid {info["uuid"]}')
 
 
 def generate_uuid():
@@ -131,32 +108,9 @@ def is_valid_uuid(maybe_uuid_str):
 
 def check_redis_consistency(expected_publ_num_by_type=None):
     # get info from non-redis sources
-    num_total_publs = 0
-    total_publs = []
-    all_sources = []
-    for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
-        for type_def in publ_module.PUBLICATION_TYPES.values():
-            all_sources += type_def['internal_sources']
-    providers = get_providers_from_source_names(all_sources)
-    results = call_modules_fn(providers, 'get_usernames')
-    usernames = []
-    for r in results:
-        usernames += r
-    usernames = list(set(usernames))
-    for username in usernames:
-        for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
-            for type_def in publ_module.PUBLICATION_TYPES.values():
-                publ_type_name = type_def['type']
-                sources = get_modules_from_names(type_def['internal_sources'])
-                pubnames = []
-                results = call_modules_fn(sources, 'get_publication_infos', [username, publ_type_name])
-                for r in results:
-                    pubnames += r.keys()
-                pubnames = list(set(pubnames))
-                # print(f'username {username}, publ_type_name {publ_type_name}, pubnames {pubnames}')
-                num_total_publs += len(pubnames)
-                for pubname in pubnames:
-                    total_publs.append((username, publ_type_name, pubname))
+    infos = publications.get_publication_infos()
+    num_total_publs = len(infos)
+    total_publs = list(infos.keys())
 
     # publication types and names
     redis = settings.LAYMAN_REDIS
