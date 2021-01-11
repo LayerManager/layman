@@ -22,6 +22,7 @@ PUBLICATION_TYPES = {
     f'{MAP_TYPE}': {
         'type': MAP_TYPE,
         'module': __name__,
+        'rest_path_name': MAP_REST_PATH_NAME,
         'blueprints': [
             maps_bp,
             map_bp,
