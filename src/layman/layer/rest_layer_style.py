@@ -5,7 +5,7 @@ from layman.authz import authorize_publications_decorator
 from layman.layer.geoserver import sld
 from layman.util import check_username_decorator
 from layman import settings
-from . import util
+from . import util, LAYER_REST_PATH_NAME
 
 bp = Blueprint('rest_layer_style', __name__)
 
@@ -20,7 +20,7 @@ def before_request():
     pass
 
 
-@bp.route('/layers/<layername>/style', methods=['GET'])
+@bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/style", methods=['GET'])
 def get(username, layername):
     app.logger.info(f"GET Style, user={g.user}, username={username}, layername={layername}")
 

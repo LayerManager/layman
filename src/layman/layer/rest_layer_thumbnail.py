@@ -5,7 +5,7 @@ from flask import Blueprint, send_file, current_app as app, g
 from layman.common.filesystem.util import get_user_dir
 from layman.http import LaymanError
 from layman.util import check_username_decorator
-from . import util
+from . import util, LAYER_REST_PATH_NAME
 from .filesystem import thumbnail
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
@@ -23,7 +23,7 @@ def before_request():
     pass
 
 
-@bp.route('/layers/<layername>/thumbnail', methods=['GET'])
+@bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/thumbnail", methods=['GET'])
 def get(username, layername):
     app.logger.info(f"GET Layer Thumbnail, user={g.user}")
 

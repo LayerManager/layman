@@ -9,6 +9,9 @@ def get_layer_sources():
     return get_layer_type_def()['internal_sources']
 
 
+LAYER_REST_PATH_NAME = "layers"
+
+
 from .rest_layers import bp as layers_bp
 from .rest_layer import bp as layer_bp
 from .rest_layer_chunk import bp as layer_chunk_bp

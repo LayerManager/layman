@@ -6,7 +6,7 @@ from werkzeug.datastructures import FileStorage
 
 from layman.common import rest as rest_util
 from layman.util import check_username_decorator
-from . import util
+from . import util, MAP_REST_PATH_NAME
 from .filesystem import input_file, thumbnail
 from layman import authn
 from layman.authn import authenticate
@@ -25,7 +25,7 @@ def before_request():
     pass
 
 
-@bp.route('/maps/<mapname>', methods=['GET'])
+@bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>", methods=['GET'])
 def get(username, mapname):
     app.logger.info(f"GET Map, user={g.user}")
 
@@ -34,7 +34,7 @@ def get(username, mapname):
     return jsonify(info), 200
 
 
-@bp.route('/maps/<mapname>', methods=['PATCH'])
+@bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>", methods=['PATCH'])
 @util.lock_decorator
 def patch(username, mapname):
     app.logger.info(f"PATCH Map, user={g.user}")
@@ -104,7 +104,7 @@ def patch(username, mapname):
     return jsonify(info), 200
 
 
-@bp.route('/maps/<mapname>', methods=['DELETE'])
+@bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>", methods=['DELETE'])
 @util.lock_decorator
 def delete_map(username, mapname):
     app.logger.info(f"DELETE Map, user={g.user}")

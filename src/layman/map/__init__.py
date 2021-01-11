@@ -9,6 +9,9 @@ def get_map_type_def():
     return PUBLICATION_TYPES[MAP_TYPE]
 
 
+MAP_REST_PATH_NAME = "maps"
+
+
 from .rest_maps import bp as maps_bp
 from .rest_map import bp as map_bp
 from .rest_map_file import bp as map_file_bp
