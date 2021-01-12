@@ -245,7 +245,7 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
     return result
 
 
-def get_publication_infos(workspace, publ_type, context=None):
+def get_publication_infos(workspace=None, publ_type=None, context=None):
     from layman import authz
     from layman.common.prime_db_schema import publications
     context = context or {}

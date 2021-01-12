@@ -8,7 +8,7 @@ from layman import celery as celery_util
 from layman.common import redis as redis_util
 from redis import WatchError
 from . import settings
-from layman.common.prime_db_schema import publications
+from layman import util as layman_util
 
 UUID_SET_KEY = f'{__name__}:UUID_SET'
 UUID_METADATA_KEY = f'{__name__}:UUID_METADATA:{{uuid}}'
@@ -18,7 +18,7 @@ USER_TYPE_NAMES_KEY = f'{__name__}:USER_TYPE_NAMES:{{username}}:{{publication_ty
 def import_uuids_to_redis():
     current_app.logger.info('Importing UUIDs to REDIS')
 
-    infos = publications.get_publication_infos()
+    infos = layman_util.get_publication_infos()
     for (workspace, publication_type, publication_name), info in infos.items():
         register_publication_uuid(workspace, publication_type,
                                   publication_name, info["uuid"],
@@ -108,7 +108,7 @@ def is_valid_uuid(maybe_uuid_str):
 
 def check_redis_consistency(expected_publ_num_by_type=None):
     # get info from non-redis sources
-    infos = publications.get_publication_infos()
+    infos = layman_util.get_publication_infos()
     num_total_publs = len(infos)
     total_publs = list(infos.keys())
 

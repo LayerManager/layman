@@ -18,12 +18,3 @@ def wait_for_url(url, max_attempts, sleeping_time):
                 raise e
             attempt += 1
         time.sleep(sleeping_time)
-
-
-def assert_same_infos(info_to_test,
-                      expected_info,
-                      more_info=None):
-    for publication_name in info_to_test:
-        if info_to_test[publication_name].get('id'):
-            del info_to_test[publication_name]['id']
-    assert info_to_test == expected_info, (info_to_test, expected_info, more_info)

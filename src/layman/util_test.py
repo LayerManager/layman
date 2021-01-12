@@ -3,7 +3,7 @@ import importlib
 
 from . import app as app, settings, LaymanError, util
 from .util import slugify, get_modules_from_names, get_providers_from_source_names
-from test import process_client, util as test_util
+from test import process_client
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
 from layman.common.filesystem import uuid
@@ -157,19 +157,22 @@ def test_get_publication_infos(publication_type):
     process_client.publish_publication(publication_type, workspace, publication, title=title)
 
     with app.app_context():
-        result_infos_all = {(workspace, publication_type, publication): {'name': publication,
-                                                                         'title': title,
-                                                                         'uuid': uuid.get_publication_uuid(publication_type,
-                                                                                                           workspace,
-                                                                                                           publication_type,
-                                                                                                           publication),
-                                                                         'type': publication_type,
-                                                                         'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                                                           'write': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                                                           }
-                                                                         }}
+        expected_result = {(workspace, publication_type, publication): {'name': publication,
+                                                                        'title': title,
+                                                                        'uuid': uuid.get_publication_uuid(publication_type,
+                                                                                                          workspace,
+                                                                                                          publication_type,
+                                                                                                          publication),
+                                                                        'type': publication_type,
+                                                                        'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                                                          'write': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                                                          }
+                                                                        }}
         # util
         publication_infos = layman_util.get_publication_infos(workspace, publication_type)
-        test_util.assert_same_infos(publication_infos, result_infos_all, 'layman_util.get_publication_infos')
+        for publication_name in publication_infos:
+            if publication_infos[publication_name].get('id'):
+                del publication_infos[publication_name]['id']
+        assert publication_infos == expected_result, (publication_infos, expected_result)
 
     process_client.delete_publication(publication_type, workspace, publication)
