@@ -252,13 +252,11 @@ def get_publication_infos(workspace, publ_type, context=None):
 
     infos_orig = publications.get_publication_infos(workspace, publ_type)
 
-    result = {}
     if 'actor_name' in context:
         actor = context['actor_name']
         access_type = context['access_type']
-        for key, info in infos_orig.items():
-            if authz.is_user_in_access_rule(actor, info.get('access_rights').get(access_type)):
-                result[key] = info
+        result = {key: info for key, info in infos_orig.items()
+                  if authz.is_user_in_access_rule(actor, info.get('access_rights').get(access_type))}
     else:
         result = infos_orig
 

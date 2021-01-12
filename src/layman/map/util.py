@@ -1,6 +1,6 @@
 from functools import wraps, partial
 import json
-from jsonschema import validate, ValidationError, Draft7Validator
+from jsonschema import validate, Draft7Validator
 import os
 import re
 

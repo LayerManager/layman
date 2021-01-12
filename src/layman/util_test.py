@@ -3,8 +3,10 @@ import importlib
 
 from . import app as app, settings, LaymanError, util
 from .util import slugify, get_modules_from_names, get_providers_from_source_names
-from test import process_client
+from test import process_client, util as test_util
+from layman import util as layman_util
 from layman.layer import LAYER_TYPE
+from layman.common.filesystem import uuid
 
 
 def test_slugify():
@@ -143,3 +145,31 @@ class TestGetPublicationInfosClass:
             infos = util.get_publication_infos(self.owner, publ_type, context)
         publ_set = set([publication_name for (workspace, publication_type, publication_name) in infos.keys()])
         assert publ_set == expected_publications, publ_set
+
+
+@pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
+@pytest.mark.usefixtures('ensure_layman')
+def test_get_publication_infos(publication_type):
+    workspace = 'test_get_publication_infos_user'
+    publication = 'test_get_publication_infos_publication'
+    title = "Test get publication infos - publication íářžý"
+
+    process_client.publish_publication(publication_type, workspace, publication, title=title)
+
+    with app.app_context():
+        result_infos_all = {(workspace, publication_type, publication): {'name': publication,
+                                                                         'title': title,
+                                                                         'uuid': uuid.get_publication_uuid(publication_type,
+                                                                                                           workspace,
+                                                                                                           publication_type,
+                                                                                                           publication),
+                                                                         'type': publication_type,
+                                                                         'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                                                           'write': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                                                           }
+                                                                         }}
+        # util
+        publication_infos = layman_util.get_publication_infos(workspace, publication_type)
+        test_util.assert_same_infos(publication_infos, result_infos_all, 'layman_util.get_publication_infos')
+
+    process_client.delete_publication(publication_type, workspace, publication)

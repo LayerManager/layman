@@ -5,33 +5,8 @@ import requests
 del sys.modules['layman']
 
 from layman import app, settings
-from .filesystem import uuid
-from . import MAP_TYPE
 from layman import util as layman_util
-from test import process_client, util as test_util
-
-
-@pytest.mark.usefixtures('ensure_layman')
-def test_get_publication_infos():
-    username = 'test_get_publication_infos_user'
-    mapname = 'test_get_publication_infos_layer'
-    maptitle = "Test get publication infos - publication title íářžý"
-
-    process_client.publish_map(username, mapname, title=maptitle)
-
-    with app.app_context():
-        result_infos_all = {(username, MAP_TYPE, mapname): {'name': mapname,
-                                                            'title': maptitle,
-                                                            'uuid': uuid.get_map_uuid(username, mapname),
-                                                            'type': MAP_TYPE,
-                                                            'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                                              'write': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                                              }
-                                                            }}
-        map_infos = layman_util.get_publication_infos(username, MAP_TYPE)
-        test_util.assert_same_infos(map_infos, result_infos_all, 'layman_util.get_publication_infos')
-
-    process_client.delete_map(username, mapname)
+from test import process_client
 
 
 @pytest.mark.usefixtures('ensure_layman')

@@ -22,12 +22,10 @@ class TestDeletePublicationsClass:
                          after_delete_publications,
                          remaining_publications):
             delete_json = process_client.delete_publications(publ_type, owner, headers=headers)
-            print(f'test_delete_publications: get_json={delete_json}')
             publication_set = {publication['name'] for publication in delete_json}
             assert after_delete_publications == publication_set
 
             get_json = process_client.get_publications(publ_type, workspace=owner, headers=authn_headers_owner)
-            print(f'test_delete_publications: get_json={get_json}')
             publication_set = {publication['name'] for publication in get_json}
             assert remaining_publications == publication_set
 

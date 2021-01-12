@@ -27,7 +27,8 @@ def before_request():
 def get(username):
     app.logger.info(f"GET Layers, user={g.user}")
 
-    layer_infos = layman_util.get_publication_infos(username, LAYER_TYPE)
+    layer_infos_whole = layman_util.get_publication_infos(username, LAYER_TYPE)
+    layer_infos = {name: info for (workspace, publication_type, name), info in layer_infos_whole.items()}
 
     sorted_infos = sorted(layer_infos.items(), key=lambda x: x[0])
 

@@ -4,35 +4,9 @@ import requests
 
 del sys.modules['layman']
 
-from layman import app, settings
-from .filesystem import uuid
-from . import LAYER_TYPE
+from layman import app
 from layman import util as layman_util
-from test import process_client, util as test_util
-
-
-@pytest.mark.usefixtures('ensure_layman')
-def test_get_publication_infos():
-    username = 'test_get_publication_infos_user'
-    layername = 'test_get_publication_infos_layer'
-    layertitle = "Test get publication infos - layer íářžý"
-
-    process_client.publish_layer(username, layername, title=layertitle)
-
-    with app.app_context():
-        result_infos_all = {(username, LAYER_TYPE, layername): {'name': layername,
-                                                                'title': layertitle,
-                                                                'uuid': uuid.get_layer_uuid(username, layername),
-                                                                'type': LAYER_TYPE,
-                                                                'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                                                  'write': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                                                  }
-                                                                }}
-        # util
-        layer_infos = layman_util.get_publication_infos(username, LAYER_TYPE)
-        test_util.assert_same_infos(layer_infos, result_infos_all, 'layman_util.get_publication_infos')
-
-    process_client.delete_layer(username, layername)
+from test import process_client
 
 
 @pytest.mark.usefixtures('ensure_layman')
