@@ -29,7 +29,7 @@ def refresh_table(
         ensure_user=False
 ):
     if ensure_user:
-        db.ensure_whole_user(username)
+        db.ensure_workspace(username)
     if self.is_aborted():
         raise AbortedException
     main_filepath = get_layer_main_file_path(username, layername)
