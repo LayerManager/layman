@@ -1,5 +1,5 @@
 from layman import settings
-from layman.util import get_modules_from_names
+from layman.util import get_publication_types
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 RIGHT_WRITE = 'write'
@@ -23,10 +23,9 @@ def setup_codelists_data():
     sql = f"""insert into {DB_SCHEMA}.right_types (name) values ('{RIGHT_WRITE}');
 insert into {DB_SCHEMA}.right_types (name) values ('{RIGHT_READ}');"""
 
-    for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
-        for type_def in publ_module.PUBLICATION_TYPES.values():
-            publ_type_name = type_def['type']
-            sql = sql + f"""
+    for type_def in get_publication_types(use_cache=False).values():
+        publ_type_name = type_def['type']
+        sql = sql + f"""
 insert into {DB_SCHEMA}.publication_types (name) values ('{publ_type_name}');"""
     return sql
 
