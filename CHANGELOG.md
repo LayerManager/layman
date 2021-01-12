@@ -7,6 +7,13 @@
    - Sample SRS list for World: `4326,3857`
    - Sample SRS list for Czech Republic: `4326,3857,5514,102067,32633,32634`
    - Sample SRS list for Latvia: `4326,3857,3059`
+
+  During startup, Layman passes definitions of each EPSG to GeoServer, either from its internal sources, or from [epsg.io](https://epsg.io/). If download from epsg.io fails, warning `Not able to download EPSG definition from epsg.io` appears in log. In such case, you can [set EPSG definition manually](https://docs.geoserver.org/2.13.0/user/configuration/crshandling/customcrs.html) and restart GeoServer.
+
+  If you want to be sure that GeoServer understands each of your SRS that you passed into LAYMAN_OUTPUT_SRS_LIST, visit GeoServer's admin GUI, page Services > WMS or WFS, and click on Submit. If you see no error message, everything is OK.
+  
+  It can be also useful to generate output bounding box for every supported SRS in WMS Capabilities documents. You can control this in GeoServer's admin GUI, page Services > WMS, checkbox "Output bounding box for every supported CRS".
+ 
 ### Changes
 - At first start of Layman, GeoServer security rules of each publication are recalculated according to publication's access rights. It fixes [#200](https://github.com/jirik/layman/issues/200) also for existing layers.
 - One of [OAuth2 HTTP headers](doc/oauth2/index.md#request-layman-rest-api), `AuthorizationIssUrl`, is optional if and only if there is only one OAuth2 authorization server registered at Layman. The header was mandatory in 1.8.0 and sooner.
