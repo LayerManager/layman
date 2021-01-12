@@ -1,16 +1,14 @@
 import json
-import re
 from urllib.parse import urljoin
 
 import requests
-from flask import g, current_app as app
+from flask import g
 
 from layman.http import LaymanError
 from layman import settings, util as layman_util
 from layman.common import geoserver as common
 from layman.layer import LAYER_TYPE, db as db_source
 
-FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
 FLASK_RULES_KEY = f"{__name__}:RULES"
 
 headers_json = {
@@ -21,6 +19,11 @@ headers_xml = {
     'Accept': 'application/xml',
     'Content-type': 'application/xml',
 }
+
+ensure_whole_user = common.ensure_whole_user
+delete_whole_user = common.delete_whole_user
+ensure_workspace = common.ensure_workspace
+delete_workspace = common.delete_workspace
 
 
 def get_all_rules(auth):
@@ -51,12 +54,6 @@ def check_username(username, auth=settings.LAYMAN_GS_AUTH):
     rolename = common.username_to_rolename(username)
     if rolename in common.RESERVED_ROLE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
-
-
-ensure_whole_user = common.ensure_whole_user
-
-
-delete_whole_user = common.delete_whole_user
 
 
 def publish_layer_from_db(username, layername, description, title, access_rights):

@@ -5,7 +5,7 @@ from owslib.wms import WebMapService
 from owslib.wfs import WebFeatureService
 
 from layman.cache.mem import CACHE as MEM_CACHE
-from layman.common.geoserver import headers_json, get_proxy_base_url, get_usernames, get_user_roles
+from layman.common.geoserver import headers_json, get_proxy_base_url
 
 
 CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL'

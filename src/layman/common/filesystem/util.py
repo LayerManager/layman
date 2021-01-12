@@ -30,14 +30,14 @@ def get_user_dir(username):
     return userdir
 
 
-def ensure_user_directory(username):
-    userdir = get_user_dir(username)
+def ensure_workspace(workspace):
+    userdir = get_user_dir(workspace)
     pathlib.Path(userdir).mkdir(exist_ok=True, parents=True)
     return userdir
 
 
-def delete_user_directory(username):
-    userdir = get_user_dir(username)
+def delete_workspace(workspace):
+    userdir = get_user_dir(workspace)
     try:
         os.rmdir(userdir)
     except FileNotFoundError:
@@ -45,11 +45,11 @@ def delete_user_directory(username):
 
 
 def ensure_whole_user(username):
-    ensure_user_directory(username)
+    ensure_workspace(username)
 
 
 def delete_whole_user(username):
-    delete_user_directory(username)
+    delete_workspace(username)
 
 
 def get_publications_dir(publ_type, username):

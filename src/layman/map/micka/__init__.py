@@ -11,6 +11,14 @@ def delete_whole_user(username):
     pass
 
 
+def ensure_workspace(workspace):
+    pass
+
+
+def delete_workspace(workspace):
+    pass
+
+
 def check_username(username):
     pass
 

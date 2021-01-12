@@ -18,6 +18,14 @@ def ensure_whole_user(username, userinfo=None):
         users_util.ensure_user(id_workspace, userinfo)
 
 
+def delete_workspace(workspace):
+    workspaces_util.delete_workspace(workspace)
+
+
+def ensure_workspace(workspace):
+    workspaces_util.ensure_workspace(workspace)
+
+
 def check_username(username):
     users_util.check_username(username)
     workspaces_util.check_workspace_name(username)

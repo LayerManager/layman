@@ -54,7 +54,7 @@ def check_username(username, conn_cur=None):
         raise LaymanError(35, {'reserved_by': __name__, 'schema': username})
 
 
-def ensure_user_schema(username, conn_cur=None):
+def ensure_workspace(username, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
@@ -67,7 +67,7 @@ def ensure_user_schema(username, conn_cur=None):
         raise LaymanError(7)
 
 
-def delete_user_schema(username, conn_cur=None):
+def delete_workspace(username, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
@@ -81,11 +81,11 @@ def delete_user_schema(username, conn_cur=None):
 
 
 def ensure_whole_user(username):
-    ensure_user_schema(username)
+    ensure_workspace(username)
 
 
 def delete_whole_user(username):
-    delete_user_schema(username)
+    delete_workspace(username)
 
 
 # def import_layer_vector_file(username, layername, main):
