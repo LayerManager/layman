@@ -125,7 +125,7 @@ Name of [PostgreSQL user](https://www.postgresql.org/docs/9.5/sql-createuser.htm
 Password of [LAYMAN_PG_USER](#LAYMAN_PG_USER).
 
 ### LAYMAN_PRIME_SCHEMA
-Name of Layman data schema in PostgreSQL database. Information about publications, users and access rights is stored in this schema. This name have to starts with lowercase character or underscore, followed by lowercase characters, numbers or underscores. Also, it must be different from existing [workspace name](models.md#workspace). Value should not be changed after first start of Layman. 
+Name of Layman data schema in PostgreSQL database. Information about users, publications, access rights, and [more](data-storage.md#postgresql) is stored in this schema. This name have to starts with lowercase character or underscore, followed by lowercase characters, numbers or underscores. Also, it must be different from existing [workspace name](models.md#workspace). Value should not be changed after first start of Layman. 
 
 ## Connection to GeoServer
 

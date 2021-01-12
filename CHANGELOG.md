@@ -9,6 +9,7 @@
    - Sample SRS list for Latvia: `4326,3857,3059`
 ### Changes
 - One of [OAuth2 HTTP headers](doc/oauth2/index.md#request-layman-rest-api), `AuthorizationIssUrl`, is optional if and only if there is only one OAuth2 authorization server registered at Layman. The header was mandatory in 1.8.0 and sooner.
+- Information about data version including migration ID is stored in [PostgreSQL](doc/data-storage.md#data-version).
 
 ## v1.8.1
  2021-01-06

@@ -7,6 +7,7 @@ Types of data:
 - [Layers](#layers)
 - [Maps](#maps)
 - [Tasks](#tasks) (asynchronous tasks)
+- [Data version](#data-version)
 
 Data stores:
 - [Redis](#redis)
@@ -59,6 +60,9 @@ Information about asynchronous tasks consists of few parameters necessary for Ce
 
 Task information are saved to [Redis](#redis) only.
 
+### Data version
+Information about data version including migration ID is stored in [PostgreSQL](#postgresql).
+
 ## Stores
 ### Redis
 Data is saved in LAYMAN_REDIS_URL database. Keys are prefixed with
@@ -77,13 +81,13 @@ Data is saved to LAYMAN_DATA_DIR directory.
 Filesystem is used as persistent data store, so data survives Layman restart.
  
 ### PostgreSQL
-Layman uses directly **one database** specified by [LAYMAN_PG_DBNAME](env-settings.md#LAYMAN_PG_DBNAME) to store
-- general information about users, workspaces, and publications including access rights in schema specified by [LAYMAN_PRIME_SCHEMA](env-settings.md#LAYMAN_PRIME_SCHEMA),
-- vector layer data.
-
-Vector layer data is organized in schemas and tables:
-- **[Workspace schema](https://www.postgresql.org/docs/9.1/ddl-schemas.html)** is created for every created [workspace](models.md#workspace). Name of workspace schema is always the same as workspace name.
-- **[Table](https://www.postgresql.org/docs/9.1/sql-createtable.html)** is created in workspace schema for each published layer. Name of the table is the same as layername. The table contains data from vector data files.
+Layman uses directly **one database** specified by [LAYMAN_PG_DBNAME](env-settings.md#LAYMAN_PG_DBNAME) to store data. There are two kinds of schemas in such database:
+- [LAYMAN_PRIME_SCHEMA](env-settings.md#LAYMAN_PRIME_SCHEMA) that holds information about
+   - users, workspaces, and publications including access rights
+   - data version including migration ID
+- Schemas holding vector layer data.
+    - One **[workspace schema](https://www.postgresql.org/docs/9.1/ddl-schemas.html)** is created for every created [workspace](models.md#workspace). Name of workspace schema is always the same as workspace name.
+    - One **[table](https://www.postgresql.org/docs/9.1/sql-createtable.html)** is created in workspace schema for each published layer. Name of the table is the same as layername. The table contains data from vector data files.
 
 **Second database** is used by Micka to store metadata records. The database including its structure is completely managed by Micka. By default, it's named `hsrs_micka6`.
 
