@@ -49,6 +49,8 @@ def test_publication_interface_methods():
         'check_username',
         'ensure_whole_user',
         'delete_whole_user',
+        'ensure_workspace',
+        'delete_workspace',
     }
 
     provider_modules_getter = get_providers_from_source_names

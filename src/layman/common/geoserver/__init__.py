@@ -6,13 +6,11 @@ import requests
 import secrets
 import string
 from urllib.parse import urljoin
-from flask import g
 from layman import settings
 
 
 logger = logging.getLogger(__name__)
 
-FLASK_WORKSPACES_KEY = f"{__name__}:WORKSPACES"
 FLASK_RULES_KEY = f"{__name__}:RULES"
 
 RESERVED_WORKSPACE_NAMES = [
@@ -209,26 +207,22 @@ def layman_users_to_geoserver_roles(layman_users):
 
 
 def get_all_workspaces(auth):
-    key = FLASK_WORKSPACES_KEY
-    if key not in g:
-        r = requests.get(
-            settings.LAYMAN_GS_REST_WORKSPACES,
-            # data=json.dumps(payload),
-            headers=headers_json,
-            auth=auth,
-            timeout=5,
-        )
-        r.raise_for_status()
-        if r.json()['workspaces'] == "":
-            all_workspaces = []
-        else:
-            all_workspaces = r.json()['workspaces']['workspace']
-        g.setdefault(key, all_workspaces)
+    r = requests.get(
+        settings.LAYMAN_GS_REST_WORKSPACES,
+        headers=headers_json,
+        auth=auth,
+        timeout=5,
+    )
+    r.raise_for_status()
+    if r.json()['workspaces'] == "":
+        all_workspaces = []
+    else:
+        all_workspaces = [workspace["name"] for workspace in r.json()['workspaces']['workspace']]
 
-    return g.get(key)
+    return all_workspaces
 
 
-def ensure_user_db_store(username, auth):
+def ensure_db_store(username, auth):
     r = requests.post(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + '/datastores'),
         data=json.dumps({
@@ -275,7 +269,7 @@ def ensure_user_db_store(username, auth):
     r.raise_for_status()
 
 
-def delete_user_db_store(username, auth):
+def delete_db_store(username, auth):
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + f'/datastores/{username}'),
         headers=headers_json,
@@ -286,9 +280,9 @@ def delete_user_db_store(username, auth):
         r.raise_for_status()
 
 
-def ensure_user_workspace(username, auth):
+def ensure_workspace(username, auth=settings.LAYMAN_GS_AUTH):
     all_workspaces = get_all_workspaces(auth)
-    if not any(ws['name'] == username for ws in all_workspaces):
+    if username not in all_workspaces:
         r = requests.post(
             settings.LAYMAN_GS_REST_WORKSPACES,
             data=json.dumps({'workspace': {'name': username}}),
@@ -297,11 +291,11 @@ def ensure_user_workspace(username, auth):
             timeout=5,
         )
         r.raise_for_status()
-        ensure_user_db_store(username, auth)
+        ensure_db_store(username, auth)
 
 
-def delete_user_workspace(username, auth):
-    delete_user_db_store(username, auth)
+def delete_workspace(username, auth=settings.LAYMAN_GS_AUTH):
+    delete_db_store(username, auth)
 
     delete_security_roles(username + '.*.r', auth)
     delete_security_roles(username + '.*.w', auth)
@@ -322,12 +316,12 @@ def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
     ensure_role(role, auth)
     ensure_user_role(username, role, auth)
     ensure_user_role(username, settings.LAYMAN_GS_ROLE, auth)
-    ensure_user_workspace(username, auth)
+    ensure_workspace(username, auth)
 
 
 def delete_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
     role = username_to_rolename(username)
-    delete_user_workspace(username, auth)
+    delete_workspace(username, auth)
     delete_user_role(username, role, auth)
     delete_user_role(username, settings.LAYMAN_GS_ROLE, auth)
     delete_role(role, auth)
