@@ -47,3 +47,20 @@ def geoserver_everyone_rights_repair():
             gs_common.ensure_layer_security_roles(workspace, publication_name, security_roles, right_type[0], settings.LAYMAN_GS_AUTH)
 
     logger.info(f'    DONE - access rights EVERYONE is not propagated to GeoServer for authenticated users')
+
+
+def geoserver_remove_users_for_public_workspaces():
+    logger.info(f'    Starting - delete unnecessary users and roles created for public workspaces')
+    sql_select_public_workspaces = f'''
+        select w.name from {DB_SCHEMA}.workspaces w
+        where NOT EXISTS(select 0 FROM {DB_SCHEMA}.USERS u where u.id_workspace = w.id)'''
+    public_workspaces = db_util.run_query(sql_select_public_workspaces)
+    auth = settings.LAYMAN_GS_AUTH
+    for (workspace, ) in public_workspaces:
+        role = gs_common.username_to_rolename(workspace)
+        gs_common.delete_user_role(workspace, role, auth)
+        gs_common.delete_user_role(workspace, settings.LAYMAN_GS_ROLE, auth)
+        gs_common.delete_role(role, auth)
+        gs_common.delete_user(workspace, auth)
+
+    logger.info(f'    DONE - delete unnecessary users and roles created for public workspaces')
