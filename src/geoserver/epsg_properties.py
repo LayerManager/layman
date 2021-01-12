@@ -87,7 +87,7 @@ def setup_epsg(data_dir, srs_list):
             res.raise_for_status()
             new_epsg[code] = res.text
         except BaseException as ex:
-            logger.warning(f'Not able to download EPSG definition from epsg.id for code={code}. Reason={ex}')
+            logger.warning(f'Not able to download EPSG definition from epsg.io for code={code}. Reason={ex}')
 
     with open(file_path, "a") as f:
         for epsg_definition in new_epsg.values():
