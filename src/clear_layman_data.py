@@ -120,6 +120,25 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
             )
             r.raise_for_status()
 
+    r = requests.get(settings.LAYMAN_GS_REST_WORKSPACES,
+                     headers=headers_json,
+                     auth=auth
+                     )
+    r.raise_for_status()
+
+    if r.json()['workspaces'] != "":
+        all_workspaces = [workspace["name"] for workspace in r.json()['workspaces']['workspace']]
+        for workspace in all_workspaces:
+            r = requests.delete(
+                urljoin(settings.LAYMAN_GS_REST_WORKSPACES, workspace),
+                headers=headers_json,
+                auth=auth,
+                params={
+                    'recurse': 'true'
+                }
+            )
+            r.raise_for_status()
+
     # micka
     opts = {} if settings.CSW_BASIC_AUTHN is None else {
         'username': settings.CSW_BASIC_AUTHN[0],

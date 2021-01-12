@@ -232,7 +232,7 @@ make start-dev
 :warning: It will delete
 - all files within [LAYMAN_DATA_DIR](doc/env-settings.md#LAYMAN_DATA_DIR)!
 - all layman-related schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME)!
-- all workspaces accessible namely by [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE)!
+- all workspaces in [GeoServer](doc/data-storage.md#geoserver)!
 - all keys in Redis logical database identified by [LAYMAN_REDIS_URL](doc/env-settings.md#LAYMAN_REDIS_URL)!
 - all keys in Redis logical database identified by [LTC_REDIS_URL](doc/env-settings.md#LTC_REDIS_URL)!
 - metadata records from CSW identified by [CSW_URL](doc/env-settings.md#CSW_URL) whose at least one online distribution URL contains [LAYMAN_PROXY_SERVER_NAME](doc/env-settings.md#LAYMAN_PROXY_SERVER_NAME)!
