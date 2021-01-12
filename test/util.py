@@ -26,4 +26,4 @@ def assert_same_infos(info_to_test,
     for publication_name in info_to_test:
         if info_to_test[publication_name].get('id'):
             del info_to_test[publication_name]['id']
-    assert info_to_test == expected_info, (info_to_test, more_info)
+    assert info_to_test == expected_info, (info_to_test, expected_info, more_info)

@@ -71,14 +71,5 @@ def post_layer(username,
     pubs_util.insert_publication(username, db_info)
 
 
-def get_publication_infos(username, publication_type):
-    if publication_type != '.'.join(__name__.split('.')[:-2]):
-        raise Exception(f'Unknown pyblication type {publication_type}')
-
-    result = {layername: layer_info for (username_value, type, layername), layer_info in
-              pubs_util.get_publication_infos(username, LAYER_TYPE).items()}
-    return result
-
-
 def get_metadata_comparison(username, publication_name):
     pass

@@ -5,7 +5,6 @@ import requests
 del sys.modules['layman']
 
 from layman import app, settings
-from .prime_db_schema import table as prime_table
 from .filesystem import uuid
 from . import LAYER_TYPE
 from layman import util as layman_util
@@ -21,28 +20,17 @@ def test_get_publication_infos():
     process_client.publish_layer(username, layername, title=layertitle)
 
     with app.app_context():
-        result_infos_all = {layername: {'name': layername,
-                                        'title': layertitle,
-                                        'uuid': uuid.get_layer_uuid(username, layername),
-                                        'type': LAYER_TYPE,
-                                        'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                          'write': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                          }
-                                        }}
-        modules = [
-            {'name': 'prime_table.table',
-             'result_infos': result_infos_all,
-             'method_publications': prime_table.get_publication_infos,
-             },
-        ]
-
-        for module in modules:
-            publication_infos = module["method_publications"](username, LAYER_TYPE)
-            test_util.assert_same_infos(publication_infos, module["result_infos"], module)
-
+        result_infos_all = {(username, LAYER_TYPE, layername): {'name': layername,
+                                                                'title': layertitle,
+                                                                'uuid': uuid.get_layer_uuid(username, layername),
+                                                                'type': LAYER_TYPE,
+                                                                'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                                                  'write': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                                                  }
+                                                                }}
         # util
         layer_infos = layman_util.get_publication_infos(username, LAYER_TYPE)
-        test_util.assert_same_infos(layer_infos, result_infos_all)
+        test_util.assert_same_infos(layer_infos, result_infos_all, 'layman_util.get_publication_infos')
 
     process_client.delete_layer(username, layername)
 

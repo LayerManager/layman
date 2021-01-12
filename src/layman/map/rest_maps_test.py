@@ -5,11 +5,9 @@ import requests
 del sys.modules['layman']
 
 from layman import app, settings
-from .filesystem import input_file, uuid, thumbnail
-from .micka import soap
-from .prime_db_schema import table as prime_table
-from . import util, MAP_TYPE
-from layman.util import url_for
+from .filesystem import uuid
+from . import MAP_TYPE
+from layman import util as layman_util
 from test import process_client, util as test_util
 
 
@@ -22,27 +20,16 @@ def test_get_publication_infos():
     process_client.publish_map(username, mapname, title=maptitle)
 
     with app.app_context():
-        result_infos_all = {mapname: {'name': mapname,
-                                      'title': maptitle,
-                                      'uuid': uuid.get_map_uuid(username, mapname),
-                                      'type': MAP_TYPE,
-                                      'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                        'write': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                        }
-                                      }}
-        modules = [
-            {'name': 'prime_table.table',
-             'result_infos': result_infos_all,
-             'method_publications': prime_table.get_publication_infos,
-             },
-        ]
-
-        for module in modules:
-            publication_infos = module["method_publications"](username, MAP_TYPE)
-            test_util.assert_same_infos(publication_infos, module["result_infos"], module)
-
-        map_infos = util.get_publication_infos(username, MAP_TYPE)
-        test_util.assert_same_infos(map_infos, result_infos_all)
+        result_infos_all = {(username, MAP_TYPE, mapname): {'name': mapname,
+                                                            'title': maptitle,
+                                                            'uuid': uuid.get_map_uuid(username, mapname),
+                                                            'type': MAP_TYPE,
+                                                            'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                                              'write': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                                              }
+                                                            }}
+        map_infos = layman_util.get_publication_infos(username, MAP_TYPE)
+        test_util.assert_same_infos(map_infos, result_infos_all, 'layman_util.get_publication_infos')
 
     process_client.delete_map(username, mapname)
 
@@ -60,7 +47,7 @@ def test_get_map_title():
         process_client.publish_map(username, name, title=title)
 
     with app.app_context():
-        url_get = url_for('rest_maps.get', username=username)
+        url_get = layman_util.url_for('rest_maps.get', username=username)
     # maps.GET
     rv = requests.get(url_get)
     assert rv.status_code == 200, rv.json()
@@ -81,7 +68,7 @@ def test_get_maps():
     process_client.publish_map(username, mapname, title=mapname)
 
     with app.app_context():
-        url_get = url_for('rest_maps.get', username=username)
+        url_get = layman_util.url_for('rest_maps.get', username=username)
     # maps.GET
     rv = requests.get(url_get)
     assert rv.status_code == 200, rv.json()

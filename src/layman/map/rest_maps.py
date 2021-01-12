@@ -29,7 +29,8 @@ def before_request():
 def get(username):
     app.logger.info(f"GET Maps, user={g.user}")
 
-    mapinfos = layman_util.get_publication_infos(username, MAP_TYPE)
+    mapinfos_whole = layman_util.get_publication_infos(username, MAP_TYPE)
+    mapinfos = {name: info for (workspace, publication_type, name), info in mapinfos_whole.items()}
 
     sorted_infos = sorted(mapinfos.items(), key=lambda x: x[0])
     infos = [
