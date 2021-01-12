@@ -81,9 +81,8 @@ def get_usernames(use_cache=True, skip_modules=None):
         providers = get_internal_providers()
     else:
         all_sources = []
-        for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
-            for type_def in publ_module.PUBLICATION_TYPES.values():
-                all_sources += type_def['internal_sources']
+        for type_def in get_publication_types(use_cache=False).values():
+            all_sources += type_def['internal_sources']
         providers = get_providers_from_source_names(all_sources, skip_modules)
     results = call_modules_fn(providers, 'get_usernames')
     usernames = []
@@ -108,36 +107,46 @@ def get_internal_providers():
     key = FLASK_PROVIDERS_KEY
     if key not in current_app.config:
         all_sources = []
-        for publ_module in get_publication_modules():
-            for type_def in publ_module.PUBLICATION_TYPES.values():
-                all_sources += type_def['internal_sources']
+        for type_def in get_publication_types().values():
+            all_sources += type_def['internal_sources']
         current_app.config[key] = get_providers_from_source_names(all_sources)
     return current_app.config[key]
 
 
-def get_publication_types():
-    key = FLASK_PUBLICATION_TYPES_KEY
-    if key not in current_app.config:
-        all_types = {}
-        for publ_module in get_publication_modules():
-            all_types.update(publ_module.PUBLICATION_TYPES)
-        current_app.config[key] = all_types
-    return current_app.config[key]
+def get_publication_types(use_cache=True):
+    def modules_to_types(publ_modules):
+        return {
+            type_name: type_def
+            for publ_module in publ_modules
+            for type_name, type_def in publ_module.PUBLICATION_TYPES.items()
+        }
+    if use_cache:
+        key = FLASK_PUBLICATION_TYPES_KEY
+        if key not in current_app.config:
+            current_app.config[key] = modules_to_types(get_publication_modules())
+
+        result = current_app.config[key]
+    else:
+        result = modules_to_types(get_publication_modules(use_cache=False))
+    return result
 
 
 def get_blueprints():
     blueprints = []
-    for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
-        for type_def in publ_module.PUBLICATION_TYPES.values():
-            blueprints += type_def['blueprints']
+    for type_def in get_publication_types(use_cache=False).values():
+        blueprints += type_def['blueprints']
     return blueprints
 
 
-def get_publication_modules():
-    key = FLASK_PUBLICATION_MODULES_KEY
-    if key not in current_app.config:
-        current_app.config[key] = get_modules_from_names(settings.PUBLICATION_MODULES)
-    return current_app.config[key]
+def get_publication_modules(use_cache=True):
+    if use_cache:
+        key = FLASK_PUBLICATION_MODULES_KEY
+        if key not in current_app.config:
+            current_app.config[key] = get_modules_from_names(settings.PUBLICATION_MODULES)
+        result = current_app.config[key]
+    else:
+        result = get_modules_from_names(settings.PUBLICATION_MODULES)
+    return result
 
 
 def get_providers_from_source_names(source_names, skip_modules=None):
