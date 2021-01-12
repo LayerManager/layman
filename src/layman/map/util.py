@@ -1,17 +1,13 @@
 from functools import wraps, partial
-import importlib
-import inspect
 import json
-from jsonschema import validate, ValidationError, Draft7Validator
+from jsonschema import validate, Draft7Validator
 import os
 import re
 
 from layman.authn.filesystem import get_authn_info
-from celery import chain
 from flask import current_app, request, g
 
 from layman import LaymanError
-from layman.common import util as layman_util
 from layman.common.micka import util as micka_util
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for
@@ -80,12 +76,6 @@ def get_providers():
     if key not in current_app.config:
         current_app.config[key] = get_providers_from_source_names(get_map_sources())
     return current_app.config[key]
-
-
-def get_map_infos(username):
-    sources = get_sources()
-    results = call_modules_fn(sources, 'get_map_infos', [username])
-    return layman_util.merge_infos(results)
 
 
 TASKS_TO_MAP_INFO_KEYS = {

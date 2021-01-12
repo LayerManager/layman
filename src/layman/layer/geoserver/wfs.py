@@ -11,9 +11,10 @@ from . import headers_json
 from . import wms
 from layman import settings, patch_mode
 from layman.cache import mem_redis
-from layman.layer.filesystem import input_file
 from layman.layer.util import is_layer_task_ready
 from layman.common import geoserver as common_geoserver
+from layman import util as layman_util
+from layman.layer import LAYER_TYPE
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
 
@@ -139,7 +140,7 @@ def get_wfs_proxy(username):
         return wfs_proxy
 
     def currently_changing():
-        layerinfos = input_file.get_layer_infos(username)
+        layerinfos = layman_util.get_publication_infos(username, LAYER_TYPE)
         result = any((
             not is_layer_task_ready(username, layername)
             for layername in layerinfos
@@ -176,24 +177,6 @@ def get_layer_info(username, layername):
             'url': wfs_proxy_url
         },
     }
-
-
-def get_layer_infos(username):
-    wfs = get_wfs_proxy(username)
-    if wfs is None:
-        result = {}
-    else:
-        result = {name.split(':')[1]: {"name": name.split(':')[1],
-                                       "title": info.title} for (name, info) in wfs.contents.items()}
-    return result
-
-
-def get_publication_infos(username, publication_type):
-    if publication_type != '.'.join(__name__.split('.')[:-2]):
-        raise Exception(f'Unknown pyblication type {publication_type}')
-
-    infos = get_layer_infos(username)
-    return infos
 
 
 def get_publication_uuid(username, publication_type, publication_name):

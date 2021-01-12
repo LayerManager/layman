@@ -26,7 +26,6 @@ def test_recreate_schema():
     with app.app_context():
         run_statement(model.DROP_SCHEMA_SQL)
         ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
-                      settings.PUBLICATION_MODULES,
                       settings.RIGHTS_EVERYONE_ROLE)
 
     process_client.delete_layer(username, 'test_recreate_schema_layer')
@@ -48,7 +47,6 @@ def test_schema():
     with app.app_context():
         run_statement(model.DROP_SCHEMA_SQL)
         ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
-                      settings.PUBLICATION_MODULES,
                       settings.RIGHTS_EVERYONE_ROLE)
 
         workspaces = run_query(f'select count(*) from {DB_SCHEMA}.workspaces;')
@@ -92,7 +90,7 @@ def test_steps():
         assert exists_workspaces[0][0] == 0
         exists_pubs = run_query(f'select count(*) from {DB_SCHEMA}.publications;')
         assert exists_pubs[0][0] == 0
-        migrate_users_and_publications(settings.PUBLICATION_MODULES, settings.RIGHTS_EVERYONE_ROLE)
+        migrate_users_and_publications(settings.RIGHTS_EVERYONE_ROLE)
         exists_workspaces = run_query(f'select count(*) from {DB_SCHEMA}.workspaces;')
         assert exists_workspaces[0][0] > 0
         exists_pubs = run_query(f'select count(*) from {DB_SCHEMA}.publications;')

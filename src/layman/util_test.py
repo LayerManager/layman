@@ -4,7 +4,9 @@ import importlib
 from . import app as app, settings, LaymanError, util
 from .util import slugify, get_modules_from_names, get_providers_from_source_names
 from test import process_client
+from layman import util as layman_util
 from layman.layer import LAYER_TYPE
+from layman.common.filesystem import uuid
 
 
 def test_slugify():
@@ -38,7 +40,6 @@ def assert_module_methods(module, methods):
 def test_publication_interface_methods():
     publication_source_methods = {
         'get_publication_uuid',
-        'get_publication_infos',
         'get_metadata_comparison',
         'pre_publication_action_check',
     }
@@ -71,7 +72,6 @@ def test_publication_interface_methods():
             'publication_type': 'layman.layer',
             'modules_getter': source_modules_getter,
             'methods': publication_source_methods.union({
-                'get_layer_infos',
                 'get_layer_info',
                 'delete_layer',
                 'patch_layer',
@@ -82,7 +82,6 @@ def test_publication_interface_methods():
             'publication_type': 'layman.map',
             'modules_getter': source_modules_getter,
             'methods': publication_source_methods.union({
-                'get_map_infos',
                 'get_map_info',
                 'patch_map',
                 'post_map',
@@ -144,5 +143,36 @@ class TestGetPublicationInfosClass:
                                    expected_publications):
         with app.app_context():
             infos = util.get_publication_infos(self.owner, publ_type, context)
-        publ_set = set(infos.keys())
+        publ_set = set([publication_name for (workspace, publication_type, publication_name) in infos.keys()])
         assert publ_set == expected_publications, publ_set
+
+
+@pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
+@pytest.mark.usefixtures('ensure_layman')
+def test_get_publication_infos(publication_type):
+    workspace = 'test_get_publication_infos_user'
+    publication = 'test_get_publication_infos_publication'
+    title = "Test get publication infos - publication íářžý"
+
+    process_client.publish_publication(publication_type, workspace, publication, title=title)
+
+    with app.app_context():
+        expected_result = {(workspace, publication_type, publication): {'name': publication,
+                                                                        'title': title,
+                                                                        'uuid': uuid.get_publication_uuid(publication_type,
+                                                                                                          workspace,
+                                                                                                          publication_type,
+                                                                                                          publication),
+                                                                        'type': publication_type,
+                                                                        'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                                                          'write': [settings.RIGHTS_EVERYONE_ROLE, ],
+                                                                                          }
+                                                                        }}
+        # util
+        publication_infos = layman_util.get_publication_infos(workspace, publication_type)
+        for publication_name in publication_infos:
+            if publication_infos[publication_name].get('id'):
+                del publication_infos[publication_name]['id']
+        assert publication_infos == expected_result, (publication_infos, expected_result)
+
+    process_client.delete_publication(publication_type, workspace, publication)

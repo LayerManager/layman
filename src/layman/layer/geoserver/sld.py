@@ -85,18 +85,6 @@ def get_layer_info(username, layername):
     return info
 
 
-def get_layer_infos(username):
-    return {}
-
-
-def get_publication_infos(username, publication_type):
-    if publication_type != '.'.join(__name__.split('.')[:-2]):
-        raise Exception(f'Unknown publication type {publication_type}')
-
-    infos = get_layer_infos(username)
-    return infos
-
-
 def get_publication_uuid(username, publication_type, publication_name):
     return None
 

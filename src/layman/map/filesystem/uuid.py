@@ -1,7 +1,6 @@
 from functools import partial
 
 from layman.common.filesystem import uuid as common_uuid
-from . import input_file
 
 MAP_TYPE = '.'.join(__name__.split('.')[:-2])
 
@@ -13,20 +12,6 @@ delete_map = partial(common_uuid.delete_publication, MAP_TYPE)
 
 # username, publication_type, publication_name
 get_publication_uuid = partial(common_uuid.get_publication_uuid, MAP_TYPE)
-
-
-def get_map_infos(username):
-    infos = input_file.get_map_infos(username)
-    for name in infos:
-        infos[name]['uuid'] = get_map_uuid(username, name)
-    return infos
-
-
-def get_publication_infos(username, publication_type):
-    if publication_type != '.'.join(__name__.split('.')[:-2]):
-        raise Exception(f'Unknown pyblication type {publication_type}')
-
-    return get_map_infos(username)
 
 
 def get_map_uuid(username, mapname):

@@ -5,7 +5,8 @@ import requests
 from layman import app, settings
 from layman.common import geoserver
 from layman.common.prime_db_schema import schema_initialization
-from layman.layer.util import get_layer_infos
+from layman.layer import LAYER_TYPE
+from layman import util as layman_util
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +21,6 @@ def upgrade_1_8():
         logger.info(f'  Creating prime_db_schema')
         schema_initialization.check_schema_name(settings.LAYMAN_PRIME_SCHEMA)
         schema_initialization.ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
-                                            settings.PUBLICATION_MODULES,
                                             settings.RIGHTS_EVERYONE_ROLE)
 
         logger.info(f'  Ensuring users')
@@ -51,7 +51,7 @@ def upgrade_1_8():
         # Create rules for publications/layers
         for username in all_usernames:
             logger.info(f'    Ensuring GS rules for user {username}')
-            for layer, info in get_layer_infos(username).items():
+            for layer, info in layman_util.get_publication_infos(username, LAYER_TYPE).items():
                 logger.info(f'      Ensuring GS rules for user {username} and layer {layer}')
                 for type in ['read', 'write']:
                     security_read_roles = geoserver.layman_users_to_geoserver_roles(info['access_rights'][type])

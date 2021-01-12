@@ -13,7 +13,6 @@ from layman import authn, util as layman_util
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 from layman.common import redis as redis_util
-from .prime_db_schema import table
 
 bp = Blueprint('rest_maps', __name__)
 
@@ -30,12 +29,13 @@ def before_request():
 def get(username):
     app.logger.info(f"GET Maps, user={g.user}")
 
-    mapinfos = table.get_map_infos(username)
+    mapinfos_whole = layman_util.get_publication_infos(username, MAP_TYPE)
+    mapinfos = {name: info for (workspace, publication_type, name), info in mapinfos_whole.items()}
 
     sorted_infos = sorted(mapinfos.items(), key=lambda x: x[0])
     infos = [
         {
-            'name': name,
+            'name': info["name"],
             'title': info.get("title", None),
             'url': url_for('rest_map.get', mapname=name, username=username),
             'uuid': info['uuid'],

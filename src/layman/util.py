@@ -245,31 +245,20 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
     return result
 
 
-def get_publication_infos(workspace, publ_type, context=None):
+def get_publication_infos(workspace=None, publ_type=None, context=None):
     from layman import authz
-    from layman.common import util as common_util
-    from layman.layer import LAYER_TYPE
-    from layman.map import MAP_TYPE
+    from layman.common.prime_db_schema import publications
     context = context or {}
 
-    sources_names = get_publication_types()[publ_type]['access_rights_source']
-    sources = get_modules_from_names([sources_names])
+    infos_orig = publications.get_publication_infos(workspace, publ_type)
 
-    info_method = {
-        LAYER_TYPE: 'get_layer_infos',
-        MAP_TYPE: 'get_map_infos',
-    }[publ_type]
-
-    partial_infos = call_modules_fn(sources, info_method, [workspace])
-    infos = common_util.merge_infos(partial_infos)
-
-    result = {}
     if 'actor_name' in context:
         actor = context['actor_name']
         access_type = context['access_type']
-        for (name, info) in infos.items():
-            if authz.is_user_in_access_rule(actor, info.get('access_rights').get(access_type)):
-                result[name] = info
+        result = {key: info for key, info in infos_orig.items()
+                  if authz.is_user_in_access_rule(actor, info.get('access_rights').get(access_type))}
+    else:
+        result = infos_orig
 
     return result
 
@@ -289,7 +278,7 @@ def delete_publications(user,
     actor_name = authn.get_authn_username()
     whole_infos = get_publication_infos(user, publ_type, {'actor_name': actor_name, 'access_type': 'write'})
 
-    for publication in whole_infos:
+    for (workspace, publication_type, publication) in whole_infos.keys():
         redis_util.create_lock(user, publ_type, publication, error_code, method)
         try:
             abort_publication_fn(user, publication)

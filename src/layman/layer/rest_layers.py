@@ -10,7 +10,7 @@ from .filesystem import input_file, input_sld, input_chunk, uuid
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 from layman.common import redis as redis_util
-from .prime_db_schema import table
+from layman import util as layman_util
 
 bp = Blueprint('rest_layers', __name__)
 
@@ -27,7 +27,8 @@ def before_request():
 def get(username):
     app.logger.info(f"GET Layers, user={g.user}")
 
-    layer_infos = table.get_layer_infos(username)
+    layer_infos_whole = layman_util.get_publication_infos(username, LAYER_TYPE)
+    layer_infos = {name: info for (workspace, publication_type, name), info in layer_infos_whole.items()}
 
     sorted_infos = sorted(layer_infos.items(), key=lambda x: x[0])
 

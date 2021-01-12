@@ -2,11 +2,6 @@ from ...common.prime_db_schema import publications as pubs_util
 from .. import MAP_TYPE
 
 
-def get_map_infos(username):
-    result = {mapname: map_info for (username_value, type, mapname), map_info in pubs_util.get_publication_infos(username, MAP_TYPE).items()}
-    return result
-
-
 def get_publication_uuid(username, publication_type, publication_name):
     infos = pubs_util.get_publication_infos(username, publication_type)
     return infos.get((username, publication_type, publication_name), dict()).get("uuid")
@@ -68,14 +63,6 @@ def post_map(username,
                "actor_name": actor_name,
                }
     pubs_util.insert_publication(username, db_info)
-
-
-def get_publication_infos(username, publication_type):
-    if publication_type != '.'.join(__name__.split('.')[:-2]):
-        raise Exception(f'Unknown pyblication type {publication_type}')
-
-    infos = get_map_infos(username)
-    return infos
 
 
 def delete_map(username, map_name):
