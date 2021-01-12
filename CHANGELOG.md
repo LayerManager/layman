@@ -8,6 +8,7 @@
    - Sample SRS list for Czech Republic: `4326,3857,5514,102067,32633,32634`
    - Sample SRS list for Latvia: `4326,3857,3059`
 ### Changes
+- At first start of Layman, GeoServer security rules of each publication are recalculated according to publication's access rights. It fixes [#200](https://github.com/jirik/layman/issues/200) also for existing layers.
 - One of [OAuth2 HTTP headers](doc/oauth2/index.md#request-layman-rest-api), `AuthorizationIssUrl`, is optional if and only if there is only one OAuth2 authorization server registered at Layman. The header was mandatory in 1.8.0 and sooner.
 - Information about data version including migration ID is stored in [PostgreSQL](doc/data-storage.md#data-version).
 
