@@ -92,14 +92,6 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                     from .authn.redis import import_authn_to_redis
 
                     import_authn_to_redis()
-                app.logger.info(f'Ensuring users')
-                from .util import get_usernames, ensure_whole_user, check_username
-
-                with app.app_context():
-                    for username in get_usernames():
-                        app.logger.info(f'  Ensuring user {username}')
-                        check_username(username)
-                        ensure_whole_user(username)
 
                 pipe.multi()
                 pipe.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
