@@ -57,6 +57,7 @@ def geoserver_remove_users_for_public_workspaces():
     public_workspaces = db_util.run_query(sql_select_public_workspaces)
     auth = settings.LAYMAN_GS_AUTH
     for (workspace, ) in public_workspaces:
+        logger.info(f'      Delete user and role for workspace {workspace}')
         role = gs_common.username_to_rolename(workspace)
         gs_common.delete_user_role(workspace, role, auth)
         gs_common.delete_user_role(workspace, settings.LAYMAN_GS_ROLE, auth)
