@@ -6,6 +6,8 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+EPSG_ENCODING = 'iso-8859-1'
+
 EPSG_PROPERTIES_DEFAULT = {
     3059: '3059=PROJCS["LKS92 / Latvia TM",GEOGCS["LKS92",DATUM["Latvia_1992",SPHEROID["GRS 1980",6378137,298.257222101,'
           'AUTHORITY["EPSG","7019"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6661"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],'
@@ -53,7 +55,7 @@ EPSG_PROPERTIES_DEFAULT = {
 def get_srs_list_from_epsg_file(file_path):
     result = set()
     if os.path.exists(file_path):
-        with open(file_path, 'r') as f:
+        with open(file_path, 'r', encoding=EPSG_ENCODING) as f:
             epsg_props = f.read()
         epsg_defs = re.finditer(r'^([1-9][0-9]+)=', epsg_props, re.MULTILINE)
         result = {int(epsg_def.group(1)) for epsg_def in epsg_defs}
@@ -89,7 +91,7 @@ def setup_epsg(data_dir, srs_list):
         except BaseException as ex:
             logger.warning(f'Not able to download EPSG definition from epsg.io for code={code}. Reason={ex}')
 
-    with open(file_path, "a") as f:
+    with open(file_path, "a", encoding=EPSG_ENCODING) as f:
         for epsg_definition in new_epsg.values():
             f.write(epsg_definition)
             f.write('\n')
