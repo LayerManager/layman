@@ -51,7 +51,7 @@ def upgrade_1_8():
         # Create rules for publications/layers
         for username in all_usernames:
             logger.info(f'    Ensuring GS rules for user {username}')
-            for layer, info in layman_util.get_publication_infos(username, LAYER_TYPE).items():
+            for (workspace, publication_type, layer), info in layman_util.get_publication_infos(username, LAYER_TYPE).items():
                 logger.info(f'      Ensuring GS rules for user {username} and layer {layer}')
                 for type in ['read', 'write']:
                     security_read_roles = geoserver.layman_users_to_geoserver_roles(info['access_rights'][type])
