@@ -1,7 +1,7 @@
 # Changelog
 
 ## v1.9.0
- ???
+ 2021-01-14
 ### Upgrade requirements
 - Set environment variable [LAYMAN_OUTPUT_SRS_LIST](doc/env-settings.md#LAYMAN_OUTPUT_SRS_LIST) that contains list of EPSG codes that will appear as output spatial reference systems in both WMS and WFS. Choose any EPSG codes you need and add two mandatory systems `4326` and `3857`.
    - Sample SRS list for World: `4326,3857`
