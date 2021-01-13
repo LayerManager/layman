@@ -1,7 +1,7 @@
 # Changelog
 
 ## v1.9.0
- 2021-01-??
+ ???
 ### Upgrade requirements
 - Set environment variable [LAYMAN_OUTPUT_SRS_LIST](doc/env-settings.md#LAYMAN_OUTPUT_SRS_LIST) that contains list of EPSG codes that will appear as output spatial reference systems in both WMS and WFS. Choose any EPSG codes you need and add two mandatory systems `4326` and `3857`.
    - Sample SRS list for World: `4326,3857`
@@ -14,10 +14,16 @@
   
   It can be also useful to generate output bounding box for every supported SRS in WMS Capabilities documents. You can control this in GeoServer's admin GUI, page Services > WMS, checkbox "Output bounding box for every supported CRS".
  
+### Migrations
+Data manipulations that automatically run at first start of Layman:
+- [Data version table](doc/data-storage.md#data-version) is created. 
+- GeoServer's security rules of each publication are recalculated according to publication's access rights. It fixes [#200](https://github.com/jirik/layman/issues/200) also for existing layers.
+- Mistakenly created users and roles in GeoServer, created for public workspaces, are deleted.
+
 ### Changes
-- At first start of Layman, GeoServer security rules of each publication are recalculated according to publication's access rights. It fixes [#200](https://github.com/jirik/layman/issues/200) also for existing layers.
 - One of [OAuth2 HTTP headers](doc/oauth2/index.md#request-layman-rest-api), `AuthorizationIssUrl`, is optional if and only if there is only one OAuth2 authorization server registered at Layman. The header was mandatory in 1.8.0 and sooner.
 - Information about data version including migration ID is stored in [PostgreSQL](doc/data-storage.md#data-version).
+- When public workspace is created, only workspace is created on GeoServer. Previously also user and roles were mistakenly created.
 
 ## v1.8.1
  2021-01-06
