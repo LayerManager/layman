@@ -13,7 +13,7 @@ from layman import celery as celery_util
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common import metadata as common_md
-from layman.common.util import PUBLICATION_NAME_PATTERN
+from layman.common.util import PUBLICATION_NAME_PATTERN, clear_publication_info
 
 LAYERNAME_PATTERN = PUBLICATION_NAME_PATTERN
 ATTRNAME_PATTERN = PUBLICATION_NAME_PATTERN
@@ -146,6 +146,8 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
     }
 
     complete_info.update(partial_info)
+
+    clear_publication_info(complete_info)
 
     return complete_info
 

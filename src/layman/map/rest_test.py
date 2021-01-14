@@ -246,6 +246,8 @@ def test_post_maps_simple(client):
         thumbnail = resp_json['thumbnail']
         assert 'status' in thumbnail
         assert thumbnail['status'] in ['PENDING', 'STARTED']
+        assert 'id' not in resp_json.keys()
+        assert 'type' not in resp_json.keys()
 
     with app.app_context():
         map_info = client.get(url_for('rest_map.get', username=username, mapname=mapname)).get_json()

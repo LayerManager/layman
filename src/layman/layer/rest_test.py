@@ -317,6 +317,9 @@ def test_post_layers_simple(client):
         assert layer_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
         assert layer_info['metadata']['comparison_url'] == url_for('rest_layer_metadata_comparison.get',
                                                                    username=username, layername=layername)
+        assert 'id' not in layer_info.keys()
+        assert 'type' not in layer_info.keys()
+
         r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
         r.raise_for_status()
         assert layername in r.text
