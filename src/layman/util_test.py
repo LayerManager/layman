@@ -27,6 +27,43 @@ def test_check_reserved_workspace_names():
             assert exc_info.value.data['reserved_by'] == 'RESERVED_WORKSPACE_NAMES'
 
 
+@pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
+def test_get_users_workspaces():
+    public_workspace = 'test_get_users_workspaces_workspace'
+    user = 'test_get_users_workspaces_user'
+    publication = 'test_get_users_workspaces_publication'
+    authz_headers = process_client.get_authz_headers(user)
+
+    process_client.ensure_reserved_username(user, authz_headers)
+
+    for publication_type in process_client.PUBLICATION_TYPES:
+        process_client.publish_publication(publication_type,
+                                           public_workspace,
+                                           publication)
+        all_sources = []
+        for type_def in util.get_publication_types(use_cache=False).values():
+            all_sources += type_def['internal_sources']
+        providers = get_providers_from_source_names(all_sources)
+        for provider in providers:
+            with app.app_context():
+                usernames = provider.get_usernames()
+
+            assert public_workspace not in usernames, (publication_type, provider)
+
+        with app.app_context():
+            usernames = util.get_usernames(use_cache=False)
+            workspaces = util.get_workspaces(use_cache=False)
+
+        assert user in usernames
+        assert public_workspace not in usernames
+        assert user in workspaces
+        assert public_workspace in workspaces
+
+        process_client.delete_publication(publication_type,
+                                          public_workspace,
+                                          publication)
+
+
 def assert_module_methods(module, methods):
     for method in methods:
         # print(f'test_module_methods: module={module.__name__}, method={method}')
@@ -46,6 +83,7 @@ def test_publication_interface_methods():
 
     publication_provider_methods = {
         'get_usernames',
+        'get_workspaces',
         'check_username',
         'ensure_whole_user',
         'delete_whole_user',

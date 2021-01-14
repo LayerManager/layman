@@ -122,5 +122,9 @@ def get_usernames():
     return common.get_usernames_by_role(settings.LAYMAN_GS_ROLE, settings.LAYMAN_GS_AUTH, [settings.LAYMAN_GS_USER])
 
 
+def get_workspaces():
+    return common.get_all_workspaces(settings.LAYMAN_GS_AUTH)
+
+
 def check_new_layername(username, layername):
     pass

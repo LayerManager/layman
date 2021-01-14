@@ -65,6 +65,7 @@ def liferay_mock():
                 'test_get_publication_infos_user_owner': None,
                 'test_rest_soap_user': None,
                 'test_geoserver_remove_users_for_public_workspaces_user': None,
+                'test_get_users_workspaces_user': None,
             },
         },
         'host': '0.0.0.0',

@@ -50,7 +50,9 @@ def test_schema():
                       settings.RIGHTS_EVERYONE_ROLE)
 
         workspaces = run_query(f'select count(*) from {DB_SCHEMA}.workspaces;')
-        assert workspaces[0][0] == len(util.get_usernames())
+        assert workspaces[0][0] == len(util.get_workspaces())
+        users = run_query(f'select count(*) from {DB_SCHEMA}.users;')
+        assert users[0][0] == len(util.get_usernames(use_cache=False))
         user_infos = workspaces_util.get_workspace_infos(username)
         assert username in user_infos
         pub_infos = pub_util.get_publication_infos(username)
