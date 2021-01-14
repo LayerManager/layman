@@ -18,7 +18,7 @@ from .micka import soap
 from .micka.csw import map_json_to_operates_on, map_json_to_epsg_codes
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common import metadata as common_md
-from layman.common.util import PUBLICATION_NAME_PATTERN
+from layman.common.util import PUBLICATION_NAME_PATTERN, clear_publication_info
 
 
 MAPNAME_PATTERN = PUBLICATION_NAME_PATTERN
@@ -183,6 +183,8 @@ def get_complete_map_info(username=None, mapname=None, cached=False):
     }
 
     complete_info.update(partial_info)
+
+    clear_publication_info(complete_info)
 
     return complete_info
 

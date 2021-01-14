@@ -12,3 +12,12 @@ def merge_infos(infos):
         for (name, info) in source.items():
             result_infos[name].update(info)
     return result_infos
+
+
+def clear_publication_info(info):
+    for key in ['id', 'type']:
+        try:
+            del info[key]
+        except KeyError:
+            pass
+    return info
