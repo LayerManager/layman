@@ -5,21 +5,26 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
 def ensure_user(id_workspace, userinfo):
-    sql = f"""insert into {DB_SCHEMA}.users (id_workspace, preferred_username, given_name, family_name, middle_name, name, email, issuer_id, sub)
-values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-ON CONFLICT (id_workspace) DO update SET id_workspace = EXCLUDED.id_workspace returning id;"""
-    data = (id_workspace,
-            userinfo["claims"]["preferred_username"],
-            userinfo["claims"]["given_name"],
-            userinfo["claims"]["family_name"],
-            userinfo["claims"]["middle_name"],
-            userinfo["claims"]["name"],
-            userinfo["claims"]["email"],
-            userinfo["issuer_id"],
-            userinfo["sub"],
-            )
-    ids = util.run_query(sql, data)
-    return ids[0][0]
+    users = get_user_infos(id_workspace=id_workspace)
+    if users:
+        result = list(users.values())[0]["id"]
+    else:
+        sql = f"""insert into {DB_SCHEMA}.users (id_workspace, preferred_username, given_name, family_name, middle_name, name, email, issuer_id, sub)
+    values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+    ON CONFLICT (id_workspace) DO update SET id_workspace = EXCLUDED.id_workspace returning id;"""
+        data = (id_workspace,
+                userinfo["claims"]["preferred_username"],
+                userinfo["claims"]["given_name"],
+                userinfo["claims"]["family_name"],
+                userinfo["claims"]["middle_name"],
+                userinfo["claims"]["name"],
+                userinfo["claims"]["email"],
+                userinfo["issuer_id"],
+                userinfo["sub"],
+                )
+        ids = util.run_query(sql, data)
+        result = ids[0][0]
+    return result
 
 
 def delete_user(username):
@@ -30,7 +35,8 @@ def delete_user(username):
 
 
 def get_user_infos(username=None,
-                   iss_sub=None):
+                   iss_sub=None,
+                   id_workspace=None):
     assert not (username and iss_sub)
     iss_sub = iss_sub or dict()
 
@@ -39,8 +45,10 @@ def get_user_infos(username=None,
         join_clause = 'c.username = w.name'
     elif iss_sub:
         join_clause = 'c.issuer_id = u.issuer_id and c.sub = u.sub'
+    elif id_workspace:
+        join_clause = 'c.id_workspace = w.id'
 
-    sql = f"""with const as (select %s username, %s issuer_id, %s sub)
+    sql = f"""with const as (select %s username, %s issuer_id, %s sub, %s id_workspace)
 select u.id,
        w.name username,
        u.preferred_username,
@@ -56,7 +64,7 @@ from {DB_SCHEMA}.workspaces w inner join
      const c on (""" + join_clause + """)
 order by w.name asc
 ;"""
-    params = (username, iss_sub.get('issuer_id'), iss_sub.get('sub'))
+    params = (username, iss_sub.get('issuer_id'), iss_sub.get('sub'), id_workspace)
     values = util.run_query(sql, params)
     result = {username: {"id": user_id,
                          "username": username,

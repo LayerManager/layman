@@ -5,12 +5,17 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
 def ensure_workspace(name):
-    sql = f"""insert into {DB_SCHEMA}.workspaces (name)
-    values (%s)
-    ON CONFLICT (name) DO update SET name = EXCLUDED.name returning id;"""
-    data = (name, )
-    ids = util.run_query(sql, data)
-    return ids[0][0]
+    workspaces = get_workspace_infos(name)
+    if workspaces:
+        result = workspaces[name]["id"]
+    else:
+        sql = f"""insert into {DB_SCHEMA}.workspaces (name)
+        values (%s)
+        ON CONFLICT (name) DO update SET name = EXCLUDED.name returning id;"""
+        data = (name, )
+        ids = util.run_query(sql, data)
+        result = ids[0][0]
+    return result
 
 
 def delete_workspace(name):
