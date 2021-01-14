@@ -1,5 +1,6 @@
 from layman import settings, app as app
-from . import users as user_util, workspaces as workspace_util
+from . import users as user_util, workspaces as workspace_util, util as db_util
+from .. import prime_db_schema
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
@@ -44,12 +45,29 @@ def test_ensure_user():
                            "middle_name": "ensure",
                            }
                 }
+    sql = f'select us.last_value from {DB_SCHEMA}.users_id_seq us;'
     with app.app_context():
         id_workspace = workspace_util.ensure_workspace(username)
         user_id = user_util.ensure_user(id_workspace, userinfo)
         assert user_id
         user_id2 = user_util.ensure_user(id_workspace, userinfo)
         assert user_id2 == user_id
+        prime_db_schema.delete_whole_user(username)
+
+    with app.app_context():
+        users_seq_value_1 = db_util.run_query(sql)[0][0]
+        (id_workspace, id_user) = prime_db_schema.ensure_whole_user(username, userinfo)
+        users_seq_value_2 = db_util.run_query(sql)[0][0]
+        assert users_seq_value_2 == id_user,\
+            f'users_seq_value_1={users_seq_value_1}, id_user={id_user}, users_seq_value_2={users_seq_value_2}'
+        assert users_seq_value_2 == users_seq_value_1 + 1,\
+            f'users_seq_value_1={users_seq_value_1}, id_user={id_user}, users_seq_value_2={users_seq_value_2}'
+        (id_workspace2, id_user2) = prime_db_schema.ensure_whole_user(username, userinfo)
+        users_seq_value_3 = db_util.run_query(sql)[0][0]
+        assert id_user2 == id_user
+        assert users_seq_value_3 == users_seq_value_2,\
+            f'users_seq_value_1={users_seq_value_1}, id_user={id_user},' \
+            f'users_seq_value_2={users_seq_value_2}, users_seq_value_3={users_seq_value_3}'
 
 
 def test_delete_user():

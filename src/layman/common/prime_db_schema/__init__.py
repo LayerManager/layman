@@ -14,8 +14,10 @@ def delete_whole_user(username):
 
 def ensure_whole_user(username, userinfo=None):
     id_workspace = workspaces_util.ensure_workspace(username)
+    id_user = None
     if userinfo:
-        users_util.ensure_user(id_workspace, userinfo)
+        id_user = users_util.ensure_user(id_workspace, userinfo)
+    return id_workspace, id_user
 
 
 def delete_workspace(workspace):
