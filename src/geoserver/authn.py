@@ -1,15 +1,15 @@
 import logging
-from distutils.dir_util import copy_tree
 
 from lxml import etree as ET
 import os
 import pathlib
 
+from setup_geoserver import logger
+
 logger = logging.getLogger(__name__)
 
 
 def ensure_request_header_authn(data_dir, name, attribute, user_group_service, role_service):
-    logger.info(f"Ensuring Request Header Authentication '{name}'")
     authn_exists = get_authn(data_dir, name) is not None
     if not authn_exists:
         create_request_header_authn(data_dir, name, attribute, user_group_service, role_service)
@@ -54,7 +54,7 @@ def get_security_filter_group(data_dir, name):
 
 
 def create_security_filter_group(data_dir, name, filter_names):
-    logger.info(f"Creating Authentication Filter group '{name}' with filters {','.join(filter_names)}")
+    logger.info(f"  Creating Authentication Filter group '{name}' with filters {','.join(filter_names)}")
     security_xml = get_security(data_dir)
     new_chain = ET.Element('filters')
     new_chain.attrib['name'] = name
@@ -76,19 +76,18 @@ def create_security_filter_group(data_dir, name, filter_names):
 
 
 def remove_security_filter_groups(data_dir, names):
-    logger.info(f"Deleting Authentication Filter groups '{names}'")
     security_xml = get_security(data_dir)
 
     for name in names:
         filter = security_xml.find(f'//filterChain/filters[@name="{name}"]')
         if filter:
+            logger.info(f"  Deleting Authentication Filter groups '{name}'")
             filter.getparent().remove(filter)
     security_path = os.path.join(data_dir, 'security/config.xml')
     security_xml.write(security_path)
 
 
 def ensure_security_filter_group(data_dir, name, filter_names):
-    logger.info(f"Ensuring Authentication Filter group '{name}' with filters {','.join(filter_names)}")
     group_exists = get_security_filter_group(data_dir, name) is not None
     if not group_exists:
         create_security_filter_group(data_dir, name, filter_names)
@@ -96,6 +95,37 @@ def ensure_security_filter_group(data_dir, name, filter_names):
     return group_created
 
 
-def ensure_data_dir(data_dir, data_dir_initial):
-    if not os.listdir(data_dir):
-        copy_tree(data_dir_initial, data_dir)
+def setup_authn(datadir,
+                filter_name,
+                header_name,
+                header_attribute,
+                user_group_service,
+                role_service,
+                old_filter_names,
+                ):
+    logger.info(f"Ensuring Authentication Filter group '{filter_name}' "
+                f"with filters {header_name}, "
+                f"removing old groups {old_filter_names}.")
+
+    ensure_request_header_authn(
+        datadir,
+        header_name,
+        header_attribute,
+        user_group_service,
+        role_service
+    )
+
+    remove_security_filter_groups(
+        datadir,
+        old_filter_names,
+    )
+
+    ensure_security_filter_group(
+        datadir,
+        filter_name,
+        [
+            header_name,
+            'basic',
+            'anonymous',
+        ]
+    )
