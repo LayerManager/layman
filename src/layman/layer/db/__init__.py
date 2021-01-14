@@ -31,7 +31,7 @@ def get_connection_cursor():
     return g.get(key)
 
 
-def get_usernames(conn_cur=None):
+def get_workspaces(conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
@@ -47,6 +47,10 @@ def get_usernames(conn_cur=None):
     return [
         r[0] for r in rows
     ]
+
+
+def get_usernames():
+    return []
 
 
 def check_username(username, conn_cur=None):

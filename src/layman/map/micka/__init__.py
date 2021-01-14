@@ -3,6 +3,9 @@ def get_usernames():
     return []
 
 
+get_workspaces = get_usernames
+
+
 def ensure_whole_user(username):
     pass
 

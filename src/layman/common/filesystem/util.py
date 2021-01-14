@@ -16,6 +16,18 @@ def get_usernames():
     user_names = [
         subfile for subfile in os.listdir(usersdir)
         if os.path.isdir(os.path.join(usersdir, subfile))
+        and os.path.exists(os.path.join(usersdir, subfile, 'authn.txt'))
+    ]
+    return user_names
+
+
+def get_workspaces():
+    usersdir = get_users_dir()
+    if not os.path.exists(usersdir):
+        return []
+    user_names = [
+        subfile for subfile in os.listdir(usersdir)
+        if os.path.isdir(os.path.join(usersdir, subfile))
     ]
     return user_names
 
