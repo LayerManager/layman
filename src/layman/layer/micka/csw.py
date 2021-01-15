@@ -153,6 +153,7 @@ def get_template_path_and_values(username, layername, http_method=None):
         md_language=md_language,
         languages=languages,
         scale_denominator=scale_denominator,
+        epsg_codes=settings.LAYMAN_OUTPUT_SRS_LIST,
     )
     if http_method == 'post':
         prop_values.pop('revision_date', None)
