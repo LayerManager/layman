@@ -525,7 +525,7 @@ def reload(auth):
     r = requests.post(r_url,
                       headers=headers_json,
                       auth=auth,
-                      timeout=5,
+                      timeout=20,
                       )
     r.raise_for_status()
     logger.info(f"Reloading GeoServer done")
