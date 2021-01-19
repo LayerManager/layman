@@ -49,8 +49,6 @@ def setup_user_layer(username, layername, authn_headers):
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ], headers=authn_headers)
 
-    assert ln == layername
-
 
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
 def test_wfs_proxy():
@@ -64,8 +62,6 @@ def test_wfs_proxy():
     ln = client_util.publish_layer(username,
                                    layername1,
                                    headers=authn_headers1)
-
-    assert ln == layername1
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
     headers = {
@@ -148,8 +144,6 @@ def test_wms_ows_proxy(service_endpoint):
     client_util.ensure_reserved_username(username, headers=authn_headers)
     ln = client_util.publish_layer(username, layername, headers=authn_headers)
 
-    assert ln == layername
-
     wms_url = geoserver_client.get_wms_url(username, service_endpoint)
 
     wms = geoserver_client.get_wms_capabilities(username, service_endpoint, headers=authn_headers)
@@ -184,13 +178,11 @@ def test_missing_attribute():
                                    ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
                                    headers=authn_headers,
                                    )
-    assert ln == layername
     ln2 = client_util.publish_layer(username,
                                     layername2,
                                     ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
                                     headers=authn_headers,
                                     )
-    assert ln2 == layername2
 
     wfs_t_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
 
@@ -339,7 +331,6 @@ def test_missing_attribute_authz():
                                    layername1,
                                    ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
                                    headers=authn_headers1)
-    assert ln == layername1
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
 

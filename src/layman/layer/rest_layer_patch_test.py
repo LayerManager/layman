@@ -171,7 +171,7 @@ def test_access_rights(access_rights_and_expected_list, use_file):
                           file_paths=[
                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
                           ] if use_file else None)
-        assert ln == layername
+
         client_util.assert_user_layers(username, [layername], owner_authn_headers)
         assert_gs_user_and_roles(username)
         assert_gs_layer_data_security(username, layername, roles_to_test)

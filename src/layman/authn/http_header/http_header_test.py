@@ -2,6 +2,7 @@ import pytest
 from test import process_client
 from layman import settings, app
 from layman.common import prime_db_schema
+from layman.http import LaymanError
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -13,9 +14,12 @@ def test_http_header():
         settings.LAYMAN_AUTHN_HTTP_HEADER_NAME: username,
     }
 
-    resp = process_client.get_layer(workspace, layername, headers=http_authn_headers, assert_status=False)
-    assert resp.status_code == 403
-    assert resp.json()['code'] == 44  # username not recognized by HTTP Header authentication
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.get_layer(workspace, layername, headers=http_authn_headers)
+    assert exc_info.value.http_code == 403
+    assert exc_info.value.code == 44
+    assert exc_info.value.message == 'Unsuccessful HTTP Header authentication.'
+    assert exc_info.value.data == 'Username test_http_header_user not recognized.'
 
     # reserve the username in prime DB schema
     with app.app_context():
@@ -35,9 +39,11 @@ def test_http_header():
             }
         )
 
-    resp = process_client.get_layer(workspace, layername, headers=http_authn_headers, assert_status=False)
-    assert resp.status_code == 404
-    assert resp.json()['code'] == 40  # username was recognized and authenticated, but workspace was not found
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.get_layer(workspace, layername, headers=http_authn_headers)
+    assert exc_info.value.http_code == 404
+    assert exc_info.value.code == 40
+    assert exc_info.value.message == 'Workspace does not exist.'
 
     with app.app_context():
         prime_db_schema.delete_whole_user(username)

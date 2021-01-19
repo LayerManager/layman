@@ -2,12 +2,14 @@ import time
 import requests
 import os
 import logging
+import json
 from functools import partial
 from collections import namedtuple
 
-from layman import settings, app
+from layman import app
 from layman.util import url_for
 from layman.layer.geoserver import wfs, wms
+from layman.http import LaymanError
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +78,18 @@ def wait_for_rest(url, max_attempts, sleeping_time, keys_to_check, headers=None)
             raise Exception('Max attempts reached!')
 
 
+def raise_layman_error(response, status_codes_to_skip=None):
+    status_codes_to_skip = status_codes_to_skip or set()
+    status_codes_to_skip.add(200)
+    if 400 <= response.status_code < 500 and response.status_code not in status_codes_to_skip:
+        details = json.loads(response.text)
+        raise LaymanError(details['code'],
+                          details.get('detail'),
+                          http_code=response.status_code,
+                          sub_code=details.get('sub_code'))
+    assert response.status_code in status_codes_to_skip, f"response.status_code={response.status_code}\nresponse.text={response.text}"
+
+
 def patch_publication(publication_type,
                       username,
                       name,
@@ -83,7 +97,6 @@ def patch_publication(publication_type,
                       headers=None,
                       access_rights=None,
                       title=None,
-                      assert_status=True,
                       ):
     headers = headers or {}
     file_paths = file_paths or []
@@ -111,8 +124,7 @@ def patch_publication(publication_type,
                            files=files,
                            headers=headers,
                            data=data)
-        if assert_status:
-            assert r.status_code == 200, r.text
+        raise_layman_error(r)
     finally:
         for fp in files:
             fp[1][1].close()
@@ -121,13 +133,10 @@ def patch_publication(publication_type,
         url = url_for(publication_type_def.get_url,
                       username=username,
                       **{publication_type_def.url_param_name: name})
-    if assert_status:
-        wait_for_rest(url, 30, 0.5, publication_type_def.keys_to_check, headers=headers)
+    wait_for_rest(url, 30, 0.5, publication_type_def.keys_to_check, headers=headers)
     wfs.clear_cache(username)
     wms.clear_cache(username)
-    if not assert_status:
-        return r
-    return name
+    return r.json()
 
 
 patch_map = partial(patch_publication, MAP_TYPE)
@@ -142,7 +151,7 @@ def ensure_publication(publication_type,
                        ):
     headers = headers or {}
 
-    r = get_publications(publication_type, username, headers=headers, assert_status=False)
+    r = get_publications(publication_type, username, headers=headers, )
     publication_obj = next((publication for publication in r.json() if publication['name'] == name), None)
     if r.status_code == 200 and publication_obj:
         patch_needed = False
@@ -152,9 +161,9 @@ def ensure_publication(publication_type,
             if 'write' in access_rights and set(access_rights['write'].split(',')) != set(publication_obj['access_rights']['write']):
                 patch_needed = True
         if patch_needed:
-            patch_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
+            return patch_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
     else:
-        publish_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
+        return publish_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
 
 
 ensure_layer = partial(ensure_publication, LAYER_TYPE)
@@ -168,7 +177,6 @@ def publish_publication(publication_type,
                         headers=None,
                         access_rights=None,
                         title=None,
-                        assert_status=True,
                         ):
     title = title or name
     headers = headers or {}
@@ -194,8 +202,8 @@ def publish_publication(publication_type,
                           files=files,
                           data=data,
                           headers=headers)
-        if assert_status:
-            assert r.status_code == 200, r.text
+        raise_layman_error(r)
+        assert r.json()[0]['name'] == name
 
     finally:
         for fp in files:
@@ -205,36 +213,30 @@ def publish_publication(publication_type,
         url = url_for(publication_type_def.get_url,
                       username=username,
                       **{publication_type_def.url_param_name: name})
-    if assert_status:
-        wait_for_rest(url, 30, 0.5, publication_type_def.keys_to_check, headers=headers)
-    else:
-        return r
-    return name
+    wait_for_rest(url, 30, 0.5, publication_type_def.keys_to_check, headers=headers)
+    return r.json()[0]
 
 
 publish_map = partial(publish_publication, MAP_TYPE)
 publish_layer = partial(publish_publication, LAYER_TYPE)
 
 
-def get_publications(publication_type, workspace, headers=None, assert_status=True,):
+def get_publications(publication_type, workspace, headers=None, ):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
         r_url = url_for(publication_type_def.get_list_url, username=workspace)
     r = requests.get(r_url, headers=headers)
-    if assert_status:
-        assert r.status_code == 200, r.text
-        return r.json()
-    else:
-        return r
+    raise_layman_error(r)
+    return r.json()
 
 
 get_maps = partial(get_publications, MAP_TYPE)
 get_layers = partial(get_publications, LAYER_TYPE)
 
 
-def get_publication(publication_type, username, name, headers=None, assert_status=True,):
+def get_publication(publication_type, username, name, headers=None,):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
@@ -243,30 +245,24 @@ def get_publication(publication_type, username, name, headers=None, assert_statu
                         username=username,
                         **{publication_type_def.url_param_name: name})
     r = requests.get(r_url, headers=headers)
-    if assert_status:
-        assert r.status_code == 200, r.text
-        return r.json()
-    else:
-        return r
+    raise_layman_error(r)
+    return r.json()
 
 
 get_map = partial(get_publication, MAP_TYPE)
 get_layer = partial(get_publication, LAYER_TYPE)
 
 
-def finish_delete(username, url, headers, assert_status):
+def finish_delete(username, url, headers, skip_404=False, ):
     r = requests.delete(url, headers=headers)
-    if assert_status:
-        assert r.status_code == 200, r.text
-        result = r.json()
-    else:
-        result = r
+    status_codes_to_skip = {404} if skip_404 else set()
+    raise_layman_error(r, status_codes_to_skip)
     wfs.clear_cache(username)
     wms.clear_cache(username)
-    return result
+    return r.json()
 
 
-def delete_publication(publication_type, username, name, headers=None, assert_status=True):
+def delete_publication(publication_type, username, name, headers=None, skip_404=False, ):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
@@ -275,14 +271,14 @@ def delete_publication(publication_type, username, name, headers=None, assert_st
                         username=username,
                         **{publication_type_def.url_param_name: name})
 
-    return finish_delete(username, r_url, headers, assert_status)
+    return finish_delete(username, r_url, headers, skip_404=skip_404)
 
 
 delete_map = partial(delete_publication, MAP_TYPE)
 delete_layer = partial(delete_publication, LAYER_TYPE)
 
 
-def delete_publications(publication_type, username, headers=None, assert_status=True):
+def delete_publications(publication_type, username, headers=None,):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
@@ -291,7 +287,7 @@ def delete_publications(publication_type, username, headers=None, assert_status=
                         username=username,
                         )
 
-    return finish_delete(username, r_url, headers, assert_status)
+    return finish_delete(username, r_url, headers, )
 
 
 delete_maps = partial(delete_publications, MAP_TYPE)
@@ -313,7 +309,6 @@ def get_map_metadata_comparison(username, mapname, headers=None):
     with app.app_context():
         r_url = url_for('rest_map_metadata_comparison.get', mapname=mapname, username=username)
     r = requests.get(r_url, headers=headers)
-    assert r.status_code == 200, f"r.status_code={r.status_code}\nr.text={r.text}"
     return r.json()
 
 
