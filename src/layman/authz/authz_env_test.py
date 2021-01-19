@@ -1,7 +1,7 @@
-import json
 import pytest
 
 from test import process, process_client
+from layman.http import LaymanError
 
 
 class TestPublicWorkspaceClass:
@@ -54,14 +54,14 @@ class TestPublicWorkspaceClass:
                             publish_method,
                             authz_headers=None,
                             ):
-            r = publish_method(workspace_name,
+            with pytest.raises(LaymanError) as exc_info:
+                publish_method(workspace_name,
                                publication_name,
                                headers=authz_headers,
-                               assert_status=False)
-            assert r.status_code == 403
-            details = json.loads(r.text)
-            assert details['code'] == 30
-            assert details['message'] == "Unauthorized access"
+                               )
+            assert exc_info.value.http_code == 403
+            assert exc_info.value.code == 30
+            assert exc_info.value.message == 'Unauthorized access'
 
         workspace_name = workspace_prefix + workspace_suffix
         workspace_name2 = workspace_name + '2'

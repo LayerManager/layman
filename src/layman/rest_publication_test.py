@@ -1,43 +1,48 @@
 import pytest
-import json
 
 from test import process_client
+from layman.http import LaymanError
 from layman.common.micka import util as micka_util
 
 
 @pytest.mark.parametrize('publ_type', process_client.PUBLICATION_TYPES)
 @pytest.mark.usefixtures('ensure_layman')
 def test_wrong_post(publ_type):
-    def check_response(resp):
-        assert resp.status_code == 400, (resp.status_code, r.text)
-        resp_json = json.loads(resp.text)
-        assert resp_json['code'] == 43, (resp.status_code, resp.text)
-        assert resp_json['message'] == 'Wrong access rights.', (resp.status_code, resp.text)
+    def check_response(exception):
+        assert exception.value.http_code == 400
+        assert exception.value.code == 43
+        assert exception.value.message == 'Wrong access rights.'
 
     workspace = 'test_wrong_post_workspace'
     publication = 'test_wrong_post_publication'
 
-    r = process_client.publish_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY'}, assert_status=False)
-    check_response(r)
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.publish_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY'}, )
+    check_response(exc_info)
 
-    r = process_client.publish_publication(publ_type, workspace, publication, access_rights={'write': 'EVRBODY'}, assert_status=False)
-    check_response(r)
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.publish_publication(publ_type, workspace, publication, access_rights={'write': 'EVRBODY'}, )
+    check_response(exc_info)
 
-    r = process_client.publish_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY', 'write': 'EVRBODY'}, assert_status=False)
-    check_response(r)
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.publish_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY', 'write': 'EVRBODY'}, )
+    check_response(exc_info)
 
     process_client.publish_publication(publ_type, workspace, publication)
 
-    r = process_client.patch_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY'}, assert_status=False)
-    check_response(r)
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.patch_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY'}, )
+    check_response(exc_info)
 
-    r = process_client.patch_publication(publ_type, workspace, publication, access_rights={'write': 'EVRBODY'}, assert_status=False)
-    check_response(r)
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.patch_publication(publ_type, workspace, publication, access_rights={'write': 'EVRBODY'}, )
+    check_response(exc_info)
 
-    r = process_client.patch_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY', 'write': 'EVRBODY'}, assert_status=False)
-    check_response(r)
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.patch_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY', 'write': 'EVRBODY'}, )
+    check_response(exc_info)
 
-    r = process_client.patch_publication(publ_type, workspace, publication)
+    process_client.patch_publication(publ_type, workspace, publication)
 
     process_client.delete_publication(publ_type, workspace, publication)
 

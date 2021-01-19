@@ -20,8 +20,7 @@ layername = 'country_chunks'
 @pytest.fixture(scope="module")
 def clear_country_chunks():
     yield
-    r = process_client.delete_layer(username, layername, assert_status=False)
-    assert r.status_code == 200 or r.status_code == 404
+    process_client.delete_layer(username, layername, skip_404=True)
 
 
 @pytest.fixture(scope="module")
