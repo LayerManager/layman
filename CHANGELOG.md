@@ -5,6 +5,7 @@
 ### Upgrade requirements
 ### Migrations
 ### Changes
+- [#99](https://github.com/jirik/layman/issues/99) New endpoint [`/rest/about/version'](doc/rest.md#get-version). Also available in Layman Test Client.
 
 ## v1.9.1
  2021-01-18
