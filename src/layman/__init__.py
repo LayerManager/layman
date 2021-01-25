@@ -108,6 +108,9 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
             app.logger.info(f'Waiting for Layman in other process to initialize dependencies')
             time.sleep(1)
 
+from .rest_about import bp as about_bp
+app.register_blueprint(about_bp, url_prefix=f'/rest/about')
+
 app.logger.info(f'Layman successfully started!')
 
 

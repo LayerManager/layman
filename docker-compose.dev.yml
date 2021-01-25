@@ -19,6 +19,7 @@ services:
         - ./src:/code/src
         - ./tmp:/code/tmp
         - ./start.sh:/code/start.sh
+        - ./version.txt:/code/version.txt
         - ./doc:/code/doc
         - ./deps/geoserver/data:/geoserver/data_dir
         - ./deps/geoserver/sample/geoserver_data:/geoserver/initial_data_dir

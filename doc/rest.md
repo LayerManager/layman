@@ -16,6 +16,7 @@
 |Map Metadata Comparison|`/rest/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-map-metadata-comparison) | x | x | x |
 |Users|`/rest/users`|[GET](#get-users)| x | x | x |
 |Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | [DELETE](#delete-current-user) |
+|Version|`/rest/about/version`|[GET](#get-version)| x | x | x |
 
 #### REST path parameters
 - **workspace_name**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
@@ -625,3 +626,27 @@ No action parameters.
 Content-Type: `application/json`
 
 HTTP status code 200 if credentials were deleted.
+
+## Version
+### URL
+`/rest/about/version`
+
+### GET Version
+Get information about current application version.
+
+#### Request
+No action parameters.
+#### Response
+Content-Type: `application/json`
+
+JSON object representing current application version:
+- **about**
+  - **applications**: Object with information about each application. 
+    - **layman**:
+      - **version**: String. The current version of Layman app. In format `vX.Y.Z`, with suffix `-dev` for the development version.
+      - **release-timestamp**: Datetime. Date and time of the release. For development version, date and time of the last public release.
+    - **layman-test-client**:
+      - **version**: String. The current version of Layman test client from environment variables. 
+  - **data** 
+    - **layman**:
+      - **last-migration**: String. Identifier of the last successful migration in format 'X.Y.Z-m'.
