@@ -1,21 +1,14 @@
-from flask import Blueprint, jsonify, g
+from flask import Blueprint, jsonify
 
 from layman.common.prime_db_schema import users
-from layman.authn import authenticate
 from layman import app
 
 bp = Blueprint('rest_users', __name__)
 
 
-@bp.before_request
-@authenticate
-def before_request():
-    pass
-
-
 @bp.route('', methods=['GET'])
 def get():
-    app.logger.info(f"GET Users, user={g.user}")
+    app.logger.info(f"GET Users")
 
     user_infos = users.get_user_infos()
     infos = [
