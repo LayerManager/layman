@@ -328,52 +328,33 @@ def delete_db_store(geoserver_workspace, auth):
         r.raise_for_status()
 
 
-def ensure_workspace(username, auth=settings.LAYMAN_GS_AUTH):
+def ensure_workspace(geoserver_workspace, auth=settings.LAYMAN_GS_AUTH):
     all_workspaces = get_all_workspaces(auth)
-    if username not in all_workspaces:
+    if geoserver_workspace not in all_workspaces:
         r = requests.post(
             settings.LAYMAN_GS_REST_WORKSPACES,
-            data=json.dumps({'workspace': {'name': username}}),
+            data=json.dumps({'workspace': {'name': geoserver_workspace}}),
             headers=headers_json,
             auth=auth,
             timeout=5,
         )
         r.raise_for_status()
-        ensure_db_store(username, auth)
+        return True
+    return False
 
 
-def delete_workspace(username, auth=settings.LAYMAN_GS_AUTH):
-    delete_db_store(username, auth)
-
-    delete_security_roles(username + '.*.r', auth)
-    delete_security_roles(username + '.*.w', auth)
+def delete_workspace(geoserver_workspace, auth=settings.LAYMAN_GS_AUTH):
+    delete_security_roles(geoserver_workspace + '.*.r', auth)
+    delete_security_roles(geoserver_workspace + '.*.w', auth)
 
     r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username),
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace),
         headers=headers_json,
         auth=auth,
         timeout=5,
     )
     if r.status_code != 404:
         r.raise_for_status()
-
-
-def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
-    ensure_user(username, None, auth)
-    role = username_to_rolename(username)
-    ensure_role(role, auth)
-    ensure_user_role(username, role, auth)
-    ensure_user_role(username, settings.LAYMAN_GS_ROLE, auth)
-    ensure_workspace(username, auth)
-
-
-def delete_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
-    role = username_to_rolename(username)
-    delete_workspace(username, auth)
-    delete_user_role(username, role, auth)
-    delete_user_role(username, settings.LAYMAN_GS_ROLE, auth)
-    delete_role(role, auth)
-    delete_user(username, auth)
 
 
 def username_to_rolename(username):

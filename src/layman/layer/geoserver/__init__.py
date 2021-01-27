@@ -20,10 +20,36 @@ headers_xml = {
     'Content-type': 'application/xml',
 }
 
-ensure_whole_user = common.ensure_whole_user
-delete_whole_user = common.delete_whole_user
-ensure_workspace = common.ensure_workspace
-delete_workspace = common.delete_workspace
+
+def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
+    common.ensure_user(username, None, auth)
+    role = common.username_to_rolename(username)
+    common.ensure_role(role, auth)
+    common.ensure_user_role(username, role, auth)
+    common.ensure_user_role(username, settings.LAYMAN_GS_ROLE, auth)
+    ensure_workspace(username, auth)
+
+
+def delete_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
+    role = common.username_to_rolename(username)
+    delete_workspace(username, auth)
+    common.delete_user_role(username, role, auth)
+    common.delete_user_role(username, settings.LAYMAN_GS_ROLE, auth)
+    common.delete_role(role, auth)
+    common.delete_user(username, auth)
+
+
+def ensure_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
+    for ws in [workspace]:
+        created = common.ensure_workspace(ws, auth)
+        if created:
+            common.create_db_store(ws, auth, workspace)
+
+
+def delete_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
+    for ws in [workspace]:
+        common.delete_db_store(ws, auth)
+        common.delete_workspace(ws, auth)
 
 
 def get_all_rules(auth):
