@@ -94,8 +94,9 @@ def delete_layer(username, layername):
     return {}
 
 
-def get_wfs_url(username):
-    return urljoin(settings.LAYMAN_GS_URL, username + '/wfs')
+def get_wfs_url(workspace, external_url=False):
+    base_url = get_gs_proxy_base_url() if external_url else settings.LAYMAN_GS_URL
+    return urljoin(base_url, workspace + '/wfs')
 
 
 def get_wfs_direct(username):
@@ -157,15 +158,11 @@ def clear_cache(username):
     mem_redis.delete(key)
 
 
-def _get_wfs_proxy_url(username):
-    return urljoin(get_gs_proxy_base_url(), username + '/wfs')
-
-
 def get_layer_info(username, layername):
     wfs = get_wfs_proxy(username)
     if wfs is None:
         return {}
-    wfs_proxy_url = _get_wfs_proxy_url(username)
+    wfs_proxy_url = get_wfs_url(username, external_url=True)
 
     wfs_layername = f"{username}:{layername}"
     if wfs_layername not in wfs.contents:
@@ -238,6 +235,6 @@ def add_capabilities_params_to_url(url):
 
 
 def get_capabilities_url(username):
-    url = _get_wfs_proxy_url(username)
+    url = get_wfs_url(username, external_url=True)
     url = add_capabilities_params_to_url(url)
     return url

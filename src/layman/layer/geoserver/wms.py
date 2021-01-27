@@ -54,8 +54,9 @@ def delete_layer(username, layername):
     return {}
 
 
-def get_wms_url(username):
-    return urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+def get_wms_url(workspace, external_url=False):
+    base_url = get_gs_proxy_base_url() if external_url else settings.LAYMAN_GS_URL
+    return urljoin(base_url, workspace + '/ows')
 
 
 def get_wms_direct(username):
@@ -116,15 +117,11 @@ def clear_cache(username):
     mem_redis.delete(key)
 
 
-def _get_wms_proxy_url(username):
-    return urljoin(get_gs_proxy_base_url(), username + '/ows')
-
-
 def get_layer_info(username, layername):
     wms = get_wms_proxy(username)
     if wms is None:
         return {}
-    wms_proxy_url = _get_wms_proxy_url(username)
+    wms_proxy_url = get_wms_url(username, external_url=True)
 
     if layername not in wms.contents:
         return {}
@@ -217,6 +214,6 @@ def add_capabilities_params_to_url(url):
 
 
 def get_capabilities_url(username):
-    url = _get_wms_proxy_url(username)
+    url = get_wms_url(username, external_url=True)
     url = add_capabilities_params_to_url(url)
     return url
