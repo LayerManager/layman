@@ -3,6 +3,7 @@ import pytest
 from . import upgrade_v1_9
 from layman import settings, app
 from layman.common import geoserver as gs_common
+from layman.layer import geoserver as gs_provider
 from test import process_client
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
@@ -50,7 +51,7 @@ def test_geoserver_remove_users_for_public_workspaces():
     process_client.ensure_reserved_username(user, auth_headers)
     with app.app_context():
 
-        gs_common.ensure_whole_user(workspace, auth)
+        gs_provider.ensure_whole_user(workspace, auth)
 
         usernames = gs_common.get_usernames(auth)
         assert workspace in usernames
