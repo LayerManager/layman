@@ -2,9 +2,7 @@ from datetime import date
 import glob
 import json
 import os
-import urllib
 import time
-from multiprocessing import Process
 import difflib
 import requests
 
@@ -685,7 +683,7 @@ def test_map_composed_from_local_layers(client):
     assert num_attempts < max_attempts, f"Max attempts reached, layer2info={layer_info}"
     wms_url2 = layer_info['wms']['url']
 
-    expected_url = 'http://localhost:8000/geoserver/testuser1/ows'
+    expected_url = 'http://localhost:8000/geoserver/testuser1_wms/ows'
     assert wms_url1 == expected_url
     assert wms_url2 == expected_url
 

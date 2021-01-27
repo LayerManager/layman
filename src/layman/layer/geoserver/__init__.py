@@ -8,6 +8,7 @@ from layman.http import LaymanError
 from layman import settings, util as layman_util
 from layman.common import geoserver as common
 from layman.layer import LAYER_TYPE, db as db_source
+from . import wms
 
 FLASK_RULES_KEY = f"{__name__}:RULES"
 
@@ -40,14 +41,16 @@ def delete_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
 
 
 def ensure_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
-    for ws in [workspace]:
+    geoserver_wms_workspace = wms.get_geoserver_workspace(workspace)
+    for ws in [workspace, geoserver_wms_workspace]:
         created = common.ensure_workspace(ws, auth)
         if created:
             common.create_db_store(ws, auth, workspace)
 
 
 def delete_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
-    for ws in [workspace]:
+    geoserver_wms_workspace = wms.get_geoserver_workspace(workspace)
+    for ws in [workspace, geoserver_wms_workspace]:
         common.delete_db_store(ws, auth)
         common.delete_workspace(ws, auth)
 
@@ -82,7 +85,8 @@ def check_username(username, auth=settings.LAYMAN_GS_AUTH):
         raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
 
 
-def publish_layer_from_db(username, layername, description, title, access_rights):
+def publish_layer_from_db(workspace, layername, description, title, access_rights, geoserver_workspace=None):
+    geoserver_workspace = geoserver_workspace or workspace
     keywords = [
         "features",
         layername,
@@ -101,10 +105,10 @@ def publish_layer_from_db(username, layername, description, title, access_rights
         "enabled": True,
         "store": {
             "@class": "dataStore",
-            "name": username + ":postgresql",
+            "name": geoserver_workspace + ":postgresql",
         },
     }
-    db_bbox = db_source.get_bbox(username, layername)
+    db_bbox = db_source.get_bbox(workspace, layername)
     if db_bbox is None:
         # world
         native_bbox = {
@@ -116,7 +120,7 @@ def publish_layer_from_db(username, layername, description, title, access_rights
         }
         feature_type_def['nativeBoundingBox'] = native_bbox
     r = requests.post(urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                              username + '/datastores/postgresql/featuretypes/'),
+                              geoserver_workspace + '/datastores/postgresql/featuretypes/'),
                       data=json.dumps({
                           "featureType": feature_type_def
                       }),
@@ -126,22 +130,18 @@ def publish_layer_from_db(username, layername, description, title, access_rights
                       )
     r.raise_for_status()
     # current_app.logger.info(f'publish_layer_from_db before clear_cache {username}')
-    from . import wms
-    from . import wfs
-    wfs.clear_cache(username)
-    wms.clear_cache(username)
 
     if not access_rights or not access_rights.get('read') or not access_rights.get('write'):
-        layer_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'sources_filter': 'layman.layer.prime_db_schema.table', })
+        layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'sources_filter': 'layman.layer.prime_db_schema.table', })
 
     read_roles = (access_rights and access_rights.get('read')) or layer_info['access_rights']['read']
     write_roles = (access_rights and access_rights.get('write')) or layer_info['access_rights']['write']
 
     security_read_roles = common.layman_users_to_geoserver_roles(read_roles)
-    common.ensure_layer_security_roles(username, layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
+    common.ensure_layer_security_roles(geoserver_workspace, layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
 
     security_write_roles = common.layman_users_to_geoserver_roles(write_roles)
-    common.ensure_layer_security_roles(username, layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
+    common.ensure_layer_security_roles(geoserver_workspace, layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
 
 
 def get_usernames():

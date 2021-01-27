@@ -7,7 +7,41 @@ from .. import geoserver
 
 logger = get_task_logger(__name__)
 
-PUBLISH_LAYER_FROM_DB_NAME = 'layman.layer.geoserver.wfs.refresh'
+
+def refresh_wms_needed(username, layername, task_options):
+    return True
+
+
+@celery_app.task(
+    name='layman.layer.geoserver.wms.refresh',
+    bind=True,
+    base=celery_app.AbortableTask
+)
+def refresh_wms(
+        self,
+        username,
+        layername,
+        description=None,
+        title=None,
+        ensure_user=False,
+        access_rights=None,
+):
+    if description is None:
+        description = layername
+    if title is None:
+        title = layername
+    geoserver_workspace = wms.get_geoserver_workspace(username)
+    if ensure_user:
+        geoserver.ensure_workspace(username)
+
+    if self.is_aborted():
+        raise AbortedException
+    geoserver.publish_layer_from_db(username, layername, description, title, access_rights, geoserver_workspace=geoserver_workspace)
+    wms.clear_cache(username)
+
+    if self.is_aborted():
+        wms.delete_layer(username, layername)
+        raise AbortedException
 
 
 def refresh_wfs_needed(username, layername, task_options):
@@ -15,7 +49,7 @@ def refresh_wfs_needed(username, layername, task_options):
 
 
 @celery_app.task(
-    name=PUBLISH_LAYER_FROM_DB_NAME,
+    name='layman.layer.geoserver.wfs.refresh',
     bind=True,
     base=celery_app.AbortableTask
 )
@@ -38,9 +72,9 @@ def refresh_wfs(
     if self.is_aborted():
         raise AbortedException
     geoserver.publish_layer_from_db(username, layername, description, title, access_rights)
+    wfs.clear_cache(username)
 
     if self.is_aborted():
-        wms.delete_layer(username, layername)
         wfs.delete_layer(username, layername)
         raise AbortedException
 

@@ -1,13 +1,9 @@
-import json
-import traceback
-
 import requests
 from urllib.parse import urljoin
 
-from flask import g, current_app
+from flask import current_app
 
 from .util import get_gs_proxy_base_url
-from . import headers_json
 from . import wms
 from layman import settings, patch_mode
 from layman.cache import mem_redis
@@ -37,7 +33,6 @@ def post_layer(username, layername):
 def patch_layer(workspace, layername, title, description, access_rights=None):
     common_geoserver.patch_feature_type(workspace, layername, title, description, settings.LAYMAN_GS_AUTH)
     clear_cache(workspace)
-    wms.clear_cache(workspace)
 
     if access_rights and access_rights.get('read'):
         security_read_roles = common_geoserver.layman_users_to_geoserver_roles(access_rights['read'])
@@ -51,7 +46,6 @@ def patch_layer(workspace, layername, title, description, access_rights=None):
 def delete_layer(workspace, layername):
     common_geoserver.delete_feature_type(workspace, layername, settings.LAYMAN_GS_AUTH)
     clear_cache(workspace)
-    wms.clear_cache(workspace)
 
     common_geoserver.delete_security_roles(f"{workspace}.{layername}.r", settings.LAYMAN_GS_AUTH)
     common_geoserver.delete_security_roles(f"{workspace}.{layername}.w", settings.LAYMAN_GS_AUTH)
