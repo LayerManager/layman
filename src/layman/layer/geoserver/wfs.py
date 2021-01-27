@@ -143,7 +143,7 @@ def get_wfs_proxy(username):
         layerinfos = layman_util.get_publication_infos(username, LAYER_TYPE)
         result = any((
             not is_layer_task_ready(username, layername)
-            for layername in layerinfos
+            for (_, _, layername) in layerinfos
         ))
         return result
 
