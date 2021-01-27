@@ -38,6 +38,9 @@ SERVICE_TYPES = [
 ]
 
 
+DEFAULT_DB_STORE_NAME = 'postgresql'
+
+
 def get_roles(auth):
     r_url = settings.LAYMAN_GS_REST_ROLES
     r = requests.get(r_url,
@@ -184,6 +187,50 @@ def ensure_layer_security_roles(workspace, layername, roles, type, auth):
     ensure_security_roles(rule, roles, auth)
 
 
+def delete_feature_type(geoserver_workspace, feature_type_name, auth):
+    r = requests.delete(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                geoserver_workspace + f'/datastores/{DEFAULT_DB_STORE_NAME}/featuretypes/' + feature_type_name),
+        headers=headers_json,
+        auth=auth,
+        params={
+            'recurse': 'true'
+        },
+        timeout=5,
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+
+def patch_feature_type(geoserver_workspace, feature_type_name, title, description, auth):
+    keywords = [
+        "features",
+        feature_type_name,
+        title
+    ]
+    keywords = list(set(keywords))
+    ftype = {
+        "title": title,
+        "abstract": description,
+        "keywords": {
+            "string": keywords
+        },
+    }
+    ftype = {k: v for k, v in ftype.items() if v is not None}
+    body = {
+        "featureType": ftype
+    }
+    r = requests.put(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                geoserver_workspace + '/datastores/postgresql/featuretypes/' + feature_type_name),
+        data=json.dumps(body),
+        headers=headers_json,
+        auth=auth,
+        timeout=5,
+    )
+    r.raise_for_status()
+
+
 def delete_security_roles(rule, auth):
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
@@ -222,12 +269,13 @@ def get_all_workspaces(auth):
     return all_workspaces
 
 
-def ensure_db_store(username, auth):
+def create_db_store(geoserver_workspace, auth, db_schema=None):
+    db_schema = db_schema or geoserver_workspace
     r = requests.post(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + '/datastores'),
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + '/datastores'),
         data=json.dumps({
             "dataStore": {
-                "name": "postgresql",
+                "name": DEFAULT_DB_STORE_NAME,
                 "connectionParameters": {
                     "entry": [
                         {
@@ -256,7 +304,7 @@ def ensure_db_store(username, auth):
                         },
                         {
                             "@key": "schema",
-                            "$": username
+                            "$": db_schema
                         },
                     ]
                 },
@@ -269,9 +317,9 @@ def ensure_db_store(username, auth):
     r.raise_for_status()
 
 
-def delete_db_store(username, auth):
+def delete_db_store(geoserver_workspace, auth):
     r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, username + f'/datastores/{username}'),
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + f'/datastores/{DEFAULT_DB_STORE_NAME}'),
         headers=headers_json,
         auth=auth,
         timeout=5,
