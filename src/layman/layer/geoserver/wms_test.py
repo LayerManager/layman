@@ -6,7 +6,6 @@ import requests
 
 
 @pytest.mark.usefixtures('ensure_layman_module')
-@pytest.mark.xfail(reason="Not yet implemented")
 def test_wms_workspace():
     workspace = 'test_wms_workspace_workspace'
     layername = 'test_wms_workspace_layer'

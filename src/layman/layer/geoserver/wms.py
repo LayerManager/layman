@@ -1,15 +1,12 @@
-import json
-import traceback
-
 import requests
 from urllib.parse import urljoin
 
-from flask import g, current_app
+from flask import current_app
 
-from . import headers_json
 from .util import get_gs_proxy_base_url
 from layman import settings, patch_mode
 from layman.cache import mem_redis
+from layman.common import geoserver as common_geoserver
 from layman.layer.util import is_layer_task_ready
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qs, parse_qsl
 from layman import util as layman_util
@@ -33,30 +30,34 @@ def post_layer(username, layername):
     pass
 
 
-def patch_layer(username, layername):
-    clear_cache(username)
+def patch_layer(workspace, layername, title, description, access_rights=None):
+    geoserver_workspace = get_geoserver_workspace(workspace)
+    common_geoserver.patch_feature_type(geoserver_workspace, layername, title, description, settings.LAYMAN_GS_AUTH)
+    clear_cache(workspace)
+
+    if access_rights and access_rights.get('read'):
+        security_read_roles = common_geoserver.layman_users_to_geoserver_roles(access_rights['read'])
+        common_geoserver.ensure_layer_security_roles(geoserver_workspace, layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
+
+    if access_rights and access_rights.get('write'):
+        security_write_roles = common_geoserver.layman_users_to_geoserver_roles(access_rights['write'])
+        common_geoserver.ensure_layer_security_roles(geoserver_workspace, layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
 
 
-def delete_layer(username, layername):
-    r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                username + '/layers/' + layername),
-        headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH,
-        params={
-            'recurse': 'true'
-        },
-        timeout=5,
-    )
-    if r.status_code != 404:
-        r.raise_for_status()
-    clear_cache(username)
+def delete_layer(workspace, layername):
+    geoserver_workspace = get_geoserver_workspace(workspace)
+    common_geoserver.delete_feature_type(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
+    clear_cache(workspace)
+
+    common_geoserver.delete_security_roles(f"{geoserver_workspace}.{layername}.r", settings.LAYMAN_GS_AUTH)
+    common_geoserver.delete_security_roles(f"{geoserver_workspace}.{layername}.w", settings.LAYMAN_GS_AUTH)
     return {}
 
 
 def get_wms_url(workspace, external_url=False):
+    geoserver_workspace = get_geoserver_workspace(workspace)
     base_url = get_gs_proxy_base_url() if external_url else settings.LAYMAN_GS_URL
-    return urljoin(base_url, workspace + '/ows')
+    return urljoin(base_url, geoserver_workspace + '/ows')
 
 
 def get_wms_direct(username):
@@ -217,3 +218,7 @@ def get_capabilities_url(username):
     url = get_wms_url(username, external_url=True)
     url = add_capabilities_params_to_url(url)
     return url
+
+
+def get_geoserver_workspace(workspace):
+    return workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
