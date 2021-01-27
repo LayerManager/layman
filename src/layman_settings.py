@@ -70,6 +70,8 @@ assert re.match("[a-z][a-z0-9]*", LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE), "Only 
 LAYMAN_GS_AUTHN_FILTER_NAME = 'laymanHttpFilter_v2'
 LAYMAN_GS_AUTHN_FILTER_NAME_OLD = ['laymanHttpFilter']
 
+LAYMAN_GS_WMS_WORKSPACE_POSTFIX = '_wms'
+
 LAYMAN_OUTPUT_SRS_LIST = [
     int(code) for code in os.environ['LAYMAN_OUTPUT_SRS_LIST'].split(',')
     if len(code) > 0
