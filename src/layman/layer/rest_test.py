@@ -876,6 +876,11 @@ def test_post_layers_sld_1_1_0(client):
     assert layername in wms.contents
     assert wms[layername].title == 'countries_sld_1_1_0'
 
+    layer_info = util.get_layer_info(username, layername)
+    while 'status' in layer_info['sld'] and layer_info['sld']['status'] in ['PENDING', 'STARTED']:
+        time.sleep(0.1)
+        layer_info = util.get_layer_info(username, layername)
+
     style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
                         username + '/styles/' + layername)
     r = requests.get(style_url + '.sld',
