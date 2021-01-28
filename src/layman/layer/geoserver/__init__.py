@@ -149,7 +149,9 @@ def get_usernames():
 
 
 def get_workspaces():
-    return common.get_all_workspaces(settings.LAYMAN_GS_AUTH)
+    all_workspaces = common.get_all_workspaces(settings.LAYMAN_GS_AUTH)
+    result = [workspace for workspace in all_workspaces if not workspace.endswith(settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX)]
+    return result
 
 
 def check_new_layername(username, layername):

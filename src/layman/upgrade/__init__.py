@@ -1,7 +1,7 @@
 import logging
 import psycopg2
 
-from layman.upgrade import upgrade_v1_8, upgrade_v1_9
+from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10
 from layman import settings
 from layman.common.prime_db_schema import util as db_util
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -13,6 +13,8 @@ DATA_MIGRATIONS = [
     ((1, 9, 0), [upgrade_v1_9.initialize_data_versioning,
                  upgrade_v1_9.geoserver_everyone_rights_repair,
                  upgrade_v1_9.geoserver_remove_users_for_public_workspaces]),
+    ((1, 10, 0), [upgrade_v1_10.check_usernames_for_wms_suffix,
+                  ]),
 ]
 
 

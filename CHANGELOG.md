@@ -3,7 +3,8 @@
 ## v1.10.0
   {release-date}
 ### Upgrade requirements
-### Migrations
+### Migrations and checks
+- [#154](https://github.com/jirik/layman/issues/154)  All workspaces are checked, that their name did not end with '_wms'. With any of the workspaces ended with the suffix, startup process is stopped with error code 45. In that case, please downgrade to the previous minor release version and contact Layman contributors.
 ### Changes
 - [#154](https://github.com/jirik/layman/issues/154) [WMS](doc/endpoints.md#web-map-service) is available in dedicated [GeoServer workspace](doc/data-storage.md#geoserver) whose name is composed from Layman's [workspace](doc/models.md#workspace) name and suffix `_wms`. [WFS](doc/endpoints.md#web-feature-service) remains in GeoServer workspace whose name is equal to Layman's workspace name.
 - [#99](https://github.com/jirik/layman/issues/99) New endpoint [`/rest/about/version'](doc/rest.md#get-version). Also available in Layman Test Client.
