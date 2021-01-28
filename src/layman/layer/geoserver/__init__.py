@@ -73,12 +73,15 @@ def get_all_rules(auth):
     return g.get(key)
 
 
-def check_username(username, auth=settings.LAYMAN_GS_AUTH):
+def check_username(username):
     if username == settings.LAYMAN_GS_USER:
         raise LaymanError(41, {'username': username})
 
     if username in common.RESERVED_WORKSPACE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'workspace': username})
+
+    if username.endswith(settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX):
+        raise LaymanError(45, {'workspace_name': username})
 
     rolename = common.username_to_rolename(username)
     if rolename in common.RESERVED_ROLE_NAMES:
