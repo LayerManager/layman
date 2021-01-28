@@ -66,6 +66,7 @@ def liferay_mock():
                 'test_rest_soap_user': None,
                 'test_geoserver_remove_users_for_public_workspaces_user': None,
                 'test_get_users_workspaces_user': None,
+                'test_check_user_wms' + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX: None,
             },
         },
         'host': '0.0.0.0',

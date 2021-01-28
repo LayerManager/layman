@@ -320,7 +320,7 @@ def reserve_username(username, headers=None):
         'username': username,
     }
     r = requests.patch(r_url, headers=headers, data=data)
-    r.raise_for_status()
+    raise_layman_error(r)
     claimed_username = r.json()['username']
     assert claimed_username == username
 

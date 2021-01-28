@@ -45,4 +45,5 @@ ERROR_LIST = {
     42: (409, 'LAYMAN_PRIME_SCHEMA is in conflict with existing workspace name.'),
     43: (400, 'Wrong access rights.'),
     44: (403, 'Unsuccessful HTTP Header authentication.'),
+    45: (400, 'Workspace ended with reserved suffix.'),
 }
