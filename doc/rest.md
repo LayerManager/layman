@@ -50,12 +50,12 @@ Publish vector data file as new layer of WMS and WFS.
 Processing chain consists of few steps:
 - save file to workspace directory within Layman data directory
 - import the file to PostgreSQL database as new table into workspace schema, including geometry transformation to EPSG:3857
-- publish the table as new layer (feature type) within appropriate workspace of GeoServer
+- publish the table as new layer (feature type) within appropriate workspaces of GeoServer
 - generate thumbnail image
 - publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
 - save basic information (name, title, access_rights) into PostgreSQL
 
-If workspace directory, database schema, GeoServer's workspace, or GeoServer's datastore does not exist yet, it is created on demand.
+If workspace directory, database schema, GeoServer's workspaces, or GeoServer's datastores does not exist yet, it is created on demand.
 
 Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Layer](#get-layer) and **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, sld, metadata).
 
@@ -205,7 +205,7 @@ Parameters have same meaning as in case of [POST Layers](#post-layers).
 
 Body parameters:
 - *file*, file(s) or file name(s)
-   - If provided, current layer vector data file will be deleted and replaced by this file. GeoServer layer, DB table, and thumbnail will be deleted and created again using the new file.
+   - If provided, current layer vector data file will be deleted and replaced by this file. GeoServer feature types, DB table, and thumbnail will be deleted and created again using the new file.
    - one of following options is expected:
       - GeoJSON file
       - ShapeFile files (at least three files: .shp, .shx, .dbf)

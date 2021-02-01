@@ -5,6 +5,7 @@
 ### Upgrade requirements
 ### Migrations
 ### Changes
+- [#154](https://github.com/jirik/layman/issues/154) [WMS](doc/endpoints.md#web-map-service) is available in dedicated [GeoServer workspace](doc/data-storage.md#geoserver) whose name is composed from Layman's [workspace](doc/models.md#workspace) name and suffix `_wms`. [WFS](doc/endpoints.md#web-feature-service) remains in GeoServer workspace whose name is equal to Layman's workspace name.
 - [#99](https://github.com/jirik/layman/issues/99) New endpoint [`/rest/about/version'](doc/rest.md#get-version). Also available in Layman Test Client.
 
 ## v1.9.1
