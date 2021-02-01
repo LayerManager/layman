@@ -40,6 +40,15 @@ def get_current_data_version():
     return current_version
 
 
+def set_current_data_version(version):
+    sql_insert = f'''update {DB_SCHEMA}.data_version set
+        major_version = %s,
+        minor_version = %s,
+        patch_version = %s,
+        migration = %s;'''
+    db_util.run_statement(sql_insert, version)
+
+
 def upgrade():
     logger.info(f'Checking all upgrades')
     if upgrade_v1_8.older_than_1_8():
@@ -56,12 +65,7 @@ def upgrade():
     for version, migration in migration_list_full:
         logger.info(f'  Starting migration #{version[3]} for release v{version[0]}.{version[1]}.{version[2]}: {migration}')
         migration()
-        sql_insert = f'''update {DB_SCHEMA}.data_version set
-            major_version = %s,
-            minor_version = %s,
-            patch_version = %s,
-            migration = %s;'''
-        db_util.run_statement(sql_insert, version)
+        set_current_data_version(version)
 
     final_data_version = get_current_data_version()
     assert final_data_version == max_data_version
