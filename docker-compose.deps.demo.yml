@@ -12,6 +12,7 @@ services:
          - USERNAME=docker
          - PASS=docker
          - ALLOW_IP_RANGE=0.0.0.0/0
+         - POSTGRES_TEMPLATE_EXTENSIONS=true
       restart: on-failure
 
    geoserver:
