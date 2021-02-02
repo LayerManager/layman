@@ -1,15 +1,13 @@
 import os
 import pathlib
-import requests
 from urllib.parse import urljoin
 from layman import settings
-from flask import current_app
 
 from layman import patch_mode
 from layman.util import url_for
-from . import util
+from . import util, input_file
 from layman.common.filesystem import util as common_util
-from . import input_file
+from ..geoserver import wms as geoserver_wms
 
 LAYER_SUBDIR = __name__.split('.')[-1]
 
@@ -65,11 +63,12 @@ def get_layer_thumbnail_path(username, layername):
     return os.path.join(thumbnail_dir, layername + '.png')
 
 
-def generate_layer_thumbnail(username, layername):
+def generate_layer_thumbnail(workspace, layername):
+    geoserver_workspace = geoserver_wms.get_geoserver_workspace(workspace)
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
-    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+    wms_url = urljoin(settings.LAYMAN_GS_URL, geoserver_workspace + '/ows')
     from layman.layer.geoserver.util import wms_proxy
     from layman.common.geoserver import get_layer_thumbnail, get_layer_square_bbox
     wms = wms_proxy(wms_url, headers=headers)
@@ -84,8 +83,8 @@ def generate_layer_thumbnail(username, layername):
     #     format='image/png',
     #     transparent=True,
     # )
-    ensure_layer_thumbnail_dir(username, layername)
-    tn_path = get_layer_thumbnail_path(username, layername)
+    ensure_layer_thumbnail_dir(workspace, layername)
+    tn_path = get_layer_thumbnail_path(workspace, layername)
     # out = open(tn_path, 'wb')
     # out.write(tn_img.read())
     # out.close()
