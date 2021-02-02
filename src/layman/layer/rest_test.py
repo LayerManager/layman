@@ -867,7 +867,8 @@ def test_post_layers_sld_1_1_0(client):
             fp[0].close()
 
     layer_info = util.get_layer_info(username, layername)
-    while 'status' in layer_info['wms'] and layer_info['wms']['status'] in ['PENDING', 'STARTED']:
+    while ('status' in layer_info['wms'] and layer_info['wms']['status'] in ['PENDING', 'STARTED'])\
+            or ('status' in layer_info['sld'] and layer_info['sld']['status'] in ['PENDING', 'STARTED']):
         time.sleep(0.1)
         layer_info = util.get_layer_info(username, layername)
 
@@ -875,11 +876,6 @@ def test_post_layers_sld_1_1_0(client):
     wms = wms_proxy(wms_url)
     assert layername in wms.contents
     assert wms[layername].title == 'countries_sld_1_1_0'
-
-    layer_info = util.get_layer_info(username, layername)
-    while 'status' in layer_info['sld'] and layer_info['sld']['status'] in ['PENDING', 'STARTED']:
-        time.sleep(0.1)
-        layer_info = util.get_layer_info(username, layername)
 
     style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
                         username + '_wms/styles/' + layername)
