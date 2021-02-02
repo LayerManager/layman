@@ -177,11 +177,15 @@ def publish_publication(publication_type,
                         headers=None,
                         access_rights=None,
                         title=None,
+                        style_file=None,
+                        description=None,
                         ):
     title = title or name
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     file_paths = file_paths or [publication_type_def.source_path, ]
+    if style_file:
+        assert publication_type == LAYER_TYPE
 
     with app.app_context():
         r_url = url_for(publication_type_def.post_url, username=username)
@@ -198,6 +202,10 @@ def publish_publication(publication_type,
             data["access_rights.read"] = access_rights['read']
         if access_rights and access_rights.get('write'):
             data["access_rights.write"] = access_rights['write']
+        if style_file:
+            files.append(('sld', (os.path.basename(style_file), open(style_file, 'rb'))))
+        if description:
+            data['description'] = description
         r = requests.post(r_url,
                           files=files,
                           data=data,
