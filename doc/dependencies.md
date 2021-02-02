@@ -56,6 +56,7 @@
 | [autopep8](https://github.com/hhatto/autopep8) | MIT | Pipfile | test | bin | to automatically fix code style |
 | [pytest-rerunfailures](https://github.com/pytest-dev/pytest-rerunfailures) | MPL | Pipfile | test | bin | to automatically rerun flaky tests |
 | [pytest-timeout](https://pypi.org/project/pytest-timeout/) | MIT | Pipfile | test | bin | to automatically stop tests after given timeout |
+| [pillow](https://github.com/python-pillow/Pillow) | HPND | Pipfile | test | bin | to ensure similarity of images |
 
 ### Node.js dependencies
 | name | license | used by | env | bin or src | purpose |
