@@ -289,7 +289,7 @@ def test_post_layers_simple(client):
             assert isinstance(layer_info[key_to_check], str) \
                 or 'status' not in layer_info[key_to_check]
 
-        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '_wms/ows')
         wms = wms_proxy(wms_url)
         assert layername in wms.contents
 
@@ -455,7 +455,7 @@ def test_post_layers_shp(client):
     flask_client.wait_till_layer_ready(username, layername)
     # last_task['last'].get()
 
-    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '_wms/ows')
     wms = wms_proxy(wms_url)
     assert 'ne_110m_admin_0_countries_shp' in wms.contents
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -555,12 +555,12 @@ def test_post_layers_complex(client):
         # last_task['last'].get()
         assert celery_util.is_task_ready(last_task)
 
-        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '_wms/ows')
         wms = wms_proxy(wms_url)
         assert 'countries' in wms.contents
         assert wms['countries'].title == 'staty'
         assert wms['countries'].abstract == 'popis států'
-        assert wms['countries'].styles[username + ':countries']['title'] == 'Generic Blue'
+        assert wms['countries'].styles[username + '_wms:countries']['title'] == 'Generic Blue'
 
         assert layername != ''
         rest_path = url_for('rest_layer.get', username=username, layername=layername)
@@ -581,7 +581,7 @@ def test_post_layers_complex(client):
             assert 'status' not in resp_json[source]
 
         style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                            username + '/styles/' + layername)
+                            username + '_wms/styles/' + layername)
         r = requests.get(style_url + '.sld',
                          auth=settings.LAYMAN_GS_AUTH
                          )
@@ -671,7 +671,7 @@ def test_uppercase_attr(client):
             assert 'status' not in resp_json[source], f"{source}: {resp_json[source]}"
 
         style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                            username + '/styles/' + layername)
+                            username + '_wms/styles/' + layername)
         r = requests.get(style_url + '.sld',
                          auth=settings.LAYMAN_GS_AUTH
                          )
@@ -807,12 +807,12 @@ def test_patch_layer_style(client):
         resp_json = rv.get_json()
         assert resp_json['title'] == "countries in blue"
 
-        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '_wms/ows')
         wms = wms_proxy(wms_url)
         assert layername in wms.contents
         assert wms[layername].title == 'countries in blue'
         assert wms[layername].styles[
-            username + ':' + layername]['title'] == 'Generic Blue'
+            username + '_wms:' + layername]['title'] == 'Generic Blue'
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': num_layers_before_test + 4
         })
@@ -871,7 +871,7 @@ def test_post_layers_sld_1_1_0(client):
         time.sleep(0.1)
         layer_info = util.get_layer_info(username, layername)
 
-    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '/ows')
+    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '_wms/ows')
     wms = wms_proxy(wms_url)
     assert layername in wms.contents
     assert wms[layername].title == 'countries_sld_1_1_0'
@@ -882,7 +882,7 @@ def test_post_layers_sld_1_1_0(client):
         layer_info = util.get_layer_info(username, layername)
 
     style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                        username + '/styles/' + layername)
+                        username + '_wms/styles/' + layername)
     r = requests.get(style_url + '.sld',
                      auth=settings.LAYMAN_GS_AUTH
                      )

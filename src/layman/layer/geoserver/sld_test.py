@@ -7,6 +7,7 @@ from urllib.parse import urljoin
 from layman import settings
 from test import process_client, util
 
+
 headers_sld = {
     'Accept': 'application/vnd.ogc.sld+xml',
     'Content-type': 'application/xml',
@@ -14,7 +15,6 @@ headers_sld = {
 
 
 @pytest.mark.usefixtures('ensure_layman')
-@pytest.mark.xfail(reason='Not implemented yet')
 def test_sld_style_in_wms_workspace():
     workspace = 'test_sld_style_file_workspace'
     layer = 'test_sld_style_file_layer'
@@ -39,7 +39,6 @@ def test_sld_style_in_wms_workspace():
 
 
 @pytest.mark.usefixtures('ensure_layman')
-@pytest.mark.xfail(reason='Not implemented yet')
 def test_sld_style_applied_in_wms():
     workspace = 'test_sld_style_wms_workspace'
     layer = 'test_sld_style_wms_layer'
