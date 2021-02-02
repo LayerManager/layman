@@ -90,7 +90,6 @@ class TestRestApiClass:
     def has_no_publication(r_json):
         return {li['name'] for li in r_json} == set()
 
-    @pytest.mark.timeout(20)
     @pytest.mark.parametrize(
         "rest_action, url_for_params, authz_status_code, authz_response, unauthz_status_code, unauthz_response",
         [

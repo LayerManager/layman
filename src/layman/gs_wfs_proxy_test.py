@@ -12,7 +12,6 @@ from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.common.geoserver import get_layer_thumbnail, get_layer_square_bbox
 
 
-@pytest.mark.timeout(20)
 @pytest.mark.usefixtures('ensure_layman')
 def test_rest_get():
     username = 'wfs_proxy_test'
