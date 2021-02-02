@@ -16,26 +16,6 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.timeout(20)
-@pytest.mark.usefixtures('ensure_layman')
-def test_recreate_schema():
-    username = 'test_recreate_schema_user'
-    process_client.publish_layer(username, 'test_recreate_schema_layer')
-    process_client.publish_map(username, 'test_recreate_schema_map')
-
-    with app.app_context():
-        run_statement(model.DROP_SCHEMA_SQL)
-        ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
-                      settings.RIGHTS_EVERYONE_ROLE)
-
-    process_client.delete_layer(username, 'test_recreate_schema_layer')
-    process_client.delete_map(username, 'test_recreate_schema_map')
-
-    with app.app_context():
-        pubs = pub_util.get_publication_infos(username)
-        assert len(pubs) == 0
-
-
 @pytest.mark.usefixtures('ensure_layman')
 def test_schema():
     username = 'test_schema_user'
@@ -65,38 +45,3 @@ def test_schema():
     with app.app_context():
         pubs = pub_util.get_publication_infos(username)
         assert len(pubs) == 0
-
-
-@pytest.mark.usefixtures('ensure_layman')
-def test_steps():
-    username = 'test_steps_user'
-    process_client.publish_layer(username, 'test_steps_layer')
-    process_client.publish_map(username, 'test_steps_map')
-
-    with app.app_context():
-        run_statement(model.DROP_SCHEMA_SQL)
-        exists_schema = run_query(model.EXISTS_SCHEMA_SQL)
-        assert exists_schema[0][0] == 0
-
-        run_statement(model.CREATE_SCHEMA_SQL)
-        exists_schema = run_query(model.EXISTS_SCHEMA_SQL)
-        assert exists_schema[0][0] == 1
-
-        exists_right_types = run_query(f'select count(*) from {DB_SCHEMA}.right_types;')
-        assert exists_right_types[0][0] == 0
-        run_statement(model.setup_codelists_data())
-        exists_right_types = run_query(f'select count(*) from {DB_SCHEMA}.right_types;')
-        assert exists_right_types[0][0] == 2
-
-        exists_workspaces = run_query(f'select count(*) from {DB_SCHEMA}.workspaces;')
-        assert exists_workspaces[0][0] == 0
-        exists_pubs = run_query(f'select count(*) from {DB_SCHEMA}.publications;')
-        assert exists_pubs[0][0] == 0
-        migrate_users_and_publications(settings.RIGHTS_EVERYONE_ROLE)
-        exists_workspaces = run_query(f'select count(*) from {DB_SCHEMA}.workspaces;')
-        assert exists_workspaces[0][0] > 0
-        exists_pubs = run_query(f'select count(*) from {DB_SCHEMA}.publications;')
-        assert exists_pubs[0][0] > 0
-
-    process_client.delete_layer(username, 'test_steps_layer')
-    process_client.delete_map(username, 'test_steps_map')
