@@ -20,6 +20,7 @@ services:
         - ./ensure-test-data.sh:/code/ensure-test-data.sh
         - ./deps/geoserver/data:/geoserver/data_dir
         - ./deps/geoserver/sample/geoserver_data:/geoserver/initial_data_dir
+        - ./deps/qgis/data:/qgis/data
       depends_on:
         - celery_worker_test
 
@@ -37,9 +38,11 @@ services:
         - ./sample:/code/sample
         - ./src:/code/src
         - ./tmp:/code/tmp
+        - ./deps/qgis/data:/qgis/data
       depends_on:
         - redis
         - postgresql
+        - nginx-qgis
         - geoserver
         - micka
         - timgen

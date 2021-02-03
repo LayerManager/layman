@@ -23,10 +23,12 @@ services:
         - ./doc:/code/doc
         - ./deps/geoserver/data:/geoserver/data_dir
         - ./deps/geoserver/sample/geoserver_data:/geoserver/initial_data_dir
+        - ./deps/qgis/data:/qgis/data
       depends_on:
         - timgen
         - redis
         - postgresql
+        - nginx-qgis
         - geoserver
         - layman_client
         - micka
@@ -46,6 +48,7 @@ services:
         - ./sample:/code/sample
         - ./src:/code/src
         - ./tmp:/code/tmp
+        - ./deps/qgis/data:/qgis/data
       depends_on:
         - layman_dev
 
@@ -62,6 +65,7 @@ services:
         - ./sample:/code/sample
         - ./src:/code/src
         - ./tmp:/code/tmp
+        - ./deps/qgis/data:/qgis/data
       ports:
         - 5555:5555
       depends_on:
