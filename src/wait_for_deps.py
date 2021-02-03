@@ -49,6 +49,27 @@ def main():
             attempt += 1
     print()
 
+    # QGIS Server
+    wait_for_msg = f"QGIS Server, url={settings.LAYMAN_QGIS_URL}"
+    print(f"Waiting for {wait_for_msg}")
+    while True:
+        import requests
+        try:
+            r = requests.get(
+                settings.LAYMAN_QGIS_URL,
+                timeout=0.1
+            )
+            expected_text = "<ServerException>Project file error. For OWS services: please provide a SERVICE and a MAP parameter pointing to a valid QGIS project file</ServerException>"
+            if r.status_code == 500 and expected_text in r.text:
+                print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
+                break
+            else:
+                r.raise_for_status()
+        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout, requests.exceptions.HTTPError) as e:
+            handle_exception(e, attempt, wait_for_msg)
+            attempt += 1
+    print()
+
     # GeoServer
     headers_json = {
         'Accept': 'application/json',
