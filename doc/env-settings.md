@@ -168,6 +168,17 @@ Name of [role service](https://docs.geoserver.org/stable/en/user/security/usergr
 ### LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE
 Secret value of [GeoServer HTTP authentication request header attribute](https://docs.geoserver.org/stable/en/user/security/tutorials/httpheaderproxy/index.html) used for WFS proxy. Only combination of lowercase characters and numbers must be used for the value. If you change an existing value, you have to change it also in GeoServer GUI manually.
 
+## Connection to QGIS
+
+### LAYMAN_QGIS_HOST
+Internal URL host of QGIS Server instance.
+
+### LAYMAN_QGIS_PORT
+Internal URL port of QGIS Server instance.
+
+### LAYMAN_QGIS_PATH
+URL path of QGIS Server instance.
+
 ## Connection to Micka
 
 ### CSW_BASIC_AUTHN

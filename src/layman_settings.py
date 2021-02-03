@@ -81,6 +81,13 @@ for mandatory_srs in [3857, 4326]:
         LAYMAN_OUTPUT_SRS_LIST.append(mandatory_srs)
 
 
+LAYMAN_QGIS_HOST = os.environ['LAYMAN_QGIS_HOST']
+LAYMAN_QGIS_PORT = os.environ['LAYMAN_QGIS_PORT']
+LAYMAN_QGIS_PATH = os.environ['LAYMAN_QGIS_PATH']
+
+LAYMAN_QGIS_URL = f"http://{LAYMAN_QGIS_HOST}:{LAYMAN_QGIS_PORT}{LAYMAN_QGIS_PATH}"
+
+
 # Name of schema, where Layman stores data about publication, users, ...
 LAYMAN_PRIME_SCHEMA = os.environ['LAYMAN_PRIME_SCHEMA']
 assert re.match("[a-z_][a-z0-9_]*", LAYMAN_PRIME_SCHEMA), "Only lowercase characters, numbers and underscore " \
