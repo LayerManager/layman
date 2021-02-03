@@ -33,7 +33,7 @@ deps-stop:
 	docker-compose -f docker-compose.deps.yml stop
 
 start-dev:
-	mkdir -p layman_data layman_data_test tmp
+	mkdir -p layman_data layman_data_test tmp deps/qgis/data
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_geoserver.py"
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate -d
 
@@ -41,7 +41,7 @@ stop-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop
 
 start-dev-only:
-	mkdir -p layman_data layman_data_test tmp
+	mkdir -p layman_data layman_data_test tmp deps/qgis/data
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower timgen layman_client
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_geoserver.py"
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d layman_dev celery_worker_dev flower timgen layman_client
@@ -71,7 +71,7 @@ restart-celery-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --no-deps -d layman_client
 
 prepare-dirs:
-	mkdir -p layman_data layman_data_test tmp
+	mkdir -p layman_data layman_data_test tmp deps/qgis/data
 
 build-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build --force-rm layman_dev
@@ -107,7 +107,7 @@ reset-data-directories:
 	docker-compose -f docker-compose.deps.yml rm -fsv
 	docker volume rm layman_redis-data
 	sudo rm -rf layman_data layman_data_test deps/*/data
-	mkdir -p layman_data layman_data_test tmp
+	mkdir -p layman_data layman_data_test tmp deps/qgis/data
 
 clear-python-cache-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps layman_dev bash /code/src/clear-python-cache.sh
@@ -276,6 +276,26 @@ nginx-bash-exec:
 
 nginx-restart:
 	docker-compose -f docker-compose.demo.yml -f docker-compose.deps.demo.yml up --force-recreate --no-deps -d nginx
+
+qgis-build:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build nginx-qgis qgis
+
+qgis-restart:
+	mkdir -p deps/qgis/data
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d nginx-qgis qgis
+
+qgis-stop:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop nginx-qgis qgis
+
+qgis-reset-datadir:
+	mkdir -p deps/qgis/data
+	rm -rf deps/qgis/data/*
+
+qgis-bash:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm qgis bash
+
+qgis-bash-exec:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec qgis bash
 
 stop-all-docker-containers:
 	docker stop $$(docker ps -q)

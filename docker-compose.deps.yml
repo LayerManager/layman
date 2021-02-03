@@ -17,6 +17,29 @@ services:
          - POSTGRES_TEMPLATE_EXTENSIONS=true
       restart: on-failure
 
+   qgis:
+      build:
+        context: deps/qgis/docker
+        dockerfile: Dockerfile
+      volumes:
+        - ./deps/qgis/data:/data:ro
+      restart: on-failure
+      environment:
+        - LANG=en_EN.UTF-8
+        - QGIS_SERVER_LOG_LEVEL=0
+        - DEBUG=1                  # display env before spawning QGIS Server
+      depends_on:
+        - postgresql
+
+   nginx-qgis:
+      image: nginx:1.13
+      ports:
+        - 8090:80
+      volumes:
+        - ./deps/nginx/sample/nginx-qgis.conf:/etc/nginx/conf.d/default.conf:ro
+      depends_on:
+        - qgis
+
    geoserver:
       build:
         context: deps/geoserver/docker
@@ -35,6 +58,7 @@ services:
         - deps/geoserver/docker/.env
       depends_on:
         - postgresql
+        - nginx-qgis
 
    redis:
       image: redis:4.0.11-alpine
