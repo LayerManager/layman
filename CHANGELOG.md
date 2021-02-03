@@ -3,6 +3,10 @@
 ## v1.10.0
   {release-date}
 ### Upgrade requirements
+- If you are running Layman with development settings, set environment variables
+  - [LAYMAN_QGIS_HOST](doc/env-settings.md#LAYMAN_QGIS_HOST)=nginx-qgis
+  - [LAYMAN_QGIS_PORT](doc/env-settings.md#LAYMAN_QGIS_PORT)=80
+  - [LAYMAN_QGIS_PATH](doc/env-settings.md#LAYMAN_QGIS_PATH)=/qgis/
 ### Migrations and checks
 - [#154](https://github.com/jirik/layman/issues/154)  All workspaces are checked, that their name did not end with '_wms'. With any of the workspaces ended with the suffix, startup process is stopped with error code 45. In that case, please downgrade to the previous minor release version and contact Layman contributors.
 ### Changes
@@ -10,6 +14,7 @@
 - [#154](https://github.com/jirik/layman/issues/154) SLD style published in dedicated WMS GeoServer workspace.
 - [#99](https://github.com/jirik/layman/issues/99) New endpoint [`/rest/about/version'](doc/rest.md#get-version). Also available in Layman Test Client.
 - [#154](https://github.com/jirik/layman/issues/154) Workspace name can not end with '_wms'. In such case, error with code 45 is raised.
+- New environment variables [LAYMAN_QGIS_HOST](doc/env-settings.md#LAYMAN_QGIS_HOST), [LAYMAN_QGIS_PORT](doc/env-settings.md#LAYMAN_QGIS_PORT), and [LAYMAN_QGIS_PATH](doc/env-settings.md#LAYMAN_QGIS_PATH).
 
 ## v1.9.1
  2021-01-18
