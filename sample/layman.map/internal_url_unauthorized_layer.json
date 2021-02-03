@@ -39,7 +39,7 @@
       "title": "Hranice",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://localhost:8000/geoserver/test_map_with_unauthorized_layer_user1/ows",
+      "url": "http://localhost:8000/geoserver/test_map_with_unauthorized_layer_user1_wms/ows",
       "params": {
         "LAYERS": "test_map_with_unauthorized_layer_layer1",
         "FORMAT": "image\/png"
@@ -52,7 +52,7 @@
       "title": "Mista",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://localhost:8000/geoserver/test_map_with_unauthorized_layer_user2/ows",
+      "url": "http://localhost:8000/geoserver/test_map_with_unauthorized_layer_user2_wms/ows",
       "params": {
         "LAYERS": "test_map_with_unauthorized_layer_layer2",
         "FORMAT": "image\/png"

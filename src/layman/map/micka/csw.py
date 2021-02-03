@@ -132,7 +132,8 @@ def map_json_to_operates_on(map_json, operates_on_muuids_filter=None, editor=Non
     unquote_urls(map_json)
     gs_url = get_gs_proxy_base_url()
     gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
-    gs_url_pattern = r'^' + re.escape(gs_url) + r'(' + USERNAME_ONLY_PATTERN + r')' + r'/(?:ows|wms|wfs).*$'
+    gs_url_pattern = r'^' + re.escape(gs_url) + r'(' + USERNAME_ONLY_PATTERN + r')' + \
+                     settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + r'/(?:ows|wms|wfs).*$'
     layman_layer_names = []
     for map_layer in map_json['layers']:
         layer_url = map_layer.get('url', None)
