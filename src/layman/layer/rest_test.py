@@ -2,7 +2,6 @@ from datetime import date
 import io
 import json
 import os
-from multiprocessing import Process
 import requests
 import time
 import xml.etree.ElementTree as ET
@@ -25,6 +24,7 @@ from layman.layer.filesystem import uuid as layer_uuid
 from layman.layer.filesystem.thumbnail import get_layer_thumbnail_path
 from layman import uuid
 from layman.layer import db
+from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld
 from layman import celery as celery_util
 from .micka import csw
 from layman.common.micka import util as micka_common_util
@@ -289,7 +289,7 @@ def test_post_layers_simple(client):
             assert isinstance(layer_info[key_to_check], str) \
                 or 'status' not in layer_info[key_to_check]
 
-        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '_wms/ows')
+        wms_url = geoserver_wms.get_wms_url(username)
         wms = wms_proxy(wms_url)
         assert layername in wms.contents
 
@@ -455,7 +455,7 @@ def test_post_layers_shp(client):
     flask_client.wait_till_layer_ready(username, layername)
     # last_task['last'].get()
 
-    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '_wms/ows')
+    wms_url = geoserver_wms.get_wms_url(username)
     wms = wms_proxy(wms_url)
     assert 'ne_110m_admin_0_countries_shp' in wms.contents
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -555,7 +555,7 @@ def test_post_layers_complex(client):
         # last_task['last'].get()
         assert celery_util.is_task_ready(last_task)
 
-        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '_wms/ows')
+        wms_url = geoserver_wms.get_wms_url(username)
         wms = wms_proxy(wms_url)
         assert 'countries' in wms.contents
         assert wms['countries'].title == 'staty'
@@ -580,8 +580,7 @@ def test_post_layers_complex(client):
         ]:
             assert 'status' not in resp_json[source]
 
-        style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                            username + '_wms/styles/' + layername)
+        style_url = geoserver_sld.get_workspace_style_url(username, layername)
         r = requests.get(style_url + '.sld',
                          auth=settings.LAYMAN_GS_AUTH
                          )
@@ -670,8 +669,7 @@ def test_uppercase_attr(client):
         ]:
             assert 'status' not in resp_json[source], f"{source}: {resp_json[source]}"
 
-        style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                            username + '_wms/styles/' + layername)
+        style_url = geoserver_sld.get_workspace_style_url(username, layername)
         r = requests.get(style_url + '.sld',
                          auth=settings.LAYMAN_GS_AUTH
                          )
@@ -807,7 +805,7 @@ def test_patch_layer_style(client):
         resp_json = rv.get_json()
         assert resp_json['title'] == "countries in blue"
 
-        wms_url = urljoin(settings.LAYMAN_GS_URL, username + '_wms/ows')
+        wms_url = geoserver_wms.get_wms_url(username)
         wms = wms_proxy(wms_url)
         assert layername in wms.contents
         assert wms[layername].title == 'countries in blue'
@@ -872,13 +870,12 @@ def test_post_layers_sld_1_1_0(client):
         time.sleep(0.1)
         layer_info = util.get_layer_info(username, layername)
 
-    wms_url = urljoin(settings.LAYMAN_GS_URL, username + '_wms/ows')
+    wms_url = geoserver_wms.get_wms_url(username)
     wms = wms_proxy(wms_url)
     assert layername in wms.contents
     assert wms[layername].title == 'countries_sld_1_1_0'
 
-    style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                        username + '_wms/styles/' + layername)
+    style_url = geoserver_sld.get_workspace_style_url(username, layername)
     r = requests.get(style_url + '.sld',
                      auth=settings.LAYMAN_GS_AUTH
                      )
