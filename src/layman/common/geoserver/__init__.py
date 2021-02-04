@@ -1,12 +1,15 @@
+import io
 import logging
 import json
 from functools import partial
-
+import xml.etree.ElementTree as ET
+import re
 import requests
 import secrets
 import string
 from urllib.parse import urljoin
 from layman import settings
+from layman.http import LaymanError
 
 
 logger = logging.getLogger(__name__)
@@ -27,6 +30,11 @@ RESERVED_ROLE_NAMES = [
 headers_json = {
     'Accept': 'application/json',
     'Content-type': 'application/json',
+}
+
+headers_sld = {
+    'Accept': 'application/vnd.ogc.sld+xml',
+    'Content-type': 'application/xml',
 }
 
 WMS_SERVICE_TYPE = 'wms'
@@ -267,6 +275,136 @@ def get_all_workspaces(auth):
         all_workspaces = [workspace["name"] for workspace in r.json()['workspaces']['workspace']]
 
     return all_workspaces
+
+
+def get_workspace_layer_url(geoserver_workspace, layer=None):
+    layer = layer or ''
+    return urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                   geoserver_workspace + '/layers/' + layer)
+
+
+def get_workspace_style_url(geoserver_workspace, style=None):
+    style = style or ''
+    return urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                   geoserver_workspace + '/styles/' + style)
+
+
+def launder_attribute_name(attr_name):
+    # https://github.com/OSGeo/gdal/blob/355b41831cd2685c85d1aabe5b95665a2c6e99b7/gdal/ogr/ogrsf_frmts/pgdump/ogrpgdumpdatasource.cpp#L129,L155
+    return re.sub(r"['\-#]", '_', attr_name.lower())
+
+
+def post_workspace_sld_style(geoserver_workspace, layername, sld_file):
+    if sld_file is None:
+        r = requests.get(
+            urljoin(settings.LAYMAN_GS_REST_STYLES, 'generic.sld'),
+            auth=settings.LAYMAN_GS_AUTH,
+            timeout=5,
+        )
+        r.raise_for_status()
+        sld_file = io.BytesIO(r.content)
+    r = requests.post(
+        get_workspace_style_url(geoserver_workspace),
+        data=json.dumps(
+            {
+                "style": {
+                    "name": layername,
+                    "format": "sld",
+                    "filename": layername + ".sld"
+                }
+            }
+        ),
+        headers=headers_json,
+        auth=settings.LAYMAN_GS_AUTH,
+        timeout=5,
+    )
+    r.raise_for_status()
+
+    tree = ET.parse(sld_file)
+    root = tree.getroot()
+    if 'version' in root.attrib and root.attrib['version'] == '1.1.0':
+        sld_content_type = 'application/vnd.ogc.se+xml'
+    else:
+        sld_content_type = 'application/vnd.ogc.sld+xml'
+
+    propertname_els = tree.findall('.//{http://www.opengis.net/ogc}PropertyName')
+    for el in propertname_els:
+        el.text = launder_attribute_name(el.text)
+
+    sld_file = io.BytesIO()
+    tree.write(
+        sld_file,
+        encoding=None,
+        xml_declaration=True,
+    )
+    sld_file.seek(0)
+
+    r = requests.put(
+        get_workspace_style_url(geoserver_workspace, layername),
+        data=sld_file.read(),
+        headers={
+            'Accept': 'application/json',
+            'Content-type': sld_content_type,
+        },
+        auth=settings.LAYMAN_GS_AUTH,
+        timeout=5,
+    )
+    if r.status_code == 400:
+        raise LaymanError(14, data=r.text)
+    r.raise_for_status()
+    r = requests.put(get_workspace_layer_url(geoserver_workspace, layername),
+                     data=json.dumps(
+                         {
+                             "layer": {
+                                 "defaultStyle": {
+                                     "name": geoserver_workspace + ':' + layername,
+                                     "workspace": geoserver_workspace,
+                                 },
+                             }
+                         }),
+                     headers=headers_json,
+                     auth=settings.LAYMAN_GS_AUTH,
+                     timeout=5,
+                     )
+    # app.logger.info(r.text)
+    r.raise_for_status()
+
+
+def get_workspace_style_response(geoserver_workspace, stylename, headers=None, auth=None):
+    if headers is None:
+        headers = headers_sld
+    url = get_workspace_style_url(geoserver_workspace, stylename)
+    r = requests.get(url,
+                     auth=auth,
+                     headers=headers,
+                     timeout=5,
+                     )
+    return r
+
+
+def delete_workspace_style(geoserver_workspace, stylename, auth=None):
+    r = get_workspace_style_response(geoserver_workspace, stylename, auth=auth)
+    if r.status_code == 404:
+        return {}
+    else:
+        r.raise_for_status()
+    sld_stream = io.BytesIO(r.content)
+
+    style_url = get_workspace_style_url(geoserver_workspace, stylename)
+    r = requests.delete(style_url,
+                        headers=headers_json,
+                        auth=settings.LAYMAN_GS_AUTH,
+                        params={
+                            'purge': 'true',
+                            'recurse': 'true',
+                        },
+                        timeout=5,
+                        )
+    if r.status_code == 404:
+        return {}
+    else:
+        r.raise_for_status()
+    return sld_stream
 
 
 def create_db_store(geoserver_workspace, auth, db_schema=None):

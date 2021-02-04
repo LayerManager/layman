@@ -1,38 +1,20 @@
-import io
-import json
-import re
-from urllib.parse import urljoin
-import xml.etree.ElementTree as ET
-
-import requests
-
 from layman.layer.filesystem.input_sld import get_layer_file
-from layman.http import LaymanError
+from layman.common import geoserver
 from layman import settings, patch_mode
-from . import headers_json
 from . import wms
 from ...util import url_for
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
-headers_sld = {
-    'Accept': 'application/vnd.ogc.sld+xml',
-    'Content-type': 'application/xml',
-}
-
 
 def get_workspace_style_url(workspace, style=None):
-    style = style or ''
     geoserver_workspace = wms.get_geoserver_workspace(workspace)
-    return urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                   geoserver_workspace + '/styles/' + style)
+    return geoserver.get_workspace_style_url(geoserver_workspace, style)
 
 
 def get_workspace_layer_url(workspace, layer=None):
-    layer = layer or ''
     geoserver_workspace = wms.get_geoserver_workspace(workspace)
-    return urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                   geoserver_workspace + '/layers/' + layer)
+    return geoserver.get_workspace_layer_url(geoserver_workspace, layer)
 
 
 def pre_publication_action_check(username, layername):
@@ -48,40 +30,21 @@ def patch_layer(username, layername):
 
 
 def delete_layer(workspace, layername):
-    style_url = get_workspace_style_url(workspace, layername)
-    r = requests.get(style_url + '.sld',
-                     auth=settings.LAYMAN_GS_AUTH,
-                     timeout=5,
-                     )
-    if r.status_code == 404:
-        return {}
-    else:
-        r.raise_for_status()
-    sld_file = io.BytesIO(r.content)
-
-    r = requests.delete(style_url,
-                        headers=headers_json,
-                        auth=settings.LAYMAN_GS_AUTH,
-                        params={
-                            'purge': 'true',
-                            'recurse': 'true',
-                        },
-                        timeout=5,
-                        )
-    if r.status_code == 404:
-        return {}
-    else:
-        r.raise_for_status()
+    geoserver_workspace = wms.get_geoserver_workspace(workspace)
+    sld_stream = geoserver.delete_workspace_style(geoserver_workspace, layername, auth=settings.LAYMAN_GS_AUTH)
     wms.clear_cache(workspace)
-    return {
-        'sld': {
-            'file': sld_file
+    if sld_stream == {}:
+        return {}
+    else:
+        return {
+            'sld': {
+                'file': sld_stream,
+            }
         }
-    }
 
 
 def get_layer_info(username, layername):
-    r = get_style_response(username, layername, headers_sld, settings.LAYMAN_GS_AUTH)
+    r = get_style_response(username, layername, geoserver.headers_sld, settings.LAYMAN_GS_AUTH)
     if r.status_code == 200:
         url = url_for('rest_layer_style.get', username=username, layername=layername)
         info = {
@@ -99,95 +62,11 @@ def get_publication_uuid(username, publication_type, publication_name):
     return None
 
 
-def launder_attribute_name(attr_name):
-    # https://github.com/OSGeo/gdal/blob/355b41831cd2685c85d1aabe5b95665a2c6e99b7/gdal/ogr/ogrsf_frmts/pgdump/ogrpgdumpdatasource.cpp#L129,L155
-    return re.sub(r"['\-#]", '_', attr_name.lower())
-
-
 def create_layer_style(workspace, layername):
     geoserver_workspace = wms.get_geoserver_workspace(workspace)
     sld_file = get_layer_file(workspace, layername)
     # print('create_layer_style', sld_file)
-    if sld_file is None:
-        r = requests.get(
-            urljoin(settings.LAYMAN_GS_REST_STYLES, 'generic.sld'),
-            auth=settings.LAYMAN_GS_AUTH,
-            timeout=5,
-        )
-        r.raise_for_status()
-        sld_file = io.BytesIO(r.content)
-    r = requests.post(
-        get_workspace_style_url(workspace),
-        data=json.dumps(
-            {
-                "style": {
-                    "name": layername,
-                    # "workspace": {
-                    #     "name": "browser"
-                    # },
-                    "format": "sld",
-                    # "languageVersion": {
-                    #     "version": "1.0.0"
-                    # },
-                    "filename": layername + ".sld"
-                }
-            }
-        ),
-        headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH,
-        timeout=5,
-    )
-    r.raise_for_status()
-    # app.logger.info(sld_file.read())
-
-    tree = ET.parse(sld_file)
-    root = tree.getroot()
-    if 'version' in root.attrib and root.attrib['version'] == '1.1.0':
-        sld_content_type = 'application/vnd.ogc.se+xml'
-    else:
-        sld_content_type = 'application/vnd.ogc.sld+xml'
-
-    propertname_els = tree.findall('.//{http://www.opengis.net/ogc}PropertyName')
-    for el in propertname_els:
-        el.text = launder_attribute_name(el.text)
-
-    sld_file = io.BytesIO()
-    tree.write(
-        sld_file,
-        encoding=None,
-        xml_declaration=True,
-    )
-    sld_file.seek(0)
-
-    r = requests.put(
-        get_workspace_style_url(workspace, layername),
-        data=sld_file.read(),
-        headers={
-            'Accept': 'application/json',
-            'Content-type': sld_content_type,
-        },
-        auth=settings.LAYMAN_GS_AUTH,
-        timeout=5,
-    )
-    if r.status_code == 400:
-        raise LaymanError(14, data=r.text)
-    r.raise_for_status()
-    r = requests.put(get_workspace_layer_url(workspace, layername),
-                     data=json.dumps(
-                         {
-                             "layer": {
-                                 "defaultStyle": {
-                                     "name": geoserver_workspace + ':' + layername,
-                                     "workspace": geoserver_workspace,
-                                 },
-                             }
-                         }),
-                     headers=headers_json,
-                     auth=settings.LAYMAN_GS_AUTH,
-                     timeout=5,
-                     )
-    # app.logger.info(r.text)
-    r.raise_for_status()
+    geoserver.post_workspace_sld_style(geoserver_workspace, layername, sld_file)
 
 
 def get_metadata_comparison(username, layername):
@@ -195,13 +74,5 @@ def get_metadata_comparison(username, layername):
 
 
 def get_style_response(workspace, stylename, headers=None, auth=None):
-    if headers is None:
-        headers = headers_sld
-    url = get_workspace_style_url(workspace, stylename)
-
-    r = requests.get(url,
-                     auth=auth,
-                     headers=headers,
-                     timeout=5,
-                     )
-    return r
+    geoserver_workspace = wms.get_geoserver_workspace(workspace)
+    return geoserver.get_workspace_style_response(geoserver_workspace, stylename, headers, auth)
