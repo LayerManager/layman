@@ -54,19 +54,7 @@ def test_sld_style_applied_in_wms():
 
     url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&STYLES=&LAYERS={workspace}:{layer}&SRS=EPSG:3857&WIDTH=768&HEIGHT=752&BBOX=-30022616.05686392,-30569903.32873383,30022616.05686392,28224386.44929134"
 
-    r = requests.get(url,
-                     timeout=5,
-                     stream=True,
-                     )
-    r.raise_for_status()
-    with open(obtained_file, 'wb') as f:
-        for chunk in r:
-            f.write(chunk)
+    util.assert_same_images(url, obtained_file, expected_file, 2000)
 
-    diffs = util.compare_images(expected_file, obtained_file)
-
-    assert diffs < 2000
-
-    os.remove(obtained_file)
     process_client.delete_layer(workspace,
                                 layer)
