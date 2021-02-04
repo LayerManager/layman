@@ -143,6 +143,9 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
         'metadata': {
             'status': 'NOT_AVAILABLE'
         },
+        'sld': {
+            'status': 'NOT_AVAILABLE'
+        },
     }
 
     complete_info.update(partial_info)
