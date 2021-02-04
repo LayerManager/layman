@@ -21,6 +21,20 @@ headers_sld = {
 }
 
 
+def get_workspace_style_url(workspace, style=None):
+    style = style or ''
+    geoserver_workspace = wms.get_geoserver_workspace(workspace)
+    return urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                   geoserver_workspace + '/styles/' + style)
+
+
+def get_workspace_layer_url(workspace, layer=None):
+    layer = layer or ''
+    geoserver_workspace = wms.get_geoserver_workspace(workspace)
+    return urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                   geoserver_workspace + '/layers/' + layer)
+
+
 def pre_publication_action_check(username, layername):
     pass
 
@@ -34,9 +48,7 @@ def patch_layer(username, layername):
 
 
 def delete_layer(workspace, layername):
-    geoserver_workspace = wms.get_geoserver_workspace(workspace)
-    style_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                        geoserver_workspace + '/styles/' + layername)
+    style_url = get_workspace_style_url(workspace, layername)
     r = requests.get(style_url + '.sld',
                      auth=settings.LAYMAN_GS_AUTH,
                      timeout=5,
@@ -105,7 +117,7 @@ def create_layer_style(workspace, layername):
         r.raise_for_status()
         sld_file = io.BytesIO(r.content)
     r = requests.post(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + '/styles/'),
+        get_workspace_style_url(workspace),
         data=json.dumps(
             {
                 "style": {
@@ -148,8 +160,7 @@ def create_layer_style(workspace, layername):
     sld_file.seek(0)
 
     r = requests.put(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                geoserver_workspace + '/styles/' + layername),
+        get_workspace_style_url(workspace, layername),
         data=sld_file.read(),
         headers={
             'Accept': 'application/json',
@@ -161,8 +172,7 @@ def create_layer_style(workspace, layername):
     if r.status_code == 400:
         raise LaymanError(14, data=r.text)
     r.raise_for_status()
-    r = requests.put(urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
-                             geoserver_workspace + '/layers/' + layername),
+    r = requests.put(get_workspace_layer_url(workspace, layername),
                      data=json.dumps(
                          {
                              "layer": {
@@ -185,10 +195,9 @@ def get_metadata_comparison(username, layername):
 
 
 def get_style_response(workspace, stylename, headers=None, auth=None):
-    geoserver_workspace = wms.get_geoserver_workspace(workspace)
     if headers is None:
         headers = headers_sld
-    url = settings.LAYMAN_GS_REST + f'workspaces/{geoserver_workspace}/styles/{stylename}'
+    url = get_workspace_style_url(workspace, stylename)
 
     r = requests.get(url,
                      auth=auth,
