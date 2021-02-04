@@ -1,3 +1,4 @@
+import io
 import time
 import requests
 import os
@@ -5,6 +6,7 @@ import logging
 import json
 from functools import partial
 from collections import namedtuple
+import xml.etree.ElementTree as ET
 
 from layman import app
 from layman.util import url_for
@@ -259,6 +261,16 @@ def get_publication(publication_type, username, name, headers=None,):
 
 get_map = partial(get_publication, MAP_TYPE)
 get_layer = partial(get_publication, LAYER_TYPE)
+
+
+def get_layer_style(workspace, layer, headers=None):
+    with app.app_context():
+        r_url = url_for('rest_layer_style.get',
+                        username=workspace,
+                        layername=layer)
+    r = requests.get(r_url, headers=headers)
+    raise_layman_error(r)
+    return ET.parse(io.BytesIO(r.content))
 
 
 def finish_delete(username, url, headers, skip_404=False, ):
