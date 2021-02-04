@@ -1,3 +1,4 @@
+import os
 import requests
 import time
 from requests.exceptions import ConnectionError
@@ -37,3 +38,19 @@ def compare_images(image1, image2):
                 diffs += 1
 
     return diffs
+
+
+def assert_same_images(img_url, tmp_file_path, expected_file_path, diff_threshold):
+    r = requests.get(img_url,
+                     timeout=5,
+                     )
+    r.raise_for_status()
+    with open(tmp_file_path, 'wb') as f:
+        for chunk in r:
+            f.write(chunk)
+
+    diffs = compare_images(expected_file_path, tmp_file_path)
+
+    assert diffs < diff_threshold
+
+    os.remove(tmp_file_path)
