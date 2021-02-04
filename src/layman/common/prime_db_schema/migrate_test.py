@@ -3,11 +3,12 @@ import pytest
 
 from test import process_client
 
-from layman import settings, app as app, util
+from layman import settings, app, util, upgrade
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
+from layman.upgrade import upgrade_v1_9
 from . import model, publications as pub_util, workspaces as workspaces_util
-from .schema_initialization import migrate_users_and_publications, ensure_schema
+from .schema_initialization import ensure_schema
 from .util import run_query, run_statement
 
 
@@ -16,7 +17,17 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.usefixtures('ensure_layman')
+@pytest.fixture()
+def save_upgrade_status():
+    with app.app_context():
+        current_version = upgrade.get_current_data_version()
+    yield
+    with app.app_context():
+        upgrade_v1_9.initialize_data_versioning()
+        upgrade.set_current_data_version(current_version)
+
+
+@pytest.mark.usefixtures('ensure_layman', 'save_upgrade_status')
 def test_schema():
     username = 'test_schema_user'
     layername = 'test_schema_layer'
