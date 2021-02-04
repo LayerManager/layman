@@ -173,11 +173,11 @@ JSON object with following structure:
   - *status*: Status information about saving and availability of files. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **db_table**
-  - **name**: String. DB table name within PostgreSQL workspace schema. This table is used as GeoServer source of layer.
+  - *name*: String. DB table name within PostgreSQL workspace schema. This table is used as GeoServer source of layer.
   - *status*: Status information about DB import and availability of the table. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **sld**
-  - **url**: String. URL of layer default style. It points to [GET Layer Style](#get-layer-style).
+  - *url*: String. URL of layer default style. It points to [GET Layer Style](#get-layer-style).
   - *status*: Status information about publishing SLD. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *metadata*
