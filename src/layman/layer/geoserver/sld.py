@@ -67,6 +67,7 @@ def create_layer_style(workspace, layername):
     sld_file = get_layer_file(workspace, layername)
     # print('create_layer_style', sld_file)
     geoserver.post_workspace_sld_style(geoserver_workspace, layername, sld_file)
+    wms.clear_cache(workspace)
 
 
 def get_metadata_comparison(username, layername):
