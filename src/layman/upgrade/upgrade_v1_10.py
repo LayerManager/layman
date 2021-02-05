@@ -1,12 +1,21 @@
 import io
+import json
+import re
+import logging
 from layman import settings
 from layman.http import LaymanError
 from layman.common import prime_db_schema
 from layman.common import geoserver as gs_common
+from layman.common.prime_db_schema import workspaces
 from layman import util
 from layman.layer import LAYER_TYPE
 from layman.layer import geoserver
 from layman.layer.geoserver import wms
+from layman.map import MAP_TYPE
+from layman.map.filesystem import input_file
+from layman.layer.geoserver import util as gs_util
+
+logger = logging.getLogger(__name__)
 
 
 def check_usernames_for_wms_suffix():
@@ -43,3 +52,40 @@ def migrate_layers_to_wms_workspace(workspace=None):
         wms.clear_cache(workspace)
 
         gs_common.delete_workspace_style(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
+
+
+def migrate_maps_on_wms_workspace():
+    logger.info(f'    Starting - migrate maps json urls')
+    infos = util.get_publication_infos(publ_type=MAP_TYPE)
+    gs_url = gs_util.get_gs_proxy_base_url()
+    gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
+    gs_wms_url_pattern = r'^' + re.escape(gs_url) + r'(' + util.USERNAME_ONLY_PATTERN + r')' + r'(/(?:ows|wms|wfs).*)$'
+    all_workspaces = workspaces.get_workspace_names()
+    for (workspace, _, map) in infos.keys():
+        file_path = input_file.get_map_file(workspace, map)
+        is_changed = False
+        with open(file_path, 'r') as map_file:
+            map_json_raw = json.load(map_file)
+            map_json = input_file.unquote_urls(map_json_raw)
+            for map_layer in map_json['layers']:
+                layer_url = map_layer.get('url', None)
+                if not layer_url:
+                    continue
+                match = re.match(gs_wms_url_pattern, layer_url)
+                if not match:
+                    continue
+                layer_workspace = match.group(1)
+                if not layer_workspace:
+                    continue
+                if layer_workspace not in all_workspaces:
+                    logger.warning(f'      Do not know workspace {layer_workspace} in map {workspace}.{map}. Not migrating this url.')
+                    continue
+
+                layer_wms_workspace = wms.get_geoserver_workspace(layer_workspace)
+                map_layer['url'] = f'{gs_url}{layer_wms_workspace}{match.group(2)}'
+                is_changed = True
+        if is_changed:
+            logger.info(f'      Store new json for {workspace}.{map}')
+            with open(file_path, 'w') as map_file:
+                json.dump(map_json, map_file, indent=4)
+    logger.info(f'    DONE - migrate maps json urls')

@@ -1,4 +1,5 @@
 import pytest
+import shutil
 
 from . import upgrade_v1_10
 from layman import app, settings
@@ -10,6 +11,7 @@ from layman.layer.geoserver import wms
 from layman.common import geoserver as gs_common
 from layman.layer import db
 from layman.uuid import generate_uuid
+from layman.map.filesystem import input_file, thumbnail
 from test import process_client, util
 
 
@@ -28,7 +30,7 @@ def test_check_usernames_for_wms_suffix():
         assert exc_info.value.data['workspace'] == username_wms
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def ensure_layer():
     def ensure_layer_internal(workspace, layer):
         with app.app_context():
@@ -110,3 +112,62 @@ def test_migrate_layers_to_wms_workspace(ensure_layer):
     util.assert_same_images(new_wms_url, obtained_file2, expected_file, 2000)
 
     process_client.delete_layer(workspace, layer)
+
+
+@pytest.fixture()
+def ensure_map():
+
+    def ensure_map_internal(workspace, map, layer_workspace, layer):
+        geojson_files = ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
+        style_file = 'sample/style/generic-blue.xml'
+        source_map_file_path = '/code/src/layman/upgrade/upgrade_v1_10_test_map.json'
+        process_client.publish_layer(layer_workspace,
+                                     layer,
+                                     file_paths=geojson_files,
+                                     style_file=style_file)
+        process_client.publish_map(workspace,
+                                   map,
+                                   )
+
+        with app.app_context():
+            input_file.ensure_map_input_file_dir(workspace, map)
+            map_file_path = input_file.get_map_file(workspace, map)
+            shutil.copyfile(source_map_file_path, map_file_path)
+            thumbnail.generate_map_thumbnail(workspace, map, '')
+
+    yield ensure_map_internal
+
+
+@pytest.mark.usefixtures('ensure_layman')
+def test_migrate_maps_on_wms_workspace(ensure_map):
+    layer_workspace = 'test_migrate_maps_on_wms_workspace_layer_workspace'
+    layer = 'test_migrate_maps_on_wms_workspace_layer'
+    workspace = 'test_migrate_maps_on_wms_workspace_workspace'
+    map = 'test_migrate_maps_on_wms_workspace_map'
+    expected_file = 'sample/style/test_sld_style_applied_in_map_thumbnail_map.png'
+
+    ensure_map(workspace, map, layer_workspace, layer)
+
+    with app.app_context():
+        map_json = input_file.get_map_json(workspace, map)
+        assert map_json['layers'][0]['url'] == 'http://localhost:8000/geoserver/test_migrate_maps_on_wms_workspace_layer_workspace/ows',\
+            map_json
+        thumbnail_path = thumbnail.get_map_thumbnail_path(workspace, map)
+    diffs_before = util.compare_images(expected_file, thumbnail_path)
+    shutil.copyfile(thumbnail_path, '/code/tmp/artifacts/upgrade_v1_10_map_thumbnail_before.png')
+    assert 28000 < diffs_before < 35000
+
+    with app.app_context():
+        upgrade_v1_10.migrate_maps_on_wms_workspace()
+
+    with app.app_context():
+        map_json = input_file.get_map_json(workspace, map)
+        assert map_json['layers'][0][
+            'url'] == 'http://localhost:8000/geoserver/test_migrate_maps_on_wms_workspace_layer_workspace_wms/ows', map_json
+        thumbnail.generate_map_thumbnail(workspace, map, '')
+    diffs_after = util.compare_images(expected_file, thumbnail_path)
+    shutil.copyfile(thumbnail_path, '/code/tmp/artifacts/upgrade_v1_10_map_thumbnail_after.png')
+    assert diffs_after < 1000
+
+    process_client.delete_layer(layer_workspace, layer)
+    process_client.delete_map(workspace, map)
