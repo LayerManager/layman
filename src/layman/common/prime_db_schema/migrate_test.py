@@ -27,6 +27,7 @@ def save_upgrade_status():
         upgrade.set_current_data_version(current_version)
 
 
+@pytest.mark.timeout(40)
 @pytest.mark.usefixtures('ensure_layman', 'save_upgrade_status')
 def test_schema():
     username = 'test_schema_user'
