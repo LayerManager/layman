@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def check_usernames_for_wms_suffix():
+    logger.info(f'    Starting - checking users with {settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX} suffix')
     workspaces = prime_db_schema.get_workspaces()
     for workspace in workspaces:
         if workspace.endswith(settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX):
@@ -29,11 +30,14 @@ def check_usernames_for_wms_suffix():
                               data={'workspace': workspace,
                                     }
                               )
+    logger.info(f'    DONE - checking users with {settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX} suffix')
 
 
 def migrate_layers_to_wms_workspace(workspace=None):
+    logger.info(f'    Starting - migrate layers to WMS workspace')
     infos = util.get_publication_infos(publ_type=LAYER_TYPE, workspace=workspace)
     for (workspace, publication_type, layer) in infos.keys():
+        logger.info(f'      Migrate layer {workspace}.{layer}')
         info = util.get_publication_info(workspace, publication_type, layer)
         geoserver_workspace = wms.get_geoserver_workspace(workspace)
         geoserver.ensure_workspace(workspace)
@@ -52,6 +56,7 @@ def migrate_layers_to_wms_workspace(workspace=None):
         wms.clear_cache(workspace)
 
         gs_common.delete_workspace_style(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
+    logger.info(f'    DONE - migrate layers to WMS workspace')
 
 
 def migrate_maps_on_wms_workspace():
