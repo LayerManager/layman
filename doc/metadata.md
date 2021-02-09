@@ -284,7 +284,7 @@ Multiplicity: 1
 
 Shape: String
 
-Example: `"http://localhost:8600/geoserver/workspace1/ows"`
+Example: `"http://localhost:8600/geoserver/workspace1_wms/ows"`
 
 Synchronizable: yes
 
