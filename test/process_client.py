@@ -93,6 +93,8 @@ def raise_layman_error(response, status_codes_to_skip=None):
                           details.get('detail'),
                           http_code=response.status_code,
                           sub_code=details.get('sub_code'))
+    if response.status_code not in status_codes_to_skip:
+        response.raise_for_status()
     assert response.status_code in status_codes_to_skip, f"response.status_code={response.status_code}\nresponse.text={response.text}"
 
 
