@@ -17,6 +17,7 @@ DATA_MIGRATIONS = [
                   upgrade_v1_10.migrate_layers_to_wms_workspace,
                   upgrade_v1_10.migrate_maps_on_wms_workspace,
                   upgrade_v1_10.migrate_metadata_records,
+                  upgrade_v1_10.migrate_input_sld_directory_to_input_style,
                   ]),
 ]
 
