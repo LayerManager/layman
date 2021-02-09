@@ -38,7 +38,7 @@ PUBLICATION_TYPES = {
             'layman.layer.prime_db_schema.table',
             'layman.layer.filesystem.input_chunk',
             'layman.layer.filesystem.input_file',
-            'layman.layer.filesystem.input_sld',
+            'layman.layer.filesystem.input_style',
             'layman.layer.db.table',
             'layman.layer.geoserver.wfs',
             'layman.layer.geoserver.wms',

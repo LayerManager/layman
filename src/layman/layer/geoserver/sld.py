@@ -1,4 +1,4 @@
-from layman.layer.filesystem.input_sld import get_layer_file
+from layman.layer.filesystem.input_style import get_layer_file
 from layman.common import geoserver
 from layman import settings, patch_mode
 from . import wms
