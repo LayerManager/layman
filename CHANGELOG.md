@@ -10,6 +10,7 @@
 ### Migrations and checks
 - [#154](https://github.com/jirik/layman/issues/154) All workspaces are checked, that their name did not end with '_wms'. With any of the workspaces ended with the suffix, startup process is stopped with error code 45. In that case, please downgrade to the previous minor release version and contact Layman contributors.
 - [#154](https://github.com/jirik/layman/issues/154) All layers are copied into [dedicated WMS GeoServer workspace](doc/data-storage.md#geoserver). Styles are also moved into that workspace.
+- [#154](https://github.com/jirik/layman/issues/154) Maps with URLs pointing to any layer stored in GeoServer are rewritten to dedicated [WMS workspace](doc/data-storage.md#geoserver).
 ### Changes
 - [#154](https://github.com/jirik/layman/issues/154) [WMS](doc/endpoints.md#web-map-service) is available in dedicated [GeoServer workspace](doc/data-storage.md#geoserver) whose name is composed from Layman's [workspace](doc/models.md#workspace) name and suffix `_wms`. [WFS](doc/endpoints.md#web-feature-service) remains in GeoServer workspace whose name is equal to Layman's workspace name.
 - [#154](https://github.com/jirik/layman/issues/154) SLD style published in dedicated WMS GeoServer workspace.
@@ -17,7 +18,6 @@
 - [#154](https://github.com/jirik/layman/issues/154) Workspace name can not end with '_wms'. In such case, error with code 45 is raised.
 - New environment variables [LAYMAN_QGIS_HOST](doc/env-settings.md#LAYMAN_QGIS_HOST), [LAYMAN_QGIS_PORT](doc/env-settings.md#LAYMAN_QGIS_PORT), and [LAYMAN_QGIS_PATH](doc/env-settings.md#LAYMAN_QGIS_PATH).
 - [#154](https://github.com/jirik/layman/issues/154) For endpoints [POST Layers](doc/rest.md#post-layers) and [PATCH Layer](doc/rest.md#patch-layer), parameter *sld* is replaced by the new parameter *style* and marked as deprecated. In response to endpoints [GET Layer](doc/rest.md#get-layer) and [PATCH Layer](doc/rest.md#patch-layer), *sld* is replaced by the new *style* item and marked as deprecated.
-
 
 ## v1.9.1
  2021-01-18
