@@ -15,7 +15,7 @@ def test_sld_style_applied_in_thumbnail():
     workspace = 'test_sld_style_applied_in_thumbnail_workspace'
     layer = 'test_sld_style_applied_in_thumbnail_layer'
     geojson_file = ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
-    style_file = 'sample/style/generic-blue.xml'
+    style_file = 'sample/style/generic-blue_sld.xml'
     expected_file = 'sample/style/test_sld_style_applied_in_thumbnail_layer.png'
 
     process_client.publish_layer(workspace,

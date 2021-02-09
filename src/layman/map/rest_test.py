@@ -141,7 +141,7 @@ def test_post_maps_invalid_file(client):
     username = 'testuser1'
     rest_path = url_for('rest_maps.post', username=username)
     file_paths = [
-        'sample/style/generic-blue.xml',
+        'sample/style/generic-blue_sld.xml',
     ]
     for fp in file_paths:
         assert os.path.isfile(fp)
