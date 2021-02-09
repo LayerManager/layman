@@ -6,7 +6,7 @@ from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
 from layman import settings, authn, util as layman_util
 from . import util, LAYER_TYPE, LAYER_REST_PATH_NAME
-from .filesystem import input_file, input_sld, input_chunk, uuid
+from .filesystem import input_file, input_style, input_chunk, uuid
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 from layman.common import redis as redis_util
@@ -143,7 +143,7 @@ def post(username):
         task_options.update({'uuid': uuid_str, })
 
         # save files
-        input_sld.save_layer_file(username, layername, style_file)
+        input_style.save_layer_file(username, layername, style_file)
         if use_chunk_upload:
             files_to_upload = input_chunk.save_layer_files_str(
                 username, layername, files, check_crs)

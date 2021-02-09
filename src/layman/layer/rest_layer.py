@@ -1,13 +1,11 @@
 from flask import Blueprint, jsonify, request, current_app as app, g
-from copy import deepcopy
 
 from layman.common import rest as rest_util
-from layman.common import redis as redis_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator
 from layman import settings, authn
 from . import util, LAYER_REST_PATH_NAME
-from .filesystem import input_file, input_sld, input_chunk
+from .filesystem import input_file, input_style, input_chunk
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 
@@ -115,7 +113,7 @@ def patch(username, layername):
             except KeyError:
                 pass
         if style_file is not None:
-            input_sld.save_layer_file(username, layername, style_file)
+            input_style.save_layer_file(username, layername, style_file)
 
         kwargs.update({
             'crs_id': crs_id,
