@@ -1,9 +1,10 @@
 import os
 import pathlib
 
+from lxml import etree as ET
 from werkzeug.datastructures import FileStorage
 
-from layman import patch_mode
+from layman import patch_mode, LaymanError, layer
 from . import util
 from . import input_file
 
@@ -73,3 +74,20 @@ def get_layer_file(username, layername):
 
 def get_metadata_comparison(username, publication_name):
     pass
+
+
+def get_style_type_from_xml_file(style_path):
+    if os.path.exists(style_path):
+        xml_tree = etree.parse(style_path)
+        root_tag = xml_tree.getroot().tag
+        root_attribute = etree.QName(root_tag).localname
+        result = next((sd for sd in layer.STYLE_TYPES_DEF if sd.root_element == root_attribute), None)
+        if not result:
+            raise LaymanError(46)
+    else:
+        result = layer.NO_STYLE_DEF
+    return result
+
+
+def get_layer_style_type(workspace, layer):
+    return get_style_type_from_xml_file(get_file_path(workspace, layer))

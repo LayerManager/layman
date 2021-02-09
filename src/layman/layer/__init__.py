@@ -1,3 +1,4 @@
+from collections import namedtuple
 LAYER_TYPE = __name__
 
 
@@ -74,3 +75,26 @@ PUBLICATION_TYPES = {
         },
     }
 }
+
+StyleTypeDef = namedtuple('StyleTypeDef', ['code',
+                                           'root_element',
+                                           'extension',
+                                           'store_in_geoserver'
+                                           ])
+STYLE_TYPES_DEF = [StyleTypeDef('none',
+                                None,
+                                None,
+                                True,
+                                ),
+                   StyleTypeDef('sld',
+                                'StyledLayerDescriptor',
+                                'sld',
+                                True,
+                                ),
+                   StyleTypeDef('qgis',
+                                'qgis',
+                                'qgis',
+                                False,
+                                ),
+                   ]
+NO_STYLE_DEF = STYLE_TYPES_DEF[0]
