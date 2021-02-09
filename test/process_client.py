@@ -40,7 +40,9 @@ PublicationTypeDef = namedtuple('PublicationTypeDef', ['url_param_name',
                                                        'delete_url',
                                                        'delete_multi_url',
                                                        'keys_to_check',
-                                                       'source_path'])
+                                                       'source_path',
+                                                       'metadata_comparison_url',
+                                                       ])
 PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                       'rest_maps.post',
                                                       'rest_map.patch',
@@ -50,6 +52,7 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                       'rest_maps.delete',
                                                       map_keys_to_check,
                                                       'sample/layman.map/small_map.json',
+                                                      'rest_map_metadata_comparison.get',
                                                       ),
                          LAYER_TYPE: PublicationTypeDef('layername',
                                                         'rest_layers.post',
@@ -60,6 +63,7 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                         'rest_layers.delete',
                                                         layer_keys_to_check,
                                                         'sample/layman.layer/small_layer.geojson',
+                                                        'rest_layer_metadata_comparison.get',
                                                         ),
                          }
 
@@ -325,11 +329,17 @@ assert_user_layers = partial(assert_user_publications, LAYER_TYPE)
 assert_user_maps = partial(assert_user_publications, MAP_TYPE)
 
 
-def get_map_metadata_comparison(username, mapname, headers=None):
+def get_publication_metadata_comparison(publication_type, workspace, name, headers=None):
+    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     with app.app_context():
-        r_url = url_for('rest_map_metadata_comparison.get', mapname=mapname, username=username)
+        r_url = url_for(publication_type_def.metadata_comparison_url, **{publication_type_def.url_param_name: name}, username=workspace)
     r = requests.get(r_url, headers=headers)
+    raise_layman_error(r)
     return r.json()
+
+
+get_layer_metadata_comparison = partial(get_publication_metadata_comparison, LAYER_TYPE)
+get_map_metadata_comparison = partial(get_publication_metadata_comparison, MAP_TYPE)
 
 
 def reserve_username(username, headers=None):
@@ -367,3 +377,10 @@ def get_authz_headers(username):
     return {f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
             f'{TOKEN_HEADER}': f'Bearer {username}',
             }
+
+
+def get_source_key_from_metadata_comparison(md_comparison, url_prefix):
+    return next((
+        k for k, v in md_comparison['metadata_sources'].items()
+        if v['url'].startswith(url_prefix)
+    ), None)
