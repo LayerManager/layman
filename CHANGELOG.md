@@ -11,6 +11,7 @@
 - [#154](https://github.com/jirik/layman/issues/154) All workspaces are checked, that their name did not end with '_wms'. With any of the workspaces ended with the suffix, startup process is stopped with error code 45. In that case, please downgrade to the previous minor release version and contact Layman contributors.
 - [#154](https://github.com/jirik/layman/issues/154) All layers are copied into [dedicated WMS GeoServer workspace](doc/data-storage.md#geoserver). Styles are also moved into that workspace.
 - [#154](https://github.com/jirik/layman/issues/154) Maps with URLs pointing to any layer stored in GeoServer are rewritten to dedicated [WMS workspace](doc/data-storage.md#geoserver).
+- [#154](https://github.com/jirik/layman/issues/154) Metadata property [`wms_url`](doc/metadata.md) in existing layer metadata records is updated to dedicated [WMS workspace](doc/data-storage.md#geoserver).
 ### Changes
 - [#154](https://github.com/jirik/layman/issues/154) [WMS](doc/endpoints.md#web-map-service) is available in dedicated [GeoServer workspace](doc/data-storage.md#geoserver) whose name is composed from Layman's [workspace](doc/models.md#workspace) name and suffix `_wms`. [WFS](doc/endpoints.md#web-feature-service) remains in GeoServer workspace whose name is equal to Layman's workspace name.
 - [#154](https://github.com/jirik/layman/issues/154) SLD style published in dedicated WMS GeoServer workspace.

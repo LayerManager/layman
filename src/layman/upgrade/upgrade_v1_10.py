@@ -1,7 +1,8 @@
 import io
 import json
-import re
 import logging
+import re
+import time
 from layman import settings
 from layman.http import LaymanError
 from layman.common import prime_db_schema
@@ -11,6 +12,7 @@ from layman import util
 from layman.layer import LAYER_TYPE
 from layman.layer import geoserver
 from layman.layer.geoserver import wms
+from layman.layer.micka import csw
 from layman.map import MAP_TYPE
 from layman.map.filesystem import input_file
 from layman.layer.geoserver import util as gs_util
@@ -94,3 +96,15 @@ def migrate_maps_on_wms_workspace():
             with open(file_path, 'w') as map_file:
                 json.dump(map_json, map_file, indent=4)
     logger.info(f'    DONE - migrate maps json urls')
+
+
+def migrate_metadata_records(workspace=None):
+    logger.info(f'    Starting - migrate layer metadata records')
+    infos = util.get_publication_infos(publ_type=LAYER_TYPE, workspace=workspace)
+    for (workspace, _, layer) in infos.keys():
+        wms.clear_cache(workspace)
+        muuid = csw.patch_layer(workspace, layer, ['wms_url'], create_if_not_exists=False)
+        if not muuid:
+            logger.warning(f'      Metadata record of layer {workspace}.{layer} was not migrated, because the record does not exist.')
+        time.sleep(0.5)
+    logger.info(f'    DONE - migrate layer metadata records')

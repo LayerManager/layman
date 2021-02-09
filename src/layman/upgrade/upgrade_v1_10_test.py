@@ -1,3 +1,4 @@
+from datetime import date
 import pytest
 import shutil
 
@@ -9,6 +10,8 @@ from layman.layer.prime_db_schema import table as prime_db_schema_table
 from layman.layer import geoserver as gs_layer
 from layman.layer.geoserver import wms
 from layman.common import geoserver as gs_common
+from layman.common.micka import util as micka_util
+from layman.common.filesystem import uuid as uuid_common
 from layman.layer import db
 from layman.uuid import generate_uuid
 from layman.map.filesystem import input_file, thumbnail
@@ -33,15 +36,17 @@ def test_check_usernames_for_wms_suffix():
 @pytest.fixture()
 def ensure_layer():
     def ensure_layer_internal(workspace, layer):
+        access_rights = {'read': [settings.RIGHTS_EVERYONE_ROLE], 'write': [settings.RIGHTS_EVERYONE_ROLE], }
         with app.app_context():
             uuid_str = generate_uuid()
             prime_db_schema_table.post_layer(workspace,
                                              layer,
-                                             {'read': [settings.RIGHTS_EVERYONE_ROLE], 'write': [settings.RIGHTS_EVERYONE_ROLE], },
+                                             access_rights,
                                              layer,
                                              uuid_str,
                                              None)
             file_path = '/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
+            uuid_common.assign_publication_uuid('layman.layer', workspace, layer, uuid_str=uuid_str)
             db.ensure_workspace(workspace)
             db.import_layer_vector_file(workspace, layer, file_path, None)
 
@@ -53,6 +58,17 @@ def ensure_layer():
             sld_file_path = 'sample/style/generic-blue.xml'
             with open(sld_file_path, 'rb') as sld_file:
                 gs_common.post_workspace_sld_style(workspace, layer, sld_file)
+
+            md_path = '/code/src/layman/upgrade/upgrade_v1_10_test_layer_metadata.xml'
+            with open(md_path, 'r') as template_file:
+                md_template = template_file.read()
+            record = md_template.format(uuid=uuid_str,
+                                        md_date_stamp=date.today().strftime('%Y-%m-%d'),
+                                        publication_date=date.today().strftime('%Y-%m-%d'),
+                                        workspace=workspace,
+                                        layer=layer,
+                                        )
+            micka_util.soap_insert_record(record, is_public=True)
 
     yield ensure_layer_internal
 
@@ -171,3 +187,51 @@ def test_migrate_maps_on_wms_workspace(ensure_map):
 
     process_client.delete_layer(layer_workspace, layer)
     process_client.delete_map(workspace, map)
+
+
+@pytest.mark.usefixtures('ensure_layman')
+def test_migrate_wms_workspace_metadata(ensure_layer):
+    def assert_md_keys(layer_info):
+        for key in ['comparison_url', 'csw_url', 'identifier', 'record_url']:
+            assert key in layer_info['metadata']
+
+    workspace = 'test_migrate_wms_workspace_metadata_workspace'
+    layer = 'test_migrate_wms_workspace_metadata_layer'
+    ensure_layer(workspace, layer)
+
+    with app.app_context():
+        upgrade_v1_10.migrate_layers_to_wms_workspace(workspace)
+
+    wms_workspace = wms.get_geoserver_workspace(workspace)
+    wms_old_prefix = f"http://localhost:8000/geoserver/{workspace}/ows"
+    wms_new_prefix = f"http://localhost:8000/geoserver/{wms_workspace}/ows"
+    csw_prefix = f"http://localhost:3080/csw"
+
+    layer_info = process_client.get_layer(workspace, layer)
+    assert_md_keys(layer_info)
+
+    md_comparison = process_client.get_layer_metadata_comparison(workspace, layer)
+    md_props = md_comparison['metadata_properties']
+
+    csw_src_key = process_client.get_source_key_from_metadata_comparison(md_comparison, csw_prefix)
+    assert csw_src_key is not None
+
+    assert md_props['wms_url']['equal'] is False
+    assert md_props['wms_url']['equal_or_null'] is False
+    assert md_props['wms_url']['values'][csw_src_key].startswith(wms_old_prefix)
+    with app.app_context():
+        upgrade_v1_10.migrate_metadata_records(workspace)
+
+    layer_info = process_client.get_layer(workspace, layer)
+    assert_md_keys(layer_info)
+
+    md_comparison = process_client.get_layer_metadata_comparison(workspace, layer)
+    md_props = md_comparison['metadata_properties']
+
+    csw_src_key = process_client.get_source_key_from_metadata_comparison(md_comparison, csw_prefix)
+    assert csw_src_key is not None
+    assert md_props['wms_url']['values'][csw_src_key].startswith(wms_new_prefix)
+    for v in md_props['wms_url']['values'].values():
+        assert v.startswith(wms_new_prefix)
+    assert md_props['wms_url']['equal'] is True
+    assert md_props['wms_url']['equal_or_null'] is True
