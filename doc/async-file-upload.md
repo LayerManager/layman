@@ -21,8 +21,8 @@ You need some HTML form for user to choose files he wants to publish and fill so
   CRS:
   <input name="crs" type="text" />
 
-  SLD style:
-  <input name="sld" type="file" />
+  Style file:
+  <input name="style" type="file" />
 
   <button type="submit">Submit</button>
 </form>

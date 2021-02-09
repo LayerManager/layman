@@ -205,7 +205,7 @@ def publish_publication(publication_type,
         if access_rights and access_rights.get('write'):
             data["access_rights.write"] = access_rights['write']
         if style_file:
-            files.append(('sld', (os.path.basename(style_file), open(style_file, 'rb'))))
+            files.append(('style', (os.path.basename(style_file), open(style_file, 'rb'))))
         if description:
             data['description'] = description
         r = requests.post(r_url,

@@ -81,12 +81,14 @@ def patch(username, layername):
         update_info = True
 
     # SLD
-    sld_file = None
-    if 'sld' in request.files and not request.files['sld'].filename == '':
-        sld_file = request.files['sld']
+    style_file = None
+    if 'style' in request.files and not request.files['style'].filename == '':
+        style_file = request.files['style']
+    elif 'sld' in request.files and not request.files['sld'].filename == '':
+        style_file = request.files['sld']
 
     delete_from = None
-    if sld_file is not None:
+    if style_file is not None:
         delete_from = 'layman.layer.geoserver.sld'
     if len(files) > 0:
         delete_from = 'layman.layer.filesystem.input_file'
@@ -107,13 +109,13 @@ def patch(username, layername):
 
     if delete_from is not None:
         deleted = util.delete_layer(username, layername, source=delete_from, http_method='patch')
-        if sld_file is None:
+        if style_file is None:
             try:
-                sld_file = deleted['sld']['file']
+                style_file = deleted['style']['file']
             except KeyError:
                 pass
-        if sld_file is not None:
-            input_sld.save_layer_file(username, layername, sld_file)
+        if style_file is not None:
+            input_sld.save_layer_file(username, layername, style_file)
 
         kwargs.update({
             'crs_id': crs_id,
