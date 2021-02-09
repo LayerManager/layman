@@ -51,7 +51,7 @@ def get_layer_info(username, layername):
         return {}
 
 
-def patch_layer(username, layername, metadata_properties_to_refresh, actor_name=None):
+def patch_layer(username, layername, metadata_properties_to_refresh, actor_name=None, create_if_not_exists=True):
     # current_app.logger.info(f"patch_layer metadata_properties_to_refresh={metadata_properties_to_refresh}")
     if len(metadata_properties_to_refresh) == 0:
         return {}
@@ -62,7 +62,10 @@ def patch_layer(username, layername, metadata_properties_to_refresh, actor_name=
     muuid = get_metadata_uuid(uuid)
     el = common_util.get_record_element_by_id(csw, muuid)
     if el is None:
-        return csw_insert(username, layername)
+        if create_if_not_exists:
+            return csw_insert(username, layername)
+        else:
+            return None
     # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
 
     _, prop_values = get_template_path_and_values(username, layername, http_method='patch')
