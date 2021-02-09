@@ -193,7 +193,8 @@ def patch_layer(username, layername, task_options, stop_sync_at, start_async_at)
 TASKS_TO_LAYER_INFO_KEYS = {
     'layman.layer.filesystem.input_chunk.refresh': ['file'],
     'layman.layer.db.table.refresh': ['db_table'],
-    'layman.layer.geoserver.wfs.refresh': ['wms', 'wfs'],
+    'layman.layer.geoserver.wfs.refresh': ['wfs'],
+    'layman.layer.geoserver.wms.refresh': ['wms'],
     'layman.layer.geoserver.sld.refresh': ['style'],
     'layman.layer.filesystem.thumbnail.refresh': ['thumbnail'],
     'layman.layer.micka.soap.refresh': ['metadata'],
