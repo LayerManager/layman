@@ -298,8 +298,7 @@ def soap_insert(template_values):
     return muuid
 
 
-def soap_insert_record_from_template(template_path, prop_values, metadata_properties, is_public):
-    record = fill_xml_template_as_pretty_str(template_path, prop_values, metadata_properties)
+def soap_insert_record(record, is_public):
     try:
         muuid = soap_insert({
             'public': '1' if is_public else '0',
@@ -311,6 +310,11 @@ def soap_insert_record_from_template(template_path, prop_values, metadata_proper
         current_app.logger.info(traceback.format_exc())
         raise LaymanError(38)
     return muuid
+
+
+def soap_insert_record_from_template(template_path, prop_values, metadata_properties, is_public):
+    record = fill_xml_template_as_pretty_str(template_path, prop_values, metadata_properties)
+    return soap_insert_record(record, is_public)
 
 
 def csw_update(template_values):
