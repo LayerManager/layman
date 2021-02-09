@@ -3,6 +3,7 @@ import json
 import logging
 import re
 import time
+import os
 from layman import settings
 from layman.http import LaymanError
 from layman.common import prime_db_schema
@@ -13,6 +14,7 @@ from layman.layer import LAYER_TYPE
 from layman.layer import geoserver
 from layman.layer.geoserver import wms
 from layman.layer.micka import csw
+from layman.layer.filesystem import util as layer_fs_util, input_style
 from layman.map import MAP_TYPE
 from layman.map.filesystem import input_file
 from layman.layer.geoserver import util as gs_util
@@ -108,3 +110,17 @@ def migrate_metadata_records(workspace=None):
             logger.warning(f'      Metadata record of layer {workspace}.{layer} was not migrated, because the record does not exist.')
         time.sleep(0.5)
     logger.info(f'    DONE - migrate layer metadata records')
+
+
+def migrate_input_sld_directory_to_input_style():
+    logger.info(f'    Starting - migrate input_sld directories to input_style')
+    infos = util.get_publication_infos(publ_type=LAYER_TYPE)
+    for (workspace, _, layer) in infos.keys():
+        sld_path = os.path.join(layer_fs_util.get_layer_dir(workspace, layer),
+                                'input_sld')
+        if os.path.exists(sld_path):
+            logger.info(f'      Migrate layer {workspace}.{layer}')
+            style_path = input_style.get_layer_input_style_dir(workspace, layer)
+            os.rename(sld_path, style_path)
+
+    logger.info(f'    DONE - migrate input_sld directories to input_style')

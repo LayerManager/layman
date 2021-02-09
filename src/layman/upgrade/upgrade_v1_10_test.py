@@ -1,6 +1,8 @@
 from datetime import date
+import pathlib
 import pytest
 import shutil
+import os
 
 from . import upgrade_v1_10
 from layman import app, settings
@@ -9,8 +11,10 @@ from layman.common import prime_db_schema
 from layman.layer.prime_db_schema import table as prime_db_schema_table
 from layman.layer import geoserver as gs_layer
 from layman.layer.geoserver import wms
+from layman.layer.filesystem import util as layer_fs_util, input_style
 from layman.common import geoserver as gs_common
 from layman.common.micka import util as micka_util
+from layman.common.filesystem import uuid as uuid_common
 from layman.common.filesystem import uuid as uuid_common
 from layman.layer import db
 from layman.uuid import generate_uuid
@@ -37,6 +41,7 @@ def test_check_usernames_for_wms_suffix():
 def ensure_layer():
     def ensure_layer_internal(workspace, layer):
         access_rights = {'read': [settings.RIGHTS_EVERYONE_ROLE], 'write': [settings.RIGHTS_EVERYONE_ROLE], }
+        style_file = 'sample/style/generic-blue.xml'
         with app.app_context():
             uuid_str = generate_uuid()
             prime_db_schema_table.post_layer(workspace,
@@ -49,16 +54,13 @@ def ensure_layer():
             uuid_common.assign_publication_uuid('layman.layer', workspace, layer, uuid_str=uuid_str)
             db.ensure_workspace(workspace)
             db.import_layer_vector_file(workspace, layer, file_path, None)
-
             created = gs_common.ensure_workspace(workspace, settings.LAYMAN_GS_AUTH)
             if created:
                 gs_common.create_db_store(workspace, settings.LAYMAN_GS_AUTH, db_schema=workspace)
             gs_layer.publish_layer_from_db(workspace, layer, layer, layer, None, workspace)
-
             sld_file_path = 'sample/style/generic-blue.xml'
             with open(sld_file_path, 'rb') as sld_file:
                 gs_common.post_workspace_sld_style(workspace, layer, sld_file)
-
             md_path = '/code/src/layman/upgrade/upgrade_v1_10_test_layer_metadata.xml'
             with open(md_path, 'r') as template_file:
                 md_template = template_file.read()
@@ -69,6 +71,11 @@ def ensure_layer():
                                         layer=layer,
                                         )
             micka_util.soap_insert_record(record, is_public=True)
+
+            input_sld_dir = os.path.join(layer_fs_util.get_layer_dir(workspace, layer),
+                                         'input_sld')
+            pathlib.Path(input_sld_dir).mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(style_file, os.path.join(input_sld_dir, layer + '.xml'))
 
     yield ensure_layer_internal
 
@@ -235,3 +242,30 @@ def test_migrate_wms_workspace_metadata(ensure_layer):
         assert v.startswith(wms_new_prefix)
     assert md_props['wms_url']['equal'] is True
     assert md_props['wms_url']['equal_or_null'] is True
+
+
+@pytest.mark.usefixtures('ensure_layman')
+def test_migrate_input_sld_directory_to_input_style(ensure_layer):
+    workspace = 'test_migrate_input_sld_directory_to_input_style_workspace'
+    layer = 'test_migrate_input_sld_directory_to_input_style_layer'
+    with app.app_context():
+        input_sld_dir = os.path.join(layer_fs_util.get_layer_dir(workspace, layer),
+                                     'input_sld')
+        input_style_dir = os.path.join(layer_fs_util.get_layer_dir(workspace, layer),
+                                       'input_style')
+
+        assert input_style_dir == input_style.get_layer_input_style_dir(workspace, layer)
+
+        ensure_layer(workspace, layer)
+
+        assert os.path.exists(input_sld_dir)
+        assert not os.path.exists(input_style_dir)
+        assert os.path.exists(os.path.join(input_sld_dir, f'{layer}.xml'))
+
+        upgrade_v1_10.migrate_input_sld_directory_to_input_style()
+
+        assert not os.path.exists(input_sld_dir)
+        assert os.path.exists(input_style_dir)
+        assert os.path.exists(os.path.join(input_style_dir, f'{layer}.xml'))
+
+    process_client.delete_layer(workspace, layer)
