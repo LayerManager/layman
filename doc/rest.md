@@ -57,7 +57,7 @@ Processing chain consists of few steps:
 
 If workspace directory, database schema, GeoServer's workspaces, or GeoServer's datastores does not exist yet, it is created on demand.
 
-Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Layer](#get-layer) and **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, sld, metadata).
+Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Layer](#get-layer) and **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, style, metadata).
 
 It is possible to upload data files asynchronously, which is suitable for large files. This can be done in three steps:
 1. Send POST Layers request with **file** parameter filled by file names that you want to upload
@@ -90,8 +90,9 @@ Body parameters:
 - *crs*, string `EPSG:3857` or `EPSG:4326`
    - CRS of the file
    - by default it is read/guessed from input file
-- *sld*, SLD file
+- *style*, style file
    - by default default SLD style of GeoServer is used
+   - SLD file or QGIS style file
    - uploading of additional style files, e.g. point-symbol images or fonts is not supported
 - *access_rights.read*, string
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
@@ -99,6 +100,9 @@ Body parameters:
 - *access_rights.write*, string
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [write access](./security.md#publication-access-rights) to this publication
    - default value is current authenticated user, or EVERYONE if published by anonymous
+- ~~sld~~, SLD file
+   - **deprecated parameter**
+   - alias for *style* parameter
 
 #### Response
 Content-Type: `application/json`
@@ -176,10 +180,13 @@ JSON object with following structure:
   - *name*: String. DB table name within PostgreSQL workspace schema. This table is used as GeoServer source of layer.
   - *status*: Status information about DB import and availability of the table. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
-- **sld**
+- **style**
   - *url*: String. URL of layer default style. It points to [GET Layer Style](#get-layer-style).
-  - *status*: Status information about publishing SLD. See [GET Layer](#get-layer) **wms** property for meaning.
+  - *status*: Status information about publishing style. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
+- **~~style~~**
+  - **Deprecated**
+  - Replaced by **style**, contains same info
 - *metadata*
   - *identifier*: String. Identifier of metadata record in CSW instance.
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.
@@ -216,13 +223,16 @@ Body parameters:
 - *description*
 - *crs*, string `EPSG:3857` or `EPSG:4326`
    - Taken into account only if `file` is provided.
-- *sld*, SLD file
+- *style*, style file
+   - SLD or QGIS style file
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 - *access_rights.read*, string
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
 - *access_rights.write*, string
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [write access](./security.md#publication-access-rights) to this publication
-
+- ~~sld~~, SLD file
+   - **deprecated parameter**
+   - alias for *style* parameter
 #### Response
 Content-Type: `application/json`
 

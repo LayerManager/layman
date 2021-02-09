@@ -37,7 +37,7 @@ Remember that Layman supports only `EPSG:4326` and `EPSG:3857` projections by de
 
 In QGIS, you need to implement following steps.
 
-First, publish each layer whose data source is local ShapeFile or GeoJSON as WMS layer using [POST Layers](rest.md#post-layers) endpoint. Do not forget to respect supported projection (see `crs` input parameter). Also set `sld` parameter to layer style, otherwise the data file will be displayed with default GeoServer style.
+First, publish each layer whose data source is local ShapeFile or GeoJSON as WMS layer using [POST Layers](rest.md#post-layers) endpoint. Do not forget to respect supported projection (see `crs` input parameter). Also set `style` parameter to layer style, otherwise the data file will be displayed with default GeoServer style.
 
 In response of [POST Layers](rest.md#post-layers) you will obtain
  - `name` of the layer unique within all layers in used [workspace](models.md#workspace)

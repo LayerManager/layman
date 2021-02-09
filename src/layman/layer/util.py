@@ -143,7 +143,7 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
         'metadata': {
             'status': 'NOT_AVAILABLE'
         },
-        'sld': {
+        'style': {
             'status': 'NOT_AVAILABLE'
         },
     }
@@ -152,6 +152,7 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
 
     clear_publication_info(complete_info)
 
+    complete_info['sld'] = complete_info['style']
     return complete_info
 
 
@@ -193,7 +194,7 @@ TASKS_TO_LAYER_INFO_KEYS = {
     'layman.layer.filesystem.input_chunk.refresh': ['file'],
     'layman.layer.db.table.refresh': ['db_table'],
     'layman.layer.geoserver.wfs.refresh': ['wms', 'wfs'],
-    'layman.layer.geoserver.sld.refresh': ['sld'],
+    'layman.layer.geoserver.sld.refresh': ['style'],
     'layman.layer.filesystem.thumbnail.refresh': ['thumbnail'],
     'layman.layer.micka.soap.refresh': ['metadata'],
 }

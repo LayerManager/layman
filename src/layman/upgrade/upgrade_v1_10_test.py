@@ -91,7 +91,7 @@ def test_migrate_layers_to_wms_workspace(ensure_layer):
     layer_info = process_client.get_layer(workspace, layer)
     assert layer_info['wms']['url'] == f'http://localhost:8000/geoserver/{wms_workspace}/ows'
     assert layer_info['wfs']['url'] == f'http://localhost:8000/geoserver/{workspace}/wfs'
-    assert layer_info['sld']['url'] == f'http://layman_test_run_1:8000/rest/{workspace}/layers/{layer}/style'
+    assert layer_info['style']['url'] == f'http://layman_test_run_1:8000/rest/{workspace}/layers/{layer}/style'
 
     all_workspaces = gs_common.get_all_workspaces(settings.LAYMAN_GS_AUTH)
     assert workspace in all_workspaces

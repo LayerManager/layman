@@ -539,7 +539,7 @@ def test_post_layers_complex(client):
                 'name': 'countries',
                 'title': 'staty',
                 'description': 'popis států',
-                'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
+                'style': (open(sld_path, 'rb'), os.path.basename(sld_path)),
             })
             assert rv.status_code == 200
             resp_json = rv.get_json()
@@ -638,7 +638,7 @@ def test_uppercase_attr(client):
             rv = client.post(rest_path, data={
                 'file': files,
                 'name': layername,
-                'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
+                'style': (open(sld_path, 'rb'), os.path.basename(sld_path)),
             })
             assert rv.status_code == 200
             resp_json = rv.get_json()
@@ -784,7 +784,7 @@ def test_patch_layer_style(client):
         sld_path = 'sample/style/generic-blue.xml'
         assert os.path.isfile(sld_path)
         rv = client.patch(rest_path, data={
-            'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
+            'style': (open(sld_path, 'rb'), os.path.basename(sld_path)),
             'title': 'countries in blue'
         })
         assert rv.status_code == 200
@@ -854,7 +854,7 @@ def test_post_layers_sld_1_1_0(client):
         rv = client.post(rest_path, data={
             'file': files,
             'name': layername,
-            'sld': (open(sld_path, 'rb'), os.path.basename(sld_path)),
+            'style': (open(sld_path, 'rb'), os.path.basename(sld_path)),
         })
         assert rv.status_code == 200
         resp_json = rv.get_json()
@@ -866,7 +866,7 @@ def test_post_layers_sld_1_1_0(client):
 
     layer_info = util.get_layer_info(username, layername)
     while ('status' in layer_info['wms'] and layer_info['wms']['status'] in ['PENDING', 'STARTED'])\
-            or ('status' in layer_info['sld'] and layer_info['sld']['status'] in ['PENDING', 'STARTED']):
+            or ('status' in layer_info['style'] and layer_info['style']['status'] in ['PENDING', 'STARTED']):
         time.sleep(0.1)
         layer_info = util.get_layer_info(username, layername)
 

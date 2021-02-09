@@ -10,7 +10,6 @@ from .filesystem import input_file, input_sld, input_chunk, uuid
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 from layman.common import redis as redis_util
-from layman import util as layman_util
 
 bp = Blueprint('rest_layers', __name__)
 
@@ -95,10 +94,12 @@ def post(username):
     # DESCRIPTION
     description = request.form.get('description', '')
 
-    # SLD
-    sld_file = None
-    if 'sld' in request.files and not request.files['sld'].filename == '':
-        sld_file = request.files['sld']
+    # Style
+    style_file = None
+    if 'style' in request.files and not request.files['style'].filename == '':
+        style_file = request.files['style']
+    elif 'sld' in request.files and not request.files['sld'].filename == '':
+        style_file = request.files['sld']
 
     actor_name = authn.get_authn_username()
 
@@ -142,7 +143,7 @@ def post(username):
         task_options.update({'uuid': uuid_str, })
 
         # save files
-        input_sld.save_layer_file(username, layername, sld_file)
+        input_sld.save_layer_file(username, layername, style_file)
         if use_chunk_upload:
             files_to_upload = input_chunk.save_layer_files_str(
                 username, layername, files, check_crs)

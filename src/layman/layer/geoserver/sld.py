@@ -37,7 +37,7 @@ def delete_layer(workspace, layername):
         return {}
     else:
         return {
-            'sld': {
+            'style': {
                 'file': sld_stream,
             }
         }
@@ -48,7 +48,7 @@ def get_layer_info(username, layername):
     if r.status_code == 200:
         url = url_for('rest_layer_style.get', username=username, layername=layername)
         info = {
-            'sld': {
+            'style': {
                 'url': url
             },
         }
