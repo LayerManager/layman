@@ -19,7 +19,7 @@ def test_sld_style_in_wms_workspace():
     workspace = 'test_sld_style_file_workspace'
     layer = 'test_sld_style_file_layer'
     geojson_file = ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
-    style_file = 'sample/style/generic-blue.xml'
+    style_file = 'sample/style/generic-blue_sld.xml'
 
     process_client.publish_layer(workspace,
                                  layer,
@@ -43,7 +43,7 @@ def test_sld_style_applied_in_wms():
     workspace = 'test_sld_style_wms_workspace'
     layer = 'test_sld_style_wms_layer'
     geojson_file = ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
-    style_file = 'sample/style/generic-blue.xml'
+    style_file = 'sample/style/generic-blue_sld.xml'
     expected_file = 'sample/style/countries_wms_blue.png'
     obtained_file = 'tmp/artifacts/test_sld_style_applied_in_wms.png'
 

@@ -17,7 +17,7 @@ def test_sld_style_applied_in_map_thumbnail():
     map = 'test_sld_style_applied_in_map_thumbnail_map'
     geojson_file = ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
     map_file = ['sample/layman.map/internal_url_thumbnail.json']
-    style_file = 'sample/style/generic-blue.xml'
+    style_file = 'sample/style/generic-blue_sld.xml'
     expected_file = 'sample/style/test_sld_style_applied_in_map_thumbnail_map.png'
 
     process_client.publish_layer(workspace,

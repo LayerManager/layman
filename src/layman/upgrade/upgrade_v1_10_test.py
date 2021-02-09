@@ -41,7 +41,7 @@ def test_check_usernames_for_wms_suffix():
 def ensure_layer():
     def ensure_layer_internal(workspace, layer):
         access_rights = {'read': [settings.RIGHTS_EVERYONE_ROLE], 'write': [settings.RIGHTS_EVERYONE_ROLE], }
-        style_file = 'sample/style/generic-blue.xml'
+        style_file = 'sample/style/generic-blue_sld.xml'
         with app.app_context():
             uuid_str = generate_uuid()
             prime_db_schema_table.post_layer(workspace,
@@ -58,7 +58,7 @@ def ensure_layer():
             if created:
                 gs_common.create_db_store(workspace, settings.LAYMAN_GS_AUTH, db_schema=workspace)
             gs_layer.publish_layer_from_db(workspace, layer, layer, layer, None, workspace)
-            sld_file_path = 'sample/style/generic-blue.xml'
+            sld_file_path = 'sample/style/generic-blue_sld.xml'
             with open(sld_file_path, 'rb') as sld_file:
                 gs_common.post_workspace_sld_style(workspace, layer, sld_file)
             md_path = '/code/src/layman/upgrade/upgrade_v1_10_test_layer_metadata.xml'
@@ -142,7 +142,7 @@ def ensure_map():
 
     def ensure_map_internal(workspace, map, layer_workspace, layer):
         geojson_files = ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
-        style_file = 'sample/style/generic-blue.xml'
+        style_file = 'sample/style/generic-blue_sld.xml'
         source_map_file_path = '/code/src/layman/upgrade/upgrade_v1_10_test_map.json'
         process_client.publish_layer(layer_workspace,
                                      layer,

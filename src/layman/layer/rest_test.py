@@ -529,7 +529,7 @@ def test_post_layers_complex(client):
         for fp in file_paths:
             assert os.path.isfile(fp)
         files = []
-        sld_path = 'sample/style/generic-blue.xml'
+        sld_path = 'sample/style/generic-blue_sld.xml'
         assert os.path.isfile(sld_path)
         layername = ''
         try:
@@ -781,7 +781,7 @@ def test_patch_layer_style(client):
         username = 'testuser1'
         layername = 'ne_110m_admin_0_countries'
         rest_path = url_for('rest_layer.patch', username=username, layername=layername)
-        sld_path = 'sample/style/generic-blue.xml'
+        sld_path = 'sample/style/generic-blue_sld.xml'
         assert os.path.isfile(sld_path)
         rv = client.patch(rest_path, data={
             'style': (open(sld_path, 'rb'), os.path.basename(sld_path)),
