@@ -105,10 +105,13 @@ def patch_publication(publication_type,
                       headers=None,
                       access_rights=None,
                       title=None,
+                      style_file=None,
                       ):
     headers = headers or {}
     file_paths = file_paths or []
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
+    if style_file:
+        assert publication_type == LAYER_TYPE
 
     with app.app_context():
         r_url = url_for(publication_type_def.patch_url,
@@ -127,6 +130,8 @@ def patch_publication(publication_type,
             data["access_rights.write"] = access_rights['write']
         if title:
             data['title'] = title
+        if style_file:
+            files.append(('style', (os.path.basename(style_file), open(style_file, 'rb'))))
 
         r = requests.patch(r_url,
                            files=files,
