@@ -1,4 +1,4 @@
-from layman.layer.filesystem.input_style import get_layer_file
+from layman.layer.filesystem import input_style
 from layman.common import geoserver
 from layman import settings, patch_mode
 from . import wms
@@ -64,9 +64,9 @@ def get_publication_uuid(username, publication_type, publication_name):
 
 def create_layer_style(workspace, layername):
     geoserver_workspace = wms.get_geoserver_workspace(workspace)
-    sld_file = get_layer_file(workspace, layername)
-    # print('create_layer_style', sld_file)
-    geoserver.post_workspace_sld_style(geoserver_workspace, layername, sld_file)
+    if input_style.get_layer_style_type(workspace, layername).store_in_geoserver:
+        style_file = input_style.get_layer_file(workspace, layername)
+        geoserver.post_workspace_sld_style(geoserver_workspace, layername, style_file)
     wms.clear_cache(workspace)
 
 
