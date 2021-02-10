@@ -92,7 +92,7 @@ Body parameters:
    - by default it is read/guessed from input file
 - *style*, style file
    - by default default SLD style of GeoServer is used
-   - SLD file or QGIS style file
+   - SLD or QGIS style file (recognized by the root element of XML - `StyledLayerDescriptor` or `qgis`)
    - uploading of additional style files, e.g. point-symbol images or fonts is not supported
 - *access_rights.read*, string
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
@@ -224,7 +224,7 @@ Body parameters:
 - *crs*, string `EPSG:3857` or `EPSG:4326`
    - Taken into account only if `file` is provided.
 - *style*, style file
-   - SLD or QGIS style file
+   - SLD or QGIS style file (recognized by the root element of XML - `StyledLayerDescriptor` or `qgis`)
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 - *access_rights.read*, string
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication

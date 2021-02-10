@@ -20,6 +20,7 @@
 - [#154](https://github.com/jirik/layman/issues/154) Workspace name can not end with '_wms'. In such case, error with code 45 is raised.
 - New environment variables [LAYMAN_QGIS_HOST](doc/env-settings.md#LAYMAN_QGIS_HOST), [LAYMAN_QGIS_PORT](doc/env-settings.md#LAYMAN_QGIS_PORT), and [LAYMAN_QGIS_PATH](doc/env-settings.md#LAYMAN_QGIS_PATH).
 - [#154](https://github.com/jirik/layman/issues/154) For endpoints [POST Layers](doc/rest.md#post-layers) and [PATCH Layer](doc/rest.md#patch-layer), parameter *sld* is replaced by the new parameter *style* and marked as deprecated. In response to endpoints [GET Layer](doc/rest.md#get-layer) and [PATCH Layer](doc/rest.md#patch-layer), *sld* is replaced by the new *style* item and marked as deprecated.
+- [#154](https://github.com/jirik/layman/issues/154) Also QGIS style file is accepted, previously only SLD file was.
 
 ## v1.9.1
  2021-01-18

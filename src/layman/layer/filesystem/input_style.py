@@ -1,7 +1,8 @@
 import os
 import pathlib
+import glob
 
-from lxml import etree as ET
+from lxml import etree
 from werkzeug.datastructures import FileStorage
 
 from layman import patch_mode, LaymanError, layer
@@ -46,28 +47,36 @@ def delete_layer(username, layername):
     util.delete_layer_subdir(username, layername, LAYER_SUBDIR)
 
 
-def get_file_path(username, layername):
+def get_file_path(username, layername, with_extension=True):
     input_style_dir = get_layer_input_style_dir(username, layername)
-    return os.path.join(input_style_dir, layername + '.sld')
+    style_files = glob.glob(os.path.join(input_style_dir, layername + '.*'))
+    if with_extension:
+        result = style_files[0] if style_files else None
+    else:
+        result = os.path.join(input_style_dir, layername)
+    return result
 
 
 def save_layer_file(username, layername, style_file):
-    style_path = get_file_path(username, layername)
+    style_path_clear = get_file_path(username, layername, with_extension=False)
+    style_path_temp = style_path_clear + '.temp'
     if style_file is None:
         delete_layer(username, layername)
-    elif isinstance(style_file, FileStorage):
-        ensure_layer_input_style_dir(username, layername)
-        style_file.save(style_path)
     else:
         ensure_layer_input_style_dir(username, layername)
-        with open(style_path, 'wb') as out:
-            out.write(style_file.read())
+        if isinstance(style_file, FileStorage):
+            style_file.save(style_path_temp)
+        else:
+            with open(style_path_temp, 'wb') as out:
+                out.write(style_file.read())
+        extension = get_style_type_from_xml_file(style_path_temp).extension
+        os.rename(style_path_temp, style_path_clear + '.' + extension)
 
 
 def get_layer_file(username, layername):
     style_path = get_file_path(username, layername)
 
-    if os.path.exists(style_path):
+    if style_path and os.path.exists(style_path):
         return open(style_path, 'rb')
     return None
 
@@ -77,7 +86,7 @@ def get_metadata_comparison(username, publication_name):
 
 
 def get_style_type_from_xml_file(style_path):
-    if os.path.exists(style_path):
+    if style_path and os.path.exists(style_path):
         xml_tree = etree.parse(style_path)
         root_tag = xml_tree.getroot().tag
         root_attribute = etree.QName(root_tag).localname
