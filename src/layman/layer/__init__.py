@@ -41,6 +41,7 @@ PUBLICATION_TYPES = {
             'layman.layer.filesystem.input_file',
             'layman.layer.filesystem.input_style',
             'layman.layer.db.table',
+            'layman.layer.qgis.wms',
             'layman.layer.geoserver.wfs',
             'layman.layer.geoserver.wms',
             'layman.layer.geoserver.sld',
@@ -55,6 +56,9 @@ PUBLICATION_TYPES = {
             'layman.layer.micka.tasks',
         ],
         'layman.common.filesystem': {
+            'publications_dir': 'layers'
+        },
+        'layman.layer.qgis': {
             'publications_dir': 'layers'
         },
         'layman.common.metadata': {
