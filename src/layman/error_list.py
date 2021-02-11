@@ -47,4 +47,5 @@ ERROR_LIST = {
     44: (403, 'Unsuccessful HTTP Header authentication.'),
     45: (400, 'Workspace ended with reserved suffix.'),
     46: (400, 'Unknown style file. Can recognize only SLD and QGIS files.'),
+    47: (400, 'Error in QML'),
 }
