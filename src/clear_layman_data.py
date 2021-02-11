@@ -1,23 +1,29 @@
 import importlib
 import os
-import re
 import shutil
 from urllib.parse import urljoin
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 
-def main():
-    print(f"Clearing Layman data.")
-    # filesystem
-    if os.path.exists(settings.LAYMAN_DATA_DIR):
-        for the_file in os.listdir(settings.LAYMAN_DATA_DIR):
-            file_path = os.path.join(settings.LAYMAN_DATA_DIR, the_file)
+def clear_directory(directory):
+    if os.path.exists(directory):
+        for the_file in os.listdir(directory):
+            file_path = os.path.join(directory, the_file)
             print(f"Removing filesystem path {file_path}")
             if os.path.isfile(file_path):
                 os.unlink(file_path)
             elif os.path.isdir(file_path):
                 shutil.rmtree(file_path)
+
+
+def main():
+    print(f"Clearing Layman data.")
+    # filesystem
+    clear_directory(settings.LAYMAN_DATA_DIR)
+
+    # qgis
+    clear_directory(settings.LAYMAN_QGIS_DATA_DIR)
 
     # postgresql
     import psycopg2
