@@ -9,7 +9,6 @@ from layman import settings, patch_mode
 from . import util
 from layman.common.filesystem import util as common_util
 from layman.common.filesystem import input_file as common
-from layman.common import util as layman_util
 
 LAYER_SUBDIR = __name__.split('.')[-1]
 
