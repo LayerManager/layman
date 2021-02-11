@@ -116,6 +116,7 @@ def test_publication_interface_methods():
                 'delete_layer',
                 'patch_layer',
                 'post_layer',
+                'PATCH_MODE',
             }),
         },
         {
