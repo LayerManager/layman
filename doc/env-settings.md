@@ -179,6 +179,9 @@ Internal URL port of QGIS Server instance.
 ### LAYMAN_QGIS_PATH
 URL path of QGIS Server instance.
 
+### LAYMAN_QGIS_DATA_DIR
+Filesystem directory where data published on QGIS are stored, including styles.
+
 ## Connection to Micka
 
 ### CSW_BASIC_AUTHN
@@ -214,4 +217,3 @@ See [Flask documentation](https://flask.palletsprojects.com/en/1.1.x/config/#SEC
 
 ### UID_GID
 String with unix-like user identifier and group identifier `<UID>:<GID>`, e.g. `1000:1000`. Suitable for [mounting some volumes as non-root user](./../README.md#mount-some-volumes-as-non-root-user).
-
