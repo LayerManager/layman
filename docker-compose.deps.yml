@@ -22,7 +22,7 @@ services:
         context: deps/qgis/docker
         dockerfile: Dockerfile
       volumes:
-        - ./deps/qgis/data:/data:ro
+        - ./deps/qgis/data:/qgis/data:ro
       restart: on-failure
       environment:
         - LANG=en_EN.UTF-8
