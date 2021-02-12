@@ -139,3 +139,20 @@ def migrate_input_sld_directory_to_input_style():
             os.rename(sld_path, style_path)
 
     logger.info(f'    DONE - migrate input_sld directories to input_style')
+
+
+def update_style_type_in_db():
+    logger.info(f'    Starting - fulfill style type column in DB')
+    db_schema = settings.LAYMAN_PRIME_SCHEMA
+
+    update_layers = f"""update {db_schema}.publications set style_type = 'sld' where type = 'layman.layer'"""
+    db_util.run_statement(update_layers)
+    add_constraint = f"""DO $$ BEGIN
+    alter table {db_schema}.publications add constraint con_style_type
+check (type = 'layman.map' or style_type is not null);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;"""
+    db_util.run_statement(add_constraint)
+
+    logger.info(f'    DONE - fulfill style type column in DB')

@@ -14,6 +14,7 @@
 - [#154](https://github.com/jirik/layman/issues/154) Maps with URLs pointing to any layer stored in GeoServer are rewritten to dedicated [WMS workspace](doc/data-storage.md#geoserver).
 - [#154](https://github.com/jirik/layman/issues/154) Metadata property [`wms_url`](doc/metadata.md) in existing layer metadata records is updated to dedicated [WMS workspace](doc/data-storage.md#geoserver).
 - [#154](https://github.com/jirik/layman/issues/154) Rename internal directories from `/users/{workspace}/layers/{layer}/input_sld` to `/users/{workspace}/layers/{layer}/input_style`
+- [#154](https://github.com/jirik/layman/issues/154) Save in DB if layer is stored in GeoServer or in QGIS.
 ### Changes
 - [#154](https://github.com/jirik/layman/issues/154) [WMS](doc/endpoints.md#web-map-service) is available in dedicated [GeoServer workspace](doc/data-storage.md#geoserver) whose name is composed from Layman's [workspace](doc/models.md#workspace) name and suffix `_wms`. [WFS](doc/endpoints.md#web-feature-service) remains in GeoServer workspace whose name is equal to Layman's workspace name.
 - [#154](https://github.com/jirik/layman/issues/154) SLD style published in dedicated WMS GeoServer workspace.
