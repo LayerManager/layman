@@ -3,21 +3,30 @@ import os
 
 from layman.http import LaymanError
 from layman.authn.filesystem import get_authn_info
-from layman.common.prime_db_schema import workspaces, users, publications as publications_module
+from layman.common.prime_db_schema import workspaces, users, publications as publications_module, rights as rights_module
 from layman.util import get_workspaces as global_get_workspaces
-from layman import util as layman_util
+from layman import util as layman_util, settings
 from . import util as db_util, model
 from ...layer.filesystem import util as fs_layer_util
 from ...map.filesystem import util as fs_map_util
 from ...map.filesystem.input_file import get_map_info
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
+DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
+ROLE_EVERYONE = settings.RIGHTS_EVERYONE_ROLE
 
 logger = logging.getLogger(__name__)
 
 
 def migrate_users_and_publications(role_everyone):
     workspace_names = global_get_workspaces(use_cache=False)
+
+    layer_context = {'sources_filter': 'layman.layer.filesystem.uuid, layman.layer.filesystem.input_chunk, '
+                                       'layman.layer.filesystem.input_file, layman.layer.filesystem.input_style, layman.layer.db.table, '
+                                       'layman.layer.qgis.wms, layman.layer.geoserver.wfs, layman.layer.geoserver.wms, '
+                                       'layman.layer.geoserver.sld, layman.layer.filesystem.thumbnail, layman.layer.micka.soap'}
+    map_context = {'sources_filter': 'layman.map.filesystem.uuid, layman.map.filesystem.input_file, layman.map.filesystem.thumbnail, '
+                                     'layman.map.micka.soap'}
 
     for workspace_name in workspace_names:
         userinfo = get_authn_info(workspace_name)
@@ -37,27 +46,32 @@ def migrate_users_and_publications(role_everyone):
                                   )
             userinfo['issuer_id'] = userinfo['iss_id']
             users.ensure_user(id_workspace, userinfo)
-            roles = {workspace_name, }
+            everyone_can_write = False
         else:
             # It is public workspace, so all publications are available to everybody
-            roles = {role_everyone, }
+            everyone_can_write = True
 
-        for (publ_type, infos_method) in [(LAYER_TYPE, get_layer_infos),
-                                          (MAP_TYPE, get_map_infos)
-                                          ]:
+        for (publ_type, infos_method, context) in [(LAYER_TYPE, get_layer_infos, layer_context),
+                                                   (MAP_TYPE, get_map_infos, map_context)
+                                                   ]:
             publications = infos_method(workspace_name)
             for name in publications:
-                info = layman_util.get_publication_info(workspace_name, publ_type, name)
-                pub_info = {"name": name,
-                            "title": info.get("title", name),
-                            "publ_type_name": publ_type,
-                            "uuid": info["uuid"],
-                            "actor_name": workspace_name,
-                            "access_rights": {"read": {role_everyone, },
-                                              "write": roles,
-                                              }
-                            }
-                publications_module.insert_publication(workspace_name, pub_info)
+                info = layman_util.get_publication_info(workspace_name, publ_type, name, context)
+                insert_publications_sql = f'''insert into {DB_SCHEMA}.publications as p
+                        (id_workspace, name, title, type, uuid, everyone_can_read, everyone_can_write) values
+                        (%s, %s, %s, %s, %s, %s, %s)
+                returning id
+                ;'''
+
+                data = (id_workspace,
+                        name,
+                        info.get("title", name),
+                        publ_type,
+                        info["uuid"],
+                        True,
+                        everyone_can_write,
+                        )
+                db_util.run_query(insert_publications_sql, data)[0][0]
 
 
 def schema_exists():
