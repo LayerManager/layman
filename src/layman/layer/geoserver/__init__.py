@@ -115,10 +115,10 @@ def publish_layer_from_db(workspace, layername, description, title, access_right
     if db_bbox is None:
         # world
         native_bbox = {
-            "minx": -20026376.39,
-            "miny": -20048966.10,
-            "maxx": 20026376.39,
-            "maxy": 20048966.10,
+            "minx": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[0],
+            "miny": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[1],
+            "maxx": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[2],
+            "maxy": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[3],
             "crs": "EPSG:3857",
         }
         feature_type_def['nativeBoundingBox'] = native_bbox
