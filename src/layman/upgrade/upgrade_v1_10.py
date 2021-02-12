@@ -8,7 +8,7 @@ from layman import settings
 from layman.http import LaymanError
 from layman.common import prime_db_schema
 from layman.common import geoserver as gs_common
-from layman.common.prime_db_schema import workspaces
+from layman.common.prime_db_schema import workspaces, util as db_util
 from layman import util
 from layman.layer import LAYER_TYPE
 from layman.layer import geoserver
@@ -20,6 +20,21 @@ from layman.map.filesystem import input_file
 from layman.layer.geoserver import util as gs_util
 
 logger = logging.getLogger(__name__)
+
+
+def alter_schema():
+    logger.info(f'    Starting - alter DB prime schema')
+    db_schema = settings.LAYMAN_PRIME_SCHEMA
+    add_column = f'''
+DO $$ BEGIN
+    CREATE TYPE enum_style_type AS ENUM ('sld', 'qgis');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+    ALTER TABLE {db_schema}.publications ADD COLUMN IF NOT EXISTS
+    style_type enum_style_type;'''
+    db_util.run_statement(add_column)
+    logger.info(f'    DONE - alter DB prime schema')
 
 
 def check_usernames_for_wms_suffix():
