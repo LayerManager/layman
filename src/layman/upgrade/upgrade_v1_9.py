@@ -1,9 +1,8 @@
 import logging
 
 from layman import settings
-from layman.layer import LAYER_TYPE
 from layman.common import geoserver as gs_common
-from layman.common.prime_db_schema import util as db_util, publications
+from layman.common.prime_db_schema import util as db_util
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 logger = logging.getLogger(__name__)
@@ -37,10 +36,28 @@ def initialize_data_versioning():
 # repair for issue #200
 def geoserver_everyone_rights_repair():
     logger.info(f'    Starting - access rights EVERYONE is not propagated to GeoServer for authenticated users')
-    publication_infos = publications.get_publication_infos(pub_type=LAYER_TYPE)
-    for (workspace, publication_type, publication_name), info in publication_infos.items():
+    select_layers = f"select w.name, p.name " \
+                    f"from {DB_SCHEMA}.publications p inner join {DB_SCHEMA}.workspaces w on w.id = p.id_workspace " \
+                    f"where p.type = 'layman.layer' "
+    publication_infos = db_util.run_query(select_layers)
+    select_rights = f"""select (select rtrim(concat(case when u.id is not null then w.name || ',' end,
+                            string_agg(w2.name, ',') || ',',
+                            case when p.everyone_can_read then '{settings.RIGHTS_EVERYONE_ROLE}' || ',' end
+                            ), ',')
+        from _prime_schema.rights r inner join
+             _prime_schema.users u2 on r.id_user = u2.id inner join
+             _prime_schema.workspaces w2 on w2.id = u2.id_workspace
+        where r.id_publication = p.id
+          and r.type = %s) can_read_users
+from _prime_schema.workspaces w  inner join
+     _prime_schema.publications p on p.id_workspace = w.id
+                           and p.type = 'layman.layer' left join
+     _prime_schema.users u on u.id_workspace = w.id
+where w.name = %s
+  and p.name = %s"""
+    for (workspace, publication_name) in publication_infos:
         for right_type in ['read', 'write']:
-            users_roles = info['access_rights'][right_type]
+            users_roles = db_util.run_query(select_rights, (right_type, workspace, publication_name))[0]
             security_roles = gs_common.layman_users_to_geoserver_roles(users_roles)
             logger.info(f'    Setting security roles for: ({workspace}/{publication_name}).{right_type} '
                         f'to ({security_roles}) from layman roles ({users_roles})')
