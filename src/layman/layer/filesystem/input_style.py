@@ -57,20 +57,18 @@ def get_file_path(username, layername, with_extension=True):
     return result
 
 
-def save_layer_file(username, layername, style_file):
-    style_path_clear = get_file_path(username, layername, with_extension=False)
-    style_path_temp = style_path_clear + '.temp'
+def save_layer_file(username, layername, style_file, style_type):
     if style_file is None:
         delete_layer(username, layername)
     else:
+        style_path_clear = get_file_path(username, layername, with_extension=False)
+        style_path = style_path_clear + '.' + style_type.extension
         ensure_layer_input_style_dir(username, layername)
         if isinstance(style_file, FileStorage):
-            style_file.save(style_path_temp)
+            style_file.save(style_path)
         else:
-            with open(style_path_temp, 'wb') as out:
+            with open(style_path, 'wb') as out:
                 out.write(style_file.read())
-        extension = get_style_type_from_xml_file(style_path_temp).extension
-        os.rename(style_path_temp, style_path_clear + '.' + extension)
 
 
 def get_layer_file(username, layername):
@@ -85,10 +83,12 @@ def get_metadata_comparison(username, publication_name):
     pass
 
 
-def get_style_type_from_xml_file(style_path):
-    if style_path and os.path.exists(style_path):
-        xml_tree = etree.parse(style_path)
-        root_tag = xml_tree.getroot().tag
+def get_style_type_from_file_storage(file_storage):
+    if file_storage:
+        xml = file_storage.read()
+        file_storage.seek(0)
+        xml_tree = etree.fromstring(xml)
+        root_tag = xml_tree.tag
         root_attribute = etree.QName(root_tag).localname
         result = next((sd for sd in layer.STYLE_TYPES_DEF if sd.root_element == root_attribute), None)
         if not result:
@@ -96,7 +96,3 @@ def get_style_type_from_xml_file(style_path):
     else:
         result = layer.NO_STYLE_DEF
     return result
-
-
-def get_layer_style_type(workspace, layer):
-    return get_style_type_from_xml_file(get_file_path(workspace, layer))

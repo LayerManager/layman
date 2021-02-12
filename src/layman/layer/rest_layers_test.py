@@ -5,9 +5,10 @@ from test import process_client
 
 del sys.modules['layman']
 
-from layman import app
-from layman import util as layman_util
+from layman import app, util as layman_util, settings
+from layman.layer import util as layer_util
 from layman.layer.filesystem import input_style
+DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -47,16 +48,17 @@ def assert_style_file(workspace,
         or all(v is None for v in [layer_style_file, expected_style_file])
 
 
-@pytest.mark.parametrize('source_style_file_path, layer_suffix, expected_style_file_template', [
-    ('sample/style/generic-blue_sld.xml', '_sld', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.sld'),
-    ('sample/style/sld_1_1_0.xml', '_sld11', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.sld'),
-    ('sample/style/funny_qml.xml', '_qml', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.qgis'),
-    ('', '_no_style', None),
+@pytest.mark.parametrize('source_style_file_path, layer_suffix, expected_style_file_template, expected_style_type', [
+    ('sample/style/generic-blue_sld.xml', '_sld', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.sld', 'sld'),
+    ('sample/style/sld_1_1_0.xml', '_sld11', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.sld', 'sld'),
+    ('sample/style/funny_qml.xml', '_qml', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.qgis', 'qgis'),
+    ('', '_no_style', None, 'sld'),
 ])
 @pytest.mark.usefixtures('ensure_layman')
 def test_style_correctly_saved(source_style_file_path,
                                layer_suffix,
-                               expected_style_file_template):
+                               expected_style_file_template,
+                               expected_style_type):
     workspace = 'test_style_correctly_saved_workspace'
     layer = 'test_style_correctly_saved_layer' + layer_suffix
     expected_style_file = expected_style_file_template.format(workspace=workspace, layer=layer) if expected_style_file_template else None
@@ -64,14 +66,25 @@ def test_style_correctly_saved(source_style_file_path,
                                  layer,
                                  style_file=source_style_file_path)
     assert_style_file(workspace, layer, expected_style_file)
+    with app.app_context():
+        info = layer_util.get_layer_info(workspace, layer)
+    assert info['style_type'] == expected_style_type
+
+    process_client.delete_layer(workspace, layer)
+    process_client.publish_layer(workspace, layer)
 
     with app.app_context():
-        input_style.delete_layer(workspace, layer)
+        info = layer_util.get_layer_info(workspace, layer)
+    assert info['style_type'] == 'sld'
+
     assert_style_file(workspace, layer, None)
 
     process_client.patch_layer(workspace,
                                layer,
                                style_file=source_style_file_path)
     assert_style_file(workspace, layer, expected_style_file)
+    with app.app_context():
+        info = layer_util.get_layer_info(workspace, layer)
+    assert info['style_type'] == expected_style_type
 
     process_client.delete_layer(workspace, layer)

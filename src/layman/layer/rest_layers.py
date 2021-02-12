@@ -100,6 +100,7 @@ def post(username):
         style_file = request.files['style']
     elif 'sld' in request.files and not request.files['sld'].filename == '':
         style_file = request.files['sld']
+    style_type = input_style.get_style_type_from_file_storage(style_file)
 
     actor_name = authn.get_authn_username()
 
@@ -110,6 +111,8 @@ def post(username):
         'ensure_user': True,
         'check_crs': False,
         'actor_name': actor_name,
+        'style_type': style_type,
+        'store_in_geoserver': style_type.store_in_geoserver,
     }
 
     rest_util.setup_post_access_rights(request.form, task_options, actor_name)
@@ -143,7 +146,7 @@ def post(username):
         task_options.update({'uuid': uuid_str, })
 
         # save files
-        input_style.save_layer_file(username, layername, style_file)
+        input_style.save_layer_file(username, layername, style_file, style_type)
         if use_chunk_upload:
             files_to_upload = input_chunk.save_layer_files_str(
                 username, layername, files, check_crs)

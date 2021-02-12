@@ -200,7 +200,7 @@ def test_get_publication_infos(publication_type):
     with app.app_context():
         expected_result = {(workspace, publication_type, publication): {'name': publication,
                                                                         'title': title,
-                                                                        'style_type':  None,
+                                                                        'style_type': 'sld' if publication_type == LAYER_TYPE else None,
                                                                         'uuid': uuid.get_publication_uuid(publication_type,
                                                                                                           workspace,
                                                                                                           publication_type,
