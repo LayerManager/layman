@@ -6,7 +6,7 @@ from test import process_client
 from layman import settings, app, util, upgrade
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
-from layman.upgrade import upgrade_v1_9
+from layman import upgrade
 from . import model, publications as pub_util, workspaces as workspaces_util
 from .schema_initialization import ensure_schema
 from .util import run_query, run_statement
@@ -26,7 +26,8 @@ def save_upgrade_status():
         current_version = upgrade.get_current_data_version()
     yield
     with app.app_context():
-        upgrade_v1_9.initialize_data_versioning()
+        upgrade.upgrade_v1_9.initialize_data_versioning()
+        upgrade.upgrade_v1_10.alter_schema()
         upgrade.set_current_data_version(current_version)
 
 

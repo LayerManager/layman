@@ -23,13 +23,17 @@ def delete_layer(username, layer_name):
 def patch_layer(username,
                 layername,
                 actor_name,
+                style_type=None,
                 title=None,
-                access_rights=None):
+                access_rights=None,
+                ):
     db_info = {"name": layername,
                "title": title,
                "publ_type_name": LAYER_TYPE,
                "actor_name": actor_name,
                }
+    if style_type:
+        db_info['style_type'] = style_type.code
     if access_rights:
         db_info['access_rights'] = access_rights
     pubs_util.update_publication(username, db_info)
@@ -60,6 +64,7 @@ def post_layer(username,
                title,
                uuid,
                actor_name,
+               style_type=None,
                ):
     db_info = {"name": layername,
                "title": title,
@@ -67,6 +72,7 @@ def post_layer(username,
                "uuid": uuid,
                "access_rights": access_rights,
                "actor_name": actor_name,
+               'style_type': style_type.code if style_type else None,
                }
     pubs_util.insert_publication(username, db_info)
 

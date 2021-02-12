@@ -19,6 +19,7 @@ select p.id as id_publication,
        p.name,
        p.title,
        p.uuid::text,
+       p.style_type,
        (select rtrim(concat(case when u.id is not null then w.name || ',' end,
                             string_agg(w2.name, ',') || ',',
                             case when p.everyone_can_read then c.everyone_role || ',' end
@@ -56,10 +57,11 @@ from const c inner join
                                    'title': title,
                                    'uuid': uuid,
                                    'type': type,
+                                   'style_type': style_type,
                                    'access_rights': {'read': [x for x in can_read_users.split(',')],
                                                      'write': [x for x in can_write_users.split(',')]}
                                    }
-             for id_publication, workspace_name, type, publication_name, title, uuid, can_read_users, can_write_users
+             for id_publication, workspace_name, type, publication_name, title, uuid, style_type, can_read_users, can_write_users
              in values}
     return infos
 
@@ -151,8 +153,8 @@ def insert_publication(workspace_name, info):
     check_publication_info(workspace_name, info)
 
     insert_publications_sql = f'''insert into {DB_SCHEMA}.publications as p
-        (id_workspace, name, title, type, uuid, everyone_can_read, everyone_can_write) values
-        (%s, %s, %s, %s, %s, %s, %s)
+        (id_workspace, name, title, type, uuid, style_type, everyone_can_read, everyone_can_write) values
+        (%s, %s, %s, %s, %s, %s, %s, %s)
 returning id
 ;'''
 
@@ -161,6 +163,7 @@ returning id
             info.get("title"),
             info.get("publ_type_name"),
             info.get("uuid"),
+            info.get('style_type'),
             ROLE_EVERYONE in info['access_rights']['read'],
             ROLE_EVERYONE in info['access_rights']['write'],
             )
@@ -210,6 +213,7 @@ def update_publication(workspace_name, info):
 
     update_publications_sql = f'''update {DB_SCHEMA}.publications set
     title = coalesce(%s, title),
+    style_type = coalesce(%s, style_type),
     everyone_can_read = coalesce(%s, everyone_can_read),
     everyone_can_write = coalesce(%s, everyone_can_write)
 where id_workspace = %s
@@ -219,6 +223,7 @@ returning id
 ;'''
 
     data = (info.get("title"),
+            info.get('style_type'),
             access_rights_changes['read']['EVERYONE'],
             access_rights_changes['write']['EVERYONE'],
             id_workspace,

@@ -15,7 +15,7 @@ def merge_infos(infos):
 
 
 def clear_publication_info(info):
-    for key in ['id', 'type']:
+    for key in ['id', 'type', 'style_type']:
         try:
             del info[key]
         except KeyError:
