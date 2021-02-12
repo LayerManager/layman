@@ -200,3 +200,11 @@ REST_USERS_PREFIX = 'users'
 RESERVED_WORKSPACE_NAMES = {REST_USERS_PREFIX}
 
 # PREFERRED_LANGUAGES = ['cs', 'en']
+
+# Bounding box used if data file is empty (in EPSG:3857)
+LAYMAN_DEFAULT_OUTPUT_BBOX = [
+    -20026376.39,
+    -20048966.10,
+    20026376.39,
+    20048966.10,
+]
