@@ -491,10 +491,10 @@ from {username}.{layername}
             result = result['coordinates'] + result['coordinates']
         elif result['type'] == 'Polygon':
             result = [
-                min([c[0] for c in result['coordinates']]),
-                min([c[1] for c in result['coordinates']]),
-                max([c[0] for c in result['coordinates']]),
-                max([c[1] for c in result['coordinates']]),
+                min([c[0] for c in result['coordinates'][0]]),
+                min([c[1] for c in result['coordinates'][0]]),
+                max([c[0] for c in result['coordinates'][0]]),
+                max([c[1] for c in result['coordinates'][0]]),
             ]
         else:
             raise Exception(f"Unknown BBox type {result['type']}")
