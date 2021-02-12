@@ -3,23 +3,25 @@ import pathlib
 import pytest
 import shutil
 import os
+from collections import namedtuple
 
 from . import upgrade_v1_10
 from layman import app, settings
 from layman.http import LaymanError
 from layman.common import prime_db_schema
+from layman.layer import geoserver as gs_layer, util as layer_util, db
 from layman.layer.prime_db_schema import table as prime_db_schema_table
-from layman.layer import geoserver as gs_layer
 from layman.layer.geoserver import wms
 from layman.layer.filesystem import util as layer_fs_util, input_style
+from layman.map.filesystem import input_file, thumbnail
+from layman.map import util as map_util
 from layman.common import geoserver as gs_common
 from layman.common.micka import util as micka_util
 from layman.common.filesystem import uuid as uuid_common
-from layman.common.filesystem import uuid as uuid_common
-from layman.layer import db
+from layman.common.prime_db_schema import util as db_util
 from layman.uuid import generate_uuid
-from layman.map.filesystem import input_file, thumbnail
 from test import process_client, util
+DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -49,7 +51,8 @@ def ensure_layer():
                                              access_rights,
                                              layer,
                                              uuid_str,
-                                             None)
+                                             None,
+                                             )
             file_path = '/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
             uuid_common.assign_publication_uuid('layman.layer', workspace, layer, uuid_str=uuid_str)
             db.ensure_workspace(workspace)
@@ -269,3 +272,62 @@ def test_migrate_input_sld_directory_to_input_style(ensure_layer):
         assert os.path.exists(os.path.join(input_style_dir, f'{layer}.xml'))
 
     process_client.delete_layer(workspace, layer)
+
+
+@pytest.mark.usefixtures('ensure_layman')
+def test_update_style_type_in_db():
+    workspace = 'test_update_style_type_in_db_workspace'
+    map = 'test_update_style_type_in_db_map'
+    TestLayerDef = namedtuple('TestLayerDef', ['name',
+                                               'style_file',
+                                               'expected_style',
+                                               ])
+    layers = [TestLayerDef('test_update_style_type_in_db_none_layer',
+                           '',
+                           'sld',
+                           ),
+              TestLayerDef('test_update_style_type_in_db_sld_layer',
+                           'sample/style/generic-blue_sld.xml',
+                           'sld',
+                           ),
+              TestLayerDef('test_update_style_type_in_db_sld110_layer',
+                           'sample/style/sld_1_1_0.xml',
+                           'sld',
+                           ),
+              # This should not happened, because before this release, it was not possible to upload QGIS files
+              TestLayerDef('test_update_style_type_in_db_qgis_layer',
+                           'sample/style/funny_qml.xml',
+                           'sld',
+                           ),
+              ]
+
+    process_client.publish_map(workspace, map)
+    for layer in layers:
+        process_client.publish_layer(workspace,
+                                     layer.name,
+                                     style_file=layer.style_file,
+                                     )
+
+    set_column_null = f"""update {DB_SCHEMA}.publications set style_type = null"""
+
+    with app.app_context():
+        db_util.run_statement(set_column_null)
+        map_info = map_util.get_map_info(workspace, map)
+        assert map_info['style_type'] is None
+        for layer in layers:
+            layer_info = layer_util.get_layer_info(workspace, layer.name)
+            assert layer_info['style_type'] is None
+
+        upgrade_v1_10.update_style_type_in_db()
+
+        map_info = map_util.get_map_info(workspace, map)
+        assert map_info['style_type'] is None
+        for layer in layers:
+            layer_info = layer_util.get_layer_info(workspace, layer.name)
+            assert layer_info['style_type'] == layer.expected_style
+
+    process_client.delete_map(workspace, map)
+    for layer in layers:
+        process_client.delete_layer(workspace,
+                                    layer.name,
+                                    )

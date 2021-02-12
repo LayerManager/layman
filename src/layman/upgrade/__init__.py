@@ -8,7 +8,6 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 logger = logging.getLogger(__name__)
 
-
 DATA_MIGRATIONS = [
     ((1, 9, 0), [upgrade_v1_9.initialize_data_versioning,
                  upgrade_v1_9.geoserver_everyone_rights_repair,
@@ -19,6 +18,7 @@ DATA_MIGRATIONS = [
                   upgrade_v1_10.migrate_maps_on_wms_workspace,
                   upgrade_v1_10.migrate_metadata_records,
                   upgrade_v1_10.migrate_input_sld_directory_to_input_style,
+                  upgrade_v1_10.update_style_type_in_db,
                   ]),
 ]
 
