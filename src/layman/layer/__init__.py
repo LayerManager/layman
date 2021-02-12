@@ -85,12 +85,7 @@ StyleTypeDef = namedtuple('StyleTypeDef', ['code',
                                            'extension',
                                            'store_in_geoserver'
                                            ])
-STYLE_TYPES_DEF = [StyleTypeDef('none',
-                                None,
-                                None,
-                                True,
-                                ),
-                   StyleTypeDef('sld',
+STYLE_TYPES_DEF = [StyleTypeDef('sld',
                                 'StyledLayerDescriptor',
                                 'sld',
                                 True,

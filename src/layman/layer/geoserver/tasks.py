@@ -88,10 +88,11 @@ def refresh_sld_needed(username, layername, task_options):
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_sld(self, username, layername):
+def refresh_sld(self, username, layername, store_in_geoserver):
     if self.is_aborted():
         raise AbortedException
-    sld.create_layer_style(username, layername)
+    if store_in_geoserver:
+        sld.create_layer_style(username, layername)
 
     if self.is_aborted():
         sld.delete_layer(username, layername)

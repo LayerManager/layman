@@ -1,5 +1,6 @@
 import pytest
 import lxml
+from werkzeug.datastructures import FileStorage
 
 from layman import LaymanError
 from layman.layer.filesystem import input_style
@@ -9,11 +10,16 @@ from layman.layer.filesystem import input_style
     ('sample/style/generic-blue_sld.xml', 'sld'),
     ('sample/style/sld_1_1_0.xml', 'sld'),
     ('sample/style/funny_qml.xml', 'qgis'),
-    ('sample/style/not_existing_file.xml', 'none'),
+    (None, 'sld'),
 ])
 def test_get_style_type_from_xml_file(file_path,
                                       expected_type):
-    detected_type = input_style.get_style_type_from_xml_file(file_path)
+    if file_path:
+        with open(file_path, 'rb') as fp:
+            file = FileStorage(fp)
+            detected_type = input_style.get_style_type_from_file_storage(file)
+    else:
+        detected_type = input_style.get_style_type_from_file_storage(file_path)
     assert detected_type.code == expected_type
 
 
@@ -25,5 +31,7 @@ def test_get_style_type_from_xml_file_errors(file_path,
                                              expected_error,
                                              expected_code):
     with pytest.raises(expected_error) as exc_info:
-        _ = input_style.get_style_type_from_xml_file(file_path)
+        with open(file_path, 'rb') as fp:
+            file = FileStorage(fp)
+            input_style.get_style_type_from_file_storage(file)
     assert exc_info.value.code == expected_code

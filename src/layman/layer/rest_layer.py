@@ -84,6 +84,9 @@ def patch(username, layername):
         style_file = request.files['style']
     elif 'sld' in request.files and not request.files['sld'].filename == '':
         style_file = request.files['sld']
+    style_type = input_style.get_style_type_from_file_storage(style_file)
+    kwargs['style_type'] = style_type
+    kwargs['store_in_geoserver'] = style_type.store_in_geoserver
 
     delete_from = None
     if style_file is not None:
@@ -112,14 +115,17 @@ def patch(username, layername):
                 style_file = deleted['style']['file']
             except KeyError:
                 pass
-        if style_file is not None:
-            input_style.save_layer_file(username, layername, style_file)
+        style_type = input_style.get_style_type_from_file_storage(style_file)
+        kwargs['style_type'] = style_type
+        kwargs['store_in_geoserver'] = style_type.store_in_geoserver
+        if style_file:
+            input_style.save_layer_file(username, layername, style_file, style_type)
 
         kwargs.update({
             'crs_id': crs_id,
             'ensure_user': False,
             'http_method': 'patch',
-            'metadata_properties_to_refresh': props_to_refresh
+            'metadata_properties_to_refresh': props_to_refresh,
         })
 
         if delete_from == 'layman.layer.filesystem.input_file':

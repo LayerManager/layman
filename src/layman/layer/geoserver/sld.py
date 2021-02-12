@@ -64,9 +64,8 @@ def get_publication_uuid(username, publication_type, publication_name):
 
 def create_layer_style(workspace, layername):
     geoserver_workspace = wms.get_geoserver_workspace(workspace)
-    if input_style.get_layer_style_type(workspace, layername).store_in_geoserver:
-        style_file = input_style.get_layer_file(workspace, layername)
-        geoserver.post_workspace_sld_style(geoserver_workspace, layername, style_file)
+    style_file = input_style.get_layer_file(workspace, layername)
+    geoserver.post_workspace_sld_style(geoserver_workspace, layername, style_file)
     wms.clear_cache(workspace)
 
 
