@@ -21,6 +21,7 @@ def refresh_wms(
         self,
         username,
         layername,
+        store_in_geoserver,
         description=None,
         title=None,
         ensure_user=False,
@@ -36,7 +37,22 @@ def refresh_wms(
 
     if self.is_aborted():
         raise AbortedException
-    geoserver.publish_layer_from_db(username, layername, description, title, access_rights, geoserver_workspace=geoserver_workspace)
+    if store_in_geoserver:
+        geoserver.publish_layer_from_db(username,
+                                        layername,
+                                        description,
+                                        title,
+                                        access_rights,
+                                        geoserver_workspace=geoserver_workspace,
+                                        )
+    else:
+        geoserver.publish_layer_from_qgis(username,
+                                          layername,
+                                          description,
+                                          title,
+                                          access_rights,
+                                          geoserver_workspace=geoserver_workspace,
+                                          )
     wms.clear_cache(username)
 
     if self.is_aborted():

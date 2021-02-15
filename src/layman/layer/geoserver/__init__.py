@@ -9,6 +9,7 @@ from layman import settings, util as layman_util
 from layman.common import geoserver as common
 from layman.layer import LAYER_TYPE, db as db_source
 from . import wms
+from layman.layer.qgis import wms as qgis_wms
 
 FLASK_RULES_KEY = f"{__name__}:RULES"
 
@@ -88,6 +89,23 @@ def check_username(username):
         raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
 
 
+def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspace):
+    geoserver_workspace = geoserver_workspace or workspace
+    layer_info = None
+    if not access_rights or not access_rights.get('read') or not access_rights.get('write'):
+        layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
+                                                      context={'sources_filter': 'layman.layer.prime_db_schema.table', })
+
+    read_roles = (access_rights and access_rights.get('read')) or layer_info['access_rights']['read']
+    write_roles = (access_rights and access_rights.get('write')) or layer_info['access_rights']['write']
+
+    security_read_roles = common.layman_users_to_geoserver_roles(read_roles)
+    common.ensure_layer_security_roles(geoserver_workspace, layer, security_read_roles, 'r', auth)
+
+    security_write_roles = common.layman_users_to_geoserver_roles(write_roles)
+    common.ensure_layer_security_roles(geoserver_workspace, layer, security_write_roles, 'w', auth)
+
+
 def publish_layer_from_db(workspace, layername, description, title, access_rights, geoserver_workspace=None):
     geoserver_workspace = geoserver_workspace or workspace
     keywords = [
@@ -132,19 +150,62 @@ def publish_layer_from_db(workspace, layername, description, title, access_right
                       timeout=5,
                       )
     r.raise_for_status()
-    # current_app.logger.info(f'publish_layer_from_db before clear_cache {username}')
 
-    if not access_rights or not access_rights.get('read') or not access_rights.get('write'):
-        layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'sources_filter': 'layman.layer.prime_db_schema.table', })
+    set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 
-    read_roles = (access_rights and access_rights.get('read')) or layer_info['access_rights']['read']
-    write_roles = (access_rights and access_rights.get('write')) or layer_info['access_rights']['write']
 
-    security_read_roles = common.layman_users_to_geoserver_roles(read_roles)
-    common.ensure_layer_security_roles(geoserver_workspace, layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
+def publish_layer_from_qgis(workspace, layername, description, title, access_rights, geoserver_workspace=None):
+    geoserver_workspace = geoserver_workspace or workspace
+    common.create_wms_store(geoserver_workspace,
+                            layername,
+                            settings.LAYMAN_GS_AUTH,
+                            qgis_wms.get_layer_capabilities_url(workspace, layername))
 
-    security_write_roles = common.layman_users_to_geoserver_roles(write_roles)
-    common.ensure_layer_security_roles(geoserver_workspace, layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
+    keywords = [
+        "features",
+        layername,
+        title
+    ]
+    keywords = list(set(keywords))
+    feature_type_def = {
+        "name": layername,
+        "nativeName": 'OpenStreetMap',   # TODO there should be layername
+        "title": title,
+        "abstract": description,
+        "keywords": {
+            "string": keywords
+        },
+        "srs": "EPSG:3857",
+        "projectionPolicy": "FORCE_DECLARED",
+        "enabled": True,
+        "store": {
+            "@class": "wmsStore",
+            "name": geoserver_workspace + f":{common.DEFAULT_QGIS_STORE_NAME}_{layername}",
+        },
+    }
+    db_bbox = db_source.get_bbox(workspace, layername)
+    if db_bbox is None:
+        # world
+        native_bbox = {
+            "minx": -20026376.39,
+            "miny": -20048966.10,
+            "maxx": 20026376.39,
+            "maxy": 20048966.10,
+            "crs": "EPSG:3857",
+        }
+        feature_type_def['nativeBoundingBox'] = native_bbox
+    r = requests.post(urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                              geoserver_workspace + '/wmslayers/'),
+                      data=json.dumps({
+                          "wmsLayer": feature_type_def
+                      }),
+                      headers=headers_json,
+                      auth=settings.LAYMAN_GS_AUTH,
+                      timeout=5,
+                      )
+    r.raise_for_status()
+
+    set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 
 
 def get_usernames():

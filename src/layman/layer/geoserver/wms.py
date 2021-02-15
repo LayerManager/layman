@@ -47,6 +47,8 @@ def patch_layer(workspace, layername, title, description, access_rights=None):
 def delete_layer(workspace, layername):
     geoserver_workspace = get_geoserver_workspace(workspace)
     common_geoserver.delete_feature_type(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
+    common_geoserver.delete_wms_layer(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
+    common_geoserver.delete_wms_store(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
     clear_cache(workspace)
 
     common_geoserver.delete_security_roles(f"{geoserver_workspace}.{layername}.r", settings.LAYMAN_GS_AUTH)

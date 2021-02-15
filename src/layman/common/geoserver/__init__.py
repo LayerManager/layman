@@ -47,6 +47,7 @@ SERVICE_TYPES = [
 
 
 DEFAULT_DB_STORE_NAME = 'postgresql'
+DEFAULT_QGIS_STORE_NAME = 'qgis'
 
 
 def get_roles(auth):
@@ -458,6 +459,56 @@ def create_db_store(geoserver_workspace, auth, db_schema=None):
 def delete_db_store(geoserver_workspace, auth):
     r = requests.delete(
         urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + f'/datastores/{DEFAULT_DB_STORE_NAME}'),
+        headers=headers_json,
+        auth=auth,
+        timeout=5,
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+
+def create_wms_store(geoserver_workspace, layer, auth, get_capabilities_url):
+    r = requests.post(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + '/wmsstores'),
+        data=json.dumps({
+            "wmsStore": {
+                "name": f'{DEFAULT_QGIS_STORE_NAME}_{layer}',
+                "type": "WMS",
+                "capabilitiesURL": get_capabilities_url,
+            }
+        }),
+        headers=headers_json,
+        auth=auth,
+        timeout=5,
+    )
+    r.raise_for_status()
+
+
+def delete_wms_store(geoserver_workspace, layer, auth):
+    url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + f'/wmsstores/{DEFAULT_QGIS_STORE_NAME}_{layer}')
+    r = requests.delete(
+        url,
+        headers=headers_json,
+        auth=auth,
+        timeout=5,
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+
+def delete_wms_layer(geoserver_workspace, layer, auth):
+    url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + f'/layers/{layer}')
+    r = requests.delete(
+        url,
+        headers=headers_json,
+        auth=auth,
+        timeout=5,
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+    url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + f'/wmslayers/{layer}')
+    r = requests.delete(
+        url,
         headers=headers_json,
         auth=auth,
         timeout=5,

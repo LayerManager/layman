@@ -11,13 +11,16 @@ from test import process_client
 def test_qgis_rest():
     workspace = 'test_qgis_rest_workspace'
     layer = 'test_qgis_rest_layer'
+    source_style_file_path = 'sample/style/funny_qml.xml'
     workspace_directory = f'{settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}'
     layer_directory = f'{workspace_directory}/layers/{layer}'
 
     assert not os.path.exists(workspace_directory)
     assert not os.path.exists(layer_directory)
 
-    process_client.publish_layer(workspace, layer)
+    process_client.publish_layer(workspace,
+                                 layer,
+                                 style_file=source_style_file_path)
     assert os.path.exists(workspace_directory)
     assert os.path.exists(layer_directory)
     with app.app_context():

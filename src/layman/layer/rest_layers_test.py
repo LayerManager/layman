@@ -88,3 +88,14 @@ def test_style_correctly_saved(source_style_file_path,
     assert info['style_type'] == expected_style_type
 
     process_client.delete_layer(workspace, layer)
+
+
+@pytest.mark.usefixtures('ensure_layman')
+def test_qgis_cascade_wms():
+    workspace = 'test_qgis_cascade_wms_workspace'
+    layer = 'test_qgis_cascade_wms_layer'
+    source_style_file_path = 'sample/style/funny_qml.xml'
+    process_client.publish_layer(workspace,
+                                 layer,
+                                 style_file=source_style_file_path)
+    process_client.delete_layer(workspace, layer)
