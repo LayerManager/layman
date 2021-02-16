@@ -9,6 +9,7 @@ from layman import settings, util as layman_util
 from layman.common import geoserver as common
 from layman.layer import LAYER_TYPE, db as db_source
 from . import wms
+from layman.layer.qgis import wms as qgis_wms
 
 FLASK_RULES_KEY = f"{__name__}:RULES"
 
@@ -154,6 +155,59 @@ def publish_layer_from_db(workspace, layername, description, title, access_right
     r.raise_for_status()
 
     set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
+
+
+def publish_layer_from_qgis(workspace, layer, description, title, access_rights, geoserver_workspace=None):
+    geoserver_workspace = geoserver_workspace or workspace
+    store_name = wms.get_qgis_store_name(layer)
+    common.create_wms_store(geoserver_workspace,
+                            settings.LAYMAN_GS_AUTH,
+                            store_name,
+                            qgis_wms.get_layer_capabilities_url(workspace, layer))
+
+    keywords = [
+        "features",
+        layer,
+        title
+    ]
+    keywords = list(set(keywords))
+    wms_layer_def = {
+        "name": layer,
+        "nativeName": layer,
+        "title": title,
+        "abstract": description,
+        "keywords": {
+            "string": keywords
+        },
+        "nativeCRS": "EPSG:3857",
+        "srs": "EPSG:3857",
+        "projectionPolicy": "NONE",
+        "enabled": True,
+        "store": {
+            "@class": "wmsStore",
+            "name": geoserver_workspace + f":{store_name}",
+        },
+    }
+    db_bbox = db_source.get_bbox(workspace, layer)
+    wms_layer_def['nativeBoundingBox'] = get_default_native_bbox(workspace, layer) if not db_bbox else {
+        "minx": db_bbox[0],
+        "miny": db_bbox[1],
+        "maxx": db_bbox[2],
+        "maxy": db_bbox[3],
+        "crs": "EPSG:3857",
+    }
+    r = requests.post(urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                              geoserver_workspace + '/wmslayers/'),
+                      data=json.dumps({
+                          "wmsLayer": wms_layer_def
+                      }),
+                      headers=headers_json,
+                      auth=settings.LAYMAN_GS_AUTH,
+                      timeout=5,
+                      )
+    r.raise_for_status()
+
+    set_security_rules(workspace, layer, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 
 
 def get_usernames():

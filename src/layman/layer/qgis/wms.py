@@ -1,5 +1,6 @@
 import os
 
+from . import util
 from layman import patch_mode, settings
 from layman.layer import qgis
 
@@ -28,7 +29,7 @@ def get_layer_info(username, layername):
 
 
 def post_layer(username, layername):
-    qgis.ensure_layer_dir(username, layername)
+    pass
 
 
 def patch_layer(username, layername):
@@ -36,7 +37,17 @@ def patch_layer(username, layername):
 
 
 def delete_layer(username, layername):
+    style_stream = util.get_layer_style_stream(username, layername)
+    if style_stream:
+        result = {
+            'style': {
+                'file': style_stream,
+            }
+        }
+    else:
+        result = {}
     qgis.delete_layer_dir(username, layername)
+    return result
 
 
 def get_layer_capabilities_url(workspace, layer):

@@ -1,8 +1,11 @@
 import copy
 import datetime
 import os
-from layman import settings, LaymanError
+import io
 from lxml import etree as ET
+
+from layman import settings, LaymanError
+from layman.layer.filesystem import input_style
 
 
 def get_layer_template_path():
@@ -18,6 +21,17 @@ def extent_to_xml_string(extent):
         f"<{tag}>{extent}</{tag}>"
         for idx, tag in enumerate(['xmin', 'ymin', 'xmax', 'ymax'])
     ])
+
+
+def get_layer_style_stream(workspace, layer):
+    style_path = input_style.get_file_path(workspace, layer)
+    if style_path and os.path.exists(style_path):
+        with open(style_path, 'r') as style_file:
+            style = style_file.read()
+        style_stream = io.BytesIO(style.encode())
+        return style_stream
+    else:
+        return None
 
 
 def fill_layer_template(workspace, layer, uuid, native_bbox, qml_path):

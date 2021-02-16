@@ -58,9 +58,8 @@ def get_file_path(username, layername, with_extension=True):
 
 
 def save_layer_file(username, layername, style_file, style_type):
-    if style_file is None:
-        delete_layer(username, layername)
-    else:
+    delete_layer(username, layername)
+    if style_file:
         style_path_clear = get_file_path(username, layername, with_extension=False)
         style_path = style_path_clear + '.' + style_type.extension
         ensure_layer_input_style_dir(username, layername)

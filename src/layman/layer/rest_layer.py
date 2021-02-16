@@ -84,13 +84,13 @@ def patch(username, layername):
         style_file = request.files['style']
     elif 'sld' in request.files and not request.files['sld'].filename == '':
         style_file = request.files['sld']
-    style_type = input_style.get_style_type_from_file_storage(style_file)
-    kwargs['style_type'] = style_type
-    kwargs['store_in_geoserver'] = style_type.store_in_geoserver
 
     delete_from = None
-    if style_file is not None:
-        delete_from = 'layman.layer.geoserver.sld'
+    if style_file:
+        style_type = input_style.get_style_type_from_file_storage(style_file)
+        kwargs['style_type'] = style_type
+        kwargs['store_in_geoserver'] = style_type.store_in_geoserver
+        delete_from = 'layman.layer.qgis.wms'
     if len(files) > 0:
         delete_from = 'layman.layer.filesystem.input_file'
 

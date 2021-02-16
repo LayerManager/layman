@@ -1,9 +1,10 @@
 from celery.utils.log import get_task_logger
 
 from layman.celery import AbortedException
-from layman import celery_app
+from layman import celery_app, settings
 from . import wms, wfs, sld
 from .. import geoserver
+from layman.common import geoserver as common_geoserver
 
 logger = get_task_logger(__name__)
 
@@ -21,6 +22,7 @@ def refresh_wms(
         self,
         username,
         layername,
+        store_in_geoserver,
         description=None,
         title=None,
         ensure_user=False,
@@ -36,7 +38,25 @@ def refresh_wms(
 
     if self.is_aborted():
         raise AbortedException
-    geoserver.publish_layer_from_db(username, layername, description, title, access_rights, geoserver_workspace=geoserver_workspace)
+    if store_in_geoserver:
+        common_geoserver.delete_wms_layer(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
+        common_geoserver.delete_wms_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, wms.get_qgis_store_name(layername))
+        geoserver.publish_layer_from_db(username,
+                                        layername,
+                                        description,
+                                        title,
+                                        access_rights,
+                                        geoserver_workspace=geoserver_workspace,
+                                        )
+    else:
+        common_geoserver.delete_feature_type(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
+        geoserver.publish_layer_from_qgis(username,
+                                          layername,
+                                          description,
+                                          title,
+                                          access_rights,
+                                          geoserver_workspace=geoserver_workspace,
+                                          )
     wms.clear_cache(username)
 
     if self.is_aborted():
