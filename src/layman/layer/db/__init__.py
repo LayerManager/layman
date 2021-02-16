@@ -4,13 +4,14 @@ import math
 import os
 import psycopg2
 from flask import g
+import logging
 
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
-from layman.common.prime_db_schema import users as users_util
 
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
+logger = logging.getLogger(__name__)
 
 
 def create_connection_cursor():
@@ -42,6 +43,7 @@ def get_workspaces(conn_cur=None):
     where schema_name NOT IN ('{"', '".join(settings.PG_NON_USER_SCHEMAS)}\
 ') AND schema_owner = '{settings.LAYMAN_PG_USER}'""")
     except BaseException:
+        logger.error(f'get_workspaces ERROR')
         raise LaymanError(7)
     rows = cur.fetchall()
     return [
@@ -68,6 +70,7 @@ def ensure_workspace(username, conn_cur=None):
             f"""CREATE SCHEMA IF NOT EXISTS "{username}" AUTHORIZATION {settings.LAYMAN_PG_USER}""")
         conn.commit()
     except BaseException:
+        logger.error(f'ensure_workspace ERROR')
         raise LaymanError(7)
 
 
@@ -81,6 +84,7 @@ def delete_workspace(username, conn_cur=None):
             f"""DROP SCHEMA IF EXISTS "{username}" RESTRICT""")
         conn.commit()
     except BaseException:
+        logger.error(f'delete_workspace ERROR')
         raise LaymanError(7)
 
 
@@ -151,6 +155,7 @@ def check_new_layername(username, layername, conn_cur=None):
     JOIN   pg_namespace n ON n.oid = c.relnamespace
     WHERE  n.nspname IN ('{username}', '{settings.PG_POSTGIS_SCHEMA}') AND c.relname='{layername}'""")
     except BaseException:
+        logger.error(f'check_new_layername ERROR')
         raise LaymanError(7)
     rows = cur.fetchall()
     if len(rows) > 0:
@@ -169,6 +174,7 @@ AND table_name = '{layername}'
 AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 """)
     except BaseException:
+        logger.error(f'get_text_column_names ERROR')
         raise LaymanError(7)
     rows = cur.fetchall()
     return [r[0] for r in rows]
@@ -185,6 +191,7 @@ WHERE table_schema = '{username}'
 AND table_name = '{layername}'
 """)
     except BaseException:
+        logger.error(f'get_all_column_names ERROR')
         raise LaymanError(7)
     rows = cur.fetchall()
     return [r[0] for r in rows]
@@ -199,6 +206,7 @@ select count(*)
 from {username}.{layername}
 """)
     except BaseException:
+        logger.error(f'get_number_of_features ERROR')
         raise LaymanError(7)
     rows = cur.fetchall()
     return rows[0][0]
@@ -221,6 +229,7 @@ order by ogc_fid
 limit {limit}
 """)
     except BaseException:
+        logger.error(f'get_text_data ERROR')
         raise LaymanError(7)
     rows = cur.fetchall()
     col_texts = defaultdict(list)
@@ -359,6 +368,7 @@ def get_most_frequent_lower_distance(username, layername, conn_cur=None):
     try:
         cur.execute(query)
     except BaseException:
+        logger.error(f'get_most_frequent_lower_distance ERROR')
         raise LaymanError(7)
     rows = cur.fetchall()
     # for row in rows:
@@ -416,6 +426,7 @@ def get_most_frequent_lower_distance2(username, layername, conn_cur=None):
     try:
         cur.execute(query)
     except BaseException:
+        logger.error(f'get_most_frequent_lower_distance2 ERROR')
         raise LaymanError(7)
     rows = cur.fetchall()
     # for row in rows:
@@ -434,6 +445,7 @@ def create_string_attributes(attribute_tuples, conn_cur=None):
     try:
         cur.execute(query)
     except BaseException:
+        logger.error(f'create_string_attributes ERROR')
         raise LaymanError(7)
 
 
@@ -452,6 +464,7 @@ where c.column_name is null"""
         if attribute_tuples:
             cur.execute(query)
     except BaseException:
+        logger.error(f'get_missing_attributes ERROR')
         raise LaymanError(7)
 
     missing_attributes = set()
@@ -475,11 +488,13 @@ def get_bbox(username, layername, conn_cur=None):
     conn, cur = conn_cur or get_connection_cursor()
 
     try:
-        cur.execute(f"""
+        sql = f"""
 select ST_AsGeoJSON(ST_Extent(wkb_geometry))
 from {username}.{layername}
-""")
-    except BaseException:
+"""
+        cur.execute(sql)
+    except BaseException as exc:
+        logger.error(f'get_bbox ERROR username={username}, layer={layername}, sql="{sql}", exc={exc} \n\n\n , exc={exc.with_traceback()}')
         raise LaymanError(7)
     rows = cur.fetchall()
     conn.commit()
