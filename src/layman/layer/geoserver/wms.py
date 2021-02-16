@@ -222,3 +222,7 @@ def get_capabilities_url(username):
 
 def get_geoserver_workspace(workspace):
     return workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
+
+
+def get_qgis_store_name(layer):
+    return f'{DEFAULT_WMS_STORE_PREFIX}_{layer}'

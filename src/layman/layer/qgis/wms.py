@@ -1,6 +1,6 @@
 import os
 
-from layman import patch_mode
+from layman import patch_mode, settings
 from layman.layer import qgis
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
@@ -37,3 +37,12 @@ def patch_layer(username, layername):
 
 def delete_layer(username, layername):
     qgis.delete_layer_dir(username, layername)
+
+
+def get_layer_capabilities_url(workspace, layer):
+    url = f'{settings.LAYMAN_QGIS_URL}?SERVICE=WMS&REQUEST=GetCapabilities&VERSION={VERSION}&map={get_layer_file_path(workspace, layer)}'
+    return url
+
+
+def get_layer_file_path(workspace, layer):
+    return os.path.join(qgis.get_layer_dir(workspace, layer), f'{layer}.qgis')
