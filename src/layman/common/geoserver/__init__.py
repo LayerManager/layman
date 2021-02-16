@@ -466,6 +466,50 @@ def delete_db_store(geoserver_workspace, auth):
         r.raise_for_status()
 
 
+def create_wms_store(geoserver_workspace, auth, wms_store_name, get_capabilities_url):
+    r = requests.post(
+        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + '/wmsstores'),
+        data=json.dumps({
+            "wmsStore": {
+                "name": wms_store_name,
+                "type": "WMS",
+                "capabilitiesURL": get_capabilities_url,
+            }
+        }),
+        headers=headers_json,
+        auth=auth,
+        timeout=5,
+    )
+    r.raise_for_status()
+
+
+def delete_wms_store(geoserver_workspace, auth, wms_store_name):
+    url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + f'/wmsstores/{wms_store_name}')
+    r = requests.delete(
+        url,
+        headers=headers_json,
+        auth=auth,
+        timeout=5,
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+
+def delete_wms_layer(geoserver_workspace, layer, auth):
+    url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + f'/wmslayers/{layer}')
+    r = requests.delete(
+        url,
+        headers=headers_json,
+        auth=auth,
+        timeout=5,
+        params={
+            'recurse': 'true'
+        }
+    )
+    if r.status_code != 404:
+        r.raise_for_status()
+
+
 def ensure_workspace(geoserver_workspace, auth=settings.LAYMAN_GS_AUTH):
     all_workspaces = get_all_workspaces(auth)
     if geoserver_workspace not in all_workspaces:
