@@ -52,6 +52,7 @@ PUBLICATION_TYPES = {
         'task_modules': [
             'layman.layer.db.tasks',
             'layman.layer.filesystem.tasks',
+            'layman.layer.qgis.tasks',
             'layman.layer.geoserver.tasks',
             'layman.layer.micka.tasks',
         ],
