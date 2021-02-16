@@ -88,6 +88,33 @@ def check_username(username):
         raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
 
 
+def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspace):
+    geoserver_workspace = geoserver_workspace or workspace
+    layer_info = None
+    if not access_rights or not access_rights.get('read') or not access_rights.get('write'):
+        layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
+                                                      context={'sources_filter': 'layman.layer.prime_db_schema.table', })
+
+    read_roles = (access_rights and access_rights.get('read')) or layer_info['access_rights']['read']
+    write_roles = (access_rights and access_rights.get('write')) or layer_info['access_rights']['write']
+
+    security_read_roles = common.layman_users_to_geoserver_roles(read_roles)
+    common.ensure_layer_security_roles(geoserver_workspace, layer, security_read_roles, 'r', auth)
+
+    security_write_roles = common.layman_users_to_geoserver_roles(write_roles)
+    common.ensure_layer_security_roles(geoserver_workspace, layer, security_write_roles, 'w', auth)
+
+
+def get_default_native_bbox(workspace, layer):
+    return {
+        "minx": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[0],
+        "miny": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[1],
+        "maxx": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[2],
+        "maxy": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[3],
+        "crs": "EPSG:3857",
+    }
+
+
 def publish_layer_from_db(workspace, layername, description, title, access_rights, geoserver_workspace=None):
     geoserver_workspace = geoserver_workspace or workspace
     keywords = [
@@ -114,14 +141,7 @@ def publish_layer_from_db(workspace, layername, description, title, access_right
     db_bbox = db_source.get_bbox(workspace, layername)
     if db_bbox is None:
         # world
-        native_bbox = {
-            "minx": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[0],
-            "miny": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[1],
-            "maxx": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[2],
-            "maxy": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[3],
-            "crs": "EPSG:3857",
-        }
-        feature_type_def['nativeBoundingBox'] = native_bbox
+        feature_type_def['nativeBoundingBox'] = get_default_native_bbox(workspace, layername)
     r = requests.post(urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
                               geoserver_workspace + '/datastores/postgresql/featuretypes/'),
                       data=json.dumps({
@@ -132,19 +152,8 @@ def publish_layer_from_db(workspace, layername, description, title, access_right
                       timeout=5,
                       )
     r.raise_for_status()
-    # current_app.logger.info(f'publish_layer_from_db before clear_cache {username}')
 
-    if not access_rights or not access_rights.get('read') or not access_rights.get('write'):
-        layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'sources_filter': 'layman.layer.prime_db_schema.table', })
-
-    read_roles = (access_rights and access_rights.get('read')) or layer_info['access_rights']['read']
-    write_roles = (access_rights and access_rights.get('write')) or layer_info['access_rights']['write']
-
-    security_read_roles = common.layman_users_to_geoserver_roles(read_roles)
-    common.ensure_layer_security_roles(geoserver_workspace, layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
-
-    security_write_roles = common.layman_users_to_geoserver_roles(write_roles)
-    common.ensure_layer_security_roles(geoserver_workspace, layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
+    set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 
 
 def get_usernames():
