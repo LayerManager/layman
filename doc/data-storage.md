@@ -34,7 +34,9 @@ When user [publishes new layer](rest.md#post-layers)
 Subsequently, when asynchronous tasks run,
 - vector data file chunks and completed vector data files are saved to [filesystem](#filesystem) (if sent [asynchronously](async-file-upload.md)),
 - vector data files are imported to [PostgreSQL](#postgresql),
-- PostgreSQL table with vector data is registered to, access rights are synchronized to, and visualization file is saved to [GeoServer](#geoserver),
+- PostgreSQL table with vector data is registered to, access rights are synchronized to, and visualization file is saved to [GeoServer](#geoserver) for WFS,
+- PostgreSQL table with vector data is registered to, access rights are synchronized to, and visualization file is saved to [GeoServer](#geoserver) for WMS of layers with SLD style,
+- QGS file is created on [filesystem](#filesystem) and through QGIS server registered to [GeoServer](#geoserver) with WMS cascade, access rights are synchronized, for WMS of layers with QGIS style,
 - thumbnail file is saved to [filesystem](#filesystem),
 - and metadata record is saved to [PostgreSQL](#postgresql) using Micka's CSW.
 
@@ -78,6 +80,10 @@ Data is saved to LAYMAN_DATA_DIR directory.
 
 **Publication directory** is created inside workspace directory for each publication (e.g. map or layer) the user published. Name of the publication directory is the same as name of the publication (e.g. layername or mapname). Publication-related information is saved in publication directory.
 
+**QGIS workspace directory** is created in LAYMAN_QGIS_DATA_DIR directory for every created [workspace](models.md#workspace). Name of the workspace directory is the same as workspace name.
+
+**QGIS layer directory** is created inside QGIS workspace directory for each layer with QGIS style the user published. Name of the publication directory is the same as name of the layer. QGS project with style definition is stored in this directory for WMS purpose.
+
 Filesystem is used as persistent data store, so data survives Layman restart.
  
 ### PostgreSQL
@@ -96,7 +102,7 @@ PostgreSQL is used as persistent data store, so data survives Layman restart.
 ### GeoServer
 **[User](https://docs.geoserver.org/stable/en/user/security/webadmin/ugr.html)** and **[role](https://docs.geoserver.org/stable/en/user/security/webadmin/ugr.html)** are created for every [user](models.md#user) who reserved [username](models.md#username). User name on GeoServer is the same as username on Layman. Role name is composed a `USER_<upper-cased username>`.
 
-Two **[workspaces](https://docs.geoserver.org/stable/en/user/data/webadmin/workspaces.html)** are created, each with one **[PostgreSQL datastore](https://docs.geoserver.org/latest/en/user/data/app-schema/data-stores.html#postgis)**, for every [workspace](models.md#workspace) (both personal and public). First workspace is meant for [WFS](endpoints.md#web-feature-service) and has the same name as the workspace on Layman. Second workspace is meant for [WMS](endpoints.md#web-map-service) and is suffixed with `_wms`. Name of the datastore is `postgresql` for both workspaces. Every workspace-related information (including PostgreSQL datastore) is saved inside workspace.
+Two **[workspaces](https://docs.geoserver.org/stable/en/user/data/webadmin/workspaces.html)** are created, each with one **[PostgreSQL datastore](https://docs.geoserver.org/latest/en/user/data/app-schema/data-stores.html#postgis)**, for every [workspace](models.md#workspace) (both personal and public). First workspace is meant for [WFS](endpoints.md#web-feature-service) and has the same name as the workspace on Layman. Second workspace is meant for [WMS](endpoints.md#web-map-service) and is suffixed with `_wms`. Name of the datastore is `postgresql` for both workspaces. Every workspace-related information (including PostgreSQL datastore) is saved inside workspace. For layers with QGIS style, also WMS store is created for each layer (pointing to QGS file of the layer on the QGIS server) and WMS layer to [cascade](https://docs.geoserver.org/stable/en/user/data/cascaded/wms.html) the layer's WMS.
 
 **[Feature type](https://docs.geoserver.org/stable/en/user/rest/api/featuretypes.html)** and **[layer](https://docs.geoserver.org/stable/en/user/data/webadmin/layers.html)** are registered in both workspaces (WMS and WFS), and **[style](https://docs.geoserver.org/latest/en/user/styling/webadmin/index.html)** is created in WMS workspace for each layer published on Layman. Name of these three models are the same as layername. Feature type points to appropriate PostgreSQL table through PostgreSQL datastore. Style contains visualization file.
 

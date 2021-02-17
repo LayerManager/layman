@@ -50,7 +50,12 @@ Publish vector data file as new layer of WMS and WFS.
 Processing chain consists of few steps:
 - save file to workspace directory within Layman data directory
 - import the file to PostgreSQL database as new table into workspace schema, including geometry transformation to EPSG:3857
-- publish the table as new layer (feature type) within appropriate workspaces of GeoServer
+- publish the table as new layer (feature type) within appropriate WFS workspaces of GeoServer
+- for layers with SLD or none style:
+  - publish the table as new layer (feature type) within appropriate WMS workspaces of GeoServer
+- else for layers with QGIS style:
+  - create QGS file on QGIS server filesystem with appropriate style
+  - publish the layer on GeoServer through WMS cascade from QGIS server
 - generate thumbnail image
 - publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
 - save basic information (name, title, access_rights) into PostgreSQL

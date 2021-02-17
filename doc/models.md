@@ -18,14 +18,14 @@
       - [filesystem](data-storage.md#filesystem): `/path/to/LAYMAN_DATA_DIR/users/<workspace_name>/layers/<layername>` 
       - [PostgreSQL](data-storage.md#postgresql): `db=LAYMAN_PG_DBNAME, schema=<workspace_name>, table=<layername>` 
       - [GeoServer WFS](data-storage.md#geoserver): `/geoserver/<workspace_name>/ows, layer=<layername>`
-      - [GeoServer WMS](data-storage.md#geoserver): `/geoserver/<workspace_name>_wms/ows, layer=<layername>, style=<layername>` 
+      - [GeoServer WMS](data-storage.md#geoserver): `/geoserver/<workspace_name>_wms/ows, layer=<layername>, style=<layername>`
   - or by UUID:
       - Micka: `/record/basic/m-<uuid>`
 - Simple rules
   - one DB table per input file
   - one WFS feature type per DB table
   - one WMS layer per DB table
-  - one SLD style per WMS layer
+  - one SLD or QGIS style per WMS layer
   - one thumbnail per WMS layer
   - one metadata record per WMS&WFS layer
   
