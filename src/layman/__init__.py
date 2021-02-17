@@ -81,7 +81,6 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
 
                 with app.app_context():
                     from . import upgrade
-
                     upgrade.upgrade()
 
                 app.logger.info(f'Loading Redis database')
@@ -92,6 +91,11 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                     from .authn.redis import import_authn_to_redis
 
                     import_authn_to_redis()
+
+                app.logger.info(f'Update SRS output list for QGIS projects')
+                with app.app_context():
+                    from .layer.qgis import output_srs
+                    output_srs.ensure_output_srs_for_all()
 
                 pipe.multi()
                 pipe.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')

@@ -24,6 +24,7 @@
 - [#154](https://github.com/jirik/layman/issues/154) For endpoints [POST Layers](doc/rest.md#post-layers) and [PATCH Layer](doc/rest.md#patch-layer), parameter *sld* is replaced by the new parameter *style* and marked as deprecated. In response to endpoints [GET Layer](doc/rest.md#get-layer) and [PATCH Layer](doc/rest.md#patch-layer), *sld* is replaced by the new *style* item and marked as deprecated.
 - [#154](https://github.com/jirik/layman/issues/154) Also QGIS style file is accepted, previously only SLD file was.
 - [#154](https://github.com/jirik/layman/issues/154) Layers with [QGIS style](https://docs.qgis.org/3.16/en/docs/user_manual/style_library/style_manager.html#exporting-items) are published on [GeoServer dedicated WMS workspace](doc/data-storage.md#geoserver) through WMS cascade from QGIS server, where they are stored as QGS file. All layers are published directly from PostgreSQL database to GeoServer for [WFS workspace](doc/data-storage.md#geoserver).
+- [#154](https://github.com/jirik/layman/issues/154) During startup, [LAYMAN_OUTPUT_SRS_LIST](doc/env-settings.md#LAYMAN_OUTPUT_SRS_LIST) is ensure for all QGIS layers.
 
 ## v1.9.1
  2021-01-18

@@ -1,4 +1,5 @@
 import os
+from owslib.wms import WebMapService
 
 from . import util, wms
 from .. import db
@@ -72,3 +73,14 @@ def save_qgs_file(workspace, layer):
     qgs_str = util.fill_project_template(workspace, layer, uuid, layer_qml, settings.LAYMAN_OUTPUT_SRS_LIST, layer_bbox)
     with open(wms.get_layer_file_path(workspace, layer), "w") as qgs_file:
         print(qgs_str, file=qgs_file)
+
+
+def wms_direct(wms_url, xml=None, version=None, headers=None):
+    version = version or VERSION
+    result_wms = WebMapService(wms_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version, headers=headers)
+    return result_wms
+
+
+def get_wms_capabilities(workspace=None, layer=None, headers=None):
+    wms_url = get_layer_capabilities_url(workspace, layer)
+    return wms_direct(wms_url, headers=headers)
