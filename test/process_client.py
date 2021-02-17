@@ -120,7 +120,7 @@ def patch_publication(publication_type,
                         **{publication_type_def.url_param_name: name})
 
     for fp in file_paths:
-        assert os.path.isfile(fp)
+        assert os.path.isfile(fp), fp
     files = []
     try:
         files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
@@ -205,7 +205,7 @@ def publish_publication(publication_type,
         r_url = url_for(publication_type_def.post_url, username=username)
 
     for fp in file_paths:
-        assert os.path.isfile(fp)
+        assert os.path.isfile(fp), fp
     files = []
     try:
         files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]

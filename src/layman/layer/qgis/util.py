@@ -24,8 +24,19 @@ def extent_to_xml_string(extent):
     ])
 
 
+def get_style_path(workspace, layer):
+    return input_style.get_file_path(workspace, layer)
+
+
+def get_style_xml(workspace, layer):
+    style_path = get_style_path(workspace, layer)
+    parser = ET.XMLParser(remove_blank_text=True)
+    qml_xml = ET.parse(style_path, parser=parser)
+    return qml_xml
+
+
 def get_layer_style_stream(workspace, layer):
-    style_path = input_style.get_file_path(workspace, layer)
+    style_path = get_style_path(workspace, layer)
     if style_path and os.path.exists(style_path):
         with open(style_path, 'r') as style_file:
             style = style_file.read()
@@ -125,3 +136,52 @@ def get_layer_wms_crs_list_values(workspace, layer):
         assert split_element[0] == 'EPSG', ET.tostring(crs_element)
         crs_list.add(int(split_element[1]))
     return crs_list
+
+
+def get_qml_geometry_from_qml(qml):
+    symbol_to_geometry_type = {
+        'marker': 'Point',
+        'line': 'Line',
+        'fill': 'Polygon',
+    }
+    symbol_types = {
+        str(attr_value) for attr_value in qml.xpath('/qgis/renderer-v2/symbols/symbol/@type')
+    }
+    if not symbol_types:
+        raise LaymanError(47, data=f'Symbol type not found in QML.')
+    if len(symbol_types) > 1:
+        raise LaymanError(47, data=f'Mixed symbol types in QML: {symbol_types}')
+    symbol_type = next(iter(symbol_types))
+    if symbol_type not in symbol_to_geometry_type:
+        raise LaymanError(47, data=f'Unknown QGIS symbol type "{symbol_type}".')
+    result = symbol_to_geometry_type[symbol_type]
+    return result
+
+
+def get_source_type(db_types, qml_geometry):
+    result = None
+    if qml_geometry == "Point":
+        if "ST_MultiPoint" in db_types:
+            result = "MultiPoint"
+        elif "ST_Point" in db_types:
+            result = "Point"
+    elif qml_geometry == "Line":
+        if "ST_LineString" in db_types and "ST_MultiLineString" not in db_types:
+            result = "LineString"
+        elif "ST_LineString" in db_types and "ST_MultiLineString" in db_types:
+            result = "MultiCurve"
+        elif "ST_LineString" not in db_types and "ST_MultiLineString" in db_types:
+            result = "MultiLineString"
+    elif qml_geometry == "Polygon":
+        if "ST_Polygon" in db_types and "ST_MultiPolygon" not in db_types:
+            result = "Polygon"
+        elif "ST_Polygon" in db_types and "ST_MultiPolygon" in db_types:
+            result = "MultiSurface"
+        elif "ST_Polygon" not in db_types and "ST_MultiPolygon" in db_types:
+            result = "MultiPolygon"
+    elif qml_geometry == "Unknown geometry":
+        if "ST_GeometryCollection" in db_types:
+            result = "GeometryCollection"
+    if result is None:
+        raise LaymanError(47, data=f'Unknown combination of QGIS geometry "{qml_geometry}" and DB geometry types {db_types}')
+    return result
