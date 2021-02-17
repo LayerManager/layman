@@ -93,22 +93,30 @@ def test_publication_basic():
 def test_select_publications():
     username = 'test_select_publications_user1'
     layername = 'test_select_publications_layer1'
+    layer_qgis = 'test_select_publications_layer_qgis'
     mapname = 'test_select_publications_map1'
+    qgis_style_file = 'sample/style/funny_qml.xml'
 
     process_client.publish_layer(username, layername)
+    process_client.publish_layer(username, layer_qgis, style_file=qgis_style_file,)
     process_client.publish_map(username, mapname)
 
     with app.app_context():
         pubs = publications.get_publication_infos(username, LAYER_TYPE)
-        assert len(pubs) == 1
+        assert len(pubs) == 2
         pubs = publications.get_publication_infos(username, MAP_TYPE)
         assert len(pubs) == 1
+        pubs = publications.get_publication_infos(username, style_type='qgis')
+        assert len(pubs) == 1
+        pubs = publications.get_publication_infos(username, style_type='sld')
+        assert len(pubs) == 1
         pubs = publications.get_publication_infos(username)
-        assert len(pubs) == 2
+        assert len(pubs) == 3
         pubs = publications.get_publication_infos()
-        assert len(pubs) >= 2
+        assert len(pubs) >= 3
 
     process_client.delete_layer(username, layername)
+    process_client.delete_layer(username, layer_qgis)
     process_client.delete_map(username, mapname)
 
     with app.app_context():
