@@ -1,8 +1,10 @@
 import os
 
-from . import util
+from . import util, wms
+from .. import db
 from layman import patch_mode, settings
-from layman.layer import qgis
+from layman.layer import qgis, util as layer_util
+from layman.layer.filesystem import input_style
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = "1.3.0"
@@ -57,3 +59,16 @@ def get_layer_capabilities_url(workspace, layer):
 
 def get_layer_file_path(workspace, layer):
     return os.path.join(qgis.get_layer_dir(workspace, layer), f'{layer}.qgis')
+
+
+def save_qgs_file(workspace, layer):
+    info = layer_util.get_layer_info(workspace, layer)
+    uuid = info['uuid']
+    qgis.ensure_layer_dir(workspace, layer)
+    layer_bbox = db.get_bbox(workspace, layer)
+    layer_bbox = layer_bbox or settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+    qml_path = input_style.get_file_path(workspace, layer)
+    layer_qml = util.fill_layer_template(workspace, layer, uuid, layer_bbox, qml_path)
+    qgs_str = util.fill_project_template(workspace, layer, uuid, layer_qml, settings.LAYMAN_OUTPUT_SRS_LIST, layer_bbox)
+    with open(wms.get_layer_file_path(workspace, layer), "w") as qgs_file:
+        print(qgs_str, file=qgs_file)
