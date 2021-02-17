@@ -46,12 +46,12 @@ def get_layer_style_stream(workspace, layer):
         return None
 
 
-def fill_layer_template(workspace, layer, uuid, native_bbox, qml_path):
+def fill_layer_template(workspace, layer, uuid, native_bbox, qml_xml, source_type):
     db_schema = workspace
     layer_name = layer
-    wkb_type = 'MultiSurface'
-    layer_type = 'MultiSurface'
-    geometry_type = 'Polygon'
+    wkb_type = source_type
+    source_type = source_type
+    qml_geometry = get_qml_geometry_from_qml(qml_xml)
     db_table = layer
 
     template_path = get_layer_template_path()
@@ -63,20 +63,19 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, qml_path):
         db_port=settings.LAYMAN_PG_PORT,
         db_user=settings.LAYMAN_PG_USER,
         db_password=settings.LAYMAN_PG_PASSWORD,
-        layer_type=layer_type,
+        source_type=source_type,
         db_schema=db_schema,
         db_table=db_table,
         layer_name=layer_name,
         layer_uuid=uuid,
         wkb_type=wkb_type,
-        geometry_type=geometry_type,
+        qml_geometry=qml_geometry,
         extent=extent_to_xml_string(native_bbox),
         default_action_canvas_value='{00000000-0000-0000-0000-000000000000}'
     )
 
     parser = ET.XMLParser(remove_blank_text=True)
     layer_xml = ET.fromstring(skeleton_xml_str.encode('utf-8'), parser=parser)
-    qml_xml = ET.parse(qml_path, parser=parser)
     layer_el_tags = [el.tag for el in layer_xml.xpath('/maplayer/*')]
     tags_to_rewrite = ['legend', 'expressionfields']
     for qml_el in qml_xml.xpath('/qgis/*'):
@@ -95,11 +94,11 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, qml_path):
     return full_xml_str
 
 
-def fill_project_template(workspace, layer, layer_uuid, layer_qml, epsg_codes, extent):
+def fill_project_template(workspace, layer, layer_uuid, layer_qml, epsg_codes, extent, source_type):
     wms_crs_list_values = "\n".join((f"<value>EPSG:{code}</value>" for code in epsg_codes))
     db_schema = workspace
     layer_name = layer
-    layer_type = 'MultiSurface'
+    source_type = source_type
     db_table = layer
     creation_iso_datetime = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
 
@@ -112,7 +111,7 @@ def fill_project_template(workspace, layer, layer_uuid, layer_qml, epsg_codes, e
         db_port=settings.LAYMAN_PG_PORT,
         db_user=settings.LAYMAN_PG_USER,
         db_password=settings.LAYMAN_PG_PASSWORD,
-        layer_type=layer_type,
+        source_type=source_type,
         db_schema=db_schema,
         db_table=db_table,
         layer_name=layer_name,

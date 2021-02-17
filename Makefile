@@ -297,6 +297,9 @@ qgis-bash:
 qgis-bash-exec:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec qgis bash
 
+qgis-bash-exec-root :
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec -u root qgis bash
+
 stop-all-docker-containers:
 	docker stop $$(docker ps -q)
 

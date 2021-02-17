@@ -1,4 +1,5 @@
 import os
+from lxml import etree as ET
 import pytest
 import requests
 from . import util, wms as qgis_wms
@@ -30,8 +31,14 @@ def test_fill_project_template():
         layer_bbox = db.get_bbox(workspace, layer)
     layer_bbox = layer_bbox or settings.LAYMAN_DEFAULT_OUTPUT_BBOX
     qml_path = '/code/sample/style/funny_qml.xml'
-    layer_qml = util.fill_layer_template(workspace, layer, layer_uuid, layer_bbox, qml_path)
-    qgs_str = util.fill_project_template(workspace, layer, layer_uuid, layer_qml, settings.LAYMAN_OUTPUT_SRS_LIST, layer_bbox)
+    parser = ET.XMLParser(remove_blank_text=True)
+    qml_xml = ET.parse(qml_path, parser=parser)
+    with app.app_context():
+        db_types = db.get_geometry_types(workspace, layer)
+    qml_geometry = util.get_qml_geometry_from_qml(qml_xml)
+    source_type = util.get_source_type(db_types, qml_geometry)
+    layer_qml = util.fill_layer_template(workspace, layer, layer_uuid, layer_bbox, qml_xml, source_type)
+    qgs_str = util.fill_project_template(workspace, layer, layer_uuid, layer_qml, settings.LAYMAN_OUTPUT_SRS_LIST, layer_bbox, source_type)
     with open(qgs_path, "w") as qgs_file:
         print(qgs_str, file=qgs_file)
 
