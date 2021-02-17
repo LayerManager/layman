@@ -523,3 +523,20 @@ from {username}.{layername}
     elif result is not None:
         raise Exception(f"Unknown BBox result {result}")
     return result
+
+
+def get_geometry_types(username, layername, conn_cur=None):
+    conn, cur = conn_cur or get_connection_cursor()
+    try:
+        sql = f"""
+select distinct ST_GeometryType(wkb_geometry) as geometry_type_name
+from {username}.{layername}
+"""
+        cur.execute(sql)
+    except BaseException as exc:
+        logger.error(f'get_geometry_types ERROR')
+        raise LaymanError(7)
+    rows = cur.fetchall()
+    conn.commit()
+    result = [row[0] for row in rows]
+    return result
