@@ -3,7 +3,7 @@ from lxml import etree as ET
 import pytest
 import requests
 from . import util, wms as qgis_wms
-from layman import app, settings
+from layman import app, settings, LaymanError
 from .. import db
 from test import process_client
 from owslib.wms import WebMapService
@@ -57,5 +57,57 @@ def test_fill_project_template():
     with pytest.raises(requests.exceptions.HTTPError) as excinfo:
         WebMapService(wms_url, version=qgis_wms.VERSION)
     assert excinfo.value.response.status_code == 500
+
+    process_client.delete_layer(workspace, layer)
+
+
+@pytest.mark.parametrize('layer, exp_db_types, qml_geometry_to_exp_source_type', [
+    ('all', {'ST_Point', 'ST_MultiPoint', 'ST_LineString', 'ST_MultiLineString', 'ST_Polygon', 'ST_MultiPolygon', 'ST_GeometryCollection'}, {
+        'Point': 'MultiPoint',
+        'Line': 'MultiCurve',
+        'Polygon': 'MultiSurface',
+        'Unknown geometry': 'GeometryCollection',
+    }),
+    ('geometrycollection', {'ST_GeometryCollection'}, {
+        'Unknown geometry': 'GeometryCollection',
+    }),
+    ('linestring', {'ST_LineString'}, {
+        'Line': 'LineString',
+    }),
+    ('multilinestring', {'ST_MultiLineString'}, {
+        'Line': 'MultiLineString',
+    }),
+    ('multipoint', {'ST_MultiPoint'}, {
+        'Point': 'MultiPoint',
+    }),
+    ('multipolygon', {'ST_MultiPolygon'}, {
+        'Polygon': 'MultiPolygon',
+    }),
+    ('point', {'ST_Point'}, {
+        'Point': 'Point',
+    }),
+    ('polygon', {'ST_Polygon'}, {
+        'Polygon': 'Polygon',
+    }),
+])
+@pytest.mark.usefixtures('ensure_layman')
+def test_geometry_types(layer, exp_db_types, qml_geometry_to_exp_source_type):
+    workspace = 'test_geometry_types_workspace'
+    process_client.publish_layer(workspace, layer, file_paths=[f'/code/sample/data/geometry-types/{layer}.geojson'],)
+    with app.app_context():
+        db_types = db.get_geometry_types(workspace, layer)
+    assert set(db_types) == exp_db_types
+
+    qgis_geometries = ['Point', 'Line', 'Polygon', 'Unknown geometry']
+
+    for qml_geometry in qgis_geometries:
+        exp_source_type = qml_geometry_to_exp_source_type.get(qml_geometry)
+        if exp_source_type is None:
+            with pytest.raises(LaymanError) as excinfo:
+                source_type = util.get_source_type(db_types, qml_geometry)
+            assert excinfo.value.code == 47, f"qml_geometry={qml_geometry}, exp_source_type={exp_source_type}"
+        else:
+            source_type = util.get_source_type(db_types, qml_geometry)
+            assert source_type == exp_source_type, f"qml_geometry={qml_geometry}, exp_source_type={exp_source_type}, source_type={source_type}, db_types={db_types}"
 
     process_client.delete_layer(workspace, layer)
