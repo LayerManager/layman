@@ -4,6 +4,7 @@ import os
 import io
 from lxml import etree as ET
 
+from . import wms
 from layman import settings, LaymanError
 from layman.layer.filesystem import input_style
 
@@ -110,3 +111,17 @@ def fill_project_template(workspace, layer, layer_uuid, layer_qml, epsg_codes, e
         creation_iso_datetime=creation_iso_datetime,
         extent=extent_to_xml_string(extent),
     )
+
+
+def get_layer_wms_crs_list_values(workspace, layer):
+    file_path = wms.get_layer_file_path(workspace, layer)
+    tree = ET.parse(file_path)
+    crs_elements = tree.xpath("/qgis/properties/WMSCrsList")
+    assert len(crs_elements) == 1
+    crs_element = crs_elements[0]
+    crs_list = set()
+    for element in crs_element.iter("value"):
+        split_element = element.text.split(':')
+        assert split_element[0] == 'EPSG', ET.tostring(crs_element)
+        crs_list.add(int(split_element[1]))
+    return crs_list
