@@ -11,8 +11,8 @@ ROLE_EVERYONE = settings.RIGHTS_EVERYONE_ROLE
 psycopg2.extras.register_uuid()
 
 
-def get_publication_infos(workspace_name=None, pub_type=None):
-    sql = f"""with const as (select %s workspace_name, %s pub_type, %s everyone_role)
+def get_publication_infos(workspace_name=None, pub_type=None, style_type=None):
+    sql = f"""with const as (select %s workspace_name, %s pub_type, %s everyone_role, %s style_type)
 select p.id as id_publication,
        w.name as workspace_name,
        p.type,
@@ -43,12 +43,15 @@ from const c inner join
                                   or c.workspace_name is null) inner join
      {DB_SCHEMA}.publications p on p.id_workspace = w.id
                            and (   p.type = c.pub_type
-                                or c.pub_type is null) left join
+                                or c.pub_type is null)
+                           and (   p.style_type::text = c.style_type
+                                or c.style_type is null) left join
      {DB_SCHEMA}.users u on u.id_workspace = w.id
 ;"""
     values = util.run_query(sql, (workspace_name,
                                   pub_type,
                                   ROLE_EVERYONE,
+                                  style_type,
                                   ))
     infos = {(workspace_name,
               type,
