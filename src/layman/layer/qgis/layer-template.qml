@@ -1,9 +1,9 @@
-    <maplayer wkbType="{wkb_type}" refreshOnNotifyMessage="" simplifyDrawingHints="1" autoRefreshEnabled="0" simplifyDrawingTol="1" simplifyMaxScale="1" minScale="100000000" hasScaleBasedVisibilityFlag="0" simplifyAlgorithm="0" labelsEnabled="0" type="vector" autoRefreshTime="0" styleCategories="AllStyleCategories" readOnly="0" maxScale="0" simplifyLocal="1" geometry="{geometry_type}" refreshOnNotifyEnabled="0">
+    <maplayer wkbType="{wkb_type}" refreshOnNotifyMessage="" simplifyDrawingHints="1" autoRefreshEnabled="0" simplifyDrawingTol="1" simplifyMaxScale="1" minScale="100000000" hasScaleBasedVisibilityFlag="0" simplifyAlgorithm="0" labelsEnabled="0" type="vector" autoRefreshTime="0" styleCategories="AllStyleCategories" readOnly="0" maxScale="0" simplifyLocal="1" geometry="{qml_geometry}" refreshOnNotifyEnabled="0">
       <extent>
         {extent}
       </extent>
       <id>{layer_name}_{layer_uuid}</id>
-      <datasource>dbname='{db_name}' host={db_host} port={db_port} user='{db_user}' password='{db_password}' sslmode=disable key='ogc_fid' srid=3857 type={layer_type} checkPrimaryKeyUnicity='1' table="{db_schema}"."{db_table}" (wkb_geometry)</datasource>
+      <datasource>dbname='{db_name}' host={db_host} port={db_port} user='{db_user}' password='{db_password}' sslmode=disable key='ogc_fid' srid=3857 type={source_type} checkPrimaryKeyUnicity='1' table="{db_schema}"."{db_table}" (wkb_geometry)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
