@@ -4,13 +4,70 @@
     {
       "type": "Feature",
       "properties": {
-        "geometry_type_name": "Point"
+        "geometry_type_name": "Point",
+        "class": 1
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           15.0,
           49.0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "Point",
+        "class": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.1,
+          49.2
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "Point",
+        "class": 2
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.3,
+          49.3
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "Point",
+        "class": 2
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.1,
+          49.1
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "Point",
+        "class": 3
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.2,
+          49.1
         ]
       }
     }

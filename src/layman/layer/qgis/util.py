@@ -50,7 +50,6 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, qml_xml, source_typ
     db_schema = workspace
     layer_name = layer
     wkb_type = source_type
-    source_type = source_type
     qml_geometry = get_qml_geometry_from_qml(qml_xml)
     db_table = layer
 

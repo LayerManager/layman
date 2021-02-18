@@ -4,7 +4,8 @@
     {
       "type": "Feature",
       "properties": {
-        "geometry_type_name": "Point"
+        "geometry_type_name": "Point",
+        "class": 1
       },
       "geometry": {
         "type": "Point",
@@ -17,18 +18,33 @@
     {
       "type": "Feature",
       "properties": {
-        "geometry_type_name": "LineString"
+        "geometry_type_name": "Point",
+        "class": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.1,
+          49.2
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "LineString",
+        "class": 1
       },
       "geometry": {
         "type": "LineString",
         "coordinates": [
           [
-            16.0,
+            15.0,
             49.0
           ],
           [
-            16.0,
-            50.0
+            15.3,
+            49.3
           ]
         ]
       }
@@ -36,30 +52,31 @@
     {
       "type": "Feature",
       "properties": {
-        "geometry_type_name": "Polygon"
+        "geometry_type_name": "Polygon",
+        "class": 1
       },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
           [
             [
-              17.0,
+              15.0,
               49.0
             ],
             [
-              18.0,
+              15.1,
               49.0
             ],
             [
-              18.0,
-              50.0
+              15.1,
+              49.1
             ],
             [
-              17.0,
-              50.0
+              15.0,
+              49.1
             ],
             [
-              17.0,
+              15.0,
               49.0
             ]
           ]
@@ -69,18 +86,33 @@
     {
       "type": "Feature",
       "properties": {
-        "geometry_type_name": "MultiPoint"
+        "geometry_type_name": "Polygon",
+        "class": 2
       },
       "geometry": {
-        "type": "MultiPoint",
+        "type": "Polygon",
         "coordinates": [
           [
-            15.0,
-            48.0
-          ],
-          [
-            15.0,
-            47.8
+            [
+              15.2,
+              49.0
+            ],
+            [
+              15.3,
+              49.0
+            ],
+            [
+              15.3,
+              49.1
+            ],
+            [
+              15.2,
+              49.1
+            ],
+            [
+              15.2,
+              49.0
+            ]
           ]
         ]
       }
@@ -88,29 +120,66 @@
     {
       "type": "Feature",
       "properties": {
-        "geometry_type_name": "MultiLineString"
+        "geometry_type_name": "MultiPoint",
+        "class": 2
+      },
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            15.3,
+            49.3
+          ],
+          [
+            15.1,
+            49.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "MultiPoint",
+        "class": 3
+      },
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            15.2,
+            49.1
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "MultiLineString",
+        "class": 2
       },
       "geometry": {
         "type": "MultiLineString",
         "coordinates": [
           [
             [
-              16.0,
-              48.0
+              15.0,
+              49.0
             ],
             [
-              16.0,
-              48.5
+              15.2,
+              49.1
             ]
           ],
           [
             [
-              16.0,
-              47.0
+              15.3,
+              49.3
             ],
             [
-              16.0,
-              47.5
+              15.1,
+              49.2
             ]
           ]
         ]
@@ -119,7 +188,30 @@
     {
       "type": "Feature",
       "properties": {
-        "geometry_type_name": "MultiPolygon"
+        "geometry_type_name": "MultiLineString",
+        "class": 3
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              15.2,
+              49.1
+            ],
+            [
+              15.1,
+              49.2
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "MultiPolygon",
+        "class": 3
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -127,48 +219,48 @@
           [
             [
               [
-                17.0,
-                48.0
+                15.2,
+                49.2
               ],
               [
-                18.0,
-                48.0
+                15.3,
+                49.2
               ],
               [
-                18.0,
-                48.5
+                15.3,
+                49.3
               ],
               [
-                17.0,
-                48.5
+                15.2,
+                49.3
               ],
               [
-                17.0,
-                48.0
+                15.2,
+                49.2
               ]
             ]
           ],
           [
             [
               [
-                17.0,
-                47.0
+                15.1,
+                49.1
               ],
               [
-                18.0,
-                47.0
+                15.2,
+                49.1
               ],
               [
-                18.0,
-                47.5
+                15.15,
+                49.15
               ],
               [
-                17.0,
-                47.5
+                15.1,
+                49.2
               ],
               [
-                17.0,
-                47.0
+                15.1,
+                49.1
               ]
             ]
           ]
@@ -187,19 +279,19 @@
             "type": "Point",
             "coordinates": [
               15.0,
-              45.0
+              49.0
             ]
           },
           {
             "type": "LineString",
             "coordinates": [
               [
-                16.0,
-                45.0
+                15.0,
+                49.0
               ],
               [
-                16.0,
-                46.0
+                15.3,
+                49.3
               ]
             ]
           },
@@ -208,24 +300,24 @@
             "coordinates": [
               [
                 [
-                  17.0,
-                  45.0
+                  15.0,
+                  49.0
                 ],
                 [
-                  18.0,
-                  45.0
+                  15.1,
+                  49.0
                 ],
                 [
-                  18.0,
-                  46.0
+                  15.1,
+                  49.1
                 ],
                 [
-                  17.0,
-                  46.0
+                  15.0,
+                  49.1
                 ],
                 [
-                  17.0,
-                  45.0
+                  15.0,
+                  49.0
                 ]
               ]
             ]

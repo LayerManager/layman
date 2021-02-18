@@ -4,31 +4,134 @@
     {
       "type": "Feature",
       "properties": {
-        "geometry_type_name": "Polygon"
+        "geometry_type_name": "Polygon",
+        "class": 1
       },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
           [
             [
-              17.0,
+              15.0,
               49.0
             ],
             [
-              18.0,
+              15.1,
               49.0
             ],
             [
-              18.0,
-              50.0
+              15.1,
+              49.1
             ],
             [
-              17.0,
-              50.0
+              15.0,
+              49.1
             ],
             [
-              17.0,
+              15.0,
               49.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "Polygon",
+        "class": 2
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              15.2,
+              49.0
+            ],
+            [
+              15.3,
+              49.0
+            ],
+            [
+              15.3,
+              49.1
+            ],
+            [
+              15.2,
+              49.1
+            ],
+            [
+              15.2,
+              49.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "Polygon",
+        "class": 3
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              15.2,
+              49.2
+            ],
+            [
+              15.3,
+              49.2
+            ],
+            [
+              15.3,
+              49.3
+            ],
+            [
+              15.2,
+              49.3
+            ],
+            [
+              15.2,
+              49.2
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "Polygon",
+        "class": 3
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              15.1,
+              49.1
+            ],
+            [
+              15.2,
+              49.1
+            ],
+            [
+              15.15,
+              49.15
+            ],
+            [
+              15.1,
+              49.2
+            ],
+            [
+              15.1,
+              49.1
             ]
           ]
         ]
