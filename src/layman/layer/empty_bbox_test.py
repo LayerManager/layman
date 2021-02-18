@@ -40,7 +40,7 @@ def wfs_t_insert_point(workspace, layername):
     r = requests.post(wfs_t_url,
                       data=wfs_t_data,
                       headers=wfs_t_headers)
-    assert r.status_code == 200
+    assert r.status_code == 200, r.text
 
 
 @pytest.mark.parametrize('layername, file_paths', [
