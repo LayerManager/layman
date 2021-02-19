@@ -25,6 +25,7 @@
 - [#154](https://github.com/jirik/layman/issues/154) Also QGIS style file is accepted, previously only SLD file was.
 - [#154](https://github.com/jirik/layman/issues/154) Layers with [QGIS style](https://docs.qgis.org/3.16/en/docs/user_manual/style_library/style_manager.html#exporting-items) are published on [GeoServer dedicated WMS workspace](doc/data-storage.md#geoserver) through WMS cascade from QGIS server, where they are stored as QGS file. All layers are published directly from PostgreSQL database to GeoServer for [WFS workspace](doc/data-storage.md#geoserver).
 - [#154](https://github.com/jirik/layman/issues/154) During startup, [LAYMAN_OUTPUT_SRS_LIST](doc/env-settings.md#LAYMAN_OUTPUT_SRS_LIST) is ensure for all QGIS layers.
+- [#154](https://github.com/jirik/layman/issues/154) Treat attribute names in QML (also known as '[launder](https://gdal.org/drivers/vector/pg.html#layer-creation-options)').
 
 ## v1.9.1
  2021-01-18
