@@ -12,7 +12,7 @@ WMS respects [publication access rights](security.md#publication-access-rights).
 
 The authentication proxy behaves in the same way as in case of [WMS](#web-map-service).
 
-The WFS proxy automatically creates missing attributes in DB table before redirecting WFS-T request to GeoServer. Each missing attribute is created as `VARCHAR(1024)`. Works for WFS-T 1.0, 1.1 and 2.0 on actions Insert, Update and Replace. If creating attribute fails for any reason, warning is logged and request is forwarded to GeoServer nevertheless.
+The WFS proxy automatically creates missing attributes in DB table before redirecting WFS-T request to GeoServer. Each missing attribute is created as `VARCHAR(1024)`. Also if QML style is used, attribute is automatically added to QGS project file. Works for WFS-T 1.0, 1.1 and 2.0 on actions Insert, Update and Replace. If creating attribute fails for any reason, warning is logged and request is forwarded to GeoServer nevertheless.
 
 WFS respects [publication access rights](security.md#publication-access-rights). If user asks for type (layer) he has not read access to by DescribeFeatureType or GetFeature request, GeoServer returns standard ExceptionReport (code InvalidParameterValue, locator typeName or typeNames). To perform WFS-T requests, write access is needed.
 

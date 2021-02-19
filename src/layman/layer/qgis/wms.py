@@ -69,8 +69,12 @@ def save_qgs_file(workspace, layer):
     qml = util.get_style_xml(workspace, layer)
     qml_geometry = util.get_qml_geometry_from_qml(qml)
     db_types = db.get_geometry_types(workspace, layer)
+    db_cols = [
+        col for col in db.get_all_column_infos(workspace, layer)
+        if col.name not in ['wkb_geometry', 'ogc_fid']
+    ]
     source_type = util.get_source_type(db_types, qml_geometry)
-    layer_qml = util.fill_layer_template(workspace, layer, uuid, layer_bbox, qml, source_type)
+    layer_qml = util.fill_layer_template(workspace, layer, uuid, layer_bbox, qml, source_type, db_cols)
     qgs_str = util.fill_project_template(workspace, layer, uuid, layer_qml, settings.LAYMAN_OUTPUT_SRS_LIST,
                                          layer_bbox, source_type)
     with open(get_layer_file_path(workspace, layer), "w") as qgs_file:

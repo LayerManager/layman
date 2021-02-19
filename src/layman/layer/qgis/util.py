@@ -47,7 +47,7 @@ def get_layer_style_stream(workspace, layer):
         return None
 
 
-def fill_layer_template(workspace, layer, uuid, native_bbox, qml_xml, source_type):
+def fill_layer_template(workspace, layer, uuid, native_bbox, qml_xml, source_type, attrs_to_ensure):
     db_schema = workspace
     layer_name = layer
     wkb_type = source_type
@@ -75,6 +75,7 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, qml_xml, source_typ
     )
 
     launder_attribute_names(qml_xml)
+    ensure_attributes_in_qml(qml_xml, attrs_to_ensure)
 
     parser = ET.XMLParser(remove_blank_text=True)
     layer_xml = ET.fromstring(skeleton_xml_str.encode('utf-8'), parser=parser)
@@ -184,21 +185,60 @@ def get_source_type(db_types, qml_geometry):
         if "ST_GeometryCollection" in db_types:
             result = "GeometryCollection"
     if result is None:
-        raise LaymanError(47, data=f'Unknown combination of QGIS geometry "{qml_geometry}" and DB geometry types {db_types}')
+        raise LaymanError(47,
+                          data=f'Unknown combination of QML geometry "{qml_geometry}" and DB geometry types '
+                               f'{db_types}')
     return result
 
 
+FIELD_XML_ATTRIBUTES = [
+    ("/qgis/renderer-v2", "attr"),
+    ("/qgis/fieldConfiguration/field", "name"),
+    ("/qgis/aliases/alias", "field"),
+    ("/qgis/defaults/default", "field"),
+    ("/qgis/constraints/constraint", "field"),
+    ("/qgis/constraintExpressions/constraint", "field"),
+    ("/qgis/attributetableconfig/columns/column[@type='field']", "name"),
+    ("/qgis/editable/field", "name"),
+    ("/qgis/labelOnTop/field", "name"),
+]
+
+
 def launder_attribute_names(qml):
-    for el_path, attr_name in [
-        ("/qgis/renderer-v2", "attr"),
-        ("/qgis/fieldConfiguration/field", "name"),
-        ("/qgis/aliases/alias", "field"),
-        ("/qgis/defaults/default", "field"),
-        ("/qgis/constraints/constraint", "field"),
-        ("/qgis/constraintExpressions/constraint", "field"),
-        ("/qgis/attributetableconfig/columns/column[@type='field']", "name"),
-        ("/qgis/editable/field", "name"),
-        ("/qgis/labelOnTop/field", "name"),
-    ]:
+    for el_path, attr_name in FIELD_XML_ATTRIBUTES:
         for el in qml.xpath(f'{el_path}[@{attr_name}]'):
             el.attrib[attr_name] = db_commmon.launder_attribute_name(el.attrib[attr_name])
+
+
+def get_attribute_names_from_qml(qml):
+    result = set()
+    for el_path, attr_name in FIELD_XML_ATTRIBUTES:
+        for el in qml.xpath(f'{el_path}[@{attr_name}]'):
+            result.add(el.attrib[attr_name])
+    return result
+
+
+def ensure_attributes_in_qml(qml, attrs_to_ensure):
+    existing_attr_names = get_attribute_names_from_qml(qml)
+    missing_attrs = [attr for attr in attrs_to_ensure if attr.name not in existing_attr_names]
+
+    parser = ET.XMLParser(remove_blank_text=True)
+    field_template = """
+        <field configurationFlags="None" name="{field_name}">
+          <editWidget type="TextEdit">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+    """
+
+    fields_el = qml.xpath(f'/qgis/fieldConfiguration')[0]
+    for attr in missing_attrs:
+        if attr.data_type != 'character varying':
+            raise LaymanError(47, data=f'Attribute "{attr.name}" can not be automatically added to QML, because of its '
+                                       f'unsupported data type "{attr.data_type}". This is probably caused by '
+                                       f'inconsistency between attributes used in QML style and attributes in data '
+                                       f'file. You can fix this by uploading QML style listing all data attributes.')
+        field_el = ET.fromstring(field_template.format(field_name=attr.name), parser=parser)
+        fields_el.append(field_el)
