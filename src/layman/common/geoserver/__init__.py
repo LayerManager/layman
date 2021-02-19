@@ -3,12 +3,12 @@ import logging
 import json
 from functools import partial
 import xml.etree.ElementTree as ET
-import re
 import requests
 import secrets
 import string
 from urllib.parse import urljoin
 from layman import settings
+from ..db import launder_attribute_name
 from layman.http import LaymanError
 
 
@@ -287,11 +287,6 @@ def get_workspace_style_url(geoserver_workspace, style=None):
     style = style or ''
     return urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
                    geoserver_workspace + '/styles/' + style)
-
-
-def launder_attribute_name(attr_name):
-    # https://github.com/OSGeo/gdal/blob/355b41831cd2685c85d1aabe5b95665a2c6e99b7/gdal/ogr/ogrsf_frmts/pgdump/ogrpgdumpdatasource.cpp#L129,L155
-    return re.sub(r"['\-#]", '_', attr_name.lower())
 
 
 def post_workspace_sld_style(geoserver_workspace, layername, sld_file):
