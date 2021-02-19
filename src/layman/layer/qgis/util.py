@@ -7,6 +7,7 @@ from lxml import etree as ET
 from . import wms
 from layman import settings, LaymanError
 from layman.layer.filesystem import input_style
+from layman.common import db as db_commmon
 
 
 def get_layer_template_path():
@@ -72,6 +73,8 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, qml_xml, source_typ
         extent=extent_to_xml_string(native_bbox),
         default_action_canvas_value='{00000000-0000-0000-0000-000000000000}'
     )
+
+    launder_attribute_names(qml_xml)
 
     parser = ET.XMLParser(remove_blank_text=True)
     layer_xml = ET.fromstring(skeleton_xml_str.encode('utf-8'), parser=parser)
@@ -183,3 +186,19 @@ def get_source_type(db_types, qml_geometry):
     if result is None:
         raise LaymanError(47, data=f'Unknown combination of QGIS geometry "{qml_geometry}" and DB geometry types {db_types}')
     return result
+
+
+def launder_attribute_names(qml):
+    for el_path, attr_name in [
+        ("/qgis/renderer-v2", "attr"),
+        ("/qgis/fieldConfiguration/field", "name"),
+        ("/qgis/aliases/alias", "field"),
+        ("/qgis/defaults/default", "field"),
+        ("/qgis/constraints/constraint", "field"),
+        ("/qgis/constraintExpressions/constraint", "field"),
+        ("/qgis/attributetableconfig/columns/column[@type='field']", "name"),
+        ("/qgis/editable/field", "name"),
+        ("/qgis/labelOnTop/field", "name"),
+    ]:
+        for el in qml.xpath(f'{el_path}[@{attr_name}]'):
+            el.attrib[attr_name] = db_commmon.launder_attribute_name(el.attrib[attr_name])

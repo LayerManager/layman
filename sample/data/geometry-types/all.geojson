@@ -5,7 +5,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "Point",
-        "class": 1
+        "Class-ID": 1
       },
       "geometry": {
         "type": "Point",
@@ -19,7 +19,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "Point",
-        "class": 1
+        "Class-ID": 1
       },
       "geometry": {
         "type": "Point",
@@ -33,7 +33,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "LineString",
-        "class": 1
+        "Class-ID": 1
       },
       "geometry": {
         "type": "LineString",
@@ -53,7 +53,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "Polygon",
-        "class": 1
+        "Class-ID": 1
       },
       "geometry": {
         "type": "Polygon",
@@ -87,7 +87,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "Polygon",
-        "class": 2
+        "Class-ID": 2
       },
       "geometry": {
         "type": "Polygon",
@@ -121,7 +121,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "MultiPoint",
-        "class": 2
+        "Class-ID": 2
       },
       "geometry": {
         "type": "MultiPoint",
@@ -141,7 +141,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "MultiPoint",
-        "class": 3
+        "Class-ID": 3
       },
       "geometry": {
         "type": "MultiPoint",
@@ -157,7 +157,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "MultiLineString",
-        "class": 2
+        "Class-ID": 2
       },
       "geometry": {
         "type": "MultiLineString",
@@ -189,7 +189,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "MultiLineString",
-        "class": 3
+        "Class-ID": 3
       },
       "geometry": {
         "type": "MultiLineString",
@@ -211,7 +211,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "MultiPolygon",
-        "class": 3
+        "Class-ID": 3
       },
       "geometry": {
         "type": "MultiPolygon",
