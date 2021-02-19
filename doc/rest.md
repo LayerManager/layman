@@ -53,7 +53,7 @@ Processing chain consists of few steps:
 - publish the table as new layer (feature type) within appropriate WFS workspaces of GeoServer
 - for layers with SLD or none style:
   - publish the table as new layer (feature type) within appropriate WMS workspaces of GeoServer
-- else for layers with QGIS style:
+- else for layers with QML style:
   - create QGS file on QGIS server filesystem with appropriate style
   - publish the layer on GeoServer through WMS cascade from QGIS server
 - generate thumbnail image
@@ -83,6 +83,7 @@ Body parameters:
    - if file names are provided, files must be uploaded subsequently using [POST Layer Chunk](#post-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be safely stored in DB
+   - if QML style is used in this request, it must list all attributes contained in given data file
 - *name*, string
    - computer-friendly identifier of the layer
    - must be unique among all layers of one workspace
@@ -98,7 +99,7 @@ Body parameters:
    - by default it is read/guessed from input file
 - *style*, style file
    - by default default SLD style of GeoServer is used
-   - SLD or QGIS style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
+   - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
    - uploading of additional style files, e.g. point-symbol images or fonts is not supported
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
 - *access_rights.read*, string
@@ -226,12 +227,13 @@ Body parameters:
       - file names, i.e. array of strings
    - if file names are provided, files must be uploaded subsequently using [POST Layer Chunk](#post-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
+   - if QML style is used (either directly within this request, or indirectly from previous state on server), it must list all attributes contained in given data file
 - *title*
 - *description*
 - *crs*, string `EPSG:3857` or `EPSG:4326`
    - Taken into account only if `file` is provided.
 - *style*, style file
-   - SLD or QGIS style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
+   - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 - *access_rights.read*, string
