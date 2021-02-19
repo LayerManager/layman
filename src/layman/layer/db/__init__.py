@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 import json
 import math
 import os
@@ -12,6 +12,9 @@ from layman import settings
 
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 logger = logging.getLogger(__name__)
+
+
+ColumnInfo = namedtuple('ColumnInfo', 'name data_type')
 
 
 def create_connection_cursor():
@@ -181,11 +184,15 @@ AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 
 
 def get_all_column_names(username, layername, conn_cur=None):
+    return [col.name for col in get_all_column_infos(username, layername, conn_cur)]
+
+
+def get_all_column_infos(username, layername, conn_cur=None):
     conn, cur = conn_cur or get_connection_cursor()
 
     try:
         cur.execute(f"""
-SELECT QUOTE_IDENT(column_name) AS column_name
+SELECT QUOTE_IDENT(column_name) AS column_name, data_type
 FROM information_schema.columns
 WHERE table_schema = '{username}'
 AND table_name = '{layername}'
@@ -194,7 +201,7 @@ AND table_name = '{layername}'
         logger.error(f'get_all_column_names ERROR')
         raise LaymanError(7)
     rows = cur.fetchall()
-    return [r[0] for r in rows]
+    return [ColumnInfo(name=r[0], data_type=r[1]) for r in rows]
 
 
 def get_number_of_features(username, layername, conn_cur=None):
