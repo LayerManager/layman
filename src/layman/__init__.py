@@ -92,7 +92,7 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
 
                     import_authn_to_redis()
 
-                app.logger.info(f'Update SRS output list for QGIS projects')
+                app.logger.info(f'Ensure SRS output list for QGIS projects')
                 with app.app_context():
                     from .layer.qgis import output_srs
                     output_srs.ensure_output_srs_for_all()
