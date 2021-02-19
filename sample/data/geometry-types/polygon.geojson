@@ -5,7 +5,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "Polygon",
-        "class": 1
+        "Class-ID": 1
       },
       "geometry": {
         "type": "Polygon",
@@ -39,7 +39,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "Polygon",
-        "class": 2
+        "Class-ID": 2
       },
       "geometry": {
         "type": "Polygon",
@@ -73,7 +73,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "Polygon",
-        "class": 3
+        "Class-ID": 3
       },
       "geometry": {
         "type": "Polygon",
@@ -107,7 +107,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "Polygon",
-        "class": 3
+        "Class-ID": 3
       },
       "geometry": {
         "type": "Polygon",
