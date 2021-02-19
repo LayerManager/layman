@@ -82,6 +82,7 @@ Body parameters:
       - file names, i.e. array of strings
    - if file names are provided, files must be uploaded subsequently using [POST Layer Chunk](#post-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
+   - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be safely stored in DB
 - *name*, string
    - computer-friendly identifier of the layer
    - must be unique among all layers of one workspace
@@ -97,8 +98,9 @@ Body parameters:
    - by default it is read/guessed from input file
 - *style*, style file
    - by default default SLD style of GeoServer is used
-   - SLD or QGIS style file (recognized by the root element of XML - `StyledLayerDescriptor` or `qgis`)
+   - SLD or QGIS style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
    - uploading of additional style files, e.g. point-symbol images or fonts is not supported
+   - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
 - *access_rights.read*, string
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
    - default value is current authenticated user, or EVERYONE if published by anonymous
@@ -229,7 +231,8 @@ Body parameters:
 - *crs*, string `EPSG:3857` or `EPSG:4326`
    - Taken into account only if `file` is provided.
 - *style*, style file
-   - SLD or QGIS style file (recognized by the root element of XML - `StyledLayerDescriptor` or `qgis`)
+   - SLD or QGIS style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
+   - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 - *access_rights.read*, string
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
