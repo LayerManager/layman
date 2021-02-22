@@ -7,7 +7,7 @@ from lxml import etree as ET
 from . import wms
 from layman import settings, LaymanError
 from layman.layer.filesystem import input_style
-from layman.common import db as db_commmon
+from layman.common import db as db_common
 
 
 def get_layer_template_path():
@@ -207,7 +207,7 @@ FIELD_XML_ATTRIBUTES = [
 def launder_attribute_names(qml):
     for el_path, attr_name in FIELD_XML_ATTRIBUTES:
         for el in qml.xpath(f'{el_path}[@{attr_name}]'):
-            el.attrib[attr_name] = db_commmon.launder_attribute_name(el.attrib[attr_name])
+            el.attrib[attr_name] = db_common.launder_attribute_name(el.attrib[attr_name])
 
 
 def get_attribute_names_from_qml(qml):
@@ -242,3 +242,17 @@ def ensure_attributes_in_qml(qml, attrs_to_ensure):
                                        f'file. You can fix this by uploading QML style listing all data attributes.')
         field_el = ET.fromstring(field_template.format(field_name=attr.name), parser=parser)
         fields_el.append(field_el)
+
+
+def get_attribute_names_from_qgs(qgs):
+    result = set()
+    for el in qgs.xpath(f'/qgis/projectlayers/maplayer/fieldConfiguration/field'):
+        result.add(el.attrib['name'])
+    return result
+
+
+def get_layer_attribute_names(workspace, layer):
+    qgs_path = wms.get_layer_file_path(workspace, layer)
+    parser = ET.XMLParser(remove_blank_text=True)
+    qgs_xml = ET.parse(qgs_path, parser=parser)
+    return get_attribute_names_from_qgs(qgs_xml)
