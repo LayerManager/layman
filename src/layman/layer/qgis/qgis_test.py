@@ -11,7 +11,7 @@ from test import process_client
 def test_qgis_rest():
     workspace = 'test_qgis_rest_workspace'
     layer = 'test_qgis_rest_layer'
-    source_style_file_path = 'sample/style/funny_qml.xml'
+    source_style_file_path = 'sample/style/small_layer.qml'
     workspace_directory = f'{settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}'
     layer_directory = f'{workspace_directory}/layers/{layer}'
 

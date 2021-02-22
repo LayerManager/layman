@@ -296,7 +296,7 @@ def test_update_style_type_in_db():
                            ),
               # This should not happened, because before this release, it was not possible to upload QGIS files
               TestLayerDef('test_update_style_type_in_db_qgis_layer',
-                           'sample/style/funny_qml.xml',
+                           'sample/style/small_layer.qml',
                            'sld',
                            ),
               ]
