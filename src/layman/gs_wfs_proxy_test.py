@@ -2,14 +2,14 @@ import pytest
 import requests
 from owslib.feature.schema import get_schema as get_wfs_schema
 
-from layman import app
-from layman import settings
-from layman.layer import db
-from test.process_client import get_authz_headers
-from test import process_client as client_util, geoserver_client
-from test.data import wfs as data_wfs
+from layman import app, settings
+from layman.layer import db, util as layer_util
 from layman.layer.geoserver import wfs as geoserver_wfs
+from layman.layer.qgis import util as qgis_util, wms as qgis_wms
 from layman.common.geoserver import get_layer_thumbnail, get_layer_square_bbox
+from test import process_client as client_util, geoserver_client
+from test.process_client import get_authz_headers
+from test.data import wfs as data_wfs
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -159,7 +159,11 @@ def test_wms_ows_proxy(service_endpoint):
 
 
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
-def test_missing_attribute():
+@pytest.mark.parametrize('style_file', [
+    None,
+    'sample/style/ne_10m_admin_0_countries.qml',
+])
+def test_missing_attribute(style_file, ):
     username = 'testmissingattr'
     layername = 'inexisting_attribute_layer'
     layername2 = 'inexisting_attribute_layer2'
@@ -171,33 +175,41 @@ def test_missing_attribute():
         **authn_headers,
     }
 
-    client_util.reserve_username(username, headers=authn_headers)
-    ln = client_util.publish_layer(username,
-                                   layername,
-                                   ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
-                                   headers=authn_headers,
-                                   )
-    ln2 = client_util.publish_layer(username,
-                                    layername2,
-                                    ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
-                                    headers=authn_headers,
-                                    )
+    client_util.ensure_reserved_username(username, headers=authn_headers)
+    client_util.publish_layer(username,
+                              layername,
+                              file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+                              style_file=style_file,
+                              headers=authn_headers,
+                              )
+    client_util.publish_layer(username,
+                              layername2,
+                              file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+                              style_file=style_file,
+                              headers=authn_headers,
+                              )
 
     wfs_t_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
+    with app.app_context():
+        style_type = layer_util.get_layer_info(username, layername)['style_type']
 
-    def wfs_post(username, attr_names_list, data_xml):
+    def wfs_post(workspace, attr_names_list, data_xml):
         with app.app_context():
-            wfs_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs"
+            wfs_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}/wfs"
             old_db_attributes = {}
             old_wfs_properties = {}
-            for layername, attr_names in attr_names_list:
+            for layer, attr_names in attr_names_list:
                 # test that all attr_names are not yet presented in DB table
-                old_db_attributes[layername] = db.get_all_column_names(username, layername)
+                old_db_attributes[layer] = db.get_all_column_names(workspace, layer)
                 for attr_name in attr_names:
-                    assert attr_name not in old_db_attributes[layername], f"old_db_attributes={old_db_attributes[layername]}, attr_name={attr_name}"
+                    assert attr_name not in old_db_attributes[layer], f"old_db_attributes={old_db_attributes[layer]}, attr_name={attr_name}"
                 layer_schema = get_wfs_schema(
-                    wfs_url, typename=f"{username}:{layername}", version=geoserver_wfs.VERSION, headers=authn_headers)
-                old_wfs_properties[layername] = sorted(layer_schema['properties'].keys())
+                    wfs_url, typename=f"{workspace}:{layer}", version=geoserver_wfs.VERSION, headers=authn_headers)
+                old_wfs_properties[layer] = sorted(layer_schema['properties'].keys())
+                if style_type == 'qgis':
+                    assert qgis_wms.get_layer_info(workspace, layer)
+                    old_qgis_attributes = qgis_util.get_layer_attribute_names(workspace, layer)
+                    assert all(attr_name not in old_qgis_attributes for attr_name in attr_names), (attr_names, old_qgis_attributes)
 
             r = requests.post(wfs_t_url,
                               data=data_xml,
@@ -206,21 +218,27 @@ def test_missing_attribute():
 
             new_db_attributes = {}
             new_wfs_properties = {}
-            for layername, attr_names in attr_names_list:
+            for layer, attr_names in attr_names_list:
                 # test that exactly all attr_names were created in DB table
-                new_db_attributes[layername] = db.get_all_column_names(username, layername)
+                new_db_attributes[layer] = db.get_all_column_names(workspace, layer)
                 for attr_name in attr_names:
-                    assert attr_name in new_db_attributes[layername], f"new_db_attributes={new_db_attributes[layername]}, attr_name={attr_name}"
-                assert set(attr_names).union(set(old_db_attributes[layername])) == set(new_db_attributes[layername])
+                    assert attr_name in new_db_attributes[layer], f"new_db_attributes={new_db_attributes[layer]}, attr_name={attr_name}"
+                assert set(attr_names).union(set(old_db_attributes[layer])) == set(new_db_attributes[layer])
 
                 # test that exactly all attr_names were distinguished also in WFS feature type
                 layer_schema = get_wfs_schema(
-                    wfs_url, typename=f"{username}:{layername}", version=geoserver_wfs.VERSION, headers=authn_headers)
-                new_wfs_properties[layername] = sorted(layer_schema['properties'].keys())
+                    wfs_url, typename=f"{workspace}:{layer}", version=geoserver_wfs.VERSION, headers=authn_headers)
+                new_wfs_properties[layer] = sorted(layer_schema['properties'].keys())
                 for attr_name in attr_names:
-                    assert attr_name in new_wfs_properties[layername], f"new_wfs_properties={new_wfs_properties[layername]}, attr_name={attr_name}"
-                assert set(attr_names).union(set(old_wfs_properties[layername])) == set(new_wfs_properties[layername]),\
-                    set(new_wfs_properties[layername]).difference(set(attr_names).union(set(old_wfs_properties[layername])))
+                    assert attr_name in new_wfs_properties[layer], f"new_wfs_properties={new_wfs_properties[layer]}, attr_name={attr_name}"
+                assert set(attr_names).union(set(old_wfs_properties[layer])) == set(new_wfs_properties[layer]),\
+                    set(new_wfs_properties[layer]).difference(set(attr_names).union(set(old_wfs_properties[layer])))
+                if style_type == 'qgis':
+                    assert qgis_wms.get_layer_info(workspace, layer)
+                    new_qgis_attributes = qgis_util.get_layer_attribute_names(workspace, layer)
+                    assert all(attr_name in new_qgis_attributes for attr_name in attr_names), (attr_names, new_qgis_attributes)
+                else:
+                    assert not qgis_wms.get_layer_info(workspace, layer)
 
     attr_names = ['inexisting_attribute_attr', 'inexisting_attribute_attr1a']
     data_xml = data_wfs.get_wfs20_insert_points_new_attr(username, layername, attr_names)

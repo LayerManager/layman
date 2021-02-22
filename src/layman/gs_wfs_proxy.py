@@ -6,15 +6,13 @@ from lxml import etree as ET
 
 from flask import Blueprint, g, current_app as app, request, Response
 
+from layman import authn, authz, settings
 from layman.authn import authenticate
-from layman import authn
-from layman import settings
-from layman.layer import db
+from layman.layer import db, LAYER_TYPE, util as layer_util
+from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import LAYERNAME_PATTERN, ATTRNAME_PATTERN
 from layman.util import USERNAME_ONLY_PATTERN
 from layman.common.geoserver import reset as gs_reset
-from layman.layer import LAYER_TYPE
-from layman import authz
 
 
 bp = Blueprint('gs_wfs_proxy_bp', __name__)
@@ -38,10 +36,10 @@ def ensure_wfs_t_attributes(binary_data):
         attribs = set()
         for action in xml_tree:
             action_qname = ET.QName(action)
-            if action_qname.localname in ('Insert', 'Replace'):
+            if action_qname.localname in ('Insert', 'Replace', ):
                 extracted_attribs = extract_attributes_from_wfs_t_insert_replace(action)
                 attribs.update(extracted_attribs)
-            elif action_qname.localname in ('Update'):
+            elif action_qname.localname in ('Update', ):
                 extracted_attribs = extract_attributes_from_wfs_t_update(action,
                                                                          xml_tree,
                                                                          major_version=version[0:1])
@@ -51,6 +49,11 @@ def ensure_wfs_t_attributes(binary_data):
         if attribs:
             created_attributes = db.ensure_attributes(attribs)
             if created_attributes:
+                changed_layers = {(workspace, layer) for workspace, layer, _ in created_attributes}
+                qgis_changed_layers = {(workspace, layer) for workspace, layer in changed_layers
+                                       if layer_util.get_layer_info(workspace, layer)['style_type'] == 'qgis'}
+                for workspace, layer in qgis_changed_layers:
+                    qgis_wms.save_qgs_file(workspace, layer)
                 gs_reset(settings.LAYMAN_GS_AUTH)
 
     except BaseException as err:
