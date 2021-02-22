@@ -281,6 +281,7 @@ def test_missing_attribute():
     client_util.delete_layer(username, layername2, headers)
 
 
+@pytest.mark.flaky(reruns=2, reruns_delay=2)
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
 def test_missing_attribute_authz():
     username = 'testmissingattr_authz'
