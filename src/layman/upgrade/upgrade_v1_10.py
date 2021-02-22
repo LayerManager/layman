@@ -2,8 +2,10 @@ import io
 import json
 import logging
 import re
+import requests
 import time
 import os
+from urllib.parse import urljoin
 from layman import settings
 from layman.http import LaymanError
 from layman.common import prime_db_schema
@@ -60,21 +62,42 @@ def migrate_layers_to_wms_workspace(workspace=None):
         info = util.get_publication_info(workspace, publication_type, layer)
         geoserver_workspace = wms.get_geoserver_workspace(workspace)
         geoserver.ensure_workspace(workspace)
+        if not (isinstance(info.get('db_table'), str) and info.get('db_table') == layer):
+            logger.warning(f'        Layer DB table not available, not migrating.')
+            continue
 
-        geoserver.publish_layer_from_db(workspace,
-                                        layer,
-                                        info.get('description'),
-                                        info.get('title'),
-                                        info.get('access_rights'),
-                                        geoserver_workspace=geoserver_workspace)
-        wms.clear_cache(workspace)
+        r = requests.get(
+            urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+                    geoserver_workspace + '/layers/' + layer),
+            auth=settings.LAYMAN_GS_AUTH,
+            timeout=5,
+        )
+        if r.status_code == 404:
+            geoserver.publish_layer_from_db(workspace,
+                                            layer,
+                                            info.get('description'),
+                                            info.get('title'),
+                                            info.get('access_rights'),
+                                            geoserver_workspace=geoserver_workspace)
+            wms.clear_cache(workspace)
+        else:
+            r.raise_for_status()
+            logger.info(f'        Layer already migrated.')
 
-        sld_r = gs_common.get_workspace_style_response(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
-        sld_stream = io.BytesIO(sld_r.content)
-        gs_common.post_workspace_sld_style(geoserver_workspace, layer, sld_stream)
-        wms.clear_cache(workspace)
+        sld_wms_r = gs_common.get_workspace_style_response(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH)
+        if sld_wms_r.status_code == 404:
+            sld_r = gs_common.get_workspace_style_response(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
+            if sld_r.status_code == 200:
+                sld_stream = io.BytesIO(sld_r.content)
+                gs_common.post_workspace_sld_style(geoserver_workspace, layer, sld_stream)
+                gs_common.delete_workspace_style(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
+                wms.clear_cache(workspace)
+            else:
+                logger.warning(f"      Error when loading SLD style from GeoServer, status code={sld_r.status_code}, response=\n{sld_r.content}")
+        else:
+            sld_wms_r.raise_for_status()
+            logger.info(f'        Layer SLD style already migrated.')
 
-        gs_common.delete_workspace_style(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
     logger.info(f'    DONE - migrate layers to WMS workspace')
 
 
