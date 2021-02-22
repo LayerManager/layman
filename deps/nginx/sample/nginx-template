@@ -43,6 +43,20 @@ server {
         proxy_set_header Host $host;
     }
 
+    location /qgis {
+        allow  127.0.0.1;
+        # docker containers 172.18.0.x
+        allow  172.18.0.0/24;
+        deny   all;
+        proxy_buffers 16 16k;
+        proxy_buffer_size 16k;
+        gzip off;
+        fastcgi_pass layman_qgis_1:5555;
+        fastcgi_param SERVER_NAME nginx;
+        fastcgi_param SERVER_PORT 80;
+        include fastcgi_params;
+    }
+
     location / {
         proxy_pass http://layman_client:3000/;
         proxy_set_header Host $host;
