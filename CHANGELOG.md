@@ -3,6 +3,11 @@
 ## v1.10.0
   {release-date}
 ### Upgrade requirements
+- Set environment variables
+  - [LAYMAN_QGIS_HOST](doc/env-settings.md#LAYMAN_QGIS_HOST)=nginx
+  - [LAYMAN_QGIS_PORT](doc/env-settings.md#LAYMAN_QGIS_PORT)=80
+  - [LAYMAN_QGIS_PATH](doc/env-settings.md#LAYMAN_QGIS_PATH)=/qgis/
+  - [LAYMAN_QGIS_DATA_DIR](doc/env-settings.md#LAYMAN_QGIS_DATA_DIR)=/qgis/data/demo
 - If you are running Layman with development settings, set environment variables
   - [LAYMAN_QGIS_HOST](doc/env-settings.md#LAYMAN_QGIS_HOST)=nginx-qgis
   - [LAYMAN_QGIS_PORT](doc/env-settings.md#LAYMAN_QGIS_PORT)=80

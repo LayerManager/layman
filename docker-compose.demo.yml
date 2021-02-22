@@ -22,11 +22,13 @@ services:
         - ./version.txt:/code/version.txt
         - ./deps/geoserver/data:/geoserver/data_dir
         - ./deps/geoserver/sample/geoserver_data:/geoserver/initial_data_dir
+        - ./deps/qgis/data:/qgis/data
       depends_on:
         - timgen
         - layman_client
         - redis
         - postgresql
+        - qgis
         - geoserver
 
    celery_worker:
@@ -43,6 +45,7 @@ services:
       volumes:
         - ./layman_data:/layman_data
         - ./src/layman_settings.py:/code/src/layman_settings.py
+        - ./deps/qgis/data:/qgis/data
       depends_on:
         - layman
 
@@ -60,6 +63,7 @@ services:
       volumes:
         - ./layman_data:/layman_data
         - ./src/layman_settings.py:/code/src/layman_settings.py
+        - ./deps/qgis/data:/qgis/data
       depends_on:
         - celery_worker
 
