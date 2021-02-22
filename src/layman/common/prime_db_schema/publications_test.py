@@ -95,7 +95,7 @@ def test_select_publications():
     layername = 'test_select_publications_layer1'
     layer_qgis = 'test_select_publications_layer_qgis'
     mapname = 'test_select_publications_map1'
-    qgis_style_file = 'sample/style/funny_qml.xml'
+    qgis_style_file = 'sample/style/small_layer.qml'
 
     process_client.publish_layer(username, layername)
     process_client.publish_layer(username, layer_qgis, style_file=qgis_style_file,)

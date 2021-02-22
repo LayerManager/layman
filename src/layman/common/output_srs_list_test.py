@@ -38,7 +38,7 @@ def test_custom_srs_list(ensure_layer):
     layer_sld2 = 'test_custom_srs_list_sld_layer2'
     layer_qgis1 = 'test_custom_srs_list_qgis_layer1'
     layer_qgis2 = 'test_custom_srs_list_qgis_layer2'
-    source_style_file_path = 'sample/style/funny_qml.xml'
+    source_style_file_path = 'sample/style/small_layer.qml'
     assert settings.LAYMAN_OUTPUT_SRS_LIST != OUTPUT_SRS_LIST
 
     process.ensure_layman_function(process.LAYMAN_DEFAULT_SETTINGS)

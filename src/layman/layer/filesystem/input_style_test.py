@@ -9,7 +9,7 @@ from layman.layer.filesystem import input_style
 @pytest.mark.parametrize('file_path, expected_type', [
     ('sample/style/generic-blue_sld.xml', 'sld'),
     ('sample/style/sld_1_1_0.xml', 'sld'),
-    ('sample/style/funny_qml.xml', 'qgis'),
+    ('sample/style/small_layer.qml', 'qgis'),
     (None, 'sld'),
 ])
 def test_get_style_type_from_xml_file(file_path,

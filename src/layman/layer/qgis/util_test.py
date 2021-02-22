@@ -31,7 +31,7 @@ def test_fill_project_template():
     with app.app_context():
         layer_bbox = db.get_bbox(workspace, layer)
     layer_bbox = layer_bbox or settings.LAYMAN_DEFAULT_OUTPUT_BBOX
-    qml_path = '/code/sample/style/funny_qml.xml'
+    qml_path = '/code/sample/style/ne_10m_admin_0_countries.qml'
     parser = ET.XMLParser(remove_blank_text=True)
     qml_xml = ET.parse(qml_path, parser=parser)
     with app.app_context():

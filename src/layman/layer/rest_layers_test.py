@@ -54,7 +54,7 @@ def assert_style_file(workspace,
 @pytest.mark.parametrize('source_style_file_path, layer_suffix, expected_style_file_template, expected_style_type', [
     ('sample/style/generic-blue_sld.xml', '_sld', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.sld', 'sld'),
     ('sample/style/sld_1_1_0.xml', '_sld11', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.sld', 'sld'),
-    ('sample/style/funny_qml.xml', '_qml', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.qgis', 'qgis'),
+    ('sample/style/small_layer.qml', '_qml', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.qgis', 'qgis'),
     ('', '_no_style', None, 'sld'),
 ])
 @pytest.mark.usefixtures('ensure_layman')
@@ -97,7 +97,7 @@ class TestQgisCascadeWmsClass:
     workspace = 'test_qgis_cascade_wms_workspace'
     layer = 'test_qgis_cascade_wms_layer'
     qgis_layer_files = ['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson']
-    qgis_style_file = 'sample/style/funny_qml.xml'
+    qgis_style_file = 'sample/style/ne_10m_admin_0_countries.qml'
     sld_layer_files = ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
     sld_style_file = 'sample/style/generic-blue_sld.xml'
     expected_qgis_thumbnail = 'sample/style/test_qgis_style_applied_in_thumbnail_layer.png'
