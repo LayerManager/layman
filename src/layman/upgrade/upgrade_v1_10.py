@@ -143,9 +143,18 @@ def migrate_metadata_records(workspace=None):
     infos = util.get_publication_infos(publ_type=LAYER_TYPE, workspace=workspace)
     for (workspace, _, layer) in infos.keys():
         wms.clear_cache(workspace)
-        muuid = csw.patch_layer(workspace, layer, ['wms_url'], create_if_not_exists=False)
-        if not muuid:
-            logger.warning(f'      Metadata record of layer {workspace}.{layer} was not migrated, because the record does not exist.')
+        logger.info(f'      Migrate layer {workspace}.{layer}')
+        try:
+            muuid = csw.patch_layer(workspace, layer, ['wms_url'], create_if_not_exists=False, timeout=2)
+            if not muuid:
+                logger.warning(f'        Metadata record of layer was not migrated, because the record does not exist.')
+        except requests.exceptions.ReadTimeout:
+            md_props = list(csw.get_metadata_comparison(workspace, layer).values())
+            md_wms_url = md_props[0]['wms_url'] if md_props else None
+            exp_wms_url = wms.add_capabilities_params_to_url(wms.get_wms_url(workspace, external_url=True))
+            if md_wms_url != exp_wms_url:
+                logger.exception(
+                    f'        WMS URL was not migrated (should be {exp_wms_url}, but is {md_wms_url})!')
         time.sleep(0.5)
     logger.info(f'    DONE - migrate layer metadata records')
 

@@ -51,7 +51,7 @@ def get_layer_info(username, layername):
         return {}
 
 
-def patch_layer(username, layername, metadata_properties_to_refresh, actor_name=None, create_if_not_exists=True):
+def patch_layer(username, layername, metadata_properties_to_refresh, actor_name=None, create_if_not_exists=True, timeout=5):
     # current_app.logger.info(f"patch_layer metadata_properties_to_refresh={metadata_properties_to_refresh}")
     if len(metadata_properties_to_refresh) == 0:
         return {}
@@ -83,7 +83,7 @@ def patch_layer(username, layername, metadata_properties_to_refresh, actor_name=
         muuid = common_util.csw_update({
             'muuid': muuid,
             'record': record,
-        })
+        }, timeout=timeout)
     except (HTTPError, ConnectionError):
         current_app.logger.info(traceback.format_exc())
         raise LaymanError(38)
@@ -364,7 +364,7 @@ def get_metadata_comparison(username, layername):
     muuid = get_metadata_uuid(uuid)
     el = common_util.get_record_element_by_id(csw, muuid)
     if el is None:
-        return
+        return {}
 
     # current_app.logger.info(f"xml\n{ET.tostring(el)}")
 
