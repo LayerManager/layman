@@ -54,7 +54,7 @@ def assert_style_file(workspace,
 @pytest.mark.parametrize('source_style_file_path, layer_suffix, expected_style_file_template, expected_style_type', [
     ('sample/style/generic-blue_sld.xml', '_sld', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.sld', 'sld'),
     ('sample/style/sld_1_1_0.xml', '_sld11', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.sld', 'sld'),
-    ('sample/style/small_layer.qml', '_qml', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.qgis', 'qgis'),
+    ('sample/style/small_layer.qml', '_qml', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.qml', 'qml'),
     ('', '_no_style', None, 'sld'),
 ])
 @pytest.mark.usefixtures('ensure_layman')
@@ -97,7 +97,7 @@ class TestQgisCascadeWmsClass:
     workspace = 'test_qgis_cascade_wms_workspace'
     layer = 'test_qgis_cascade_wms_layer'
     qgis_layer_files = ['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson']
-    qgis_style_file = 'sample/style/ne_10m_admin_0_countries.qml'
+    qml_style_file = 'sample/style/ne_10m_admin_0_countries.qml'
     sld_layer_files = ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
     sld_style_file = 'sample/style/generic-blue_sld.xml'
     expected_qgis_thumbnail = 'sample/style/test_qgis_style_applied_in_thumbnail_layer.png'
@@ -113,18 +113,18 @@ class TestQgisCascadeWmsClass:
 
         with app.app_context():
             info = layer_util.get_layer_info(workspace, layer)
-        assert (info['style_type'] == 'qgis') == (style == 'qgis'), info.get('style_type', None)
+        assert (info['style_type'] == 'qml') == (style == 'qml'), info.get('style_type', None)
 
-        assert (os.path.exists(expected_style_file + '.qgis')) == (style == 'qgis')
+        assert (os.path.exists(expected_style_file + '.qml')) == (style == 'qml')
         assert (os.path.exists(expected_style_file + '.sld')) == (style == 'sld')
-        assert (os.path.exists(expected_qgis_file)) == (style == 'qgis')
+        assert (os.path.exists(expected_qgis_file)) == (style == 'qml')
 
         rv = requests.get(wms_stores_url,
                           auth=settings.LAYMAN_GS_AUTH,
                           timeout=5,
                           )
         assert rv.status_code == 200, rv.json()
-        if style == 'qgis':
+        if style == 'qml':
             assert rv.json()['wmsStores']['wmsStore'][0]['name'] == f'{DEFAULT_WMS_STORE_PREFIX}_{layer}', rv.json()
 
         rv = requests.get(wms_layers_url,
@@ -143,16 +143,16 @@ class TestQgisCascadeWmsClass:
     @pytest.mark.usefixtures('ensure_layman')
     @pytest.mark.parametrize('operations', [
         [
-            ({'file_paths': qgis_layer_files, 'style_file': qgis_style_file, }, 'qgis', expected_qgis_thumbnail),
+            ({'file_paths': qgis_layer_files, 'style_file': qml_style_file, }, 'qml', expected_qgis_thumbnail),
         ],
         [
             ({'file_paths': qgis_layer_files, }, None, None),
-            ({'style_file': qgis_style_file, }, 'qgis', expected_qgis_thumbnail),
-            ({'title': 'Title defined', }, 'qgis', expected_qgis_thumbnail),
-            ({'file_paths': sld_layer_files, }, 'qgis', None),
+            ({'style_file': qml_style_file, }, 'qml', expected_qgis_thumbnail),
+            ({'title': 'Title defined', }, 'qml', expected_qgis_thumbnail),
+            ({'file_paths': sld_layer_files, }, 'qml', None),
             ({'style_file': sld_style_file, }, 'sld', expected_sld_thumbnail),
             ({'file_paths': qgis_layer_files, }, 'sld', None),
-            ({'style_file': qgis_style_file, }, 'qgis', expected_qgis_thumbnail),
+            ({'style_file': qml_style_file, }, 'qml', expected_qgis_thumbnail),
         ],
     ])
     def test_qgis_cascade_wms(self,
