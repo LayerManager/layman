@@ -29,7 +29,7 @@ def alter_schema():
     db_schema = settings.LAYMAN_PRIME_SCHEMA
     add_column = f'''
 DO $$ BEGIN
-    CREATE TYPE enum_style_type AS ENUM ('sld', 'qgis');
+    CREATE TYPE enum_style_type AS ENUM ('sld', 'qml');
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;

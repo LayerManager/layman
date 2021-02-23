@@ -206,7 +206,7 @@ def test_missing_attribute(style_file, ):
                 layer_schema = get_wfs_schema(
                     wfs_url, typename=f"{workspace}:{layer}", version=geoserver_wfs.VERSION, headers=authn_headers)
                 old_wfs_properties[layer] = sorted(layer_schema['properties'].keys())
-                if style_type == 'qgis':
+                if style_type == 'qml':
                     assert qgis_wms.get_layer_info(workspace, layer)
                     old_qgis_attributes = qgis_util.get_layer_attribute_names(workspace, layer)
                     assert all(attr_name not in old_qgis_attributes for attr_name in attr_names), (attr_names, old_qgis_attributes)
@@ -233,7 +233,7 @@ def test_missing_attribute(style_file, ):
                     assert attr_name in new_wfs_properties[layer], f"new_wfs_properties={new_wfs_properties[layer]}, attr_name={attr_name}"
                 assert set(attr_names).union(set(old_wfs_properties[layer])) == set(new_wfs_properties[layer]),\
                     set(new_wfs_properties[layer]).difference(set(attr_names).union(set(old_wfs_properties[layer])))
-                if style_type == 'qgis':
+                if style_type == 'qml':
                     assert qgis_wms.get_layer_info(workspace, layer)
                     new_qgis_attributes = qgis_util.get_layer_attribute_names(workspace, layer)
                     assert all(attr_name in new_qgis_attributes for attr_name in attr_names), (attr_names, new_qgis_attributes)
