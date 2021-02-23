@@ -9,7 +9,7 @@ from . import upgrade_v1_10
 from layman import app, settings
 from layman.http import LaymanError
 from layman.common import prime_db_schema
-from layman.layer import geoserver as gs_layer, util as layer_util, db
+from layman.layer import geoserver as gs_layer, util as layer_util, db, NO_STYLE_DEF
 from layman.layer.prime_db_schema import table as prime_db_schema_table
 from layman.layer.geoserver import wms
 from layman.layer.filesystem import util as layer_fs_util, input_style
@@ -22,6 +22,22 @@ from layman.common.prime_db_schema import util as db_util
 from layman.uuid import generate_uuid
 from test import process_client, util
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
+
+
+@pytest.fixture()
+def publications_constraint():
+    drop_constraint = f'alter table {DB_SCHEMA}.publications drop constraint if exists con_style_type'
+    with app.app_context():
+        db_util.run_statement(drop_constraint)
+    yield
+    add_constraint = f"""DO $$ BEGIN
+        alter table {DB_SCHEMA}.publications add constraint con_style_type
+    check (type = 'layman.map' or style_type is not null);
+    EXCEPTION
+        WHEN duplicate_object THEN null;
+    END $$;"""
+    with app.app_context():
+        db_util.run_statement(add_constraint)
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -52,6 +68,7 @@ def ensure_layer():
                                              layer,
                                              uuid_str,
                                              None,
+                                             NO_STYLE_DEF,
                                              )
             file_path = '/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
             uuid_common.assign_publication_uuid('layman.layer', workspace, layer, uuid_str=uuid_str)
@@ -274,7 +291,7 @@ def test_migrate_input_sld_directory_to_input_style(ensure_layer):
     process_client.delete_layer(workspace, layer)
 
 
-@pytest.mark.usefixtures('ensure_layman')
+@pytest.mark.usefixtures('ensure_layman', 'publications_constraint')
 def test_update_style_type_in_db():
     workspace = 'test_update_style_type_in_db_workspace'
     map = 'test_update_style_type_in_db_map'
