@@ -79,6 +79,8 @@ def test_style_correctly_saved(source_style_file_path,
     with app.app_context():
         info = layer_util.get_layer_info(workspace, layer)
     assert info['style_type'] == 'sld'
+    assert info['style']['type'] == 'sld', info.get('style')
+    assert info['style']['url'], info.get('style')
 
     assert_style_file(workspace, layer, None)
 
@@ -118,6 +120,8 @@ class TestQgisCascadeWmsClass:
         assert (os.path.exists(expected_style_file + '.qml')) == (style == 'qml')
         assert (os.path.exists(expected_style_file + '.sld')) == (style == 'sld')
         assert (os.path.exists(expected_qgis_file)) == (style == 'qml')
+        assert info['style']['type'] == style if style else 'sld', info.get('style')
+        assert info['style']['url'], info.get('style')
 
         rv = requests.get(wms_stores_url,
                           auth=settings.LAYMAN_GS_AUTH,

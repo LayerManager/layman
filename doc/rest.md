@@ -190,6 +190,7 @@ JSON object with following structure:
   - *error*: If status is FAILURE, this may contain error object.
 - **style**
   - *url*: String. URL of layer default style. It points to [GET Layer Style](#get-layer-style).
+  - *type*: String. Type of used style. Either 'sld' or 'qml'.
   - *status*: Status information about publishing style. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **~~style~~**

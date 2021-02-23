@@ -1,7 +1,7 @@
 import pytest
 import os
 
-from layman import app, settings
+from layman import app, settings, util as layman_util
 from layman.layer import qgis
 from layman.layer.qgis import wms
 from test import process_client
@@ -24,7 +24,11 @@ def test_qgis_rest():
     assert os.path.exists(workspace_directory)
     assert os.path.exists(layer_directory)
     with app.app_context():
-        assert wms.get_layer_info(workspace, layer) == {'name': layer}
+        url = layman_util.url_for('rest_layer_style.get', username=workspace, layername=layer)
+        assert wms.get_layer_info(workspace, layer) == {'name': layer,
+                                                        'style': {'type': 'qml',
+                                                                  'url': url},
+                                                        }
         assert workspace in qgis.get_workspaces()
 
     process_client.delete_layer(workspace, layer)

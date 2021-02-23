@@ -49,7 +49,8 @@ def get_layer_info(username, layername):
         url = url_for('rest_layer_style.get', username=username, layername=layername)
         info = {
             'style': {
-                'url': url
+                'url': url,
+                'type': 'sld',
             },
         }
     else:

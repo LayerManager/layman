@@ -2,8 +2,8 @@ import os
 from owslib.wms import WebMapService
 
 from . import util
-from layman import patch_mode, settings
 from .. import db, qgis, util as layer_util
+from layman import patch_mode, settings, util as layman_util
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = "1.3.0"
@@ -25,7 +25,14 @@ def get_layer_info(username, layername):
     input_file_dir = qgis.get_layer_dir(username, layername)
     result = {}
     if os.path.exists(input_file_dir):
-        result = {'name': layername}
+        url = layman_util.url_for('rest_layer_style.get', username=username, layername=layername)
+        result = {
+            'name': layername,
+            'style': {
+                'url': url,
+                'type': 'qml',
+            },
+        }
     return result
 
 
