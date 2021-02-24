@@ -45,7 +45,7 @@ def patch_layer(username, layername):
 
 
 def delete_layer(username, layername):
-    style_stream = util.get_layer_style_stream(username, layername)
+    style_stream = util.get_layer_original_style_stream(username, layername)
     if style_stream:
         result = {
             'style': {
@@ -73,7 +73,7 @@ def save_qgs_file(workspace, layer):
     qgis.ensure_layer_dir(workspace, layer)
     layer_bbox = db.get_bbox(workspace, layer)
     layer_bbox = layer_bbox or settings.LAYMAN_DEFAULT_OUTPUT_BBOX
-    qml = util.get_style_xml(workspace, layer)
+    qml = util.get_original_style_xml(workspace, layer)
     qml_geometry = util.get_qml_geometry_from_qml(qml)
     db_types = db.get_geometry_types(workspace, layer)
     db_cols = [

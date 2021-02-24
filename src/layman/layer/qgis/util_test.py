@@ -132,7 +132,7 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
                 process_client.patch_layer(workspace, layer, style_file=get_qml_style_path(new_qml_style_name))
                 old_qml_style_name = new_qml_style_name
             with app.app_context():
-                qml = util.get_style_xml(workspace, layer)
+                qml = util.get_original_style_xml(workspace, layer)
             found_qml_geometry = util.get_qml_geometry_from_qml(qml)
             assert found_qml_geometry == qml_geometry
             exp_file_path = f'/code/sample/data/geometry-types/{new_qml_style_name}.png'

@@ -25,19 +25,19 @@ def extent_to_xml_string(extent):
     ])
 
 
-def get_style_path(workspace, layer):
+def get_original_style_path(workspace, layer):
     return input_style.get_file_path(workspace, layer)
 
 
-def get_style_xml(workspace, layer):
-    style_path = get_style_path(workspace, layer)
+def get_original_style_xml(workspace, layer):
+    style_path = get_original_style_path(workspace, layer)
     parser = ET.XMLParser(remove_blank_text=True)
     qml_xml = ET.parse(style_path, parser=parser)
     return qml_xml
 
 
-def get_layer_style_stream(workspace, layer):
-    style_path = get_style_path(workspace, layer)
+def get_layer_original_style_stream(workspace, layer):
+    style_path = get_original_style_path(workspace, layer)
     if style_path and os.path.exists(style_path):
         with open(style_path, 'r') as style_file:
             style = style_file.read()
