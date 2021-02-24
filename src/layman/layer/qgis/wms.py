@@ -88,6 +88,14 @@ def save_qgs_file(workspace, layer):
         print(qgs_str, file=qgs_file)
 
 
+def get_style_qml(workspace, layer):
+    style_template_file = util.get_style_template_path()
+    layer_template_file = util.get_layer_template_path()
+    layer_project_file = get_layer_file_path(workspace, layer)
+    original_qml = util.get_original_style_path(workspace, layer)
+    return util.get_current_style_xml(style_template_file, layer_template_file, layer_project_file, original_qml)
+
+
 def wms_direct(wms_url, xml=None, version=None, headers=None):
     version = version or VERSION
     result_wms = WebMapService(wms_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version, headers=headers)

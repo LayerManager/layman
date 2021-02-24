@@ -20,6 +20,10 @@ def get_project_template_path():
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), './project-template.qgs')
 
 
+def get_style_template_path():
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), './qml-template.qml')
+
+
 def extent_to_xml_string(extent):
     return "\n".join([
         f"<{tag}>{extent}</{tag}>"
@@ -82,7 +86,6 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, qml_xml, source_typ
     parser = ET.XMLParser(remove_blank_text=True)
     layer_xml = ET.fromstring(skeleton_xml_str.encode('utf-8'), parser=parser)
     layer_el_tags = [el.tag for el in layer_xml.xpath('/maplayer/*')]
-    tags_to_rewrite = ['legend', 'expressionfields']
     for qml_el in qml_xml.xpath('/qgis/*'):
         # print(f"qml_el={qml_el.tag}")
         tag = qml_el.tag
@@ -258,3 +261,32 @@ def get_layer_attribute_names(workspace, layer):
     parser = ET.XMLParser(remove_blank_text=True)
     qgs_xml = ET.parse(qgs_path, parser=parser)
     return get_attribute_names_from_qgs(qgs_xml)
+
+
+def get_current_style_xml(style_template_file, layer_template_file, layer_project_file, original_qml_path):
+    parser = ET.XMLParser(remove_blank_text=True)
+
+    qml_xml_tree = ET.parse(style_template_file, parser=parser)
+    qml_xml = qml_xml_tree.getroot()
+
+    qgs_xml = ET.parse(layer_project_file, parser=parser)
+    qgs_maplayers = qgs_xml.xpath('/qgis/projectlayers/maplayer')
+    assert len(qgs_maplayers) == 1
+    qgs_maplayer = qgs_maplayers[0]
+
+    layer_template_xml = ET.parse(layer_template_file, parser=parser)
+    layer_template_maplayers = layer_template_xml.xpath('/maplayer')
+    assert len(layer_template_maplayers) == 1
+    elements_not_copy = [el.tag for el in layer_template_maplayers[0].xpath('/maplayer/*')
+                         if el.tag not in ELEMENTS_TO_REWRITE]
+
+    original_qml = ET.parse(original_qml_path, parser=parser).getroot()
+    for name, value in original_qml.attrib.items():
+        qml_xml.attrib[name] = value
+
+    for el in qgs_maplayer:
+        if el.tag not in elements_not_copy:
+            qml_xml.append(copy.deepcopy(el))
+
+    full_xml_str = ET.tostring(qml_xml, encoding='unicode', pretty_print=True)
+    return full_xml_str
