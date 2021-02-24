@@ -9,6 +9,8 @@ from layman import settings, LaymanError
 from layman.layer.filesystem import input_style
 from layman.common import db as db_common
 
+ELEMENTS_TO_REWRITE = ['legend', 'expressionfields']
+
 
 def get_layer_template_path():
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), './layer-template.qml')
@@ -85,7 +87,7 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, qml_xml, source_typ
         # print(f"qml_el={qml_el.tag}")
         tag = qml_el.tag
         if tag in layer_el_tags:
-            if tag in tags_to_rewrite:
+            if tag in ELEMENTS_TO_REWRITE:
                 layer_el = layer_xml.xpath(f'/maplayer/{tag}')[0]
                 layer_el.getparent().replace(layer_el, copy.deepcopy(qml_el))
             else:
