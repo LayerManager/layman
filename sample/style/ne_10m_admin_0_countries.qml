@@ -1,5 +1,5 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis simplifyLocal="1" readOnly="0" minScale="100000000" labelsEnabled="0" simplifyDrawingTol="1" styleCategories="AllStyleCategories" simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="1" simplifyAlgorithm="0" version="3.12.3-București">
+<qgis simplifyLocal="1" readOnly="0" minScale="200000000" labelsEnabled="0" simplifyDrawingTol="1" styleCategories="AllStyleCategories" simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="1" simplifyAlgorithm="0" version="3.12.3-București">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>

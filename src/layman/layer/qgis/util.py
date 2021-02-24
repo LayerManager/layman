@@ -92,6 +92,12 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, qml_xml, source_typ
                 raise LaymanError(47, data=f'Element {tag} already present in layer template.')
         else:
             layer_xml.append(copy.deepcopy(qml_el))
+    skip_attrs = ['version']
+    qml_root = qml_xml.getroot()
+    for attr_name, attr_value in qml_root.attrib.items():
+        if attr_name in skip_attrs:
+            continue
+        layer_xml.attrib[attr_name] = attr_value
 
     full_xml_str = ET.tostring(layer_xml, encoding='unicode', pretty_print=True)
     return full_xml_str
