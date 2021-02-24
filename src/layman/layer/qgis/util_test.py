@@ -34,6 +34,10 @@ def test_fill_project_template():
     qml_path = '/code/sample/style/ne_10m_admin_0_countries.qml'
     parser = ET.XMLParser(remove_blank_text=True)
     qml_xml = ET.parse(qml_path, parser=parser)
+    exp_min_scale = '200000000'
+    template_xml = ET.parse(util.get_layer_template_path(), parser=parser)
+    assert qml_xml.getroot().attrib['minScale'] == exp_min_scale
+    assert template_xml.getroot().attrib['minScale'] != exp_min_scale
     with app.app_context():
         db_types = db.get_geometry_types(workspace, layer)
         db_cols = [
@@ -42,8 +46,10 @@ def test_fill_project_template():
         ]
     qml_geometry = util.get_qml_geometry_from_qml(qml_xml)
     source_type = util.get_source_type(db_types, qml_geometry)
-    layer_qml = util.fill_layer_template(workspace, layer, layer_uuid, layer_bbox, qml_xml, source_type, db_cols)
-    qgs_str = util.fill_project_template(workspace, layer, layer_uuid, layer_qml, settings.LAYMAN_OUTPUT_SRS_LIST, layer_bbox,
+    layer_qml_str = util.fill_layer_template(workspace, layer, layer_uuid, layer_bbox, qml_xml, source_type, db_cols)
+    layer_qml = ET.fromstring(layer_qml_str.encode('utf-8'), parser=parser)
+    assert layer_qml.attrib['minScale'] == exp_min_scale
+    qgs_str = util.fill_project_template(workspace, layer, layer_uuid, layer_qml_str, settings.LAYMAN_OUTPUT_SRS_LIST, layer_bbox,
                                          source_type)
     with open(qgs_path, "w") as qgs_file:
         print(qgs_str, file=qgs_file)
