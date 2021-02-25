@@ -9,7 +9,7 @@ def _get_multi_publication_path_pattern():
     workspace_pattern = r"(?P<workspace>" + USERNAME_ONLY_PATTERN + r")"
     publ_type_names = [publ_type['rest_path_name'] for publ_type in get_publication_types().values()]
     publ_type_pattern = r"(?P<publication_type>" + "|".join(publ_type_names) + r")"
-    return "^/rest/" + workspace_pattern + "/" + publ_type_pattern
+    return "^/rest/workspaces/" + workspace_pattern + "/" + publ_type_pattern
 
 
 _MULTI_PUBLICATION_PATH_PATTERN = None

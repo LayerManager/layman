@@ -2,7 +2,7 @@ import pytest
 import importlib
 
 from . import app as app, settings, LaymanError, util
-from .util import slugify, get_modules_from_names, get_providers_from_source_names
+from .util import slugify, get_modules_from_names, get_providers_from_source_names, url_for
 from test import process_client
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
@@ -218,3 +218,14 @@ def test_get_publication_infos(publication_type):
         assert publication_infos == expected_result, (publication_infos, expected_result)
 
     process_client.delete_publication(publication_type, workspace, publication)
+
+
+@pytest.mark.parametrize('endpoint, params, expected_url', [
+    ('rest_maps.get', {'username': 'workspace_name'},
+     f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/workspace_name/maps'),
+    ('rest_layers.get', {'username': 'workspace_name'},
+     f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/workspace_name/layers'),
+])
+def test_url_for(endpoint, params, expected_url):
+    with app.app_context():
+        assert url_for(endpoint, **params) == expected_url
