@@ -1,6 +1,4 @@
-from multiprocessing import Process
 import pytest
-import time
 import os
 import filecmp
 import difflib
@@ -9,10 +7,7 @@ import sys
 
 del sys.modules['layman']
 
-from layman import uuid
-from layman import app as app
-from layman import settings
-from layman.map import MAP_TYPE
+from layman import app as app, settings, util as layman_util
 from .csw import _get_property_values, METADATA_PROPERTIES
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals
 
