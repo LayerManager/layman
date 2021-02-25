@@ -14,7 +14,7 @@
 - Thumbnail image available
 - Layer-related data is named and structured 
   - either by [workspace](#workspace) name and layername
-      - [REST API](rest.md): `/rest/<workspace_name>/layers/<layername>` 
+      - [REST API](rest.md): `/rest/workspaces/<workspace_name>/layers/<layername>` 
       - [filesystem](data-storage.md#filesystem): `/path/to/LAYMAN_DATA_DIR/users/<workspace_name>/layers/<layername>` 
       - [PostgreSQL](data-storage.md#postgresql): `db=LAYMAN_PG_DBNAME, schema=<workspace_name>, table=<layername>` 
       - [GeoServer WFS](data-storage.md#geoserver): `/geoserver/<workspace_name>/ows, layer=<layername>`
@@ -38,7 +38,7 @@
 - Thumbnail image available
 - Map-related data is named and structured
   - either by [workspace](#workspace) and layername
-      - [REST API](rest.md): `/rest/<workspace_name>/maps/<mapname>` 
+      - [REST API](rest.md): `/rest/workspaces/<workspace_name>/maps/<mapname>` 
       - file system: `/path/to/LAYMAN_DATA_DIR/users/<workspace_name>/maps/<mapname>` 
   - or by UUID:
       - Micka: `/record/basic/m-<uuid>`
@@ -69,7 +69,7 @@
 ## Workspace
 - Workspace is folder for [publications](#publication).
 - Each workspace is identified by name that is unique among all workspaces.
-- Workspace name is sometimes used for structuring publication-related data. For example, it's part of REST API URL (`/rest/<workspace_name>/...`), directory names (`<LAYMAN_DATA_DIR>/users/<workspace_name>/...`), DB schemas, or OGC Web Services (`/geoserver/<workspace_name>/...`, `/geoserver/<workspace_name>_wms/...`).
+- Workspace name is sometimes used for structuring publication-related data. For example, it's part of REST API URL (`/rest/workspaces/<workspace_name>/...`), directory names (`<LAYMAN_DATA_DIR>/users/<workspace_name>/...`), DB schemas, or OGC Web Services (`/geoserver/<workspace_name>/...`, `/geoserver/<workspace_name>_wms/...`).
 - Workspace's REST API consists of all [map and layer endpoints](rest.md) endpoints.
 - There are following types of workspaces:
    - [Personal workspace](#personal-workspace)

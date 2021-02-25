@@ -33,6 +33,7 @@
 - [#154](https://github.com/jirik/layman/issues/154) Treat attribute names in QML (also known as '[launder](https://gdal.org/drivers/vector/pg.html#layer-creation-options)').
 - [#154](https://github.com/jirik/layman/issues/154) Endpoint [GET Layer](doc/rest.md#get-layer) returns in 'style' also 'type', either 'sld' or 'qml'.
 - [#154](https://github.com/jirik/layman/issues/154) Endpoint [GET Layer Style](doc/rest.md#get-layer-style) returns 'sld' or 'qml' XML in response.
+- [#67](https://github.com/jirik/layman/issues/67) Publication endpoints has `workspaces/` before a workspace name in the url. Whole path is for example: `/rest/workspaces/<workspace_name>/layers`
 
 ## v1.9.1
  2021-01-18

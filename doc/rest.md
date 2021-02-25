@@ -3,17 +3,17 @@
 ## Overview
 |Endpoint|URL|GET|POST|PATCH|DELETE|
 |---|---|---|---|---|---|
-|Layers|`/rest/<workspace_name>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | [DELETE](#delete-layers) |
-|[Layer](models.md#layer)|`/rest/<workspace_name>/layers/<layername>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
-|Layer Thumbnail|`/rest/<workspace_name>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
-|Layer Style|`/rest/<workspace_name>/layers/<layername>/style`|[GET](#get-layer-style)| x | x | x |
-|Layer Chunk|`/rest/<workspace_name>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
-|Layer Metadata Comparison|`/rest/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-layer-metadata-comparison) | x | x | x |
-|Maps|`/rest/<workspace_name>/maps`|[GET](#get-maps)| [POST](#post-maps) | x | [DELETE](#delete-maps) |
-|[Map](models.md#map)|`/rest/<workspace_name>/maps/<mapname>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
-|Map File|`/rest/<workspace_name>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
-|Map Thumbnail|`/rest/<workspace_name>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
-|Map Metadata Comparison|`/rest/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-map-metadata-comparison) | x | x | x |
+|Layers|`/rest/workspaces/<workspace_name>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | [DELETE](#delete-layers) |
+|[Layer](models.md#layer)|`/rest/workspaces/<workspace_name>/layers/<layername>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
+|Layer Thumbnail|`/rest/workspaces/<workspace_name>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
+|Layer Style|`/rest/workspaces/<workspace_name>/layers/<layername>/style`|[GET](#get-layer-style)| x | x | x |
+|Layer Chunk|`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
+|Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-layer-metadata-comparison) | x | x | x |
+|Maps|`/rest/workspaces/<workspace_name>/maps`|[GET](#get-maps)| [POST](#post-maps) | x | [DELETE](#delete-maps) |
+|[Map](models.md#map)|`/rest/workspaces/<workspace_name>/maps/<mapname>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
+|Map File|`/rest/workspaces/<workspace_name>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
+|Map Thumbnail|`/rest/workspaces/<workspace_name>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
+|Map Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-map-metadata-comparison) | x | x | x |
 |Users|`/rest/users`|[GET](#get-users)| x | x | x |
 |Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | [DELETE](#delete-current-user) |
 |Version|`/rest/about/version`|[GET](#get-version)| x | x | x |
@@ -25,7 +25,7 @@
 
 ## Layers
 ### URL
-`/rest/<workspace_name>/layers`
+`/rest/workspaces/<workspace_name>/layers`
 
 ### GET Layers
 Get list of published layers.
@@ -143,7 +143,7 @@ JSON array of objects representing deleted layers:
 
 ## Layer
 ### URL
-`/rest/<workspace_name>/layers/<layername>`
+`/rest/workspaces/<workspace_name>/layers/<layername>`
 
 #### Endpoint path parameters
 - **layername**
@@ -267,7 +267,7 @@ JSON object representing deleted layer:
 
 ## Layer Thumbnail
 ### URL
-`/rest/<workspace_name>/layers/<layername>/thumbnail`
+`/rest/workspaces/<workspace_name>/layers/<layername>/thumbnail`
 ### GET Layer Thumbnail
 Get thumbnail of the layer in PNG format, 300x300 px, transparent background.
 
@@ -281,7 +281,7 @@ PNG image.
 
 ## Layer Style
 ### URL
-`/rest/<workspace_name>/layers/<layername>/style`
+`/rest/workspaces/<workspace_name>/layers/<layername>/style`
 ### GET Layer Style
 Get default style of the layer in XML format. Request is redirected to GeoServer [/rest/workspaces/{workspace}/styles/{style}](https://docs.geoserver.org/latest/en/api/#1.0.0/styles.yaml) for layers with SLD style. For layers with QML style, response is created in Layman. Anybody can call GET, nobody can call any other method. 
 
@@ -617,7 +617,7 @@ Content-Type: `application/json`
 JSON object with following structure:
 - **authenticated**: Boolean. `true` if user is authenticated, `false` if user is anonymous.
 - **claims**: Object. Dictionary of known claims (e.g. name, nickname, preferred_username, or email). Claims are inspired by and have same meaning as [OpenID Connect standard claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims). Some claims are set even if the user is anonymous (e.g. name).
-- *username*: String. [Username](models.md#username) the user reserved within Layman. If not set, it was not reserved yet. To be used as username in some REST API paths (i.e. `/rest/<username>/...`)
+- *username*: String. [Username](models.md#username) the user reserved within Layman. If not set, it was not reserved yet. To be used as username in some REST API paths (i.e. `/rest/workspaces/<username>/...`)
 
 ### PATCH Current User
 Update information about current user. Currently used only for reserving `username`.
