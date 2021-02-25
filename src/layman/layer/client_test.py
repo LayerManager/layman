@@ -40,6 +40,7 @@ def chrome():
     chrome.quit()
 
 
+@pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
 def test_post_layers_chunk(chrome):
 
@@ -116,6 +117,7 @@ def test_post_layers_chunk(chrome):
     assert not process.LAYMAN_REDIS.exists(total_chunks_key)
 
 
+@pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
 def test_patch_layer_chunk(chrome):
 
