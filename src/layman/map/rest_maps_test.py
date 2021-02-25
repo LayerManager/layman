@@ -49,6 +49,7 @@ def test_get_maps():
 
     assert rv.json()[0]['name'] == mapname
     assert rv.json()[0]['title'] == mapname
-    assert rv.json()[0]['url'] == f"http://{settings.LAYMAN_SERVER_NAME}/rest/{username}/maps/{mapname}"
+    with app.app_context():
+        assert rv.json()[0]['url'] == layman_util.url_for('rest_map.get', username=username, mapname=mapname)
 
     process_client.delete_map(username, mapname)

@@ -72,34 +72,35 @@ def test_parse_md_properties():
             'title',
             'operates_on',
         ], METADATA_PROPERTIES)
-    expected = {
-        'md_file_identifier': 'm-91147a27-1ff4-4242-ba6d-faffb92224c6',
-        'md_organisation_name': None,
-        'organisation_name': None,
-        'md_date_stamp': '2007-05-25',
-        'reference_system': [3857],
-        'title': 'World places and boundaries',
-        'publication_date': '2007-05-25',
-        'identifier': {
-            'identifier': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet',
-            'label': 'svet',
-        },
-        'abstract': 'World places and boundaries abstract',
-        'graphic_url': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet/thumbnail',
-        'extent': [-35, -48.5, 179, 81.5],
-        'map_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet',
-        'map_file_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet/file',
-        'operates_on': [
-            {
-                'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-39cc8994-adbc-427a-8522-569eb7e691b2#_m-39cc8994-adbc-427a-8522-569eb7e691b2',
-                'xlink:title': 'hranice',
+    with app.app_context():
+        expected = {
+            'md_file_identifier': 'm-91147a27-1ff4-4242-ba6d-faffb92224c6',
+            'md_organisation_name': None,
+            'organisation_name': None,
+            'md_date_stamp': '2007-05-25',
+            'reference_system': [3857],
+            'title': 'World places and boundaries',
+            'publication_date': '2007-05-25',
+            'identifier': {
+                'identifier': layman_util.url_for('rest_map.get', username='testuser1', mapname='svet'),
+                'label': 'svet',
             },
-            {
-                'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-fb48a6e3-f36c-43fd-a885-ae7de82b3924#_m-fb48a6e3-f36c-43fd-a885-ae7de82b3924',
-                'xlink:title': 'mista',
-            },
-        ],
-    }
+            'abstract': 'World places and boundaries abstract',
+            'graphic_url': layman_util.url_for('rest_map_thumbnail.get', username='testuser1', mapname='svet'),
+            'extent': [-35, -48.5, 179, 81.5],
+            'map_endpoint': layman_util.url_for('rest_map.get', username='testuser1', mapname='svet'),
+            'map_file_endpoint': layman_util.url_for('rest_map_file.get', username='testuser1', mapname='svet'),
+            'operates_on': [
+                {
+                    'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-39cc8994-adbc-427a-8522-569eb7e691b2#_m-39cc8994-adbc-427a-8522-569eb7e691b2',
+                    'xlink:title': 'hranice',
+                },
+                {
+                    'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-fb48a6e3-f36c-43fd-a885-ae7de82b3924#_m-fb48a6e3-f36c-43fd-a885-ae7de82b3924',
+                    'xlink:title': 'mista',
+                },
+            ],
+        }
     assert set(props.keys()) == set(expected.keys())
     for k in props.keys():
         equals_fn = COMMON_PROPERTIES[k].get('equals_fn', None)
@@ -109,35 +110,36 @@ def test_parse_md_properties():
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_fill_xml_template(client):
-    xml_file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/map/micka/record-template.xml', {
-        'md_file_identifier': 'm-91147a27-1ff4-4242-ba6d-faffb92224c6',
-        'md_organisation_name': None,
-        'md_date_stamp': '2007-05-25',
-        'reference_system': [3857],
-        'title': 'World places and boundaries',
-        'publication_date': '2007-05-25',
-        'identifier': {
-            'identifier': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet',
-            'label': 'svet',
-        },
-        'abstract': 'World places and boundaries abstract',
-        'organisation_name': None,
-        'graphic_url': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet/thumbnail',
-        'extent': [-35, -48.5, 179, 81.5],
-        'map_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet',
-        'map_file_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/maps/svet/file',
-        'md_language': 'cze',
-        'operates_on': [
-            {
-                'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-39cc8994-adbc-427a-8522-569eb7e691b2#_m-39cc8994-adbc-427a-8522-569eb7e691b2',
-                'xlink:title': 'hranice',
+    with app.app_context():
+        xml_file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/map/micka/record-template.xml', {
+            'md_file_identifier': 'm-91147a27-1ff4-4242-ba6d-faffb92224c6',
+            'md_organisation_name': None,
+            'md_date_stamp': '2007-05-25',
+            'reference_system': [3857],
+            'title': 'World places and boundaries',
+            'publication_date': '2007-05-25',
+            'identifier': {
+                'identifier': layman_util.url_for('rest_map.get', username='testuser1', mapname='svet'),
+                'label': 'svet',
             },
-            {
-                'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-fb48a6e3-f36c-43fd-a885-ae7de82b3924#_m-fb48a6e3-f36c-43fd-a885-ae7de82b3924',
-                'xlink:title': 'mista',
-            },
-        ],
-    }, METADATA_PROPERTIES)
+            'abstract': 'World places and boundaries abstract',
+            'organisation_name': None,
+            'graphic_url': layman_util.url_for('rest_map_thumbnail.get', username='testuser1', mapname='svet'),
+            'extent': [-35, -48.5, 179, 81.5],
+            'map_endpoint': layman_util.url_for('rest_map.get', username='testuser1', mapname='svet'),
+            'map_file_endpoint': layman_util.url_for('rest_map_file.get', username='testuser1', mapname='svet'),
+            'md_language': 'cze',
+            'operates_on': [
+                {
+                    'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-39cc8994-adbc-427a-8522-569eb7e691b2#_m-39cc8994-adbc-427a-8522-569eb7e691b2',
+                    'xlink:title': 'hranice',
+                },
+                {
+                    'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-fb48a6e3-f36c-43fd-a885-ae7de82b3924#_m-fb48a6e3-f36c-43fd-a885-ae7de82b3924',
+                    'xlink:title': 'mista',
+                },
+            ],
+        }, METADATA_PROPERTIES)
 
     expected_path = 'src/layman/map/micka/record-template-filled.xml'
     with open(expected_path) as f:

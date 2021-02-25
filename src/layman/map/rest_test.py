@@ -287,30 +287,31 @@ def test_post_maps_simple(client):
     r.raise_for_status()
     assert mapname in r.text
 
-    expected_md_values = {
-        'abstract': "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce.",
-        'extent': [
-            14.62,
-            50.58,
-            15.42,
-            50.82
-        ],
-        'graphic_url': "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje/thumbnail",
-        'identifier': {
-            "identifier": "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje",
-            "label": "administrativni_cleneni_libereckeho_kraje"
-        },
-        'map_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje",
-        'map_file_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje/file",
-        'operates_on': [],
-        'organisation_name': None,
-        'publication_date': TODAY_DATE,
-        'reference_system': [
-            3857
-        ],
-        'revision_date': None,
-        'title': "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje",
-    }
+    with app.app_context():
+        expected_md_values = {
+            'abstract': "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce.",
+            'extent': [
+                14.62,
+                50.58,
+                15.42,
+                50.82
+            ],
+            'graphic_url': url_for('rest_map_thumbnail.get', username=username, mapname=mapname),
+            'identifier': {
+                "identifier": url_for('rest_map.get', username=username, mapname=mapname),
+                "label": "administrativni_cleneni_libereckeho_kraje"
+            },
+            'map_endpoint': url_for('rest_map.get', username=username, mapname=mapname),
+            'map_file_endpoint': url_for('rest_map_file.get', username=username, mapname=mapname),
+            'operates_on': [],
+            'organisation_name': None,
+            'publication_date': TODAY_DATE,
+            'reference_system': [
+                3857
+            ],
+            'revision_date': None,
+            'title': "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje",
+        }
     check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
@@ -415,30 +416,31 @@ def test_post_maps_complex(client):
             map_info = client.get(url_for('rest_map.get', username=username,
                                           mapname=mapname)).get_json()
 
-    expected_md_values = {
-        'abstract': "Libovoln\u00fd popis",
-        'extent': [
-            14.62,
-            50.58,
-            15.42,
-            50.82
-        ],
-        'graphic_url': "http://layman_test_run_1:8000/rest/testuser1/maps/libe/thumbnail",
-        'identifier': {
-            "identifier": "http://layman_test_run_1:8000/rest/testuser1/maps/libe",
-            "label": "libe"
-        },
-        'map_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/libe",
-        'map_file_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/libe/file",
-        'operates_on': [],
-        'organisation_name': None,
-        'publication_date': TODAY_DATE,
-        'reference_system': [
-            3857
-        ],
-        'revision_date': None,
-        'title': "Libereck\u00fd kraj: Administrativn\u00ed \u010dlen\u011bn\u00ed",
-    }
+    with app.app_context():
+        expected_md_values = {
+            'abstract': "Libovoln\u00fd popis",
+            'extent': [
+                14.62,
+                50.58,
+                15.42,
+                50.82
+            ],
+            'graphic_url': url_for('rest_map_thumbnail.get', username=username, mapname=mapname),
+            'identifier': {
+                "identifier": url_for('rest_map.get', username=username, mapname=mapname),
+                "label": "libe"
+            },
+            'map_endpoint': url_for('rest_map.get', username=username, mapname=mapname),
+            'map_file_endpoint': url_for('rest_map_file.get', username=username, mapname=mapname),
+            'operates_on': [],
+            'organisation_name': None,
+            'publication_date': TODAY_DATE,
+            'reference_system': [
+                3857
+            ],
+            'revision_date': None,
+            'title': "Libereck\u00fd kraj: Administrativn\u00ed \u010dlen\u011bn\u00ed",
+        }
     check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
@@ -546,30 +548,31 @@ def test_patch_map(client):
             f'{MAP_TYPE}': num_maps_before_test + 2
         })
 
-    expected_md_values = {
-        'abstract': "Nov\u00fd popis",
-        'extent': [
-            14.623,
-            50.58,
-            15.42,
-            50.82
-        ],
-        'graphic_url': "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje/thumbnail",
-        'identifier': {
-            "identifier": "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje",
-            "label": "administrativni_cleneni_libereckeho_kraje"
-        },
-        'map_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje",
-        'map_file_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/administrativni_cleneni_libereckeho_kraje/file",
-        'operates_on': [],
-        'organisation_name': None,
-        'publication_date': TODAY_DATE,
-        'reference_system': [
-            3857
-        ],
-        'revision_date': TODAY_DATE,
-        'title': "Nov\u00fd n\u00e1zev",
-    }
+    with app.app_context():
+        expected_md_values = {
+            'abstract': "Nov\u00fd popis",
+            'extent': [
+                14.623,
+                50.58,
+                15.42,
+                50.82
+            ],
+            'graphic_url': url_for('rest_map_thumbnail.get', username=username, mapname=mapname),
+            'identifier': {
+                "identifier": url_for('rest_map.get', username=username, mapname=mapname),
+                "label": "administrativni_cleneni_libereckeho_kraje"
+            },
+            'map_endpoint': url_for('rest_map.get', username=username, mapname=mapname),
+            'map_file_endpoint': url_for('rest_map_file.get', username=username, mapname=mapname),
+            'operates_on': [],
+            'organisation_name': None,
+            'publication_date': TODAY_DATE,
+            'reference_system': [
+                3857
+            ],
+            'revision_date': TODAY_DATE,
+            'title': "Nov\u00fd n\u00e1zev",
+        }
     check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
@@ -795,37 +798,38 @@ def test_map_composed_from_local_layers(client):
             '-      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and minus_line.endswith(
             '" xlink:title="mista" xlink:type="simple"/>\n'), minus_line
 
-    expected_md_values = {
-        'abstract': "World places and boundaries abstract",
-        'extent': [
-            -35.0,
-            -48.5,
-            179.0,
-            81.5
-        ],
-        'graphic_url': "http://layman_test_run_1:8000/rest/testuser1/maps/svet/thumbnail",
-        'identifier': {
-            "identifier": "http://layman_test_run_1:8000/rest/testuser1/maps/svet",
-            "label": "svet"
-        },
-        'map_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/svet",
-        'map_file_endpoint': "http://layman_test_run_1:8000/rest/testuser1/maps/svet/file",
-        'operates_on': [
-            {
-                "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{layer2uuid}#_m-{layer2uuid}",
-                "xlink:title": "hranice"
+    with app.app_context():
+        expected_md_values = {
+            'abstract': "World places and boundaries abstract",
+            'extent': [
+                -35.0,
+                -48.5,
+                179.0,
+                81.5
+            ],
+            'graphic_url': url_for('rest_map_thumbnail.get', username=username, mapname=mapname),
+            'identifier': {
+                "identifier": url_for('rest_map.get', username=username, mapname=mapname),
+                "label": "svet"
             },
-            {
-                "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{layer1uuid}#_m-{layer1uuid}",
-                "xlink:title": "mista"
-            }
-        ],
-        'organisation_name': None,
-        'publication_date': TODAY_DATE,
-        'reference_system': [
-            3857
-        ],
-        'revision_date': None,
-        'title': "World places and boundaries",
-    }
+            'map_endpoint': url_for('rest_map.get', username=username, mapname=mapname),
+            'map_file_endpoint': url_for('rest_map_file.get', username=username, mapname=mapname),
+            'operates_on': [
+                {
+                    "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{layer2uuid}#_m-{layer2uuid}",
+                    "xlink:title": "hranice"
+                },
+                {
+                    "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{layer1uuid}#_m-{layer1uuid}",
+                    "xlink:title": "mista"
+                }
+            ],
+            'organisation_name': None,
+            'publication_date': TODAY_DATE,
+            'reference_system': [
+                3857
+            ],
+            'revision_date': None,
+            'title': "World places and boundaries",
+        }
     check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)

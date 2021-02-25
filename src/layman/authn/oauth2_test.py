@@ -203,7 +203,8 @@ def test_unexisting_introspection_url(client, headers):
 @pytest.mark.usefixtures('app_context', 'inactive_token_introspection_url', 'ensure_layman')
 def test_token_inactive(client, headers):
     username = 'testuser1'
-    rv = client.get(url_for('rest_layers.get', username=username), headers=headers)
+    url = url_for('rest_layers.get', username=username)
+    rv = client.get(url, headers=headers)
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
@@ -221,7 +222,8 @@ def test_token_inactive(client, headers):
 @pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'ensure_layman')
 def test_token_active(client, headers):
     username = 'testuser1'
-    rv = client.get(url_for('rest_layers.get', username=username), headers=headers)
+    url = url_for('rest_layers.get', username=username)
+    rv = client.get(url, headers=headers)
     assert rv.status_code == 404
     resp_json = rv.get_json()
     assert resp_json['code'] == 40

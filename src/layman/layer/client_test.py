@@ -9,7 +9,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from layman.layer.filesystem import input_chunk
-from layman import settings
+from layman import settings, util as layman_util, app
 
 from test import process, process_client
 
@@ -51,7 +51,6 @@ def test_post_layers_chunk(chrome):
     for fp in file_paths:
         assert os.path.isfile(fp)
 
-    domain = f"http://{settings.LAYMAN_SERVER_NAME}"
     client_url = settings.LAYMAN_CLIENT_URL
 
     r = requests.get(client_url)
@@ -87,7 +86,8 @@ def test_post_layers_chunk(chrome):
 
     time.sleep(0.5)
 
-    layer_url = f'{domain}/rest/{username}/layers/{layername}?'
+    with app.app_context():
+        layer_url = layman_util.url_for('rest_layer.get', username=username, layername=layername)
     r = requests.get(layer_url)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
     max_attempts = 20
@@ -131,7 +131,6 @@ def test_patch_layer_chunk(chrome):
         print('fp', fp)
         assert os.path.isfile(fp)
 
-    domain = f"http://{settings.LAYMAN_SERVER_NAME}"
     client_url = settings.LAYMAN_CLIENT_URL
 
     r = requests.get(client_url)
@@ -172,7 +171,8 @@ def test_patch_layer_chunk(chrome):
 
     time.sleep(0.5)
 
-    layer_url = f'{domain}/rest/{username}/layers/{layername}?'
+    with app.app_context():
+        layer_url = layman_util.url_for('rest_layer.get', username=username, layername=layername)
     r = requests.get(layer_url)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
     max_attempts = 20
