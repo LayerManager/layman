@@ -54,6 +54,7 @@ def chrome():
     chrome.quit()
 
 
+@pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman')
 def test_post_no_file(client, chrome):
     check_redis_consistency(expected_publ_num_by_type={
