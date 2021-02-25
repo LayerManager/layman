@@ -1,6 +1,4 @@
-from multiprocessing import Process
 import pytest
-import time
 import os
 import filecmp
 import difflib
@@ -9,10 +7,8 @@ import sys
 
 del sys.modules['layman']
 
-from layman import uuid
-from layman import app as app
-from layman import settings
-from layman.layer import LAYER_TYPE
+from layman import uuid, app as app, settings
+from layman.util import url_for
 from .csw import _get_property_values
 
 from layman.common.micka import util as common_util

@@ -1,8 +1,4 @@
-from multiprocessing import Process
-import os
 import requests
-import shutil
-import time
 
 import pytest
 from layman.util import url_for

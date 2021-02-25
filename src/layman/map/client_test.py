@@ -1,6 +1,5 @@
 import json
 import time
-from multiprocessing import Process
 
 import pytest
 import requests

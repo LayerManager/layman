@@ -4,8 +4,7 @@ import requests
 
 del sys.modules['layman']
 
-from layman import app, settings
-from layman import util as layman_util
+from layman import app, settings, util as layman_util
 from test import process_client
 
 
