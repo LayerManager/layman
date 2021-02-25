@@ -328,23 +328,24 @@ def test_post_layers_simple(client):
             f'{LAYER_TYPE}': num_layers_before_test + 1
         })
 
-    expected_md_values = {
-        'abstract': None,
-        'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-        'graphic_url': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries/thumbnail',
-        'identifier': {
-            'identifier': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries',
-            'label': 'ne_110m_admin_0_countries'
-        },
-        'language': ['eng'],
-        'layer_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries',
-        'organisation_name': None,
-        'publication_date': TODAY_DATE,
-        'reference_system': [3857, 4326, 5514],
-        'revision_date': None,
-        'scale_denominator': 100000000,
-        'title': 'ne_110m_admin_0_countries',
-    }
+    with app.app_context():
+        expected_md_values = {
+            'abstract': None,
+            'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
+            'graphic_url': url_for('rest_layer_thumbnail.get', username=username, layername=layername),
+            'identifier': {
+                'identifier': url_for('rest_layer.get', username=username, layername=layername),
+                'label': 'ne_110m_admin_0_countries'
+            },
+            'language': ['eng'],
+            'layer_endpoint': url_for('rest_layer.get', username=username, layername=layername),
+            'organisation_name': None,
+            'publication_date': TODAY_DATE,
+            'reference_system': [3857, 4326, 5514],
+            'revision_date': None,
+            'scale_denominator': 100000000,
+            'title': 'ne_110m_admin_0_countries',
+        }
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
@@ -599,23 +600,24 @@ def test_post_layers_complex(client):
             f'{LAYER_TYPE}': num_layers_before_test + 4
         })
 
-    expected_md_values = {
-        'abstract': "popis st\u00e1t\u016f",
-        'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-        'graphic_url': "http://layman_test_run_1:8000/rest/testuser2/layers/countries/thumbnail",
-        'identifier': {
-            "identifier": "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
-            "label": "countries"
-        },
-        'language': ["eng"],
-        'layer_endpoint': "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
-        'organisation_name': None,
-        'publication_date': TODAY_DATE,
-        'reference_system': [3857, 4326, 5514],
-        'revision_date': None,
-        'scale_denominator': 100000000,
-        'title': "staty",
-    }
+    with app.app_context():
+        expected_md_values = {
+            'abstract': "popis st\u00e1t\u016f",
+            'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
+            'graphic_url': url_for('rest_layer_thumbnail.get', username=username, layername=layername),
+            'identifier': {
+                "identifier": url_for('rest_layer.get', username=username, layername=layername),
+                "label": "countries"
+            },
+            'language': ["eng"],
+            'layer_endpoint': url_for('rest_layer.get', username=username, layername=layername),
+            'organisation_name': None,
+            'publication_date': TODAY_DATE,
+            'reference_system': [3857, 4326, 5514],
+            'revision_date': None,
+            'scale_denominator': 100000000,
+            'title': "staty",
+        }
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
@@ -750,23 +752,24 @@ def test_patch_layer_title(client):
         assert resp_json['title'] == new_title
         assert resp_json['description'] == new_description
 
-    expected_md_values = {
-        'abstract': "and new description",
-        'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-        'graphic_url': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries/thumbnail',
-        'identifier': {
-            'identifier': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries',
-            'label': 'ne_110m_admin_0_countries'
-        },
-        'language': ['eng'],
-        'layer_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries',
-        'organisation_name': None,
-        'publication_date': TODAY_DATE,
-        'reference_system': [3857, 4326, 5514],
-        'revision_date': TODAY_DATE,
-        'scale_denominator': 100000000,
-        'title': "New Title of Countries",
-    }
+    with app.app_context():
+        expected_md_values = {
+            'abstract': "and new description",
+            'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
+            'graphic_url': url_for('rest_layer_thumbnail.get', username=username, layername=layername),
+            'identifier': {
+                'identifier': url_for('rest_layer.get', username=username, layername=layername),
+                'label': 'ne_110m_admin_0_countries'
+            },
+            'language': ['eng'],
+            'layer_endpoint': url_for('rest_layer.get', username=username, layername=layername),
+            'organisation_name': None,
+            'publication_date': TODAY_DATE,
+            'reference_system': [3857, 4326, 5514],
+            'revision_date': TODAY_DATE,
+            'scale_denominator': 100000000,
+            'title': "New Title of Countries",
+        }
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
     with app.app_context():
@@ -815,23 +818,24 @@ def test_patch_layer_style(client):
             f'{LAYER_TYPE}': num_layers_before_test + 4
         })
 
-    expected_md_values = {
-        'abstract': "and new description",
-        'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-        'graphic_url': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries/thumbnail',
-        'identifier': {
-            'identifier': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries',
-            'label': 'ne_110m_admin_0_countries'
-        },
-        'language': ['eng'],
-        'layer_endpoint': 'http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries',
-        'organisation_name': None,
-        'publication_date': TODAY_DATE,
-        'reference_system': [3857, 4326, 5514],
-        'revision_date': TODAY_DATE,
-        'scale_denominator': 100000000,
-        'title': 'countries in blue',
-    }
+    with app.app_context():
+        expected_md_values = {
+            'abstract': "and new description",
+            'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
+            'graphic_url': url_for('rest_layer_thumbnail.get', username=username, layername=layername),
+            'identifier': {
+                'identifier': url_for('rest_layer.get', username=username, layername=layername),
+                'label': 'ne_110m_admin_0_countries'
+            },
+            'language': ['eng'],
+            'layer_endpoint': url_for('rest_layer.get', username=username, layername=layername),
+            'organisation_name': None,
+            'publication_date': TODAY_DATE,
+            'reference_system': [3857, 4326, 5514],
+            'revision_date': TODAY_DATE,
+            'scale_denominator': 100000000,
+            'title': 'countries in blue',
+        }
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
@@ -955,23 +959,24 @@ def test_patch_layer_data(client):
             f'{LAYER_TYPE}': num_layers_before_test + 4
         })
 
-    expected_md_values = {
-        'abstract': "popis st\u00e1t\u016f",
-        'extent': [-175.22056435043098, -41.29999116752133, 179.21664802661394, 64.15002486626597],
-        'graphic_url': "http://layman_test_run_1:8000/rest/testuser2/layers/countries/thumbnail",
-        'identifier': {
-            "identifier": "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
-            "label": "countries"
-        },
-        'language': ["eng", 'chi', 'rus'],
-        'layer_endpoint': "http://layman_test_run_1:8000/rest/testuser2/layers/countries",
-        'organisation_name': None,
-        'publication_date': TODAY_DATE,
-        'reference_system': [3857, 4326, 5514],
-        'revision_date': TODAY_DATE,
-        'scale_denominator': None,
-        'title': 'populated places',
-    }
+    with app.app_context():
+        expected_md_values = {
+            'abstract': "popis st\u00e1t\u016f",
+            'extent': [-175.22056435043098, -41.29999116752133, 179.21664802661394, 64.15002486626597],
+            'graphic_url': url_for('rest_layer_thumbnail.get', username=username, layername=layername),
+            'identifier': {
+                'identifier': url_for('rest_layer.get', username=username, layername=layername),
+                "label": "countries"
+            },
+            'language': ["eng", 'chi', 'rus'],
+            'layer_endpoint': url_for('rest_layer.get', username=username, layername=layername),
+            'organisation_name': None,
+            'publication_date': TODAY_DATE,
+            'reference_system': [3857, 4326, 5514],
+            'revision_date': TODAY_DATE,
+            'scale_denominator': None,
+            'title': 'populated places',
+        }
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 

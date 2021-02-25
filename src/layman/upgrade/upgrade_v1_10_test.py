@@ -7,6 +7,7 @@ from collections import namedtuple
 
 from . import upgrade_v1_10
 from layman import app, settings
+from layman.util import url_for
 from layman.http import LaymanError
 from layman.common import prime_db_schema
 from layman.layer import geoserver as gs_layer, util as layer_util, db, NO_STYLE_DEF
@@ -134,7 +135,8 @@ def test_migrate_layers_to_wms_workspace(ensure_layer):
     layer_info = process_client.get_layer(workspace, layer)
     assert layer_info['wms']['url'] == f'http://localhost:8000/geoserver/{wms_workspace}/ows'
     assert layer_info['wfs']['url'] == f'http://localhost:8000/geoserver/{workspace}/wfs'
-    assert layer_info['style']['url'] == f'http://layman_test_run_1:8000/rest/{workspace}/layers/{layer}/style'
+    with app.app_context():
+        assert layer_info['style']['url'] == url_for('rest_layer_style.get', username=workspace, layername=layer)
 
     all_workspaces = gs_common.get_all_workspaces(settings.LAYMAN_GS_AUTH)
     assert workspace in all_workspaces

@@ -76,27 +76,28 @@ def test_parse_md_properties():
             'wfs_url',
             'wms_url',
         ], METADATA_PROPERTIES)
-    expected = {
-        'md_file_identifier': 'm-ca238200-8200-1a23-9399-42c9fca53542',
-        'md_date_stamp': '2007-05-25',
-        'md_organisation_name': None,
-        'organisation_name': None,
-        'scale_denominator': None,
-        'language': [],
-        'reference_system': [4326, 3857],
-        'title': 'CORINE - Krajinný pokryv CLC 90',
-        'publication_date': '2007-05-25',
-        'identifier': {
-            'identifier': 'http://www.env.cz/data/corine/1990',
-            'label': 'MZP-CORINE',
-        },
-        'abstract': None,
-        'graphic_url': 'http://layman_test_run_1:8000/rest/browser/layers/layer/thumbnail',
-        'extent': [11.87, 48.12, 19.13, 51.59],
-        'wms_url': 'http://www.env.cz/corine/data/download.zip',
-        'wfs_url': 'http://www.env.cz/corine/data/download.zip',
-        'layer_endpoint': 'http://layman_test_run_1:8000/rest/browser/layers/layer',
-    }
+    with app.app_context():
+        expected = {
+            'md_file_identifier': 'm-ca238200-8200-1a23-9399-42c9fca53542',
+            'md_date_stamp': '2007-05-25',
+            'md_organisation_name': None,
+            'organisation_name': None,
+            'scale_denominator': None,
+            'language': [],
+            'reference_system': [4326, 3857],
+            'title': 'CORINE - Krajinný pokryv CLC 90',
+            'publication_date': '2007-05-25',
+            'identifier': {
+                'identifier': 'http://www.env.cz/data/corine/1990',
+                'label': 'MZP-CORINE',
+            },
+            'abstract': None,
+            'graphic_url': url_for('rest_layer_thumbnail.get', username='browser', layername='layer'),
+            'extent': [11.87, 48.12, 19.13, 51.59],
+            'wms_url': 'http://www.env.cz/corine/data/download.zip',
+            'wfs_url': 'http://www.env.cz/corine/data/download.zip',
+            'layer_endpoint': url_for('rest_layer.get', username='browser', layername='layer'),
+        }
     assert set(props.keys()) == set(expected.keys())
     for k in props.keys():
         equals_fn = COMMON_PROPERTIES[k].get('equals_fn', None)
