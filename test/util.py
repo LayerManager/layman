@@ -1,4 +1,5 @@
 import os
+import pathlib
 import requests
 import time
 from requests.exceptions import ConnectionError
@@ -45,12 +46,13 @@ def assert_same_images(img_url, tmp_file_path, expected_file_path, diff_threshol
                      timeout=5,
                      )
     r.raise_for_status()
+    pathlib.Path(os.path.dirname(tmp_file_path)).mkdir(parents=True, exist_ok=True)
     with open(tmp_file_path, 'wb') as f:
         for chunk in r:
             f.write(chunk)
 
     diffs = compare_images(expected_file_path, tmp_file_path)
 
-    assert diffs < diff_threshold
+    assert diffs < diff_threshold, f"{diffs} >= {diff_threshold}"
 
     os.remove(tmp_file_path)
