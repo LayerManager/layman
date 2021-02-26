@@ -29,18 +29,19 @@ def alter_schema():
     db_schema = settings.LAYMAN_PRIME_SCHEMA
     add_column = f'''
 DO $$ BEGIN
-    CREATE TYPE enum_style_type AS ENUM ('sld', 'qml');
+    CREATE TYPE {db_schema}.enum_style_type AS ENUM ('sld', 'qml');
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
     ALTER TABLE {db_schema}.publications ADD COLUMN IF NOT EXISTS
-    style_type enum_style_type;'''
+    style_type {db_schema}.enum_style_type;'''
     db_util.run_statement(add_column)
     logger.info(f'    DONE - alter DB prime schema')
 
 
-def check_usernames_for_wms_suffix():
-    logger.info(f'    Starting - checking users with {settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX} suffix')
+def check_workspace_names():
+    logger.info(f'    Starting - checking workspace names - for {settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX} suffix, '
+                f'for `{settings.REST_WORKSPACES_PREFIX}` name')
     workspaces = prime_db_schema.get_workspaces()
     for workspace in workspaces:
         if workspace.endswith(settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX):
@@ -51,7 +52,16 @@ def check_usernames_for_wms_suffix():
                               data={'workspace': workspace,
                                     }
                               )
-    logger.info(f'    DONE - checking users with {settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX} suffix')
+    if settings.REST_WORKSPACES_PREFIX in workspaces:
+        raise LaymanError(f"A workspace has reserved name '{settings.REST_WORKSPACES_PREFIX}'. "
+                          f"In that case, please downgrade to the previous minor release version of Layman and contact Layman "
+                          f"contributors. One way how to do that is to create an issue in Layman repository: "
+                          f"https://github.com/jirik/layman/issues/",
+                          data={'workspace': settings.REST_WORKSPACES_PREFIX
+                                }
+                          )
+    logger.info(f'    DONE - checking workspace names - for {settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX} suffix, '
+                f'for `{settings.REST_WORKSPACES_PREFIX}` name')
 
 
 def migrate_layers_to_wms_workspace(workspace=None):
