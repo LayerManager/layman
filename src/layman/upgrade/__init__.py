@@ -13,7 +13,7 @@ DATA_MIGRATIONS = [
                  upgrade_v1_9.geoserver_everyone_rights_repair,
                  upgrade_v1_9.geoserver_remove_users_for_public_workspaces]),
     ((1, 10, 0), [upgrade_v1_10.alter_schema,
-                  upgrade_v1_10.check_usernames_for_wms_suffix,
+                  upgrade_v1_10.check_workspace_names,
                   upgrade_v1_10.migrate_layers_to_wms_workspace,
                   upgrade_v1_10.migrate_maps_on_wms_workspace,
                   upgrade_v1_10.migrate_metadata_records,
