@@ -1,7 +1,8 @@
+import math
 import pytest
 from layman import settings, app
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
-from test import process, process_client, geoserver_client
+from test import process, process_client, geoserver_client, util
 
 
 LAYERS_TO_DELETE_AFTER_TEST = []
@@ -126,3 +127,31 @@ def test_spatial_precision(ensure_layer, point_id, epsg_code, exp_coordinates, p
     feature = next(f for f in feature_collection['features'] if f['properties']['point_id'] == point_id)
     for idx, coordinate in enumerate(feature['geometry']['coordinates']):
         assert abs(coordinate - exp_coordinates[idx]) <= precision, f"EPSG:{epsg_code}: expected coordinates={exp_coordinates}, found coordinates={feature['geometry']['coordinates']}"
+
+
+@pytest.mark.parametrize('epsg_code, extent, img_size', [
+    (3857, (1848629.9227203887, 6308682.319202789, 1848674.6599045212, 6308704.687794856), (601, 301)),
+])
+@pytest.mark.parametrize('style_type', ['sld', 'qml'])
+def test_spatial_precision_wms(ensure_layer, epsg_code, extent, img_size, style_type):
+    process.ensure_layman_function({
+        'LAYMAN_OUTPUT_SRS_LIST': ','.join([str(code) for code in OUTPUT_SRS_LIST])
+    })
+    workspace = 'test_spatial_precision_wms_workspace'
+    layer = 'test_spatial_precision_wms_layer'
+
+    ensure_layer(workspace, layer, file_paths=['sample/layman.layer/sample_point_cz.geojson'], )
+    process_client.patch_layer(workspace, layer, style_file=f'sample/layman.layer/sample_point_cz.{style_type}')
+
+    expected_file = f'sample/layman.layer/sample_point_cz_{epsg_code}.png'
+    obtained_file = f'tmp/artifacts/test_spatial_precision_wms/sample_point_cz_{style_type}_{epsg_code}.png'
+
+    url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS={workspace}_wms%3A{layer}&FORMAT_OPTIONS=antialias%3Afull&SRS=EPSG%3A{epsg_code}&WIDTH={img_size[0]}&HEIGHT={img_size[1]}&BBOX={"%2C".join((str(c) for c in extent))}'
+
+    circle_diameter = 30
+    circle_perimeter = circle_diameter * math.pi
+    num_circles = 5
+    diff_line_width = 2
+    pixel_diff_limit = circle_perimeter * num_circles * diff_line_width
+
+    util.assert_same_images(url, obtained_file, expected_file, pixel_diff_limit)
