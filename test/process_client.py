@@ -97,6 +97,7 @@ def raise_layman_error(response, status_codes_to_skip=None):
         logger.error(f'raise_layman_error: response.status_code={response.status_code}, response.text={response.text}')
         response.raise_for_status()
     assert response.status_code in status_codes_to_skip, f"response.status_code={response.status_code}\nresponse.text={response.text}"
+    assert 'Deprecation' not in response.headers, f'This is deprecated URL! Use new one. headers={response.headers}'
 
 
 def patch_publication(publication_type,
