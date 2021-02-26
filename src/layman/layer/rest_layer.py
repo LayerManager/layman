@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request, current_app as app, g
 from layman.common import rest as rest_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator
-from layman import settings, authn
+from layman import settings, authn, util as layman_util
 from . import util, LAYER_REST_PATH_NAME
 from .filesystem import input_file, input_style, input_chunk
 from layman.authn import authenticate
@@ -20,6 +20,12 @@ bp = Blueprint('rest_layer', __name__)
 @util.info_decorator
 def before_request():
     pass
+
+
+@bp.after_request
+def after_request(response):
+    layman_util.check_deprecated_url(response)
+    return response
 
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['GET'])

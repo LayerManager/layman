@@ -21,6 +21,12 @@ def before_request():
     pass
 
 
+@bp.after_request
+def after_request(response):
+    layman_util.check_deprecated_url(response)
+    return response
+
+
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/style", methods=['GET'])
 def get(username, layername):
     app.logger.info(f"GET Style, user={g.user}, username={username}, layername={layername}")

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, current_app as app, g
 
-from layman.http import LaymanError
+from layman import LaymanError, util as layman_util
 from layman.util import check_username_decorator
 from . import util, LAYER_REST_PATH_NAME
 from .filesystem import input_chunk
@@ -17,6 +17,12 @@ bp = Blueprint('rest_layer_chunk', __name__)
 @authorize_publications_decorator
 def before_request():
     pass
+
+
+@bp.after_request
+def after_request(response):
+    layman_util.check_deprecated_url(response)
+    return response
 
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/chunk", methods=['POST'])

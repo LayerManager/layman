@@ -3,7 +3,7 @@ import os
 from flask import Blueprint, send_file, current_app as app, g
 
 from layman.common.filesystem.util import get_user_dir
-from layman.http import LaymanError
+from layman import LaymanError, util as layman_util
 from layman.util import check_username_decorator
 from . import util, MAP_REST_PATH_NAME
 from .filesystem import thumbnail
@@ -21,6 +21,12 @@ bp = Blueprint('rest_map_thumbnail', __name__)
 @util.info_decorator
 def before_request():
     pass
+
+
+@bp.after_request
+def after_request(response):
+    layman_util.check_deprecated_url(response)
+    return response
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>/thumbnail", methods=['GET'])
