@@ -25,6 +25,12 @@ def before_request():
     pass
 
 
+@bp.after_request
+def after_request(response):
+    layman_util.check_deprecated_url(response)
+    return response
+
+
 @bp.route(f"/{MAP_REST_PATH_NAME}", methods=['GET'])
 def get(username):
     app.logger.info(f"GET Maps, user={g.user}")

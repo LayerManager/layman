@@ -8,7 +8,7 @@ from layman.common import rest as rest_util
 from layman.util import check_username_decorator
 from . import util, MAP_REST_PATH_NAME
 from .filesystem import input_file, thumbnail
-from layman import authn
+from layman import authn, util as layman_util
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 
@@ -23,6 +23,12 @@ bp = Blueprint('rest_map', __name__)
 @util.info_decorator
 def before_request():
     pass
+
+
+@bp.after_request
+def after_request(response):
+    layman_util.check_deprecated_url(response)
+    return response
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>", methods=['GET'])

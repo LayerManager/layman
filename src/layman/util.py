@@ -4,12 +4,15 @@ import inspect
 import re
 import unicodedata
 from collections import OrderedDict
+import logging
 
 from flask import current_app, request, url_for as flask_url_for, jsonify
 from unidecode import unidecode
 
 from layman import settings
 from layman.http import LaymanError
+
+logger = logging.getLogger(__name__)
 
 USERNAME_ONLY_PATTERN = r"[a-z][a-z0-9]*(?:_[a-z0-9]+)*"
 
@@ -47,6 +50,14 @@ def to_safe_names(unsafe_names, type_name):
     if len(values) == 0:
         values = [type_name]
     return values
+
+
+def check_deprecated_url(response):
+    regexp = rf'^/rest/{settings.REST_WORKSPACES_PREFIX}\b.*$'
+    if not re.match(regexp, request.path):
+        response.headers['Deprecation'] = 'version=v2'
+        response.headers['Link'] = f'<{request.url.replace("/rest/",f"/rest/{settings.REST_WORKSPACES_PREFIX}/")}>; rel="alternate"'
+    return response
 
 
 def check_username_decorator(f):
