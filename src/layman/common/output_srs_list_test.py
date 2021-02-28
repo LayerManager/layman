@@ -133,7 +133,7 @@ def test_spatial_precision(ensure_layer, point_id, epsg_code, exp_coordinates, p
     (3857, (1848629.9227203887, 6308682.319202789, 1848674.6599045212, 6308704.687794856), (601, 301), 'sld'),
     (3857, (1848629.9227203887, 6308682.319202789, 1848674.6599045212, 6308704.687794856), (601, 301), 'qml'),
     (4326, (49.19890575980367231, 16.60658065319004706, 49.1990742144799853, 16.6068740057260591), (560, 321), 'sld'),
-    pytest.param(4326, (49.19890575980367231, 16.60658065319004706, 49.1990742144799853, 16.6068740057260591), (560, 321), 'qml', marks=pytest.mark.xfail(reason="Bug in axis order")),
+    (4326, (49.19890575980367231, 16.60658065319004706, 49.1990742144799853, 16.6068740057260591), (560, 321), 'qml'),
     (5514, (-598222.0717287908774, -1160322.246679280885, -598192.4913120940328, -1160305.260429263581), (559, 321), 'sld'),
     pytest.param(5514, (-598222.0717287908774, -1160322.246679280885, -598192.4913120940328, -1160305.260429263581), (559, 321), 'qml', marks=pytest.mark.xfail(reason="Insufficient precision")),
     (32633, (617036.812525726622, 5450809.904478034005, 617060.6595777452458, 5450828.394583584741), (414, 321), 'sld'),
@@ -153,9 +153,6 @@ def test_spatial_precision_wms(ensure_layer, epsg_code, extent, img_size, style_
 
     expected_file = f'sample/layman.layer/sample_point_cz_{epsg_code}.png'
     obtained_file = f'tmp/artifacts/test_spatial_precision_wms/sample_point_cz_{style_type}_{epsg_code}.png'
-
-    # if epsg_code == 4326 and style_type == 'qml':
-    #     extent = [extent[1], extent[0], extent[3], extent[2]]
 
     url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS={workspace}_wms%3A{layer}&FORMAT_OPTIONS=antialias%3Afull&CRS=EPSG%3A{epsg_code}&WIDTH={img_size[0]}&HEIGHT={img_size[1]}&BBOX={"%2C".join((str(c) for c in extent))}'
 
