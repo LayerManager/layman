@@ -16,6 +16,7 @@ def test_fill_project_template():
     layer = 'test_fill_project_template_layer'
     qgs_path = f'{settings.LAYMAN_QGIS_DATA_DIR}/{layer}.qgs'
     wms_url = f'{settings.LAYMAN_QGIS_URL}?MAP={qgs_path}'
+    wms_version = '1.3.0'
 
     layer_info = process_client.publish_layer(workspace,
                                               layer,
@@ -25,7 +26,7 @@ def test_fill_project_template():
     layer_uuid = layer_info['uuid']
 
     with pytest.raises(requests.exceptions.HTTPError) as excinfo:
-        WebMapService(wms_url, version=qgis_wms.VERSION)
+        WebMapService(wms_url, version=wms_version)
     assert excinfo.value.response.status_code == 500
 
     with app.app_context():
@@ -54,7 +55,7 @@ def test_fill_project_template():
     with open(qgs_path, "w") as qgs_file:
         print(qgs_str, file=qgs_file)
 
-    wmsi = WebMapService(wms_url, version=qgis_wms.VERSION)
+    wmsi = WebMapService(wms_url, version=wms_version)
     assert layer in wmsi.contents
     wms_layer = wmsi.contents[layer]
     for expected_output_srs in settings.LAYMAN_OUTPUT_SRS_LIST:
@@ -67,7 +68,7 @@ def test_fill_project_template():
     os.remove(qgs_path)
 
     with pytest.raises(requests.exceptions.HTTPError) as excinfo:
-        WebMapService(wms_url, version=qgis_wms.VERSION)
+        WebMapService(wms_url, version=wms_version)
     assert excinfo.value.response.status_code == 500
 
     process_client.delete_layer(workspace, layer)
