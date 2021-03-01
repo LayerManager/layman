@@ -14,14 +14,22 @@ def mock_method():
 
 
 @pytest.mark.parametrize('request_path', [
-    '/rest/workspaces/layers',
-    '/rest/workspaces/layers/abc',
-    '/rest/workspaces/username/abc',
-    '/rest/workspaces/username/publications',
-    '/rest/workspaces/username/publications/blablabla',
-    '/rest/workspaces/username/publications/blablabla/da',
-    '/rest/workspaces/users/layers',
-    '/rest/workspaces/users/maps/map',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/layers',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/layers/abc',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/username/abc',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/username/publications',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/username/publications/blablabla',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/username/publications/blablabla/da',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/users/layers',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/users/maps/map',
+    f'/rest/layers',
+    f'/rest/layers/abc',
+    f'/rest/username/abc',
+    f'/rest/username/publications',
+    f'/rest/username/publications/blablabla',
+    f'/rest/username/publications/blablabla/da',
+    f'/rest/users/layers',
+    f'/rest/users/maps/map',
 ])
 def test_authorize_publications_decorator_does_not_accept_path(request_path):
     with app.test_request_context(request_path):
@@ -31,12 +39,18 @@ def test_authorize_publications_decorator_does_not_accept_path(request_path):
 
 
 @pytest.mark.parametrize('request_path', [
-    '/rest/workspaces/user_a/layers',
-    '/rest/workspaces/user_a/layers/',
-    '/rest/workspaces/user_a/maps/',
-    '/rest/workspaces/user_a/layers/abc',
-    '/rest/workspaces/user_a/layers/some_layer/some/nested/endpoint',
-    '/rest/workspaces/user_a/maps/a_map',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/user_a/layers',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/user_a/layers/',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/user_a/maps/',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/user_a/layers/abc',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/user_a/layers/some_layer/some/nested/endpoint',
+    f'/rest/{settings.REST_WORKSPACES_PREFIX}/user_a/maps/a_map',
+    f'/rest/user_a/layers',
+    f'/rest/user_a/layers/',
+    f'/rest/user_a/maps/',
+    f'/rest/user_a/layers/abc',
+    f'/rest/user_a/layers/some_layer/some/nested/endpoint',
+    f'/rest/user_a/maps/a_map',
 ])
 def test_authorize_publications_decorator_accepts_path(request_path):
     with app.test_request_context(request_path):

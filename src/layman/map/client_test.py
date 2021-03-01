@@ -103,7 +103,7 @@ def test_post_no_file(client, chrome):
     severe_entries = [e for e in entries if e['level'] == 'SEVERE']
     assert len(severe_entries) == 1
     for entry in severe_entries:
-        assert entry['message'].startswith(f'{client_url}rest/workspaces/{username}/maps?'
+        assert entry['message'].startswith(f'{client_url}rest/{settings.REST_WORKSPACES_PREFIX}/{username}/maps?'
                                            ) and entry['message'].endswith(
             'Failed to load resource: the server responded with a status of 400 (BAD REQUEST)')
 

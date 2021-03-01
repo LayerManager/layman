@@ -196,7 +196,7 @@ def test_patch_layer_chunk(chrome):
         assert entry['level'] == 'INFO' or (
             entry['level'] == 'SEVERE'
             and entry['message'].startswith(
-                f'{client_url}rest/workspaces/{username}/layers/{layername}/chunk?'
+                f'{client_url}rest/{settings.REST_WORKSPACES_PREFIX}/{username}/layers/{layername}/chunk?'
             ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(username, layername)
