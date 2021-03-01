@@ -222,9 +222,9 @@ def test_get_publication_infos(publication_type):
 
 @pytest.mark.parametrize('endpoint, params, expected_url', [
     ('rest_maps.get', {'username': 'workspace_name'},
-     f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/workspace_name/maps'),
+     f'http://{settings.LAYMAN_SERVER_NAME}/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/maps'),
     ('rest_layers.get', {'username': 'workspace_name'},
-     f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/workspace_name/layers'),
+     f'http://{settings.LAYMAN_SERVER_NAME}/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/layers'),
 ])
 def test_url_for(endpoint, params, expected_url):
     with app.app_context():
