@@ -6,7 +6,7 @@ from .. import db, qgis, util as layer_util
 from layman import patch_mode, settings, util as layman_util
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
-VERSION = "1.3.0"
+VERSION = "1.1.1"
 
 
 def get_publication_uuid(username, publication_type, publication_name):
