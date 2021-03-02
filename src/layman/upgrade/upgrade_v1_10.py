@@ -14,12 +14,12 @@ from layman.common.prime_db_schema import workspaces, util as db_util
 from layman import util
 from layman.layer import LAYER_TYPE
 from layman.layer import geoserver
-from layman.layer.geoserver import wms
-from layman.layer.micka import csw
+from layman.layer.geoserver import wms, util as gs_util
+from layman.layer.micka import csw as layer_csw
 from layman.layer.filesystem import util as layer_fs_util, input_style
 from layman.map import MAP_TYPE
 from layman.map.filesystem import input_file
-from layman.layer.geoserver import util as gs_util
+from layman.map.micka import csw as map_csw
 
 logger = logging.getLogger(__name__)
 
@@ -149,24 +149,42 @@ def migrate_maps_on_wms_workspace():
 
 
 def migrate_metadata_records(workspace=None):
-    logger.info(f'    Starting - migrate layer metadata records')
+    logger.info(f'    Starting - migrate publication metadata records')
     infos = util.get_publication_infos(publ_type=LAYER_TYPE, workspace=workspace)
     for (workspace, _, layer) in infos.keys():
         wms.clear_cache(workspace)
         logger.info(f'      Migrate layer {workspace}.{layer}')
         try:
-            muuid = csw.patch_layer(workspace, layer, ['wms_url'], create_if_not_exists=False, timeout=2)
+            muuid = layer_csw.patch_layer(workspace, layer, ['wms_url', 'graphic_url', 'identifier', 'layer_endpoint', ],
+                                          create_if_not_exists=False, timeout=2)
             if not muuid:
                 logger.warning(f'        Metadata record of layer was not migrated, because the record does not exist.')
         except requests.exceptions.ReadTimeout:
-            md_props = list(csw.get_metadata_comparison(workspace, layer).values())
+            md_props = list(layer_csw.get_metadata_comparison(workspace, layer).values())
             md_wms_url = md_props[0]['wms_url'] if md_props else None
             exp_wms_url = wms.add_capabilities_params_to_url(wms.get_wms_url(workspace, external_url=True))
             if md_wms_url != exp_wms_url:
                 logger.exception(
                     f'        WMS URL was not migrated (should be {exp_wms_url}, but is {md_wms_url})!')
         time.sleep(0.5)
-    logger.info(f'    DONE - migrate layer metadata records')
+
+    infos = util.get_publication_infos(publ_type=MAP_TYPE, workspace=workspace)
+    for (workspace, _, map) in infos.keys():
+        logger.info(f'      Migrate map {workspace}.{map}')
+        try:
+            muuid = map_csw.patch_map(workspace, map, ['graphic_url', 'identifier', 'map_endpoint', 'map_file_endpoint', ],
+                                      create_if_not_exists=False, timeout=2)
+            if not muuid:
+                logger.warning(f'        Metadata record of the map was not migrated, because the record does not exist.')
+        except requests.exceptions.ReadTimeout:
+            md_props = list(map_csw.get_metadata_comparison(workspace, map).values())
+            md_map_endpoint = md_props[0]['map_endpoint'] if md_props else None
+            exp_map_endpoint = util.url_for('rest_map.get', username=workspace, mapname=map)
+            if md_map_endpoint != exp_map_endpoint:
+                logger.exception(
+                    f'        Map endpoint was not migrated (should be {exp_map_endpoint}, but is {md_map_endpoint})!')
+        time.sleep(0.5)
+    logger.info(f'    DONE - migrate publication metadata records')
 
 
 def migrate_input_sld_directory_to_input_style():

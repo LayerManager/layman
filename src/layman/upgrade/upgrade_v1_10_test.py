@@ -278,6 +278,16 @@ def test_migrate_wms_workspace_metadata(ensure_layer):
         assert v.startswith(wms_new_prefix)
     assert md_props['wms_url']['equal'] is True
     assert md_props['wms_url']['equal_or_null'] is True
+    process_client.delete_layer(workspace, layer)
+
+
+@pytest.mark.usefixtures('ensure_layman')
+def test_migrate_metadata_records_map():
+    workspace = 'test_migrate_metadata_records_map_workspace'
+    map = 'test_migrate_metadata_records_map_map'
+    process_client.publish_map(workspace, map)
+    with app.app_context():
+        upgrade_v1_10.migrate_metadata_records(workspace)
 
 
 @pytest.mark.usefixtures('ensure_layman')
