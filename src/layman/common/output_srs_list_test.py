@@ -129,19 +129,23 @@ def test_spatial_precision(ensure_layer, point_id, epsg_code, exp_coordinates, p
         assert abs(coordinate - exp_coordinates[idx]) <= precision, f"EPSG:{epsg_code}: expected coordinates={exp_coordinates}, found coordinates={feature['geometry']['coordinates']}"
 
 
-@pytest.mark.parametrize('epsg_code, extent, img_size, style_type', [
-    (3857, (1848629.9227203887, 6308682.319202789, 1848674.6599045212, 6308704.687794856), (601, 301), 'sld'),
-    (3857, (1848629.9227203887, 6308682.319202789, 1848674.6599045212, 6308704.687794856), (601, 301), 'qml'),
-    (4326, (49.19890575980367231, 16.60658065319004706, 49.1990742144799853, 16.6068740057260591), (560, 321), 'sld'),
-    (4326, (49.19890575980367231, 16.60658065319004706, 49.1990742144799853, 16.6068740057260591), (560, 321), 'qml'),
-    (5514, (-598222.0717287908774, -1160322.246679280885, -598192.4913120940328, -1160305.260429263581), (559, 321), 'sld'),
-    pytest.param(5514, (-598222.0717287908774, -1160322.246679280885, -598192.4913120940328, -1160305.260429263581), (559, 321), 'qml', marks=pytest.mark.xfail(reason="Insufficient precision")),
-    (32633, (617036.812525726622, 5450809.904478034005, 617060.6595777452458, 5450828.394583584741), (414, 321), 'sld'),
-    (32633, (617036.812525726622, 5450809.904478034005, 617060.6595777452458, 5450828.394583584741), (414, 321), 'qml'),
-    (32634, (179980.6214514021121, 5458862.472599638626, 180005.4304265903484, 5458881.708544168621), (415, 321), 'sld'),
-    (32634, (179980.6214514021121, 5458862.472599638626, 180005.4304265903484, 5458881.708544168621), (415, 321), 'qml'),
+@pytest.mark.parametrize('epsg_code, extent, img_size, style_type, wms_version, diff_line_width, suffix', [
+    (3857, (1848629.922, 6308682.319, 1848674.659, 6308704.687), (601, 301), 'sld', '1.3.0', 2, ''),
+    (3857, (1848629.922, 6308682.319, 1848674.659, 6308704.687), (601, 301), 'qml', '1.3.0', 2, ''),
+    (4326, (49.198905759, 16.606580653, 49.199074214, 16.606874005), (560, 321), 'sld', '1.3.0', 2, ''),
+    (4326, (49.198905759, 16.606580653, 49.199074214, 16.606874005), (560, 321), 'qml', '1.3.0', 2, ''),
+    (4326, (16.606580653, 49.198905759, 16.606874005, 49.199074214), (560, 321), 'sld', '1.1.1', 2, ''),
+    (4326, (16.606580653, 49.198905759, 16.606874005, 49.199074214), (560, 321), 'qml', '1.1.1', 2, ''),
+    (5514, (-598222.071, -1160322.246, -598192.491, -1160305.260), (559, 321), 'sld', '1.3.0', 2, ''),
+    # (5514, (-598222.071, -1160322.246, -598192.491, -1160305.260), (559, 321), 'qml', '1.3.0', 2, ''),
+    (5514, (-598236.981, -1160331.352, -598182.368, -1160295.230), (381, 252), 'sld', '1.3.0', 2, '_low'),
+    (5514, (-598236.981, -1160331.352, -598182.368, -1160295.230), (381, 252), 'qml', '1.3.0', 4, '_low'),
+    (32633, (617036.812, 5450809.904, 617060.659, 5450828.394), (414, 321), 'sld', '1.3.0', 2, ''),
+    (32633, (617036.812, 5450809.904, 617060.659, 5450828.394), (414, 321), 'qml', '1.3.0', 2, ''),
+    (32634, (179980.621, 5458862.472, 180005.430, 5458881.708), (415, 321), 'sld', '1.3.0', 2, ''),
+    (32634, (179980.621, 5458862.472, 180005.430, 5458881.708), (415, 321), 'qml', '1.3.0', 2, ''),
 ])
-def test_spatial_precision_wms(ensure_layer, epsg_code, extent, img_size, style_type):
+def test_spatial_precision_wms(ensure_layer, epsg_code, extent, img_size, style_type, wms_version, diff_line_width, suffix):
     process.ensure_layman_function({
         'LAYMAN_OUTPUT_SRS_LIST': ','.join([str(code) for code in OUTPUT_SRS_LIST])
     })
@@ -151,15 +155,18 @@ def test_spatial_precision_wms(ensure_layer, epsg_code, extent, img_size, style_
     ensure_layer(workspace, layer, file_paths=['sample/layman.layer/sample_point_cz.geojson'], )
     process_client.patch_layer(workspace, layer, style_file=f'sample/layman.layer/sample_point_cz.{style_type}')
 
-    expected_file = f'sample/layman.layer/sample_point_cz_{epsg_code}.png'
-    obtained_file = f'tmp/artifacts/test_spatial_precision_wms/sample_point_cz_{style_type}_{epsg_code}.png'
+    expected_file = f'sample/layman.layer/sample_point_cz_{epsg_code}{suffix}.png'
+    obtained_file = f'tmp/artifacts/test_spatial_precision_wms/sample_point_cz_{style_type}_{epsg_code}{suffix}.png'
+    crs_name = {
+        '1.1.1': 'SRS',
+        '1.3.0': 'CRS',
+    }[wms_version]
 
-    url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS={workspace}_wms%3A{layer}&FORMAT_OPTIONS=antialias%3Afull&CRS=EPSG%3A{epsg_code}&WIDTH={img_size[0]}&HEIGHT={img_size[1]}&BBOX={"%2C".join((str(c) for c in extent))}'
+    url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?SERVICE=WMS&VERSION={wms_version}&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS={workspace}_wms%3A{layer}&FORMAT_OPTIONS=antialias%3Afull&{crs_name}=EPSG%3A{epsg_code}&WIDTH={img_size[0]}&HEIGHT={img_size[1]}&BBOX={"%2C".join((str(c) for c in extent))}'
 
     circle_diameter = 30
     circle_perimeter = circle_diameter * math.pi
     num_circles = 5
-    diff_line_width = 2
     pixel_diff_limit = circle_perimeter * num_circles * diff_line_width
 
     util.assert_same_images(url, obtained_file, expected_file, pixel_diff_limit)
