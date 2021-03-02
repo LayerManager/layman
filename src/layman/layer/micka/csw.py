@@ -80,7 +80,7 @@ def patch_layer(username, layername, metadata_properties_to_refresh, actor_name=
     record = ET.tostring(el, encoding='unicode', pretty_print=True)
     # current_app.logger.info(f"patch_layer record=\n{record}")
     try:
-        muuid = common_util.csw_update({
+        common_util.csw_update({
             'muuid': muuid,
             'record': record,
         }, timeout=timeout)
