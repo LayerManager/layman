@@ -10,12 +10,14 @@ IN_CELERY_WORKER_PROCESS = sys.argv and sys.argv[0].endswith('/celery/__main__.p
 IN_PYTEST_PROCESS = sys.argv and sys.argv[0].endswith('/pytest/__main__.py')
 IN_FLOWER_PROCESS = sys.argv and sys.argv[0].endswith('/flower/__main__.py')
 IN_FLASK_PROCESS = sys.argv and (sys.argv[0].endswith('/flask') or sys.argv[0].endswith('/gunicorn'))
+IN_UPGRADE_PROCESS = sys.argv and sys.argv[0].endswith('standalone_upgrade.py')
 assert [
     IN_CELERY_WORKER_PROCESS,
     IN_PYTEST_PROCESS,
     IN_FLOWER_PROCESS,
     IN_FLASK_PROCESS,
-].count(True) == 1, f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}, IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}, IN_FLOWER_PROCESS={IN_FLOWER_PROCESS}, IN_FLASK_PROCESS={IN_FLASK_PROCESS}"
+    IN_UPGRADE_PROCESS,
+].count(True) == 1, f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}, IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}, IN_FLOWER_PROCESS={IN_FLOWER_PROCESS}, IN_FLASK_PROCESS={IN_FLASK_PROCESS}, IN_UPGRADE_PROCESS={IN_UPGRADE_PROCESS}"
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
@@ -46,6 +48,7 @@ app.logger.info(f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}")
 app.logger.info(f"IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}")
 app.logger.info(f"IN_FLOWER_PROCESS={IN_FLOWER_PROCESS}")
 app.logger.info(f"IN_FLASK_PROCESS={IN_FLASK_PROCESS}")
+app.logger.info(f"IN_UPGRADE_PROCESS={IN_UPGRADE_PROCESS}")
 
 # load UUIDs only once
 LAYMAN_DEPS_ADJUSTED_KEY = f"{__name__}:LAYMAN_DEPS_ADJUSTED"
@@ -58,7 +61,7 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
         if settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
             pipe.multi()
             rds_key_value = settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY)
-            if (IN_FLASK_PROCESS or IN_PYTEST_PROCESS) and rds_key_value is None:
+            if (IN_FLASK_PROCESS or IN_PYTEST_PROCESS or IN_UPGRADE_PROCESS) and rds_key_value is None:
                 pipe.set(LAYMAN_DEPS_ADJUSTED_KEY, 'processing')
                 pipe.execute()
 
@@ -80,23 +83,24 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                     if settings.LAYMAN_GS_PROXY_BASE_URL != '':
                         gs.ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
 
-                with app.app_context():
-                    from . import upgrade
-                    upgrade.upgrade()
+                if not IN_UPGRADE_PROCESS:
+                    with app.app_context():
+                        from . import upgrade
+                        upgrade.upgrade()
 
-                app.logger.info(f'Loading Redis database')
-                with app.app_context():
-                    from .uuid import import_uuids_to_redis
+                    app.logger.info(f'Loading Redis database')
+                    with app.app_context():
+                        from .uuid import import_uuids_to_redis
 
-                    import_uuids_to_redis()
-                    from .authn.redis import import_authn_to_redis
+                        import_uuids_to_redis()
+                        from .authn.redis import import_authn_to_redis
 
-                    import_authn_to_redis()
+                        import_authn_to_redis()
 
-                app.logger.info(f'Ensure SRS output list for QGIS projects')
-                with app.app_context():
-                    from .layer.qgis import output_srs
-                    output_srs.ensure_output_srs_for_all()
+                    app.logger.info(f'Ensure SRS output list for QGIS projects')
+                    with app.app_context():
+                        from .layer.qgis import output_srs
+                        output_srs.ensure_output_srs_for_all()
 
                 pipe.multi()
                 pipe.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
