@@ -8,8 +8,9 @@ Publishing geospatial data online through [REST API](doc/rest.md).
   - [**map**](doc/models.md#map): collection of layers
 - Accepts data in [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON), [ShapeFile](https://en.wikipedia.org/wiki/Shapefile), [Styled Layer Descriptor](https://www.opengeospatial.org/standards/sld), [Symbology Encoding](https://www.opengeospatial.org/standards/se), or [HSLayers Map Composition](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema) format
 - Even large files can be easily uploaded from browser thanks to asynchronous chunk upload
+- [OAuth2 authentication](doc/security.md#authentication)
+- [Authorization](doc/security.md#authorization) enables to set read and write access to each layer and map for specific users
 - Asynchronous processing
-- Each vector dataset is automatically imported into PostGIS database
 - Provides URL endpoints
   - [REST API](doc/rest.md)
   - [Web Map Service (WMS)](doc/endpoints.md#web-map-service)
@@ -94,12 +95,7 @@ Files at all three levels are suffixed with strings that indicates what they are
 When you are switching between different contexts (e.g. between demo and dev), always check that you are using settings intended for your context, especially
 - `.env*` file (check `env_file` properties in `docker-compose.*.yml` file)
 
-Also, anytime you change `.env` file, remember to rebuild docker images as some environment variables affect build stage of docker images. Particularly these environment settings:
-- [UID_GID](doc/env-settings.md#UID_GID)
-- [LAYMAN_GS_HOST](doc/env-settings.md#LAYMAN_GS_HOST)
-- [LAYMAN_GS_PORT](doc/env-settings.md#LAYMAN_GS_PORT)
-- [LAYMAN_SERVER_NAME](doc/env-settings.md#LAYMAN_SERVER_NAME)
-- [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION)
+Also, anytime you change `.env` file, remember to rebuild docker images as some environment variables affect build stage of docker images. Rebuild happens automatically as a part of `make start-demo*` commands.
 
 
 ## Dependencies
