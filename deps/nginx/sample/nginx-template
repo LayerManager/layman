@@ -5,7 +5,10 @@ server {
     client_max_body_size 2m;
 
     location ~* ^/(geoserver(/[a-z0-9_]+)?/(wfs|wms|ows)) {
-        proxy_pass http://layman:8000/$1$is_args$args;
+        # https://stackoverflow.com/a/52319161
+        resolver 127.0.0.11;
+        set $layman_hostport_tmp "layman:8000";
+        proxy_pass http://$layman_hostport_tmp/$1$is_args$args;
         proxy_set_header Host $host;
         proxy_set_header ${LAYMAN_AUTHN_HTTP_HEADER_NAME} "";
     }
@@ -16,13 +19,19 @@ server {
     }
 
     location /rest/ {
-        proxy_pass http://layman:8000/rest/;
+        # https://stackoverflow.com/a/52319161
+        resolver 127.0.0.11;
+        set $layman_hostport_tmp "layman:8000";
+        proxy_pass http://$layman_hostport_tmp/rest/;
         proxy_set_header Host $host;
         proxy_set_header ${LAYMAN_AUTHN_HTTP_HEADER_NAME} "";
     }
 
     location /flower/ {
-        proxy_pass http://flower:5555/flower/;
+        # https://stackoverflow.com/a/52319161
+        resolver 127.0.0.11;
+        set $flower_hostport_tmp "flower:5555";
+        proxy_pass http://$flower_hostport_tmp/flower/;
         proxy_set_header Host $host;
     }
 
