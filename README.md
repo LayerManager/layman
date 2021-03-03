@@ -127,6 +127,10 @@ General steps to upgrade layman to MINOR or PATCH version:
    - `layman_data`
    - `deps/*/data` (data directories of external dependencies)
 1. Follow **Upgrade requirements** in [Changelog](CHANGELOG.md) of all MINOR and PATCH versions greater than your current version and lower or equal to the version you are upgrading to.
+1. If you are expecting long-running upgrade, run **standalone upgrade**, otherwise Gunicorn could time out. The command depends on how you are starting Layman.
+   - If you are starting Layman with `make start-demo`, run `make upgrade-demo`.
+   - If you are starting Layman with `make start-demo-full` or `make start-demo-full-with-optional-deps`, run `make upgrade-demo-full`.
+   - If you are starting Layman with `make start-dev`, you don't need to run standalone migration.
 1. Start Layman.
 
 ## Run in production
