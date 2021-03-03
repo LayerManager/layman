@@ -72,7 +72,7 @@ def migrate_layers_to_wms_workspace(workspace=None):
         info = util.get_publication_info(workspace, publication_type, layer)
         geoserver_workspace = wms.get_geoserver_workspace(workspace)
         geoserver.ensure_workspace(workspace)
-        if not (isinstance(info.get('db_table'), str) and info.get('db_table') == layer):
+        if not (info.get('db_table') and info.get('db_table').get('name') == layer):
             logger.warning(f'        Layer DB table not available, not migrating.')
             continue
 

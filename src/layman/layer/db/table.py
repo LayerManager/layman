@@ -34,7 +34,9 @@ WHERE schemaname = '{username}'
     rows = cur.fetchall()
     if len(rows) > 0:
         return {
-            'db_table': layername
+            'db_table': {
+                'name': layername,
+            },
         }
     else:
         return {}
