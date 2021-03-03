@@ -30,6 +30,20 @@ stop-demo:
 build-demo:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
 
+upgrade-demo:
+	mkdir -p layman_data deps/qgis/data
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps postgresql qgis geoserver redis timgen layman_client nginx
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps layman bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
+
+upgrade-demo-full:
+	mkdir -p layman_data deps/qgis/data
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps postgresql qgis geoserver redis timgen layman_client micka nginx
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps layman bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
+
 deps-start:
 	docker-compose -f docker-compose.deps.yml up --force-recreate -d
 
@@ -73,6 +87,12 @@ restart-celery-dev:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml up --no-deps -d celery_worker_test
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --no-deps -d flower
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --no-deps -d layman_client
+
+upgrade-dev:
+	mkdir -p layman_data layman_data_test tmp deps/qgis/data
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_geoserver.py"
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d timgen layman_client postgresql qgis nginx-qgis geoserver redis micka
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps layman_dev bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
 
 prepare-dirs:
 	mkdir -p layman_data layman_data_test tmp deps/qgis/data
