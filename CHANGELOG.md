@@ -1,7 +1,7 @@
 # Changelog
 
 ## v1.10.0
-  {release-date}
+ 2021-03-04
 ### Upgrade requirements
 - Set environment variables
   - [LAYMAN_QGIS_HOST](doc/env-settings.md#LAYMAN_QGIS_HOST)=nginx
@@ -13,31 +13,40 @@
   - [LAYMAN_QGIS_PORT](doc/env-settings.md#LAYMAN_QGIS_PORT)=80
   - [LAYMAN_QGIS_PATH](doc/env-settings.md#LAYMAN_QGIS_PATH)=/qgis/
   - [LAYMAN_QGIS_DATA_DIR](doc/env-settings.md#LAYMAN_QGIS_DATA_DIR)=/qgis/data/dev
-- Run [standalone upgrade](README.md#upgrade) before starting Layman.
 - Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.5.1`
     - If you are running Layman with development settings, run also `make client-build`.
+- Run [standalone upgrade](README.md#upgrade) before starting Layman.
 ### Migrations and checks
-- [#154](https://github.com/jirik/layman/issues/154) All workspaces are checked, that their name did not end with '_wms'. With any of the workspaces ended with the suffix, startup process is stopped with error code 45. In that case, please downgrade to the previous minor release version and contact Layman contributors.
+- [#154](https://github.com/jirik/layman/issues/154) New column `style_type` in `publications` table is created.
+- [#154](https://github.com/jirik/layman/issues/154) All workspaces are checked, that their name did not end with `_wms` and is not equal to `workspaces`. If there is any conflict found, startup process is stopped with error code 45. In that case, please downgrade to the previous minor release version and contact Layman contributors.
 - [#154](https://github.com/jirik/layman/issues/154) All layers are copied into [dedicated WMS GeoServer workspace](doc/data-storage.md#geoserver). Styles are also moved into that workspace.
 - [#154](https://github.com/jirik/layman/issues/154) Maps with URLs pointing to any layer stored in GeoServer are rewritten to dedicated [WMS workspace](doc/data-storage.md#geoserver).
-- [#154](https://github.com/jirik/layman/issues/154) Metadata property [`wms_url`](doc/metadata.md) in existing layer metadata records is updated to dedicated [WMS workspace](doc/data-storage.md#geoserver).
+- [#154](https://github.com/jirik/layman/issues/154) Following metadata properties are updated:
+   - layers: [`wms_url`](doc/metadata.md#wms_url), [`graphic_url`](doc/metadata.md#graphic_url), [`identifier`](doc/metadata.md#identifier), [`layer_endpoint`](doc/metadata.md#layer_endpoint)
+   - maps: [`graphic_url`](doc/metadata.md#graphic_url), [`identifier`](doc/metadata.md#identifier), [`map_endpoint`](doc/metadata.md#map_endpoint), [`map_file_endpoint`](doc/metadata.md#map_file_endpoint)
 - [#154](https://github.com/jirik/layman/issues/154) Rename internal directories from `/users/{workspace}/layers/{layer}/input_sld` to `/users/{workspace}/layers/{layer}/input_style`
-- [#154](https://github.com/jirik/layman/issues/154) Save in DB if layer is stored in GeoServer or in QGIS.
+- [#154](https://github.com/jirik/layman/issues/154) Fill column `style_type` with `"sld"` for all layers.
 ### Changes
-- [#154](https://github.com/jirik/layman/issues/154) [WMS](doc/endpoints.md#web-map-service) is available in dedicated [GeoServer workspace](doc/data-storage.md#geoserver) whose name is composed from Layman's [workspace](doc/models.md#workspace) name and suffix `_wms`. [WFS](doc/endpoints.md#web-feature-service) remains in GeoServer workspace whose name is equal to Layman's workspace name.
-- [#154](https://github.com/jirik/layman/issues/154) SLD style published in dedicated WMS GeoServer workspace.
-- [#99](https://github.com/jirik/layman/issues/99) New endpoint [`/rest/about/version'](doc/rest.md#get-version). Also available in Layman Test Client.
-- [#154](https://github.com/jirik/layman/issues/154) Workspace name can not end with '_wms'. In such case, error with code 45 is raised.
-- New environment variables [LAYMAN_QGIS_HOST](doc/env-settings.md#LAYMAN_QGIS_HOST), [LAYMAN_QGIS_PORT](doc/env-settings.md#LAYMAN_QGIS_PORT), and [LAYMAN_QGIS_PATH](doc/env-settings.md#LAYMAN_QGIS_PATH).
-- [#154](https://github.com/jirik/layman/issues/154) For endpoints [POST Layers](doc/rest.md#post-layers) and [PATCH Layer](doc/rest.md#patch-layer), parameter *sld* is replaced by the new parameter *style* and marked as deprecated. In response to endpoints [GET Layer](doc/rest.md#get-layer) and [PATCH Layer](doc/rest.md#patch-layer), *sld* is replaced by the new *style* item and marked as deprecated.
-- [#154](https://github.com/jirik/layman/issues/154) Also QGIS style file is accepted, previously only SLD file was.
-- [#154](https://github.com/jirik/layman/issues/154) Layers with [QGIS style](https://docs.qgis.org/3.16/en/docs/user_manual/style_library/style_manager.html#exporting-items) are published on [GeoServer dedicated WMS workspace](doc/data-storage.md#geoserver) through WMS cascade from QGIS server, where they are stored as QGS file. All layers are published directly from PostgreSQL database to GeoServer for [WFS workspace](doc/data-storage.md#geoserver).
-- [#154](https://github.com/jirik/layman/issues/154) During startup, [LAYMAN_OUTPUT_SRS_LIST](doc/env-settings.md#LAYMAN_OUTPUT_SRS_LIST) is ensure for all QGIS layers.
-- [#154](https://github.com/jirik/layman/issues/154) Treat attribute names in QML (also known as '[launder](https://gdal.org/drivers/vector/pg.html#layer-creation-options)').
-- [#154](https://github.com/jirik/layman/issues/154) Endpoint [GET Layer](doc/rest.md#get-layer) returns in 'style' also 'type', either 'sld' or 'qml'.
-- [#154](https://github.com/jirik/layman/issues/154) Endpoint [GET Layer Style](doc/rest.md#get-layer-style) returns 'sld' or 'qml' XML in response.
-- [#67](https://github.com/jirik/layman/issues/67) Publication endpoints has `workspaces/` before a workspace name in the url. Whole path is for example: `/rest/workspaces/<workspace_name>/layers`. Old endpoints are marked as deprecated (with `Deprecation` header in response) and will be removed with next major release.
+- [#154](https://github.com/jirik/layman/issues/154) Enable to publish QGIS layer styles (QML)
+    - For endpoints [POST Layers](doc/rest.md#post-layers) and [PATCH Layer](doc/rest.md#patch-layer), parameter *sld* is replaced with the new parameter *style* and marked as deprecated. In response to endpoints [GET Layer](doc/rest.md#get-layer) and [PATCH Layer](doc/rest.md#patch-layer), *sld* is replaced by the new *style* item and marked as deprecated. Layman Test Client now uses *style* parameter.
+    - Parameter *style* accepts also QGIS layer style (QML). Layman Test Client enables to select also `*.qml` files.
+    - Endpoint [GET Layer](doc/rest.md#get-layer) returns in `style` attribute also `type`, either `"sld"` or `"qml"`.
+    - Endpoint [GET Layer Style](doc/rest.md#get-layer-style) returns SLD style or QML style.
+    - Treat attribute names in QML (also known as '[launder](https://gdal.org/drivers/vector/pg.html#layer-creation-options)').
+    - New docker container with QGIS server called `qgis` in demo configuration.
+    - New directory [LAYMAN_QGIS_DATA_DIR](doc/env-settings.md#LAYMAN_QGIS_DATA_DIR) is used to store [layer QGS files](doc/data-storage.md#filesystem).
+    - [WMS](doc/endpoints.md#web-map-service) is moved to dedicated [GeoServer workspace](doc/data-storage.md#geoserver) whose name is composed from Layman's [workspace](doc/models.md#workspace) name and suffix `_wms`. [WFS](doc/endpoints.md#web-feature-service) remains in GeoServer workspace whose name is equal to Layman's workspace name.
+    - Layers with [QGIS style](https://docs.qgis.org/3.16/en/docs/user_manual/style_library/style_manager.html#exporting-items) are published on [GeoServer dedicated WMS workspace](doc/data-storage.md#geoserver) through WMS cascade from QGIS server, where they are stored as QGS file. All layers are published directly from PostgreSQL database to GeoServer for [WFS workspace](doc/data-storage.md#geoserver).
+    - SLD style published in dedicated WMS GeoServer workspace.
+    - New environment variables [LAYMAN_QGIS_HOST](doc/env-settings.md#LAYMAN_QGIS_HOST), [LAYMAN_QGIS_PORT](doc/env-settings.md#LAYMAN_QGIS_PORT), [LAYMAN_QGIS_PATH](doc/env-settings.md#LAYMAN_QGIS_PATH), and [LAYMAN_QGIS_DATA_DIR](doc/env-settings.md#LAYMAN_QGIS_DATA_DIR).
+    - Workspace name can not end with '_wms'. In such case, error with code 45 is raised.
+    - During startup, [LAYMAN_OUTPUT_SRS_LIST](doc/env-settings.md#LAYMAN_OUTPUT_SRS_LIST) is ensure for all QGIS layers.
+- [#67](https://github.com/jirik/layman/issues/67) Workspace-related [REST API endpoints](doc/rest.md) (maps, layers) were moved from `/rest/*` to `/rest/workspaces/*`. Whole path is for example: `/rest/workspaces/<workspace_name>/layers`. Old endpoints are marked as deprecated (with `Deprecation` header in response) and will be removed with next major release.
+- [#99](https://github.com/jirik/layman/issues/99) New endpoint [GET Version](doc/rest.md#get-version). Also available in Layman Test Client.
 - Endpoint [GET Layer](doc/rest.md#get-layer) returns JSON object for **db_table** item. Previously incorrectly returns DB table name directly in **db_table** instead of *name* subitem.
+- Undocumented attributes `type` and `id` were removed from GET Layer and Get Map responses.
+- To indicated if Layman is running, you can call [GET Version](doc/rest.md#get-version).
+- Optional [standalone upgrade](README.md#upgrade) command was implemented to avoid Gunicorn timeout.
 
 ## v1.9.1
  2021-01-18
