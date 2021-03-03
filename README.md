@@ -118,6 +118,17 @@ However, if you want to run Layman in production, it is strongly recommended to 
 - Micka 2020.014 (versions >=2020.010 probably work too)
 
 
+## Upgrade
+Layman follows [semantic versioning](https://semver.org/), so any change in MINOR and PATCH version should be backwards compatible. Still, human make mistakes, so it's recommended to backup data directories as a part of each upgrade.
+
+General steps to upgrade layman to MINOR or PATCH version:
+1. Stop layman. For demo configuration, `make stop-demo`, for dev configuration `make stop-dev`.
+1. Backup data directories. By default, they are located at
+   - `layman_data`
+   - `deps/*/data` (data directories of external dependencies)
+1. Follow **Upgrade requirements** in [Changelog](CHANGELOG.md) of all MINOR and PATCH versions greater than your current version and lower or equal to the version you are upgrading to.
+1. Start Layman.
+
 ## Run in production
 To run layman in production, you need to provide [external dependencies](#dependencies) and [configure](#configuration) layman manually.
 
