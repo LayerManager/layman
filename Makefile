@@ -4,13 +4,13 @@ start-demo:
 	mkdir -p layman_data deps/qgis/data
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client nginx
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql qgis geoserver redis layman celery_worker flower timgen layman_client nginx
 
 start-demo-full:
 	mkdir -p layman_data deps/qgis/data
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql geoserver redis layman celery_worker flower timgen layman_client micka nginx
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql qgis geoserver redis layman celery_worker flower timgen layman_client micka nginx
 
 start-demo-only:
 	mkdir -p layman_data deps/qgis/data
