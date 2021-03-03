@@ -6,7 +6,7 @@ Publishing geospatial data online through [REST API](doc/rest.md).
 - Two publication models available:
   - [**layer**](doc/models.md#layer): visual representation of single vector dataset (i.e. ShapeFile or GeoJSON)
   - [**map**](doc/models.md#map): collection of layers
-- Accepts data in [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON), [ShapeFile](https://en.wikipedia.org/wiki/Shapefile), [Styled Layer Descriptor](https://www.opengeospatial.org/standards/sld), [Symbology Encoding](https://www.opengeospatial.org/standards/se), or [HSLayers Map Composition](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema) format
+- Accepts data in [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON), [ShapeFile](https://en.wikipedia.org/wiki/Shapefile), [Styled Layer Descriptor](https://www.opengeospatial.org/standards/sld), [Symbology Encoding](https://www.opengeospatial.org/standards/se), [QGIS Style File Format](https://docs.qgis.org/3.16/en/docs/user_manual/appendices/qgis_file_formats.html#qml-the-qgis-style-file-format) or [HSLayers Map Composition](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema) format
 - Even large files can be easily uploaded from browser thanks to asynchronous chunk upload
 - [OAuth2 authentication](doc/security.md#authentication)
 - [Authorization](doc/security.md#authorization) enables to set read and write access to each layer and map for specific users
@@ -19,7 +19,7 @@ Publishing geospatial data online through [REST API](doc/rest.md).
 - Documented [security system](doc/security.md)
 - Documented [data storage](doc/data-storage.md)
 - Configurable by environment variables
-- Standing on the shoulders of Docker, Python, Flask, PostgreSQL, PostGIS, GDAL, GeoServer, OpenLayers, Celery, Redis, and [more](doc/dependencies.md)
+- Standing on the shoulders of Docker, Python, Flask, PostgreSQL, PostGIS, GDAL, QGIS Server, GeoServer, OpenLayers, Celery, Redis, and [more](doc/dependencies.md)
 - Inspired by [CCSS-CZ/layman](https://github.com/CCSS-CZ/layman)
 
 
@@ -101,6 +101,7 @@ Also, anytime you change `.env` file, remember to rebuild docker images as some 
 ## Dependencies
 Layman has [many dependencies](doc/dependencies.md). Most of them are shipped with Layman. However there are some **external dependencies** that should be treated carefully:
 - PostgreSQL & PostGIS
+- QGIS Server
 - GeoServer
 - Redis
 - Micka
@@ -109,6 +110,7 @@ These external dependencies are shipped with Layman for development, testing and
 
 However, if you want to run Layman in production, it is strongly recommended to install external dependencies separately. Recommended (i.e. tested) versions are:
 - PostgreSQL 10.0 & PostGIS 2.4
+- QGIS Server 3.16.1
 - GeoServer 2.13.0
 - Redis 4.0
 - Micka 2020.014 (versions >=2020.010 probably work too)
@@ -134,11 +136,14 @@ To run layman in production, you need to provide [external dependencies](#depend
 
 When providing **external dependencies**, check their production-related documentation:
 - [PostgreSQL 10.0](https://www.postgresql.org/docs/10/admin.html) & [PostGIS 2.4](http://postgis.net/docs/manual-2.4/performance_tips.html)
+- [QGIS Server 3.16.1](https://docs.qgis.org/3.10/en/docs/user_manual/working_with_ogc/server/index.html)
 - [GeoServer 2.13.0](https://docs.geoserver.org/2.13.0/user/production/index.html#production)
 - [Redis 4.0](https://redis.io/topics/admin)
 - [Micka v2020.014](https://github.com/hsrs-cz/Micka/releases/tag/v2020.014), see also [configuration](deps/micka/sample/confs/config.local.neon) of [dockerized Micka](https://github.com/jirik/docker-micka).
 
 Within PostgreSQL, you need to provide one database for Layman and one database for Micka. For Layman, you also need to provide one user [LAYMAN_PG_USER](doc/env-settings.md#LAYMAN_PG_USER) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME) database. The user also needs access to `public` schema where PostGIS must be installed.
+
+Within QGIS Server, you do not need to provide anything special.
 
 Within GeoServer, you need to provide either admin password [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD), or one Layman user [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and one layman role [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE). If admin password is provided, Layman will create the Layman user and the Layman role automatically.
 
@@ -242,6 +247,7 @@ make start-dev
 ## Test
 :warning: It will delete
 - all files within [LAYMAN_DATA_DIR](doc/env-settings.md#LAYMAN_DATA_DIR)!
+- all files within [LAYMAN_QGIS_DATA_DIR](doc/env-settings.md#LAYMAN_QGIS_DATA_DIR)!
 - all layman-related schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME)!
 - all workspaces in [GeoServer](doc/data-storage.md#geoserver)!
 - all keys in Redis logical database identified by [LAYMAN_REDIS_URL](doc/env-settings.md#LAYMAN_REDIS_URL)!
