@@ -126,7 +126,7 @@ def test_migrate_layers_to_wms_workspace(ensure_layer):
 
     assert layer_info['wms']['status'] == 'NOT_AVAILABLE'
     assert layer_info['wfs']['url'] == f'http://localhost:8000/geoserver/{workspace}/wfs'
-    assert layer_info['db_table'] == layer
+    assert layer_info['db_table']['name'] == layer
 
     all_workspaces = gs_common.get_all_workspaces(settings.LAYMAN_GS_AUTH)
     assert workspace in all_workspaces
