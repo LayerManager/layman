@@ -73,7 +73,7 @@ Wait until you see something like
 [2019-10-30 13:45:36 +0000] [12] [INFO] Layman successfully started!
 ```
 
-Then visit [http://localhost/](http://localhost/). You will see simple web client that interacts with [REST API](doc/rest.md).
+Then visit [http://localhost/](http://localhost/). You will see simple web client that interacts with [REST API](doc/rest.md). To check if Layman is running, call [GET Version](doc/rest.md#get-version).
 
 To stop running service, run `make stop-demo`.
 
