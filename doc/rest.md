@@ -289,7 +289,9 @@ Get default style of the layer in XML format. Request is redirected to GeoServer
 #### Request
 No action parameters.
 #### Response
-Content-Type: `Application/xml`
+Content-Type:
+  - `application/vnd.ogc.sld+xml` or `application/vnd.ogc.se+xml` for SLD
+  - `application/x-qgis-layer-settings` for QML
 
 
 ## Layer Chunk
