@@ -49,9 +49,9 @@
     - SLD style published in dedicated WMS GeoServer workspace.
     - New environment variables [LAYMAN_QGIS_HOST](doc/env-settings.md#LAYMAN_QGIS_HOST), [LAYMAN_QGIS_PORT](doc/env-settings.md#LAYMAN_QGIS_PORT), [LAYMAN_QGIS_PATH](doc/env-settings.md#LAYMAN_QGIS_PATH), and [LAYMAN_QGIS_DATA_DIR](doc/env-settings.md#LAYMAN_QGIS_DATA_DIR).
     - Workspace name can not end with '_wms'. In such case, error with code 45 is raised.
-    - During startup, [LAYMAN_OUTPUT_SRS_LIST](doc/env-settings.md#LAYMAN_OUTPUT_SRS_LIST) is ensure for all QGIS layers.
+    - During startup, [LAYMAN_OUTPUT_SRS_LIST](doc/env-settings.md#LAYMAN_OUTPUT_SRS_LIST) is ensured for all QGIS layers.
 - [#67](https://github.com/jirik/layman/issues/67) Workspace-related [REST API endpoints](doc/rest.md) (maps, layers) were moved from `/rest/*` to `/rest/workspaces/*`. Whole path is for example: `/rest/workspaces/<workspace_name>/layers`. Old endpoints are marked as deprecated (with `Deprecation` header in response) and will be removed with next major release.
-- [#99](https://github.com/jirik/layman/issues/99) New endpoint [GET Version](doc/rest.md#get-version). Also available in Layman Test Client.
+- [#99](https://github.com/jirik/layman/issues/99) New endpoint [GET Version](doc/rest.md#get-version). It is also available in Layman Test Client.
 - Endpoint [GET Layer](doc/rest.md#get-layer) returns JSON object for **db_table** item. Previously incorrectly returns DB table name directly in **db_table** instead of *name* subitem.
 - Undocumented attributes `type` and `id` were removed from GET Layer and Get Map responses.
 - To indicated if Layman is running, you can call [GET Version](doc/rest.md#get-version).
