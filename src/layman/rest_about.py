@@ -16,14 +16,20 @@ def get_version_from_txt():
     return version, release_date
 
 
+def clean_version(version):
+    if version[0] == 'v':
+        version = version[1:]
+    return version
+
+
 @bp.route('/version', methods=['GET'])
 def get_version():
     version, release_date = get_version_from_txt()
     data_version = upgrade.get_current_data_version()
-    result = {'about': {'applications': {'layman': {'version': version,
+    result = {'about': {'applications': {'layman': {'version': clean_version(version),
                                                     'release-timestamp': release_date,
                                                     },
-                                         'layman-test-client': {'version': os.environ['LAYMAN_CLIENT_VERSION'],
+                                         'layman-test-client': {'version': clean_version(os.environ['LAYMAN_CLIENT_VERSION']),
                                                                 },
 
                                          },

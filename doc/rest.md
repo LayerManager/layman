@@ -665,10 +665,10 @@ JSON object representing current application version:
 - **about**
   - **applications**: Object with information about each application. 
     - **layman**:
-      - **version**: String. The current version of Layman app. In format `vX.Y.Z`, with suffix `-dev` for the development version.
+      - **version**: String. The current version of Layman app. In [semantic versioning](https://semver.org/) format `X.Y.Z`, with suffix `-dev` for the development version.
       - **release-timestamp**: Datetime. Date and time of the release. For development version, date and time of the last public release.
     - **layman-test-client**:
-      - **version**: String. The current version of Layman test client from environment variables. 
+      - **version**: String. The current version of installed Layman test client. In [semantic versioning](https://semver.org/) format `X.Y.Z`, or commit hash for development version.
   - **data** 
     - **layman**:
       - **last-migration**: String. Identifier of the last successful migration in format 'X.Y.Z-m'.
