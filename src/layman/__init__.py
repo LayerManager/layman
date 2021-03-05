@@ -65,8 +65,8 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                 pipe.set(LAYMAN_DEPS_ADJUSTED_KEY, 'processing')
                 pipe.execute()
 
-                app.logger.info(f'Adjusting GeoServer')
                 with app.app_context():
+                    app.logger.info(f'Adjusting GeoServer roles')
                     from layman.common import geoserver as gs
 
                     if settings.GEOSERVER_ADMIN_AUTH:
@@ -74,22 +74,22 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                         gs.ensure_user(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_PASSWORD, settings.GEOSERVER_ADMIN_AUTH)
                         gs.ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN', settings.GEOSERVER_ADMIN_AUTH)
                         gs.ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
-                    any_srs_list_changed = False
-                    for service in gs.SERVICE_TYPES:
-                        service_srs_list_changed = gs.ensure_service_srs_list(service, settings.LAYMAN_OUTPUT_SRS_LIST, settings.LAYMAN_GS_AUTH)
-                        any_srs_list_changed = service_srs_list_changed or any_srs_list_changed
-                    if any_srs_list_changed:
-                        gs.reload(settings.LAYMAN_GS_AUTH)
-                    if settings.LAYMAN_GS_PROXY_BASE_URL != '':
-                        gs.ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
 
-                if not IN_UPGRADE_PROCESS:
-                    with app.app_context():
+                    if not IN_UPGRADE_PROCESS:
+                        app.logger.info(f'Adjusting GeoServer SRS')
+                        any_srs_list_changed = False
+                        for service in gs.SERVICE_TYPES:
+                            service_srs_list_changed = gs.ensure_service_srs_list(service, settings.LAYMAN_OUTPUT_SRS_LIST, settings.LAYMAN_GS_AUTH)
+                            any_srs_list_changed = service_srs_list_changed or any_srs_list_changed
+                        if any_srs_list_changed:
+                            gs.reload(settings.LAYMAN_GS_AUTH)
+                        if settings.LAYMAN_GS_PROXY_BASE_URL != '':
+                            gs.ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
+
                         from . import upgrade
                         upgrade.upgrade()
 
-                    app.logger.info(f'Loading Redis database')
-                    with app.app_context():
+                        app.logger.info(f'Loading Redis database')
                         from .uuid import import_uuids_to_redis
 
                         import_uuids_to_redis()
@@ -97,8 +97,7 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
 
                         import_authn_to_redis()
 
-                    app.logger.info(f'Ensure SRS output list for QGIS projects')
-                    with app.app_context():
+                        app.logger.info(f'Ensure SRS output list for QGIS projects')
                         from .layer.qgis import output_srs
                         output_srs.ensure_output_srs_for_all()
 
