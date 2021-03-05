@@ -15,7 +15,7 @@ from layman.util import USERNAME_ONLY_PATTERN
 from layman.common.geoserver import reset as gs_reset
 
 
-bp = Blueprint('gs_wfs_proxy_bp', __name__)
+bp = Blueprint('geoserver_proxy_bp', __name__)
 
 
 @bp.before_request
@@ -28,9 +28,12 @@ def ensure_wfs_t_attributes(binary_data):
     try:
         xml_tree = ET.XML(binary_data)
         version = xml_tree.get('version')[0:4]
-        if version not in ["2.0.", "1.0.", "1.1."] or xml_tree.get('service').upper() != "WFS":
-            app.logger.warning(f"WFS Proxy: only xml version 2.0, 1.1, 1.0 and WFS service are supported. Request "
-                               f"only redirected. Version={xml_tree.get('version')}, service={xml_tree.get('service')}")
+        service = xml_tree.get('service').upper()
+        if service != 'WFS':
+            return
+        if version not in ["2.0.", "1.0.", "1.1."]:
+            app.logger.warning(f"WFS Proxy: only xml versions 2.0, 1.1, 1.0 are supported. Request "
+                               f"only redirected. Version={xml_tree.get('version')}")
             return
 
         attribs = set()
@@ -146,7 +149,7 @@ def extract_attributes_from_wfs_t_insert_replace(action):
 
 @bp.route('/<path:subpath>', methods=['POST', 'GET'])
 def proxy(subpath):
-    app.logger.info(f"GET WFS proxy, user={g.user}, subpath={subpath}, url={request.url}, request.query_string={request.query_string.decode('UTF-8')}")
+    app.logger.info(f"{request.method} GeoServer proxy, user={g.user}, subpath={subpath}, url={request.url}, request.query_string={request.query_string.decode('UTF-8')}")
 
     url = settings.LAYMAN_GS_URL + subpath + '?' + request.query_string.decode('UTF-8')
     headers_req = {key.lower(): value for (key, value) in request.headers if key.lower() not in ['host', settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE.lower()]}
@@ -155,7 +158,7 @@ def proxy(subpath):
     if authn_username:
         headers_req[settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE] = authn_username
 
-    app.logger.info(f"GET WFS proxy, headers_req={headers_req}, url={url}")
+    app.logger.info(f"{request.method} GeoServer proxy, headers_req={headers_req}, url={url}")
     if data is not None and len(data) > 0:
         ensure_wfs_t_attributes(data)
     response = requests.request(method=request.method,

@@ -44,7 +44,7 @@ def test_rest_get():
 
 def setup_user_layer(username, layername, authn_headers):
     client_util.reserve_username(username, headers=authn_headers)
-    ln = client_util.publish_layer(username, layername, [
+    client_util.publish_layer(username, layername, [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ], headers=authn_headers)
 
@@ -353,7 +353,6 @@ def test_missing_attribute_authz():
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
 
     # Testing, that user2 is not able to write to layer of user1
-
     client_util.reserve_username(username2, headers=authn_headers2)
 
     # INSERT

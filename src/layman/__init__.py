@@ -37,11 +37,11 @@ for bp in get_blueprints():
     app.register_blueprint(bp, url_prefix='/rest/<username>')
 
 from .user.rest_current_user import bp as current_user_bp
-from .gs_wfs_proxy import bp as gs_wfs_proxy_bp
+from .geoserver_proxy import bp as geoserver_proxy_bp
 from .user.rest_users import bp as users_bp
 
 app.register_blueprint(current_user_bp, url_prefix='/rest/current-user')
-app.register_blueprint(gs_wfs_proxy_bp, url_prefix='/geoserver')
+app.register_blueprint(geoserver_proxy_bp, url_prefix='/geoserver')
 app.register_blueprint(users_bp, url_prefix=f'/rest/{settings.REST_USERS_PREFIX}')
 
 app.logger.info(f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}")
