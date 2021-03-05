@@ -19,8 +19,8 @@ def test_wms_workspace():
     assert r_json['wfs']['url'] == wfs_url
 
     with app.app_context():
-        internal_wms_url = url_for('gs_wfs_proxy_bp.proxy', subpath=workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + '/ows')
-        internal_wfs_url = url_for('gs_wfs_proxy_bp.proxy', subpath=workspace + '/wfs')
+        internal_wms_url = url_for('geoserver_proxy_bp.proxy', subpath=workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + '/ows')
+        internal_wfs_url = url_for('geoserver_proxy_bp.proxy', subpath=workspace + '/wfs')
 
     r_wms = requests.get(internal_wms_url, params={
         'service': 'WMS',

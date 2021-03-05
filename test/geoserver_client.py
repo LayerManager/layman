@@ -7,7 +7,7 @@ from layman.layer.geoserver import wfs
 
 def get_url(workspace, service_endpoint):
     with app.app_context():
-        wfs_url = url_for('gs_wfs_proxy_bp.proxy', subpath=workspace + '/' + service_endpoint)
+        wfs_url = url_for('geoserver_proxy_bp.proxy', subpath=workspace + '/' + service_endpoint)
     return wfs_url
 
 
