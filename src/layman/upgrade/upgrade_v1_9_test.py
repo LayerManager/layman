@@ -36,6 +36,7 @@ def test_geoserver_everyone_rights_repair():
         upgrade_v1_9.geoserver_everyone_rights_repair()
 
     assert_roles(workspace, layer, expected_roles2)
+    process_client.delete_layer(workspace, layer)
 
 
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
