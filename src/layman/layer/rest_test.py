@@ -707,15 +707,18 @@ def test_uppercase_attr(client):
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_get_layers_testuser1_v2(client):
     username = 'testuser1'
+    layer1 = 'countries_concurrent'
+    layer2 = 'ne_110m_admin_0_countries'
+    layer3 = 'ne_110m_admin_0_countries_shp'
     rv = client.get(url_for('rest_layers.get', username=username))
     assert rv.status_code == 200
     resp_json = rv.get_json()
     # assert len(resp_json) == 3
     layernames = [layer['name'] for layer in resp_json]
     for ln in [
-        'countries_concurrent',
-        'ne_110m_admin_0_countries',
-        'ne_110m_admin_0_countries_shp'
+        layer1,
+        layer2,
+        layer3,
     ]:
         assert ln in layernames
 
@@ -1160,6 +1163,12 @@ def test_get_layers_testuser2(client):
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 2
     })
+
+
+@pytest.mark.usefixtures('ensure_layman')
+def test_just_delete_layers(client):
+    flask_client.delete_layer('testuser1', 'countries_concurrent', client)
+    flask_client.delete_layer('testuser1', 'ne_110m_admin_0_countries_shp', client)
 
 
 @pytest.mark.usefixtures('ensure_layman')

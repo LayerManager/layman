@@ -288,6 +288,7 @@ def test_migrate_metadata_records_map():
     process_client.publish_map(workspace, map)
     with app.app_context():
         upgrade_v1_10.migrate_metadata_records(workspace)
+    process_client.delete_map(workspace, map)
 
 
 @pytest.mark.usefixtures('ensure_layman')

@@ -833,3 +833,11 @@ def test_map_composed_from_local_layers(client):
             'title': "World places and boundaries",
         }
     check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
+
+
+@pytest.mark.usefixtures('ensure_layman')
+def test_just_delete_publications(client):
+    flask_client.delete_map('testuser1', 'libe', client)
+    flask_client.delete_map('testuser1', 'svet', client)
+    flask_client.delete_layer('testuser1', 'hranice', client)
+    flask_client.delete_layer('testuser1', 'mista', client)
