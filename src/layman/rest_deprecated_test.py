@@ -1,5 +1,6 @@
 import pytest
 import requests
+import re
 
 from layman import settings
 
@@ -36,6 +37,10 @@ def test_deprecated_header(method,
         return
     assert all(header in r.headers.keys() for header in depr_headers), (r.headers, r.status_code, r.text)
 
+    link_header = r.headers['Link']
+    alternate_link = re.search('<(.+?)>;', link_header).group(1)
+
     url_new = url.replace('/rest/', f'/rest/{settings.REST_WORKSPACES_PREFIX}/')
+    assert alternate_link == url_new, link_header
     r = method(url_new)
     assert all(header not in r.headers.keys() for header in depr_headers), (r.headers, r.status_code, r.text)
