@@ -12,9 +12,10 @@ def get_task_chain(publ_type, username, publ_name, task_options, start_at, publ_
 def get_task_methods(publ_type, username, publ_name, task_options, start_at):
     if start_at is None:
         return []
-    start_idx = publ_type['internal_sources'].index(start_at)
+    internal_sources = list(publ_type['internal_sources'].keys())
+    start_idx = internal_sources.index(start_at)
     source_names = [
-        m for m in publ_type['internal_sources'][start_idx:]
+        m for m in internal_sources[start_idx:]
         if f"{m.rsplit('.', 1)[0]}.tasks" in publ_type['task_modules']
     ]
     task_methods = []
