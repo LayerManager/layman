@@ -43,7 +43,6 @@ PUBLICATION_TYPES = {
             ('layman.map.filesystem.thumbnail', InternalSourceTypeDef(info_items=['thumbnail', ]),),
             ('layman.map.micka.soap', InternalSourceTypeDef(info_items=['metadata', ]),),
         ]),
-        'access_rights_source': 'layman.map.prime_db_schema.table',
         'task_modules': [
             'layman.map.filesystem.tasks',
             'layman.map.micka.tasks',
