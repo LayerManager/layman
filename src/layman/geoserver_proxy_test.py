@@ -158,6 +158,7 @@ def test_wms_ows_proxy(service_endpoint):
     client_util.delete_layer(username, layername, headers=authn_headers)
 
 
+@pytest.mark.flaky(reruns=2, reruns_delay=2)
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
 @pytest.mark.parametrize('style_file', [
     None,
