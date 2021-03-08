@@ -68,14 +68,18 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                          }
 
 
-def wait_for_rest(url, max_attempts, sleeping_time, keys_to_check, headers=None):
+def check_response_keys(keys_to_check, response):
+    return response.status_code == 200 and all(
+        'status' not in response.json()[k] for k in keys_to_check
+    )
+
+
+def wait_for_rest(url, max_attempts, sleeping_time, check_response, headers=None):
     headers = headers or None
     r = requests.get(url, headers=headers, timeout=5)
 
     attempts = 1
-    while not (r.status_code == 200 and all(
-            'status' not in r.json()[k] for k in keys_to_check
-    )):
+    while not check_response(r):
         time.sleep(sleeping_time)
         r = requests.get(url, headers=headers, timeout=5)
         attempts += 1
@@ -108,10 +112,12 @@ def patch_publication(publication_type,
                       access_rights=None,
                       title=None,
                       style_file=None,
+                      check_response_fn=None,
                       ):
     headers = headers or {}
     file_paths = file_paths or []
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
+    check_response_fn = check_response_fn or partial(check_response_keys, publication_type_def.keys_to_check)
     if style_file:
         assert publication_type == LAYER_TYPE
 
@@ -148,7 +154,7 @@ def patch_publication(publication_type,
         url = url_for(publication_type_def.get_url,
                       username=username,
                       **{publication_type_def.url_param_name: name})
-    wait_for_rest(url, 30, 0.5, publication_type_def.keys_to_check, headers=headers)
+    wait_for_rest(url, 30, 0.5, check_response_fn, headers=headers)
     wfs.clear_cache(username)
     wms.clear_cache(username)
     return r.json()
@@ -194,11 +200,13 @@ def publish_publication(publication_type,
                         title=None,
                         style_file=None,
                         description=None,
+                        check_response_fn=None,
                         ):
     title = title or name
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     file_paths = file_paths or [publication_type_def.source_path, ]
+    check_response_fn = check_response_fn or partial(check_response_keys, publication_type_def.keys_to_check)
     if style_file:
         assert publication_type == LAYER_TYPE
 
@@ -236,7 +244,7 @@ def publish_publication(publication_type,
         url = url_for(publication_type_def.get_url,
                       username=username,
                       **{publication_type_def.url_param_name: name})
-    wait_for_rest(url, 30, 0.5, publication_type_def.keys_to_check, headers=headers)
+    wait_for_rest(url, 30, 0.5, check_response_fn, headers=headers)
     return r.json()[0]
 
 
