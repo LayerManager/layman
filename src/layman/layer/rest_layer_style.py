@@ -31,9 +31,7 @@ def after_request(response):
 def get(username, layername):
     app.logger.info(f"GET Style, user={g.user}, username={username}, layername={layername}")
 
-    style_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={
-        'sources_filter': layman_util.get_publication_types()[LAYER_TYPE]['access_rights_source'],
-    })['style_type']
+    style_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['access_rights'], })['style_type']
     if style_type == 'sld':
         response = sld.get_style_response(username,
                                           layername,

@@ -658,9 +658,7 @@ def patch_publication_by_soap(workspace,
                               csw_source,
                               csw_patch_method,
                               soap_insert_method):
-    publ_info = get_publication_info(workspace, publ_type, publ_name, context={
-        'sources_filter': get_publication_types()[publ_type]['access_rights_source'],
-    })
+    publ_info = get_publication_info(workspace, publ_type, publ_name, context={'keys': ['access_rights'], })
     uuid = publ_info.get('uuid')
 
     csw_instance = create_csw()

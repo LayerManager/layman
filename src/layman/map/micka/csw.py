@@ -161,21 +161,15 @@ def map_json_to_operates_on(map_json, operates_on_muuids_filter=None, editor=Non
     operates_on = []
     csw_url = settings.CSW_PROXY_URL
     for (layer_username, layername) in layman_layer_names:
-        layer_md_info = get_publication_info(layer_username, LAYER_TYPE, layername, context={
-            'sources_filter': 'layman.layer.micka.soap',
-        })
+        layer_md_info = get_publication_info(layer_username, LAYER_TYPE, layername, context={'keys': ['metadata', ], })
         layer_muuid = layer_md_info.get('metadata', {}).get('identifier')
         if operates_on_muuids_filter is not None:
             if layer_muuid not in operates_on_muuids_filter:
                 continue
-            layer_wms_info = get_publication_info(layer_username, LAYER_TYPE, layername, context={
-                'sources_filter': 'layman.layer.geoserver.wms',
-            })
+            layer_wms_info = get_publication_info(layer_username, LAYER_TYPE, layername, context={'keys': ['wms', ], })
         else:
-            layer_wms_info = get_publication_info(layer_username, LAYER_TYPE, layername, context={
-                'sources_filter': 'layman.layer.geoserver.wms',
-                'actor_name': editor,
-            })
+            layer_wms_info = get_publication_info(layer_username, LAYER_TYPE, layername, context={'keys': ['wfs', ],
+                                                                                                  'actor_name': editor, })
             if not (layer_muuid and layer_wms_info):
                 continue
         layer_title = layer_wms_info['title']

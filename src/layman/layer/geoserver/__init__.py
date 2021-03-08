@@ -94,7 +94,7 @@ def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspac
     layer_info = None
     if not access_rights or not access_rights.get('read') or not access_rights.get('write'):
         layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
-                                                      context={'sources_filter': 'layman.layer.prime_db_schema.table', })
+                                                      context={'keys': ['access_rights', ]})
 
     read_roles = (access_rights and access_rights.get('read')) or layer_info['access_rights']['read']
     write_roles = (access_rights and access_rights.get('write')) or layer_info['access_rights']['write']
