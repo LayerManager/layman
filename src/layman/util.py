@@ -259,7 +259,8 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
     if 'sources_filter' in context:
         sources_names = context['sources_filter'].split(',')
         if 'actor_name' in context:
-            sources_names.append(get_publication_types()[publ_type]['access_rights_source'])
+            sources_names.extend([source for source, source_def in get_publication_types()[publ_type]['internal_sources'].items()
+                                  if 'access_rights' in source_def.info_items])
         sources = [
             s for s in sources if s.__name__ in sources_names
         ]
