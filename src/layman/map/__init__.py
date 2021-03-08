@@ -1,3 +1,8 @@
+from collections import OrderedDict
+
+from ..common import InternalSourceTypeDef
+
+
 def get_map_sources():
     return PUBLICATION_TYPES[f'{__name__}']['internal_sources']
 
@@ -31,13 +36,13 @@ PUBLICATION_TYPES = {
             map_metadata_comparison_bp,
         ],
         # see also .util.TASKS_TO_MAP_INFO_KEYS
-        'internal_sources': [
-            'layman.map.filesystem.uuid',
-            'layman.map.prime_db_schema.table',
-            'layman.map.filesystem.input_file',
-            'layman.map.filesystem.thumbnail',
-            'layman.map.micka.soap',
-        ],
+        'internal_sources': OrderedDict([
+            ('layman.map.filesystem.uuid', InternalSourceTypeDef(info_items=[]),),
+            ('layman.map.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'title', 'uuid', ]),),
+            ('layman.map.filesystem.input_file', InternalSourceTypeDef(info_items=['description', 'file']),),
+            ('layman.map.filesystem.thumbnail', InternalSourceTypeDef(info_items=['thumbnail', ]),),
+            ('layman.map.micka.soap', InternalSourceTypeDef(info_items=['metadata', ]),),
+        ]),
         'access_rights_source': 'layman.map.prime_db_schema.table',
         'task_modules': [
             'layman.map.filesystem.tasks',

@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 LAYER_TYPE = __name__
 
 
@@ -13,6 +13,7 @@ def get_layer_sources():
 LAYER_REST_PATH_NAME = "layers"
 
 
+from ..common import InternalSourceTypeDef
 from .rest_layers import bp as layers_bp
 from .rest_layer import bp as layer_bp
 from .rest_layer_chunk import bp as layer_chunk_bp
@@ -34,20 +35,20 @@ PUBLICATION_TYPES = {
             layer_metadata_comparison_bp,
         ],
         # see also .util.TASKS_TO_LAYER_INFO_KEYS
-        'internal_sources': [  # internal sources to process when new source is published
-            'layman.layer.filesystem.uuid',
-            'layman.layer.prime_db_schema.table',
-            'layman.layer.filesystem.input_chunk',
-            'layman.layer.filesystem.input_file',
-            'layman.layer.filesystem.input_style',
-            'layman.layer.db.table',
-            'layman.layer.qgis.wms',
-            'layman.layer.geoserver.wfs',
-            'layman.layer.geoserver.wms',
-            'layman.layer.geoserver.sld',
-            'layman.layer.filesystem.thumbnail',
-            'layman.layer.micka.soap',
-        ],
+        'internal_sources': OrderedDict([  # internal sources to process when new source is published
+            ('layman.layer.filesystem.uuid', InternalSourceTypeDef(info_items=[]),),
+            ('layman.layer.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'title', 'uuid', ]),),
+            ('layman.layer.filesystem.input_chunk', InternalSourceTypeDef(info_items=[]),),
+            ('layman.layer.filesystem.input_file', InternalSourceTypeDef(info_items=['file', ]),),
+            ('layman.layer.filesystem.input_style', InternalSourceTypeDef(info_items=[]),),
+            ('layman.layer.db.table', InternalSourceTypeDef(info_items=['db_table', ]),),
+            ('layman.layer.qgis.wms', InternalSourceTypeDef(info_items=['style', ]),),
+            ('layman.layer.geoserver.wfs', InternalSourceTypeDef(info_items=['wfs', 'description', ]),),
+            ('layman.layer.geoserver.wms', InternalSourceTypeDef(info_items=['wms', ]),),
+            ('layman.layer.geoserver.sld', InternalSourceTypeDef(info_items=['style', ]),),
+            ('layman.layer.filesystem.thumbnail', InternalSourceTypeDef(info_items=['thumbnail', ]),),
+            ('layman.layer.micka.soap', InternalSourceTypeDef(info_items=['metadata', ]),),
+        ]),
         'access_rights_source': 'layman.layer.prime_db_schema.table',
         'task_modules': [
             'layman.layer.db.tasks',
