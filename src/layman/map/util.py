@@ -7,7 +7,7 @@ import re
 from layman.authn.filesystem import get_authn_info
 from flask import current_app, request, g
 
-from layman import LaymanError
+from layman import LaymanError, util as layman_util
 from layman.common.micka import util as micka_util
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for
@@ -84,12 +84,8 @@ TASKS_TO_MAP_INFO_KEYS = {
 }
 
 
-def get_map_info(username, mapname):
-    sources = get_sources()
-    partial_infos = call_modules_fn(sources, 'get_map_info', [username, mapname])
-    partial_info = {}
-    for pi in partial_infos:
-        partial_info.update(pi)
+def get_map_info(username, mapname, context=None):
+    partial_info = layman_util.get_publication_info(username, MAP_TYPE, mapname, context)
 
     last_task = _get_map_task(username, mapname)
     if last_task is None or celery_util.is_task_successful(last_task):

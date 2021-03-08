@@ -254,6 +254,7 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
     from layman.map import MAP_TYPE
     context = context or {}
 
+    assert not ('sources_filter' in context and 'keys' in context)
     sources = get_internal_sources(publ_type)
     if 'sources_filter' in context:
         sources_names = context['sources_filter'].split(',')
@@ -262,6 +263,15 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
         sources = [
             s for s in sources if s.__name__ in sources_names
         ]
+
+    if 'keys' in context:
+        keys = set(context['keys'])
+        if 'actor_name' in context:
+            keys.add('access_rights')
+        sources_names = [source for source, source_def in get_publication_types()[publ_type]['internal_sources'].items()
+                         if keys.intersection(source_def.info_items)]
+        sources = [s for s in sources if s.__name__ in sources_names]
+        assert sources, sources_names
 
     info_method = {
         LAYER_TYPE: 'get_layer_info',
