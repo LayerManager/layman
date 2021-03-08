@@ -38,10 +38,10 @@ def prep_test_get_publication_info():
     (MAP_TYPE, map, None, {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}, {}),
     (LAYER_TYPE, layer, {'actor_name': user_owner}, {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}, {}),
     (LAYER_TYPE, layer, {'actor_name': user_without_rights}, {}, {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}),
-    (LAYER_TYPE, layer, {'actor_name': user_owner, 'sources_filter': ''}, {'name', 'title', 'access_rights', 'uuid', }, {'metadata', 'file', }),
-    (MAP_TYPE, map, {'actor_name': user_owner, 'sources_filter': ''}, {'name', 'title', 'access_rights', 'uuid', }, {'metadata', 'file', }),
-    (LAYER_TYPE, layer, {'sources_filter': 'layman.layer.micka.soap'}, {'metadata', }, {'name', 'title', 'access_rights', 'uuid', 'file', }),
-    (MAP_TYPE, map, {'sources_filter': 'layman.map.filesystem.thumbnail'}, {'thumbnail'}, {'name', 'title', 'access_rights', 'uuid', 'file', 'metadata', }),
+    (LAYER_TYPE, layer, {'actor_name': user_owner, 'keys': []}, {'name', 'title', 'access_rights', 'uuid', }, {'metadata', 'file', }),
+    (MAP_TYPE, map, {'actor_name': user_owner, 'keys': []}, {'name', 'title', 'access_rights', 'uuid', }, {'metadata', 'file', }),
+    (LAYER_TYPE, layer, {'keys': ['metadata']}, {'metadata', }, {'name', 'title', 'access_rights', 'uuid', 'file', }),
+    (MAP_TYPE, map, {'keys': ['thumbnail']}, {'thumbnail'}, {'name', 'title', 'access_rights', 'uuid', 'file', 'metadata', }),
 ])
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock', 'prep_test_get_publication_info')
 def test_get_publication_info(pub_type,
