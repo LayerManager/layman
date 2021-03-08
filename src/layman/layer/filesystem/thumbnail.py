@@ -1,6 +1,6 @@
 import os
 import pathlib
-from layman import settings
+from layman import settings, LaymanError
 
 from layman import patch_mode
 from layman.util import url_for
@@ -89,6 +89,8 @@ def generate_layer_thumbnail(workspace, layername):
 
     from layman.layer.geoserver.wms import VERSION
     r = get_layer_thumbnail(wms_url, layername, tn_bbox, headers=headers, wms_version=VERSION)
+    if "png" not in r.headers['content-type'].lower():
+        raise LaymanError("Thumbnail rendering failed", data=r.content)
     r.raise_for_status()
     with open(tn_path, "wb") as out_file:
         out_file.write(r.content)
