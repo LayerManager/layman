@@ -1,12 +1,9 @@
 from functools import wraps, partial
-import importlib
-import inspect
 import re
 
 from flask import current_app, request, g
 
-from layman import LaymanError, patch_mode
-from layman.common import util as layman_util
+from layman import LaymanError, patch_mode, util as layman_util
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for
 from layman import celery as celery_util
@@ -77,12 +74,8 @@ def check_new_layername(username, layername):
     call_modules_fn(providers, 'check_new_layername', [username, layername])
 
 
-def get_layer_info(username, layername):
-    sources = get_sources()
-    partial_infos = call_modules_fn(sources, 'get_layer_info', [username, layername])
-    partial_info = {}
-    for pi in partial_infos:
-        partial_info.update(pi)
+def get_layer_info(username, layername, context=None):
+    partial_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context)
 
     last_task = _get_layer_task(username, layername)
     if last_task is None or celery_util.is_task_successful(last_task):
