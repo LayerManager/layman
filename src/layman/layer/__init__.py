@@ -14,25 +14,25 @@ LAYER_REST_PATH_NAME = "layers"
 
 
 from ..common import InternalSourceTypeDef
-from .rest_workspace_layers import bp as layers_bp
-from .rest_workspace_layer import bp as layer_bp
-from .rest_workspace_layer_chunk import bp as layer_chunk_bp
-from .rest_workspace_layer_thumbnail import bp as layer_thumbnail_bp
-from .rest_workspace_layer_style import bp as layer_style_bp
-from .rest_workspace_layer_metadata_comparison import bp as layer_metadata_comparison_bp
+from .rest_workspace_layers import bp as workspace_layers_bp
+from .rest_workspace_layer import bp as workspace_layer_bp
+from .rest_workspace_layer_chunk import bp as workspace_layer_chunk_bp
+from .rest_workspace_layer_thumbnail import bp as workspace_layer_thumbnail_bp
+from .rest_workspace_layer_style import bp as workspace_layer_style_bp
+from .rest_workspace_layer_metadata_comparison import bp as workspace_layer_metadata_comparison_bp
 
 PUBLICATION_TYPES = {
     f'{LAYER_TYPE}': {
         'type': LAYER_TYPE,  # unique type name, same as dict key
         'module': __name__,  # name of module that defines the type
         'rest_path_name': LAYER_REST_PATH_NAME,
-        'blueprints': [  # blueprints to register
-            layers_bp,
-            layer_bp,
-            layer_chunk_bp,
-            layer_thumbnail_bp,
-            layer_style_bp,
-            layer_metadata_comparison_bp,
+        'workspace_blueprints': [  # blueprints to register
+            workspace_layers_bp,
+            workspace_layer_bp,
+            workspace_layer_chunk_bp,
+            workspace_layer_thumbnail_bp,
+            workspace_layer_style_bp,
+            workspace_layer_metadata_comparison_bp,
         ],
         # see also .util.TASKS_TO_LAYER_INFO_KEYS
         'internal_sources': OrderedDict([  # internal sources to process when new source is published
