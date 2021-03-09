@@ -25,7 +25,7 @@ When user [reserves his username](rest.md#patch-current-user), names, contacts a
 ### Layers
 Information about [layers](models.md#layer) includes vector data and visualization.
 
-When user [publishes new layer](rest.md#post-layers)
+When user [publishes new layer](rest.md#post-workspace-layers)
 - UUID and name is saved to [Redis](#redis) and [filesystem](#filesystem),
 - UUID, name, title and access rights are to [PostgreSQL](#postgresql),
 - vector data files and visualization file is saved to [filesystem](#filesystem) (if uploaded [synchronously](async-file-upload.md)),
@@ -40,12 +40,12 @@ Subsequently, when asynchronous tasks run,
 - thumbnail file is saved to [filesystem](#filesystem),
 - and metadata record is saved to [PostgreSQL](#postgresql) using Micka's CSW.
 
-When user [patches existing layer](rest.md#patch-layer), data is saved in the same way.
+When user [patches existing layer](rest.md#patch-workspace-layer), data is saved in the same way.
 
 ### Maps
 Information about [maps](models.md#map) includes JSON definition.
 
-When user [publishes new map](rest.md#post-maps)
+When user [publishes new map](rest.md#post-workspace-maps)
 - UUID and name is saved to [Redis](#redis) and [filesystem](#filesystem),
 - UUID, name, title and access rights are saved to [PostgreSQL](#postgresql),
 - JSON file is saved to [filesystem](#filesystem),
@@ -55,7 +55,7 @@ Subsequently, when asynchronous tasks run,
 - thumbnail file is saved to [filesystem](#filesystem)
 - and metadata record is saved to [PostgreSQL](#postgresql) using Micka's CSW.
 
-When user [patches existing map](rest.md#patch-map), data is saved in the same way.
+When user [patches existing map](rest.md#patch-workspace-map), data is saved in the same way.
 
 ### Tasks
 Information about asynchronous tasks consists of few parameters necessary for Celery task runner. In case of publishing or patching layer or map, it includes e.g. task name, owner name, layer/map name, and additional parameters derived from HTTP POST/PATCH parameters.
