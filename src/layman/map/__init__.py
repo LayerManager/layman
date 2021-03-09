@@ -22,6 +22,7 @@ from .rest_workspace_map import bp as workspace_map_bp
 from .rest_workspace_map_file import bp as workspace_map_file_bp
 from .rest_workspace_map_thumbnail import bp as workspace_map_thumbnail_bp
 from .rest_workspace_map_metadata_comparison import bp as workspace_map_metadata_comparison_bp
+from .rest_maps import bp as maps_bp
 
 PUBLICATION_TYPES = {
     f'{MAP_TYPE}': {
@@ -34,6 +35,9 @@ PUBLICATION_TYPES = {
             workspace_map_file_bp,
             workspace_map_thumbnail_bp,
             workspace_map_metadata_comparison_bp,
+        ],
+        'blueprints': [
+            maps_bp,
         ],
         # see also .util.TASKS_TO_MAP_INFO_KEYS
         'internal_sources': OrderedDict([
