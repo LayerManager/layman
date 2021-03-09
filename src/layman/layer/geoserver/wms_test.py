@@ -13,8 +13,8 @@ def test_wms_workspace():
     wms_url = f"http://localhost:8000/geoserver/test_wms_workspace_workspace{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows"
     wfs_url = f"http://localhost:8000/geoserver/test_wms_workspace_workspace/wfs"
 
-    process_client.publish_layer(workspace, layername)
-    r_json = process_client.get_layer(workspace, layername)
+    process_client.publish_workspace_layer(workspace, layername)
+    r_json = process_client.get_workspace_layer(workspace, layername)
     assert r_json['wms']['url'] == wms_url
     assert r_json['wfs']['url'] == wfs_url
 
@@ -36,4 +36,4 @@ def test_wms_workspace():
     })
     assert r_wfs.status_code == 200
 
-    process_client.delete_layer(workspace, layername)
+    process_client.delete_workspace_layer(workspace, layername)

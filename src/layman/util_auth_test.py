@@ -24,13 +24,13 @@ def prep_test_get_publication_info():
     access_rights = {'read': user_owner,
                      'write': user_owner}
 
-    process_client.publish_layer(user_owner, layer, headers=auth_header_owner, access_rights=access_rights)
-    process_client.publish_map(user_owner, map, headers=auth_header_owner, access_rights=access_rights)
+    process_client.publish_workspace_layer(user_owner, layer, headers=auth_header_owner, access_rights=access_rights)
+    process_client.publish_workspace_map(user_owner, map, headers=auth_header_owner, access_rights=access_rights)
 
     yield
 
-    process_client.delete_map(user_owner, map, headers=auth_header_owner)
-    process_client.delete_layer(user_owner, layer, headers=auth_header_owner)
+    process_client.delete_workspace_map(user_owner, map, headers=auth_header_owner)
+    process_client.delete_workspace_layer(user_owner, layer, headers=auth_header_owner)
 
 
 @pytest.mark.parametrize('pub_type, pub_name, context, expected_items, not_expected_items,', [

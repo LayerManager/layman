@@ -73,11 +73,11 @@ class TestRestApiClass:
         layername = self.layername
         mapname = self.mapname
         process_client.ensure_reserved_username(username, headers=authz_headers)
-        process_client.publish_layer(username, layername, headers=authz_headers)
-        process_client.publish_map(username, mapname, headers=authz_headers)
+        process_client.publish_workspace_layer(username, layername, headers=authz_headers)
+        process_client.publish_workspace_map(username, mapname, headers=authz_headers)
         yield
-        process_client.delete_layer(username, layername, headers=authz_headers)
-        process_client.delete_map(username, mapname, headers=authz_headers)
+        process_client.delete_workspace_layer(username, layername, headers=authz_headers)
+        process_client.delete_workspace_map(username, mapname, headers=authz_headers)
 
     @staticmethod
     def assert_response(response, exp_status_code, exp_data):
@@ -135,10 +135,10 @@ class TestRestApiClass:
         patch_method = None
         publ_name = None
         if '_layer' in rest_action:
-            patch_method = process_client.patch_layer
+            patch_method = process_client.patch_workspace_layer
             publ_name = self.layername
         elif '_map' in rest_action:
-            patch_method = process_client.patch_map
+            patch_method = process_client.patch_workspace_map
             publ_name = self.mapname
         assert publ_name
 

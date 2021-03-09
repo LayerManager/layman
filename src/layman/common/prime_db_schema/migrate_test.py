@@ -33,11 +33,11 @@ def save_upgrade_status():
 
 @pytest.fixture()
 def prepare_publications():
-    process_client.publish_layer(username, layername)
-    process_client.publish_map(username, mapname)
+    process_client.publish_workspace_layer(username, layername)
+    process_client.publish_workspace_map(username, mapname)
     yield
-    process_client.delete_layer(username, layername)
-    process_client.delete_map(username, mapname)
+    process_client.delete_workspace_layer(username, layername)
+    process_client.delete_workspace_map(username, mapname)
 
     with app.app_context():
         pubs = pub_util.get_publication_infos(username)

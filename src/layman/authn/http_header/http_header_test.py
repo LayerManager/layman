@@ -15,7 +15,7 @@ def test_http_header():
     }
 
     with pytest.raises(LaymanError) as exc_info:
-        process_client.get_layer(workspace, layername, headers=http_authn_headers)
+        process_client.get_workspace_layer(workspace, layername, headers=http_authn_headers)
     assert exc_info.value.http_code == 403
     assert exc_info.value.code == 44
     assert exc_info.value.message == 'Unsuccessful HTTP Header authentication.'
@@ -40,7 +40,7 @@ def test_http_header():
         )
 
     with pytest.raises(LaymanError) as exc_info:
-        process_client.get_layer(workspace, layername, headers=http_authn_headers)
+        process_client.get_workspace_layer(workspace, layername, headers=http_authn_headers)
     assert exc_info.value.http_code == 404
     assert exc_info.value.code == 40
     assert exc_info.value.message == 'Workspace does not exist.'

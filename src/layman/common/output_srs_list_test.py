@@ -21,17 +21,17 @@ def delete_layer_after_test():
         LAYERS_TO_DELETE_AFTER_TEST.append((workspace, layername))
     yield register_layer_to_delete
     for workspace, layername in LAYERS_TO_DELETE_AFTER_TEST:
-        process_client.delete_layer(workspace, layername)
+        process_client.delete_workspace_layer(workspace, layername)
 
 
 @pytest.fixture(scope="module")
 def ensure_layer(delete_layer_after_test):
     def ensure_layer_internal(workspace, layername, file_paths=None, style_file=None):
         if (workspace, layername) not in LAYERS_TO_DELETE_AFTER_TEST:
-            process_client.publish_layer(workspace, layername, file_paths=file_paths, style_file=style_file)
+            process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths, style_file=style_file)
             delete_layer_after_test(workspace, layername)
         else:
-            process_client.patch_layer(workspace, layername, file_paths=file_paths, style_file=style_file)
+            process_client.patch_workspace_layer(workspace, layername, file_paths=file_paths, style_file=style_file)
     yield ensure_layer_internal
 
 

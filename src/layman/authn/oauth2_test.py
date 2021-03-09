@@ -359,7 +359,7 @@ def test_patch_current_user_without_username():
     exp_email = 'test_patch_current_user_user1_email' + '@liferay.com'
     exp_name = 'FirstName MiddleName LastName'
     mapname = 'map1'
-    process_client.publish_map(workspace, mapname, headers=user1_authn_headers)
+    process_client.publish_workspace_map(workspace, mapname, headers=user1_authn_headers)
 
     with app.app_context():
         rest_path = url_for('rest_workspace_map_file.get', username=workspace, mapname=mapname)
@@ -372,4 +372,4 @@ def test_patch_current_user_without_username():
     assert user_info['name'] == exp_name
     assert user_info['email'] == exp_email
 
-    process_client.delete_map(workspace, mapname, headers=user1_authn_headers)
+    process_client.delete_workspace_map(workspace, mapname, headers=user1_authn_headers)

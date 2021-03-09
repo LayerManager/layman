@@ -15,7 +15,7 @@ def test_style_value():
     username = 'test_style_value_user'
     layername = 'test_style_value_layer'
 
-    process_client.publish_layer(username, layername)
+    process_client.publish_workspace_layer(username, layername)
 
     with app.app_context():
         layer_url = url_for('rest_workspace_layer.get', username=username, layername=layername)
@@ -37,4 +37,4 @@ def test_style_value():
     r_del = requests.delete(style_url)
     assert r_del.status_code >= 400, (r_del.text, style_url)
 
-    process_client.delete_layer(username, layername)
+    process_client.delete_workspace_layer(username, layername)

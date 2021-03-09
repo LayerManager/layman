@@ -150,8 +150,8 @@ def test_access_rights(access_rights_and_expected_list, use_file):
     owner_authn_headers = client_util.get_authz_headers(username)
     other_authn_headers = client_util.get_authz_headers(username2)
 
-    post_method = client_util.publish_layer
-    patch_method = client_util.patch_layer
+    post_method = client_util.publish_workspace_layer
+    patch_method = client_util.patch_workspace_layer
     full_access_rights = {
         'read': access_rights_and_expected_list[0]['read'],
         'write': access_rights_and_expected_list[0]['write'],
@@ -172,7 +172,7 @@ def test_access_rights(access_rights_and_expected_list, use_file):
                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
                           ] if use_file else None)
 
-        client_util.assert_user_layers(username, [layername], owner_authn_headers)
+        client_util.assert_workspace_layers(username, [layername], owner_authn_headers)
         assert_gs_user_and_roles(username)
         assert_gs_layer_data_security(username, layername, roles_to_test)
         assert_layman_layer_access_rights(username, layername, roles_to_test)
@@ -180,4 +180,4 @@ def test_access_rights(access_rights_and_expected_list, use_file):
         assert_wms_access(username, other_authn_headers, access_rights_and_expected['expected_other_user_layers'])
         assert_wms_access(username, None, access_rights_and_expected['expected_anonymous_layers'])
 
-    client_util.delete_layer(username, layername, headers=owner_authn_headers)
+    client_util.delete_workspace_layer(username, layername, headers=owner_authn_headers)

@@ -17,7 +17,7 @@ def test_rest_get():
     username = 'wfs_proxy_test'
     layername = 'layer_wfs_proxy_test'
 
-    client_util.publish_layer(username, layername)
+    client_util.publish_workspace_layer(username, layername)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
     headers = {
@@ -39,12 +39,12 @@ def test_rest_get():
                           headers=headers)
     assert r.status_code == 200
 
-    client_util.delete_layer(username, layername)
+    client_util.delete_workspace_layer(username, layername)
 
 
 def setup_user_layer(username, layername, authn_headers):
     client_util.reserve_username(username, headers=authn_headers)
-    client_util.publish_layer(username, layername, [
+    client_util.publish_workspace_layer(username, layername, [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ], headers=authn_headers)
 
@@ -58,9 +58,9 @@ def test_wfs_proxy():
     authn_headers1 = get_authz_headers(username)
 
     client_util.reserve_username(username, headers=authn_headers1)
-    ln = client_util.publish_layer(username,
-                                   layername1,
-                                   headers=authn_headers1)
+    ln = client_util.publish_workspace_layer(username,
+                                             layername1,
+                                             headers=authn_headers1)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
     headers = {
@@ -129,7 +129,7 @@ def test_wfs_proxy():
                       headers=headers4)
     assert r.status_code == 400, r.text
 
-    client_util.delete_layer(username, layername1, headers)
+    client_util.delete_workspace_layer(username, layername1, headers)
 
 
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
@@ -141,7 +141,7 @@ def test_wms_ows_proxy(service_endpoint):
     authn_headers = get_authz_headers(username)
 
     client_util.ensure_reserved_username(username, headers=authn_headers)
-    ln = client_util.publish_layer(username, layername, headers=authn_headers)
+    ln = client_util.publish_workspace_layer(username, layername, headers=authn_headers)
 
     wms_url = geoserver_client.get_wms_url(username, service_endpoint)
 
@@ -155,7 +155,7 @@ def test_wms_ows_proxy(service_endpoint):
     r.raise_for_status()
     assert 'image' in r.headers['content-type']
 
-    client_util.delete_layer(username, layername, headers=authn_headers)
+    client_util.delete_workspace_layer(username, layername, headers=authn_headers)
 
 
 @pytest.mark.flaky(reruns=2, reruns_delay=2)
@@ -177,18 +177,18 @@ def test_missing_attribute(style_file, ):
     }
 
     client_util.ensure_reserved_username(username, headers=authn_headers)
-    client_util.publish_layer(username,
-                              layername,
-                              file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
-                              style_file=style_file,
-                              headers=authn_headers,
-                              )
-    client_util.publish_layer(username,
-                              layername2,
-                              file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
-                              style_file=style_file,
-                              headers=authn_headers,
-                              )
+    client_util.publish_workspace_layer(username,
+                                        layername,
+                                        file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+                                        style_file=style_file,
+                                        headers=authn_headers,
+                                        )
+    client_util.publish_workspace_layer(username,
+                                        layername2,
+                                        file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+                                        style_file=style_file,
+                                        headers=authn_headers,
+                                        )
 
     wfs_t_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
     with app.app_context():
@@ -296,8 +296,8 @@ def test_missing_attribute(style_file, ):
     data_xml = data_wfs.get_wfs11_insert_polygon_new_attr(username, layername, attr_names10)
     wfs_post(username, [(layername, attr_names10)], data_xml)
 
-    client_util.delete_layer(username, layername, headers)
-    client_util.delete_layer(username, layername2, headers)
+    client_util.delete_workspace_layer(username, layername, headers)
+    client_util.delete_workspace_layer(username, layername2, headers)
 
 
 @pytest.mark.flaky(reruns=2, reruns_delay=2)
@@ -346,10 +346,10 @@ def test_missing_attribute_authz():
             assert attr_name in new_db_attributes, f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
 
     client_util.reserve_username(username, headers=authn_headers1)
-    ln = client_util.publish_layer(username,
-                                   layername1,
-                                   ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
-                                   headers=authn_headers1)
+    ln = client_util.publish_workspace_layer(username,
+                                             layername1,
+                                             ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+                                             headers=authn_headers1)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
 
@@ -366,4 +366,4 @@ def test_missing_attribute_authz():
     data_xml = data_wfs.get_wfs20_update_points_new_attr(username, layername1, attr_names)
     do_test(data_xml, attr_names)
 
-    client_util.delete_layer(username, layername1, headers1)
+    client_util.delete_workspace_layer(username, layername1, headers1)

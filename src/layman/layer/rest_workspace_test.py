@@ -1178,7 +1178,7 @@ def test_layer_with_different_geometry():
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
     ]
-    process_client.publish_layer(username, layername, file_paths=file_paths)
+    process_client.publish_workspace_layer(username, layername, file_paths=file_paths)
 
     url_path_ows = urljoin(urljoin(settings.LAYMAN_GS_URL, username), 'ows?service=WFS&request=Transaction')
     url_path_wfs = urljoin(urljoin(settings.LAYMAN_GS_URL, username), 'wfs?request=Transaction')
@@ -1219,4 +1219,4 @@ def test_layer_with_different_geometry():
                       auth=settings.LAYMAN_GS_AUTH
                       )
     assert r.status_code == 200, f"HTTP Error {r.status_code}\n{r.text}"
-    process_client.delete_layer(username, layername)
+    process_client.delete_workspace_layer(username, layername)

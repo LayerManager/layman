@@ -17,34 +17,34 @@ def test_wrong_post(publ_type):
     publication = 'test_wrong_post_publication'
 
     with pytest.raises(LaymanError) as exc_info:
-        process_client.publish_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY'}, )
+        process_client.publish_workspace_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY'}, )
     check_response(exc_info)
 
     with pytest.raises(LaymanError) as exc_info:
-        process_client.publish_publication(publ_type, workspace, publication, access_rights={'write': 'EVRBODY'}, )
+        process_client.publish_workspace_publication(publ_type, workspace, publication, access_rights={'write': 'EVRBODY'}, )
     check_response(exc_info)
 
     with pytest.raises(LaymanError) as exc_info:
-        process_client.publish_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY', 'write': 'EVRBODY'}, )
+        process_client.publish_workspace_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY', 'write': 'EVRBODY'}, )
     check_response(exc_info)
 
-    process_client.publish_publication(publ_type, workspace, publication)
+    process_client.publish_workspace_publication(publ_type, workspace, publication)
 
     with pytest.raises(LaymanError) as exc_info:
-        process_client.patch_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY'}, )
-    check_response(exc_info)
-
-    with pytest.raises(LaymanError) as exc_info:
-        process_client.patch_publication(publ_type, workspace, publication, access_rights={'write': 'EVRBODY'}, )
+        process_client.patch_workspace_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY'}, )
     check_response(exc_info)
 
     with pytest.raises(LaymanError) as exc_info:
-        process_client.patch_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY', 'write': 'EVRBODY'}, )
+        process_client.patch_workspace_publication(publ_type, workspace, publication, access_rights={'write': 'EVRBODY'}, )
     check_response(exc_info)
 
-    process_client.patch_publication(publ_type, workspace, publication)
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.patch_workspace_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY', 'write': 'EVRBODY'}, )
+    check_response(exc_info)
 
-    process_client.delete_publication(publ_type, workspace, publication)
+    process_client.patch_workspace_publication(publ_type, workspace, publication)
+
+    process_client.delete_workspace_publication(publ_type, workspace, publication)
 
 
 class TestSoapClass:
@@ -65,10 +65,10 @@ class TestSoapClass:
     @pytest.fixture()
     def clear_data(self):
         yield
-        process_client.delete_publication(self.publication_type,
-                                          self.username,
-                                          self.publication_name,
-                                          headers=self.authz_headers)
+        process_client.delete_workspace_publication(self.publication_type,
+                                                    self.username,
+                                                    self.publication_name,
+                                                    headers=self.authz_headers)
 
     @pytest.mark.flaky(reruns=5, reruns_delay=2)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'reserve_username', 'clear_data')
@@ -84,8 +84,8 @@ class TestSoapClass:
         publ_name_prefix = self.publ_name_prefix
         authz_headers = self.authz_headers
 
-        post_method = process_client.publish_publication
-        patch_method = process_client.patch_publication
+        post_method = process_client.publish_workspace_publication
+        patch_method = process_client.patch_workspace_publication
         publ_name = f"{publ_name_prefix}{publ_type.split('.')[-1]}"
         self.publication_type = publ_type
         self.publication_name = publ_name
@@ -99,7 +99,7 @@ class TestSoapClass:
                          headers=authz_headers,
                          access_rights=access_rights)
 
-            publ_uuid = process_client.get_publication(publ_type, username, publ_name, headers=authz_headers)['uuid']
+            publ_uuid = process_client.get_workspace_publication(publ_type, username, publ_name, headers=authz_headers)['uuid']
             publ_muuid = f"m-{publ_uuid}"
             assert micka_util.get_number_of_records(publ_muuid, use_authn=True) > 0
             anon_number_of_records = micka_util.get_number_of_records(publ_muuid, use_authn=False)

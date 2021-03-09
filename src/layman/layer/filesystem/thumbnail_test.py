@@ -18,10 +18,10 @@ def test_sld_style_applied_in_thumbnail():
     style_file = 'sample/style/generic-blue_sld.xml'
     expected_file = 'sample/style/test_sld_style_applied_in_thumbnail_layer.png'
 
-    process_client.publish_layer(workspace,
-                                 layer,
-                                 file_paths=geojson_file,
-                                 style_file=style_file)
+    process_client.publish_workspace_layer(workspace,
+                                           layer,
+                                           file_paths=geojson_file,
+                                           style_file=style_file)
 
     with app.app_context():
         thumbnail_path = thumbnail.get_layer_thumbnail_path(workspace, layer)
@@ -30,8 +30,8 @@ def test_sld_style_applied_in_thumbnail():
 
     assert diffs < 1000
 
-    process_client.delete_layer(workspace,
-                                layer)
+    process_client.delete_workspace_layer(workspace,
+                                          layer)
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -51,18 +51,18 @@ def test_wrong_sld_causes_no_thumbnail():
         else:
             return False
 
-    process_client.publish_layer(workspace,
-                                 layer,
-                                 file_paths=geojson_file,
-                                 style_file=style_file,
-                                 check_response_fn=wait_for_thumbnail_error,
-                                 )
+    process_client.publish_workspace_layer(workspace,
+                                           layer,
+                                           file_paths=geojson_file,
+                                           style_file=style_file,
+                                           check_response_fn=wait_for_thumbnail_error,
+                                           )
 
-    layer_info = process_client.get_layer(workspace, layer)
+    layer_info = process_client.get_workspace_layer(workspace, layer)
 
     assert 'error' in layer_info['thumbnail']
     assert layer_info['thumbnail']['error']['message'] == 'Thumbnail rendering failed'
     assert layer_info['thumbnail']['error']['code'] == -1
 
-    process_client.delete_layer(workspace,
-                                layer)
+    process_client.delete_workspace_layer(workspace,
+                                          layer)
