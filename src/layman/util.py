@@ -159,10 +159,10 @@ def get_publication_types(use_cache=True):
     return result
 
 
-def get_blueprints():
+def get_workspace_blueprints():
     blueprints = []
     for type_def in get_publication_types(use_cache=False).values():
-        blueprints += type_def['blueprints']
+        blueprints += type_def['workspace_blueprints']
     return blueprints
 
 

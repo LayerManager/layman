@@ -17,23 +17,23 @@ def get_map_type_def():
 MAP_REST_PATH_NAME = "maps"
 
 
-from .rest_workspace_maps import bp as maps_bp
-from .rest_workspace_map import bp as map_bp
-from .rest_workspace_map_file import bp as map_file_bp
-from .rest_workspace_map_thumbnail import bp as map_thumbnail_bp
-from .rest_workspace_map_metadata_comparison import bp as map_metadata_comparison_bp
+from .rest_workspace_maps import bp as workspace_maps_bp
+from .rest_workspace_map import bp as workspace_map_bp
+from .rest_workspace_map_file import bp as workspace_map_file_bp
+from .rest_workspace_map_thumbnail import bp as workspace_map_thumbnail_bp
+from .rest_workspace_map_metadata_comparison import bp as workspace_map_metadata_comparison_bp
 
 PUBLICATION_TYPES = {
     f'{MAP_TYPE}': {
         'type': MAP_TYPE,
         'module': __name__,
         'rest_path_name': MAP_REST_PATH_NAME,
-        'blueprints': [
-            maps_bp,
-            map_bp,
-            map_file_bp,
-            map_thumbnail_bp,
-            map_metadata_comparison_bp,
+        'workspace_blueprints': [
+            workspace_maps_bp,
+            workspace_map_bp,
+            workspace_map_file_bp,
+            workspace_map_thumbnail_bp,
+            workspace_map_metadata_comparison_bp,
         ],
         # see also .util.TASKS_TO_MAP_INFO_KEYS
         'internal_sources': OrderedDict([
