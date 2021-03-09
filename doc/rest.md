@@ -305,7 +305,7 @@ The endpoint is activated after [POST Layers](#post-layers) or [PATCH Layer](#pa
 - layer is deleted
 
 ### URL
-`/rest/<workspace_name>/layers/<layername>/chunk`
+`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`
 ### GET Layer Chunk
 Test if file chunk is already uploaded on the server.
 
@@ -359,7 +359,7 @@ JSON object with one attribute:
 
 ## Maps
 ### URL
-`/rest/<workspace_name>/maps`
+`/rest/workspaces/<workspace_name>/maps`
 
 ### GET Maps
 Get list of published maps (map compositions).
@@ -445,7 +445,7 @@ JSON array of objects representing deleted maps:
 
 ## Map
 ### URL
-`/rest/<workspace_name>/maps/<mapname>`
+`/rest/workspaces/<workspace_name>/maps/<mapname>`
 
 #### Endpoint path parameters
 - **mapname**
@@ -530,7 +530,7 @@ JSON object representing deleted map:
 
 ## Map File
 ### URL
-`/rest/<workspace_name>/maps/<mapname>/file`
+`/rest/workspaces/<workspace_name>/maps/<mapname>/file`
 ### GET Map File
 Get JSON file describing the map valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema).
 
@@ -554,7 +554,7 @@ JSON file describing the map valid against [map-composition schema](https://gith
 
 ## Map Thumbnail
 ### URL
-`/rest/<workspace_name>/maps/<mapname>/thumbnail`
+`/rest/workspaces/<workspace_name>/maps/<mapname>/thumbnail`
 ### GET Map Thumbnail
 Get thumbnail of the map in PNG format, 300x300 px, transparent background.
 
