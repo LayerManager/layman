@@ -1,4 +1,5 @@
 import pytest
+from layman import settings
 from test import process_client
 
 
@@ -54,3 +55,44 @@ class TestDeletePublicationsClass:
         check_delete(authn_headers_owner,
                      {publication_a, },
                      set())
+
+
+class TestGetPublications:
+    workspace1 = 'test_get_publications_workspace1'
+    workspace2 = 'test_get_publications_workspace2'
+    authn_headers_user2 = process_client.get_authz_headers(workspace2)
+    publications = [(workspace1, 'test_get_publications_publication1e', dict()),
+                    (workspace2, 'test_get_publications_publication2e', {'headers': authn_headers_user2,
+                                                                         'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
+                                                                                           'write': settings.RIGHTS_EVERYONE_ROLE}, }),
+                    (workspace2, 'test_get_publications_publication2o', {'headers': authn_headers_user2,
+                                                                         'access_rights': {'read': workspace2,
+                                                                                           'write': workspace2}, }),
+                    ]
+
+    @pytest.fixture(scope="class")
+    def provide_data(self):
+        process_client.ensure_reserved_username(self.workspace2, self.authn_headers_user2)
+
+        for publication_type in process_client.PUBLICATION_TYPES:
+            for publication in self.publications:
+                process_client.publish_workspace_publication(publication_type, publication[0], publication[1], **publication[2])
+        yield
+        for publication_type in process_client.PUBLICATION_TYPES:
+            for publication in self.publications:
+                process_client.delete_workspace_publication(publication_type, publication[0], publication[1],
+                                                            publication[2].get('headers'))
+
+    @pytest.mark.parametrize('headers, expected_publications', [
+        (authn_headers_user2, [(workspace1, 'test_get_publications_publication1e'),
+                               (workspace2, 'test_get_publications_publication2e'),
+                               (workspace2, 'test_get_publications_publication2o'),
+                               ], ),
+        (None, [(workspace1, 'test_get_publications_publication1e'), (workspace2, 'test_get_publications_publication2e'), ],),
+    ])
+    @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
+    @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
+    def test_get_publications(self, publication_type, headers, expected_publications):
+        infos = process_client.get_publications(publication_type, headers, )
+        info_publications = [(info.get('workspace'), info.get('name')) for info in infos]
+        assert expected_publications == info_publications

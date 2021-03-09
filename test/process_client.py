@@ -33,6 +33,7 @@ PUBLICATION_TYPES = [
 
 
 PublicationTypeDef = namedtuple('PublicationTypeDef', ['url_param_name',
+                                                       'get_publications_url',
                                                        'post_workspace_publication_url',
                                                        'patch_workspace_publication_url',
                                                        'get_workspace_publications_url',
@@ -44,6 +45,7 @@ PublicationTypeDef = namedtuple('PublicationTypeDef', ['url_param_name',
                                                        'get_workspace_metadata_comparison_url',
                                                        ])
 PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
+                                                      'rest_maps.get',
                                                       'rest_workspace_maps.post',
                                                       'rest_workspace_map.patch',
                                                       'rest_workspace_maps.get',
@@ -55,6 +57,7 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                       'rest_workspace_map_metadata_comparison.get',
                                                       ),
                          LAYER_TYPE: PublicationTypeDef('layername',
+                                                        'rest_layers.get',
                                                         'rest_workspace_layers.post',
                                                         'rest_workspace_layer.patch',
                                                         'rest_workspace_layers.get',
@@ -265,6 +268,21 @@ def get_workspace_publications(publication_type, workspace, headers=None, ):
 
 get_workspace_maps = partial(get_workspace_publications, MAP_TYPE)
 get_workspace_layers = partial(get_workspace_publications, LAYER_TYPE)
+
+
+def get_publications(publication_type, headers=None, ):
+    headers = headers or {}
+    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
+
+    with app.app_context():
+        r_url = url_for(publication_type_def.get_publications_url)
+    r = requests.get(r_url, headers=headers)
+    raise_layman_error(r)
+    return r.json()
+
+
+get_maps = partial(get_publications, MAP_TYPE)
+get_layers = partial(get_publications, LAYER_TYPE)
 
 
 def get_workspace_publication(publication_type, username, name, headers=None, ):

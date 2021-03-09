@@ -166,6 +166,13 @@ def get_workspace_blueprints():
     return blueprints
 
 
+def get_blueprints():
+    blueprints = []
+    for type_def in get_publication_types(use_cache=False).values():
+        blueprints += type_def['blueprints']
+    return blueprints
+
+
 def get_publication_modules(use_cache=True):
     if use_cache:
         key = FLASK_PUBLICATION_MODULES_KEY

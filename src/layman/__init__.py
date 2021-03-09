@@ -30,11 +30,14 @@ from .make_celery import make_celery
 
 celery_app = make_celery(app)
 
-from .util import get_workspace_blueprints
+from .util import get_workspace_blueprints, get_blueprints
 
 for bp in get_workspace_blueprints():
     app.register_blueprint(bp, url_prefix=f'/rest/{settings.REST_WORKSPACES_PREFIX}/<username>')
     app.register_blueprint(bp, url_prefix='/rest/<username>')
+
+for bp in get_blueprints():
+    app.register_blueprint(bp, url_prefix=f'/rest')
 
 from .user.rest_current_user import bp as current_user_bp
 from .geoserver_proxy import bp as geoserver_proxy_bp
