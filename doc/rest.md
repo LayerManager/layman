@@ -3,12 +3,14 @@
 ## Overview
 |Endpoint|URL|GET|POST|PATCH|DELETE|
 |---|---|---|---|---|---|
+|Layers|`/rest/layers`|[GET](#get-layers)| x | x | x |
 |Workspace Layers|`/rest/workspaces/<workspace_name>/layers`|[GET](#get-workspace-layers)| [POST](#post-workspace-layers) | x | [DELETE](#delete-workspace-layers) |
 |[Workspace Layer](models.md#layer)|`/rest/workspaces/<workspace_name>/layers/<layername>`|[GET](#get-workspace-layer)| x | [PATCH](#patch-workspace-layer) | [DELETE](#delete-workspace-layer) |
 |Workspace Layer Thumbnail|`/rest/workspaces/<workspace_name>/layers/<layername>/thumbnail`|[GET](#get-workspace-layer-thumbnail)| x | x | x |
 |Workspace Layer Style|`/rest/workspaces/<workspace_name>/layers/<layername>/style`|[GET](#get-workspace-layer-style)| x | x | x |
 |Workspace Layer Chunk|`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`|[GET](#get-workspace-layer-chunk)| [POST](#post-workspace-layer-chunk) | x | x |
 |Workspace Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-layer-metadata-comparison) | x | x | x |
+|Maps|`/rest/maps`|[GET](#get-maps)| x | x | x |
 |Workspace Maps|`/rest/workspaces/<workspace_name>/maps`|[GET](#get-workspace-maps)| [POST](#post-workspace-maps) | x | [DELETE](#delete-workspace-maps) |
 |[Workspace Map](models.md#map)|`/rest/workspaces/<workspace_name>/maps/<mapname>`|[GET](#get-workspace-map)| x | [PATCH](#patch-workspace-map) | [DELETE](#delete-workspace-map) |
 |Workspace Map File|`/rest/workspaces/<workspace_name>/maps/<mapname>/file`|[GET](#get-workspace-map-file)| x | x | x |
@@ -23,6 +25,28 @@
    - string identifying [workspace](models.md#workspace)
   
 **_NOTE:_** Before version 1.10.0, workspace-related endpoints did not include `/workspaces` in their path. These old endpoints are still functional, but deprecated. More specifically, they return HTTP header **Deprecation**. If you get such header in response, rewrite your client to use new endpoint path. Old endpoints will stop working in the next major release.
+
+## Layers
+### URL
+`/rest/layers`
+
+### GET Layers
+Get list of published layers.
+
+#### Request
+No action parameters.
+#### Response
+Content-Type: `application/json`
+
+JSON array of objects representing available layers with following structure:
+- **workspace**: String. Name of the layer's workspace.
+- **name**: String. Name of the layer.
+- **title**: String. Title of the layer.
+- **uuid**: String. UUID of the layer.
+- **url**: String. URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
+- **access_rights**:
+  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
+  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 
 ## Workspace Layers
 ### URL
@@ -355,6 +379,30 @@ JSON object with one attribute:
   - **values**: Dictionary of objects. Key is ID of metadata source corresponding with `metadata_sources` attribute. Value is any valid JSON (null, number, string, boolean, list, or object) representing value of [metadata property](./metadata.md) (e.g. `[3857, 4326]`). Null means the value is not set.
   - **equal**: Boolean. True if all values are considered equal, false otherwise.
   - **equal_or_null**: Boolean. True if all values are considered equal or null, false otherwise.
+
+
+## Maps
+### URL
+`/rest/maps`
+
+### GET Maps
+Get list of published maps (map compositions).
+
+#### Request
+No action parameters.
+#### Response
+Content-Type: `application/json`
+
+JSON array of objects representing available maps with following structure:
+- **workspace**: String. Name of the map's workspace.
+- **name**: String. Name of the map.
+- **title**: String. Title of the map.
+- **uuid**: String. UUID of the map.
+- **url**: String. URL of the map. It points to [GET Workspace Map](#get-workspace-map).
+- **access_rights**:
+  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
+  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
+
 
 ## Workspace Maps
 ### URL
