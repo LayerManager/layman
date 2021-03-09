@@ -171,7 +171,7 @@ def abort_task_chain(results_by_order, results_by_name=None):
         if prev_task_state == 'STARTED':
             current_app.logger.info(
                 f'waiting for result of {task_name} {task_result.id} with state {task_result.state}')
-            # if hangs forever, see comment in src/layman/layer/rest_test.py::test_post_layers_simple
+            # if hangs forever, see comment in src/layman/layer/rest_workspace_test.py::test_post_layers_simple
             task_result.get(propagate=False)
         current_app.logger.info(f'aborted result {task_name} {task_result.id} with state {task_result.state}')
 
