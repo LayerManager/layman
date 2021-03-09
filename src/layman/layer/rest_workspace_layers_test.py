@@ -24,7 +24,7 @@ def test_get_layer_title():
     sorted_layers = sorted(layers)
 
     for (name, title) in layers:
-        process_client.publish_layer(username, name, title=title)
+        process_client.publish_workspace_layer(username, name, title=title)
 
     # layers.GET
     with app.app_context():
@@ -37,7 +37,7 @@ def test_get_layer_title():
         assert rv.json()[i]["title"] == sorted_layers[i][1]
 
     for (name, title) in layers:
-        process_client.delete_layer(username, name)
+        process_client.delete_workspace_layer(username, name)
 
 
 def assert_style_file(workspace,
@@ -65,16 +65,16 @@ def test_style_correctly_saved(source_style_file_path,
     workspace = 'test_style_correctly_saved_workspace'
     layer = 'test_style_correctly_saved_layer' + layer_suffix
     expected_style_file = expected_style_file_template.format(workspace=workspace, layer=layer) if expected_style_file_template else None
-    process_client.publish_layer(workspace,
-                                 layer,
-                                 style_file=source_style_file_path)
+    process_client.publish_workspace_layer(workspace,
+                                           layer,
+                                           style_file=source_style_file_path)
     assert_style_file(workspace, layer, expected_style_file)
     with app.app_context():
         info = layer_util.get_layer_info(workspace, layer)
     assert info['style_type'] == expected_style_type
 
-    process_client.delete_layer(workspace, layer)
-    process_client.publish_layer(workspace, layer)
+    process_client.delete_workspace_layer(workspace, layer)
+    process_client.publish_workspace_layer(workspace, layer)
 
     with app.app_context():
         info = layer_util.get_layer_info(workspace, layer)
@@ -84,15 +84,15 @@ def test_style_correctly_saved(source_style_file_path,
 
     assert_style_file(workspace, layer, None)
 
-    process_client.patch_layer(workspace,
-                               layer,
-                               style_file=source_style_file_path)
+    process_client.patch_workspace_layer(workspace,
+                                         layer,
+                                         style_file=source_style_file_path)
     assert_style_file(workspace, layer, expected_style_file)
     with app.app_context():
         info = layer_util.get_layer_info(workspace, layer)
     assert info['style_type'] == expected_style_type
 
-    process_client.delete_layer(workspace, layer)
+    process_client.delete_workspace_layer(workspace, layer)
 
 
 class TestQgisCascadeWmsClass:
@@ -166,13 +166,13 @@ class TestQgisCascadeWmsClass:
 
         for i, (params, expected_style, expected_thumbnail) in enumerate(operations):
             if i == 0:
-                process_client.publish_layer(workspace,
-                                             layer,
-                                             **params)
+                process_client.publish_workspace_layer(workspace,
+                                                       layer,
+                                                       **params)
             else:
-                process_client.patch_layer(workspace,
-                                           layer,
-                                           **params)
+                process_client.patch_workspace_layer(workspace,
+                                                     layer,
+                                                     **params)
             self.assert_wms_layer(workspace, layer, expected_style, expected_thumbnail)
 
-        process_client.delete_layer(workspace, layer)
+        process_client.delete_workspace_layer(workspace, layer)

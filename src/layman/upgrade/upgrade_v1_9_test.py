@@ -26,7 +26,7 @@ def test_geoserver_everyone_rights_repair():
     expected_roles1 = {'ROLE_ANONYMOUS'}
     expected_roles2 = {'ROLE_ANONYMOUS', 'ROLE_AUTHENTICATED'}
 
-    process_client.publish_layer(workspace, layer)
+    process_client.publish_workspace_layer(workspace, layer)
     for right_type in ['read', 'write']:
         gs_common.ensure_layer_security_roles(workspace, layer, expected_roles1, right_type[0], auth)
 
@@ -36,7 +36,7 @@ def test_geoserver_everyone_rights_repair():
         upgrade_v1_9.geoserver_everyone_rights_repair()
 
     assert_roles(workspace, layer, expected_roles2)
-    process_client.delete_layer(workspace, layer)
+    process_client.delete_workspace_layer(workspace, layer)
 
 
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
@@ -48,7 +48,7 @@ def test_geoserver_remove_users_for_public_workspaces():
     gs_rolename = gs_common.username_to_rolename(workspace)
     gs_rolename2 = gs_common.username_to_rolename(user)
 
-    process_client.publish_layer(workspace, layer)
+    process_client.publish_workspace_layer(workspace, layer)
     process_client.ensure_reserved_username(user, auth_headers)
     with app.app_context():
 
@@ -76,8 +76,8 @@ def test_geoserver_remove_users_for_public_workspaces():
         assert workspace in workspaces, workspaces
         assert user in workspaces
 
-    process_client.delete_layer(workspace, layer)
-    process_client.publish_layer(workspace, layer)
-    process_client.delete_layer(workspace, layer)
-    process_client.publish_layer(workspace, layer + '2')
-    process_client.delete_layer(workspace, layer + '2')
+    process_client.delete_workspace_layer(workspace, layer)
+    process_client.publish_workspace_layer(workspace, layer)
+    process_client.delete_workspace_layer(workspace, layer)
+    process_client.publish_workspace_layer(workspace, layer + '2')
+    process_client.delete_workspace_layer(workspace, layer + '2')

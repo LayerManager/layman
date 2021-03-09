@@ -37,9 +37,9 @@ def test_get_users_workspaces():
     process_client.ensure_reserved_username(user, authz_headers)
 
     for publication_type in process_client.PUBLICATION_TYPES:
-        process_client.publish_publication(publication_type,
-                                           public_workspace,
-                                           publication)
+        process_client.publish_workspace_publication(publication_type,
+                                                     public_workspace,
+                                                     publication)
         all_sources = []
         for type_def in util.get_publication_types(use_cache=False).values():
             all_sources += type_def['internal_sources']
@@ -59,9 +59,9 @@ def test_get_users_workspaces():
         assert user in workspaces
         assert public_workspace in workspaces
 
-        process_client.delete_publication(publication_type,
-                                          public_workspace,
-                                          publication)
+        process_client.delete_workspace_publication(publication_type,
+                                                    public_workspace,
+                                                    publication)
 
 
 def assert_module_methods(module, methods):
@@ -165,13 +165,13 @@ class TestGetPublicationInfosClass:
         layer_read = self.layer_read
         layer_none = self.layer_none
         process_client.ensure_reserved_username(username, headers=authz_headers)
-        process_client.publish_layer(username, layer_both, headers=authz_headers, access_rights={'read': 'EVERYONE', 'write': 'EVERYONE'})
-        process_client.publish_layer(username, layer_read, headers=authz_headers, access_rights={'read': 'EVERYONE', 'write': username})
-        process_client.publish_layer(username, layer_none, headers=authz_headers, access_rights={'read': username, 'write': username})
+        process_client.publish_workspace_layer(username, layer_both, headers=authz_headers, access_rights={'read': 'EVERYONE', 'write': 'EVERYONE'})
+        process_client.publish_workspace_layer(username, layer_read, headers=authz_headers, access_rights={'read': 'EVERYONE', 'write': username})
+        process_client.publish_workspace_layer(username, layer_none, headers=authz_headers, access_rights={'read': username, 'write': username})
         yield
-        process_client.delete_layer(username, layer_both, headers=authz_headers)
-        process_client.delete_layer(username, layer_read, headers=authz_headers)
-        process_client.delete_layer(username, layer_none, headers=authz_headers)
+        process_client.delete_workspace_layer(username, layer_both, headers=authz_headers)
+        process_client.delete_workspace_layer(username, layer_read, headers=authz_headers)
+        process_client.delete_workspace_layer(username, layer_none, headers=authz_headers)
 
     @pytest.mark.parametrize('publ_type, context, expected_publications', [
         (LAYER_TYPE, {'actor_name': actor, 'access_type': 'read'}, {layer_both, layer_read},),
@@ -194,7 +194,7 @@ def test_get_publication_info_items(publication_type):
     workspace = 'test_get_publication_info_items_workspace'
     publication = 'test_get_publication_info_items_publication'
 
-    process_client.publish_publication(publication_type, workspace, publication)
+    process_client.publish_workspace_publication(publication_type, workspace, publication)
 
     with app.app_context():
         for source, source_def in layman_util.get_publication_types()[publication_type]['internal_sources'].items():
@@ -203,7 +203,7 @@ def test_get_publication_info_items(publication_type):
                 info = layman_util.get_publication_info(workspace, publication_type, publication, context)
                 assert key in info, info
 
-    process_client.delete_publication(publication_type, workspace, publication)
+    process_client.delete_workspace_publication(publication_type, workspace, publication)
 
 
 @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
@@ -213,7 +213,7 @@ def test_get_publication_infos(publication_type):
     publication = 'test_get_publication_infos_publication'
     title = "Test get publication infos - publication íářžý"
 
-    process_client.publish_publication(publication_type, workspace, publication, title=title)
+    process_client.publish_workspace_publication(publication_type, workspace, publication, title=title)
 
     with app.app_context():
         expected_result = {(workspace, publication_type, publication): {'name': publication,
@@ -235,7 +235,7 @@ def test_get_publication_infos(publication_type):
                 del publication_infos[publication_name]['id']
         assert publication_infos == expected_result, (publication_infos, expected_result)
 
-    process_client.delete_publication(publication_type, workspace, publication)
+    process_client.delete_workspace_publication(publication_type, workspace, publication)
 
 
 @pytest.mark.parametrize('endpoint, params, expected_url', [

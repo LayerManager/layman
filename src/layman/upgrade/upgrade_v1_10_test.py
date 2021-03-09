@@ -122,7 +122,7 @@ def test_migrate_layers_to_wms_workspace(ensure_layer):
     expected_file = 'sample/style/countries_wms_blue.png'
     ensure_layer(workspace, layer)
 
-    layer_info = process_client.get_layer(workspace, layer)
+    layer_info = process_client.get_workspace_layer(workspace, layer)
 
     assert layer_info['wms']['status'] == 'NOT_AVAILABLE'
     assert layer_info['wfs']['url'] == f'http://localhost:8000/geoserver/{workspace}/wfs'
@@ -146,7 +146,7 @@ def test_migrate_layers_to_wms_workspace(ensure_layer):
     with app.app_context():
         upgrade_v1_10.migrate_layers_to_wms_workspace(workspace)
 
-    layer_info = process_client.get_layer(workspace, layer)
+    layer_info = process_client.get_workspace_layer(workspace, layer)
     assert layer_info['wms']['url'] == f'http://localhost:8000/geoserver/{wms_workspace}/ows'
     assert layer_info['wfs']['url'] == f'http://localhost:8000/geoserver/{workspace}/wfs'
     with app.app_context():
@@ -160,7 +160,7 @@ def test_migrate_layers_to_wms_workspace(ensure_layer):
     sld_wms_r = gs_common.get_workspace_style_response(wms_workspace, layer, auth=settings.LAYMAN_GS_AUTH)
     assert sld_wms_r.status_code == 200
 
-    sld_stream = process_client.get_layer_style(workspace, layer)
+    sld_stream = process_client.get_workspace_layer_style(workspace, layer)
     assert sld_stream
 
     new_wms_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/" \
@@ -170,7 +170,7 @@ def test_migrate_layers_to_wms_workspace(ensure_layer):
     obtained_file2 = 'tmp/artifacts/test_migrate_layers_to_wms_workspace_after_migration.png'
     util.assert_same_images(new_wms_url, obtained_file2, expected_file, 2000)
 
-    process_client.delete_layer(workspace, layer)
+    process_client.delete_workspace_layer(workspace, layer)
 
 
 @pytest.fixture()
@@ -180,13 +180,13 @@ def ensure_map():
         geojson_files = ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
         style_file = 'sample/style/generic-blue_sld.xml'
         source_map_file_path = '/code/src/layman/upgrade/upgrade_v1_10_test_map.json'
-        process_client.publish_layer(layer_workspace,
-                                     layer,
-                                     file_paths=geojson_files,
-                                     style_file=style_file)
-        process_client.publish_map(workspace,
-                                   map,
-                                   )
+        process_client.publish_workspace_layer(layer_workspace,
+                                               layer,
+                                               file_paths=geojson_files,
+                                               style_file=style_file)
+        process_client.publish_workspace_map(workspace,
+                                             map,
+                                             )
 
         with app.app_context():
             input_file.ensure_map_input_file_dir(workspace, map)
@@ -228,8 +228,8 @@ def test_migrate_maps_on_wms_workspace(ensure_map):
     shutil.copyfile(thumbnail_path, '/code/tmp/artifacts/upgrade_v1_10_map_thumbnail_after.png')
     assert diffs_after < 1000
 
-    process_client.delete_layer(layer_workspace, layer)
-    process_client.delete_map(workspace, map)
+    process_client.delete_workspace_layer(layer_workspace, layer)
+    process_client.delete_workspace_map(workspace, map)
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -250,10 +250,10 @@ def test_migrate_wms_workspace_metadata(ensure_layer):
     wms_new_prefix = f"http://localhost:8000/geoserver/{wms_workspace}/ows"
     csw_prefix = f"http://localhost:3080/csw"
 
-    layer_info = process_client.get_layer(workspace, layer)
+    layer_info = process_client.get_workspace_layer(workspace, layer)
     assert_md_keys(layer_info)
 
-    md_comparison = process_client.get_layer_metadata_comparison(workspace, layer)
+    md_comparison = process_client.get_workspace_layer_metadata_comparison(workspace, layer)
     md_props = md_comparison['metadata_properties']
 
     csw_src_key = process_client.get_source_key_from_metadata_comparison(md_comparison, csw_prefix)
@@ -265,10 +265,10 @@ def test_migrate_wms_workspace_metadata(ensure_layer):
     with app.app_context():
         upgrade_v1_10.migrate_metadata_records(workspace)
 
-    layer_info = process_client.get_layer(workspace, layer)
+    layer_info = process_client.get_workspace_layer(workspace, layer)
     assert_md_keys(layer_info)
 
-    md_comparison = process_client.get_layer_metadata_comparison(workspace, layer)
+    md_comparison = process_client.get_workspace_layer_metadata_comparison(workspace, layer)
     md_props = md_comparison['metadata_properties']
 
     csw_src_key = process_client.get_source_key_from_metadata_comparison(md_comparison, csw_prefix)
@@ -278,17 +278,17 @@ def test_migrate_wms_workspace_metadata(ensure_layer):
         assert v.startswith(wms_new_prefix)
     assert md_props['wms_url']['equal'] is True
     assert md_props['wms_url']['equal_or_null'] is True
-    process_client.delete_layer(workspace, layer)
+    process_client.delete_workspace_layer(workspace, layer)
 
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_migrate_metadata_records_map():
     workspace = 'test_migrate_metadata_records_map_workspace'
     map = 'test_migrate_metadata_records_map_map'
-    process_client.publish_map(workspace, map)
+    process_client.publish_workspace_map(workspace, map)
     with app.app_context():
         upgrade_v1_10.migrate_metadata_records(workspace)
-    process_client.delete_map(workspace, map)
+    process_client.delete_workspace_map(workspace, map)
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -315,7 +315,7 @@ def test_migrate_input_sld_directory_to_input_style(ensure_layer):
         assert os.path.exists(input_style_dir)
         assert os.path.exists(os.path.join(input_style_dir, f'{layer}.xml'))
 
-    process_client.delete_layer(workspace, layer)
+    process_client.delete_workspace_layer(workspace, layer)
 
 
 @pytest.mark.usefixtures('ensure_layman', 'publications_constraint')
@@ -345,12 +345,12 @@ def test_update_style_type_in_db():
                            ),
               ]
 
-    process_client.publish_map(workspace, map)
+    process_client.publish_workspace_map(workspace, map)
     for layer in layers:
-        process_client.publish_layer(workspace,
-                                     layer.name,
-                                     style_file=layer.style_file,
-                                     )
+        process_client.publish_workspace_layer(workspace,
+                                               layer.name,
+                                               style_file=layer.style_file,
+                                               )
 
     set_column_null = f"""update {DB_SCHEMA}.publications set style_type = null"""
 
@@ -370,8 +370,8 @@ def test_update_style_type_in_db():
             layer_info = layer_util.get_layer_info(workspace, layer.name)
             assert layer_info['style_type'] == layer.expected_style
 
-    process_client.delete_map(workspace, map)
+    process_client.delete_workspace_map(workspace, map)
     for layer in layers:
-        process_client.delete_layer(workspace,
-                                    layer.name,
-                                    )
+        process_client.delete_workspace_layer(workspace,
+                                              layer.name,
+                                              )

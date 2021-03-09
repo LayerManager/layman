@@ -52,14 +52,14 @@ def test_empty_shapefile(layername, file_paths):
     workspace = 'test_empty_bbox_workspace'
     title = layername
 
-    process_client.publish_layer(workspace, layername, file_paths=file_paths)
+    process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths)
 
     wms_layer = assert_wms_layer(workspace, layername, title)
     native_bbox = wms_layer.boundingBox
     wgs_bbox = wms_layer.boundingBoxWGS84
 
     title = 'new title'
-    process_client.patch_layer(workspace, layername, title=title)
+    process_client.patch_workspace_layer(workspace, layername, title=title)
     wms_layer = assert_wms_layer(workspace, layername, title)
     assert wms_layer.boundingBox == native_bbox
     assert wms_layer.boundingBoxWGS84 == wgs_bbox
@@ -69,4 +69,4 @@ def test_empty_shapefile(layername, file_paths):
     assert wms_layer.boundingBox == native_bbox
     assert wms_layer.boundingBoxWGS84 == wgs_bbox
 
-    process_client.delete_layer(workspace, layername)
+    process_client.delete_workspace_layer(workspace, layername)

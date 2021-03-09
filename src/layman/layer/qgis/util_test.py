@@ -18,10 +18,10 @@ def test_fill_project_template():
     wms_url = f'{settings.LAYMAN_QGIS_URL}?MAP={qgs_path}'
     wms_version = '1.3.0'
 
-    layer_info = process_client.publish_layer(workspace,
-                                              layer,
-                                              file_paths=['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson'],
-                                              )
+    layer_info = process_client.publish_workspace_layer(workspace,
+                                                        layer,
+                                                        file_paths=['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson'],
+                                                        )
 
     layer_uuid = layer_info['uuid']
 
@@ -71,7 +71,7 @@ def test_fill_project_template():
         WebMapService(wms_url, version=wms_version)
     assert excinfo.value.response.status_code == 500
 
-    process_client.delete_layer(workspace, layer)
+    process_client.delete_workspace_layer(workspace, layer)
 
 
 @pytest.mark.parametrize('layer, exp_db_types, qml_geometry_dict', [
@@ -110,7 +110,7 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
         return f'/code/sample/data/geometry-types/{style_name}.qml' if style_name else None
 
     workspace = 'test_geometry_types_workspace'
-    process_client.publish_layer(workspace, layer, file_paths=[f'/code/sample/data/geometry-types/{layer}.geojson'], )
+    process_client.publish_workspace_layer(workspace, layer, file_paths=[f'/code/sample/data/geometry-types/{layer}.geojson'], )
     with app.app_context():
         db_types = db.get_geometry_types(workspace, layer)
     assert set(db_types) == exp_db_types
@@ -130,7 +130,7 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
                                                    f"source_type={source_type}, db_types={db_types}"
         if new_qml_style_name:
             if new_qml_style_name != old_qml_style_name:
-                process_client.patch_layer(workspace, layer, style_file=get_qml_style_path(new_qml_style_name))
+                process_client.patch_workspace_layer(workspace, layer, style_file=get_qml_style_path(new_qml_style_name))
                 old_qml_style_name = new_qml_style_name
             with app.app_context():
                 qml = util.get_original_style_xml(workspace, layer)
@@ -142,4 +142,4 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
             diff_pixels = test_util.compare_images(thumbnail_path, exp_file_path)
             assert diff_pixels == 0
 
-    process_client.delete_layer(workspace, layer)
+    process_client.delete_workspace_layer(workspace, layer)

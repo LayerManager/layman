@@ -97,9 +97,9 @@ def test_select_publications():
     mapname = 'test_select_publications_map1'
     qml_style_file = 'sample/style/small_layer.qml'
 
-    process_client.publish_layer(username, layername)
-    process_client.publish_layer(username, layer_qml, style_file=qml_style_file,)
-    process_client.publish_map(username, mapname)
+    process_client.publish_workspace_layer(username, layername)
+    process_client.publish_workspace_layer(username, layer_qml, style_file=qml_style_file, )
+    process_client.publish_workspace_map(username, mapname)
 
     with app.app_context():
         pubs = publications.get_publication_infos(username, LAYER_TYPE)
@@ -115,9 +115,9 @@ def test_select_publications():
         pubs = publications.get_publication_infos()
         assert len(pubs) >= 3
 
-    process_client.delete_layer(username, layername)
-    process_client.delete_layer(username, layer_qml)
-    process_client.delete_map(username, mapname)
+    process_client.delete_workspace_layer(username, layername)
+    process_client.delete_workspace_layer(username, layer_qml)
+    process_client.delete_workspace_map(username, mapname)
 
     with app.app_context():
         pubs = publications.get_publication_infos(username)
@@ -586,10 +586,10 @@ def test_publications_same_name():
     username = 'test_publications_same_name_user'
     username2 = 'test_publications_same_name_user2'
 
-    process_client.publish_layer(username, publ_name)
-    process_client.publish_map(username, publ_name)
-    process_client.publish_layer(username2, publ_name)
-    process_client.publish_map(username2, publ_name)
+    process_client.publish_workspace_layer(username, publ_name)
+    process_client.publish_workspace_map(username, publ_name)
+    process_client.publish_workspace_layer(username2, publ_name)
+    process_client.publish_workspace_map(username2, publ_name)
 
     with app.app_context():
         pubs = publications.get_publication_infos(username)
@@ -599,7 +599,7 @@ def test_publications_same_name():
         pubs = publications.get_publication_infos()
         assert len(pubs) >= 4
 
-    process_client.delete_layer(username, publ_name)
-    process_client.delete_map(username, publ_name)
-    process_client.delete_layer(username2, publ_name)
-    process_client.delete_map(username2, publ_name)
+    process_client.delete_workspace_layer(username, publ_name)
+    process_client.delete_workspace_map(username, publ_name)
+    process_client.delete_workspace_layer(username2, publ_name)
+    process_client.delete_workspace_map(username2, publ_name)

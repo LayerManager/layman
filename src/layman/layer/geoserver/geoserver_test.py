@@ -10,7 +10,7 @@ def test_check_workspace_wms():
     workspace = 'test_check_workspace_wms_user' + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
     layer = 'test_check_workspace_wms_layer'
     with pytest.raises(LaymanError) as exc_info:
-        process_client.publish_layer(workspace, layer)
+        process_client.publish_workspace_layer(workspace, layer)
     assert exc_info.value.http_code == 400
     assert exc_info.value.code == 45
     assert exc_info.value.data['workspace_name'] == workspace

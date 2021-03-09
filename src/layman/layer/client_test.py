@@ -20,7 +20,7 @@ layername = 'country_chunks'
 @pytest.fixture(scope="module")
 def clear_country_chunks():
     yield
-    process_client.delete_layer(username, layername, skip_404=True)
+    process_client.delete_workspace_layer(username, layername, skip_404=True)
 
 
 @pytest.fixture(scope="module")

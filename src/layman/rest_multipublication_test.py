@@ -21,11 +21,11 @@ class TestDeletePublicationsClass:
         def check_delete(headers,
                          after_delete_publications,
                          remaining_publications):
-            delete_json = process_client.delete_publications(publ_type, owner, headers=headers)
+            delete_json = process_client.delete_workspace_publications(publ_type, owner, headers=headers)
             publication_set = {publication['name'] for publication in delete_json}
             assert after_delete_publications == publication_set
 
-            get_json = process_client.get_publications(publ_type, workspace=owner, headers=authn_headers_owner)
+            get_json = process_client.get_workspace_publications(publ_type, workspace=owner, headers=authn_headers_owner)
             publication_set = {publication['name'] for publication in get_json}
             assert remaining_publications == publication_set
 
@@ -40,9 +40,9 @@ class TestDeletePublicationsClass:
                         ]
 
         for (name, access_rights) in publications:
-            process_client.publish_publication(publ_type, owner, name, access_rights=access_rights, headers=authn_headers_owner)
+            process_client.publish_workspace_publication(publ_type, owner, name, access_rights=access_rights, headers=authn_headers_owner)
 
-        rv = process_client.get_publications(publ_type, workspace=owner, headers=authn_headers_owner)
+        rv = process_client.get_workspace_publications(publ_type, workspace=owner, headers=authn_headers_owner)
         assert len(rv) == len(publications)
 
         # Delete by other user with rights only for one layer

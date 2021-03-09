@@ -18,9 +18,9 @@ def test_qgis_rest():
     assert not os.path.exists(workspace_directory)
     assert not os.path.exists(layer_directory)
 
-    process_client.publish_layer(workspace,
-                                 layer,
-                                 style_file=source_style_file_path)
+    process_client.publish_workspace_layer(workspace,
+                                           layer,
+                                           style_file=source_style_file_path)
     assert os.path.exists(workspace_directory)
     assert os.path.exists(layer_directory)
     with app.app_context():
@@ -31,7 +31,7 @@ def test_qgis_rest():
                                                         }
         assert workspace in qgis.get_workspaces()
 
-    process_client.delete_layer(workspace, layer)
+    process_client.delete_workspace_layer(workspace, layer)
     assert os.path.exists(workspace_directory)
     assert not os.path.exists(layer_directory)
     with app.app_context():

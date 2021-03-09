@@ -18,7 +18,7 @@ def test_get_map_title():
     sorted_maps = sorted(maps)
 
     for (name, title) in maps:
-        process_client.publish_map(username, name, title=title)
+        process_client.publish_workspace_map(username, name, title=title)
 
     with app.app_context():
         url_get = layman_util.url_for('rest_workspace_maps.get', username=username)
@@ -31,7 +31,7 @@ def test_get_map_title():
         assert rv.json()[i]["title"] == sorted_maps[i][1]
 
     for (name, title) in maps:
-        process_client.delete_map(username, name)
+        process_client.delete_workspace_map(username, name)
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -39,7 +39,7 @@ def test_get_maps():
     username = 'test_get_maps_user'
     mapname = 'test_get_maps_map'
 
-    process_client.publish_map(username, mapname, title=mapname)
+    process_client.publish_workspace_map(username, mapname, title=mapname)
 
     with app.app_context():
         url_get = layman_util.url_for('rest_workspace_maps.get', username=username)
@@ -52,4 +52,4 @@ def test_get_maps():
     with app.app_context():
         assert rv.json()[0]['url'] == layman_util.url_for('rest_workspace_map.get', username=username, mapname=mapname)
 
-    process_client.delete_map(username, mapname)
+    process_client.delete_workspace_map(username, mapname)

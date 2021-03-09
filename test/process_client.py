@@ -104,16 +104,16 @@ def raise_layman_error(response, status_codes_to_skip=None):
     assert 'Deprecation' not in response.headers, f'This is deprecated URL! Use new one. headers={response.headers}'
 
 
-def patch_publication(publication_type,
-                      username,
-                      name,
-                      file_paths=None,
-                      headers=None,
-                      access_rights=None,
-                      title=None,
-                      style_file=None,
-                      check_response_fn=None,
-                      ):
+def patch_workspace_publication(publication_type,
+                                username,
+                                name,
+                                file_paths=None,
+                                headers=None,
+                                access_rights=None,
+                                title=None,
+                                style_file=None,
+                                check_response_fn=None,
+                                ):
     headers = headers or {}
     file_paths = file_paths or []
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
@@ -160,19 +160,19 @@ def patch_publication(publication_type,
     return r.json()
 
 
-patch_map = partial(patch_publication, MAP_TYPE)
-patch_layer = partial(patch_publication, LAYER_TYPE)
+patch_workspace_map = partial(patch_workspace_publication, MAP_TYPE)
+patch_workspace_layer = partial(patch_workspace_publication, LAYER_TYPE)
 
 
-def ensure_publication(publication_type,
-                       username,
-                       name,
-                       headers=None,
-                       access_rights=None,
-                       ):
+def ensure_workspace_publication(publication_type,
+                                 username,
+                                 name,
+                                 headers=None,
+                                 access_rights=None,
+                                 ):
     headers = headers or {}
 
-    r = get_publications(publication_type, username, headers=headers, )
+    r = get_workspace_publications(publication_type, username, headers=headers, )
     publication_obj = next((publication for publication in r.json() if publication['name'] == name), None)
     if r.status_code == 200 and publication_obj:
         patch_needed = False
@@ -182,26 +182,26 @@ def ensure_publication(publication_type,
             if 'write' in access_rights and set(access_rights['write'].split(',')) != set(publication_obj['access_rights']['write']):
                 patch_needed = True
         if patch_needed:
-            return patch_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
+            return patch_workspace_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
     else:
-        return publish_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
+        return publish_workspace_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
 
 
-ensure_layer = partial(ensure_publication, LAYER_TYPE)
-ensure_map = partial(ensure_publication, MAP_TYPE)
+ensure_workspace_layer = partial(ensure_workspace_publication, LAYER_TYPE)
+ensure_workspace_map = partial(ensure_workspace_publication, MAP_TYPE)
 
 
-def publish_publication(publication_type,
-                        username,
-                        name,
-                        file_paths=None,
-                        headers=None,
-                        access_rights=None,
-                        title=None,
-                        style_file=None,
-                        description=None,
-                        check_response_fn=None,
-                        ):
+def publish_workspace_publication(publication_type,
+                                  username,
+                                  name,
+                                  file_paths=None,
+                                  headers=None,
+                                  access_rights=None,
+                                  title=None,
+                                  style_file=None,
+                                  description=None,
+                                  check_response_fn=None,
+                                  ):
     title = title or name
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
@@ -248,11 +248,11 @@ def publish_publication(publication_type,
     return r.json()[0]
 
 
-publish_map = partial(publish_publication, MAP_TYPE)
-publish_layer = partial(publish_publication, LAYER_TYPE)
+publish_workspace_map = partial(publish_workspace_publication, MAP_TYPE)
+publish_workspace_layer = partial(publish_workspace_publication, LAYER_TYPE)
 
 
-def get_publications(publication_type, workspace, headers=None, ):
+def get_workspace_publications(publication_type, workspace, headers=None, ):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
@@ -263,11 +263,11 @@ def get_publications(publication_type, workspace, headers=None, ):
     return r.json()
 
 
-get_maps = partial(get_publications, MAP_TYPE)
-get_layers = partial(get_publications, LAYER_TYPE)
+get_workspace_maps = partial(get_workspace_publications, MAP_TYPE)
+get_workspace_layers = partial(get_workspace_publications, LAYER_TYPE)
 
 
-def get_publication(publication_type, username, name, headers=None,):
+def get_workspace_publication(publication_type, username, name, headers=None, ):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
@@ -280,11 +280,11 @@ def get_publication(publication_type, username, name, headers=None,):
     return r.json()
 
 
-get_map = partial(get_publication, MAP_TYPE)
-get_layer = partial(get_publication, LAYER_TYPE)
+get_workspace_map = partial(get_workspace_publication, MAP_TYPE)
+get_workspace_layer = partial(get_workspace_publication, LAYER_TYPE)
 
 
-def get_layer_style(workspace, layer, headers=None):
+def get_workspace_layer_style(workspace, layer, headers=None):
     with app.app_context():
         r_url = url_for('rest_workspace_layer_style.get',
                         username=workspace,
@@ -303,7 +303,7 @@ def finish_delete(username, url, headers, skip_404=False, ):
     return r.json()
 
 
-def delete_publication(publication_type, username, name, headers=None, skip_404=False, ):
+def delete_workspace_publication(publication_type, username, name, headers=None, skip_404=False, ):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
@@ -315,11 +315,11 @@ def delete_publication(publication_type, username, name, headers=None, skip_404=
     return finish_delete(username, r_url, headers, skip_404=skip_404)
 
 
-delete_map = partial(delete_publication, MAP_TYPE)
-delete_layer = partial(delete_publication, LAYER_TYPE)
+delete_workspace_map = partial(delete_workspace_publication, MAP_TYPE)
+delete_workspace_layer = partial(delete_workspace_publication, LAYER_TYPE)
 
 
-def delete_publications(publication_type, username, headers=None,):
+def delete_workspace_publications(publication_type, username, headers=None, ):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
@@ -331,22 +331,22 @@ def delete_publications(publication_type, username, headers=None,):
     return finish_delete(username, r_url, headers, )
 
 
-delete_maps = partial(delete_publications, MAP_TYPE)
-delete_layers = partial(delete_publications, LAYER_TYPE)
+delete_workspace_maps = partial(delete_workspace_publications, MAP_TYPE)
+delete_workspace_layers = partial(delete_workspace_publications, LAYER_TYPE)
 
 
-def assert_user_publications(publication_type, workspace, expected_publication_names, headers=None):
-    r = get_publications(publication_type, workspace, headers)
+def assert_workspace_publications(publication_type, workspace, expected_publication_names, headers=None):
+    r = get_workspace_publications(publication_type, workspace, headers)
     publication_names = [li['name'] for li in r]
     assert set(publication_names) == set(expected_publication_names),\
         f"Publications {expected_publication_names} not equal to {r.text}. publication_type={publication_type}"
 
 
-assert_user_layers = partial(assert_user_publications, LAYER_TYPE)
-assert_user_maps = partial(assert_user_publications, MAP_TYPE)
+assert_workspace_layers = partial(assert_workspace_publications, LAYER_TYPE)
+assert_workspace_maps = partial(assert_workspace_publications, MAP_TYPE)
 
 
-def get_publication_metadata_comparison(publication_type, workspace, name, headers=None):
+def get_workspace_publication_metadata_comparison(publication_type, workspace, name, headers=None):
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     with app.app_context():
         r_url = url_for(publication_type_def.get_workspace_metadata_comparison_url, **{publication_type_def.url_param_name: name}, username=workspace)
@@ -355,8 +355,8 @@ def get_publication_metadata_comparison(publication_type, workspace, name, heade
     return r.json()
 
 
-get_layer_metadata_comparison = partial(get_publication_metadata_comparison, LAYER_TYPE)
-get_map_metadata_comparison = partial(get_publication_metadata_comparison, MAP_TYPE)
+get_workspace_layer_metadata_comparison = partial(get_workspace_publication_metadata_comparison, LAYER_TYPE)
+get_workspace_map_metadata_comparison = partial(get_workspace_publication_metadata_comparison, MAP_TYPE)
 
 
 def reserve_username(username, headers=None):

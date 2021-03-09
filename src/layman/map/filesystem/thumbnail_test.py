@@ -20,14 +20,14 @@ def test_sld_style_applied_in_map_thumbnail():
     style_file = 'sample/style/generic-blue_sld.xml'
     expected_file = 'sample/style/test_sld_style_applied_in_map_thumbnail_map.png'
 
-    process_client.publish_layer(workspace,
-                                 layer,
-                                 file_paths=geojson_file,
-                                 style_file=style_file)
+    process_client.publish_workspace_layer(workspace,
+                                           layer,
+                                           file_paths=geojson_file,
+                                           style_file=style_file)
 
-    process_client.publish_map(workspace,
-                               map,
-                               file_paths=map_file)
+    process_client.publish_workspace_map(workspace,
+                                         map,
+                                         file_paths=map_file)
 
     with app.app_context():
         thumbnail_path = thumbnail.get_map_thumbnail_path(workspace, map)
@@ -36,5 +36,5 @@ def test_sld_style_applied_in_map_thumbnail():
 
     assert diffs < 1000
 
-    process_client.delete_map(workspace, map)
-    process_client.delete_layer(workspace, layer)
+    process_client.delete_workspace_map(workspace, map)
+    process_client.delete_workspace_layer(workspace, layer)
