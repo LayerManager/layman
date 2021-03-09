@@ -64,7 +64,7 @@ def patch_layer(client):
     username = TEST_USER
     layername = TEST_LAYER
     with app.app_context():
-        rest_path = url_for('rest_layer.patch', username=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.patch', username=username, layername=layername)
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
         ]

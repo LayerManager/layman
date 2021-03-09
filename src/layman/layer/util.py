@@ -115,7 +115,7 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
 
     complete_info = {
         'name': layername,
-        'url': url_for('rest_layer.get', layername=layername, username=username),
+        'url': url_for('rest_workspace_layer.get', layername=layername, username=username),
         'title': layername,
         'description': '',
         'wms': {

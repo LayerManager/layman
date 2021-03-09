@@ -10,7 +10,7 @@ from .filesystem import thumbnail
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 
-bp = Blueprint('rest_layer_thumbnail', __name__)
+bp = Blueprint('rest_workspace_layer_thumbnail', __name__)
 
 
 @bp.before_request

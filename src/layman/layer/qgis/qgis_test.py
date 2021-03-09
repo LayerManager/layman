@@ -10,7 +10,7 @@ from test import process_client
 @pytest.mark.usefixtures('ensure_layman')
 def test_qgis_rest():
     workspace = 'test_qgis_rest_workspace'
-    layer = 'test_qgis_rest_layer'
+    layer = 'test_qgis_rest_workspace_layer'
     source_style_file_path = 'sample/style/small_layer.qml'
     workspace_directory = f'{settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}'
     layer_directory = f'{workspace_directory}/layers/{layer}'
@@ -24,7 +24,7 @@ def test_qgis_rest():
     assert os.path.exists(workspace_directory)
     assert os.path.exists(layer_directory)
     with app.app_context():
-        url = layman_util.url_for('rest_layer_style.get', username=workspace, layername=layer)
+        url = layman_util.url_for('rest_workspace_layer_style.get', username=workspace, layername=layer)
         assert wms.get_layer_info(workspace, layer) == {'name': layer,
                                                         'style': {'type': 'qml',
                                                                   'url': url},

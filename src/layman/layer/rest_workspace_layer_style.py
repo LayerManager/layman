@@ -8,7 +8,7 @@ from layman.util import check_username_decorator
 from layman import settings, util as layman_util
 from . import util, LAYER_REST_PATH_NAME, LAYER_TYPE
 
-bp = Blueprint('rest_layer_style', __name__)
+bp = Blueprint('rest_workspace_layer_style', __name__)
 
 
 @bp.before_request

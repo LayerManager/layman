@@ -87,7 +87,7 @@ def test_post_layers_chunk(chrome):
     time.sleep(0.5)
 
     with app.app_context():
-        layer_url = layman_util.url_for('rest_layer.get', username=username, layername=layername)
+        layer_url = layman_util.url_for('rest_workspace_layer.get', username=username, layername=layername)
     r = requests.get(layer_url)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
     max_attempts = 20
@@ -172,7 +172,7 @@ def test_patch_layer_chunk(chrome):
     time.sleep(0.5)
 
     with app.app_context():
-        layer_url = layman_util.url_for('rest_layer.get', username=username, layername=layername)
+        layer_url = layman_util.url_for('rest_workspace_layer.get', username=username, layername=layername)
     r = requests.get(layer_url)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
     max_attempts = 20

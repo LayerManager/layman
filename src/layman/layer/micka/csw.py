@@ -44,7 +44,7 @@ def get_layer_info(username, layername):
                 'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
                 'record_url': settings.CSW_RECORD_URL.format(identifier=muuid),
-                'comparison_url': url_for('rest_layer_metadata_comparison.get', username=username, layername=layername),
+                'comparison_url': url_for('rest_workspace_layer_metadata_comparison.get', username=username, layername=layername),
             }
         }
     else:
@@ -146,7 +146,7 @@ def get_template_path_and_values(username, layername, http_method=None):
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         revision_date=revision_date.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
-        identifier=url_for('rest_layer.get', username=username, layername=layername),
+        identifier=url_for('rest_workspace_layer.get', username=username, layername=layername),
         identifier_label=layername,
         extent=wms_layer.boundingBoxWGS84,
         wms_url=wms.get_wms_url(username, external_url=True),
@@ -203,12 +203,12 @@ def _get_property_values(
             'label': identifier_label,
         },
         'abstract': abstract,
-        'graphic_url': url_for('rest_layer_thumbnail.get', username=username, layername=layername),
+        'graphic_url': url_for('rest_workspace_layer_thumbnail.get', username=username, layername=layername),
         'extent': extent,
 
         'wms_url': wms.add_capabilities_params_to_url(wms_url),
         'wfs_url': wfs.add_capabilities_params_to_url(wfs_url),
-        'layer_endpoint': url_for('rest_layer.get', username=username, layername=layername),
+        'layer_endpoint': url_for('rest_workspace_layer.get', username=username, layername=layername),
         'scale_denominator': scale_denominator,
         'language': languages,
         'md_organisation_name': md_organisation_name,

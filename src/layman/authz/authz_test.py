@@ -107,17 +107,17 @@ class TestRestApiClass:
     @pytest.mark.parametrize(
         "rest_action, url_for_params, authz_status_code, authz_response, unauthz_status_code, unauthz_response",
         [
-            ('rest_layers.get', {}, 200, has_single_layer.__func__, 200, has_no_publication.__func__),
-            ('rest_layer.get', {'layername': layername}, 200, None, 404, 15),
-            ('rest_layer_metadata_comparison.get', {'layername': layername}, 200, None, 404, 15),
-            ('rest_layer_style.get', {'layername': layername}, 200, None, 404, 15),
-            ('rest_layer_thumbnail.get', {'layername': layername}, 200, None, 404, 15),
-            ('rest_layer_chunk.get', {'layername': layername}, 400, 20, 404, 15),
-            ('rest_maps.get', {}, 200, has_single_map.__func__, 200, has_no_publication.__func__),
-            ('rest_map.get', {'mapname': mapname}, 200, None, 404, 26),
-            ('rest_map_file.get', {'mapname': mapname}, 200, None, 404, 26),
-            ('rest_map_metadata_comparison.get', {'mapname': mapname}, 200, None, 404, 26),
-            ('rest_map_thumbnail.get', {'mapname': mapname}, 200, None, 404, 26),
+            ('rest_workspace_layers.get', {}, 200, has_single_layer.__func__, 200, has_no_publication.__func__),
+            ('rest_workspace_layer.get', {'layername': layername}, 200, None, 404, 15),
+            ('rest_workspace_layer_metadata_comparison.get', {'layername': layername}, 200, None, 404, 15),
+            ('rest_workspace_layer_style.get', {'layername': layername}, 200, None, 404, 15),
+            ('rest_workspace_layer_thumbnail.get', {'layername': layername}, 200, None, 404, 15),
+            ('rest_workspace_layer_chunk.get', {'layername': layername}, 400, 20, 404, 15),
+            ('rest_workspace_maps.get', {}, 200, has_single_map.__func__, 200, has_no_publication.__func__),
+            ('rest_workspace_map.get', {'mapname': mapname}, 200, None, 404, 26),
+            ('rest_workspace_map_file.get', {'mapname': mapname}, 200, None, 404, 26),
+            ('rest_workspace_map_metadata_comparison.get', {'mapname': mapname}, 200, None, 404, 26),
+            ('rest_workspace_map_thumbnail.get', {'mapname': mapname}, 200, None, 404, 26),
         ],
     )
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_publications')

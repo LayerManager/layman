@@ -12,7 +12,7 @@ from layman import authn, util as layman_util
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 
-bp = Blueprint('rest_map', __name__)
+bp = Blueprint('rest_workspace_map', __name__)
 
 
 @bp.before_request

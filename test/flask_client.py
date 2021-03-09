@@ -21,7 +21,7 @@ def publish_layer(username,
     title = title or layername
     file_paths = file_paths or ['tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson', ]
     with app.app_context():
-        rest_path = url_for('rest_layers.post', username=username)
+        rest_path = url_for('rest_workspace_layers.post', username=username)
 
         for fp in file_paths:
             assert os.path.isfile(fp)
@@ -58,7 +58,7 @@ def client():
 def delete_layer(username, layername, client, headers=None):
     headers = headers or {}
     with app.app_context():
-        r_url = url_for('rest_layers.delete', username=username, layername=layername)
+        r_url = url_for('rest_workspace_layers.delete', username=username, layername=layername)
         r = client.delete(r_url, headers=headers)
     assert r.status_code == 200, (r.status_code, r.get_json())
 
@@ -66,7 +66,7 @@ def delete_layer(username, layername, client, headers=None):
 def delete_map(username, mapname, client, headers=None):
     headers = headers or {}
     with app.app_context():
-        r_url = url_for('rest_maps.delete', username=username, mapname=mapname)
+        r_url = url_for('rest_workspace_maps.delete', username=username, mapname=mapname)
         r = client.delete(r_url, headers=headers)
     assert r.status_code == 200, (r.status_code, r.get_json())
 
@@ -80,7 +80,7 @@ def publish_map(username,
     maptitle = maptitle or mapname
     headers = headers or {}
     with app.app_context():
-        rest_path = url_for('rest_maps.post', username=username)
+        rest_path = url_for('rest_workspace_maps.post', username=username)
 
         file_paths = [
             'sample/layman.map/full.json',
@@ -122,7 +122,7 @@ def wait_till_layer_ready(username, layername):
 
 def ensure_workspace(workspace, client):
     with app.app_context():
-        r = client.get(url_for('rest_layers.post', username=workspace))
+        r = client.get(url_for('rest_workspace_layers.post', username=workspace))
     if r.status_code == 404 and r.get_json()['code'] == 40:
         tmp_layername = 'tmp_layername'
         publish_layer(workspace, tmp_layername, client)
