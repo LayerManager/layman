@@ -30,7 +30,7 @@ def get_layer_info(username, layername):
     if os.path.exists(thumbnail_path):
         return {
             'thumbnail': {
-                'url': url_for('rest_layer_thumbnail.get', username=username,
+                'url': url_for('rest_workspace_layer_thumbnail.get', username=username,
                                layername=layername),
                 'path': os.path.relpath(thumbnail_path, common_util.get_user_dir(username))
             }

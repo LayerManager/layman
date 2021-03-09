@@ -43,7 +43,7 @@ def get_map_info(username, mapname):
         return {
             'file': {
                 'path': map_file_path,
-                'url': url_for('rest_map_file.get', mapname=mapname, username=username),
+                'url': url_for('rest_workspace_map_file.get', mapname=mapname, username=username),
             },
             'title': map_json['title'] or '',
             'description': map_json['abstract'] or '',

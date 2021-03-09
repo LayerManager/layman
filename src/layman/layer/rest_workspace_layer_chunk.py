@@ -7,7 +7,7 @@ from .filesystem import input_chunk
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 
-bp = Blueprint('rest_layer_chunk', __name__)
+bp = Blueprint('rest_workspace_layer_chunk', __name__)
 
 
 @bp.before_request

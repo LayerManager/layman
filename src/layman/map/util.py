@@ -164,7 +164,7 @@ def get_complete_map_info(username=None, mapname=None, cached=False):
 
     complete_info = {
         'name': mapname,
-        'url': url_for('rest_map.get', mapname=mapname, username=username),
+        'url': url_for('rest_workspace_map.get', mapname=mapname, username=username),
         'title': mapname,
         'description': '',
         'file': {
@@ -294,7 +294,7 @@ def get_metadata_comparison(username, mapname):
             soap_operates_on = next(iter(partial_infos[soap_idx].values()))['operates_on']
         operates_on_muuids_filter = micka_util.operates_on_values_to_muuids(soap_operates_on)
         layman_file_props = map_file_to_metadata_properties(map_json, operates_on_muuids_filter)
-        map_file_url = url_for('rest_map_file.get', mapname=mapname, username=username)
+        map_file_url = url_for('rest_workspace_map_file.get', mapname=mapname, username=username)
         all_props[map_file_url] = layman_file_props
 
     return common_md.transform_metadata_props_to_comparison(all_props)

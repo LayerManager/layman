@@ -51,7 +51,7 @@ def provide_map(client):
     with app.app_context():
         username = TEST_USER
         mapname = TEST_MAP
-        rest_path = url_for('rest_maps.post', username=username)
+        rest_path = url_for('rest_workspace_maps.post', username=username)
         file_paths = [
             'sample/layman.map/full.json',
         ]
@@ -72,7 +72,7 @@ def provide_map(client):
     wait_till_ready(username, mapname)
     yield rv.get_json()[0]
     with app.app_context():
-        rest_path = url_for('rest_map.delete_map', username=username, mapname=mapname)
+        rest_path = url_for('rest_workspace_map.delete_map', username=username, mapname=mapname)
         rv = client.delete(rest_path)
         assert rv.status_code == 200
 
@@ -81,7 +81,7 @@ def patch_map(client):
     with app.app_context():
         username = TEST_USER
         mapname = TEST_MAP
-        rest_path = url_for('rest_map.patch', username=username, mapname=mapname)
+        rest_path = url_for('rest_workspace_map.patch', username=username, mapname=mapname)
         file_paths = [
             'sample/layman.map/full.json',
         ]

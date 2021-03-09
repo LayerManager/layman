@@ -17,7 +17,7 @@ def test_get_layer_style_sld():
                                  )
 
     with app.app_context():
-        rest_url = url_for('rest_layer_style.get', username=username, layername=layername)
+        rest_url = url_for('rest_workspace_layer_style.get', username=username, layername=layername)
     rv = requests.get(rest_url)
     assert rv.status_code == 200, rv.text
     # lxml does not support importing from utf8 string
@@ -38,7 +38,7 @@ def test_get_layer_style_qml():
                                  )
 
     with app.app_context():
-        rest_url = url_for('rest_layer_style.get', username=username, layername=layername)
+        rest_url = url_for('rest_workspace_layer_style.get', username=username, layername=layername)
     rv = requests.get(rest_url)
     assert rv.status_code == 200, rv.text
     # lxml does not support importing from utf8 string

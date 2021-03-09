@@ -9,7 +9,7 @@ from .filesystem import input_file, input_style, input_chunk
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 
-bp = Blueprint('rest_layer', __name__)
+bp = Blueprint('rest_workspace_layer', __name__)
 
 
 @bp.before_request

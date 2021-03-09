@@ -11,7 +11,7 @@ from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 from layman.common import redis as redis_util
 
-bp = Blueprint('rest_layers', __name__)
+bp = Blueprint('rest_workspace_layers', __name__)
 
 
 @bp.before_request
@@ -41,7 +41,7 @@ def get(username):
         {
             'name': info["name"],
             'title': info.get("title", None),
-            'url': url_for('rest_layer.get', layername=name, username=username),
+            'url': url_for('rest_workspace_layer.get', layername=name, username=username),
             'uuid': info["uuid"],
             'access_rights': info['access_rights'],
         }
@@ -127,7 +127,7 @@ def post(username):
                                       task_options,
                                       )
 
-    layerurl = url_for('rest_layer.get', layername=layername, username=username)
+    layerurl = url_for('rest_workspace_layer.get', layername=layername, username=username)
 
     layer_result = {
         'name': layername,
@@ -195,7 +195,7 @@ def delete(username):
                                             util.abort_layer_tasks,
                                             util.delete_layer,
                                             request.method,
-                                            'rest_layer.get',
+                                            'rest_workspace_layer.get',
                                             'layername',
                                             )
     return infos, 200

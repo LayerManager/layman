@@ -14,7 +14,7 @@ from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 from layman.common import redis as redis_util
 
-bp = Blueprint('rest_maps', __name__)
+bp = Blueprint('rest_workspace_maps', __name__)
 
 
 @bp.before_request
@@ -43,7 +43,7 @@ def get(username):
         {
             'name': info["name"],
             'title': info.get("title", None),
-            'url': url_for('rest_map.get', mapname=name, username=username),
+            'url': url_for('rest_workspace_map.get', mapname=name, username=username),
             'uuid': info['uuid'],
             'access_rights': info['access_rights'],
         }
@@ -87,7 +87,7 @@ def post(username):
     else:
         description = file_json.get('abstract', '')
 
-    mapurl = url_for('rest_map.get', mapname=mapname, username=username)
+    mapurl = url_for('rest_workspace_map.get', mapname=mapname, username=username)
 
     redis_util.lock_publication(username, MAP_TYPE, mapname, request.method)
 
@@ -154,7 +154,7 @@ def delete(username):
                                             util.abort_map_tasks,
                                             util.delete_map,
                                             request.method,
-                                            'rest_map.get',
+                                            'rest_workspace_map.get',
                                             'mapname',
                                             )
 

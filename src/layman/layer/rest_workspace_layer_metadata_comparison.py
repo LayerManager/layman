@@ -5,7 +5,7 @@ from . import util, LAYER_REST_PATH_NAME
 from layman.authn import authenticate
 from layman.authz import authorize_publications_decorator
 
-bp = Blueprint('rest_layer_metadata_comparison', __name__)
+bp = Blueprint('rest_workspace_layer_metadata_comparison', __name__)
 
 
 @bp.before_request
