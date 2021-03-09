@@ -48,7 +48,7 @@ Both read and write access rights contain list of [user names](models.md#usernam
 
 Users listed in access rights, either directly or indirectly through roles, are granted to perform described actions.
 
-Access rights are set by [POST Layers](rest.md#post-layers) request and can be changed by [PATCH Layer](rest.md#patch-layer) request (analogically for maps). 
+Access rights are set by [POST Workspace Layers](rest.md#post-workspace-layers) request and can be changed by [PATCH Workspace Layer](rest.md#patch-workspace-layer) request (analogically for maps). 
 
 #### Access to single-publication endpoints
 Single-publication endpoints are:
@@ -63,11 +63,11 @@ Multi-publication endpoints are:
 - [Maps](rest.md#overview) 
 
 Access is treated by following rules:
-- Every authenticated user can send [POST Layers](rest.md#post-layers) to his own [personal workspace](models.md#personal-workspace).
-- Everyone can send [POST Layers](rest.md#post-layers) to any existing [public workspace](models.md#public-workspace) if and only if she is listed in [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](env-settings.md#GRANT_PUBLISH_IN_PUBLIC_WORKSPACE) (directly or through role).
-- Everyone can send [POST Layers](rest.md#post-layers) to any not-yet-existing [public workspace](models.md#public-workspace) if and only if she is listed in [GRANT_CREATE_PUBLIC_WORKSPACE](env-settings.md#GRANT_CREATE_PUBLIC_WORKSPACE) (directly or through role). Such action leads to creation of the public workspace.
-- Everyone can send [GET Layers](rest.md#get-layers) request to any workspace, receiving only publications she has read access to.
-- Everyone can send [DELETE Layers](rest.md#delete-layers) request to any workspace, deleting only publications she has write access to.
+- Every authenticated user can send [POST Workspace Layers](rest.md#post-workspace-layers) to his own [personal workspace](models.md#personal-workspace).
+- Everyone can send [POST Workspace Layers](rest.md#post-workspace-layers) to any existing [public workspace](models.md#public-workspace) if and only if she is listed in [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](env-settings.md#GRANT_PUBLISH_IN_PUBLIC_WORKSPACE) (directly or through role).
+- Everyone can send [POST Workspace Layers](rest.md#post-workspace-layers) to any not-yet-existing [public workspace](models.md#public-workspace) if and only if she is listed in [GRANT_CREATE_PUBLIC_WORKSPACE](env-settings.md#GRANT_CREATE_PUBLIC_WORKSPACE) (directly or through role). Such action leads to creation of the public workspace.
+- Everyone can send [GET Workspace Layers](rest.md#get-workspace-layers) request to any workspace, receiving only publications she has read access to.
+- Everyone can send [DELETE Workspace Layers](rest.md#delete-workspace-layers) request to any workspace, deleting only publications she has write access to.
 
 It's analogical for maps.
 

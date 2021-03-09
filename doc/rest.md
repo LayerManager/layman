@@ -3,17 +3,17 @@
 ## Overview
 |Endpoint|URL|GET|POST|PATCH|DELETE|
 |---|---|---|---|---|---|
-|Layers|`/rest/workspaces/<workspace_name>/layers`|[GET](#get-layers)| [POST](#post-layers) | x | [DELETE](#delete-layers) |
-|[Layer](models.md#layer)|`/rest/workspaces/<workspace_name>/layers/<layername>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
-|Layer Thumbnail|`/rest/workspaces/<workspace_name>/layers/<layername>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
-|Layer Style|`/rest/workspaces/<workspace_name>/layers/<layername>/style`|[GET](#get-layer-style)| x | x | x |
-|Layer Chunk|`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
-|Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-layer-metadata-comparison) | x | x | x |
-|Maps|`/rest/workspaces/<workspace_name>/maps`|[GET](#get-maps)| [POST](#post-maps) | x | [DELETE](#delete-maps) |
-|[Map](models.md#map)|`/rest/workspaces/<workspace_name>/maps/<mapname>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
-|Map File|`/rest/workspaces/<workspace_name>/maps/<mapname>/file`|[GET](#get-map-file)| x | x | x |
-|Map Thumbnail|`/rest/workspaces/<workspace_name>/maps/<mapname>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
-|Map Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-map-metadata-comparison) | x | x | x |
+|Workspace Layers|`/rest/workspaces/<workspace_name>/layers`|[GET](#get-workspace-layers)| [POST](#post-workspace-layers) | x | [DELETE](#delete-workspace-layers) |
+|[Workspace Layer](models.md#layer)|`/rest/workspaces/<workspace_name>/layers/<layername>`|[GET](#get-workspace-layer)| x | [PATCH](#patch-workspace-layer) | [DELETE](#delete-workspace-layer) |
+|Workspace Layer Thumbnail|`/rest/workspaces/<workspace_name>/layers/<layername>/thumbnail`|[GET](#get-workspace-layer-thumbnail)| x | x | x |
+|Workspace Layer Style|`/rest/workspaces/<workspace_name>/layers/<layername>/style`|[GET](#get-workspace-layer-style)| x | x | x |
+|Workspace Layer Chunk|`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`|[GET](#get-workspace-layer-chunk)| [POST](#post-workspace-layer-chunk) | x | x |
+|Workspace Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-layer-metadata-comparison) | x | x | x |
+|Workspace Maps|`/rest/workspaces/<workspace_name>/maps`|[GET](#get-workspace-maps)| [POST](#post-workspace-maps) | x | [DELETE](#delete-workspace-maps) |
+|[Workspace Map](models.md#map)|`/rest/workspaces/<workspace_name>/maps/<mapname>`|[GET](#get-workspace-map)| x | [PATCH](#patch-workspace-map) | [DELETE](#delete-workspace-map) |
+|Workspace Map File|`/rest/workspaces/<workspace_name>/maps/<mapname>/file`|[GET](#get-workspace-map-file)| x | x | x |
+|Workspace Map Thumbnail|`/rest/workspaces/<workspace_name>/maps/<mapname>/thumbnail`|[GET](#get-workspace-map-thumbnail)| x | x | x |
+|Workspace Map Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-map-metadata-comparison) | x | x | x |
 |Users|`/rest/users`|[GET](#get-users)| x | x | x |
 |Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | [DELETE](#delete-current-user) |
 |Version|`/rest/about/version`|[GET](#get-version)| x | x | x |
@@ -24,11 +24,11 @@
   
 **_NOTE:_** Before version 1.10.0, workspace-related endpoints did not include `/workspaces` in their path. These old endpoints are still functional, but deprecated. More specifically, they return HTTP header **Deprecation**. If you get such header in response, rewrite your client to use new endpoint path. Old endpoints will stop working in the next major release.
 
-## Layers
+## Workspace Layers
 ### URL
 `/rest/workspaces/<workspace_name>/layers`
 
-### GET Layers
+### GET Workspace Layers
 Get list of published layers.
 
 #### Request
@@ -40,12 +40,12 @@ JSON array of objects representing available layers with following structure:
 - **name**: String. Name of the layer.
 - **title**: String. Title of the layer.
 - **uuid**: String. UUID of the layer.
-- **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
+- **url**: String. URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 
-### POST Layers
+### POST Workspace Layers
 Publish vector data file as new layer of WMS and WFS.
 
 Processing chain consists of few steps:
@@ -63,12 +63,12 @@ Processing chain consists of few steps:
 
 If workspace directory, database schema, GeoServer's workspaces, or GeoServer's datastores does not exist yet, it is created on demand.
 
-Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Layer](#get-layer) and **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, style, metadata).
+Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Workspace Layer](#get-workspace-layer) and **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, style, metadata).
 
 It is possible to upload data files asynchronously, which is suitable for large files. This can be done in three steps:
-1. Send POST Layers request with **file** parameter filled by file names that you want to upload
-2. Read set of files accepted to upload from POST Layers response, **files_to_upload** property. The set of accepted files will be either equal to or subset of file names sent in **file** parameter.
-3. Send [POST Layer Chunk](#post-layer-chunk) requests using Resumable.js to upload files.
+1. Send POST Workspace Layers request with **file** parameter filled by file names that you want to upload
+2. Read set of files accepted to upload from POST Workspace Layers response, **files_to_upload** property. The set of accepted files will be either equal to or subset of file names sent in **file** parameter.
+3. Send [POST Workspace Layer Chunk](#post-workspace-layer-chunk) requests using Resumable.js to upload files.
 
 Check [Asynchronous file upload](async-file-upload.md) example.
 
@@ -81,7 +81,7 @@ Body parameters:
       - GeoJSON file
       - ShapeFile files (at least three files: .shp, .shx, .dbf)
       - file names, i.e. array of strings
-   - if file names are provided, files must be uploaded subsequently using [POST Layer Chunk](#post-layer-chunk)
+   - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be safely stored in DB
    - if QML style is used in this request, it must list all attributes contained in given data file
@@ -119,12 +119,12 @@ Content-Type: `application/json`
 JSON array of objects representing posted layers with following structure:
 - **name**: String. Name of the layer.
 - **uuid**: String. UUID of the layer.
-- **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
-- *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. Each object represents one file that server expects to be subsequently uploaded using [POST Layer Chunk](#post-layer-chunk). Each object has following properties:
+- **url**: String. URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
+- *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. Each object represents one file that server expects to be subsequently uploaded using [POST Workspace Layer Chunk](#post-workspace-layer-chunk). Each object has following properties:
    - **file**: name of the file, equal to one of file name from **file** parameter
    - **layman_original_parameter**: name of the request parameter that contained the file name; currently, the only possible value is `file`
 
-### DELETE Layers
+### DELETE Workspace Layers
 Delete existing layers and all associated sources, including vector data file and DB table for all layers in the workspace. It is possible to delete layers, whose publication process is still running. In such case, the publication process is aborted safely. Only layers on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
 
 #### Request
@@ -137,21 +137,21 @@ JSON array of objects representing deleted layers:
 - **name**: String. Former name of the layer.
 - **title**: String. Former title of the layer.
 - **uuid**: String. Former UUID of the layer.
-- **url**: String. Former URL of the layer. It points to [GET Layer](#get-layer).
+- **url**: String. Former URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with former [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with former [write access](./security.md#Authorization).
 
-## Layer
+## Workspace Layer
 ### URL
 `/rest/workspaces/<workspace_name>/layers/<layername>`
 
 #### Endpoint path parameters
 - **layername**
    - layer name used for identification
-   - it can be obtained from responses of [GET Layers](#get-layers), [POST Layers](#post-layers), and all responses of this endpoint
+   - it can be obtained from responses of [GET Workspace Layers](#get-workspace-layers), [POST Workspace Layers](#post-workspace-layers), and all responses of this endpoint
 
-### GET Layer
+### GET Workspace Layer
 Get information about existing layer.
 
 #### Request
@@ -175,24 +175,24 @@ JSON object with following structure:
   - *error*: If status is FAILURE, this may contain error object.
 - **wfs**
   - *url*: String. URL of WFS endpoint. It points to WFS endpoint of appropriate GeoServer workspace.
-  - *status*: Status information about GeoServer import and availability of WFS feature type. See [GET Layer](#get-layer) **wms** property for meaning.
+  - *status*: Status information about GeoServer import and availability of WFS feature type. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
-  - *url*: String. URL of layer thumbnail. It points to [GET Layer Thumbnail](#get-layer-thumbnail).
-  - *status*: Status information about generating and availability of thumbnail. See [GET Layer](#get-layer) **wms** property for meaning.
+  - *url*: String. URL of layer thumbnail. It points to [GET Workspace Layer Thumbnail](#get-workspace-layer-thumbnail).
+  - *status*: Status information about generating and availability of thumbnail. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **file**
   - *path*: String. Path to input vector data file that was imported to the DB table. Path is relative to workspace directory.
-  - *status*: Status information about saving and availability of files. See [GET Layer](#get-layer) **wms** property for meaning.
+  - *status*: Status information about saving and availability of files. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **db_table**
   - *name*: String. DB table name within PostgreSQL workspace schema. This table is used as GeoServer source of layer.
-  - *status*: Status information about DB import and availability of the table. See [GET Layer](#get-layer) **wms** property for meaning.
+  - *status*: Status information about DB import and availability of the table. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **style**
-  - *url*: String. URL of layer default style. It points to [GET Layer Style](#get-layer-style).
+  - *url*: String. URL of layer default style. It points to [GET Workspace Layer Style](#get-workspace-layer-style).
   - *type*: String. Type of used style. Either 'sld' or 'qml'.
-  - *status*: Status information about publishing style. See [GET Layer](#get-layer) **wms** property for meaning.
+  - *status*: Status information about publishing style. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **~~style~~**
   - **Deprecated**
@@ -201,24 +201,24 @@ JSON object with following structure:
   - *identifier*: String. Identifier of metadata record in CSW instance.
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.
   - *csw_url*: String. URL of CSW endpoint. It points to CSW endpoint of Micka.
-  - *comparison_url*: String. URL of [GET Layer Metadata Comparison](#get-layer-metadata-comparison).
-  - *status*: Status information about metadata import and availability. See [GET Layer](#get-layer) **wms** property for meaning.
+  - *comparison_url*: String. URL of [GET Workspace Layer Metadata Comparison](#get-workspace-layer-metadata-comparison).
+  - *status*: Status information about metadata import and availability. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 
-### PATCH Layer
-Update information about existing layer. First, it deletes sources of the layer, and then it publishes them again with new parameters. The processing chain is similar to [POST Layers](#post-layers).
+### PATCH Workspace Layer
+Update information about existing layer. First, it deletes sources of the layer, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Layers](#post-workspace-layers).
 
 Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing.
 
-It is possible to upload data files asynchronously, which is suitable for large files. See [POST Layers](#post-layers).
+It is possible to upload data files asynchronously, which is suitable for large files. See [POST Workspace Layers](#post-workspace-layers).
 
 #### Request
 Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
 
-Parameters have same meaning as in case of [POST Layers](#post-layers).
+Parameters have same meaning as in case of [POST Workspace Layers](#post-workspace-layers).
 
 Body parameters:
 - *file*, file(s) or file name(s)
@@ -227,7 +227,7 @@ Body parameters:
       - GeoJSON file
       - ShapeFile files (at least three files: .shp, .shx, .dbf)
       - file names, i.e. array of strings
-   - if file names are provided, files must be uploaded subsequently using [POST Layer Chunk](#post-layer-chunk)
+   - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - if QML style is used (either directly within this request, or indirectly from previous state on server), it must list all attributes contained in given data file
 - *title*
@@ -248,10 +248,10 @@ Body parameters:
 #### Response
 Content-Type: `application/json`
 
-JSON object, same as in case of [GET](#get-layer), possibly extended with one extra property:
-- *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. See [POST Layers](#post-layers) response to find out more.
+JSON object, same as in case of [GET Workspace Layer](#get-workspace-layer), possibly extended with one extra property:
+- *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. See [POST Workspace Layers](#post-workspace-layers) response to find out more.
 
-### DELETE Layer
+### DELETE Workspace Layer
 Delete existing layer and all associated sources, including vector data file and DB table. It is possible to delete layer, whose publication process is still running. In such case, the publication process is aborted safely.
 
 #### Request
@@ -263,13 +263,13 @@ Content-Type: `application/json`
 JSON object representing deleted layer:
 - **name**: String. Former name of the layer.
 - **uuid**: String. Former UUID of the layer.
-- **url**: String. Former URL of the layer. It points to [GET Layer](#get-layer).
+- **url**: String. Former URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
 
 
-## Layer Thumbnail
+## Workspace Layer Thumbnail
 ### URL
 `/rest/workspaces/<workspace_name>/layers/<layername>/thumbnail`
-### GET Layer Thumbnail
+### GET Workspace Layer Thumbnail
 Get thumbnail of the layer in PNG format, 300x300 px, transparent background.
 
 #### Request
@@ -280,10 +280,10 @@ Content-Type: `image/png`
 PNG image.
 
 
-## Layer Style
+## Workspace Layer Style
 ### URL
 `/rest/workspaces/<workspace_name>/layers/<layername>/style`
-### GET Layer Style
+### GET Workspace Layer Style
 Get default style of the layer in XML format. Request is redirected to GeoServer [/rest/workspaces/{workspace}/styles/{style}](https://docs.geoserver.org/latest/en/api/#1.0.0/styles.yaml) for layers with SLD style. For layers with QML style, response is created in Layman. Anybody can call GET, nobody can call any other method. 
 
 #### Request
@@ -294,24 +294,24 @@ Content-Type:
   - `application/x-qgis-layer-settings` for QML
 
 
-## Layer Chunk
+## Workspace Layer Chunk
 Layer Chunk endpoint enables to upload layer data files asynchronously by splitting them into small parts called *chunks* that are uploaded independently. The endpoint is expected to be operated using [Resumable.js](http://www.resumablejs.com/) library. Resumable.js can split and upload files by chunks using [HTML File API](https://developer.mozilla.org/en-US/docs/Web/API/File), widely [supported by major browsers](https://caniuse.com/#feat=fileapi).
 
 Check [Asynchronous file upload](async-file-upload.md) example. 
 
-The endpoint is activated after [POST Layers](#post-layers) or [PATCH Layer](#patch-layer) request if and only if the **file** parameter contained file name(s). The endpoint is active till first of the following happens:
+The endpoint is activated after [POST Workspace Layers](#post-workspace-layers) or [PATCH Workspace Layer](#patch-workspace-layer) request if and only if the **file** parameter contained file name(s). The endpoint is active till first of the following happens:
 - all file chunks are uploaded
 - no chunk is uploaded within [UPLOAD_MAX_INACTIVITY_TIME](../src/layman_settings.py)
 - layer is deleted
 
 ### URL
-`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`
-### GET Layer Chunk
+`/rest/<workspace_name>/layers/<layername>/chunk`
+### GET Workspace Layer Chunk
 Test if file chunk is already uploaded on the server.
 
 #### Request
 Query parameters:
-- **layman_original_parameter**, name of parameter of preceding request ([POST Layers](#post-layers) or [PATCH Layer](#patch-layer)) that contained the file name
+- **layman_original_parameter**, name of parameter of preceding request ([POST Workspace Layers](#post-workspace-layers) or [PATCH Workspace Layer](#patch-workspace-layer)) that contained the file name
 - **resumableFilename**, name of file whose chunk is requested
 - **resumableChunkNumber**, serial number of requested chunk
 
@@ -320,7 +320,7 @@ Content-Type: `application/json`
 
 HTTP status code 200 if chunk is already uploaded on the server, otherwise 404.
 
-### POST Layer Chunk
+### POST Workspace Layer Chunk
 Upload file chunk to the server.
 
 #### Request
@@ -330,7 +330,7 @@ Body parameters:
 - **file**, uploaded chunk
 - **resumableChunkNumber**, serial number of uploaded chunk
 - **resumableFilename**, name of file whose chunk is uploaded
-- **layman_original_parameter**, name of parameter of preceding request ([POST Layers](#post-layers) or [PATCH Layer](#patch-layer)) that contained the file name
+- **layman_original_parameter**, name of parameter of preceding request ([POST Workspace Layers](#post-workspace-layers) or [PATCH Workspace Layer](#patch-workspace-layer)) that contained the file name
 - **resumableTotalChunks**, number of chunks the file is split to
 
 #### Response
@@ -339,7 +339,7 @@ Content-Type: `application/json`
 HTTP status code 200 if chunk was successfully saved.
 
 
-### GET Layer Metadata Comparison
+### GET Workspace Layer Metadata Comparison
 Get comparison of metadata properties among Layman, CSW, WMS and WFS.
 
 #### Request
@@ -350,18 +350,17 @@ Content-Type: `application/json`
 
 JSON object with one attribute:
 - **metadata_sources**: Dictionary of objects. Key is ID of metadata source valid for this JSON only (not persistent in time!). Value is object with following attributes:
-  - **url**: String. URL of the metadata source ([GET Layer](#get-layer), CSW record, WMS Capabilities, or WFS Capabitilities).
+  - **url**: String. URL of the metadata source ([GET Workspace Layer](#get-workspace-layer), CSW record, WMS Capabilities, or WFS Capabitilities).
 - **metadata_properties**: Dictionary of objects. Key is name of [metadata property](./metadata.md) (e.g. `reference_system`). Value is object with following attributes:
   - **values**: Dictionary of objects. Key is ID of metadata source corresponding with `metadata_sources` attribute. Value is any valid JSON (null, number, string, boolean, list, or object) representing value of [metadata property](./metadata.md) (e.g. `[3857, 4326]`). Null means the value is not set.
   - **equal**: Boolean. True if all values are considered equal, false otherwise.
   - **equal_or_null**: Boolean. True if all values are considered equal or null, false otherwise.
 
-
-## Maps
+## Workspace Maps
 ### URL
 `/rest/workspaces/<workspace_name>/maps`
 
-### GET Maps
+### GET Workspace Maps
 Get list of published maps (map compositions).
 
 #### Request
@@ -373,12 +372,12 @@ JSON array of objects representing available maps with following structure:
 - **name**: String. Name of the map.
 - **title**: String. Title of the map.
 - **uuid**: String. UUID of the map.
-- **url**: String. URL of the map. It points to [GET Map](#get-map).
+- **url**: String. URL of the map. It points to [GET Workspace Map](#get-workspace-map).
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 
-### POST Maps
+### POST Workspace Maps
 Publish new map composition. Accepts JSON valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema) used by [Hslayers-ng](https://github.com/hslayers/hslayers-ng).
 
 Processing chain consists of few steps:
@@ -423,9 +422,9 @@ Content-Type: `application/json`
 JSON array of objects representing posted maps with following structure:
 - **name**: String. Name of the map.
 - **uuid**: String. UUID of the map.
-- **url**: String. URL of the map. It points to [GET Map](#get-map).
+- **url**: String. URL of the map. It points to [GET Workspace Map](#get-workspace-map).
 
-### DELETE Maps
+### DELETE Workspace Maps
 Delete existing maps and all associated sources, including map-composition JSON file and map thumbnail for all mapss in the workspace. Only maps on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
 
 #### Request
@@ -438,21 +437,21 @@ JSON array of objects representing deleted maps:
 - **name**: String. Former name of the map.
 - **title**: String. Former title of the map.
 - **uuid**: String. Former UUID of the map.
-- **url**: String. Former URL of the map. It points to [GET Map](#get-map).
+- **url**: String. Former URL of the map. It points to [GET Workspace Map](#get-workspace-map).
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with former [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with former [write access](./security.md#Authorization).
 
-## Map
+## Workspace Map
 ### URL
 `/rest/workspaces/<workspace_name>/maps/<mapname>`
 
 #### Endpoint path parameters
 - **mapname**
    - map name used for identification
-   - it can be obtained from responses of [GET Maps](#get-maps), [POST Maps](#post-maps), and all responses of this endpoint
+   - it can be obtained from responses of [GET Workspace Maps](#get-workspace-maps), [POST Workspace Maps](#post-workspace-maps), and all responses of this endpoint
 
-### GET Map
+### GET Workspace Map
 Get information about existing map.
 
 #### Request
@@ -467,32 +466,32 @@ JSON object with following structure:
 - **title**: String. Taken from `title` attribute of JSON root object
 - **description**: String. Taken from `abstract` attribute of JSON root object.
 - **file**
-  - *url*: String. URL of map-composition JSON file. It points to [GET Map File](#get-map-file).
+  - *url*: String. URL of map-composition JSON file. It points to [GET Workspace Map File](#get-workspace-map-file).
   - *path*: String. Path to map-composition JSON file, relative to workspace directory.
-  - *status*: Status information about availability of file. See [GET Layer](#get-layer) **wms** property for meaning.
+  - *status*: Status information about availability of file. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
-  - *url*: String. URL of map thumbnail. It points to [GET Map Thumbnail](#get-map-thumbnail).
-  - *status*: Status information about generating and availability of thumbnail. See [GET Layer](#get-layer) **wms** property for meaning.
+  - *url*: String. URL of map thumbnail. It points to [GET Workspace Map Thumbnail](#get-workspace-map-thumbnail).
+  - *status*: Status information about generating and availability of thumbnail. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *metadata*
   - *identifier*: String. Identifier of metadata record in CSW instance.
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.
   - *csw_url*: String. URL of CSW endpoint. It points to CSW endpoint of Micka.
-  - *comparison_url*: String. URL of [GET Map Metadata Comparison](#get-map-metadata-comparison).
-  - *status*: Status information about metadata import and availability. See [GET Map](#get-map) 
+  - *comparison_url*: String. URL of [GET Workspace Map Metadata Comparison](#get-workspace-map-metadata-comparison).
+  - *status*: Status information about metadata import and availability. See [GET Workspace Map](#get-workspace-map) 
   - *error*: If status is FAILURE, this may contain error object.
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 
-### PATCH Map
-Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Maps](#post-maps).
+### PATCH Workspace Map
+Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Maps](#post-workspace-maps).
 
 #### Request
 Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
 
-Parameters have same meaning as in case of [POST Maps](#post-maps).
+Parameters have same meaning as in case of [POST Workspace Maps](#post-workspace-maps).
 
 Body parameters:
 *file*, JSON file
@@ -511,9 +510,9 @@ Body parameters:
 #### Response
 Content-Type: `application/json`
 
-JSON object, same as in case of [GET](#get-map).
+JSON object, same as in case of [GET Workspace Map](#get-workspace-map).
 
-### DELETE Map
+### DELETE Workspace Map
 Delete existing map and all associated sources, including map-composition JSON file and map thumbnail.
 
 #### Request
@@ -525,19 +524,19 @@ Content-Type: `application/json`
 JSON object representing deleted map:
 - **name**: String. Former name of the map.
 - **uuid**: String. Former UUID of the map.
-- **url**: String. Former URL of the map. It points to [GET Map](#get-map).
+- **url**: String. Former URL of the map. It points to [GET Workspace Map](#get-workspace-map).
 
 
-## Map File
+## Workspace Map File
 ### URL
 `/rest/workspaces/<workspace_name>/maps/<mapname>/file`
-### GET Map File
+### GET Workspace Map File
 Get JSON file describing the map valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema).
 
 Notice that some JSON properties are automatically updated by layman, so file obtained by this endpoint may be slightly different from file that was uploaded. Expected changes:
 - **name** set to `<mapname>` in URL of this endpoint
-- **title** obtained from [POST Maps](#post-maps) or [PATCH Map](#patch-map) as `title`
-- **abstract** obtained from [POST Maps](#post-maps) or [PATCH Map](#patch-map) as `description`
+- **title** obtained from [POST Workspace Maps](#post-workspace-maps) or [PATCH Workspace Map](#patch-workspace-map) as `title`
+- **abstract** obtained from [POST Workspace Maps](#post-workspace-maps) or [PATCH Workspace Map](#patch-workspace-map) as `description`
 - **user** updated on the fly during this request:
    - **name** set to `<workspace_name>` in URL of this endpoint
    - **email** set to email of the owner, or empty string if not known
@@ -552,10 +551,10 @@ Content-Type: `application/json`
 JSON file describing the map valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema).
 
 
-## Map Thumbnail
+## Workspace Map Thumbnail
 ### URL
 `/rest/workspaces/<workspace_name>/maps/<mapname>/thumbnail`
-### GET Map Thumbnail
+### GET Workspace Map Thumbnail
 Get thumbnail of the map in PNG format, 300x300 px, transparent background.
 
 #### Request
@@ -566,7 +565,7 @@ Content-Type: `image/png`
 PNG image.
 
 
-### GET Map Metadata Comparison
+### GET Workspace Map Metadata Comparison
 Get comparison of metadata properties among Layman and CSW.
 
 #### Request
@@ -577,7 +576,7 @@ Content-Type: `application/json`
 
 JSON object with one attribute:
 - **metadata_sources**: Dictionary of objects. Key is ID of metadata source valid for this JSON only (not persistent in time!). Value is object with following attributes:
-  - **url**: String. URL of the metadata source ([GET Map](#get-map), [GET Map File](#get-map-file), or CSW record).
+  - **url**: String. URL of the metadata source ([GET Workspace Map](#get-workspace-map), [GET Workspace Map File](#get-workspace-map-file), or CSW record).
 - **metadata_properties**: Dictionary of objects. Key is name of [metadata property](./metadata.md) (e.g. `reference_system`). Value is object with following attributes:
   - **values**: Dictionary of objects. Key is ID of metadata source corresponding with `metadata_sources` attribute. Value is any valid JSON (null, number, string, boolean, list, or object) representing value of [metadata property](./metadata.md) (e.g. `[3857, 4326]`). Null means the value is not set.
   - **equal**: Boolean. True if all values are considered equal, false otherwise.

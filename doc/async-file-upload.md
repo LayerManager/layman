@@ -1,11 +1,11 @@
 # Asynchronous file upload
 
-In case of [POST Layers](rest.md#post-layers) and [PATCH Layer](rest.md#patch-layer), it is possible to upload data files asynchronously, which is suitable for large files. Let's demonstrate how it can be implemented on client side.
+In case of [POST Workspace Layers](rest.md#post-workspace-layers) and [PATCH Workspace Layer](rest.md#patch-workspace-layer), it is possible to upload data files asynchronously, which is suitable for large files. Let's demonstrate how it can be implemented on client side.
 
 ## HTML
 You need some HTML form for user to choose files he wants to publish and fill some additional parametes:
 ```html
-<form id="post-layers-form" >
+<form id="post-workspace-layers-form" >
   Vector data file:
   <input name="file" type="file" multiple />
 
@@ -33,9 +33,9 @@ Now, if you add `target="/rest/workspaces/some_workspace_name/layers" method="PO
 ## JavaScript
 
 Brief overview:
-- before POST Layers request is sent to the server, check file sizes and decide if to make sync or async file upload
+- before [POST Workspace Layers](rest.md#post-workspace-layers) request is sent to the server, check file sizes and decide if to make sync or async file upload
 - if async, switch from files to file names and save files for later async upload
-- send POST Layers request using AJAX
+- send [POST Workspace Layers](rest.md#post-workspace-layers) request using AJAX
 - if async, read server response to setup [Resumable.js](http://www.resumablejs.com/) correctly, and start async upload of files
 
 Example:
@@ -59,7 +59,7 @@ const onFormSubmit = (event) => {
 
   if (RESUMABLE_ENABLED) {
     // let's find out size of chosen files
-    const form_data = new FormData(document.getElementById("post-layers-form"));
+    const form_data = new FormData(document.getElementById("post-workspace-layers-form"));
     const sum_file_size = form_data.getAll("file") // all files in "file" input
         .filter(f => f.name) // ignore files without name
         .reduce((prev, f) => prev + f.size, 0);
@@ -78,7 +78,7 @@ const onFormSubmit = (event) => {
     }
   }
 
-  // send POST Layers request with form data
+  // send POST Workspace Layers request with form data
   fetch('/rest/workspaces/some_workspace_name/layers', {
     method: 'POST',
     body: form_data,
@@ -143,6 +143,6 @@ const onFormSubmit = (event) => {
 };
 
 // listen for user
-document.getElementById("post-layers-form").addEventListener("submit", onFormSubmit);
+document.getElementById("post-workspace-layers-form").addEventListener("submit", onFormSubmit);
 ```
 
