@@ -143,6 +143,7 @@ class TestQgisCascadeWmsClass:
             diffs = test_util.compare_images(thumbnail_path, expected_thumbnail_path)
             assert diffs < 100
 
+    @pytest.mark.flaky(reruns=2, reruns_delay=2)
     @pytest.mark.timeout(60)
     @pytest.mark.usefixtures('ensure_layman')
     @pytest.mark.parametrize('operations', [
