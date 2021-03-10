@@ -89,40 +89,50 @@ def test_publication_basic():
                          MAP_TYPE)
 
 
-@pytest.mark.usefixtures('ensure_layman')
-def test_select_publications():
-    username = 'test_select_publications_user1'
-    layername = 'test_select_publications_layer1'
-    layer_qml = 'test_select_publications_layer_qml'
-    mapname = 'test_select_publications_map1'
+class TestSelectPublicationsBasic:
+    workspace1 = 'test_select_publications_basic_workspace1'
+    workspace2 = 'test_select_publications_basic_workspace2'
     qml_style_file = 'sample/style/small_layer.qml'
+    publications = [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le', dict()),
+                    (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml', {'style_file': qml_style_file}),
+                    (workspace1, MAP_TYPE, 'test_select_publications_publication1me', dict()),
+                    (workspace2, LAYER_TYPE, 'test_select_publications_publication2le', dict()),
+                    ]
 
-    process_client.publish_workspace_layer(username, layername)
-    process_client.publish_workspace_layer(username, layer_qml, style_file=qml_style_file, )
-    process_client.publish_workspace_map(username, mapname)
+    @pytest.fixture(scope="class")
+    def provide_data(self):
+        for publication in self.publications:
+            process_client.publish_workspace_publication(publication[1], publication[0], publication[2], **publication[3])
+        yield
+        for publication in self.publications:
+            process_client.delete_workspace_publication(publication[1], publication[0], publication[2])
 
-    with app.app_context():
-        pubs = publications.get_publication_infos(username, LAYER_TYPE)
-        assert len(pubs) == 2
-        pubs = publications.get_publication_infos(username, MAP_TYPE)
-        assert len(pubs) == 1
-        pubs = publications.get_publication_infos(username, style_type='qml')
-        assert len(pubs) == 1
-        pubs = publications.get_publication_infos(username, style_type='sld')
-        assert len(pubs) == 1
-        pubs = publications.get_publication_infos(username)
-        assert len(pubs) == 3
-        pubs = publications.get_publication_infos()
-        assert len(pubs) >= 3
-
-    process_client.delete_workspace_layer(username, layername)
-    process_client.delete_workspace_layer(username, layer_qml)
-    process_client.delete_workspace_map(username, mapname)
-
-    with app.app_context():
-        pubs = publications.get_publication_infos(username)
-        assert len(pubs) == 0, pubs
-        workspaces.delete_workspace(username)
+    @pytest.mark.parametrize('query_params, expected_publications', [
+        ({'workspace_name': workspace1, 'pub_type': LAYER_TYPE},
+         [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le'),
+          (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml'),
+          ]),
+        ({'workspace_name': workspace1, 'pub_type': MAP_TYPE}, [(workspace1, MAP_TYPE, 'test_select_publications_publication1me'), ]),
+        ({'workspace_name': workspace1, 'style_type': 'qml'},
+         [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml'), ]),
+        ({'workspace_name': workspace1, 'style_type': 'sld'},
+         [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le'), ]),
+        ({'workspace_name': workspace1}, [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le'),
+                                          (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml'),
+                                          (workspace1, MAP_TYPE, 'test_select_publications_publication1me'),
+                                          ]),
+        (dict(), [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le'),
+                  (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml'),
+                  (workspace1, MAP_TYPE, 'test_select_publications_publication1me'),
+                  (workspace2, LAYER_TYPE, 'test_select_publications_publication2le'),
+                  ]),
+    ])
+    @pytest.mark.usefixtures('ensure_layman', 'provide_data')
+    def test_get_publications(self, query_params, expected_publications):
+        with app.app_context():
+            infos = publications.get_publication_infos(**query_params)
+        info_publications = list(infos.keys())
+        assert expected_publications == info_publications
 
 
 def test_only_valid_names():
