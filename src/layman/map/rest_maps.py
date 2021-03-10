@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, g
 from flask import current_app as app
 
 from layman.util import url_for
-from layman import util as layman_util
+from layman import util as layman_util, settings
 from . import MAP_TYPE, MAP_REST_PATH_NAME
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
@@ -20,7 +20,7 @@ def before_request():
 def get():
     app.logger.info(f"GET Maps, user={g.user}")
 
-    user = g.user.get('username') if g.user else None
+    user = g.user.get('username') if g.user else settings.ANONYM_USER
     map_infos_whole = layman_util.get_publication_infos(publ_type=MAP_TYPE, context={'actor_name': user,
                                                                                      'access_type': 'read',
                                                                                      })
