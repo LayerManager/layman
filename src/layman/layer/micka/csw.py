@@ -12,12 +12,10 @@ from layman.layer.filesystem.uuid import get_layer_uuid
 from layman.layer import db
 from layman.layer.geoserver import wms
 from layman.layer.geoserver import wfs
-from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer import LAYER_TYPE
 from layman import settings, patch_mode, LaymanError
-from layman.util import url_for
+from layman.util import url_for, get_publication_info
 from requests.exceptions import HTTPError, ConnectionError
-from urllib.parse import urljoin
 from lxml import etree as ET
 
 PATCH_MODE = patch_mode.NO_DELETE
@@ -126,13 +124,25 @@ def csw_insert(username, layername):
 def get_template_path_and_values(username, layername, http_method=None):
     assert http_method in ['post', 'patch']
     wmsi = wms.get_wms_proxy(username)
-    wms_layer = wmsi.contents[layername]
+    wms_layer = wmsi.contents.get(layername) if wmsi else None
+    publ_info = get_publication_info(username, LAYER_TYPE, layername, context={
+        'keys': ['title'],
+    })
+    title = publ_info['title']
+
+    if wms_layer:
+        abstract = wms_layer.abstract
+        extent = wms_layer.boundingBoxWGS84
+    else:
+        abstract = None
+        extent = [-180, -90, 180, 90]
+
     uuid_file_path = get_publication_uuid_file(LAYER_TYPE, username, layername)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
     revision_date = datetime.now()
     md_language = next(iter(common_language.get_languages_iso639_2(' '.join([
-        wms_layer.title or '',
-        wms_layer.abstract or ''
+        title or '',
+        abstract or ''
     ]))), None)
     languages = db.get_text_languages(username, layername)
     scale_denominator = db.guess_scale_denominator(username, layername)
@@ -141,14 +151,14 @@ def get_template_path_and_values(username, layername, http_method=None):
         username=username,
         layername=layername,
         uuid=get_layer_uuid(username, layername),
-        title=wms_layer.title,
-        abstract=wms_layer.abstract or None,
+        title=title,
+        abstract=abstract or None,
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         revision_date=revision_date.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
         identifier=url_for('rest_workspace_layer.get', username=username, layername=layername),
         identifier_label=layername,
-        extent=wms_layer.boundingBoxWGS84,
+        extent=extent,
         wms_url=wms.get_wms_url(username, external_url=True),
         wfs_url=wfs.get_wfs_url(username, external_url=True),
         md_organisation_name=None,
