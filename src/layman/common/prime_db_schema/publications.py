@@ -11,8 +11,8 @@ ROLE_EVERYONE = settings.RIGHTS_EVERYONE_ROLE
 psycopg2.extras.register_uuid()
 
 
-def get_publication_infos(workspace_name=None, pub_type=None, style_type=None):
-    sql = f"""with const as (select %s workspace_name, %s pub_type, %s everyone_role, %s style_type)
+def get_publication_infos(workspace_name=None, pub_type=None, style_type=None, ):
+    sql_basic = f"""
 select p.id as id_publication,
        w.name as workspace_name,
        p.type,
@@ -22,7 +22,7 @@ select p.id as id_publication,
        p.style_type,
        (select rtrim(concat(case when u.id is not null then w.name || ',' end,
                             string_agg(w2.name, ',') || ',',
-                            case when p.everyone_can_read then c.everyone_role || ',' end
+                            case when p.everyone_can_read then %s || ',' end
                             ), ',')
         from {DB_SCHEMA}.rights r inner join
              {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
@@ -31,28 +31,37 @@ select p.id as id_publication,
           and r.type = 'read') can_read_users,
        (select rtrim(concat(case when u.id is not null then w.name || ',' end,
                             string_agg(w2.name, ',') || ',',
-                            case when p.everyone_can_write then c.everyone_role || ',' end
+                            case when p.everyone_can_write then %s || ',' end
                             ), ',')
         from {DB_SCHEMA}.rights r inner join
              {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
              {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
         where r.id_publication = p.id
           and r.type = 'write') can_write_users
-from const c inner join
-     {DB_SCHEMA}.workspaces w on (   w.name = c.workspace_name
-                                  or c.workspace_name is null) inner join
-     {DB_SCHEMA}.publications p on p.id_workspace = w.id
-                           and (   p.type = c.pub_type
-                                or c.pub_type is null)
-                           and (   p.style_type::text = c.style_type
-                                or c.style_type is null) left join
+from {DB_SCHEMA}.workspaces w inner join
+     {DB_SCHEMA}.publications p on p.id_workspace = w.id left join
      {DB_SCHEMA}.users u on u.id_workspace = w.id
-;"""
-    values = util.run_query(sql, (workspace_name,
-                                  pub_type,
-                                  ROLE_EVERYONE,
-                                  style_type,
-                                  ))
+"""
+    query_params = (ROLE_EVERYONE, ROLE_EVERYONE, )
+    where_parts = []
+    where_params_def = [(workspace_name, 'w.name = %s', (workspace_name, )),
+                        (pub_type, 'p.type = %s', (pub_type, )),
+                        (style_type, 'p.style_type::text = %s', (style_type, )),
+                        # (actor, 'p.style_type::text = %s', (workspace_name, )),
+                        ]
+    for (value, where_part, params, ) in where_params_def:
+        if value:
+            where_parts.append(where_part)
+            query_params = query_params + params
+
+    where_clause = ''
+    if where_parts:
+        where_clause = 'WHERE ' + '\n  AND '.join(where_parts) + '\n'
+
+    order_by_clause = 'ORDER BY w.name ASC, p.name ASC\n'
+    select = sql_basic + where_clause + order_by_clause
+    values = util.run_query(select, query_params)
+
     infos = {(workspace_name,
               type,
               publication_name,): {'id': id_publication,
