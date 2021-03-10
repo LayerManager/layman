@@ -108,6 +108,7 @@ PG_POSTGIS_SCHEMA = 'public'
 
 # Name of "everyone" role in rights
 RIGHTS_EVERYONE_ROLE = "EVERYONE"
+ANONYM_USER = "--ANONYM--"
 
 # related to testing only
 LAYMAN_PG_TEMPLATE_DBNAME = os.getenv('LAYMAN_PG_TEMPLATE_DBNAME')

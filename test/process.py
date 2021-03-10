@@ -68,6 +68,8 @@ def liferay_mock():
                 'test_get_users_workspaces_user': None,
                 'test_check_user_wms' + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX: None,
                 'test_get_publications_workspace2': None,
+                'test_select_publications_complex_workspace1': None,
+                'test_select_publications_complex_workspace2': None,
             },
         },
         'host': '0.0.0.0',

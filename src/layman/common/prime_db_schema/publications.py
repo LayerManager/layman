@@ -11,7 +11,7 @@ ROLE_EVERYONE = settings.RIGHTS_EVERYONE_ROLE
 psycopg2.extras.register_uuid()
 
 
-def get_publication_infos(workspace_name=None, pub_type=None, style_type=None, ):
+def get_publication_infos(workspace_name=None, pub_type=None, style_type=None, reader=None, writer=None):
     sql_basic = f"""
 select p.id as id_publication,
        w.name as workspace_name,
@@ -47,7 +47,26 @@ from {DB_SCHEMA}.workspaces w inner join
     where_params_def = [(workspace_name, 'w.name = %s', (workspace_name, )),
                         (pub_type, 'p.type = %s', (pub_type, )),
                         (style_type, 'p.style_type::text = %s', (style_type, )),
-                        # (actor, 'p.style_type::text = %s', (workspace_name, )),
+                        (reader == settings.ANONYM_USER, 'p.everyone_can_read = TRUE', tuple()),
+                        (reader and reader != settings.ANONYM_USER, f"""(p.everyone_can_read = TRUE
+                        or (u.id is not null and w.name = %s)
+                        or EXISTS(select 1
+                                  from {DB_SCHEMA}.rights r inner join
+                                       {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
+                                       {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
+                                  where r.id_publication = p.id
+                                    and r.type = 'read'
+                                    and w2.name = %s))""", (reader, reader,)),
+                        (writer == settings.ANONYM_USER, 'p.everyone_can_write = TRUE', tuple()),
+                        (writer and writer != settings.ANONYM_USER, f"""(p.everyone_can_write = TRUE
+                        or (u.id is not null and w.name = %s)
+                        or EXISTS(select 1
+                                  from {DB_SCHEMA}.rights r inner join
+                                       {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
+                                       {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
+                                  where r.id_publication = p.id
+                                    and r.type = 'write'
+                                    and w2.name = %s))""", (writer, writer,)),
                         ]
     for (value, where_part, params, ) in where_params_def:
         if value:

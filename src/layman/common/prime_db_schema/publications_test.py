@@ -135,6 +135,76 @@ class TestSelectPublicationsBasic:
         assert expected_publications == info_publications
 
 
+class TestSelectPublicationsComplex:
+    workspace1 = 'test_select_publications_complex_workspace1'
+    workspace2 = 'test_select_publications_complex_workspace2'
+    authn_headers_user1 = process_client.get_authz_headers(workspace1)
+    authn_headers_user2 = process_client.get_authz_headers(workspace2)
+    publications = [
+        (workspace1, MAP_TYPE, 'test_select_publications_publication1e',
+         {'headers': authn_headers_user1,
+          'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
+                            'write': settings.RIGHTS_EVERYONE_ROLE}, }),
+        (workspace1, MAP_TYPE, 'test_select_publications_publication1o',
+         {'headers': authn_headers_user1,
+          'access_rights': {'read': workspace1,
+                            'write': workspace1}, }),
+        (workspace1, MAP_TYPE, 'test_select_publications_publication1oe',
+         {'headers': authn_headers_user1,
+          'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
+                            'write': workspace1}, }),
+        (workspace2, MAP_TYPE, 'test_select_publications_publication2e',
+         {'headers': authn_headers_user2,
+          'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
+                            'write': settings.RIGHTS_EVERYONE_ROLE}, }),
+        (workspace2, MAP_TYPE, 'test_select_publications_publication2o',
+         {'headers': authn_headers_user2,
+          'access_rights': {'read': workspace2,
+                            'write': workspace2}, }),
+    ]
+
+    @pytest.fixture(scope="class")
+    def provide_data(self):
+        process_client.ensure_reserved_username(self.workspace1, self.authn_headers_user1)
+        process_client.ensure_reserved_username(self.workspace2, self.authn_headers_user2)
+        for publication in self.publications:
+            process_client.publish_workspace_publication(publication[1], publication[0], publication[2], **publication[3])
+        yield
+        for publication in self.publications:
+            process_client.delete_workspace_publication(publication[1], publication[0], publication[2], publication[3].get('headers'))
+
+    @pytest.mark.parametrize('query_params, expected_publications', [
+        (dict(), [(workspace1, MAP_TYPE, 'test_select_publications_publication1e'),
+                  (workspace1, MAP_TYPE, 'test_select_publications_publication1o'),
+                  (workspace1, MAP_TYPE, 'test_select_publications_publication1oe'),
+                  (workspace2, MAP_TYPE, 'test_select_publications_publication2e'),
+                  (workspace2, MAP_TYPE, 'test_select_publications_publication2o'),
+                  ]),
+        ({'reader': settings.ANONYM_USER}, [(workspace1, MAP_TYPE, 'test_select_publications_publication1e'),
+                                            (workspace1, MAP_TYPE, 'test_select_publications_publication1oe'),
+                                            (workspace2, MAP_TYPE, 'test_select_publications_publication2e'),
+                                            ]),
+        ({'reader': workspace2}, [(workspace1, MAP_TYPE, 'test_select_publications_publication1e'),
+                                  (workspace1, MAP_TYPE, 'test_select_publications_publication1oe'),
+                                  (workspace2, MAP_TYPE, 'test_select_publications_publication2e'),
+                                  (workspace2, MAP_TYPE, 'test_select_publications_publication2o'),
+                                  ]),
+        ({'writer': settings.ANONYM_USER}, [(workspace1, MAP_TYPE, 'test_select_publications_publication1e'),
+                                            (workspace2, MAP_TYPE, 'test_select_publications_publication2e'),
+                                            ]),
+        ({'writer': workspace2}, [(workspace1, MAP_TYPE, 'test_select_publications_publication1e'),
+                                  (workspace2, MAP_TYPE, 'test_select_publications_publication2e'),
+                                  (workspace2, MAP_TYPE, 'test_select_publications_publication2o'),
+                                  ]),
+    ])
+    @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
+    def test_get_publications(self, query_params, expected_publications):
+        with app.app_context():
+            infos = publications.get_publication_infos(**query_params)
+        info_publications = list(infos.keys())
+        assert expected_publications == info_publications
+
+
 def test_only_valid_names():
     workspace_name = 'test_only_valid_names_workspace'
     username = 'test_only_valid_names_user'
