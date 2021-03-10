@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.10.1-dev
+ {release-date}
+### Upgrade requirements
+### Migrations and checks
+### Changes
+
 ## v1.10.0
  2021-03-04
 ### Upgrade requirements
