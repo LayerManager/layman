@@ -10,6 +10,10 @@
 - [#273](https://github.com/jirik/layman/issues/273) New endpoints [GET Layers](doc/rest.md#get-layers) and [GET Layers](doc/rest.md#get-maps) to query publications in all [workspaces](doc/models.md#workspace).
 - [#273](https://github.com/jirik/layman/issues/273) All Layer(s) and Map(s) endpoints with `<workspace_name>` in their URL were renamed to 'Workspace Layer...' and 'Workspace Map' in the documentation.
 
+## v1.10.1
+ 2021-03-10
+### Changes
+- [#285](https://github.com/jirik/layman/issues/285) Fix upgrade 1.10.0 error (CSW get_template_path_and_values now works even if the layer is not in GeoServer).
 
 ## v1.10.0
  2021-03-04
