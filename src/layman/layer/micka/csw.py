@@ -144,8 +144,14 @@ def get_template_path_and_values(username, layername, http_method=None):
         title or '',
         abstract or ''
     ]))), None)
-    languages = db.get_text_languages(username, layername)
-    scale_denominator = db.guess_scale_denominator(username, layername)
+    try:
+        languages = db.get_text_languages(username, layername)
+    except LaymanError:
+        languages = []
+    try:
+        scale_denominator = db.guess_scale_denominator(username, layername)
+    except LaymanError:
+        scale_denominator = None
 
     prop_values = _get_property_values(
         username=username,

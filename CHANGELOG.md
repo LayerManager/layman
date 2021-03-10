@@ -13,7 +13,7 @@
 ## v1.10.1
  2021-03-10
 ### Changes
-- [#285](https://github.com/jirik/layman/issues/285) Fix upgrade 1.10.0 error (CSW get_template_path_and_values now works even if the layer is not in GeoServer).
+- [#285](https://github.com/jirik/layman/issues/285) Fix upgrade 1.10.0 error (CSW get_template_path_and_values now works even if the layer is not in GeoServer and/or in DB).
 
 ## v1.10.0
  2021-03-04
