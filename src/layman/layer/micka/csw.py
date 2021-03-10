@@ -25,8 +25,8 @@ def get_metadata_uuid(uuid):
     return f"m-{uuid}" if uuid is not None else None
 
 
-def get_layer_info(username, layername):
-    uuid = get_layer_uuid(username, layername)
+def get_layer_info(workspace, layername):
+    uuid = get_layer_uuid(workspace, layername)
     try:
         csw = common_util.create_csw()
         if uuid is None or csw is None:
@@ -42,18 +42,18 @@ def get_layer_info(username, layername):
                 'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
                 'record_url': settings.CSW_RECORD_URL.format(identifier=muuid),
-                'comparison_url': url_for('rest_workspace_layer_metadata_comparison.get', username=username, layername=layername),
+                'comparison_url': url_for('rest_workspace_layer_metadata_comparison.get', username=workspace, layername=layername),
             }
         }
     else:
         return {}
 
 
-def patch_layer(username, layername, metadata_properties_to_refresh, actor_name=None, create_if_not_exists=True, timeout=5):
+def patch_layer(workspace, layername, metadata_properties_to_refresh, actor_name=None, create_if_not_exists=True, timeout=5):
     # current_app.logger.info(f"patch_layer metadata_properties_to_refresh={metadata_properties_to_refresh}")
     if len(metadata_properties_to_refresh) == 0:
         return {}
-    uuid = get_layer_uuid(username, layername)
+    uuid = get_layer_uuid(workspace, layername)
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return {}
@@ -61,12 +61,12 @@ def patch_layer(username, layername, metadata_properties_to_refresh, actor_name=
     el = common_util.get_record_element_by_id(csw, muuid)
     if el is None:
         if create_if_not_exists:
-            return csw_insert(username, layername)
+            return csw_insert(workspace, layername)
         else:
             return None
     # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
 
-    _, prop_values = get_template_path_and_values(username, layername, http_method='patch')
+    _, prop_values = get_template_path_and_values(workspace, layername, http_method='patch')
     prop_values = {
         k: v for k, v in prop_values.items()
         if k in metadata_properties_to_refresh + ['md_date_stamp']
@@ -88,16 +88,16 @@ def patch_layer(username, layername, metadata_properties_to_refresh, actor_name=
     return muuid
 
 
-def get_publication_uuid(username, publication_type, publication_name):
+def get_publication_uuid(workspace, publication_type, publication_name):
     return None
 
 
-def post_layer(username, layername):
+def post_layer(workspace, layername):
     pass
 
 
-def delete_layer(username, layername):
-    uuid = get_layer_uuid(username, layername)
+def delete_layer(workspace, layername):
+    uuid = get_layer_uuid(workspace, layername)
     muuid = get_metadata_uuid(uuid)
     if muuid is None:
         return
@@ -108,8 +108,8 @@ def delete_layer(username, layername):
         raise LaymanError(38)
 
 
-def csw_insert(username, layername):
-    template_path, prop_values = get_template_path_and_values(username, layername, http_method='post')
+def csw_insert(workspace, layername):
+    template_path, prop_values = get_template_path_and_values(workspace, layername, http_method='post')
     record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
     try:
         muuid = common_util.csw_insert({
@@ -121,11 +121,11 @@ def csw_insert(username, layername):
     return muuid
 
 
-def get_template_path_and_values(username, layername, http_method=None):
+def get_template_path_and_values(workspace, layername, http_method=None):
     assert http_method in ['post', 'patch']
-    wmsi = wms.get_wms_proxy(username)
+    wmsi = wms.get_wms_proxy(workspace)
     wms_layer = wmsi.contents.get(layername) if wmsi else None
-    publ_info = get_publication_info(username, LAYER_TYPE, layername, context={
+    publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
         'keys': ['title'],
     })
     title = publ_info['title']
@@ -137,7 +137,7 @@ def get_template_path_and_values(username, layername, http_method=None):
         abstract = None
         extent = [-180, -90, 180, 90]
 
-    uuid_file_path = get_publication_uuid_file(LAYER_TYPE, username, layername)
+    uuid_file_path = get_publication_uuid_file(LAYER_TYPE, workspace, layername)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
     revision_date = datetime.now()
     md_language = next(iter(common_language.get_languages_iso639_2(' '.join([
@@ -145,28 +145,28 @@ def get_template_path_and_values(username, layername, http_method=None):
         abstract or ''
     ]))), None)
     try:
-        languages = db.get_text_languages(username, layername)
+        languages = db.get_text_languages(workspace, layername)
     except LaymanError:
         languages = []
     try:
-        scale_denominator = db.guess_scale_denominator(username, layername)
+        scale_denominator = db.guess_scale_denominator(workspace, layername)
     except LaymanError:
         scale_denominator = None
 
     prop_values = _get_property_values(
-        username=username,
+        workspace=workspace,
         layername=layername,
-        uuid=get_layer_uuid(username, layername),
+        uuid=get_layer_uuid(workspace, layername),
         title=title,
         abstract=abstract or None,
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         revision_date=revision_date.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
-        identifier=url_for('rest_workspace_layer.get', username=username, layername=layername),
+        identifier=url_for('rest_workspace_layer.get', username=workspace, layername=layername),
         identifier_label=layername,
         extent=extent,
-        wms_url=wms.get_wms_url(username, external_url=True),
-        wfs_url=wfs.get_wfs_url(username, external_url=True),
+        wms_url=wms.get_wms_url(workspace, external_url=True),
+        wfs_url=wfs.get_wfs_url(workspace, external_url=True),
         md_organisation_name=None,
         organisation_name=None,
         md_language=md_language,
@@ -181,7 +181,7 @@ def get_template_path_and_values(username, layername, http_method=None):
 
 
 def _get_property_values(
-        username='browser',
+        workspace='browser',
         layername='layer',
         uuid='ca238200-8200-1a23-9399-42c9fca53542',
         title='CORINE - Krajinný pokryv CLC 90',
@@ -219,12 +219,12 @@ def _get_property_values(
             'label': identifier_label,
         },
         'abstract': abstract,
-        'graphic_url': url_for('rest_workspace_layer_thumbnail.get', username=username, layername=layername),
+        'graphic_url': url_for('rest_workspace_layer_thumbnail.get', username=workspace, layername=layername),
         'extent': extent,
 
         'wms_url': wms.add_capabilities_params_to_url(wms_url),
         'wfs_url': wfs.add_capabilities_params_to_url(wfs_url),
-        'layer_endpoint': url_for('rest_workspace_layer.get', username=username, layername=layername),
+        'layer_endpoint': url_for('rest_workspace_layer.get', username=workspace, layername=layername),
         'scale_denominator': scale_denominator,
         'language': languages,
         'md_organisation_name': md_organisation_name,
@@ -372,8 +372,8 @@ METADATA_PROPERTIES = {
 }
 
 
-def get_metadata_comparison(username, layername):
-    uuid = get_layer_uuid(username, layername)
+def get_metadata_comparison(workspace, layername):
+    uuid = get_layer_uuid(workspace, layername)
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return {}
