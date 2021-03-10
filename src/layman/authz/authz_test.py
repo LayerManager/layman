@@ -4,11 +4,11 @@ import requests
 from layman import app, settings, LaymanError
 from layman.util import url_for
 from flask import g
-from . import authorize_publications_decorator
+from . import authorize_workspace_publications_decorator
 from test import process_client
 
 
-@authorize_publications_decorator
+@authorize_workspace_publications_decorator
 def mock_method():
     pass
 

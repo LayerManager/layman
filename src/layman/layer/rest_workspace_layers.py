@@ -8,7 +8,7 @@ from layman import settings, authn, util as layman_util
 from . import util, LAYER_TYPE, LAYER_REST_PATH_NAME
 from .filesystem import input_file, input_style, input_chunk, uuid
 from layman.authn import authenticate
-from layman.authz import authorize_publications_decorator
+from layman.authz import authorize_workspace_publications_decorator
 from layman.common import redis as redis_util
 
 bp = Blueprint('rest_workspace_layers', __name__)
@@ -17,7 +17,7 @@ bp = Blueprint('rest_workspace_layers', __name__)
 @bp.before_request
 @check_username_decorator
 @authenticate
-@authorize_publications_decorator
+@authorize_workspace_publications_decorator
 def before_request():
     pass
 
