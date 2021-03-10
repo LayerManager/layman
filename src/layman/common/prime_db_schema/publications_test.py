@@ -24,6 +24,7 @@ userinfo_baseline = {"issuer_id": 'mock_test_publications_test',
 def test_publication_basic():
     def publications_by_type(prefix,
                              publication_type,
+                             style_type,
                              ):
         username = prefix + '_username'
         publication_name = prefix + '_pub_name'
@@ -39,9 +40,10 @@ def test_publication_basic():
                        "publ_type_name": publication_type,
                        "uuid": uuid_orig,
                        "actor_name": username,
+                       'style_type': style_type,
                        "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
                                          "write": {settings.RIGHTS_EVERYONE_ROLE, },
-                                         }
+                                         },
                        }
             publications.insert_publication(username, db_info)
             pubs = publications.get_publication_infos(username, publication_type)
@@ -55,7 +57,8 @@ def test_publication_basic():
                        "publ_type_name": publication_type,
                        "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
                                          "write": {settings.RIGHTS_EVERYONE_ROLE, },
-                                         }
+                                         },
+                       'style_type': style_type,
                        }
             publications.update_publication(username, db_info)
             pubs = publications.get_publication_infos(username, publication_type)
@@ -69,7 +72,8 @@ def test_publication_basic():
                        "publ_type_name": publication_type,
                        "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
                                          "write": {settings.RIGHTS_EVERYONE_ROLE, },
-                                         }
+                                         },
+                       'style_type': style_type,
                        }
             publications.update_publication(username, db_info)
             pubs = publications.get_publication_infos(username, publication_type)
@@ -84,9 +88,13 @@ def test_publication_basic():
             workspaces.delete_workspace(username)
 
     publications_by_type('test_publication_basic_layer',
-                         LAYER_TYPE)
+                         LAYER_TYPE,
+                         'sld',
+                         )
     publications_by_type('test_publication_basic_map',
-                         MAP_TYPE)
+                         MAP_TYPE,
+                         None,
+                         )
 
 
 class TestSelectPublicationsBasic:
