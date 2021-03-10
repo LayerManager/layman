@@ -301,21 +301,14 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
 
 
 def get_publication_infos(workspace=None, publ_type=None, context=None, style_type=None):
-    from layman import authz
     from layman.common.prime_db_schema import publications
     context = context or {}
 
-    infos_orig = publications.get_publication_infos(workspace, publ_type, style_type)
+    reader = (context.get('actor_name') or settings.ANONYM_USER) if context.get('access_type') == 'read' else None
+    writer = (context.get('actor_name') or settings.ANONYM_USER) if context.get('access_type') == 'write' else None
+    infos = publications.get_publication_infos(workspace, publ_type, style_type, reader=reader, writer=writer)
 
-    if 'actor_name' in context:
-        actor = context['actor_name']
-        access_type = context['access_type']
-        result = {key: info for key, info in infos_orig.items()
-                  if authz.is_user_in_access_rule(actor, info.get('access_rights').get(access_type))}
-    else:
-        result = infos_orig
-
-    return result
+    return infos
 
 
 def delete_publications(user,
