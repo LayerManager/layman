@@ -4,7 +4,7 @@ from layman import LaymanError, util as layman_util
 from layman.util import check_username_decorator
 from . import util, MAP_REST_PATH_NAME
 from layman.authn import authenticate
-from layman.authz import authorize_publications_decorator
+from layman.authz import authorize_workspace_publications_decorator
 
 bp = Blueprint('rest_workspace_map_file', __name__)
 
@@ -13,7 +13,7 @@ bp = Blueprint('rest_workspace_map_file', __name__)
 @check_username_decorator
 @util.check_mapname_decorator
 @authenticate
-@authorize_publications_decorator
+@authorize_workspace_publications_decorator
 @util.info_decorator
 def before_request():
     pass

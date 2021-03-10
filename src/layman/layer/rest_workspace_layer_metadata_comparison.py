@@ -3,7 +3,7 @@ from flask import Blueprint, send_file, current_app as app, g, jsonify
 from layman import util as layman_util
 from . import util, LAYER_REST_PATH_NAME
 from layman.authn import authenticate
-from layman.authz import authorize_publications_decorator
+from layman.authz import authorize_workspace_publications_decorator
 
 bp = Blueprint('rest_workspace_layer_metadata_comparison', __name__)
 
@@ -12,7 +12,7 @@ bp = Blueprint('rest_workspace_layer_metadata_comparison', __name__)
 @layman_util.check_username_decorator
 @util.check_layername_decorator
 @authenticate
-@authorize_publications_decorator
+@authorize_workspace_publications_decorator
 @util.info_decorator
 def before_request():
     pass
