@@ -61,6 +61,7 @@ No action parameters.
 Content-Type: `application/json`
 
 JSON array of objects representing available layers with following structure:
+- **workspace**: String. Name of the layer's workspace.
 - **name**: String. Name of the layer.
 - **title**: String. Title of the layer.
 - **uuid**: String. UUID of the layer.
@@ -417,6 +418,7 @@ No action parameters.
 Content-Type: `application/json`
 
 JSON array of objects representing available maps with following structure:
+- **workspace**: String. Name of the map's workspace.
 - **name**: String. Name of the map.
 - **title**: String. Title of the map.
 - **uuid**: String. UUID of the map.

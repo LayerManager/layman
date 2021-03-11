@@ -9,6 +9,7 @@
 ### Changes
 - [#273](https://github.com/jirik/layman/issues/273) New endpoints [GET Layers](doc/rest.md#get-layers) and [GET Layers](doc/rest.md#get-maps) to query publications in all [workspaces](doc/models.md#workspace).
 - [#273](https://github.com/jirik/layman/issues/273) All Layer(s) and Map(s) endpoints with `<workspace_name>` in their URL were renamed to 'Workspace Layer...' and 'Workspace Map' in the documentation.
+- [#273](https://github.com/jirik/layman/issues/273)  Item **workspace** was added to response of [GET Workspace Layers](doc/rest.md#get-workspace-layers) and [GET Workspace Maps](doc/rest.md#get-workspace-maps)
 
 ## v1.10.1
  2021-03-10
