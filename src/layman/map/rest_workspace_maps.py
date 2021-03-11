@@ -36,20 +36,20 @@ def get(username):
     app.logger.info(f"GET Maps, user={g.user}")
 
     mapinfos_whole = layman_util.get_publication_infos(username, MAP_TYPE)
-    mapinfos = {name: info for (workspace, publication_type, name), info in mapinfos_whole.items()}
 
-    sorted_infos = sorted(mapinfos.items(), key=lambda x: x[0])
     infos = [
         {
             'name': info["name"],
+            'workspace': workspace,
             'title': info.get("title", None),
             'url': url_for('rest_workspace_map.get', mapname=name, username=username),
             'uuid': info['uuid'],
             'access_rights': info['access_rights'],
         }
-        for (name, info) in sorted_infos
+        for (workspace, publication_type, name), info in mapinfos_whole.items()
     ]
-    return jsonify(infos), 200
+    sorted_infos = sorted(infos, key=lambda x: x['name'])
+    return jsonify(sorted_infos), 200
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}", methods=['POST'])
