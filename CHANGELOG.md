@@ -3,9 +3,8 @@
 ## v1.11.0-dev
  {release-date}
 ### Upgrade requirements
-
-### Migrations and checks
-
+- Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.6.1`
+    - If you are running Layman with development settings, run also `make client-build`.
 ### Changes
 - [#273](https://github.com/jirik/layman/issues/273) New endpoints [GET Layers](doc/rest.md#get-layers) and [GET Layers](doc/rest.md#get-maps) to query publications in all [workspaces](doc/models.md#workspace).
 - [#273](https://github.com/jirik/layman/issues/273) All Layer(s) and Map(s) endpoints with `<workspace_name>` in their URL were renamed to 'Workspace Layer...' and 'Workspace Map' in the documentation.
