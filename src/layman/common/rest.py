@@ -5,33 +5,33 @@ from .util import PUBLICATION_NAME_ONLY_PATTERN
 from layman.util import USERNAME_ONLY_PATTERN, get_publication_types
 
 
-def _get_multi_publication_path_pattern():
+def _get_workspace_multi_publication_path_pattern():
     workspace_pattern = r"(?P<workspace>" + USERNAME_ONLY_PATTERN + r")"
     publ_type_names = [publ_type['rest_path_name'] for publ_type in get_publication_types().values()]
     publ_type_pattern = r"(?P<publication_type>" + "|".join(publ_type_names) + r")"
     return f"^/rest/({settings.REST_WORKSPACES_PREFIX}/)?" + workspace_pattern + "/" + publ_type_pattern
 
 
-_MULTI_PUBLICATION_PATH_PATTERN = None
-_SINGLE_PUBLICATION_PATH_PATTERN = None
+_WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN = None
+_WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN = None
 _URL_NAME_TO_PUBLICATION_TYPE = None
 
 
-def get_multipublication_path_pattern():
-    global _MULTI_PUBLICATION_PATH_PATTERN
-    if _MULTI_PUBLICATION_PATH_PATTERN is None:
-        _MULTI_PUBLICATION_PATH_PATTERN = re.compile(_get_multi_publication_path_pattern() + r"/?$")
-    return _MULTI_PUBLICATION_PATH_PATTERN
+def get_workspace_multipublication_path_pattern():
+    global _WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN
+    if _WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN is None:
+        _WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN = re.compile(_get_workspace_multi_publication_path_pattern() + r"/?$")
+    return _WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN
 
 
 def get_singlepublication_path_pattern():
-    global _SINGLE_PUBLICATION_PATH_PATTERN
-    if _SINGLE_PUBLICATION_PATH_PATTERN is None:
-        _SINGLE_PUBLICATION_PATH_PATTERN = re.compile(
-            _get_multi_publication_path_pattern()
+    global _WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN
+    if _WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN is None:
+        _WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN = re.compile(
+            _get_workspace_multi_publication_path_pattern()
             + r"/(?P<publication_name>" + PUBLICATION_NAME_ONLY_PATTERN + r")(?:/.*)?$"
         )
-    return _SINGLE_PUBLICATION_PATH_PATTERN
+    return _WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN
 
 
 def get_url_name_to_publication_type():
@@ -49,7 +49,7 @@ def parse_request_path(request_path):
     publication_type = None
     publication_type_url_prefix = None
     publication_name = None
-    m = get_multipublication_path_pattern().match(request_path)
+    m = get_workspace_multipublication_path_pattern().match(request_path)
     if not m:
         m = get_singlepublication_path_pattern().match(request_path)
     if m:
