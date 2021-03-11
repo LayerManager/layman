@@ -60,6 +60,12 @@ def test_post_layers_chunk(chrome):
     chrome.set_window_size(1000, 2000)
     chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-1.png')
 
+    button = chrome.find_elements_by_xpath('//button[text()="POST"]')
+    assert len(button) == 1
+    button = button[0]
+    button.click()
+    chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-1.5.png')
+
     user_input = chrome.find_elements_by_name('Workspace')
     assert len(user_input) == 1
     user_input = user_input[0]
