@@ -5,12 +5,14 @@ from layman.util import url_for
 from layman import util as layman_util
 from . import LAYER_TYPE, LAYER_REST_PATH_NAME
 from layman.authn import authenticate
+from layman.authz import authorize_publications_decorator
 
 bp = Blueprint('rest_layers', __name__)
 
 
 @bp.before_request
 @authenticate
+@authorize_publications_decorator
 def before_request():
     pass
 

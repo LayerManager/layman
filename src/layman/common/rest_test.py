@@ -12,7 +12,6 @@ from .rest import parse_request_path
     f'/rest/{settings.REST_WORKSPACES_PREFIX}/username/publications/blablabla/da',
     f'/rest/{settings.REST_WORKSPACES_PREFIX}/users/layers',
     f'/rest/{settings.REST_WORKSPACES_PREFIX}/users/maps/map',
-    f'/rest/layers',
     f'/rest/layers/abc',
     f'/rest/username/abc',
     f'/rest/username/publications',
@@ -39,6 +38,8 @@ def test_parse_wrong_request_path(request_path):
     (f'/rest/user_a/layers/abc', ('user_a', 'layman.layer', 'abc')),
     (f'/rest/user_a/layers/some_layer/some/nested/endpoint', ('user_a', 'layman.layer', 'some_layer')),
     (f'/rest/user_a/maps/a_map', ('user_a', 'layman.map', 'a_map')),
+    (f'/rest/layers', (None, 'layman.layer', None)),
+    (f'/rest/maps', (None, 'layman.map', None)),
 ])
 def test_parse_request_path(request_path, exp_result):
     with app.app_context():

@@ -65,7 +65,7 @@ def authorize(workspace, publication_type, publication_name, request_method, act
             raise LaymanError(31, {'method': request_method})  # unsupported method
 
 
-def authorize_after_multi_get_request(workspace, actor_name, response):
+def authorize_after_multi_get_request(actor_name, response):
     # print(f"authorize_after_request, status_code = {response.status_code}, workspace={workspace}, actor_name={actor_name}")
     if response.status_code == 200:
         publications_json = json.loads(response.get_data())
@@ -123,7 +123,25 @@ def authorize_workspace_publications_decorator(f):
         if workspace and publication_type and not publication_name and request.method == 'GET':
             @after_this_request
             def authorize_after_request_tmp(response):
-                return authorize_after_multi_get_request(workspace, actor_name, response)
+                return authorize_after_multi_get_request(actor_name, response)
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
+def authorize_publications_decorator(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # print(f"authorize ARGS {args} KWARGS {kwargs}")
+        req_path = request.script_root + request.path
+        (workspace, publication_type, publication_name) = parse_request_path(req_path)
+        if publication_type is None or workspace or publication_name:
+            raise Exception(f"Authorization module is unable to authorize path {req_path}")
+        actor_name = authn.get_authn_username()
+        if request.method == 'GET':
+            @after_this_request
+            def authorize_after_request_tmp(response):
+                return authorize_after_multi_get_request(actor_name, response)
         return f(*args, **kwargs)
 
     return decorated_function

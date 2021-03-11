@@ -5,13 +5,14 @@ from layman.util import url_for
 from layman import util as layman_util
 from . import MAP_TYPE, MAP_REST_PATH_NAME
 from layman.authn import authenticate
-from layman.authz import authorize_workspace_publications_decorator
+from layman.authz import authorize_publications_decorator
 
 bp = Blueprint('rest_maps', __name__)
 
 
 @bp.before_request
 @authenticate
+@authorize_publications_decorator
 def before_request():
     pass
 
