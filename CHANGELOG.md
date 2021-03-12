@@ -7,6 +7,7 @@
 ### Migrations and checks
 
 ### Changes
+- [#273](https://github.com/jirik/layman/issues/273) Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Maps](doc/rest.md#get-maps) can filter and reorder results according to new query parameters. 
 
 ## v1.11.0
  2021-03-16
