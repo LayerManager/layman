@@ -184,6 +184,12 @@ def get_publication_modules(use_cache=True):
     return result
 
 
+def get_publication_module(publication_type, use_cache=True):
+    modules = get_publication_modules(use_cache=use_cache)
+    module = next(module for module in modules if publication_type in module.PUBLICATION_TYPES)
+    return module
+
+
 def get_providers_from_source_names(source_names, skip_modules=None):
     skip_modules = skip_modules or set()
     provider_names = list(OrderedDict.fromkeys(map(
