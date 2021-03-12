@@ -190,6 +190,11 @@ def get_publication_module(publication_type, use_cache=True):
     return module
 
 
+def get_workspace_publication_url(publication_type, workspace, publication_name, use_cache=True):
+    publ_module = get_publication_module(publication_type, use_cache=use_cache)
+    return publ_module.get_workspace_publication_url(workspace, publication_name)
+
+
 def get_providers_from_source_names(source_names, skip_modules=None):
     skip_modules = skip_modules or set()
     provider_names = list(OrderedDict.fromkeys(map(

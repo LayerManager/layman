@@ -70,3 +70,10 @@ PUBLICATION_TYPES = {
         },
     }
 }
+
+
+from layman.util import url_for
+
+
+def get_workspace_publication_url(workspace, publication_name):
+    return url_for('rest_workspace_map.get', mapname=publication_name, username=workspace)
