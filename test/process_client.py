@@ -270,13 +270,14 @@ get_workspace_maps = partial(get_workspace_publications, MAP_TYPE)
 get_workspace_layers = partial(get_workspace_publications, LAYER_TYPE)
 
 
-def get_publications(publication_type, headers=None, ):
+def get_publications(publication_type, headers=None, query_params=None):
     headers = headers or {}
+    query_params = query_params or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
         r_url = url_for(publication_type_def.get_publications_url)
-    r = requests.get(r_url, headers=headers)
+    r = requests.get(r_url, headers=headers, params=query_params)
     raise_layman_error(r)
     return r.json()
 
