@@ -1,18 +1,18 @@
+from flask import jsonify
 import re
 
-from layman import settings
+from layman import settings, util as layman_util
 from .util import PUBLICATION_NAME_ONLY_PATTERN
-from layman.util import USERNAME_ONLY_PATTERN, get_publication_types
 
 
 def _get_pub_type_pattern():
-    publ_type_names = [publ_type['rest_path_name'] for publ_type in get_publication_types().values()]
+    publ_type_names = [publ_type['rest_path_name'] for publ_type in layman_util.get_publication_types().values()]
     publ_type_pattern = r"(?P<publication_type>" + "|".join(publ_type_names) + r")"
     return publ_type_pattern
 
 
 def _get_workspace_multi_publication_path_pattern():
-    workspace_pattern = r"(?P<workspace>" + USERNAME_ONLY_PATTERN + r")"
+    workspace_pattern = r"(?P<workspace>" + layman_util.USERNAME_ONLY_PATTERN + r")"
     return f"^/rest/({settings.REST_WORKSPACES_PREFIX}/)?" + workspace_pattern + "/" + _get_pub_type_pattern()
 
 
@@ -51,7 +51,7 @@ def get_url_name_to_publication_type():
     if _URL_NAME_TO_PUBLICATION_TYPE is None:
         _URL_NAME_TO_PUBLICATION_TYPE = {
             publ_type['rest_path_name']: publ_type
-            for publ_type in get_publication_types().values()
+            for publ_type in layman_util.get_publication_types().values()
         }
     return _URL_NAME_TO_PUBLICATION_TYPE
 
@@ -98,3 +98,23 @@ def setup_post_access_rights(request_form, kwargs, actor_name):
         else:
             access_rights = list({x.strip() for x in request_form['access_rights.' + type].split(',')})
         kwargs['access_rights'][type] = access_rights
+
+
+def get_publications(publication_type, user):
+    publication_infos_whole = layman_util.get_publication_infos(publ_type=publication_type,
+                                                                context={'actor_name': user,
+                                                                         'access_type': 'read',
+                                                                         })
+
+    infos = [
+        {
+            'name': name,
+            'workspace': workspace,
+            'title': info.get("title"),
+            'url': layman_util.get_workspace_publication_url(publication_type, workspace, name),
+            'uuid': info["uuid"],
+            'access_rights': info['access_rights'],
+        }
+        for (workspace, _, name), info in publication_infos_whole.items()
+    ]
+    return jsonify(infos), 200
