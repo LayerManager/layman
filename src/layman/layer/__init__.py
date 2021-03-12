@@ -102,3 +102,10 @@ STYLE_TYPES_DEF = [StyleTypeDef('sld',
                                 ),
                    ]
 NO_STYLE_DEF = STYLE_TYPES_DEF[0]
+
+
+from layman.util import url_for
+
+
+def get_workspace_publication_url(workspace, publication_name):
+    return url_for('rest_workspace_layer.get', layername=publication_name, username=workspace)
