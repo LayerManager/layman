@@ -11,7 +11,10 @@ ROLE_EVERYONE = settings.RIGHTS_EVERYONE_ROLE
 psycopg2.extras.register_uuid()
 
 
-def get_publication_infos(workspace_name=None, pub_type=None, style_type=None, reader=None, writer=None):
+def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
+                          reader=None, writer=None,
+                          full_text=None,
+                          ):
     sql_basic = f"""
 select p.id as id_publication,
        w.name as workspace_name,
@@ -67,6 +70,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                   where r.id_publication = p.id
                                     and r.type = 'write'
                                     and w2.name = %s))""", (writer, writer,)),
+                        (full_text, 'to_tsvector(unaccent(p.title)) @@ to_tsquery(unaccent(%s))', (full_text, )),
                         ]
     for (value, where_part, params, ) in where_params_def:
         if value:
