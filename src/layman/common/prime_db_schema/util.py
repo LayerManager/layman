@@ -1,5 +1,6 @@
 from flask import g, current_app as app
 import psycopg2
+import re
 
 from layman import settings
 from layman.http import LaymanError
@@ -59,3 +60,9 @@ def run_statement(query, data=None, conn_cur=None, encapsulate_exception=True):
         else:
             raise exc
     return rows
+
+
+def to_tsquery_string(value):
+    value = re.sub(r'[\W_]+', ' ', value, flags=re.UNICODE).strip()
+    value = value.replace(' ', ' | ')
+    return value
