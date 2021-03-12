@@ -26,7 +26,8 @@ class TestDeletePublicationsClass:
             publication_set = {publication['name'] for publication in delete_json}
             assert after_delete_publications == publication_set
 
-            get_json = process_client.get_workspace_publications(publ_type, workspace=owner, headers=authn_headers_owner)
+            get_json = process_client.get_workspace_publications(publ_type, workspace=owner,
+                                                                 headers=authn_headers_owner)
             publication_set = {publication['name'] for publication in get_json}
             assert remaining_publications == publication_set
 
@@ -41,7 +42,8 @@ class TestDeletePublicationsClass:
                         ]
 
         for (name, access_rights) in publications:
-            process_client.publish_workspace_publication(publ_type, owner, name, access_rights=access_rights, headers=authn_headers_owner)
+            process_client.publish_workspace_publication(publ_type, owner, name, access_rights=access_rights,
+                                                         headers=authn_headers_owner)
 
         rv = process_client.get_workspace_publications(publ_type, workspace=owner, headers=authn_headers_owner)
         assert len(rv) == len(publications)
@@ -61,14 +63,23 @@ class TestGetPublications:
     workspace1 = 'test_get_publications_workspace1'
     workspace2 = 'test_get_publications_workspace2'
     authn_headers_user2 = process_client.get_authz_headers(workspace2)
-    publications = [(workspace1, 'test_get_publications_publication1e', dict()),
-                    (workspace2, 'test_get_publications_publication2e', {'headers': authn_headers_user2,
-                                                                         'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
-                                                                                           'write': settings.RIGHTS_EVERYONE_ROLE}, }),
-                    (workspace2, 'test_get_publications_publication2o', {'headers': authn_headers_user2,
-                                                                         'access_rights': {'read': workspace2,
-                                                                                           'write': workspace2}, }),
-                    ]
+    publications = [
+        (workspace1, 'test_get_publications_publication1e', {
+            'title': 'Public publication in public workspace'
+        }),
+        (workspace2, 'test_get_publications_publication2e', {
+            'headers': authn_headers_user2,
+            'title': '\'Too yellow horse\' means "Příliš žluťoučký kůň".',
+            'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
+                              'write': settings.RIGHTS_EVERYONE_ROLE},
+        }),
+        (workspace2, 'test_get_publications_publication2o', {
+            'headers': authn_headers_user2,
+            'title': 'Příliš jiný žluťoučký kůň úpěl ďábelské ódy',
+            'access_rights': {'read': workspace2,
+                              'write': workspace2},
+        }),
+    ]
 
     @pytest.fixture(scope="class")
     def provide_data(self):
@@ -83,16 +94,35 @@ class TestGetPublications:
                 process_client.delete_workspace_publication(publication_type, publication[0], publication[1],
                                                             publication[2].get('headers'))
 
-    @pytest.mark.parametrize('headers, expected_publications', [
-        (authn_headers_user2, [(workspace1, 'test_get_publications_publication1e'),
-                               (workspace2, 'test_get_publications_publication2e'),
-                               (workspace2, 'test_get_publications_publication2o'),
-                               ], ),
-        (None, [(workspace1, 'test_get_publications_publication1e'), (workspace2, 'test_get_publications_publication2e'), ],),
+    @pytest.mark.parametrize('headers, query_params, expected_publications', [
+        (authn_headers_user2, {}, [(workspace1, 'test_get_publications_publication1e'),
+                                   (workspace2, 'test_get_publications_publication2e'),
+                                   (workspace2, 'test_get_publications_publication2o'),
+                                   ],),
+        (None, {}, [(workspace1, 'test_get_publications_publication1e'),
+                    (workspace2, 'test_get_publications_publication2e'),
+                    ],),
+        (authn_headers_user2, {'full_text_filter': 'kůň'}, [(workspace2, 'test_get_publications_publication2e'),
+                                                            (workspace2, 'test_get_publications_publication2o'),
+                                                            ],),
+        (None, {'full_text_filter': 'The Fačřš_tÚŮTŤsa   "  a34432[;] ;.\\Ra\'\'ts'}, list(),),
+        (authn_headers_user2, {'full_text_filter': '\'Too yellow horse\' means "Příliš žluťoučký kůň".'}, [
+            (workspace2, 'test_get_publications_publication2e'),
+            (workspace2, 'test_get_publications_publication2o'),
+        ],),
+        (authn_headers_user2, {'full_text_filter': 'mean'}, [(workspace2, 'test_get_publications_publication2e'),
+                                                             ],),
+        (authn_headers_user2, {'full_text_filter': 'jiný další kůň'}, [(workspace2, 'test_get_publications_publication2o'),
+                                                                       (workspace2, 'test_get_publications_publication2e'),
+                                                                       ],),
+        (authn_headers_user2, {'full_text_filter': 'workspace publication'}, [
+            (workspace1, 'test_get_publications_publication1e'),
+        ],),
     ])
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
-    def test_get_publications(self, publication_type, headers, expected_publications):
-        infos = process_client.get_publications(publication_type, headers, )
-        info_publications = [(info.get('workspace'), info.get('name')) for info in infos]
+    def test_get_publications(self, publication_type, headers, query_params, expected_publications):
+        infos = process_client.get_publications(publication_type, headers, query_params=query_params)
+        info_publications = [(info['workspace'], info['name']) for info in infos]
+        assert set(expected_publications) == set(info_publications)
         assert expected_publications == info_publications

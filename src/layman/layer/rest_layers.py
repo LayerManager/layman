@@ -1,4 +1,4 @@
-from flask import Blueprint, g
+from flask import Blueprint, g, request
 from flask import current_app as app
 
 from layman import settings
@@ -22,4 +22,4 @@ def get():
     app.logger.info(f"GET Layers, user={g.user}")
 
     user = g.user.get('username') if g.user else settings.ANONYM_USER
-    return rest_common.get_publications(LAYER_TYPE, user)
+    return rest_common.get_publications(LAYER_TYPE, user, request.args)

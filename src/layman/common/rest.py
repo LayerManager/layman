@@ -2,6 +2,7 @@ from flask import jsonify
 import re
 
 from layman import settings, util as layman_util
+from layman.common.prime_db_schema import util as prime_db_schema_util
 from .util import PUBLICATION_NAME_ONLY_PATTERN
 
 
@@ -100,11 +101,26 @@ def setup_post_access_rights(request_form, kwargs, actor_name):
         kwargs['access_rights'][type] = access_rights
 
 
-def get_publications(publication_type, user):
+def get_publications(publication_type, user, request_args):
+
+    full_text_filter = None
+    if 'full_text_filter' in request_args:
+        full_text_filter = prime_db_schema_util.to_tsquery_string(request_args.get('full_text_filter')) or None
+
+    order_by_list = []
+    ordering_full_text = None
+    if full_text_filter:
+        ordering_full_text = full_text_filter
+        order_by_list = ['full_text']
+
     publication_infos_whole = layman_util.get_publication_infos(publ_type=publication_type,
                                                                 context={'actor_name': user,
-                                                                         'access_type': 'read',
-                                                                         })
+                                                                         'access_type': 'read'
+                                                                         },
+                                                                full_text_filter=full_text_filter,
+                                                                order_by_list=order_by_list,
+                                                                ordering_full_text=ordering_full_text,
+                                                                )
 
     infos = [
         {
