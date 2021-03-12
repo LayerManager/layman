@@ -13,9 +13,48 @@ psycopg2.extras.register_uuid()
 
 def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
                           reader=None, writer=None,
-                          full_text=None,
+                          full_text_filter=None,
+                          order_by_list=None,
+                          ordering_full_text=None,
                           ):
-    sql_basic = f"""
+    order_by_list = order_by_list or []
+
+    where_params_def = [
+        (workspace_name, 'w.name = %s', (workspace_name,)),
+        (pub_type, 'p.type = %s', (pub_type,)),
+        (style_type, 'p.style_type::text = %s', (style_type,)),
+        (reader == settings.ANONYM_USER, 'p.everyone_can_read = TRUE', tuple()),
+        (reader and reader != settings.ANONYM_USER, f"""(p.everyone_can_read = TRUE
+                        or (u.id is not null and w.name = %s)
+                        or EXISTS(select 1
+                                  from {DB_SCHEMA}.rights r inner join
+                                       {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
+                                       {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
+                                  where r.id_publication = p.id
+                                    and r.type = 'read'
+                                    and w2.name = %s))""", (reader, reader,)),
+        (writer == settings.ANONYM_USER, 'p.everyone_can_write = TRUE', tuple()),
+        (writer and writer != settings.ANONYM_USER, f"""(p.everyone_can_write = TRUE
+                        or (u.id is not null and w.name = %s)
+                        or EXISTS(select 1
+                                  from {DB_SCHEMA}.rights r inner join
+                                       {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
+                                       {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
+                                  where r.id_publication = p.id
+                                    and r.type = 'write'
+                                    and w2.name = %s))""", (writer, writer,)),
+        (full_text_filter, 'to_tsvector(unaccent(p.title)) @@ to_tsquery(unaccent(%s))', (full_text_filter,)),
+    ]
+
+    order_by_definition = {
+        'full_text': ('ts_rank_cd(to_tsvector(unaccent(p.title)), to_tsquery(unaccent(%s))) DESC', (ordering_full_text,)),
+    }
+
+    assert all(ordering_item in order_by_definition.keys() for ordering_item in order_by_list)
+
+    #########################################################
+    # SELECT clause
+    select_clause = f"""
 select p.id as id_publication,
        w.name as workspace_name,
        p.type,
@@ -45,45 +84,40 @@ from {DB_SCHEMA}.workspaces w inner join
      {DB_SCHEMA}.publications p on p.id_workspace = w.id left join
      {DB_SCHEMA}.users u on u.id_workspace = w.id
 """
-    query_params = (ROLE_EVERYONE, ROLE_EVERYONE, )
-    where_parts = []
-    where_params_def = [(workspace_name, 'w.name = %s', (workspace_name, )),
-                        (pub_type, 'p.type = %s', (pub_type, )),
-                        (style_type, 'p.style_type::text = %s', (style_type, )),
-                        (reader == settings.ANONYM_USER, 'p.everyone_can_read = TRUE', tuple()),
-                        (reader and reader != settings.ANONYM_USER, f"""(p.everyone_can_read = TRUE
-                        or (u.id is not null and w.name = %s)
-                        or EXISTS(select 1
-                                  from {DB_SCHEMA}.rights r inner join
-                                       {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
-                                       {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
-                                  where r.id_publication = p.id
-                                    and r.type = 'read'
-                                    and w2.name = %s))""", (reader, reader,)),
-                        (writer == settings.ANONYM_USER, 'p.everyone_can_write = TRUE', tuple()),
-                        (writer and writer != settings.ANONYM_USER, f"""(p.everyone_can_write = TRUE
-                        or (u.id is not null and w.name = %s)
-                        or EXISTS(select 1
-                                  from {DB_SCHEMA}.rights r inner join
-                                       {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
-                                       {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
-                                  where r.id_publication = p.id
-                                    and r.type = 'write'
-                                    and w2.name = %s))""", (writer, writer,)),
-                        (full_text, 'to_tsvector(unaccent(p.title)) @@ to_tsquery(unaccent(%s))', (full_text, )),
-                        ]
+    select_params = (ROLE_EVERYONE, ROLE_EVERYONE, )
+
+    #########################################################
+    # WHERE clause
+    where_params = tuple()
+    where_parts = list()
     for (value, where_part, params, ) in where_params_def:
         if value:
             where_parts.append(where_part)
-            query_params = query_params + params
-
+            where_params = where_params + params
     where_clause = ''
     if where_parts:
         where_clause = 'WHERE ' + '\n  AND '.join(where_parts) + '\n'
 
-    order_by_clause = 'ORDER BY w.name ASC, p.name ASC\n'
-    select = sql_basic + where_clause + order_by_clause
-    values = util.run_query(select, query_params)
+    #########################################################
+    # ORDER BY clause
+    order_by_params = tuple()
+    order_by_parts = list()
+    for order_by_part in order_by_list:
+        order_by_parts.append(order_by_definition[order_by_part][0])
+        order_by_params = order_by_params + order_by_definition[order_by_part][1]
+
+    order_by_parts.append('w.name ASC')
+    order_by_parts.append('p.name ASC')
+    order_by_clause = 'ORDER BY ' + ', '.join(order_by_parts)
+
+    #########################################################
+    # Put it together
+    sql_params = select_params + where_params + order_by_params
+    select = select_clause + where_clause + order_by_clause
+    values = util.run_query(select, sql_params)
+
+    # print(f'get_publication_infos:\n\n order_by_clause={order_by_clause},\n where_clause={where_clause},\n sql_params={sql_params},'
+    #       f'\n order_by_list={order_by_list},\n full_text_ordering={full_text_ordering}')
 
     infos = {(workspace_name,
               type,
