@@ -34,7 +34,9 @@
 Get list of published layers.
 
 #### Request
-No action parameters.
+Query parameters:
+- *full_text_filter*: String. List of words separated by space. Only layers with at least one of them in title will be return. Search is case-insensitive, unaccent and did lemmatization for English. By default, layers are ordered by search rank in response if this filter is used.
+
 #### Response
 Content-Type: `application/json`
 
@@ -390,7 +392,9 @@ JSON object with one attribute:
 Get list of published maps (map compositions).
 
 #### Request
-No action parameters.
+Query parameters:
+- *full_text_filter*: String. List of words separated by space. Only maps with at least one of them in title will be return. Search is case-insensitive, unaccent and did lemmatization for English. By default, maps are ordered by search rank in response if this filter is used.
+
 #### Response
 Content-Type: `application/json`
 
