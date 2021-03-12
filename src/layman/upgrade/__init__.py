@@ -1,7 +1,7 @@
 import logging
 import psycopg2
 
-from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10
+from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12
 from layman import settings
 from layman.common.prime_db_schema import util as db_util
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -20,6 +20,8 @@ DATA_MIGRATIONS = [
                   upgrade_v1_10.migrate_input_sld_directory_to_input_style,
                   upgrade_v1_10.update_style_type_in_db,
                   ]),
+    ((1, 12, 0), [upgrade_v1_12.install_unaccent_to_db,
+                  ])
 ]
 
 
