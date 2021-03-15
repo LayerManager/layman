@@ -43,11 +43,11 @@ def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
                                   where r.id_publication = p.id
                                     and r.type = 'write'
                                     and w2.name = %s))""", (writer, writer,)),
-        (full_text_filter, 'to_tsvector(unaccent(p.title)) @@ to_tsquery(unaccent(%s))', (full_text_filter,)),
+        (full_text_filter, '_prime_schema.my_unaccent(p.title) @@ to_tsquery(unaccent(%s))', (full_text_filter,)),
     ]
 
     order_by_definition = {
-        'full_text': ('ts_rank_cd(to_tsvector(unaccent(p.title)), to_tsquery(unaccent(%s))) DESC', (ordering_full_text,)),
+        'full_text': ('ts_rank_cd(_prime_schema.my_unaccent(p.title), to_tsquery(unaccent(%s))) DESC', (ordering_full_text,)),
     }
 
     assert all(ordering_item in order_by_definition.keys() for ordering_item in order_by_list)
