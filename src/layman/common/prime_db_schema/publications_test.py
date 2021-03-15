@@ -244,6 +244,7 @@ class TestSelectPublicationsComplex:
         with app.app_context():
             infos = publications.get_publication_infos(**query_params)
         info_publications = list(infos.keys())
+        assert set(expected_publications) == set(info_publications)
         assert expected_publications == info_publications
 
 
