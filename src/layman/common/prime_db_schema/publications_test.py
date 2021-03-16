@@ -156,7 +156,7 @@ class TestSelectPublicationsComplex:
                             'write': settings.RIGHTS_EVERYONE_ROLE}, }),
         (workspace1, MAP_TYPE, 'test_select_publications_publication1o',
          {'headers': authn_headers_user1,
-          'title': 'kun Karel',
+          'title': 'Ďůlek kun Karel',
           'access_rights': {'read': workspace1,
                             'write': workspace1}, }),
         (workspace1, MAP_TYPE, 'test_select_publications_publication1oe',
@@ -237,6 +237,13 @@ class TestSelectPublicationsComplex:
             (workspace1, MAP_TYPE, 'test_select_publications_publication1o'),
             (workspace1, MAP_TYPE, 'test_select_publications_publication1e'),
             (workspace1, MAP_TYPE, 'test_select_publications_publication1oe'),
+        ]),
+        ({'order_by_list': ['title'], }, [
+            (workspace2, MAP_TYPE, 'test_select_publications_publication2o'),
+            (workspace1, MAP_TYPE, 'test_select_publications_publication1o'),
+            (workspace1, MAP_TYPE, 'test_select_publications_publication1oe'),
+            (workspace1, MAP_TYPE, 'test_select_publications_publication1e'),
+            (workspace2, MAP_TYPE, 'test_select_publications_publication2e'),
         ]),
     ])
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
