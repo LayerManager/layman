@@ -20,7 +20,7 @@ DATA_MIGRATIONS = [
                   upgrade_v1_10.migrate_input_sld_directory_to_input_style,
                   upgrade_v1_10.update_style_type_in_db,
                   ]),
-    ((1, 12, 0), [upgrade_v1_12.install_unaccent_to_db,
+    ((1, 12, 0), [upgrade_v1_12.adjust_prime_db_schema_for_fulltext_search,
                   ])
 ]
 
