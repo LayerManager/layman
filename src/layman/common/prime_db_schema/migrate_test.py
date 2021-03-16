@@ -28,8 +28,10 @@ def save_upgrade_status():
     with app.app_context():
         upgrade.upgrade_v1_9.initialize_data_versioning()
         upgrade.upgrade_v1_10.alter_schema()
-        upgrade.set_current_data_version(current_version)
+        upgrade.upgrade_v1_10.update_style_type_in_db()
         upgrade.upgrade_v1_12.install_unaccent_to_db()
+
+        upgrade.set_current_data_version(current_version)
 
 
 @pytest.fixture()
