@@ -4,6 +4,9 @@ import re
 from layman import settings, util as layman_util
 from layman.common.prime_db_schema import util as prime_db_schema_util
 from .util import PUBLICATION_NAME_ONLY_PATTERN
+from . import get_publications_consts as consts
+
+
 
 
 def _get_pub_type_pattern():
@@ -104,14 +107,14 @@ def setup_post_access_rights(request_form, kwargs, actor_name):
 def get_publications(publication_type, user, request_args):
 
     full_text_filter = None
-    if 'full_text_filter' in request_args:
-        full_text_filter = prime_db_schema_util.to_tsquery_string(request_args.get('full_text_filter')) or None
+    if consts.FILTER_FULL_TEXT in request_args:
+        full_text_filter = prime_db_schema_util.to_tsquery_string(request_args.get(consts.FILTER_FULL_TEXT)) or None
 
     order_by_list = []
     ordering_full_text = None
     if full_text_filter:
         ordering_full_text = full_text_filter
-        order_by_list = ['full_text']
+        order_by_list = [consts.ORDER_BY_FULL_TEXT]
 
     publication_infos_whole = layman_util.get_publication_infos(publ_type=publication_type,
                                                                 context={'actor_name': user,
