@@ -2,6 +2,7 @@ import logging
 import psycopg2.extras
 
 from . import util, workspaces, users, rights
+from layman.common import get_publications_consts as consts
 from layman import settings, LaymanError
 
 logger = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
     ]
 
     order_by_definition = {
-        'full_text': ('ts_rank_cd(_prime_schema.my_unaccent(p.title), to_tsquery(unaccent(%s))) DESC', (ordering_full_text,)),
+        consts.ORDER_BY_FULL_TEXT: ('ts_rank_cd(_prime_schema.my_unaccent(p.title), to_tsquery(unaccent(%s))) DESC', (ordering_full_text,)),
     }
 
     assert all(ordering_item in order_by_definition.keys() for ordering_item in order_by_list)
