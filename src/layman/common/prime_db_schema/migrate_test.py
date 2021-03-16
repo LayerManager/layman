@@ -29,7 +29,7 @@ def save_upgrade_status():
         upgrade.upgrade_v1_9.initialize_data_versioning()
         upgrade.upgrade_v1_10.alter_schema()
         upgrade.upgrade_v1_10.update_style_type_in_db()
-        upgrade.upgrade_v1_12.install_unaccent_to_db()
+        upgrade.upgrade_v1_12.adjust_prime_db_schema_for_fulltext_search()
 
         upgrade.set_current_data_version(current_version)
 
