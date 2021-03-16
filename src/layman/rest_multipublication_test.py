@@ -1,5 +1,5 @@
 import pytest
-from layman import settings
+from layman import settings, LaymanError
 from test import process_client
 
 
@@ -118,6 +118,10 @@ class TestGetPublications:
         (authn_headers_user2, {'full_text_filter': 'workspace publication'}, [
             (workspace1, 'test_get_publications_publication1e'),
         ],),
+        (authn_headers_user2, {'order_by': 'title'}, [(workspace2, 'test_get_publications_publication2o'),
+                                                      (workspace1, 'test_get_publications_publication1e'),
+                                                      (workspace2, 'test_get_publications_publication2e'),
+                                                      ],),
     ])
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
@@ -126,3 +130,18 @@ class TestGetPublications:
         info_publications = [(info['workspace'], info['name']) for info in infos]
         assert set(expected_publications) == set(info_publications)
         assert expected_publications == info_publications
+
+
+@pytest.mark.parametrize('query_params, error_code, error_specification,', [
+    ({'order_by': 'gdasfda'}, (2, 400), {'parameter': 'order_by'}),
+    ({'order_by': 'full_text'}, (48, 400), dict()),
+])
+@pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
+@pytest.mark.usefixtures('ensure_layman', )
+def test_get_publications_errors(publication_type, query_params, error_code, error_specification):
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.get_publications(publication_type, query_params=query_params)
+    assert exc_info.value.code == error_code[0]
+    assert exc_info.value.http_code == error_code[1]
+    for key, value in error_specification.items():
+        assert exc_info.value.data[key] == value, (exc_info, error_specification)

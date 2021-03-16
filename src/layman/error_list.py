@@ -48,4 +48,5 @@ ERROR_LIST = {
     45: (400, 'Workspace ended with reserved suffix.'),
     46: (400, 'Unknown style file. Can recognize only SLD and QML files.'),
     47: (400, 'Error in QML'),
+    48: (400, 'Wrong combination of parameters'),
 }

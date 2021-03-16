@@ -1,12 +1,10 @@
 from flask import jsonify
 import re
 
-from layman import settings, util as layman_util
+from layman import settings, util as layman_util, LaymanError
 from layman.common.prime_db_schema import util as prime_db_schema_util
 from .util import PUBLICATION_NAME_ONLY_PATTERN
 from . import get_publications_consts as consts
-
-
 
 
 def _get_pub_type_pattern():
@@ -80,7 +78,7 @@ def parse_request_path(request_path):
         workspace = None
         publication_type = None
         publication_name = None
-    return (workspace, publication_type, publication_name)
+    return workspace, publication_type, publication_name
 
 
 def setup_patch_access_rights(request_form, kwargs):
@@ -105,16 +103,29 @@ def setup_post_access_rights(request_form, kwargs, actor_name):
 
 
 def get_publications(publication_type, user, request_args):
+    known_order_by_values = [consts.ORDER_BY_TITLE, consts.ORDER_BY_FULL_TEXT, ]
 
     full_text_filter = None
     if consts.FILTER_FULL_TEXT in request_args:
         full_text_filter = prime_db_schema_util.to_tsquery_string(request_args.get(consts.FILTER_FULL_TEXT)) or None
 
     order_by_list = []
+    order_by_value = request_args.get(consts.ORDER_BY_PARAM)
+    if order_by_value:
+        if order_by_value not in known_order_by_values:
+            raise LaymanError(2, {'parameter': consts.ORDER_BY_PARAM, 'supported_values': known_order_by_values})
+
+        if order_by_value == consts.ORDER_BY_FULL_TEXT and not full_text_filter:
+            raise LaymanError(48, f'Value "{consts.ORDER_BY_FULL_TEXT}" of parameter "{consts.ORDER_BY_PARAM}" can be '
+                                  f'used only if "{consts.FILTER_FULL_TEXT}" parameter is set.')
+
+        order_by_list.append(order_by_value)
+
     ordering_full_text = None
-    if full_text_filter:
-        ordering_full_text = full_text_filter
-        order_by_list = [consts.ORDER_BY_FULL_TEXT]
+    if not order_by_list:
+        if full_text_filter:
+            ordering_full_text = full_text_filter
+            order_by_list = [consts.ORDER_BY_FULL_TEXT]
 
     publication_infos_whole = layman_util.get_publication_infos(publ_type=publication_type,
                                                                 context={'actor_name': user,
