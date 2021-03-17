@@ -39,6 +39,7 @@ Query parameters:
 - *order_by*: String. Can be one of these values:
   - `full_text` Publications will be ordered by results of full-text search. Can be used only in combination with *full_text_filter*.
   - `title` Publications will be ordered lexicographically by title value.
+  - `last_change` Publications will be ordered by time of last change. Recently updated publications will be first.
 
 #### Response
 Content-Type: `application/json`
@@ -400,6 +401,7 @@ Query parameters:
 - *order_by*: String. Can be one of these values:
   - `full_text` Publications will be ordered by results of full-text search. Can be used only in combination with *full_text_filter*.
   - `title` Publications will be ordered lexicographically by title value.
+  - `last_change` Publications will be ordered by time of last change. Recently updated publications will be first.
 
 #### Response
 Content-Type: `application/json`
