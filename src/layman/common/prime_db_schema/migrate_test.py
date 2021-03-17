@@ -6,7 +6,6 @@ from test import process_client
 from layman import settings, app, util, upgrade
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
-from layman import upgrade
 from . import model, publications as pub_util, workspaces as workspaces_util
 from .schema_initialization import ensure_schema
 from .util import run_query, run_statement
@@ -30,6 +29,7 @@ def save_upgrade_status():
         upgrade.upgrade_v1_10.alter_schema()
         upgrade.upgrade_v1_10.update_style_type_in_db()
         upgrade.upgrade_v1_12.adjust_prime_db_schema_for_fulltext_search()
+        upgrade.upgrade_v1_12.adjust_prime_db_schema_for_last_change_search()
 
         upgrade.set_current_data_version(current_version)
 

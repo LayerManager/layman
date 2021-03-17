@@ -21,6 +21,7 @@ DATA_MIGRATIONS = [
                   upgrade_v1_10.update_style_type_in_db,
                   ]),
     ((1, 12, 0), [upgrade_v1_12.adjust_prime_db_schema_for_fulltext_search,
+                  upgrade_v1_12.adjust_prime_db_schema_for_last_change_search,
                   ])
 ]
 
