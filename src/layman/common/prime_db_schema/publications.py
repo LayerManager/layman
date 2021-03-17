@@ -224,8 +224,8 @@ def insert_publication(workspace_name, info):
     check_publication_info(workspace_name, info)
 
     insert_publications_sql = f'''insert into {DB_SCHEMA}.publications as p
-        (id_workspace, name, title, type, uuid, style_type, everyone_can_read, everyone_can_write) values
-        (%s, %s, %s, %s, %s, %s, %s, %s)
+        (id_workspace, name, title, type, uuid, style_type, everyone_can_read, everyone_can_write, updated_at) values
+        (%s, %s, %s, %s, %s, %s, %s, %s,  current_timestamp)
 returning id
 ;'''
 
@@ -286,7 +286,8 @@ def update_publication(workspace_name, info):
     title = coalesce(%s, title),
     style_type = coalesce(%s, style_type),
     everyone_can_read = coalesce(%s, everyone_can_read),
-    everyone_can_write = coalesce(%s, everyone_can_write)
+    everyone_can_write = coalesce(%s, everyone_can_write),
+    updated_at =  current_timestamp
 where id_workspace = %s
   and name = %s
   and type = %s

@@ -6,6 +6,7 @@
 
 ### Migrations and checks
 - [#257](https://github.com/jirik/layman/issues/257) Adjust prime DB schema for full-text filtering (install [unaccent](https://www.postgresql.org/docs/10/unaccent.html), create immutable `my_unaccent` function, index unaccented `title` column in `publications` table).
+- [#257](https://github.com/jirik/layman/issues/257) Adjust prime DB schema for ordering by last change (create and fill column `updated_at` in `publications` table).
 
 ### Changes
 - [#257](https://github.com/jirik/layman/issues/257) Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Maps](doc/rest.md#get-maps) can filter and reorder results according to new query parameters. 
