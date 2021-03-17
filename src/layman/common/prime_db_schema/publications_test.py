@@ -274,19 +274,19 @@ def test_only_valid_names():
 
         with pytest.raises(LaymanError) as exc_info:
             publications.only_valid_names({username, workspace_name})
-            assert exc_info.value.code == 43
+        assert exc_info.value.code == 43
 
         with pytest.raises(LaymanError) as exc_info:
             publications.only_valid_names({workspace_name, username})
-            assert exc_info.value.code == 43
+        assert exc_info.value.code == 43
 
         with pytest.raises(LaymanError) as exc_info:
             publications.only_valid_names({workspace_name, settings.RIGHTS_EVERYONE_ROLE, })
-            assert exc_info.value.code == 43
+        assert exc_info.value.code == 43
 
         with pytest.raises(LaymanError) as exc_info:
             publications.only_valid_names({settings.RIGHTS_EVERYONE_ROLE, 'skaljgdalskfglshfgd', })
-            assert exc_info.value.code == 43
+        assert exc_info.value.code == 43
 
         users.delete_user(username)
         workspaces.delete_workspace(workspace_name)
@@ -304,7 +304,7 @@ def test_at_least_one_can_write():
 
     with pytest.raises(LaymanError) as exc_info:
         publications.at_least_one_can_write(set())
-        assert exc_info.value.code == 43
+    assert exc_info.value.code == 43
 
 
 def test_who_can_write_can_read():
@@ -325,23 +325,23 @@ def test_who_can_write_can_read():
 
     with pytest.raises(LaymanError) as exc_info:
         publications.who_can_write_can_read(set(), {workspace_name, })
-        assert exc_info.value.code == 43
+    assert exc_info.value.code == 43
 
     with pytest.raises(LaymanError) as exc_info:
         publications.who_can_write_can_read(set(), {username, })
-        assert exc_info.value.code == 43
+    assert exc_info.value.code == 43
 
     with pytest.raises(LaymanError) as exc_info:
         publications.who_can_write_can_read(set(), {settings.RIGHTS_EVERYONE_ROLE, })
-        assert exc_info.value.code == 43
+    assert exc_info.value.code == 43
 
     with pytest.raises(LaymanError) as exc_info:
         publications.who_can_write_can_read(username, {settings.RIGHTS_EVERYONE_ROLE, })
-        assert exc_info.value.code == 43
+    assert exc_info.value.code == 43
 
     with pytest.raises(LaymanError) as exc_info:
         publications.who_can_write_can_read(username, {workspace_name, })
-        assert exc_info.value.code == 43
+    assert exc_info.value.code == 43
 
 
 def test_i_can_still_write():
@@ -356,19 +356,19 @@ def test_i_can_still_write():
 
     with pytest.raises(LaymanError) as exc_info:
         publications.i_can_still_write(None, set())
-        assert exc_info.value.code == 43
+    assert exc_info.value.code == 43
 
     with pytest.raises(LaymanError) as exc_info:
         publications.i_can_still_write(None, {workspace_name, })
-        assert exc_info.value.code == 43
+    assert exc_info.value.code == 43
 
     with pytest.raises(LaymanError) as exc_info:
         publications.i_can_still_write(username, set())
-        assert exc_info.value.code == 43
+    assert exc_info.value.code == 43
 
     with pytest.raises(LaymanError) as exc_info:
         publications.i_can_still_write(username, {workspace_name, })
-        assert exc_info.value.code == 43
+    assert exc_info.value.code == 43
 
 
 def test_owner_can_still_write():
@@ -384,11 +384,11 @@ def test_owner_can_still_write():
 
     with pytest.raises(LaymanError) as exc_info:
         publications.owner_can_still_write(username, set())
-        assert exc_info.value.code == 43
+    assert exc_info.value.code == 43
 
     with pytest.raises(LaymanError) as exc_info:
         publications.owner_can_still_write(username, {workspace_name, })
-        assert exc_info.value.code == 43
+    assert exc_info.value.code == 43
 
 
 def test_clear_roles():
@@ -649,7 +649,7 @@ def test_update_rights():
                                     [username, username2, ],
                                     [username, username2, ],
                                     )
-            assert exc_info.value.code == 43
+        assert exc_info.value.code == 43
 
         with pytest.raises(LaymanError) as exc_info:
             case_test_update_rights(username,
@@ -660,7 +660,7 @@ def test_update_rights():
                                     [username, username2, ],
                                     [username, username2, ],
                                     )
-            assert exc_info.value.code == 43
+        assert exc_info.value.code == 43
 
         with pytest.raises(LaymanError) as exc_info:
             case_test_update_rights(username,
@@ -671,7 +671,7 @@ def test_update_rights():
                                     [username, username2, ],
                                     [username, username2, ],
                                     )
-            assert exc_info.value.code == 43
+        assert exc_info.value.code == 43
 
         case_test_update_rights(username,
                                 publication_insert_info,
@@ -691,7 +691,7 @@ def test_update_rights():
                                     [username, username2, ],
                                     [username, username2, username2, ],
                                     )
-            assert exc_info.value.code == 43
+        assert exc_info.value.code == 43
 
         with pytest.raises(LaymanError) as exc_info:
             case_test_update_rights(username,
@@ -702,7 +702,7 @@ def test_update_rights():
                                     [username, username2, ],
                                     [settings.RIGHTS_EVERYONE_ROLE, ],
                                     )
-            assert exc_info.value.code == 43
+        assert exc_info.value.code == 43
 
         publications.delete_publication(username, publication_insert_info["publ_type_name"], publication_insert_info["name"])
         users.delete_user(username)
