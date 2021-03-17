@@ -50,6 +50,7 @@ def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
     order_by_definition = {
         consts.ORDER_BY_FULL_TEXT: ('ts_rank_cd(_prime_schema.my_unaccent(p.title), to_tsquery(unaccent(%s))) DESC', (ordering_full_text,)),
         consts.ORDER_BY_TITLE: ('unaccent(p.title) ASC', tuple()),
+        consts.ORDER_BY_LAST_CHANGE: ('updated_at DESC', tuple()),
     }
 
     assert all(ordering_item in order_by_definition.keys() for ordering_item in order_by_list)

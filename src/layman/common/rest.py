@@ -103,7 +103,7 @@ def setup_post_access_rights(request_form, kwargs, actor_name):
 
 
 def get_publications(publication_type, user, request_args):
-    known_order_by_values = [consts.ORDER_BY_TITLE, consts.ORDER_BY_FULL_TEXT, ]
+    known_order_by_values = [consts.ORDER_BY_TITLE, consts.ORDER_BY_FULL_TEXT, consts.ORDER_BY_LAST_CHANGE, ]
 
     full_text_filter = None
     if consts.FILTER_FULL_TEXT in request_args:

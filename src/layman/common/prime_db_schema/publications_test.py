@@ -245,6 +245,13 @@ class TestSelectPublicationsComplex:
             (workspace1, MAP_TYPE, 'test_select_publications_publication1e'),
             (workspace2, MAP_TYPE, 'test_select_publications_publication2e'),
         ]),
+        ({'order_by_list': ['last_change'], }, [
+            (workspace2, MAP_TYPE, 'test_select_publications_publication2o'),
+            (workspace2, MAP_TYPE, 'test_select_publications_publication2e'),
+            (workspace1, MAP_TYPE, 'test_select_publications_publication1oe'),
+            (workspace1, MAP_TYPE, 'test_select_publications_publication1o'),
+            (workspace1, MAP_TYPE, 'test_select_publications_publication1e'),
+        ]),
     ])
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
     def test_get_publications(self, query_params, expected_publications):

@@ -122,6 +122,10 @@ class TestGetPublications:
                                                       (workspace1, 'test_get_publications_publication1e'),
                                                       (workspace2, 'test_get_publications_publication2e'),
                                                       ],),
+        (authn_headers_user2, {'order_by': 'last_change'}, [(workspace2, 'test_get_publications_publication2o'),
+                                                            (workspace2, 'test_get_publications_publication2e'),
+                                                            (workspace1, 'test_get_publications_publication1e'),
+                                                            ],),
     ])
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
