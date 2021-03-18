@@ -23,6 +23,8 @@ from layman.map.micka import csw as map_csw
 
 logger = logging.getLogger(__name__)
 
+db_schema = settings.LAYMAN_PRIME_SCHEMA
+
 
 def alter_schema():
     logger.info(f'    Starting - alter DB prime schema')
@@ -66,8 +68,20 @@ def check_workspace_names():
 
 def migrate_layers_to_wms_workspace(workspace=None):
     logger.info(f'    Starting - migrate layers to WMS workspace')
-    infos = util.get_publication_infos(publ_type=LAYER_TYPE, workspace=workspace)
-    for (workspace, publication_type, layer) in infos.keys():
+    query = f'''
+select  w.name,
+        p.type,
+        p.name
+from {db_schema}.publications p inner join
+     {db_schema}.workspaces w on w.id = p.id_workspace
+where p.type = %s
+'''
+    params = (LAYER_TYPE, )
+    if workspace:
+        query = query + '  AND w.name = %s'
+        params = params + (workspace, )
+    publications = db_util.run_query(query, params)
+    for (workspace, publication_type, layer) in publications:
         logger.info(f'      Migrate layer {workspace}.{layer}')
         info = util.get_publication_info(workspace, publication_type, layer)
         geoserver_workspace = wms.get_geoserver_workspace(workspace)
@@ -113,12 +127,20 @@ def migrate_layers_to_wms_workspace(workspace=None):
 
 def migrate_maps_on_wms_workspace():
     logger.info(f'    Starting - migrate maps json urls')
-    infos = util.get_publication_infos(publ_type=MAP_TYPE)
+    query = f'''
+    select  w.name,
+            p.name
+    from {db_schema}.publications p inner join
+         {db_schema}.workspaces w on w.id = p.id_workspace
+    where p.type = %s
+    '''
+    params = (MAP_TYPE,)
+    publications = db_util.run_query(query, params)
     gs_url = gs_util.get_gs_proxy_base_url()
     gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
     gs_wms_url_pattern = r'^' + re.escape(gs_url) + r'(' + util.USERNAME_ONLY_PATTERN + r')' + r'(/(?:ows|wms|wfs).*)$'
     all_workspaces = workspaces.get_workspace_names()
-    for (workspace, _, map) in infos.keys():
+    for (workspace, map) in publications:
         file_path = input_file.get_map_file(workspace, map)
         is_changed = False
         with open(file_path, 'r') as map_file:
@@ -150,8 +172,19 @@ def migrate_maps_on_wms_workspace():
 
 def migrate_metadata_records(workspace=None):
     logger.info(f'    Starting - migrate publication metadata records')
-    infos = util.get_publication_infos(publ_type=LAYER_TYPE, workspace=workspace)
-    for (workspace, _, layer) in infos.keys():
+    query = f'''
+    select  w.name,
+            p.name
+    from {db_schema}.publications p inner join
+         {db_schema}.workspaces w on w.id = p.id_workspace
+    where p.type = %s
+    '''
+    params = (LAYER_TYPE,)
+    if workspace:
+        query = query + '  AND w.name = %s'
+        params = params + (workspace,)
+    publications = db_util.run_query(query, params)
+    for (workspace, layer) in publications:
         wms.clear_cache(workspace)
         logger.info(f'      Migrate layer {workspace}.{layer}')
         try:
@@ -168,8 +201,19 @@ def migrate_metadata_records(workspace=None):
                     f'        WMS URL was not migrated (should be {exp_wms_url}, but is {md_wms_url})!')
         time.sleep(0.5)
 
-    infos = util.get_publication_infos(publ_type=MAP_TYPE, workspace=workspace)
-    for (workspace, _, map) in infos.keys():
+    query = f'''
+    select  w.name,
+            p.name
+    from {db_schema}.publications p inner join
+         {db_schema}.workspaces w on w.id = p.id_workspace
+    where p.type = %s
+    '''
+    params = (MAP_TYPE,)
+    if workspace:
+        query = query + '  AND w.name = %s'
+        params = params + (workspace,)
+    publications = db_util.run_query(query, params)
+    for (workspace, map) in publications:
         logger.info(f'      Migrate map {workspace}.{map}')
         try:
             muuid = map_csw.patch_map(workspace, map, ['graphic_url', 'identifier', 'map_endpoint', 'map_file_endpoint', ],
@@ -189,8 +233,16 @@ def migrate_metadata_records(workspace=None):
 
 def migrate_input_sld_directory_to_input_style():
     logger.info(f'    Starting - migrate input_sld directories to input_style')
-    infos = util.get_publication_infos(publ_type=LAYER_TYPE)
-    for (workspace, _, layer) in infos.keys():
+    query = f'''
+    select  w.name,
+            p.name
+    from {db_schema}.publications p inner join
+         {db_schema}.workspaces w on w.id = p.id_workspace
+    where p.type = %s
+    '''
+    params = (LAYER_TYPE,)
+    publications = db_util.run_query(query, params)
+    for (workspace, layer) in publications:
         sld_path = os.path.join(layer_fs_util.get_layer_dir(workspace, layer),
                                 'input_sld')
         if os.path.exists(sld_path):
