@@ -22,4 +22,4 @@ def get():
     app.logger.info(f"GET Maps, user={g.user}")
 
     user = get_authn_username() or settings.ANONYM_USER
-    return rest_common.get_publications(MAP_TYPE, user, request.args)
+    return rest_common.get_publications(MAP_TYPE, user, request_args=request.args)

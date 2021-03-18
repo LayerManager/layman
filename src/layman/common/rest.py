@@ -102,7 +102,8 @@ def setup_post_access_rights(request_form, kwargs, actor_name):
         kwargs['access_rights'][type] = access_rights
 
 
-def get_publications(publication_type, user, request_args):
+def get_publications(publication_type, user, request_args=None):
+    request_args = request_args or {}
     known_order_by_values = [consts.ORDER_BY_TITLE, consts.ORDER_BY_FULL_TEXT, consts.ORDER_BY_LAST_CHANGE, ]
 
     full_text_filter = None
