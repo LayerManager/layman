@@ -20,4 +20,5 @@ def clear_publication_info(info):
             del info[key]
         except KeyError:
             pass
+    info['updated_at'] = info['updated_at'].isoformat()
     return info

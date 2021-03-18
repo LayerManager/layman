@@ -233,6 +233,8 @@ def test_get_publication_infos(publication_type):
         for publication_name in publication_infos:
             if publication_infos[publication_name].get('id'):
                 del publication_infos[publication_name]['id']
+            if publication_infos[publication_name].get('updated_at'):
+                del publication_infos[publication_name]['updated_at']
         assert publication_infos == expected_result, (publication_infos, expected_result)
 
     process_client.delete_workspace_publication(publication_type, workspace, publication)

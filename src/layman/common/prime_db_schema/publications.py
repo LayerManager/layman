@@ -65,6 +65,7 @@ select p.id as id_publication,
        p.title,
        p.uuid::text,
        p.style_type,
+       p.updated_at,
        (select rtrim(concat(case when u.id is not null then w.name || ',' end,
                             string_agg(w2.name, ',') || ',',
                             case when p.everyone_can_read then %s || ',' end
@@ -130,10 +131,11 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'uuid': uuid,
                                    'type': type,
                                    'style_type': style_type,
+                                   'updated_at': updated_at,
                                    'access_rights': {'read': [x for x in can_read_users.split(',')],
                                                      'write': [x for x in can_write_users.split(',')]}
                                    }
-             for id_publication, workspace_name, type, publication_name, title, uuid, style_type, can_read_users, can_write_users
+             for id_publication, workspace_name, type, publication_name, title, uuid, style_type, updated_at, can_read_users, can_write_users
              in values}
     return infos
 

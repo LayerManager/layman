@@ -1,5 +1,6 @@
 import pytest
 import datetime
+from dateutil.parser import parse
 
 from test import process_client
 from layman import LaymanError, settings, app
@@ -133,8 +134,13 @@ def test_updated_at(publication_type):
     with app.app_context():
         results = db_util.run_query(query, (workspace, publication_type, publication))
     assert len(results) == 1 and len(results[0]) == 1, results
-    updated_at = results[0][0]
-    assert timestamp1 < updated_at < timestamp2
+    updated_at_db = results[0][0]
+    assert timestamp1 < updated_at_db < timestamp2
+
+    info = process_client.get_workspace_publication(publication_type, workspace, publication)
+    updated_at_rest_str = info['updated_at']
+    updated_at_rest = parse(updated_at_rest_str)
+    assert timestamp1 < updated_at_rest < timestamp2
 
     timestamp3 = datetime.datetime.now(datetime.timezone.utc)
     process_client.patch_workspace_publication(publication_type, workspace, publication, title='Title')
@@ -143,6 +149,12 @@ def test_updated_at(publication_type):
     with app.app_context():
         results = db_util.run_query(query, (workspace, publication_type, publication))
     assert len(results) == 1 and len(results[0]) == 1, results
-    updated_at = results[0][0]
-    assert timestamp3 < updated_at < timestamp4
+    updated_at_db = results[0][0]
+    assert timestamp3 < updated_at_db < timestamp4
 
+    info = process_client.get_workspace_publication(publication_type, workspace, publication)
+    updated_at_rest_str = info['updated_at']
+    updated_at_rest = parse(updated_at_rest_str)
+    assert timestamp3 < updated_at_rest < timestamp4
+
+    process_client.delete_workspace_publication(publication_type, workspace, publication)

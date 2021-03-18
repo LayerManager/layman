@@ -9,7 +9,8 @@
 - [#257](https://github.com/jirik/layman/issues/257) Adjust prime DB schema for ordering by last change (create and fill column `updated_at` in `publications` table).
 
 ### Changes
-- [#257](https://github.com/jirik/layman/issues/257) Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Maps](doc/rest.md#get-maps) can filter and reorder results according to new query parameters. 
+- [#257](https://github.com/jirik/layman/issues/257) Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Maps](doc/rest.md#get-maps) can filter and reorder results according to new query parameters.
+- [#257](https://github.com/jirik/layman/issues/257) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layer), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-map), [GET Workspace Map](doc/rest.md#get-workspace-map), and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) contains new attribute `updated_at` with date and time of last PATCH/POST request to given publication.
 
 ## v1.11.0
  2021-03-16
