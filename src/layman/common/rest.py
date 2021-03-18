@@ -144,6 +144,7 @@ def get_publications(publication_type, user, request_args):
             'url': layman_util.get_workspace_publication_url(publication_type, workspace, name),
             'uuid': info["uuid"],
             'access_rights': info['access_rights'],
+            'updated_at': info['updated_at'].isoformat(),
         }
         for (workspace, _, name), info in publication_infos_whole.items()
     ]

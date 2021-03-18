@@ -50,6 +50,7 @@ JSON array of objects representing available layers with following structure:
 - **title**: String. Title of the layer.
 - **uuid**: String. UUID of the layer.
 - **url**: String. URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
+- **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
@@ -72,6 +73,7 @@ JSON array of objects representing available layers with following structure:
 - **title**: String. Title of the layer.
 - **uuid**: String. UUID of the layer.
 - **url**: String. URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
+- **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
@@ -196,6 +198,7 @@ JSON object with following structure:
 - **url**: String. URL pointing to this endpoint.
 - **title**: String.
 - **description**: String.
+- **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
 - **wms**
   - *url*: String. URL of WMS endpoint. It points to WMS endpoint of appropriate GeoServer workspace.
   - *status*: Status information about GeoServer import and availability of WMS layer. No status object means the source is available. Usual state values are
@@ -412,6 +415,7 @@ JSON array of objects representing available maps with following structure:
 - **title**: String. Title of the map.
 - **uuid**: String. UUID of the map.
 - **url**: String. URL of the map. It points to [GET Workspace Map](#get-workspace-map).
+- **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
@@ -435,6 +439,7 @@ JSON array of objects representing available maps with following structure:
 - **title**: String. Title of the map.
 - **uuid**: String. UUID of the map.
 - **url**: String. URL of the map. It points to [GET Workspace Map](#get-workspace-map).
+- **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
@@ -527,6 +532,7 @@ JSON object with following structure:
 - **url**: String. URL pointing to this endpoint.
 - **title**: String. Taken from `title` attribute of JSON root object
 - **description**: String. Taken from `abstract` attribute of JSON root object.
+- **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
 - **file**
   - *url*: String. URL of map-composition JSON file. It points to [GET Workspace Map File](#get-workspace-map-file).
   - *path*: String. Path to map-composition JSON file, relative to workspace directory.

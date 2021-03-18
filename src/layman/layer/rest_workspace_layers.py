@@ -41,6 +41,7 @@ def get(username):
             'title': info.get("title", None),
             'url': url_for('rest_workspace_layer.get', layername=name, username=username),
             'uuid': info["uuid"],
+            'updated_at': info['updated_at'].isoformat(),
             'access_rights': info['access_rights'],
         }
         for (workspace, publication_type, name), info in layer_infos_whole.items()
