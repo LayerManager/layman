@@ -102,7 +102,7 @@ def setup_post_access_rights(request_form, kwargs, actor_name):
         kwargs['access_rights'][type] = access_rights
 
 
-def get_publications(publication_type, user, request_args=None):
+def get_publications(publication_type, user, request_args=None, workspace=None):
     request_args = request_args or {}
     known_order_by_values = [consts.ORDER_BY_TITLE, consts.ORDER_BY_FULL_TEXT, consts.ORDER_BY_LAST_CHANGE, ]
 
@@ -129,6 +129,7 @@ def get_publications(publication_type, user, request_args=None):
             order_by_list = [consts.ORDER_BY_FULL_TEXT]
 
     publication_infos_whole = layman_util.get_publication_infos(publ_type=publication_type,
+                                                                workspace=workspace,
                                                                 context={'actor_name': user,
                                                                          'access_type': 'read'
                                                                          },

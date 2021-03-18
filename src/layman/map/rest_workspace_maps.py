@@ -9,10 +9,10 @@ from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
 from . import util, MAP_TYPE, MAP_REST_PATH_NAME
 from .filesystem import input_file, uuid
-from layman import authn, util as layman_util
-from layman.authn import authenticate
+from layman import authn, util as layman_util, settings
+from layman.authn import authenticate, get_authn_username
 from layman.authz import authorize_workspace_publications_decorator
-from layman.common import redis as redis_util
+from layman.common import redis as redis_util, rest as rest_common
 
 bp = Blueprint('rest_workspace_maps', __name__)
 
@@ -35,22 +35,8 @@ def after_request(response):
 def get(username):
     app.logger.info(f"GET Maps, user={g.user}")
 
-    mapinfos_whole = layman_util.get_publication_infos(username, MAP_TYPE)
-
-    infos = [
-        {
-            'name': info["name"],
-            'workspace': workspace,
-            'title': info.get("title", None),
-            'url': url_for('rest_workspace_map.get', mapname=name, username=username),
-            'uuid': info['uuid'],
-            'updated_at': info['updated_at'].isoformat(),
-            'access_rights': info['access_rights'],
-        }
-        for (workspace, publication_type, name), info in mapinfos_whole.items()
-    ]
-    sorted_infos = sorted(infos, key=lambda x: x['name'])
-    return jsonify(sorted_infos), 200
+    user = get_authn_username() or settings.ANONYM_USER
+    return rest_common.get_publications(MAP_TYPE, user, workspace=username)
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}", methods=['POST'])

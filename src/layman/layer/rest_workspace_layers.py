@@ -7,9 +7,9 @@ from layman.util import check_username_decorator, url_for
 from layman import settings, authn, util as layman_util
 from . import util, LAYER_TYPE, LAYER_REST_PATH_NAME
 from .filesystem import input_file, input_style, input_chunk, uuid
-from layman.authn import authenticate
+from layman.authn import authenticate, get_authn_username
 from layman.authz import authorize_workspace_publications_decorator
-from layman.common import redis as redis_util
+from layman.common import redis as redis_util, rest as rest_common
 
 bp = Blueprint('rest_workspace_layers', __name__)
 
@@ -32,22 +32,8 @@ def after_request(response):
 def get(username):
     app.logger.info(f"GET Layers, user={g.user}")
 
-    layer_infos_whole = layman_util.get_publication_infos(username, LAYER_TYPE)
-
-    infos = [
-        {
-            'name': info["name"],
-            'workspace': workspace,
-            'title': info.get("title", None),
-            'url': url_for('rest_workspace_layer.get', layername=name, username=username),
-            'uuid': info["uuid"],
-            'updated_at': info['updated_at'].isoformat(),
-            'access_rights': info['access_rights'],
-        }
-        for (workspace, publication_type, name), info in layer_infos_whole.items()
-    ]
-    sorted_infos = sorted(infos, key=lambda x: x['name'])
-    return jsonify(sorted_infos), 200
+    user = get_authn_username() or settings.ANONYM_USER
+    return rest_common.get_publications(LAYER_TYPE, user, workspace=username)
 
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}", methods=['POST'])
