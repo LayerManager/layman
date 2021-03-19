@@ -50,17 +50,18 @@ def get_layer_info(username, layername):
     main_filename = get_main_file_name(filenames)
     if main_filename is not None:
         main_filename = os.path.relpath(main_filename, common_util.get_user_dir(username))
-        return {
+        result = {
             'file': {
                 'path': main_filename
             }
         }
     elif os.path.exists(util.get_layer_dir(username, layername)):
-        return {
+        result = {
             'name': layername
         }
     else:
-        return {}
+        result = {}
+    return result
 
 
 from . import uuid

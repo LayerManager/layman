@@ -381,8 +381,7 @@ def delete_workspace_style(geoserver_workspace, stylename, auth=None):
     r = get_workspace_style_response(geoserver_workspace, stylename, auth=auth)
     if r.status_code == 404:
         return {}
-    else:
-        r.raise_for_status()
+    r.raise_for_status()
     sld_stream = io.BytesIO(r.content)
 
     style_url = get_workspace_style_url(geoserver_workspace, stylename)
@@ -397,8 +396,7 @@ def delete_workspace_style(geoserver_workspace, stylename, auth=None):
                         )
     if r.status_code == 404:
         return {}
-    else:
-        r.raise_for_status()
+    r.raise_for_status()
     return sld_stream
 
 

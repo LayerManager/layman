@@ -368,10 +368,9 @@ def csw_delete(muuid):
     if root_el.tag == nspath_eval('ows:ExceptionReport', NAMESPACES):
         if is_record_does_not_exist_exception(root_el):
             return
-        else:
-            raise LaymanError(37, data={
-                'response': r.text
-            })
+        raise LaymanError(37, data={
+            'response': r.text
+        })
     assert root_el.tag == nspath_eval('csw:TransactionResponse', NAMESPACES), r.content
     assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalDeleted', NAMESPACES)).text == "1", r.content
 

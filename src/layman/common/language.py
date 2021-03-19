@@ -220,8 +220,7 @@ def get_languages_by_script(text):
     maxchar = max(text)
     if u'\u0400' <= maxchar <= u'\u04ff':
         return ['ru']
-    else:
-        return []
+    return []
 
 
 def get_languages_cld2(text):

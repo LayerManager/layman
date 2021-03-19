@@ -45,25 +45,23 @@ def get_layer_info(workspace, layername):
                 'comparison_url': url_for('rest_workspace_layer_metadata_comparison.get', username=workspace, layername=layername),
             }
         }
-    else:
-        return {}
+    return {}
 
 
 def patch_layer(workspace, layername, metadata_properties_to_refresh, actor_name=None, create_if_not_exists=True, timeout=5):
     # current_app.logger.info(f"patch_layer metadata_properties_to_refresh={metadata_properties_to_refresh}")
     if len(metadata_properties_to_refresh) == 0:
-        return {}
+        return None
     uuid = get_layer_uuid(workspace, layername)
     csw = common_util.create_csw()
     if uuid is None or csw is None:
-        return {}
+        return None
     muuid = get_metadata_uuid(uuid)
     el = common_util.get_record_element_by_id(csw, muuid)
     if el is None:
         if create_if_not_exists:
             return csw_insert(workspace, layername)
-        else:
-            return None
+        return None
     # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
 
     _, prop_values = get_template_path_and_values(workspace, layername, http_method='patch')

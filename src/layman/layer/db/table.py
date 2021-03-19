@@ -32,14 +32,14 @@ WHERE schemaname = '{username}'
     except BaseException:
         raise LaymanError(7)
     rows = cur.fetchall()
+    result = {}
     if len(rows) > 0:
-        return {
+        result = {
             'db_table': {
                 'name': layername,
             },
         }
-    else:
-        return {}
+    return result
 
 
 def delete_layer(username, layername, conn_cur=None):

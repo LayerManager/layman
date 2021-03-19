@@ -33,14 +33,15 @@ def delete_layer(workspace, layername):
     geoserver_workspace = wms.get_geoserver_workspace(workspace)
     sld_stream = geoserver.delete_workspace_style(geoserver_workspace, layername, auth=settings.LAYMAN_GS_AUTH)
     wms.clear_cache(workspace)
-    if sld_stream == {}:
-        return {}
-    else:
-        return {
+    if sld_stream:
+        result = {
             'style': {
                 'file': sld_stream,
             }
         }
+    else:
+        result = {}
+    return result
 
 
 def get_layer_info(username, layername):

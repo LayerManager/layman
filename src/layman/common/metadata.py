@@ -104,8 +104,7 @@ def prop_equals(value_a, value_b, equals_fn=None):
     equals_fn = equals_fn or (lambda a, b: a == b)
     if value_a is None or value_b is None:
         return value_a is value_b
-    else:
-        return equals_fn(value_a, value_b)
+    return equals_fn(value_a, value_b)
 
 
 def prop_equals_or_none(values, equals_fn=None):

@@ -68,10 +68,11 @@ def get(username, layername):
         username, layername, parameter_name, filename, chunk_number)
 
     if chunk_exists:
-        return jsonify({
+        result = jsonify({
             'message': 'Chunk exists.'
         }), 200
     else:
-        return jsonify({
+        result = jsonify({
             'message': 'Chunk not found.'
         }), 404
+    return result

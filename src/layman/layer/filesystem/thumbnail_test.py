@@ -45,11 +45,12 @@ def test_wrong_sld_causes_no_thumbnail():
         ok_keys = ['db_table', 'wms', 'wfs', 'file']
         if response.status_code == 200:
             r_json = response.json()
-            return response.status_code == 200 and all(
+            result = response.status_code == 200 and all(
                 'status' not in r_json[k] for k in ok_keys
             ) and 'status' in r_json['thumbnail'] and r_json['thumbnail']['status'] in ['FAILURE']
         else:
-            return False
+            result = False
+        return result
 
     process_client.publish_workspace_layer(workspace,
                                            layer,

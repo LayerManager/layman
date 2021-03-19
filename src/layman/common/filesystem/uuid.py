@@ -12,8 +12,7 @@ def get_publication_info(publ_type, username, publication_name):
         return {
             'uuid': uuid_str,
         }
-    else:
-        return {}
+    return {}
 
 
 def delete_publication(publ_type, username, publication_name):
@@ -29,10 +28,9 @@ def get_publication_uuid(publ_type, username, publication_type, publication_name
     uuid_path = get_publication_uuid_file(publ_type, username, publication_name)
     if not os.path.exists(uuid_path):
         return None
-    else:
-        with open(uuid_path, "r") as uuid_file:
-            uuid_str = uuid_file.read().strip()
-        return uuid_str
+    with open(uuid_path, "r") as uuid_file:
+        uuid_str = uuid_file.read().strip()
+    return uuid_str
 
 
 def get_publication_uuid_file(publ_type, username, publication_name):
