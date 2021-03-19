@@ -49,8 +49,7 @@ def refresh_input_chunk(self, username, layername, check_crs=True):
             last_change = time.time()
             num_files_saved = chunk_info[1]
             num_chunks_saved = chunk_info[2]
-    else:
-        logger.info(f'Layer chunks uploaded {username}.{layername}')
+    logger.info(f'Layer chunks uploaded {username}.{layername}')
 
     if check_crs:
         main_filepath = input_file.get_layer_main_file_path(username, layername)
