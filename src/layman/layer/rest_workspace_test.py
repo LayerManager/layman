@@ -18,7 +18,7 @@ del sys.modules['layman']
 
 from . import util, LAYER_TYPE
 from .geoserver.util import get_feature_type, wms_proxy
-from layman import app as app
+from layman import app
 from layman import settings
 from layman.layer.filesystem import uuid as layer_uuid
 from layman.layer.filesystem.thumbnail import get_layer_thumbnail_path

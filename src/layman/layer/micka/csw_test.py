@@ -10,7 +10,7 @@ import sys
 
 del sys.modules['layman']
 
-from layman import app as app, LaymanError
+from layman import app, LaymanError
 from layman import settings
 from .csw import get_layer_info, delete_layer, get_metadata_uuid
 

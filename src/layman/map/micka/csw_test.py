@@ -10,7 +10,7 @@ import sys
 
 del sys.modules['layman']
 
-from layman import app as app, LaymanError
+from layman import app, LaymanError
 from layman import settings
 from .csw import get_map_info, delete_map, get_metadata_uuid
 from layman.map.rest_workspace_test import wait_till_ready

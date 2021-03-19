@@ -7,7 +7,7 @@ import sys
 
 del sys.modules['layman']
 
-from layman import app as app, settings, util as layman_util
+from layman import app, settings, util as layman_util
 from .csw import _get_property_values, METADATA_PROPERTIES
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals
 
