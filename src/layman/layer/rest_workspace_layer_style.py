@@ -32,6 +32,7 @@ def get(username, layername):
     app.logger.info(f"GET Style, user={g.user}, username={username}, layername={layername}")
 
     style_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['access_rights'], })['style_type']
+    result = None
     if style_type == 'sld':
         response = sld.get_style_response(username,
                                           layername,
@@ -42,9 +43,10 @@ def get(username, layername):
         final_response = Response(response.content,
                                   response.status_code,
                                   headers)
-        return final_response
+        result = final_response
     elif style_type == 'qml':
         response_qml = qgis_wms.get_style_qml(username,
                                               layername,
                                               )
-        return Response(response_qml, mimetype='application/x-qgis-layer-settings')
+        result = Response(response_qml, mimetype='application/x-qgis-layer-settings')
+    return result
