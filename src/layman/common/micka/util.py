@@ -260,10 +260,9 @@ def base_insert(xml_str):
                 'locator': root_el[0].attrib["locator"],
                 'text': root_el[0][0].text,
             })
-        else:
-            raise LaymanError(37, data={
-                'response': r.text
-            })
+        raise LaymanError(37, data={
+            'response': r.text
+        })
     return root_el, r
 
 
@@ -332,10 +331,9 @@ def csw_update(template_values, timeout=5):
             raise LaymanError(39, data={
                 'response': r.text
             })
-        else:
-            raise LaymanError(37, data={
-                'response': r.text
-            })
+        raise LaymanError(37, data={
+            'response': r.text
+        })
     assert root_el.tag == nspath_eval('csw:TransactionResponse', NAMESPACES), r.content
     assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalUpdated', NAMESPACES)).text == "1", r.content
 
