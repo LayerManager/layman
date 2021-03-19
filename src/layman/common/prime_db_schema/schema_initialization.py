@@ -71,7 +71,7 @@ def migrate_users_and_publications(role_everyone):
                         True,
                         everyone_can_write,
                         )
-                db_util.run_query(insert_publications_sql, data)[0][0]
+                db_util.run_statement(insert_publications_sql, data)
 
 
 def schema_exists():
