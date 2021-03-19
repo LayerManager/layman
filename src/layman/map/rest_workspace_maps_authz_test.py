@@ -8,7 +8,7 @@ def assert_operates_on(workspace, mapname, expected_layers, authz_headers):
     operates_on = md_comparison['metadata_properties']['operates_on']
     assert (operates_on['equal']), json.dumps(operates_on, indent=2)
     assert (operates_on['equal_or_null']), json.dumps(operates_on, indent=2)
-    assert (len(operates_on['values'].values()) == 2)  # GET Map File, CSW
+    assert len(operates_on['values'].values()) == 2  # GET Map File, CSW
     for operates_on_value in operates_on['values'].values():
         for (layer_uuid, layer_title) in expected_layers:
             layer_record = next(rec for rec in operates_on_value
