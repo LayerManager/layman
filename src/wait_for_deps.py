@@ -62,8 +62,7 @@ def main():
             if r.status_code == 500 and expected_text in r.text:
                 print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
                 break
-            else:
-                r.raise_for_status()
+            r.raise_for_status()
         except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout, requests.exceptions.HTTPError) as e:
             handle_exception(e, attempt, wait_for_msg)
             attempt += 1
