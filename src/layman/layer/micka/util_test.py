@@ -7,7 +7,7 @@ import sys
 
 del sys.modules['layman']
 
-from layman import uuid, app as app, settings
+from layman import uuid, app, settings
 from layman.util import url_for
 from .csw import _get_property_values
 

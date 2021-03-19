@@ -7,7 +7,7 @@ import sys
 
 del sys.modules['layman']
 
-from layman import app as app, celery_app
+from layman import app, celery_app
 from layman.layer.filesystem import input_chunk
 from layman import celery as celery_util
 from layman.common import tasks as tasks_util
