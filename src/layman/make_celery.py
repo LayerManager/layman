@@ -1,7 +1,5 @@
 from celery import Celery, signals
 from celery.contrib import abortable
-from flask import current_app
-from celery.contrib.abortable import AbortableAsyncResult
 from layman import settings
 from .util import get_modules_from_names
 
@@ -50,7 +48,7 @@ def get_task_modules():
 @signals.task_prerun.connect
 def on_task_prerun(**kwargs):
     task_name = kwargs['task'].name
-    from layman import app, celery_app
+    from layman import app
     from layman.util import get_publication_types
     from layman.celery import task_prerun
     with app.app_context():
@@ -72,7 +70,7 @@ def on_task_prerun(**kwargs):
 @signals.task_postrun.connect
 def on_task_postrun(**kwargs):
     task_name = kwargs['task'].name
-    from layman import app, celery_app
+    from layman import app
     from layman.util import get_publication_types
     from layman.celery import task_postrun
     with app.app_context():

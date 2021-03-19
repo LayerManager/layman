@@ -1,5 +1,4 @@
 from celery.utils.log import get_task_logger
-from flask import current_app as app
 
 from layman.celery import AbortedException
 from layman.layer.filesystem.input_file import get_layer_main_file_path

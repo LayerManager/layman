@@ -1,4 +1,3 @@
-from flask import g, current_app
 import hashlib
 from redis import WatchError
 

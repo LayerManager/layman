@@ -1,7 +1,6 @@
 import os
 import pathlib
 import shutil
-from flask import current_app
 
 from layman import settings
 from layman.util import get_publication_types

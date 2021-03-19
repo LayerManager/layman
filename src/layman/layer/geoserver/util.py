@@ -1,4 +1,3 @@
-import json
 import requests
 from urllib.parse import urljoin, urlparse
 from owslib.wms import WebMapService

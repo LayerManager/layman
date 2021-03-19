@@ -2,7 +2,7 @@ import os
 from lxml import etree as ET
 import pytest
 import requests
-from . import util, wms as qgis_wms
+from . import util
 from layman import app, settings, LaymanError
 from .. import db
 from ..filesystem import thumbnail

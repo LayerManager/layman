@@ -1,16 +1,13 @@
 from celery import chain
 import importlib
-from multiprocessing import Process
 import time
 from celery.contrib.abortable import AbortableAsyncResult
-import pytest
 
 import sys
 
 del sys.modules['layman']
 
 from layman import app as app, celery_app
-from layman.layer import util as layer_util
 from layman.layer.filesystem import input_chunk
 from layman import celery as celery_util
 from layman.common import tasks as tasks_util

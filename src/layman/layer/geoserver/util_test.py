@@ -1,5 +1,3 @@
-import pytest
-
 from . import get_usernames
 from layman import settings
 

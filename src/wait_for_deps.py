@@ -3,7 +3,6 @@ import os
 import re
 import sys
 import time
-import traceback
 from urllib.parse import urljoin
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
