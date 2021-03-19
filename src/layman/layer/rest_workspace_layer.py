@@ -72,17 +72,13 @@ def patch(username, layername):
             raise LaymanError(2, {'parameter': 'crs', 'supported_values': settings.INPUT_SRS_LIST})
     check_crs = crs_id is None
 
-    update_info = False
-
     # TITLE
     if len(request.form.get('title', '')) > 0:
         kwargs['title'] = request.form['title']
-        update_info = True
 
     # DESCRIPTION
     if len(request.form.get('description', '')) > 0:
         kwargs['description'] = request.form['description']
-        update_info = True
 
     # SLD
     style_file = None

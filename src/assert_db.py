@@ -54,10 +54,6 @@ def main():
 
 
 def handle_exception(e, attempt, wait_for_msg=None):
-    if attempt < MAX_ATTEMPTS:
-        msg_end = f"Waiting {ATTEMPT_INTERVAL} seconds before next attempt."
-    else:
-        msg_end = "Max attempts reached!"
     if attempt >= MAX_ATTEMPTS:
         print(f"Reaching max attempts when waiting for {wait_for_msg}")
         sys.exit(1)

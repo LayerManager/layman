@@ -139,7 +139,7 @@ def check_filenames(username, layername, filenames, check_crs, ignore_existing_f
                                        'by setting "crs" parameter.'
             raise LaymanError(18, detail)
     input_file_dir = get_layer_input_file_dir(username, layername)
-    filename_mapping, filepath_mapping = get_file_name_mappings(
+    filename_mapping, _ = get_file_name_mappings(
         filenames, main_filename, layername, input_file_dir
     )
 
@@ -155,7 +155,7 @@ def save_layer_files(username, layername, files, check_crs):
     filenames = list(map(lambda f: f.filename, files))
     main_filename = get_main_file_name(filenames)
     input_file_dir = ensure_layer_input_file_dir(username, layername)
-    filename_mapping, filepath_mapping = get_file_name_mappings(
+    _, filepath_mapping = get_file_name_mappings(
         filenames, main_filename, layername, input_file_dir
     )
 

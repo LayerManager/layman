@@ -164,13 +164,13 @@ def test_access_rights(access_rights_and_expected_list, use_file):
             if access_rights_and_expected.get(right_type):
                 roles_to_test[right_type] = access_rights_and_expected[right_type]
                 access_rights[right_type] = access_rights_and_expected[right_type]
-        ln = write_method(username,
-                          layername,
-                          access_rights={key: ','.join(value) for key, value in access_rights.items()},
-                          headers=owner_authn_headers,
-                          file_paths=[
-                              'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
-                          ] if use_file else None)
+        write_method(username,
+                     layername,
+                     access_rights={key: ','.join(value) for key, value in access_rights.items()},
+                     headers=owner_authn_headers,
+                     file_paths=[
+                         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
+                     ] if use_file else None)
 
         client_util.assert_workspace_layers(username, [layername], owner_authn_headers)
         assert_gs_user_and_roles(username)

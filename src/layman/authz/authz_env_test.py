@@ -16,7 +16,7 @@ class TestPublicWorkspaceClass:
         user_authz_headers = self.user_authz_headers
         env_vars = dict(process.AUTHN_SETTINGS)
 
-        layman_process = process.ensure_layman_function(env_vars)
+        process.ensure_layman_function(env_vars)
         process_client.reserve_username(username, headers=user_authz_headers)
         yield
 

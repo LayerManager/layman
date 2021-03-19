@@ -38,7 +38,7 @@ def get_connection_cursor():
 def get_workspaces(conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
-    conn, cur = conn_cur
+    _, cur = conn_cur
 
     try:
         cur.execute(f"""select schema_name
@@ -149,7 +149,7 @@ def import_layer_vector_file_async(username, layername, main_filepath,
 def check_new_layername(username, layername, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
-    conn, cur = conn_cur
+    _, cur = conn_cur
 
     # DB table name conflicts
     try:
@@ -166,7 +166,7 @@ def check_new_layername(username, layername, conn_cur=None):
 
 
 def get_text_column_names(username, layername, conn_cur=None):
-    conn, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or get_connection_cursor()
 
     try:
         cur.execute(f"""
@@ -188,7 +188,7 @@ def get_all_column_names(username, layername, conn_cur=None):
 
 
 def get_all_column_infos(username, layername, conn_cur=None):
-    conn, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or get_connection_cursor()
 
     try:
         cur.execute(f"""
@@ -205,7 +205,7 @@ AND table_name = '{layername}'
 
 
 def get_number_of_features(username, layername, conn_cur=None):
-    conn, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or get_connection_cursor()
 
     try:
         cur.execute(f"""
@@ -220,7 +220,7 @@ from {username}.{layername}
 
 
 def get_text_data(username, layername, conn_cur=None):
-    conn, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or get_connection_cursor()
     col_names = get_text_column_names(username, layername, conn_cur=conn_cur)
     if len(col_names) == 0:
         return [], 0
@@ -363,7 +363,7 @@ limit 1
 
 
 def get_most_frequent_lower_distance(username, layername, conn_cur=None):
-    conn, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or get_connection_cursor()
 
     query = get_most_frequent_lower_distance_query(username, layername, [
         'ST_NPoints'
@@ -421,7 +421,7 @@ def guess_scale_denominator(username, layername):
 
 
 def get_most_frequent_lower_distance2(username, layername, conn_cur=None):
-    conn, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or get_connection_cursor()
 
     query = get_most_frequent_lower_distance_query(username, layername, [
         'st_area', 'Box2D'
@@ -447,7 +447,7 @@ def get_most_frequent_lower_distance2(username, layername, conn_cur=None):
 
 
 def create_string_attributes(attribute_tuples, conn_cur=None):
-    conn, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or get_connection_cursor()
     query = "\n".join([f"""ALTER TABLE {username}.{layername} ADD COLUMN {attrname} VARCHAR(1024);""" for username, layername, attrname in attribute_tuples]) + "\n COMMIT;"
     try:
         cur.execute(query)
@@ -457,7 +457,7 @@ def create_string_attributes(attribute_tuples, conn_cur=None):
 
 
 def get_missing_attributes(attribute_tuples, conn_cur=None):
-    conn, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or get_connection_cursor()
 
     # Find all triples which do not already exist
     query = f"""select attribs.*
@@ -540,7 +540,7 @@ select distinct ST_GeometryType(wkb_geometry) as geometry_type_name
 from {username}.{layername}
 """
         cur.execute(sql)
-    except BaseException as exc:
+    except BaseException:
         logger.error(f'get_geometry_types ERROR')
         raise LaymanError(7)
     rows = cur.fetchall()

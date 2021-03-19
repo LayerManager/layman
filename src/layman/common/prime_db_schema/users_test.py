@@ -25,7 +25,7 @@ def test_get_user_infos():
                 }
     with app.app_context():
         id_workspace = workspace_util.ensure_workspace(username)
-        user_id = user_util.ensure_user(id_workspace, userinfo)
+        user_util.ensure_user(id_workspace, userinfo)
 
         user_infos = user_util.get_user_infos(username)
         assert {username} == user_infos.keys()
@@ -62,7 +62,7 @@ def test_ensure_user():
             f'users_seq_value_1={users_seq_value_1}, id_user={id_user}, users_seq_value_2={users_seq_value_2}'
         assert users_seq_value_2 == users_seq_value_1 + 1,\
             f'users_seq_value_1={users_seq_value_1}, id_user={id_user}, users_seq_value_2={users_seq_value_2}'
-        (id_workspace2, id_user2) = prime_db_schema.ensure_whole_user(username, userinfo)
+        (_, id_user2) = prime_db_schema.ensure_whole_user(username, userinfo)
         users_seq_value_3 = db_util.run_query(sql)[0][0]
         assert id_user2 == id_user
         assert users_seq_value_3 == users_seq_value_2,\

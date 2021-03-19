@@ -121,6 +121,7 @@ def authorize_workspace_publications_decorator(f):
         # raises exception in case of unauthorized request
         authorize(workspace, publication_type, publication_name, request.method, actor_name)
         if workspace and publication_type and not publication_name and request.method == 'GET':
+            # pylint: disable=unused-variable
             @after_this_request
             def authorize_after_request_tmp(response):
                 return authorize_after_multi_get_request(actor_name, response)
@@ -139,6 +140,7 @@ def authorize_publications_decorator(f):
             raise Exception(f"Authorization module is unable to authorize path {req_path}")
         actor_name = authn.get_authn_username()
         if request.method == 'GET':
+            # pylint: disable=unused-variable
             @after_this_request
             def authorize_after_request_tmp(response):
                 return authorize_after_multi_get_request(actor_name, response)

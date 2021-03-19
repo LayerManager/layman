@@ -40,7 +40,7 @@ def main():
     while True:
         import psycopg2
         try:
-            with psycopg2.connect(**conn_dict) as conn:
+            with psycopg2.connect(**conn_dict):
                 pass
             print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
             break
@@ -142,13 +142,6 @@ def main():
 
 
 def handle_exception(e, attempt, wait_for_msg=None):
-    if attempt < MAX_ATTEMPTS:
-        msg_end = f"Waiting {ATTEMPT_INTERVAL} seconds before next attempt."
-    else:
-        msg_end = "Max attempts reached!"
-    # print(f"Attempt {attempt}/{MAX_ATTEMPTS} failed:")
-    # print(e)
-    # print(msg_end)
     # traceback.print_exc()
     if attempt >= MAX_ATTEMPTS:
         print(f"Reaching max attempts when waiting for {wait_for_msg}")

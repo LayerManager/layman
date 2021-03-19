@@ -10,7 +10,7 @@ from test.data import wfs as wfs_data_util
 
 def get_shp_file_paths(shp_file_path):
     extensions = ['dbf', 'prj', 'qpj', 'shx']
-    root, shp_ext = os.path.splitext(shp_file_path)
+    root, _ = os.path.splitext(shp_file_path)
     result = [f"{root}.{ext}" for ext in extensions]
     result.append(shp_file_path)
     return result

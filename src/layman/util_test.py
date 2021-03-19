@@ -197,7 +197,7 @@ def test_get_publication_info_items(publication_type):
     process_client.publish_workspace_publication(publication_type, workspace, publication)
 
     with app.app_context():
-        for source, source_def in layman_util.get_publication_types()[publication_type]['internal_sources'].items():
+        for _, source_def in layman_util.get_publication_types()[publication_type]['internal_sources'].items():
             for key in source_def.info_items:
                 context = {'keys': [key]}
                 info = layman_util.get_publication_info(workspace, publication_type, publication, context)
