@@ -38,10 +38,7 @@ def get_single_prop_els(parent_el, prop_name, publ_properties):
     last_prop_el = None
     if len(single_prop_els) == 0 and micka_prop['xpath_property'].find('[') >= 0:
         simple_xpath_property = micka_prop['xpath_property'][:micka_prop['xpath_property'].find('[')]
-        single_prop_els = [
-            e for e in
-            parent_el.xpath(simple_xpath_property, namespaces=NAMESPACES)
-        ]
+        single_prop_els = parent_el.xpath(simple_xpath_property, namespaces=NAMESPACES)
         last_prop_el = single_prop_els[-1] if single_prop_els else None
         single_prop_els = [
             e for e in

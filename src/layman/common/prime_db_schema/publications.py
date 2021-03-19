@@ -132,8 +132,8 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'type': type,
                                    'style_type': style_type,
                                    'updated_at': updated_at,
-                                   'access_rights': {'read': [x for x in can_read_users.split(',')],
-                                                     'write': [x for x in can_write_users.split(',')]}
+                                   'access_rights': {'read': can_read_users.split(','),
+                                                     'write': can_write_users.split(',')}
                                    }
              for id_publication, workspace_name, type, publication_name, title, uuid, style_type, updated_at, can_read_users, can_write_users
              in values}
