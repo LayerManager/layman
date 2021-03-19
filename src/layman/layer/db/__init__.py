@@ -241,8 +241,7 @@ limit {limit}
     rows = cur.fetchall()
     col_texts = defaultdict(list)
     for row in rows:
-        for idx in range(len(col_names)):
-            col_name = col_names[idx]
+        for idx, col_name in enumerate(col_names):
             v = row[idx]
             if v is not None and len(v) > 0:
                 col_texts[col_name].append(v)
