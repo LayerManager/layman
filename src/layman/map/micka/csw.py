@@ -43,8 +43,7 @@ def get_map_info(username, mapname):
                 'comparison_url': url_for('rest_workspace_map_metadata_comparison.get', username=username, mapname=mapname),
             }
         }
-    else:
-        return {}
+    return {}
 
 
 def get_publication_uuid(username, publication_type, publication_name):
@@ -83,14 +82,13 @@ def patch_map(username, mapname, metadata_properties_to_refresh=None, actor_name
     uuid = get_map_uuid(username, mapname)
     csw = common_util.create_csw()
     if uuid is None or csw is None:
-        return {}
+        return None
     muuid = get_metadata_uuid(uuid)
     el = common_util.get_record_element_by_id(csw, muuid)
     if el is None:
         if create_if_not_exists:
             return csw_insert(username, mapname, actor_name=actor_name)
-        else:
-            return None
+        return None
     # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
 
     _, prop_values = get_template_path_and_values(username, mapname, http_method='patch', actor_name=actor_name)

@@ -35,11 +35,12 @@ def get_map_file(username, mapname):
 
 def get_map_info(username, mapname):
     map_file_path = get_map_file(username, mapname)
+    result = {}
     if os.path.exists(map_file_path):
         with open(map_file_path, 'r') as map_file:
             map_json = json.load(map_file)
         map_file_path = os.path.relpath(map_file_path, common_util.get_user_dir(username))
-        return {
+        result = {
             'file': {
                 'path': map_file_path,
                 'url': url_for('rest_workspace_map_file.get', mapname=mapname, username=username),
@@ -48,11 +49,10 @@ def get_map_info(username, mapname):
             'description': map_json['abstract'] or '',
         }
     elif os.path.exists(util.get_map_dir(username, mapname)):
-        return {
+        result = {
             'name': mapname
         }
-    else:
-        return {}
+    return result
 
 
 from . import uuid

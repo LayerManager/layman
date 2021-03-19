@@ -48,9 +48,10 @@ def get_layer_original_style_stream(workspace, layer):
         with open(style_path, 'r') as style_file:
             style = style_file.read()
         style_stream = io.BytesIO(style.encode())
-        return style_stream
+        result = style_stream
     else:
-        return None
+        result = None
+    return result
 
 
 def fill_layer_template(workspace, layer, uuid, native_bbox, qml_xml, source_type, attrs_to_ensure):

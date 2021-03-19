@@ -24,14 +24,14 @@ def authorize(workspace, publication_type, publication_name, request_method, act
             if not workspaces.get_workspace_infos(workspace):
                 raise LaymanError(40)  # Workspace not found
             return
-        elif request_method in ['POST']:
+        if request_method in ['POST']:
             if actor_name == workspace:
                 return
-            elif ((not users.get_user_infos(workspace))  # public workspace
+            if ((not users.get_user_infos(workspace))  # public workspace
                     and can_user_publish_in_public_workspace(actor_name)):  # actor can publish in public workspace
                 if workspaces.get_workspace_infos(workspace):  # workspaces exists
                     return
-                elif can_user_create_public_workspace(actor_name):  # workspaces can be created by actor
+                if can_user_create_public_workspace(actor_name):  # workspaces can be created by actor
                     # raises exception if new workspace is not correct
                     layman_util.check_username(workspace)
                 else:
@@ -52,17 +52,14 @@ def authorize(workspace, publication_type, publication_name, request_method, act
         if request_method in ['GET']:
             if user_can_read:
                 return
-            else:
-                raise LaymanError(publication_not_found_code)
+            raise LaymanError(publication_not_found_code)
         elif request_method in ['POST', 'PUT', 'PATCH', 'DELETE']:
             if is_user_in_access_rule(actor_name, publ_info['access_rights']['write']):
                 return
-            elif user_can_read:
+            if user_can_read:
                 raise LaymanError(30)  # unauthorized request
-            else:
-                raise LaymanError(publication_not_found_code)
-        else:
-            raise LaymanError(31, {'method': request_method})  # unsupported method
+            raise LaymanError(publication_not_found_code)
+        raise LaymanError(31, {'method': request_method})  # unsupported method
 
 
 def authorize_after_multi_get_request(actor_name, response):
