@@ -1,20 +1,20 @@
 import os
 import time
-
+import requests
+from requests.exceptions import HTTPError, ConnectionError
+from owslib.csw import CatalogueServiceWeb
 from owslib.util import nspath_eval
 from flask import current_app
 from io import BytesIO
-from owslib.csw import CatalogueServiceWeb
-from requests.exceptions import HTTPError, ConnectionError
 from xml.sax.saxutils import escape
 from lxml import etree as ET
 import urllib.parse as urlparse
 import traceback
+from copy import deepcopy
+
 from layman import settings, LaymanError, authz
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
 from layman.util import get_publication_info
-import requests
-from copy import deepcopy
 
 NAMESPACES = {
     'csw': 'http://www.opengis.net/cat/csw/2.0.2',
