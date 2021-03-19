@@ -93,7 +93,7 @@ def fill_xml_template_obj(tree_or_el, prop_values, publ_properties, basic_templa
                 tmp_el_to_copy = tmp_el_to_copy.getparent()
                 anc_level_distance -= 1
             tmp_last_anc_el = tmp_el_to_copy.getparent()
-            assert (tmp_last_anc_el.tag == last_anc_el.tag)
+            assert tmp_last_anc_el.tag == last_anc_el.tag
             tmp_prev_sibl = tmp_last_anc_el[tmp_last_anc_el.index(tmp_el_to_copy) - 1]
             prev_sibl = last_anc_el.findall(f"./{tmp_prev_sibl.tag}")[-1]
             insert_idx = last_anc_el.index(prev_sibl) + 1

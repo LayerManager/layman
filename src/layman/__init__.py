@@ -115,7 +115,7 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
         wait_for_other_process = True
 
     if wait_for_other_process:
-        while (settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done'):
+        while settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':
             app.logger.info(f'Waiting for Layman in other process to initialize dependencies')
             time.sleep(1)
 

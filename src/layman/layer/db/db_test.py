@@ -166,7 +166,7 @@ def test_abort_import_layer_vector_file(client):
                                               crs_id)
         time1 = time.time()
         while p.poll() is None:
-            if (time.time() - time1 > 0.1):
+            if time.time() - time1 > 0.1:
                 # print('terminating process')
                 p.terminate()
             time.sleep(0.1)
