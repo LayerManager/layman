@@ -58,9 +58,9 @@ def test_wfs_proxy():
     authn_headers1 = get_authz_headers(username)
 
     client_util.reserve_username(username, headers=authn_headers1)
-    ln = client_util.publish_workspace_layer(username,
-                                             layername1,
-                                             headers=authn_headers1)
+    client_util.publish_workspace_layer(username,
+                                        layername1,
+                                        headers=authn_headers1)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
     headers = {
@@ -141,7 +141,7 @@ def test_wms_ows_proxy(service_endpoint):
     authn_headers = get_authz_headers(username)
 
     client_util.ensure_reserved_username(username, headers=authn_headers)
-    ln = client_util.publish_workspace_layer(username, layername, headers=authn_headers)
+    client_util.publish_workspace_layer(username, layername, headers=authn_headers)
 
     wms_url = geoserver_client.get_wms_url(username, service_endpoint)
 
@@ -346,10 +346,10 @@ def test_missing_attribute_authz():
             assert attr_name in new_db_attributes, f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
 
     client_util.reserve_username(username, headers=authn_headers1)
-    ln = client_util.publish_workspace_layer(username,
-                                             layername1,
-                                             ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
-                                             headers=authn_headers1)
+    client_util.publish_workspace_layer(username,
+                                        layername1,
+                                        ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+                                        headers=authn_headers1)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
 

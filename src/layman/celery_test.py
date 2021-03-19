@@ -51,7 +51,7 @@ def test_single_abortable_task(client):
     username = 'test_abort_user'
     layername = 'test_abort_layer'
     with app.app_context():
-        files_to_upload = input_chunk.save_layer_files_str(username, layername, filenames, check_crs)
+        input_chunk.save_layer_files_str(username, layername, filenames, check_crs)
     task_chain = chain(*[
         tasks_util._get_task_signature(username, layername, t, task_options, 'layername')
         for t in tasks
@@ -103,7 +103,7 @@ def test_abortable_task_chain(client):
     username = 'test_abort_user'
     layername = 'test_abort_layer2'
     with app.app_context():
-        files_to_upload = input_chunk.save_layer_files_str(username, layername, filenames, check_crs)
+        input_chunk.save_layer_files_str(username, layername, filenames, check_crs)
     task_chain = chain(*[
         tasks_util._get_task_signature(username, layername, t, task_options, 'layername')
         for t in tasks

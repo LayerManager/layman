@@ -98,7 +98,7 @@ def client():
     app.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
 
     # print('before app.app_context()')
-    with app.app_context() as ctx:
+    with app.app_context():
         publs_by_type = uuid.check_redis_consistency()
         global num_layers_before_test
         num_layers_before_test = len(publs_by_type[LAYER_TYPE])
@@ -795,7 +795,7 @@ def test_patch_layer_style(client):
         })
         assert rv.status_code == 200
 
-        last_task = util._get_layer_task(username, layername)
+        # last_task = util._get_layer_task(username, layername)
         # TODO
         # Time to generate testing thumbnail is probably shorter than getting & parsing WMS/WFS capabilities documents
         # so it's finished before PATCH request is completed
@@ -1090,7 +1090,6 @@ def test_post_layers_long_and_delete_it(client):
     rv = client.delete(rest_path)
     assert rv.status_code == 200
     rv = client.get(url_for('rest_workspace_layer.get', username=username, layername=layername))
-    resp_json = rv.get_json()
     # print(resp_json)
     assert rv.status_code == 404
     uuid.check_redis_consistency(expected_publ_num_by_type={

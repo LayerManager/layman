@@ -232,12 +232,12 @@ def get_languages_cld2(text):
         return []
     text = ' '.join(tokens)
     # print(f"get_languages_cld2 text={text}")
-    reliable, text_bytes_found, details = pycld2.detect(text, bestEffort=False)
+    reliable, _, details = pycld2.detect(text, bestEffort=False)
     # print(reliable, text_bytes_found, details)
 
     if not reliable:
         # print('not reliable', reliable, text_bytes_found, details)
-        reliable, text_bytes_found, details = pycld2.detect(text, bestEffort=True)
+        reliable, _, details = pycld2.detect(text, bestEffort=True)
 
     # guess language by script
     if not reliable:

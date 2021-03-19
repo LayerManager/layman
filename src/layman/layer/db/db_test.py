@@ -21,7 +21,7 @@ def client():
     layman.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
     client = layman.test_client()
 
-    with layman.app_context() as ctx:
+    with layman.app_context():
         yield client
         pass
 
@@ -187,7 +187,7 @@ def test_data_language(client, boundary_table):
     # print(f"username={username}, layername={layername}")
     col_names = db.get_text_column_names(username, layername)
     assert set(col_names) == set(['featurecla', 'name', 'name_alt'])
-    text_data, num_rows = db.get_text_data(username, layername)
+    text_data, _ = db.get_text_data(username, layername)
     # print(f"num_rows={num_rows}")
     assert len(text_data) == 1
     assert text_data[0].startswith(' '.join(['International boundary (verify)'] * 100))

@@ -346,7 +346,7 @@ def delete_publications(user,
     actor_name = authn.get_authn_username()
     whole_infos = get_publication_infos(user, publ_type, {'actor_name': actor_name, 'access_type': 'write'})
 
-    for (workspace, publication_type, publication) in whole_infos.keys():
+    for (_, _, publication) in whole_infos.keys():
         redis_util.create_lock(user, publ_type, publication, error_code, method)
         try:
             abort_publication_fn(user, publication)

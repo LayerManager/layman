@@ -20,7 +20,7 @@ def patch_layer(username, layername):
 def get_layer_info(username, layername, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
-    conn, cur = conn_cur
+    _, cur = conn_cur
     try:
         cur.execute(f"""
 SELECT schemaname, tablename, tableowner

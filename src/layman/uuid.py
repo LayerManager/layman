@@ -170,7 +170,7 @@ def check_redis_consistency(expected_publ_num_by_type=None):
     # publication locks
     locks = redis.hgetall(redis_util.PUBLICATION_LOCKS_KEY)
     assert len(locks) == len(task_names_tuples), f"{locks} != {task_names_tuples}"
-    for k, v in locks.items():
+    for k, _ in locks.items():
         username, publication_type, publication_name = k.split(':')
         assert next((
             t for t in task_names_tuples

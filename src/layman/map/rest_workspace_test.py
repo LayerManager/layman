@@ -85,7 +85,7 @@ def client():
     app.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
 
     # print('before app.app_context()')
-    with app.app_context() as ctx:
+    with app.app_context():
         publs_by_type = uuid.check_redis_consistency()
         global num_maps_before_test
         num_maps_before_test = len(publs_by_type[MAP_TYPE])

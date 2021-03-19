@@ -13,7 +13,7 @@ auth = settings.LAYMAN_GS_AUTH
 
 @pytest.fixture(scope="module", autouse=True)
 def app_context():
-    with app.app_context() as ctx:
+    with app.app_context():
         yield
 
 
