@@ -66,7 +66,7 @@ def check_workspace_names():
                 f'for `{settings.REST_WORKSPACES_PREFIX}` name')
 
 
-def migrate_layers_to_wms_workspace(workspace=None):
+def migrate_layers_to_wms_workspace(workspace_filter=None):
     logger.info(f'    Starting - migrate layers to WMS workspace')
     query = f'''
 select  w.name,
@@ -77,9 +77,9 @@ from {db_schema}.publications p inner join
 where p.type = %s
 '''
     params = (LAYER_TYPE, )
-    if workspace:
+    if workspace_filter:
         query = query + '  AND w.name = %s'
-        params = params + (workspace, )
+        params = params + (workspace_filter,)
     publications = db_util.run_query(query, params)
     for (workspace, publication_type, layer) in publications:
         logger.info(f'      Migrate layer {workspace}.{layer}')
@@ -170,7 +170,7 @@ def migrate_maps_on_wms_workspace():
     logger.info(f'    DONE - migrate maps json urls')
 
 
-def migrate_metadata_records(workspace=None):
+def migrate_metadata_records(workspace_filter=None):
     logger.info(f'    Starting - migrate publication metadata records')
     query = f'''
     select  w.name,
@@ -180,9 +180,9 @@ def migrate_metadata_records(workspace=None):
     where p.type = %s
     '''
     params = (LAYER_TYPE,)
-    if workspace:
+    if workspace_filter:
         query = query + '  AND w.name = %s'
-        params = params + (workspace,)
+        params = params + (workspace_filter,)
     publications = db_util.run_query(query, params)
     for (workspace, layer) in publications:
         wms.clear_cache(workspace)
@@ -209,9 +209,9 @@ def migrate_metadata_records(workspace=None):
     where p.type = %s
     '''
     params = (MAP_TYPE,)
-    if workspace:
+    if workspace_filter:
         query = query + '  AND w.name = %s'
-        params = params + (workspace,)
+        params = params + (workspace_filter,)
     publications = db_util.run_query(query, params)
     for (workspace, map) in publications:
         logger.info(f'      Migrate map {workspace}.{map}')
