@@ -99,10 +99,10 @@ def test_parse_md_properties():
             'layer_endpoint': url_for('rest_workspace_layer.get', username='browser', layername='layer'),
         }
     assert set(props.keys()) == set(expected.keys())
-    for k in props.keys():
+    for k, value in props.items():
         equals_fn = COMMON_PROPERTIES[k].get('equals_fn', None)
-        assert prop_equals(props[k], expected[k],
-                           equals_fn), f"Values of property {k} do not equal: {props[k]} != {expected[k]}"
+        assert prop_equals(value, expected[k],
+                           equals_fn), f"Values of property {k} do not equal: {value} != {expected[k]}"
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
