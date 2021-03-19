@@ -113,7 +113,6 @@ def fill_project_template(workspace, layer, layer_uuid, layer_qml, epsg_codes, e
     wms_crs_list_values = "\n".join((f"<value>EPSG:{code}</value>" for code in epsg_codes))
     db_schema = workspace
     layer_name = layer
-    source_type = source_type
     db_table = layer
     creation_iso_datetime = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
 
