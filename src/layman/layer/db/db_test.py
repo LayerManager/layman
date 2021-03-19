@@ -23,7 +23,6 @@ def client():
 
     with layman.app_context():
         yield client
-        pass
 
 
 @pytest.fixture(scope="module")
@@ -171,7 +170,6 @@ def test_abort_import_layer_vector_file(client):
                 # print('terminating process')
                 p.terminate()
             time.sleep(0.1)
-            pass
 
         return_code = p.poll()
         return return_code
