@@ -580,7 +580,6 @@ def test_update_rights():
                                "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
                                                  "write": {settings.RIGHTS_EVERYONE_ROLE, },
                                                  },
-                               'actor_name': username
                                }
 
     with app.app_context():
