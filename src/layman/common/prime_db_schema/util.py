@@ -39,8 +39,7 @@ def run_query(query, data=None, conn_cur=None, encapsulate_exception=True):
         if encapsulate_exception:
             app.logger.error(f"run_query, query={query}, data={data}, exc={exc}")
             raise LaymanError(7)
-        else:
-            raise exc
+        raise exc
 
     return rows
 
@@ -57,8 +56,7 @@ def run_statement(query, data=None, conn_cur=None, encapsulate_exception=True):
         if encapsulate_exception:
             app.logger.error(f"run_query, query={query}, data={data}, exc={exc}")
             raise LaymanError(7)
-        else:
-            raise exc
+        raise exc
     return rows
 
 

@@ -53,7 +53,7 @@ def authorize(workspace, publication_type, publication_name, request_method, act
             if user_can_read:
                 return
             raise LaymanError(publication_not_found_code)
-        elif request_method in ['POST', 'PUT', 'PATCH', 'DELETE']:
+        if request_method in ['POST', 'PUT', 'PATCH', 'DELETE']:
             if is_user_in_access_rule(actor_name, publ_info['access_rights']['write']):
                 return
             if user_can_read:

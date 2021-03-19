@@ -41,13 +41,12 @@ def refresh_table(
         logger.info(f'terminating {username} {layername}')
         delete_layer(username, layername)
         raise AbortedException
-    else:
-        return_code = p.poll()
-        if return_code != 0:
-            pg_error = str(p.stdout.read())
-            logger.error(f"STDOUT: {pg_error}")
-            if "ERROR:  zero-length delimited identifier at or near" in pg_error:
-                err_code = 28
-            else:
-                err_code = 11
-            raise LaymanError(err_code, private_data=pg_error)
+    return_code = p.poll()
+    if return_code != 0:
+        pg_error = str(p.stdout.read())
+        logger.error(f"STDOUT: {pg_error}")
+        if "ERROR:  zero-length delimited identifier at or near" in pg_error:
+            err_code = 28
+        else:
+            err_code = 11
+        raise LaymanError(err_code, private_data=pg_error)
