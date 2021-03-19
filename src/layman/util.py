@@ -207,10 +207,7 @@ def get_providers_from_source_names(source_names, skip_modules=None):
 
 
 def get_modules_from_names(module_names):
-    modules = list(map(
-        lambda module_name: importlib.import_module(module_name),
-        module_names
-    ))
+    modules = [importlib.import_module(module_name) for module_name in module_names]
     return modules
 
 
