@@ -185,9 +185,12 @@ def ensure_workspace_publication(publication_type,
             if 'write' in access_rights and set(access_rights['write'].split(',')) != set(publication_obj['access_rights']['write']):
                 patch_needed = True
         if patch_needed:
-            return patch_workspace_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
+            result = patch_workspace_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
+        else:
+            result = None
     else:
-        return publish_workspace_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
+        result = publish_workspace_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
+    return result
 
 
 ensure_workspace_layer = partial(ensure_workspace_publication, LAYER_TYPE)

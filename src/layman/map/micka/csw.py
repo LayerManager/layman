@@ -418,7 +418,7 @@ def get_metadata_comparison(username, mapname):
     muuid = get_metadata_uuid(uuid)
     el = common_util.get_record_element_by_id(csw, muuid)
     if el is None:
-        return
+        return {}
 
     # current_app.logger.info(f"xml\n{ET.tostring(el)}")
 
