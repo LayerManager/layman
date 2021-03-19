@@ -648,7 +648,7 @@ def ensure_service_srs_list(service, srs_list, auth):
     if list_change:
         service_settings['srs'] = {
             'string': srs_list,
-        },
+        }
         logger.info(f"Service {service}: Current SRS list {current_srs_list} not equals to requested {srs_list}, changing.")
         r_url = get_service_url(service)
         r = requests.put(
