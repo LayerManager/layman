@@ -1,5 +1,5 @@
-from flask import g, current_app
-from layman import LaymanError, settings, authn
+from flask import g
+from layman import LaymanError, authn
 from layman.authn import get_open_id_claims, get_iss_id, get_sub
 from layman.util import slugify, to_safe_names, check_username, get_workspaces, ensure_whole_user, delete_whole_user
 from layman.authn import redis as authn_redis, filesystem as authn_filesystem, prime_db_schema as authn_prime_db_schema

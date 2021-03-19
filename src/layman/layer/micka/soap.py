@@ -1,7 +1,6 @@
-from flask import current_app
 from . import csw
 from .. import LAYER_TYPE
-from layman import settings, LaymanError, authz
+from layman import settings, authz
 from layman.common.micka import util as common_util
 
 PATCH_MODE = csw.PATCH_MODE

@@ -2,7 +2,6 @@ import base64
 import os
 import pathlib
 import re
-import socket
 import time
 from urllib.parse import urlencode
 from flask import current_app

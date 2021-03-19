@@ -146,7 +146,7 @@ def test_num_records(client):
     num_publications = sum([len(publs) for publs in publs_by_type.values()])
     csw = common_util.create_csw()
     assert csw is not None, f"{settings.CSW_URL}, {settings.CSW_BASIC_AUTHN}"
-    from owslib.fes import PropertyIsEqualTo, PropertyIsLike, BBox
+    from owslib.fes import PropertyIsLike
     any_query = PropertyIsLike('apiso:Identifier', '*', wildCard='*')
     csw.getrecords2(constraints=[any_query], maxrecords=100, outputschema="http://www.isotc211.org/2005/gmd")
     assert csw.exceptionreport is None

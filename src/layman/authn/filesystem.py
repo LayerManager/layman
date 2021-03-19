@@ -1,6 +1,5 @@
 import json
 import os
-from flask import current_app
 from layman.common.filesystem import util
 
 AUTHN_SUBFILE = 'authn.txt'

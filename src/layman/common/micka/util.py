@@ -2,7 +2,7 @@ import os
 import time
 
 from owslib.util import nspath_eval
-from flask import g, current_app
+from flask import current_app
 from io import BytesIO
 from owslib.csw import CatalogueServiceWeb
 from requests.exceptions import HTTPError, ConnectionError
@@ -12,7 +12,7 @@ import urllib.parse as urlparse
 import traceback
 from layman import settings, LaymanError, authz
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
-from layman.util import get_publication_info, get_publication_types
+from layman.util import get_publication_info
 import requests
 from copy import deepcopy
 

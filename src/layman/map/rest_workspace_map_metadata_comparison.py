@@ -1,4 +1,4 @@
-from flask import Blueprint, send_file, current_app as app, g, jsonify
+from flask import Blueprint, current_app as app, g, jsonify
 
 from layman import util as layman_util
 from . import util, MAP_REST_PATH_NAME

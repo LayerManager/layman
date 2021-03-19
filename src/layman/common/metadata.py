@@ -1,4 +1,3 @@
-from flask import current_app
 import json
 from layman.util import get_publication_types
 

@@ -1,6 +1,5 @@
 from layman import settings
 import requests
-from requests.exceptions import ConnectionError
 
 AUTH_URLS = settings.OAUTH2_LIFERAY_AUTH_URLS
 INTROSPECTION_URL = settings.OAUTH2_LIFERAY_INTROSPECTION_URL

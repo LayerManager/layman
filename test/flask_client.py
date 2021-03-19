@@ -1,15 +1,12 @@
 import os
 import time
-from multiprocessing.context import Process
 
 import pytest
 
-from layman import app, settings, celery as celery_util, uuid
+from layman import app, settings, celery as celery_util
 from layman.layer import util as util_layer
-from layman.layer import LAYER_TYPE
 from layman.map import util as util_map
 from layman.util import url_for
-from test.util import wait_for_url
 
 
 def publish_layer(username,

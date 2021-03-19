@@ -1,4 +1,3 @@
-from flask import current_app
 from . import csw
 from .. import MAP_TYPE
 from layman.common.micka import util as common_util

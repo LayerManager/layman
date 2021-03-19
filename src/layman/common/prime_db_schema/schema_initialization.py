@@ -3,7 +3,7 @@ import os
 
 from layman.http import LaymanError
 from layman.authn.filesystem import get_authn_info
-from layman.common.prime_db_schema import workspaces, users, publications as publications_module, rights as rights_module
+from layman.common.prime_db_schema import workspaces, users
 from layman.util import get_workspaces as global_get_workspaces
 from layman import util as layman_util, settings
 from . import util as db_util, model

@@ -1,4 +1,4 @@
-from flask import request, g, current_app
+from flask import request, current_app
 from functools import wraps
 from layman import settings
 from layman import LaymanError
