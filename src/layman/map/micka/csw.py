@@ -5,18 +5,19 @@ import re
 from requests.exceptions import HTTPError, ConnectionError
 import os
 import traceback
+from lxml import etree as ET
 from xml.sax.saxutils import escape
+
 from layman import settings, LaymanError
-from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common import language as common_language
+from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util
 from layman.map import MAP_TYPE
 from layman.map.filesystem.uuid import get_map_uuid
 from layman.map.filesystem.input_file import get_map_json, unquote_urls
-from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.layer import LAYER_TYPE
+from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.util import url_for, USERNAME_ONLY_PATTERN, get_publication_info
-from lxml import etree as ET
 
 
 def get_metadata_uuid(uuid):

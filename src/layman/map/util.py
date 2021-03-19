@@ -3,21 +3,18 @@ import json
 from jsonschema import validate, Draft7Validator
 import os
 import re
-
-from layman.authn.filesystem import get_authn_info
 from flask import current_app, request, g
 
-from layman import LaymanError, util as layman_util
+from layman import LaymanError, util as layman_util, celery as celery_util
+from layman.authn.filesystem import get_authn_info
 from layman.common.micka import util as micka_util
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for
-from layman import celery as celery_util
 from . import get_map_sources, MAP_TYPE, get_map_type_def
 from .filesystem import input_file
 from .micka import soap
 from .micka.csw import map_json_to_operates_on, map_json_to_epsg_codes
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
-from layman.common import metadata as common_md
 from layman.common.util import PUBLICATION_NAME_PATTERN, clear_publication_info
 
 
@@ -297,13 +294,13 @@ def get_metadata_comparison(username, mapname):
         map_file_url = url_for('rest_workspace_map_file.get', mapname=mapname, username=username)
         all_props[map_file_url] = layman_file_props
 
-    return common_md.transform_metadata_props_to_comparison(all_props)
+    return metadata_common.transform_metadata_props_to_comparison(all_props)
 
 
 def get_same_or_missing_prop_names(username, mapname):
     md_comparison = get_metadata_comparison(username, mapname)
     prop_names = get_syncable_prop_names()
-    return common_md.get_same_or_missing_prop_names(prop_names, md_comparison)
+    return metadata_common.get_same_or_missing_prop_names(prop_names, md_comparison)
 
 
 def get_map_file_json(username, mapname):

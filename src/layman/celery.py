@@ -1,8 +1,9 @@
 import json
 import time
 from flask import current_app
-from layman import settings
 from celery.contrib.abortable import AbortableAsyncResult
+
+from layman import settings
 from layman.common import redis as redis_util
 
 REDIS_CURRENT_TASK_NAMES = f"{__name__}:CURRENT_TASK_NAMES"
