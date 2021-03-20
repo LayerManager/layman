@@ -185,7 +185,7 @@ def layer_file_chunk_info(username, layername):
                     for x in range(1, total_chunks + 1)
                 ]
                 file_upload_complete = \
-                    all([os.path.exists(p) for p in chunk_paths])
+                    all(os.path.exists(p) for p in chunk_paths)
                 if file_upload_complete:
                     current_app.logger.info(
                         'file_upload_complete ' + target_fn)
