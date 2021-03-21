@@ -91,7 +91,7 @@ jobs:
         run: pylint --version
 
       - name: Run pylint
-        run: pylint -f colorized -r y --fail-under 8.2 --disable=missing-docstring --disable=f-string-without-interpolation --disable=logging-fstring-interpolation --max-line-length=127 ./src ./test
+        run: pylint -f colorized -r y --fail-under 8.9 --disable=missing-docstring --disable=f-string-without-interpolation --disable=logging-fstring-interpolation --max-line-length=127 ./src ./test
 
   PyLint-hard:
     runs-on: ubuntu-latest
