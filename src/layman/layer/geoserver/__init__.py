@@ -96,8 +96,8 @@ def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspac
         layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
                                                       context={'keys': ['access_rights', ]})
 
-    read_roles = (access_rights and access_rights.get('read')) or layer_info['access_rights']['read']
-    write_roles = (access_rights and access_rights.get('write')) or layer_info['access_rights']['write']
+    read_roles = access_rights.get('read') if access_rights and access_rights.get('read') else layer_info['access_rights']['read']
+    write_roles = access_rights.get('write') if access_rights and access_rights.get('write') else layer_info['access_rights']['write']
 
     security_read_roles = common.layman_users_to_geoserver_roles(read_roles)
     common.ensure_layer_security_roles(geoserver_workspace, layer, security_read_roles, 'r', auth)
