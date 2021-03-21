@@ -310,7 +310,7 @@ METADATA_PROPERTIES = {
         'xpath_parent': '/gmd:MD_Metadata',
         'xpath_property': './gmd:referenceSystemInfo[gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor[starts-with(@xlink:href, "http://www.opengis.net/def/crs/EPSG/0/")]]',
         'xpath_extract': './gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor/@xlink:href',
-        'xpath_extract_fn': lambda l: int(l[0].rsplit('/')[-1]) if len(l) else None,
+        'xpath_extract_fn': lambda l: int(l[0].rsplit('/')[-1]) if l else None,
         'adjust_property_element': common_util.adjust_reference_system_info,
     },
     'title': {

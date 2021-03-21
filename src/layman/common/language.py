@@ -257,7 +257,7 @@ def get_languages_cld2(text):
             d for d in known_languages
             if d[1] in PREFERRED_LANGUAGES
         ]
-        langs = preferred_languages if len(preferred_languages) else known_languages
+        langs = preferred_languages if preferred_languages else known_languages
         lang_scores = [lang[2] * lang[3] for lang in langs]
         idx = lang_scores.index(max(lang_scores))
         result = [langs[idx][1]]
