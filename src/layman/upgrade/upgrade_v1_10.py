@@ -216,6 +216,7 @@ def migrate_metadata_records(workspace_filter=None):
     for (workspace, map) in publications:
         logger.info(f'      Migrate map {workspace}.{map}')
         try:
+            # pylint: disable=assignment-from-no-return
             muuid = map_csw.patch_map(workspace, map, ['graphic_url', 'identifier', 'map_endpoint', 'map_file_endpoint', ],
                                       create_if_not_exists=False, timeout=2)
             if not muuid:
