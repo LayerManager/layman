@@ -1,9 +1,9 @@
 from flask import Blueprint, current_app as app, g, jsonify
 
 from layman import util as layman_util
-from . import util, MAP_REST_PATH_NAME
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
+from . import util, MAP_REST_PATH_NAME
 
 bp = Blueprint('rest_workspace_map_metadata_comparison', __name__)
 

@@ -1,5 +1,5 @@
-import pytest
 import requests
+import pytest
 
 from layman import app, settings
 from layman.util import url_for

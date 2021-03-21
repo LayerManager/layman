@@ -1,12 +1,12 @@
 import io
 import time
-import requests
 import os
 import logging
 import json
 from functools import partial
 from collections import namedtuple
 import xml.etree.ElementTree as ET
+import requests
 
 from layman import app
 from layman.util import url_for

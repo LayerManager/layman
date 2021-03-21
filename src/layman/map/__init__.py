@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+from layman.util import url_for
 from ..common import InternalSourceTypeDef
 
 
@@ -70,9 +71,6 @@ PUBLICATION_TYPES = {
         },
     }
 }
-
-
-from layman.util import url_for
 
 
 def get_workspace_publication_url(workspace, publication_name):

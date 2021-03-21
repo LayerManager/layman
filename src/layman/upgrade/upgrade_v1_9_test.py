@@ -1,10 +1,10 @@
+from test import process_client
 import pytest
 
-from . import upgrade_v1_9
 from layman import settings, app
 from layman.common import geoserver as gs_common
 from layman.layer import geoserver as gs_provider
-from test import process_client
+from . import upgrade_v1_9
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 auth = settings.LAYMAN_GS_AUTH

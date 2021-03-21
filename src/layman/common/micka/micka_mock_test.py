@@ -1,15 +1,13 @@
-import requests
 from multiprocessing import Process
 import time
-
+import sys
+from test.mock.micka import run
+import requests
 import pytest
 
 from layman import settings
-import sys
-
 del sys.modules['layman']
 
-from test.mock.micka import run
 
 PORT1 = 8020
 PORT2 = 8021

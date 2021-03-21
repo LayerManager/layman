@@ -1,7 +1,8 @@
+from test import process_client, util
 import pytest
+
 from layman import app
 from . import thumbnail
-from test import process_client, util
 
 
 headers_sld = {

@@ -1,18 +1,16 @@
 import json
 import time
-
-import pytest
+import sys
 import requests
+import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-import sys
-
 del sys.modules['layman']
 
-from layman.map import MAP_TYPE
 from layman import app, settings
+from layman.map import MAP_TYPE
 from layman.uuid import check_redis_consistency
 
 num_maps_before_test = 0

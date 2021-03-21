@@ -1,10 +1,9 @@
+from test import process_client
 import pytest
-
-from . import util, app
 
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
-from test import process_client
+from . import util, app
 
 
 layer = 'test_get_publication_info_layer'

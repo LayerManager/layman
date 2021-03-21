@@ -6,12 +6,12 @@ from werkzeug.datastructures import FileStorage
 
 from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
-from . import util, MAP_TYPE, MAP_REST_PATH_NAME
-from .filesystem import input_file, uuid
 from layman import authn, util as layman_util, settings
 from layman.authn import authenticate, get_authn_username
 from layman.authz import authorize_workspace_publications_decorator
 from layman.common import redis as redis_util, rest as rest_common
+from . import util, MAP_TYPE, MAP_REST_PATH_NAME
+from .filesystem import input_file, uuid
 
 bp = Blueprint('rest_workspace_maps', __name__)
 

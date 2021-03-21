@@ -2,9 +2,9 @@ from celery.utils.log import get_task_logger
 
 from layman.celery import AbortedException
 from layman import celery_app, settings
+from layman.common import geoserver as common_geoserver
 from . import wms, wfs, sld
 from .. import geoserver
-from layman.common import geoserver as common_geoserver
 
 logger = get_task_logger(__name__)
 

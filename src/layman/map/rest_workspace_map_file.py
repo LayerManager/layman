@@ -2,9 +2,9 @@ from flask import Blueprint, jsonify, current_app as app, g
 
 from layman import LaymanError, util as layman_util
 from layman.util import check_username_decorator
-from . import util, MAP_REST_PATH_NAME
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
+from . import util, MAP_REST_PATH_NAME
 
 bp = Blueprint('rest_workspace_map_file', __name__)
 

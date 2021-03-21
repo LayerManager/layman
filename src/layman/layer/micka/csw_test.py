@@ -1,21 +1,19 @@
-from flask import url_for
 from multiprocessing import Process
 import os
-import pytest
 import time
-import requests
 from urllib.parse import urljoin
-
 import sys
+from test.mock.micka import run
+from test import flask_client
+import requests
+from flask import url_for
+import pytest
 
 del sys.modules['layman']
 
 from layman import app, LaymanError
 from layman import settings
 from .csw import get_layer_info, delete_layer, get_metadata_uuid
-
-from test.mock.micka import run
-from test import flask_client
 
 MICKA_PORT = 8020
 

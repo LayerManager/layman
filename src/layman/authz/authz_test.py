@@ -1,11 +1,11 @@
-import pytest
+from test import process_client
 import requests
+from flask import g
+import pytest
 
 from layman import app, settings, LaymanError
 from layman.util import url_for
-from flask import g
 from . import authorize_workspace_publications_decorator
-from test import process_client
 
 
 @authorize_workspace_publications_decorator

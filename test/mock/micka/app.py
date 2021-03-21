@@ -1,7 +1,6 @@
-from flask import Flask, Blueprint
-
 import os
 import importlib
+from flask import Flask, Blueprint
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 

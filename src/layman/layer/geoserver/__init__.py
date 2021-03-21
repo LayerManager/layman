@@ -1,6 +1,5 @@
 import json
 from urllib.parse import urljoin
-
 import requests
 from flask import g
 
@@ -8,8 +7,8 @@ from layman.http import LaymanError
 from layman import settings, util as layman_util
 from layman.common import geoserver as common
 from layman.layer import LAYER_TYPE, db as db_source
-from . import wms
 from layman.layer.qgis import wms as qgis_wms
+from . import wms
 
 FLASK_RULES_KEY = f"{__name__}:RULES"
 

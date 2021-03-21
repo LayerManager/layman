@@ -1,16 +1,15 @@
-import requests
 from urllib.parse import urljoin
-
+import requests
 from flask import current_app
 
-from .util import get_gs_proxy_base_url
-from . import wms
 from layman import settings, patch_mode
 from layman.cache import mem_redis
 from layman.layer.util import is_layer_task_ready
 from layman.common import geoserver as common_geoserver
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
+from .util import get_gs_proxy_base_url
+from . import wms
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
 

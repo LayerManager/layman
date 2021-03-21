@@ -1,6 +1,7 @@
-from celery import chain
 import importlib
 import inspect
+from celery import chain
+
 from layman import settings
 
 

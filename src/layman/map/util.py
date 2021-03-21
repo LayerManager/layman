@@ -1,21 +1,21 @@
 from functools import wraps, partial
 import json
-from jsonschema import validate, Draft7Validator
 import os
 import re
+from jsonschema import validate, Draft7Validator
 from flask import current_app, request, g
 
 from layman import LaymanError, util as layman_util, celery as celery_util
 from layman.authn.filesystem import get_authn_info
 from layman.common.micka import util as micka_util
+from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
+from layman.common.util import PUBLICATION_NAME_PATTERN, clear_publication_info
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for
 from . import get_map_sources, MAP_TYPE, get_map_type_def
 from .filesystem import input_file
 from .micka import soap
 from .micka.csw import map_json_to_operates_on, map_json_to_epsg_codes
-from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
-from layman.common.util import PUBLICATION_NAME_PATTERN, clear_publication_info
 
 
 MAPNAME_PATTERN = PUBLICATION_NAME_PATTERN

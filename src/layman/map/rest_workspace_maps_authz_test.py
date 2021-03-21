@@ -1,6 +1,6 @@
 import json
-import pytest
 from test import process_client
+import pytest
 
 
 def assert_operates_on(workspace, mapname, expected_layers, authz_headers):

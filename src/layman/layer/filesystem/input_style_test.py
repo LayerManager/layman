@@ -1,5 +1,5 @@
-import pytest
 import lxml
+import pytest
 from werkzeug.datastructures import FileStorage
 
 from layman import LaymanError

@@ -1,7 +1,7 @@
 import logging
 
-from . import util
 from layman import settings
+from . import util
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 logger = logging.getLogger(__name__)

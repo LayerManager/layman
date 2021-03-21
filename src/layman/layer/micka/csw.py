@@ -2,7 +2,8 @@ from datetime import datetime, date
 import os
 from functools import partial
 import traceback
-
+from requests.exceptions import HTTPError, ConnectionError
+from lxml import etree as ET
 from flask import current_app
 
 from layman.common.filesystem.uuid import get_publication_uuid_file
@@ -15,8 +16,6 @@ from layman.layer.geoserver import wfs
 from layman.layer import LAYER_TYPE
 from layman import settings, patch_mode, LaymanError
 from layman.util import url_for, get_publication_info
-from requests.exceptions import HTTPError, ConnectionError
-from lxml import etree as ET
 
 PATCH_MODE = patch_mode.NO_DELETE
 

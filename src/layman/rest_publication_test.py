@@ -1,8 +1,8 @@
-import pytest
 import datetime
-from dateutil.parser import parse
-
 from test import process_client
+from dateutil.parser import parse
+import pytest
+
 from layman import LaymanError, settings, app
 from layman.common.prime_db_schema import util as db_util
 from layman.common.micka import util as micka_util

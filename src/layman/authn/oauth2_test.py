@@ -1,9 +1,8 @@
+import sys
+from test import process, process_client
 import requests
-
 import pytest
 from layman.util import url_for
-
-import sys
 
 del sys.modules['layman']
 
@@ -13,7 +12,6 @@ from layman import settings
 from layman import uuid
 from .oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
 from .oauth2 import liferay
-from test import process, process_client
 
 
 LIFERAY_PORT = process.LIFERAY_PORT

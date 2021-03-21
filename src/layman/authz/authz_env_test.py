@@ -1,6 +1,6 @@
+from test import process, process_client
 import pytest
 
-from test import process, process_client
 from layman.http import LaymanError
 
 

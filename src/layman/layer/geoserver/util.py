@@ -1,5 +1,5 @@
-import requests
 from urllib.parse import urljoin, urlparse
+import requests
 from owslib.wms import WebMapService
 from owslib.wfs import WebFeatureService
 

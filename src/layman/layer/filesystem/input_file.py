@@ -6,9 +6,8 @@ from osgeo import ogr
 
 from layman.http import LaymanError
 from layman import settings, patch_mode
+from layman.common.filesystem import util as common_util, input_file as common
 from . import util
-from layman.common.filesystem import util as common_util
-from layman.common.filesystem import input_file as common
 
 LAYER_SUBDIR = __name__.split('.')[-1]
 

@@ -3,10 +3,10 @@ import os
 import pathlib
 from urllib.parse import unquote
 
-from . import util
 from layman.common.filesystem import util as common_util
 from layman.common.filesystem import input_file as common
 from layman.util import url_for
+from . import util
 
 MAP_SUBDIR = __name__.split('.')[-1]
 

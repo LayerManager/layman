@@ -1,7 +1,8 @@
 import pytest
-from .. import geoserver as common
+
 from layman import app
 from layman import settings
+from .. import geoserver as common
 
 TEST_ROLE = 'test_role_abc'
 TEST_USER = 'test_user_abc'
