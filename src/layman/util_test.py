@@ -133,10 +133,10 @@ def test_publication_interface_methods():
 
     module_getters = [provider_modules_getter, source_modules_getter]
     for modules_getter in module_getters:
-        assert set(settings.PUBLICATION_MODULES) == set([
+        assert set(settings.PUBLICATION_MODULES) == set(
             interface['publication_type'] for interface in interfaces
             if modules_getter == interface['modules_getter']
-        ])
+        )
 
     for interface in interfaces:
         publ_module = importlib.import_module(interface['publication_type'])
@@ -184,7 +184,7 @@ class TestGetPublicationInfosClass:
                                    expected_publications):
         with app.app_context():
             infos = util.get_publication_infos(self.owner, publ_type, context)
-        publ_set = set([publication_name for (workspace, publication_type, publication_name) in infos.keys()])
+        publ_set = set(publication_name for (workspace, publication_type, publication_name) in infos.keys())
         assert publ_set == expected_publications, publ_set
 
 
