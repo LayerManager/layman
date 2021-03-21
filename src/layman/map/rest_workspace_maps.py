@@ -4,7 +4,6 @@ import io
 from flask import Blueprint, jsonify, request, current_app as app, g
 from werkzeug.datastructures import FileStorage
 
-from layman.common import rest as rest_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
 from . import util, MAP_TYPE, MAP_REST_PATH_NAME
@@ -92,7 +91,7 @@ def post(username):
             'actor_name': actor_name
         }
 
-        rest_util.setup_post_access_rights(request.form, kwargs, actor_name)
+        rest_common.setup_post_access_rights(request.form, kwargs, actor_name)
         util.pre_publication_action_check(username,
                                           mapname,
                                           kwargs,
