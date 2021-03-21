@@ -33,6 +33,7 @@ def get_max_data_version():
 
 def get_current_data_version():
     # This table should have only one row (or none for the first time)
+    # pylint: disable=no-member
     current_version = None
     try:
         sql_select = f'''select major_version, minor_version, patch_version, migration from {DB_SCHEMA}.data_version;'''
