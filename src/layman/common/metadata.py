@@ -88,8 +88,8 @@ PROPERTIES = {
     },
     'operates_on': {
         'upper_mp': '*',
-        'equals_fn': lambda a, b: set([json.dumps(ai, sort_keys=True) for ai in a]) == set(
-            [json.dumps(bi, sort_keys=True) for bi in b]),
+        'equals_fn': lambda a, b: set(json.dumps(ai, sort_keys=True) for ai in a) == set(
+            json.dumps(bi, sort_keys=True) for bi in b),
     },
     'map_endpoint': {
         'upper_mp': '1',
@@ -177,7 +177,7 @@ def _extent_intersects(a, b):
 
 
 def transform_metadata_props_to_comparison(all_props):
-    prop_names = sorted(list(set([pn for po in all_props.values() for pn in po.keys()])))
+    prop_names = sorted(list(set(pn for po in all_props.values() for pn in po.keys())))
     sources = {
         f"s{idx + 1}": {
             'url': k
