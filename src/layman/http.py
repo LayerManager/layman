@@ -1,6 +1,7 @@
 from .error_list import ERROR_LIST
 
 
+# pylint: disable=super-init-not-called
 class LaymanError(Exception):
 
     def __init__(self, code_or_message, data=None, http_code=None, private_data=None, sub_code=None):
