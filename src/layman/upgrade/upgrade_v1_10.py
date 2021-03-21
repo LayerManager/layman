@@ -217,7 +217,9 @@ def migrate_metadata_records(workspace_filter=None):
         logger.info(f'      Migrate map {workspace}.{map}')
         try:
             # pylint: disable=assignment-from-no-return
-            muuid = map_csw.patch_map(workspace, map, ['graphic_url', 'identifier', 'map_endpoint', 'map_file_endpoint', ],
+            muuid = map_csw.patch_map(workspace, map,
+                                      metadata_properties_to_refresh=['graphic_url', 'identifier', 'map_endpoint',
+                                                                      'map_file_endpoint', ],
                                       create_if_not_exists=False, timeout=2)
             if not muuid:
                 logger.warning(f'        Metadata record of the map was not migrated, because the record does not exist.')
