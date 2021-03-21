@@ -13,8 +13,8 @@ def create_connection_cursor():
     try:
         connection = psycopg2.connect(**settings.PG_CONN)
         connection.set_session(autocommit=True)
-    except BaseException:
-        raise LaymanError(6)
+    except BaseException as exc:
+        raise LaymanError(6) from exc
     cursor = connection.cursor()
     return connection, cursor
 
@@ -38,7 +38,7 @@ def run_query(query, data=None, conn_cur=None, encapsulate_exception=True):
     except BaseException as exc:
         if encapsulate_exception:
             app.logger.error(f"run_query, query={query}, data={data}, exc={exc}")
-            raise LaymanError(7)
+            raise LaymanError(7) from exc
         raise exc
 
     return rows
@@ -55,7 +55,7 @@ def run_statement(query, data=None, conn_cur=None, encapsulate_exception=True):
     except BaseException as exc:
         if encapsulate_exception:
             app.logger.error(f"run_query, query={query}, data={data}, exc={exc}")
-            raise LaymanError(7)
+            raise LaymanError(7) from exc
         raise exc
     return rows
 

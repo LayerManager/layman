@@ -208,11 +208,11 @@ def check_file(file):
             validate(instance=file_json, schema=schema_json)
             return file_json
 
-    except ValueError:
+    except ValueError as exc:
         raise LaymanError(2, {
             'parameter': 'file',
             'reason': 'Invalid JSON syntax'
-        })
+        }) from exc
 
 
 def _get_map_task(username, mapname):

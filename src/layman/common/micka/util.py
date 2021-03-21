@@ -302,9 +302,9 @@ def soap_insert_record(record, is_public):
             'edit_user': settings.CSW_BASIC_AUTHN[0],
             'read_user': settings.CSW_BASIC_AUTHN[0],
         })
-    except (HTTPError, ConnectionError):
+    except (HTTPError, ConnectionError) as exc:
         current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38)
+        raise LaymanError(38) from exc
     return muuid
 
 

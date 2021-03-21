@@ -21,8 +21,8 @@ def create_connection_cursor():
     try:
         connection = psycopg2.connect(**settings.PG_CONN)
         connection.set_session(autocommit=True)
-    except BaseException:
-        raise LaymanError(6)
+    except BaseException as exc:
+        raise LaymanError(6) from exc
     cursor = connection.cursor()
     return (connection, cursor)
 
@@ -45,9 +45,9 @@ def get_workspaces(conn_cur=None):
     from information_schema.schemata
     where schema_name NOT IN ('{"', '".join(settings.PG_NON_USER_SCHEMAS)}\
 ') AND schema_owner = '{settings.LAYMAN_PG_USER}'""")
-    except BaseException:
+    except BaseException as exc:
         logger.error(f'get_workspaces ERROR')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
     rows = cur.fetchall()
     return [
         r[0] for r in rows
@@ -72,9 +72,9 @@ def ensure_workspace(username, conn_cur=None):
         cur.execute(
             f"""CREATE SCHEMA IF NOT EXISTS "{username}" AUTHORIZATION {settings.LAYMAN_PG_USER}""")
         conn.commit()
-    except BaseException:
+    except BaseException as exc:
         logger.error(f'ensure_workspace ERROR')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
 
 
 def delete_workspace(username, conn_cur=None):
@@ -86,9 +86,9 @@ def delete_workspace(username, conn_cur=None):
         cur.execute(
             f"""DROP SCHEMA IF EXISTS "{username}" RESTRICT""")
         conn.commit()
-    except BaseException:
+    except BaseException as exc:
         logger.error(f'delete_workspace ERROR')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
 
 
 def ensure_whole_user(username):
@@ -157,9 +157,9 @@ def check_new_layername(username, layername, conn_cur=None):
     FROM   pg_class c
     JOIN   pg_namespace n ON n.oid = c.relnamespace
     WHERE  n.nspname IN ('{username}', '{settings.PG_POSTGIS_SCHEMA}') AND c.relname='{layername}'""")
-    except BaseException:
+    except BaseException as exc:
         logger.error(f'check_new_layername ERROR')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
     rows = cur.fetchall()
     if len(rows) > 0:
         raise LaymanError(9, {'db_object_name': layername})
@@ -176,9 +176,9 @@ WHERE table_schema = '{username}'
 AND table_name = '{layername}'
 AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 """)
-    except BaseException:
+    except BaseException as exc:
         logger.error(f'get_text_column_names ERROR')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
     rows = cur.fetchall()
     return [r[0] for r in rows]
 
@@ -197,9 +197,9 @@ FROM information_schema.columns
 WHERE table_schema = '{username}'
 AND table_name = '{layername}'
 """)
-    except BaseException:
+    except BaseException as exc:
         logger.error(f'get_all_column_names ERROR')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
     rows = cur.fetchall()
     return [ColumnInfo(name=r[0], data_type=r[1]) for r in rows]
 
@@ -212,9 +212,9 @@ def get_number_of_features(username, layername, conn_cur=None):
 select count(*)
 from {username}.{layername}
 """)
-    except BaseException:
+    except BaseException as exc:
         logger.error(f'get_number_of_features ERROR')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
     rows = cur.fetchall()
     return rows[0][0]
 
@@ -235,9 +235,9 @@ from {username}.{layername}
 order by ogc_fid
 limit {limit}
 """)
-    except BaseException:
+    except BaseException as exc:
         logger.error(f'get_text_data ERROR')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
     rows = cur.fetchall()
     col_texts = defaultdict(list)
     for row in rows:
@@ -373,9 +373,9 @@ def get_most_frequent_lower_distance(username, layername, conn_cur=None):
 
     try:
         cur.execute(query)
-    except BaseException:
+    except BaseException as exc:
         logger.error(f'get_most_frequent_lower_distance ERROR')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
     rows = cur.fetchall()
     # for row in rows:
     #     print(f"row={row}")
@@ -431,9 +431,9 @@ def get_most_frequent_lower_distance2(username, layername, conn_cur=None):
 
     try:
         cur.execute(query)
-    except BaseException:
+    except BaseException as exc:
         logger.error(f'get_most_frequent_lower_distance2 ERROR')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
     rows = cur.fetchall()
     # for row in rows:
     #     print(f"row={row}")
@@ -450,9 +450,9 @@ def create_string_attributes(attribute_tuples, conn_cur=None):
     query = "\n".join([f"""ALTER TABLE {username}.{layername} ADD COLUMN {attrname} VARCHAR(1024);""" for username, layername, attrname in attribute_tuples]) + "\n COMMIT;"
     try:
         cur.execute(query)
-    except BaseException:
+    except BaseException as exc:
         logger.error(f'create_string_attributes ERROR')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
 
 
 def get_missing_attributes(attribute_tuples, conn_cur=None):
@@ -469,9 +469,9 @@ where c.column_name is null"""
     try:
         if attribute_tuples:
             cur.execute(query)
-    except BaseException:
+    except BaseException as exc:
         logger.error(f'get_missing_attributes ERROR')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
 
     missing_attributes = set()
     rows = cur.fetchall()
@@ -501,7 +501,7 @@ from {username}.{layername}
         cur.execute(sql)
     except BaseException as exc:
         logger.error(f'get_bbox ERROR username={username}, layer={layername}, sql="{sql}", exc={exc} \n\n\n , exc={exc.with_traceback()}')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
     rows = cur.fetchall()
     conn.commit()
     result = rows[0][0]
@@ -539,9 +539,9 @@ select distinct ST_GeometryType(wkb_geometry) as geometry_type_name
 from {username}.{layername}
 """
         cur.execute(sql)
-    except BaseException:
+    except BaseException as exc:
         logger.error(f'get_geometry_types ERROR')
-        raise LaymanError(7)
+        raise LaymanError(7) from exc
     rows = cur.fetchall()
     conn.commit()
     result = [row[0] for row in rows]
