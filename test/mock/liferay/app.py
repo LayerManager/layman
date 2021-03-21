@@ -19,7 +19,7 @@ def create_app(app_config):
             tok2prof.update(token_2_profile)
             u_idx = 30000
             for username, userdef in v.items():
-                sub = userdef and userdef.get('sub', None) or f"{u_idx}"
+                sub = userdef.get('sub') if userdef else f'{u_idx}'
                 assert sub not in [
                     introsp['sub'] for introsp in tok2is.values()
                 ]
