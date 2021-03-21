@@ -1,6 +1,7 @@
-import pytest
-from layman import settings, LaymanError
 from test import process_client
+import pytest
+
+from layman import settings, LaymanError
 
 
 class TestDeletePublicationsClass:

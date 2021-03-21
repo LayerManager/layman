@@ -2,18 +2,15 @@ import io
 import json
 import logging
 import re
-import requests
 import time
 import os
 from urllib.parse import urljoin
-from layman import settings
+import requests
+from layman import settings, util
 from layman.http import LaymanError
-from layman.common import prime_db_schema
-from layman.common import geoserver as gs_common
+from layman.common import prime_db_schema, geoserver as gs_common
 from layman.common.prime_db_schema import workspaces, util as db_util
-from layman import util
-from layman.layer import LAYER_TYPE
-from layman.layer import geoserver
+from layman.layer import LAYER_TYPE, geoserver
 from layman.layer.geoserver import wms, util as gs_util
 from layman.layer.micka import csw as layer_csw
 from layman.layer.filesystem import util as layer_fs_util, input_style

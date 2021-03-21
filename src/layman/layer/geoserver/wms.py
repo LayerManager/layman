@@ -1,15 +1,14 @@
-import requests
 from urllib.parse import urljoin
-
+from urllib.parse import urlencode, urlparse, urlunparse, parse_qs, parse_qsl
+import requests
 from flask import current_app
 
-from .util import get_gs_proxy_base_url
 from layman import settings, patch_mode, util as layman_util
 from layman.cache import mem_redis
 from layman.common import geoserver as common_geoserver
 from layman.layer.util import is_layer_task_ready
-from urllib.parse import urlencode, urlparse, urlunparse, parse_qs, parse_qsl
 from layman.layer import LAYER_TYPE, util as layer_util
+from .util import get_gs_proxy_base_url
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
 DEFAULT_WMS_STORE_PREFIX = 'qgis'

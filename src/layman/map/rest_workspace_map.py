@@ -4,13 +4,13 @@ import io
 from flask import Blueprint, jsonify, request, current_app as app, g
 from werkzeug.datastructures import FileStorage
 
+from layman import authn, util as layman_util
 from layman.common import rest as rest_util
 from layman.util import check_username_decorator
-from . import util, MAP_REST_PATH_NAME
-from .filesystem import input_file, thumbnail
-from layman import authn, util as layman_util
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
+from . import util, MAP_REST_PATH_NAME
+from .filesystem import input_file, thumbnail
 
 bp = Blueprint('rest_workspace_map', __name__)
 

@@ -1,5 +1,5 @@
-from . import util
 from layman import settings
+from . import util
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 

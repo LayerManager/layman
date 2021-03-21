@@ -1,5 +1,5 @@
-from flask import jsonify
 import re
+from flask import jsonify
 
 from layman import settings, util as layman_util, LaymanError
 from layman.common.prime_db_schema import util as prime_db_schema_util

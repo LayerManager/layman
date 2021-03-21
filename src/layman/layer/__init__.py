@@ -13,6 +13,7 @@ def get_layer_sources():
 LAYER_REST_PATH_NAME = "layers"
 
 
+from layman.util import url_for
 from ..common import InternalSourceTypeDef
 from .rest_workspace_layers import bp as workspace_layers_bp
 from .rest_workspace_layer import bp as workspace_layer_bp
@@ -102,9 +103,6 @@ STYLE_TYPES_DEF = [StyleTypeDef('sld',
                                 ),
                    ]
 NO_STYLE_DEF = STYLE_TYPES_DEF[0]
-
-
-from layman.util import url_for
 
 
 def get_workspace_publication_url(workspace, publication_name):

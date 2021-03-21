@@ -1,12 +1,12 @@
 from datetime import datetime, date
-from flask import current_app
 from functools import partial
 import re
-from requests.exceptions import HTTPError, ConnectionError
 import os
 import traceback
-from lxml import etree as ET
 from xml.sax.saxutils import escape
+from lxml import etree as ET
+from requests.exceptions import HTTPError, ConnectionError
+from flask import current_app
 
 from layman import settings, LaymanError
 from layman.common import language as common_language

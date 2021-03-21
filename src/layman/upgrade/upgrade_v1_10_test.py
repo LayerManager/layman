@@ -1,11 +1,11 @@
 from datetime import date
 import pathlib
-import pytest
 import shutil
 import os
 from collections import namedtuple
+from test import process_client, util
+import pytest
 
-from . import upgrade_v1_10
 from layman import app, settings
 from layman.util import url_for
 from layman.http import LaymanError
@@ -21,7 +21,7 @@ from layman.common.micka import util as micka_util
 from layman.common.filesystem import uuid as uuid_common
 from layman.common.prime_db_schema import util as db_util
 from layman.uuid import generate_uuid
-from test import process_client, util
+from . import upgrade_v1_10
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 

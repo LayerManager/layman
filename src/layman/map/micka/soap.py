@@ -1,7 +1,7 @@
+from layman import settings, authz
+from layman.common.micka import util as common_util
 from . import csw
 from .. import MAP_TYPE
-from layman.common.micka import util as common_util
-from layman import settings, authz
 
 get_map_info = csw.get_map_info
 

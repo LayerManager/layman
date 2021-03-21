@@ -1,6 +1,6 @@
-from flask import g, current_app as app
-import psycopg2
 import re
+import psycopg2
+from flask import g, current_app as app
 
 from layman import settings
 from layman.http import LaymanError

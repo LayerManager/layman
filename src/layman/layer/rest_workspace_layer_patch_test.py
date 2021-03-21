@@ -1,12 +1,10 @@
+from test import geoserver_client, process_client as client_util
 import pytest
 
 from layman import settings, app
 from layman.common import geoserver
 from layman.layer.prime_db_schema import table as prime_db_schema
 from layman.common.prime_db_schema import users
-from test import geoserver_client
-
-from test import process_client as client_util
 
 
 def assert_gs_user_and_roles(username):

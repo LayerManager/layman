@@ -4,10 +4,10 @@ from layman.common import rest as rest_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator
 from layman import settings, authn, util as layman_util
-from . import util, LAYER_REST_PATH_NAME
-from .filesystem import input_file, input_style, input_chunk
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
+from . import util, LAYER_REST_PATH_NAME
+from .filesystem import input_file, input_style, input_chunk
 
 bp = Blueprint('rest_workspace_layer', __name__)
 

@@ -1,9 +1,9 @@
-from celery import chain
 import importlib
 import time
-from celery.contrib.abortable import AbortableAsyncResult
-
 import sys
+from test import flask_client
+from celery import chain
+from celery.contrib.abortable import AbortableAsyncResult
 
 del sys.modules['layman']
 
@@ -11,7 +11,6 @@ from layman import app, celery_app
 from layman.layer.filesystem import input_chunk
 from layman import celery as celery_util
 from layman.common import tasks as tasks_util
-from test import flask_client
 
 min_geojson = """
 {

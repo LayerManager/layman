@@ -1,13 +1,13 @@
 import os
+from test import process_client, util as test_util
 from lxml import etree as ET
-import pytest
 import requests
-from . import util
+from owslib.wms import WebMapService
+import pytest
 from layman import app, settings, LaymanError
+from . import util
 from .. import db
 from ..filesystem import thumbnail
-from test import process_client, util as test_util
-from owslib.wms import WebMapService
 
 
 @pytest.mark.usefixtures('ensure_layman')

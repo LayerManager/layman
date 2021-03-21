@@ -1,11 +1,11 @@
 import sys
-import pytest
+from test import process_client
 import requests
+import pytest
 
 del sys.modules['layman']
 
 from layman import app, util as layman_util
-from test import process_client
 
 
 @pytest.mark.usefixtures('ensure_layman')

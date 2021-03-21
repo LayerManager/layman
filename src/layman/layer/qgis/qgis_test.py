@@ -1,10 +1,10 @@
-import pytest
 import os
+from test import process_client
+import pytest
 
 from layman import app, settings, util as layman_util
 from layman.layer import qgis
 from layman.layer.qgis import wms
-from test import process_client
 
 
 @pytest.mark.usefixtures('ensure_layman')

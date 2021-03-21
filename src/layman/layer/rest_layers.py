@@ -1,11 +1,10 @@
-from flask import Blueprint, g, request
-from flask import current_app as app
+from flask import Blueprint, g, request, current_app as app
 
 from layman import settings
-from . import LAYER_TYPE, LAYER_REST_PATH_NAME
 from layman.authn import authenticate, get_authn_username
 from layman.authz import authorize_publications_decorator
 from layman.common import rest as rest_common
+from . import LAYER_TYPE, LAYER_REST_PATH_NAME
 
 bp = Blueprint('rest_layers', __name__)
 

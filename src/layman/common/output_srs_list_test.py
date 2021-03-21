@@ -1,8 +1,9 @@
 import math
+from test import process, process_client, geoserver_client, util
 import pytest
+
 from layman import settings, app
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
-from test import process, process_client, geoserver_client, util
 
 
 LAYERS_TO_DELETE_AFTER_TEST = []

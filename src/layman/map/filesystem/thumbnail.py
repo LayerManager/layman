@@ -10,11 +10,10 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import \
     DesiredCapabilities
 
-from . import util
-from layman.common.filesystem import util as common_util
-from . import input_file
 from layman import settings
+from layman.common.filesystem import util as common_util
 from layman.util import url_for
+from . import util, input_file
 
 MAP_SUBDIR = __name__.split('.')[-1]
 

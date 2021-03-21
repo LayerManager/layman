@@ -1,7 +1,6 @@
 import logging
-import pytest
-
 from test import process_client
+import pytest
 
 from layman import settings, app, util, upgrade
 from layman.layer import LAYER_TYPE

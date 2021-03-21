@@ -1,5 +1,5 @@
-from layman import settings
 import requests
+from layman import settings
 
 AUTH_URLS = settings.OAUTH2_LIFERAY_AUTH_URLS
 INTROSPECTION_URL = settings.OAUTH2_LIFERAY_INTROSPECTION_URL

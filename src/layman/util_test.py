@@ -1,12 +1,12 @@
-import pytest
-import importlib
-
-from . import app, settings, LaymanError, util
-from .util import slugify, get_modules_from_names, get_providers_from_source_names, url_for
 from test import process_client
+import importlib
+import pytest
+
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
 from layman.common.filesystem import uuid
+from . import app, settings, LaymanError, util
+from .util import slugify, get_modules_from_names, get_providers_from_source_names, url_for
 
 
 def test_slugify():

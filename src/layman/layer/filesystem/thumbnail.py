@@ -1,11 +1,10 @@
 import os
 import pathlib
-from layman import settings, LaymanError
 
-from layman import patch_mode
+from layman import settings, LaymanError, patch_mode
 from layman.util import url_for
-from . import util, input_file
 from layman.common.filesystem import util as common_util
+from . import util, input_file
 from ..geoserver import wms as geoserver_wms
 
 LAYER_SUBDIR = __name__.split('.')[-1]

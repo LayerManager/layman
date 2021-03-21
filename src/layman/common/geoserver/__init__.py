@@ -3,13 +3,14 @@ import logging
 import json
 from functools import partial
 import xml.etree.ElementTree as ET
-import requests
 import secrets
 import string
 from urllib.parse import urljoin
+import requests
+
 from layman import settings
-from ..db import launder_attribute_name
 from layman.http import LaymanError
+from ..db import launder_attribute_name
 
 
 logger = logging.getLogger(__name__)

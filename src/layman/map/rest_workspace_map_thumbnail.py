@@ -1,14 +1,13 @@
 import os
-
 from flask import Blueprint, send_file, current_app as app, g
 
-from layman.common.filesystem.util import get_user_dir
 from layman import LaymanError, util as layman_util
 from layman.util import check_username_decorator
-from . import util, MAP_REST_PATH_NAME
-from .filesystem import thumbnail
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
+from layman.common.filesystem.util import get_user_dir
+from . import util, MAP_REST_PATH_NAME
+from .filesystem import thumbnail
 
 bp = Blueprint('rest_workspace_map_thumbnail', __name__)
 

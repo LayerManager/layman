@@ -4,24 +4,21 @@ import json
 import os
 import time
 import difflib
+import sys
+from test import flask_client
 import requests
-
 import pytest
 from flask import url_for
-from test import flask_client
-
-import sys
 
 del sys.modules['layman']
 
-from . import util, MAP_TYPE
-from .micka import csw
-from .filesystem import uuid as map_uuid
-from layman import app, settings, uuid
-from layman import celery as celery_util
+from layman import app, settings, uuid, celery as celery_util
 from layman.util import url_for as url_for_external
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
+from . import util, MAP_TYPE
+from .micka import csw
+from .filesystem import uuid as map_uuid
 
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
 

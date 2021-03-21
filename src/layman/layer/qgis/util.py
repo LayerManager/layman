@@ -4,10 +4,10 @@ import os
 import io
 from lxml import etree as ET
 
-from . import wms
 from layman import settings, LaymanError
 from layman.layer.filesystem import input_style
 from layman.common import db as db_common
+from . import wms
 
 ELEMENTS_TO_REWRITE = ['legend', 'expressionfields']
 

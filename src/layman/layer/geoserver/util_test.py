@@ -1,5 +1,5 @@
-from . import get_usernames
 from layman import settings
+from . import get_usernames
 
 
 def test_layman_gs_user_not_in_get_usernames():

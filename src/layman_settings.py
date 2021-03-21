@@ -1,6 +1,7 @@
 import os
 import re
 from urllib.parse import urljoin, urlparse
+import redis
 from layman_settings_util import read_clients_dict_from_env
 
 LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
@@ -170,7 +171,6 @@ UPLOAD_MAX_INACTIVITY_TIME = 5 * 60  # 5 minutes
 LAYMAN_CACHE_GS_TIMEOUT = 1 * 60  # 1 minute
 
 LAYMAN_REDIS_URL = os.environ['LAYMAN_REDIS_URL']
-import redis
 
 LAYMAN_REDIS = redis.Redis.from_url(LAYMAN_REDIS_URL, encoding="utf-8", decode_responses=True)
 
