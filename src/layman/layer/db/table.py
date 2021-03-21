@@ -29,8 +29,8 @@ WHERE schemaname = '{username}'
     AND tablename = '{layername}'
     AND tableowner = '{settings.LAYMAN_PG_USER}'
 """)
-    except BaseException:
-        raise LaymanError(7)
+    except BaseException as exc:
+        raise LaymanError(7) from exc
     rows = cur.fetchall()
     result = {}
     if len(rows) > 0:
@@ -52,8 +52,8 @@ def delete_layer(username, layername, conn_cur=None):
     try:
         cur.execute(query)
         conn.commit()
-    except BaseException:
-        raise LaymanError(7)
+    except BaseException as exc:
+        raise LaymanError(7)from exc
 
 
 def get_publication_uuid(username, publication_type, publication_name):

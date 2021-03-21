@@ -80,9 +80,9 @@ def patch_layer(workspace, layername, metadata_properties_to_refresh, actor_name
             'muuid': muuid,
             'record': record,
         }, timeout=timeout)
-    except (HTTPError, ConnectionError):
+    except (HTTPError, ConnectionError) as exc:
         current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38)
+        raise LaymanError(38) from exc
     return muuid
 
 
@@ -101,9 +101,9 @@ def delete_layer(workspace, layername):
         return
     try:
         common_util.csw_delete(muuid)
-    except (HTTPError, ConnectionError):
+    except (HTTPError, ConnectionError) as exc:
         current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38)
+        raise LaymanError(38) from exc
 
 
 def csw_insert(workspace, layername):
@@ -113,9 +113,9 @@ def csw_insert(workspace, layername):
         muuid = common_util.csw_insert({
             'record': record
         })
-    except (HTTPError, ConnectionError):
+    except (HTTPError, ConnectionError) as exc:
         current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38)
+        raise LaymanError(38) from exc
     return muuid
 
 

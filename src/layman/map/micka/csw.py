@@ -58,9 +58,9 @@ def delete_map(username, mapname):
         return
     try:
         common_util.csw_delete(muuid)
-    except (HTTPError, ConnectionError):
+    except (HTTPError, ConnectionError) as exc:
         current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38)
+        raise LaymanError(38) from exc
 
 
 def post_map(username, mapname):
@@ -100,9 +100,9 @@ def patch_map(username, mapname, metadata_properties_to_refresh=None, actor_name
             'muuid': muuid,
             'record': record,
         }, timeout=timeout)
-    except (HTTPError, ConnectionError):
+    except (HTTPError, ConnectionError) as exc:
         current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38)
+        raise LaymanError(38) from exc
     return muuid
 
 
@@ -113,9 +113,9 @@ def csw_insert(username, mapname, actor_name):
         muuid = common_util.csw_insert({
             'record': record
         })
-    except (HTTPError, ConnectionError):
+    except (HTTPError, ConnectionError) as exc:
         current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38)
+        raise LaymanError(38) from exc
     return muuid
 
 
