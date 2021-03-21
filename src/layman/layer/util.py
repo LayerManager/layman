@@ -9,7 +9,6 @@ from layman.util import call_modules_fn, get_providers_from_source_names, get_in
 from layman import celery as celery_util
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
-from layman.common import metadata as common_md
 from layman.common.util import PUBLICATION_NAME_PATTERN, clear_publication_info
 
 LAYERNAME_PATTERN = PUBLICATION_NAME_PATTERN
@@ -263,7 +262,7 @@ def get_metadata_comparison(username, layername):
         if pi is not None:
             all_props.update(pi)
 
-    return common_md.transform_metadata_props_to_comparison(all_props)
+    return metadata_common.transform_metadata_props_to_comparison(all_props)
 
 
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, LAYER_TYPE)
@@ -272,4 +271,4 @@ get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, LAYER
 def get_same_or_missing_prop_names(username, layername):
     md_comparison = get_metadata_comparison(username, layername)
     prop_names = get_syncable_prop_names()
-    return common_md.get_same_or_missing_prop_names(prop_names, md_comparison)
+    return metadata_common.get_same_or_missing_prop_names(prop_names, md_comparison)

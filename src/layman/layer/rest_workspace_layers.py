@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify, request, g
 from flask import current_app as app
 
-from layman.common import rest as rest_util
 from layman.http import LaymanError
 from layman.util import check_username_decorator, url_for
 from layman import settings, authn, util as layman_util
@@ -107,7 +106,7 @@ def post(username):
         'store_in_geoserver': style_type.store_in_geoserver,
     }
 
-    rest_util.setup_post_access_rights(request.form, task_options, actor_name)
+    rest_common.setup_post_access_rights(request.form, task_options, actor_name)
     util.pre_publication_action_check(username,
                                       layername,
                                       task_options,
