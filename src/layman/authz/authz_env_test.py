@@ -20,7 +20,7 @@ class TestPublicWorkspaceClass:
         process_client.reserve_username(username, headers=user_authz_headers)
         yield
 
-    @pytest.mark.timeout(30)
+    @classmethod
     @pytest.mark.usefixtures('liferay_mock', 'setup_test_public_workspace_variable')
     @pytest.mark.parametrize("publish_method, delete_method, workspace_suffix", [
         (process_client.publish_workspace_layer, process_client.delete_workspace_layer, '_layer',),
@@ -36,7 +36,7 @@ class TestPublicWorkspaceClass:
             (username, 'EVERYONE', workspace_name + 'ue', publication_name, user_authz_headers, True, True, False,),
         ],
     )
-    def test_public_workspace_variable(self,
+    def test_public_workspace_variable(cls,
                                        create_public_workspace,
                                        publish_in_public_workspace,
                                        workspace_prefix,
