@@ -91,7 +91,7 @@ jobs:
         run: pylint --version
 
       - name: Run pylint
-        run: pylint -f colorized -r y --fail-under 8.2 --disable=missing-docstring --max-line-length=127 ./src ./test
+        run: pylint -f colorized -r y --fail-under 8.2 --disable=missing-docstring --disable=f-string-without-interpolation --disable=logging-fstring-interpolation --max-line-length=127 ./src ./test
 
   PyLint-hard:
     runs-on: ubuntu-latest
@@ -112,7 +112,7 @@ jobs:
         run: pylint --version
 
       - name: Run pylint
-        run: pylint -f colorized -r y --disable=missing-docstring --disable=duplicate-except --disable=duplicate-code --disable=no-name-in-module --disable=fixme --disable=invalid-name --disable=too-many-lines --disable=wrong-import-order --disable=unused-argument --disable=line-too-long --disable=redefined-outer-name --disable=f-string-without-interpolation --disable=logging-fstring-interpolation --disable=c-extension-no-member --disable=import-outside-toplevel --disable=too-many-locals --disable=redefined-builtin --disable=too-many-arguments --disable=wrong-import-position --disable=protected-access --disable=too-many-statements --disable=global-statement --disable=too-many-branches --max-line-length=127 ./src ./test
+        run: pylint -f colorized -r y --disable=missing-docstring --disable=f-string-without-interpolation --disable=logging-fstring-interpolation --disable=duplicate-except --disable=duplicate-code --disable=no-name-in-module --disable=fixme --disable=invalid-name --disable=too-many-lines --disable=wrong-import-order --disable=unused-argument --disable=line-too-long --disable=redefined-outer-name --disable=c-extension-no-member --disable=import-outside-toplevel --disable=too-many-locals --disable=redefined-builtin --disable=too-many-arguments --disable=wrong-import-position --disable=protected-access --disable=too-many-statements --disable=global-statement --disable=too-many-branches --max-line-length=127 ./src ./test
 
   AutoPEP8:
     runs-on: ubuntu-latest
