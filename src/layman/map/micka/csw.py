@@ -51,14 +51,6 @@ def get_publication_uuid(username, publication_type, publication_name):
     return None
 
 
-def post_map(username, mapname):
-    pass
-
-
-def patch_map(username, mapname):
-    pass
-
-
 def delete_map(username, mapname):
     uuid = get_map_uuid(username, mapname)
     muuid = get_metadata_uuid(uuid)
