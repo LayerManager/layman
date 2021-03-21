@@ -94,6 +94,7 @@ class TestGetPublications:
                 process_client.delete_workspace_publication(publication_type, publication[0], publication[1],
                                                             publication[2].get('headers'))
 
+    @classmethod
     @pytest.mark.parametrize('headers, query_params, expected_publications', [
         (authn_headers_user2, {}, [(workspace1, 'test_get_publications_publication1e'),
                                    (workspace2, 'test_get_publications_publication2e'),
@@ -129,7 +130,7 @@ class TestGetPublications:
     ])
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
-    def test_get_publications(self, publication_type, headers, query_params, expected_publications):
+    def test_get_publications(cls, publication_type, headers, query_params, expected_publications):
         infos = process_client.get_publications(publication_type, headers, query_params=query_params)
         info_publications = [(info['workspace'], info['name']) for info in infos]
         assert set(expected_publications) == set(info_publications)
