@@ -261,7 +261,7 @@ def get_text_languages(username, layername):
         if len(t) < num_rows:
             continue
         langs = get_languages_iso639_2(t)
-        if len(langs):
+        if langs:
             lang = langs[0]
             # print(f"text={t}\nlanguage={lang}")
             all_langs.add(lang)
