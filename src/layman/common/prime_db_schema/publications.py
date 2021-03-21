@@ -210,7 +210,7 @@ def check_publication_info(workspace_name, info):
                                'actor_name': info.get("actor_name"),
                                'owner': info["owner"],
                                'message': exc_info.data,
-                               })
+                               }) from exc_info
 
 
 def clear_roles(users_list, workspace_name):
