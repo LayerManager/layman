@@ -169,7 +169,7 @@ def get_metadata_comparison(username, layername):
         crs_list.append(4326)
         crs_list = sorted(list(set(crs_list)))
         reference_system = crs_list
-    except Exception as e:
+    except BaseException as e:
         current_app.logger.error(e)
         reference_system = None
     props = {
