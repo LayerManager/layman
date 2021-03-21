@@ -4,6 +4,7 @@ from layman import settings
 from .util import get_modules_from_names
 
 
+# pylint: disable=too-few-public-methods
 def make_celery(app):
     celery_app = Celery(
         'layman',
