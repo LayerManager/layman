@@ -174,7 +174,7 @@ def get_metadata_comparison(username, layername):
             if crs.split(':')[0] == 'EPSG'
         ])
         reference_system = crs_list
-    except Exception as e:
+    except BaseException as e:
         current_app.logger.error(e)
         reference_system = None
     props = {
