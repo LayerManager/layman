@@ -1,6 +1,6 @@
-from . import get_connection_cursor
 from layman import settings, patch_mode
 from layman.http import LaymanError
+from . import get_connection_cursor
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 

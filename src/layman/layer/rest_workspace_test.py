@@ -2,22 +2,20 @@ from datetime import date
 import io
 import json
 import os
-import requests
 import time
 import xml.etree.ElementTree as ET
 from urllib.parse import urljoin
 import difflib
 import logging
-
+import sys
+from test import flask_client, process_client
+from test.data import wfs as data_wfs
+import requests
 import pytest
 from flask import url_for
 
-import sys
-
 del sys.modules['layman']
 
-from . import util, LAYER_TYPE
-from .geoserver.util import get_feature_type, wms_proxy
 from layman import app
 from layman import settings
 from layman.layer.filesystem import uuid as layer_uuid
@@ -26,11 +24,11 @@ from layman import uuid
 from layman.layer import db
 from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld
 from layman import celery as celery_util
-from .micka import csw
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
-from test.data import wfs as data_wfs
-from test import flask_client, process_client
+from . import util, LAYER_TYPE
+from .geoserver.util import get_feature_type, wms_proxy
+from .micka import csw
 
 logger = logging.getLogger(__name__)
 

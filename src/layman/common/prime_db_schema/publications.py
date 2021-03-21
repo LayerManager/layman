@@ -1,9 +1,9 @@
 import logging
 import psycopg2.extras
 
-from . import util, workspaces, users, rights
-from layman.common import get_publications_consts as consts
 from layman import settings, LaymanError
+from layman.common import get_publications_consts as consts
+from . import util, workspaces, users, rights
 
 logger = logging.getLogger(__name__)
 

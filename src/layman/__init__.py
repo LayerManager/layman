@@ -1,9 +1,9 @@
-from flask import Flask, redirect, jsonify
-
 import os
 import importlib
 import sys
 import time
+from flask import Flask, redirect, jsonify
+
 from redis import WatchError
 
 IN_CELERY_WORKER_PROCESS = sys.argv and sys.argv[0].endswith('/celery/__main__.py')

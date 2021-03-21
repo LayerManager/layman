@@ -1,17 +1,15 @@
-import pytest
 import os
 import filecmp
 import difflib
-
 import sys
+import pytest
 
 del sys.modules['layman']
 
 from layman import app, settings, util as layman_util
-from .csw import _get_property_values, METADATA_PROPERTIES
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals
-
 from layman.common.micka import util as common_util
+from .csw import _get_property_values, METADATA_PROPERTIES
 
 
 @pytest.fixture(scope="module")

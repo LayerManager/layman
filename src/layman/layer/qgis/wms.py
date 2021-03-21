@@ -1,9 +1,9 @@
 import os
 from owslib.wms import WebMapService
 
+from layman import patch_mode, settings, util as layman_util
 from . import util
 from .. import db, qgis, util as layer_util
-from layman import patch_mode, settings, util as layman_util
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = "1.1.1"

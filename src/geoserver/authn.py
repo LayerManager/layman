@@ -1,8 +1,7 @@
 import logging
-
-from lxml import etree as ET
 import os
 import pathlib
+from lxml import etree as ET
 
 from setup_geoserver import logger
 

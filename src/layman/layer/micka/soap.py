@@ -1,7 +1,7 @@
-from . import csw
-from .. import LAYER_TYPE
 from layman import settings, authz
 from layman.common.micka import util as common_util
+from . import csw
+from .. import LAYER_TYPE
 
 PATCH_MODE = csw.PATCH_MODE
 

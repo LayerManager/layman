@@ -1,13 +1,14 @@
-from layman import settings
-from layman.http import LaymanError
-from layman.authn.redis import get_username
 import importlib
 import json
 import math
-import requests
 import time
+import requests
 from requests.exceptions import ConnectionError
 from flask import request, g, current_app
+
+from layman import settings
+from layman.http import LaymanError
+from layman.authn.redis import get_username
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_PROVIDER_KEY = f'{__name__}:PROVIDER'

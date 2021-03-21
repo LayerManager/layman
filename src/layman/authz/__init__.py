@@ -1,6 +1,6 @@
 import json
-from flask import after_this_request, request
 from functools import wraps
+from flask import after_this_request, request
 
 from layman import LaymanError, settings, authn, util as layman_util
 from layman.common.prime_db_schema import workspaces, users

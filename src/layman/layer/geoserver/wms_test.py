@@ -1,8 +1,8 @@
-import pytest
 from test import process_client
+import requests
+import pytest
 from layman import settings, app
 from layman.util import url_for
-import requests
 
 
 @pytest.mark.usefixtures('ensure_layman_module')

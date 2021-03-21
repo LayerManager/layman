@@ -1,6 +1,6 @@
 import logging
-from . import util, wms
 from layman import util as layman_util, settings
+from . import util, wms
 
 logger = logging.getLogger(__name__)
 

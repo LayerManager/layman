@@ -1,10 +1,9 @@
-import pytest
-import requests
-
 from urllib.parse import urljoin
+from test import process_client, util
+import requests
+import pytest
 
 from layman import settings
-from test import process_client, util
 
 
 headers_sld = {

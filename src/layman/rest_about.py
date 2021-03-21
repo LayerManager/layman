@@ -1,5 +1,5 @@
-from flask import Blueprint, jsonify
 import os
+from flask import Blueprint, jsonify
 
 from layman import upgrade
 

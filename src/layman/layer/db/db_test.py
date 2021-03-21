@@ -1,9 +1,8 @@
 import os
 import shutil
-import pytest
 import time
-
 import sys
+import pytest
 
 del sys.modules['layman']
 

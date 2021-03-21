@@ -1,10 +1,10 @@
+from test import process_client
 import requests
-import pytest
 from lxml import etree as ET
+import pytest
 
 from layman import app
 from layman.util import url_for
-from test import process_client
 
 
 @pytest.mark.usefixtures('ensure_layman')

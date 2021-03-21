@@ -1,16 +1,16 @@
 import os
 import time
+from io import BytesIO
+from xml.sax.saxutils import escape
+import urllib.parse as urlparse
+import traceback
+from copy import deepcopy
 import requests
 from requests.exceptions import HTTPError, ConnectionError
 from owslib.csw import CatalogueServiceWeb
 from owslib.util import nspath_eval
-from flask import current_app
-from io import BytesIO
-from xml.sax.saxutils import escape
 from lxml import etree as ET
-import urllib.parse as urlparse
-import traceback
-from copy import deepcopy
+from flask import current_app
 
 from layman import settings, LaymanError, authz
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES

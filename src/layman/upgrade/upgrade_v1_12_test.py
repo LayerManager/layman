@@ -1,11 +1,10 @@
-import pytest
 import datetime
-
+from test import process_client
+import pytest
 
 from layman import app, settings
-from . import upgrade_v1_12
-from test import process_client
 from layman.common.prime_db_schema import util as db_util
+from . import upgrade_v1_12
 
 db_schema = settings.LAYMAN_PRIME_SCHEMA
 

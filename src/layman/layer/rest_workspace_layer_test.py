@@ -1,12 +1,12 @@
-import sys
-import pytest
-import requests
 import json
+import sys
+from test import process_client
+import requests
+import pytest
 
 del sys.modules['layman']
 
 from layman import app
-from test import process_client
 from layman.util import url_for
 
 

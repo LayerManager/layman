@@ -2,10 +2,10 @@ from flask import Blueprint, jsonify, request, current_app as app, g
 
 from layman import LaymanError, util as layman_util
 from layman.util import check_username_decorator
-from . import util, LAYER_REST_PATH_NAME
-from .filesystem import input_chunk
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
+from . import util, LAYER_REST_PATH_NAME
+from .filesystem import input_chunk
 
 bp = Blueprint('rest_workspace_layer_chunk', __name__)
 

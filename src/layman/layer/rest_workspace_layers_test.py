@@ -1,9 +1,9 @@
-import sys
-import pytest
-import requests
 import os
+import sys
 from urllib.parse import urljoin
 from test import process_client, util as test_util
+import requests
+import pytest
 
 del sys.modules['layman']
 

@@ -1,8 +1,8 @@
+from test import process_client
 import pytest
 
 from layman import settings
 from layman.http import LaymanError
-from test import process_client
 
 
 @pytest.mark.usefixtures('ensure_layman')

@@ -1,5 +1,5 @@
-import pytest
 from test import process_client
+import pytest
 from layman import settings, app
 from layman.common import prime_db_schema
 from layman.http import LaymanError

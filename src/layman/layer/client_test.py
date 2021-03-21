@@ -1,9 +1,10 @@
 import glob
 import time
 import os
-
-import pytest
+from test import process, process_client
 import requests
+import pytest
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -11,7 +12,6 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from layman.layer.filesystem import input_chunk
 from layman import settings, util as layman_util, app
 
-from test import process, process_client
 
 username = 'testuser1'
 layername = 'country_chunks'

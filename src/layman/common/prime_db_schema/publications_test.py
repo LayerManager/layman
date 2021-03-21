@@ -1,7 +1,6 @@
-import pytest
 import uuid
-
 from test import process_client
+import pytest
 
 from layman import settings, app as app, LaymanError
 from layman.layer import LAYER_TYPE

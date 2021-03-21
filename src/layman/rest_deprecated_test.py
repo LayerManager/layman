@@ -1,6 +1,6 @@
-import pytest
-import requests
 import re
+import requests
+import pytest
 
 from layman import settings
 

@@ -2,9 +2,9 @@ from collections import defaultdict, namedtuple
 import json
 import math
 import os
+import logging
 import psycopg2
 from flask import g
-import logging
 
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError

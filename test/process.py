@@ -1,15 +1,14 @@
-import pytest
 from multiprocessing import Process
 import subprocess
 import os
-import redis
 import logging
 import time
+from test import util
+from test.mock.liferay import run
+import redis
+import pytest
 
 from layman import settings
-
-from test.mock.liferay import run
-from test import util
 
 
 logger = logging.getLogger(__name__)

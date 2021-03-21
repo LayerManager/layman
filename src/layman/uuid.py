@@ -1,11 +1,12 @@
 from collections import defaultdict
 from uuid import UUID, uuid4
-from redis import WatchError
-from flask import current_app
 
-from . import settings
-from layman.common import redis as redis_util
+from flask import current_app
+from redis import WatchError
+
 from layman import LaymanError, celery as celery_util, util as layman_util
+from layman.common import redis as redis_util
+from . import settings
 
 UUID_SET_KEY = f'{__name__}:UUID_SET'
 UUID_METADATA_KEY = f'{__name__}:UUID_METADATA:{{uuid}}'

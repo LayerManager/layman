@@ -1,15 +1,13 @@
-import requests
 from multiprocessing import Process
 import time
-
+import sys
+from test.mock.liferay import run
+import requests
 import pytest
 
 from layman import settings
-import sys
 
 del sys.modules['layman']
-
-from test.mock.liferay import run
 from .util import TOKEN_HEADER, ISS_URL_HEADER
 
 PORT1 = 8031
