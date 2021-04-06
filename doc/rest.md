@@ -54,6 +54,7 @@ JSON array of objects representing available layers with following structure:
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
+- **bounding_box**:  List of 4 floats. Bounding box coodinates [XMIN, YMIN, XMAX, YMAX] in EPSG:3857.
 
 ## Workspace Layers
 ### URL
@@ -77,6 +78,7 @@ JSON array of objects representing available layers with following structure:
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
+- **bounding_box**:  List of 4 floats. Bounding box coodinates [XMIN, YMIN, XMAX, YMAX] in EPSG:3857.
 
 ### POST Workspace Layers
 Publish vector data file as new layer of WMS and WFS.
@@ -241,6 +243,7 @@ JSON object with following structure:
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
+- **bounding_box**:  List of 4 floats. Bounding box coodinates [XMIN, YMIN, XMAX, YMAX] in EPSG:3857.
 
 ### PATCH Workspace Layer
 Update information about existing layer. First, it deletes sources of the layer, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Layers](#post-workspace-layers).

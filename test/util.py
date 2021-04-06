@@ -56,3 +56,10 @@ def assert_same_images(img_url, tmp_file_path, expected_file_path, diff_threshol
     assert diffs < diff_threshold, f"{diffs} >= {diff_threshold}"
 
     os.remove(tmp_file_path)
+
+
+def assert_same_bboxes(bbox1, bbox2, precision):
+    assert len(bbox1) == 4, (bbox1, len(bbox1))
+    assert len(bbox2) == 4, (bbox2, len(bbox2))
+    for i in range(0, 3):
+        assert abs(bbox2[i] - bbox1[i]) <= precision, (bbox1, bbox2, precision, i)

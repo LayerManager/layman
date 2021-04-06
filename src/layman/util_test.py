@@ -1,4 +1,4 @@
-from test import process_client
+from test import process_client, data as test_data, util as test_util
 import importlib
 import pytest
 
@@ -226,7 +226,7 @@ def test_get_publication_infos(publication_type):
                                                                         'type': publication_type,
                                                                         'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
                                                                                           'write': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                                                          }
+                                                                                          },
                                                                         }}
         # util
         publication_infos = layman_util.get_publication_infos(workspace, publication_type)
@@ -235,6 +235,11 @@ def test_get_publication_infos(publication_type):
                 del publication_infos[publication_name]['id']
             if publication_infos[publication_name].get('updated_at'):
                 del publication_infos[publication_name]['updated_at']
+            if publication_infos[publication_name].get('type') == LAYER_TYPE:
+                test_util.assert_same_bboxes(publication_infos[publication_name]['bounding_box'],
+                                             test_data.SMALL_LAYER_BBOX,
+                                             0.00001)
+            del publication_infos[publication_name]['bounding_box']
         assert publication_infos == expected_result, (publication_infos, expected_result)
 
     process_client.delete_workspace_publication(publication_type, workspace, publication)

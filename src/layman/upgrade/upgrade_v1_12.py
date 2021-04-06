@@ -94,3 +94,8 @@ def migrate_layer_metadata(workspace_filter=None):
         time.sleep(0.5)
 
     logger.info(f'    DONE - migrate layer metadata records')
+
+
+def adjust_prime_db_schema_for_bbox_search():
+    statement = f'ALTER TABLE {db_schema}.publications ADD COLUMN IF NOT EXISTS bbox box2d;'
+    db_util.run_statement(statement)
