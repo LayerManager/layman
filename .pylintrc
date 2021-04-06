@@ -139,7 +139,13 @@ disable=print-statement,
         deprecated-sys-function,
         exception-escape,
         comprehension-escape,
-        import-error
+        import-error,
+        RP0401,
+        RP0101,
+        RP0701,
+        RP0801,
+        RP0001,
+        RP0002,
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
