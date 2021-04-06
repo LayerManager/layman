@@ -8,7 +8,7 @@ pytest = "*"
 watchdog = {extras = ["watchmedo"],version = "*"}
 flake8 = "*"
 pycodestyle = "*"
-pylint = "*"
+pylint = "==2.7.4"
 autopep8 = "*"
 pytest-rerunfailures = "*"
 pytest-timeout = "*"
