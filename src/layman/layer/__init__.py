@@ -42,11 +42,13 @@ PUBLICATION_TYPES = {
         # see also .util.TASKS_TO_LAYER_INFO_KEYS
         'internal_sources': OrderedDict([  # internal sources to process when new source is published
             ('layman.layer.filesystem.uuid', InternalSourceTypeDef(info_items=[]),),
-            ('layman.layer.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'title', 'uuid', ]),),
+            ('layman.layer.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'title', 'uuid',
+                                                                                     'bounding_box', ]),),
             ('layman.layer.filesystem.input_chunk', InternalSourceTypeDef(info_items=[]),),
             ('layman.layer.filesystem.input_file', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_style', InternalSourceTypeDef(info_items=[]),),
             ('layman.layer.db.table', InternalSourceTypeDef(info_items=['db_table', ]),),
+            ('layman.layer.prime_db_schema.bbox', InternalSourceTypeDef(info_items=[]),),
             ('layman.layer.qgis.wms', InternalSourceTypeDef(info_items=['style', ]),),
             ('layman.layer.geoserver.wfs', InternalSourceTypeDef(info_items=['wfs', 'description', ]),),
             ('layman.layer.geoserver.wms', InternalSourceTypeDef(info_items=['wms', ]),),
@@ -56,6 +58,7 @@ PUBLICATION_TYPES = {
         ]),
         'task_modules': {
             'layman.layer.db.tasks',
+            'layman.layer.prime_db_schema.tasks',
             'layman.layer.filesystem.tasks',
             'layman.layer.qgis.tasks',
             'layman.layer.geoserver.tasks',
