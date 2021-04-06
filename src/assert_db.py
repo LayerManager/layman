@@ -37,7 +37,7 @@ def main():
         with psycopg2.connect(**conn_dict):
             pass
         print(f"DB {conn_dict['dbname']} exists.")
-    except BaseException:
+    except psycopg2.OperationalError:
         print(f"DB {conn_dict['dbname']} does not exists, creating.")
         conn_dict = settings.PG_CONN.copy()
         conn_dict['dbname'] = 'postgres'
