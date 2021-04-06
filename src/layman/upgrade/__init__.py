@@ -23,6 +23,7 @@ DATA_MIGRATIONS = [
     ((1, 12, 0), [upgrade_v1_12.adjust_prime_db_schema_for_fulltext_search,
                   upgrade_v1_12.adjust_prime_db_schema_for_last_change_search,
                   upgrade_v1_12.migrate_layer_metadata,
+                  upgrade_v1_12.adjust_prime_db_schema_for_bbox_search,
                   ])
 ]
 

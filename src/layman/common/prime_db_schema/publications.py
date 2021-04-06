@@ -66,6 +66,10 @@ select p.id as id_publication,
        p.uuid::text,
        p.style_type,
        p.updated_at,
+       ST_XMIN(p.bbox) as xmin,
+       ST_YMIN(p.bbox) as ymin,
+       ST_XMAX(p.bbox) as xmax,
+       ST_YMAX(p.bbox) as ymax,
        (select rtrim(concat(case when u.id is not null then w.name || ',' end,
                             string_agg(w2.name, ',') || ',',
                             case when p.everyone_can_read then %s || ',' end
@@ -132,10 +136,12 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'type': type,
                                    'style_type': style_type,
                                    'updated_at': updated_at,
+                                   'bounding_box': [xmin, ymin, xmax, ymax],
                                    'access_rights': {'read': can_read_users.split(','),
                                                      'write': can_write_users.split(',')}
                                    }
-             for id_publication, workspace_name, type, publication_name, title, uuid, style_type, updated_at, can_read_users, can_write_users
+             for id_publication, workspace_name, type, publication_name, title, uuid, style_type, updated_at, xmin, ymin, xmax, ymax,
+             can_read_users, can_write_users
              in values}
     return infos
 

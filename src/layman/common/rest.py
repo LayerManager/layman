@@ -147,6 +147,7 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
             'uuid': info["uuid"],
             'access_rights': info['access_rights'],
             'updated_at': info['updated_at'].isoformat(),
+            'bounding_box': info['bounding_box'],
         }
         for (workspace, _, name), info in publication_infos_whole.items()
     ]
