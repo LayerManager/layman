@@ -20,7 +20,7 @@ flask = "*"
 unidecode = "*"
 psycopg2-binary = "*"
 requests = "*"
-owslib = "*"
+owslib = "==0.22.0" # https://github.com/geopython/OWSLib/issues/762
 jsonschema = "*"
 flower = "*"
 selenium = "*"
