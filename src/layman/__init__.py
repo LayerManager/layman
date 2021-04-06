@@ -12,13 +12,15 @@ IN_PYTEST_PROCESS = sys.argv and sys.argv[0].endswith('/pytest/__main__.py')
 IN_FLOWER_PROCESS = sys.argv and sys.argv[0].endswith('/flower/__main__.py')
 IN_FLASK_PROCESS = sys.argv and (sys.argv[0].endswith('/flask') or sys.argv[0].endswith('/gunicorn'))
 IN_UPGRADE_PROCESS = sys.argv and sys.argv[0].endswith('standalone_upgrade.py')
+IN_UTIL_PROCESS = sys.argv and sys.argv[0].endswith('refresh-doc-metadata-xpath.py')
 assert [
     IN_CELERY_WORKER_PROCESS,
     IN_PYTEST_PROCESS,
     IN_FLOWER_PROCESS,
     IN_FLASK_PROCESS,
     IN_UPGRADE_PROCESS,
-].count(True) == 1, f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}, IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}, IN_FLOWER_PROCESS={IN_FLOWER_PROCESS}, IN_FLASK_PROCESS={IN_FLASK_PROCESS}, IN_UPGRADE_PROCESS={IN_UPGRADE_PROCESS}"
+    IN_UTIL_PROCESS,
+].count(True) == 1, f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}, IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}, IN_FLOWER_PROCESS={IN_FLOWER_PROCESS}, IN_FLASK_PROCESS={IN_FLASK_PROCESS}, IN_UPGRADE_PROCESS={IN_UPGRADE_PROCESS}, IN_UTIL_PROCESS={IN_UTIL_PROCESS}"
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
@@ -54,6 +56,7 @@ logger.info(f"IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}")
 logger.info(f"IN_FLOWER_PROCESS={IN_FLOWER_PROCESS}")
 logger.info(f"IN_FLASK_PROCESS={IN_FLASK_PROCESS}")
 logger.info(f"IN_UPGRADE_PROCESS={IN_UPGRADE_PROCESS}")
+logger.info(f"IN_UTIL_PROCESS={IN_UTIL_PROCESS}")
 
 # load UUIDs only once
 LAYMAN_DEPS_ADJUSTED_KEY = f"{__name__}:LAYMAN_DEPS_ADJUSTED"
