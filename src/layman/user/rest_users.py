@@ -1,7 +1,6 @@
-from flask import Blueprint, jsonify
+from flask import current_app as app, Blueprint, jsonify
 
 from layman.common.prime_db_schema import users
-from layman import app
 
 bp = Blueprint('rest_users', __name__)
 
