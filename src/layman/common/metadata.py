@@ -77,11 +77,11 @@ PROPERTIES = {
     },
     'wms_url': {
         'upper_mp': '1',
-        'equals_fn': lambda a, b: strip_capabilities_params(a) == strip_capabilities_params(b),
+        'equals_fn': lambda a, b: strip_capabilities_and_layers_params(a) == strip_capabilities_and_layers_params(b),
     },
     'wfs_url': {
         'upper_mp': '1',
-        'equals_fn': lambda a, b: strip_capabilities_params(a) == strip_capabilities_params(b),
+        'equals_fn': lambda a, b: strip_capabilities_and_layers_params(a) == strip_capabilities_and_layers_params(b),
     },
     'layer_endpoint': {
         'upper_mp': '1',
@@ -137,9 +137,9 @@ def prop_equals_strict(values, equals_fn=None):
     return result
 
 
-def strip_capabilities_params(url):
+def strip_capabilities_and_layers_params(url):
     from layman.layer.geoserver.wms import strip_params_from_url
-    return strip_params_from_url(url, ['SERVICE', 'REQUEST', 'VERSION'])
+    return strip_params_from_url(url, ['SERVICE', 'REQUEST', 'VERSION', 'LAYERS'])
 
 
 def _is_extent_empty(e):

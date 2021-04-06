@@ -268,11 +268,13 @@ XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentifica
 
 
 ### wfs_url
+It contains standard SERVICE, REQUEST, and VERSION parameters and non-standard LAYERS parameter that holds name of the feature type at given WFS instance.
+
 Multiplicity: 1
 
 Shape: String
 
-Example: `"http://localhost:8600/geoserver/workspace1/ows"`
+Example: `"http://localhost:8600/geoserver/workspace1/ows?SERVICE=WFS&REQUEST=GetCapabilities&VERSION=2.0.0&LAYERS=layer"`
 
 Synchronizable: yes
 
@@ -280,11 +282,13 @@ XPath for Layer: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:
 
 
 ### wms_url
+It contains standard SERVICE, REQUEST, and VERSION parameters and non-standard LAYERS parameter that holds name of the layer at given WMS instance.
+
 Multiplicity: 1
 
 Shape: String
 
-Example: `"http://localhost:8600/geoserver/workspace1_wms/ows"`
+Example: `"http://localhost:8600/geoserver/workspace1_wms/ows?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0&LAYERS=layer"`
 
 Synchronizable: yes
 

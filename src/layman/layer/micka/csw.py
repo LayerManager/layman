@@ -219,8 +219,8 @@ def _get_property_values(
         'graphic_url': url_for('rest_workspace_layer_thumbnail.get', username=workspace, layername=layername),
         'extent': extent,
 
-        'wms_url': wms.add_capabilities_params_to_url(wms_url),
-        'wfs_url': wfs.add_capabilities_params_to_url(wfs_url),
+        'wms_url': f"{wms.add_capabilities_params_to_url(wms_url)}&LAYERS={layername}",
+        'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={layername}",
         'layer_endpoint': url_for('rest_workspace_layer.get', username=workspace, layername=layername),
         'scale_denominator': scale_denominator,
         'language': languages,
