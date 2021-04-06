@@ -16,6 +16,7 @@ services:
         - ./tmp:/code/tmp
         - ./test.sh:/code/test.sh
         - ./pytest.ini:/code/pytest.ini
+        - ./.pylintrc:/code/.pylintrc
         - ./version.txt:/code/version.txt
         - ./ensure-test-data.sh:/code/ensure-test-data.sh
         - ./deps/geoserver/data:/geoserver/data_dir

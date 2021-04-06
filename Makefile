@@ -197,7 +197,7 @@ test-bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm layman_test bash
 
 lint:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "flake8 --count --select=E9,F63,F7,F82 --show-source --statistics ./src && pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,W503 ./src ./test"
+	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "pylint -f colorized -r y --disable=missing-docstring --disable=f-string-without-interpolation --disable=logging-fstring-interpolation --disable=duplicate-except --disable=duplicate-code --disable=no-name-in-module --disable=fixme --disable=invalid-name --disable=too-many-lines --disable=unused-argument --disable=line-too-long --disable=redefined-outer-name --disable=c-extension-no-member --disable=import-outside-toplevel --disable=too-many-locals --disable=redefined-builtin --disable=too-many-arguments --disable=wrong-import-position --disable=protected-access --disable=too-many-statements --disable=global-statement --disable=too-many-branches --max-line-length=127 ./src ./test && flake8 --count --select=E9,F63,F7,F82 --show-source --statistics ./src && pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,W503 ./src ./test"
 
 lint-fix:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test autopep8 --recursive --in-place --aggressive --aggressive --exit-code --ignore=E402,E501,W503 ./src ./test
