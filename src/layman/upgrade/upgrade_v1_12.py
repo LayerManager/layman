@@ -104,4 +104,40 @@ def adjust_prime_db_schema_for_bbox_search():
     logger.info(f'    Starting - alter DB prime schema for search by bbox')
     statement = f'ALTER TABLE {DB_SCHEMA}.publications ADD COLUMN IF NOT EXISTS bbox box2d;'
     db_util.run_statement(statement)
+    logger.info(f'      Set bbox for all layers')
+    query = f'''
+    select  w.name,
+            p.type,
+            p.name
+    from {DB_SCHEMA}.publications p inner join
+         {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
+    where p.type = %s
+    '''
+    params = (LAYER_TYPE,)
+    publications = db_util.run_query(query, params)
+    for (workspace, _, layer) in publications:
+        logger.info(f'      Migrate layer {workspace}.{layer}')
+        table_query = f'''
+        SELECT count(*)
+        FROM pg_tables
+        WHERE schemaname = '{workspace}'
+          AND tablename = '{layer}'
+          AND tableowner = '{settings.LAYMAN_PG_USER}'
+        ;'''
+        cnt = db_util.run_query(table_query)[0][0]
+        if cnt == 0:
+            logger.warning(f'        Layer DB table not available, not migrating.')
+            continue
+
+        bbox_query = f'''
+        select ST_Extent(l.wkb_geometry) bbox
+        from {workspace}.{layer} l
+        ;'''
+        bbox = db_util.run_query(bbox_query)[0]
+        set_bbox_query = f'''update {DB_SCHEMA}.publications set
+            bbox = %s
+            where name = %s
+              and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
+        db_util.run_statement(set_bbox_query, (bbox, layer, workspace,))
+
     logger.info(f'    DONE - alter DB prime schema for search by bbox')
