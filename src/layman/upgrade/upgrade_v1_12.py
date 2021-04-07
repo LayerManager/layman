@@ -16,6 +16,7 @@ db_schema = settings.LAYMAN_PRIME_SCHEMA
 
 
 def adjust_prime_db_schema_for_fulltext_search():
+    logger.info(f'    Starting - alter DB prime schema for fulltext search')
     statement = f'''CREATE EXTENSION IF NOT EXISTS unaccent;
     drop index if exists {db_schema}.title_tsv_idx;
     drop function if exists {db_schema}.my_unaccent;
@@ -25,12 +26,15 @@ def adjust_prime_db_schema_for_fulltext_search():
     '''
 
     db_util.run_statement(statement)
+    logger.info(f'    DONE - alter DB prime schema for fulltext search')
 
 
 def adjust_prime_db_schema_for_last_change_search():
+    logger.info(f'    Starting - alter DB prime schema for search by updated_at')
     statement = f'ALTER TABLE {db_schema}.publications ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone;'
     db_util.run_statement(statement)
 
+    logger.info(f'      Set updated_at for all publications')
     query = f'''select p.id,
        w.name,
        p.type,
@@ -60,6 +64,7 @@ from {db_schema}.publications p inner join
 
     statement = f'ALTER TABLE {db_schema}.publications ALTER COLUMN updated_at SET NOT NULL;'
     db_util.run_statement(statement)
+    logger.info(f'    DONE - alter DB prime schema for search by updated_at')
 
 
 def migrate_layer_metadata(workspace_filter=None):
@@ -97,5 +102,7 @@ def migrate_layer_metadata(workspace_filter=None):
 
 
 def adjust_prime_db_schema_for_bbox_search():
+    logger.info(f'    Starting - alter DB prime schema for search by bbox')
     statement = f'ALTER TABLE {db_schema}.publications ADD COLUMN IF NOT EXISTS bbox box2d;'
     db_util.run_statement(statement)
+    logger.info(f'    DONE - alter DB prime schema for search by bbox')
