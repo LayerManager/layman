@@ -1,5 +1,5 @@
 import datetime
-from test import process_client
+from test import process_client, util as test_util, data as test_data
 import pytest
 
 from layman import app, settings
@@ -145,5 +145,44 @@ def test_migrate_layer_metadata(ensure_layer):
     assert_csw_value(md_comparison, 'wms_url', exp_wms_url)
     exp_wfs_url = f"{exp_wfs_url}&LAYERS={layer}"
     assert_csw_value(md_comparison, 'wfs_url', exp_wfs_url)
+
+    process_client.delete_workspace_layer(workspace, layer)
+
+
+@pytest.mark.usefixtures('ensure_layman')
+def test_adjust_prime_db_schema_for_bbox_search():
+    workspace = 'test_adjust_prime_db_schema_for_bbox_search_workspace'
+    layer = 'test_adjust_prime_db_schema_for_bbox_search_layer'
+
+    expected_bbox = test_data.SMALL_LAYER_BBOX
+
+    process_client.publish_workspace_layer(workspace, layer)
+    with app.app_context():
+        statement = f'ALTER TABLE {db_schema}.publications ALTER COLUMN bbox DROP NOT NULL;'
+        db_util.run_statement(statement)
+        statement = f'update {db_schema}.publications set bbox = null;'
+        db_util.run_statement(statement)
+
+        query = f'select p.id from {db_schema}.publications p where p.bbox is not null;'
+        results = db_util.run_query(query)
+        assert not results, results
+
+        upgrade_v1_12.adjust_prime_db_schema_for_bbox_search()
+
+        query = f'''
+        select ST_XMIN(p.bbox),
+               ST_YMIN(p.bbox),
+               ST_XMAX(p.bbox),
+               ST_YMAX(p.bbox)
+        from {db_schema}.publications p inner join
+             {db_schema}.workspaces w on p.id_workspace = w.id
+        where w.name = %s
+          and p.type = %s
+          and p.name = %s
+        ;'''
+        results = db_util.run_query(query, (workspace, 'layman.layer', layer))
+        assert len(results) == 1 and len(results[0]) == 4, results
+        bbox = results[0]
+        test_util.assert_same_bboxes(bbox, expected_bbox, 0.000001)
 
     process_client.delete_workspace_layer(workspace, layer)
