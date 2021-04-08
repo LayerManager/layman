@@ -5,7 +5,7 @@ from flask import g
 
 from layman.http import LaymanError
 from layman import settings, util as layman_util
-from layman.common import geoserver as common
+from layman.common import geoserver as common, util as common_util
 from layman.layer import LAYER_TYPE, db as db_source
 from layman.layer.qgis import wms as qgis_wms
 from . import wms
@@ -139,7 +139,7 @@ def publish_layer_from_db(workspace, layername, description, title, access_right
         },
     }
     db_bbox = db_source.get_bbox(workspace, layername)
-    if db_bbox is None:
+    if common_util.bbox_is_empty(db_bbox):
         # world
         feature_type_def['nativeBoundingBox'] = get_default_native_bbox(workspace, layername)
     r = requests.post(urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
@@ -188,7 +188,7 @@ def publish_layer_from_qgis(workspace, layer, description, title, access_rights,
         },
     }
     db_bbox = db_source.get_bbox(workspace, layer)
-    wms_layer_def['nativeBoundingBox'] = get_default_native_bbox(workspace, layer) if not db_bbox else {
+    wms_layer_def['nativeBoundingBox'] = get_default_native_bbox(workspace, layer) if common_util.bbox_is_empty(db_bbox) else {
         "minx": db_bbox[0],
         "miny": db_bbox[1],
         "maxx": db_bbox[2],
