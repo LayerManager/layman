@@ -261,12 +261,16 @@ def map_info_to_metadata_properties(info):
     return result
 
 
+def get_bbox_from_json(map_json):
+    return float(map_json['extent'][0]), float(map_json['extent'][1]), float(map_json['extent'][2]), float(map_json['extent'][3])
+
+
 def map_file_to_metadata_properties(map_json, operates_on_muuids_filter):
     result = {
         'title': map_json['title'],
         'abstract': map_json['abstract'],
         'operates_on': map_json_to_operates_on(map_json, operates_on_muuids_filter=operates_on_muuids_filter),
-        'extent': [float(c) for c in map_json['extent']],
+        'extent': list(get_bbox_from_json(map_json)),
         'reference_system': map_json_to_epsg_codes(map_json),
     }
     return result
