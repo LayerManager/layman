@@ -335,3 +335,13 @@ def delete_publication(workspace_name, type, name):
             logger.warning(f'Deleting NON existing publication. workspace_name={workspace_name}, type={type}, pub_name={name}')
     else:
         logger.warning(f'Deleting publication for NON existing workspace. workspace_name={workspace_name}, type={type}, pub_name={name}')
+
+
+def set_bbox(workspace, publication_type, publication, bbox):
+    query = f'''update {DB_SCHEMA}.publications set
+    bbox = ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s ,%s))
+    where type = %s
+      and name = %s
+      and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
+    params = bbox + (publication_type, publication, workspace,)
+    util.run_statement(query, params)

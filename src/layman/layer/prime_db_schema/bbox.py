@@ -1,8 +1,6 @@
-from layman import patch_mode, settings
-from layman.common.prime_db_schema import util as db_util
+from layman import patch_mode
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
-DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
 def get_publication_uuid(username, publication_type, publication_name):
@@ -48,12 +46,3 @@ def post_layer(username,
 
 def get_metadata_comparison(username, publication_name):
     pass
-
-
-def set_bbox(workspace, layer, bbox):
-    query = f'''update {DB_SCHEMA}.publications set
-    bbox = ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s ,%s))
-    where name = %s
-      and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
-    params = bbox + (layer, workspace, )
-    db_util.run_statement(query, params)
