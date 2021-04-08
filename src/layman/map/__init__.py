@@ -48,10 +48,10 @@ PUBLICATION_TYPES = {
             ('layman.map.filesystem.thumbnail', InternalSourceTypeDef(info_items=['thumbnail', ]),),
             ('layman.map.micka.soap', InternalSourceTypeDef(info_items=['metadata', ]),),
         ]),
-        'task_modules': [
+        'task_modules': {
             'layman.map.filesystem.tasks',
             'layman.map.micka.tasks',
-        ],
+        },
         'layman.common.filesystem': {
             'publications_dir': 'maps'
         },
