@@ -235,10 +235,11 @@ def test_get_publication_infos(publication_type):
                 del publication_infos[publication_name]['id']
             if publication_infos[publication_name].get('updated_at'):
                 del publication_infos[publication_name]['updated_at']
-            if publication_infos[publication_name].get('type') == LAYER_TYPE:
-                test_util.assert_same_bboxes(publication_infos[publication_name]['bounding_box'],
-                                             test_data.SMALL_LAYER_BBOX,
-                                             0.00001)
+            expected_bbox = test_data.SMALL_LAYER_BBOX if publication_infos[publication_name]['type'] == LAYER_TYPE \
+                else test_data.SMALL_MAP_BBOX
+            test_util.assert_same_bboxes(publication_infos[publication_name]['bounding_box'],
+                                         expected_bbox,
+                                         0.00001)
             del publication_infos[publication_name]['bounding_box']
         assert publication_infos == expected_result, (publication_infos, expected_result)
 
