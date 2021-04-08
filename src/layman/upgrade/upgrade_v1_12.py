@@ -1,8 +1,16 @@
-import os
 import datetime
+import logging
+import os
+import time
+import requests
 
 from layman import settings
 from layman.common.prime_db_schema import util as db_util
+from layman.layer import LAYER_TYPE
+from layman.layer.geoserver import wms
+from layman.layer.micka import csw as layer_csw
+
+logger = logging.getLogger(__name__)
 
 db_schema = settings.LAYMAN_PRIME_SCHEMA
 
@@ -52,3 +60,37 @@ from {db_schema}.publications p inner join
 
     statement = f'ALTER TABLE {db_schema}.publications ALTER COLUMN updated_at SET NOT NULL;'
     db_util.run_statement(statement)
+
+
+def migrate_layer_metadata(workspace_filter=None):
+    logger.info(f'    Starting - migrate layer metadata records')
+    query = f'''
+    select  w.name,
+            p.name
+    from {db_schema}.publications p inner join
+         {db_schema}.workspaces w on w.id = p.id_workspace
+    where p.type = %s
+    '''
+    params = (LAYER_TYPE,)
+    if workspace_filter:
+        query = query + '  AND w.name = %s'
+        params = params + (workspace_filter,)
+    publications = db_util.run_query(query, params)
+    for (workspace, layer) in publications:
+        logger.info(f'      Migrate layer {workspace}.{layer}')
+        try:
+            muuid = layer_csw.patch_layer(workspace, layer, ['wms_url', 'wfs_url'],
+                                          create_if_not_exists=False, timeout=2)
+            if not muuid:
+                logger.warning(f'        Metadata record of layer was not migrated, because the record does not exist.')
+        except requests.exceptions.ReadTimeout:
+            md_props = list(layer_csw.get_metadata_comparison(workspace, layer).values())
+            md_wms_url = md_props[0]['wms_url'] if md_props else None
+            base_wms_url = wms.add_capabilities_params_to_url(wms.get_wms_url(workspace, external_url=True))
+            exp_wms_url = f"{base_wms_url}?LAYERS={layer}"
+            if md_wms_url != exp_wms_url:
+                logger.exception(
+                    f'        WMS URL was not migrated (should be {exp_wms_url}, but is {md_wms_url})!')
+        time.sleep(0.5)
+
+    logger.info(f'    DONE - migrate layer metadata records')
