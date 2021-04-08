@@ -1,5 +1,4 @@
 from collections import defaultdict, namedtuple
-import json
 import math
 import os
 import logging
@@ -7,6 +6,7 @@ import psycopg2
 from flask import g
 
 from layman.common.language import get_languages_iso639_2
+from layman.common.prime_db_schema import util as db_util
 from layman.http import LaymanError
 from layman import settings
 
@@ -491,43 +491,17 @@ def ensure_attributes(attribute_tuples):
 
 
 def get_bbox(username, layername, conn_cur=None):
-    conn, cur = conn_cur or get_connection_cursor()
-
-    try:
-        sql = f"""
-select ST_AsGeoJSON(ST_Extent(wkb_geometry))
-from {username}.{layername}
-"""
-        cur.execute(sql)
-    except BaseException as exc:
-        logger.error(f'get_bbox ERROR username={username}, layer={layername}, sql="{sql}", exc={exc} \n\n\n , exc={exc.with_traceback()}')
-        raise LaymanError(7) from exc
-    rows = cur.fetchall()
-    conn.commit()
-    result = rows[0][0]
-    if result is not None:
-        result = json.loads(result)
-    if isinstance(result, dict):
-        if result['type'] == 'Point':
-            result = result['coordinates'] + result['coordinates']
-        elif result['type'] == 'LineString':
-            result = [
-                min([c[0] for c in result['coordinates']]),
-                min([c[1] for c in result['coordinates']]),
-                max([c[0] for c in result['coordinates']]),
-                max([c[1] for c in result['coordinates']]),
-            ]
-        elif result['type'] == 'Polygon':
-            result = [
-                min([c[0] for c in result['coordinates'][0]]),
-                min([c[1] for c in result['coordinates'][0]]),
-                max([c[0] for c in result['coordinates'][0]]),
-                max([c[1] for c in result['coordinates'][0]]),
-            ]
-        else:
-            raise Exception(f"Unknown BBox type {result['type']}")
-    elif result is not None:
-        raise Exception(f"Unknown BBox result {result}")
+    query = f'''
+    with tmp as (select ST_Extent(l.wkb_geometry) as bbox
+                 from {username}.{layername} l
+    )
+    select st_xmin(bbox),
+           st_ymin(bbox),
+           st_xmax(bbox),
+           st_ymax(bbox)
+    from tmp
+    '''
+    result = db_util.run_query(query, conn_cur=conn_cur)[0]
     return result
 
 

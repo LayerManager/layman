@@ -22,3 +22,7 @@ def clear_publication_info(info):
             pass
     info['updated_at'] = info['updated_at'].isoformat()
     return info
+
+
+def bbox_is_empty(bbox):
+    return all(num is None for num in bbox)
