@@ -153,10 +153,13 @@ def test_migrate_layer_metadata(ensure_layer):
 def test_adjust_prime_db_schema_for_bbox_search():
     workspace = 'test_adjust_prime_db_schema_for_bbox_search_workspace'
     layer = 'test_adjust_prime_db_schema_for_bbox_search_layer'
+    map = 'test_adjust_prime_db_schema_for_bbox_search_map'
 
-    expected_bbox = test_data.SMALL_LAYER_BBOX
+    expected_bbox_layer = test_data.SMALL_LAYER_BBOX
+    expected_bbox_map = test_data.SMALL_MAP_BBOX
 
     process_client.publish_workspace_layer(workspace, layer)
+    process_client.publish_workspace_map(workspace, map)
     with app.app_context():
         statement = f'ALTER TABLE {db_schema}.publications ALTER COLUMN bbox DROP NOT NULL;'
         db_util.run_statement(statement)
@@ -169,20 +172,22 @@ def test_adjust_prime_db_schema_for_bbox_search():
 
         upgrade_v1_12.adjust_prime_db_schema_for_bbox_search()
 
-        query = f'''
-        select ST_XMIN(p.bbox),
-               ST_YMIN(p.bbox),
-               ST_XMAX(p.bbox),
-               ST_YMAX(p.bbox)
-        from {db_schema}.publications p inner join
-             {db_schema}.workspaces w on p.id_workspace = w.id
-        where w.name = %s
-          and p.type = %s
-          and p.name = %s
-        ;'''
-        results = db_util.run_query(query, (workspace, 'layman.layer', layer))
-        assert len(results) == 1 and len(results[0]) == 4, results
-        bbox = results[0]
-        test_util.assert_same_bboxes(bbox, expected_bbox, 0.000001)
+        for publication_type, publication, expected_bbox in [('layman.layer', layer, expected_bbox_layer),
+                                                             ('layman.map', map, expected_bbox_map)]:
+            query = f'''
+            select ST_XMIN(p.bbox),
+                   ST_YMIN(p.bbox),
+                   ST_XMAX(p.bbox),
+                   ST_YMAX(p.bbox)
+            from {db_schema}.publications p inner join
+                 {db_schema}.workspaces w on p.id_workspace = w.id
+            where w.name = %s
+              and p.type = %s
+              and p.name = %s
+            ;'''
+            results = db_util.run_query(query, (workspace, publication_type, publication))
+            assert len(results) == 1 and len(results[0]) == 4, results
+            bbox = results[0]
+            test_util.assert_same_bboxes(bbox, expected_bbox, 0.000001)
 
     process_client.delete_workspace_layer(workspace, layer)

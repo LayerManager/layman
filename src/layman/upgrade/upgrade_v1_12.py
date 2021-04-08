@@ -9,6 +9,7 @@ from layman.common.prime_db_schema import util as db_util
 from layman.layer import LAYER_TYPE
 from layman.layer.geoserver import wms
 from layman.layer.micka import csw as layer_csw
+from layman.map import MAP_TYPE
 
 logger = logging.getLogger(__name__)
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -104,7 +105,8 @@ def adjust_prime_db_schema_for_bbox_search():
     logger.info(f'    Starting - alter DB prime schema for search by bbox')
     statement = f'ALTER TABLE {DB_SCHEMA}.publications ADD COLUMN IF NOT EXISTS bbox box2d;'
     db_util.run_statement(statement)
-    logger.info(f'      Set bbox for all layers')
+    logger.info(f'      Set bbox for all publications')
+
     query = f'''
     select  w.name,
             p.type,
@@ -134,10 +136,40 @@ def adjust_prime_db_schema_for_bbox_search():
         from {workspace}.{layer} l
         ;'''
         bbox = db_util.run_query(bbox_query)[0]
-        set_bbox_query = f'''update {DB_SCHEMA}.publications set
+        set_layer_bbox_query = f'''
+        update {DB_SCHEMA}.publications set
             bbox = %s
-            where name = %s
-              and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
-        db_util.run_statement(set_bbox_query, (bbox, layer, workspace,))
+        where type = %s
+          and name = %s
+          and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
+        db_util.run_statement(set_layer_bbox_query, (bbox, LAYER_TYPE, layer, workspace,))
+
+    params = (MAP_TYPE,)
+    publications = db_util.run_query(query, params)
+    for (workspace, _, map) in publications:
+        from layman.map.filesystem import input_file
+        logger.info(f'      Migrate map {workspace}.{map}')
+        map_json = input_file.get_map_json(workspace, map)
+        bbox_4326 = float(map_json['extent'][0]), float(map_json['extent'][1]),\
+            float(map_json['extent'][2]), float(map_json['extent'][3])
+        query_transform = f'''
+        with tmp as (select ST_Transform(ST_SetSRID(ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s, %s)), %s), %s) bbox)
+        select st_xmin(bbox),
+               st_ymin(bbox),
+               st_xmax(bbox),
+               st_ymax(bbox)
+        from tmp
+        ;'''
+        params = bbox_4326 + (4326, 3857,)
+        bbox_3857 = db_util.run_query(query_transform, params)[0]
+
+        set_map_bbox_query = f'''
+        update {DB_SCHEMA}.publications set
+            bbox = ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s ,%s))
+        where type = %s
+          and name = %s
+          and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
+        params = bbox_3857 + (MAP_TYPE, map, workspace,)
+        db_util.run_statement(set_map_bbox_query, params)
 
     logger.info(f'    DONE - alter DB prime schema for search by bbox')
