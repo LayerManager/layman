@@ -54,13 +54,13 @@ PUBLICATION_TYPES = {
             ('layman.layer.filesystem.thumbnail', InternalSourceTypeDef(info_items=['thumbnail', ]),),
             ('layman.layer.micka.soap', InternalSourceTypeDef(info_items=['metadata', ]),),
         ]),
-        'task_modules': [
+        'task_modules': {
             'layman.layer.db.tasks',
             'layman.layer.filesystem.tasks',
             'layman.layer.qgis.tasks',
             'layman.layer.geoserver.tasks',
             'layman.layer.micka.tasks',
-        ],
+        },
         'layman.common.filesystem': {
             'publications_dir': 'layers'
         },
