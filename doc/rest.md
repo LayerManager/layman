@@ -422,6 +422,7 @@ JSON array of objects representing available maps with following structure:
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
+- **bounding_box**:  List of 4 floats. Bounding box coodinates [XMIN, YMIN, XMAX, YMAX] in EPSG:3857.
 
 
 ## Workspace Maps
@@ -446,6 +447,7 @@ JSON array of objects representing available maps with following structure:
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
+- **bounding_box**:  List of 4 floats. Bounding box coodinates [XMIN, YMIN, XMAX, YMAX] in EPSG:3857.
 
 ### POST Workspace Maps
 Publish new map composition. Accepts JSON valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema) used by [Hslayers-ng](https://github.com/hslayers/hslayers-ng).
@@ -555,6 +557,7 @@ JSON object with following structure:
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
+- **bounding_box**:  List of 4 floats. Bounding box coodinates [XMIN, YMIN, XMAX, YMAX] in EPSG:3857.
 
 ### PATCH Workspace Map
 Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Maps](#post-workspace-maps).
