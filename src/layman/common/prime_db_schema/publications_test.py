@@ -272,6 +272,11 @@ class TestSelectPublicationsComplex:
             (workspace1, MAP_TYPE, 'test_select_publications_publication1o'),
             (workspace1, MAP_TYPE, 'test_select_publications_publication1oe'),
         ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
+        pytest.param({'bounding_box_filter': [1669792, 6106854.83488507, 1700000, 6274861.39400658],
+                      }, [
+            (workspace1, MAP_TYPE, 'test_select_publications_publication1e'),
+            (workspace2, MAP_TYPE, 'test_select_publications_publication2e'),
+        ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
     ])
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
     def test_get_publications(query_params, expected_publications):

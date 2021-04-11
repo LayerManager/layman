@@ -154,6 +154,11 @@ class TestGetPublications:
                 (workspace2, 'test_get_publications_publication2o'),
                 (workspace1, 'test_get_publications_publication1e'),
             ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
+        pytest.param(
+            authn_headers_user2,
+            {'bounding_box_filter': [1669792, 6106854.83488507, 1700000, 6274861.39400658]}, [
+                (workspace2, 'test_get_publications_publication2e'),
+            ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
     ])
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
