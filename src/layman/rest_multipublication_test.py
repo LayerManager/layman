@@ -66,20 +66,37 @@ class TestGetPublications:
     authn_headers_user2 = process_client.get_authz_headers(workspace2)
     publications = [
         (workspace1, 'test_get_publications_publication1e', {
-            'title': 'Public publication in public workspace'
+            'title': 'Public publication in public workspace',
+        }, {
+            process_client.MAP_TYPE: {'file_paths': ['test/data/bbox/map_none.json', ],
+                                      },
+            process_client.LAYER_TYPE: {'file_paths': ['test/data/bbox/layer_none.geojson', ],
+                                        },
         }),
         (workspace2, 'test_get_publications_publication2e', {
             'headers': authn_headers_user2,
             'title': '\'Too yellow horse\' means "Příliš žluťoučký kůň".',
             'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
                               'write': settings.RIGHTS_EVERYONE_ROLE},
-        }),
+        }, {
+            process_client.MAP_TYPE: {'file_paths': ['test/data/bbox/map_full.json', ],
+                                      },
+            process_client.LAYER_TYPE: {'file_paths': ['test/data/bbox/layer_full.geojson', ],
+                                        },
+        },
+        ),
         (workspace2, 'test_get_publications_publication2o', {
             'headers': authn_headers_user2,
             'title': 'Příliš jiný žluťoučký kůň úpěl ďábelské ódy',
             'access_rights': {'read': workspace2,
                               'write': workspace2},
-        }),
+        }, {
+            process_client.MAP_TYPE: {'file_paths': ['test/data/bbox/map_quarter.json', ],
+                                      },
+            process_client.LAYER_TYPE: {'file_paths': ['test/data/bbox/layer_quarter.geojson', ],
+                                        },
+        },
+        ),
     ]
 
     @pytest.fixture(scope="class")
@@ -88,7 +105,8 @@ class TestGetPublications:
 
         for publication_type in process_client.PUBLICATION_TYPES:
             for publication in self.publications:
-                process_client.publish_workspace_publication(publication_type, publication[0], publication[1], **publication[2])
+                process_client.publish_workspace_publication(publication_type, publication[0], publication[1], **publication[2],
+                                                             **publication[3][publication_type])
         yield
         for publication_type in process_client.PUBLICATION_TYPES:
             for publication in self.publications:
@@ -128,6 +146,14 @@ class TestGetPublications:
                                                             (workspace2, 'test_get_publications_publication2e'),
                                                             (workspace1, 'test_get_publications_publication1e'),
                                                             ],),
+        pytest.param(
+            authn_headers_user2,
+            {'order_by_list': ['bounding_box'],
+             'ordering_bounding_box': [1558472.87110583, 6106854.83488507, 1669792.3618991, 6274861.39400658]}, [
+                (workspace2, 'test_get_publications_publication2e'),
+                (workspace2, 'test_get_publications_publication2o'),
+                (workspace1, 'test_get_publications_publication1e'),
+            ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
     ])
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
