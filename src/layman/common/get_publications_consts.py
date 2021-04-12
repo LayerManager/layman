@@ -1,5 +1,8 @@
 FILTER_FULL_TEXT = 'full_text_filter'
 
+FILTER_BBOX = 'bbox_filter'
+FILTER_BBOX_PATTERN = r"^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$"
+
 ORDER_BY_PARAM = 'order_by'
 
 ORDER_BY_FULL_TEXT = 'full_text'

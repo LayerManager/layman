@@ -3,6 +3,7 @@ from flask import jsonify
 
 from layman import settings, util as layman_util, LaymanError
 from layman.common.prime_db_schema import util as prime_db_schema_util
+from layman.common import bbox as bbox_util
 from .util import PUBLICATION_NAME_ONLY_PATTERN
 from . import get_publications_consts as consts
 
@@ -108,7 +109,23 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
 
     full_text_filter = None
     if consts.FILTER_FULL_TEXT in request_args:
-        full_text_filter = prime_db_schema_util.to_tsquery_string(request_args.get(consts.FILTER_FULL_TEXT)) or None
+        full_text_filter = prime_db_schema_util.to_tsquery_string(request_args[consts.FILTER_FULL_TEXT]) or None
+
+    if request_args.get(consts.FILTER_BBOX):
+        m = re.match(consts.FILTER_BBOX_PATTERN, request_args[consts.FILTER_BBOX])
+        if not m:
+            raise LaymanError(2, {'parameter': consts.FILTER_BBOX, 'expected': {
+                'text': 'Four comma-separated coordinates: minx,miny,maxx,maxy',
+                'regular_expression': consts.FILTER_BBOX_PATTERN,
+            }})
+        coords = tuple(float(c) for c in m.groups())
+        if not bbox_util.is_valid(coords):
+            raise LaymanError(2, {'parameter': consts.FILTER_BBOX, 'expected': 'minx <= maxx and miny <= maxy'})
+        bbox = coords
+        if not bbox_util.contains_bbox(settings.LAYMAN_EPSG_3857_EXTENT, bbox):
+            max_extent_str = ','.join(settings.LAYMAN_EPSG_3857_EXTENT)
+            raise LaymanError(2, {'parameter': consts.FILTER_BBOX,
+                                  'expected': f"Bounding box must be contained by {max_extent_str}"})
 
     order_by_list = []
     order_by_value = request_args.get(consts.ORDER_BY_PARAM)
