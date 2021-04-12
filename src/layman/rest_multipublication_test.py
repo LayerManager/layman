@@ -153,15 +153,15 @@ class TestGetPublications:
                                                             ],),
         pytest.param(
             authn_headers_user2,
-            {'order_by_list': ['bounding_box'],
-             'ordering_bounding_box': [3000, 3000, 5000, 5000]}, [
+            {'order_by_list': ['bbox'],
+             'ordering_bbox': [3000, 3000, 5000, 5000]}, [
                 (workspace2, publication_2e_3_3x5_5),
                 (workspace2, publication_2o_2_2x4_4),
                 (workspace1, publication_1e_3_7x5_9),
             ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
         pytest.param(
             authn_headers_user2,
-            {'bounding_box_filter': [3000, 3000, 5000, 5000]}, [
+            {'bbox_filter': [3000, 3000, 5000, 5000]}, [
                 (workspace2, publication_2e_3_3x5_5),
             ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
     ])
