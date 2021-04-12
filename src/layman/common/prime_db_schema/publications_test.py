@@ -114,7 +114,7 @@ class TestSelectPublicationsBasic:
         for publication in self.publications:
             process_client.delete_workspace_publication(publication[1], publication[0], publication[2])
 
-    @classmethod
+    @staticmethod
     @pytest.mark.parametrize('query_params, expected_publications', [
         ({'workspace_name': workspace1, 'pub_type': LAYER_TYPE},
          [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le'),
@@ -136,7 +136,7 @@ class TestSelectPublicationsBasic:
                   ]),
     ])
     @pytest.mark.usefixtures('ensure_layman', 'provide_data')
-    def test_get_publications(cls, query_params, expected_publications):
+    def test_get_publications(query_params, expected_publications):
         with app.app_context():
             infos = publications.get_publication_infos(**query_params)
         info_publications = list(infos.keys())
@@ -186,7 +186,7 @@ class TestSelectPublicationsComplex:
         for publication in self.publications:
             process_client.delete_workspace_publication(publication[1], publication[0], publication[2], publication[3].get('headers'))
 
-    @classmethod
+    @staticmethod
     @pytest.mark.parametrize('query_params, expected_publications', [
         (dict(), [(workspace1, MAP_TYPE, 'test_select_publications_publication1e'),
                   (workspace1, MAP_TYPE, 'test_select_publications_publication1o'),
@@ -255,7 +255,7 @@ class TestSelectPublicationsComplex:
         ]),
     ])
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
-    def test_get_publications(cls, query_params, expected_publications):
+    def test_get_publications(query_params, expected_publications):
         with app.app_context():
             infos = publications.get_publication_infos(**query_params)
         info_publications = list(infos.keys())
