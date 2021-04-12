@@ -111,6 +111,7 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
     if consts.FILTER_FULL_TEXT in request_args:
         full_text_filter = prime_db_schema_util.to_tsquery_string(request_args[consts.FILTER_FULL_TEXT]) or None
 
+    bbox_filter = None
     if request_args.get(consts.FILTER_BBOX):
         m = re.match(consts.FILTER_BBOX_PATTERN, request_args[consts.FILTER_BBOX])
         if not m:
@@ -126,6 +127,7 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
             max_extent_str = ','.join(settings.LAYMAN_EPSG_3857_EXTENT)
             raise LaymanError(2, {'parameter': consts.FILTER_BBOX,
                                   'expected': f"Bounding box must be contained by {max_extent_str}"})
+        bbox_filter = bbox
 
     order_by_list = []
     order_by_value = request_args.get(consts.ORDER_BY_PARAM)
@@ -151,6 +153,7 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
                                                                          'access_type': 'read'
                                                                          },
                                                                 full_text_filter=full_text_filter,
+                                                                bbox_filter=bbox_filter,
                                                                 order_by_list=order_by_list,
                                                                 ordering_full_text=ordering_full_text,
                                                                 )

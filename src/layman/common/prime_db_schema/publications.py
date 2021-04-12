@@ -15,6 +15,7 @@ psycopg2.extras.register_uuid()
 def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
                           reader=None, writer=None,
                           full_text_filter=None,
+                          bbox_filter=None,
                           order_by_list=None,
                           ordering_full_text=None,
                           ):
@@ -45,6 +46,7 @@ def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
                                     and r.type = 'write'
                                     and w2.name = %s))""", (writer, writer,)),
         (full_text_filter, '_prime_schema.my_unaccent(p.title) @@ to_tsquery(unaccent(%s))', (full_text_filter,)),
+        (bbox_filter, 'p.bbox && ST_MakeBox2D(ST_MakePoint(%s, %s), ST_MakePoint(%s, %s))', bbox_filter),
     ]
 
     order_by_definition = {
