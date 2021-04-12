@@ -177,6 +177,10 @@ class TestGetPublications:
 @pytest.mark.parametrize('query_params, error_code, error_specification,', [
     ({'order_by': 'gdasfda'}, (2, 400), {'parameter': 'order_by'}),
     ({'order_by': 'full_text'}, (48, 400), dict()),
+    ({'bbox_filter': '1,2,3,4,5'}, (2, 400), {'parameter': 'bbox_filter'}),
+    ({'bbox_filter': '1,2,c,4'}, (2, 400), {'parameter': 'bbox_filter'}),
+    ({'bbox_filter': '1,4,2,3'}, (2, 400), {'parameter': 'bbox_filter'}),
+    ({'bbox_filter': '-20026376.39,-20048966.10,30026376.39,30048966.10,'}, (2, 400), {'parameter': 'bbox_filter'}),
 ])
 @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
 @pytest.mark.usefixtures('ensure_layman', )
