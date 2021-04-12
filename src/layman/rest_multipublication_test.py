@@ -64,22 +64,44 @@ class TestGetPublications:
     workspace1 = 'test_get_publications_workspace1'
     workspace2 = 'test_get_publications_workspace2'
     authn_headers_user2 = process_client.get_authz_headers(workspace2)
+
+    publication_1e_3_7x5_9 = 'test_get_publications_publication1e'
+    publication_2e_3_3x5_5 = 'test_get_publications_publication2e'
+    publication_2o_2_2x4_4 = 'test_get_publications_publication2o'
+
     publications = [
-        (workspace1, 'test_get_publications_publication1e', {
-            'title': 'Public publication in public workspace'
+        (workspace1, publication_1e_3_7x5_9, {
+            'title': 'Public publication in public workspace',
+        }, {
+            process_client.MAP_TYPE: {'file_paths': ['test/data/bbox/map_3_7-5_9.json', ],
+                                      },
+            process_client.LAYER_TYPE: {'file_paths': ['test/data/bbox/layer_3_7-5_9.geojson', ],
+                                        },
         }),
-        (workspace2, 'test_get_publications_publication2e', {
+        (workspace2, publication_2e_3_3x5_5, {
             'headers': authn_headers_user2,
             'title': '\'Too yellow horse\' means "Příliš žluťoučký kůň".',
             'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
                               'write': settings.RIGHTS_EVERYONE_ROLE},
-        }),
-        (workspace2, 'test_get_publications_publication2o', {
+        }, {
+            process_client.MAP_TYPE: {'file_paths': ['test/data/bbox/map_3_3-5_5.json', ],
+                                      },
+            process_client.LAYER_TYPE: {'file_paths': ['test/data/bbox/layer_3_3-5_5.geojson', ],
+                                        },
+        },
+        ),
+        (workspace2, publication_2o_2_2x4_4, {
             'headers': authn_headers_user2,
             'title': 'Příliš jiný žluťoučký kůň úpěl ďábelské ódy',
             'access_rights': {'read': workspace2,
                               'write': workspace2},
-        }),
+        }, {
+            process_client.MAP_TYPE: {'file_paths': ['test/data/bbox/map_2_2-4_4.json', ],
+                                      },
+            process_client.LAYER_TYPE: {'file_paths': ['test/data/bbox/layer_2_2-4_4.geojson', ],
+                                        },
+        },
+        ),
     ]
 
     @pytest.fixture(scope="class")
@@ -88,7 +110,8 @@ class TestGetPublications:
 
         for publication_type in process_client.PUBLICATION_TYPES:
             for publication in self.publications:
-                process_client.publish_workspace_publication(publication_type, publication[0], publication[1], **publication[2])
+                process_client.publish_workspace_publication(publication_type, publication[0], publication[1], **publication[2],
+                                                             **publication[3][publication_type])
         yield
         for publication_type in process_client.PUBLICATION_TYPES:
             for publication in self.publications:
@@ -97,37 +120,45 @@ class TestGetPublications:
 
     @staticmethod
     @pytest.mark.parametrize('headers, query_params, expected_publications', [
-        (authn_headers_user2, {}, [(workspace1, 'test_get_publications_publication1e'),
-                                   (workspace2, 'test_get_publications_publication2e'),
-                                   (workspace2, 'test_get_publications_publication2o'),
+        (authn_headers_user2, {}, [(workspace1, publication_1e_3_7x5_9),
+                                   (workspace2, publication_2e_3_3x5_5),
+                                   (workspace2, publication_2o_2_2x4_4),
                                    ],),
-        (None, {}, [(workspace1, 'test_get_publications_publication1e'),
-                    (workspace2, 'test_get_publications_publication2e'),
+        (None, {}, [(workspace1, publication_1e_3_7x5_9),
+                    (workspace2, publication_2e_3_3x5_5),
                     ],),
-        (authn_headers_user2, {'full_text_filter': 'kůň'}, [(workspace2, 'test_get_publications_publication2e'),
-                                                            (workspace2, 'test_get_publications_publication2o'),
+        (authn_headers_user2, {'full_text_filter': 'kůň'}, [(workspace2, publication_2e_3_3x5_5),
+                                                            (workspace2, publication_2o_2_2x4_4),
                                                             ],),
         (None, {'full_text_filter': 'The Fačřš_tÚŮTŤsa   "  a34432[;] ;.\\Ra\'\'ts'}, list(),),
         (authn_headers_user2, {'full_text_filter': '\'Too yellow horse\' means "Příliš žluťoučký kůň".'}, [
-            (workspace2, 'test_get_publications_publication2e'),
-            (workspace2, 'test_get_publications_publication2o'),
+            (workspace2, publication_2e_3_3x5_5),
+            (workspace2, publication_2o_2_2x4_4),
         ],),
-        (authn_headers_user2, {'full_text_filter': 'mean'}, [(workspace2, 'test_get_publications_publication2e'),
+        (authn_headers_user2, {'full_text_filter': 'mean'}, [(workspace2, publication_2e_3_3x5_5),
                                                              ],),
-        (authn_headers_user2, {'full_text_filter': 'jiný další kůň'}, [(workspace2, 'test_get_publications_publication2o'),
-                                                                       (workspace2, 'test_get_publications_publication2e'),
+        (authn_headers_user2, {'full_text_filter': 'jiný další kůň'}, [(workspace2, publication_2o_2_2x4_4),
+                                                                       (workspace2, publication_2e_3_3x5_5),
                                                                        ],),
         (authn_headers_user2, {'full_text_filter': 'workspace publication'}, [
-            (workspace1, 'test_get_publications_publication1e'),
+            (workspace1, publication_1e_3_7x5_9),
         ],),
-        (authn_headers_user2, {'order_by': 'title'}, [(workspace2, 'test_get_publications_publication2o'),
-                                                      (workspace1, 'test_get_publications_publication1e'),
-                                                      (workspace2, 'test_get_publications_publication2e'),
+        (authn_headers_user2, {'order_by': 'title'}, [(workspace2, publication_2o_2_2x4_4),
+                                                      (workspace1, publication_1e_3_7x5_9),
+                                                      (workspace2, publication_2e_3_3x5_5),
                                                       ],),
-        (authn_headers_user2, {'order_by': 'last_change'}, [(workspace2, 'test_get_publications_publication2o'),
-                                                            (workspace2, 'test_get_publications_publication2e'),
-                                                            (workspace1, 'test_get_publications_publication1e'),
+        (authn_headers_user2, {'order_by': 'last_change'}, [(workspace2, publication_2o_2_2x4_4),
+                                                            (workspace2, publication_2e_3_3x5_5),
+                                                            (workspace1, publication_1e_3_7x5_9),
                                                             ],),
+        pytest.param(
+            authn_headers_user2,
+            {'order_by_list': ['bounding_box'],
+             'ordering_bounding_box': [3000, 3000, 5000, 5000]}, [
+                (workspace2, publication_2e_3_3x5_5),
+                (workspace2, publication_2o_2_2x4_4),
+                (workspace1, publication_1e_3_7x5_9),
+            ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
     ])
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
