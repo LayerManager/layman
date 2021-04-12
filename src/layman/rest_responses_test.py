@@ -76,12 +76,12 @@ class TestResponsesClass:
     }
     expected_layers = {
         **expected_common_multi,
-        'bounding_box': test_data.SMALL_LAYER_BBOX,
+        'bounding_box': list(test_data.SMALL_LAYER_BBOX),
         'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
     }
     expected_maps = {
         **expected_common_multi,
-        'bounding_box': test_data.SMALL_MAP_BBOX,
+        'bounding_box': list(test_data.SMALL_MAP_BBOX),
         'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}',
     }
 
@@ -95,7 +95,7 @@ class TestResponsesClass:
     }
     expected_layer = {
         **expected_common,
-        'bounding_box': test_data.SMALL_LAYER_BBOX,
+        'bounding_box': list(test_data.SMALL_LAYER_BBOX),
         'db_table': {'name': publication},
         'file': {'path': f'layers/{publication}/input_file/{publication}.geojson'},
         'metadata': {'comparison_url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/'
@@ -115,7 +115,7 @@ class TestResponsesClass:
     }
     expected_map = {
         **expected_common,
-        'bounding_box': test_data.SMALL_MAP_BBOX,
+        'bounding_box': list(test_data.SMALL_MAP_BBOX),
         'file': {'path': f'maps/{publication}/input_file/{publication}.json',
                  'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/file'},
         'metadata': {
