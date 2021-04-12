@@ -271,7 +271,7 @@ class TestSelectPublicationsComplex:
             (workspace1, MAP_TYPE, layer_1e_2_4x6_6),
         ]),
         pytest.param({'order_by_list': ['bounding_box'],
-                      'ordering_bbox': [3000, 3000, 5000, 5000],
+                      'ordering_bbox': (3000, 3000, 5000, 5000),
                       }, [
             (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
             (workspace1, MAP_TYPE, layer_1e_2_4x6_6),
@@ -279,7 +279,7 @@ class TestSelectPublicationsComplex:
             (workspace1, MAP_TYPE, layer_1o_2_2x3_6),
             (workspace1, MAP_TYPE, layer_1oe_3_7x5_9),
         ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
-        pytest.param({'bbox_filter': [3000, 3000, 5000, 5000],
+        pytest.param({'bbox_filter': (3000, 3000, 5000, 5000),
                       }, [
             (workspace1, MAP_TYPE, layer_1e_2_4x6_6),
             (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
