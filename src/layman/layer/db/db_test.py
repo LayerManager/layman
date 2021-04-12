@@ -9,7 +9,7 @@ del sys.modules['layman']
 from layman import app as layman, settings
 from layman.layer.filesystem.input_file import ensure_layer_input_file_dir
 from layman.layer.filesystem.util import get_layer_dir
-from layman.common import util as common_util
+from layman.common import bbox as bbox_util
 from layman.layer import db
 from .table import delete_layer
 
@@ -297,7 +297,7 @@ def test_empty_table_bbox(empty_table):
     username, layername = empty_table
     with layman.app_context():
         bbox = db.get_bbox(username, layername)
-    assert common_util.bbox_is_empty(bbox), bbox
+    assert bbox_util.is_empty(bbox), bbox
 
 
 def test_single_point_table_bbox(single_point_table):

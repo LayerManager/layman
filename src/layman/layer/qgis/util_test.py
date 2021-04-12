@@ -5,7 +5,7 @@ import requests
 from owslib.wms import WebMapService
 import pytest
 from layman import app, settings, LaymanError
-from layman.common import util as common_util
+from layman.common import bbox as bbox_util
 from . import util
 from .. import db
 from ..filesystem import thumbnail
@@ -32,7 +32,7 @@ def test_fill_project_template():
 
     with app.app_context():
         layer_bbox = db.get_bbox(workspace, layer)
-    layer_bbox = layer_bbox if not common_util.bbox_is_empty(layer_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+    layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
     qml_path = '/code/sample/style/ne_10m_admin_0_countries.qml'
     parser = ET.XMLParser(remove_blank_text=True)
     qml_xml = ET.parse(qml_path, parser=parser)
