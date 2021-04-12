@@ -1,10 +1,12 @@
 import datetime
 
+import test.data
+from test import process_client, data as test_data
+
 import pytest
 from dateutil.parser import parse
 
-import process_client
-from layman import app
+from layman import app, settings
 from layman.common.prime_db_schema import util as db_util
 from layman.rest_publication_test import db_schema
 
@@ -55,3 +57,56 @@ def test_updated_at(publication_type):
     assert timestamp3 < updated_at_rest < timestamp4
 
     process_client.delete_workspace_publication(publication_type, workspace, publication)
+
+
+class TestResponsesClass:
+    workspace = 'test_responses_workspace'
+    publication = 'test_responses_publication'
+    common_params = dict()
+
+    expected_common_multi = {
+        'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
+        'name': publication,
+        'title': publication,
+        'updated_at': None,
+        'uuid': None,
+        'workspace': workspace,
+    }
+    expected_layers = {
+        **expected_common_multi,
+        'bounding_box': test_data.SMALL_LAYER_BBOX,
+        'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/'
+               f'layers/{publication}',
+    }
+    expected_maps = {
+        **expected_common_multi,
+        'bounding_box': test_data.SMALL_MAP_BBOX,
+        'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/'
+               f'maps/{publication}',
+    }
+
+    @pytest.fixture(scope="class")
+    def provide_data(self):
+        for publication_type in process_client.PUBLICATION_TYPES:
+            process_client.publish_workspace_publication(publication_type, self.workspace, self.publication, **self.common_params,)
+        yield
+        for publication_type in process_client.PUBLICATION_TYPES:
+            process_client.delete_workspace_publication(publication_type, self.workspace, self.publication, )
+
+    @staticmethod
+    @pytest.mark.usefixtures('ensure_layman', 'provide_data')
+    @pytest.mark.parametrize('query_method, method_params, expected_info', [
+        (process_client.get_layers, dict(), expected_layers),
+        (process_client.get_maps, dict(), expected_maps),
+        (process_client.get_workspace_layers, {'workspace': workspace}, expected_layers),
+        (process_client.get_workspace_maps, {'workspace': workspace}, expected_maps),
+    ])
+    def test_rest_responses(query_method, method_params, expected_info, ):
+        response = query_method(**method_params)
+        assert len(response) == 1
+        info = response[0]
+        assert len(info) == len(expected_info), info
+        for key, value in expected_info.items():
+            assert key in info.keys()
+            if value:
+                assert info[key] == value
