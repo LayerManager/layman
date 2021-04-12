@@ -5,6 +5,11 @@ def is_empty(bbox):
     return all(num is None for num in bbox)
 
 
+def contains_bbox(bbox1, bbox2):
+    return not is_empty(bbox1) and not is_empty(bbox2) \
+        and bbox1[0] <= bbox2[0] and bbox2[2] <= bbox1[2] and bbox1[1] <= bbox2[1] and bbox2[3] <= bbox1[3]
+
+
 def transform(bbox, epsg_from=4326, epsg_to=3857):
     query = f'''
     with tmp as (select ST_Transform(ST_SetSRID(ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s, %s)), %s), %s) bbox)
