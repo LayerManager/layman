@@ -159,11 +159,10 @@ class TestGetPublications:
                 (workspace2, publication_2o_2_2x4_4),
                 (workspace1, publication_1e_3_7x5_9),
             ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
-        pytest.param(
-            authn_headers_user2,
-            {'bbox_filter': [3000, 3000, 5000, 5000]}, [
-                (workspace2, publication_2e_3_3x5_5),
-            ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
+        (authn_headers_user2, {'bbox_filter': ','.join(str(c) for c in [3001, 3001, 4999, 4999])}, [
+            (workspace2, publication_2e_3_3x5_5),
+            (workspace2, publication_2o_2_2x4_4),
+        ]),
     ])
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')

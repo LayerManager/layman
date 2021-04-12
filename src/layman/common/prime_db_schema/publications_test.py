@@ -279,11 +279,12 @@ class TestSelectPublicationsComplex:
             (workspace1, MAP_TYPE, layer_1o_2_2x3_6),
             (workspace1, MAP_TYPE, layer_1oe_3_7x5_9),
         ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
-        pytest.param({'bbox_filter': (3000, 3000, 5000, 5000),
-                      }, [
+        ({'bbox_filter': (3001, 3001, 4999, 4999),
+          }, [
             (workspace1, MAP_TYPE, layer_1e_2_4x6_6),
             (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
-        ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
+            (workspace2, MAP_TYPE, layer_2o_2_2x4_4),
+        ]),
     ])
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
     def test_get_publications(query_params, expected_publications):

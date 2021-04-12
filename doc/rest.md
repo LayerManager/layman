@@ -35,7 +35,8 @@ Get list of published layers.
 
 #### Request
 Query parameters:
-- *full_text_filter*: String. List of words separated by space. Only layers with at least one of them in title will be return. Search is case-insensitive, unaccent and did lemmatization for English. By default, layers are ordered by search rank in response if this filter is used.
+- *full_text_filter*: String. List of words separated by space. Only layers with at least one of them in title will be returned. Search is case-insensitive, unaccent and did lemmatization for English. By default, layers are ordered by search rank in response if this filter is used.
+- *bbox_filter*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. Only layers whose bounding box intersects with given bounding box will be returned.
 - *order_by*: String. Can be one of these values:
   - `full_text` Publications will be ordered by results of full-text search. Can be used only in combination with *full_text_filter*.
   - `title` Publications will be ordered lexicographically by title value.
@@ -403,7 +404,8 @@ Get list of published maps (map compositions).
 
 #### Request
 Query parameters:
-- *full_text_filter*: String. List of words separated by space. Only maps with at least one of them in title will be return. Search is case-insensitive, unaccent and did lemmatization for English. By default, maps are ordered by search rank in response if this filter is used.
+- *full_text_filter*: String. List of words separated by space. Only maps with at least one of them in title will be returned. Search is case-insensitive, unaccent and did lemmatization for English. By default, maps are ordered by search rank in response if this filter is used.
+- *bbox_filter*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. Only maps whose bounding box intersects with given bounding box will be returned.
 - *order_by*: String. Can be one of these values:
   - `full_text` Publications will be ordered by results of full-text search. Can be used only in combination with *full_text_filter*.
   - `title` Publications will be ordered lexicographically by title value.
