@@ -15,6 +15,18 @@ def test_is_empty(bbox, expected_result):
     assert bbox_util.is_empty(bbox) == expected_result
 
 
+@pytest.mark.parametrize('bbox, expected_result', [
+    ((None, None, None, None, ), True),
+    ((1, 2, 3, 4, ), True),
+    ((1, 2, 1, 2, ), True),
+    ((1, None, None, None,), False),
+    ((3, 1, 2, 4,), False),
+    ((2, 2, 3, -4,), False),
+])
+def test_is_valid(bbox, expected_result):
+    assert bbox_util.is_valid(bbox) == expected_result
+
+
 @pytest.mark.parametrize('bbox1, bbox2, expected_result', [
     ((1, 1, 4, 4, ), (2, 2, 3, 3, ), True),
     ((1, 1, 4, 4, ), (1, 1, 4, 4, ), True),
