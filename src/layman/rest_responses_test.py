@@ -1,6 +1,5 @@
 import datetime
 
-import test.data
 from test import process_client, data as test_data
 
 import pytest
@@ -62,7 +61,10 @@ def test_updated_at(publication_type):
 class TestResponsesClass:
     workspace = 'test_responses_workspace'
     publication = 'test_responses_publication'
-    common_params = dict()
+    description = 'Toto je popisek.'
+    common_params = {
+        'description': description,
+    }
 
     expected_common_multi = {
         'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
@@ -75,14 +77,57 @@ class TestResponsesClass:
     expected_layers = {
         **expected_common_multi,
         'bounding_box': test_data.SMALL_LAYER_BBOX,
-        'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/'
-               f'layers/{publication}',
+        'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
     }
     expected_maps = {
         **expected_common_multi,
         'bounding_box': test_data.SMALL_MAP_BBOX,
-        'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/'
-               f'maps/{publication}',
+        'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}',
+    }
+
+    expected_common = {
+        'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
+        'description': description,
+        'name': publication,
+        'title': publication,
+        'updated_at': None,
+        'uuid': None,
+    }
+    expected_layer = {
+        **expected_common,
+        'bounding_box': test_data.SMALL_LAYER_BBOX,
+        'db_table': {'name': publication},
+        'file': {'path': f'layers/{publication}/input_file/{publication}.geojson'},
+        'metadata': {'comparison_url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/'
+                                       f'metadata-comparison',
+                     'csw_url': f'{settings.CSW_PROXY_URL}',
+                     'identifier': None,
+                     'record_url': None},
+        'sld': {'type': 'sld',
+                'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/style'},
+        'style': {'type': 'sld',
+                  'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/style'},
+        'thumbnail': {'path': f'layers/{publication}/thumbnail/{publication}.png',
+                      'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/thumbnail'},
+        'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
+        'wfs': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}/wfs'},
+        'wms': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}_wms/ows'},
+    }
+    expected_map = {
+        **expected_common,
+        'bounding_box': test_data.SMALL_MAP_BBOX,
+        'file': {'path': f'maps/{publication}/input_file/{publication}.json',
+                 'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/file'},
+        'metadata': {
+            'comparison_url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/'
+                              f'metadata-comparison',
+            'csw_url': f'{settings.CSW_PROXY_URL}',
+            'identifier': None,
+            'record_url': None},
+        'thumbnail': {'path': f'maps/{publication}/thumbnail/{publication}.png',
+                      'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/thumbnail'},
+        'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}',
+        'uuid': None,
     }
 
     @pytest.fixture(scope="class")
@@ -94,19 +139,29 @@ class TestResponsesClass:
             process_client.delete_workspace_publication(publication_type, self.workspace, self.publication, )
 
     @staticmethod
+    def compare_infos(info, expected_info, path):
+        assert info.keys() == expected_info.keys(), (info, path)
+        for key, value in expected_info.items():
+            if isinstance(value, dict):
+                TestResponsesClass.compare_infos(info[key], value, '/' + key + '/')
+            elif value:
+                assert info[key] == value, path + key
+
+    @staticmethod
     @pytest.mark.usefixtures('ensure_layman', 'provide_data')
     @pytest.mark.parametrize('query_method, method_params, expected_info', [
         (process_client.get_layers, dict(), expected_layers),
         (process_client.get_maps, dict(), expected_maps),
         (process_client.get_workspace_layers, {'workspace': workspace}, expected_layers),
         (process_client.get_workspace_maps, {'workspace': workspace}, expected_maps),
+        (process_client.get_workspace_layer, {'username': workspace, 'name': publication}, expected_layer),
+        (process_client.get_workspace_map, {'username': workspace, 'name': publication}, expected_map),
     ])
     def test_rest_responses(query_method, method_params, expected_info, ):
         response = query_method(**method_params)
-        assert len(response) == 1
-        info = response[0]
-        assert len(info) == len(expected_info), info
-        for key, value in expected_info.items():
-            assert key in info.keys()
-            if value:
-                assert info[key] == value
+        if isinstance(response, list):
+            assert len(response) == 1
+            info = response[0]
+        else:
+            info = response
+        TestResponsesClass.compare_infos(info, expected_info, '/')
