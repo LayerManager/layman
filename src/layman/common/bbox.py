@@ -5,6 +5,12 @@ def is_empty(bbox):
     return all(num is None for num in bbox)
 
 
+def is_valid(coords):
+    return len(coords) == 4 \
+        and coords.count(None) in {0, 4} \
+        and (is_empty(coords) or (coords[0] <= coords[2] and coords[1] <= coords[3]))
+
+
 def contains_bbox(bbox1, bbox2):
     return not is_empty(bbox1) and not is_empty(bbox2) \
         and bbox1[0] <= bbox2[0] and bbox2[2] <= bbox1[2] and bbox1[1] <= bbox2[1] and bbox2[3] <= bbox1[3]
