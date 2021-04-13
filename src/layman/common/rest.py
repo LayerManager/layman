@@ -125,14 +125,15 @@ def get_bbox_from_param(request_args, param_name):
 
 def get_publications(publication_type, user, request_args=None, workspace=None):
     request_args = request_args or {}
-    known_order_by_values = [consts.ORDER_BY_TITLE, consts.ORDER_BY_FULL_TEXT, consts.ORDER_BY_LAST_CHANGE, ]
+    known_order_by_values = [consts.ORDER_BY_TITLE, consts.ORDER_BY_FULL_TEXT, consts.ORDER_BY_LAST_CHANGE,
+                             consts.ORDER_BY_BBOX, ]
 
     full_text_filter = None
     if consts.FILTER_FULL_TEXT in request_args:
         full_text_filter = prime_db_schema_util.to_tsquery_string(request_args[consts.FILTER_FULL_TEXT]) or None
 
     bbox_filter = get_bbox_from_param(request_args, consts.FILTER_BBOX)
-    get_bbox_from_param(request_args, consts.ORDERING_BBOX)
+    ordering_bbox = get_bbox_from_param(request_args, consts.ORDERING_BBOX)
 
     order_by_list = []
     order_by_value = request_args.get(consts.ORDER_BY_PARAM)
@@ -143,6 +144,9 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
         if order_by_value == consts.ORDER_BY_FULL_TEXT and not full_text_filter:
             raise LaymanError(48, f'Value "{consts.ORDER_BY_FULL_TEXT}" of parameter "{consts.ORDER_BY_PARAM}" can be '
                                   f'used only if "{consts.FILTER_FULL_TEXT}" parameter is set.')
+        if order_by_value == consts.ORDER_BY_BBOX and not bbox_filter and not ordering_bbox:
+            raise LaymanError(48, f'Value "{consts.ORDER_BY_BBOX}" of parameter "{consts.ORDER_BY_PARAM}" can be '
+                                  f'used only if "{consts.FILTER_BBOX}" or "{consts.ORDER_BY_BBOX}" parameter is set.')
 
         order_by_list.append(order_by_value)
 
