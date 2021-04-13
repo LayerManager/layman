@@ -18,6 +18,7 @@ def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
                           bbox_filter=None,
                           order_by_list=None,
                           ordering_full_text=None,
+                          ordering_bbox=None,
                           ):
     order_by_list = order_by_list or []
 
@@ -50,9 +51,18 @@ def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
     ]
 
     order_by_definition = {
-        consts.ORDER_BY_FULL_TEXT: ('ts_rank_cd(_prime_schema.my_unaccent(p.title), to_tsquery(unaccent(%s))) DESC', (ordering_full_text,)),
+        consts.ORDER_BY_FULL_TEXT: ('ts_rank_cd(_prime_schema.my_unaccent(p.title), to_tsquery(unaccent(%s))) DESC',
+                                    (ordering_full_text,)),
         consts.ORDER_BY_TITLE: ('unaccent(p.title) ASC', tuple()),
         consts.ORDER_BY_LAST_CHANGE: ('updated_at DESC', tuple()),
+        consts.ORDER_BY_BBOX: ("""
+            -- A∩B * (1/A + 1/B)
+            st_area(st_intersection(p.bbox,ST_MakeBox2D(ST_MakePoint(%s, %s),
+                                                        ST_MakePoint(%s, %s))))
+             * (1/st_area(p.bbox) +
+                1/st_area(ST_MakeBox2D(ST_MakePoint(%s, %s),
+                                       ST_MakePoint(%s, %s)))) DESC
+                """, ordering_bbox + ordering_bbox if ordering_bbox else tuple()),
     }
 
     assert all(ordering_item in order_by_definition.keys() for ordering_item in order_by_list)
