@@ -188,7 +188,11 @@ def adjust_data_for_bbox_search():
         from tmp
         ;'''
         params = bbox_4326 + (4326, 3857,)
-        bbox_3857 = db_util.run_query(query_transform, params)[0]
+        try:
+            bbox_3857 = db_util.run_query(query_transform, params)[0]
+        except BaseException:
+            logger.warning(f'        Bounding box not transformed, so set to None.')
+            bbox_3857 = (None, None, None, None)
 
         set_map_bbox_query = f'''
         update {DB_SCHEMA}.publications set
