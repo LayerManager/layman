@@ -140,6 +140,10 @@ class TestGetPublications:
         (authn_headers_user2, {'full_text_filter': 'jiný další kůň'}, [(workspace2, publication_2o_2_2x4_4),
                                                                        (workspace2, publication_2e_3_3x5_5),
                                                                        ],),
+        (authn_headers_user2, {'full_text_filter': 'jiný další kůň', 'order_by': 'full_text'}, [
+            (workspace2, publication_2o_2_2x4_4),
+            (workspace2, publication_2e_3_3x5_5),
+        ],),
         (authn_headers_user2, {'full_text_filter': 'workspace publication'}, [
             (workspace1, publication_1e_3_7x5_9),
         ],),

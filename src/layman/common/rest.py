@@ -144,8 +144,9 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
     ordering_full_text = None
     if not order_by_list:
         if full_text_filter:
-            ordering_full_text = full_text_filter
             order_by_list = [consts.ORDER_BY_FULL_TEXT]
+    if consts.ORDER_BY_FULL_TEXT in order_by_list:
+        ordering_full_text = full_text_filter
 
     publication_infos_whole = layman_util.get_publication_infos(publ_type=publication_type,
                                                                 workspace=workspace,
