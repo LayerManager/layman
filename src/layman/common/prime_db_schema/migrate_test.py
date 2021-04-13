@@ -21,17 +21,21 @@ logger = logging.getLogger(__name__)
 @pytest.fixture()
 def save_upgrade_status():
     with app.app_context():
-        current_version = upgrade.get_current_data_version()
+        current_versions = {(migration_type, upgrade.get_current_version(migration_type))
+                            for migration_type in [upgrade.consts.MIGRATION_TYPE_SCHEMA, upgrade.consts.MIGRATION_TYPE_DATA]}
     yield
     with app.app_context():
         upgrade.upgrade_v1_9.initialize_data_versioning()
         upgrade.upgrade_v1_10.alter_schema()
         upgrade.upgrade_v1_10.update_style_type_in_db()
+        upgrade.upgrade_v1_12.adjust_db_for_schema_migrations()
         upgrade.upgrade_v1_12.adjust_prime_db_schema_for_fulltext_search()
         upgrade.upgrade_v1_12.adjust_prime_db_schema_for_last_change_search()
         upgrade.upgrade_v1_12.adjust_prime_db_schema_for_bbox_search()
+        upgrade.upgrade_v1_12.adjust_data_for_last_change_search()
 
-        upgrade.set_current_data_version(current_version)
+        for (migration_type, version) in current_versions:
+            upgrade.set_current_migration_version(migration_type, version)
 
 
 @pytest.fixture()

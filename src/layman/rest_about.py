@@ -25,7 +25,13 @@ def clean_version(version):
 @bp.route('/version', methods=['GET'])
 def get_version():
     version, release_date = get_version_from_txt()
-    data_version = upgrade.get_current_data_version()
+
+    migrations = dict()
+    for migration_type in {upgrade.consts.MIGRATION_TYPE_DATA, upgrade.consts.MIGRATION_TYPE_SCHEMA, }:
+        current_version = upgrade.get_current_version(migration_type)
+        migrations[f'last-{migration_type}-migration'] =\
+            f'{current_version[0]}.{current_version[1]}.{current_version[2]}-{current_version[3]}'
+    migrations['last-migration'] = migrations[f'last-{upgrade.consts.MIGRATION_TYPE_SCHEMA}-migration']  # for backward compatibility
     result = {'about': {'applications': {'layman': {'version': clean_version(version),
                                                     'release-timestamp': release_date,
                                                     },
@@ -33,8 +39,7 @@ def get_version():
                                                                 },
 
                                          },
-                        'data': {'layman': {'last-migration': f'{data_version[0]}.{data_version[1]}.{data_version[2]}-{data_version[3]}',
-                                            },
+                        'data': {'layman': migrations,
                                  },
                         },
               }

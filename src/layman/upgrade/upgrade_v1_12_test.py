@@ -80,7 +80,7 @@ def test_adjust_prime_db_schema_for_last_change_search():
         results = db_util.run_query(query)
         assert not results, results
 
-        upgrade_v1_12.adjust_prime_db_schema_for_last_change_search()
+        upgrade_v1_12.adjust_data_for_last_change_search()
 
         query = f'''
 select p.updated_at
@@ -170,7 +170,7 @@ def test_adjust_prime_db_schema_for_bbox_search():
         results = db_util.run_query(query)
         assert not results, results
 
-        upgrade_v1_12.adjust_prime_db_schema_for_bbox_search()
+        upgrade_v1_12.adjust_data_for_bbox_search()
 
         for publication_type, publication, expected_bbox in [('layman.layer', layer, expected_bbox_layer),
                                                              ('layman.map', map, expected_bbox_map)]:
