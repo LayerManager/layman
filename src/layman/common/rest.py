@@ -103,6 +103,26 @@ def setup_post_access_rights(request_form, kwargs, actor_name):
         kwargs['access_rights'][type] = access_rights
 
 
+def get_bbox_from_param(request_args, param_name):
+    bbox = None
+    if request_args.get(param_name):
+        m = re.match(consts.BBOX_PATTERN, request_args[param_name])
+        if not m:
+            raise LaymanError(2, {'parameter': param_name, 'expected': {
+                'text': 'Four comma-separated coordinates: minx,miny,maxx,maxy',
+                'regular_expression': consts.BBOX_PATTERN,
+            }})
+        coords = tuple(float(c) for c in m.groups())
+        if not bbox_util.is_valid(coords):
+            raise LaymanError(2, {'parameter': param_name, 'expected': 'minx <= maxx and miny <= maxy'})
+        bbox = coords
+        if not bbox_util.contains_bbox(settings.LAYMAN_EPSG_3857_EXTENT, bbox):
+            max_extent_str = ','.join(settings.LAYMAN_EPSG_3857_EXTENT)
+            raise LaymanError(2, {'parameter': param_name,
+                                  'expected': f"Bounding box must be contained by {max_extent_str}"})
+    return bbox
+
+
 def get_publications(publication_type, user, request_args=None, workspace=None):
     request_args = request_args or {}
     known_order_by_values = [consts.ORDER_BY_TITLE, consts.ORDER_BY_FULL_TEXT, consts.ORDER_BY_LAST_CHANGE, ]
@@ -111,23 +131,7 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
     if consts.FILTER_FULL_TEXT in request_args:
         full_text_filter = prime_db_schema_util.to_tsquery_string(request_args[consts.FILTER_FULL_TEXT]) or None
 
-    bbox_filter = None
-    if request_args.get(consts.FILTER_BBOX):
-        m = re.match(consts.BBOX_PATTERN, request_args[consts.FILTER_BBOX])
-        if not m:
-            raise LaymanError(2, {'parameter': consts.FILTER_BBOX, 'expected': {
-                'text': 'Four comma-separated coordinates: minx,miny,maxx,maxy',
-                'regular_expression': consts.BBOX_PATTERN,
-            }})
-        coords = tuple(float(c) for c in m.groups())
-        if not bbox_util.is_valid(coords):
-            raise LaymanError(2, {'parameter': consts.FILTER_BBOX, 'expected': 'minx <= maxx and miny <= maxy'})
-        bbox = coords
-        if not bbox_util.contains_bbox(settings.LAYMAN_EPSG_3857_EXTENT, bbox):
-            max_extent_str = ','.join(settings.LAYMAN_EPSG_3857_EXTENT)
-            raise LaymanError(2, {'parameter': consts.FILTER_BBOX,
-                                  'expected': f"Bounding box must be contained by {max_extent_str}"})
-        bbox_filter = bbox
+    bbox_filter = get_bbox_from_param(request_args, consts.FILTER_BBOX)
 
     order_by_list = []
     order_by_value = request_args.get(consts.ORDER_BY_PARAM)
