@@ -35,12 +35,16 @@ Get list of published layers.
 
 #### Request
 Query parameters:
-- *full_text_filter*: String. List of words separated by space. Only layers with at least one of them in title will be returned. Search is case-insensitive, unaccent and did lemmatization for English. By default, layers are ordered by search rank in response if this filter is used.
+- *full_text_filter*: String. List of words separated by space. Only layers with at least one of them in title will be returned. Search is case-insensitive, unaccent and did lemmatization for English.
 - *bbox_filter*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. Only layers whose bounding box intersects with given bounding box will be returned.
 - *order_by*: String. Can be one of these values:
   - `full_text` Publications will be ordered by results of full-text search. Can be used only in combination with *full_text_filter*.
   - `title` Publications will be ordered lexicographically by title value.
   - `last_change` Publications will be ordered by time of last change. Recently updated publications will be first.
+  - `bbox` Publications will be ordered by similarity of bounding box with bounding box passed in *ordering_bbox* or *bbox_filter*. Can be used only in combination with  *ordering_bbox* or *bbox_filter*.
+  
+  If *full_text_filter* is set, default value is `full_text`; if *bbox_filter* is set, default value is `bbox`; otherwise default value is empty string, i.e. no ordering is guaranteed.
+- *ordering_bbox*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. The bounding box will be used for ordering. Can be used only if *order_by* is set to `bbox` (by default or explicitly).
 
 #### Response
 Content-Type: `application/json`
