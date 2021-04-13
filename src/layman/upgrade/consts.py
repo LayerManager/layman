@@ -1,0 +1,2 @@
+MIGRATION_TYPE_DATA = 'data'
+MIGRATION_TYPE_SCHEMA = 'schema'
