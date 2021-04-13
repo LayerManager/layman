@@ -155,15 +155,13 @@ class TestGetPublications:
                                                             (workspace2, publication_2e_3_3x5_5),
                                                             (workspace1, publication_1e_3_7x5_9),
                                                             ],),
-        pytest.param(
-            authn_headers_user2,
-            {'order_by_list': ['bbox'],
-             'ordering_bbox': [3000, 3000, 5000, 5000]}, [
-                (workspace2, publication_2e_3_3x5_5),
-                (workspace2, publication_2o_2_2x4_4),
-                (workspace1, publication_1e_3_7x5_9),
-            ], marks=pytest.mark.xfail(reason='Not yet implemented!')),
-        (authn_headers_user2, {'bbox_filter': ','.join(str(c) for c in [3001, 3001, 4999, 4999])}, [
+        (authn_headers_user2, {'order_by_list': ['bbox'],
+                               'ordering_bbox': ','.join(str(c) for c in (2999, 2999, 5001, 5001))}, [
+            (workspace2, publication_2e_3_3x5_5),
+            (workspace2, publication_2o_2_2x4_4),
+            (workspace1, publication_1e_3_7x5_9),
+        ]),
+        (authn_headers_user2, {'bbox_filter': ','.join(str(c) for c in (3001, 3001, 4999, 4999))}, [
             (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
         ]),
@@ -181,6 +179,7 @@ class TestGetPublications:
     ({'order_by': 'gdasfda'}, (2, 400), {'parameter': 'order_by'}),
     ({'order_by': 'full_text'}, (48, 400), dict()),
     ({'order_by': 'bbox'}, (48, 400), dict()),
+    ({'order_by': 'title', 'ordering_bbox': '1,2,3,4'}, (48, 400), dict()),
     ({'bbox_filter': '1,2,3,4,5'}, (2, 400), {'parameter': 'bbox_filter'}),
     ({'bbox_filter': '1,2,c,4'}, (2, 400), {'parameter': 'bbox_filter'}),
     ({'bbox_filter': '1,4,2,3'}, (2, 400), {'parameter': 'bbox_filter'}),

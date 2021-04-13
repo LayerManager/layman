@@ -313,6 +313,7 @@ def get_publication_infos(workspace=None, publ_type=None, context=None, style_ty
                           bbox_filter=None,
                           order_by_list=None,
                           ordering_full_text=None,
+                          ordering_bbox=None,
                           ):
     from layman.common.prime_db_schema import publications
     context = context or {}
@@ -325,6 +326,7 @@ def get_publication_infos(workspace=None, publ_type=None, context=None, style_ty
                                                bbox_filter=bbox_filter,
                                                order_by_list=order_by_list,
                                                ordering_full_text=ordering_full_text,
+                                               ordering_bbox=ordering_bbox,
                                                )
 
     return infos
