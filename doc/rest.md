@@ -748,4 +748,8 @@ JSON object representing current application version:
       - **version**: String. The current version of installed Layman test client. In [semantic versioning](https://semver.org/) format `X.Y.Z`, or commit hash for development version.
   - **data** 
     - **layman**:
-      - **last-migration**: String. Identifier of the last successful migration in format 'X.Y.Z-m'.
+      - **last-schema-migration**: String. Identifier of the last successful schema migration in format 'X.Y.Z-m'.
+      - **last-data-migration**: String. Identifier of the last successful data migration in format 'X.Y.Z-m'.
+      - **last-migration**:
+        - **deprecated parameter**
+        - alias for *last-schema-migration* parameter
