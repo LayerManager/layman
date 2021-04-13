@@ -132,6 +132,7 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
         full_text_filter = prime_db_schema_util.to_tsquery_string(request_args[consts.FILTER_FULL_TEXT]) or None
 
     bbox_filter = get_bbox_from_param(request_args, consts.FILTER_BBOX)
+    get_bbox_from_param(request_args, consts.ORDERING_BBOX)
 
     order_by_list = []
     order_by_value = request_args.get(consts.ORDER_BY_PARAM)
