@@ -83,6 +83,9 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                         gs.ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN', settings.GEOSERVER_ADMIN_AUTH)
                         gs.ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
 
+                    if settings.LAYMAN_GS_PROXY_BASE_URL != '':
+                        gs.ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
+
                     if not IN_UPGRADE_PROCESS:
                         logger.info(f'Adjusting GeoServer SRS')
                         any_srs_list_changed = False
@@ -91,8 +94,6 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                             any_srs_list_changed = service_srs_list_changed or any_srs_list_changed
                         if any_srs_list_changed:
                             gs.reload(settings.LAYMAN_GS_AUTH)
-                        if settings.LAYMAN_GS_PROXY_BASE_URL != '':
-                            gs.ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
 
                         from . import upgrade
                         upgrade.upgrade()
