@@ -57,8 +57,7 @@ def get_current_version(migration_type):
         sql_result = db_util.run_query(sql_select, encapsulate_exception=False)
         row_count = len(sql_result)
         if row_count == 1:
-            current_version_sql = sql_result[0]
-            current_version = (current_version_sql[0], current_version_sql[1], current_version_sql[2], current_version_sql[3])
+            current_version = sql_result[0]
         elif row_count == 0:
             current_version = (-1, -1, -1, -1)
         else:
