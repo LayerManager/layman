@@ -56,23 +56,26 @@ def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
         consts.ORDER_BY_TITLE: ('unaccent(p.title) ASC', tuple()),
         consts.ORDER_BY_LAST_CHANGE: ('updated_at DESC', tuple()),
         consts.ORDER_BY_BBOX: ("""
-            -- A∩B * (1/A + 1/B)
-            -- in case of no-area and very small bounding boxes, min_area (1) is used instead of real area
+            -- A∩B / (A + B)
             CASE
+                -- if there is any intersection
                 WHEN p.bbox && ST_MakeBox2D(ST_MakePoint(%s, %s),
                                             ST_MakePoint(%s, %s))
                     THEN
+                        -- in cases, when area of intersection is 0, we want it rank higher than no intersection
                         GREATEST(st_area(st_intersection(p.bbox, ST_MakeBox2D(ST_MakePoint(%s, %s),
                                                                               ST_MakePoint(%s, %s)))),
-                                 /* min_area */ 1)
+                                 1)
+                        -- we have to solve division by 0
+                        / (GREATEST(st_area(p.bbox), 1) +
+                           GREATEST(st_area(ST_MakeBox2D(ST_MakePoint(%s, %s),
+                                                         ST_MakePoint(%s, %s))),
+                                    1)
+                           )
+                -- if there is no intersection, result is 0 in all cases
                 ELSE
                     0
-            END
-             * (1/GREATEST(st_area(p.bbox), /* min_area */ 1) +
-                1/GREATEST(st_area(ST_MakeBox2D(ST_MakePoint(%s, %s),
-                                                ST_MakePoint(%s, %s))),
-                           /* min_area */ 1)
-                ) DESC
+            END DESC
             """, ordering_bbox + ordering_bbox + ordering_bbox if ordering_bbox else tuple()),
     }
 
