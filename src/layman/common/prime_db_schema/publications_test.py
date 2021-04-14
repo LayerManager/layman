@@ -150,6 +150,7 @@ class TestSelectPublicationsComplex:
     authn_headers_user2 = process_client.get_authz_headers(workspace2)
 
     layer_1e_2_4x6_6 = 'test_select_publications_publication1e'
+    layer_1e_3_3x3_3 = 'test_select_publications_publication1e_3_3x3_3'
     layer_1o_2_2x3_6 = 'test_select_publications_publication1o'
     layer_1oe_3_7x5_9 = 'test_select_publications_publication1oe'
     layer_2e_3_3x5_5 = 'test_select_publications_publication2e'
@@ -162,6 +163,13 @@ class TestSelectPublicationsComplex:
           'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
                             'write': settings.RIGHTS_EVERYONE_ROLE},
           'file_paths': ['test/data/bbox/map_2_4-6_6.json', ],
+          }),
+        (workspace1, MAP_TYPE, layer_1e_3_3x3_3,
+         {'headers': authn_headers_user1,
+          'title': 'Jednobodová vrstva',
+          'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
+                            'write': settings.RIGHTS_EVERYONE_ROLE},
+          'file_paths': ['test/data/bbox/map_3_3-3_3.json', ],
           }),
         (workspace1, MAP_TYPE, layer_1o_2_2x3_6,
          {'headers': authn_headers_user1,
@@ -206,24 +214,29 @@ class TestSelectPublicationsComplex:
     @staticmethod
     @pytest.mark.parametrize('query_params, expected_publications', [
         (dict(), [(workspace1, MAP_TYPE, layer_1e_2_4x6_6),
+                  (workspace1, MAP_TYPE, layer_1e_3_3x3_3),
                   (workspace1, MAP_TYPE, layer_1o_2_2x3_6),
                   (workspace1, MAP_TYPE, layer_1oe_3_7x5_9),
                   (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
                   (workspace2, MAP_TYPE, layer_2o_2_2x4_4),
                   ]),
         ({'reader': settings.ANONYM_USER}, [(workspace1, MAP_TYPE, layer_1e_2_4x6_6),
+                                            (workspace1, MAP_TYPE, layer_1e_3_3x3_3),
                                             (workspace1, MAP_TYPE, layer_1oe_3_7x5_9),
                                             (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
                                             ]),
         ({'reader': workspace2}, [(workspace1, MAP_TYPE, layer_1e_2_4x6_6),
+                                  (workspace1, MAP_TYPE, layer_1e_3_3x3_3),
                                   (workspace1, MAP_TYPE, layer_1oe_3_7x5_9),
                                   (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
                                   (workspace2, MAP_TYPE, layer_2o_2_2x4_4),
                                   ]),
         ({'writer': settings.ANONYM_USER}, [(workspace1, MAP_TYPE, layer_1e_2_4x6_6),
+                                            (workspace1, MAP_TYPE, layer_1e_3_3x3_3),
                                             (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
                                             ]),
         ({'writer': workspace2}, [(workspace1, MAP_TYPE, layer_1e_2_4x6_6),
+                                  (workspace1, MAP_TYPE, layer_1e_3_3x3_3),
                                   (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
                                   (workspace2, MAP_TYPE, layer_2o_2_2x4_4),
                                   ]),
@@ -248,6 +261,7 @@ class TestSelectPublicationsComplex:
             (workspace1, MAP_TYPE, layer_1oe_3_7x5_9),
             (workspace2, MAP_TYPE, layer_2o_2_2x4_4),
             (workspace1, MAP_TYPE, layer_1e_2_4x6_6),
+            (workspace1, MAP_TYPE, layer_1e_3_3x3_3),
             (workspace1, MAP_TYPE, layer_1o_2_2x3_6),
             (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
         ]),
@@ -260,6 +274,7 @@ class TestSelectPublicationsComplex:
             (workspace2, MAP_TYPE, layer_2o_2_2x4_4),
             (workspace1, MAP_TYPE, layer_1o_2_2x3_6),
             (workspace1, MAP_TYPE, layer_1oe_3_7x5_9),
+            (workspace1, MAP_TYPE, layer_1e_3_3x3_3),
             (workspace1, MAP_TYPE, layer_1e_2_4x6_6),
             (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
         ]),
@@ -268,6 +283,7 @@ class TestSelectPublicationsComplex:
             (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
             (workspace1, MAP_TYPE, layer_1oe_3_7x5_9),
             (workspace1, MAP_TYPE, layer_1o_2_2x3_6),
+            (workspace1, MAP_TYPE, layer_1e_3_3x3_3),
             (workspace1, MAP_TYPE, layer_1e_2_4x6_6),
         ]),
         ({'order_by_list': ['bbox'], 'ordering_bbox': (2999, 2999, 5001, 5001), }, [
@@ -275,6 +291,7 @@ class TestSelectPublicationsComplex:
             (workspace1, MAP_TYPE, layer_1e_2_4x6_6),
             (workspace2, MAP_TYPE, layer_2o_2_2x4_4),
             (workspace1, MAP_TYPE, layer_1o_2_2x3_6),
+            (workspace1, MAP_TYPE, layer_1e_3_3x3_3),
             (workspace1, MAP_TYPE, layer_1oe_3_7x5_9),
         ]),
         ({'order_by_list': ['bbox'], 'ordering_bbox': (4001, 4001, 4001, 4001),

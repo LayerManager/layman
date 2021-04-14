@@ -66,6 +66,7 @@ class TestGetPublications:
     authn_headers_user2 = process_client.get_authz_headers(workspace2)
 
     publication_1e_3_7x5_9 = 'test_get_publications_publication1e'
+    publication_1e_3_3x3_3 = 'test_get_publications_publication1e_3x3'
     publication_2e_3_3x5_5 = 'test_get_publications_publication2e'
     publication_2o_2_2x4_4 = 'test_get_publications_publication2o'
 
@@ -76,6 +77,14 @@ class TestGetPublications:
             process_client.MAP_TYPE: {'file_paths': ['test/data/bbox/map_3_7-5_9.json', ],
                                       },
             process_client.LAYER_TYPE: {'file_paths': ['test/data/bbox/layer_3_7-5_9.geojson', ],
+                                        },
+        }),
+        (workspace1, publication_1e_3_3x3_3, {
+            'title': 'Jednobodová publikace',
+        }, {
+            process_client.MAP_TYPE: {'file_paths': ['test/data/bbox/map_3_3-3_3.json', ],
+                                      },
+            process_client.LAYER_TYPE: {'file_paths': ['test/data/bbox/layer_3_3-3_3.geojson', ],
                                         },
         }),
         (workspace2, publication_2e_3_3x5_5, {
@@ -121,10 +130,12 @@ class TestGetPublications:
     @staticmethod
     @pytest.mark.parametrize('headers, query_params, expected_publications', [
         (authn_headers_user2, {}, [(workspace1, publication_1e_3_7x5_9),
+                                   (workspace1, publication_1e_3_3x3_3),
                                    (workspace2, publication_2e_3_3x5_5),
                                    (workspace2, publication_2o_2_2x4_4),
                                    ],),
         (None, {}, [(workspace1, publication_1e_3_7x5_9),
+                    (workspace1, publication_1e_3_3x3_3),
                     (workspace2, publication_2e_3_3x5_5),
                     ],),
         (authn_headers_user2, {'full_text_filter': 'kůň'}, [(workspace2, publication_2e_3_3x5_5),
@@ -147,18 +158,21 @@ class TestGetPublications:
         (authn_headers_user2, {'full_text_filter': 'workspace publication'}, [
             (workspace1, publication_1e_3_7x5_9),
         ],),
-        (authn_headers_user2, {'order_by': 'title'}, [(workspace2, publication_2o_2_2x4_4),
+        (authn_headers_user2, {'order_by': 'title'}, [(workspace1, publication_1e_3_3x3_3),
+                                                      (workspace2, publication_2o_2_2x4_4),
                                                       (workspace1, publication_1e_3_7x5_9),
                                                       (workspace2, publication_2e_3_3x5_5),
                                                       ],),
         (authn_headers_user2, {'order_by': 'last_change'}, [(workspace2, publication_2o_2_2x4_4),
                                                             (workspace2, publication_2e_3_3x5_5),
+                                                            (workspace1, publication_1e_3_3x3_3),
                                                             (workspace1, publication_1e_3_7x5_9),
                                                             ],),
         (authn_headers_user2, {'order_by_list': ['bbox'],
                                'ordering_bbox': ','.join(str(c) for c in (2999, 2999, 5001, 5001))}, [
             (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
+            (workspace1, publication_1e_3_3x3_3),
             (workspace1, publication_1e_3_7x5_9),
         ]),
         (authn_headers_user2, {'order_by_list': ['bbox'],
@@ -166,6 +180,7 @@ class TestGetPublications:
             (workspace2, publication_2o_2_2x4_4),  # because it has slightly smaller area then 3_3x5_5
             (workspace2, publication_2e_3_3x5_5),
             (workspace1, publication_1e_3_7x5_9),
+            (workspace1, publication_1e_3_3x3_3),
         ]),
         (authn_headers_user2, {'bbox_filter': ','.join(str(c) for c in (3001, 3001, 4999, 4999))}, [
             (workspace2, publication_2e_3_3x5_5),
