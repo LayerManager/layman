@@ -27,11 +27,13 @@ def get_connection_cursor():
     return g.get(key)
 
 
-def run_query(query, data=None, conn_cur=None, encapsulate_exception=True):
+def run_query(query, data=None, conn_cur=None, encapsulate_exception=True, log_query=False):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
     try:
+        if log_query:
+            app.logger.info(f"query={cur.mogrify(query, data).decode()}")
         cur.execute(query, data)
         rows = cur.fetchall()
         conn.commit()
@@ -44,11 +46,13 @@ def run_query(query, data=None, conn_cur=None, encapsulate_exception=True):
     return rows
 
 
-def run_statement(query, data=None, conn_cur=None, encapsulate_exception=True):
+def run_statement(query, data=None, conn_cur=None, encapsulate_exception=True, log_query=False):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
     try:
+        if log_query:
+            app.logger.info(f"query={cur.mogrify(query, data).decode()}")
         cur.execute(query, data)
         rows = cur.rowcount
         conn.commit()
