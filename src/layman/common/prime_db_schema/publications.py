@@ -57,12 +57,23 @@ def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
         consts.ORDER_BY_LAST_CHANGE: ('updated_at DESC', tuple()),
         consts.ORDER_BY_BBOX: ("""
             -- A∩B * (1/A + 1/B)
-            st_area(st_intersection(p.bbox,ST_MakeBox2D(ST_MakePoint(%s, %s),
-                                                        ST_MakePoint(%s, %s))))
-             * (1/st_area(p.bbox) +
-                1/st_area(ST_MakeBox2D(ST_MakePoint(%s, %s),
-                                       ST_MakePoint(%s, %s)))) DESC
-                """, ordering_bbox + ordering_bbox if ordering_bbox else tuple()),
+            -- in case of no-area and very small bounding boxes, min_area (1) is used instead of real area
+            CASE
+                WHEN p.bbox && ST_MakeBox2D(ST_MakePoint(%s, %s),
+                                            ST_MakePoint(%s, %s))
+                    THEN
+                        GREATEST(st_area(st_intersection(p.bbox, ST_MakeBox2D(ST_MakePoint(%s, %s),
+                                                                              ST_MakePoint(%s, %s)))),
+                                 /* min_area */ 1)
+                ELSE
+                    0
+            END
+             * (1/GREATEST(st_area(p.bbox), /* min_area */ 1) +
+                1/GREATEST(st_area(ST_MakeBox2D(ST_MakePoint(%s, %s),
+                                                ST_MakePoint(%s, %s))),
+                           /* min_area */ 1)
+                ) DESC
+            """, ordering_bbox + ordering_bbox + ordering_bbox if ordering_bbox else tuple()),
     }
 
     assert all(ordering_item in order_by_definition.keys() for ordering_item in order_by_list)
