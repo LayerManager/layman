@@ -183,11 +183,9 @@ class TestGetPublications:
     ({'bbox_filter': '1,2,3,4,5'}, (2, 400), {'parameter': 'bbox_filter'}),
     ({'bbox_filter': '1,2,c,4'}, (2, 400), {'parameter': 'bbox_filter'}),
     ({'bbox_filter': '1,4,2,3'}, (2, 400), {'parameter': 'bbox_filter'}),
-    ({'bbox_filter': '-20026376.39,-20048966.10,30026376.39,30048966.10,'}, (2, 400), {'parameter': 'bbox_filter'}),
     ({'ordering_bbox': '1,2,3,4,5'}, (2, 400), {'parameter': 'ordering_bbox'}),
     ({'ordering_bbox': '1,2,c,4'}, (2, 400), {'parameter': 'ordering_bbox'}),
     ({'ordering_bbox': '1,4,2,3'}, (2, 400), {'parameter': 'ordering_bbox'}),
-    ({'ordering_bbox': '-20026376.39,-20048966.10,30026376.39,30048966.10,'}, (2, 400), {'parameter': 'ordering_bbox'}),
 ])
 @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
 @pytest.mark.usefixtures('ensure_layman', )

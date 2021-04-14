@@ -116,10 +116,6 @@ def get_bbox_from_param(request_args, param_name):
         if not bbox_util.is_valid(coords):
             raise LaymanError(2, {'parameter': param_name, 'expected': 'minx <= maxx and miny <= maxy'})
         bbox = coords
-        if not bbox_util.contains_bbox(settings.LAYMAN_EPSG_3857_EXTENT, bbox):
-            max_extent_str = ','.join(settings.LAYMAN_EPSG_3857_EXTENT)
-            raise LaymanError(2, {'parameter': param_name,
-                                  'expected': f"Bounding box must be contained by {max_extent_str}"})
     return bbox
 
 
