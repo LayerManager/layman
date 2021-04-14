@@ -14,6 +14,7 @@ psycopg2.extras.register_uuid()
 
 def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
                           reader=None, writer=None,
+                          limit=None, offset=None,
                           full_text_filter=None,
                           bbox_filter=None,
                           order_by_list=None,
@@ -145,9 +146,23 @@ from {DB_SCHEMA}.workspaces w inner join
     order_by_clause = 'ORDER BY ' + ', '.join(order_by_parts)
 
     #########################################################
+    # Pagination clause
+    pagination_params = tuple()
+    pagination_clause = ''
+
+    if limit is not None:
+        assert limit >= 0
+        assert isinstance(limit, int)
+        pagination_clause = pagination_clause + f' LIMIT {limit} '
+    if offset is not None:
+        assert offset >= 0
+        assert isinstance(offset, int)
+        pagination_clause = pagination_clause + f' OFFSET {offset} '
+
+    #########################################################
     # Put it together
-    sql_params = select_params + where_params + order_by_params
-    select = select_clause + where_clause + order_by_clause
+    sql_params = select_params + where_params + order_by_params + pagination_params
+    select = select_clause + where_clause + order_by_clause + pagination_clause
     values = util.run_query(select, sql_params)
 
     # print(f'get_publication_infos:\n\n order_by_clause={order_by_clause},\n where_clause={where_clause},\n sql_params={sql_params},'

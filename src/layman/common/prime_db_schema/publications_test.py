@@ -340,6 +340,35 @@ class TestSelectPublicationsComplex:
             (workspace2, MAP_TYPE, map_2e_3_3x5_5),
             (workspace2, MAP_TYPE, map_2o_2_2x4_4),
         ]),
+        ({'limit': 2}, [
+            (workspace1, MAP_TYPE, map_1e_2_4x6_6),
+            (workspace1, MAP_TYPE, map_1e_3_3x3_3),
+            # (workspace1, MAP_TYPE, map_1o_2_2x3_6),
+            # (workspace1, MAP_TYPE, map_1oe_3_7x5_9),
+            # (workspace2, MAP_TYPE, map_2e_3_3x5_5),
+            # (workspace2, MAP_TYPE, map_2o_2_2x4_4),
+            # (workspace3, MAP_TYPE, map_3o_null),
+        ]),
+        ({'offset': 2}, [
+            # (workspace1, MAP_TYPE, map_1e_2_4x6_6),
+            # (workspace1, MAP_TYPE, map_1e_3_3x3_3),
+            (workspace1, MAP_TYPE, map_1o_2_2x3_6),
+            (workspace1, MAP_TYPE, map_1oe_3_7x5_9),
+            (workspace2, MAP_TYPE, map_2e_3_3x5_5),
+            (workspace2, MAP_TYPE, map_2o_2_2x4_4),
+            (workspace3, MAP_TYPE, map_3o_null),
+        ]),
+        ({'limit': 2, 'offset': 2}, [
+            # (workspace1, MAP_TYPE, map_1e_2_4x6_6),
+            # (workspace1, MAP_TYPE, map_1e_3_3x3_3),
+            (workspace1, MAP_TYPE, map_1o_2_2x3_6),
+            (workspace1, MAP_TYPE, map_1oe_3_7x5_9),
+            # (workspace2, MAP_TYPE, map_2e_3_3x5_5),
+            # (workspace2, MAP_TYPE, map_2o_2_2x4_4),
+            # (workspace3, MAP_TYPE, map_3o_null),
+        ]),
+        ({'limit': 0, 'offset': 0}, [
+        ]),
     ])
     @pytest.mark.usefixtures('provide_data')
     def test_get_publications(query_params, expected_publications):
