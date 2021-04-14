@@ -277,9 +277,19 @@ class TestSelectPublicationsComplex:
             (workspace1, MAP_TYPE, layer_1o_2_2x3_6),
             (workspace1, MAP_TYPE, layer_1oe_3_7x5_9),
         ]),
+        ({'order_by_list': ['bbox'], 'ordering_bbox': (4001, 4001, 4001, 4001),
+          'bbox_filter': (4001, 4001, 4001, 4001), }, [
+            (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
+            (workspace1, MAP_TYPE, layer_1e_2_4x6_6),
+        ]),
         ({'bbox_filter': (3001, 3001, 4999, 4999),
           }, [
             (workspace1, MAP_TYPE, layer_1e_2_4x6_6),
+            (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
+            (workspace2, MAP_TYPE, layer_2o_2_2x4_4),
+        ]),
+        ({'bbox_filter': (3001, 3001, 3001, 3001),
+          }, [
             (workspace2, MAP_TYPE, layer_2e_3_3x5_5),
             (workspace2, MAP_TYPE, layer_2o_2_2x4_4),
         ]),
