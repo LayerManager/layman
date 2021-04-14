@@ -1,5 +1,5 @@
 BBOX_PATTERN = r"^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$"
-INTEGER_PATTER = f"^([-+]?[0-9]+)$"
+INTEGER_PATTERN = f"^([-+]?[0-9]+)$"
 
 FILTER_FULL_TEXT = 'full_text_filter'
 FILTER_BBOX = 'bbox_filter'
@@ -10,3 +10,6 @@ ORDER_BY_TITLE = 'title'
 ORDER_BY_LAST_CHANGE = 'last_change'
 ORDER_BY_BBOX = 'bbox'
 ORDERING_BBOX = 'ordering_bbox'
+
+LIMIT = 'limit'
+OFFSET = 'offset'

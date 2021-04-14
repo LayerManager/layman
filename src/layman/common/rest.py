@@ -123,21 +123,21 @@ def get_integer_from_param(request_args, param_name, negative=True, zero=True, p
     result = None
     assert negative or zero or positive
     if request_args.get(param_name):
-        m = re.match(consts.INTEGER_PATTER, request_args[param_name])
+        m = re.match(consts.INTEGER_PATTERN, request_args[param_name])
         if not m:
             raise LaymanError(2, {'parameter': param_name, 'expected': {
                 'text': 'Integer with optional sign',
-                'regular_expression': consts.INTEGER_PATTER,
+                'regular_expression': consts.INTEGER_PATTERN,
             }})
         integer = int(m.groups()[0])
 
         if integer < 0 and not negative:
             expected_than = '>' + ('=' if zero else '')
             raise LaymanError(2, {'parameter': param_name, 'expected': f'value {expected_than} 0'})
-        elif integer == 0 and not zero:
+        if integer == 0 and not zero:
             expected_than = ('<' if negative else '') + ('>' if positive else '')
             raise LaymanError(2, {'parameter': param_name, 'expected': f'value {expected_than} 0'})
-        elif integer > 0 and not positive:
+        if integer > 0 and not positive:
             expected_than = '<' + ('=' if zero else '')
             raise LaymanError(2, {'parameter': param_name, 'expected': f'value {expected_than} 0'})
         result = integer
@@ -184,11 +184,15 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
 
     order_by_list = [order_by_value] if order_by_value else []
 
+    limit = get_integer_from_param(request_args, consts.LIMIT, negative=False)
+    offset = get_integer_from_param(request_args, consts.OFFSET, negative=False)
+
     publication_infos_whole = layman_util.get_publication_infos(publ_type=publication_type,
                                                                 workspace=workspace,
                                                                 context={'actor_name': user,
                                                                          'access_type': 'read'
                                                                          },
+                                                                limit=limit, offset=offset,
                                                                 full_text_filter=full_text_filter,
                                                                 bbox_filter=bbox_filter,
                                                                 order_by_list=order_by_list,
