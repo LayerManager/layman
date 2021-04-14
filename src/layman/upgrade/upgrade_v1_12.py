@@ -3,6 +3,7 @@ import logging
 import os
 import time
 import requests
+import psycopg2
 
 from layman import settings
 from layman.common.prime_db_schema import util as db_util
@@ -189,9 +190,9 @@ def adjust_data_for_bbox_search():
         ;'''
         params = bbox_4326 + (4326, 3857,)
         try:
-            bbox_3857 = db_util.run_query(query_transform, params)[0]
-        except BaseException:
-            logger.warning(f'        Bounding box not transformed, so set to None.')
+            bbox_3857 = db_util.run_query(query_transform, params, encapsulate_exception=False)[0]
+        except psycopg2.errors.InternalError_:
+            logger.warning(f'        Bounding box not transformed, so set to None. Bounding box in 4326: "{bbox_4326}"')
             bbox_3857 = (None, None, None, None)
 
         set_map_bbox_query = f'''
