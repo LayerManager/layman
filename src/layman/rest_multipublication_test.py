@@ -189,6 +189,26 @@ class TestGetPublications:
         (authn_headers_user2, {'bbox_filter': ','.join(str(c) for c in (4001, 4001, 4001, 4001))}, [
             (workspace2, publication_2e_3_3x5_5),
         ]),
+        (authn_headers_user2, {'limit': 2}, [
+            (workspace1, publication_1e_3_7x5_9),
+            (workspace1, publication_1e_3_3x3_3),
+            # (workspace2, publication_2e_3_3x5_5),
+            # (workspace2, publication_2o_2_2x4_4),
+        ],),
+        (authn_headers_user2, {'offset': 1}, [
+            # (workspace1, publication_1e_3_7x5_9),
+            (workspace1, publication_1e_3_3x3_3),
+            (workspace2, publication_2e_3_3x5_5),
+            (workspace2, publication_2o_2_2x4_4),
+        ],),
+        (authn_headers_user2, {'limit': 1, 'offset': 1}, [
+            # (workspace1, publication_1e_3_7x5_9),
+            (workspace1, publication_1e_3_3x3_3),
+            # (workspace2, publication_2e_3_3x5_5),
+            # (workspace2, publication_2o_2_2x4_4),
+        ],),
+        (authn_headers_user2, {'limit': 0, 'offset': 0}, [
+        ],),
     ])
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
@@ -210,6 +230,10 @@ class TestGetPublications:
     ({'ordering_bbox': '1,2,3,4,5'}, (2, 400), {'parameter': 'ordering_bbox'}),
     ({'ordering_bbox': '1,2,c,4'}, (2, 400), {'parameter': 'ordering_bbox'}),
     ({'ordering_bbox': '1,4,2,3'}, (2, 400), {'parameter': 'ordering_bbox'}),
+    ({'limit': 'dasda'}, (2, 400), {'parameter': 'limit'}),
+    ({'limit': '-7'}, (2, 400), {'parameter': 'limit'}),
+    ({'offset': 'dasda'}, (2, 400), {'parameter': 'offset'}),
+    ({'offset': '-7'}, (2, 400), {'parameter': 'offset'}),
 ])
 @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
 @pytest.mark.usefixtures('ensure_layman', )
