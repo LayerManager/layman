@@ -207,8 +207,15 @@ from {DB_SCHEMA}.workspaces w inner join
         count = util.run_query(select, sql_params)
         total_count = count[0][-1]
 
+    if infos:
+        start = offset + 1 if offset else 1
+        content_range = (start, start + len(infos) - 1)
+    else:
+        content_range = (0, 0)
+
     result = {'items': infos,
               'total_count': total_count,
+              'content_range': content_range,
               }
     return result
 
