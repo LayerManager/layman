@@ -146,6 +146,7 @@ class TestSelectPublicationsBasic:
 class TestSelectPublicationsComplex:
     workspace1 = 'test_select_publications_complex_workspace1'
     workspace2 = 'test_select_publications_complex_workspace2'
+    workspace3 = 'test_select_publications_complex_workspace3'
 
     map_1e_2_4x6_6 = 'test_select_publications_map1e'
     map_1e_3_3x3_3 = 'test_select_publications_map1e_3_3x3_3'
@@ -153,6 +154,7 @@ class TestSelectPublicationsComplex:
     map_1oe_3_7x5_9 = 'test_select_publications_map1oe'
     map_2e_3_3x5_5 = 'test_select_publications_map2e'
     map_2o_2_2x4_4 = 'test_select_publications_map2o'
+    map_3o_null = 'test_select_publications_map3o'
 
     publications = [
         (workspace1, MAP_TYPE, map_1e_2_4x6_6,
@@ -191,12 +193,18 @@ class TestSelectPublicationsComplex:
                             'write': {workspace2}},
           'bbox': (2000, 2000, 4000, 4000),
           }),
+        (workspace3, MAP_TYPE, map_3o_null,
+         {'title': 'Nullový bounding box',
+          'access_rights': {'read': {workspace3},
+                            'write': {workspace3}},
+          'bbox': (None, None, None, None),
+          }),
     ]
 
     @pytest.fixture(scope="class")
     def provide_data(self):
         with app.app_context():
-            for idx, ws in enumerate([self.workspace1, self.workspace2]):
+            for idx, ws in enumerate([self.workspace1, self.workspace2, self.workspace3]):
                 ws_id = workspaces.ensure_workspace(ws)
                 userinfo = {
                     'sub': idx + 1,
@@ -236,6 +244,7 @@ class TestSelectPublicationsComplex:
                   (workspace1, MAP_TYPE, map_1oe_3_7x5_9),
                   (workspace2, MAP_TYPE, map_2e_3_3x5_5),
                   (workspace2, MAP_TYPE, map_2o_2_2x4_4),
+                  (workspace3, MAP_TYPE, map_3o_null),
                   ]),
         ({'reader': settings.ANONYM_USER}, [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
                                             (workspace1, MAP_TYPE, map_1e_3_3x3_3),
@@ -281,6 +290,7 @@ class TestSelectPublicationsComplex:
             (workspace1, MAP_TYPE, map_1e_3_3x3_3),
             (workspace1, MAP_TYPE, map_1o_2_2x3_6),
             (workspace2, MAP_TYPE, map_2e_3_3x5_5),
+            (workspace3, MAP_TYPE, map_3o_null),
         ]),
         ({'full_text_filter': 'dva | kun', 'order_by_list': ['full_text'], 'ordering_full_text': 'karel | kun'}, [
             (workspace1, MAP_TYPE, map_1o_2_2x3_6),
@@ -292,10 +302,12 @@ class TestSelectPublicationsComplex:
             (workspace1, MAP_TYPE, map_1o_2_2x3_6),
             (workspace1, MAP_TYPE, map_1oe_3_7x5_9),
             (workspace1, MAP_TYPE, map_1e_3_3x3_3),
+            (workspace3, MAP_TYPE, map_3o_null),
             (workspace1, MAP_TYPE, map_1e_2_4x6_6),
             (workspace2, MAP_TYPE, map_2e_3_3x5_5),
         ]),
         ({'order_by_list': ['last_change'], }, [
+            (workspace3, MAP_TYPE, map_3o_null),
             (workspace2, MAP_TYPE, map_2o_2_2x4_4),
             (workspace2, MAP_TYPE, map_2e_3_3x5_5),
             (workspace1, MAP_TYPE, map_1oe_3_7x5_9),
@@ -310,6 +322,7 @@ class TestSelectPublicationsComplex:
             (workspace1, MAP_TYPE, map_1o_2_2x3_6),
             (workspace1, MAP_TYPE, map_1e_3_3x3_3),
             (workspace1, MAP_TYPE, map_1oe_3_7x5_9),
+            (workspace3, MAP_TYPE, map_3o_null),
         ]),
         ({'order_by_list': ['bbox'], 'ordering_bbox': (4001, 4001, 4001, 4001),
           'bbox_filter': (4001, 4001, 4001, 4001), }, [
