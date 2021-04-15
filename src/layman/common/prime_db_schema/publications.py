@@ -14,13 +14,20 @@ psycopg2.extras.register_uuid()
 
 def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
                           reader=None, writer=None,
-                          limit=None, offset=None,
-                          full_text_filter=None,
-                          bbox_filter=None,
-                          order_by_list=None,
-                          ordering_full_text=None,
-                          ordering_bbox=None,
                           ):
+    return get_publication_infos_with_metainfo(workspace_name, pub_type, style_type,
+                                               reader, writer,)['items']
+
+
+def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, style_type=None,
+                                        reader=None, writer=None,
+                                        limit=None, offset=None,
+                                        full_text_filter=None,
+                                        bbox_filter=None,
+                                        order_by_list=None,
+                                        ordering_full_text=None,
+                                        ordering_bbox=None,
+                                        ):
     order_by_list = order_by_list or []
 
     where_params_def = [
@@ -184,7 +191,9 @@ from {DB_SCHEMA}.workspaces w inner join
              for id_publication, workspace_name, type, publication_name, title, uuid, style_type, updated_at, xmin, ymin, xmax, ymax,
              can_read_users, can_write_users
              in values}
-    return infos
+    result = {'items': infos,
+              }
+    return result
 
 
 def only_valid_names(users_list):

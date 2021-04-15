@@ -1,5 +1,5 @@
 import re
-from flask import jsonify
+from flask import jsonify, make_response
 
 from layman import settings, util as layman_util, LaymanError
 from layman.common.prime_db_schema import util as prime_db_schema_util
@@ -187,18 +187,18 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
     limit = get_integer_from_param(request_args, consts.LIMIT, negative=False)
     offset = get_integer_from_param(request_args, consts.OFFSET, negative=False)
 
-    publication_infos_whole = layman_util.get_publication_infos(publ_type=publication_type,
-                                                                workspace=workspace,
-                                                                context={'actor_name': user,
-                                                                         'access_type': 'read'
-                                                                         },
-                                                                limit=limit, offset=offset,
-                                                                full_text_filter=full_text_filter,
-                                                                bbox_filter=bbox_filter,
-                                                                order_by_list=order_by_list,
-                                                                ordering_full_text=ordering_full_text,
-                                                                ordering_bbox=ordering_bbox,
-                                                                )
+    publication_infos_whole = layman_util.get_publication_infos_with_metainfo(publ_type=publication_type,
+                                                                              workspace=workspace,
+                                                                              context={'actor_name': user,
+                                                                                       'access_type': 'read'
+                                                                                       },
+                                                                              limit=limit, offset=offset,
+                                                                              full_text_filter=full_text_filter,
+                                                                              bbox_filter=bbox_filter,
+                                                                              order_by_list=order_by_list,
+                                                                              ordering_full_text=ordering_full_text,
+                                                                              ordering_bbox=ordering_bbox,
+                                                                              )
 
     infos = [
         {
@@ -211,6 +211,7 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
             'updated_at': info['updated_at'].isoformat(),
             'bounding_box': info['bounding_box'],
         }
-        for (workspace, _, name), info in publication_infos_whole.items()
+        for (workspace, _, name), info in publication_infos_whole['items'].items()
     ]
-    return jsonify(infos), 200
+    response = make_response(jsonify(infos), 200)
+    return response
