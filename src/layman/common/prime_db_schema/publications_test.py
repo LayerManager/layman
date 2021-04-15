@@ -237,7 +237,7 @@ class TestSelectPublicationsComplex:
                 publications.delete_publication(workspace, publ_type, publ_name)
 
     @staticmethod
-    @pytest.mark.parametrize('query_params, expected_publications', [
+    @pytest.mark.parametrize('query_params, expected_result', [
         (dict(), [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
                   (workspace1, MAP_TYPE, map_1e_3_3x3_3),
                   (workspace1, MAP_TYPE, map_1o_2_2x3_6),
@@ -371,12 +371,12 @@ class TestSelectPublicationsComplex:
         ]),
     ])
     @pytest.mark.usefixtures('provide_data')
-    def test_get_publications(query_params, expected_publications):
+    def test_get_publication_infos_with_metainfo(query_params, expected_result):
         with app.app_context():
-            infos = publications.get_publication_infos(**query_params)
-        info_publications = list(infos.keys())
-        assert set(expected_publications) == set(info_publications)
-        assert expected_publications == info_publications
+            infos = publications.get_publication_infos_with_metainfo(**query_params)
+        info_publications = list(infos['items'].keys())
+        assert set(expected_result) == set(info_publications)
+        assert expected_result == info_publications
 
 
 def test_only_valid_names():
