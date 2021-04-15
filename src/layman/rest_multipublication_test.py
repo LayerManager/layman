@@ -128,95 +128,165 @@ class TestGetPublications:
                                                             publication[2].get('headers'))
 
     @staticmethod
-    @pytest.mark.parametrize('headers, query_params, expected_publications', [
+    @pytest.mark.parametrize('headers, query_params, expected_publications, expected_headers', [
         (authn_headers_user2, {}, [(workspace1, publication_1e_3_7x5_9),
                                    (workspace1, publication_1e_3_3x3_3),
                                    (workspace2, publication_2e_3_3x5_5),
                                    (workspace2, publication_2o_2_2x4_4),
-                                   ],),
+                                   ], {
+            'X-Total-Count': '4',
+            'Content-Range': 'items 1-4/4'
+        },),
         (None, {}, [(workspace1, publication_1e_3_7x5_9),
                     (workspace1, publication_1e_3_3x3_3),
                     (workspace2, publication_2e_3_3x5_5),
-                    ],),
+                    ], {
+            'X-Total-Count': '3',
+            'Content-Range': 'items 1-3/3'
+        },),
         (authn_headers_user2, {'full_text_filter': 'kůň'}, [(workspace2, publication_2e_3_3x5_5),
                                                             (workspace2, publication_2o_2_2x4_4),
-                                                            ],),
-        (None, {'full_text_filter': 'The Fačřš_tÚŮTŤsa   "  a34432[;] ;.\\Ra\'\'ts'}, list(),),
+                                                            ], {
+            'X-Total-Count': '2',
+            'Content-Range': 'items 1-2/2'
+        },),
+        (None, {'full_text_filter': 'The Fačřš_tÚŮTŤsa   "  a34432[;] ;.\\Ra\'\'ts'}, list(), {
+            'X-Total-Count': '0',
+            'Content-Range': 'items 0-0/0'
+        },),
         (authn_headers_user2, {'full_text_filter': '\'Too yellow horse\' means "Příliš žluťoučký kůň".'}, [
             (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
-        ],),
+        ], {
+            'X-Total-Count': '2',
+            'Content-Range': 'items 1-2/2'
+        },),
         (authn_headers_user2, {'full_text_filter': 'mean'}, [(workspace2, publication_2e_3_3x5_5),
-                                                             ],),
+                                                             ], {
+            'X-Total-Count': '1',
+            'Content-Range': 'items 1-1/1'
+        },),
         (authn_headers_user2, {'full_text_filter': 'jiný další kůň'}, [(workspace2, publication_2o_2_2x4_4),
                                                                        (workspace2, publication_2e_3_3x5_5),
-                                                                       ],),
+                                                                       ], {
+            'X-Total-Count': '2',
+            'Content-Range': 'items 1-2/2'
+        },),
         (authn_headers_user2, {'full_text_filter': 'jiný další kůň', 'order_by': 'full_text'}, [
             (workspace2, publication_2o_2_2x4_4),
             (workspace2, publication_2e_3_3x5_5),
-        ],),
+        ], {
+            'X-Total-Count': '2',
+            'Content-Range': 'items 1-2/2'
+        },),
         (authn_headers_user2, {'full_text_filter': 'workspace publication'}, [
             (workspace1, publication_1e_3_7x5_9),
-        ],),
+        ], {
+            'X-Total-Count': '1',
+            'Content-Range': 'items 1-1/1'
+        },),
         (authn_headers_user2, {'order_by': 'title'}, [(workspace1, publication_1e_3_3x3_3),
                                                       (workspace2, publication_2o_2_2x4_4),
                                                       (workspace1, publication_1e_3_7x5_9),
                                                       (workspace2, publication_2e_3_3x5_5),
-                                                      ],),
+                                                      ], {
+            'X-Total-Count': '4',
+            'Content-Range': 'items 1-4/4'
+        },),
         (authn_headers_user2, {'order_by': 'last_change'}, [(workspace2, publication_2o_2_2x4_4),
                                                             (workspace2, publication_2e_3_3x5_5),
                                                             (workspace1, publication_1e_3_3x3_3),
                                                             (workspace1, publication_1e_3_7x5_9),
-                                                            ],),
+                                                            ], {
+            'X-Total-Count': '4',
+            'Content-Range': 'items 1-4/4'
+        },),
         (authn_headers_user2, {'order_by_list': ['bbox'],
                                'ordering_bbox': ','.join(str(c) for c in (2999, 2999, 5001, 5001))}, [
             (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
             (workspace1, publication_1e_3_3x3_3),
             (workspace1, publication_1e_3_7x5_9),
-        ]),
+        ], {
+            'X-Total-Count': '4',
+            'Content-Range': 'items 1-4/4'
+        },),
         (authn_headers_user2, {'order_by_list': ['bbox'],
                                'ordering_bbox': ','.join(str(c) for c in (3001, 3001, 3001, 3001))}, [
             (workspace2, publication_2o_2_2x4_4),  # because it has slightly smaller area then 3_3x5_5
             (workspace2, publication_2e_3_3x5_5),
             (workspace1, publication_1e_3_7x5_9),
             (workspace1, publication_1e_3_3x3_3),
-        ]),
+        ], {
+            'X-Total-Count': '4',
+            'Content-Range': 'items 1-4/4'
+        },),
         (authn_headers_user2, {'bbox_filter': ','.join(str(c) for c in (3001, 3001, 4999, 4999))}, [
             (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
-        ]),
+        ], {
+            'X-Total-Count': '2',
+            'Content-Range': 'items 1-2/2'
+        },),
         (authn_headers_user2, {'bbox_filter': ','.join(str(c) for c in (4001, 4001, 4001, 4001))}, [
             (workspace2, publication_2e_3_3x5_5),
-        ]),
+        ], {
+            'X-Total-Count': '1',
+            'Content-Range': 'items 1-1/1'
+        },),
         (authn_headers_user2, {'limit': 2}, [
             (workspace1, publication_1e_3_7x5_9),
             (workspace1, publication_1e_3_3x3_3),
             # (workspace2, publication_2e_3_3x5_5),
             # (workspace2, publication_2o_2_2x4_4),
-        ],),
+        ], {
+            'X-Total-Count': '4',
+            'Content-Range': 'items 1-2/4'
+        },),
         (authn_headers_user2, {'offset': 1}, [
             # (workspace1, publication_1e_3_7x5_9),
             (workspace1, publication_1e_3_3x3_3),
             (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
-        ],),
+        ], {
+            'X-Total-Count': '4',
+            'Content-Range': 'items 2-4/4'
+        },),
         (authn_headers_user2, {'limit': 1, 'offset': 1}, [
             # (workspace1, publication_1e_3_7x5_9),
             (workspace1, publication_1e_3_3x3_3),
             # (workspace2, publication_2e_3_3x5_5),
             # (workspace2, publication_2o_2_2x4_4),
-        ],),
+        ], {
+            'X-Total-Count': '4',
+            'Content-Range': 'items 2-2/4'
+        },),
         (authn_headers_user2, {'limit': 0, 'offset': 0}, [
-        ],),
+        ], {
+            'X-Total-Count': '4',
+            'Content-Range': 'items 0-0/4'
+        },),
+        (authn_headers_user2, {'limit': 5, 'offset': 3}, [
+            # (workspace1, publication_1e_3_7x5_9),
+            # (workspace1, publication_1e_3_3x3_3),
+            # (workspace2, publication_2e_3_3x5_5),
+            (workspace2, publication_2o_2_2x4_4),
+        ], {
+            'X-Total-Count': '4',
+            'Content-Range': 'items 4-4/4'
+        },),
     ])
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
-    def test_get_publications(publication_type, headers, query_params, expected_publications):
-        infos = process_client.get_publications(publication_type, headers, query_params=query_params)
+    def test_get_publications(publication_type, headers, query_params, expected_publications, expected_headers, ):
+        response = process_client.get_publications_response(publication_type, headers, query_params=query_params)
+        infos = response.json()
         info_publications = [(info['workspace'], info['name']) for info in infos]
         assert set(expected_publications) == set(info_publications)
         assert expected_publications == info_publications
+        for header, value in expected_headers.items():
+            assert header in response.headers, response.headers
+            assert value == response.headers[header], response.headers
 
 
 @pytest.mark.parametrize('query_params, error_code, error_specification,', [

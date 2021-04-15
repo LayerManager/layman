@@ -63,6 +63,10 @@ JSON array of objects representing available layers with following structure:
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 - **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
 
+Headers:
+- **X-Total-Count**: Total number of publications available from the request, taking into account all filtering parameters except `limit` and `offset`. Example `"247"`.
+- **Content-Range**: Indicates where in a full list of publications a partial response belongs. Syntax of value is `<units> <range_start>-<range_end>/<size>`. Value of `units` is always `items`. Value of `range_start` is one-based index of the first publication within the full list, or zero if no values are returned. Value of `range_end` is one-based index of the last publication within the full list, or zero if no values are returned. Example: `items 1-20/247`.
+
 ## Workspace Layers
 ### URL
 `/rest/workspaces/<workspace_name>/layers`
@@ -438,6 +442,9 @@ JSON array of objects representing available maps with following structure:
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 - **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
 
+Headers:
+- **X-Total-Count**: Total number of publications available from the request, taking into account all filtering parameters except `limit` and `offset`. Example `"247"`.
+- **Content-Range**: Indicates where in a full list of publications a partial response belongs. Syntax of value is `<units> <range_start>-<range_end>/<size>`. Value of `units` is always `items`. Value of `range_start` is one-based index of the first publication within the full list, or zero if no values are returned. Value of `range_end` is one-based index of the last publication within the full list, or zero if no values are returned. Example: `items 1-20/247`.
 
 ## Workspace Maps
 ### URL
