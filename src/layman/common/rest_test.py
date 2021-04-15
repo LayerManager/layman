@@ -1,6 +1,7 @@
 import pytest
-from layman import app, settings
-from .rest import parse_request_path
+from layman import app, settings, LaymanError
+from . import get_publications_consts
+from .rest import parse_request_path, get_integer_from_param
 
 
 @pytest.mark.parametrize('request_path', [
@@ -44,3 +45,30 @@ def test_parse_wrong_request_path(request_path):
 def test_parse_request_path(request_path, exp_result):
     with app.app_context():
         assert parse_request_path(request_path) == exp_result, request_path
+
+
+@pytest.mark.parametrize('request_args, param_name, expected_value', [
+    (dict(), 'integer', None),
+    ({'integer': '8'}, 'integer', 8),
+    ({'integer': '-8'}, 'integer', -8),
+    ({'integer': '0'}, 'integer', 0),
+    ({'integer': '+4'}, 'integer', 4),
+])
+def test_get_integer_from_param(request_args, param_name, expected_value):
+    result = get_integer_from_param(request_args, param_name)
+    assert result == expected_value
+
+
+@pytest.mark.parametrize('request_args, param_name, other_params, expected_expected', [
+    ({'integer': '0'}, 'integer', {'zero': False}, 'value <> 0'),
+    ({'integer': '-44'}, 'integer', {'negative': False, 'zero': False}, 'value > 0'),
+    ({'integer': '7'}, 'integer', {'positive': False}, 'value <= 0'),
+    ({'integer': 'asfg'}, 'integer', {'zero': False}, {'text': 'Integer with optional sign',
+                                                       'regular_expression': get_publications_consts.INTEGER_PATTERN}),
+])
+def test_get_integer_from_param_fail(request_args, param_name, other_params, expected_expected):
+    with pytest.raises(LaymanError) as exc_info:
+        get_integer_from_param(request_args, param_name, **other_params)
+    assert exc_info.value.code == 2
+    assert exc_info.value.http_code == 400
+    assert exc_info.value.data['expected'] == expected_expected
