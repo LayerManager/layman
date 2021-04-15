@@ -248,6 +248,7 @@ class TestSelectPublicationsComplex:
                       (workspace3, MAP_TYPE, map_3o_null),
                       ],
             'total_count': 7,
+            'content_range': (1, 7),
         }),
         ({'reader': settings.ANONYM_USER}, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
@@ -256,6 +257,7 @@ class TestSelectPublicationsComplex:
                       (workspace2, MAP_TYPE, map_2e_3_3x5_5),
                       ],
             'total_count': 4,
+            'content_range': (1, 4),
         }),
         ({'reader': workspace2}, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
@@ -265,6 +267,7 @@ class TestSelectPublicationsComplex:
                       (workspace2, MAP_TYPE, map_2o_2_2x4_4),
                       ],
             'total_count': 5,
+            'content_range': (1, 5),
         }),
         ({'writer': settings.ANONYM_USER}, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
@@ -272,6 +275,7 @@ class TestSelectPublicationsComplex:
                       (workspace2, MAP_TYPE, map_2e_3_3x5_5),
                       ],
             'total_count': 3,
+            'content_range': (1, 3),
         }),
         ({'writer': workspace2}, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
@@ -280,32 +284,38 @@ class TestSelectPublicationsComplex:
                       (workspace2, MAP_TYPE, map_2o_2_2x4_4),
                       ],
             'total_count': 4,
+            'content_range': (1, 4),
         }),
         ({'full_text_filter': 'dva'}, {
             'items': [(workspace1, MAP_TYPE, map_1oe_3_7x5_9),
                       ],
             'total_count': 1,
+            'content_range': (1, 1),
         }),
         ({'full_text_filter': 'games'}, {
             'items': [(workspace2, MAP_TYPE, map_2e_3_3x5_5),
                       ],
             'total_count': 1,
+            'content_range': (1, 1),
         }),
         ({'full_text_filter': 'kun'}, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
                       (workspace1, MAP_TYPE, map_1o_2_2x3_6),
                       ],
             'total_count': 2,
+            'content_range': (1, 2),
         }),
         ({'full_text_filter': 'jedna'}, {
             'items': [(workspace1, MAP_TYPE, map_1oe_3_7x5_9),
                       (workspace2, MAP_TYPE, map_2o_2_2x4_4),
                       ],
             'total_count': 2,
+            'content_range': (1, 2),
         }),
         ({'full_text_filter': 'upet'}, {
             'items': [],
             'total_count': 0,
+            'content_range': (0, 0),
         }),
         ({'full_text_filter': 'dva | kun'}, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
@@ -313,11 +323,13 @@ class TestSelectPublicationsComplex:
                       (workspace1, MAP_TYPE, map_1oe_3_7x5_9),
                       ],
             'total_count': 3,
+            'content_range': (1, 3),
         }),
         ({'full_text_filter': 'kun & ody'}, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
                       ],
             'total_count': 1,
+            'content_range': (1, 1),
         }),
         ({'order_by_list': ['full_text'], 'ordering_full_text': 'jedna'}, {
             'items': [(workspace1, MAP_TYPE, map_1oe_3_7x5_9),
@@ -329,6 +341,7 @@ class TestSelectPublicationsComplex:
                       (workspace3, MAP_TYPE, map_3o_null),
                       ],
             'total_count': 7,
+            'content_range': (1, 7),
         }),
         ({'full_text_filter': 'dva | kun', 'order_by_list': ['full_text'], 'ordering_full_text': 'karel | kun'}, {
             'items': [(workspace1, MAP_TYPE, map_1o_2_2x3_6),
@@ -336,6 +349,7 @@ class TestSelectPublicationsComplex:
                       (workspace1, MAP_TYPE, map_1oe_3_7x5_9),
                       ],
             'total_count': 3,
+            'content_range': (1, 3),
         }),
         ({'order_by_list': ['title'], }, {
             'items': [(workspace2, MAP_TYPE, map_2o_2_2x4_4),
@@ -347,6 +361,7 @@ class TestSelectPublicationsComplex:
                       (workspace2, MAP_TYPE, map_2e_3_3x5_5),
                       ],
             'total_count': 7,
+            'content_range': (1, 7),
         }),
         ({'order_by_list': ['last_change'], }, {
             'items': [(workspace3, MAP_TYPE, map_3o_null),
@@ -358,6 +373,7 @@ class TestSelectPublicationsComplex:
                       (workspace1, MAP_TYPE, map_1e_2_4x6_6),
                       ],
             'total_count': 7,
+            'content_range': (1, 7),
         }),
         ({'order_by_list': ['bbox'], 'ordering_bbox': (2999, 2999, 5001, 5001), }, {
             'items': [(workspace2, MAP_TYPE, map_2e_3_3x5_5),
@@ -369,6 +385,7 @@ class TestSelectPublicationsComplex:
                       (workspace3, MAP_TYPE, map_3o_null),
                       ],
             'total_count': 7,
+            'content_range': (1, 7),
         }),
         ({'order_by_list': ['bbox'], 'ordering_bbox': (4001, 4001, 4001, 4001),
           'bbox_filter': (4001, 4001, 4001, 4001), }, {
@@ -376,6 +393,7 @@ class TestSelectPublicationsComplex:
                       (workspace1, MAP_TYPE, map_1e_2_4x6_6),
                       ],
             'total_count': 2,
+            'content_range': (1, 2),
         }),
         ({'bbox_filter': (3001, 3001, 4999, 4999), }, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
@@ -383,12 +401,14 @@ class TestSelectPublicationsComplex:
                       (workspace2, MAP_TYPE, map_2o_2_2x4_4),
                       ],
             'total_count': 3,
+            'content_range': (1, 3),
         }),
         ({'bbox_filter': (3001, 3001, 3001, 3001), }, {
             'items': [(workspace2, MAP_TYPE, map_2e_3_3x5_5),
                       (workspace2, MAP_TYPE, map_2o_2_2x4_4),
                       ],
             'total_count': 2,
+            'content_range': (1, 2),
         }),
         ({'limit': 2}, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
@@ -400,6 +420,7 @@ class TestSelectPublicationsComplex:
                       # (workspace3, MAP_TYPE, map_3o_null),
                       ],
             'total_count': 7,
+            'content_range': (1, 2),
         }),
         ({'offset': 2}, {
             'items': [
@@ -412,6 +433,20 @@ class TestSelectPublicationsComplex:
                 (workspace3, MAP_TYPE, map_3o_null),
             ],
             'total_count': 7,
+            'content_range': (3, 7),
+        }),
+        ({'limit': 5, 'offset': 5}, {
+            'items': [
+                # (workspace1, MAP_TYPE, map_1e_2_4x6_6),
+                # (workspace1, MAP_TYPE, map_1e_3_3x3_3),
+                # (workspace1, MAP_TYPE, map_1o_2_2x3_6),
+                # (workspace1, MAP_TYPE, map_1oe_3_7x5_9),
+                # (workspace2, MAP_TYPE, map_2e_3_3x5_5),
+                (workspace2, MAP_TYPE, map_2o_2_2x4_4),
+                (workspace3, MAP_TYPE, map_3o_null),
+            ],
+            'total_count': 7,
+            'content_range': (6, 7),
         }),
         ({'limit': 2, 'offset': 2}, {
             'items': [
@@ -424,11 +459,13 @@ class TestSelectPublicationsComplex:
                 # (workspace3, MAP_TYPE, map_3o_null),
             ],
             'total_count': 7,
+            'content_range': (3, 4),
         }),
         ({'limit': 0, 'offset': 0}, {
             'items': [
             ],
             'total_count': 7,
+            'content_range': (0, 0),
         }),
     ])
     @pytest.mark.usefixtures('provide_data')
@@ -439,6 +476,7 @@ class TestSelectPublicationsComplex:
         assert set(expected_result['items']) == set(info_publications)
         assert expected_result['items'] == info_publications
         assert expected_result['total_count'] == infos['total_count']
+        assert expected_result['content_range'] == infos['content_range']
 
 
 def test_only_valid_names():
