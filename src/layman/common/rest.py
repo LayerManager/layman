@@ -119,6 +119,32 @@ def get_bbox_from_param(request_args, param_name):
     return bbox
 
 
+def get_integer_from_param(request_args, param_name, negative=True, zero=True, positive=True):
+    result = None
+    assert negative or zero or positive
+    if request_args.get(param_name):
+        m = re.match(consts.INTEGER_PATTER, request_args[param_name])
+        if not m:
+            raise LaymanError(2, {'parameter': param_name, 'expected': {
+                'text': 'Integer with optional sign',
+                'regular_expression': consts.INTEGER_PATTER,
+            }})
+        integer = int(m.groups()[0])
+
+        if integer < 0 and not negative:
+            expected_than = '>' + ('=' if zero else '')
+            raise LaymanError(2, {'parameter': param_name, 'expected': f'value {expected_than} 0'})
+        elif integer == 0 and not zero:
+            expected_than = ('<' if negative else '') + ('>' if positive else '')
+            raise LaymanError(2, {'parameter': param_name, 'expected': f'value {expected_than} 0'})
+        elif integer > 0 and not positive:
+            expected_than = '<' + ('=' if zero else '')
+            raise LaymanError(2, {'parameter': param_name, 'expected': f'value {expected_than} 0'})
+        result = integer
+
+    return result
+
+
 def get_publications(publication_type, user, request_args=None, workspace=None):
     request_args = request_args or {}
     known_order_by_values = [consts.ORDER_BY_TITLE, consts.ORDER_BY_FULL_TEXT, consts.ORDER_BY_LAST_CHANGE,

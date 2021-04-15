@@ -1,4 +1,5 @@
 BBOX_PATTERN = r"^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$"
+INTEGER_PATTER = f"^([-+]?[0-9]+)$"
 
 FILTER_FULL_TEXT = 'full_text_filter'
 FILTER_BBOX = 'bbox_filter'
