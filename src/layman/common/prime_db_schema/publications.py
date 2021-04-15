@@ -121,7 +121,8 @@ select p.id as id_publication,
              {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
              {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
         where r.id_publication = p.id
-          and r.type = 'write') can_write_users
+          and r.type = 'write') can_write_users,
+       count(*) OVER() AS full_count
 from {DB_SCHEMA}.workspaces w inner join
      {DB_SCHEMA}.publications p on p.id_workspace = w.id left join
      {DB_SCHEMA}.users u on u.id_workspace = w.id
@@ -189,9 +190,25 @@ from {DB_SCHEMA}.workspaces w inner join
                                                      'write': can_write_users.split(',')}
                                    }
              for id_publication, workspace_name, type, publication_name, title, uuid, style_type, updated_at, xmin, ymin, xmax, ymax,
-             can_read_users, can_write_users
+             can_read_users, can_write_users, _
              in values}
+
+    if values:
+        total_count = values[0][-1]
+    else:
+        count_clause = f"""
+        select count(*) AS full_count
+        from {DB_SCHEMA}.workspaces w inner join
+             {DB_SCHEMA}.publications p on p.id_workspace = w.id left join
+             {DB_SCHEMA}.users u on u.id_workspace = w.id
+        """
+        sql_params = where_params
+        select = count_clause + where_clause
+        count = util.run_query(select, sql_params)
+        total_count = count[0][-1]
+
     result = {'items': infos,
+              'total_count': total_count,
               }
     return result
 
