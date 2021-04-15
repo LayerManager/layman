@@ -214,4 +214,7 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
         for (workspace, _, name), info in publication_infos_whole['items'].items()
     ]
     response = make_response(jsonify(infos), 200)
+    response.headers['X-Total-Count'] = publication_infos_whole['total_count']
+    response.headers['Content-Range'] = f'items {publication_infos_whole["content_range"][0]}-' \
+                                        f'{publication_infos_whole["content_range"][1]}/{publication_infos_whole["total_count"]}'
     return response
