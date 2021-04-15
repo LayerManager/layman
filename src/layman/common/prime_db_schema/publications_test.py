@@ -146,8 +146,6 @@ class TestSelectPublicationsBasic:
 class TestSelectPublicationsComplex:
     workspace1 = 'test_select_publications_complex_workspace1'
     workspace2 = 'test_select_publications_complex_workspace2'
-    authn_headers_user1 = process_client.get_authz_headers(workspace1)
-    authn_headers_user2 = process_client.get_authz_headers(workspace2)
 
     map_1e_2_4x6_6 = 'test_select_publications_map1e'
     map_1e_3_3x3_3 = 'test_select_publications_map1e_3_3x3_3'
@@ -158,58 +156,77 @@ class TestSelectPublicationsComplex:
 
     publications = [
         (workspace1, MAP_TYPE, map_1e_2_4x6_6,
-         {'headers': authn_headers_user1,
-          'title': 'Příliš žluťoučký Kůň úpěl ďábelské ódy',
-          'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
-                            'write': settings.RIGHTS_EVERYONE_ROLE},
-          'file_paths': ['test/data/bbox/map_2_4-6_6.json', ],
+         {'title': 'Příliš žluťoučký Kůň úpěl ďábelské ódy',
+          'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
+                            'write': {settings.RIGHTS_EVERYONE_ROLE}},
+          'bbox': (2000, 4000, 6000, 6000),
           }),
         (workspace1, MAP_TYPE, map_1e_3_3x3_3,
-         {'headers': authn_headers_user1,
-          'title': 'Jednobodová vrstva',
-          'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
-                            'write': settings.RIGHTS_EVERYONE_ROLE},
-          'file_paths': ['test/data/bbox/map_3_3-3_3.json', ],
+         {'title': 'Jednobodová vrstva',
+          'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
+                            'write': {settings.RIGHTS_EVERYONE_ROLE}},
+          'bbox': (3000, 3000, 3000, 3000),
           }),
         (workspace1, MAP_TYPE, map_1o_2_2x3_6,
-         {'headers': authn_headers_user1,
-          'title': 'Ďůlek kun Karel',
-          'access_rights': {'read': workspace1,
-                            'write': workspace1},
-          'file_paths': ['test/data/bbox/map_2_2-3_6.json', ],
+         {'title': 'Ďůlek kun Karel',
+          'access_rights': {'read': {workspace1},
+                            'write': {workspace1}},
+          'bbox': (2000, 2000, 3000, 6000),
           }),
         (workspace1, MAP_TYPE, map_1oe_3_7x5_9,
-         {'headers': authn_headers_user1,
-          'title': 'jedna dva tři čtyři',
-          'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
-                            'write': workspace1},
-          'file_paths': ['test/data/bbox/map_3_7-5_9.json', ],
+         {'title': 'jedna dva tři čtyři',
+          'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
+                            'write': {workspace1}},
+          'bbox': (3000, 7000, 5000, 9000),
           }),
         (workspace2, MAP_TYPE, map_2e_3_3x5_5,
-         {'headers': authn_headers_user2,
-          'title': 'Svíčky is the best game',
-          'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
-                            'write': settings.RIGHTS_EVERYONE_ROLE},
-          'file_paths': ['test/data/bbox/map_3_3-5_5.json', ],
+         {'title': 'Svíčky is the best game',
+          'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
+                            'write': {settings.RIGHTS_EVERYONE_ROLE}},
+          'bbox': (3000, 3000, 5000, 5000),
           }),
         (workspace2, MAP_TYPE, map_2o_2_2x4_4,
-         {'headers': authn_headers_user2,
-          'title': 'druhá mapa JeDnA óda',
-          'access_rights': {'read': workspace2,
-                            'write': workspace2},
-          'file_paths': ['test/data/bbox/map_2_2-4_4.json', ],
+         {'title': 'druhá mapa JeDnA óda',
+          'access_rights': {'read': {workspace2},
+                            'write': {workspace2}},
+          'bbox': (2000, 2000, 4000, 4000),
           }),
     ]
 
     @pytest.fixture(scope="class")
     def provide_data(self):
-        process_client.ensure_reserved_username(self.workspace1, self.authn_headers_user1)
-        process_client.ensure_reserved_username(self.workspace2, self.authn_headers_user2)
-        for publication in self.publications:
-            process_client.publish_workspace_publication(publication[1], publication[0], publication[2], **publication[3])
+        with app.app_context():
+            for idx, ws in enumerate([self.workspace1, self.workspace2]):
+                ws_id = workspaces.ensure_workspace(ws)
+                userinfo = {
+                    'sub': idx + 1,
+                    'issuer_id': 'layman',
+                    'claims': {
+                        'email': f"{ws}@liferay.com",
+                        'name': ws,
+                        'middle_name': '',
+                        'family_name': ws,
+                        'given_name': ws,
+                        'preferred_username': ws,
+                    }
+                }
+                users.ensure_user(ws_id, userinfo)
+
+            for workspace, publ_type, publ_name, publ_info in self.publications:
+                publications.insert_publication(workspace, {
+                    'name': publ_name,
+                    'title': publ_info['title'],
+                    'publ_type_name': publ_type,
+                    'uuid': uuid.uuid4(),
+                    'actor_name': workspace,
+                    'style_type': 'sld',
+                    'access_rights': publ_info['access_rights'],
+                })
+                publications.set_bbox(workspace, publ_type, publ_name, publ_info['bbox'])
         yield
-        for publication in self.publications:
-            process_client.delete_workspace_publication(publication[1], publication[0], publication[2], publication[3].get('headers'))
+        with app.app_context():
+            for workspace, publ_type, publ_name, _ in self.publications:
+                publications.delete_publication(workspace, publ_type, publ_name)
 
     @staticmethod
     @pytest.mark.parametrize('query_params, expected_publications', [
@@ -311,7 +328,7 @@ class TestSelectPublicationsComplex:
             (workspace2, MAP_TYPE, map_2o_2_2x4_4),
         ]),
     ])
-    @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
+    @pytest.mark.usefixtures('provide_data')
     def test_get_publications(query_params, expected_publications):
         with app.app_context():
             infos = publications.get_publication_infos(**query_params)
