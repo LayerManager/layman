@@ -1,10 +1,9 @@
-from test import process_client, data as test_data, util as test_util
+from test import process_client
 import importlib
 import pytest
 
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
-from layman.common.filesystem import uuid
 from . import app, settings, LaymanError, util
 from .util import slugify, get_modules_from_names, get_providers_from_source_names, url_for
 
@@ -202,46 +201,6 @@ def test_get_publication_info_items(publication_type):
                 context = {'keys': [key]}
                 info = layman_util.get_publication_info(workspace, publication_type, publication, context)
                 assert key in info, info
-
-    process_client.delete_workspace_publication(publication_type, workspace, publication)
-
-
-@pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
-@pytest.mark.usefixtures('ensure_layman')
-def test_get_publication_infos(publication_type):
-    workspace = 'test_get_publication_infos_user'
-    publication = 'test_get_publication_infos_publication'
-    title = "Test get publication infos - publication íářžý"
-
-    process_client.publish_workspace_publication(publication_type, workspace, publication, title=title)
-
-    with app.app_context():
-        expected_result = {(workspace, publication_type, publication): {'name': publication,
-                                                                        'title': title,
-                                                                        'style_type': 'sld' if publication_type == LAYER_TYPE else None,
-                                                                        'uuid': uuid.get_publication_uuid(publication_type,
-                                                                                                          workspace,
-                                                                                                          publication_type,
-                                                                                                          publication),
-                                                                        'type': publication_type,
-                                                                        'access_rights': {'read': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                                                          'write': [settings.RIGHTS_EVERYONE_ROLE, ],
-                                                                                          },
-                                                                        }}
-        # util
-        publication_infos = layman_util.get_publication_infos(workspace, publication_type)
-        for publication_name in publication_infos:
-            if publication_infos[publication_name].get('id'):
-                del publication_infos[publication_name]['id']
-            if publication_infos[publication_name].get('updated_at'):
-                del publication_infos[publication_name]['updated_at']
-            expected_bbox = test_data.SMALL_LAYER_BBOX if publication_infos[publication_name]['type'] == LAYER_TYPE \
-                else test_data.SMALL_MAP_BBOX
-            test_util.assert_same_bboxes(publication_infos[publication_name]['bounding_box'],
-                                         expected_bbox,
-                                         0.00001)
-            del publication_infos[publication_name]['bounding_box']
-        assert publication_infos == expected_result, (publication_infos, expected_result)
 
     process_client.delete_workspace_publication(publication_type, workspace, publication)
 
