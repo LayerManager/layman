@@ -150,43 +150,58 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
     known_order_by_values = [consts.ORDER_BY_TITLE, consts.ORDER_BY_FULL_TEXT, consts.ORDER_BY_LAST_CHANGE,
                              consts.ORDER_BY_BBOX, ]
 
+    #########################################################
+    # Filters
     full_text_filter = None
     if consts.FILTER_FULL_TEXT in request_args:
         full_text_filter = prime_db_schema_util.to_tsquery_string(request_args[consts.FILTER_FULL_TEXT]) or None
 
     bbox_filter = get_bbox_from_param(request_args, consts.FILTER_BBOX)
+
+    #########################################################
+    # Ordering
     ordering_bbox = get_bbox_from_param(request_args, consts.ORDERING_BBOX)
 
-    order_by_value = request_args.get(consts.ORDER_BY_PARAM)
-    if order_by_value:
-        if order_by_value not in known_order_by_values:
+    explicit_order_by_value = request_args.get(consts.ORDER_BY_PARAM)
+    if explicit_order_by_value:
+        if explicit_order_by_value not in known_order_by_values:
             raise LaymanError(2, {'parameter': consts.ORDER_BY_PARAM, 'supported_values': known_order_by_values})
-
-        if order_by_value == consts.ORDER_BY_FULL_TEXT and not full_text_filter:
-            raise LaymanError(48, f'Value "{consts.ORDER_BY_FULL_TEXT}" of parameter "{consts.ORDER_BY_PARAM}" can be '
-                                  f'used only if "{consts.FILTER_FULL_TEXT}" parameter is set.')
-        if order_by_value == consts.ORDER_BY_BBOX and not bbox_filter and not ordering_bbox:
-            raise LaymanError(48, f'Value "{consts.ORDER_BY_BBOX}" of parameter "{consts.ORDER_BY_PARAM}" can be '
-                                  f'used only if "{consts.FILTER_BBOX}" or "{consts.ORDER_BY_BBOX}" parameter is set.')
+        order_by_value = explicit_order_by_value
+    # Set ordering by other parameters if not specified by request
     elif full_text_filter:
         order_by_value = consts.ORDER_BY_FULL_TEXT
     elif bbox_filter or ordering_bbox:
         order_by_value = consts.ORDER_BY_BBOX
+    else:
+        order_by_value = None
+
+    if order_by_value == consts.ORDER_BY_BBOX and not ordering_bbox:
+        ordering_bbox = bbox_filter
+
+    ordering_full_text = full_text_filter if order_by_value == consts.ORDER_BY_FULL_TEXT else None
+
+    order_by_list = [order_by_value] if order_by_value else []
+
+    #########################################################
+    # Checking parameters combination
+    if explicit_order_by_value == consts.ORDER_BY_FULL_TEXT and not full_text_filter:
+        raise LaymanError(48, f'Value "{consts.ORDER_BY_FULL_TEXT}" of parameter "{consts.ORDER_BY_PARAM}" can be '
+                              f'used only if "{consts.FILTER_FULL_TEXT}" parameter is set.')
+
+    if explicit_order_by_value == consts.ORDER_BY_BBOX and not bbox_filter and not ordering_bbox:
+        raise LaymanError(48, f'Value "{consts.ORDER_BY_BBOX}" of parameter "{consts.ORDER_BY_PARAM}" can be '
+                              f'used only if "{consts.FILTER_BBOX}" or "{consts.ORDER_BY_BBOX}" parameter is set.')
 
     if ordering_bbox and order_by_value != consts.ORDER_BY_BBOX:
         raise LaymanError(48, f'Parameter "{consts.ORDERING_BBOX}" can be set only if '
                               f'parameter "{consts.ORDER_BY_PARAM}" is set to {consts.ORDER_BY_BBOX}.')
 
-    ordering_full_text = full_text_filter if order_by_value == consts.ORDER_BY_FULL_TEXT else None
-
-    if order_by_value == consts.ORDER_BY_BBOX and not ordering_bbox:
-        ordering_bbox = bbox_filter
-
-    order_by_list = [order_by_value] if order_by_value else []
-
+    #########################################################
+    # Pagination
     limit = get_integer_from_param(request_args, consts.LIMIT, negative=False)
     offset = get_integer_from_param(request_args, consts.OFFSET, negative=False)
 
+    #########################################################
     publication_infos_whole = layman_util.get_publication_infos_with_metainfo(publ_type=publication_type,
                                                                               workspace=workspace,
                                                                               context={'actor_name': user,
