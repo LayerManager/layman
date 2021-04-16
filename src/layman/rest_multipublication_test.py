@@ -66,6 +66,7 @@ class TestGetPublications:
     authn_headers_user2 = process_client.get_authz_headers(workspace2)
 
     publication_1e_3_7x5_9 = 'test_get_publications_publication1e'
+    publication_1e_2_4x6_6 = 'test_get_publications_publication1e_2x4'
     publication_1e_3_3x3_3 = 'test_get_publications_publication1e_3x3'
     publication_2e_3_3x5_5 = 'test_get_publications_publication2e'
     publication_2o_2_2x4_4 = 'test_get_publications_publication2o'
@@ -74,6 +75,10 @@ class TestGetPublications:
         (workspace1, publication_1e_3_7x5_9, {
             'title': 'Public publication in public workspace (publication)',
             'bbox': (3000, 7000, 5000, 9000),
+        }),
+        (workspace1, publication_1e_2_4x6_6, {
+            'title': 'Příliš jiný žluťoučký kůň úpěl ďábelské ódy (publication)',
+            'bbox': (2000, 4000, 6000, 6000),
         }),
         (workspace1, publication_1e_3_3x3_3, {
             'title': 'Jednobodová publikace (publication)',
@@ -111,25 +116,28 @@ class TestGetPublications:
     @staticmethod
     @pytest.mark.parametrize('headers, query_params, expected_publications, expected_headers', [
         (authn_headers_user2, {}, [(workspace1, publication_1e_3_7x5_9),
+                                   (workspace1, publication_1e_2_4x6_6),
                                    (workspace1, publication_1e_3_3x3_3),
                                    (workspace2, publication_2e_3_3x5_5),
                                    (workspace2, publication_2o_2_2x4_4),
                                    ], {
-            'X-Total-Count': '4',
-            'Content-Range': 'items 1-4/4'
+            'X-Total-Count': '5',
+            'Content-Range': 'items 1-5/5'
         },),
         (None, {}, [(workspace1, publication_1e_3_7x5_9),
+                    (workspace1, publication_1e_2_4x6_6),
                     (workspace1, publication_1e_3_3x3_3),
                     (workspace2, publication_2e_3_3x5_5),
                     ], {
-            'X-Total-Count': '3',
-            'Content-Range': 'items 1-3/3'
+            'X-Total-Count': '4',
+            'Content-Range': 'items 1-4/4'
         },),
-        (authn_headers_user2, {'full_text_filter': 'kůň'}, [(workspace2, publication_2e_3_3x5_5),
+        (authn_headers_user2, {'full_text_filter': 'kůň'}, [(workspace1, publication_1e_2_4x6_6),
+                                                            (workspace2, publication_2e_3_3x5_5),
                                                             (workspace2, publication_2o_2_2x4_4),
                                                             ], {
-            'X-Total-Count': '2',
-            'Content-Range': 'items 1-2/2'
+            'X-Total-Count': '3',
+            'Content-Range': 'items 1-3/3'
         },),
         (None, {'full_text_filter': 'The Fačřš_tÚŮTŤsa   "  a34432[;] ;.\\Ra\'\'ts'}, list(), {
             'X-Total-Count': '0',
@@ -137,127 +145,141 @@ class TestGetPublications:
         },),
         (authn_headers_user2, {'full_text_filter': '\'Too yellow horse\' means "Příliš žluťoučký kůň".'}, [
             (workspace2, publication_2e_3_3x5_5),
+            (workspace1, publication_1e_2_4x6_6),
             (workspace2, publication_2o_2_2x4_4),
         ], {
-            'X-Total-Count': '2',
-            'Content-Range': 'items 1-2/2'
+            'X-Total-Count': '3',
+            'Content-Range': 'items 1-3/3'
         },),
         (authn_headers_user2, {'full_text_filter': 'mean'}, [(workspace2, publication_2e_3_3x5_5),
                                                              ], {
             'X-Total-Count': '1',
             'Content-Range': 'items 1-1/1'
         },),
-        (authn_headers_user2, {'full_text_filter': 'jiný další kůň'}, [(workspace2, publication_2o_2_2x4_4),
+        (authn_headers_user2, {'full_text_filter': 'jiný další kůň'}, [(workspace1, publication_1e_2_4x6_6),
+                                                                       (workspace2, publication_2o_2_2x4_4),
                                                                        (workspace2, publication_2e_3_3x5_5),
                                                                        ], {
-            'X-Total-Count': '2',
-            'Content-Range': 'items 1-2/2'
+            'X-Total-Count': '3',
+            'Content-Range': 'items 1-3/3'
         },),
         (authn_headers_user2, {'full_text_filter': 'jiný další kůň', 'order_by': 'full_text'}, [
+            (workspace1, publication_1e_2_4x6_6),
             (workspace2, publication_2o_2_2x4_4),
             (workspace2, publication_2e_3_3x5_5),
         ], {
-            'X-Total-Count': '2',
-            'Content-Range': 'items 1-2/2'
+            'X-Total-Count': '3',
+            'Content-Range': 'items 1-3/3'
         },),
         (authn_headers_user2, {'full_text_filter': 'workspace publication'}, [
             (workspace1, publication_1e_3_7x5_9),
+            (workspace1, publication_1e_2_4x6_6),
             (workspace1, publication_1e_3_3x3_3),
             (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
         ], {
-            'X-Total-Count': '4',
-            'Content-Range': 'items 1-4/4'
+            'X-Total-Count': '5',
+            'Content-Range': 'items 1-5/5'
         },),
         (authn_headers_user2, {'order_by': 'title'}, [(workspace1, publication_1e_3_3x3_3),
+                                                      (workspace1, publication_1e_2_4x6_6),
                                                       (workspace2, publication_2o_2_2x4_4),
                                                       (workspace1, publication_1e_3_7x5_9),
                                                       (workspace2, publication_2e_3_3x5_5),
                                                       ], {
-            'X-Total-Count': '4',
-            'Content-Range': 'items 1-4/4'
+            'X-Total-Count': '5',
+            'Content-Range': 'items 1-5/5'
         },),
         (authn_headers_user2, {'order_by': 'last_change'}, [(workspace2, publication_2o_2_2x4_4),
                                                             (workspace2, publication_2e_3_3x5_5),
                                                             (workspace1, publication_1e_3_3x3_3),
+                                                            (workspace1, publication_1e_2_4x6_6),
                                                             (workspace1, publication_1e_3_7x5_9),
                                                             ], {
-            'X-Total-Count': '4',
-            'Content-Range': 'items 1-4/4'
+            'X-Total-Count': '5',
+            'Content-Range': 'items 1-5/5'
         },),
         (authn_headers_user2, {'order_by_list': ['bbox'],
                                'ordering_bbox': ','.join(str(c) for c in (2999, 2999, 5001, 5001))}, [
             (workspace2, publication_2e_3_3x5_5),
+            (workspace1, publication_1e_2_4x6_6),
             (workspace2, publication_2o_2_2x4_4),
             (workspace1, publication_1e_3_3x3_3),
             (workspace1, publication_1e_3_7x5_9),
         ], {
-            'X-Total-Count': '4',
-            'Content-Range': 'items 1-4/4'
+            'X-Total-Count': '5',
+            'Content-Range': 'items 1-5/5'
         },),
         (authn_headers_user2, {'order_by_list': ['bbox'],
                                'ordering_bbox': ','.join(str(c) for c in (3001, 3001, 3001, 3001))}, [
             (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
             (workspace1, publication_1e_3_7x5_9),
+            (workspace1, publication_1e_2_4x6_6),
             (workspace1, publication_1e_3_3x3_3),
         ], {
-            'X-Total-Count': '4',
-            'Content-Range': 'items 1-4/4'
+            'X-Total-Count': '5',
+            'Content-Range': 'items 1-5/5'
         },),
         (authn_headers_user2, {'bbox_filter': ','.join(str(c) for c in (3001, 3001, 4999, 4999))}, [
             (workspace2, publication_2e_3_3x5_5),
+            (workspace1, publication_1e_2_4x6_6),
             (workspace2, publication_2o_2_2x4_4),
+        ], {
+            'X-Total-Count': '3',
+            'Content-Range': 'items 1-3/3'
+        },),
+        (authn_headers_user2, {'bbox_filter': ','.join(str(c) for c in (4001, 4001, 4001, 4001))}, [
+            (workspace2, publication_2e_3_3x5_5),
+            (workspace1, publication_1e_2_4x6_6),
         ], {
             'X-Total-Count': '2',
             'Content-Range': 'items 1-2/2'
         },),
-        (authn_headers_user2, {'bbox_filter': ','.join(str(c) for c in (4001, 4001, 4001, 4001))}, [
-            (workspace2, publication_2e_3_3x5_5),
-        ], {
-            'X-Total-Count': '1',
-            'Content-Range': 'items 1-1/1'
-        },),
         (authn_headers_user2, {'limit': 2}, [
             (workspace1, publication_1e_3_7x5_9),
-            (workspace1, publication_1e_3_3x3_3),
+            (workspace1, publication_1e_2_4x6_6),
+            # (workspace1, publication_1e_3_3x3_3),
             # (workspace2, publication_2e_3_3x5_5),
             # (workspace2, publication_2o_2_2x4_4),
         ], {
-            'X-Total-Count': '4',
-            'Content-Range': 'items 1-2/4'
+            'X-Total-Count': '5',
+            'Content-Range': 'items 1-2/5'
         },),
         (authn_headers_user2, {'offset': 1}, [
             # (workspace1, publication_1e_3_7x5_9),
+            (workspace1, publication_1e_2_4x6_6),
             (workspace1, publication_1e_3_3x3_3),
             (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
         ], {
-            'X-Total-Count': '4',
-            'Content-Range': 'items 2-4/4'
+            'X-Total-Count': '5',
+            'Content-Range': 'items 2-5/5'
         },),
         (authn_headers_user2, {'limit': 1, 'offset': 1}, [
             # (workspace1, publication_1e_3_7x5_9),
-            (workspace1, publication_1e_3_3x3_3),
+            (workspace1, publication_1e_2_4x6_6),
+            # (workspace1, publication_1e_3_3x3_3),
             # (workspace2, publication_2e_3_3x5_5),
             # (workspace2, publication_2o_2_2x4_4),
         ], {
-            'X-Total-Count': '4',
-            'Content-Range': 'items 2-2/4'
+            'X-Total-Count': '5',
+            'Content-Range': 'items 2-2/5'
         },),
         (authn_headers_user2, {'limit': 0, 'offset': 0}, [
         ], {
-            'X-Total-Count': '4',
-            'Content-Range': 'items 0-0/4'
+            'X-Total-Count': '5',
+            'Content-Range': 'items 0-0/5'
         },),
-        (authn_headers_user2, {'limit': 5, 'offset': 3}, [
+        (authn_headers_user2, {'limit': 6, 'offset': 3}, [
             # (workspace1, publication_1e_3_7x5_9),
+            # (workspace1, publication_1e_2_4x6_6),
             # (workspace1, publication_1e_3_3x3_3),
-            # (workspace2, publication_2e_3_3x5_5),
+            (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
         ], {
-            'X-Total-Count': '4',
-            'Content-Range': 'items 4-4/4'
+            'X-Total-Count': '5',
+            'Content-Range': 'items 4-5/5'
         },),
     ])
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
