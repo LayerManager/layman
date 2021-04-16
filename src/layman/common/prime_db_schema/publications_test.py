@@ -1,5 +1,5 @@
 import uuid
-from test import process_client
+from test import process_client, prime_db_schema_client
 import pytest
 
 from layman import settings, app as app, LaymanError
@@ -203,38 +203,14 @@ class TestSelectPublicationsComplex:
 
     @pytest.fixture(scope="class")
     def provide_data(self):
-        with app.app_context():
-            for idx, ws in enumerate([self.workspace1, self.workspace2, self.workspace3]):
-                ws_id = workspaces.ensure_workspace(ws)
-                userinfo = {
-                    'sub': idx + 1,
-                    'issuer_id': 'layman',
-                    'claims': {
-                        'email': f"{ws}@liferay.com",
-                        'name': ws,
-                        'middle_name': '',
-                        'family_name': ws,
-                        'given_name': ws,
-                        'preferred_username': ws,
-                    }
-                }
-                users.ensure_user(ws_id, userinfo)
-
-            for workspace, publ_type, publ_name, publ_info in self.publications:
-                publications.insert_publication(workspace, {
-                    'name': publ_name,
-                    'title': publ_info['title'],
-                    'publ_type_name': publ_type,
-                    'uuid': uuid.uuid4(),
-                    'actor_name': workspace,
-                    'style_type': 'sld',
-                    'access_rights': publ_info['access_rights'],
-                })
-                publications.set_bbox(workspace, publ_type, publ_name, publ_info['bbox'])
+        workspaces = [self.workspace1, self.workspace2, self.workspace3]
+        for workspace in workspaces:
+            prime_db_schema_client.ensure_user(workspace)
+        for workspace, publ_type, publ_name, publ_params in self.publications:
+            prime_db_schema_client.post_workspace_publication(publ_type, workspace, publ_name, workspace,
+                                                              **publ_params)
         yield
-        with app.app_context():
-            for workspace, publ_type, publ_name, _ in self.publications:
-                publications.delete_publication(workspace, publ_type, publ_name)
+        prime_db_schema_client.clear_workspaces(workspaces)
 
     @staticmethod
     @pytest.mark.parametrize('query_params, expected_result', [
