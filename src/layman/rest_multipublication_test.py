@@ -1,7 +1,7 @@
-from test import process_client
+from test import process_client, prime_db_schema_client
 import pytest
 
-from layman import settings, LaymanError
+from layman import LaymanError, settings
 
 
 class TestDeletePublicationsClass:
@@ -73,42 +73,26 @@ class TestGetPublications:
     publications = [
         (workspace1, publication_1e_3_7x5_9, {
             'title': 'Public publication in public workspace',
-        }, {
-            process_client.MAP_TYPE: {'file_paths': ['test/data/bbox/map_3_7-5_9.json', ],
-                                      },
-            process_client.LAYER_TYPE: {'file_paths': ['test/data/bbox/layer_3_7-5_9.geojson', ],
-                                        },
+            'bbox': (3000, 7000, 5000, 9000),
         }),
         (workspace1, publication_1e_3_3x3_3, {
             'title': 'Jednobodová publikace',
-        }, {
-            process_client.MAP_TYPE: {'file_paths': ['test/data/bbox/map_3_3-3_3.json', ],
-                                      },
-            process_client.LAYER_TYPE: {'file_paths': ['test/data/bbox/layer_3_3-3_3.geojson', ],
-                                        },
+            'bbox': (3000, 3000, 3000, 3000),
         }),
         (workspace2, publication_2e_3_3x5_5, {
-            'headers': authn_headers_user2,
             'title': '\'Too yellow horse\' means "Příliš žluťoučký kůň".',
-            'access_rights': {'read': settings.RIGHTS_EVERYONE_ROLE,
-                              'write': settings.RIGHTS_EVERYONE_ROLE},
-        }, {
-            process_client.MAP_TYPE: {'file_paths': ['test/data/bbox/map_3_3-5_5.json', ],
-                                      },
-            process_client.LAYER_TYPE: {'file_paths': ['test/data/bbox/layer_3_3-5_5.geojson', ],
-                                        },
+            'bbox': (3000, 3000, 5000, 5000),
+            'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
+                              'write': {settings.RIGHTS_EVERYONE_ROLE}},
+            'actor': workspace2,
         },
         ),
         (workspace2, publication_2o_2_2x4_4, {
-            'headers': authn_headers_user2,
             'title': 'Příliš jiný žluťoučký kůň úpěl ďábelské ódy',
-            'access_rights': {'read': workspace2,
-                              'write': workspace2},
-        }, {
-            process_client.MAP_TYPE: {'file_paths': ['test/data/bbox/map_2_2-4_4.json', ],
-                                      },
-            process_client.LAYER_TYPE: {'file_paths': ['test/data/bbox/layer_2_2-4_4.geojson', ],
-                                        },
+            'actor': workspace2,
+            'access_rights': {'read': {workspace2},
+                              'write': {workspace2}},
+            'bbox': (2000, 2000, 4000, 4000),
         },
         ),
     ]
@@ -116,16 +100,13 @@ class TestGetPublications:
     @pytest.fixture(scope="class")
     def provide_data(self):
         process_client.ensure_reserved_username(self.workspace2, self.authn_headers_user2)
+        prime_db_schema_client.ensure_workspace(self.workspace1)
 
-        for publication_type in process_client.PUBLICATION_TYPES:
-            for publication in self.publications:
-                process_client.publish_workspace_publication(publication_type, publication[0], publication[1], **publication[2],
-                                                             **publication[3][publication_type])
+        for publ_type in process_client.PUBLICATION_TYPES:
+            for workspace, publ_name, publ_params in self.publications:
+                prime_db_schema_client.post_workspace_publication(publ_type, workspace, publ_name, **publ_params)
         yield
-        for publication_type in process_client.PUBLICATION_TYPES:
-            for publication in self.publications:
-                process_client.delete_workspace_publication(publication_type, publication[0], publication[1],
-                                                            publication[2].get('headers'))
+        prime_db_schema_client.clear_workspaces([self.workspace1, self.workspace2])
 
     @staticmethod
     @pytest.mark.parametrize('headers, query_params, expected_publications, expected_headers', [
@@ -213,8 +194,8 @@ class TestGetPublications:
         },),
         (authn_headers_user2, {'order_by_list': ['bbox'],
                                'ordering_bbox': ','.join(str(c) for c in (3001, 3001, 3001, 3001))}, [
-            (workspace2, publication_2o_2_2x4_4),  # because it has slightly smaller area then 3_3x5_5
             (workspace2, publication_2e_3_3x5_5),
+            (workspace2, publication_2o_2_2x4_4),
             (workspace1, publication_1e_3_7x5_9),
             (workspace1, publication_1e_3_3x3_3),
         ], {
