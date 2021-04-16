@@ -38,15 +38,15 @@ Query parameters:
 - *full_text_filter*: String. List of words separated by space. Only layers with at least one of them in title will be returned. Search is case-insensitive, unaccent and did lemmatization for English.
 - *bbox_filter*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. Only layers whose bounding box intersects with given bounding box will be returned.
 - *order_by*: String. Can be one of these values:
-  - `full_text` Publications will be ordered by results of full-text search. Can be used only in combination with *full_text_filter*.
-  - `title` Publications will be ordered lexicographically by title value.
-  - `last_change` Publications will be ordered by time of last change. Recently updated publications will be first.
-  - `bbox` Publications will be ordered by similarity of bounding box with bounding box passed in *ordering_bbox* or *bbox_filter*. Can be used only in combination with  *ordering_bbox* or *bbox_filter*.
+  - `full_text` Layers will be ordered by results of full-text search. Can be used only in combination with *full_text_filter*.
+  - `title` Layers will be ordered lexicographically by title value.
+  - `last_change` Layers will be ordered by time of last change. Recently updated layers will be first.
+  - `bbox` Layers will be ordered by similarity of bounding box with bounding box passed in *ordering_bbox* or *bbox_filter*. Can be used only in combination with  *ordering_bbox* or *bbox_filter*.
   
   If *full_text_filter* is set, default value is `full_text`; if *bbox_filter* is set, default value is `bbox`; otherwise default value is empty string, i.e. no ordering is guaranteed.
 - *ordering_bbox*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. The bounding box will be used for ordering. Can be used only if *order_by* is set to `bbox` (by default or explicitly).
-- *limit*: Non-negative Integer. No more publications than this number will be returned. But possibly less, if the query itself yields less publications.
-- *offset*: Non-negative Integer. Says to skip that many publications before beginning to return publications.
+- *limit*: Non-negative Integer. No more layers than this number will be returned. But possibly less, if the query itself yields fewer layers.
+- *offset*: Non-negative Integer. Says to skip that many layers before beginning to return layers.
 
 #### Response
 Content-Type: `application/json`
@@ -57,15 +57,15 @@ JSON array of objects representing available layers with following structure:
 - **title**: String. Title of the layer.
 - **uuid**: String. UUID of the layer.
 - **url**: String. URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
-- **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
+- **updated_at**: String. Date and time of last POST/PATCH of the layer. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 - **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
 
 Headers:
-- **X-Total-Count**: Total number of publications available from the request, taking into account all filtering parameters except `limit` and `offset`. Example `"247"`.
-- **Content-Range**: Indicates where in a full list of publications a partial response belongs. Syntax of value is `<units> <range_start>-<range_end>/<size>`. Value of `units` is always `items`. Value of `range_start` is one-based index of the first publication within the full list, or zero if no values are returned. Value of `range_end` is one-based index of the last publication within the full list, or zero if no values are returned. Example: `items 1-20/247`.
+- **X-Total-Count**: Total number of layers available from the request, taking into account all filtering parameters except `limit` and `offset`. Example `"247"`.
+- **Content-Range**: Indicates where in a full list of layers a partial response belongs. Syntax of value is `<units> <range_start>-<range_end>/<size>`. Value of `units` is always `items`. Value of `range_start` is one-based index of the first layer within the full list, or zero if no values are returned. Value of `range_end` is one-based index of the last layer within the full list, or zero if no values are returned. Example: `items 1-20/247`.
 
 ## Workspace Layers
 ### URL
@@ -74,22 +74,7 @@ Headers:
 ### GET Workspace Layers
 Get list of published layers.
 
-#### Request
-No action parameters.
-#### Response
-Content-Type: `application/json`
-
-JSON array of objects representing available layers with following structure:
-- **workspace**: String. Name of the layer's workspace.
-- **name**: String. Name of the layer.
-- **title**: String. Title of the layer.
-- **uuid**: String. UUID of the layer.
-- **url**: String. URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
-- **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
-- **access_rights**:
-  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
-  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
-- **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
+Have the same request parameters and response structure and headers as [GET Layers](#get-layers).
 
 ### POST Workspace Layers
 Publish vector data file as new layer of WMS and WFS.
@@ -412,39 +397,7 @@ JSON object with one attribute:
 ### GET Maps
 Get list of published maps (map compositions).
 
-#### Request
-Query parameters:
-- *full_text_filter*: String. List of words separated by space. Only maps with at least one of them in title will be returned. Search is case-insensitive, unaccent and did lemmatization for English.
-- *bbox_filter*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. Only maps whose bounding box intersects with given bounding box will be returned.
-- *order_by*: String. Can be one of these values:
-  - `full_text` Publications will be ordered by results of full-text search. Can be used only in combination with *full_text_filter*.
-  - `title` Publications will be ordered lexicographically by title value.
-  - `last_change` Publications will be ordered by time of last change. Recently updated publications will be first.
-  - `bbox` Publications will be ordered by similarity of bounding box with bounding box passed in *ordering_bbox* or *bbox_filter*. Can be used only in combination with  *ordering_bbox* or *bbox_filter*.
-  
-  If *full_text_filter* is set, default value is `full_text`; if *bbox_filter* is set, default value is `bbox`; otherwise default value is empty string, i.e. no ordering is guaranteed.
-- *ordering_bbox*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. The bounding box will be used for ordering. Can be used only if *order_by* is set to `bbox` (by default or explicitly).
-- *limit*: Non-negative Integer. No more publications than this number will be returned. But possibly less, if the query itself yields less publications.
-- *offset*: Non-negative Integer. Says to skip that many publications before beginning to return publications.
-
-#### Response
-Content-Type: `application/json`
-
-JSON array of objects representing available maps with following structure:
-- **workspace**: String. Name of the map's workspace.
-- **name**: String. Name of the map.
-- **title**: String. Title of the map.
-- **uuid**: String. UUID of the map.
-- **url**: String. URL of the map. It points to [GET Workspace Map](#get-workspace-map).
-- **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
-- **access_rights**:
-  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
-  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
-- **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
-
-Headers:
-- **X-Total-Count**: Total number of publications available from the request, taking into account all filtering parameters except `limit` and `offset`. Example `"247"`.
-- **Content-Range**: Indicates where in a full list of publications a partial response belongs. Syntax of value is `<units> <range_start>-<range_end>/<size>`. Value of `units` is always `items`. Value of `range_start` is one-based index of the first publication within the full list, or zero if no values are returned. Value of `range_end` is one-based index of the last publication within the full list, or zero if no values are returned. Example: `items 1-20/247`.
+Have the same request parameters and response structure and headers as [GET Layers](#get-layers).
 
 ## Workspace Maps
 ### URL
@@ -453,22 +406,7 @@ Headers:
 ### GET Workspace Maps
 Get list of published maps (map compositions).
 
-#### Request
-No action parameters.
-#### Response
-Content-Type: `application/json`
-
-JSON array of objects representing available maps with following structure:
-- **workspace**: String. Name of the map's workspace.
-- **name**: String. Name of the map.
-- **title**: String. Title of the map.
-- **uuid**: String. UUID of the map.
-- **url**: String. URL of the map. It points to [GET Workspace Map](#get-workspace-map).
-- **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
-- **access_rights**:
-  - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
-  - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
-- **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
+Have the same request parameters and response structure and headers as [GET Layers](#get-layers).
 
 ### POST Workspace Maps
 Publish new map composition. Accepts JSON valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema) used by [Hslayers-ng](https://github.com/hslayers/hslayers-ng).
