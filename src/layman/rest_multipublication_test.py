@@ -72,15 +72,15 @@ class TestGetPublications:
 
     publications = [
         (workspace1, publication_1e_3_7x5_9, {
-            'title': 'Public publication in public workspace',
+            'title': 'Public publication in public workspace (publication)',
             'bbox': (3000, 7000, 5000, 9000),
         }),
         (workspace1, publication_1e_3_3x3_3, {
-            'title': 'Jednobodová publikace',
+            'title': 'Jednobodová publikace (publication)',
             'bbox': (3000, 3000, 3000, 3000),
         }),
         (workspace2, publication_2e_3_3x5_5, {
-            'title': '\'Too yellow horse\' means "Příliš žluťoučký kůň".',
+            'title': '\'Too yellow horse\' means "Příliš žluťoučký kůň". (publication)',
             'bbox': (3000, 3000, 5000, 5000),
             'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
                               'write': {settings.RIGHTS_EVERYONE_ROLE}},
@@ -88,7 +88,7 @@ class TestGetPublications:
         },
         ),
         (workspace2, publication_2o_2_2x4_4, {
-            'title': 'Příliš jiný žluťoučký kůň úpěl ďábelské ódy',
+            'title': 'Příliš jiný žluťoučký kůň úpěl ďábelské ódy (publication)',
             'actor': workspace2,
             'access_rights': {'read': {workspace2},
                               'write': {workspace2}},
@@ -162,9 +162,12 @@ class TestGetPublications:
         },),
         (authn_headers_user2, {'full_text_filter': 'workspace publication'}, [
             (workspace1, publication_1e_3_7x5_9),
+            (workspace1, publication_1e_3_3x3_3),
+            (workspace2, publication_2e_3_3x5_5),
+            (workspace2, publication_2o_2_2x4_4),
         ], {
-            'X-Total-Count': '1',
-            'Content-Range': 'items 1-1/1'
+            'X-Total-Count': '4',
+            'Content-Range': 'items 1-4/4'
         },),
         (authn_headers_user2, {'order_by': 'title'}, [(workspace1, publication_1e_3_3x3_3),
                                                       (workspace2, publication_2o_2_2x4_4),
