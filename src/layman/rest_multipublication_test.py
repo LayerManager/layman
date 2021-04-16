@@ -281,6 +281,73 @@ class TestGetPublications:
             'X-Total-Count': '5',
             'Content-Range': 'items 4-5/5'
         },),
+        (
+            authn_headers_user2, {'order_by': 'title',
+                                  'full_text_filter': 'ódy',
+                                  'bbox_filter': ','.join(str(c) for c in (3001, 3001, 4999, 4999)),
+                                  'limit': 1,
+                                  }, [
+                (workspace1, publication_1e_2_4x6_6),
+                # (workspace2, publication_2o_2_2x4_4), limit
+            ], {'X-Total-Count': '2',
+                'Content-Range': 'items 1-1/2'},),
+        (
+            authn_headers_user2, {'order_by': 'title',
+                                  'full_text_filter': 'ódy',
+                                  'bbox_filter': ','.join(str(c) for c in (3001, 3001, 4999, 4999)),
+                                  'offset': 1,
+                                  }, [
+                # (workspace1, publication_1e_2_4x6_6), offset
+                (workspace2, publication_2o_2_2x4_4),
+            ], {'X-Total-Count': '2',
+                'Content-Range': 'items 2-2/2'},),
+        (
+            authn_headers_user2, {'order_by': 'bbox',
+                                  'full_text_filter': 'prilis',
+                                  'bbox_filter': ','.join(str(c) for c in (2000, 2000, 6000, 6000)),
+                                  'offset': 1,
+                                  'limit': 1,
+                                  }, [
+                # (workspace1, publication_1e_2_4x6_6),
+                (workspace2, publication_2e_3_3x5_5),
+                # (workspace2, publication_2o_2_2x4_4),
+            ], {'X-Total-Count': '3',
+                'Content-Range': 'items 2-2/3'},),
+        (
+            authn_headers_user2, {'full_text_filter': 'prilis yellow',
+                                  'bbox_filter': ','.join(str(c) for c in (2000, 2000, 6000, 6000)),
+                                  'offset': 1,
+                                  'limit': 1,
+                                  }, [
+                # (workspace2, publication_2e_3_3x5_5),
+                (workspace1, publication_1e_2_4x6_6),
+                # (workspace2, publication_2o_2_2x4_4),
+            ], {'X-Total-Count': '3',
+                'Content-Range': 'items 2-2/3'},),
+        (
+            authn_headers_user2, {'order_by': 'title',
+                                  'full_text_filter': 'prilis',
+                                  'bbox_filter': ','.join(str(c) for c in (2000, 2000, 6000, 6000)),
+                                  'offset': 1,
+                                  'limit': 1,
+                                  }, [
+                # (workspace1, publication_1e_2_4x6_6),
+                (workspace2, publication_2o_2_2x4_4),
+                # (workspace2, publication_2e_3_3x5_5),
+            ], {'X-Total-Count': '3',
+                'Content-Range': 'items 2-2/3'},),
+        (
+            authn_headers_user2, {'order_by': 'last_change',
+                                  'full_text_filter': 'prilis',
+                                  'bbox_filter': ','.join(str(c) for c in (2000, 2000, 6000, 6000)),
+                                  'offset': 1,
+                                  'limit': 1,
+                                  }, [
+                # (workspace2, publication_2o_2_2x4_4),
+                (workspace2, publication_2e_3_3x5_5),
+                # (workspace1, publication_1e_2_4x6_6),
+            ], {'X-Total-Count': '3',
+                'Content-Range': 'items 2-2/3'},),
     ])
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
