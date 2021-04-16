@@ -65,17 +65,13 @@ class TestGetPublications:
     workspace2 = 'test_get_publications_workspace2'
     authn_headers_user2 = process_client.get_authz_headers(workspace2)
 
-    publication_1e_3_7x5_9 = 'test_get_publications_publication1e'
-    publication_1e_2_4x6_6 = 'test_get_publications_publication1e_2x4'
-    publication_1e_3_3x3_3 = 'test_get_publications_publication1e_3x3'
-    publication_2e_3_3x5_5 = 'test_get_publications_publication2e'
-    publication_2o_2_2x4_4 = 'test_get_publications_publication2o'
+    publication_1e_2_4x6_6 = 'test_get_publications_publication1e_2_4x6_6'
+    publication_1e_3_3x3_3 = 'test_get_publications_publication1e_3_3x3_3'
+    publication_1e_3_7x5_9 = 'test_get_publications_publication1e_3_7x5_9'
+    publication_2e_3_3x5_5 = 'test_get_publications_publication2e_3_3x5_5'
+    publication_2o_2_2x4_4 = 'test_get_publications_publication2o_2_2x4_4'
 
     publications = [
-        (workspace1, publication_1e_3_7x5_9, {
-            'title': 'Public publication in public workspace (publication)',
-            'bbox': (3000, 7000, 5000, 9000),
-        }),
         (workspace1, publication_1e_2_4x6_6, {
             'title': 'Příliš jiný žluťoučký kůň úpěl ďábelské ódy (publication)',
             'bbox': (2000, 4000, 6000, 6000),
@@ -83,6 +79,10 @@ class TestGetPublications:
         (workspace1, publication_1e_3_3x3_3, {
             'title': 'Jednobodová publikace (publication)',
             'bbox': (3000, 3000, 3000, 3000),
+        }),
+        (workspace1, publication_1e_3_7x5_9, {
+            'title': 'Public publication in public workspace (publication)',
+            'bbox': (3000, 7000, 5000, 9000),
         }),
         (workspace2, publication_2e_3_3x5_5, {
             'title': '\'Too yellow horse\' means "Příliš žluťoučký kůň". (publication)',
@@ -115,18 +115,18 @@ class TestGetPublications:
 
     @staticmethod
     @pytest.mark.parametrize('headers, query_params, expected_publications, expected_headers', [
-        (authn_headers_user2, {}, [(workspace1, publication_1e_3_7x5_9),
-                                   (workspace1, publication_1e_2_4x6_6),
+        (authn_headers_user2, {}, [(workspace1, publication_1e_2_4x6_6),
                                    (workspace1, publication_1e_3_3x3_3),
+                                   (workspace1, publication_1e_3_7x5_9),
                                    (workspace2, publication_2e_3_3x5_5),
                                    (workspace2, publication_2o_2_2x4_4),
                                    ], {
             'X-Total-Count': '5',
             'Content-Range': 'items 1-5/5'
         },),
-        (None, {}, [(workspace1, publication_1e_3_7x5_9),
-                    (workspace1, publication_1e_2_4x6_6),
+        (None, {}, [(workspace1, publication_1e_2_4x6_6),
                     (workspace1, publication_1e_3_3x3_3),
+                    (workspace1, publication_1e_3_7x5_9),
                     (workspace2, publication_2e_3_3x5_5),
                     ], {
             'X-Total-Count': '4',
@@ -192,9 +192,9 @@ class TestGetPublications:
         },),
         (authn_headers_user2, {'order_by': 'last_change'}, [(workspace2, publication_2o_2_2x4_4),
                                                             (workspace2, publication_2e_3_3x5_5),
+                                                            (workspace1, publication_1e_3_7x5_9),
                                                             (workspace1, publication_1e_3_3x3_3),
                                                             (workspace1, publication_1e_2_4x6_6),
-                                                            (workspace1, publication_1e_3_7x5_9),
                                                             ], {
             'X-Total-Count': '5',
             'Content-Range': 'items 1-5/5'
@@ -214,9 +214,9 @@ class TestGetPublications:
                                'ordering_bbox': ','.join(str(c) for c in (3001, 3001, 3001, 3001))}, [
             (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
-            (workspace1, publication_1e_3_7x5_9),
             (workspace1, publication_1e_2_4x6_6),
             (workspace1, publication_1e_3_3x3_3),
+            (workspace1, publication_1e_3_7x5_9),
         ], {
             'X-Total-Count': '5',
             'Content-Range': 'items 1-5/5'
@@ -237,9 +237,9 @@ class TestGetPublications:
             'Content-Range': 'items 1-2/2'
         },),
         (authn_headers_user2, {'limit': 2}, [
-            (workspace1, publication_1e_3_7x5_9),
             (workspace1, publication_1e_2_4x6_6),
-            # (workspace1, publication_1e_3_3x3_3),
+            (workspace1, publication_1e_3_3x3_3),
+            # (workspace1, publication_1e_3_7x5_9),
             # (workspace2, publication_2e_3_3x5_5),
             # (workspace2, publication_2o_2_2x4_4),
         ], {
@@ -247,9 +247,9 @@ class TestGetPublications:
             'Content-Range': 'items 1-2/5'
         },),
         (authn_headers_user2, {'offset': 1}, [
-            # (workspace1, publication_1e_3_7x5_9),
-            (workspace1, publication_1e_2_4x6_6),
+            # (workspace1, publication_1e_2_4x6_6),
             (workspace1, publication_1e_3_3x3_3),
+            (workspace1, publication_1e_3_7x5_9),
             (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
         ], {
@@ -257,9 +257,9 @@ class TestGetPublications:
             'Content-Range': 'items 2-5/5'
         },),
         (authn_headers_user2, {'limit': 1, 'offset': 1}, [
+            # (workspace1, publication_1e_2_4x6_6),
+            (workspace1, publication_1e_3_3x3_3),
             # (workspace1, publication_1e_3_7x5_9),
-            (workspace1, publication_1e_2_4x6_6),
-            # (workspace1, publication_1e_3_3x3_3),
             # (workspace2, publication_2e_3_3x5_5),
             # (workspace2, publication_2o_2_2x4_4),
         ], {
@@ -272,9 +272,9 @@ class TestGetPublications:
             'Content-Range': 'items 0-0/5'
         },),
         (authn_headers_user2, {'limit': 6, 'offset': 3}, [
-            # (workspace1, publication_1e_3_7x5_9),
             # (workspace1, publication_1e_2_4x6_6),
             # (workspace1, publication_1e_3_3x3_3),
+            # (workspace1, publication_1e_3_7x5_9),
             (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
         ], {
