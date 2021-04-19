@@ -32,7 +32,7 @@ def get(username):
     app.logger.info(f"GET Layers, user={g.user}")
 
     user = get_authn_username() or settings.ANONYM_USER
-    return rest_common.get_publications(LAYER_TYPE, user, workspace=username)
+    return rest_common.get_publications(LAYER_TYPE, user, request_args=request.args, workspace=username)
 
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}", methods=['POST'])
