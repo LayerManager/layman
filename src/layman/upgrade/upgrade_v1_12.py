@@ -117,7 +117,7 @@ def migrate_layer_metadata(workspace_filter=None):
             md_props = list(layer_csw.get_metadata_comparison(workspace, layer).values())
             md_wms_url = md_props[0]['wms_url'] if md_props else None
             base_wms_url = wms.add_capabilities_params_to_url(wms.get_wms_url(workspace, external_url=True))
-            exp_wms_url = f"{base_wms_url}?LAYERS={layer}"
+            exp_wms_url = f"{base_wms_url}&LAYERS={layer}"
             if md_wms_url != exp_wms_url:
                 logger.exception(
                     f'        WMS URL was not migrated (should be {exp_wms_url}, but is {md_wms_url})!')
