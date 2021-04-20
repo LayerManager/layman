@@ -3,7 +3,8 @@
 ## v1.12.0
  {release-date}
 ### Upgrade requirements
-
+- Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.7.0`
+    - If you are running Layman with development settings, run also `make client-build`.
 ### Migrations and checks
 - Schema migrations (table alters) and data migrations are split to separate lists. All schema migrations run before data migrations.
 #### Schema migrations
