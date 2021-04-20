@@ -5,22 +5,25 @@
 ### Upgrade requirements
 - Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.7.0`
     - If you are running Layman with development settings, run also `make client-build`.
+- Run [standalone upgrade](README.md#upgrade) before starting Layman.
 ### Migrations and checks
-- Schema migrations (table alters) and data migrations are split to separate lists. All schema migrations run before data migrations.
+- Schema migrations (e.g. `ALTER TABLE ...` statements) and data migrations are split into separate lists. All schema migrations run before data migrations.
 #### Schema migrations
+- Adjust prime DB schema for two migration types, schema and data. Add new data type `enum_migration_type`, add new column `migration_type` to table `data_version` , insert second record to the table.
 - [#257](https://github.com/jirik/layman/issues/257) Adjust prime DB schema for full-text filtering (install [unaccent](https://www.postgresql.org/docs/10/unaccent.html), create immutable `my_unaccent` function, index unaccented `title` column in `publications` table).
 - [#257](https://github.com/jirik/layman/issues/257) Create new column `updated_at` in `publications` table.
-- [#257](https://github.com/jirik/layman/issues/257) Create new columng `bbox` in `publications` table.
+- [#257](https://github.com/jirik/layman/issues/257) Create new column `bbox` in `publications` table.
 #### Data migrations
 - [#257](https://github.com/jirik/layman/issues/257) Fill column `updated_at` in `publications` table.
 - [#302](https://github.com/jirik/layman/issues/302) Add URL parameter `LAYERS` to metadata properties [wms_url](doc/metadata.md#wms_url) and [wfs_url](doc/metadata.md#wfs_url) in existing metadata record of each layer. This non-standard parameter holds name of the layer at given WMS/WFS.
 - [#257](https://github.com/jirik/layman/issues/257) Fill column `bbox` in `publications` table.
 ### Changes
-- [#257](https://github.com/jirik/layman/issues/257) Endpoints [GET Layers](doc/rest.md#get-layers), [GET Worksapce Layers](doc/rest.md#get-workspace-layers), [GET Maps](doc/rest.md#get-maps) and [GET Workspace Maps](doc/rest.md#get-workspace-maps) can filter and reorder results according to new query parameters. All request parameters, response structure and response headers are described in [GET Layers](doc/rest.md#get-layers) documentation.
-- [#257](https://github.com/jirik/layman/issues/257) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-maps), [GET Workspace Map](doc/rest.md#get-workspace-map), and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) contains new attribute `updated_at` with date and time of last PATCH/POST request to given publication.
-- [#257](https://github.com/jirik/layman/issues/257) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-maps), [GET Workspace Map](doc/rest.md#get-workspace-map), and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) contains new attribute `bounding_box` with bounding box coordinates in EPSG:3857.
+- [#257](https://github.com/jirik/layman/issues/257) Endpoints [GET Layers](doc/rest.md#get-layers), [GET Worksapce Layers](doc/rest.md#get-workspace-layers), [GET Maps](doc/rest.md#get-maps) and [GET Workspace Maps](doc/rest.md#get-workspace-maps) can filter, order, and paginate results according to new query parameters. All request parameters, response structure and response headers are described in [GET Layers](doc/rest.md#get-layers) documentation.
+- [#257](https://github.com/jirik/layman/issues/257) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-maps), [GET Workspace Map](doc/rest.md#get-workspace-map), and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) contains new attributes
+   - `updated_at` with date and time of last PATCH/POST request to given publication
+   - `bounding_box` with bounding box coordinates in EPSG:3857
 - [#302](https://github.com/jirik/layman/issues/302) Metadata properties [wms_url](doc/metadata.md#wms_url) and [wfs_url](doc/metadata.md#wfs_url) contain new URL parameter `LAYERS` whose value is name of the layer. It's non-standard way how to store name of the layer at given WMS/WFS instance within metadata record.
-- Migration version was split in [GET Version](doc/rest.md#get-version) to **last-schema-migration** and **last-data-migration**. Original **last-migration** stay as alias to **last-schema-migration**.
+- Migration version was split in [GET Version](doc/rest.md#get-version) to **last-schema-migration** and **last-data-migration**. Original **last-migration** stays as deprecated alias to **last-schema-migration**.
 
 ## v1.11.0
  2021-03-16
