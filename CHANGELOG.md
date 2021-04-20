@@ -1,7 +1,7 @@
 # Changelog
 
 ## v1.12.0
- {release-date}
+ 2021-04-21
 ### Upgrade requirements
 - Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.7.0`
     - If you are running Layman with development settings, run also `make client-build`.
