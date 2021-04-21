@@ -1,4 +1,5 @@
 from flask import g
+from layman import settings
 from . import util
 
 authenticate = util.authenticate
@@ -13,4 +14,14 @@ flush_cache = util.flush_cache
 
 
 def get_authn_username():
-    return g.user and g.user.get('username')
+    anonymous = settings.ANONYM_USER
+    noname = settings.NONAME_USER
+    if g.user is None:
+        result = anonymous
+    else:
+        result = g.user.get('username', noname)
+    return result
+
+
+def is_user_with_name(user):
+    return user and user not in {settings.ANONYM_USER, settings.NONAME_USER}

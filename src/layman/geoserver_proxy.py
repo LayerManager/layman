@@ -7,7 +7,7 @@ from lxml import etree as ET
 from flask import Blueprint, g, current_app as app, request, Response
 
 from layman import authn, authz, settings
-from layman.authn import authenticate
+from layman.authn import authenticate, is_user_with_name
 from layman.layer import db, LAYER_TYPE, util as layer_util
 from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import LAYERNAME_PATTERN, ATTRNAME_PATTERN
@@ -155,7 +155,7 @@ def proxy(subpath):
     headers_req = {key.lower(): value for (key, value) in request.headers if key.lower() not in ['host', settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE.lower()]}
     data = request.get_data()
     authn_username = authn.get_authn_username()
-    if authn_username:
+    if is_user_with_name(authn_username):
         headers_req[settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE] = authn_username
 
     app.logger.info(f"{request.method} GeoServer proxy, headers_req={headers_req}, url={url}")

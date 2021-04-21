@@ -31,7 +31,7 @@ def after_request(response):
 def get(username):
     app.logger.info(f"GET Layers, user={g.user}")
 
-    user = get_authn_username() or settings.ANONYM_USER
+    user = get_authn_username()
     return rest_common.get_publications(LAYER_TYPE, user, request_args=request.args, workspace=username)
 
 
