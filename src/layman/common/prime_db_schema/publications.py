@@ -61,7 +61,7 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
     order_by_definition = {
         consts.ORDER_BY_FULL_TEXT: ('ts_rank_cd(_prime_schema.my_unaccent(p.title), to_tsquery(unaccent(%s))) DESC',
                                     (ordering_full_text,)),
-        consts.ORDER_BY_TITLE: ('unaccent(p.title) ASC', tuple()),
+        consts.ORDER_BY_TITLE: ('lower(unaccent(p.title)) ASC', tuple()),
         consts.ORDER_BY_LAST_CHANGE: ('updated_at DESC', tuple()),
         consts.ORDER_BY_BBOX: ("""
             -- A∩B / (A + B)
