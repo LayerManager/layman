@@ -1,13 +1,14 @@
 # Changelog
 
 ## v1.13.0
-
 {release_date}
 ### Upgrade requirements
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
+- Rename filesystem directory containing workspaces from `users` to `workspaces`
 ### Changes
+- Filesystem directory containing workspaces was renamed from `users` to `workspaces`
 
 ## v1.12.0
  2021-04-21

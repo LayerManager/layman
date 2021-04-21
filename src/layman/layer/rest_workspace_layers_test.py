@@ -52,9 +52,9 @@ def assert_style_file(workspace,
 
 
 @pytest.mark.parametrize('source_style_file_path, layer_suffix, expected_style_file_template, expected_style_type', [
-    ('sample/style/generic-blue_sld.xml', '_sld', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.sld', 'sld'),
-    ('sample/style/sld_1_1_0.xml', '_sld11', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.sld', 'sld'),
-    ('sample/style/small_layer.qml', '_qml', '/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}.qml', 'qml'),
+    ('sample/style/generic-blue_sld.xml', '_sld', '/layman_data_test/workspaces/{workspace}/layers/{layer}/input_style/{layer}.sld', 'sld'),
+    ('sample/style/sld_1_1_0.xml', '_sld11', '/layman_data_test/workspaces/{workspace}/layers/{layer}/input_style/{layer}.sld', 'sld'),
+    ('sample/style/small_layer.qml', '_qml', '/layman_data_test/workspaces/{workspace}/layers/{layer}/input_style/{layer}.qml', 'qml'),
     ('', '_no_style', None, 'sld'),
 ])
 @pytest.mark.usefixtures('ensure_layman')
@@ -107,9 +107,9 @@ class TestQgisCascadeWmsClass:
 
     @staticmethod
     def assert_wms_layer(workspace, layer, style, expected_thumbnail_path=None):
-        expected_style_file = f'/layman_data_test/users/{workspace}/layers/{layer}/input_style/{layer}'
+        expected_style_file = f'/layman_data_test/workspaces/{workspace}/layers/{layer}/input_style/{layer}'
         expected_qgis_file = f'/qgis/data/test/workspaces/{workspace}/layers/{layer}/{layer}.qgis'
-        thumbnail_path = f'/layman_data_test/users/{workspace}/layers/{layer}/thumbnail/{layer}.png'
+        thumbnail_path = f'/layman_data_test/workspaces/{workspace}/layers/{layer}/thumbnail/{layer}.png'
         wms_stores_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES, f'{workspace}_wms/wmsstores/')
         wms_layers_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES, f'{workspace}_wms/wmslayers/')
 

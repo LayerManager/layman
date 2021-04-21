@@ -1,7 +1,7 @@
 import logging
 import psycopg2
 
-from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12
+from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_13
 from layman import settings
 from layman.common.prime_db_schema import util as db_util
 from . import consts
@@ -31,6 +31,9 @@ MIGRATIONS = {
             upgrade_v1_12.adjust_prime_db_schema_for_fulltext_search,
             upgrade_v1_12.adjust_prime_db_schema_for_last_change_search,
             upgrade_v1_12.adjust_prime_db_schema_for_bbox_search,
+        ]),
+        ((1, 13, 0), [
+            upgrade_v1_13.rename_users_directory,
         ]),
     ],
     consts.MIGRATION_TYPE_DATA: [
