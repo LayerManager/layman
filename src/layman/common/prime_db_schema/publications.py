@@ -2,6 +2,7 @@ import logging
 import psycopg2.extras
 
 from layman import settings, LaymanError
+from layman.authn import is_user_with_name
 from layman.common import get_publications_consts as consts
 from . import util, workspaces, users, rights
 
@@ -34,8 +35,8 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
         (workspace_name, 'w.name = %s', (workspace_name,)),
         (pub_type, 'p.type = %s', (pub_type,)),
         (style_type, 'p.style_type::text = %s', (style_type,)),
-        (reader == settings.ANONYM_USER, 'p.everyone_can_read = TRUE', tuple()),
-        (reader and reader != settings.ANONYM_USER, f"""(p.everyone_can_read = TRUE
+        (reader and not is_user_with_name(reader), 'p.everyone_can_read = TRUE', tuple()),
+        (is_user_with_name(reader), f"""(p.everyone_can_read = TRUE
                         or (u.id is not null and w.name = %s)
                         or EXISTS(select 1
                                   from {DB_SCHEMA}.rights r inner join
@@ -44,8 +45,8 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
                                   where r.id_publication = p.id
                                     and r.type = 'read'
                                     and w2.name = %s))""", (reader, reader,)),
-        (writer == settings.ANONYM_USER, 'p.everyone_can_write = TRUE', tuple()),
-        (writer and writer != settings.ANONYM_USER, f"""(p.everyone_can_write = TRUE
+        (writer and not is_user_with_name(writer), 'p.everyone_can_write = TRUE', tuple()),
+        (is_user_with_name(writer), f"""(p.everyone_can_write = TRUE
                         or (u.id is not null and w.name = %s)
                         or EXISTS(select 1
                                   from {DB_SCHEMA}.rights r inner join
@@ -173,8 +174,7 @@ from {DB_SCHEMA}.workspaces w inner join
     select = select_clause + where_clause + order_by_clause + pagination_clause
     values = util.run_query(select, sql_params)
 
-    # print(f'get_publication_infos:\n\n order_by_clause={order_by_clause},\n where_clause={where_clause},\n sql_params={sql_params},'
-    #       f'\n order_by_list={order_by_list},\n full_text_ordering={full_text_ordering}')
+    # print(f'get_publication_infos:\n\nselect={select}\n\nsql_params={sql_params}\n\n&&&&&&&&&&&&&&&&&')
 
     infos = {(workspace_name,
               type,

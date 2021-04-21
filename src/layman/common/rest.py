@@ -2,6 +2,7 @@ import re
 from flask import jsonify, make_response
 
 from layman import settings, util as layman_util, LaymanError
+from layman.authn import is_user_with_name
 from layman.common.prime_db_schema import util as prime_db_schema_util
 from layman.common import bbox as bbox_util
 from .util import PUBLICATION_NAME_ONLY_PATTERN
@@ -94,7 +95,7 @@ def setup_post_access_rights(request_form, kwargs, actor_name):
     kwargs['access_rights'] = dict()
     for type in ['read', 'write']:
         if not request_form.get('access_rights.' + type):
-            if actor_name:
+            if is_user_with_name(actor_name):
                 access_rights = [actor_name]
             else:
                 access_rights = [settings.RIGHTS_EVERYONE_ROLE]

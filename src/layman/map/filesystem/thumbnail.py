@@ -11,6 +11,7 @@ from selenium.webdriver.common.desired_capabilities import \
     DesiredCapabilities
 
 from layman import settings
+from layman.authn import is_user_with_name
 from layman.common.filesystem import util as common_util
 from layman.util import url_for
 from . import util, input_file
@@ -77,7 +78,7 @@ def generate_map_thumbnail(username, mapname, editor):
         'layman_public_url': f"{settings.LAYMAN_PUBLIC_URL_SCHEME}://{settings.LAYMAN_PROXY_SERVER_NAME}/",
         'gs_url': f"http://{settings.LAYMAN_SERVER_NAME}{settings.LAYMAN_GS_PATH}",
         'gs_public_url': f"{settings.LAYMAN_GS_PROXY_BASE_URL}",
-        'editor': editor or '',
+        'editor': editor if is_user_with_name(editor) else '',
         'proxy_header': settings.LAYMAN_AUTHN_HTTP_HEADER_NAME,
         # 'file_name': tmp_file_name,
     })
