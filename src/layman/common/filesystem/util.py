@@ -32,7 +32,7 @@ def get_workspaces():
 
 
 def get_users_dir():
-    usersdir = os.path.join(settings.LAYMAN_DATA_DIR, 'users')
+    usersdir = os.path.join(settings.LAYMAN_DATA_DIR, 'workspaces')
     return usersdir
 
 
