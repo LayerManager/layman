@@ -77,14 +77,14 @@ def ensure_workspace(workspace, conn_cur=None):
         raise LaymanError(7) from exc
 
 
-def delete_workspace(username, conn_cur=None):
+def delete_workspace(workspace, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
 
     try:
         cur.execute(
-            f"""DROP SCHEMA IF EXISTS "{username}" RESTRICT""")
+            f"""DROP SCHEMA IF EXISTS "{workspace}" RESTRICT""")
         conn.commit()
     except BaseException as exc:
         logger.error(f'delete_workspace ERROR')
