@@ -33,7 +33,7 @@ def pre_publication_action_check(workspace,
     pass
 
 
-def post_layer(username,
+def post_layer(workspace,
                layername,
                access_rights,
                title,

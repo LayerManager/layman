@@ -58,7 +58,7 @@ def pre_publication_action_check(workspace,
         pubs_util.check_publication_info(workspace, db_info)
 
 
-def post_layer(username,
+def post_layer(workspace,
                layername,
                access_rights,
                title,
@@ -74,7 +74,7 @@ def post_layer(username,
                "actor_name": actor_name,
                'style_type': style_type.code if style_type else None,
                }
-    pubs_util.insert_publication(username, db_info)
+    pubs_util.insert_publication(workspace, db_info)
 
 
 def get_metadata_comparison(workspace, publication_name):
