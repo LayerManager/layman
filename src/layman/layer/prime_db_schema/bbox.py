@@ -15,7 +15,7 @@ def delete_layer(workspace, layer_name):
     pass
 
 
-def patch_layer(username,
+def patch_layer(workspace,
                 layername,
                 actor_name,
                 style_type=None,

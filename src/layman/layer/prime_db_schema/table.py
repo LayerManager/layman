@@ -20,7 +20,7 @@ def delete_layer(workspace, layer_name):
     return pubs_util.delete_publication(workspace, LAYER_TYPE, layer_name)
 
 
-def patch_layer(username,
+def patch_layer(workspace,
                 layername,
                 actor_name,
                 style_type=None,
@@ -36,7 +36,7 @@ def patch_layer(username,
         db_info['style_type'] = style_type.code
     if access_rights:
         db_info['access_rights'] = access_rights
-    pubs_util.update_publication(username, db_info)
+    pubs_util.update_publication(workspace, db_info)
 
 
 def pre_publication_action_check(workspace,
