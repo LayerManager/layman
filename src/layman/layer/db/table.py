@@ -60,5 +60,5 @@ def get_publication_uuid(workspace, publication_type, publication_name):
     return None
 
 
-def get_metadata_comparison(username, publication_name):
+def get_metadata_comparison(workspace, publication_name):
     pass

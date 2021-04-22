@@ -34,5 +34,5 @@ def patch_map(username, mapname):
     pass
 
 
-def get_metadata_comparison(username, layername):
+def get_metadata_comparison(workspace, layername):
     pass

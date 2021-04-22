@@ -77,5 +77,5 @@ def post_layer(username,
     pubs_util.insert_publication(username, db_info)
 
 
-def get_metadata_comparison(username, publication_name):
+def get_metadata_comparison(workspace, publication_name):
     pass

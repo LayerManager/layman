@@ -14,7 +14,7 @@ def get_publication_uuid(workspace, publication_type, publication_name):
     return None
 
 
-def get_metadata_comparison(username, layername):
+def get_metadata_comparison(workspace, layername):
     pass
 
 

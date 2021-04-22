@@ -250,14 +250,14 @@ def layer_info_to_metadata_properties(info):
     return result
 
 
-def get_metadata_comparison(username, layername):
+def get_metadata_comparison(workspace, layername):
     layman_info = get_complete_layer_info(cached=True)
     layman_props = layer_info_to_metadata_properties(layman_info)
     all_props = {
         f"{layman_props['layer_endpoint']}": layman_props,
     }
     sources = get_sources()
-    partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [username, layername])
+    partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [workspace, layername])
     for pi in partial_infos:
         if pi is not None:
             all_props.update(pi)

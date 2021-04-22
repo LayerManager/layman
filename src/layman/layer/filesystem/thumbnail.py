@@ -95,5 +95,5 @@ def generate_layer_thumbnail(workspace, layername):
         out_file.write(r.content)
 
 
-def get_metadata_comparison(username, layername):
+def get_metadata_comparison(workspace, layername):
     pass

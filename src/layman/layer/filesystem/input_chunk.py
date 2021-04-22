@@ -222,5 +222,5 @@ def _get_chunk_name(uploaded_filename, chunk_number):
     return uploaded_filename + "_part_%03d" % chunk_number
 
 
-def get_metadata_comparison(username, publication_name):
+def get_metadata_comparison(workspace, publication_name):
     pass

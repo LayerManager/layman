@@ -206,5 +206,5 @@ def get_file_name_mappings(file_names, main_file_name, layer_name, output_dir):
     return (filename_mapping, filepath_mapping)
 
 
-def get_metadata_comparison(username, publication_name):
+def get_metadata_comparison(workspace, publication_name):
     pass

@@ -137,8 +137,8 @@ def get_publication_uuid(workspace, publication_type, publication_name):
     return None
 
 
-def get_metadata_comparison(username, layername):
-    wfs = get_wfs_direct(username)
+def get_metadata_comparison(workspace, layername):
+    wfs = get_wfs_direct(workspace)
     if wfs is None:
         return {}
     cap_op = wfs.getOperationByName('GetCapabilities')
@@ -149,7 +149,7 @@ def get_metadata_comparison(username, layername):
             if m.get("type").lower() == 'get'
         ), None
     )
-    wfs_layername = f"{username}:{layername}"
+    wfs_layername = f"{workspace}:{layername}"
     wfs_layer = wfs.contents.get(wfs_layername, None)
     try:
         title = wfs_layer.title
@@ -179,7 +179,7 @@ def get_metadata_comparison(username, layername):
         'reference_system': reference_system,
     }
     # current_app.logger.info(f"props:\n{json.dumps(props, indent=2)}")
-    url = get_capabilities_url(username)
+    url = get_capabilities_url(workspace)
     return {
         f"{url}": props
     }

@@ -142,8 +142,8 @@ def get_publication_uuid(workspace, publication_type, publication_name):
     return None
 
 
-def get_metadata_comparison(username, layername):
-    wms = get_wms_direct(username)
+def get_metadata_comparison(workspace, layername):
+    wms = get_wms_direct(workspace)
     if wms is None:
         return {}
     cap_op = wms.getOperationByName('GetCapabilities')
@@ -184,7 +184,7 @@ def get_metadata_comparison(username, layername):
         'reference_system': reference_system,
     }
     # current_app.logger.info(f"props:\n{json.dumps(props, indent=2)}")
-    url = get_capabilities_url(username)
+    url = get_capabilities_url(workspace)
     return {
         f"{url}": props
     }

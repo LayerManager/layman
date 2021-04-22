@@ -44,5 +44,5 @@ def post_layer(username,
     pass
 
 
-def get_metadata_comparison(username, publication_name):
+def get_metadata_comparison(workspace, publication_name):
     pass
