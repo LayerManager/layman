@@ -39,7 +39,7 @@ def get_map_info(username, mapname):
     if os.path.exists(map_file_path):
         with open(map_file_path, 'r') as map_file:
             map_json = json.load(map_file)
-        map_file_path = os.path.relpath(map_file_path, common_util.get_user_dir(username))
+        map_file_path = os.path.relpath(map_file_path, common_util.get_workspace_dir(username))
         result = {
             'file': {
                 'path': map_file_path,

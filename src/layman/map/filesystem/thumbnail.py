@@ -38,7 +38,7 @@ def get_map_info(username, mapname):
             'thumbnail': {
                 'url': url_for('rest_workspace_map_thumbnail.get', workspace=username,
                                mapname=mapname),
-                'path': os.path.relpath(thumbnail_path, common_util.get_user_dir(username))
+                'path': os.path.relpath(thumbnail_path, common_util.get_workspace_dir(username))
             }
         }
     return {}

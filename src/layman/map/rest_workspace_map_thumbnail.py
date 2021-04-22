@@ -5,7 +5,7 @@ from layman import LaymanError, util as layman_util
 from layman.util import check_username_decorator
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
-from layman.common.filesystem.util import get_user_dir
+from layman.common.filesystem.util import get_workspace_dir
 from . import util, MAP_REST_PATH_NAME
 from .filesystem import thumbnail
 
@@ -34,7 +34,7 @@ def get(workspace, mapname):
 
     thumbnail_info = thumbnail.get_map_info(workspace, mapname)
     if thumbnail_info:
-        userdir = get_user_dir(workspace)
+        userdir = get_workspace_dir(workspace)
         thumbnail_path = thumbnail_info['thumbnail']['path']
         thumbnail_path = os.path.join(userdir, thumbnail_path)
         return send_file(thumbnail_path, mimetype='image/png')

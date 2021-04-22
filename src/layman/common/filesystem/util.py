@@ -9,7 +9,7 @@ PUBL_TYPE_DEF_KEY = '.'.join(__name__.split('.')[:-1])
 
 
 def get_usernames():
-    usersdir = get_users_dir()
+    usersdir = get_workspaces_dir()
     if not os.path.exists(usersdir):
         return []
     user_names = [
@@ -21,7 +21,7 @@ def get_usernames():
 
 
 def get_workspaces():
-    usersdir = get_users_dir()
+    usersdir = get_workspaces_dir()
     if not os.path.exists(usersdir):
         return []
     user_names = [
@@ -31,26 +31,26 @@ def get_workspaces():
     return user_names
 
 
-def get_users_dir():
-    usersdir = os.path.join(settings.LAYMAN_DATA_DIR, 'workspaces')
-    return usersdir
+def get_workspaces_dir():
+    workspacesdir = os.path.join(settings.LAYMAN_DATA_DIR, 'workspaces')
+    return workspacesdir
 
 
-def get_user_dir(username):
-    userdir = os.path.join(get_users_dir(), username)
-    return userdir
+def get_workspace_dir(workspace):
+    workspacedir = os.path.join(get_workspaces_dir(), workspace)
+    return workspacedir
 
 
 def ensure_workspace(workspace):
-    userdir = get_user_dir(workspace)
-    pathlib.Path(userdir).mkdir(exist_ok=True, parents=True)
-    return userdir
+    workspacedir = get_workspace_dir(workspace)
+    pathlib.Path(workspacedir).mkdir(exist_ok=True, parents=True)
+    return workspacedir
 
 
 def delete_workspace(workspace):
-    userdir = get_user_dir(workspace)
+    workspacedir = get_workspace_dir(workspace)
     try:
-        os.rmdir(userdir)
+        os.rmdir(workspacedir)
     except FileNotFoundError:
         pass
 
@@ -63,29 +63,29 @@ def delete_whole_user(username):
     delete_workspace(username)
 
 
-def get_publications_dir(publ_type, username):
+def get_publications_dir(publ_type, workspace):
     publ_types = get_publication_types()
     dirname = publ_types[publ_type][PUBL_TYPE_DEF_KEY]['publications_dir']
-    layersdir = os.path.join(get_user_dir(username), dirname)
+    layersdir = os.path.join(get_workspace_dir(workspace), dirname)
     return layersdir
 
 
-def get_publication_dir(publ_type, username, publ_name):
+def get_publication_dir(publ_type, workspace, publ_name):
     publ_dir = os.path.join(
-        get_publications_dir(publ_type, username),
+        get_publications_dir(publ_type, workspace),
         publ_name
     )
     return publ_dir
 
 
-def ensure_publication_dir(publ_type, username, publ_name):
-    publ_dir = get_publication_dir(publ_type, username, publ_name)
+def ensure_publication_dir(publ_type, workspace, publ_name):
+    publ_dir = get_publication_dir(publ_type, workspace, publ_name)
     pathlib.Path(publ_dir).mkdir(exist_ok=True, parents=True)
     return publ_dir
 
 
-def delete_publication_subfile(publ_type, username, publ_name, subfile):
-    publ_dir = get_publication_dir(publ_type, username, publ_name)
+def delete_publication_subfile(publ_type, workspace, publ_name, subfile):
+    publ_dir = get_publication_dir(publ_type, workspace, publ_name)
     publ_subfile = os.path.join(publ_dir, subfile)
     try:
         os.remove(publ_subfile)
@@ -96,8 +96,8 @@ def delete_publication_subfile(publ_type, username, publ_name, subfile):
     return {}
 
 
-def delete_publication_subdir(publ_type, username, publ_name, subdir):
-    publ_dir = get_publication_dir(publ_type, username, publ_name)
+def delete_publication_subdir(publ_type, workspace, publ_name, subdir):
+    publ_dir = get_publication_dir(publ_type, workspace, publ_name)
     publ_subdir = os.path.join(publ_dir, subdir)
     try:
         shutil.rmtree(publ_subdir)

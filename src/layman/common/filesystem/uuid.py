@@ -6,8 +6,8 @@ from . import util
 PUBLICATION_SUBFILE = 'uuid.txt'
 
 
-def get_publication_info(publ_type, username, publication_name):
-    uuid_str = get_publication_uuid(publ_type, username, publ_type, publication_name)
+def get_publication_info(publ_type, workspace, publication_name):
+    uuid_str = get_publication_uuid(publ_type, workspace, publ_type, publication_name)
     if uuid_str is not None:
         return {
             'uuid': uuid_str,
@@ -33,16 +33,16 @@ def get_publication_uuid(publ_type, username, publication_type, publication_name
     return uuid_str
 
 
-def get_publication_uuid_file(publ_type, username, publication_name):
-    uuid_file = os.path.join(util.get_publication_dir(publ_type, username, publication_name),
+def get_publication_uuid_file(publ_type, workspace, publication_name):
+    uuid_file = os.path.join(util.get_publication_dir(publ_type, workspace, publication_name),
                              PUBLICATION_SUBFILE)
     return uuid_file
 
 
-def assign_publication_uuid(publ_type, username, publication_name, uuid_str=None):
-    uuid_str = register_publication_uuid(username, publ_type, publication_name, uuid_str)
-    uuid_path = get_publication_uuid_file(publ_type, username, publication_name)
-    util.ensure_publication_dir(publ_type, username, publication_name)
+def assign_publication_uuid(publ_type, workspace, publication_name, uuid_str=None):
+    uuid_str = register_publication_uuid(workspace, publ_type, publication_name, uuid_str)
+    uuid_path = get_publication_uuid_file(publ_type, workspace, publication_name)
+    util.ensure_publication_dir(publ_type, workspace, publication_name)
     with open(uuid_path, "w") as uuid_file:
         uuid_file.write(uuid_str)
     return uuid_str
