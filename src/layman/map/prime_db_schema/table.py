@@ -65,8 +65,8 @@ def post_map(workspace,
     pubs_util.insert_publication(workspace, db_info)
 
 
-def delete_map(username, map_name):
-    return pubs_util.delete_publication(username, MAP_TYPE, map_name)
+def delete_map(workspace, map_name):
+    return pubs_util.delete_publication(workspace, MAP_TYPE, map_name)
 
 
 def get_metadata_comparison(workspace, publication_name):

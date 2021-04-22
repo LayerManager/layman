@@ -144,10 +144,10 @@ def patch_map(workspace, mapname, task_options, start_at):
     celery_util.set_publication_task_info(workspace, MAP_TYPE, mapname, patch_tasks, res)
 
 
-def delete_map(username, mapname, kwargs=None):
+def delete_map(workspace, mapname, kwargs=None):
     sources = get_sources()
-    call_modules_fn(sources[::-1], 'delete_map', [username, mapname], kwargs=kwargs)
-    celery_util.delete_publication(username, MAP_TYPE, mapname)
+    call_modules_fn(sources[::-1], 'delete_map', [workspace, mapname], kwargs=kwargs)
+    celery_util.delete_publication(workspace, MAP_TYPE, mapname)
 
 
 def get_complete_map_info(username=None, mapname=None, cached=False):

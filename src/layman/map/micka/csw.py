@@ -51,8 +51,8 @@ def get_publication_uuid(workspace, publication_type, publication_name):
     return None
 
 
-def delete_map(username, mapname):
-    uuid = get_map_uuid(username, mapname)
+def delete_map(workspace, mapname):
+    uuid = get_map_uuid(workspace, mapname)
     muuid = get_metadata_uuid(uuid)
     if muuid is None:
         return
