@@ -22,8 +22,8 @@ def post_layer(username, layername):
     pass
 
 
-def patch_layer(username, layername, metadata_properties_to_refresh, access_rights=None):
-    common_util.patch_publication_by_soap(workspace=username,
+def patch_layer(workspace, layername, metadata_properties_to_refresh, access_rights=None):
+    common_util.patch_publication_by_soap(workspace=workspace,
                                           publ_type=LAYER_TYPE,
                                           publ_name=layername,
                                           metadata_properties_to_refresh=metadata_properties_to_refresh,

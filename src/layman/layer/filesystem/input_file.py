@@ -34,7 +34,7 @@ def post_layer(username, layername):
     pass
 
 
-def patch_layer(username, layername):
+def patch_layer(workspace, layername):
     pass
 
 
