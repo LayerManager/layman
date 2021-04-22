@@ -276,18 +276,18 @@ def map_file_to_metadata_properties(map_json, operates_on_muuids_filter):
     return result
 
 
-def get_metadata_comparison(username, mapname):
+def get_metadata_comparison(workspace, mapname):
     layman_info = get_complete_map_info(cached=True)
     layman_props = map_info_to_metadata_properties(layman_info)
     all_props = {
         f"{layman_props['map_endpoint']}": layman_props,
     }
     sources = get_sources()
-    partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [username, mapname])
+    partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [workspace, mapname])
     for pi in partial_infos:
         if pi is not None:
             all_props.update(pi)
-    map_json = get_map_file_json(username, mapname)
+    map_json = get_map_file_json(workspace, mapname)
     if map_json:
         soap_idx = sources.index(soap)
         soap_operates_on = []
@@ -295,7 +295,7 @@ def get_metadata_comparison(username, mapname):
             soap_operates_on = next(iter(partial_infos[soap_idx].values()))['operates_on']
         operates_on_muuids_filter = micka_util.operates_on_values_to_muuids(soap_operates_on)
         layman_file_props = map_file_to_metadata_properties(map_json, operates_on_muuids_filter)
-        map_file_url = url_for('rest_workspace_map_file.get', mapname=mapname, workspace=username)
+        map_file_url = url_for('rest_workspace_map_file.get', mapname=mapname, workspace=workspace)
         all_props[map_file_url] = layman_file_props
 
     return metadata_common.transform_metadata_props_to_comparison(all_props)

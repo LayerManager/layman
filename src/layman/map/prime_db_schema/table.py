@@ -69,5 +69,5 @@ def delete_map(username, map_name):
     return pubs_util.delete_publication(username, MAP_TYPE, map_name)
 
 
-def get_metadata_comparison(username, publication_name):
+def get_metadata_comparison(workspace, publication_name):
     pass

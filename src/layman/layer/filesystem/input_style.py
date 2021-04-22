@@ -78,7 +78,7 @@ def get_layer_file(username, layername):
     return None
 
 
-def get_metadata_comparison(username, publication_name):
+def get_metadata_comparison(workspace, publication_name):
     pass
 
 

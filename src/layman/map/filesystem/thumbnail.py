@@ -143,5 +143,5 @@ def generate_map_thumbnail(username, mapname, editor):
         f.write(base64.b64decode(data_url))
 
 
-def get_metadata_comparison(username, layername):
+def get_metadata_comparison(workspace, layername):
     pass

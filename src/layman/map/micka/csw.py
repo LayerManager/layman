@@ -401,8 +401,8 @@ METADATA_PROPERTIES = {
 }
 
 
-def get_metadata_comparison(username, mapname):
-    uuid = get_map_uuid(username, mapname)
+def get_metadata_comparison(workspace, mapname):
+    uuid = get_map_uuid(workspace, mapname)
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return {}

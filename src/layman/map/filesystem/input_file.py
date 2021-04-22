@@ -136,5 +136,5 @@ def post_map(username, mapname, description, title):
 patch_map = post_map
 
 
-def get_metadata_comparison(username, publication_name):
+def get_metadata_comparison(workspace, publication_name):
     pass

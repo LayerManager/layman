@@ -71,7 +71,7 @@ def create_layer_style(workspace, layername):
     wms.clear_cache(workspace)
 
 
-def get_metadata_comparison(username, layername):
+def get_metadata_comparison(workspace, layername):
     pass
 
 
