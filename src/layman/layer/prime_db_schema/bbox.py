@@ -3,7 +3,7 @@ from layman import patch_mode
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
-def get_publication_uuid(username, publication_type, publication_name):
+def get_publication_uuid(workspace, publication_type, publication_name):
     return None
 
 

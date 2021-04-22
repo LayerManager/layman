@@ -2,9 +2,9 @@ from ...common.prime_db_schema import publications as pubs_util
 from .. import MAP_TYPE
 
 
-def get_publication_uuid(username, publication_type, publication_name):
-    infos = pubs_util.get_publication_infos(username, publication_type)
-    return infos.get((username, publication_type, publication_name), dict()).get("uuid")
+def get_publication_uuid(workspace, publication_type, publication_name):
+    infos = pubs_util.get_publication_infos(workspace, publication_type)
+    return infos.get((workspace, publication_type, publication_name), dict()).get("uuid")
 
 
 def get_map_info(username, mapname):
