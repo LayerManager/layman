@@ -13,7 +13,7 @@ def get_map_info(workspace, mapname):
     return info
 
 
-def patch_map(username,
+def patch_map(workspace,
               mapname,
               actor_name,
               title=None,
@@ -25,7 +25,7 @@ def patch_map(username,
                }
     if access_rights:
         db_info['access_rights'] = access_rights
-    pubs_util.update_publication(username, db_info)
+    pubs_util.update_publication(workspace, db_info)
 
 
 def pre_publication_action_check(workspace,

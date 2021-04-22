@@ -44,9 +44,9 @@ def get_map_info(workspace, mapname):
     return {}
 
 
-def patch_map(username, mapname, file_changed=True):
-    if file_changed or not get_map_info(username, mapname):
-        post_map(username, mapname)
+def patch_map(workspace, mapname, file_changed=True):
+    if file_changed or not get_map_info(workspace, mapname):
+        post_map(workspace, mapname)
 
 
 get_publication_uuid = input_file.get_publication_uuid

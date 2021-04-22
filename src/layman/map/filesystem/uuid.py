@@ -30,7 +30,7 @@ def post_map(username, mapname):
     pass
 
 
-def patch_map(username, mapname):
+def patch_map(workspace, mapname):
     pass
 
 

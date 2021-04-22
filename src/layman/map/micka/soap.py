@@ -18,8 +18,8 @@ def pre_publication_action_check(workspace, layername):
     pass
 
 
-def patch_map(username, mapname, metadata_properties_to_refresh=None, access_rights=None, actor_name=None):
-    common_util.patch_publication_by_soap(workspace=username,
+def patch_map(workspace, mapname, metadata_properties_to_refresh=None, access_rights=None, actor_name=None):
+    common_util.patch_publication_by_soap(workspace=workspace,
                                           publ_type=MAP_TYPE,
                                           publ_name=mapname,
                                           metadata_properties_to_refresh=metadata_properties_to_refresh,
