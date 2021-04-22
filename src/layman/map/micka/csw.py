@@ -63,7 +63,7 @@ def delete_map(username, mapname):
         raise LaymanError(38) from exc
 
 
-def post_map(username, mapname):
+def post_map(workspace, mapname):
     pass
 
 

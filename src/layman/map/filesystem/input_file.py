@@ -122,8 +122,8 @@ def pre_publication_action_check(workspace, layername):
     pass
 
 
-def post_map(username, mapname, description, title):
-    map_file_path = get_map_file(username, mapname)
+def post_map(workspace, mapname, description, title):
+    map_file_path = get_map_file(workspace, mapname)
     with open(map_file_path, 'r') as map_file:
         map_json = json.load(map_file)
     map_json['name'] = mapname

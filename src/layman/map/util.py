@@ -116,18 +116,18 @@ def pre_publication_action_check(workspace, mapname, task_options):
     call_modules_fn(sources, 'pre_publication_action_check', [workspace, mapname], kwargs=task_options)
 
 
-def post_map(username, mapname, task_options, start_at):
+def post_map(workspace, mapname, task_options, start_at):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'post_map', [username, mapname], kwargs=task_options)
+    call_modules_fn(sources, 'post_map', [workspace, mapname], kwargs=task_options)
 
     # async processing
-    post_tasks = tasks_util.get_task_methods(get_map_type_def(), username, mapname, task_options, start_at)
-    post_chain = tasks_util.get_chain_of_methods(username, mapname, post_tasks, task_options, 'mapname')
+    post_tasks = tasks_util.get_task_methods(get_map_type_def(), workspace, mapname, task_options, start_at)
+    post_chain = tasks_util.get_chain_of_methods(workspace, mapname, post_tasks, task_options, 'mapname')
     # res = post_chain.apply_async()
     res = post_chain()
 
-    celery_util.set_publication_task_info(username, MAP_TYPE, mapname, post_tasks, res)
+    celery_util.set_publication_task_info(workspace, MAP_TYPE, mapname, post_tasks, res)
 
 
 def patch_map(workspace, mapname, task_options, start_at):
