@@ -67,12 +67,12 @@ def post_map(username, mapname):
     pass
 
 
-def patch_map(username, mapname, metadata_properties_to_refresh=None, actor_name=None, create_if_not_exists=True, timeout=5):
+def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_name=None, create_if_not_exists=True, timeout=5):
     # current_app.logger.info(f"patch_map metadata_properties_to_refresh={metadata_properties_to_refresh}")
     metadata_properties_to_refresh = metadata_properties_to_refresh or []
     if len(metadata_properties_to_refresh) == 0:
         return {}
-    uuid = get_map_uuid(username, mapname)
+    uuid = get_map_uuid(workspace, mapname)
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return None
@@ -80,11 +80,11 @@ def patch_map(username, mapname, metadata_properties_to_refresh=None, actor_name
     el = common_util.get_record_element_by_id(csw, muuid)
     if el is None:
         if create_if_not_exists:
-            return csw_insert(username, mapname, actor_name=actor_name)
+            return csw_insert(workspace, mapname, actor_name=actor_name)
         return None
     # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
 
-    _, prop_values = get_template_path_and_values(username, mapname, http_method='patch', actor_name=actor_name)
+    _, prop_values = get_template_path_and_values(workspace, mapname, http_method='patch', actor_name=actor_name)
     prop_values = {
         k: v for k, v in prop_values.items()
         if k in metadata_properties_to_refresh + ['md_date_stamp']
