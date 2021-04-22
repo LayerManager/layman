@@ -219,5 +219,5 @@ def get_workspaces():
     return result
 
 
-def check_new_layername(username, layername):
+def check_new_layername(workspace, layername):
     pass

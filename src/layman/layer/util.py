@@ -67,10 +67,10 @@ def get_providers():
     return current_app.config[key]
 
 
-def check_new_layername(username, layername):
+def check_new_layername(workspace, layername):
     check_layername(layername)
     providers = get_providers()
-    call_modules_fn(providers, 'check_new_layername', [username, layername])
+    call_modules_fn(providers, 'check_new_layername', [workspace, layername])
 
 
 def get_layer_info(username, layername, context=None):
