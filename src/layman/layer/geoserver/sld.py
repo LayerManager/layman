@@ -17,7 +17,7 @@ def get_workspace_layer_url(workspace, layer=None):
     return geoserver.get_workspace_layer_url(geoserver_workspace, layer)
 
 
-def pre_publication_action_check(username, layername):
+def pre_publication_action_check(workspace, layername):
     pass
 
 

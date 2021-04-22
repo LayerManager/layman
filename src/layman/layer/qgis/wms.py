@@ -18,7 +18,7 @@ def get_metadata_comparison(workspace, layername):
     pass
 
 
-def pre_publication_action_check(username, layername):
+def pre_publication_action_check(workspace, layername):
     pass
 
 

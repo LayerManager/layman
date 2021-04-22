@@ -21,7 +21,7 @@ def get_layer_uuid(username, layername):
 assign_layer_uuid = partial(common_uuid.assign_publication_uuid, LAYER_TYPE)
 
 
-def pre_publication_action_check(username, layername):
+def pre_publication_action_check(workspace, layername):
     pass
 
 

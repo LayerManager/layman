@@ -14,7 +14,7 @@ get_metadata_comparison = csw.get_metadata_comparison
 delete_map = csw.delete_map
 
 
-def pre_publication_action_check(username, layername):
+def pre_publication_action_check(workspace, layername):
     pass
 
 

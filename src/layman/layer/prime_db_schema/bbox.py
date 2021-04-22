@@ -25,7 +25,7 @@ def patch_layer(username,
     pass
 
 
-def pre_publication_action_check(username,
+def pre_publication_action_check(workspace,
                                  layername,
                                  actor_name,
                                  access_rights=None,

@@ -40,7 +40,7 @@ def get_layer_info(username, layername):
 get_publication_uuid = input_file.get_publication_uuid
 
 
-def pre_publication_action_check(username, layername):
+def pre_publication_action_check(workspace, layername):
     pass
 
 
