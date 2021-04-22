@@ -10,9 +10,9 @@ def get_publication_uuid(workspace, publication_type, publication_name):
     return infos.get((workspace, publication_type, publication_name), dict()).get("uuid")
 
 
-def get_layer_info(username, layername):
-    layers = pubs_util.get_publication_infos(username, LAYER_TYPE)
-    info = layers.get((username, LAYER_TYPE, layername), dict())
+def get_layer_info(workspace, layername):
+    layers = pubs_util.get_publication_infos(workspace, LAYER_TYPE)
+    info = layers.get((workspace, LAYER_TYPE, layername), dict())
     return info
 
 

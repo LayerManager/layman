@@ -73,10 +73,10 @@ def check_new_layername(workspace, layername):
     call_modules_fn(providers, 'check_new_layername', [workspace, layername])
 
 
-def get_layer_info(username, layername, context=None):
-    partial_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context)
+def get_layer_info(workspace, layername, context=None):
+    partial_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context)
 
-    last_task = _get_layer_task(username, layername)
+    last_task = _get_layer_task(workspace, layername)
     if last_task is None or celery_util.is_task_successful(last_task):
         return partial_info
 

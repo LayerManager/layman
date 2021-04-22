@@ -22,11 +22,11 @@ def pre_publication_action_check(workspace, layername):
     pass
 
 
-def get_layer_info(username, layername):
-    input_file_dir = qgis.get_layer_dir(username, layername)
+def get_layer_info(workspace, layername):
+    input_file_dir = qgis.get_layer_dir(workspace, layername)
     result = {}
     if os.path.exists(input_file_dir):
-        url = layman_util.url_for('rest_workspace_layer_style.get', workspace=username, layername=layername)
+        url = layman_util.url_for('rest_workspace_layer_style.get', workspace=workspace, layername=layername)
         result = {
             'name': layername,
             'style': {

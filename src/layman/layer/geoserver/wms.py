@@ -121,11 +121,11 @@ def clear_cache(username):
     mem_redis.delete(key)
 
 
-def get_layer_info(username, layername):
-    wms = get_wms_proxy(username)
+def get_layer_info(workspace, layername):
+    wms = get_wms_proxy(workspace)
     if wms is None:
         return {}
-    wms_proxy_url = get_wms_url(username, external_url=True)
+    wms_proxy_url = get_wms_url(workspace, external_url=True)
 
     if layername not in wms.contents:
         return {}

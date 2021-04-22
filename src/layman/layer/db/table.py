@@ -17,7 +17,7 @@ def patch_layer(username, layername):
     pass
 
 
-def get_layer_info(username, layername, conn_cur=None):
+def get_layer_info(workspace, layername, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     _, cur = conn_cur
@@ -25,7 +25,7 @@ def get_layer_info(username, layername, conn_cur=None):
         cur.execute(f"""
 SELECT schemaname, tablename, tableowner
 FROM pg_tables
-WHERE schemaname = '{username}'
+WHERE schemaname = '{workspace}'
     AND tablename = '{layername}'
     AND tableowner = '{settings.LAYMAN_PG_USER}'
 """)
