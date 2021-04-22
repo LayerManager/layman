@@ -63,14 +63,14 @@ def check_username(username, conn_cur=None):
         raise LaymanError(35, {'reserved_by': __name__, 'schema': username})
 
 
-def ensure_workspace(username, conn_cur=None):
+def ensure_workspace(workspace, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
 
     try:
         cur.execute(
-            f"""CREATE SCHEMA IF NOT EXISTS "{username}" AUTHORIZATION {settings.LAYMAN_PG_USER}""")
+            f"""CREATE SCHEMA IF NOT EXISTS "{workspace}" AUTHORIZATION {settings.LAYMAN_PG_USER}""")
         conn.commit()
     except BaseException as exc:
         logger.error(f'ensure_workspace ERROR')
