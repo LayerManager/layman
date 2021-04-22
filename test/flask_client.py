@@ -9,7 +9,7 @@ from layman.map import util as util_map
 from layman.util import url_for
 
 
-def publish_layer(username,
+def publish_layer(workspace,
                   layername,
                   client,
                   title=None,
@@ -18,7 +18,7 @@ def publish_layer(username,
     title = title or layername
     file_paths = file_paths or ['tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson', ]
     with app.app_context():
-        rest_path = url_for('rest_workspace_layers.post', username=username)
+        rest_path = url_for('rest_workspace_layers.post', username=workspace)
 
         for fp in file_paths:
             assert os.path.isfile(fp)
@@ -36,7 +36,7 @@ def publish_layer(username,
             for fp in files:
                 fp[0].close()
 
-    wait_till_layer_ready(username, layername)
+    wait_till_layer_ready(workspace, layername)
     return rv.get_json()[0]
 
 
@@ -52,23 +52,23 @@ def client():
     yield client
 
 
-def delete_layer(username, layername, client, headers=None):
+def delete_layer(workspace, layername, client, headers=None):
     headers = headers or {}
     with app.app_context():
-        r_url = url_for('rest_workspace_layers.delete', username=username, layername=layername)
+        r_url = url_for('rest_workspace_layers.delete', username=workspace, layername=layername)
         r = client.delete(r_url, headers=headers)
     assert r.status_code == 200, (r.status_code, r.get_json())
 
 
-def delete_map(username, mapname, client, headers=None):
+def delete_map(workspace, mapname, client, headers=None):
     headers = headers or {}
     with app.app_context():
-        r_url = url_for('rest_workspace_maps.delete', username=username, mapname=mapname)
+        r_url = url_for('rest_workspace_maps.delete', username=workspace, mapname=mapname)
         r = client.delete(r_url, headers=headers)
     assert r.status_code == 200, (r.status_code, r.get_json())
 
 
-def publish_map(username,
+def publish_map(workspace,
                 mapname,
                 client,
                 maptitle=None,
@@ -77,7 +77,7 @@ def publish_map(username,
     maptitle = maptitle or mapname
     headers = headers or {}
     with app.app_context():
-        rest_path = url_for('rest_workspace_maps.post', username=username)
+        rest_path = url_for('rest_workspace_maps.post', username=workspace)
 
         file_paths = [
             'sample/layman.map/full.json',
@@ -100,21 +100,21 @@ def publish_map(username,
             for fp in files:
                 fp[0].close()
 
-    wait_till_map_ready(username, mapname)
+    wait_till_map_ready(workspace, mapname)
 
 
-def wait_till_map_ready(username, name):
-    last_task = util_map._get_map_task(username, name)
+def wait_till_map_ready(workspace, name):
+    last_task = util_map._get_map_task(workspace, name)
     while last_task is not None and not celery_util.is_task_ready(last_task):
         time.sleep(0.1)
-        last_task = util_map._get_map_task(username, name)
+        last_task = util_map._get_map_task(workspace, name)
 
 
-def wait_till_layer_ready(username, layername):
-    last_task = util_layer._get_layer_task(username, layername)
+def wait_till_layer_ready(workspace, layername):
+    last_task = util_layer._get_layer_task(workspace, layername)
     while last_task is not None and not celery_util.is_task_ready(last_task):
         time.sleep(0.1)
-        last_task = util_layer._get_layer_task(username, layername)
+        last_task = util_layer._get_layer_task(workspace, layername)
 
 
 def ensure_workspace(workspace, client):
