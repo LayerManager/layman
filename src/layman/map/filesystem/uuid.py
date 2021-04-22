@@ -26,7 +26,7 @@ def pre_publication_action_check(workspace, layername):
     pass
 
 
-def post_map(username, mapname):
+def post_map(workspace, mapname):
     pass
 
 

@@ -47,7 +47,7 @@ def pre_publication_action_check(workspace,
         pubs_util.check_publication_info(workspace, db_info)
 
 
-def post_map(username,
+def post_map(workspace,
              mapname,
              uuid,
              title,
@@ -62,7 +62,7 @@ def post_map(username,
                "access_rights": access_rights,
                "actor_name": actor_name,
                }
-    pubs_util.insert_publication(username, db_info)
+    pubs_util.insert_publication(workspace, db_info)
 
 
 def delete_map(username, map_name):
