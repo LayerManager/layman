@@ -11,7 +11,7 @@ def get_layer_info(workspace, layername):
     return dict()
 
 
-def delete_layer(username, layer_name):
+def delete_layer(workspace, layer_name):
     pass
 
 

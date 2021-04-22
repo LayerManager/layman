@@ -38,8 +38,8 @@ def patch_layer(username, layername):
     pass
 
 
-def delete_layer(username, layername):
-    util.delete_layer_subdir(username, layername, LAYER_SUBDIR)
+def delete_layer(workspace, layername):
+    util.delete_layer_subdir(workspace, layername, LAYER_SUBDIR)
 
 
 def get_layer_info(workspace, layername):

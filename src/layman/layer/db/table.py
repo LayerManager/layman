@@ -42,12 +42,12 @@ WHERE schemaname = '{workspace}'
     return result
 
 
-def delete_layer(username, layername, conn_cur=None):
+def delete_layer(workspace, layername, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     conn, cur = conn_cur
     query = f"""
-    DROP TABLE IF EXISTS "{username}"."{layername}" CASCADE
+    DROP TABLE IF EXISTS "{workspace}"."{layername}" CASCADE
     """
     try:
         cur.execute(query)

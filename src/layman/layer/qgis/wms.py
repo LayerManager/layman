@@ -45,8 +45,8 @@ def patch_layer(username, layername):
     pass
 
 
-def delete_layer(username, layername):
-    style_stream = util.get_layer_original_style_stream(username, layername)
+def delete_layer(workspace, layername):
+    style_stream = util.get_layer_original_style_stream(workspace, layername)
     if style_stream:
         result = {
             'style': {
@@ -55,7 +55,7 @@ def delete_layer(username, layername):
         }
     else:
         result = {}
-    qgis.delete_layer_dir(username, layername)
+    qgis.delete_layer_dir(workspace, layername)
     return result
 
 

@@ -16,8 +16,8 @@ def get_layer_info(workspace, layername):
     return info
 
 
-def delete_layer(username, layer_name):
-    return pubs_util.delete_publication(username, LAYER_TYPE, layer_name)
+def delete_layer(workspace, layer_name):
+    return pubs_util.delete_publication(workspace, LAYER_TYPE, layer_name)
 
 
 def patch_layer(username,

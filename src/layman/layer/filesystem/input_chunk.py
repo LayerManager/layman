@@ -27,9 +27,9 @@ def ensure_layer_resumable_dir(username, layername):
     return resumable_dir
 
 
-def delete_layer(username, layername):
-    util.delete_layer_subdir(username, layername, LAYER_SUBDIR)
-    chunk_key = get_layer_redis_total_chunks_key(username, layername)
+def delete_layer(workspace, layername):
+    util.delete_layer_subdir(workspace, layername, LAYER_SUBDIR)
+    chunk_key = get_layer_redis_total_chunks_key(workspace, layername)
     settings.LAYMAN_REDIS.delete(chunk_key)
 
 
