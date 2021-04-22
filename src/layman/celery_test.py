@@ -44,12 +44,12 @@ def test_single_abortable_task(client):
         'check_crs': check_crs,
     }
     filenames = ['abc.geojson']
-    username = 'test_abort_user'
+    workspace = 'test_abort_user'
     layername = 'test_abort_layer'
     with app.app_context():
-        input_chunk.save_layer_files_str(username, layername, filenames, check_crs)
+        input_chunk.save_layer_files_str(workspace, layername, filenames, check_crs)
     task_chain = chain(*[
-        tasks_util._get_task_signature(username, layername, t, task_options, 'layername')
+        tasks_util._get_task_signature(workspace, layername, t, task_options, 'layername')
         for t in tasks
     ])
     task_result = task_chain()
@@ -72,7 +72,7 @@ def test_single_abortable_task(client):
     # first one is failure, because it throws AbortedException
     assert results[0].state == results_copy[0].state == 'FAILURE'
     with app.app_context():
-        input_chunk.delete_layer(username, layername)
+        input_chunk.delete_layer(workspace, layername)
 
 
 def test_abortable_task_chain(client):
@@ -96,12 +96,12 @@ def test_abortable_task_chain(client):
         'check_crs': check_crs,
     }
     filenames = ['abc.geojson']
-    username = 'test_abort_user'
+    workspace = 'test_abort_user'
     layername = 'test_abort_layer2'
     with app.app_context():
-        input_chunk.save_layer_files_str(username, layername, filenames, check_crs)
+        input_chunk.save_layer_files_str(workspace, layername, filenames, check_crs)
     task_chain = chain(*[
-        tasks_util._get_task_signature(username, layername, t, task_options, 'layername')
+        tasks_util._get_task_signature(workspace, layername, t, task_options, 'layername')
         for t in tasks
     ])
     task_result = task_chain()
@@ -132,4 +132,4 @@ def test_abortable_task_chain(client):
     assert results[1].state == results_copy[1].state == 'ABORTED'
     assert results[2].state == results_copy[2].state == 'ABORTED'
     with app.app_context():
-        input_chunk.delete_layer(username, layername)
+        input_chunk.delete_layer(workspace, layername)
