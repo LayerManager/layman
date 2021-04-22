@@ -7,9 +7,9 @@ def get_publication_uuid(workspace, publication_type, publication_name):
     return infos.get((workspace, publication_type, publication_name), dict()).get("uuid")
 
 
-def get_map_info(username, mapname):
-    maps = pubs_util.get_publication_infos(username, MAP_TYPE)
-    info = maps.get((username, MAP_TYPE, mapname), dict())
+def get_map_info(workspace, mapname):
+    maps = pubs_util.get_publication_infos(workspace, MAP_TYPE)
+    info = maps.get((workspace, MAP_TYPE, mapname), dict())
     return info
 
 

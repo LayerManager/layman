@@ -31,14 +31,14 @@ def ensure_map_thumbnail_dir(username, mapname):
     return thumbnail_dir
 
 
-def get_map_info(username, mapname):
-    thumbnail_path = get_map_thumbnail_path(username, mapname)
+def get_map_info(workspace, mapname):
+    thumbnail_path = get_map_thumbnail_path(workspace, mapname)
     if os.path.exists(thumbnail_path):
         return {
             'thumbnail': {
-                'url': url_for('rest_workspace_map_thumbnail.get', workspace=username,
+                'url': url_for('rest_workspace_map_thumbnail.get', workspace=workspace,
                                mapname=mapname),
-                'path': os.path.relpath(thumbnail_path, common_util.get_workspace_dir(username))
+                'path': os.path.relpath(thumbnail_path, common_util.get_workspace_dir(workspace))
             }
         }
     return {}

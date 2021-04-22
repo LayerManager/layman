@@ -24,8 +24,8 @@ def get_metadata_uuid(uuid):
     return f"m-{uuid}" if uuid is not None else None
 
 
-def get_map_info(username, mapname):
-    uuid = get_map_uuid(username, mapname)
+def get_map_info(workspace, mapname):
+    uuid = get_map_uuid(workspace, mapname)
     try:
         csw = common_util.create_csw()
         if uuid is None or csw is None:
@@ -41,7 +41,7 @@ def get_map_info(username, mapname):
                 'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
                 'record_url': settings.CSW_RECORD_URL.format(identifier=muuid),
-                'comparison_url': url_for('rest_workspace_map_metadata_comparison.get', workspace=username, mapname=mapname),
+                'comparison_url': url_for('rest_workspace_map_metadata_comparison.get', workspace=workspace, mapname=mapname),
             }
         }
     return {}
