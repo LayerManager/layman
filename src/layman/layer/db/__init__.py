@@ -146,7 +146,7 @@ def import_layer_vector_file_async(username, layername, main_filepath,
     return p
 
 
-def check_new_layername(username, layername, conn_cur=None):
+def check_new_layername(workspace, layername, conn_cur=None):
     if conn_cur is None:
         conn_cur = get_connection_cursor()
     _, cur = conn_cur
@@ -156,7 +156,7 @@ def check_new_layername(username, layername, conn_cur=None):
         cur.execute(f"""SELECT n.nspname AS schemaname, c.relname, c.relkind
     FROM   pg_class c
     JOIN   pg_namespace n ON n.oid = c.relnamespace
-    WHERE  n.nspname IN ('{username}', '{settings.PG_POSTGIS_SCHEMA}') AND c.relname='{layername}'""")
+    WHERE  n.nspname IN ('{workspace}', '{settings.PG_POSTGIS_SCHEMA}') AND c.relname='{layername}'""")
     except BaseException as exc:
         logger.error(f'check_new_layername ERROR')
         raise LaymanError(7) from exc

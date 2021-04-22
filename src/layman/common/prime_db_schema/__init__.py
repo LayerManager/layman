@@ -4,7 +4,7 @@ get_usernames = users_util.get_usernames
 get_workspaces = workspaces_util.get_workspace_names
 
 
-def check_new_layername(username, layername):
+def check_new_layername(workspace, layername):
     pass
 
 

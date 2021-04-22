@@ -26,5 +26,5 @@ def check_username(workspace):
     pass
 
 
-def check_new_layername(username, layername):
+def check_new_layername(workspace, layername):
     pass
