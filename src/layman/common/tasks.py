@@ -5,12 +5,12 @@ from celery import chain
 from layman import settings
 
 
-def get_task_chain(publ_type, username, publ_name, task_options, start_at, publ_param_name):
-    methods = get_task_methods(publ_type, username, publ_name, task_options, start_at)
-    return get_chain_of_methods(username, publ_name, methods, task_options, publ_param_name)
+def get_task_chain(publ_type, workspace, publ_name, task_options, start_at, publ_param_name):
+    methods = get_task_methods(publ_type, workspace, publ_name, task_options, start_at)
+    return get_chain_of_methods(workspace, publ_name, methods, task_options, publ_param_name)
 
 
-def get_task_methods(publ_type, username, publ_name, task_options, start_at):
+def get_task_methods(publ_type, workspace, publ_name, task_options, start_at):
     if start_at is None:
         return []
     internal_sources = list(publ_type['internal_sources'].keys())
@@ -28,19 +28,19 @@ def get_task_methods(publ_type, username, publ_name, task_options, start_at):
         if task_method is None:
             continue
         needed_method = getattr(task_module, f"{method_name}_needed")
-        if needed_method(username, publ_name, task_options):
+        if needed_method(workspace, publ_name, task_options):
             task_methods.append(task_method)
     return task_methods
 
 
-def get_chain_of_methods(username, publ_name, task_methods, task_options, publ_param_name):
+def get_chain_of_methods(workspace, publ_name, task_methods, task_options, publ_param_name):
     return chain(*[
-        _get_task_signature(username, publ_name, t, task_options, publ_param_name)
+        _get_task_signature(workspace, publ_name, t, task_options, publ_param_name)
         for t in task_methods
     ])
 
 
-def _get_task_signature(username, publ_name, task, task_options, publ_param_name):
+def _get_task_signature(workspace, publ_name, task, task_options, publ_param_name):
     param_names = [
         pname
         for pname in inspect.signature(task).parameters.keys()
@@ -52,7 +52,7 @@ def _get_task_signature(username, publ_name, task, task_options, publ_param_name
         if key in param_names
     }
     return task.signature(
-        (username, publ_name),
+        (workspace, publ_name),
         task_opts,
         queue=settings.LAYMAN_CELERY_QUEUE,
         immutable=True,

@@ -48,7 +48,7 @@ def get_layer_info(username, layername):
     filenames = glob.glob(pattern)
     main_filename = get_main_file_name(filenames)
     if main_filename is not None:
-        main_filename = os.path.relpath(main_filename, common_util.get_user_dir(username))
+        main_filename = os.path.relpath(main_filename, common_util.get_workspace_dir(username))
         result = {
             'file': {
                 'path': main_filename

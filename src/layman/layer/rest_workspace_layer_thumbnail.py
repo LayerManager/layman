@@ -2,7 +2,7 @@ import os
 
 from flask import Blueprint, send_file, current_app as app, g
 
-from layman.common.filesystem.util import get_user_dir
+from layman.common.filesystem.util import get_workspace_dir
 from layman import LaymanError, util as layman_util
 from layman.util import check_username_decorator
 from layman.authn import authenticate
@@ -35,7 +35,7 @@ def get(workspace, layername):
 
     thumbnail_info = thumbnail.get_layer_info(workspace, layername)
     if thumbnail_info:
-        userdir = get_user_dir(workspace)
+        userdir = get_workspace_dir(workspace)
         thumbnail_path = thumbnail_info['thumbnail']['path']
         thumbnail_path = os.path.join(userdir, thumbnail_path)
         return send_file(thumbnail_path, mimetype='image/png')

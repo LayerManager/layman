@@ -71,7 +71,7 @@ from {DB_SCHEMA}.publications p inner join
     publications = db_util.run_query(query)
     for (id, workspace, type, name, ) in publications:
         publ_dir = os.path.join(
-            fs_util.get_users_dir(),
+            fs_util.get_workspaces_dir(),
             workspace,
             type.split('.')[1] + 's',
             name,

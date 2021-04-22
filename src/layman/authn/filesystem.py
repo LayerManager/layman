@@ -18,7 +18,7 @@ def save_username_reservation(username, iss_id, sub, claims):
 
 
 def get_authn_file(username):
-    uuid_file = os.path.join(util.get_user_dir(username), AUTHN_SUBFILE)
+    uuid_file = os.path.join(util.get_workspace_dir(username), AUTHN_SUBFILE)
     return uuid_file
 
 
