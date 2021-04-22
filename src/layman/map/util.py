@@ -81,10 +81,10 @@ TASKS_TO_MAP_INFO_KEYS = {
 }
 
 
-def get_map_info(username, mapname, context=None):
-    partial_info = layman_util.get_publication_info(username, MAP_TYPE, mapname, context)
+def get_map_info(workspace, mapname, context=None):
+    partial_info = layman_util.get_publication_info(workspace, MAP_TYPE, mapname, context)
 
-    last_task = _get_map_task(username, mapname)
+    last_task = _get_map_task(workspace, mapname)
     if last_task is None or celery_util.is_task_successful(last_task):
         return partial_info
 

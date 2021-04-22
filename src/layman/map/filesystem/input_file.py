@@ -33,22 +33,22 @@ def get_map_file(username, mapname):
     return mapfile_path
 
 
-def get_map_info(username, mapname):
-    map_file_path = get_map_file(username, mapname)
+def get_map_info(workspace, mapname):
+    map_file_path = get_map_file(workspace, mapname)
     result = {}
     if os.path.exists(map_file_path):
         with open(map_file_path, 'r') as map_file:
             map_json = json.load(map_file)
-        map_file_path = os.path.relpath(map_file_path, common_util.get_workspace_dir(username))
+        map_file_path = os.path.relpath(map_file_path, common_util.get_workspace_dir(workspace))
         result = {
             'file': {
                 'path': map_file_path,
-                'url': url_for('rest_workspace_map_file.get', mapname=mapname, workspace=username),
+                'url': url_for('rest_workspace_map_file.get', mapname=mapname, workspace=workspace),
             },
             'title': map_json['title'] or '',
             'description': map_json['abstract'] or '',
         }
-    elif os.path.exists(util.get_map_dir(username, mapname)):
+    elif os.path.exists(util.get_map_dir(workspace, mapname)):
         result = {
             'name': mapname
         }
