@@ -110,10 +110,10 @@ def get_map_info(username, mapname, context=None):
     return partial_info
 
 
-def pre_publication_action_check(username, mapname, task_options):
+def pre_publication_action_check(workspace, mapname, task_options):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'pre_publication_action_check', [username, mapname], kwargs=task_options)
+    call_modules_fn(sources, 'pre_publication_action_check', [workspace, mapname], kwargs=task_options)
 
 
 def post_map(username, mapname, task_options, start_at):

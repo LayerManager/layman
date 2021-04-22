@@ -28,7 +28,7 @@ def patch_map(username,
     pubs_util.update_publication(username, db_info)
 
 
-def pre_publication_action_check(username,
+def pre_publication_action_check(workspace,
                                  layername,
                                  actor_name,
                                  access_rights=None,
@@ -42,9 +42,9 @@ def pre_publication_action_check(username,
         old_info = None
         for type in ['read', 'write']:
             if not access_rights.get(type):
-                old_info = old_info or get_map_info(username, layername)
+                old_info = old_info or get_map_info(workspace, layername)
                 access_rights[type + '_old'] = old_info['access_rights'][type]
-        pubs_util.check_publication_info(username, db_info)
+        pubs_util.check_publication_info(workspace, db_info)
 
 
 def post_map(username,

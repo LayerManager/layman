@@ -5,7 +5,7 @@ from . import get_connection_cursor
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
-def pre_publication_action_check(username, layername):
+def pre_publication_action_check(workspace, layername):
     pass
 
 

@@ -118,7 +118,7 @@ def unquote_urls(map_json):
     return map_json
 
 
-def pre_publication_action_check(username, layername):
+def pre_publication_action_check(workspace, layername):
     pass
 
 
