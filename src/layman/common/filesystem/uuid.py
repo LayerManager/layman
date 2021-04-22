@@ -22,10 +22,10 @@ def delete_publication(publ_type, username, publication_name):
     util.delete_publication_subfile(publ_type, username, publication_name, PUBLICATION_SUBFILE)
 
 
-def get_publication_uuid(publ_type, username, publication_type, publication_name):
+def get_publication_uuid(publ_type, workspace, publication_type, publication_name):
     if publication_type != publ_type:
         raise Exception(f'Unknown publication type {publication_type} for type {publ_type}')
-    uuid_path = get_publication_uuid_file(publ_type, username, publication_name)
+    uuid_path = get_publication_uuid_file(publ_type, workspace, publication_name)
     if not os.path.exists(uuid_path):
         return None
     with open(uuid_path, "r") as uuid_file:

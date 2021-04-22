@@ -56,7 +56,7 @@ def delete_layer(username, layername, conn_cur=None):
         raise LaymanError(7)from exc
 
 
-def get_publication_uuid(username, publication_type, publication_name):
+def get_publication_uuid(workspace, publication_type, publication_name):
     return None
 
 

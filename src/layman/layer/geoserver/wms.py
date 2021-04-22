@@ -138,7 +138,7 @@ def get_layer_info(username, layername):
     }
 
 
-def get_publication_uuid(username, publication_type, publication_name):
+def get_publication_uuid(workspace, publication_type, publication_name):
     return None
 
 

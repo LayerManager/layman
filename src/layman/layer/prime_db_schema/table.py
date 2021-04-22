@@ -5,9 +5,9 @@ from layman import patch_mode
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
-def get_publication_uuid(username, publication_type, publication_name):
-    infos = pubs_util.get_publication_infos(username, publication_type)
-    return infos.get((username, publication_type, publication_name), dict()).get("uuid")
+def get_publication_uuid(workspace, publication_type, publication_name):
+    infos = pubs_util.get_publication_infos(workspace, publication_type)
+    return infos.get((workspace, publication_type, publication_name), dict()).get("uuid")
 
 
 def get_layer_info(username, layername):

@@ -10,7 +10,7 @@ PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = "1.1.1"
 
 
-def get_publication_uuid(username, publication_type, publication_name):
+def get_publication_uuid(workspace, publication_type, publication_name):
     return None
 
 

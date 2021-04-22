@@ -47,7 +47,7 @@ def get_map_info(username, mapname):
     return {}
 
 
-def get_publication_uuid(username, publication_type, publication_name):
+def get_publication_uuid(workspace, publication_type, publication_name):
     return None
 
 
