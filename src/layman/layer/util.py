@@ -193,7 +193,7 @@ TASKS_TO_LAYER_INFO_KEYS = {
 }
 
 
-def delete_layer(username, layername, source=None, http_method='delete'):
+def delete_layer(workspace, layername, source=None, http_method='delete'):
     sources = get_sources()
     source_idx = next((
         idx for idx, m in enumerate(sources) if m.__name__ == source
@@ -208,11 +208,11 @@ def delete_layer(username, layername, source=None, http_method='delete'):
     # print(f"delete_layer {username}.{layername} using {len(sources)} sources: {[s.__name__ for s in sources]}")
 
     result = {}
-    results = call_modules_fn(sources, 'delete_layer', [username, layername])
+    results = call_modules_fn(sources, 'delete_layer', [workspace, layername])
     for r in results:
         if r is not None:
             result.update(r)
-    celery_util.delete_publication(username, LAYER_TYPE, layername)
+    celery_util.delete_publication(workspace, LAYER_TYPE, layername)
     return result
 
 
