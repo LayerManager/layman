@@ -36,9 +36,9 @@ def check_layername_decorator(f):
 def info_decorator(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        username = request.view_args['username']
+        workspace = request.view_args['workspace']
         layername = request.view_args['layername']
-        info = get_complete_layer_info(username, layername)
+        info = get_complete_layer_info(workspace, layername)
         assert FLASK_INFO_KEY not in g, g.get(FLASK_INFO_KEY)
         # current_app.logger.info(f"Setting INFO of layer {username}:{layername}")
         g.setdefault(FLASK_INFO_KEY, info)
@@ -114,7 +114,7 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
 
     complete_info = {
         'name': layername,
-        'url': url_for('rest_workspace_layer.get', layername=layername, username=username),
+        'url': url_for('rest_workspace_layer.get', layername=layername, workspace=username),
         'title': layername,
         'description': '',
         'wms': {

@@ -16,7 +16,7 @@ def create_lock_decorator(publication_type, publication_name_key, error_code, is
     def lock_decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            username = request.view_args['username']
+            username = request.view_args['workspace']
             publication_name = request.view_args[publication_name_key]
             create_lock(username, publication_type, publication_name, error_code, request.method)
             try:

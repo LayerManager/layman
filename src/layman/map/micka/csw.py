@@ -41,7 +41,7 @@ def get_map_info(username, mapname):
                 'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
                 'record_url': settings.CSW_RECORD_URL.format(identifier=muuid),
-                'comparison_url': url_for('rest_workspace_map_metadata_comparison.get', username=username, mapname=mapname),
+                'comparison_url': url_for('rest_workspace_map_metadata_comparison.get', workspace=username, mapname=mapname),
             }
         }
     return {}
@@ -201,7 +201,7 @@ def get_template_path_and_values(username, mapname, http_method=None, actor_name
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         revision_date=revision_date.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
-        identifier=url_for('rest_workspace_map.get', username=username, mapname=mapname),
+        identifier=url_for('rest_workspace_map.get', workspace=username, mapname=mapname),
         identifier_label=mapname,
         extent=[float(c) for c in map_json['extent']],
         epsg_codes=map_json_to_epsg_codes(map_json),
@@ -262,11 +262,11 @@ def _get_property_values(
             'label': identifier_label,
         },
         'abstract': abstract,
-        'graphic_url': url_for('rest_workspace_map_thumbnail.get', username=username, mapname=mapname),
+        'graphic_url': url_for('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
         'extent': extent,
 
-        'map_endpoint': escape(url_for('rest_workspace_map.get', username=username, mapname=mapname)),
-        'map_file_endpoint': escape(url_for('rest_workspace_map_file.get', username=username, mapname=mapname)),
+        'map_endpoint': escape(url_for('rest_workspace_map.get', workspace=username, mapname=mapname)),
+        'map_file_endpoint': escape(url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname)),
         'operates_on': operates_on,
         'md_organisation_name': md_organisation_name,
         'organisation_name': organisation_name,

@@ -26,7 +26,7 @@ def get_layer_info(username, layername):
     input_file_dir = qgis.get_layer_dir(username, layername)
     result = {}
     if os.path.exists(input_file_dir):
-        url = layman_util.url_for('rest_workspace_layer_style.get', username=username, layername=layername)
+        url = layman_util.url_for('rest_workspace_layer_style.get', workspace=username, layername=layername)
         result = {
             'name': layername,
             'style': {

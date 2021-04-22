@@ -21,7 +21,7 @@ def test_get_map_title():
         process_client.publish_workspace_map(username, name, title=title)
 
     with app.app_context():
-        url_get = layman_util.url_for('rest_workspace_maps.get', username=username)
+        url_get = layman_util.url_for('rest_workspace_maps.get', workspace=username)
     # maps.GET
     rv = requests.get(url_get)
     assert rv.status_code == 200, rv.json()
@@ -42,7 +42,7 @@ def test_get_maps():
     process_client.publish_workspace_map(username, mapname, title=mapname)
 
     with app.app_context():
-        url_get = layman_util.url_for('rest_workspace_maps.get', username=username)
+        url_get = layman_util.url_for('rest_workspace_maps.get', workspace=username)
     # maps.GET
     rv = requests.get(url_get)
     assert rv.status_code == 200, rv.json()
@@ -50,6 +50,6 @@ def test_get_maps():
     assert rv.json()[0]['name'] == mapname
     assert rv.json()[0]['title'] == mapname
     with app.app_context():
-        assert rv.json()[0]['url'] == layman_util.url_for('rest_workspace_map.get', username=username, mapname=mapname)
+        assert rv.json()[0]['url'] == layman_util.url_for('rest_workspace_map.get', workspace=username, mapname=mapname)
 
     process_client.delete_workspace_map(username, mapname)

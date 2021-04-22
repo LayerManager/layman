@@ -63,8 +63,8 @@ def check_deprecated_url(response):
 def check_username_decorator(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        username = request.view_args['username']
-        check_username(username, pattern_only=True)
+        workspace = request.view_args['workspace']
+        check_username(workspace, pattern_only=True)
         result = f(*args, **kwargs)
         return result
 
@@ -372,7 +372,7 @@ def delete_publications(user,
         {
             'name': info["name"],
             'title': info.get("title", None),
-            'url': url_for(**{'endpoint': url_path, publ_param: name, 'username': user}),
+            'url': url_for(**{'endpoint': url_path, publ_param: name, 'workspace': user}),
             'uuid': info["uuid"],
             'access_rights': info['access_rights'],
         }

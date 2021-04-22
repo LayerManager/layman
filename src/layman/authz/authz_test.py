@@ -142,7 +142,7 @@ class TestRestApiClass:
             publ_name = self.mapname
         assert publ_name
 
-        url_for_params['username'] = username
+        url_for_params['workspace'] = username
 
         with app.app_context():
             rest_url = url_for(rest_action, **url_for_params)

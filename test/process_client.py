@@ -126,7 +126,7 @@ def patch_workspace_publication(publication_type,
 
     with app.app_context():
         r_url = url_for(publication_type_def.patch_workspace_publication_url,
-                        username=workspace,
+                        workspace=workspace,
                         **{publication_type_def.url_param_name: name})
 
     for fp in file_paths:
@@ -155,7 +155,7 @@ def patch_workspace_publication(publication_type,
 
     with app.app_context():
         url = url_for(publication_type_def.get_workspace_publication_url,
-                      username=workspace,
+                      workspace=workspace,
                       **{publication_type_def.url_param_name: name})
     wait_for_rest(url, 30, 0.5, check_response_fn, headers=headers)
     wfs.clear_cache(workspace)
@@ -217,7 +217,7 @@ def publish_workspace_publication(publication_type,
         assert publication_type == LAYER_TYPE
 
     with app.app_context():
-        r_url = url_for(publication_type_def.post_workspace_publication_url, username=workspace)
+        r_url = url_for(publication_type_def.post_workspace_publication_url, workspace=workspace)
 
     for fp in file_paths:
         assert os.path.isfile(fp), fp
@@ -248,7 +248,7 @@ def publish_workspace_publication(publication_type,
 
     with app.app_context():
         url = url_for(publication_type_def.get_workspace_publication_url,
-                      username=workspace,
+                      workspace=workspace,
                       **{publication_type_def.url_param_name: name})
     wait_for_rest(url, 30, 0.5, check_response_fn, headers=headers)
     return r.json()[0]
@@ -264,7 +264,7 @@ def get_workspace_publications_response(publication_type, workspace, headers=Non
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
-        r_url = url_for(publication_type_def.get_workspace_publications_url, username=workspace)
+        r_url = url_for(publication_type_def.get_workspace_publications_url, workspace=workspace)
     r = requests.get(r_url, headers=headers, params=query_params)
     raise_layman_error(r)
     return r
@@ -304,7 +304,7 @@ def get_workspace_publication(publication_type, workspace, name, headers=None, )
 
     with app.app_context():
         r_url = url_for(publication_type_def.get_workspace_publication_url,
-                        username=workspace,
+                        workspace=workspace,
                         **{publication_type_def.url_param_name: name})
     r = requests.get(r_url, headers=headers)
     raise_layman_error(r)
@@ -318,7 +318,7 @@ get_workspace_layer = partial(get_workspace_publication, LAYER_TYPE)
 def get_workspace_layer_style(workspace, layer, headers=None):
     with app.app_context():
         r_url = url_for('rest_workspace_layer_style.get',
-                        username=workspace,
+                        workspace=workspace,
                         layername=layer)
     r = requests.get(r_url, headers=headers)
     raise_layman_error(r)
@@ -340,7 +340,7 @@ def delete_workspace_publication(publication_type, workspace, name, headers=None
 
     with app.app_context():
         r_url = url_for(publication_type_def.delete_workspace_publication_url,
-                        username=workspace,
+                        workspace=workspace,
                         **{publication_type_def.url_param_name: name})
 
     return finish_delete(workspace, r_url, headers, skip_404=skip_404)
@@ -356,7 +356,7 @@ def delete_workspace_publications(publication_type, workspace, headers=None, ):
 
     with app.app_context():
         r_url = url_for(publication_type_def.delete_workspace_publications_url,
-                        username=workspace,
+                        workspace=workspace,
                         )
 
     return finish_delete(workspace, r_url, headers, )
@@ -380,7 +380,7 @@ assert_workspace_maps = partial(assert_workspace_publications, MAP_TYPE)
 def get_workspace_publication_metadata_comparison(publication_type, workspace, name, headers=None):
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     with app.app_context():
-        r_url = url_for(publication_type_def.get_workspace_metadata_comparison_url, **{publication_type_def.url_param_name: name}, username=workspace)
+        r_url = url_for(publication_type_def.get_workspace_metadata_comparison_url, **{publication_type_def.url_param_name: name}, workspace=workspace)
     r = requests.get(r_url, headers=headers)
     raise_layman_error(r)
     return r.json()

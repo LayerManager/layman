@@ -18,8 +18,8 @@ def test_style_value():
     process_client.publish_workspace_layer(username, layername)
 
     with app.app_context():
-        layer_url = url_for('rest_workspace_layer.get', username=username, layername=layername)
-        expected_style_url = url_for('rest_workspace_layer_style.get', username=username, layername=layername)
+        layer_url = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
+        expected_style_url = url_for('rest_workspace_layer_style.get', workspace=username, layername=layername)
     r = requests.get(layer_url)
     assert r.status_code == 200, r.text
     resp_json = json.loads(r.text)

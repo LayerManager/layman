@@ -29,7 +29,7 @@ def after_request(response):
 
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['GET'])
-def get(username, layername):
+def get(workspace, layername):
     app.logger.info(f"GET Layer, user={g.user}")
 
     info = util.get_complete_layer_info(cached=True)
@@ -39,7 +39,7 @@ def get(username, layername):
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['PATCH'])
 @util.lock_decorator
-def patch(username, layername):
+def patch(workspace, layername):
     app.logger.info(f"PATCH Layer, user={g.user}")
 
     info = util.get_complete_layer_info(cached=True)
@@ -102,16 +102,16 @@ def patch(username, layername):
             filenames = files
         else:
             filenames = [f.filename for f in files]
-        input_file.check_filenames(username, layername, filenames,
+        input_file.check_filenames(workspace, layername, filenames,
                                    check_crs, ignore_existing_files=True)
 
-    props_to_refresh = util.get_same_or_missing_prop_names(username, layername)
+    props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
 
     layer_result = {}
 
     if delete_from is not None:
-        deleted = util.delete_layer(username, layername, source=delete_from, http_method='patch')
+        deleted = util.delete_layer(workspace, layername, source=delete_from, http_method='patch')
         if style_file is None:
             try:
                 style_file = deleted['style']['file']
@@ -121,7 +121,7 @@ def patch(username, layername):
         kwargs['style_type'] = style_type
         kwargs['store_in_geoserver'] = style_type.store_in_geoserver
         if style_file:
-            input_style.save_layer_file(username, layername, style_file, style_type)
+            input_style.save_layer_file(workspace, layername, style_file, style_type)
 
         kwargs.update({
             'crs_id': crs_id,
@@ -134,7 +134,7 @@ def patch(username, layername):
 
             if use_chunk_upload:
                 files_to_upload = input_chunk.save_layer_files_str(
-                    username, layername, files, check_crs)
+                    workspace, layername, files, check_crs)
                 layer_result.update({
                     'files_to_upload': files_to_upload,
                 })
@@ -143,17 +143,17 @@ def patch(username, layername):
                 })
             else:
                 input_file.save_layer_files(
-                    username, layername, files, check_crs)
+                    workspace, layername, files, check_crs)
     kwargs.update({'actor_name': authn.get_authn_username()})
 
     rest_util.setup_patch_access_rights(request.form, kwargs)
-    util.pre_publication_action_check(username,
+    util.pre_publication_action_check(workspace,
                                       layername,
                                       kwargs,
                                       )
 
     util.patch_layer(
-        username,
+        workspace,
         layername,
         kwargs,
         delete_from,
@@ -161,7 +161,7 @@ def patch(username, layername):
     )
 
     app.logger.info('PATCH Layer changes done')
-    info = util.get_complete_layer_info(username, layername)
+    info = util.get_complete_layer_info(workspace, layername)
     info.update(layer_result)
 
     return jsonify(info), 200
@@ -169,14 +169,14 @@ def patch(username, layername):
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['DELETE'])
 @util.lock_decorator
-def delete_layer(username, layername):
+def delete_layer(workspace, layername):
     app.logger.info(f"DELETE Layer, user={g.user}")
 
     info = util.get_complete_layer_info(cached=True)
 
-    util.abort_layer_tasks(username, layername)
+    util.abort_layer_tasks(workspace, layername)
 
-    util.delete_layer(username, layername)
+    util.delete_layer(workspace, layername)
 
     app.logger.info('DELETE Layer done')
 
