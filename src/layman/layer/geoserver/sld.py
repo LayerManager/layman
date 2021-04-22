@@ -44,10 +44,10 @@ def delete_layer(workspace, layername):
     return result
 
 
-def get_layer_info(username, layername):
-    r = get_style_response(username, layername, geoserver.headers_sld, settings.LAYMAN_GS_AUTH)
+def get_layer_info(workspace, layername):
+    r = get_style_response(workspace, layername, geoserver.headers_sld, settings.LAYMAN_GS_AUTH)
     if r.status_code == 200:
-        url = url_for('rest_workspace_layer_style.get', workspace=username, layername=layername)
+        url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=layername)
         info = {
             'style': {
                 'url': url,

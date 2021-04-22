@@ -42,19 +42,19 @@ def delete_layer(username, layername):
     util.delete_layer_subdir(username, layername, LAYER_SUBDIR)
 
 
-def get_layer_info(username, layername):
-    input_file_dir = get_layer_input_file_dir(username, layername)
+def get_layer_info(workspace, layername):
+    input_file_dir = get_layer_input_file_dir(workspace, layername)
     pattern = os.path.join(input_file_dir, layername + '.*')
     filenames = glob.glob(pattern)
     main_filename = get_main_file_name(filenames)
     if main_filename is not None:
-        main_filename = os.path.relpath(main_filename, common_util.get_workspace_dir(username))
+        main_filename = os.path.relpath(main_filename, common_util.get_workspace_dir(workspace))
         result = {
             'file': {
                 'path': main_filename
             }
         }
-    elif os.path.exists(util.get_layer_dir(username, layername)):
+    elif os.path.exists(util.get_layer_dir(workspace, layername)):
         result = {
             'name': layername
         }

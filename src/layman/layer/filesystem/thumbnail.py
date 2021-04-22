@@ -24,14 +24,14 @@ def ensure_layer_thumbnail_dir(username, layername):
     return thumbnail_dir
 
 
-def get_layer_info(username, layername):
-    thumbnail_path = get_layer_thumbnail_path(username, layername)
+def get_layer_info(workspace, layername):
+    thumbnail_path = get_layer_thumbnail_path(workspace, layername)
     if os.path.exists(thumbnail_path):
         return {
             'thumbnail': {
-                'url': url_for('rest_workspace_layer_thumbnail.get', workspace=username,
+                'url': url_for('rest_workspace_layer_thumbnail.get', workspace=workspace,
                                layername=layername),
-                'path': os.path.relpath(thumbnail_path, common_util.get_workspace_dir(username))
+                'path': os.path.relpath(thumbnail_path, common_util.get_workspace_dir(workspace))
             }
         }
     return {}

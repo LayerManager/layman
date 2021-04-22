@@ -115,13 +115,13 @@ def clear_cache(username):
     mem_redis.delete(key)
 
 
-def get_layer_info(username, layername):
-    wfs = get_wfs_proxy(username)
+def get_layer_info(workspace, layername):
+    wfs = get_wfs_proxy(workspace)
     if wfs is None:
         return {}
-    wfs_proxy_url = get_wfs_url(username, external_url=True)
+    wfs_proxy_url = get_wfs_url(workspace, external_url=True)
 
-    wfs_layername = f"{username}:{layername}"
+    wfs_layername = f"{workspace}:{layername}"
     if wfs_layername not in wfs.contents:
         return {}
     return {
