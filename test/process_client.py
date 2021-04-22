@@ -108,7 +108,7 @@ def raise_layman_error(response, status_codes_to_skip=None):
 
 
 def patch_workspace_publication(publication_type,
-                                username,
+                                workspace,
                                 name,
                                 file_paths=None,
                                 headers=None,
@@ -126,7 +126,7 @@ def patch_workspace_publication(publication_type,
 
     with app.app_context():
         r_url = url_for(publication_type_def.patch_workspace_publication_url,
-                        username=username,
+                        username=workspace,
                         **{publication_type_def.url_param_name: name})
 
     for fp in file_paths:
@@ -155,11 +155,11 @@ def patch_workspace_publication(publication_type,
 
     with app.app_context():
         url = url_for(publication_type_def.get_workspace_publication_url,
-                      username=username,
+                      username=workspace,
                       **{publication_type_def.url_param_name: name})
     wait_for_rest(url, 30, 0.5, check_response_fn, headers=headers)
-    wfs.clear_cache(username)
-    wms.clear_cache(username)
+    wfs.clear_cache(workspace)
+    wms.clear_cache(workspace)
     return r.json()
 
 
@@ -168,14 +168,14 @@ patch_workspace_layer = partial(patch_workspace_publication, LAYER_TYPE)
 
 
 def ensure_workspace_publication(publication_type,
-                                 username,
+                                 workspace,
                                  name,
                                  headers=None,
                                  access_rights=None,
                                  ):
     headers = headers or {}
 
-    r = get_workspace_publications(publication_type, username, headers=headers, )
+    r = get_workspace_publications(publication_type, workspace, headers=headers, )
     publication_obj = next((publication for publication in r.json() if publication['name'] == name), None)
     if r.status_code == 200 and publication_obj:
         patch_needed = False
@@ -185,11 +185,11 @@ def ensure_workspace_publication(publication_type,
             if 'write' in access_rights and set(access_rights['write'].split(',')) != set(publication_obj['access_rights']['write']):
                 patch_needed = True
         if patch_needed:
-            result = patch_workspace_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
+            result = patch_workspace_publication(publication_type, workspace, name, access_rights=access_rights, headers=headers)
         else:
             result = None
     else:
-        result = publish_workspace_publication(publication_type, username, name, access_rights=access_rights, headers=headers)
+        result = publish_workspace_publication(publication_type, workspace, name, access_rights=access_rights, headers=headers)
     return result
 
 
@@ -198,7 +198,7 @@ ensure_workspace_map = partial(ensure_workspace_publication, MAP_TYPE)
 
 
 def publish_workspace_publication(publication_type,
-                                  username,
+                                  workspace,
                                   name,
                                   file_paths=None,
                                   headers=None,
@@ -217,7 +217,7 @@ def publish_workspace_publication(publication_type,
         assert publication_type == LAYER_TYPE
 
     with app.app_context():
-        r_url = url_for(publication_type_def.post_workspace_publication_url, username=username)
+        r_url = url_for(publication_type_def.post_workspace_publication_url, username=workspace)
 
     for fp in file_paths:
         assert os.path.isfile(fp), fp
@@ -248,7 +248,7 @@ def publish_workspace_publication(publication_type,
 
     with app.app_context():
         url = url_for(publication_type_def.get_workspace_publication_url,
-                      username=username,
+                      username=workspace,
                       **{publication_type_def.url_param_name: name})
     wait_for_rest(url, 30, 0.5, check_response_fn, headers=headers)
     return r.json()[0]
@@ -298,13 +298,13 @@ get_maps = partial(get_publications, MAP_TYPE)
 get_layers = partial(get_publications, LAYER_TYPE)
 
 
-def get_workspace_publication(publication_type, username, name, headers=None, ):
+def get_workspace_publication(publication_type, workspace, name, headers=None, ):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
         r_url = url_for(publication_type_def.get_workspace_publication_url,
-                        username=username,
+                        username=workspace,
                         **{publication_type_def.url_param_name: name})
     r = requests.get(r_url, headers=headers)
     raise_layman_error(r)
@@ -325,41 +325,41 @@ def get_workspace_layer_style(workspace, layer, headers=None):
     return ET.parse(io.BytesIO(r.content))
 
 
-def finish_delete(username, url, headers, skip_404=False, ):
+def finish_delete(workspace, url, headers, skip_404=False, ):
     r = requests.delete(url, headers=headers)
     status_codes_to_skip = {404} if skip_404 else set()
     raise_layman_error(r, status_codes_to_skip)
-    wfs.clear_cache(username)
-    wms.clear_cache(username)
+    wfs.clear_cache(workspace)
+    wms.clear_cache(workspace)
     return r.json()
 
 
-def delete_workspace_publication(publication_type, username, name, headers=None, skip_404=False, ):
+def delete_workspace_publication(publication_type, workspace, name, headers=None, skip_404=False, ):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
         r_url = url_for(publication_type_def.delete_workspace_publication_url,
-                        username=username,
+                        username=workspace,
                         **{publication_type_def.url_param_name: name})
 
-    return finish_delete(username, r_url, headers, skip_404=skip_404)
+    return finish_delete(workspace, r_url, headers, skip_404=skip_404)
 
 
 delete_workspace_map = partial(delete_workspace_publication, MAP_TYPE)
 delete_workspace_layer = partial(delete_workspace_publication, LAYER_TYPE)
 
 
-def delete_workspace_publications(publication_type, username, headers=None, ):
+def delete_workspace_publications(publication_type, workspace, headers=None, ):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
         r_url = url_for(publication_type_def.delete_workspace_publications_url,
-                        username=username,
+                        username=workspace,
                         )
 
-    return finish_delete(username, r_url, headers, )
+    return finish_delete(workspace, r_url, headers, )
 
 
 delete_workspace_maps = partial(delete_workspace_publications, MAP_TYPE)

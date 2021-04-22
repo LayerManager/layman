@@ -154,8 +154,8 @@ class TestResponsesClass:
         (process_client.get_maps, dict(), expected_maps),
         (process_client.get_workspace_layers, {'workspace': workspace}, expected_layers),
         (process_client.get_workspace_maps, {'workspace': workspace}, expected_maps),
-        (process_client.get_workspace_layer, {'username': workspace, 'name': publication}, expected_layer),
-        (process_client.get_workspace_map, {'username': workspace, 'name': publication}, expected_map),
+        (process_client.get_workspace_layer, {'workspace': workspace, 'name': publication}, expected_layer),
+        (process_client.get_workspace_map, {'workspace': workspace, 'name': publication}, expected_map),
     ])
     def test_rest_responses(query_method, method_params, expected_info, ):
         response = query_method(**method_params)
