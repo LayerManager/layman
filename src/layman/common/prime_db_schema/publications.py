@@ -221,9 +221,9 @@ from {DB_SCHEMA}.workspaces w inner join
 
 
 def only_valid_names(users_list):
-    usernames_for_chesk = set(users_list)
-    usernames_for_chesk.discard(ROLE_EVERYONE)
-    for username in usernames_for_chesk:
+    usernames_for_check = set(users_list)
+    usernames_for_check.discard(ROLE_EVERYONE)
+    for username in usernames_for_check:
         info = users.get_user_infos(username)
         if not info:
             raise LaymanError(43, f'Not existing user. Username={username}')
