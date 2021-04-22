@@ -52,8 +52,8 @@ def patch_map(workspace, mapname, file_changed=True):
 get_publication_uuid = input_file.get_publication_uuid
 
 
-def delete_map(username, mapname):
-    util.delete_map_subdir(username, mapname, MAP_SUBDIR)
+def delete_map(workspace, mapname):
+    util.delete_map_subdir(workspace, mapname, MAP_SUBDIR)
 
 
 def get_map_thumbnail_path(username, mapname):

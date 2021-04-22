@@ -23,8 +23,8 @@ def ensure_map_input_file_dir(username, mapname):
     return input_file_dir
 
 
-def delete_map(username, mapname):
-    util.delete_map_subdir(username, mapname, MAP_SUBDIR)
+def delete_map(workspace, mapname):
+    util.delete_map_subdir(workspace, mapname, MAP_SUBDIR)
 
 
 def get_map_file(username, mapname):
