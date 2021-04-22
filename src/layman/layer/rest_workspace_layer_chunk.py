@@ -26,7 +26,7 @@ def after_request(response):
 
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/chunk", methods=['POST'])
-def post(username, layername):
+def post(workspace, layername):
     app.logger.info(f"POST Layer Chunk, user={g.user}")
 
     total_chunks = request.form.get('resumableTotalChunks', type=int)
@@ -43,7 +43,7 @@ def post(username, layername):
                                       type=str)
     chunk = request.files['file']
 
-    input_chunk.save_layer_file_chunk(username, layername, parameter_name,
+    input_chunk.save_layer_file_chunk(workspace, layername, parameter_name,
                                       filename, chunk,
                                       chunk_number, total_chunks)
     # time.sleep(5)
@@ -54,7 +54,7 @@ def post(username, layername):
 
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/chunk", methods=['GET'])
-def get(username, layername):
+def get(workspace, layername):
     app.logger.info(f"GET Layer Chunk, user={g.user}")
 
     chunk_number = request.args.get('resumableChunkNumber', default=1,
@@ -65,7 +65,7 @@ def get(username, layername):
                                       type=str)
 
     chunk_exists = input_chunk.layer_file_chunk_exists(
-        username, layername, parameter_name, filename, chunk_number)
+        workspace, layername, parameter_name, filename, chunk_number)
 
     if chunk_exists:
         result = jsonify({

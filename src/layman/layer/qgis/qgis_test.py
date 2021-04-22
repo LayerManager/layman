@@ -24,7 +24,7 @@ def test_qgis_rest():
     assert os.path.exists(workspace_directory)
     assert os.path.exists(layer_directory)
     with app.app_context():
-        url = layman_util.url_for('rest_workspace_layer_style.get', username=workspace, layername=layer)
+        url = layman_util.url_for('rest_workspace_layer_style.get', workspace=workspace, layername=layer)
         assert wms.get_layer_info(workspace, layer) == {'name': layer,
                                                         'style': {'type': 'qml',
                                                                   'url': url},

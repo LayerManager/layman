@@ -32,7 +32,7 @@ def after_request(response):
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>", methods=['GET'])
-def get(username, mapname):
+def get(workspace, mapname):
     app.logger.info(f"GET Map, user={g.user}")
 
     info = util.get_complete_map_info(cached=True)
@@ -42,7 +42,7 @@ def get(username, mapname):
 
 @bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>", methods=['PATCH'])
 @util.lock_decorator
-def patch(username, mapname):
+def patch(workspace, mapname):
     app.logger.info(f"PATCH Map, user={g.user}")
 
     info = util.get_complete_map_info(cached=True)
@@ -71,16 +71,16 @@ def patch(username, mapname):
     else:
         description = info['description']
 
-    props_to_refresh = util.get_same_or_missing_prop_names(username, mapname)
+    props_to_refresh = util.get_same_or_missing_prop_names(workspace, mapname)
     metadata_properties_to_refresh = props_to_refresh
     if file is not None:
-        thumbnail.delete_map(username, mapname)
+        thumbnail.delete_map(workspace, mapname)
         file = FileStorage(
             io.BytesIO(json.dumps(file_json).encode()),
             file.filename
         )
         input_file.save_map_files(
-            username, mapname, [file])
+            workspace, mapname, [file])
 
     file_changed = file is not None
     kwargs = {
@@ -93,34 +93,34 @@ def patch(username, mapname):
     }
 
     rest_util.setup_patch_access_rights(request.form, kwargs)
-    util.pre_publication_action_check(username,
+    util.pre_publication_action_check(workspace,
                                       mapname,
                                       kwargs,
                                       )
 
     util.patch_map(
-        username,
+        workspace,
         mapname,
         kwargs,
         'layman.map.filesystem.input_file' if file_changed else None
     )
 
-    info = util.get_complete_map_info(username, mapname)
+    info = util.get_complete_map_info(workspace, mapname)
 
     return jsonify(info), 200
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>", methods=['DELETE'])
 @util.lock_decorator
-def delete_map(username, mapname):
+def delete_map(workspace, mapname):
     app.logger.info(f"DELETE Map, user={g.user}")
 
     # raise exception if map does not exist
     info = util.get_complete_map_info(cached=True)
 
-    util.abort_map_tasks(username, mapname)
+    util.abort_map_tasks(workspace, mapname)
 
-    util.delete_map(username, mapname)
+    util.delete_map(workspace, mapname)
 
     app.logger.info('DELETE Map done')
 

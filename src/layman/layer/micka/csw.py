@@ -41,7 +41,7 @@ def get_layer_info(workspace, layername):
                 'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
                 'record_url': settings.CSW_RECORD_URL.format(identifier=muuid),
-                'comparison_url': url_for('rest_workspace_layer_metadata_comparison.get', username=workspace, layername=layername),
+                'comparison_url': url_for('rest_workspace_layer_metadata_comparison.get', workspace=workspace, layername=layername),
             }
         }
     return {}
@@ -159,7 +159,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         revision_date=revision_date.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
-        identifier=url_for('rest_workspace_layer.get', username=workspace, layername=layername),
+        identifier=url_for('rest_workspace_layer.get', workspace=workspace, layername=layername),
         identifier_label=layername,
         extent=extent,
         wms_url=wms.get_wms_url(workspace, external_url=True),
@@ -216,12 +216,12 @@ def _get_property_values(
             'label': identifier_label,
         },
         'abstract': abstract,
-        'graphic_url': url_for('rest_workspace_layer_thumbnail.get', username=workspace, layername=layername),
+        'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
         'extent': extent,
 
         'wms_url': f"{wms.add_capabilities_params_to_url(wms_url)}&LAYERS={layername}",
         'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={layername}",
-        'layer_endpoint': url_for('rest_workspace_layer.get', username=workspace, layername=layername),
+        'layer_endpoint': url_for('rest_workspace_layer.get', workspace=workspace, layername=layername),
         'scale_denominator': scale_denominator,
         'language': languages,
         'md_organisation_name': md_organisation_name,

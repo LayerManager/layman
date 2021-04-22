@@ -37,8 +37,8 @@ celery_app = make_celery(app)
 from .util import get_workspace_blueprints, get_blueprints
 
 for bp in get_workspace_blueprints():
-    app.register_blueprint(bp, url_prefix=f'/rest/{settings.REST_WORKSPACES_PREFIX}/<username>')
-    app.register_blueprint(bp, url_prefix='/rest/<username>')
+    app.register_blueprint(bp, url_prefix=f'/rest/{settings.REST_WORKSPACES_PREFIX}/<workspace>')
+    app.register_blueprint(bp, url_prefix='/rest/<workspace>')
 
 for bp in get_blueprints():
     app.register_blueprint(bp, url_prefix=f'/rest')

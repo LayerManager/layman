@@ -28,7 +28,7 @@ def test_get_layer_title():
 
     # layers.GET
     with app.app_context():
-        url = layman_util.url_for('rest_workspace_layers.get', username=username)
+        url = layman_util.url_for('rest_workspace_layers.get', workspace=username)
     rv = requests.get(url)
     assert rv.status_code == 200, rv.text
 

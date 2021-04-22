@@ -28,13 +28,13 @@ def after_request(response):
 
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/style", methods=['GET'])
-def get(username, layername):
-    app.logger.info(f"GET Style, user={g.user}, username={username}, layername={layername}")
+def get(workspace, layername):
+    app.logger.info(f"GET Style, user={g.user}, workspace={workspace}, layername={layername}")
 
-    style_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['access_rights'], })['style_type']
+    style_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['access_rights'], })['style_type']
     result = None
     if style_type == 'sld':
-        response = sld.get_style_response(username,
+        response = sld.get_style_response(workspace,
                                           layername,
                                           auth=settings.LAYMAN_GS_AUTH)
         excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
@@ -45,7 +45,7 @@ def get(username, layername):
                                   headers)
         result = final_response
     elif style_type == 'qml':
-        response_qml = qgis_wms.get_style_qml(username,
+        response_qml = qgis_wms.get_style_qml(workspace,
                                               layername,
                                               )
         result = Response(response_qml, mimetype='application/x-qgis-layer-settings')

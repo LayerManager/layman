@@ -80,14 +80,14 @@ def test_parse_md_properties():
             'title': 'World places and boundaries',
             'publication_date': '2007-05-25',
             'identifier': {
-                'identifier': layman_util.url_for('rest_workspace_map.get', username='testuser1', mapname='svet'),
+                'identifier': layman_util.url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet'),
                 'label': 'svet',
             },
             'abstract': 'World places and boundaries abstract',
-            'graphic_url': layman_util.url_for('rest_workspace_map_thumbnail.get', username='testuser1', mapname='svet'),
+            'graphic_url': layman_util.url_for('rest_workspace_map_thumbnail.get', workspace='testuser1', mapname='svet'),
             'extent': [-35, -48.5, 179, 81.5],
-            'map_endpoint': layman_util.url_for('rest_workspace_map.get', username='testuser1', mapname='svet'),
-            'map_file_endpoint': layman_util.url_for('rest_workspace_map_file.get', username='testuser1', mapname='svet'),
+            'map_endpoint': layman_util.url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet'),
+            'map_file_endpoint': layman_util.url_for('rest_workspace_map_file.get', workspace='testuser1', mapname='svet'),
             'operates_on': [
                 {
                     'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-39cc8994-adbc-427a-8522-569eb7e691b2#_m-39cc8994-adbc-427a-8522-569eb7e691b2',
@@ -117,15 +117,15 @@ def test_fill_xml_template(client):
             'title': 'World places and boundaries',
             'publication_date': '2007-05-25',
             'identifier': {
-                'identifier': layman_util.url_for('rest_workspace_map.get', username='testuser1', mapname='svet'),
+                'identifier': layman_util.url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet'),
                 'label': 'svet',
             },
             'abstract': 'World places and boundaries abstract',
             'organisation_name': None,
-            'graphic_url': layman_util.url_for('rest_workspace_map_thumbnail.get', username='testuser1', mapname='svet'),
+            'graphic_url': layman_util.url_for('rest_workspace_map_thumbnail.get', workspace='testuser1', mapname='svet'),
             'extent': [-35, -48.5, 179, 81.5],
-            'map_endpoint': layman_util.url_for('rest_workspace_map.get', username='testuser1', mapname='svet'),
-            'map_file_endpoint': layman_util.url_for('rest_workspace_map_file.get', username='testuser1', mapname='svet'),
+            'map_endpoint': layman_util.url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet'),
+            'map_file_endpoint': layman_util.url_for('rest_workspace_map_file.get', workspace='testuser1', mapname='svet'),
             'md_language': 'cze',
             'operates_on': [
                 {

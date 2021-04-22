@@ -67,7 +67,7 @@ num_layers_before_test = 0
 
 def check_metadata(client, username, layername, props_equal, expected_values):
     with app.app_context():
-        rest_path = url_for('rest_workspace_layer_metadata_comparison.get', username=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer_metadata_comparison.get', workspace=username, layername=layername)
         rv = client.get(rest_path)
         assert rv.status_code == 200, rv.get_json()
         resp_json = rv.get_json()
@@ -113,7 +113,7 @@ def app_context():
 def test_wrong_value_of_user(client):
     usernames = [' ', '2a', 'ě', ';', '?', 'ABC']
     for username in usernames:
-        rv = client.post(url_for('rest_workspace_layers.post', username=username))
+        rv = client.post(url_for('rest_workspace_layers.post', workspace=username))
         resp_json = rv.get_json()
         # print('username', username)
         # print(resp_json)
@@ -131,7 +131,7 @@ def test_layman_gs_user_conflict(client):
 
     username = settings.LAYMAN_GS_USER
     layername = 'layer1'
-    rest_path = url_for('rest_workspace_layers.post', username=username)
+    rest_path = url_for('rest_workspace_layers.post', workspace=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
     ]
@@ -162,7 +162,7 @@ def test_wrong_value_of_layername(client):
     layernames = [' ', '2a', 'ě', ';', '?', 'ABC']
     for layername in layernames:
         with app.app_context():
-            rv = client.get(url_for('rest_workspace_layer.get', username=username, layername=layername))
+            rv = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername))
         resp_json = rv.get_json()
         assert rv.status_code == 400, resp_json
         assert resp_json['code'] == 2
@@ -171,7 +171,7 @@ def test_wrong_value_of_layername(client):
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_no_file(client):
-    rv = client.post(url_for('rest_workspace_layers.post', username='testuser1'))
+    rv = client.post(url_for('rest_workspace_layers.post', workspace='testuser1'))
     assert rv.status_code == 400
     resp_json = rv.get_json()
     # print('resp_json', resp_json)
@@ -183,7 +183,7 @@ def test_no_file(client):
 def test_username_schema_conflict(client):
     if len(settings.PG_NON_USER_SCHEMAS) == 0:
         return
-    rv = client.post(url_for('rest_workspace_layers.post', username=settings.PG_NON_USER_SCHEMAS[0]))
+    rv = client.post(url_for('rest_workspace_layers.post', workspace=settings.PG_NON_USER_SCHEMAS[0]))
     assert rv.status_code == 409
     resp_json = rv.get_json()
     # print(resp_json)
@@ -195,7 +195,7 @@ def test_username_schema_conflict(client):
         'pg_toast',
         'information_schema',
     ]:
-        rv = client.post(url_for('rest_workspace_layers.post', username=schema_name), data={
+        rv = client.post(url_for('rest_workspace_layers.post', workspace=schema_name), data={
             'file': [
                 (io.BytesIO(min_geojson.encode()), '/file.geojson')
             ]
@@ -217,7 +217,7 @@ def test_layername_db_object_conflict(client):
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(url_for('rest_workspace_layers.post', username='testuser1'), data={
+        rv = client.post(url_for('rest_workspace_layers.post', workspace='testuser1'), data={
             'file': files,
             'name': 'spatial_ref_sys',
         })
@@ -236,7 +236,7 @@ def test_get_layers_testuser1_v1(client):
     # publish and delete layer to ensure that username exists
     flask_client.publish_layer(username, layername, client)
     flask_client.delete_layer(username, layername, client)
-    rv = client.get(url_for('rest_workspace_layers.get', username=username))
+    rv = client.get(url_for('rest_workspace_layers.get', workspace=username))
     assert rv.status_code == 200, rv.get_json()
     # assert len(resp_json) == 0
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -249,7 +249,7 @@ def test_post_layers_simple(client):
     with app.app_context():
         username = 'testuser1'
 
-        rest_path = url_for('rest_workspace_layers.post', username=username)
+        rest_path = url_for('rest_workspace_layers.post', workspace=username)
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
         ]
@@ -307,14 +307,14 @@ def test_post_layers_simple(client):
             layername
         )
 
-        layer_info = client.get(url_for('rest_workspace_layer.get', username=username, layername=layername)).get_json()
+        layer_info = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername)).get_json()
         assert set(layer_info['metadata'].keys()) == {'identifier', 'csw_url', 'record_url', 'comparison_url'}
         assert layer_info['metadata']['identifier'] == f"m-{uuid_str}"
         assert layer_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
         md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
         assert layer_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
         assert layer_info['metadata']['comparison_url'] == url_for('rest_workspace_layer_metadata_comparison.get',
-                                                                   username=username, layername=layername)
+                                                                   workspace=username, layername=layername)
         assert 'id' not in layer_info.keys()
         assert 'type' not in layer_info.keys()
 
@@ -330,13 +330,13 @@ def test_post_layers_simple(client):
         expected_md_values = {
             'abstract': None,
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', username=username, layername=layername),
+            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
             'identifier': {
-                'identifier': url_for('rest_workspace_layer.get', username=username, layername=layername),
+                'identifier': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
                 'label': 'ne_110m_admin_0_countries'
             },
             'language': ['eng'],
-            'layer_endpoint': url_for('rest_workspace_layer.get', username=username, layername=layername),
+            'layer_endpoint': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -351,7 +351,7 @@ def test_post_layers_simple(client):
 def test_post_layers_concurrent(client):
     username = 'testuser1'
     layername = 'countries_concurrent'
-    rest_path = url_for('rest_workspace_layers.post', username=username)
+    rest_path = url_for('rest_workspace_layers.post', workspace=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
@@ -392,7 +392,7 @@ def test_post_layers_concurrent(client):
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_shp_missing_extensions(client):
     username = 'testuser1'
-    rest_path = url_for('rest_workspace_layers.post', username=username)
+    rest_path = url_for('rest_workspace_layers.post', workspace=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp',
@@ -425,7 +425,7 @@ def test_post_layers_shp_missing_extensions(client):
 def test_post_layers_shp(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries_shp'
-    rest_path = url_for('rest_workspace_layers.post', username=username)
+    rest_path = url_for('rest_workspace_layers.post', workspace=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
@@ -494,7 +494,7 @@ def test_post_layers_shp(client):
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_layer_exists(client):
     username = 'testuser1'
-    rest_path = url_for('rest_workspace_layers.post', username=username)
+    rest_path = url_for('rest_workspace_layers.post', workspace=username)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
@@ -521,7 +521,7 @@ def test_post_layers_layer_exists(client):
 def test_post_layers_complex(client):
     with app.app_context():
         username = 'testuser2'
-        rest_path = url_for('rest_workspace_layers.post', username=username)
+        rest_path = url_for('rest_workspace_layers.post', workspace=username)
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
         ]
@@ -562,7 +562,7 @@ def test_post_layers_complex(client):
         assert wms['countries'].styles[username + '_wms:countries']['title'] == 'Generic Blue'
 
         assert layername != ''
-        rest_path = url_for('rest_workspace_layer.get', username=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
         rv = client.get(rest_path)
         assert 200 <= rv.status_code < 300
         resp_json = rv.get_json()
@@ -602,13 +602,13 @@ def test_post_layers_complex(client):
         expected_md_values = {
             'abstract': "popis st\u00e1t\u016f",
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', username=username, layername=layername),
+            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
             'identifier': {
-                "identifier": url_for('rest_workspace_layer.get', username=username, layername=layername),
+                "identifier": url_for('rest_workspace_layer.get', workspace=username, layername=layername),
                 "label": "countries"
             },
             'language': ["eng"],
-            'layer_endpoint': url_for('rest_workspace_layer.get', username=username, layername=layername),
+            'layer_endpoint': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -623,7 +623,7 @@ def test_post_layers_complex(client):
 def test_uppercase_attr(client):
     with app.app_context():
         username = 'testuser2'
-        rest_path = url_for('rest_workspace_layers.post', username=username)
+        rest_path = url_for('rest_workspace_layers.post', workspace=username)
         file_paths = [
             'sample/data/upper_attr.geojson',
         ]
@@ -654,7 +654,7 @@ def test_uppercase_attr(client):
         assert celery_util.is_task_ready(last_task)
 
     with app.app_context():
-        rest_path = url_for('rest_workspace_layer.get', username=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
         rv = client.get(rest_path)
         assert 200 <= rv.status_code < 300
         resp_json = rv.get_json()
@@ -693,7 +693,7 @@ def test_uppercase_attr(client):
         assert os.path.getsize(th_path) > 5000
 
     with app.app_context():
-        rest_path = url_for('rest_workspace_layer.delete_layer', username=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
         rv = client.delete(rest_path)
         assert 200 <= rv.status_code < 300
 
@@ -708,7 +708,7 @@ def test_get_layers_testuser1_v2(client):
     layer1 = 'countries_concurrent'
     layer2 = 'ne_110m_admin_0_countries'
     layer3 = 'ne_110m_admin_0_countries_shp'
-    rv = client.get(url_for('rest_workspace_layers.get', username=username))
+    rv = client.get(url_for('rest_workspace_layers.get', workspace=username))
     assert rv.status_code == 200
     resp_json = rv.get_json()
     # assert len(resp_json) == 3
@@ -721,7 +721,7 @@ def test_get_layers_testuser1_v2(client):
         assert ln in layernames
 
     username = 'testuser2'
-    rv = client.get(url_for('rest_workspace_layers.get', username=username))
+    rv = client.get(url_for('rest_workspace_layers.get', workspace=username))
     resp_json = rv.get_json()
     assert rv.status_code == 200
     assert len(resp_json) == 1
@@ -737,7 +737,7 @@ def test_patch_layer_title(client):
     with app.app_context():
         username = 'testuser1'
         layername = 'ne_110m_admin_0_countries'
-        rest_path = url_for('rest_workspace_layer.patch', username=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.patch', workspace=username, layername=layername)
         new_title = "New Title of Countries"
         new_description = "and new description"
         rv = client.patch(rest_path, data={
@@ -757,13 +757,13 @@ def test_patch_layer_title(client):
         expected_md_values = {
             'abstract': "and new description",
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', username=username, layername=layername),
+            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
             'identifier': {
-                'identifier': url_for('rest_workspace_layer.get', username=username, layername=layername),
+                'identifier': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
                 'label': 'ne_110m_admin_0_countries'
             },
             'language': ['eng'],
-            'layer_endpoint': url_for('rest_workspace_layer.get', username=username, layername=layername),
+            'layer_endpoint': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -784,7 +784,7 @@ def test_patch_layer_style(client):
     with app.app_context():
         username = 'testuser1'
         layername = 'ne_110m_admin_0_countries'
-        rest_path = url_for('rest_workspace_layer.patch', username=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.patch', workspace=username, layername=layername)
         sld_path = 'sample/style/generic-blue_sld.xml'
         assert os.path.isfile(sld_path)
         rv = client.patch(rest_path, data={
@@ -823,13 +823,13 @@ def test_patch_layer_style(client):
         expected_md_values = {
             'abstract': "and new description",
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', username=username, layername=layername),
+            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
             'identifier': {
-                'identifier': url_for('rest_workspace_layer.get', username=username, layername=layername),
+                'identifier': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
                 'label': 'ne_110m_admin_0_countries'
             },
             'language': ['eng'],
-            'layer_endpoint': url_for('rest_workspace_layer.get', username=username, layername=layername),
+            'layer_endpoint': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -844,7 +844,7 @@ def test_patch_layer_style(client):
 def test_post_layers_sld_1_1_0(client):
     username = 'testuser1'
     layername = 'countries_sld_1_1_0'
-    rest_path = url_for('rest_workspace_layers.post', username=username, layername=layername)
+    rest_path = url_for('rest_workspace_layers.post', workspace=username, layername=layername)
 
     file_paths = [
         'sample/data/test_layer4.geojson',
@@ -900,7 +900,7 @@ def test_post_layers_sld_1_1_0(client):
         f'{LAYER_TYPE}': num_layers_before_test + 5
     })
 
-    rest_path = url_for('rest_workspace_layer.delete_layer', username=username, layername=layername)
+    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
     rv = client.delete(rest_path)
     assert rv.status_code == 200
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -913,7 +913,7 @@ def test_patch_layer_data(client):
     with app.app_context():
         username = 'testuser2'
         layername = 'countries'
-        rest_path = url_for('rest_workspace_layer.patch', username=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.patch', workspace=username, layername=layername)
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
         ]
@@ -942,7 +942,7 @@ def test_patch_layer_data(client):
         # last_task['last'].get()
 
     with app.app_context():
-        rest_path = url_for('rest_workspace_layer.get', username=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
         rv = client.get(rest_path)
         assert 200 <= rv.status_code < 300
 
@@ -964,13 +964,13 @@ def test_patch_layer_data(client):
         expected_md_values = {
             'abstract': "popis st\u00e1t\u016f",
             'extent': [-175.22056435043098, -41.29999116752133, 179.21664802661394, 64.15002486626597],
-            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', username=username, layername=layername),
+            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
             'identifier': {
-                'identifier': url_for('rest_workspace_layer.get', username=username, layername=layername),
+                'identifier': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
                 "label": "countries"
             },
             'language': ["eng", 'chi', 'rus'],
-            'layer_endpoint': url_for('rest_workspace_layer.get', username=username, layername=layername),
+            'layer_endpoint': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -986,7 +986,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
     with app.app_context():
         username = 'testuser2'
         layername = 'countries'
-        rest_path = url_for('rest_workspace_layer.patch', username=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.patch', workspace=username, layername=layername)
         file_paths = [
             'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
         ]
@@ -1033,7 +1033,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
         })
 
     with app.app_context():
-        rest_path = url_for('rest_workspace_layer.delete_layer', username=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
         rv = client.delete(rest_path)
         assert rv.status_code == 200
 
@@ -1056,7 +1056,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_long_and_delete_it(client):
     username = 'testuser1'
-    rest_path = url_for('rest_workspace_layers.post', username=username)
+    rest_path = url_for('rest_workspace_layers.post', workspace=username)
     file_paths = [
         'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
     ]
@@ -1084,10 +1084,10 @@ def test_post_layers_long_and_delete_it(client):
     for key_to_check in keys_to_check:
         assert 'status' in layer_info[key_to_check]
 
-    rest_path = url_for('rest_workspace_layer.delete_layer', username=username, layername=layername)
+    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
     rv = client.delete(rest_path)
     assert rv.status_code == 200
-    rv = client.get(url_for('rest_workspace_layer.get', username=username, layername=layername))
+    rv = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername))
     # print(resp_json)
     assert rv.status_code == 404
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -1099,14 +1099,14 @@ def test_post_layers_long_and_delete_it(client):
 def test_delete_layer(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
-    rest_path = url_for('rest_workspace_layer.delete_layer', username=username, layername=layername)
+    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
     rv = client.delete(rest_path)
     assert rv.status_code == 200
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 2
     })
 
-    rest_path = url_for('rest_workspace_layer.delete_layer', username=username, layername=layername)
+    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
     rv = client.delete(rest_path)
     assert rv.status_code == 404
     resp_json = rv.get_json()
@@ -1116,7 +1116,7 @@ def test_delete_layer(client):
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_zero_length_attribute(client):
     username = 'testuser1'
-    rest_path = url_for('rest_workspace_layers.post', username=username)
+    rest_path = url_for('rest_workspace_layers.post', workspace=username)
     file_paths = [
         'sample/data/zero_length_attribute.geojson',
     ]
@@ -1142,7 +1142,7 @@ def test_post_layers_zero_length_attribute(client):
     assert layer_info['db_table']['status'] == 'FAILURE'
     assert layer_info['db_table']['error']['code'] == 28
 
-    rest_path = url_for('rest_workspace_layer.delete_layer', username=username, layername=layername)
+    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
     rv = client.delete(rest_path)
     assert rv.status_code == 200
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -1153,7 +1153,7 @@ def test_post_layers_zero_length_attribute(client):
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_get_layers_testuser2(client):
     username = 'testuser2'
-    rv = client.get(url_for('rest_workspace_layers.get', username=username))
+    rv = client.get(url_for('rest_workspace_layers.get', workspace=username))
     assert rv.status_code == 200
     resp_json = rv.get_json()
     assert len(resp_json) == 0

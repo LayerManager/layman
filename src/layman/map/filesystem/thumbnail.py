@@ -36,7 +36,7 @@ def get_map_info(username, mapname):
     if os.path.exists(thumbnail_path):
         return {
             'thumbnail': {
-                'url': url_for('rest_workspace_map_thumbnail.get', username=username,
+                'url': url_for('rest_workspace_map_thumbnail.get', workspace=username,
                                mapname=mapname),
                 'path': os.path.relpath(thumbnail_path, common_util.get_user_dir(username))
             }
@@ -70,7 +70,7 @@ def post_map(username, mapname):
 
 
 def generate_map_thumbnail(username, mapname, editor):
-    map_file_get_url = url_for('rest_workspace_map_file.get', username=username, mapname=mapname)
+    map_file_get_url = url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname)
 
     params = urlencode({
         'map_def_url': map_file_get_url,

@@ -93,7 +93,7 @@ def test_two_clients():
 @pytest.mark.usefixtures('app_context')
 def test_no_auth_header(client):
     username = 'testuser1'
-    rv = client.get(url_for('rest_workspace_layers.get', username=username), headers={
+    rv = client.get(url_for('rest_workspace_layers.get', workspace=username), headers={
         f'{ISS_URL_HEADER}': 'abc'
     })
     assert rv.status_code == 403
@@ -113,7 +113,7 @@ def test_no_auth_header(client):
 @pytest.mark.usefixtures('app_context')
 def test_auth_header_one_part(client, headers):
     username = 'testuser1'
-    rv = client.get(url_for('rest_workspace_layers.get', username=username), headers=headers)
+    rv = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
@@ -131,7 +131,7 @@ def test_auth_header_one_part(client, headers):
 @pytest.mark.usefixtures('app_context')
 def test_auth_header_bad_first_part(client, headers):
     username = 'testuser1'
-    rv = client.get(url_for('rest_workspace_layers.get', username=username), headers=headers)
+    rv = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
@@ -149,7 +149,7 @@ def test_auth_header_bad_first_part(client, headers):
 @pytest.mark.usefixtures('app_context')
 def test_auth_header_no_access_token(client, headers):
     username = 'testuser1'
-    rv = client.get(url_for('rest_workspace_layers.get', username=username), headers=headers)
+    rv = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
@@ -165,7 +165,7 @@ def test_auth_header_no_access_token(client, headers):
 @pytest.mark.usefixtures('app_context')
 def test_no_provider_found(client, headers):
     username = 'testuser1'
-    rv = client.get(url_for('rest_workspace_layers.get', username=username), headers=headers)
+    rv = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
@@ -183,7 +183,7 @@ def test_no_provider_found(client, headers):
 @pytest.mark.usefixtures('app_context', 'unexisting_introspection_url')
 def test_unexisting_introspection_url(client, headers):
     username = 'testuser1'
-    rv = client.get(url_for('rest_workspace_layers.get', username=username), headers=headers)
+    rv = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
     assert rv.status_code == 403
     resp_json = rv.get_json()
     assert resp_json['code'] == 32
@@ -201,7 +201,7 @@ def test_unexisting_introspection_url(client, headers):
 @pytest.mark.usefixtures('app_context', 'inactive_token_introspection_url', 'ensure_layman')
 def test_token_inactive(client, headers):
     username = 'testuser1'
-    url = url_for('rest_workspace_layers.get', username=username)
+    url = url_for('rest_workspace_layers.get', workspace=username)
     rv = client.get(url, headers=headers)
     assert rv.status_code == 403
     resp_json = rv.get_json()
@@ -220,7 +220,7 @@ def test_token_inactive(client, headers):
 @pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'ensure_layman')
 def test_token_active(client, headers):
     username = 'testuser1'
-    url = url_for('rest_workspace_layers.get', username=username)
+    url = url_for('rest_workspace_layers.get', workspace=username)
     rv = client.get(url, headers=headers)
     assert rv.status_code == 404
     resp_json = rv.get_json()
@@ -360,7 +360,7 @@ def test_patch_current_user_without_username():
     process_client.publish_workspace_map(workspace, mapname, headers=user1_authn_headers)
 
     with app.app_context():
-        rest_path = url_for('rest_workspace_map_file.get', username=workspace, mapname=mapname)
+        rest_path = url_for('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)
     r = requests.get(rest_path, headers=user1_authn_headers)
     assert r.status_code == 200, r.text
     resp_json = r.json()

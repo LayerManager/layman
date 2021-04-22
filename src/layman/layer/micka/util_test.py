@@ -89,11 +89,11 @@ def test_parse_md_properties():
                 'label': 'MZP-CORINE',
             },
             'abstract': None,
-            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', username='browser', layername='layer'),
+            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace='browser', layername='layer'),
             'extent': [11.87, 48.12, 19.13, 51.59],
             'wms_url': 'http://www.env.cz/corine/data/download.zip',
             'wfs_url': 'http://www.env.cz/corine/data/download.zip',
-            'layer_endpoint': url_for('rest_workspace_layer.get', username='browser', layername='layer'),
+            'layer_endpoint': url_for('rest_workspace_layer.get', workspace='browser', layername='layer'),
         }
     assert set(props.keys()) == set(expected.keys())
     for k, value in props.items():

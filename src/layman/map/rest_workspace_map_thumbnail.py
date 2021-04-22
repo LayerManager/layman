@@ -29,12 +29,12 @@ def after_request(response):
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>/thumbnail", methods=['GET'])
-def get(username, mapname):
+def get(workspace, mapname):
     app.logger.info(f"GET Map Thumbnail, user={g.user}")
 
-    thumbnail_info = thumbnail.get_map_info(username, mapname)
+    thumbnail_info = thumbnail.get_map_info(workspace, mapname)
     if thumbnail_info:
-        userdir = get_user_dir(username)
+        userdir = get_user_dir(workspace)
         thumbnail_path = thumbnail_info['thumbnail']['path']
         thumbnail_path = os.path.join(userdir, thumbnail_path)
         return send_file(thumbnail_path, mimetype='image/png')

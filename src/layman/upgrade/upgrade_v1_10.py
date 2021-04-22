@@ -222,7 +222,7 @@ def migrate_metadata_records(workspace_filter=None):
         except requests.exceptions.ReadTimeout:
             md_props = list(map_csw.get_metadata_comparison(workspace, map).values())
             md_map_endpoint = md_props[0]['map_endpoint'] if md_props else None
-            exp_map_endpoint = util.url_for('rest_workspace_map.get', username=workspace, mapname=map)
+            exp_map_endpoint = util.url_for('rest_workspace_map.get', workspace=workspace, mapname=map)
             if md_map_endpoint != exp_map_endpoint:
                 logger.exception(
                     f'        Map endpoint was not migrated (should be {exp_map_endpoint}, but is {md_map_endpoint})!')

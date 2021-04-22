@@ -109,4 +109,4 @@ NO_STYLE_DEF = STYLE_TYPES_DEF[0]
 
 
 def get_workspace_publication_url(workspace, publication_name):
-    return url_for('rest_workspace_layer.get', layername=publication_name, username=workspace)
+    return url_for('rest_workspace_layer.get', layername=publication_name, workspace=workspace)

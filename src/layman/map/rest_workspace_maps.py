@@ -31,15 +31,15 @@ def after_request(response):
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}", methods=['GET'])
-def get(username):
+def get(workspace):
     app.logger.info(f"GET Maps, user={g.user}")
 
     user = get_authn_username()
-    return rest_common.get_publications(MAP_TYPE, user, request_args=request.args, workspace=username)
+    return rest_common.get_publications(MAP_TYPE, user, request_args=request.args, workspace=workspace)
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}", methods=['POST'])
-def post(username):
+def post(workspace):
     app.logger.info(f"POST Maps, user={g.user}")
 
     # FILE
@@ -55,7 +55,7 @@ def post(username):
         unsafe_mapname = input_file.get_unsafe_mapname(file_json)
     mapname = util.to_safe_map_name(unsafe_mapname)
     util.check_mapname(mapname)
-    info = util.get_map_info(username, mapname)
+    info = util.get_map_info(workspace, mapname)
     if info:
         raise LaymanError(24, {'mapname': mapname})
 
@@ -73,9 +73,9 @@ def post(username):
     else:
         description = file_json.get('abstract', '')
 
-    mapurl = url_for('rest_workspace_map.get', mapname=mapname, username=username)
+    mapurl = url_for('rest_workspace_map.get', mapname=mapname, workspace=workspace)
 
-    redis_util.lock_publication(username, MAP_TYPE, mapname, request.method)
+    redis_util.lock_publication(workspace, MAP_TYPE, mapname, request.method)
 
     try:
         map_result = {
@@ -92,12 +92,12 @@ def post(username):
         }
 
         rest_common.setup_post_access_rights(request.form, kwargs, actor_name)
-        util.pre_publication_action_check(username,
+        util.pre_publication_action_check(workspace,
                                           mapname,
                                           kwargs,
                                           )
         # register map uuid
-        uuid_str = uuid.assign_map_uuid(username, mapname)
+        uuid_str = uuid.assign_map_uuid(workspace, mapname)
         kwargs['uuid'] = uuid_str
 
         map_result.update({
@@ -109,20 +109,20 @@ def post(username):
             file.filename
         )
         input_file.save_map_files(
-            username, mapname, [file])
+            workspace, mapname, [file])
 
         util.post_map(
-            username,
+            workspace,
             mapname,
             kwargs,
             'layman.map.filesystem.input_file'
         )
     except Exception as e:
         try:
-            if util.is_map_task_ready(username, mapname):
-                redis_util.unlock_publication(username, MAP_TYPE, mapname)
+            if util.is_map_task_ready(workspace, mapname):
+                redis_util.unlock_publication(workspace, MAP_TYPE, mapname)
         finally:
-            redis_util.unlock_publication(username, MAP_TYPE, mapname)
+            redis_util.unlock_publication(workspace, MAP_TYPE, mapname)
         raise e
 
     # app.logger.info('uploaded map '+mapname)
@@ -130,10 +130,10 @@ def post(username):
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}", methods=['DELETE'])
-def delete(username):
+def delete(workspace):
     app.logger.info(f"DELETE Maps, user={g.user}")
 
-    infos = layman_util.delete_publications(username,
+    infos = layman_util.delete_publications(workspace,
                                             MAP_TYPE,
                                             29,
                                             util.is_map_task_ready,

@@ -43,9 +43,9 @@ def check_mapname_decorator(f):
 def info_decorator(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        username = request.view_args['username']
+        workspace = request.view_args['workspace']
         mapname = request.view_args['mapname']
-        info = get_complete_map_info(username, mapname)
+        info = get_complete_map_info(workspace, mapname)
         assert FLASK_INFO_KEY not in g, g.get(FLASK_INFO_KEY)
         # current_app.logger.info(f"Setting INFO of map {username}:{mapname}")
         g.setdefault(FLASK_INFO_KEY, info)
@@ -161,7 +161,7 @@ def get_complete_map_info(username=None, mapname=None, cached=False):
 
     complete_info = {
         'name': mapname,
-        'url': url_for('rest_workspace_map.get', mapname=mapname, username=username),
+        'url': url_for('rest_workspace_map.get', mapname=mapname, workspace=username),
         'title': mapname,
         'description': '',
         'file': {
@@ -295,7 +295,7 @@ def get_metadata_comparison(username, mapname):
             soap_operates_on = next(iter(partial_infos[soap_idx].values()))['operates_on']
         operates_on_muuids_filter = micka_util.operates_on_values_to_muuids(soap_operates_on)
         layman_file_props = map_file_to_metadata_properties(map_json, operates_on_muuids_filter)
-        map_file_url = url_for('rest_workspace_map_file.get', mapname=mapname, username=username)
+        map_file_url = url_for('rest_workspace_map_file.get', mapname=mapname, workspace=username)
         all_props[map_file_url] = layman_file_props
 
     return metadata_common.transform_metadata_props_to_comparison(all_props)

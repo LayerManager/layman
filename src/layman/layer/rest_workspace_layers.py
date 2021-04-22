@@ -28,15 +28,15 @@ def after_request(response):
 
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}", methods=['GET'])
-def get(username):
+def get(workspace):
     app.logger.info(f"GET Layers, user={g.user}")
 
     user = get_authn_username()
-    return rest_common.get_publications(LAYER_TYPE, user, request_args=request.args, workspace=username)
+    return rest_common.get_publications(LAYER_TYPE, user, request_args=request.args, workspace=workspace)
 
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}", methods=['POST'])
-def post(username):
+def post(workspace):
     app.logger.info(f"POST Layers, user={g.user}")
 
     # FILE
@@ -63,10 +63,10 @@ def post(username):
         unsafe_layername = input_file.get_unsafe_layername(files)
     layername = util.to_safe_layer_name(unsafe_layername)
     util.check_layername(layername)
-    info = util.get_layer_info(username, layername)
+    info = util.get_layer_info(workspace, layername)
     if info:
         raise LaymanError(17, {'layername': layername})
-    util.check_new_layername(username, layername)
+    util.check_new_layername(workspace, layername)
 
     # CRS
     crs_id = None
@@ -107,12 +107,12 @@ def post(username):
     }
 
     rest_common.setup_post_access_rights(request.form, task_options, actor_name)
-    util.pre_publication_action_check(username,
+    util.pre_publication_action_check(workspace,
                                       layername,
                                       task_options,
                                       )
 
-    layerurl = url_for('rest_workspace_layer.get', layername=layername, username=username)
+    layerurl = url_for('rest_workspace_layer.get', layername=layername, workspace=workspace)
 
     layer_result = {
         'name': layername,
@@ -124,23 +124,23 @@ def post(username):
         filenames = files
     else:
         filenames = [f.filename for f in files]
-    input_file.check_filenames(username, layername, filenames, check_crs)
+    input_file.check_filenames(workspace, layername, filenames, check_crs)
 
-    redis_util.lock_publication(username, LAYER_TYPE, layername, request.method)
+    redis_util.lock_publication(workspace, LAYER_TYPE, layername, request.method)
 
     try:
         # register layer uuid
-        uuid_str = uuid.assign_layer_uuid(username, layername)
+        uuid_str = uuid.assign_layer_uuid(workspace, layername)
         layer_result.update({
             'uuid': uuid_str,
         })
         task_options.update({'uuid': uuid_str, })
 
         # save files
-        input_style.save_layer_file(username, layername, style_file, style_type)
+        input_style.save_layer_file(workspace, layername, style_file, style_type)
         if use_chunk_upload:
             files_to_upload = input_chunk.save_layer_files_str(
-                username, layername, files, check_crs)
+                workspace, layername, files, check_crs)
             layer_result.update({
                 'files_to_upload': files_to_upload,
             })
@@ -149,20 +149,20 @@ def post(username):
             })
         else:
             input_file.save_layer_files(
-                username, layername, files, check_crs)
+                workspace, layername, files, check_crs)
 
         util.post_layer(
-            username,
+            workspace,
             layername,
             task_options,
             'layman.layer.filesystem.input_chunk' if use_chunk_upload else 'layman.layer.filesystem.input_file'
         )
     except Exception as e:
         try:
-            if util.is_layer_task_ready(username, layername):
-                redis_util.unlock_publication(username, LAYER_TYPE, layername)
+            if util.is_layer_task_ready(workspace, layername):
+                redis_util.unlock_publication(workspace, LAYER_TYPE, layername)
         finally:
-            redis_util.unlock_publication(username, LAYER_TYPE, layername)
+            redis_util.unlock_publication(workspace, LAYER_TYPE, layername)
         raise e
 
     # app.logger.info('uploaded layer '+layername)
@@ -170,10 +170,10 @@ def post(username):
 
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}", methods=['DELETE'])
-def delete(username):
+def delete(workspace):
     app.logger.info(f"DELETE Layers, user={g.user}")
 
-    infos = layman_util.delete_publications(username,
+    infos = layman_util.delete_publications(workspace,
                                             LAYER_TYPE,
                                             19,
                                             util.is_layer_task_ready,
