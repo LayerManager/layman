@@ -18,7 +18,7 @@ def pre_publication_action_check(workspace, layername):
     pass
 
 
-def post_layer(username, layername):
+def post_layer(workspace, layername):
     pass
 
 

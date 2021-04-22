@@ -37,7 +37,7 @@ def get_layer_info(workspace, layername):
     return result
 
 
-def post_layer(username, layername):
+def post_layer(workspace, layername):
     pass
 
 
