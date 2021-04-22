@@ -14,7 +14,7 @@ def delete_whole_user(username):
     pass
 
 
-def ensure_workspace(username):
+def ensure_workspace(workspace):
     pass
 
 
