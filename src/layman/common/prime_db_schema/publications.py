@@ -1,10 +1,11 @@
 import logging
 import psycopg2.extras
 
+from db import util as db_util
 from layman import settings, LaymanError
 from layman.authn import is_user_with_name
 from layman.common import get_publications_consts as consts
-from . import util, workspaces, users, rights
+from . import workspaces, users, rights
 
 logger = logging.getLogger(__name__)
 
@@ -172,7 +173,7 @@ from {DB_SCHEMA}.workspaces w inner join
     # Put it together
     sql_params = select_params + where_params + order_by_params + pagination_params
     select = select_clause + where_clause + order_by_clause + pagination_clause
-    values = util.run_query(select, sql_params)
+    values = db_util.run_query(select, sql_params)
 
     # print(f'get_publication_infos:\n\nselect={select}\n\nsql_params={sql_params}\n\n&&&&&&&&&&&&&&&&&')
 
@@ -204,7 +205,7 @@ from {DB_SCHEMA}.workspaces w inner join
         """
         sql_params = where_params
         select = count_clause + where_clause
-        count = util.run_query(select, sql_params)
+        count = db_util.run_query(select, sql_params)
         total_count = count[0][-1]
 
     if infos:
@@ -321,7 +322,7 @@ returning id
             ROLE_EVERYONE in info['access_rights']['read'],
             ROLE_EVERYONE in info['access_rights']['write'],
             )
-    pub_id = util.run_query(insert_publications_sql, data)[0][0]
+    pub_id = db_util.run_query(insert_publications_sql, data)[0][0]
 
     read_users = clear_roles(info['access_rights']['read'], workspace_name)
     write_users = clear_roles(info['access_rights']['write'], workspace_name)
@@ -385,7 +386,7 @@ returning id
             info.get("name"),
             info.get("publ_type_name"),
             )
-    pub_id = util.run_query(update_publications_sql, data)[0][0]
+    pub_id = db_util.run_query(update_publications_sql, data)[0][0]
 
     for right_type in right_type_list:
         rights.insert_rights(pub_id, access_rights_changes[right_type]['add'], right_type)
@@ -402,9 +403,9 @@ def delete_publication(workspace_name, type, name):
             rights.delete_rights_for_publication(id_publication)
             id_workspace = workspace_info["id"]
             sql = f"""delete from {DB_SCHEMA}.publications p where p.id_workspace = %s and p.name = %s and p.type = %s;"""
-            util.run_statement(sql, (id_workspace,
-                                     name,
-                                     type,))
+            db_util.run_statement(sql, (id_workspace,
+                                        name,
+                                        type,))
         else:
             logger.warning(f'Deleting NON existing publication. workspace_name={workspace_name}, type={type}, pub_name={name}')
     else:
@@ -418,4 +419,4 @@ def set_bbox(workspace, publication_type, publication, bbox):
       and name = %s
       and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
     params = bbox + (publication_type, publication, workspace,)
-    util.run_statement(query, params)
+    db_util.run_statement(query, params)

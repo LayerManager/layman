@@ -2,11 +2,11 @@ import datetime
 from test import process_client, util as test_util, data as test_data
 import pytest
 
+from db import util as db_util
 from layman import app, settings
 from layman.common import geoserver as gs_common
 from layman.common.filesystem import uuid as uuid_common
 from layman.common.micka import util as micka_util
-from layman.common.prime_db_schema import util as db_util
 from layman.layer import geoserver as gs_layer, NO_STYLE_DEF, db
 from layman.layer.geoserver import wms
 from layman.layer.prime_db_schema import table as prime_db_schema_table

@@ -1,7 +1,7 @@
 import logging
 
+from db import util as db_util
 from layman import settings
-from . import util
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 logger = logging.getLogger(__name__)
@@ -21,17 +21,17 @@ def insert_rights(id_publication,
 returning id
 ;'''
     for username in users:
-        util.run_query(sql, (id_publication,
-                             type,
-                             username,
-                             ))
+        db_util.run_query(sql, (id_publication,
+                                type,
+                                username,
+                                ))
 
 
 def delete_rights_for_publication(id_publication):
     sql = f'''delete from {DB_SCHEMA}.rights where id_publication = %s;'''
-    util.run_statement(sql,
-                       (id_publication,)
-                       )
+    db_util.run_statement(sql,
+                          (id_publication,)
+                          )
 
 
 def remove_rights(id_publication, users_list, right_type):
@@ -43,9 +43,9 @@ where id_publication = %s
                       {DB_SCHEMA}.workspaces w on w.id = u.id_workspace
                  where w.name = %s);'''
     for username in users_list:
-        util.run_statement(sql,
-                           (id_publication,
-                            right_type,
-                            username,
-                            )
-                           )
+        db_util.run_statement(sql,
+                              (id_publication,
+                               right_type,
+                               username,
+                               )
+                              )

@@ -1,5 +1,6 @@
+from db import util as db_util
 from layman import settings
-from . import util, workspaces
+from . import workspaces
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
@@ -22,14 +23,14 @@ def ensure_user(id_workspace, userinfo):
                 userinfo["issuer_id"],
                 userinfo["sub"],
                 )
-        ids = util.run_query(sql, data)
+        ids = db_util.run_query(sql, data)
         result = ids[0][0]
     return result
 
 
 def delete_user(username):
     sql = f"delete from {DB_SCHEMA}.users where id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);"
-    deleted = util.run_statement(sql, (username,))
+    deleted = db_util.run_statement(sql, (username,))
     if deleted:
         workspaces.delete_workspace(username)
 
@@ -65,7 +66,7 @@ from {DB_SCHEMA}.workspaces w inner join
 order by w.name asc
 ;"""
     params = (username, iss_sub.get('issuer_id'), iss_sub.get('sub'), id_workspace)
-    values = util.run_query(sql, params)
+    values = db_util.run_query(sql, params)
     result = {username: {"id": user_id,
                          "username": username,
                          "preferred_username": preferred_username,

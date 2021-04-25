@@ -1,6 +1,6 @@
+from db import util as db_util
 from layman import settings, patch_mode
 from layman.http import LaymanError
-from . import get_connection_cursor
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
@@ -19,7 +19,7 @@ def patch_layer(workspace, layername):
 
 def get_layer_info(workspace, layername, conn_cur=None):
     if conn_cur is None:
-        conn_cur = get_connection_cursor()
+        conn_cur = db_util.get_connection_cursor()
     _, cur = conn_cur
     try:
         cur.execute(f"""
@@ -44,7 +44,7 @@ WHERE schemaname = '{workspace}'
 
 def delete_layer(workspace, layername, conn_cur=None):
     if conn_cur is None:
-        conn_cur = get_connection_cursor()
+        conn_cur = db_util.get_connection_cursor()
     conn, cur = conn_cur
     query = f"""
     DROP TABLE IF EXISTS "{workspace}"."{layername}" CASCADE

@@ -1,7 +1,7 @@
 import pytest
 
+from db import util as db_util
 from layman import upgrade, app, settings
-from layman.common.prime_db_schema import util as db_util
 from . import consts
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 

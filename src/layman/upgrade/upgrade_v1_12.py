@@ -5,9 +5,9 @@ import time
 import requests
 import psycopg2
 
+from db import util as db_util
 from layman import settings
 from layman.common.filesystem import util as fs_util
-from layman.common.prime_db_schema import util as db_util
 from layman.layer import LAYER_TYPE
 from layman.layer.geoserver import wms
 from layman.layer.micka import csw as layer_csw

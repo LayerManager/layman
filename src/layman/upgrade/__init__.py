@@ -1,9 +1,9 @@
 import logging
 import psycopg2
 
+from db import util as db_util
 from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_13
 from layman import settings
-from layman.common.prime_db_schema import util as db_util
 from . import consts
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA

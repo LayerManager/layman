@@ -2,11 +2,9 @@ from collections import defaultdict, namedtuple
 import math
 import os
 import logging
-import psycopg2
-from flask import g
 
+from db import util as db_util, PG_CONN
 from layman.common.language import get_languages_iso639_2
-from layman.common.prime_db_schema import util as db_util
 from layman.http import LaymanError
 from layman import settings
 
@@ -17,27 +15,9 @@ logger = logging.getLogger(__name__)
 ColumnInfo = namedtuple('ColumnInfo', 'name data_type')
 
 
-def create_connection_cursor():
-    try:
-        connection = psycopg2.connect(**settings.PG_CONN)
-        connection.set_session(autocommit=True)
-    except BaseException as exc:
-        raise LaymanError(6) from exc
-    cursor = connection.cursor()
-    return (connection, cursor)
-
-
-def get_connection_cursor():
-    key = FLASK_CONN_CUR_KEY
-    if key not in g:
-        conn_cur = create_connection_cursor()
-        g.setdefault(key, conn_cur)
-    return g.get(key)
-
-
 def get_workspaces(conn_cur=None):
     if conn_cur is None:
-        conn_cur = get_connection_cursor()
+        conn_cur = db_util.get_connection_cursor()
     _, cur = conn_cur
 
     try:
@@ -65,7 +45,7 @@ def check_username(username, conn_cur=None):
 
 def ensure_workspace(workspace, conn_cur=None):
     if conn_cur is None:
-        conn_cur = get_connection_cursor()
+        conn_cur = db_util.get_connection_cursor()
     conn, cur = conn_cur
 
     try:
@@ -79,7 +59,7 @@ def ensure_workspace(workspace, conn_cur=None):
 
 def delete_workspace(workspace, conn_cur=None):
     if conn_cur is None:
-        conn_cur = get_connection_cursor()
+        conn_cur = db_util.get_connection_cursor()
     conn, cur = conn_cur
 
     try:
@@ -115,7 +95,7 @@ def import_layer_vector_file_async(username, layername, main_filepath,
                                    crs_id):
     # import file to database table
     import subprocess
-    pg_conn = ' '.join([f"{k}='{v}'" for k, v in settings.PG_CONN.items()])
+    pg_conn = ' '.join([f"{k}='{v}'" for k, v in PG_CONN.items()])
     bash_args = [
         'ogr2ogr',
         '-t_srs', 'EPSG:3857',
@@ -148,7 +128,7 @@ def import_layer_vector_file_async(username, layername, main_filepath,
 
 def check_new_layername(workspace, layername, conn_cur=None):
     if conn_cur is None:
-        conn_cur = get_connection_cursor()
+        conn_cur = db_util.get_connection_cursor()
     _, cur = conn_cur
 
     # DB table name conflicts
@@ -166,7 +146,7 @@ def check_new_layername(workspace, layername, conn_cur=None):
 
 
 def get_text_column_names(username, layername, conn_cur=None):
-    _, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or db_util.get_connection_cursor()
 
     try:
         cur.execute(f"""
@@ -188,7 +168,7 @@ def get_all_column_names(username, layername, conn_cur=None):
 
 
 def get_all_column_infos(username, layername, conn_cur=None):
-    _, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or db_util.get_connection_cursor()
 
     try:
         cur.execute(f"""
@@ -205,7 +185,7 @@ AND table_name = '{layername}'
 
 
 def get_number_of_features(username, layername, conn_cur=None):
-    _, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or db_util.get_connection_cursor()
 
     try:
         cur.execute(f"""
@@ -220,7 +200,7 @@ from {username}.{layername}
 
 
 def get_text_data(username, layername, conn_cur=None):
-    _, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or db_util.get_connection_cursor()
     col_names = get_text_column_names(username, layername, conn_cur=conn_cur)
     if len(col_names) == 0:
         return [], 0
@@ -362,7 +342,7 @@ limit 1
 
 
 def get_most_frequent_lower_distance(username, layername, conn_cur=None):
-    _, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or db_util.get_connection_cursor()
 
     query = get_most_frequent_lower_distance_query(username, layername, [
         'ST_NPoints'
@@ -420,7 +400,7 @@ def guess_scale_denominator(username, layername):
 
 
 def get_most_frequent_lower_distance2(username, layername, conn_cur=None):
-    _, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or db_util.get_connection_cursor()
 
     query = get_most_frequent_lower_distance_query(username, layername, [
         'st_area', 'Box2D'
@@ -446,7 +426,7 @@ def get_most_frequent_lower_distance2(username, layername, conn_cur=None):
 
 
 def create_string_attributes(attribute_tuples, conn_cur=None):
-    _, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or db_util.get_connection_cursor()
     query = "\n".join([f"""ALTER TABLE {username}.{layername} ADD COLUMN {attrname} VARCHAR(1024);""" for username, layername, attrname in attribute_tuples]) + "\n COMMIT;"
     try:
         cur.execute(query)
@@ -456,7 +436,7 @@ def create_string_attributes(attribute_tuples, conn_cur=None):
 
 
 def get_missing_attributes(attribute_tuples, conn_cur=None):
-    _, cur = conn_cur or get_connection_cursor()
+    _, cur = conn_cur or db_util.get_connection_cursor()
 
     # Find all triples which do not already exist
     query = f"""select attribs.*
@@ -483,7 +463,7 @@ where c.column_name is null"""
 
 
 def ensure_attributes(attribute_tuples):
-    conn_cur = get_connection_cursor()
+    conn_cur = db_util.get_connection_cursor()
     missing_attributes = get_missing_attributes(attribute_tuples, conn_cur)
     if missing_attributes:
         create_string_attributes(missing_attributes, conn_cur)
@@ -506,7 +486,7 @@ def get_bbox(username, layername, conn_cur=None):
 
 
 def get_geometry_types(username, layername, conn_cur=None):
-    conn, cur = conn_cur or get_connection_cursor()
+    conn, cur = conn_cur or db_util.get_connection_cursor()
     try:
         sql = f"""
 select distinct ST_GeometryType(wkb_geometry) as geometry_type_name

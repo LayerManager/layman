@@ -6,10 +6,12 @@ import time
 import os
 from urllib.parse import urljoin
 import requests
+
+from db import util as db_util
 from layman import settings, util
 from layman.http import LaymanError
 from layman.common import prime_db_schema, geoserver as gs_common
-from layman.common.prime_db_schema import workspaces, util as db_util
+from layman.common.prime_db_schema import workspaces
 from layman.layer import LAYER_TYPE, geoserver
 from layman.layer.geoserver import wms, util as gs_util
 from layman.layer.micka import csw as layer_csw
