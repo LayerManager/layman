@@ -6,6 +6,7 @@ from collections import namedtuple
 from test import process_client, util
 import pytest
 
+from db import util as db_util
 from layman import app, settings
 from layman.util import url_for
 from layman.http import LaymanError
@@ -19,7 +20,6 @@ from layman.map import util as map_util
 from layman.common import geoserver as gs_common
 from layman.common.micka import util as micka_util
 from layman.common.filesystem import uuid as uuid_common
-from layman.common.prime_db_schema import util as db_util
 from layman.uuid import generate_uuid
 from . import upgrade_v1_10
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA

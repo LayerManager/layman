@@ -1,5 +1,5 @@
+from db import util as db_util
 from layman import settings
-from . import util
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
@@ -13,14 +13,14 @@ def ensure_workspace(name):
         values (%s)
         ON CONFLICT (name) DO update SET name = EXCLUDED.name returning id;"""
         data = (name, )
-        ids = util.run_query(sql, data)
+        ids = db_util.run_query(sql, data)
         result = ids[0][0]
     return result
 
 
 def delete_workspace(name):
     sql = f"delete from {DB_SCHEMA}.workspaces where name = %s;"
-    util.run_statement(sql, (name,))
+    db_util.run_statement(sql, (name,))
 
 
 def get_workspace_infos(name=None):
@@ -32,7 +32,7 @@ def get_workspace_infos(name=None):
                      or c.name is null)
     order by w.name asc
     ;"""
-    values = util.run_query(sql, (name,))
+    values = db_util.run_query(sql, (name,))
     result = {name: {"id": workspace_id,
                      "name": name,
                      } for workspace_id, name in

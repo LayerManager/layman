@@ -1,8 +1,9 @@
 import logging
 
+from db import util as db_util
 from layman import settings
 from layman.common import geoserver as gs_common
-from layman.common.prime_db_schema import util as db_util
+
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 logger = logging.getLogger(__name__)

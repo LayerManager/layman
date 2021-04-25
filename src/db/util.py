@@ -1,20 +1,22 @@
+import logging
 import re
 import psycopg2
-from flask import g, current_app as app
+from flask import g
 
-from layman import settings
-from layman.http import LaymanError
+from . import PG_CONN
+from .error import Error
 
+logger = logging.getLogger(__name__)
 
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 
 
 def create_connection_cursor():
     try:
-        connection = psycopg2.connect(**settings.PG_CONN)
+        connection = psycopg2.connect(**PG_CONN)
         connection.set_session(autocommit=True)
     except BaseException as exc:
-        raise LaymanError(6) from exc
+        raise Error(1) from exc
     cursor = connection.cursor()
     return connection, cursor
 
@@ -33,14 +35,14 @@ def run_query(query, data=None, conn_cur=None, encapsulate_exception=True, log_q
     conn, cur = conn_cur
     try:
         if log_query:
-            app.logger.info(f"query={cur.mogrify(query, data).decode()}")
+            logger.info(f"query={cur.mogrify(query, data).decode()}")
         cur.execute(query, data)
         rows = cur.fetchall()
         conn.commit()
     except BaseException as exc:
         if encapsulate_exception:
-            app.logger.error(f"run_query, query={query}, data={data}, exc={exc}")
-            raise LaymanError(7) from exc
+            logger.error(f"run_query, query={query}, data={data}, exc={exc}")
+            raise Error(2) from exc
         raise exc
 
     return rows
@@ -52,14 +54,14 @@ def run_statement(query, data=None, conn_cur=None, encapsulate_exception=True, l
     conn, cur = conn_cur
     try:
         if log_query:
-            app.logger.info(f"query={cur.mogrify(query, data).decode()}")
+            logger.info(f"query={cur.mogrify(query, data).decode()}")
         cur.execute(query, data)
         rows = cur.rowcount
         conn.commit()
     except BaseException as exc:
         if encapsulate_exception:
-            app.logger.error(f"run_query, query={query}, data={data}, exc={exc}")
-            raise LaymanError(7) from exc
+            logger.error(f"run_query, query={query}, data={data}, exc={exc}")
+            raise Error(2) from exc
         raise exc
     return rows
 

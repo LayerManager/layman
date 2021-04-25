@@ -2,6 +2,8 @@ import os
 import re
 from urllib.parse import urljoin, urlparse
 import redis
+
+import db
 from layman_settings_util import read_clients_dict_from_env
 
 LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
@@ -29,6 +31,7 @@ PG_CONN = {
     'user': LAYMAN_PG_USER,
     'password': LAYMAN_PG_PASSWORD,
 }
+db.PG_CONN = PG_CONN
 
 GEOSERVER_ADMIN_USER = 'admin'
 GEOSERVER_ADMIN_PASSWORD = os.getenv('GEOSERVER_ADMIN_PASSWORD', None)

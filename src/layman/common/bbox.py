@@ -1,4 +1,4 @@
-from layman.common.prime_db_schema import util as db_util
+from db import util as db_util
 
 
 def is_empty(bbox):

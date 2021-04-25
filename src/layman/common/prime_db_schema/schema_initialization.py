@@ -1,6 +1,7 @@
 import logging
 import os
 
+from db import util as db_util
 from layman import util as layman_util, settings
 from layman.http import LaymanError
 from layman.authn.filesystem import get_authn_info
@@ -8,7 +9,7 @@ from layman.common.prime_db_schema import workspaces, users
 from layman.util import get_workspaces as global_get_workspaces
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
-from . import util as db_util, model
+from . import model
 from ...layer.filesystem import util as fs_layer_util
 from ...map.filesystem import util as fs_map_util
 from ...map.filesystem.input_file import get_map_info
