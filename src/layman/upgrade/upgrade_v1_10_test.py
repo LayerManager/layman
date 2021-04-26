@@ -7,6 +7,7 @@ from test import process_client, util
 import pytest
 
 from db import util as db_util
+from geoserver import util as gs_util
 from layman import app, settings
 from layman.util import url_for
 from layman.http import LaymanError
@@ -17,7 +18,7 @@ from layman.layer.geoserver import wms
 from layman.layer.filesystem import util as layer_fs_util, input_style
 from layman.map.filesystem import input_file, thumbnail
 from layman.map import util as map_util
-from layman.common import geoserver as gs_common
+from layman.common.db import launder_attribute_name
 from layman.common.micka import util as micka_util
 from layman.common.filesystem import uuid as uuid_common
 from layman.uuid import generate_uuid
@@ -89,13 +90,13 @@ def ensure_layer():
             uuid_common.assign_publication_uuid('layman.layer', workspace, layer, uuid_str=uuid_str)
             db.ensure_workspace(workspace)
             db.import_layer_vector_file(workspace, layer, file_path, None)
-            created = gs_common.ensure_workspace(workspace, settings.LAYMAN_GS_AUTH)
+            created = gs_util.ensure_workspace(workspace, settings.LAYMAN_GS_AUTH)
             if created:
-                gs_common.create_db_store(workspace, settings.LAYMAN_GS_AUTH, db_schema=workspace)
+                gs_util.create_db_store(workspace, settings.LAYMAN_GS_AUTH, db_schema=workspace)
             gs_layer.publish_layer_from_db(workspace, layer, layer, layer, None, workspace)
             sld_file_path = 'sample/style/generic-blue_sld.xml'
             with open(sld_file_path, 'rb') as sld_file:
-                gs_common.post_workspace_sld_style(workspace, layer, sld_file)
+                gs_util.post_workspace_sld_style(workspace, layer, sld_file, launder_attribute_name)
             md_path = '/code/src/layman/upgrade/upgrade_v1_10_test_layer_metadata.xml'
             with open(md_path, 'r') as template_file:
                 md_template = template_file.read()
@@ -128,11 +129,11 @@ def test_migrate_layers_to_wms_workspace(ensure_layer):
     assert layer_info['wfs']['url'] == f'http://localhost:8000/geoserver/{workspace}/wfs'
     assert layer_info['db_table']['name'] == layer
 
-    all_workspaces = gs_common.get_all_workspaces(settings.LAYMAN_GS_AUTH)
+    all_workspaces = gs_util.get_all_workspaces(settings.LAYMAN_GS_AUTH)
     assert workspace in all_workspaces
     wms_workspace = wms.get_geoserver_workspace(workspace)
     assert wms_workspace not in all_workspaces
-    sld_wfs_r = gs_common.get_workspace_style_response(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
+    sld_wfs_r = gs_util.get_workspace_style_response(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
     assert sld_wfs_r.status_code == 200
 
     old_wms_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/" \
@@ -152,12 +153,12 @@ def test_migrate_layers_to_wms_workspace(ensure_layer):
     with app.app_context():
         assert layer_info['style']['url'] == url_for('rest_workspace_layer_style.get', workspace=workspace, layername=layer)
 
-    all_workspaces = gs_common.get_all_workspaces(settings.LAYMAN_GS_AUTH)
+    all_workspaces = gs_util.get_all_workspaces(settings.LAYMAN_GS_AUTH)
     assert workspace in all_workspaces
     assert wms_workspace in all_workspaces
-    sld_wfs_r = gs_common.get_workspace_style_response(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
+    sld_wfs_r = gs_util.get_workspace_style_response(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
     assert sld_wfs_r.status_code == 404
-    sld_wms_r = gs_common.get_workspace_style_response(wms_workspace, layer, auth=settings.LAYMAN_GS_AUTH)
+    sld_wms_r = gs_util.get_workspace_style_response(wms_workspace, layer, auth=settings.LAYMAN_GS_AUTH)
     assert sld_wms_r.status_code == 200
 
     sld_stream = process_client.get_workspace_layer_style(workspace, layer)

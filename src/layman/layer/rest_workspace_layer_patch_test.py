@@ -1,17 +1,18 @@
 from test import geoserver_client, process_client as client_util
 import pytest
 
+from geoserver import util as gs_util
 from layman import settings, app
-from layman.common import geoserver
 from layman.layer.prime_db_schema import table as prime_db_schema
+from layman.common import geoserver as gs_common
 from layman.common.prime_db_schema import users
 
 
 def assert_gs_user_and_roles(username):
     auth = settings.LAYMAN_GS_AUTH
-    gs_usernames = geoserver.get_usernames(auth)
+    gs_usernames = gs_util.get_usernames(auth)
     assert username in gs_usernames
-    gs_user_roles = geoserver.get_user_roles(username, auth)
+    gs_user_roles = gs_util.get_user_roles(username, auth)
     user_role = f"USER_{username.upper()}"
     assert user_role in gs_user_roles
     assert settings.LAYMAN_GS_ROLE in gs_user_roles
@@ -23,11 +24,11 @@ def assert_gs_layer_data_security(username,
     auth = settings.LAYMAN_GS_AUTH
     with app.app_context():
         is_personal_workspace = users.get_user_infos(username)
-    owner_and_everyone_roles = geoserver.layman_users_to_geoserver_roles({username, settings.RIGHTS_EVERYONE_ROLE})
-    owner_role_set = geoserver.layman_users_to_geoserver_roles({username})
+    owner_and_everyone_roles = gs_common.layman_users_to_geoserver_roles({username, settings.RIGHTS_EVERYONE_ROLE})
+    owner_role_set = gs_common.layman_users_to_geoserver_roles({username})
     for right_type in ['read', 'write']:
-        gs_expected_roles = geoserver.layman_users_to_geoserver_roles(expected_roles[right_type])
-        gs_roles = geoserver.get_security_roles(f'{username}.{layername}.{right_type[0]}', auth)
+        gs_expected_roles = gs_common.layman_users_to_geoserver_roles(expected_roles[right_type])
+        gs_roles = gs_util.get_security_roles(f'{username}.{layername}.{right_type[0]}', auth)
         assert gs_expected_roles == gs_roles\
             or (is_personal_workspace
                 and gs_expected_roles == owner_and_everyone_roles == gs_roles.union(owner_role_set)), right_type

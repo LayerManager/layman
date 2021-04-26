@@ -2,8 +2,9 @@ from urllib.parse import urljoin
 import logging
 import requests
 
+from geoserver import util as gs_util
 from layman import app, settings
-from layman.common import geoserver
+from layman.common import geoserver as gs_common
 from layman.common.prime_db_schema import schema_initialization
 from layman.layer import LAYER_TYPE
 from layman import util as layman_util
@@ -54,5 +55,5 @@ def upgrade_1_8():
             for (_, _, layer), info in layman_util.get_publication_infos(username, LAYER_TYPE).items():
                 logger.info(f'      Ensuring GS rules for user {username} and layer {layer}')
                 for type in ['read', 'write']:
-                    security_read_roles = geoserver.layman_users_to_geoserver_roles(info['access_rights'][type])
-                    geoserver.ensure_layer_security_roles(username, layer, security_read_roles, type[0], settings.LAYMAN_GS_AUTH)
+                    security_read_roles = gs_common.layman_users_to_geoserver_roles(info['access_rights'][type])
+                    gs_util.ensure_layer_security_roles(username, layer, security_read_roles, type[0], settings.LAYMAN_GS_AUTH)

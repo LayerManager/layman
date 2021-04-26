@@ -8,12 +8,14 @@ from urllib.parse import urljoin
 import requests
 
 from db import util as db_util
+from geoserver import util as gs_util
 from layman import settings, util
 from layman.http import LaymanError
-from layman.common import prime_db_schema, geoserver as gs_common
+from layman.common import prime_db_schema
+from layman.common.db import launder_attribute_name
 from layman.common.prime_db_schema import workspaces
 from layman.layer import LAYER_TYPE, geoserver
-from layman.layer.geoserver import wms, util as gs_util
+from layman.layer.geoserver import wms, util as layer_gs_util
 from layman.layer.micka import csw as layer_csw
 from layman.layer.filesystem import util as layer_fs_util, input_style
 from layman.map import MAP_TYPE
@@ -107,13 +109,13 @@ where p.type = %s
             r.raise_for_status()
             logger.info(f'        Layer already migrated.')
 
-        sld_wms_r = gs_common.get_workspace_style_response(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH)
+        sld_wms_r = gs_util.get_workspace_style_response(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH)
         if sld_wms_r.status_code == 404:
-            sld_r = gs_common.get_workspace_style_response(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
+            sld_r = gs_util.get_workspace_style_response(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
             if sld_r.status_code == 200:
                 sld_stream = io.BytesIO(sld_r.content)
-                gs_common.post_workspace_sld_style(geoserver_workspace, layer, sld_stream)
-                gs_common.delete_workspace_style(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
+                gs_util.post_workspace_sld_style(geoserver_workspace, layer, sld_stream, launder_attribute_name)
+                gs_util.delete_workspace_style(workspace, layer, auth=settings.LAYMAN_GS_AUTH)
                 wms.clear_cache(workspace)
             else:
                 logger.warning(f"      Error when loading SLD style from GeoServer, status code={sld_r.status_code}, response=\n{sld_r.content}")
@@ -135,7 +137,7 @@ def migrate_maps_on_wms_workspace():
     '''
     params = (MAP_TYPE,)
     publications = db_util.run_query(query, params)
-    gs_url = gs_util.get_gs_proxy_base_url()
+    gs_url = layer_gs_util.get_gs_proxy_base_url()
     gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
     gs_wms_url_pattern = r'^' + re.escape(gs_url) + r'(' + util.USERNAME_ONLY_PATTERN + r')' + r'(/(?:ows|wms|wfs).*)$'
     all_workspaces = workspaces.get_workspace_names()

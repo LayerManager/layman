@@ -6,13 +6,13 @@ from lxml import etree as ET
 
 from flask import Blueprint, g, current_app as app, request, Response
 
+from geoserver.util import reset as gs_reset
 from layman import authn, authz, settings
 from layman.authn import authenticate, is_user_with_name
 from layman.layer import db, LAYER_TYPE, util as layer_util
 from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import LAYERNAME_PATTERN, ATTRNAME_PATTERN
 from layman.util import USERNAME_ONLY_PATTERN
-from layman.common.geoserver import reset as gs_reset
 
 
 bp = Blueprint('geoserver_proxy_bp', __name__)

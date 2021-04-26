@@ -3,9 +3,10 @@ from urllib.parse import urljoin
 import requests
 from flask import g
 
+from geoserver import util as gs_util
 from layman.http import LaymanError
 from layman import settings, util as layman_util
-from layman.common import geoserver as common, bbox as bbox_util
+from layman.common import bbox as bbox_util, geoserver as gs_common
 from layman.layer import LAYER_TYPE, db as db_source
 from layman.layer.qgis import wms as qgis_wms
 from . import wms
@@ -23,36 +24,36 @@ headers_xml = {
 
 
 def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
-    common.ensure_user(username, None, auth)
-    role = common.username_to_rolename(username)
-    common.ensure_role(role, auth)
-    common.ensure_user_role(username, role, auth)
-    common.ensure_user_role(username, settings.LAYMAN_GS_ROLE, auth)
+    gs_util.ensure_user(username, None, auth)
+    role = gs_util.username_to_rolename(username)
+    gs_util.ensure_role(role, auth)
+    gs_util.ensure_user_role(username, role, auth)
+    gs_util.ensure_user_role(username, settings.LAYMAN_GS_ROLE, auth)
     ensure_workspace(username, auth)
 
 
 def delete_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
-    role = common.username_to_rolename(username)
+    role = gs_util.username_to_rolename(username)
     delete_workspace(username, auth)
-    common.delete_user_role(username, role, auth)
-    common.delete_user_role(username, settings.LAYMAN_GS_ROLE, auth)
-    common.delete_role(role, auth)
-    common.delete_user(username, auth)
+    gs_util.delete_user_role(username, role, auth)
+    gs_util.delete_user_role(username, settings.LAYMAN_GS_ROLE, auth)
+    gs_util.delete_role(role, auth)
+    gs_util.delete_user(username, auth)
 
 
 def ensure_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
     geoserver_wms_workspace = wms.get_geoserver_workspace(workspace)
     for ws in [workspace, geoserver_wms_workspace]:
-        created = common.ensure_workspace(ws, auth)
+        created = gs_util.ensure_workspace(ws, auth)
         if created:
-            common.create_db_store(ws, auth, workspace)
+            gs_util.create_db_store(ws, auth, workspace)
 
 
 def delete_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
     geoserver_wms_workspace = wms.get_geoserver_workspace(workspace)
     for ws in [workspace, geoserver_wms_workspace]:
-        common.delete_db_store(ws, auth)
-        common.delete_workspace(ws, auth)
+        gs_util.delete_db_store(ws, auth)
+        gs_util.delete_workspace(ws, auth)
 
 
 def get_all_rules(auth):
@@ -77,14 +78,14 @@ def check_username(username):
     if username == settings.LAYMAN_GS_USER:
         raise LaymanError(41, {'username': username})
 
-    if username in common.RESERVED_WORKSPACE_NAMES:
+    if username in gs_util.RESERVED_WORKSPACE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'workspace': username})
 
     if username.endswith(settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX):
         raise LaymanError(45, {'workspace_name': username})
 
-    rolename = common.username_to_rolename(username)
-    if rolename in common.RESERVED_ROLE_NAMES:
+    rolename = gs_util.username_to_rolename(username)
+    if rolename in gs_util.RESERVED_ROLE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
 
 
@@ -98,11 +99,11 @@ def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspac
     read_roles = access_rights.get('read') if access_rights and access_rights.get('read') else layer_info['access_rights']['read']
     write_roles = access_rights.get('write') if access_rights and access_rights.get('write') else layer_info['access_rights']['write']
 
-    security_read_roles = common.layman_users_to_geoserver_roles(read_roles)
-    common.ensure_layer_security_roles(geoserver_workspace, layer, security_read_roles, 'r', auth)
+    security_read_roles = gs_common.layman_users_to_geoserver_roles(read_roles)
+    gs_util.ensure_layer_security_roles(geoserver_workspace, layer, security_read_roles, 'r', auth)
 
-    security_write_roles = common.layman_users_to_geoserver_roles(write_roles)
-    common.ensure_layer_security_roles(geoserver_workspace, layer, security_write_roles, 'w', auth)
+    security_write_roles = gs_common.layman_users_to_geoserver_roles(write_roles)
+    gs_util.ensure_layer_security_roles(geoserver_workspace, layer, security_write_roles, 'w', auth)
 
 
 def get_default_native_bbox(workspace, layer):
@@ -159,10 +160,10 @@ def publish_layer_from_db(workspace, layername, description, title, access_right
 def publish_layer_from_qgis(workspace, layer, description, title, access_rights, geoserver_workspace=None):
     geoserver_workspace = geoserver_workspace or workspace
     store_name = wms.get_qgis_store_name(layer)
-    common.create_wms_store(geoserver_workspace,
-                            settings.LAYMAN_GS_AUTH,
-                            store_name,
-                            qgis_wms.get_layer_capabilities_url(workspace, layer))
+    gs_util.create_wms_store(geoserver_workspace,
+                             settings.LAYMAN_GS_AUTH,
+                             store_name,
+                             qgis_wms.get_layer_capabilities_url(workspace, layer))
 
     keywords = [
         "features",
@@ -210,11 +211,11 @@ def publish_layer_from_qgis(workspace, layer, description, title, access_rights,
 
 
 def get_usernames():
-    return common.get_usernames_by_role(settings.LAYMAN_GS_ROLE, settings.LAYMAN_GS_AUTH, [settings.LAYMAN_GS_USER])
+    return gs_util.get_usernames_by_role(settings.LAYMAN_GS_ROLE, settings.LAYMAN_GS_AUTH, [settings.LAYMAN_GS_USER])
 
 
 def get_workspaces():
-    all_workspaces = common.get_all_workspaces(settings.LAYMAN_GS_AUTH)
+    all_workspaces = gs_util.get_all_workspaces(settings.LAYMAN_GS_AUTH)
     result = [workspace for workspace in all_workspaces if not workspace.endswith(settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX)]
     return result
 
