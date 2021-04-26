@@ -158,7 +158,6 @@ def test_wms_ows_proxy(service_endpoint):
     client_util.delete_workspace_layer(username, layername, headers=authn_headers)
 
 
-@pytest.mark.flaky(reruns=2, reruns_delay=2)
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
 @pytest.mark.parametrize('style_file', [
     None,
@@ -300,7 +299,6 @@ def test_missing_attribute(style_file, ):
     client_util.delete_workspace_layer(username, layername2, headers)
 
 
-@pytest.mark.flaky(reruns=2, reruns_delay=2)
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
 def test_missing_attribute_authz():
     username = 'testmissingattr_authz'
