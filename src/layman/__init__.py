@@ -75,25 +75,25 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
 
                 with app.app_context():
                     logger.info(f'Adjusting GeoServer roles')
-                    from layman.common import geoserver as gs
+                    from geoserver import util as gs_util
 
                     if settings.GEOSERVER_ADMIN_AUTH:
-                        gs.ensure_role(settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
-                        gs.ensure_user(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_PASSWORD, settings.GEOSERVER_ADMIN_AUTH)
-                        gs.ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN', settings.GEOSERVER_ADMIN_AUTH)
-                        gs.ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
+                        gs_util.ensure_role(settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
+                        gs_util.ensure_user(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_PASSWORD, settings.GEOSERVER_ADMIN_AUTH)
+                        gs_util.ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN', settings.GEOSERVER_ADMIN_AUTH)
+                        gs_util.ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
 
                     if settings.LAYMAN_GS_PROXY_BASE_URL != '':
-                        gs.ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
+                        gs_util.ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL, settings.LAYMAN_GS_AUTH)
 
                     if not IN_UPGRADE_PROCESS:
                         logger.info(f'Adjusting GeoServer SRS')
                         any_srs_list_changed = False
-                        for service in gs.SERVICE_TYPES:
-                            service_srs_list_changed = gs.ensure_service_srs_list(service, settings.LAYMAN_OUTPUT_SRS_LIST, settings.LAYMAN_GS_AUTH)
+                        for service in gs_util.SERVICE_TYPES:
+                            service_srs_list_changed = gs_util.ensure_service_srs_list(service, settings.LAYMAN_OUTPUT_SRS_LIST, settings.LAYMAN_GS_AUTH)
                             any_srs_list_changed = service_srs_list_changed or any_srs_list_changed
                         if any_srs_list_changed:
-                            gs.reload(settings.LAYMAN_GS_AUTH)
+                            gs_util.reload(settings.LAYMAN_GS_AUTH)
 
                         from . import upgrade
                         upgrade.upgrade()

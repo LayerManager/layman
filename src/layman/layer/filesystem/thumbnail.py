@@ -66,8 +66,8 @@ def generate_layer_thumbnail(workspace, layername):
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
     wms_url = geoserver_wms.get_wms_url(workspace)
+    from geoserver.util import get_layer_thumbnail, get_layer_square_bbox
     from layman.layer.geoserver.util import wms_proxy
-    from layman.common.geoserver import get_layer_thumbnail, get_layer_square_bbox
     wms = wms_proxy(wms_url, headers=headers)
     # current_app.logger.info(list(wms.contents))
     tn_bbox = get_layer_square_bbox(wms, layername)

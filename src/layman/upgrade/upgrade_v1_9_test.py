@@ -1,8 +1,8 @@
 from test import process_client
 import pytest
 
+from geoserver import util as gs_util
 from layman import settings, app
-from layman.common import geoserver as gs_common
 from layman.layer import geoserver as gs_provider
 from . import upgrade_v1_9
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -15,7 +15,7 @@ def assert_roles(workspace,
                  expected_roles):
     for right_type in ['read', 'write']:
         rule = f'{workspace}.{layer}.{right_type[0]}'
-        roles = gs_common.get_security_roles(rule, auth)
+        roles = gs_util.get_security_roles(rule, auth)
         assert roles == expected_roles
 
 
@@ -28,7 +28,7 @@ def test_geoserver_everyone_rights_repair():
 
     process_client.publish_workspace_layer(workspace, layer)
     for right_type in ['read', 'write']:
-        gs_common.ensure_layer_security_roles(workspace, layer, expected_roles1, right_type[0], auth)
+        gs_util.ensure_layer_security_roles(workspace, layer, expected_roles1, right_type[0], auth)
 
     assert_roles(workspace, layer, expected_roles1)
 
@@ -45,8 +45,8 @@ def test_geoserver_remove_users_for_public_workspaces():
     user = 'test_geoserver_remove_users_for_public_workspaces_user'
     auth_headers = process_client.get_authz_headers(user)
     layer = 'test_geoserver_remove_users_for_public_workspaces_layer'
-    gs_rolename = gs_common.username_to_rolename(workspace)
-    gs_rolename2 = gs_common.username_to_rolename(user)
+    gs_rolename = gs_util.username_to_rolename(workspace)
+    gs_rolename2 = gs_util.username_to_rolename(user)
 
     process_client.publish_workspace_layer(workspace, layer)
     process_client.ensure_reserved_username(user, auth_headers)
@@ -54,25 +54,25 @@ def test_geoserver_remove_users_for_public_workspaces():
 
         gs_provider.ensure_whole_user(workspace, auth)
 
-        usernames = gs_common.get_usernames(auth)
+        usernames = gs_util.get_usernames(auth)
         assert workspace in usernames
         assert user in usernames
-        roles = gs_common.get_roles(auth)
+        roles = gs_util.get_roles(auth)
         assert gs_rolename in roles
         assert gs_rolename2 in roles
-        workspaces = gs_common.get_all_workspaces(auth)
+        workspaces = gs_util.get_all_workspaces(auth)
         assert workspace in workspaces
         assert user in workspaces
 
         upgrade_v1_9.geoserver_remove_users_for_public_workspaces()
 
-        usernames = gs_common.get_usernames(auth)
+        usernames = gs_util.get_usernames(auth)
         assert workspace not in usernames, usernames
         assert user in usernames
-        roles = gs_common.get_roles(auth)
+        roles = gs_util.get_roles(auth)
         assert gs_rolename not in roles, roles
         assert gs_rolename2 in roles
-        workspaces = gs_common.get_all_workspaces(auth)
+        workspaces = gs_util.get_all_workspaces(auth)
         assert workspace in workspaces, workspaces
         assert user in workspaces
 

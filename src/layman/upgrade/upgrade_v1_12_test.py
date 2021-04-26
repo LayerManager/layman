@@ -3,8 +3,8 @@ from test import process_client, util as test_util, data as test_data
 import pytest
 
 from db import util as db_util
+from geoserver import util as gs_util
 from layman import app, settings
-from layman.common import geoserver as gs_common
 from layman.common.filesystem import uuid as uuid_common
 from layman.common.micka import util as micka_util
 from layman.layer import geoserver as gs_layer, NO_STYLE_DEF, db
@@ -35,15 +35,15 @@ def ensure_layer():
             db.ensure_workspace(workspace)
             db.import_layer_vector_file(workspace, layer, file_path, None)
             # wfs
-            created = gs_common.ensure_workspace(workspace, settings.LAYMAN_GS_AUTH)
+            created = gs_util.ensure_workspace(workspace, settings.LAYMAN_GS_AUTH)
             if created:
-                gs_common.create_db_store(workspace, settings.LAYMAN_GS_AUTH, db_schema=workspace)
+                gs_util.create_db_store(workspace, settings.LAYMAN_GS_AUTH, db_schema=workspace)
             gs_layer.publish_layer_from_db(workspace, layer, layer, layer, None, workspace)
             # wms
             geoserver_workspace = wms.get_geoserver_workspace(workspace)
-            created = gs_common.ensure_workspace(geoserver_workspace, settings.LAYMAN_GS_AUTH)
+            created = gs_util.ensure_workspace(geoserver_workspace, settings.LAYMAN_GS_AUTH)
             if created:
-                gs_common.create_db_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, db_schema=workspace)
+                gs_util.create_db_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, db_schema=workspace)
             gs_layer.publish_layer_from_db(workspace, layer, layer, layer, None, geoserver_workspace)
 
             md_path = '/code/src/layman/upgrade/upgrade_v1_12_test_layer_metadata.xml'
