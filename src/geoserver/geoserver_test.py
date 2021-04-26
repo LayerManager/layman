@@ -18,6 +18,12 @@ def app_context():
         yield
 
 
+@pytest.fixture(scope="module", autouse=True)
+def restart_gs():
+    yield
+    gs_util.reload(auth)
+
+
 @pytest.fixture()
 def gs_user():
     usernames = gs_util.get_usernames(auth)
