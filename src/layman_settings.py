@@ -4,6 +4,7 @@ from urllib.parse import urljoin, urlparse
 import redis
 
 import db
+import geoserver
 from layman_settings_util import read_clients_dict_from_env
 
 LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
@@ -51,20 +52,10 @@ LAYMAN_GS_PORT = os.environ['LAYMAN_GS_PORT']
 LAYMAN_GS_PATH = os.environ['LAYMAN_GS_PATH']
 
 LAYMAN_GS_URL = f"http://{LAYMAN_GS_HOST}:{LAYMAN_GS_PORT}{LAYMAN_GS_PATH}"
+geoserver.set_settings(LAYMAN_GS_URL, LAYMAN_GS_ROLE_SERVICE, LAYMAN_GS_USER_GROUP_SERVICE, )
+geoserver.GS_AUTH = LAYMAN_GS_AUTH
 
 LAYMAN_GS_ROLE = os.environ['LAYMAN_GS_ROLE']
-
-LAYMAN_GS_REST = urljoin(LAYMAN_GS_URL, 'rest/')
-LAYMAN_GS_REST_STYLES = urljoin(LAYMAN_GS_REST, 'styles/')
-LAYMAN_GS_REST_WORKSPACES = urljoin(LAYMAN_GS_REST, 'workspaces/')
-LAYMAN_GS_REST_SETTINGS = urljoin(LAYMAN_GS_REST, 'settings/')
-LAYMAN_GS_REST_SECURITY_ACL_LAYERS = urljoin(LAYMAN_GS_REST,
-                                             'security/acl/layers/')
-LAYMAN_GS_REST_ROLES = urljoin(LAYMAN_GS_REST, f'security/roles/service/{LAYMAN_GS_ROLE_SERVICE}/')
-LAYMAN_GS_REST_USERS = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAYMAN_GS_USER_GROUP_SERVICE}/users/')
-LAYMAN_GS_REST_USER = urljoin(LAYMAN_GS_REST, f'security/usergroup/service/{LAYMAN_GS_USER_GROUP_SERVICE}/user/')
-LAYMAN_GS_REST_WMS_SETTINGS = urljoin(LAYMAN_GS_REST, f'services/wms/settings/')
-LAYMAN_GS_REST_WFS_SETTINGS = urljoin(LAYMAN_GS_REST, f'services/wfs/settings/')
 
 LAYMAN_GS_AUTHN_HTTP_HEADER_NAME = 'laymanHttpHeader'
 LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE = os.environ['LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE']

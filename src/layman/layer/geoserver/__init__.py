@@ -3,7 +3,7 @@ from urllib.parse import urljoin
 import requests
 from flask import g
 
-from geoserver import util as gs_util
+from geoserver import util as gs_util, GS_REST_WORKSPACES
 from layman.http import LaymanError
 from layman import settings, util as layman_util
 from layman.common import bbox as bbox_util, geoserver as gs_common
@@ -143,7 +143,7 @@ def publish_layer_from_db(workspace, layername, description, title, access_right
     if bbox_util.is_empty(db_bbox):
         # world
         feature_type_def['nativeBoundingBox'] = get_default_native_bbox(workspace, layername)
-    r = requests.post(urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+    r = requests.post(urljoin(GS_REST_WORKSPACES,
                               geoserver_workspace + '/datastores/postgresql/featuretypes/'),
                       data=json.dumps({
                           "featureType": feature_type_def
@@ -196,7 +196,7 @@ def publish_layer_from_qgis(workspace, layer, description, title, access_rights,
         "maxy": db_bbox[3],
         "crs": "EPSG:3857",
     }
-    r = requests.post(urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+    r = requests.post(urljoin(GS_REST_WORKSPACES,
                               geoserver_workspace + '/wmslayers/'),
                       data=json.dumps({
                           "wmsLayer": wms_layer_def

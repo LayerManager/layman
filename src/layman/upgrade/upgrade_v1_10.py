@@ -8,7 +8,7 @@ from urllib.parse import urljoin
 import requests
 
 from db import util as db_util
-from geoserver import util as gs_util
+from geoserver import util as gs_util, GS_REST_WORKSPACES
 from layman import settings, util
 from layman.http import LaymanError
 from layman.common import prime_db_schema
@@ -92,7 +92,7 @@ where p.type = %s
             continue
 
         r = requests.get(
-            urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+            urljoin(GS_REST_WORKSPACES,
                     geoserver_workspace + '/layers/' + layer),
             auth=settings.LAYMAN_GS_AUTH,
             timeout=5,

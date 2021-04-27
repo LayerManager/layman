@@ -5,6 +5,8 @@ import sys
 import time
 from urllib.parse import urljoin
 
+import geoserver
+
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 ATTEMPT_INTERVAL = 2
@@ -74,13 +76,13 @@ def main():
         'Content-type': 'application/json',
     }
     auth = settings.GEOSERVER_ADMIN_AUTH or settings.LAYMAN_GS_AUTH
-    wait_for_msg = f"GeoServer REST API, user={auth[0]}, url={settings.LAYMAN_GS_REST_WORKSPACES}"
+    wait_for_msg = f"GeoServer REST API, user={auth[0]}, url={geoserver.GS_REST_WORKSPACES}"
     print(f"Waiting for {wait_for_msg}")
     while True:
         import requests
         try:
             r = requests.get(
-                settings.LAYMAN_GS_REST_WORKSPACES,
+                geoserver.GS_REST_WORKSPACES,
                 headers=headers_json,
                 auth=auth,
                 timeout=0.1
