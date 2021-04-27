@@ -15,10 +15,11 @@ def merge_infos(infos):
 
 
 def clear_publication_info(info):
-    for key in ['id', 'type', 'style_type']:
-        try:
-            del info[key]
-        except KeyError:
-            pass
+    for key in list(info.keys()):
+        if key.startswith('_') or key in ['id', 'type', 'style_type']:
+            try:
+                del info[key]
+            except KeyError:
+                pass
     info['updated_at'] = info['updated_at'].isoformat()
     return info
