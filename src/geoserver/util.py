@@ -8,7 +8,6 @@ import string
 from urllib.parse import urljoin
 import requests
 
-from layman_settings import LAYMAN_PG_HOST, LAYMAN_PG_PORT, LAYMAN_PG_DBNAME, LAYMAN_PG_USER, LAYMAN_PG_PASSWORD
 from . import GS_REST_ROLES, GS_REST_USERS, GS_REST_SECURITY_ACL_LAYERS, GS_REST_WORKSPACES, GS_REST_STYLES, GS_AUTH,\
     GS_REST_WMS_SETTINGS, GS_REST_WFS_SETTINGS, GS_REST_USER, GS_REST_SETTINGS, GS_REST
 from .error import Error
@@ -392,7 +391,7 @@ def delete_workspace_style(geoserver_workspace, stylename, auth=None):
     return sld_stream
 
 
-def create_db_store(geoserver_workspace, auth, db_schema=None):
+def create_db_store(geoserver_workspace, auth, db_schema=None, pg_conn=None, ):
     db_schema = db_schema or geoserver_workspace
     r = requests.post(
         urljoin(GS_REST_WORKSPACES, geoserver_workspace + '/datastores'),
@@ -407,23 +406,23 @@ def create_db_store(geoserver_workspace, auth, db_schema=None):
                         },
                         {
                             "@key": "host",
-                            "$": LAYMAN_PG_HOST
+                            "$": pg_conn['host']
                         },
                         {
                             "@key": "port",
-                            "$": LAYMAN_PG_PORT
+                            "$": pg_conn['port']
                         },
                         {
                             "@key": "database",
-                            "$": LAYMAN_PG_DBNAME
+                            "$": pg_conn['dbname']
                         },
                         {
                             "@key": "user",
-                            "$": LAYMAN_PG_USER
+                            "$": pg_conn['user']
                         },
                         {
                             "@key": "passwd",
-                            "$": LAYMAN_PG_PASSWORD
+                            "$": pg_conn['password']
                         },
                         {
                             "@key": "schema",

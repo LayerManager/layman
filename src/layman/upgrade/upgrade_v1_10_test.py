@@ -92,7 +92,7 @@ def ensure_layer():
             db.import_layer_vector_file(workspace, layer, file_path, None)
             created = gs_util.ensure_workspace(workspace, settings.LAYMAN_GS_AUTH)
             if created:
-                gs_util.create_db_store(workspace, settings.LAYMAN_GS_AUTH, db_schema=workspace)
+                gs_util.create_db_store(workspace, settings.LAYMAN_GS_AUTH, db_schema=workspace, pg_conn=settings.PG_CONN)
             gs_layer.publish_layer_from_db(workspace, layer, layer, layer, None, workspace)
             sld_file_path = 'sample/style/generic-blue_sld.xml'
             with open(sld_file_path, 'rb') as sld_file:
