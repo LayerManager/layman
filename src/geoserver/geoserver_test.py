@@ -1,6 +1,5 @@
 import pytest
 
-from layman import app
 from . import util as gs_util, GS_AUTH
 
 TEST_ROLE = 'test_role_abc'
@@ -8,12 +7,6 @@ TEST_USER = 'test_user_abc'
 TEST_USER_PASSWORD = 'test_user_abc_pwd'
 TEST_SERVICE_SRS_LIST = [3035, 4326]
 TEST_PROXY_BASE_URL = 'https://example.com/geoserver/'
-
-
-@pytest.fixture(scope="module", autouse=True)
-def app_context():
-    with app.app_context():
-        yield
 
 
 @pytest.fixture(scope="module", autouse=True)
