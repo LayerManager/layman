@@ -3,6 +3,7 @@
 ## v1.13.0
 {release_date}
 ### Upgrade requirements
+- If you are running Layman with development settings, run `make timgen-build`.
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations

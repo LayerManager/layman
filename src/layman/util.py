@@ -3,6 +3,7 @@ import importlib
 import inspect
 import re
 import unicodedata
+import urllib.parse
 from collections import OrderedDict
 import logging
 
@@ -245,7 +246,8 @@ def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_cal
 DUMB_MAP_ADAPTER = None
 
 
-def url_for(endpoint, **values):
+def url_for(endpoint, *, internal=False, **values):
+    assert not (internal and values.get('_external'))
     # Flask does not accept SERVER_NAME without dot, and without SERVER_NAME url_for cannot be used
     # therefore DUMB_MAP_ADAPTER is created manually ...
     global DUMB_MAP_ADAPTER
@@ -258,6 +260,10 @@ def url_for(endpoint, **values):
         result = DUMB_MAP_ADAPTER.build(endpoint, values=values, force_external=True)
     else:
         result = flask_url_for(endpoint, **values, _external=True)
+    if internal:
+        _, netloc, path, query, fragment = urllib.parse.urlsplit(result)
+        netloc = settings.LAYMAN_SERVER_NAME
+        result = urllib.parse.urlunsplit(('http', netloc, path, query, fragment))
     return result
 
 
