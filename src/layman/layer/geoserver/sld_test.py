@@ -3,6 +3,7 @@ from test import process_client, util
 import requests
 import pytest
 
+from geoserver import GS_REST, GS_AUTH
 from layman import settings
 
 
@@ -24,10 +25,10 @@ def test_sld_style_in_wms_workspace():
                                            file_paths=geojson_file,
                                            style_file=style_file)
 
-    url = urljoin(settings.LAYMAN_GS_REST, f'workspaces/{workspace}_wms/styles/{layer}')
+    url = urljoin(GS_REST, f'workspaces/{workspace}_wms/styles/{layer}')
 
     r = requests.get(url,
-                     auth=settings.LAYMAN_GS_AUTH,
+                     auth=GS_AUTH,
                      headers=headers_sld,
                      timeout=5,
                      )

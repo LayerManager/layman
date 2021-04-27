@@ -16,6 +16,7 @@ from flask import url_for
 
 del sys.modules['layman']
 
+from geoserver.util import get_feature_type
 from layman import app
 from layman import settings
 from layman.layer.filesystem import uuid as layer_uuid
@@ -27,7 +28,7 @@ from layman import celery as celery_util
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from . import util, LAYER_TYPE
-from .geoserver.util import get_feature_type, wms_proxy
+from .geoserver.util import wms_proxy
 from .micka import csw
 
 logger = logging.getLogger(__name__)

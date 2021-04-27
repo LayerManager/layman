@@ -3,6 +3,8 @@ import os
 import shutil
 from urllib.parse import urljoin
 
+import geoserver
+
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 
@@ -59,7 +61,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
     }
 
     auth = settings.GEOSERVER_ADMIN_AUTH or settings.LAYMAN_GS_AUTH
-    r = requests.get(settings.LAYMAN_GS_REST_USERS,
+    r = requests.get(geoserver.GS_REST_USERS,
                      headers=headers_json,
                      auth=auth
                      )
@@ -69,7 +71,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
         all_users.remove(settings.LAYMAN_GS_USER)
 
     for user in all_users:
-        r = requests.get(urljoin(settings.LAYMAN_GS_REST_ROLES, f'user/{user}/'),
+        r = requests.get(urljoin(geoserver.GS_REST_ROLES, f'user/{user}/'),
                          headers=headers_json,
                          auth=auth
                          )
@@ -78,7 +80,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
 
         if settings.LAYMAN_GS_ROLE in roles:
             r = requests.delete(
-                urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, user + '.*.r'),
+                urljoin(geoserver.GS_REST_SECURITY_ACL_LAYERS, user + '.*.r'),
                 headers=headers_json,
                 auth=auth
             )
@@ -86,7 +88,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
                 r.raise_for_status()
 
             r = requests.delete(
-                urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, user + '.*.w'),
+                urljoin(geoserver.GS_REST_SECURITY_ACL_LAYERS, user + '.*.w'),
                 headers=headers_json,
                 auth=auth
             )
@@ -94,7 +96,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
                 r.raise_for_status()
 
             r = requests.delete(
-                urljoin(settings.LAYMAN_GS_REST_WORKSPACES, user),
+                urljoin(geoserver.GS_REST_WORKSPACES, user),
                 headers=headers_json,
                 auth=auth,
                 params={
@@ -105,14 +107,14 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
 
             for role in roles:
                 r = requests.delete(
-                    urljoin(settings.LAYMAN_GS_REST_ROLES, f'role/{role}/user/{user}/'),
+                    urljoin(geoserver.GS_REST_ROLES, f'role/{role}/user/{user}/'),
                     headers=headers_json,
                     auth=auth,
                 )
                 r.raise_for_status()
 
             r = requests.delete(
-                urljoin(settings.LAYMAN_GS_REST_ROLES, 'role/' + f"USER_{user.upper()}"),
+                urljoin(geoserver.GS_REST_ROLES, 'role/' + f"USER_{user.upper()}"),
                 headers=headers_json,
                 auth=auth,
             )
@@ -120,13 +122,13 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
                 r.raise_for_status()
 
             r = requests.delete(
-                urljoin(settings.LAYMAN_GS_REST_USER, user),
+                urljoin(geoserver.GS_REST_USER, user),
                 headers=headers_json,
                 auth=auth,
             )
             r.raise_for_status()
 
-    r = requests.get(settings.LAYMAN_GS_REST_WORKSPACES,
+    r = requests.get(geoserver.GS_REST_WORKSPACES,
                      headers=headers_json,
                      auth=auth
                      )
@@ -136,7 +138,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
         all_workspaces = [workspace["name"] for workspace in r.json()['workspaces']['workspace']]
         for workspace in all_workspaces:
             r = requests.delete(
-                urljoin(settings.LAYMAN_GS_REST_WORKSPACES, workspace),
+                urljoin(geoserver.GS_REST_WORKSPACES, workspace),
                 headers=headers_json,
                 auth=auth,
                 params={

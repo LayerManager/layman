@@ -1,9 +1,8 @@
-from urllib.parse import urljoin, urlparse
-import requests
+from urllib.parse import urlparse
 from owslib.wms import WebMapService
 from owslib.wfs import WebFeatureService
 
-from geoserver.util import headers_json, get_proxy_base_url
+from geoserver.util import get_proxy_base_url
 from layman.cache.mem import CACHE as MEM_CACHE
 
 
@@ -18,20 +17,6 @@ def get_gs_proxy_base_url():
         proxy_base_url = get_proxy_base_url(settings.LAYMAN_GS_AUTH)
         MEM_CACHE.set(CACHE_GS_PROXY_BASE_URL_KEY, proxy_base_url, ttl=settings.LAYMAN_CACHE_GS_TIMEOUT)
     return proxy_base_url
-
-
-def get_feature_type(
-        workspace, data_store, feature_type,
-        gs_rest_workspaces=settings.LAYMAN_GS_REST_WORKSPACES):
-    r_url = urljoin(gs_rest_workspaces,
-                    f'{workspace}/datastores/{data_store}/featuretypes/{feature_type}')
-    r = requests.get(r_url,
-                     headers=headers_json,
-                     auth=settings.LAYMAN_GS_AUTH,
-                     timeout=5,
-                     )
-    r.raise_for_status()
-    return r.json()['featureType']
 
 
 def wms_direct(wms_url, xml=None, version=None, headers=None):

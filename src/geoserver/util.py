@@ -8,8 +8,10 @@ import string
 from urllib.parse import urljoin
 import requests
 
-from layman import settings
+from layman_settings import LAYMAN_PG_HOST, LAYMAN_PG_PORT, LAYMAN_PG_DBNAME, LAYMAN_PG_USER, LAYMAN_PG_PASSWORD
 from layman.http import LaymanError
+from . import GS_REST_ROLES, GS_REST_USERS, GS_REST_SECURITY_ACL_LAYERS, GS_REST_WORKSPACES, GS_REST_STYLES, GS_AUTH,\
+    GS_REST_WMS_SETTINGS, GS_REST_WFS_SETTINGS, GS_REST_USER, GS_REST_SETTINGS, GS_REST
 
 
 logger = logging.getLogger(__name__)
@@ -50,7 +52,7 @@ DEFAULT_DB_STORE_NAME = 'postgresql'
 
 
 def get_roles(auth):
-    r_url = settings.LAYMAN_GS_REST_ROLES
+    r_url = GS_REST_ROLES
     r = requests.get(r_url,
                      headers=headers_json,
                      auth=auth,
@@ -66,7 +68,7 @@ def ensure_role(role, auth):
     if not role_exists:
         logger.info(f"Role {role} does not exist yet, creating.")
         r = requests.post(
-            urljoin(settings.LAYMAN_GS_REST_ROLES, 'role/' + role),
+            urljoin(GS_REST_ROLES, 'role/' + role),
             headers=headers_json,
             auth=auth,
             timeout=5,
@@ -80,7 +82,7 @@ def ensure_role(role, auth):
 
 def delete_role(role, auth):
     r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_ROLES, 'role/' + role),
+        urljoin(GS_REST_ROLES, 'role/' + role),
         headers=headers_json,
         auth=auth,
         timeout=5,
@@ -93,7 +95,7 @@ def delete_role(role, auth):
 
 
 def get_usernames(auth):
-    r_url = settings.LAYMAN_GS_REST_USERS
+    r_url = GS_REST_USERS
     r = requests.get(r_url,
                      headers=headers_json,
                      auth=auth,
@@ -117,7 +119,7 @@ def ensure_user(user, password, auth):
             # we usually don't want to log passwords
             # logger.info(f"User {user}'s automatically generated password is {password}")
         r = requests.post(
-            settings.LAYMAN_GS_REST_USERS,
+            GS_REST_USERS,
             # TODO https://osgeo-org.atlassian.net/browse/GEOS-8486
             # seems as it's not fixed in 2.13.0
             data=json.dumps({
@@ -144,7 +146,7 @@ def get_workspace_security_roles(workspace, type, auth):
 
 def get_security_roles(rule, auth):
     r = requests.get(
-        settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
+        GS_REST_SECURITY_ACL_LAYERS,
         headers=headers_json,
         auth=auth,
         timeout=5,
@@ -164,7 +166,7 @@ def ensure_security_roles(rule, roles, auth):
 
     logger.info(f"Ensure_security_roles rule={rule}, roles={roles}, roles_str={roles_str}")
     r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
+        urljoin(GS_REST_SECURITY_ACL_LAYERS, rule),
         data=json.dumps(
             {rule: roles_str}),
         headers=headers_json,
@@ -175,7 +177,7 @@ def ensure_security_roles(rule, roles, auth):
         r.raise_for_status()
 
     r = requests.post(
-        settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
+        GS_REST_SECURITY_ACL_LAYERS,
         data=json.dumps(
             {rule: roles_str}),
         headers=headers_json,
@@ -197,7 +199,7 @@ def ensure_layer_security_roles(workspace, layername, roles, type, auth):
 
 def delete_feature_type(geoserver_workspace, feature_type_name, auth):
     r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+        urljoin(GS_REST_WORKSPACES,
                 geoserver_workspace + f'/datastores/{DEFAULT_DB_STORE_NAME}/featuretypes/' + feature_type_name),
         headers=headers_json,
         auth=auth,
@@ -229,7 +231,7 @@ def patch_feature_type(geoserver_workspace, feature_type_name, title, descriptio
         "featureType": ftype
     }
     r = requests.put(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+        urljoin(GS_REST_WORKSPACES,
                 geoserver_workspace + '/datastores/postgresql/featuretypes/' + feature_type_name),
         data=json.dumps(body),
         headers=headers_json,
@@ -241,7 +243,7 @@ def patch_feature_type(geoserver_workspace, feature_type_name, title, descriptio
 
 def delete_security_roles(rule, auth):
     r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, rule),
+        urljoin(GS_REST_SECURITY_ACL_LAYERS, rule),
         headers=headers_json,
         auth=auth,
         timeout=5,
@@ -252,7 +254,7 @@ def delete_security_roles(rule, auth):
 
 def get_all_workspaces(auth):
     r = requests.get(
-        settings.LAYMAN_GS_REST_WORKSPACES,
+        GS_REST_WORKSPACES,
         headers=headers_json,
         auth=auth,
         timeout=5,
@@ -268,21 +270,21 @@ def get_all_workspaces(auth):
 
 def get_workspace_layer_url(geoserver_workspace, layer=None):
     layer = layer or ''
-    return urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+    return urljoin(GS_REST_WORKSPACES,
                    geoserver_workspace + '/layers/' + layer)
 
 
 def get_workspace_style_url(geoserver_workspace, style=None):
     style = style or ''
-    return urljoin(settings.LAYMAN_GS_REST_WORKSPACES,
+    return urljoin(GS_REST_WORKSPACES,
                    geoserver_workspace + '/styles/' + style)
 
 
 def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_function):
     if sld_file is None:
         r = requests.get(
-            urljoin(settings.LAYMAN_GS_REST_STYLES, 'generic.sld'),
-            auth=settings.LAYMAN_GS_AUTH,
+            urljoin(GS_REST_STYLES, 'generic.sld'),
+            auth=GS_AUTH,
             timeout=5,
         )
         r.raise_for_status()
@@ -299,7 +301,7 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
             }
         ),
         headers=headers_json,
-        auth=settings.LAYMAN_GS_AUTH,
+        auth=GS_AUTH,
         timeout=5,
     )
     r.raise_for_status()
@@ -331,7 +333,7 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
             'Accept': 'application/json',
             'Content-type': sld_content_type,
         },
-        auth=settings.LAYMAN_GS_AUTH,
+        auth=GS_AUTH,
         timeout=5,
     )
     if r.status_code == 400:
@@ -348,7 +350,7 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
                              }
                          }),
                      headers=headers_json,
-                     auth=settings.LAYMAN_GS_AUTH,
+                     auth=GS_AUTH,
                      timeout=5,
                      )
     # app.logger.info(r.text)
@@ -377,7 +379,7 @@ def delete_workspace_style(geoserver_workspace, stylename, auth=None):
     style_url = get_workspace_style_url(geoserver_workspace, stylename)
     r = requests.delete(style_url,
                         headers=headers_json,
-                        auth=settings.LAYMAN_GS_AUTH,
+                        auth=GS_AUTH,
                         params={
                             'purge': 'true',
                             'recurse': 'true',
@@ -393,7 +395,7 @@ def delete_workspace_style(geoserver_workspace, stylename, auth=None):
 def create_db_store(geoserver_workspace, auth, db_schema=None):
     db_schema = db_schema or geoserver_workspace
     r = requests.post(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + '/datastores'),
+        urljoin(GS_REST_WORKSPACES, geoserver_workspace + '/datastores'),
         data=json.dumps({
             "dataStore": {
                 "name": DEFAULT_DB_STORE_NAME,
@@ -405,23 +407,23 @@ def create_db_store(geoserver_workspace, auth, db_schema=None):
                         },
                         {
                             "@key": "host",
-                            "$": settings.LAYMAN_PG_HOST
+                            "$": LAYMAN_PG_HOST
                         },
                         {
                             "@key": "port",
-                            "$": settings.LAYMAN_PG_PORT
+                            "$": LAYMAN_PG_PORT
                         },
                         {
                             "@key": "database",
-                            "$": settings.LAYMAN_PG_DBNAME
+                            "$": LAYMAN_PG_DBNAME
                         },
                         {
                             "@key": "user",
-                            "$": settings.LAYMAN_PG_USER
+                            "$": LAYMAN_PG_USER
                         },
                         {
                             "@key": "passwd",
-                            "$": settings.LAYMAN_PG_PASSWORD
+                            "$": LAYMAN_PG_PASSWORD
                         },
                         {
                             "@key": "schema",
@@ -440,7 +442,7 @@ def create_db_store(geoserver_workspace, auth, db_schema=None):
 
 def delete_db_store(geoserver_workspace, auth):
     r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + f'/datastores/{DEFAULT_DB_STORE_NAME}'),
+        urljoin(GS_REST_WORKSPACES, geoserver_workspace + f'/datastores/{DEFAULT_DB_STORE_NAME}'),
         headers=headers_json,
         auth=auth,
         timeout=5,
@@ -451,7 +453,7 @@ def delete_db_store(geoserver_workspace, auth):
 
 def create_wms_store(geoserver_workspace, auth, wms_store_name, get_capabilities_url):
     r = requests.post(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + '/wmsstores'),
+        urljoin(GS_REST_WORKSPACES, geoserver_workspace + '/wmsstores'),
         data=json.dumps({
             "wmsStore": {
                 "name": wms_store_name,
@@ -467,7 +469,7 @@ def create_wms_store(geoserver_workspace, auth, wms_store_name, get_capabilities
 
 
 def delete_wms_store(geoserver_workspace, auth, wms_store_name):
-    url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + f'/wmsstores/{wms_store_name}')
+    url = urljoin(GS_REST_WORKSPACES, geoserver_workspace + f'/wmsstores/{wms_store_name}')
     r = requests.delete(
         url,
         headers=headers_json,
@@ -479,7 +481,7 @@ def delete_wms_store(geoserver_workspace, auth, wms_store_name):
 
 
 def delete_wms_layer(geoserver_workspace, layer, auth):
-    url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace + f'/wmslayers/{layer}')
+    url = urljoin(GS_REST_WORKSPACES, geoserver_workspace + f'/wmslayers/{layer}')
     r = requests.delete(
         url,
         headers=headers_json,
@@ -493,11 +495,12 @@ def delete_wms_layer(geoserver_workspace, layer, auth):
         r.raise_for_status()
 
 
-def ensure_workspace(geoserver_workspace, auth=settings.LAYMAN_GS_AUTH):
+def ensure_workspace(geoserver_workspace, auth=None):
+    auth = auth or GS_AUTH
     all_workspaces = get_all_workspaces(auth)
     if geoserver_workspace not in all_workspaces:
         r = requests.post(
-            settings.LAYMAN_GS_REST_WORKSPACES,
+            GS_REST_WORKSPACES,
             data=json.dumps({'workspace': {'name': geoserver_workspace}}),
             headers=headers_json,
             auth=auth,
@@ -508,12 +511,13 @@ def ensure_workspace(geoserver_workspace, auth=settings.LAYMAN_GS_AUTH):
     return False
 
 
-def delete_workspace(geoserver_workspace, auth=settings.LAYMAN_GS_AUTH):
+def delete_workspace(geoserver_workspace, auth=None):
+    auth = auth or GS_AUTH
     delete_security_roles(geoserver_workspace + '.*.r', auth)
     delete_security_roles(geoserver_workspace + '.*.w', auth)
 
     r = requests.delete(
-        urljoin(settings.LAYMAN_GS_REST_WORKSPACES, geoserver_workspace),
+        urljoin(GS_REST_WORKSPACES, geoserver_workspace),
         headers=headers_json,
         auth=auth,
         timeout=5,
@@ -527,7 +531,7 @@ def username_to_rolename(username):
 
 
 def delete_user(user, auth):
-    r_url = urljoin(settings.LAYMAN_GS_REST_USER, user)
+    r_url = urljoin(GS_REST_USER, user)
     r = requests.delete(
         r_url,
         headers=headers_json,
@@ -553,7 +557,7 @@ def get_usernames_by_role(role, auth, usernames_to_ignore=None):
 
 
 def get_user_roles(user, auth):
-    r_url = urljoin(settings.LAYMAN_GS_REST_ROLES, f'user/{user}/')
+    r_url = urljoin(GS_REST_ROLES, f'user/{user}/')
     r = requests.get(r_url,
                      headers=headers_json,
                      auth=auth,
@@ -568,7 +572,7 @@ def ensure_user_role(user, role, auth):
     association_exists = role in roles
     if not association_exists:
         logger.info(f"Role {role} not associated with user {user} yet, associating.")
-        r_url = urljoin(settings.LAYMAN_GS_REST_ROLES, f'role/{role}/user/{user}/')
+        r_url = urljoin(GS_REST_ROLES, f'role/{role}/user/{user}/')
         r = requests.post(
             r_url,
             headers=headers_json,
@@ -583,7 +587,7 @@ def ensure_user_role(user, role, auth):
 
 
 def delete_user_role(user, role, auth):
-    r_url = urljoin(settings.LAYMAN_GS_REST_ROLES, f'role/{role}/user/{user}/')
+    r_url = urljoin(GS_REST_ROLES, f'role/{role}/user/{user}/')
     r = requests.delete(
         r_url,
         headers=headers_json,
@@ -599,8 +603,8 @@ def delete_user_role(user, role, auth):
 
 def get_service_url(service):
     return {
-        WMS_SERVICE_TYPE: settings.LAYMAN_GS_REST_WMS_SETTINGS,
-        WFS_SERVICE_TYPE: settings.LAYMAN_GS_REST_WFS_SETTINGS,
+        WMS_SERVICE_TYPE: GS_REST_WMS_SETTINGS,
+        WFS_SERVICE_TYPE: GS_REST_WFS_SETTINGS,
     }[service]
 
 
@@ -661,7 +665,7 @@ ensure_wfs_srs_list = partial(ensure_service_srs_list, WFS_SERVICE_TYPE)
 
 
 def get_global_settings(auth):
-    r_url = settings.LAYMAN_GS_REST_SETTINGS
+    r_url = GS_REST_SETTINGS
     r = requests.get(r_url,
                      headers=headers_json,
                      auth=auth,
@@ -684,7 +688,7 @@ def ensure_proxy_base_url(proxy_base_url, auth):
     if not url_equals:
         global_settings['settings']['proxyBaseUrl'] = proxy_base_url
         logger.info(f"Current Proxy Base URL {current_url} not equals to requested {proxy_base_url}, changing.")
-        r_url = settings.LAYMAN_GS_REST_SETTINGS
+        r_url = GS_REST_SETTINGS
         r = requests.put(
             r_url,
             data=json.dumps({
@@ -703,7 +707,7 @@ def ensure_proxy_base_url(proxy_base_url, auth):
 
 def reset(auth):
     logger.info(f"Resetting GeoServer")
-    r_url = settings.LAYMAN_GS_REST + 'reset'
+    r_url = GS_REST + 'reset'
     r = requests.post(r_url,
                       headers=headers_json,
                       auth=auth,
@@ -715,7 +719,7 @@ def reset(auth):
 
 def reload(auth):
     logger.info(f"Reloading GeoServer")
-    r_url = settings.LAYMAN_GS_REST + 'reload'
+    r_url = GS_REST + 'reload'
     r = requests.post(r_url,
                       headers=headers_json,
                       auth=auth,
@@ -752,3 +756,17 @@ def get_layer_thumbnail(wms_url, layername, bbox, headers=None, wms_version='1.3
         'TRANSPARENT': 'TRUE',
     }, headers=headers, timeout=5,)
     return r
+
+
+def get_feature_type(
+        workspace, data_store, feature_type,
+        gs_rest_workspaces=GS_REST_WORKSPACES):
+    r_url = urljoin(gs_rest_workspaces,
+                    f'{workspace}/datastores/{data_store}/featuretypes/{feature_type}')
+    r = requests.get(r_url,
+                     headers=headers_json,
+                     auth=GS_AUTH,
+                     timeout=5,
+                     )
+    r.raise_for_status()
+    return r.json()['featureType']

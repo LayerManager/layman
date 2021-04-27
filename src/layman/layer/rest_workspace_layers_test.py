@@ -7,6 +7,7 @@ import pytest
 
 del sys.modules['layman']
 
+from geoserver import GS_REST_WORKSPACES
 from layman import app, util as layman_util, settings
 from layman.layer import util as layer_util
 from layman.layer.filesystem import input_style
@@ -110,8 +111,8 @@ class TestQgisCascadeWmsClass:
         expected_style_file = f'/layman_data_test/workspaces/{workspace}/layers/{layer}/input_style/{layer}'
         expected_qgis_file = f'/qgis/data/test/workspaces/{workspace}/layers/{layer}/{layer}.qgis'
         thumbnail_path = f'/layman_data_test/workspaces/{workspace}/layers/{layer}/thumbnail/{layer}.png'
-        wms_stores_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES, f'{workspace}_wms/wmsstores/')
-        wms_layers_url = urljoin(settings.LAYMAN_GS_REST_WORKSPACES, f'{workspace}_wms/wmslayers/')
+        wms_stores_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmsstores/')
+        wms_layers_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmslayers/')
 
         with app.app_context():
             info = layer_util.get_layer_info(workspace, layer)
@@ -143,7 +144,6 @@ class TestQgisCascadeWmsClass:
             diffs = test_util.compare_images(thumbnail_path, expected_thumbnail_path)
             assert diffs < 100
 
-    @pytest.mark.flaky(reruns=2, reruns_delay=2)
     @pytest.mark.timeout(60)
     @pytest.mark.usefixtures('ensure_layman')
     @pytest.mark.parametrize('operations', [
