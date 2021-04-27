@@ -201,6 +201,8 @@ def test_get_publication_info_items(publication_type):
                 context = {'keys': [key]}
                 info = layman_util.get_publication_info(workspace, publication_type, publication, context)
                 assert key in info, info
+                internal_keys = [key[1:] for key in info if key.startswith('_')]
+                assert set(internal_keys) <= set(source_def.info_items)
 
     process_client.delete_workspace_publication(publication_type, workspace, publication)
 
