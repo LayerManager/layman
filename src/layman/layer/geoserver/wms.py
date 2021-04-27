@@ -132,6 +132,10 @@ def get_layer_info(workspace, layername):
         'wms': {
             'url': wms_proxy_url
         },
+        '_wms': {
+            'url': get_wms_url(workspace, external_url=False),
+            'workspace': get_geoserver_workspace(workspace),
+        },
     }
 
 
