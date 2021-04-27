@@ -46,7 +46,7 @@ def ensure_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
     for ws in [workspace, geoserver_wms_workspace]:
         created = gs_util.ensure_workspace(ws, auth)
         if created:
-            gs_util.create_db_store(ws, auth, workspace)
+            gs_util.create_db_store(ws, auth, workspace, pg_conn=settings.PG_CONN)
 
 
 def delete_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
