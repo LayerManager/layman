@@ -8,7 +8,7 @@ from flask import current_app
 
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util
-from layman.common import language as common_language
+from layman.common import language as common_language, empty_method, empty_method_returns_none
 from layman.layer.filesystem.uuid import get_layer_uuid
 from layman.layer import db
 from layman.layer.geoserver import wms
@@ -18,6 +18,8 @@ from layman import settings, patch_mode, LaymanError
 from layman.util import url_for, get_publication_info
 
 PATCH_MODE = patch_mode.NO_DELETE
+get_publication_uuid = empty_method_returns_none
+post_layer = empty_method
 
 
 def get_metadata_uuid(uuid):
@@ -47,7 +49,7 @@ def get_layer_info(workspace, layername):
     return {}
 
 
-def patch_layer(workspace, layername, metadata_properties_to_refresh, actor_name=None, create_if_not_exists=True, timeout=5):
+def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_name=None, create_if_not_exists=True, timeout=5):
     # current_app.logger.info(f"patch_layer metadata_properties_to_refresh={metadata_properties_to_refresh}")
     if len(metadata_properties_to_refresh) == 0:
         return None
@@ -83,14 +85,6 @@ def patch_layer(workspace, layername, metadata_properties_to_refresh, actor_name
         current_app.logger.info(traceback.format_exc())
         raise LaymanError(38) from exc
     return muuid
-
-
-def get_publication_uuid(workspace, publication_type, publication_name):
-    return None
-
-
-def post_layer(workspace, layername):
-    pass
 
 
 def delete_layer(workspace, layername):

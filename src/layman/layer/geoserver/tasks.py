@@ -3,14 +3,16 @@ from celery.utils.log import get_task_logger
 from geoserver import util as gs_util
 from layman.celery import AbortedException
 from layman import celery_app, settings
+from layman.common import empty_method_returns_true
 from . import wms, wfs, sld
 from .. import geoserver
 
 logger = get_task_logger(__name__)
 
 
-def refresh_wms_needed(username, layername, task_options):
-    return True
+refresh_wms_needed = empty_method_returns_true
+refresh_wfs_needed = empty_method_returns_true
+refresh_sld_needed = empty_method_returns_true
 
 
 @celery_app.task(
@@ -64,10 +66,6 @@ def refresh_wms(
         raise AbortedException
 
 
-def refresh_wfs_needed(username, layername, task_options):
-    return True
-
-
 @celery_app.task(
     name='layman.layer.geoserver.wfs.refresh',
     bind=True,
@@ -97,10 +95,6 @@ def refresh_wfs(
     if self.is_aborted():
         wfs.delete_layer(username, layername)
         raise AbortedException
-
-
-def refresh_sld_needed(username, layername, task_options):
-    return True
 
 
 @celery_app.task(

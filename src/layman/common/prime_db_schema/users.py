@@ -1,8 +1,11 @@
 from db import util as db_util
 from layman import settings
+from layman.common import empty_method
 from . import workspaces
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
+
+check_username = empty_method
 
 
 def ensure_user(id_workspace, userinfo):
@@ -83,7 +86,3 @@ order by w.name asc
 
 def get_usernames():
     return get_user_infos().keys()
-
-
-def check_username(username, conn_cur=None):
-    pass

@@ -1,14 +1,13 @@
 from celery.utils.log import get_task_logger
 
 from layman.celery import AbortedException
+from layman.common import empty_method_returns_true
 from layman import celery_app
 from . import csw, soap
 
 logger = get_task_logger(__name__)
-
-
-def refresh_csw_needed(username, mapname, task_options):
-    return True
+refresh_csw_needed = empty_method_returns_true
+refresh_soap_needed = empty_method_returns_true
 
 
 @celery_app.task(
@@ -27,10 +26,6 @@ def refresh_csw(self, username, mapname, http_method='post', metadata_properties
     if self.is_aborted():
         csw.delete_map(username, mapname)
         raise AbortedException
-
-
-def refresh_soap_needed(username, mapname, task_options):
-    return True
 
 
 @celery_app.task(

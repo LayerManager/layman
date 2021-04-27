@@ -6,12 +6,18 @@ from lxml import etree
 from werkzeug.datastructures import FileStorage
 
 from layman import patch_mode, LaymanError, layer
+from layman.common import empty_method, empty_method_returns_dict
 from . import util
 from . import input_file
 
 LAYER_SUBDIR = __name__.split('.')[-1]
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
+
+pre_publication_action_check = empty_method
+post_layer = empty_method
+patch_layer = empty_method
+get_metadata_comparison = empty_method_returns_dict
 
 
 def get_layer_input_style_dir(username, layername):
@@ -27,20 +33,7 @@ def ensure_layer_input_style_dir(username, layername):
 
 
 get_layer_info = input_file.get_layer_info
-
 get_publication_uuid = input_file.get_publication_uuid
-
-
-def pre_publication_action_check(workspace, layername):
-    pass
-
-
-def post_layer(workspace, layername):
-    pass
-
-
-def patch_layer(workspace, layername):
-    pass
 
 
 def delete_layer(workspace, layername):
@@ -76,10 +69,6 @@ def get_layer_file(username, layername):
     if style_path and os.path.exists(style_path):
         return open(style_path, 'rb')
     return None
-
-
-def get_metadata_comparison(workspace, publication_name):
-    pass
 
 
 def get_style_type_from_file_storage(file_storage):

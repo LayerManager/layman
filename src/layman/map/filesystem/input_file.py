@@ -3,12 +3,15 @@ import os
 import pathlib
 from urllib.parse import unquote
 
+from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import util as common_util
 from layman.common.filesystem import input_file as common
 from layman.util import url_for
 from . import util
 
 MAP_SUBDIR = __name__.split('.')[-1]
+pre_publication_action_check = empty_method
+get_metadata_comparison = empty_method_returns_dict
 
 
 def get_map_input_file_dir(username, mapname):
@@ -118,10 +121,6 @@ def unquote_urls(map_json):
     return map_json
 
 
-def pre_publication_action_check(workspace, layername):
-    pass
-
-
 def post_map(workspace, mapname, description, title):
     map_file_path = get_map_file(workspace, mapname)
     with open(map_file_path, 'r') as map_file:
@@ -134,7 +133,3 @@ def post_map(workspace, mapname, description, title):
 
 
 patch_map = post_map
-
-
-def get_metadata_comparison(workspace, publication_name):
-    pass

@@ -38,7 +38,7 @@ def get_usernames():
     return []
 
 
-def check_username(username, conn_cur=None):
+def check_username(username):
     if username in settings.PG_NON_USER_SCHEMAS:
         raise LaymanError(35, {'reserved_by': __name__, 'schema': username})
 

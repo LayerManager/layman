@@ -3,6 +3,7 @@ import pathlib
 
 from layman import settings, LaymanError, patch_mode
 from layman.util import url_for
+from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import util as common_util
 from . import util, input_file
 from ..geoserver import wms as geoserver_wms
@@ -10,6 +11,11 @@ from ..geoserver import wms as geoserver_wms
 LAYER_SUBDIR = __name__.split('.')[-1]
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
+
+get_metadata_comparison = empty_method_returns_dict
+pre_publication_action_check = empty_method
+post_layer = empty_method
+patch_layer = empty_method
 
 
 def get_layer_thumbnail_dir(username, layername):
@@ -38,18 +44,6 @@ def get_layer_info(workspace, layername):
 
 
 get_publication_uuid = input_file.get_publication_uuid
-
-
-def pre_publication_action_check(workspace, layername):
-    pass
-
-
-def post_layer(workspace, layername):
-    pass
-
-
-def patch_layer(workspace, layername):
-    pass
 
 
 def delete_layer(workspace, layername):
@@ -93,7 +87,3 @@ def generate_layer_thumbnail(workspace, layername):
     r.raise_for_status()
     with open(tn_path, "wb") as out_file:
         out_file.write(r.content)
-
-
-def get_metadata_comparison(workspace, layername):
-    pass

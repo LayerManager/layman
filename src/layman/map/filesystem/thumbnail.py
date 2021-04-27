@@ -12,11 +12,15 @@ from selenium.webdriver.common.desired_capabilities import \
 
 from layman import settings
 from layman.authn import is_user_with_name
+from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import util as common_util
 from layman.util import url_for
 from . import util, input_file
 
 MAP_SUBDIR = __name__.split('.')[-1]
+get_metadata_comparison = empty_method_returns_dict
+pre_publication_action_check = empty_method
+post_map = empty_method
 
 
 def get_map_thumbnail_dir(username, mapname):
@@ -59,14 +63,6 @@ def delete_map(workspace, mapname):
 def get_map_thumbnail_path(username, mapname):
     thumbnail_dir = get_map_thumbnail_dir(username, mapname)
     return os.path.join(thumbnail_dir, mapname + '.png')
-
-
-def pre_publication_action_check(workspace, layername):
-    pass
-
-
-def post_map(workspace, mapname):
-    pass
 
 
 def generate_map_thumbnail(username, mapname, editor):
@@ -141,7 +137,3 @@ def generate_map_thumbnail(username, mapname, editor):
 
     with open(file_path, 'wb') as f:
         f.write(base64.b64decode(data_url))
-
-
-def get_metadata_comparison(workspace, layername):
-    pass

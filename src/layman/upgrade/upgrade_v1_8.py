@@ -21,8 +21,7 @@ def upgrade_1_8():
     with app.app_context():
         logger.info(f'  Creating prime_db_schema')
         schema_initialization.check_schema_name(settings.LAYMAN_PRIME_SCHEMA)
-        schema_initialization.ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
-                                            settings.RIGHTS_EVERYONE_ROLE)
+        schema_initialization.ensure_schema(settings.LAYMAN_PRIME_SCHEMA)
 
         logger.info(f'  Ensuring users')
         from ..util import get_usernames, ensure_whole_user, check_username

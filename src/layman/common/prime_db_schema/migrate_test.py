@@ -56,8 +56,7 @@ def prepare_publications():
 def test_schema():
     with app.app_context():
         run_statement(model.DROP_SCHEMA_SQL)
-        ensure_schema(settings.LAYMAN_PRIME_SCHEMA,
-                      settings.RIGHTS_EVERYONE_ROLE)
+        ensure_schema(settings.LAYMAN_PRIME_SCHEMA,)
 
         workspaces = run_query(f'select count(*) from {DB_SCHEMA}.workspaces;')
         assert workspaces[0][0] == len(util.get_workspaces())

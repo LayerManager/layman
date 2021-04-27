@@ -1,48 +1,12 @@
 from layman import patch_mode
+from layman.common import empty_method, empty_method_returns_none, empty_method_returns_dict
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
-
-def get_publication_uuid(workspace, publication_type, publication_name):
-    return None
-
-
-def get_layer_info(workspace, layername):
-    return dict()
-
-
-def delete_layer(workspace, layer_name):
-    pass
-
-
-def patch_layer(workspace,
-                layername,
-                actor_name,
-                style_type=None,
-                title=None,
-                access_rights=None,
-                ):
-    pass
-
-
-def pre_publication_action_check(workspace,
-                                 layername,
-                                 actor_name,
-                                 access_rights=None,
-                                 ):
-    pass
-
-
-def post_layer(workspace,
-               layername,
-               access_rights,
-               title,
-               uuid,
-               actor_name,
-               style_type=None,
-               ):
-    pass
-
-
-def get_metadata_comparison(workspace, publication_name):
-    pass
+get_publication_uuid = empty_method_returns_none
+get_layer_info = empty_method_returns_dict
+delete_layer = empty_method
+patch_layer = empty_method
+pre_publication_action_check = empty_method
+post_layer = empty_method
+get_metadata_comparison = empty_method_returns_dict

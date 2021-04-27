@@ -9,7 +9,7 @@ from requests.exceptions import HTTPError, ConnectionError
 from flask import current_app
 
 from layman import settings, LaymanError
-from layman.common import language as common_language
+from layman.common import language as common_language, empty_method, empty_method_returns_none
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util
 from layman.map import MAP_TYPE
@@ -18,6 +18,9 @@ from layman.map.filesystem.input_file import get_map_json, unquote_urls
 from layman.layer import LAYER_TYPE
 from layman.layer.geoserver.util import get_gs_proxy_base_url
 from layman.util import url_for, USERNAME_ONLY_PATTERN, get_publication_info
+
+get_publication_uuid = empty_method_returns_none
+post_map = empty_method
 
 
 def get_metadata_uuid(uuid):
@@ -47,10 +50,6 @@ def get_map_info(workspace, mapname):
     return {}
 
 
-def get_publication_uuid(workspace, publication_type, publication_name):
-    return None
-
-
 def delete_map(workspace, mapname):
     uuid = get_map_uuid(workspace, mapname)
     muuid = get_metadata_uuid(uuid)
@@ -61,10 +60,6 @@ def delete_map(workspace, mapname):
     except (HTTPError, ConnectionError) as exc:
         current_app.logger.info(traceback.format_exc())
         raise LaymanError(38) from exc
-
-
-def post_map(workspace, mapname):
-    pass
 
 
 def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_name=None, create_if_not_exists=True, timeout=5):

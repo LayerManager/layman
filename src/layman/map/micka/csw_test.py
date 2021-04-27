@@ -133,6 +133,7 @@ def app_context():
 
 @pytest.fixture()
 def broken_micka_url(broken_micka):
+    # pylint: disable=unused-argument
     csw_url = settings.CSW_URL
     settings.CSW_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{MICKA_PORT}/csw"
     yield

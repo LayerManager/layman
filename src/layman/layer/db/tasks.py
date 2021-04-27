@@ -1,6 +1,7 @@
 from celery.utils.log import get_task_logger
 
 from layman.celery import AbortedException
+from layman.common import empty_method_returns_true
 from layman.layer.filesystem.input_file import get_layer_main_file_path
 from layman import celery_app
 from layman.http import LaymanError
@@ -10,9 +11,7 @@ from .table import delete_layer
 
 logger = get_task_logger(__name__)
 
-
-def refresh_table_needed(username, layername, task_options):
-    return True
+refresh_table_needed = empty_method_returns_true
 
 
 @celery_app.task(

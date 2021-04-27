@@ -1,20 +1,16 @@
 from db import util as db_util
 from layman import settings, patch_mode
+from layman.common import empty_method, empty_method_returns_none, empty_method_returns_dict
 from layman.http import LaymanError
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
-def pre_publication_action_check(workspace, layername):
-    pass
-
-
-def post_layer(workspace, layername):
-    pass
-
-
-def patch_layer(workspace, layername):
-    pass
+pre_publication_action_check = empty_method
+post_layer = empty_method
+patch_layer = empty_method
+get_metadata_comparison = empty_method_returns_dict
+get_publication_uuid = empty_method_returns_none
 
 
 def get_layer_info(workspace, layername, conn_cur=None):
@@ -54,11 +50,3 @@ def delete_layer(workspace, layername, conn_cur=None):
         conn.commit()
     except BaseException as exc:
         raise LaymanError(7)from exc
-
-
-def get_publication_uuid(workspace, publication_type, publication_name):
-    return None
-
-
-def get_metadata_comparison(workspace, publication_name):
-    pass

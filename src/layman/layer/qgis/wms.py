@@ -2,24 +2,18 @@ import os
 from owslib.wms import WebMapService
 
 from layman import patch_mode, settings, util as layman_util
-from layman.common import bbox as bbox_util
+from layman.common import bbox as bbox_util, empty_method, empty_method_returns_none, empty_method_returns_dict
 from . import util
 from .. import db, qgis, util as layer_util
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = "1.1.1"
 
-
-def get_publication_uuid(workspace, publication_type, publication_name):
-    return None
-
-
-def get_metadata_comparison(workspace, layername):
-    pass
-
-
-def pre_publication_action_check(workspace, layername):
-    pass
+get_metadata_comparison = empty_method_returns_dict
+pre_publication_action_check = empty_method
+post_layer = empty_method
+patch_layer = empty_method
+get_publication_uuid = empty_method_returns_none
 
 
 def get_layer_info(workspace, layername):
@@ -35,14 +29,6 @@ def get_layer_info(workspace, layername):
             },
         }
     return result
-
-
-def post_layer(workspace, layername):
-    pass
-
-
-def patch_layer(workspace, layername):
-    pass
 
 
 def delete_layer(workspace, layername):

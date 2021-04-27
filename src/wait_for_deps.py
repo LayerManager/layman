@@ -141,7 +141,7 @@ def main():
     print()
 
 
-def handle_exception(e, attempt, wait_for_msg=None):
+def handle_exception(_e, attempt, wait_for_msg=None):
     # traceback.print_exc()
     if attempt >= MAX_ATTEMPTS:
         print(f"Reaching max attempts when waiting for {wait_for_msg}")

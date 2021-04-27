@@ -1,5 +1,6 @@
 from functools import partial
 
+from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import uuid as common_uuid
 
 MAP_TYPE = '.'.join(__name__.split('.')[:-2])
@@ -22,17 +23,7 @@ def get_map_uuid(username, mapname):
 assign_map_uuid = partial(common_uuid.assign_publication_uuid, MAP_TYPE)
 
 
-def pre_publication_action_check(workspace, layername):
-    pass
-
-
-def post_map(workspace, mapname):
-    pass
-
-
-def patch_map(workspace, mapname):
-    pass
-
-
-def get_metadata_comparison(workspace, layername):
-    pass
+pre_publication_action_check = empty_method
+post_map = empty_method
+patch_map = empty_method
+get_metadata_comparison = empty_method_returns_dict

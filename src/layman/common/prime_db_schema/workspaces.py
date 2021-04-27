@@ -1,7 +1,10 @@
 from db import util as db_util
 from layman import settings
+from layman.common import empty_method
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
+
+check_workspace_name = empty_method
 
 
 def ensure_workspace(name):
@@ -42,7 +45,3 @@ def get_workspace_infos(name=None):
 
 def get_workspace_names():
     return get_workspace_infos().keys()
-
-
-def check_workspace_name(name):
-    pass
