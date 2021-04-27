@@ -9,9 +9,9 @@ from urllib.parse import urljoin
 import requests
 
 from layman_settings import LAYMAN_PG_HOST, LAYMAN_PG_PORT, LAYMAN_PG_DBNAME, LAYMAN_PG_USER, LAYMAN_PG_PASSWORD
-from layman.http import LaymanError
 from . import GS_REST_ROLES, GS_REST_USERS, GS_REST_SECURITY_ACL_LAYERS, GS_REST_WORKSPACES, GS_REST_STYLES, GS_AUTH,\
     GS_REST_WMS_SETTINGS, GS_REST_WFS_SETTINGS, GS_REST_USER, GS_REST_SETTINGS, GS_REST
+from .error import Error
 
 
 logger = logging.getLogger(__name__)
@@ -337,7 +337,7 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
         timeout=5,
     )
     if r.status_code == 400:
-        raise LaymanError(14, data=r.text)
+        raise Error(1, data=r.text)
     r.raise_for_status()
     r = requests.put(get_workspace_layer_url(geoserver_workspace, layername),
                      data=json.dumps(
