@@ -9,8 +9,6 @@ const get_url_param = (param_name) => {
   return url_params.get(param_name) ? decodeURIComponent(url_params.get(param_name)) : null;
 }
 
-const layman_url = get_url_param('layman_url');
-const layman_public_url = get_url_param('layman_public_url');
 const gs_url = get_url_param('gs_url');
 const gs_public_url = get_url_param('gs_public_url');
 const map_def_url = get_url_param('map_def_url');
@@ -30,7 +28,7 @@ const main = async () => {
     headers[proxy_header] = editor;
   }
   const map_json = await fetch(
-      adjust_map_url(map_def_url, layman_public_url, layman_url),
+      adjust_map_url(map_def_url),
       {
         headers,
       },

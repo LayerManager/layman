@@ -14,8 +14,9 @@ from layman import settings
 from layman.authn import is_user_with_name
 from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import util as common_util
-from layman.util import url_for
+from layman.util import url_for, get_publication_info
 from . import util, input_file
+from .. import MAP_TYPE
 
 MAP_SUBDIR = __name__.split('.')[-1]
 get_metadata_comparison = empty_method_returns_dict
@@ -66,12 +67,11 @@ def get_map_thumbnail_path(username, mapname):
 
 
 def generate_map_thumbnail(username, mapname, editor):
-    map_file_get_url = url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname)
+    map_info = get_publication_info(username, MAP_TYPE, mapname, context={'keys': ['file']})
+    map_file_get_url = map_info['_file']['url']
 
     params = urlencode({
         'map_def_url': map_file_get_url,
-        'layman_url': f"http://{settings.LAYMAN_SERVER_NAME}/",
-        'layman_public_url': f"{settings.LAYMAN_PUBLIC_URL_SCHEME}://{settings.LAYMAN_PROXY_SERVER_NAME}/",
         'gs_url': f"http://{settings.LAYMAN_SERVER_NAME}{settings.LAYMAN_GS_PATH}",
         'gs_public_url': f"{settings.LAYMAN_GS_PROXY_BASE_URL}",
         'editor': editor if is_user_with_name(editor) else '',

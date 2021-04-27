@@ -50,12 +50,7 @@ const proxify = (requested_url) => {
 };
 
 
-export const adjust_map_url = (requested_url, layman_public_url, layman_url) => {
-  if(layman_public_url && layman_url && requested_url.startsWith(layman_public_url)) {
-    const old = requested_url;
-    requested_url = requested_url.replace(layman_public_url, layman_url);
-    console.log(`replaced map URL ${old} with ${requested_url}`);
-  }
+export const adjust_map_url = (requested_url) => {
   return proxify(requested_url);
 };
 

@@ -48,6 +48,9 @@ def get_map_info(workspace, mapname):
                 'path': map_file_path,
                 'url': url_for('rest_workspace_map_file.get', mapname=mapname, workspace=workspace),
             },
+            '_file': {
+                'url': url_for('rest_workspace_map_file.get', mapname=mapname, workspace=workspace, internal=True),
+            },
             'title': map_json['title'] or '',
             'description': map_json['abstract'] or '',
         }
