@@ -4,10 +4,14 @@ import shutil
 from functools import partial
 
 from layman import settings
+from layman.common import empty_method
 from layman.util import get_publication_types
 from layman.layer import LAYER_TYPE
 
 PUBL_TYPE_DEF_KEY = __name__
+
+check_username = empty_method
+check_new_layername = empty_method
 
 
 def get_workspaces_dir():
@@ -43,10 +47,6 @@ def delete_workspace(workspace):
         pass
 
 
-def check_username(username):
-    pass
-
-
 def get_usernames():
     return []
 
@@ -60,10 +60,6 @@ def get_workspaces():
         if os.path.isdir(os.path.join(workspaces_dir, subfile))
     ]
     return workspace
-
-
-def check_new_layername(workspace, layername):
-    pass
 
 
 def get_publications_dir(publ_type, workspace):

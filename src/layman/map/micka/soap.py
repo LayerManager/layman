@@ -1,21 +1,16 @@
 from layman import settings, authz
+from layman.common import empty_method
 from layman.common.micka import util as common_util
 from . import csw
 from .. import MAP_TYPE
 
+pre_publication_action_check = empty_method
+
 get_map_info = csw.get_map_info
-
 post_map = csw.post_map
-
 get_publication_uuid = csw.get_publication_uuid
-
 get_metadata_comparison = csw.get_metadata_comparison
-
 delete_map = csw.delete_map
-
-
-def pre_publication_action_check(workspace, layername):
-    pass
 
 
 def patch_map(workspace, mapname, metadata_properties_to_refresh=None, access_rights=None, actor_name=None):

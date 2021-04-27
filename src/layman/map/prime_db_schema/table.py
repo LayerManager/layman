@@ -1,5 +1,8 @@
+from layman.common import empty_method_returns_dict
 from ...common.prime_db_schema import publications as pubs_util
 from .. import MAP_TYPE
+
+get_metadata_comparison = empty_method_returns_dict
 
 
 def get_publication_uuid(workspace, publication_type, publication_name):
@@ -67,7 +70,3 @@ def post_map(workspace,
 
 def delete_map(workspace, map_name):
     return pubs_util.delete_publication(workspace, MAP_TYPE, map_name)
-
-
-def get_metadata_comparison(workspace, publication_name):
-    pass

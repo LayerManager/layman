@@ -3,6 +3,7 @@ import time
 from celery.utils.log import get_task_logger
 
 from layman.celery import AbortedException
+from layman.common import empty_method_returns_true
 from layman import celery_app
 from layman.http import LaymanError
 from layman import settings
@@ -10,9 +11,8 @@ from . import input_file, input_chunk, thumbnail
 
 logger = get_task_logger(__name__)
 
-
-def refresh_input_chunk_needed(username, layername, task_options):
-    return True
+refresh_input_chunk_needed = empty_method_returns_true
+refresh_thumbnail_needed = empty_method_returns_true
 
 
 @celery_app.task(
@@ -54,10 +54,6 @@ def refresh_input_chunk(self, username, layername, check_crs=True):
     if check_crs:
         main_filepath = input_file.get_layer_main_file_path(username, layername)
         input_file.check_layer_crs(main_filepath)
-
-
-def refresh_thumbnail_needed(username, layername, task_options):
-    return True
 
 
 @celery_app.task(

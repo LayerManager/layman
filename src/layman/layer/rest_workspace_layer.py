@@ -30,6 +30,7 @@ def after_request(response):
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['GET'])
 def get(workspace, layername):
+    # pylint: disable=unused-argument
     app.logger.info(f"GET Layer, user={g.user}")
 
     info = util.get_complete_layer_info(cached=True)

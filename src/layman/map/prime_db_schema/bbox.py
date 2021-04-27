@@ -1,34 +1,9 @@
-def get_publication_uuid(username, publication_type, publication_name):
-    return None
+from layman.common import empty_method, empty_method_returns_dict
 
-
-def get_map_info(username, mapname):
-    return dict()
-
-
-def patch_map(username,
-              mapname,
-              ):
-    pass
-
-
-def pre_publication_action_check(username,
-                                 layername,
-                                 actor_name,
-                                 access_rights=None,
-                                 ):
-    pass
-
-
-def post_map(username,
-             mapname,
-             ):
-    pass
-
-
-def delete_map(username, map_name):
-    return dict()
-
-
-def get_metadata_comparison(username, publication_name):
-    pass
+get_publication_uuid = empty_method
+get_map_info = empty_method_returns_dict
+patch_map = empty_method
+pre_publication_action_check = empty_method
+post_map = empty_method
+delete_map = empty_method
+get_metadata_comparison = empty_method

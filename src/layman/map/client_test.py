@@ -52,8 +52,8 @@ def chrome():
 
 
 @pytest.mark.test_client
-@pytest.mark.usefixtures('ensure_layman')
-def test_post_no_file(client, chrome):
+@pytest.mark.usefixtures('ensure_layman', 'client')
+def test_post_no_file(chrome):
     check_redis_consistency(expected_publ_num_by_type={
         f'{MAP_TYPE}': num_maps_before_test
     })

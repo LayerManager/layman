@@ -11,7 +11,7 @@ PUBLICATION_TASK_INFOS = f'{__name__}:PUBLICATION_TASK_INFOS'
 TASK_ID_TO_PUBLICATION = f'{__name__}:TASK_ID_TO_PUBLICATION'
 
 
-def task_prerun(workspace, publication_type, publication_name, task_id, task_name):
+def task_prerun(workspace, _publication_type, publication_name, _task_id, task_name):
     current_app.logger.info(f"PRE task={task_name}, workspace={workspace}, publication_name={publication_name}")
     rds = settings.LAYMAN_REDIS
     key = REDIS_CURRENT_TASK_NAMES

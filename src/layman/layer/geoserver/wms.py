@@ -6,7 +6,7 @@ from flask import current_app
 from geoserver import util as gs_util
 from layman import settings, patch_mode, util as layman_util
 from layman.cache import mem_redis
-from layman.common import geoserver as gs_common
+from layman.common import geoserver as gs_common, empty_method_returns_none, empty_method
 from layman.layer.util import is_layer_task_ready
 from layman.layer import LAYER_TYPE, util as layer_util
 from .util import get_gs_proxy_base_url
@@ -17,17 +17,13 @@ DEFAULT_WMS_STORE_PREFIX = 'qgis'
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = '1.3.0'
 
+pre_publication_action_check = empty_method
+post_layer = empty_method
+get_publication_uuid = empty_method_returns_none
+
 
 def get_flask_proxy_key(username):
     return FLASK_PROXY_KEY.format(username=username)
-
-
-def pre_publication_action_check(workspace, layername):
-    pass
-
-
-def post_layer(workspace, layername):
-    pass
 
 
 def patch_layer(workspace, layername, title, description, access_rights=None):
@@ -137,10 +133,6 @@ def get_layer_info(workspace, layername):
             'url': wms_proxy_url
         },
     }
-
-
-def get_publication_uuid(workspace, publication_type, publication_name):
-    return None
 
 
 def get_metadata_comparison(workspace, layername):

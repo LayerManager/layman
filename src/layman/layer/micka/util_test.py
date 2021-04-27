@@ -32,8 +32,8 @@ def app_context():
         yield ctx
 
 
-@pytest.mark.usefixtures('app_context', 'ensure_layman')
-def test_fill_template(client):
+@pytest.mark.usefixtures('app_context', 'ensure_layman', 'client')
+def test_fill_template():
     xml_path = 'tmp/record-template.xml'
     try:
         os.remove(xml_path)
@@ -102,8 +102,8 @@ def test_parse_md_properties():
                            equals_fn), f"Values of property {k} do not equal: {value} != {expected[k]}"
 
 
-@pytest.mark.usefixtures('app_context', 'ensure_layman')
-def test_fill_xml_template(client):
+@pytest.mark.usefixtures('app_context', 'ensure_layman', 'client')
+def test_fill_xml_template():
     xml_file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml',
                                                                           {
                                                                               'md_file_identifier': 'm-abc',
@@ -137,8 +137,8 @@ def test_fill_xml_template(client):
     assert len(diff_lines) == 0, f"DIFF LINES:\n{''.join(diff_lines)}"
 
 
-@pytest.mark.usefixtures('app_context', 'ensure_layman')
-def test_num_records(client):
+@pytest.mark.usefixtures('app_context', 'ensure_layman', 'client')
+def test_num_records():
     publs_by_type = uuid.check_redis_consistency()
     num_publications = sum([len(publs) for publs in publs_by_type.values()])
     csw = common_util.create_csw()

@@ -50,7 +50,7 @@ def main():
         print(f"DB {conn_dict['dbname']} created.")
 
 
-def handle_exception(e, attempt, wait_for_msg=None):
+def handle_exception(_e, attempt, wait_for_msg=None):
     if attempt >= MAX_ATTEMPTS:
         print(f"Reaching max attempts when waiting for {wait_for_msg}")
         sys.exit(1)

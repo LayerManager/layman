@@ -6,7 +6,7 @@ from flask import g
 from geoserver import util as gs_util, GS_REST_WORKSPACES
 from layman.http import LaymanError
 from layman import settings, util as layman_util
-from layman.common import bbox as bbox_util, geoserver as gs_common
+from layman.common import bbox as bbox_util, geoserver as gs_common, empty_method
 from layman.layer import LAYER_TYPE, db as db_source
 from layman.layer.qgis import wms as qgis_wms
 from . import wms
@@ -21,6 +21,8 @@ headers_xml = {
     'Accept': 'application/xml',
     'Content-type': 'application/xml',
 }
+
+check_new_layername = empty_method
 
 
 def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
@@ -106,7 +108,7 @@ def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspac
     gs_util.ensure_layer_security_roles(geoserver_workspace, layer, security_write_roles, 'w', auth)
 
 
-def get_default_native_bbox(workspace, layer):
+def get_default_native_bbox():
     return {
         "minx": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[0],
         "miny": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[1],
@@ -142,7 +144,7 @@ def publish_layer_from_db(workspace, layername, description, title, access_right
     db_bbox = db_source.get_bbox(workspace, layername)
     if bbox_util.is_empty(db_bbox):
         # world
-        feature_type_def['nativeBoundingBox'] = get_default_native_bbox(workspace, layername)
+        feature_type_def['nativeBoundingBox'] = get_default_native_bbox()
     r = requests.post(urljoin(GS_REST_WORKSPACES,
                               geoserver_workspace + '/datastores/postgresql/featuretypes/'),
                       data=json.dumps({
@@ -189,7 +191,7 @@ def publish_layer_from_qgis(workspace, layer, description, title, access_rights,
         },
     }
     db_bbox = db_source.get_bbox(workspace, layer)
-    wms_layer_def['nativeBoundingBox'] = get_default_native_bbox(workspace, layer) if bbox_util.is_empty(db_bbox) else {
+    wms_layer_def['nativeBoundingBox'] = get_default_native_bbox() if bbox_util.is_empty(db_bbox) else {
         "minx": db_bbox[0],
         "miny": db_bbox[1],
         "maxx": db_bbox[2],
@@ -218,7 +220,3 @@ def get_workspaces():
     all_workspaces = gs_util.get_all_workspaces(settings.LAYMAN_GS_AUTH)
     result = [workspace for workspace in all_workspaces if not workspace.endswith(settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX)]
     return result
-
-
-def check_new_layername(workspace, layername):
-    pass

@@ -2,6 +2,7 @@ import importlib
 import time
 import sys
 from test import flask_client
+import pytest
 from celery import chain
 from celery.contrib.abortable import AbortableAsyncResult
 
@@ -25,7 +26,8 @@ num_layers_before_test = 0
 client = flask_client.client
 
 
-def test_single_abortable_task(client):
+@pytest.mark.usefixtures('client')
+def test_single_abortable_task():
     task_names = [
         'layman.layer.filesystem.tasks.refresh_input_chunk',
     ]
@@ -75,7 +77,8 @@ def test_single_abortable_task(client):
         input_chunk.delete_layer(workspace, layername)
 
 
-def test_abortable_task_chain(client):
+@pytest.mark.usefixtures('client')
+def test_abortable_task_chain():
     task_names = [
         'layman.layer.filesystem.tasks.refresh_input_chunk',
         'layman.layer.db.tasks.refresh_table',

@@ -8,12 +8,17 @@ from flask import current_app
 
 from layman import LaymanError
 from layman import settings, patch_mode
+from layman.common import empty_method, empty_method_returns_dict
 from . import util
 from . import input_file
 
 LAYER_SUBDIR = __name__.split('.')[-1]
-
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
+
+get_metadata_comparison = empty_method_returns_dict
+pre_publication_action_check = empty_method
+post_layer = empty_method
+patch_layer = empty_method
 
 
 def get_layer_resumable_dir(username, layername):
@@ -34,20 +39,7 @@ def delete_layer(workspace, layername):
 
 
 get_layer_info = input_file.get_layer_info
-
 get_publication_uuid = input_file.get_publication_uuid
-
-
-def pre_publication_action_check(workspace, layername):
-    pass
-
-
-def post_layer(workspace, layername):
-    pass
-
-
-def patch_layer(workspace, layername):
-    pass
 
 
 def save_layer_files_str(username, layername, files_str, check_crs):
@@ -220,7 +212,3 @@ def layer_file_chunk_info(username, layername):
 
 def _get_chunk_name(uploaded_filename, chunk_number):
     return uploaded_filename + "_part_%03d" % chunk_number
-
-
-def get_metadata_comparison(workspace, publication_name):
-    pass

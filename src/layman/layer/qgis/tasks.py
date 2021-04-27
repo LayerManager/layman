@@ -1,15 +1,14 @@
 from celery.utils.log import get_task_logger
 
 from layman import celery_app
+from layman.common import empty_method_returns_true
 from layman.celery import AbortedException
 from . import wms
 
 
 logger = get_task_logger(__name__)
 
-
-def refresh_wms_needed(username, layername, task_options):
-    return True
+refresh_wms_needed = empty_method_returns_true
 
 
 @celery_app.task(

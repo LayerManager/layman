@@ -147,7 +147,8 @@ def single_point_table(testuser1):
         delete_layer(username, layername)
 
 
-def test_abort_import_layer_vector_file(client):
+@pytest.mark.usefixtures('client')
+def test_abort_import_layer_vector_file():
     username = 'testuser1'
     layername = 'ne_10m_admin_0_countries'
     src_dir = 'tmp/naturalearth/10m/cultural'
@@ -180,7 +181,8 @@ def test_abort_import_layer_vector_file(client):
     shutil.rmtree(layerdir)
 
 
-def test_data_language(client, boundary_table):
+@pytest.mark.usefixtures('client')
+def test_data_language(boundary_table):
     username, layername = boundary_table
     # print(f"username={username}, layername={layername}")
     col_names = db.get_text_column_names(username, layername)
@@ -224,7 +226,8 @@ def test_data_language_roads(road_table):
     assert langs == ['cze']
 
 
-def test_populated_places_table(client, populated_places_table):
+@pytest.mark.usefixtures('client')
+def test_populated_places_table(populated_places_table):
     username, layername = populated_places_table
     print(f"username={username}, layername={layername}")
     col_names = db.get_text_column_names(username, layername)
@@ -269,7 +272,8 @@ def test_data_language_countries2(country110m_table):
     assert set(langs) == set(['eng'])
 
 
-def test_get_most_frequent_lower_distance(client, country110m_table, country50m_table, country10m_table,
+@pytest.mark.usefixtures('client')
+def test_get_most_frequent_lower_distance(country110m_table, country50m_table, country10m_table,
                                           data200road_table, sm5building_table):
     username, layername_110m = country110m_table
     username, layername_50m = country50m_table

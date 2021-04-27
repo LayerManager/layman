@@ -1,8 +1,10 @@
+from layman.common import empty_method_returns_dict
 from layman.common.prime_db_schema import publications as pubs_util
 from layman.layer import LAYER_TYPE
 from layman import patch_mode
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
+get_metadata_comparison = empty_method_returns_dict
 
 
 def get_publication_uuid(workspace, publication_type, publication_name):
@@ -75,7 +77,3 @@ def post_layer(workspace,
                'style_type': style_type.code if style_type else None,
                }
     pubs_util.insert_publication(workspace, db_info)
-
-
-def get_metadata_comparison(workspace, publication_name):
-    pass

@@ -20,7 +20,7 @@ ROLE_EVERYONE = settings.RIGHTS_EVERYONE_ROLE
 logger = logging.getLogger(__name__)
 
 
-def migrate_users_and_publications(role_everyone):
+def migrate_users_and_publications():
     workspace_names = global_get_workspaces(use_cache=False)
 
     layer_context = {'sources_filter': 'layman.layer.filesystem.uuid, layman.layer.filesystem.input_chunk, '
@@ -80,13 +80,12 @@ def schema_exists():
     return db_util.run_query(model.EXISTS_SCHEMA_SQL)[0][0] > 0
 
 
-def ensure_schema(db_schema,
-                  role_everyone):
+def ensure_schema(db_schema):
     if not schema_exists():
         try:
             db_util.run_statement(model.CREATE_SCHEMA_SQL)
             db_util.run_statement(model.setup_codelists_data())
-            migrate_users_and_publications(role_everyone)
+            migrate_users_and_publications()
         except BaseException as exc:
             db_util.run_statement(model.DROP_SCHEMA_SQL, conn_cur=db_util.create_connection_cursor())
             raise exc

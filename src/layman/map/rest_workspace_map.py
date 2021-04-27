@@ -33,6 +33,7 @@ def after_request(response):
 
 @bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>", methods=['GET'])
 def get(workspace, mapname):
+    # pylint: disable=unused-argument
     app.logger.info(f"GET Map, user={g.user}")
 
     info = util.get_complete_map_info(cached=True)

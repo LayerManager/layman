@@ -39,6 +39,7 @@ def unexisting_introspection_url():
 
 @pytest.fixture()
 def inactive_token_introspection_url(liferay_mock):
+    # pylint: disable=unused-argument
     introspection_url = liferay.INTROSPECTION_URL
     liferay.INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection"
     yield
@@ -47,6 +48,7 @@ def inactive_token_introspection_url(liferay_mock):
 
 @pytest.fixture()
 def active_token_introspection_url(liferay_mock):
+    # pylint: disable=unused-argument
     introspection_url = liferay.INTROSPECTION_URL
     liferay.INTROSPECTION_URL = process.AUTHN_INTROSPECTION_URL
     yield
@@ -55,6 +57,7 @@ def active_token_introspection_url(liferay_mock):
 
 @pytest.fixture()
 def user_profile_url(liferay_mock):
+    # pylint: disable=unused-argument
     user_profile_url = liferay.USER_PROFILE_URL
     liferay.USER_PROFILE_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile"
     yield

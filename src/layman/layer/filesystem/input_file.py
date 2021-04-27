@@ -6,12 +6,17 @@ from osgeo import ogr
 
 from layman.http import LaymanError
 from layman import settings, patch_mode
+from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import util as common_util, input_file as common
 from . import util
 
 LAYER_SUBDIR = __name__.split('.')[-1]
-
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
+
+pre_publication_action_check = empty_method
+post_layer = empty_method
+patch_layer = empty_method
+get_metadata_comparison = empty_method_returns_dict
 
 
 def get_layer_input_file_dir(username, layername):
@@ -24,18 +29,6 @@ def ensure_layer_input_file_dir(username, layername):
     input_file_dir = get_layer_input_file_dir(username, layername)
     pathlib.Path(input_file_dir).mkdir(parents=True, exist_ok=True)
     return input_file_dir
-
-
-def pre_publication_action_check(workspace, layername):
-    pass
-
-
-def post_layer(workspace, layername):
-    pass
-
-
-def patch_layer(workspace, layername):
-    pass
 
 
 def delete_layer(workspace, layername):
@@ -204,7 +197,3 @@ def get_file_name_mappings(file_names, main_file_name, layer_name, output_dir):
             filename_mapping[file_name] = None
             filepath_mapping[file_name] = None
     return (filename_mapping, filepath_mapping)
-
-
-def get_metadata_comparison(workspace, publication_name):
-    pass
