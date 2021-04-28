@@ -209,7 +209,7 @@ def delete_layer(workspace, layername, source=None, http_method='delete'):
 
     result = {}
     results = call_modules_fn(sources, 'delete_layer', [workspace, layername])
-    for r in results:
+    for r in results.values():
         if r is not None:
             result.update(r)
     celery_util.delete_publication(workspace, LAYER_TYPE, layername)
@@ -258,7 +258,7 @@ def get_metadata_comparison(workspace, layername):
     }
     sources = get_sources()
     partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [workspace, layername])
-    for pi in partial_infos:
+    for pi in partial_infos.values():
         if pi is not None:
             all_props.update(pi)
 

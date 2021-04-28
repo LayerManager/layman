@@ -97,7 +97,7 @@ def get_usernames(use_cache=True, skip_modules=None):
         providers = get_providers_from_source_names(all_sources, skip_modules)
     results = call_modules_fn(providers, 'get_usernames')
     usernames = []
-    for r in results:
+    for r in results.values():
         usernames += r
     usernames = list(set(usernames))
     return usernames
@@ -114,7 +114,7 @@ def get_workspaces(use_cache=True, skip_modules=None):
         providers = get_providers_from_source_names(all_sources, skip_modules)
     results = call_modules_fn(providers, 'get_workspaces')
     workspaces = []
-    for r in results:
+    for r in results.values():
         workspaces += r
     workspaces = list(set(workspaces))
     return workspaces
@@ -226,14 +226,16 @@ def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_cal
         if fn not in fns or not omit_duplicate_calls:
             fns.append(fn)
 
-    results = []
+    results = dict()
     for fn in fns:
-        fn_arg_names = inspect.getfullargspec(fn)[0]
-        res = fn(*args, **{
+        fullargspec = inspect.getfullargspec(fn)
+        fn_arg_names = fullargspec[0]
+        final_kwargs = {
             k: v for k, v in kwargs.items()
             if k in fn_arg_names
-        })
-        results.append(res)
+        }
+        res = fn(*args, **final_kwargs)
+        results[inspect.getmodule(fn)] = res
         if until is not None and until(res):
             return results
 
@@ -296,7 +298,7 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
     partial_infos = call_modules_fn(sources, info_method, [workspace, publ_name])
 
     result = {}
-    for pi in partial_infos:
+    for pi in partial_infos.values():
         result.update(pi)
 
     if 'actor_name' in context:
