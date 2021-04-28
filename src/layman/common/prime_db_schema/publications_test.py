@@ -207,7 +207,7 @@ class TestSelectPublicationsComplex:
         for workspace in workspaces:
             prime_db_schema_client.ensure_user(workspace)
         for workspace, publ_type, publ_name, publ_params in self.publications:
-            prime_db_schema_client.post_workspace_publication(publ_type, workspace, publ_name, workspace,
+            prime_db_schema_client.post_workspace_publication(publ_type, workspace, publ_name, actor=workspace,
                                                               **publ_params)
         yield
         prime_db_schema_client.clear_workspaces(workspaces)
