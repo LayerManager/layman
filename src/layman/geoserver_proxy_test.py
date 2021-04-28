@@ -44,7 +44,7 @@ def test_rest_get():
 
 def setup_user_layer(username, layername, authn_headers):
     client_util.reserve_username(username, headers=authn_headers)
-    client_util.publish_workspace_layer(username, layername, [
+    client_util.publish_workspace_layer(username, layername, file_paths=[
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ], headers=authn_headers)
 
@@ -129,7 +129,7 @@ def test_wfs_proxy():
                       headers=headers4)
     assert r.status_code == 400, r.text
 
-    client_util.delete_workspace_layer(username, layername1, headers)
+    client_util.delete_workspace_layer(username, layername1, headers=headers)
 
 
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
@@ -293,8 +293,8 @@ def test_missing_attribute(style_file, ):
     data_xml = data_wfs.get_wfs11_insert_polygon_new_attr(username, layername, attr_names10)
     wfs_post(username, [(layername, attr_names10)], data_xml)
 
-    client_util.delete_workspace_layer(username, layername, headers)
-    client_util.delete_workspace_layer(username, layername2, headers)
+    client_util.delete_workspace_layer(username, layername, headers=headers)
+    client_util.delete_workspace_layer(username, layername2, headers=headers)
 
 
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
@@ -344,7 +344,7 @@ def test_missing_attribute_authz():
     client_util.reserve_username(username, headers=authn_headers1)
     client_util.publish_workspace_layer(username,
                                         layername1,
-                                        ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+                                        file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
                                         headers=authn_headers1)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
@@ -362,4 +362,4 @@ def test_missing_attribute_authz():
     data_xml = data_wfs.get_wfs20_update_points_new_attr(username, layername1, attr_names)
     do_test(data_xml, attr_names)
 
-    client_util.delete_workspace_layer(username, layername1, headers1)
+    client_util.delete_workspace_layer(username, layername1, headers=headers1)
