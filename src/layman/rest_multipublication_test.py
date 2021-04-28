@@ -362,7 +362,7 @@ class TestGetPublications:
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
     def test_get_publications(publication_type, headers, query_params, expected_publications, expected_headers, ):
-        response = process_client.get_publications_response(publication_type, headers, query_params=query_params)
+        response = process_client.get_publications_response(publication_type, headers=headers, query_params=query_params)
         TestGetPublications.assert_response(response, expected_publications, expected_headers)
 
     @staticmethod
@@ -580,7 +580,7 @@ class TestGetPublications:
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_data')
     def test_get_workspace_publications(publication_type, workspace, headers, query_params, expected_publications, expected_headers, ):
-        response = process_client.get_workspace_publications_response(publication_type, workspace, headers, query_params=query_params)
+        response = process_client.get_workspace_publications_response(publication_type, workspace, headers=headers, query_params=query_params)
         TestGetPublications.assert_response(response, expected_publications, expected_headers)
 
 

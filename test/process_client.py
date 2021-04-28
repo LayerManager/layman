@@ -110,6 +110,7 @@ def raise_layman_error(response, status_codes_to_skip=None):
 def patch_workspace_publication(publication_type,
                                 workspace,
                                 name,
+                                *,
                                 file_paths=None,
                                 headers=None,
                                 access_rights=None,
@@ -170,6 +171,7 @@ patch_workspace_layer = partial(patch_workspace_publication, LAYER_TYPE)
 def ensure_workspace_publication(publication_type,
                                  workspace,
                                  name,
+                                 *,
                                  headers=None,
                                  access_rights=None,
                                  ):
@@ -200,6 +202,7 @@ ensure_workspace_map = partial(ensure_workspace_publication, MAP_TYPE)
 def publish_workspace_publication(publication_type,
                                   workspace,
                                   name,
+                                  *,
                                   file_paths=None,
                                   headers=None,
                                   access_rights=None,
@@ -258,7 +261,7 @@ publish_workspace_map = partial(publish_workspace_publication, MAP_TYPE)
 publish_workspace_layer = partial(publish_workspace_publication, LAYER_TYPE)
 
 
-def get_workspace_publications_response(publication_type, workspace, headers=None, query_params=None, ):
+def get_workspace_publications_response(publication_type, workspace, *, headers=None, query_params=None, ):
     headers = headers or {}
     query_params = query_params or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
@@ -270,15 +273,15 @@ def get_workspace_publications_response(publication_type, workspace, headers=Non
     return r
 
 
-def get_workspace_publications(publication_type, workspace, headers=None, query_params=None, ):
-    return get_workspace_publications_response(publication_type, workspace, headers, query_params,).json()
+def get_workspace_publications(publication_type, workspace, *, headers=None, query_params=None, ):
+    return get_workspace_publications_response(publication_type, workspace, headers=headers, query_params=query_params,).json()
 
 
 get_workspace_maps = partial(get_workspace_publications, MAP_TYPE)
 get_workspace_layers = partial(get_workspace_publications, LAYER_TYPE)
 
 
-def get_publications_response(publication_type, headers=None, query_params=None):
+def get_publications_response(publication_type, *, headers=None, query_params=None):
     headers = headers or {}
     query_params = query_params or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
@@ -290,8 +293,8 @@ def get_publications_response(publication_type, headers=None, query_params=None)
     return r
 
 
-def get_publications(publication_type, headers=None, query_params=None):
-    return get_publications_response(publication_type, headers, query_params).json()
+def get_publications(publication_type, *, headers=None, query_params=None):
+    return get_publications_response(publication_type, headers=headers, query_params=query_params).json()
 
 
 get_maps = partial(get_publications, MAP_TYPE)
@@ -334,7 +337,7 @@ def finish_delete(workspace, url, headers, skip_404=False, ):
     return r.json()
 
 
-def delete_workspace_publication(publication_type, workspace, name, headers=None, skip_404=False, ):
+def delete_workspace_publication(publication_type, workspace, name, *, headers=None, skip_404=False, ):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
@@ -367,7 +370,7 @@ delete_workspace_layers = partial(delete_workspace_publications, LAYER_TYPE)
 
 
 def assert_workspace_publications(publication_type, workspace, expected_publication_names, headers=None):
-    r = get_workspace_publications(publication_type, workspace, headers)
+    r = get_workspace_publications(publication_type, workspace, headers=headers)
     publication_names = [li['name'] for li in r]
     assert set(publication_names) == set(expected_publication_names),\
         f"Publications {expected_publication_names} not equal to {r.text}. publication_type={publication_type}"
