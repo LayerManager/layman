@@ -14,7 +14,7 @@ from layman.util import call_modules_fn, get_providers_from_source_names, get_in
     to_safe_name, url_for
 from . import get_map_sources, MAP_TYPE, get_map_type_def
 from .filesystem import input_file
-from .micka import soap
+from .micka import csw
 from .micka.csw import map_json_to_operates_on, map_json_to_epsg_codes
 
 
@@ -284,15 +284,12 @@ def get_metadata_comparison(workspace, mapname):
     }
     sources = get_sources()
     partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [workspace, mapname])
-    for pi in partial_infos:
+    for pi in partial_infos.values():
         if pi is not None:
             all_props.update(pi)
     map_json = get_map_file_json(workspace, mapname)
     if map_json:
-        soap_idx = sources.index(soap)
-        soap_operates_on = []
-        if partial_infos[soap_idx]:
-            soap_operates_on = next(iter(partial_infos[soap_idx].values()))['operates_on']
+        soap_operates_on = next(iter(partial_infos[csw].values()))['operates_on'] if partial_infos[csw] else []
         operates_on_muuids_filter = micka_util.operates_on_values_to_muuids(soap_operates_on)
         layman_file_props = map_file_to_metadata_properties(map_json, operates_on_muuids_filter)
         map_file_url = url_for('rest_workspace_map_file.get', mapname=mapname, workspace=workspace)

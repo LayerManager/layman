@@ -12,7 +12,7 @@ def authenticate(f):
     def decorated_function(*args, **kwargs):
         # current_app.logger.info(f"authenticate ARGS {args} KWARGS {kwargs}")
         authn_modules = get_authn_modules()
-        results = call_modules_fn(authn_modules, 'authenticate', until=lambda r: r is not None)
+        results = list(call_modules_fn(authn_modules, 'authenticate', until=lambda r: r is not None).values())
         authenticated = len(results) > 0 and results[-1] is not None
         if authenticated:
             authn_module = authn_modules[len(results) - 1]
