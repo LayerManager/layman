@@ -728,8 +728,7 @@ def reload(auth):
     logger.info(f"Reloading GeoServer done")
 
 
-def get_layer_square_bbox(owslib_wms, layername):
-    bbox = list(next(t for t in owslib_wms[layername].crs_list if t[4].lower() == 'epsg:3857'))
+def get_square_bbox(bbox):
     # current_app.logger.info(f"bbox={bbox}")
     min_range = min(bbox[2] - bbox[0], bbox[3] - bbox[1]) / 2
     square_bbox = (

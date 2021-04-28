@@ -205,3 +205,9 @@ LAYMAN_DEFAULT_OUTPUT_BBOX = (
     20026376.39,
     20048966.10,
 )
+
+# If bounding box of layman.layer has no area in at least one dimension,
+# this padding in meters will be added to all dimensions whose coordinates equal for thumbnail rendering.
+# E.g. if bbox is [5, 100, 5, 200] and NO_AREA_BBOX_PADDING_FOR_THUMBNAIL = 10,
+# thumbnail will be rendered with bbox [-5, 100, 15, 200].
+NO_AREA_BBOX_PADDING_FOR_THUMBNAIL = 10
