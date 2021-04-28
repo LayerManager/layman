@@ -26,6 +26,12 @@ Publishing geospatial data online through [REST API](doc/rest.md).
 ## Requirements
 - at least 3 GB RAM
 - at least 5 GB disk space
+- Linux kernel v4.11+ (because of QGIS server and its Qt 5.10+/libQt5Core dependency), for example
+  - Ubuntu 18.04.2+
+  - CentOS 8+
+  - Fedora 29+
+
+    You can check your kernel version with `uname -r`.
 - docker v17.12+, installation instructions for [centos 7](https://docs.docker.com/install/linux/docker-ce/centos/)
 - docker-compose v1.14+, installation instructions for [centos 7](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-centos-7)
 
