@@ -1,12 +1,13 @@
 import os
 import pathlib
 
+from geoserver import util as gs_util
 from layman import settings, LaymanError, patch_mode
-from layman.util import url_for
-from layman.common import empty_method, empty_method_returns_dict
+from layman.util import url_for, get_publication_info
+from layman.common import empty_method, empty_method_returns_dict, bbox as bbox_util
 from layman.common.filesystem import util as common_util
 from . import util, input_file
-from ..geoserver import wms as geoserver_wms
+from .. import LAYER_TYPE
 
 LAYER_SUBDIR = __name__.split('.')[-1]
 
@@ -59,12 +60,12 @@ def generate_layer_thumbnail(workspace, layername):
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
-    wms_url = geoserver_wms.get_wms_url(workspace)
-    from geoserver.util import get_layer_thumbnail, get_layer_square_bbox
-    from layman.layer.geoserver.util import wms_proxy
-    wms = wms_proxy(wms_url, headers=headers)
-    # current_app.logger.info(list(wms.contents))
-    tn_bbox = get_layer_square_bbox(wms, layername)
+    layer_info = get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['wms', 'bounding_box']})
+    wms_url = layer_info['_wms']['url']
+    raw_bbox = layer_info['bounding_box'] if not bbox_util.is_empty(layer_info['bounding_box']) \
+        else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+    bbox = bbox_util.ensure_bbox_with_area(raw_bbox, settings.NO_AREA_BBOX_PADDING_FOR_THUMBNAIL)
+    tn_bbox = gs_util.get_square_bbox(bbox)
     # TODO https://github.com/geopython/OWSLib/issues/709
     # tn_img = wms.getmap(
     #     layers=[layername],
@@ -81,7 +82,7 @@ def generate_layer_thumbnail(workspace, layername):
     # out.close()
 
     from layman.layer.geoserver.wms import VERSION
-    r = get_layer_thumbnail(wms_url, layername, tn_bbox, headers=headers, wms_version=VERSION)
+    r = gs_util.get_layer_thumbnail(wms_url, layername, tn_bbox, headers=headers, wms_version=VERSION)
     if "png" not in r.headers['content-type'].lower():
         raise LaymanError("Thumbnail rendering failed", data=r.content)
     r.raise_for_status()

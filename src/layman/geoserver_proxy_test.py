@@ -5,7 +5,7 @@ import requests
 from owslib.feature.schema import get_schema as get_wfs_schema
 import pytest
 
-from geoserver.util import get_layer_thumbnail, get_layer_square_bbox
+from geoserver.util import get_layer_thumbnail, get_square_bbox
 from layman import app, settings
 from layman.layer import db, util as layer_util
 from layman.layer.geoserver import wfs as geoserver_wfs
@@ -145,10 +145,8 @@ def test_wms_ows_proxy(service_endpoint):
 
     wms_url = geoserver_client.get_wms_url(username, service_endpoint)
 
-    wms = geoserver_client.get_wms_capabilities(username, service_endpoint, headers=authn_headers)
-
-    # current_app.logger.info(list(wms.contents))
-    tn_bbox = get_layer_square_bbox(wms, layername)
+    layer_info = client_util.get_workspace_layer(username, layername, headers=authn_headers)
+    tn_bbox = get_square_bbox(layer_info['bounding_box'])
 
     from layman.layer.geoserver.wms import VERSION
     r = get_layer_thumbnail(wms_url, layername, tn_bbox, headers=authn_headers, wms_version=VERSION)
