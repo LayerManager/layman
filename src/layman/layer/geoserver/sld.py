@@ -20,11 +20,6 @@ def get_workspace_style_url(workspace, style=None):
     return gs_util.get_workspace_style_url(geoserver_workspace, style)
 
 
-def get_workspace_layer_url(workspace, layer=None):
-    geoserver_workspace = wms.get_geoserver_workspace(workspace)
-    return gs_util.get_workspace_layer_url(geoserver_workspace, layer)
-
-
 def delete_layer(workspace, layername):
     geoserver_workspace = wms.get_geoserver_workspace(workspace)
     sld_stream = gs_util.delete_workspace_style(geoserver_workspace, layername, auth=settings.LAYMAN_GS_AUTH)
