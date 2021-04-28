@@ -30,7 +30,7 @@ def ensure_user(workspace):
         users.ensure_user(workspace_id, user_info)
 
 
-def post_workspace_publication(publication_type, workspace, name, actor=None, access_rights=None, title=None,
+def post_workspace_publication(publication_type, workspace, name, *, actor=None, access_rights=None, title=None,
                                bbox=None, style_type='sld'):
     access_rights = access_rights or {}
     default_access_rights = {settings.RIGHTS_EVERYONE_ROLE} if not actor else {actor}
