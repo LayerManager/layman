@@ -108,14 +108,25 @@ def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspac
     gs_util.ensure_layer_security_roles(geoserver_workspace, layer, security_write_roles, 'w', auth)
 
 
-def get_default_native_bbox():
+def bbox_to_native_bbox(bbox):
     return {
-        "minx": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[0],
-        "miny": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[1],
-        "maxx": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[2],
-        "maxy": settings.LAYMAN_DEFAULT_OUTPUT_BBOX[3],
+        "minx": bbox[0],
+        "miny": bbox[1],
+        "maxx": bbox[2],
+        "maxy": bbox[3],
         "crs": "EPSG:3857",
     }
+
+
+def get_default_native_bbox():
+    return bbox_to_native_bbox(settings.LAYMAN_DEFAULT_OUTPUT_BBOX)
+
+
+def get_layer_native_bbox(workspace, layer):
+    db_bbox = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['bounding_box']})['bounding_box']
+    # GeoServer is not working good with degradeted bbox
+    bbox = bbox_util.ensure_bbox_with_area(db_bbox, settings.NO_AREA_BBOX_PADDING) if not bbox_util.is_empty(db_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+    return bbox_to_native_bbox(bbox)
 
 
 def publish_layer_from_db(workspace, layername, description, title, access_rights, geoserver_workspace=None):
@@ -140,11 +151,8 @@ def publish_layer_from_db(workspace, layername, description, title, access_right
             "@class": "dataStore",
             "name": geoserver_workspace + ":postgresql",
         },
+        'nativeBoundingBox': get_layer_native_bbox(workspace, layername),
     }
-    db_bbox = db_source.get_bbox(workspace, layername)
-    if bbox_util.is_empty(db_bbox):
-        # world
-        feature_type_def['nativeBoundingBox'] = get_default_native_bbox()
     r = requests.post(urljoin(GS_REST_WORKSPACES,
                               geoserver_workspace + '/datastores/postgresql/featuretypes/'),
                       data=json.dumps({
@@ -189,14 +197,7 @@ def publish_layer_from_qgis(workspace, layer, description, title, access_rights,
             "@class": "wmsStore",
             "name": geoserver_workspace + f":{store_name}",
         },
-    }
-    db_bbox = db_source.get_bbox(workspace, layer)
-    wms_layer_def['nativeBoundingBox'] = get_default_native_bbox() if bbox_util.is_empty(db_bbox) else {
-        "minx": db_bbox[0],
-        "miny": db_bbox[1],
-        "maxx": db_bbox[2],
-        "maxy": db_bbox[3],
-        "crs": "EPSG:3857",
+        'nativeBoundingBox': get_layer_native_bbox(workspace, layer),
     }
     r = requests.post(urljoin(GS_REST_WORKSPACES,
                               geoserver_workspace + '/wmslayers/'),
