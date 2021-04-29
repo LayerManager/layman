@@ -72,6 +72,10 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
 
 
 def check_response_keys(keys_to_check, response):
+    if any(response.json()[k].get('status') == 'FAILURE' for k in keys_to_check):
+        error_keys = [k for k in keys_to_check if response.json()[k].get('status') == 'FAILURE']
+        logger.error(f"failed_keys={error_keys}")
+        raise Exception('Some step failed!')
     return response.status_code == 200 and all(
         'status' not in response.json()[k] for k in keys_to_check
     )
