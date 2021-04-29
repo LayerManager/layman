@@ -4,6 +4,11 @@ import time
 import requests
 from requests.exceptions import ConnectionError
 from PIL import Image, ImageChops
+from layman.util import url_for as layman_url_for
+
+
+def url_for(endpoint, *, internal=True, **values):
+    return layman_url_for(endpoint, internal=internal, **values)
 
 
 # utils
