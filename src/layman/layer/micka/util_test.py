@@ -2,12 +2,12 @@ import os
 import filecmp
 import difflib
 import sys
+from test.util import url_for
 import pytest
 
 del sys.modules['layman']
 
 from layman import uuid, app, settings
-from layman.util import url_for
 from layman.common.micka import util as common_util
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals
 from .csw import _get_property_values, METADATA_PROPERTIES
@@ -89,11 +89,13 @@ def test_parse_md_properties():
                 'label': 'MZP-CORINE',
             },
             'abstract': None,
-            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace='browser', layername='layer'),
+            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace='browser', layername='layer',
+                                   internal=False),
             'extent': [11.87, 48.12, 19.13, 51.59],
             'wms_url': 'http://www.env.cz/corine/data/download.zip',
             'wfs_url': 'http://www.env.cz/corine/data/download.zip',
-            'layer_endpoint': url_for('rest_workspace_layer.get', workspace='browser', layername='layer'),
+            'layer_endpoint': url_for('rest_workspace_layer.get', workspace='browser', layername='layer',
+                                      internal=False),
         }
     assert set(props.keys()) == set(expected.keys())
     for k, value in props.items():

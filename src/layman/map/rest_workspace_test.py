@@ -6,14 +6,13 @@ import time
 import difflib
 import sys
 from test import flask_client
+from test.util import url_for, url_for_external
 import requests
 import pytest
-from flask import url_for
 
 del sys.modules['layman']
 
 from layman import app, settings, uuid, celery as celery_util
-from layman.util import url_for as url_for_external
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from . import util, MAP_TYPE
@@ -293,13 +292,13 @@ def test_post_maps_simple(client):
                 15.42,
                 50.82
             ],
-            'graphic_url': url_for('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
+            'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
             'identifier': {
-                "identifier": url_for('rest_workspace_map.get', workspace=username, mapname=mapname),
+                "identifier": url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
                 "label": "administrativni_cleneni_libereckeho_kraje"
             },
-            'map_endpoint': url_for('rest_workspace_map.get', workspace=username, mapname=mapname),
-            'map_file_endpoint': url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname),
+            'map_endpoint': url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
+            'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=username, mapname=mapname),
             'operates_on': [],
             'organisation_name': None,
             'publication_date': TODAY_DATE,
@@ -422,13 +421,13 @@ def test_post_maps_complex(client):
                 15.42,
                 50.82
             ],
-            'graphic_url': url_for('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
+            'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
             'identifier': {
-                "identifier": url_for('rest_workspace_map.get', workspace=username, mapname=mapname),
+                "identifier": url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
                 "label": "libe"
             },
-            'map_endpoint': url_for('rest_workspace_map.get', workspace=username, mapname=mapname),
-            'map_file_endpoint': url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname),
+            'map_endpoint': url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
+            'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=username, mapname=mapname),
             'operates_on': [],
             'organisation_name': None,
             'publication_date': TODAY_DATE,
@@ -554,13 +553,13 @@ def test_patch_map(client):
                 15.42,
                 50.82
             ],
-            'graphic_url': url_for('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
+            'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
             'identifier': {
-                "identifier": url_for('rest_workspace_map.get', workspace=username, mapname=mapname),
+                "identifier": url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
                 "label": "administrativni_cleneni_libereckeho_kraje"
             },
-            'map_endpoint': url_for('rest_workspace_map.get', workspace=username, mapname=mapname),
-            'map_file_endpoint': url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname),
+            'map_endpoint': url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
+            'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=username, mapname=mapname),
             'operates_on': [],
             'organisation_name': None,
             'publication_date': TODAY_DATE,
@@ -804,13 +803,13 @@ def test_map_composed_from_local_layers(client):
                 179.0,
                 81.5
             ],
-            'graphic_url': url_for('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
+            'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
             'identifier': {
-                "identifier": url_for('rest_workspace_map.get', workspace=username, mapname=mapname),
+                "identifier": url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
                 "label": "svet"
             },
-            'map_endpoint': url_for('rest_workspace_map.get', workspace=username, mapname=mapname),
-            'map_file_endpoint': url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname),
+            'map_endpoint': url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
+            'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=username, mapname=mapname),
             'operates_on': [
                 {
                     "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{layer2uuid}#_m-{layer2uuid}",

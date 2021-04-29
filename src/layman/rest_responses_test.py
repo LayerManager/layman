@@ -77,12 +77,12 @@ class TestResponsesClass:
     expected_layers = {
         **expected_common_multi,
         'bounding_box': list(test_data.SMALL_LAYER_BBOX),
-        'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
+        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
     }
     expected_maps = {
         **expected_common_multi,
         'bounding_box': list(test_data.SMALL_MAP_BBOX),
-        'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}',
+        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}',
     }
 
     expected_common = {
@@ -98,18 +98,18 @@ class TestResponsesClass:
         'bounding_box': list(test_data.SMALL_LAYER_BBOX),
         'db_table': {'name': publication},
         'file': {'path': f'layers/{publication}/input_file/{publication}.geojson'},
-        'metadata': {'comparison_url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/'
+        'metadata': {'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/'
                                        f'metadata-comparison',
                      'csw_url': f'{settings.CSW_PROXY_URL}',
                      'identifier': None,
                      'record_url': None},
         'sld': {'type': 'sld',
-                'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/style'},
+                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/style'},
         'style': {'type': 'sld',
-                  'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/style'},
+                  'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/style'},
         'thumbnail': {'path': f'layers/{publication}/thumbnail/{publication}.png',
-                      'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/thumbnail'},
-        'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
+                      'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/thumbnail'},
+        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
         'wfs': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}/wfs'},
         'wms': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}_wms/ows'},
     }
@@ -117,16 +117,16 @@ class TestResponsesClass:
         **expected_common,
         'bounding_box': list(test_data.SMALL_MAP_BBOX),
         'file': {'path': f'maps/{publication}/input_file/{publication}.json',
-                 'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/file'},
+                 'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/file'},
         'metadata': {
-            'comparison_url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/'
+            'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/'
                               f'metadata-comparison',
             'csw_url': f'{settings.CSW_PROXY_URL}',
             'identifier': None,
             'record_url': None},
         'thumbnail': {'path': f'maps/{publication}/thumbnail/{publication}.png',
-                      'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/thumbnail'},
-        'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}',
+                      'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/thumbnail'},
+        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}',
         'uuid': None,
     }
 

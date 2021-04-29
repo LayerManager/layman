@@ -1,9 +1,9 @@
 from test import process_client
+from test.util import url_for
 import requests
 import pytest
 
 from layman import app
-from layman.util import url_for
 
 
 @pytest.mark.usefixtures('ensure_layman')

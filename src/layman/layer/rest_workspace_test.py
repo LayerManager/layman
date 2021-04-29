@@ -10,9 +10,9 @@ import logging
 import sys
 from test import flask_client, process_client
 from test.data import wfs as data_wfs
+from test.util import url_for, url_for_external
 import requests
 import pytest
-from flask import url_for
 
 del sys.modules['layman']
 
@@ -83,7 +83,7 @@ def check_metadata(client, username, layername, props_equal, expected_values):
                 vals = list(v['values'].values())
                 vals.append(expected_values[k])
                 assert prop_equals_strict(vals, equals_fn=PROPERTIES[k].get('equals_fn',
-                                                                            None)), f"Property {k} has unexpected values {json.dumps(vals, indent=2)}"
+                                                                            None)), f"Property {k} has unexpected values {json.dumps(v, indent=2)}"
 
 
 @pytest.fixture(scope="module")
@@ -314,8 +314,8 @@ def test_post_layers_simple(client):
         assert layer_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
         md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
         assert layer_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
-        assert layer_info['metadata']['comparison_url'] == url_for('rest_workspace_layer_metadata_comparison.get',
-                                                                   workspace=username, layername=layername)
+        assert layer_info['metadata']['comparison_url'] == url_for_external('rest_workspace_layer_metadata_comparison.get',
+                                                                            workspace=username, layername=layername)
         assert 'id' not in layer_info.keys()
         assert 'type' not in layer_info.keys()
 
@@ -331,13 +331,13 @@ def test_post_layers_simple(client):
         expected_md_values = {
             'abstract': None,
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
+            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
             'identifier': {
-                'identifier': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
+                'identifier': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
                 'label': 'ne_110m_admin_0_countries'
             },
             'language': ['eng'],
-            'layer_endpoint': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
+            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -603,13 +603,13 @@ def test_post_layers_complex(client):
         expected_md_values = {
             'abstract': "popis st\u00e1t\u016f",
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
+            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
             'identifier': {
-                "identifier": url_for('rest_workspace_layer.get', workspace=username, layername=layername),
+                "identifier": url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
                 "label": "countries"
             },
             'language': ["eng"],
-            'layer_endpoint': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
+            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -758,13 +758,13 @@ def test_patch_layer_title(client):
         expected_md_values = {
             'abstract': "and new description",
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
+            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
             'identifier': {
-                'identifier': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
+                'identifier': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
                 'label': 'ne_110m_admin_0_countries'
             },
             'language': ['eng'],
-            'layer_endpoint': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
+            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -824,13 +824,13 @@ def test_patch_layer_style(client):
         expected_md_values = {
             'abstract': "and new description",
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
+            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
             'identifier': {
-                'identifier': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
+                'identifier': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
                 'label': 'ne_110m_admin_0_countries'
             },
             'language': ['eng'],
-            'layer_endpoint': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
+            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -965,13 +965,13 @@ def test_patch_layer_data(client):
         expected_md_values = {
             'abstract': "popis st\u00e1t\u016f",
             'extent': [-175.22056435043098, -41.29999116752133, 179.21664802661394, 64.15002486626597],
-            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
+            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
             'identifier': {
-                'identifier': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
+                'identifier': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
                 "label": "countries"
             },
             'language': ["eng", 'chi', 'rus'],
-            'layer_endpoint': url_for('rest_workspace_layer.get', workspace=username, layername=layername),
+            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],

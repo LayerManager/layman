@@ -1,8 +1,8 @@
 import sys
 from test import process, process_client
+from test.util import url_for
 import requests
 import pytest
-from layman.util import url_for
 
 del sys.modules['layman']
 
