@@ -251,7 +251,7 @@ def url_for(endpoint, *, internal=False, **values):
     # Flask does not accept SERVER_NAME without dot, and without SERVER_NAME url_for cannot be used
     # therefore DUMB_MAP_ADAPTER is created manually ...
     global DUMB_MAP_ADAPTER
-    if current_app.config.get('SERVER_NAME', None) is None:
+    if current_app.config.get('SERVER_NAME', None) is None or current_app.config['TESTING'] is True:
         if DUMB_MAP_ADAPTER is None:
             DUMB_MAP_ADAPTER = current_app.url_map.bind(
                 settings.LAYMAN_PROXY_SERVER_NAME,
