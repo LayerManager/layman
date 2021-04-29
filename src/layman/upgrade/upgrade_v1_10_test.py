@@ -4,12 +4,12 @@ import shutil
 import os
 from collections import namedtuple
 from test import process_client, util
+from test.util import url_for
 import pytest
 
 from db import util as db_util
 from geoserver import util as gs_util
 from layman import app, settings
-from layman.util import url_for
 from layman.http import LaymanError
 from layman.common import prime_db_schema
 from layman.layer import geoserver as gs_layer, util as layer_util, db, NO_STYLE_DEF
@@ -151,7 +151,8 @@ def test_migrate_layers_to_wms_workspace(ensure_layer):
     assert layer_info['wms']['url'] == f'http://localhost:8000/geoserver/{wms_workspace}/ows'
     assert layer_info['wfs']['url'] == f'http://localhost:8000/geoserver/{workspace}/wfs'
     with app.app_context():
-        assert layer_info['style']['url'] == url_for('rest_workspace_layer_style.get', workspace=workspace, layername=layer)
+        assert layer_info['style']['url'] == url_for('rest_workspace_layer_style.get', workspace=workspace, layername=layer,
+                                                     internal=False)
 
     all_workspaces = gs_util.get_all_workspaces(settings.LAYMAN_GS_AUTH)
     assert workspace in all_workspaces

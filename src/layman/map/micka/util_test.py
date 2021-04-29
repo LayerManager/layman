@@ -2,11 +2,12 @@ import os
 import filecmp
 import difflib
 import sys
+from test.util import url_for
 import pytest
 
 del sys.modules['layman']
 
-from layman import app, settings, util as layman_util
+from layman import app, settings
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals
 from layman.common.micka import util as common_util
 from .csw import _get_property_values, METADATA_PROPERTIES
@@ -80,14 +81,17 @@ def test_parse_md_properties():
             'title': 'World places and boundaries',
             'publication_date': '2007-05-25',
             'identifier': {
-                'identifier': layman_util.url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet'),
+                'identifier': url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet', internal=False),
                 'label': 'svet',
             },
             'abstract': 'World places and boundaries abstract',
-            'graphic_url': layman_util.url_for('rest_workspace_map_thumbnail.get', workspace='testuser1', mapname='svet'),
+            'graphic_url': url_for('rest_workspace_map_thumbnail.get', workspace='testuser1', mapname='svet',
+                                   internal=False),
             'extent': [-35, -48.5, 179, 81.5],
-            'map_endpoint': layman_util.url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet'),
-            'map_file_endpoint': layman_util.url_for('rest_workspace_map_file.get', workspace='testuser1', mapname='svet'),
+            'map_endpoint': url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet',
+                                    internal=False),
+            'map_file_endpoint': url_for('rest_workspace_map_file.get', workspace='testuser1', mapname='svet',
+                                         internal=False),
             'operates_on': [
                 {
                     'xlink:href': 'http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-39cc8994-adbc-427a-8522-569eb7e691b2#_m-39cc8994-adbc-427a-8522-569eb7e691b2',
@@ -117,15 +121,18 @@ def test_fill_xml_template():
             'title': 'World places and boundaries',
             'publication_date': '2007-05-25',
             'identifier': {
-                'identifier': layman_util.url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet'),
+                'identifier': url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet', internal=False),
                 'label': 'svet',
             },
             'abstract': 'World places and boundaries abstract',
             'organisation_name': None,
-            'graphic_url': layman_util.url_for('rest_workspace_map_thumbnail.get', workspace='testuser1', mapname='svet'),
+            'graphic_url': url_for('rest_workspace_map_thumbnail.get', workspace='testuser1', mapname='svet',
+                                   internal=False),
             'extent': [-35, -48.5, 179, 81.5],
-            'map_endpoint': layman_util.url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet'),
-            'map_file_endpoint': layman_util.url_for('rest_workspace_map_file.get', workspace='testuser1', mapname='svet'),
+            'map_endpoint': url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet',
+                                    internal=False),
+            'map_file_endpoint': url_for('rest_workspace_map_file.get', workspace='testuser1', mapname='svet',
+                                         internal=False),
             'md_language': 'cze',
             'operates_on': [
                 {

@@ -1,10 +1,10 @@
 from test import process_client
+from test.util import url_for
 import requests
 from flask import g
 import pytest
 
 from layman import app, settings, LaymanError
-from layman.util import url_for
 from . import authorize_workspace_publications_decorator
 
 

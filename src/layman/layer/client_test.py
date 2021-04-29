@@ -2,6 +2,7 @@ import glob
 import time
 import os
 from test import process, process_client
+from test.util import url_for
 import requests
 import pytest
 
@@ -10,7 +11,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from layman.layer.filesystem import input_chunk
-from layman import settings, util as layman_util, app
+from layman import settings, app
 
 
 username = 'testuser1'
@@ -93,7 +94,7 @@ def test_post_layers_chunk(chrome):
     time.sleep(0.5)
 
     with app.app_context():
-        layer_url = layman_util.url_for('rest_workspace_layer.get', workspace=username, layername=layername)
+        layer_url = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
     r = requests.get(layer_url)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
     max_attempts = 20
@@ -178,7 +179,7 @@ def test_patch_layer_chunk(chrome):
     time.sleep(0.5)
 
     with app.app_context():
-        layer_url = layman_util.url_for('rest_workspace_layer.get', workspace=username, layername=layername)
+        layer_url = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
     r = requests.get(layer_url)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
     max_attempts = 20

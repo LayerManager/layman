@@ -2,18 +2,16 @@ from test import process_client
 import importlib
 import pytest
 
-from layman import util as layman_util
 from layman.layer import LAYER_TYPE
 from . import app, settings, LaymanError, util
-from .util import slugify, get_modules_from_names, get_providers_from_source_names, url_for
 
 
 def test_slugify():
-    assert slugify('Brno-město') == 'brno_mesto'
-    assert slugify('Brno__město') == 'brno_mesto'
-    assert slugify(' ') == ''
-    assert slugify(' ?:"+  @') == ''
-    assert slugify('01 Stanice vodních toků 26.4.2017 (voda)') == \
+    assert util.slugify('Brno-město') == 'brno_mesto'
+    assert util.slugify('Brno__město') == 'brno_mesto'
+    assert util.slugify(' ') == ''
+    assert util.slugify(' ?:"+  @') == ''
+    assert util.slugify('01 Stanice vodních toků 26.4.2017 (voda)') == \
         '01_stanice_vodnich_toku_26_4_2017_voda'
 
 
@@ -42,7 +40,7 @@ def test_get_users_workspaces():
         all_sources = []
         for type_def in util.get_publication_types(use_cache=False).values():
             all_sources += type_def['internal_sources']
-        providers = get_providers_from_source_names(all_sources)
+        providers = util.get_providers_from_source_names(all_sources)
         for provider in providers:
             with app.app_context():
                 usernames = provider.get_usernames()
@@ -90,8 +88,8 @@ def test_publication_interface_methods():
         'delete_workspace',
     }
 
-    provider_modules_getter = get_providers_from_source_names
-    source_modules_getter = get_modules_from_names
+    provider_modules_getter = util.get_providers_from_source_names
+    source_modules_getter = util.get_modules_from_names
 
     # In future, also parameters can be tested
     interfaces = [
@@ -196,10 +194,10 @@ def test_get_publication_info_items(publication_type):
     process_client.publish_workspace_publication(publication_type, workspace, publication)
 
     with app.app_context():
-        for _, source_def in layman_util.get_publication_types()[publication_type]['internal_sources'].items():
+        for _, source_def in util.get_publication_types()[publication_type]['internal_sources'].items():
             for key in source_def.info_items:
                 context = {'keys': [key]}
-                info = layman_util.get_publication_info(workspace, publication_type, publication, context)
+                info = util.get_publication_info(workspace, publication_type, publication, context)
                 assert key in info, info
                 internal_keys = [key[1:] for key in info if key.startswith('_')]
                 assert set(internal_keys) <= set(source_def.info_items)
@@ -207,12 +205,14 @@ def test_get_publication_info_items(publication_type):
     process_client.delete_workspace_publication(publication_type, workspace, publication)
 
 
-@pytest.mark.parametrize('endpoint, params, expected_url', [
-    ('rest_workspace_maps.get', {'workspace': 'workspace_name'},
-     f'http://{settings.LAYMAN_SERVER_NAME}/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/maps'),
-    ('rest_workspace_layers.get', {'workspace': 'workspace_name'},
-     f'http://{settings.LAYMAN_SERVER_NAME}/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/layers'),
+@pytest.mark.parametrize('endpoint, internal, params, expected_url', [
+    ('rest_workspace_maps.get', False, {'workspace': 'workspace_name'},
+     f'http://enjoychallenge.tech/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/maps'),
+    ('rest_workspace_layers.get', False, {'workspace': 'workspace_name'},
+     f'http://enjoychallenge.tech/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/layers'),
+    ('rest_about.get_version', True, {}, 'http://layman_test_run_1:8000/rest/about/version'),
+    ('rest_about.get_version', False, {}, 'http://enjoychallenge.tech/rest/about/version'),
 ])
-def test_url_for(endpoint, params, expected_url):
+def test_url_for(endpoint, internal, params, expected_url):
     with app.app_context():
-        assert url_for(endpoint, **params) == expected_url
+        assert util.url_for(endpoint, internal=internal, **params) == expected_url

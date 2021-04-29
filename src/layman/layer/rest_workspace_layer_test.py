@@ -1,13 +1,13 @@
 import json
 import sys
 from test import process_client
+from test.util import url_for
 import requests
 import pytest
 
 del sys.modules['layman']
 
 from layman import app
-from layman.util import url_for
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -19,7 +19,8 @@ def test_style_value():
 
     with app.app_context():
         layer_url = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
-        expected_style_url = url_for('rest_workspace_layer_style.get', workspace=username, layername=layername)
+        expected_style_url = url_for('rest_workspace_layer_style.get', workspace=username, layername=layername,
+                                     internal=False)
     r = requests.get(layer_url)
     assert r.status_code == 200, r.text
     resp_json = json.loads(r.text)
@@ -28,8 +29,11 @@ def test_style_value():
     assert 'url' in resp_json['style'], r.text
     assert 'status' not in resp_json['style'], r.text
 
-    style_url = resp_json['style']['url']
-    assert style_url == expected_style_url, (r.text, style_url)
+    external_style_url = resp_json['style']['url']
+    assert external_style_url == expected_style_url, (r.text, external_style_url)
+
+    with app.app_context():
+        style_url = url_for('rest_workspace_layer_style.get', workspace=username, layername=layername)
 
     r_get = requests.get(style_url)
     assert r_get.status_code == 200, (r_get.text, style_url)

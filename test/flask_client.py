@@ -6,7 +6,7 @@ import pytest
 from layman import app, settings, celery as celery_util
 from layman.layer import util as util_layer
 from layman.map import util as util_map
-from layman.util import url_for
+from .util import url_for
 
 
 def publish_layer(workspace,

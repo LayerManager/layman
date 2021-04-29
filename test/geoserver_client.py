@@ -1,8 +1,8 @@
 import requests
 from layman import app
-from layman.util import url_for
 from layman.layer.geoserver.util import wfs_direct, wms_direct
 from layman.layer.geoserver import wfs
+from .util import url_for
 
 
 def get_url(workspace, service_endpoint):

@@ -2,13 +2,14 @@ import os
 import sys
 from urllib.parse import urljoin
 from test import process_client, util as test_util
+from test.util import url_for
 import requests
 import pytest
 
 del sys.modules['layman']
 
 from geoserver import GS_REST_WORKSPACES
-from layman import app, util as layman_util, settings
+from layman import app, settings
 from layman.layer import util as layer_util
 from layman.layer.filesystem import input_style
 from layman.layer.geoserver.wms import DEFAULT_WMS_STORE_PREFIX
@@ -29,7 +30,7 @@ def test_get_layer_title():
 
     # layers.GET
     with app.app_context():
-        url = layman_util.url_for('rest_workspace_layers.get', workspace=username)
+        url = url_for('rest_workspace_layers.get', workspace=username)
     rv = requests.get(url)
     assert rv.status_code == 200, rv.text
 

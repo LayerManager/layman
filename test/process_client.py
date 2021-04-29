@@ -9,9 +9,9 @@ import xml.etree.ElementTree as ET
 import requests
 
 from layman import app
-from layman.util import url_for
 from layman.layer.geoserver import wfs, wms
 from layman.http import LaymanError
+from .util import url_for
 
 logger = logging.getLogger(__name__)
 

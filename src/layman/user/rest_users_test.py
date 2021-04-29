@@ -1,8 +1,8 @@
+from test.util import url_for
 import requests
 import pytest
 
 from layman import app, settings
-from layman.util import url_for
 from layman.common.prime_db_schema import ensure_whole_user
 
 

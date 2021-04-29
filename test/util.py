@@ -11,6 +11,11 @@ def url_for(endpoint, *, internal=True, **values):
     return layman_url_for(endpoint, internal=internal, **values)
 
 
+def url_for_external(endpoint, **values):
+    assert not values.get('internal', False)
+    return url_for(endpoint, internal=False, **values)
+
+
 # utils
 def wait_for_url(url, max_attempts, sleeping_time):
     attempt = 1
