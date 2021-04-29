@@ -142,7 +142,7 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
 
     complete_info.update(partial_info)
 
-    clear_publication_info(complete_info)
+    complete_info = clear_publication_info(complete_info)
 
     complete_info['sld'] = complete_info['style']
     return complete_info
