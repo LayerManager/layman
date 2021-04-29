@@ -177,7 +177,7 @@ def get_complete_map_info(username=None, mapname=None, cached=False):
 
     complete_info.update(partial_info)
 
-    clear_publication_info(complete_info)
+    complete_info = clear_publication_info(complete_info)
 
     return complete_info
 
