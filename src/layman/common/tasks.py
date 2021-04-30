@@ -33,6 +33,22 @@ def get_task_methods(publ_type, workspace, publ_name, task_options, start_at):
     return task_methods
 
 
+def get_source_task_methods(publ_type, method_name):
+    source_module_names = list(publ_type['internal_sources'].keys())
+    task_module_names = [f"{name}_tasks" for name in source_module_names]
+    task_methods = []
+    for task_module_name in task_module_names:
+        try:
+            task_module = importlib.import_module(task_module_name)
+        except ModuleNotFoundError:
+            continue
+        task_method = getattr(task_module, method_name, None)
+        if task_method is None:
+            continue
+        task_methods.append(task_method)
+    return task_methods
+
+
 def get_chain_of_methods(workspace, publ_name, task_methods, task_options, publ_param_name):
     return chain(*[
         _get_task_signature(workspace, publ_name, t, task_options, publ_param_name)
