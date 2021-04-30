@@ -4,6 +4,9 @@ import time
 import requests
 from requests.exceptions import ConnectionError
 from PIL import Image, ImageChops
+
+from layman.common import bbox as bbox_util
+from layman.layer.geoserver import wfs, wms
 from layman.util import url_for as layman_url_for
 
 
@@ -73,3 +76,18 @@ def assert_same_bboxes(bbox1, bbox2, precision):
     assert len(bbox2) == 4, (bbox2, len(bbox2))
     for i in range(0, 3):
         assert abs(bbox2[i] - bbox1[i]) <= precision, (bbox1, bbox2, precision, i)
+
+
+def assert_wfs_bbox(workspace, layer, expected_bbox):
+    wfs_layer = f"{workspace}:{layer}"
+    wfs_get_capabilities = wfs.get_wfs_proxy(workspace)
+    wfs_bbox_4326 = wfs_get_capabilities.contents[wfs_layer].boundingBoxWGS84
+    wfs_bbox_3857 = bbox_util.transform(wfs_bbox_4326, 4326, 3857, )
+    assert_same_bboxes(expected_bbox, wfs_bbox_3857, 0.00001)
+
+
+def assert_wms_bbox(workspace, layer, expected_bbox):
+    wms_get_capabilities = wms.get_wms_proxy(workspace)
+    wms_bboxes = wms_get_capabilities.contents[layer].crs_list
+    wms_bbox_3857 = next(bbox[:4] for bbox in wms_bboxes if bbox[4] == 'EPSG:3857')
+    assert_same_bboxes(expected_bbox, wms_bbox_3857, 0.00001)
