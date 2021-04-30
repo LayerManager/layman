@@ -24,43 +24,42 @@ def before_request():
     pass
 
 
-def ensure_wfs_t_attributes(binary_data):
-    try:
-        xml_tree = ET.XML(binary_data)
-        version = xml_tree.get('version')[0:4]
-        service = xml_tree.get('service').upper()
-        if service != 'WFS':
-            return
-        if version not in ["2.0.", "1.0.", "1.1."]:
-            app.logger.warning(f"WFS Proxy: only xml versions 2.0, 1.1, 1.0 are supported. Request "
-                               f"only redirected. Version={xml_tree.get('version')}")
-            return
+def extract_attributes_from_wfs_t(binary_data):
+    xml_tree = ET.XML(binary_data)
+    version = xml_tree.get('version')[0:4]
+    service = xml_tree.get('service').upper()
+    if service != 'WFS':
+        return None
+    if version not in ["2.0.", "1.0.", "1.1."]:
+        app.logger.warning(f"WFS Proxy: only xml versions 2.0, 1.1, 1.0 are supported. Request "
+                           f"only redirected. Version={xml_tree.get('version')}")
+        return None
 
-        attribs = set()
-        for action in xml_tree:
-            action_qname = ET.QName(action)
-            if action_qname.localname in ('Insert', 'Replace', ):
-                extracted_attribs = extract_attributes_from_wfs_t_insert_replace(action)
-                attribs.update(extracted_attribs)
-            elif action_qname.localname in ('Update', ):
-                extracted_attribs = extract_attributes_from_wfs_t_update(action,
-                                                                         xml_tree,
-                                                                         major_version=version[0:1])
-                attribs.update(extracted_attribs)
+    attribs = set()
+    for action in xml_tree:
+        action_qname = ET.QName(action)
+        if action_qname.localname in ('Insert', 'Replace',):
+            extracted_attribs = extract_attributes_from_wfs_t_insert_replace(action)
+            attribs.update(extracted_attribs)
+        elif action_qname.localname in ('Update',):
+            extracted_attribs = extract_attributes_from_wfs_t_update(action,
+                                                                     xml_tree,
+                                                                     major_version=version[0:1])
+            attribs.update(extracted_attribs)
 
-        app.logger.info(f"GET WFS check_xml_for_attribute attribs={attribs}")
-        if attribs:
-            created_attributes = db.ensure_attributes(attribs)
-            if created_attributes:
-                changed_layers = {(workspace, layer) for workspace, layer, _ in created_attributes}
-                qgis_changed_layers = {(workspace, layer) for workspace, layer in changed_layers
-                                       if layer_util.get_layer_info(workspace, layer)['style_type'] == 'qml'}
-                for workspace, layer in qgis_changed_layers:
-                    qgis_wms.save_qgs_file(workspace, layer)
-                gs_reset(settings.LAYMAN_GS_AUTH)
+    return attribs
 
-    except BaseException as err:
-        app.logger.warning(f"WFS Proxy: error={err}, trace={traceback.format_exc()}")
+
+def ensure_wfs_t_attributes(attribs):
+    app.logger.info(f"GET WFS check_xml_for_attribute attribs={attribs}")
+    created_attributes = db.ensure_attributes(attribs)
+    if created_attributes:
+        changed_layers = {(workspace, layer) for workspace, layer, _ in created_attributes}
+        qgis_changed_layers = {(workspace, layer) for workspace, layer in changed_layers
+                               if layer_util.get_layer_info(workspace, layer)['style_type'] == 'qml'}
+        for workspace, layer in qgis_changed_layers:
+            qgis_wms.save_qgs_file(workspace, layer)
+        gs_reset(settings.LAYMAN_GS_AUTH)
 
 
 def extract_attributes_from_wfs_t_update(action, xml_tree, major_version="2"):
@@ -160,7 +159,12 @@ def proxy(subpath):
 
     app.logger.info(f"{request.method} GeoServer proxy, headers_req={headers_req}, url={url}")
     if data is not None and len(data) > 0:
-        ensure_wfs_t_attributes(data)
+        try:
+            wfs_t_attribs = extract_attributes_from_wfs_t(data)
+            if wfs_t_attribs:
+                ensure_wfs_t_attributes(wfs_t_attribs)
+        except BaseException as err:
+            app.logger.warning(f"WFS Proxy: error={err}, trace={traceback.format_exc()}")
     response = requests.request(method=request.method,
                                 url=url,
                                 data=data,
