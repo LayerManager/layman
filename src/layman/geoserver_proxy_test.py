@@ -366,7 +366,16 @@ def test_missing_attribute_authz():
     client_util.delete_workspace_layer(username, layername1, headers=headers1)
 
 
-@pytest.mark.xfail(reason='Not yet implemented!')
+def assert_all_sources_bbox(workspace, layer, expected_bbox):
+    with app.app_context():
+        bbox = tuple(layman_util.get_publication_info(workspace, client_util.LAYER_TYPE, layer,
+                                                      context={'key': ['bounding_box']})['bounding_box'])
+        test_util.assert_same_bboxes(expected_bbox, bbox, 0)
+        test_util.assert_wfs_bbox(workspace, layer, expected_bbox)
+        test_util.assert_wms_bbox(workspace, layer, expected_bbox)
+
+
+@pytest.mark.xfail(reason='Not yet implemented!', raises=AssertionError)
 @pytest.mark.usefixtures('ensure_layman')
 def test_wfs_bbox():
     workspace = 'test_wfs_bbox_workspace'
@@ -375,10 +384,7 @@ def test_wfs_bbox():
 
     client_util.publish_workspace_layer(workspace, layer, )
 
-    with app.app_context():
-        bbox = tuple(layman_util.get_publication_info(workspace, client_util.LAYER_TYPE, layer,
-                                                      context={'key': ['bounding_box']})['bounding_box'])
-    test_util.assert_same_bboxes(SMALL_LAYER_BBOX, bbox, 0)
+    assert_all_sources_bbox(workspace, layer, SMALL_LAYER_BBOX)
 
     rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}/wfs?request=Transaction"
     headers = {
@@ -396,9 +402,6 @@ def test_wfs_bbox():
     # until there is way to check end of asynchronous task after WFS-T
     time.sleep(5)
 
-    with app.app_context():
-        bbox = tuple(layman_util.get_publication_info(workspace, client_util.LAYER_TYPE, layer,
-                                                      context={'key': ['bounding_box']})['bounding_box'])
-    test_util.assert_same_bboxes(expected_bbox, bbox, 0)
+    assert_all_sources_bbox(workspace, layer, expected_bbox)
 
     client_util.delete_workspace_layer(workspace, layer, )
