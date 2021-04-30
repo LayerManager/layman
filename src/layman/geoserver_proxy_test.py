@@ -370,9 +370,9 @@ def assert_all_sources_bbox(workspace, layer, expected_bbox):
     with app.app_context():
         bbox = tuple(layman_util.get_publication_info(workspace, client_util.LAYER_TYPE, layer,
                                                       context={'key': ['bounding_box']})['bounding_box'])
-        test_util.assert_same_bboxes(expected_bbox, bbox, 0)
-        test_util.assert_wfs_bbox(workspace, layer, expected_bbox)
-        test_util.assert_wms_bbox(workspace, layer, expected_bbox)
+    test_util.assert_same_bboxes(expected_bbox, bbox, 0)
+    test_util.assert_wfs_bbox(workspace, layer, expected_bbox)
+    test_util.assert_wms_bbox(workspace, layer, expected_bbox)
 
 
 @pytest.mark.xfail(reason='Not yet implemented!', raises=AssertionError)
