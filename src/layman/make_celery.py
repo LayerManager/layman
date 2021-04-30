@@ -44,6 +44,10 @@ def get_task_modules():
     for publ_module in get_modules_from_names(settings.PUBLICATION_MODULES):
         for type_def in publ_module.PUBLICATION_TYPES.values():
             task_modules += type_def['task_modules']
+            for internal_source_name in type_def['internal_sources']:
+                tasks_module_name = internal_source_name + "_tasks"
+                if importlib.util.find_spec(tasks_module_name) is not None:
+                    task_modules.append(tasks_module_name)
     return task_modules
 
 
