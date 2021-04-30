@@ -52,7 +52,8 @@ def extract_attributes_from_wfs_t(binary_data):
 
 def ensure_wfs_t_attributes(attribs):
     app.logger.info(f"GET WFS check_xml_for_attribute attribs={attribs}")
-    created_attributes = db.ensure_attributes(attribs)
+    editable_attribs = set(attr for attr in attribs if authz.can_i_edit(LAYER_TYPE, attr[0], attr[1]))
+    created_attributes = db.ensure_attributes(editable_attribs)
     if created_attributes:
         changed_layers = {(workspace, layer) for workspace, layer, _ in created_attributes}
         qgis_changed_layers = {(workspace, layer) for workspace, layer in changed_layers
@@ -78,9 +79,6 @@ def extract_attributes_from_wfs_t_update(action, xml_tree, major_version="2"):
     layer_match = re.match(LAYERNAME_PATTERN, layer_name)
     if not layer_match:
         app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={layer_name}")
-        return attribs
-    if not authz.can_i_edit(LAYER_TYPE, ws_name, layer_name):
-        app.logger.warning(f"Can not edit. ws_namespace={ws_namespace}")
         return attribs
     value_ref_string = "Name" if major_version == "1" else "ValueReference"
     properties = action.xpath('wfs:Property/wfs:' + value_ref_string, namespaces=xml_tree.nsmap)
@@ -124,9 +122,6 @@ def extract_attributes_from_wfs_t_insert_replace(action):
         layer_match = re.match(LAYERNAME_PATTERN, layer_name)
         if not layer_match:
             app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={layer_name}")
-            continue
-        if not authz.can_i_edit(LAYER_TYPE, ws_name, layer_name):
-            app.logger.warning(f"WFS Proxy: Can not edit. ws_namespace={ws_name}")
             continue
         for attrib in layer:
             attrib_qname = ET.QName(attrib)
