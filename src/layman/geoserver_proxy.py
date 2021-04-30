@@ -24,18 +24,20 @@ def before_request():
     pass
 
 
-def extract_attributes_from_wfs_t(binary_data):
+def extract_attributes_and_layers_from_wfs_t(binary_data):
     xml_tree = ET.XML(binary_data)
     version = xml_tree.get('version')[0:4]
     service = xml_tree.get('service').upper()
+    attribs = set()
+    layers = set()
+    result = (attribs, layers)
     if service != 'WFS':
-        return None
+        return result
     if version not in ["2.0.", "1.0.", "1.1."]:
         app.logger.warning(f"WFS Proxy: only xml versions 2.0, 1.1, 1.0 are supported. Request "
                            f"only redirected. Version={xml_tree.get('version')}")
-        return None
+        return result
 
-    attribs = set()
     for action in xml_tree:
         action_qname = ET.QName(action)
         if action_qname.localname in ('Insert', 'Replace',):
@@ -46,8 +48,16 @@ def extract_attributes_from_wfs_t(binary_data):
                                                                      xml_tree,
                                                                      major_version=version[0:1])
             attribs.update(extracted_attribs)
+        elif action_qname.localname in ('Delete',):
+            layer = extract_layer_from_wfs_t_delete(action)
+            if layer:
+                layers.add(layer)
 
-    return attribs
+    for attrib in attribs:
+        layers.add(attrib[:2])
+
+    result = (attribs, layers)
+    return result
 
 
 def ensure_wfs_t_attributes(attribs):
@@ -63,8 +73,14 @@ def ensure_wfs_t_attributes(attribs):
         gs_reset(settings.LAYMAN_GS_AUTH)
 
 
-def extract_attributes_from_wfs_t_update(action, xml_tree, major_version="2"):
-    attribs = set()
+def extract_layer_from_wfs_t_delete(action):
+    _, ws_name, layer_name = extract_layer_info_from_wfs_t_update_delete(action)
+    result = (ws_name, layer_name) if layer_name and ws_name else None
+    return result
+
+
+def extract_layer_info_from_wfs_t_update_delete(action):
+    result = (None, None, None)
     layer_qname = action.get('typeName').split(':')
     ws_namespace = layer_qname[0]
     ws_match = re.match(r"^(" + USERNAME_ONLY_PATTERN + ")$", ws_namespace)
@@ -73,12 +89,21 @@ def extract_attributes_from_wfs_t_update(action, xml_tree, major_version="2"):
     else:
         if ws_namespace != 'http://www.opengis.net/ogc' and not ws_namespace.startswith('http://www.opengis.net/fes/'):
             app.logger.warning(
-                f"WFS Proxy: skipping due to wrong namespace name. Namespace={ws_namespace}, action={ET.QName(action)}")
-        return attribs
+                f"WFS Proxy: wrong namespace name. Namespace={ws_namespace}, action={ET.QName(action)}")
+        return result
     layer_name = layer_qname[1]
     layer_match = re.match(LAYERNAME_PATTERN, layer_name)
     if not layer_match:
-        app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={layer_name}")
+        app.logger.warning(f"WFS Proxy: wrong layer name. Layer name={layer_name}")
+        return result
+    result = (ws_namespace, ws_name, layer_name)
+    return result
+
+
+def extract_attributes_from_wfs_t_update(action, xml_tree, major_version="2"):
+    attribs = set()
+    ws_namespace, ws_name, layer_name = extract_layer_info_from_wfs_t_update_delete(action)
+    if not (layer_name and ws_name):
         return attribs
     value_ref_string = "Name" if major_version == "1" else "ValueReference"
     properties = action.xpath('wfs:Property/wfs:' + value_ref_string, namespaces=xml_tree.nsmap)
@@ -155,7 +180,7 @@ def proxy(subpath):
     app.logger.info(f"{request.method} GeoServer proxy, headers_req={headers_req}, url={url}")
     if data is not None and len(data) > 0:
         try:
-            wfs_t_attribs = extract_attributes_from_wfs_t(data)
+            wfs_t_attribs, _ = extract_attributes_and_layers_from_wfs_t(data)
             if wfs_t_attribs:
                 ensure_wfs_t_attributes(wfs_t_attribs)
         except BaseException as err:
