@@ -1,12 +1,13 @@
-from test import process_client as client_util, geoserver_client
+import time
+from test import process_client as client_util, geoserver_client, util as test_util
 from test.process_client import get_authz_headers
-from test.data import wfs as data_wfs
+from test.data import wfs as data_wfs, SMALL_LAYER_BBOX
 import requests
 from owslib.feature.schema import get_schema as get_wfs_schema
 import pytest
 
 from geoserver.util import get_layer_thumbnail, get_square_bbox
-from layman import app, settings
+from layman import app, settings, util as layman_util
 from layman.layer import db, util as layer_util
 from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
@@ -363,3 +364,41 @@ def test_missing_attribute_authz():
     do_test(data_xml, attr_names)
 
     client_util.delete_workspace_layer(username, layername1, headers=headers1)
+
+
+def assert_all_sources_bbox(workspace, layer, expected_bbox):
+    with app.app_context():
+        bbox = tuple(layman_util.get_publication_info(workspace, client_util.LAYER_TYPE, layer,
+                                                      context={'key': ['bounding_box']})['bounding_box'])
+    test_util.assert_same_bboxes(expected_bbox, bbox, 0)
+
+
+@pytest.mark.usefixtures('ensure_layman')
+def test_wfs_bbox():
+    workspace = 'test_wfs_bbox_workspace'
+    layer = 'test_wfs_bbox_layer'
+    expected_bbox = (1571000.0, 6268800.0, 1572590.8542062, 6269876.33561699)
+
+    client_util.publish_workspace_layer(workspace, layer, )
+
+    assert_all_sources_bbox(workspace, layer, SMALL_LAYER_BBOX)
+
+    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}/wfs?request=Transaction"
+    headers = {
+        'Accept': 'text/xml',
+        'Content-type': 'text/xml',
+    }
+
+    data_xml = data_wfs.get_wfs20_insert_points(workspace, layer, )
+
+    r = requests.post(rest_url,
+                      data=data_xml,
+                      headers=headers)
+    assert r.status_code == 200, r.text
+
+    # until there is way to check end of asynchronous task after WFS-T
+    time.sleep(5)
+
+    assert_all_sources_bbox(workspace, layer, expected_bbox)
+
+    client_util.delete_workspace_layer(workspace, layer, )
