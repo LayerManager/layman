@@ -26,6 +26,10 @@ def refresh_bbox(
         raise AbortedException
 
     bbox = db_get_bbox(username, layername)
+
+    if self.is_aborted():
+        raise AbortedException
+
     set_bbox(username, LAYER_TYPE, layername, bbox, )
 
     if self.is_aborted():
