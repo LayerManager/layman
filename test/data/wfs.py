@@ -16,7 +16,7 @@ def get_wfs20_insert_points(username, layername):
                <{username}:{layername}>
                    <{username}:wkb_geometry>
                        <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
-                           <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
+                           <gml:pos>1571000 6268800</gml:pos>
                        </gml:Point>
                    </{username}:wkb_geometry>
                </{username}:{layername}>
