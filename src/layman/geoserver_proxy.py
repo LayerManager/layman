@@ -11,7 +11,7 @@ from layman import authn, authz, settings
 from layman.authn import authenticate, is_user_with_name
 from layman.layer import db, LAYER_TYPE, util as layer_util
 from layman.layer.qgis import wms as qgis_wms
-from layman.layer.util import LAYERNAME_PATTERN, ATTRNAME_PATTERN
+from layman.layer.util import LAYERNAME_PATTERN, ATTRNAME_PATTERN, patch_after_wfst
 from layman.util import USERNAME_ONLY_PATTERN
 
 
@@ -178,9 +178,10 @@ def proxy(subpath):
         headers_req[settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE] = authn_username
 
     app.logger.info(f"{request.method} GeoServer proxy, headers_req={headers_req}, url={url}")
+    wfs_t_layers = set()
     if data is not None and len(data) > 0:
         try:
-            wfs_t_attribs, _ = extract_attributes_and_layers_from_wfs_t(data)
+            wfs_t_attribs, wfs_t_layers = extract_attributes_and_layers_from_wfs_t(data)
             if wfs_t_attribs:
                 ensure_wfs_t_attributes(wfs_t_attribs)
         except BaseException as err:
@@ -192,6 +193,11 @@ def proxy(subpath):
                                 cookies=request.cookies,
                                 allow_redirects=False
                                 )
+
+    for workspace, layername in wfs_t_layers:
+        if authz.can_i_edit(LAYER_TYPE, workspace, layername):
+            patch_after_wfst(workspace, layername)
+
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = {key: value for (key, value) in response.headers.items() if key.lower() not in excluded_headers}
 
