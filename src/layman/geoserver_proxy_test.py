@@ -190,7 +190,7 @@ def test_missing_attribute(style_file, ):
 
     wfs_t_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
     with app.app_context():
-        style_type = layer_util.get_layer_info(username, layername)['style_type']
+        style_type = layer_util.get_layer_info(username, layername, context={'keys': ['style_type'], })['style_type']
 
     def wfs_post(workspace, attr_names_list, data_xml):
         with app.app_context():
@@ -371,6 +371,7 @@ def assert_all_sources_bbox(workspace, layer, expected_bbox):
         bbox = tuple(layman_util.get_publication_info(workspace, client_util.LAYER_TYPE, layer,
                                                       context={'key': ['bounding_box']})['bounding_box'])
     test_util.assert_same_bboxes(expected_bbox, bbox, 0)
+    test_util.assert_wfs_bbox(workspace, layer, expected_bbox)
 
 
 @pytest.mark.usefixtures('ensure_layman')
