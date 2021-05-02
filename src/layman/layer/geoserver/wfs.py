@@ -27,7 +27,7 @@ def get_flask_proxy_key(username):
 
 
 def patch_layer(workspace, layername, title, description, access_rights=None):
-    gs_util.patch_feature_type(workspace, layername, title, description, settings.LAYMAN_GS_AUTH)
+    gs_util.patch_feature_type(workspace, layername, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     clear_cache(workspace)
 
     if access_rights and access_rights.get('read'):

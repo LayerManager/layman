@@ -211,20 +211,25 @@ def delete_feature_type(geoserver_workspace, feature_type_name, auth):
         r.raise_for_status()
 
 
-def patch_feature_type(geoserver_workspace, feature_type_name, title, description, auth):
-    keywords = [
-        "features",
-        feature_type_name,
-        title
-    ]
-    keywords = list(set(keywords))
-    ftype = {
-        "title": title,
-        "abstract": description,
-        "keywords": {
+def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, description=None, bbox=None, auth):
+    ftype = dict()
+
+    if title:
+        ftype['title'] = title
+        keywords = [
+            "features",
+            feature_type_name,
+            title
+        ]
+        keywords = list(set(keywords))
+        ftype['keywords'] = {
             "string": keywords
-        },
-    }
+        }
+    if description:
+        ftype['abstract'] = description
+    if bbox:
+        ftype['nativeBoundingBox'] = bbox
+
     ftype = {k: v for k, v in ftype.items() if v is not None}
     body = {
         "featureType": ftype

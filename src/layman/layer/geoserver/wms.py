@@ -30,7 +30,7 @@ def patch_layer(workspace, layername, title, description, access_rights=None):
     geoserver_workspace = get_geoserver_workspace(workspace)
     info = layer_util.get_layer_info(workspace, layername)
     if info['style_type'] == 'sld':
-        gs_util.patch_feature_type(geoserver_workspace, layername, title, description, settings.LAYMAN_GS_AUTH)
+        gs_util.patch_feature_type(geoserver_workspace, layername, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
         clear_cache(workspace)
 
     if access_rights and access_rights.get('read'):
