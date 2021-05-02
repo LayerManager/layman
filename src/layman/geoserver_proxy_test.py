@@ -372,15 +372,20 @@ def assert_all_sources_bbox(workspace, layer, expected_bbox):
                                                       context={'key': ['bounding_box']})['bounding_box'])
     test_util.assert_same_bboxes(expected_bbox, bbox, 0)
     test_util.assert_wfs_bbox(workspace, layer, expected_bbox)
+    test_util.assert_wms_bbox(workspace, layer, expected_bbox)
 
 
+@pytest.mark.parametrize('style_file', [
+    None,
+    'sample/style/small_layer.qml',
+])
 @pytest.mark.usefixtures('ensure_layman')
-def test_wfs_bbox():
+def test_wfs_bbox(style_file):
     workspace = 'test_wfs_bbox_workspace'
     layer = 'test_wfs_bbox_layer'
     expected_bbox = (1571000.0, 6268800.0, 1572590.8542062, 6269876.33561699)
 
-    client_util.publish_workspace_layer(workspace, layer, )
+    client_util.publish_workspace_layer(workspace, layer, style_file=style_file, )
 
     assert_all_sources_bbox(workspace, layer, SMALL_LAYER_BBOX)
 
