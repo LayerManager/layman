@@ -5,8 +5,7 @@ from layman import app, settings
 from layman.common import bbox as bbox_util
 from layman.common.prime_db_schema import publications
 from layman.http import LaymanError
-from . import wfs, wms
-from .. import geoserver
+from . import wfs, wms, tasks
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -50,7 +49,6 @@ def assert_wms_bbox(workspace, layer, expected_bbox):
 def test_geoserver_bbox():
     workspace = 'test_geoserver_bbox_workspace'
     layer = 'test_geoserver_bbox_layer'
-    geoserver_workspace = wms.get_geoserver_workspace(workspace)
     expected_bbox_1 = test_data.SMALL_LAYER_BBOX
     expected_bboxes = [((1571203, 6268895, 1572589, 6269864), (1571203, 6268895, 1572589, 6269864)),
                        ((1571203, 6268895, 1571203, 6269864), (1571203 - settings.NO_AREA_BBOX_PADDING, 6268895,
@@ -72,36 +70,36 @@ def test_geoserver_bbox():
         for bbox, expected_bbox in expected_bboxes:
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox)
             wfs.delete_layer(workspace, layer)
-            geoserver.publish_layer_from_db(workspace, layer, layer, layer, access_rights=None)
-            wfs.clear_cache(workspace)
+            tasks.refresh_wfs.apply(args=[workspace, layer],
+                                    description=layer,
+                                    title=layer,
+                                    ensure_user=False,
+                                    access_rights=None,
+                                    )
             assert_wfs_bbox(workspace, layer, expected_bbox)
 
         # test WMS
         for bbox, expected_bbox in expected_bboxes:
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox)
             wms.delete_layer(workspace, layer)
-            geoserver.publish_layer_from_db(workspace,
-                                            layer,
-                                            layer,
-                                            layer,
-                                            access_rights=None,
-                                            geoserver_workspace=geoserver_workspace,
-                                            )
-            wms.clear_cache(workspace)
+            tasks.refresh_wms.apply(args=[workspace, layer, True],
+                                    description=layer,
+                                    title=layer,
+                                    ensure_user=False,
+                                    access_rights=None,
+                                    )
             assert_wms_bbox(workspace, layer, expected_bbox)
 
         # test cascade WMS from QGIS
         for bbox, expected_bbox in expected_bboxes:
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox)
             wms.delete_layer(workspace, layer)
-            geoserver.publish_layer_from_qgis(workspace,
-                                              layer,
-                                              layer,
-                                              layer,
-                                              access_rights=None,
-                                              geoserver_workspace=geoserver_workspace,
-                                              )
-            wms.clear_cache(workspace)
+            tasks.refresh_wms.apply(args=[workspace, layer, False],
+                                    description=layer,
+                                    title=layer,
+                                    ensure_user=False,
+                                    access_rights=None,
+                                    )
             assert_wms_bbox(workspace, layer, expected_bbox)
 
     process_client.delete_workspace_layer(workspace, layer)
