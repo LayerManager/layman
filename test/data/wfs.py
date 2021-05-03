@@ -24,6 +24,31 @@ def get_wfs20_insert_points(workspace, layername):
         </wfs:Transaction>'''
 
 
+def get_wfs20_delete_point(workspace, layername):
+    return f'''<?xml version="1.0"?>
+        <wfs:Transaction
+           version="2.0.0"
+           service="WFS"
+           xmlns:{workspace}="http://{workspace}"
+           xmlns:fes="http://www.opengis.net/fes/2.0"
+           xmlns:gml="http://www.opengis.net/gml/3.2"
+           xmlns:wfs="http://www.opengis.net/wfs/2.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.opengis.net/wfs/2.0
+                               http://schemas.opengis.net/wfs/2.0/wfs.xsd
+                               http://www.opengis.net/gml/3.2
+                               http://schemas.opengis.net/gml/3.2.1/gml.xsd">
+           <wfs:Delete typeName="{workspace}:{layername}">
+                <fes:Intersects>
+                    <fes:ValueReference>{workspace}:wkb_geometry</fes:ValueReference>
+                    <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
+                        <gml:pos>1571000 6268800</gml:pos>
+                    </gml:Point>
+                </fes:Intersects>
+           </wfs:Delete>
+        </wfs:Transaction>'''
+
+
 def get_wfs20_insert_lines(workspace, layername):
     return f'''<?xml version="1.0"?>
     <wfs:Transaction
