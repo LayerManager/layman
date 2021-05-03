@@ -72,7 +72,7 @@ def test_style_correctly_saved(source_style_file_path,
                                            style_file=source_style_file_path)
     assert_style_file(workspace, layer, expected_style_file)
     with app.app_context():
-        info = layer_util.get_layer_info(workspace, layer)
+        info = layer_util.get_layer_info(workspace, layer, context={'keys': ['style_type', 'style'], })
     assert info['style_type'] == expected_style_type
 
     process_client.delete_workspace_layer(workspace, layer)
@@ -116,7 +116,7 @@ class TestQgisCascadeWmsClass:
         wms_layers_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmslayers/')
 
         with app.app_context():
-            info = layer_util.get_layer_info(workspace, layer)
+            info = layer_util.get_layer_info(workspace, layer, context={'keys': ['style_type', 'style'], })
         assert (info['style_type'] == 'qml') == (style == 'qml'), info.get('style_type', None)
 
         assert (os.path.exists(expected_style_file + '.qml')) == (style == 'qml')
