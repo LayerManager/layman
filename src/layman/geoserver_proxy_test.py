@@ -9,6 +9,7 @@ import pytest
 from geoserver.util import get_layer_thumbnail, get_square_bbox
 from layman import app, settings, util as layman_util
 from layman.layer import db, util as layer_util
+from layman.layer.filesystem import thumbnail
 from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
 
@@ -375,15 +376,14 @@ def assert_all_sources_bbox(workspace, layer, expected_bbox):
     test_util.assert_wms_bbox(workspace, layer, expected_bbox)
 
 
-@pytest.mark.parametrize('style_file', [
-    None,
-    'sample/style/small_layer.qml',
+@pytest.mark.parametrize('style_file, thumbnail_style_postfix', [
+    (None, '_sld'),
+    ('sample/style/small_layer.qml', '_qml'),
 ])
 @pytest.mark.usefixtures('ensure_layman')
-def test_wfs_bbox(style_file):
+def test_wfs_bbox(style_file, thumbnail_style_postfix):
     workspace = 'test_wfs_bbox_workspace'
     layer = 'test_wfs_bbox_layer'
-    expected_bbox = (1571000.0, 6268800.0, 1572590.8542062, 6269876.33561699)
 
     client_util.publish_workspace_layer(workspace, layer, style_file=style_file, )
 
@@ -395,12 +395,13 @@ def test_wfs_bbox(style_file):
         'Content-type': 'text/xml',
     }
 
-    method_bbox_tuples = [
-        (data_wfs.get_wfs20_insert_points, expected_bbox),
-        (data_wfs.get_wfs20_delete_point, SMALL_LAYER_BBOX),
+    expected_bbox = (1571000.0, 6268800.0, 1572590.8542062, 6269876.33561699)
+    method_bbox_thumbnail_tuples = [
+        (data_wfs.get_wfs20_insert_points, expected_bbox, '_bigger'),
+        (data_wfs.get_wfs20_delete_point, SMALL_LAYER_BBOX, ''),
     ]
 
-    for wfs_method, exp_bbox in method_bbox_tuples:
+    for wfs_method, exp_bbox, thumbnail_bbox_postfix in method_bbox_thumbnail_tuples:
         data_xml = wfs_method(workspace, layer, )
 
         r = requests.post(rest_url,
@@ -412,5 +413,11 @@ def test_wfs_bbox(style_file):
         time.sleep(5)
 
         assert_all_sources_bbox(workspace, layer, exp_bbox)
+
+        expected_thumbnail_path = f'/code/sample/style/{layer}{thumbnail_style_postfix}{thumbnail_bbox_postfix}.png'
+        with app.app_context():
+            thumbnail_path = thumbnail.get_layer_thumbnail_path(workspace, layer)
+        diffs = test_util.compare_images(expected_thumbnail_path, thumbnail_path)
+        assert diffs < 100, expected_thumbnail_path
 
     client_util.delete_workspace_layer(workspace, layer, )
