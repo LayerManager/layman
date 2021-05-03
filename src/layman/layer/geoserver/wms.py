@@ -28,7 +28,7 @@ def get_flask_proxy_key(username):
 
 def patch_layer(workspace, layername, title, description, access_rights=None):
     geoserver_workspace = get_geoserver_workspace(workspace)
-    info = layer_util.get_layer_info(workspace, layername)
+    info = layer_util.get_layer_info(workspace, layername, context={'keys': ['style_type'], })
     if info['style_type'] == 'sld':
         gs_util.patch_feature_type(geoserver_workspace, layername, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
         clear_cache(workspace)
