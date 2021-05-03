@@ -26,7 +26,7 @@ def get_style_template_path():
 
 def extent_to_xml_string(extent):
     return "\n".join([
-        f"<{tag}>{extent}</{tag}>"
+        f"<{tag}>{extent[idx]}</{tag}>"
         for idx, tag in enumerate(['xmin', 'ymin', 'xmax', 'ymax'])
     ])
 
