@@ -10,6 +10,7 @@
 - Rename filesystem directory containing workspaces from `users` to `workspaces`
 ### Changes
 - [#159] (https://github.com/jirik/layman/issues/159) Bounding box is send explicitly to GeoServer for every layer.
+- [#159] (https://github.com/jirik/layman/issues/159) Bounding box is updated after WFS-T request. More info in [documentation](doc/endpoints.md#web-feature-service).
 - Filesystem directory containing workspaces was renamed from `users` to `workspaces`
 
 ## v1.12.0
