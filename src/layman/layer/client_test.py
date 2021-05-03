@@ -1,7 +1,7 @@
 import glob
 import time
 import os
-from test import process, process_client
+from test import process_client
 from test.util import url_for
 import requests
 import pytest
@@ -121,7 +121,7 @@ def test_post_layers_chunk(chrome):
                 'Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(username, layername)
-    assert not process.LAYMAN_REDIS.exists(total_chunks_key)
+    assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
 
 
 @pytest.mark.test_client
@@ -207,4 +207,4 @@ def test_patch_layer_chunk(chrome):
             ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(username, layername)
-    assert not process.LAYMAN_REDIS.exists(total_chunks_key)
+    assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
