@@ -276,7 +276,7 @@ def test_post_layers_simple(client):
         for key_to_check in keys_to_check:
             assert 'status' in layer_info[key_to_check]
 
-        # TODO for some reason this hangs forever on get() if run (either with src/layman/authz/read_everyone_write_owner_auth2_test.py::test_authn_map_access_rights or src/layman/authn/oauth2_test.py::test_patch_current_user_without_username) and with src/layman/common/metadata/util.csw_insert
+        # For some reason this hangs forever on get() if run (either with src/layman/authz/read_everyone_write_owner_auth2_test.py::test_authn_map_access_rights or src/layman/authn/oauth2_test.py::test_patch_current_user_without_username) and with src/layman/common/metadata/util.csw_insert
         # last_task['last'].get()
         # e.g. python3 -m pytest -W ignore::DeprecationWarning -xsvv src/layman/authn/oauth2_test.py::test_patch_current_user_without_username src/layman/layer/rest_workspace_test.py::test_post_layers_simple
         # this can badly affect also .get(propagate=False) in layman.celery.abort_task_chain
@@ -795,7 +795,7 @@ def test_patch_layer_style(client):
         assert rv.status_code == 200
 
         # last_task = util._get_layer_task(username, layername)
-        # TODO
+
         # Time to generate testing thumbnail is probably shorter than getting & parsing WMS/WFS capabilities documents
         # so it's finished before PATCH request is completed
         #

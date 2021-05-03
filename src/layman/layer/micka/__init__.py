@@ -9,7 +9,6 @@ check_new_layername = empty_method
 
 
 def get_usernames():
-    # TODO consider reading layer names from all Micka's metadata records by linkage URL
     return []
 
 

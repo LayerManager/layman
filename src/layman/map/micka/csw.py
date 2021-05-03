@@ -200,7 +200,6 @@ def get_template_path_and_values(username, mapname, http_method=None, actor_name
         identifier_label=mapname,
         extent=[float(c) for c in map_json['extent']],
         epsg_codes=map_json_to_epsg_codes(map_json),
-        # TODO create config env variable to decide if to set organisation name or not
         md_organisation_name=None,
         organisation_name=None,
         operates_on=operates_on,
