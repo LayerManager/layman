@@ -389,16 +389,22 @@ def test_wfs_bbox():
         'Content-type': 'text/xml',
     }
 
-    data_xml = data_wfs.get_wfs20_insert_points(workspace, layer, )
+    method_bbox_tuples = [
+        (data_wfs.get_wfs20_insert_points, expected_bbox),
+        (data_wfs.get_wfs20_delete_point, SMALL_LAYER_BBOX),
+    ]
 
-    r = requests.post(rest_url,
-                      data=data_xml,
-                      headers=headers)
-    assert r.status_code == 200, r.text
+    for wfs_method, exp_bbox in method_bbox_tuples:
+        data_xml = wfs_method(workspace, layer, )
 
-    # until there is way to check end of asynchronous task after WFS-T
-    time.sleep(5)
+        r = requests.post(rest_url,
+                          data=data_xml,
+                          headers=headers)
+        assert r.status_code == 200, r.text
 
-    assert_all_sources_bbox(workspace, layer, expected_bbox)
+        # until there is way to check end of asynchronous task after WFS-T
+        time.sleep(5)
+
+        assert_all_sources_bbox(workspace, layer, exp_bbox)
 
     client_util.delete_workspace_layer(workspace, layer, )
