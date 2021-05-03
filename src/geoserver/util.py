@@ -119,7 +119,7 @@ def ensure_user(user, password, auth):
             # logger.info(f"User {user}'s automatically generated password is {password}")
         r = requests.post(
             GS_REST_USERS,
-            # TODO https://osgeo-org.atlassian.net/browse/GEOS-8486
+            # https://osgeo-org.atlassian.net/browse/GEOS-8486
             # seems as it's not fixed in 2.13.0
             data=json.dumps({
                 "org.geoserver.rest.security.xml.JaxbUser": {
