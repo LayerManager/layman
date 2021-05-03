@@ -264,7 +264,7 @@ def test_missing_attribute(style_file, ):
     attr_names_u = ['inexisting_attribute_attr_complex_u']
     attr_names_r = ['inexisting_attribute_attr_complex_r']
     attr_names_complex = [(layername, attr_names_i1 + attr_names_r), (layername2, attr_names_i2 + attr_names_u)]
-    data_xml = data_wfs.get_wfs20_complex_new_attr(username=username,
+    data_xml = data_wfs.get_wfs20_complex_new_attr(workspace=username,
                                                    layername1=layername,
                                                    layername2=layername2,
                                                    attr_names_insert1=attr_names_i1,
