@@ -35,7 +35,9 @@ Get list of published layers.
 
 #### Request
 Query parameters:
-- *full_text_filter*: String. List of words separated by space. Only layers with at least one of them in title will be returned. Search is case-insensitive, unaccent and did lemmatization for English.
+- *full_text_filter*: String. String is used twice, layer has to fulfill at least one condition to be returned:
+  - As list of words separated by space. Only layers with at least one of them in title will be returned. Search is case-insensitive, unaccent and did lemmatization for English.
+  - Layers with this string as substring of title will be returned. Search is case-insensitive and unaccent.
 - *bbox_filter*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. Only layers whose bounding box intersects with given bounding box will be returned.
 - *order_by*: String. Can be one of these values:
   - `full_text` Layers will be ordered by results of full-text search. Can be used only in combination with *full_text_filter*.

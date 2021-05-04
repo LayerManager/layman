@@ -301,6 +301,14 @@ class TestSelectPublicationsComplex:
             'total_count': 3,
             'content_range': (1, 3),
         }),
+        ({'full_text_filter': 'dn'}, {
+            'items': [(workspace1, MAP_TYPE, map_1e_3_3x3_3),
+                      (workspace1, MAP_TYPE, map_1oe_3_7x5_9),
+                      (workspace2, MAP_TYPE, map_2o_2_2x4_4),
+                      ],
+            'total_count': 3,
+            'content_range': (1, 3),
+        }),
         ({'full_text_filter': 'kun & ody'}, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
                       ],

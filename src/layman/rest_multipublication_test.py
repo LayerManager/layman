@@ -191,6 +191,14 @@ class TestGetPublications:
             'X-Total-Count': '5',
             'Content-Range': 'items 1-5/5'
         },),
+        (authn_headers_user2, {'full_text_filter': 'TOUCK'}, [
+            (workspace1, publication_1e_2_4x6_6),
+            (workspace2, publication_2e_3_3x5_5),
+            (workspace2, publication_2o_2_2x4_4),
+        ], {
+            'X-Total-Count': '3',
+            'Content-Range': 'items 1-3/3'
+        },),
         (authn_headers_user2, {'order_by': 'title'}, [(workspace1, publication_1e_3_3x3_3),
                                                       (workspace1, publication_1e_2_4x6_6),
                                                       (workspace2, publication_2o_2_2x4_4),
