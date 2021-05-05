@@ -8,7 +8,7 @@ PUBLICATION_LOCKS_KEY = f'{__name__}:PUBLICATION_LOCKS'
 
 
 def create_lock(workspace, publication_type, publication_name, error_code, method):
-    check_http_method(workspace, publication_type, publication_name, error_code)
+    solve_locks(workspace, publication_type, publication_name, error_code)
     lock_publication(workspace, publication_type, publication_name, method)
 
 
@@ -61,7 +61,7 @@ def unlock_publication(workspace, publication_type, publication_name):
     rds.hdel(key, hash)
 
 
-def check_http_method(workspace, publication_type, publication_name, error_code):
+def solve_locks(workspace, publication_type, publication_name, error_code):
     current_lock = get_publication_lock(
         workspace,
         publication_type,
