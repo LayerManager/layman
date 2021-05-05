@@ -20,7 +20,7 @@ def patch_after_wfst(
     if self.is_aborted():
         raise AbortedException
 
-    bbox = geoserver.get_layer_native_bbox(workspace, layer)
+    bbox = geoserver.get_layer_bbox(workspace, layer)
     geoserver_workspace = wms.get_geoserver_workspace(workspace)
     style_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['style_type'], })['style_type']
     if style_type == 'sld':

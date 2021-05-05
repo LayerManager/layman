@@ -20,7 +20,7 @@ def patch_after_wfst(
     if self.is_aborted():
         raise AbortedException
 
-    bbox = geoserver.get_layer_native_bbox(workspace, layer)
+    bbox = geoserver.get_layer_bbox(workspace, layer)
     gs_util.patch_feature_type(workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox)
     wfs.clear_cache(workspace)
 
