@@ -1115,37 +1115,29 @@ def test_delete_layer(client):
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
-def test_post_layers_zero_length_attribute(client):
-    username = 'testuser1'
-    rest_path = url_for('rest_workspace_layers.post', workspace=username)
+def test_post_layers_zero_length_attribute():
+    workspace = 'testuser1'
+    layername = 'zero_length_attribute'
     file_paths = [
         'sample/data/zero_length_attribute.geojson',
     ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
-            'file': files,
-        })
-        assert rv.status_code == 200
-    finally:
-        for fp in files:
-            fp[0].close()
 
-    layername = 'zero_length_attribute'
+    def wait_for_db_finish(response):
+        info = response.json()
+        if 'status' in info['db_table'] and info['db_table']['status'] in ['PENDING', 'STARTED']:
+            result = False
+        else:
+            result = True
+        return result
 
-    layer_info = util.get_layer_info(username, layername)
-    while 'status' in layer_info['db_table'] and layer_info['db_table']['status'] in ['PENDING', 'STARTED']:
-        time.sleep(0.1)
-        layer_info = util.get_layer_info(username, layername)
-    assert layer_info['db_table']['status'] == 'FAILURE'
-    assert layer_info['db_table']['error']['code'] == 28
+    process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths, check_response_fn=wait_for_db_finish)
 
-    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
-    rv = client.delete(rest_path)
-    assert rv.status_code == 200
+    # layer_info = util.get_layer_info(workspace, layername, context={'keys': ['db_table']})
+    layer_info = process_client.get_workspace_layer(workspace, layername)
+    assert layer_info['db_table']['status'] == 'FAILURE', f'layer_info={layer_info}'
+    assert layer_info['db_table']['error']['code'] == 28, f'layer_info={layer_info}'
+
+    process_client.delete_workspace_layer(workspace, layername)
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 2
     })
