@@ -9,7 +9,7 @@ from requests.exceptions import HTTPError, ConnectionError
 from flask import current_app
 
 from layman import settings, LaymanError
-from layman.common import language as common_language, empty_method, empty_method_returns_none
+from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util
 from layman.map import MAP_TYPE
@@ -182,23 +182,32 @@ def get_template_path_and_values(username, mapname, http_method=None, actor_name
     revision_date = datetime.now()
     map_json = get_map_json(username, mapname)
     operates_on = map_json_to_operates_on(map_json, editor=actor_name)
+    publ_info = get_publication_info(username, MAP_TYPE, mapname, context={
+        'keys': ['title', 'bounding_box', 'description'],
+    })
+    bbox_3857 = publ_info.get('bounding_box')
+    if bbox_util.is_empty(bbox_3857):
+        bbox_3857 = settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+    extent = bbox_util.transform(tuple(bbox_3857), epsg_from=3857, epsg_to=4326)
+    title = publ_info['title']
+    abstract = publ_info.get('description')
     md_language = next(iter(common_language.get_languages_iso639_2(' '.join([
-        map_json['title'] or '',
-        map_json['abstract'] or ''
+        title or '',
+        abstract or '',
     ]))), None)
 
     prop_values = _get_property_values(
         username=username,
         mapname=mapname,
         uuid=get_map_uuid(username, mapname),
-        title=map_json['title'],
-        abstract=map_json['abstract'] or None,
+        title=title,
+        abstract=abstract or None,
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         revision_date=revision_date.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
         identifier=url_for('rest_workspace_map.get', workspace=username, mapname=mapname),
         identifier_label=mapname,
-        extent=[float(c) for c in map_json['extent']],
+        extent=extent,
         epsg_codes=map_json_to_epsg_codes(map_json),
         md_organisation_name=None,
         organisation_name=None,

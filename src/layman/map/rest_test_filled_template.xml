@@ -177,7 +177,7 @@
                 <gco:Decimal>-48.5</gco:Decimal>
               </gmd:southBoundLatitude>
               <gmd:northBoundLatitude>
-                <gco:Decimal>81.5</gco:Decimal>
+                <gco:Decimal>81.4999999999999</gco:Decimal>
               </gmd:northBoundLatitude>
             </gmd:EX_GeographicBoundingBox>
           </gmd:geographicElement>
