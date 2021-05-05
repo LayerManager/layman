@@ -12,22 +12,8 @@ def get_syncable_prop_names(publ_type):
     return prop_names
 
 
-def extent_equals(a, b, limit=0.95):
-    if not bbox_util.has_area(a):
-        a = bbox_util.ensure_bbox_with_area(a, settings.NO_AREA_BBOX_PADDING)
-    if not bbox_util.has_area(b):
-        b = bbox_util.ensure_bbox_with_area(b, settings.NO_AREA_BBOX_PADDING)
-    isect = _get_extent_intersetion(a, b)
-    if _is_extent_empty(isect):
-        return False
-
-    a_area = _get_extent_area(a)
-    b_area = _get_extent_area(b)
-    i_area = _get_extent_area(isect)
-
-    similarity = i_area / a_area * i_area / b_area
-    # current_app.logger.info(f"a={a}, b={b}, similarity={similarity}")
-    return similarity >= limit
+def extent_equals(a, b):
+    return bbox_util.are_similar(a, b, no_area_bbox_padding=settings.NO_AREA_BBOX_PADDING, limit=0.95)
 
 
 PROPERTIES = {
@@ -146,40 +132,6 @@ def prop_equals_strict(values, equals_fn=None):
 def strip_capabilities_and_layers_params(url):
     from layman.layer.geoserver.wms import strip_params_from_url
     return strip_params_from_url(url, ['SERVICE', 'REQUEST', 'VERSION', 'LAYERS'])
-
-
-def _is_extent_empty(e):
-    return any((c is None for c in e))
-
-
-def _get_extent_area(e):
-    return (e[2] - e[0]) * (e[3] - e[1])
-
-
-def _get_extent_intersetion(a, b):
-    intersection = [None] * 4
-    if _extent_intersects(a, b):
-        if a[0] > b[0]:
-            intersection[0] = a[0]
-        else:
-            intersection[0] = b[0]
-        if a[1] > b[1]:
-            intersection[1] = a[1]
-        else:
-            intersection[1] = b[1]
-        if a[2] < b[2]:
-            intersection[2] = a[2]
-        else:
-            intersection[2] = b[2]
-        if a[3] < b[3]:
-            intersection[3] = a[3]
-        else:
-            intersection[3] = b[3]
-    return intersection
-
-
-def _extent_intersects(a, b):
-    return a[0] <= b[2] and a[2] >= b[0] and a[1] <= b[3] and a[3] >= b[1]
 
 
 def transform_metadata_props_to_comparison(all_props):
