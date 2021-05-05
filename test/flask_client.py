@@ -104,17 +104,17 @@ def publish_map(workspace,
 
 
 def wait_till_map_ready(workspace, name):
-    last_task = util_map._get_map_task(workspace, name)
-    while last_task is not None and not celery_util.is_task_ready(last_task):
+    last_task = util_map._get_map_chain(workspace, name)
+    while last_task is not None and not celery_util.is_chain_ready(last_task):
         time.sleep(0.1)
-        last_task = util_map._get_map_task(workspace, name)
+        last_task = util_map._get_map_chain(workspace, name)
 
 
 def wait_till_layer_ready(workspace, layername):
-    last_task = util_layer._get_layer_task(workspace, layername)
-    while last_task is not None and not celery_util.is_task_ready(last_task):
+    last_task = util_layer._get_layer_chain(workspace, layername)
+    while last_task is not None and not celery_util.is_chain_ready(last_task):
         time.sleep(0.1)
-        last_task = util_layer._get_layer_task(workspace, layername)
+        last_task = util_layer._get_layer_chain(workspace, layername)
 
 
 def ensure_workspace(workspace, client):

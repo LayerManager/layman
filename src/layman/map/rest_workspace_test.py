@@ -42,10 +42,10 @@ num_maps_before_test = 0
 
 
 def wait_till_ready(username, mapname):
-    last_task = util._get_map_task(username, mapname)
-    while last_task is not None and not celery_util.is_task_ready(last_task):
+    chain_info = util._get_map_chain(username, mapname)
+    while chain_info is not None and not celery_util.is_chain_ready(chain_info):
         time.sleep(0.1)
-        last_task = util._get_map_task(username, mapname)
+        chain_info = util._get_map_chain(username, mapname)
 
 
 def check_metadata(client, username, mapname, props_equal, expected_values):

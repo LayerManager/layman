@@ -13,7 +13,7 @@ def create_lock(workspace, publication_type, publication_name, error_code, metho
     lock_publication(workspace, publication_type, publication_name, method)
 
 
-def create_lock_decorator(publication_type, publication_name_key, error_code, is_task_ready_fn):
+def create_lock_decorator(publication_type, publication_name_key, error_code, is_chain_ready_fn):
     def lock_decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -22,11 +22,11 @@ def create_lock_decorator(publication_type, publication_name_key, error_code, is
             create_lock(username, publication_type, publication_name, error_code, request.method)
             try:
                 result = f(*args, **kwargs)
-                if is_task_ready_fn(username, publication_name):
+                if is_chain_ready_fn(username, publication_name):
                     unlock_publication(username, publication_type, publication_name)
             except Exception as e:
                 try:
-                    if is_task_ready_fn(username, publication_name):
+                    if is_chain_ready_fn(username, publication_name):
                         unlock_publication(username, publication_type, publication_name)
                 finally:
                     unlock_publication(username, publication_type, publication_name)
