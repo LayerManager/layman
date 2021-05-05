@@ -7,7 +7,7 @@ from geoserver import util as gs_util, GS_REST_WORKSPACES
 from layman.http import LaymanError
 from layman import settings, util as layman_util
 from layman.common import bbox as bbox_util, geoserver as gs_common, empty_method
-from layman.layer import LAYER_TYPE, db as db_source
+from layman.layer import LAYER_TYPE
 from layman.layer.qgis import wms as qgis_wms
 from . import wms
 
@@ -108,16 +108,6 @@ def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspac
     gs_util.ensure_layer_security_roles(geoserver_workspace, layer, security_write_roles, 'w', auth)
 
 
-def bbox_to_native_bbox(bbox):
-    return {
-        "minx": bbox[0],
-        "miny": bbox[1],
-        "maxx": bbox[2],
-        "maxy": bbox[3],
-        "crs": "EPSG:3857",
-    }
-
-
 def get_layer_bbox(workspace, layer):
     db_bbox = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['bounding_box']})['bounding_box']
     # GeoServer is not working good with degradeted bbox
@@ -126,7 +116,7 @@ def get_layer_bbox(workspace, layer):
 
 def get_layer_native_bbox(workspace, layer):
     bbox = get_layer_bbox(workspace, layer)
-    return bbox_to_native_bbox(bbox)
+    return gs_util.bbox_to_native_bbox(bbox)
 
 
 def publish_layer_from_db(workspace, layername, description, title, access_rights, geoserver_workspace=None):
