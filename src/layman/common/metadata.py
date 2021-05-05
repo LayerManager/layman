@@ -1,4 +1,6 @@
 import json
+from layman import settings
+from layman.common import bbox as bbox_util
 from layman.util import get_publication_types
 
 PUBL_TYPE_DEF_KEY = __name__
@@ -11,6 +13,10 @@ def get_syncable_prop_names(publ_type):
 
 
 def extent_equals(a, b, limit=0.95):
+    if not bbox_util.has_area(a):
+        a = bbox_util.ensure_bbox_with_area(a, settings.NO_AREA_BBOX_PADDING)
+    if not bbox_util.has_area(b):
+        b = bbox_util.ensure_bbox_with_area(b, settings.NO_AREA_BBOX_PADDING)
     isect = _get_extent_intersetion(a, b)
     if _is_extent_empty(isect):
         return False
