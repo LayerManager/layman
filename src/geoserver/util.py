@@ -792,3 +792,13 @@ def get_feature_type(
                      )
     r.raise_for_status()
     return r.json()['featureType']
+
+
+def bbox_to_native_bbox(bbox):
+    return {
+        "minx": bbox[0],
+        "miny": bbox[1],
+        "maxx": bbox[2],
+        "maxy": bbox[3],
+        "crs": "EPSG:3857",
+    }
