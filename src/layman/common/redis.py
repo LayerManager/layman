@@ -8,7 +8,8 @@ PUBLICATION_LOCKS_KEY = f'{__name__}:PUBLICATION_LOCKS'
 
 
 def create_lock(workspace, publication_type, publication_name, error_code, method):
-    solve_locks(workspace, publication_type, publication_name, error_code)
+    method = method.lower()
+    solve_locks(workspace, publication_type, publication_name, error_code, method)
     lock_publication(workspace, publication_type, publication_name, method)
 
 
@@ -61,7 +62,7 @@ def unlock_publication(workspace, publication_type, publication_name):
     rds.hdel(key, hash)
 
 
-def solve_locks(workspace, publication_type, publication_name, error_code):
+def solve_locks(workspace, publication_type, publication_name, error_code, method):
     current_lock = get_publication_lock(
         workspace,
         publication_type,
