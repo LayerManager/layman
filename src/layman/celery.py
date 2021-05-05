@@ -99,12 +99,6 @@ def get_publication_chain_info(workspace, publication_type, publication_name):
         }
 
         chain_info['by_order'] = [results[task_id] for task_id in chain_info['by_order']]
-        for idx, res in enumerate(chain_info['by_order']):
-            if idx > 0 and res.parent is None:
-                # this is common behaviour
-                pass
-                # current_app.logger.warning(f"Parent of result {res.task_id} is None!")
-                # res.parent = tinfo['by_order'][idx-1]
         chain_info['by_name'] = {
             k: results[task_id] for k, task_id in chain_info['by_name'].items()
         }
