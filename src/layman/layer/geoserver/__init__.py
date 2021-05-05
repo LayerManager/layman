@@ -118,10 +118,6 @@ def bbox_to_native_bbox(bbox):
     }
 
 
-def get_default_native_bbox():
-    return bbox_to_native_bbox(settings.LAYMAN_DEFAULT_OUTPUT_BBOX)
-
-
 def get_layer_native_bbox(workspace, layer):
     db_bbox = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['bounding_box']})['bounding_box']
     # GeoServer is not working good with degradeted bbox
