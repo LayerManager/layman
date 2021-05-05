@@ -171,7 +171,7 @@ def abort_task_chain(results_by_order, results_by_name=None):
 
 
 def is_chain_successful(chain_info):
-    return chain_info['last'].successful() or chain_info['finished'] is True
+    return chain_info['last'].successful()
 
 
 def is_chain_failed(chain_info):

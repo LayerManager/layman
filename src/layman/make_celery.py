@@ -61,7 +61,7 @@ def on_task_prerun(**kwargs):
     with app.app_context():
         publication_type = next(
             (
-                v for k, v in get_publication_types().items()
+                v['type'] for k, v in get_publication_types().items()
                 if task_name.startswith(k)
             ),
             None
@@ -83,7 +83,7 @@ def on_task_postrun(**kwargs):
     with app.app_context():
         publication_type = next(
             (
-                v for k, v in get_publication_types().items()
+                v['type'] for k, v in get_publication_types().items()
                 if task_name.startswith(k)
             ),
             None
