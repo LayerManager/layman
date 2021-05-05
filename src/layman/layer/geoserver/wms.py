@@ -7,7 +7,7 @@ from geoserver import util as gs_util
 from layman import settings, patch_mode, util as layman_util
 from layman.cache import mem_redis
 from layman.common import geoserver as gs_common, empty_method_returns_none, empty_method
-from layman.layer.util import is_layer_task_ready
+from layman.layer.util import is_layer_chain_ready
 from layman.layer import LAYER_TYPE, util as layer_util
 from .util import get_gs_proxy_base_url
 
@@ -104,7 +104,7 @@ def get_wms_proxy(username):
     def currently_changing():
         layerinfos = layman_util.get_publication_infos(username, LAYER_TYPE)
         result = any((
-            not is_layer_task_ready(username, layername)
+            not is_layer_chain_ready(username, layername)
             for (_, _, layername) in layerinfos
         ))
         return result

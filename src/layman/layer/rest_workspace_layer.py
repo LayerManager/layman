@@ -175,7 +175,7 @@ def delete_layer(workspace, layername):
 
     info = util.get_complete_layer_info(cached=True)
 
-    util.abort_layer_tasks(workspace, layername)
+    util.abort_layer_chain(workspace, layername)
 
     util.delete_layer(workspace, layername)
 

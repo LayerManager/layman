@@ -76,13 +76,13 @@ def check_new_layername(workspace, layername):
 def get_layer_info(workspace, layername, context=None):
     partial_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context)
 
-    last_task = _get_layer_task(workspace, layername)
-    if last_task is None or celery_util.is_task_successful(last_task):
+    chain_info = _get_layer_chain(workspace, layername)
+    if chain_info is None or celery_util.is_chain_successful(chain_info):
         return partial_info
 
     failed = False
-    for res in last_task['by_order']:
-        task_name = next(k for k, v in last_task['by_name'].items() if v == res)
+    for res in chain_info['by_order']:
+        task_name = next(k for k, v in chain_info['by_name'].items() if v == res)
         source_state = {
             'status': res.state if not failed else 'NOT_AVAILABLE'
         }
@@ -164,7 +164,7 @@ def post_layer(workspace, layername, task_options, start_async_at):
     # res = post_chain.apply_async()
     res = post_chain()
 
-    celery_util.set_publication_task_info(workspace, LAYER_TYPE, layername, post_tasks, res)
+    celery_util.set_publication_chain_info(workspace, LAYER_TYPE, layername, post_tasks, res)
 
 
 def patch_layer(workspace, layername, task_options, stop_sync_at, start_async_at):
@@ -179,7 +179,7 @@ def patch_layer(workspace, layername, task_options, stop_sync_at, start_async_at
     # res = patch_chain.apply_async()
     res = patch_chain()
 
-    celery_util.set_publication_task_info(workspace, LAYER_TYPE, layername, patch_tasks, res)
+    celery_util.set_publication_chain_info(workspace, LAYER_TYPE, layername, patch_tasks, res)
 
 
 TASKS_TO_LAYER_INFO_KEYS = {
@@ -198,7 +198,7 @@ def patch_after_wfst(workspace, layername, **kwargs):
     patch_chain = tasks_util.get_chain_of_methods(workspace, layername, task_methods, kwargs, 'layername')
     res = patch_chain()
 
-    celery_util.set_publication_task_info(workspace, LAYER_TYPE, layername, task_methods, res)
+    celery_util.set_publication_chain_info(workspace, LAYER_TYPE, layername, task_methods, res)
 
 
 def delete_layer(workspace, layername, source=None, http_method='delete'):
@@ -224,22 +224,22 @@ def delete_layer(workspace, layername, source=None, http_method='delete'):
     return result
 
 
-def _get_layer_task(username, layername):
-    tinfo = celery_util.get_publication_task_info(username, LAYER_TYPE, layername)
-    return tinfo
+def _get_layer_chain(username, layername):
+    chain_info = celery_util.get_publication_chain_info(username, LAYER_TYPE, layername)
+    return chain_info
 
 
-def abort_layer_tasks(username, layername):
-    last_task = _get_layer_task(username, layername)
-    celery_util.abort_task(last_task)
+def abort_layer_chain(username, layername):
+    chain_info = _get_layer_chain(username, layername)
+    celery_util.abort_chain(chain_info)
 
 
-def is_layer_task_ready(username, layername):
-    last_task = _get_layer_task(username, layername)
-    return last_task is None or celery_util.is_task_ready(last_task)
+def is_layer_chain_ready(username, layername):
+    chain_info = _get_layer_chain(username, layername)
+    return chain_info is None or celery_util.is_chain_ready(chain_info)
 
 
-lock_decorator = redis_util.create_lock_decorator(LAYER_TYPE, 'layername', 19, is_layer_task_ready)
+lock_decorator = redis_util.create_lock_decorator(LAYER_TYPE, 'layername', 19, is_layer_chain_ready)
 
 
 def layer_info_to_metadata_properties(info):

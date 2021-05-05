@@ -119,7 +119,7 @@ def delete_map(workspace, mapname):
     # raise exception if map does not exist
     info = util.get_complete_map_info(cached=True)
 
-    util.abort_map_tasks(workspace, mapname)
+    util.abort_map_chain(workspace, mapname)
 
     util.delete_map(workspace, mapname)
 
