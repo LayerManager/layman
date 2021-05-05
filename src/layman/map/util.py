@@ -84,13 +84,13 @@ TASKS_TO_MAP_INFO_KEYS = {
 def get_map_info(workspace, mapname, context=None):
     partial_info = layman_util.get_publication_info(workspace, MAP_TYPE, mapname, context)
 
-    last_task = _get_map_task(workspace, mapname)
-    if last_task is None or celery_util.is_task_successful(last_task):
+    chain_info = _get_map_chain(workspace, mapname)
+    if chain_info is None or celery_util.is_chain_successful(chain_info):
         return partial_info
 
     failed = False
-    for res in last_task['by_order']:
-        task_name = next(k for k, v in last_task['by_name'].items() if v == res)
+    for res in chain_info['by_order']:
+        task_name = next(k for k, v in chain_info['by_name'].items() if v == res)
         source_state = {
             'status': res.state if not failed else 'NOT_AVAILABLE'
         }
@@ -127,7 +127,7 @@ def post_map(workspace, mapname, task_options, start_at):
     # res = post_chain.apply_async()
     res = post_chain()
 
-    celery_util.set_publication_task_info(workspace, MAP_TYPE, mapname, post_tasks, res)
+    celery_util.set_publication_chain_info(workspace, MAP_TYPE, mapname, post_tasks, res)
 
 
 def patch_map(workspace, mapname, task_options, start_at):
@@ -141,7 +141,7 @@ def patch_map(workspace, mapname, task_options, start_at):
     # res = patch_chain.apply_async()
     res = patch_chain()
 
-    celery_util.set_publication_task_info(workspace, MAP_TYPE, mapname, patch_tasks, res)
+    celery_util.set_publication_chain_info(workspace, MAP_TYPE, mapname, patch_tasks, res)
 
 
 def delete_map(workspace, mapname, kwargs=None):
@@ -215,19 +215,19 @@ def check_file(file):
         }) from exc
 
 
-def _get_map_task(username, mapname):
-    tinfo = celery_util.get_publication_task_info(username, MAP_TYPE, mapname)
-    return tinfo
+def _get_map_chain(username, mapname):
+    chain_info = celery_util.get_publication_chain_info(username, MAP_TYPE, mapname)
+    return chain_info
 
 
 def abort_map_tasks(username, mapname):
-    last_task = _get_map_task(username, mapname)
-    celery_util.abort_task(last_task)
+    chain_info = _get_map_chain(username, mapname)
+    celery_util.abort_chain(chain_info)
 
 
-def is_map_task_ready(username, mapname):
-    last_task = _get_map_task(username, mapname)
-    return last_task is None or celery_util.is_task_ready(last_task)
+def is_map_chain_ready(username, mapname):
+    chain_info = _get_map_chain(username, mapname)
+    return chain_info is None or celery_util.is_chain_ready(chain_info)
 
 
 def get_map_owner_info(username):
@@ -241,7 +241,7 @@ def get_map_owner_info(username):
     return result
 
 
-lock_decorator = redis_util.create_lock_decorator(MAP_TYPE, 'mapname', 29, is_map_task_ready)
+lock_decorator = redis_util.create_lock_decorator(MAP_TYPE, 'mapname', 29, is_map_chain_ready)
 
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, MAP_TYPE)
 

@@ -119,7 +119,7 @@ def post(workspace):
         )
     except Exception as e:
         try:
-            if util.is_map_task_ready(workspace, mapname):
+            if util.is_map_chain_ready(workspace, mapname):
                 redis_util.unlock_publication(workspace, MAP_TYPE, mapname)
         finally:
             redis_util.unlock_publication(workspace, MAP_TYPE, mapname)
@@ -136,7 +136,7 @@ def delete(workspace):
     infos = layman_util.delete_publications(workspace,
                                             MAP_TYPE,
                                             29,
-                                            util.is_map_task_ready,
+                                            util.is_map_chain_ready,
                                             util.abort_map_tasks,
                                             util.delete_map,
                                             request.method,

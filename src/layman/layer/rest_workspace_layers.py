@@ -159,7 +159,7 @@ def post(workspace):
         )
     except Exception as e:
         try:
-            if util.is_layer_task_ready(workspace, layername):
+            if util.is_layer_chain_ready(workspace, layername):
                 redis_util.unlock_publication(workspace, LAYER_TYPE, layername)
         finally:
             redis_util.unlock_publication(workspace, LAYER_TYPE, layername)
@@ -176,7 +176,7 @@ def delete(workspace):
     infos = layman_util.delete_publications(workspace,
                                             LAYER_TYPE,
                                             19,
-                                            util.is_layer_task_ready,
+                                            util.is_layer_chain_ready,
                                             util.abort_layer_tasks,
                                             util.delete_layer,
                                             request.method,

@@ -349,7 +349,7 @@ def get_publication_infos_with_metainfo(workspace=None, publ_type=None, context=
 def delete_publications(user,
                         publ_type,
                         error_code,
-                        is_task_ready_fn,
+                        is_chain_ready_fn,
                         abort_publication_fn,
                         delete_publication_fn,
                         method,
@@ -366,11 +366,11 @@ def delete_publications(user,
         try:
             abort_publication_fn(user, publication)
             delete_publication_fn(user, publication)
-            if is_task_ready_fn(user, publication):
+            if is_chain_ready_fn(user, publication):
                 redis_util.unlock_publication(user, publ_type, publication)
         except Exception as e:
             try:
-                if is_task_ready_fn(user, publication):
+                if is_chain_ready_fn(user, publication):
                     redis_util.unlock_publication(user, publ_type, publication)
             finally:
                 redis_util.unlock_publication(user, publ_type, publication)
