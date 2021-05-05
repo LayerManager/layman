@@ -39,6 +39,19 @@ def test_contains_bbox(bbox1, bbox2, expected_result):
     assert bbox_util.contains_bbox(bbox1, bbox2) == expected_result
 
 
+@pytest.mark.parametrize('bbox1, bbox2, expected_result', [
+    ((1, 1, 4, 4, ), (2, 2, 3, 3, ), True),
+    ((1, 1, 4, 4, ), (1, 1, 4, 4, ), True),
+    ((1, 1, 4, 4, ), (1, 1, 4, 5, ), True),
+    ((1, 1, 4, 4, ), (4, 4, 5, 5, ), True),
+    ((1, 1, 4, 4, ), (5, 5, 6, 6, ), False),
+    ((1, 1, 4, 4, ), (None, None, None, None, ), False),
+    ((None, None, None, None, ), (1, 1, 4, 4, ), False),
+])
+def test_intersects_bbox(bbox1, bbox2, expected_result):
+    assert bbox_util.intersects(bbox1, bbox2) == expected_result
+
+
 @pytest.mark.parametrize('bbox, expected_result', [
     ((1, 1, 4, 4, ), True),
     ((1, 1, 1, 3, ), False),
