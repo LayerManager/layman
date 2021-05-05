@@ -9,11 +9,14 @@ from flask import Blueprint, g, current_app as app, request, Response
 from geoserver.util import reset as gs_reset
 from layman import authn, authz, settings
 from layman.authn import authenticate, is_user_with_name
+from layman.common import redis
 from layman.layer import db, LAYER_TYPE, util as layer_util
 from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import LAYERNAME_PATTERN, ATTRNAME_PATTERN, patch_after_wfst
 from layman.util import USERNAME_ONLY_PATTERN
 
+
+METHOD_CODE = 'wfst'
 
 bp = Blueprint('geoserver_proxy_bp', __name__)
 
@@ -182,6 +185,8 @@ def proxy(subpath):
     if data is not None and len(data) > 0:
         try:
             wfs_t_attribs, wfs_t_layers = extract_attributes_and_layers_from_wfs_t(data)
+            for workspace, layer in wfs_t_layers:
+                redis.create_lock(workspace, LAYER_TYPE, layer, 19, METHOD_CODE)
             if wfs_t_attribs:
                 ensure_wfs_t_attributes(wfs_t_attribs)
         except BaseException as err:

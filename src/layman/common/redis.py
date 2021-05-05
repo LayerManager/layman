@@ -70,10 +70,9 @@ def solve_locks(workspace, publication_type, publication_name, error_code, metho
     )
     if current_lock is None:
         return
-    method = request.method.lower()
-    if method not in ['patch', 'delete']:
+    if method not in ['patch', 'delete', 'wfst', ]:
         raise Exception(f"Unknown method to check: {method}")
-    if current_lock not in ['patch', 'delete', 'post']:
+    if current_lock not in ['patch', 'delete', 'post', 'wfst', ]:
         raise Exception(f"Unknown current lock: {current_lock}")
     if current_lock in ['patch', 'post']:
         if method in ['patch', 'post']:

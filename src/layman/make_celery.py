@@ -58,8 +58,6 @@ def on_task_prerun(**kwargs):
     from layman import app
     from layman.util import get_publication_types
     from layman.celery import task_prerun
-    if task_name.endswith('.patch_after_wfst'):
-        return
     with app.app_context():
         publication_type = next(
             (
@@ -82,8 +80,6 @@ def on_task_postrun(**kwargs):
     from layman import app
     from layman.util import get_publication_types
     from layman.celery import task_postrun
-    if task_name.endswith('.patch_after_wfst'):
-        return
     with app.app_context():
         publication_type = next(
             (
