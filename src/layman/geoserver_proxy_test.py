@@ -8,6 +8,7 @@ import pytest
 
 from geoserver.util import get_layer_thumbnail, get_square_bbox
 from layman import app, settings, util as layman_util
+from layman.common import bbox as bbox_util
 from layman.layer import db, util as layer_util
 from layman.layer.filesystem import thumbnail
 from layman.layer.geoserver import wfs as geoserver_wfs
@@ -374,6 +375,19 @@ def assert_all_sources_bbox(workspace, layer, expected_bbox):
     test_util.assert_same_bboxes(expected_bbox, bbox, 0)
     test_util.assert_wfs_bbox(workspace, layer, expected_bbox)
     test_util.assert_wms_bbox(workspace, layer, expected_bbox)
+
+    with app.app_context():
+        expected_bbox_4326 = bbox_util.transform(expected_bbox, 3857, 4326, )
+    md_comparison = client_util.get_workspace_layer_metadata_comparison(workspace, layer)
+    csw_prefix = settings.CSW_PROXY_URL
+    csw_src_key = client_util.get_source_key_from_metadata_comparison(md_comparison, csw_prefix)
+    assert csw_src_key is not None
+    prop_key = 'extent'
+    md_props = md_comparison['metadata_properties']
+    assert md_props[prop_key]['equal'] is True
+    assert md_props[prop_key]['equal_or_null'] is True
+    csw_bbox_4326 = tuple(md_props[prop_key]['values'][csw_src_key])
+    test_util.assert_same_bboxes(expected_bbox_4326, csw_bbox_4326, 0.001)
 
 
 @pytest.mark.parametrize('style_file, thumbnail_style_postfix', [
