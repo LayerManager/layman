@@ -8,7 +8,7 @@ from flask import current_app
 
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util
-from layman.common import language as common_language, empty_method, empty_method_returns_none
+from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
 from layman.layer.filesystem.uuid import get_layer_uuid
 from layman.layer import db
 from layman.layer.geoserver import wms
@@ -114,19 +114,15 @@ def csw_insert(workspace, layername):
 
 def get_template_path_and_values(workspace, layername, http_method=None):
     assert http_method in ['post', 'patch']
-    wmsi = wms.get_wms_proxy(workspace)
-    wms_layer = wmsi.contents.get(layername) if wmsi else None
     publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
-        'keys': ['title'],
+        'keys': ['title', 'bounding_box', 'description'],
     })
     title = publ_info['title']
-
-    if wms_layer:
-        abstract = wms_layer.abstract
-        extent = wms_layer.boundingBoxWGS84
-    else:
-        abstract = None
-        extent = [-180, -90, 180, 90]
+    abstract = publ_info.get('description')
+    bbox_3857 = publ_info.get('bounding_box')
+    if bbox_util.is_empty(bbox_3857):
+        bbox_3857 = settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+    extent = bbox_util.transform(tuple(bbox_3857), epsg_from=3857, epsg_to=4326)
 
     uuid_file_path = get_publication_uuid_file(LAYER_TYPE, workspace, layername)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
