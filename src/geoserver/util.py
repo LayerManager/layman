@@ -228,7 +228,7 @@ def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, de
     if description:
         ftype['abstract'] = description
     if bbox:
-        ftype['nativeBoundingBox'] = bbox
+        ftype['nativeBoundingBox'] = bbox_to_native_bbox(bbox)
 
     ftype = {k: v for k, v in ftype.items() if v is not None}
     body = {
@@ -504,7 +504,7 @@ def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox):
         "enabled": True,
     }
     if bbox:
-        wms_layer['nativeBoundingBox'] = bbox
+        wms_layer['nativeBoundingBox'] = bbox_to_native_bbox(bbox)
         wms_layer['nativeCRS'] = 'EPSG:3857'
     r = requests.put(urljoin(GS_REST_WORKSPACES,
                              f'{geoserver_workspace}/wmslayers/{layer}'),
