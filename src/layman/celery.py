@@ -1,4 +1,5 @@
 import json
+import importlib
 from flask import current_app
 from celery.contrib.abortable import AbortableAsyncResult
 
@@ -8,6 +9,7 @@ from layman.common import redis as redis_util, consts
 REDIS_CURRENT_TASK_NAMES = f"{__name__}:CURRENT_TASK_NAMES"
 PUBLICATION_CHAIN_INFOS = f'{__name__}:PUBLICATION_TASK_INFOS'
 LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION = f'{__name__}:TASK_ID_TO_PUBLICATION'
+RUN_AFTER_CHAIN = f'{__name__}:RUN_AFTER_CHAIN'
 
 
 def task_prerun(workspace, _publication_type, publication_name, _task_id, task_name):
@@ -29,6 +31,12 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
     hash = task_id
     if rds.hexists(key, hash):
         finnish_publication_task(task_id)
+        next_task = pop_step_to_run_after_chain(workspace, publication_type, publication_name)
+        if next_task:
+            module_name, method_name = next_task.split('::')
+            module = importlib.import_module(module_name)
+            method = getattr(module, method_name, None)
+            method(workspace, publication_type, publication_name)
     elif task_state == 'FAILURE':
         chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
         if chain_info is not None:
@@ -38,6 +46,30 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
 
 def _get_task_hash(task_name, workspace, publication_name):
     return f"{task_name}:{workspace}:{publication_name}"
+
+
+def push_step_to_run_after_chain(workspace, publication_type, publication_name, step_code, ):
+    rds = settings.LAYMAN_REDIS
+    key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
+    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    val = rds.hget(key, hash)
+    queue = json.loads(val) if val is not None else list()
+    queue.append(step_code)
+    rds.hset(key, hash, json.dumps(queue))
+
+
+def pop_step_to_run_after_chain(workspace, publication_type, publication_name, ):
+    rds = settings.LAYMAN_REDIS
+    key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
+    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    val = rds.hget(key, hash)
+    result = None
+    if val:
+        queue = json.loads(val)
+        if len(queue) > 0:
+            result = queue.pop(0)
+        rds.hset(key, hash, json.dumps(queue))
+    return result
 
 
 def finnish_publication_task(task_id):
