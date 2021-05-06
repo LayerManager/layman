@@ -1,5 +1,16 @@
 from collections import namedtuple
 
+REQUEST_METHOD_DELETE = 'delete'
+REQUEST_METHOD_GET = 'get'
+REQUEST_METHOD_PATCH = 'patch'
+REQUEST_METHOD_POST = 'post'
+REQUEST_METHOD_PUT = 'put'
+
+PUBLICATION_LOCK_POST = REQUEST_METHOD_POST
+PUBLICATION_LOCK_PATCH = REQUEST_METHOD_PATCH
+PUBLICATION_LOCK_DELETE = REQUEST_METHOD_DELETE
+PUBLICATION_LOCK_WFST = 'wfst'
+
 InternalSourceTypeDef = namedtuple('InternalSourceTypeDef', ['info_items',
                                                              ])
 
