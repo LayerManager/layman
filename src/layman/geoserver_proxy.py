@@ -7,7 +7,7 @@ from lxml import etree as ET
 from flask import Blueprint, g, current_app as app, request, Response
 
 from geoserver.util import reset as gs_reset
-from layman import authn, authz, settings
+from layman import authn, authz, common, settings
 from layman.authn import authenticate, is_user_with_name
 from layman.common import redis
 from layman.layer import db, LAYER_TYPE, util as layer_util
@@ -197,7 +197,7 @@ def proxy(subpath):
 
     for workspace, layername in wfs_t_layers:
         if authz.can_i_edit(LAYER_TYPE, workspace, layername):
-            redis.create_lock(workspace, LAYER_TYPE, layername, 19, 'wfst')
+            redis.create_lock(workspace, LAYER_TYPE, layername, 19, common.PUBLICATION_LOCK_CODE_WFST)
             patch_after_wfst(workspace, layername)
 
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']

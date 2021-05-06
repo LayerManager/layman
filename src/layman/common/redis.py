@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import request, current_app
 
-from layman import settings, celery as celery_util
+from layman import settings, celery as celery_util, common
 from layman import LaymanError
 
 PUBLICATION_LOCKS_KEY = f'{__name__}:PUBLICATION_LOCKS'
@@ -70,22 +70,26 @@ def solve_locks(workspace, publication_type, publication_name, error_code, metho
     )
     if current_lock is None:
         return
-    if method not in ['patch', 'delete', 'wfst', ]:
+    if method not in [common.PUBLICATION_LOCK_CODE_PATCH, common.PUBLICATION_LOCK_CODE_DELETE,
+                      common.PUBLICATION_LOCK_CODE_WFST, ]:
         raise Exception(f"Unknown method to check: {method}")
-    if current_lock not in ['patch', 'delete', 'post', 'wfst', ]:
+    if current_lock not in [common.PUBLICATION_LOCK_CODE_PATCH, common.PUBLICATION_LOCK_CODE_DELETE,
+                            common.PUBLICATION_LOCK_CODE_POST,
+                            common.PUBLICATION_LOCK_CODE_WFST, ]:
         raise Exception(f"Unknown current lock: {current_lock}")
-    if current_lock in ['patch', 'post']:
-        if method in ['patch', 'post']:
+    if current_lock in [common.PUBLICATION_LOCK_CODE_PATCH, common.PUBLICATION_LOCK_CODE_POST, ]:
+        if method in [common.PUBLICATION_LOCK_CODE_PATCH, common.PUBLICATION_LOCK_CODE_POST, ]:
             raise LaymanError(error_code)
-    elif current_lock in ['delete']:
-        if method in ['patch', 'post']:
+    elif current_lock in [common.PUBLICATION_LOCK_CODE_DELETE, ]:
+        if method in [common.PUBLICATION_LOCK_CODE_PATCH, common.PUBLICATION_LOCK_CODE_POST, ]:
             raise LaymanError(error_code)
-    if method not in ['delete']:
-        if (current_lock, method) == ('wfst', 'wfst'):
+    if method not in [common.PUBLICATION_LOCK_CODE_DELETE, ]:
+        if (current_lock, method) == (common.PUBLICATION_LOCK_CODE_WFST, common.PUBLICATION_LOCK_CODE_WFST):
             chain_info = celery_util.get_publication_chain_info(workspace, publication_type, publication_name)
             celery_util.abort_chain(chain_info)
         else:
-            assert current_lock not in ['wfst', ] and method not in ['wfst', ],\
+            assert current_lock not in [common.PUBLICATION_LOCK_CODE_WFST, ] and method not in [
+                common.PUBLICATION_LOCK_CODE_WFST, ],\
                 f'current_lock={current_lock}, method={method},' \
                 f'workspace, publication_type, publication_name={(workspace, publication_type, publication_name)}'
 
