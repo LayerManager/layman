@@ -33,6 +33,7 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
     order_by_list = order_by_list or []
 
     full_text_tsquery = db_util.to_tsquery_string(full_text_filter) if full_text_filter else None
+    full_text_like = '%' + full_text_filter + '%' if full_text_filter else None
     ordering_full_text_tsquery = db_util.to_tsquery_string(ordering_full_text) if ordering_full_text else None
 
     where_params_def = [
@@ -59,7 +60,8 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
                                   where r.id_publication = p.id
                                     and r.type = 'write'
                                     and w2.name = %s))""", (writer, writer,)),
-        (full_text_filter, '_prime_schema.my_unaccent(p.title) @@ to_tsquery(unaccent(%s))', (full_text_tsquery, )),
+        (full_text_filter, '(_prime_schema.my_unaccent(p.title) @@ to_tsquery(unaccent(%s))'
+                           'or lower(unaccent(p.title)) like lower(unaccent(%s)))', (full_text_tsquery, full_text_like,)),
         (bbox_filter, 'p.bbox && ST_MakeBox2D(ST_MakePoint(%s, %s), ST_MakePoint(%s, %s))', bbox_filter),
     ]
 
