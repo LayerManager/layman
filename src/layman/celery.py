@@ -7,7 +7,7 @@ from layman.common import redis as redis_util
 
 REDIS_CURRENT_TASK_NAMES = f"{__name__}:CURRENT_TASK_NAMES"
 PUBLICATION_CHAIN_INFOS = f'{__name__}:PUBLICATION_TASK_INFOS'
-TASK_ID_TO_PUBLICATION = f'{__name__}:TASK_ID_TO_PUBLICATION'
+LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION = f'{__name__}:TASK_ID_TO_PUBLICATION'
 
 
 def task_prerun(workspace, _publication_type, publication_name, _task_id, task_name):
@@ -25,7 +25,7 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
     task_hash = _get_task_hash(task_name, workspace, publication_name)
     rds.srem(key, task_hash)
 
-    key = TASK_ID_TO_PUBLICATION
+    key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
     hash = task_id
     if rds.hexists(key, hash):
         finnish_publication_task(task_id)
@@ -42,7 +42,7 @@ def _get_task_hash(task_name, workspace, publication_name):
 
 def finnish_publication_task(task_id):
     rds = settings.LAYMAN_REDIS
-    key = TASK_ID_TO_PUBLICATION
+    key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
     hash = task_id
     publ_hash = rds.hget(key, hash)
     if publ_hash is None:
@@ -132,7 +132,7 @@ def set_publication_chain_info(workspace, publication_type, publication_name, ta
     set_publication_chain_info_dict(workspace, publication_type, publication_name, chain_info)
 
     rds = settings.LAYMAN_REDIS
-    key = TASK_ID_TO_PUBLICATION
+    key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
     val = _get_publication_hash(workspace, publication_type, publication_name)
     hash = chain_info['last']
     rds.hset(key, hash, val)
@@ -198,7 +198,7 @@ def delete_publication(workspace, publication_type, publication_name):
     hash = _get_publication_hash(workspace, publication_type, publication_name)
     rds.hdel(key, hash)
 
-    key = TASK_ID_TO_PUBLICATION
+    key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
     rds.hdel(key, task_id)
 
 
