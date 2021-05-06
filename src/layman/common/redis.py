@@ -83,13 +83,12 @@ def solve_locks(workspace, publication_type, publication_name, error_code, metho
         if method in [consts.REQUEST_METHOD_PATCH, consts.REQUEST_METHOD_POST, ]:
             raise LaymanError(error_code)
     if method not in [consts.REQUEST_METHOD_DELETE, ]:
-        if (current_lock, method) == (consts.REQUEST_METHOD_WFST, consts.REQUEST_METHOD_WFST):
+        if method == consts.REQUEST_METHOD_WFST:
+            raise LaymanError(49)
+        if current_lock == consts.REQUEST_METHOD_WFST and method in [consts.REQUEST_METHOD_PATCH, ]:
             chain_info = celery_util.get_publication_chain_info(workspace, publication_type, publication_name)
             celery_util.abort_chain(chain_info)
-        else:
-            assert current_lock not in [consts.REQUEST_METHOD_WFST, ] and method not in [consts.REQUEST_METHOD_WFST, ],\
-                f'current_lock={current_lock}, method={method},' \
-                f'workspace, publication_type, publication_name={(workspace, publication_type, publication_name)}'
+            celery_util.push_step_to_run_after_chain(workspace, publication_type, publication_name, 'layman.util::patch_after_wfst')
 
 
 def _get_publication_hash(workspace, publication_type, publication_name):

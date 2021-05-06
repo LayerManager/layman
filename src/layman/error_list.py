@@ -49,4 +49,5 @@ ERROR_LIST = {
     46: (400, 'Unknown style file. Can recognize only SLD and QML files.'),
     47: (400, 'Error in QML'),
     48: (400, 'Wrong combination of parameters'),
+    49: (400, 'Publication already in process'),
 }
