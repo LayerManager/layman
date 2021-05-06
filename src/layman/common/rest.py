@@ -1,7 +1,6 @@
 import re
 from flask import jsonify, make_response
 
-from db import util as db_util
 from layman import settings, util as layman_util, LaymanError
 from layman.authn import is_user_with_name
 from layman.common import bbox as bbox_util
@@ -155,7 +154,7 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
     # Filters
     full_text_filter = None
     if consts.FILTER_FULL_TEXT in request_args:
-        full_text_filter = db_util.to_tsquery_string(request_args[consts.FILTER_FULL_TEXT]) or None
+        full_text_filter = request_args[consts.FILTER_FULL_TEXT].strip() or None
 
     bbox_filter = get_bbox_from_param(request_args, consts.FILTER_BBOX)
 

@@ -293,19 +293,13 @@ class TestSelectPublicationsComplex:
             'total_count': 0,
             'content_range': (0, 0),
         }),
-        ({'full_text_filter': 'dva | kun'}, {
+        ({'full_text_filter': 'dva kun'}, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
                       (workspace1, MAP_TYPE, map_1o_2_2x3_6),
                       (workspace1, MAP_TYPE, map_1oe_3_7x5_9),
                       ],
             'total_count': 3,
             'content_range': (1, 3),
-        }),
-        ({'full_text_filter': 'kun & ody'}, {
-            'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
-                      ],
-            'total_count': 1,
-            'content_range': (1, 1),
         }),
         ({'order_by_list': ['full_text'], 'ordering_full_text': 'jedna'}, {
             'items': [(workspace1, MAP_TYPE, map_1oe_3_7x5_9),
@@ -319,7 +313,7 @@ class TestSelectPublicationsComplex:
             'total_count': 7,
             'content_range': (1, 7),
         }),
-        ({'full_text_filter': 'dva | kun', 'order_by_list': ['full_text'], 'ordering_full_text': 'karel | kun'}, {
+        ({'full_text_filter': 'dva kun', 'order_by_list': ['full_text'], 'ordering_full_text': 'karel kun'}, {
             'items': [(workspace1, MAP_TYPE, map_1o_2_2x3_6),
                       (workspace1, MAP_TYPE, map_1e_2_4x6_6),
                       (workspace1, MAP_TYPE, map_1oe_3_7x5_9),

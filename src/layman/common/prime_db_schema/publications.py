@@ -32,6 +32,9 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
                                         ):
     order_by_list = order_by_list or []
 
+    full_text_tsquery = db_util.to_tsquery_string(full_text_filter) if full_text_filter else None
+    ordering_full_text_tsquery = db_util.to_tsquery_string(ordering_full_text) if ordering_full_text else None
+
     where_params_def = [
         (workspace_name, 'w.name = %s', (workspace_name,)),
         (pub_type, 'p.type = %s', (pub_type,)),
@@ -56,13 +59,13 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
                                   where r.id_publication = p.id
                                     and r.type = 'write'
                                     and w2.name = %s))""", (writer, writer,)),
-        (full_text_filter, '_prime_schema.my_unaccent(p.title) @@ to_tsquery(unaccent(%s))', (full_text_filter,)),
+        (full_text_filter, '_prime_schema.my_unaccent(p.title) @@ to_tsquery(unaccent(%s))', (full_text_tsquery, )),
         (bbox_filter, 'p.bbox && ST_MakeBox2D(ST_MakePoint(%s, %s), ST_MakePoint(%s, %s))', bbox_filter),
     ]
 
     order_by_definition = {
         consts.ORDER_BY_FULL_TEXT: ('ts_rank_cd(_prime_schema.my_unaccent(p.title), to_tsquery(unaccent(%s))) DESC',
-                                    (ordering_full_text,)),
+                                    (ordering_full_text_tsquery,)),
         consts.ORDER_BY_TITLE: ('lower(unaccent(p.title)) ASC', tuple()),
         consts.ORDER_BY_LAST_CHANGE: ('updated_at DESC', tuple()),
         consts.ORDER_BY_BBOX: ("""
