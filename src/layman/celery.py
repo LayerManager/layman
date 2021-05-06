@@ -8,6 +8,7 @@ from layman.common import redis as redis_util
 REDIS_CURRENT_TASK_NAMES = f"{__name__}:CURRENT_TASK_NAMES"
 PUBLICATION_CHAIN_INFOS = f'{__name__}:PUBLICATION_TASK_INFOS'
 LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION = f'{__name__}:TASK_ID_TO_PUBLICATION'
+RUN_AFTER_CHAIN = f'{__name__}:RUN_AFTER_CHAIN'
 
 
 def task_prerun(workspace, _publication_type, publication_name, _task_id, task_name):
@@ -38,6 +39,38 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
 
 def _get_task_hash(task_name, workspace, publication_name):
     return f"{task_name}:{workspace}:{publication_name}"
+
+
+def push_step_to_run_after_chain(workspace, publication_type, publication_name, step_code, ):
+    rds = settings.LAYMAN_REDIS
+    key = RUN_AFTER_CHAIN
+    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    val = rds.hget(key, hash)
+    queue = json.loads(val) if val is not None else list()
+    if step_code not in queue:
+        queue.append(step_code)
+        rds.hset(key, hash, json.dumps(queue))
+
+
+def pop_step_to_run_after_chain(workspace, publication_type, publication_name, ):
+    rds = settings.LAYMAN_REDIS
+    key = RUN_AFTER_CHAIN
+    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    val = rds.hget(key, hash)
+    result = None
+    if val:
+        queue = json.loads(val)
+        if len(queue) > 0:
+            result = queue.pop(0)
+            rds.hset(key, hash, json.dumps(queue))
+    return result
+
+
+def clear_steps_to_run_after_chain(workspace, publication_type, publication_name, ):
+    rds = settings.LAYMAN_REDIS
+    key = RUN_AFTER_CHAIN
+    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    rds.hdel(key, hash)
 
 
 def finnish_publication_task(task_id):
