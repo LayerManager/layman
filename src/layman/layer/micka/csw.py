@@ -8,7 +8,7 @@ from flask import current_app
 
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util
-from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
+from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util, consts
 from layman.layer.filesystem.uuid import get_layer_uuid
 from layman.layer import db
 from layman.layer.geoserver import wms
@@ -65,7 +65,7 @@ def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_nam
         return None
     # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
 
-    _, prop_values = get_template_path_and_values(workspace, layername, http_method='patch')
+    _, prop_values = get_template_path_and_values(workspace, layername, http_method=consts.REQUEST_METHOD_PATCH)
     prop_values = {
         k: v for k, v in prop_values.items()
         if k in metadata_properties_to_refresh + ['md_date_stamp']
@@ -113,7 +113,7 @@ def csw_insert(workspace, layername):
 
 
 def get_template_path_and_values(workspace, layername, http_method=None):
-    assert http_method in ['post', 'patch']
+    assert http_method in [consts.REQUEST_METHOD_POST, consts.REQUEST_METHOD_PATCH]
     publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
         'keys': ['title', 'bounding_box', 'description'],
     })
@@ -161,7 +161,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         scale_denominator=scale_denominator,
         epsg_codes=settings.LAYMAN_OUTPUT_SRS_LIST,
     )
-    if http_method == 'post':
+    if http_method == consts.REQUEST_METHOD_POST:
         prop_values.pop('revision_date', None)
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
     return template_path, prop_values

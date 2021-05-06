@@ -3,7 +3,7 @@ from flask import current_app
 from celery.contrib.abortable import AbortableAsyncResult
 
 from layman import settings
-from layman.common import redis as redis_util
+from layman.common import redis as redis_util, consts
 
 REDIS_CURRENT_TASK_NAMES = f"{__name__}:CURRENT_TASK_NAMES"
 PUBLICATION_CHAIN_INFOS = f'{__name__}:PUBLICATION_TASK_INFOS'
@@ -56,7 +56,7 @@ def finnish_publication_task(task_id):
     rds.hdel(key, hash)
 
     lock = redis_util.get_publication_lock(username, publication_type, publication_name)
-    if lock in ['patch', 'post', 'wfst', ]:
+    if lock in [consts.REQUEST_METHOD_PATCH, consts.REQUEST_METHOD_POST, consts.REQUEST_METHOD_WFST, ]:
         redis_util.unlock_publication(username, publication_type, publication_name)
 
 

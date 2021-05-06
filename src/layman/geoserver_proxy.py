@@ -9,7 +9,7 @@ from flask import Blueprint, g, current_app as app, request, Response
 from geoserver.util import reset as gs_reset
 from layman import authn, authz, settings
 from layman.authn import authenticate, is_user_with_name
-from layman.common import redis
+from layman.common import redis, consts
 from layman.layer import db, LAYER_TYPE, util as layer_util
 from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import LAYERNAME_PATTERN, ATTRNAME_PATTERN, patch_after_wfst
@@ -197,7 +197,7 @@ def proxy(subpath):
 
     for workspace, layername in wfs_t_layers:
         if authz.can_i_edit(LAYER_TYPE, workspace, layername):
-            redis.create_lock(workspace, LAYER_TYPE, layername, 19, 'wfst')
+            redis.create_lock(workspace, LAYER_TYPE, layername, 19, consts.REQUEST_METHOD_WFST)
             patch_after_wfst(workspace, layername)
 
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']

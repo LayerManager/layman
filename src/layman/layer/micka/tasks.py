@@ -2,7 +2,7 @@ from celery.utils.log import get_task_logger
 
 from layman.celery import AbortedException
 from layman import celery_app
-from layman.common import empty_method_returns_true
+from layman.common import empty_method_returns_true, consts
 from . import csw, soap
 
 logger = get_task_logger(__name__)
@@ -16,11 +16,11 @@ refresh_soap_needed = empty_method_returns_true
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_csw(self, username, layername, http_method='post', metadata_properties_to_refresh=None):
+def refresh_csw(self, username, layername, http_method=consts.REQUEST_METHOD_POST, metadata_properties_to_refresh=None):
     metadata_properties_to_refresh = metadata_properties_to_refresh or []
     if self.is_aborted():
         raise AbortedException
-    if http_method == 'post':
+    if http_method == consts.REQUEST_METHOD_POST:
         csw.csw_insert(username, layername)
     else:
         csw.patch_layer(username, layername, metadata_properties_to_refresh)
@@ -35,11 +35,11 @@ def refresh_csw(self, username, layername, http_method='post', metadata_properti
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_soap(self, username, layername, http_method='post', metadata_properties_to_refresh=None, access_rights=None):
+def refresh_soap(self, username, layername, http_method=consts.REQUEST_METHOD_POST, metadata_properties_to_refresh=None, access_rights=None):
     metadata_properties_to_refresh = metadata_properties_to_refresh or []
     if self.is_aborted():
         raise AbortedException
-    if http_method == 'post':
+    if http_method == consts.REQUEST_METHOD_POST:
         soap.soap_insert(username, layername, access_rights)
     else:
         soap.patch_layer(username, layername, metadata_properties_to_refresh, access_rights)
