@@ -11,6 +11,7 @@
 ### Changes
 - [#159] (https://github.com/jirik/layman/issues/159) Bounding box is send explicitly to GeoServer for every layer.
 - [#159] (https://github.com/jirik/layman/issues/159) Bounding box is updated after WFS-T request. More info in [documentation](doc/endpoints.md#web-feature-service).
+- [#331] (https://github.com/jirik/layman/issues/331) Query parameter *full_text_filter* is also use for substring search in all endpoints with filtering.
 - Filesystem directory containing workspaces was renamed from `users` to `workspaces`
 
 ## v1.12.0
