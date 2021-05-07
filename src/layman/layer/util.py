@@ -230,8 +230,7 @@ def _get_layer_chain(username, layername):
 
 
 def abort_layer_chain(username, layername):
-    chain_info = _get_layer_chain(username, layername)
-    celery_util.abort_chain(chain_info)
+    celery_util.abort_publication_chain(username, LAYER_TYPE, layername)
 
 
 def is_layer_chain_ready(username, layername):

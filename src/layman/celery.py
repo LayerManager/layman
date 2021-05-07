@@ -179,6 +179,12 @@ def abort_chain(chain_info):
     finnish_publication_task(chain_info['last'].task_id)
 
 
+def abort_publication_chain(workspace, publication_type, publication_name):
+    chain_info = get_publication_chain_info(workspace, publication_type, publication_name)
+    abort_chain(chain_info)
+    clear_steps_to_run_after_chain(workspace, publication_type, publication_name)
+
+
 def abort_task_chain(results_by_order, results_by_name=None):
     results_by_name = results_by_name or {}
     task_results = [r for r in results_by_order if not r.ready()]
