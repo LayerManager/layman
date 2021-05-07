@@ -85,8 +85,7 @@ def solve_locks(workspace, publication_type, publication_name, error_code, reque
             raise LaymanError(error_code)
     if requested_lock not in [common.PUBLICATION_LOCK_CODE_DELETE, ]:
         if (current_lock, requested_lock) == (common.PUBLICATION_LOCK_CODE_WFST, common.PUBLICATION_LOCK_CODE_WFST):
-            chain_info = celery_util.get_publication_chain_info(workspace, publication_type, publication_name)
-            celery_util.abort_chain(chain_info)
+            celery_util.abort_publication_chain(workspace, publication_type, publication_name)
         else:
             assert current_lock not in [common.PUBLICATION_LOCK_CODE_WFST, ] and requested_lock not in [
                 common.PUBLICATION_LOCK_CODE_WFST, ],\
