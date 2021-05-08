@@ -73,6 +73,15 @@ def pop_step_to_run_after_chain(workspace, publication_type, publication_name, )
     return result
 
 
+def get_run_after_chain_queue(workspace, publication_type, publication_name, ):
+    rds = settings.LAYMAN_REDIS
+    key = RUN_AFTER_CHAIN
+    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    val = rds.hget(key, hash)
+    queue = json.loads(val) if val is not None else list()
+    return queue
+
+
 def clear_steps_to_run_after_chain(workspace, publication_type, publication_name, ):
     rds = settings.LAYMAN_REDIS
     key = RUN_AFTER_CHAIN
