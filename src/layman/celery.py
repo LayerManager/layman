@@ -30,7 +30,7 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
     key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
     hash = task_id
     if rds.hexists(key, hash):
-        finnish_publication_task(task_id)
+        finnish_publication_chain(task_id)
         next_task = pop_step_to_run_after_chain(workspace, publication_type, publication_name)
         if next_task:
             module_name, method_name = next_task.split('::')
@@ -41,7 +41,7 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
         chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
         if chain_info is not None:
             last_task_id = chain_info['last']
-            finnish_publication_task(last_task_id)
+            finnish_publication_chain(last_task_id)
 
 
 def _get_task_hash(task_name, workspace, publication_name):
@@ -80,10 +80,10 @@ def clear_steps_to_run_after_chain(workspace, publication_type, publication_name
     rds.hdel(key, hash)
 
 
-def finnish_publication_task(task_id):
+def finnish_publication_chain(last_task_id_in_chain):
     rds = settings.LAYMAN_REDIS
     key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
-    hash = task_id
+    hash = last_task_id_in_chain
     publ_hash = rds.hget(key, hash)
     if publ_hash is None:
         return
@@ -183,7 +183,7 @@ def abort_chain(chain_info):
         return
 
     abort_task_chain(chain_info['by_order'], chain_info['by_name'])
-    finnish_publication_task(chain_info['last'].task_id)
+    finnish_publication_chain(chain_info['last'].task_id)
 
 
 def abort_publication_chain(workspace, publication_type, publication_name):
