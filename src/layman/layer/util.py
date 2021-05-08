@@ -194,11 +194,7 @@ TASKS_TO_LAYER_INFO_KEYS = {
 
 
 def patch_after_wfst(workspace, layername, **kwargs):
-    task_methods = tasks_util.get_source_task_methods(get_layer_type_def(), 'patch_after_wfst')
-    patch_chain = tasks_util.get_chain_of_methods(workspace, layername, task_methods, kwargs, 'layername')
-    res = patch_chain()
-
-    celery_util.set_publication_chain_info(workspace, LAYER_TYPE, layername, task_methods, res)
+    layman_util.patch_after_wfst(workspace, LAYER_TYPE, layername, **kwargs)
 
 
 def delete_layer(workspace, layername, source=None, http_method='delete'):
