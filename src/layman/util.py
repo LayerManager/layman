@@ -11,7 +11,7 @@ from flask import current_app, request, url_for as flask_url_for, jsonify
 from unidecode import unidecode
 
 from layman import settings, celery as celery_util
-from layman.common import tasks as tasks_util
+from layman.common import tasks as tasks_util, redis
 from layman.http import LaymanError
 
 logger = logging.getLogger(__name__)
@@ -395,3 +395,20 @@ def patch_after_wfst(workspace, publication_type, publication, **kwargs):
     patch_chain = tasks_util.get_chain_of_methods(workspace, publication, task_methods, kwargs, 'layername')
     res = patch_chain()
     celery_util.set_publication_chain_info(workspace, publication_type, publication, task_methods, res)
+
+
+def get_publication_status(workspace, publication_type, publication_name, complete_info, item_keys, ):
+    chain_info = celery_util.get_publication_chain_info(workspace, publication_type, publication_name)
+    current_lock = redis.get_publication_lock(
+        workspace,
+        publication_type,
+        publication_name,
+    )
+
+    if (chain_info and not celery_util.is_chain_ready(chain_info)) or current_lock:
+        publication_status = 'UPDATING'
+    elif any(complete_info.get(v, dict()).get('status') for v in item_keys):
+        publication_status = 'INCOMPLETE'
+    else:
+        publication_status = 'COMPLETE'
+    return publication_status
