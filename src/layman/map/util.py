@@ -159,21 +159,17 @@ def get_complete_map_info(username=None, mapname=None, cached=False):
     if not any(partial_info):
         raise LaymanError(26, {'mapname': mapname})
 
+    item_keys = ['file', 'thumbnail', 'metadata', ]
+
     complete_info = {
         'name': mapname,
         'url': url_for('rest_workspace_map.get', mapname=mapname, workspace=username),
         'title': mapname,
         'description': '',
-        'file': {
-            'status': 'NOT_AVAILABLE'
-        },
-        'thumbnail': {
-            'status': 'NOT_AVAILABLE'
-        },
-        'metadata': {
-            'status': 'NOT_AVAILABLE'
-        },
     }
+
+    for key in item_keys:
+        complete_info[key] = {'status': 'NOT_AVAILABLE'}
 
     complete_info.update(partial_info)
 

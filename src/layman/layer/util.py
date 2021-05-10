@@ -112,33 +112,17 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
     if not any(partial_info):
         raise LaymanError(15, {'layername': layername})
 
+    item_keys = ['wms', 'wfs', 'thumbnail', 'file', 'db_table', 'metadata', 'style', ]
+
     complete_info = {
         'name': layername,
         'url': url_for('rest_workspace_layer.get', layername=layername, workspace=username),
         'title': layername,
         'description': '',
-        'wms': {
-            'status': 'NOT_AVAILABLE'
-        },
-        'wfs': {
-            'status': 'NOT_AVAILABLE'
-        },
-        'thumbnail': {
-            'status': 'NOT_AVAILABLE'
-        },
-        'file': {
-            'status': 'NOT_AVAILABLE'
-        },
-        'db_table': {
-            'status': 'NOT_AVAILABLE'
-        },
-        'metadata': {
-            'status': 'NOT_AVAILABLE'
-        },
-        'style': {
-            'status': 'NOT_AVAILABLE'
-        },
     }
+
+    for key in item_keys:
+        complete_info[key] = {'status': 'NOT_AVAILABLE'}
 
     complete_info.update(partial_info)
 
