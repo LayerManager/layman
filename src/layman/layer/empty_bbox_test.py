@@ -1,4 +1,5 @@
 import os
+import time
 from test import process_client
 from test.data import wfs as wfs_data_util
 import requests
@@ -68,5 +69,7 @@ def test_empty_shapefile(layername, file_paths):
     wms_layer = assert_wms_layer(workspace, layername, title)
     assert wms_layer.boundingBox == native_bbox
     assert wms_layer.boundingBoxWGS84 == wgs_bbox
+
+    time.sleep(5)
 
     process_client.delete_workspace_layer(workspace, layername)
