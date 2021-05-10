@@ -87,6 +87,7 @@ class TestResponsesClass:
 
     expected_common = {
         'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
+        'layman_metadata': {'publication_status': 'COMPLETE'},
         'description': description,
         'name': publication,
         'title': publication,

@@ -126,6 +126,9 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
 
     complete_info.update(partial_info)
 
+    complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(username, LAYER_TYPE, layername,
+                                                                                                 complete_info, item_keys)}
+
     complete_info = clear_publication_info(complete_info)
 
     complete_info['sld'] = complete_info['style']

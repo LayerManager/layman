@@ -173,6 +173,9 @@ def get_complete_map_info(username=None, mapname=None, cached=False):
 
     complete_info.update(partial_info)
 
+    complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(username, MAP_TYPE, mapname,
+                                                                                                 complete_info, item_keys)}
+
     complete_info = clear_publication_info(complete_info)
 
     return complete_info
