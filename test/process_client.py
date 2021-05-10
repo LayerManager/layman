@@ -81,6 +81,10 @@ def check_response_keys(keys_to_check, response):
     )
 
 
+def wait_for_failure(keys_to_check, response):
+    return any(response.json()[k].get('status') == 'FAILURE' for k in keys_to_check)
+
+
 def wait_for_rest(url, max_attempts, sleeping_time, check_response, headers=None):
     headers = headers or None
     r = requests.get(url, headers=headers, timeout=5)
