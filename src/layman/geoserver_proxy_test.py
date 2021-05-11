@@ -1,10 +1,10 @@
 from test import process_client as client_util, geoserver_client, util as test_util, assert_util
 from test.process_client import get_authz_headers
 from test.data import wfs as data_wfs, SMALL_LAYER_BBOX
-import requests
 from owslib.feature.schema import get_schema as get_wfs_schema
 import pytest
 
+from geoserver.error import Error as GS_Error
 from geoserver.util import get_layer_thumbnail, get_square_bbox
 from layman import app, settings
 from layman.layer import db, util as layer_util
@@ -20,25 +20,11 @@ def test_rest_get():
 
     client_util.publish_workspace_layer(username, layername)
 
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
-    headers = {
-        'Accept': 'text/xml',
-        'Content-type': 'text/xml',
-    }
-
     data_xml = data_wfs.get_wfs20_insert_points(username, layername)
 
-    with app.app_context():
-        r = requests.post(rest_url,
-                          data=data_xml,
-                          headers=headers)
-    assert r.status_code == 200, r.text
+    client_util.post_wfst(data_xml, workspace=username)
 
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=GetCapabilities"
-    with app.app_context():
-        r = requests.post(rest_url,
-                          headers=headers)
-    assert r.status_code == 200
+    client_util.post_wfst(data_xml)
 
     client_util.delete_workspace_layer(username, layername)
 
@@ -63,74 +49,40 @@ def test_wfs_proxy():
                                         layername1,
                                         headers=authn_headers1)
 
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
-    headers = {
-        'Accept': 'text/xml',
-        'Content-type': 'text/xml',
-        **authn_headers1,
-    }
-
     data_xml = data_wfs.get_wfs20_insert_points(username, layername1)
 
-    r = requests.post(rest_url,
-                      data=data_xml,
-                      headers=headers)
-    assert r.status_code == 200, r.text
+    client_util.post_wfst(data_xml, headers=authn_headers1, workspace=username)
 
     # Testing, that user1 is able to write his own layer through general WFS endpoint
-    general_rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
-    r = requests.post(general_rest_url,
-                      data=data_xml,
-                      headers=headers)
-    assert r.status_code == 200, r.text
+    client_util.post_wfst(data_xml, headers=authn_headers1)
 
     # Testing, that user2 is not able to write to layer of user1
     authn_headers2 = get_authz_headers(username2)
-
-    headers2 = {
-        'Accept': 'text/xml',
-        'Content-type': 'text/xml',
-        **authn_headers2,
-    }
-
     client_util.reserve_username(username2, headers=authn_headers2)
 
-    r = requests.post(rest_url,
-                      data=data_xml,
-                      headers=headers2)
-    assert r.status_code == 400, r.text
+    with pytest.raises(GS_Error) as exc:
+        client_util.post_wfst(data_xml, headers=authn_headers2, workspace=username)
+    assert exc.value.data['status_code'] == 400
 
     # Testing, that user2 is not able to write user1's layer through general WFS endpoint
-    general_rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
-    r = requests.post(general_rest_url,
-                      data=data_xml,
-                      headers=headers2)
-    assert r.status_code == 400, r.text
+    with pytest.raises(GS_Error) as exc:
+        client_util.post_wfst(data_xml, headers=authn_headers2)
+    assert exc.value.data['status_code'] == 400
 
     # Test anonymous
-    headers3 = {
-        'Accept': 'text/xml',
-        'Content-type': 'text/xml',
-    }
-
-    r = requests.post(rest_url,
-                      data=data_xml,
-                      headers=headers3)
-    assert r.status_code == 400, r.text
+    with pytest.raises(GS_Error) as exc:
+        client_util.post_wfst(data_xml, workspace=username)
+    assert exc.value.data['status_code'] == 400
 
     # Test fraud header
-    headers4 = {
-        'Accept': 'text/xml',
-        'Content-type': 'text/xml',
+    headers_fraud = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: username,
     }
+    with pytest.raises(GS_Error) as exc:
+        client_util.post_wfst(data_xml, headers=headers_fraud)
+    assert exc.value.data['status_code'] == 400
 
-    r = requests.post(rest_url,
-                      data=data_xml,
-                      headers=headers4)
-    assert r.status_code == 400, r.text
-
-    client_util.delete_workspace_layer(username, layername1, headers=headers)
+    client_util.delete_workspace_layer(username, layername1, headers=authn_headers1)
 
 
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
@@ -169,11 +121,6 @@ def test_missing_attribute(style_file, ):
     layername2 = 'inexisting_attribute_layer2'
 
     authn_headers = get_authz_headers(username)
-    headers = {
-        'Accept': 'text/xml',
-        'Content-type': 'text/xml',
-        **authn_headers,
-    }
 
     client_util.ensure_reserved_username(username, headers=authn_headers)
     client_util.publish_workspace_layer(username,
@@ -189,7 +136,6 @@ def test_missing_attribute(style_file, ):
                                         headers=authn_headers,
                                         )
 
-    wfs_t_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
     with app.app_context():
         style_type = layer_util.get_layer_info(username, layername, context={'keys': ['style_type'], })['style_type']
 
@@ -211,10 +157,7 @@ def test_missing_attribute(style_file, ):
                     old_qgis_attributes = qgis_util.get_layer_attribute_names(workspace, layer)
                     assert all(attr_name not in old_qgis_attributes for attr_name in attr_names), (attr_names, old_qgis_attributes)
 
-            r = requests.post(wfs_t_url,
-                              data=data_xml,
-                              headers=headers)
-            assert r.status_code == 200, f"r.status_code={r.status_code}\n{r.text}"
+            client_util.post_wfst(data_xml, headers=authn_headers, workspace=username)
 
             new_db_attributes = {}
             new_wfs_properties = {}
@@ -296,8 +239,8 @@ def test_missing_attribute(style_file, ):
     wfs_post(username, [(layername, attr_names10)], data_xml)
 
     client_util.wait_for_publication_status(username, client_util.LAYER_TYPE, layername, headers=authn_headers)
-    client_util.delete_workspace_layer(username, layername, headers=headers)
-    client_util.delete_workspace_layer(username, layername2, headers=headers)
+    client_util.delete_workspace_layer(username, layername, headers=authn_headers)
+    client_util.delete_workspace_layer(username, layername2, headers=authn_headers)
 
 
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
@@ -308,16 +251,6 @@ def test_missing_attribute_authz():
 
     authn_headers1 = get_authz_headers(username)
     authn_headers2 = get_authz_headers(username2)
-    headers1 = {
-        'Accept': 'text/xml',
-        'Content-type': 'text/xml',
-        **authn_headers1,
-    }
-    headers2 = {
-        'Accept': 'text/xml',
-        'Content-type': 'text/xml',
-        **authn_headers2,
-    }
 
     def do_test(wfs_query, attribute_names):
         # Test, that unauthorized user will not cause new attribute
@@ -325,20 +258,17 @@ def test_missing_attribute_authz():
             old_db_attributes = db.get_all_column_names(username, layername1)
         for attr_name in attribute_names:
             assert attr_name not in old_db_attributes, f"old_db_attributes={old_db_attributes}, attr_name={attr_name}"
-        r = requests.post(rest_url,
-                          data=wfs_query,
-                          headers=headers2)
-        assert r.status_code == 400, r.text
+        with pytest.raises(GS_Error) as exc:
+            client_util.post_wfst(wfs_query, headers=authn_headers2, workspace=username)
+        assert exc.value.data['status_code'] == 400
+
         with app.app_context():
             new_db_attributes = db.get_all_column_names(username, layername1)
         for attr_name in attribute_names:
             assert attr_name not in new_db_attributes, f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
 
         # Test, that authorized user will cause new attribute
-        r = requests.post(rest_url,
-                          data=wfs_query,
-                          headers=headers1)
-        assert r.status_code == 200, r.text
+        client_util.post_wfst(wfs_query, headers=authn_headers1, workspace=username)
         with app.app_context():
             new_db_attributes = db.get_all_column_names(username, layername1)
         for attr_name in attribute_names:
@@ -349,8 +279,6 @@ def test_missing_attribute_authz():
                                         layername1,
                                         file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
                                         headers=authn_headers1)
-
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{username}/wfs?request=Transaction"
 
     # Testing, that user2 is not able to write to layer of user1
     client_util.reserve_username(username2, headers=authn_headers2)
@@ -366,7 +294,7 @@ def test_missing_attribute_authz():
     do_test(data_xml, attr_names)
 
     client_util.wait_for_publication_status(username, client_util.LAYER_TYPE, layername1, headers=authn_headers1)
-    client_util.delete_workspace_layer(username, layername1, headers=headers1)
+    client_util.delete_workspace_layer(username, layername1, headers=authn_headers1)
 
 
 @pytest.mark.parametrize('style_file, thumbnail_style_postfix', [
@@ -382,12 +310,6 @@ def test_wfs_bbox(style_file, thumbnail_style_postfix):
 
     assert_util.assert_all_sources_bbox(workspace, layer, SMALL_LAYER_BBOX)
 
-    rest_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}/wfs?request=Transaction"
-    headers = {
-        'Accept': 'text/xml',
-        'Content-type': 'text/xml',
-    }
-
     expected_bbox = (1571000.0, 6268800.0, 1572590.8542062, 6269876.33561699)
     method_bbox_thumbnail_tuples = [
         (data_wfs.get_wfs20_insert_points, expected_bbox, '_bigger'),
@@ -397,12 +319,9 @@ def test_wfs_bbox(style_file, thumbnail_style_postfix):
     for wfs_method, exp_bbox, thumbnail_bbox_postfix in method_bbox_thumbnail_tuples:
         data_xml = wfs_method(workspace, layer, )
 
-        r = requests.post(rest_url,
-                          data=data_xml,
-                          headers=headers)
-        assert r.status_code == 200, r.text
-
+        client_util.post_wfst(data_xml, workspace=workspace)
         client_util.wait_for_publication_status(workspace, client_util.LAYER_TYPE, layer)
+
         assert_util.assert_all_sources_bbox(workspace, layer, exp_bbox)
 
         expected_thumbnail_path = f'/code/sample/style/{layer}{thumbnail_style_postfix}{thumbnail_bbox_postfix}.png'
