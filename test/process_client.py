@@ -8,7 +8,8 @@ from collections import namedtuple
 import xml.etree.ElementTree as ET
 import requests
 
-from layman import app
+from geoserver import error as gs_error
+from layman import app, settings
 from layman.layer.geoserver import wfs, wms
 from layman.http import LaymanError
 from .util import url_for
@@ -443,3 +444,18 @@ def get_source_key_from_metadata_comparison(md_comparison, url_prefix):
         k for k, v in md_comparison['metadata_sources'].items()
         if v['url'].startswith(url_prefix)
     ), None)
+
+
+def post_wfst(xml, *, headers=None, url=None, workspace=None):
+    assert not (url and workspace)
+    rest_url = url or f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}/wfs?request=Transaction"\
+        if workspace else f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
+    headers = headers or dict()
+    headers['Accept'] = 'text/xml'
+    headers['Content-type'] = 'text/xml'
+
+    response = requests.post(rest_url,
+                             data=xml,
+                             headers=headers)
+    if response.status_code != 200:
+        raise gs_error.Error(code_or_message='WFS-T error', data={'status_code': response.status_code})
