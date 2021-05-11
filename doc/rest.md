@@ -96,7 +96,7 @@ Processing chain consists of few steps:
 
 If workspace directory, database schema, GeoServer's workspaces, or GeoServer's datastores does not exist yet, it is created on demand.
 
-Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Workspace Layer](#get-workspace-layer) and **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, style, metadata).
+Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Workspace Layer](#get-workspace-layer) and **layman_metadata.publication_status** property or **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, style, metadata) for higher granularity.
 
 It is possible to upload data files asynchronously, which is suitable for large files. This can be done in three steps:
 1. Send POST Workspace Layers request with **file** parameter filled by file names that you want to upload
@@ -195,6 +195,11 @@ Content-Type: `application/json`
 JSON object with following structure:
 - **name**: String. Layername used for identification within given [workspace](models.md#workspace). It can be also used for identifying layer within WMS and WFS endpoints.
 - **uuid**: String. UUID of the layer.
+- **layman_metadata**
+  - **publication_status**: String. Can be one of these values:
+    - **COMPLETE**: the layer is fully updated and response is final and up-to-date.
+    - **INCOMPLETE**: some step of updating process failed, so the response is final, but missing some information.
+    - **UPDATING**: some process is currently updating the layer (i.e. post, patch, wfs-t) so the response may change.
 - **url**: String. URL pointing to this endpoint.
 - **title**: String.
 - **description**: String.
@@ -423,6 +428,8 @@ Processing chain consists of few steps:
 
 If workspace directory does not exist yet, it is created on demand.
 
+Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Workspace Map](#get-workspace-map) and **layman_metadata.publication_status** property or **status** properties of map sources (file, thumbnail, metadata) for higher granularity.
+
 #### Request
 Content-Type: `multipart/form-data`
 
@@ -495,6 +502,11 @@ Content-Type: `application/json`
 JSON object with following structure:
 - **name**: String. Mapname used for identification within Layman user workspace. Equal to `name` attribute of JSON root object
 - **uuid**: String. UUID of the map.
+- **layman_metadata**
+  - **publication_status**: String. Can be one of these values:
+    - **COMPLETE**: map is fully updated and response is final and up-to-date.
+    - **INCOMPLETE**: some step of updating process failed, so the response is final, but missing some information.
+    - **UPDATING**: some process is currently updating the map (i.e. post, patch, wfs-t) so the response may change.
 - **url**: String. URL pointing to this endpoint.
 - **title**: String. Taken from `title` attribute of JSON root object
 - **description**: String. Taken from `abstract` attribute of JSON root object.
