@@ -9,6 +9,7 @@
 #### Data migrations
 - Rename filesystem directory containing workspaces from `users` to `workspaces`
 ### Changes
+- [#159] (https://github.com/jirik/layman/issues/159) Object `layman_metadata` was added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) responses. Attribute `layman_metadata.publication_status` can be used for watching global state of publication (updating, complete, incomplete).
 - [#159] (https://github.com/jirik/layman/issues/159) Bounding box is send explicitly to GeoServer for every layer.
 - [#159] (https://github.com/jirik/layman/issues/159) Bounding box is updated after WFS-T request. More info in [documentation](doc/endpoints.md#web-feature-service).
 - [#331] (https://github.com/jirik/layman/issues/331) Query parameter *full_text_filter* is also use for substring search in all endpoints with filtering.
