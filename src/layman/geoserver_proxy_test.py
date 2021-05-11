@@ -1,5 +1,3 @@
-import time
-
 from test import process_client as client_util, geoserver_client, util as test_util, assert_util
 from test.process_client import get_authz_headers
 from test.data import wfs as data_wfs, SMALL_LAYER_BBOX
@@ -297,8 +295,7 @@ def test_missing_attribute(style_file, ):
     data_xml = data_wfs.get_wfs11_insert_polygon_new_attr(username, layername, attr_names10)
     wfs_post(username, [(layername, attr_names10)], data_xml)
 
-    time.sleep(5)
-
+    client_util.wait_for_publication_status(username, client_util.LAYER_TYPE, layername, headers=authn_headers)
     client_util.delete_workspace_layer(username, layername, headers=headers)
     client_util.delete_workspace_layer(username, layername2, headers=headers)
 
@@ -368,8 +365,7 @@ def test_missing_attribute_authz():
     data_xml = data_wfs.get_wfs20_update_points_new_attr(username, layername1, attr_names)
     do_test(data_xml, attr_names)
 
-    time.sleep(5)
-
+    client_util.wait_for_publication_status(username, client_util.LAYER_TYPE, layername1, headers=authn_headers1)
     client_util.delete_workspace_layer(username, layername1, headers=headers1)
 
 
@@ -406,9 +402,7 @@ def test_wfs_bbox(style_file, thumbnail_style_postfix):
                           headers=headers)
         assert r.status_code == 200, r.text
 
-        # until there is way to check end of asynchronous task after WFS-T
-        time.sleep(5)
-
+        client_util.wait_for_publication_status(workspace, client_util.LAYER_TYPE, layer)
         assert_util.assert_all_sources_bbox(workspace, layer, exp_bbox)
 
         expected_thumbnail_path = f'/code/sample/style/{layer}{thumbnail_style_postfix}{thumbnail_bbox_postfix}.png'

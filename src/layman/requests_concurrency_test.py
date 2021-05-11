@@ -1,5 +1,3 @@
-import time
-
 from test import process_client, assert_util
 from test.data import wfs as data_wfs
 import requests
@@ -57,7 +55,7 @@ def test_wfst_concurrency():
     assert len(queue) == 1, queue
     assert queue == ['layman.util::patch_after_wfst', ]
 
-    time.sleep(3)
+    process_client.wait_for_publication_status(workspace, process_client.LAYER_TYPE, layer)
 
     expected_bbox = (1571000.0, 6268800.0, 1572590.8542062, 6269876.33561699)
     assert_util.assert_all_sources_bbox(workspace, layer, expected_bbox)
