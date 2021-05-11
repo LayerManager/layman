@@ -96,7 +96,7 @@ Processing chain consists of few steps:
 
 If workspace directory, database schema, GeoServer's workspaces, or GeoServer's datastores does not exist yet, it is created on demand.
 
-Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Workspace Layer](#get-workspace-layer) and **layman_metadata.publication_status** property or **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, style, metadata) for higher granularity.
+Response to this request may be returned sooner than the processing chain is finished to enable [asynchronous processing](async-tasks.md). Status of processing chain can be seen using [GET Workspace Layer](#get-workspace-layer) and **layman_metadata.publication_status** property or **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, style, metadata) for higher granularity.
 
 It is possible to upload data files asynchronously, which is suitable for large files. This can be done in three steps:
 1. Send POST Workspace Layers request with **file** parameter filled by file names that you want to upload
@@ -158,7 +158,7 @@ JSON array of objects representing posted layers with following structure:
    - **layman_original_parameter**: name of the request parameter that contained the file name; currently, the only possible value is `file`
 
 ### DELETE Workspace Layers
-Delete existing layers and all associated sources, including vector data file and DB table for all layers in the workspace. It is possible to delete layers, whose publication process is still running. In such case, the publication process is aborted safely. Only layers on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
+Delete existing layers and all associated sources, including vector data file and DB table for all layers in the workspace. The currently running [asynchronous tasks](async-tasks.md) of affected layers are aborted. Only layers on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
 
 #### Request
 No action parameters.
@@ -251,9 +251,13 @@ JSON object with following structure:
 ### PATCH Workspace Layer
 Update information about existing layer. First, it deletes sources of the layer, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Layers](#post-workspace-layers).
 
-Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing.
+Response to this request may be returned sooner than the processing chain is finished to enable [asynchronous processing](async-tasks.md).
 
 It is possible to upload data files asynchronously, which is suitable for large files. See [POST Workspace Layers](#post-workspace-layers).
+
+Calling concurrent PATCH requests is not supported, as well as calling PATCH when [POST/PATCH async chain](async-tasks.md) is still running, is not allowed. In such cases, error is returned.
+
+Calling PATCH request when [WFS-T async chain](async-tasks.md) is still running causes abortion of WFS-T async chain and ensures another run of WFS-T async chain after PATCH async chain is finished.
 
 #### Request
 Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
@@ -292,7 +296,7 @@ JSON object, same as in case of [GET Workspace Layer](#get-workspace-layer), pos
 - *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. See [POST Workspace Layers](#post-workspace-layers) response to find out more.
 
 ### DELETE Workspace Layer
-Delete existing layer and all associated sources, including vector data file and DB table. It is possible to delete layer, whose publication process is still running. In such case, the publication process is aborted safely.
+Delete existing layer and all associated sources, including vector data file and DB table. The currently running [asynchronous tasks](async-tasks.md) of affected layer are aborted.
 
 #### Request
 No action parameters.
@@ -426,6 +430,8 @@ Processing chain consists of few steps:
 - publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
 - save basic information (name, title, access_rights) into PostgreSQL
 
+Some of these steps run [asynchronously](async-tasks.md).
+
 If workspace directory does not exist yet, it is created on demand.
 
 Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Workspace Map](#get-workspace-map) and **layman_metadata.publication_status** property or **status** properties of map sources (file, thumbnail, metadata) for higher granularity.
@@ -465,7 +471,7 @@ JSON array of objects representing posted maps with following structure:
 - **url**: String. URL of the map. It points to [GET Workspace Map](#get-workspace-map).
 
 ### DELETE Workspace Maps
-Delete existing maps and all associated sources, including map-composition JSON file and map thumbnail for all mapss in the workspace. Only maps on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
+Delete existing maps and all associated sources, including map-composition JSON file and map thumbnail for all maps in the workspace. The currently running [asynchronous tasks](async-tasks.md) of affected maps are aborted. Only maps on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
 
 #### Request
 No action parameters.
@@ -533,7 +539,9 @@ JSON object with following structure:
 - **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
 
 ### PATCH Workspace Map
-Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Maps](#post-workspace-maps).
+Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Maps](#post-workspace-maps), including [asynchronous tasks](async-tasks.md),
+
+Calling concurrent PATCH requests is not supported, as well as calling PATCH when [POST/PATCH async chain](async-tasks.md) is still running, is not allowed. In such cases, error is returned.
 
 #### Request
 Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
@@ -560,7 +568,7 @@ Content-Type: `application/json`
 JSON object, same as in case of [GET Workspace Map](#get-workspace-map).
 
 ### DELETE Workspace Map
-Delete existing map and all associated sources, including map-composition JSON file and map thumbnail.
+Delete existing map and all associated sources, including map-composition JSON file and map thumbnail. The currently running [asynchronous tasks](async-tasks.md) of affected map are aborted.
 
 #### Request
 No action parameters.

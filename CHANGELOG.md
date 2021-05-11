@@ -11,7 +11,7 @@
 ### Changes
 - [#159] (https://github.com/jirik/layman/issues/159) Object `layman_metadata` was added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) responses. Attribute `layman_metadata.publication_status` can be used for watching global state of publication (updating, complete, incomplete).
 - [#159] (https://github.com/jirik/layman/issues/159) Bounding box is send explicitly to GeoServer for every layer.
-- [#159] (https://github.com/jirik/layman/issues/159) Bounding box is updated after WFS-T request. More info in [documentation](doc/endpoints.md#web-feature-service).
+- [#159] (https://github.com/jirik/layman/issues/159) [WFS-T](doc/endpoints.md#web-feature-service) request causes update of bounding box and thumbnail of each edited layer in [asynchronous chain](doc/async-tasks.md). Documentation describes concurrency of WFS-T request and its asynchronous chains with another [WFS-T request](doc/endpoints.md#web-feature-service), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [DELETE Workspace Layer](doc/rest.md#delete-workspace-layer), and [DELETE Workspace Layers](doc/rest.md#delete-workspace-layers).
 - [#331] (https://github.com/jirik/layman/issues/331) Query parameter *full_text_filter* is also use for substring search in all endpoints with filtering.
 - Filesystem directory containing workspaces was renamed from `users` to `workspaces`
 
