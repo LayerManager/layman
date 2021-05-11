@@ -1,10 +1,8 @@
 import os
 from test import process_client
 from test.data import wfs as wfs_data_util
-import requests
 from owslib.wms import WebMapService
 import pytest
-from layman import settings
 from layman.layer.geoserver import wms as gs_wms
 
 
@@ -32,15 +30,7 @@ def assert_wms_layer(workspace, layername, exp_title):
 
 def wfs_t_insert_point(workspace, layername):
     wfs_t_data = wfs_data_util.get_wfs20_insert_points(workspace, layername)
-    wfs_t_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}/wfs?request=Transaction"
-    wfs_t_headers = {
-        'Accept': 'text/xml',
-        'Content-type': 'text/xml',
-    }
-    r = requests.post(wfs_t_url,
-                      data=wfs_t_data,
-                      headers=wfs_t_headers)
-    assert r.status_code == 200, r.text
+    process_client.post_wfst(wfs_t_data, workspace=workspace)
 
 
 @pytest.mark.parametrize('layername, file_paths', [
