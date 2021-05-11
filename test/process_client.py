@@ -459,3 +459,18 @@ def post_wfst(xml, *, headers=None, url=None, workspace=None):
                              headers=headers)
     if response.status_code != 200:
         raise gs_error.Error(code_or_message='WFS-T error', data={'status_code': response.status_code})
+
+
+def check_publication_status(response):
+    current_status = response.json().get('layman_metadata', dict()).get('publication_status')
+    return current_status in {'COMPLETE', 'INCOMPLETE'}
+
+
+def wait_for_publication_status(workspace, publication_type, publication, *, check_response_fn=None, headers=None,):
+    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
+    with app.app_context():
+        url = url_for(publication_type_def.get_workspace_publication_url,
+                      workspace=workspace,
+                      **{publication_type_def.url_param_name: publication})
+    check_response_fn = check_response_fn or check_publication_status
+    wait_for_rest(url, 30, 0.5, check_response=check_response_fn, headers=headers)
