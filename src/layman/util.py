@@ -357,24 +357,23 @@ def delete_publications(user,
                         url_path,
                         publ_param,
                         ):
-    from layman.common import redis as redis_util
     from layman import authn
     actor_name = authn.get_authn_username()
     whole_infos = get_publication_infos(user, publ_type, {'actor_name': actor_name, 'access_type': 'write'})
 
     for (_, _, publication) in whole_infos.keys():
-        redis_util.create_lock(user, publ_type, publication, error_code, method)
+        redis.create_lock(user, publ_type, publication, error_code, method)
         try:
             abort_publication_fn(user, publication)
             delete_publication_fn(user, publication)
             if is_chain_ready_fn(user, publication):
-                redis_util.unlock_publication(user, publ_type, publication)
+                redis.unlock_publication(user, publ_type, publication)
         except Exception as e:
             try:
                 if is_chain_ready_fn(user, publication):
-                    redis_util.unlock_publication(user, publ_type, publication)
+                    redis.unlock_publication(user, publ_type, publication)
             finally:
-                redis_util.unlock_publication(user, publ_type, publication)
+                redis.unlock_publication(user, publ_type, publication)
             raise e
 
     infos = [
