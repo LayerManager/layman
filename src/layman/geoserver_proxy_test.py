@@ -1,4 +1,4 @@
-from test import process_client as client_util, geoserver_client, util as test_util, assert_util
+from test import process_client, geoserver_client, util as test_util, assert_util
 from test.process_client import get_authz_headers
 from test.data import wfs as data_wfs, SMALL_LAYER_BBOX
 from owslib.feature.schema import get_schema as get_wfs_schema
@@ -18,20 +18,20 @@ def test_rest_get():
     username = 'wfs_proxy_test'
     layername = 'layer_wfs_proxy_test'
 
-    client_util.publish_workspace_layer(username, layername)
+    process_client.publish_workspace_layer(username, layername)
 
     data_xml = data_wfs.get_wfs20_insert_points(username, layername)
 
-    client_util.post_wfst(data_xml, workspace=username)
+    process_client.post_wfst(data_xml, workspace=username)
 
-    client_util.post_wfst(data_xml)
+    process_client.post_wfst(data_xml)
 
-    client_util.delete_workspace_layer(username, layername)
+    process_client.delete_workspace_layer(username, layername)
 
 
 def setup_user_layer(username, layername, authn_headers):
-    client_util.reserve_username(username, headers=authn_headers)
-    client_util.publish_workspace_layer(username, layername, file_paths=[
+    process_client.reserve_username(username, headers=authn_headers)
+    process_client.publish_workspace_layer(username, layername, file_paths=[
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ], headers=authn_headers)
 
@@ -44,34 +44,34 @@ def test_wfs_proxy():
 
     authn_headers1 = get_authz_headers(username)
 
-    client_util.reserve_username(username, headers=authn_headers1)
-    client_util.publish_workspace_layer(username,
-                                        layername1,
-                                        headers=authn_headers1)
+    process_client.reserve_username(username, headers=authn_headers1)
+    process_client.publish_workspace_layer(username,
+                                           layername1,
+                                           headers=authn_headers1)
 
     data_xml = data_wfs.get_wfs20_insert_points(username, layername1)
 
-    client_util.post_wfst(data_xml, headers=authn_headers1, workspace=username)
+    process_client.post_wfst(data_xml, headers=authn_headers1, workspace=username)
 
     # Testing, that user1 is able to write his own layer through general WFS endpoint
-    client_util.post_wfst(data_xml, headers=authn_headers1)
+    process_client.post_wfst(data_xml, headers=authn_headers1)
 
     # Testing, that user2 is not able to write to layer of user1
     authn_headers2 = get_authz_headers(username2)
-    client_util.reserve_username(username2, headers=authn_headers2)
+    process_client.reserve_username(username2, headers=authn_headers2)
 
     with pytest.raises(GS_Error) as exc:
-        client_util.post_wfst(data_xml, headers=authn_headers2, workspace=username)
+        process_client.post_wfst(data_xml, headers=authn_headers2, workspace=username)
     assert exc.value.data['status_code'] == 400
 
     # Testing, that user2 is not able to write user1's layer through general WFS endpoint
     with pytest.raises(GS_Error) as exc:
-        client_util.post_wfst(data_xml, headers=authn_headers2)
+        process_client.post_wfst(data_xml, headers=authn_headers2)
     assert exc.value.data['status_code'] == 400
 
     # Test anonymous
     with pytest.raises(GS_Error) as exc:
-        client_util.post_wfst(data_xml, workspace=username)
+        process_client.post_wfst(data_xml, workspace=username)
     assert exc.value.data['status_code'] == 400
 
     # Test fraud header
@@ -79,10 +79,10 @@ def test_wfs_proxy():
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: username,
     }
     with pytest.raises(GS_Error) as exc:
-        client_util.post_wfst(data_xml, headers=headers_fraud)
+        process_client.post_wfst(data_xml, headers=headers_fraud)
     assert exc.value.data['status_code'] == 400
 
-    client_util.delete_workspace_layer(username, layername1, headers=authn_headers1)
+    process_client.delete_workspace_layer(username, layername1, headers=authn_headers1)
 
 
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
@@ -93,12 +93,12 @@ def test_wms_ows_proxy(service_endpoint):
 
     authn_headers = get_authz_headers(username)
 
-    client_util.ensure_reserved_username(username, headers=authn_headers)
-    client_util.publish_workspace_layer(username, layername, headers=authn_headers)
+    process_client.ensure_reserved_username(username, headers=authn_headers)
+    process_client.publish_workspace_layer(username, layername, headers=authn_headers)
 
     wms_url = geoserver_client.get_wms_url(username, service_endpoint)
 
-    layer_info = client_util.get_workspace_layer(username, layername, headers=authn_headers)
+    layer_info = process_client.get_workspace_layer(username, layername, headers=authn_headers)
     tn_bbox = get_square_bbox(layer_info['bounding_box'])
 
     from layman.layer.geoserver.wms import VERSION
@@ -106,7 +106,7 @@ def test_wms_ows_proxy(service_endpoint):
     r.raise_for_status()
     assert 'image' in r.headers['content-type']
 
-    client_util.delete_workspace_layer(username, layername, headers=authn_headers)
+    process_client.delete_workspace_layer(username, layername, headers=authn_headers)
 
 
 @pytest.mark.timeout(60)
@@ -122,19 +122,19 @@ def test_missing_attribute(style_file, ):
 
     authn_headers = get_authz_headers(username)
 
-    client_util.ensure_reserved_username(username, headers=authn_headers)
-    client_util.publish_workspace_layer(username,
-                                        layername,
-                                        file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
-                                        style_file=style_file,
-                                        headers=authn_headers,
-                                        )
-    client_util.publish_workspace_layer(username,
-                                        layername2,
-                                        file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
-                                        style_file=style_file,
-                                        headers=authn_headers,
-                                        )
+    process_client.ensure_reserved_username(username, headers=authn_headers)
+    process_client.publish_workspace_layer(username,
+                                           layername,
+                                           file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+                                           style_file=style_file,
+                                           headers=authn_headers,
+                                           )
+    process_client.publish_workspace_layer(username,
+                                           layername2,
+                                           file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+                                           style_file=style_file,
+                                           headers=authn_headers,
+                                           )
 
     with app.app_context():
         style_type = layer_util.get_layer_info(username, layername, context={'keys': ['style_type'], })['style_type']
@@ -157,7 +157,7 @@ def test_missing_attribute(style_file, ):
                     old_qgis_attributes = qgis_util.get_layer_attribute_names(workspace, layer)
                     assert all(attr_name not in old_qgis_attributes for attr_name in attr_names), (attr_names, old_qgis_attributes)
 
-            client_util.post_wfst(data_xml, headers=authn_headers, workspace=username)
+            process_client.post_wfst(data_xml, headers=authn_headers, workspace=username)
 
             new_db_attributes = {}
             new_wfs_properties = {}
@@ -238,9 +238,9 @@ def test_missing_attribute(style_file, ):
     data_xml = data_wfs.get_wfs11_insert_polygon_new_attr(username, layername, attr_names10)
     wfs_post(username, [(layername, attr_names10)], data_xml)
 
-    client_util.wait_for_publication_status(username, client_util.LAYER_TYPE, layername, headers=authn_headers)
-    client_util.delete_workspace_layer(username, layername, headers=authn_headers)
-    client_util.delete_workspace_layer(username, layername2, headers=authn_headers)
+    process_client.wait_for_publication_status(username, process_client.LAYER_TYPE, layername, headers=authn_headers)
+    process_client.delete_workspace_layer(username, layername, headers=authn_headers)
+    process_client.delete_workspace_layer(username, layername2, headers=authn_headers)
 
 
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
@@ -259,7 +259,7 @@ def test_missing_attribute_authz():
         for attr_name in attribute_names:
             assert attr_name not in old_db_attributes, f"old_db_attributes={old_db_attributes}, attr_name={attr_name}"
         with pytest.raises(GS_Error) as exc:
-            client_util.post_wfst(wfs_query, headers=authn_headers2, workspace=username)
+            process_client.post_wfst(wfs_query, headers=authn_headers2, workspace=username)
         assert exc.value.data['status_code'] == 400
 
         with app.app_context():
@@ -268,20 +268,20 @@ def test_missing_attribute_authz():
             assert attr_name not in new_db_attributes, f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
 
         # Test, that authorized user will cause new attribute
-        client_util.post_wfst(wfs_query, headers=authn_headers1, workspace=username)
+        process_client.post_wfst(wfs_query, headers=authn_headers1, workspace=username)
         with app.app_context():
             new_db_attributes = db.get_all_column_names(username, layername1)
         for attr_name in attribute_names:
             assert attr_name in new_db_attributes, f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
 
-    client_util.reserve_username(username, headers=authn_headers1)
-    client_util.publish_workspace_layer(username,
-                                        layername1,
-                                        file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
-                                        headers=authn_headers1)
+    process_client.reserve_username(username, headers=authn_headers1)
+    process_client.publish_workspace_layer(username,
+                                           layername1,
+                                           file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+                                           headers=authn_headers1)
 
     # Testing, that user2 is not able to write to layer of user1
-    client_util.reserve_username(username2, headers=authn_headers2)
+    process_client.reserve_username(username2, headers=authn_headers2)
 
     # INSERT
     attr_names = ['inexisting_attribute_auth1', 'inexisting_attribute_auth2']
@@ -293,8 +293,8 @@ def test_missing_attribute_authz():
     data_xml = data_wfs.get_wfs20_update_points_new_attr(username, layername1, attr_names)
     do_test(data_xml, attr_names)
 
-    client_util.wait_for_publication_status(username, client_util.LAYER_TYPE, layername1, headers=authn_headers1)
-    client_util.delete_workspace_layer(username, layername1, headers=authn_headers1)
+    process_client.wait_for_publication_status(username, process_client.LAYER_TYPE, layername1, headers=authn_headers1)
+    process_client.delete_workspace_layer(username, layername1, headers=authn_headers1)
 
 
 @pytest.mark.parametrize('style_file, thumbnail_style_postfix', [
@@ -306,7 +306,7 @@ def test_wfs_bbox(style_file, thumbnail_style_postfix):
     workspace = 'test_wfs_bbox_workspace'
     layer = 'test_wfs_bbox_layer'
 
-    client_util.publish_workspace_layer(workspace, layer, style_file=style_file, )
+    process_client.publish_workspace_layer(workspace, layer, style_file=style_file, )
 
     assert_util.assert_all_sources_bbox(workspace, layer, SMALL_LAYER_BBOX)
 
@@ -319,8 +319,8 @@ def test_wfs_bbox(style_file, thumbnail_style_postfix):
     for wfs_method, exp_bbox, thumbnail_bbox_postfix in method_bbox_thumbnail_tuples:
         data_xml = wfs_method(workspace, layer, )
 
-        client_util.post_wfst(data_xml, workspace=workspace)
-        client_util.wait_for_publication_status(workspace, client_util.LAYER_TYPE, layer)
+        process_client.post_wfst(data_xml, workspace=workspace)
+        process_client.wait_for_publication_status(workspace, process_client.LAYER_TYPE, layer)
 
         assert_util.assert_all_sources_bbox(workspace, layer, exp_bbox)
 
@@ -330,4 +330,4 @@ def test_wfs_bbox(style_file, thumbnail_style_postfix):
         diffs = test_util.compare_images(expected_thumbnail_path, thumbnail_path)
         assert diffs < 100, expected_thumbnail_path
 
-    client_util.delete_workspace_layer(workspace, layer, )
+    process_client.delete_workspace_layer(workspace, layer, )
