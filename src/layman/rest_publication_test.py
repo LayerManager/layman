@@ -1,8 +1,7 @@
-from test import process_client, util
-from functools import partial
+from test import process_client
 import pytest
 
-from layman import LaymanError, settings, common, app
+from layman import LaymanError, settings, common
 from layman.common.micka import util as micka_util
 
 db_schema = settings.LAYMAN_PRIME_SCHEMA
@@ -126,13 +125,7 @@ def test_get_publication_layman_status(publ_type, error_params):
     assert 'publication_status' in info['layman_metadata'], f'info={info}'
     assert info['layman_metadata']['publication_status'] == 'UPDATING', f'info={info}'
 
-    publication_type_def = process_client.PUBLICATION_TYPES_DEF[publ_type]
-    with app.app_context():
-        url = util.url_for(publication_type_def.get_workspace_publication_url,
-                           workspace=workspace,
-                           **{publication_type_def.url_param_name: publication})
-    check_response_fn = partial(process_client.check_response_keys, publication_type_def.keys_to_check)
-    process_client.wait_for_rest(url, 30, 0.5, check_response_fn)
+    process_client.wait_for_publication_status(workspace, publ_type, publication)
 
     info = process_client.get_workspace_publication(publ_type, workspace, publication, )
     assert 'layman_metadata' in info, f'info={info}'
@@ -140,8 +133,7 @@ def test_get_publication_layman_status(publ_type, error_params):
     assert info['layman_metadata']['publication_status'] == 'COMPLETE', f'info={info}'
 
     if error_params:
-        check_response_fail = partial(process_client.wait_for_failure, publication_type_def.keys_to_check)
-        process_client.patch_workspace_publication(publ_type, workspace, publication, **error_params, check_response_fn=check_response_fail, )
+        process_client.patch_workspace_publication(publ_type, workspace, publication, **error_params, )
         info = process_client.get_workspace_publication(publ_type, workspace, publication, )
         assert 'layman_metadata' in info, f'info={info}'
         assert 'publication_status' in info['layman_metadata'], f'info={info}'
