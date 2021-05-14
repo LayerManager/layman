@@ -71,11 +71,11 @@ def solve_locks(workspace, publication_type, publication_name, error_code, reque
     if current_lock is None:
         return
     if requested_lock not in [common.PUBLICATION_LOCK_PATCH, common.PUBLICATION_LOCK_DELETE,
-                              common.PUBLICATION_LOCK_WFST, ]:
+                              common.PUBLICATION_LOCK_FEATURE_CHANGE, ]:
         raise Exception(f"Unknown method to check: {requested_lock}")
     if current_lock not in [common.PUBLICATION_LOCK_PATCH, common.PUBLICATION_LOCK_DELETE,
                             common.PUBLICATION_LOCK_POST,
-                            common.PUBLICATION_LOCK_WFST, ]:
+                            common.PUBLICATION_LOCK_FEATURE_CHANGE, ]:
         raise Exception(f"Unknown current lock: {current_lock}")
     if current_lock in [common.PUBLICATION_LOCK_PATCH, common.PUBLICATION_LOCK_POST, ]:
         if requested_lock in [common.PUBLICATION_LOCK_PATCH, common.PUBLICATION_LOCK_POST, ]:
@@ -84,9 +84,9 @@ def solve_locks(workspace, publication_type, publication_name, error_code, reque
         if requested_lock in [common.PUBLICATION_LOCK_PATCH, common.PUBLICATION_LOCK_POST, ]:
             raise LaymanError(error_code)
     if requested_lock not in [common.PUBLICATION_LOCK_DELETE, ]:
-        if requested_lock == common.PUBLICATION_LOCK_WFST:
+        if requested_lock == common.PUBLICATION_LOCK_FEATURE_CHANGE:
             raise LaymanError(19, private_data={'can_run_later': True})
-        if current_lock == common.PUBLICATION_LOCK_WFST and requested_lock in [common.REQUEST_METHOD_PATCH, common.REQUEST_METHOD_POST, ]:
+        if current_lock == common.PUBLICATION_LOCK_FEATURE_CHANGE and requested_lock in [common.REQUEST_METHOD_PATCH, common.REQUEST_METHOD_POST, ]:
             celery_util.abort_publication_chain(workspace, publication_type, publication_name)
             celery_util.push_step_to_run_after_chain(workspace, publication_type, publication_name, 'layman.util::patch_after_feature_change')
 

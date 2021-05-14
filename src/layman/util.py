@@ -391,7 +391,7 @@ def delete_publications(user,
 
 def patch_after_feature_change(workspace, publication_type, publication, **kwargs):
     try:
-        redis.create_lock(workspace, publication_type, publication, 19, common.PUBLICATION_LOCK_WFST)
+        redis.create_lock(workspace, publication_type, publication, 19, common.PUBLICATION_LOCK_FEATURE_CHANGE)
     except LaymanError as exc:
         if exc.code == 19 and exc.private_data.get('can_run_later', False):
             celery_util.push_step_to_run_after_chain(workspace, publication_type, publication,

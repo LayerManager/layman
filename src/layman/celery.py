@@ -106,7 +106,7 @@ def finish_publication_chain(last_task_id_in_chain):
     rds.hdel(key, hash)
 
     lock = redis_util.get_publication_lock(username, publication_type, publication_name)
-    if lock in [common.REQUEST_METHOD_PATCH, common.REQUEST_METHOD_POST, common.PUBLICATION_LOCK_WFST, ]:
+    if lock in [common.REQUEST_METHOD_PATCH, common.REQUEST_METHOD_POST, common.PUBLICATION_LOCK_FEATURE_CHANGE, ]:
         redis_util.unlock_publication(username, publication_type, publication_name)
 
 
