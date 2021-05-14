@@ -8,11 +8,11 @@ headers_json = geoserver.headers_json
 
 
 @celery_app.task(
-    name='layman.layer.geoserver.wfs.patch_after_wfst',
+    name='layman.layer.geoserver.wfs.patch_after_feature_change',
     bind=True,
     base=celery_app.AbortableTask
 )
-def patch_after_wfst(
+def patch_after_feature_change(
         self,
         workspace,
         layer,

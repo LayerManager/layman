@@ -9,11 +9,11 @@ logger = get_task_logger(__name__)
 
 
 @celery_app.task(
-    name='layman.layer.qgis.wms.patch_after_wfst',
+    name='layman.layer.qgis.wms.patch_after_feature_change',
     bind=True,
     base=celery_app.AbortableTask
 )
-def patch_after_wfst(
+def patch_after_feature_change(
         self,
         workspace,
         layer,
