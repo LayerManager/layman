@@ -2,10 +2,11 @@ from functools import wraps, partial
 import json
 import os
 import re
+import subprocess
 from jsonschema import validate, Draft7Validator
 from flask import current_app, request, g
 
-from layman import LaymanError, util as layman_util, celery as celery_util
+from layman import LaymanError, util as layman_util, celery as celery_util, settings
 from layman.authn.filesystem import get_authn_info
 from layman.common.micka import util as micka_util
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
@@ -308,3 +309,14 @@ def get_map_file_json(username, mapname):
         map_json['user'] = get_map_owner_info(username)
         map_json.pop("groups", None)
     return map_json
+
+
+def find_maps_by_grep(regexp):
+    data_dir = settings.LAYMAN_DATA_DIR
+    grep_cmd = f"grep -r -E '{regexp}' {data_dir} || [ $? = 1 ]"
+    p = subprocess.check_output(grep_cmd, shell=True,).decode('ascii')
+    map_paths = [line.split(':')[0] for line in p.split('\n')
+                 if line.split(':')[0]]
+
+    maps = {(map_path.split('/')[-5], map_path.split('/')[-3]) for map_path in map_paths}
+    return maps
