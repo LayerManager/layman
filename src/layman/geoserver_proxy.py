@@ -7,9 +7,8 @@ from lxml import etree as ET
 from flask import Blueprint, g, current_app as app, request, Response
 
 from geoserver.util import reset as gs_reset
-from layman import authn, authz, common, settings, LaymanError, celery as celery_util
+from layman import authn, authz, settings
 from layman.authn import authenticate, is_user_with_name
-from layman.common import redis
 from layman.layer import db, LAYER_TYPE, util as layer_util
 from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import LAYERNAME_PATTERN, ATTRNAME_PATTERN, patch_after_wfst
@@ -197,15 +196,7 @@ def proxy(subpath):
 
     for workspace, layername in wfs_t_layers:
         if authz.can_i_edit(LAYER_TYPE, workspace, layername):
-            try:
-                redis.create_lock(workspace, LAYER_TYPE, layername, 19, common.PUBLICATION_LOCK_WFST)
-                patch_after_wfst(workspace, layername)
-            except LaymanError as exc:
-                if exc.code == 19 and exc.private_data.get('can_run_later', False):
-                    celery_util.push_step_to_run_after_chain(workspace, LAYER_TYPE, layername,
-                                                             'layman.util::patch_after_wfst')
-                else:
-                    raise exc
+            patch_after_wfst(workspace, layername)
 
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = {key: value for (key, value) in response.headers.items() if key.lower() not in excluded_headers}
