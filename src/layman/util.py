@@ -10,7 +10,7 @@ import logging
 from flask import current_app, request, url_for as flask_url_for, jsonify
 from unidecode import unidecode
 
-from layman import settings, celery as celery_util
+from layman import settings, celery as celery_util, common
 from layman.common import tasks as tasks_util, redis
 from layman.http import LaymanError
 
@@ -390,7 +390,15 @@ def delete_publications(user,
 
 
 def patch_after_wfst(workspace, publication_type, publication, **kwargs):
-    task_methods = tasks_util.get_source_task_methods(get_publication_types()[publication_type], 'patch_after_wfst')
+    try:
+        redis.create_lock(workspace, publication_type, publication, 19, common.PUBLICATION_LOCK_WFST)
+    except LaymanError as exc:
+        if exc.code == 19 and exc.private_data.get('can_run_later', False):
+            celery_util.push_step_to_run_after_chain(workspace, publication_type, publication,
+                                                     'layman.util::patch_after_feature_change')
+            return
+        raise exc
+    task_methods = tasks_util.get_source_task_methods(get_publication_types()[publication_type], 'patch_after_feature_change')
     patch_chain = tasks_util.get_chain_of_methods(workspace, publication, task_methods, kwargs, 'layername')
     res = patch_chain()
     celery_util.set_publication_chain_info(workspace, publication_type, publication, task_methods, res)
