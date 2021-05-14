@@ -194,9 +194,10 @@ def proxy(subpath):
                                 allow_redirects=False
                                 )
 
-    for workspace, layername in wfs_t_layers:
-        if authz.can_i_edit(LAYER_TYPE, workspace, layername):
-            patch_after_wfst(workspace, layername)
+    if response.status_code == 200:
+        for workspace, layername in wfs_t_layers:
+            if authz.can_i_edit(LAYER_TYPE, workspace, layername):
+                patch_after_wfst(workspace, layername)
 
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = {key: value for (key, value) in response.headers.items() if key.lower() not in excluded_headers}
