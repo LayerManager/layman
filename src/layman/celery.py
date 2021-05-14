@@ -42,6 +42,7 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
         if chain_info is not None:
             last_task_id = chain_info['last']
             finnish_publication_chain(last_task_id)
+            clear_steps_to_run_after_chain(workspace, publication_type, publication_name)
 
 
 def _get_task_hash(task_name, workspace, publication_name):
