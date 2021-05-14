@@ -88,7 +88,7 @@ def solve_locks(workspace, publication_type, publication_name, error_code, reque
             raise LaymanError(19, private_data={'can_run_later': True})
         if current_lock == common.PUBLICATION_LOCK_WFST and requested_lock in [common.REQUEST_METHOD_PATCH, common.REQUEST_METHOD_POST, ]:
             celery_util.abort_publication_chain(workspace, publication_type, publication_name)
-            celery_util.push_step_to_run_after_chain(workspace, publication_type, publication_name, 'layman.util::patch_after_wfst')
+            celery_util.push_step_to_run_after_chain(workspace, publication_type, publication_name, 'layman.util::patch_after_feature_change')
 
 
 def _get_publication_hash(workspace, publication_type, publication_name):

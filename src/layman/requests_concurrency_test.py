@@ -26,19 +26,19 @@ def test_wfst_concurrency():
     process_client.patch_workspace_layer(workspace, layer, title='New title', check_response_fn=empty_method_returns_true)
     queue = celery.get_run_after_chain_queue(workspace, process_client.LAYER_TYPE, layer)
     assert len(queue) == 1, queue
-    assert queue == ['layman.util::patch_after_wfst', ]
+    assert queue == ['layman.util::patch_after_feature_change', ]
 
     process_client.post_wfst(data_xml, workspace=workspace)
 
     queue = celery.get_run_after_chain_queue(workspace, process_client.LAYER_TYPE, layer)
     assert len(queue) == 1, queue
-    assert queue == ['layman.util::patch_after_wfst', ]
+    assert queue == ['layman.util::patch_after_feature_change', ]
 
     process_client.post_wfst(data_xml, workspace=workspace)
 
     queue = celery.get_run_after_chain_queue(workspace, process_client.LAYER_TYPE, layer)
     assert len(queue) == 1, queue
-    assert queue == ['layman.util::patch_after_wfst', ]
+    assert queue == ['layman.util::patch_after_feature_change', ]
 
     process_client.wait_for_publication_status(workspace, process_client.LAYER_TYPE, layer)
 

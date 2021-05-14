@@ -8,11 +8,11 @@ logger = get_task_logger(__name__)
 
 
 @celery_app.task(
-    name='layman.layer.filesystem.thumbnail.patch_after_wfst',
+    name='layman.layer.filesystem.thumbnail.patch_after_feature_change',
     bind=True,
     base=celery_app.AbortableTask
 )
-def patch_after_wfst(self, workspace, layer):
+def patch_after_feature_change(self, workspace, layer):
     if self.is_aborted():
         raise AbortedException
     thumbnail.generate_layer_thumbnail(workspace, layer)

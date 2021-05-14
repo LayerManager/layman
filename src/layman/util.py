@@ -389,7 +389,7 @@ def delete_publications(user,
     return jsonify(infos)
 
 
-def patch_after_wfst(workspace, publication_type, publication, **kwargs):
+def patch_after_feature_change(workspace, publication_type, publication, **kwargs):
     try:
         redis.create_lock(workspace, publication_type, publication, 19, common.PUBLICATION_LOCK_WFST)
     except LaymanError as exc:

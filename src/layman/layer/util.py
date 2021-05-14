@@ -180,8 +180,8 @@ TASKS_TO_LAYER_INFO_KEYS = {
 }
 
 
-def patch_after_wfst(workspace, layername, **kwargs):
-    layman_util.patch_after_wfst(workspace, LAYER_TYPE, layername, **kwargs)
+def patch_after_feature_change(workspace, layername, **kwargs):
+    layman_util.patch_after_feature_change(workspace, LAYER_TYPE, layername, **kwargs)
 
 
 def delete_layer(workspace, layername, source=None, http_method='delete'):
