@@ -3,6 +3,7 @@ import importlib
 from flask import current_app
 from celery.contrib.abortable import AbortableAsyncResult
 
+from layman.publication_relation.util import update_related_publications_after_change
 from layman import settings, common
 from layman.common import redis as redis_util
 
@@ -37,6 +38,7 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
             module = importlib.import_module(module_name)
             method = getattr(module, method_name)
             method(workspace, publication_type, publication_name)
+        update_related_publications_after_change(workspace, publication_type, publication_name)
     elif task_state == 'FAILURE':
         chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
         if chain_info is not None:
