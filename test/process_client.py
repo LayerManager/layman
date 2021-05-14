@@ -72,20 +72,6 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                          }
 
 
-def check_response_keys(keys_to_check, response):
-    if any(response.json()[k].get('status') == 'FAILURE' for k in keys_to_check):
-        error_keys = [k for k in keys_to_check if response.json()[k].get('status') == 'FAILURE']
-        logger.error(f"failed_keys={error_keys}")
-        raise Exception('Some step failed!')
-    return response.status_code == 200 and all(
-        'status' not in response.json()[k] for k in keys_to_check
-    )
-
-
-def wait_for_failure(keys_to_check, response):
-    return any(response.json()[k].get('status') == 'FAILURE' for k in keys_to_check)
-
-
 def wait_for_rest(url, max_attempts, sleeping_time, check_response, headers=None):
     headers = headers or None
     r = requests.get(url, headers=headers, timeout=5)
@@ -130,7 +116,6 @@ def patch_workspace_publication(publication_type,
     headers = headers or {}
     file_paths = file_paths or []
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
-    check_response_fn = check_response_fn or partial(check_response_keys, publication_type_def.keys_to_check)
     if style_file:
         assert publication_type == LAYER_TYPE
 
@@ -163,11 +148,7 @@ def patch_workspace_publication(publication_type,
         for fp in files:
             fp[1][1].close()
 
-    with app.app_context():
-        url = url_for(publication_type_def.get_workspace_publication_url,
-                      workspace=workspace,
-                      **{publication_type_def.url_param_name: name})
-    wait_for_rest(url, 30, 0.5, check_response_fn, headers=headers)
+    wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn, headers=headers)
     wfs.clear_cache(workspace)
     wms.clear_cache(workspace)
     return r.json()
@@ -224,7 +205,6 @@ def publish_workspace_publication(publication_type,
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     file_paths = file_paths or [publication_type_def.source_path, ]
-    check_response_fn = check_response_fn or partial(check_response_keys, publication_type_def.keys_to_check)
     if style_file:
         assert publication_type == LAYER_TYPE
 
@@ -258,11 +238,7 @@ def publish_workspace_publication(publication_type,
         for fp in files:
             fp[1][1].close()
 
-    with app.app_context():
-        url = url_for(publication_type_def.get_workspace_publication_url,
-                      workspace=workspace,
-                      **{publication_type_def.url_param_name: name})
-    wait_for_rest(url, 30, 0.5, check_response_fn, headers=headers)
+    wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn, headers=headers)
     return r.json()[0]
 
 
