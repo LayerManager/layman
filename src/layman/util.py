@@ -308,7 +308,7 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
     for pi in partial_infos.values():
         result.update(pi)
 
-    if 'actor_name' in context:
+    if 'actor_name' in context and result:
         actor = context['actor_name']
         read_access_users = result.get('access_rights').get('read')
         if not authz.is_user_in_access_rule(actor, read_access_users):
