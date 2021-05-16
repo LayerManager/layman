@@ -3,7 +3,11 @@
 ## v1.13.0
 {release_date}
 ### Upgrade requirements
-- If you are running Layman with development settings, run `make timgen-build`.
+- If you are running Layman with development settings, run  
+```
+make build-dev
+make timgen-build
+```
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
@@ -14,6 +18,7 @@
 - [#159](https://github.com/jirik/layman/issues/159) [WFS-T](doc/endpoints.md#web-feature-service) request causes update of bounding box and thumbnail of each edited layer in [asynchronous chain](doc/async-tasks.md). Documentation describes concurrency of WFS-T request and its asynchronous chains with another [WFS-T request](doc/endpoints.md#web-feature-service), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [DELETE Workspace Layer](doc/rest.md#delete-workspace-layer), and [DELETE Workspace Layers](doc/rest.md#delete-workspace-layers).
 - [#331](https://github.com/jirik/layman/issues/331) Query parameter *full_text_filter* is also use for substring search in all endpoints with filtering.
 - Filesystem directory containing workspaces was renamed from `users` to `workspaces`
+- [#72](https://github.com/jirik/layman/issues/72) Pipenv upgraded to v2020.11.15
 
 ## v1.12.0
  2021-04-21

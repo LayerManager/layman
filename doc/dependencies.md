@@ -23,7 +23,7 @@
 | [gdal](http://www.gdal.org/) | 2.4.0 | MIT License | geographicags/docker-gdal2 | prod | bin | to import vector files into DB |
 | [chromium](https://www.chromium.org/) | 77+ | BSD and others | Dockerfile | prod | bin | for client-side map rendering and integration testing |
 | [chromedriver](http://chromedriver.chromium.org/) | 77+ | BSD and others | Dockerfile | prod | bin | for client-side map rendering and integration testing |
-| [pipenv](https://pipenv.pypa.io/en/latest/) | 2018.11.26 | MIT | Dockerfile | prod | bin | to install Python dependencies |
+| [pipenv](https://pipenv.pypa.io/en/latest/) | 2020.11.15 | MIT | Dockerfile | prod | bin | to install Python dependencies |
 | [node.js](https://nodejs.org/) | 10 | MIT | timgen/Dockerfile | prod | bin | to run Timgen |
 | [npm](https://www.npmjs.com/get-npm) | 6 | Artistic License 2.0 | timgen/Dockerfile | prod | bin | to install node.js dependencies |
 | [node.js](https://nodejs.org/) | 12 | MIT | client/docker/Dockerfile | prod | bin | to run Layman Test Client |

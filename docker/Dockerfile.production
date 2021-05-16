@@ -2,7 +2,7 @@ FROM geographica/gdal2:2.4.0
 
 RUN apt-get clean && apt-get update && \
     apt-get -y -qq install unzip curl python3-pip chromium-browser python3-lxml && \
-    pip3 install pipenv==2018.11.26
+    pip3 install pipenv==2020.11.15
 
 RUN export MAIN_CHROME_VERSION=$(apt-cache policy chromium-browser | grep -oP "Installed: \K\w+") && \
     echo "Installed chromium-browser ${MAIN_CHROME_VERSION}" && \
