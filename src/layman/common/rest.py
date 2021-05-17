@@ -64,15 +64,15 @@ def parse_request_path(request_path):
     publication_type = None
     publication_type_url_prefix = None
     publication_name = None
-    m = get_multipublication_path_pattern().match(request_path)
-    if not m:
-        m = get_workspace_multipublication_path_pattern().match(request_path)
-    if not m:
-        m = get_singlepublication_path_pattern().match(request_path)
-    if m:
-        workspace = m.groupdict().get('workspace', None)
-        publication_type_url_prefix = m.group('publication_type')
-        publication_name = m.groupdict().get('publication_name', None)
+    match = get_multipublication_path_pattern().match(request_path)
+    if not match:
+        match = get_workspace_multipublication_path_pattern().match(request_path)
+    if not match:
+        match = get_singlepublication_path_pattern().match(request_path)
+    if match:
+        workspace = match.groupdict().get('workspace', None)
+        publication_type_url_prefix = match.group('publication_type')
+        publication_name = match.groupdict().get('publication_name', None)
     if publication_type_url_prefix:
         publication_type = get_url_name_to_publication_type()[publication_type_url_prefix]['type']
     if workspace in settings.RESERVED_WORKSPACE_NAMES:
@@ -106,13 +106,13 @@ def setup_post_access_rights(request_form, kwargs, actor_name):
 def get_bbox_from_param(request_args, param_name):
     bbox = None
     if request_args.get(param_name):
-        m = re.match(consts.BBOX_PATTERN, request_args[param_name])
-        if not m:
+        match = re.match(consts.BBOX_PATTERN, request_args[param_name])
+        if not match:
             raise LaymanError(2, {'parameter': param_name, 'expected': {
                 'text': 'Four comma-separated coordinates: minx,miny,maxx,maxy',
                 'regular_expression': consts.BBOX_PATTERN,
             }})
-        coords = tuple(float(c) for c in m.groups())
+        coords = tuple(float(c) for c in match.groups())
         if not bbox_util.is_valid(coords):
             raise LaymanError(2, {'parameter': param_name, 'expected': 'minx <= maxx and miny <= maxy'})
         bbox = coords
@@ -123,13 +123,13 @@ def get_integer_from_param(request_args, param_name, negative=True, zero=True, p
     result = None
     assert negative or zero or positive
     if request_args.get(param_name):
-        m = re.match(consts.INTEGER_PATTERN, request_args[param_name])
-        if not m:
+        match = re.match(consts.INTEGER_PATTERN, request_args[param_name])
+        if not match:
             raise LaymanError(2, {'parameter': param_name, 'expected': {
                 'text': 'Integer with optional sign',
                 'regular_expression': consts.INTEGER_PATTERN,
             }})
-        integer = int(m.groups()[0])
+        integer = int(match.groups()[0])
 
         if integer < 0 and not negative:
             expected_than = '>' + ('=' if zero else '')

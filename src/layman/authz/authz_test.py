@@ -151,16 +151,16 @@ class TestRestApiClass:
             'read': username,
             'write': username,
         })
-        r = requests.get(rest_url, headers=authz_headers)
-        self.assert_response(r, authz_status_code, authz_response)
-        r = requests.get(rest_url)
-        self.assert_response(r, unauthz_status_code, unauthz_response)
+        response = requests.get(rest_url, headers=authz_headers)
+        self.assert_response(response, authz_status_code, authz_response)
+        response = requests.get(rest_url)
+        self.assert_response(response, unauthz_status_code, unauthz_response)
 
         patch_method(username, publ_name, headers=authz_headers, access_rights={
             'read': settings.RIGHTS_EVERYONE_ROLE,
             'write': settings.RIGHTS_EVERYONE_ROLE,
         })
-        r = requests.get(rest_url, headers=authz_headers)
-        self.assert_response(r, authz_status_code, authz_response)
-        r = requests.get(rest_url)
-        self.assert_response(r, authz_status_code, authz_response)
+        response = requests.get(rest_url, headers=authz_headers)
+        self.assert_response(response, authz_status_code, authz_response)
+        response = requests.get(rest_url)
+        self.assert_response(response, authz_status_code, authz_response)

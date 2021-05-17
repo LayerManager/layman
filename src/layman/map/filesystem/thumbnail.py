@@ -135,5 +135,5 @@ def generate_map_thumbnail(username, mapname, editor):
     except OSError:
         pass
 
-    with open(file_path, 'wb') as f:
-        f.write(base64.b64decode(data_url))
+    with open(file_path, 'wb') as file:
+        file.write(base64.b64decode(data_url))

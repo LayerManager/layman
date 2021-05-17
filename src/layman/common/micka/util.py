@@ -121,17 +121,17 @@ def fill_xml_template_obj(tree_or_el, prop_values, publ_properties, basic_templa
             if len(single_prop_els) > len(single_prop_values):
                 for idx in range(len(single_prop_values), len(single_prop_els)):
                     # print(f'Removing node {idx}')
-                    e = single_prop_els[idx]
-                    e.getparent().remove(e)
+                    element = single_prop_els[idx]
+                    element.getparent().remove(element)
             elif len(single_prop_values) > len(single_prop_els):
-                e = single_prop_els[-1] if single_prop_els else last_prop_el
+                element = single_prop_els[-1] if single_prop_els else last_prop_el
                 for idx in range(len(single_prop_values) - len(single_prop_els)):
-                    pe = e.getparent()
+                    parent_element = element.getparent()
                     # print(f'Adding node {idx}')
-                    new_el = deepcopy(e)
+                    new_el = deepcopy(element)
                     if not single_prop_els:
                         all_new_els.append(new_el)
-                    pe.insert(pe.index(e) + 1, new_el)
+                    parent_element.insert(parent_element.index(element) + 1, new_el)
         else:
             # current_app.logger.info(f"Copying property {prop_name} element from template")
             tmp_tree = tmp_tree or read_xml_tree(basic_template_path)
@@ -245,13 +245,13 @@ def is_record_exists_exception(root_el):
 
 def base_insert(xml_str):
     # print(f"Micka insert=\n{xml_str}")
-    r = requests.post(settings.CSW_URL,
-                      auth=settings.CSW_BASIC_AUTHN,
-                      data=xml_str.encode('utf-8'),
-                      timeout=5,)
+    response = requests.post(settings.CSW_URL,
+                             auth=settings.CSW_BASIC_AUTHN,
+                             data=xml_str.encode('utf-8'),
+                             timeout=5,)
     # print(f"Micka insert response=\n{r.text}")
-    r.raise_for_status()
-    root_el = ET.fromstring(r.content)
+    response.raise_for_status()
+    root_el = ET.fromstring(response.content)
 
     if root_el.tag == nspath_eval('ows:ExceptionReport', NAMESPACES):
         if is_record_exists_exception(root_el):
@@ -261,20 +261,20 @@ def base_insert(xml_str):
                 'text': root_el[0][0].text,
             })
         raise LaymanError(37, data={
-            'response': r.text
+            'response': response.text
         })
-    return root_el, r
+    return root_el, response
 
 
 def csw_insert(template_values):
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-insert-template.xml')
     xml_str = fill_template_as_str(template_path, template_values)
-    root_el, r = base_insert(xml_str)
-    assert root_el.tag == nspath_eval('csw:TransactionResponse', NAMESPACES), r.content
-    assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalInserted', NAMESPACES)).text == "1", r.content
+    root_el, response = base_insert(xml_str)
+    assert root_el.tag == nspath_eval('csw:TransactionResponse', NAMESPACES), response.content
+    assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalInserted', NAMESPACES)).text == "1", response.content
 
     muuid_els = root_el.findall(nspath_eval('csw:InsertResult/csw:BriefRecord/dc:identifier', NAMESPACES))
-    assert len(muuid_els) == 1, r.content
+    assert len(muuid_els) == 1, response.content
     muuid = muuid_els[0].text
     return muuid
 
@@ -282,14 +282,14 @@ def csw_insert(template_values):
 def soap_insert(template_values):
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'soap-insert-template.xml')
     xml_str = fill_template_as_str(template_path, template_values)
-    root_el, r = base_insert(xml_str)
-    assert root_el.tag == nspath_eval('soap:Envelope', NAMESPACES), r.content
+    root_el, response = base_insert(xml_str)
+    assert root_el.tag == nspath_eval('soap:Envelope', NAMESPACES), response.content
     assert root_el.find(nspath_eval('soap:Body/csw:TransactionResponse/csw:TransactionSummary/csw:totalInserted',
-                                    NAMESPACES)).text == "1", r.content
+                                    NAMESPACES)).text == "1", response.content
 
     muuid_els = root_el.findall(
         nspath_eval('soap:Body/csw:TransactionResponse/csw:InsertResult/csw:BriefRecord/dc:identifier', NAMESPACES))
-    assert len(muuid_els) == 1, r.content
+    assert len(muuid_els) == 1, response.content
     muuid = muuid_els[0].text
     return muuid
 
@@ -317,25 +317,25 @@ def csw_update(template_values, timeout=5):
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-update-template.xml')
     xml_str = fill_template_as_str(template_path, template_values)
     # print(f"CSW update request=\n{xml_str}")
-    r = requests.post(settings.CSW_URL,
-                      auth=settings.CSW_BASIC_AUTHN,
-                      data=xml_str.encode('utf-8'),
-                      timeout=timeout,
-                      )
+    response = requests.post(settings.CSW_URL,
+                             auth=settings.CSW_BASIC_AUTHN,
+                             data=xml_str.encode('utf-8'),
+                             timeout=timeout,
+                             )
     # print(f"CSW update response=\n{r.text}")
-    r.raise_for_status()
-    root_el = ET.fromstring(r.content)
+    response.raise_for_status()
+    root_el = ET.fromstring(response.content)
 
     if root_el.tag == nspath_eval('ows:ExceptionReport', NAMESPACES):
         if is_record_does_not_exist_exception(root_el):
             raise LaymanError(39, data={
-                'response': r.text
+                'response': response.text
             })
         raise LaymanError(37, data={
-            'response': r.text
+            'response': response.text
         })
-    assert root_el.tag == nspath_eval('csw:TransactionResponse', NAMESPACES), r.content
-    assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalUpdated', NAMESPACES)).text == "1", r.content
+    assert root_el.tag == nspath_eval('csw:TransactionResponse', NAMESPACES), response.content
+    assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalUpdated', NAMESPACES)).text == "1", response.content
 
 
 def is_record_does_not_exist_exception(root_el):
@@ -354,23 +354,23 @@ def csw_delete(muuid):
     }
     xml_str = fill_template_as_str(template_path, template_values)
     # print(f"CSW delete request=\n{xml_str}")
-    r = requests.post(settings.CSW_URL,
-                      auth=settings.CSW_BASIC_AUTHN,
-                      data=xml_str.encode('utf-8'),
-                      timeout=5,
-                      )
+    response = requests.post(settings.CSW_URL,
+                             auth=settings.CSW_BASIC_AUTHN,
+                             data=xml_str.encode('utf-8'),
+                             timeout=5,
+                             )
     # print(f"CSW delete response=\n{r.text}")
-    r.raise_for_status()
-    root_el = ET.fromstring(r.content)
+    response.raise_for_status()
+    root_el = ET.fromstring(response.content)
 
     if root_el.tag == nspath_eval('ows:ExceptionReport', NAMESPACES):
         if is_record_does_not_exist_exception(root_el):
             return
         raise LaymanError(37, data={
-            'response': r.text
+            'response': response.text
         })
-    assert root_el.tag == nspath_eval('csw:TransactionResponse', NAMESPACES), r.content
-    assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalDeleted', NAMESPACES)).text == "1", r.content
+    assert root_el.tag == nspath_eval('csw:TransactionResponse', NAMESPACES), response.content
+    assert root_el.find(nspath_eval('csw:TransactionSummary/csw:totalDeleted', NAMESPACES)).text == "1", response.content
 
 
 def parse_md_properties(file_obj, property_names, publ_properties):
@@ -409,14 +409,14 @@ def parse_md_properties(file_obj, property_names, publ_properties):
     return result
 
 
-def _clear_el(el):
-    el.attrib.clear()
-    for child in list(el):
-        el.remove(child)
+def _clear_el(element):
+    element.attrib.clear()
+    for child in list(element):
+        element.remove(child)
 
 
-def _add_unknown_reason(el):
-    el.attrib[ET.QName(NAMESPACES['gco'], 'nilReason')] = 'unknown'
+def _add_unknown_reason(element):
+    element.attrib[ET.QName(NAMESPACES['gco'], 'nilReason')] = 'unknown'
 
 
 def adjust_character_string(prop_el, prop_value):
@@ -594,10 +594,10 @@ def adjust_operates_on(prop_el, prop_value):
         _add_unknown_reason(prop_el)
 
 
-def get_record_element_by_id(csw, id):
-    csw.getrecordbyid(id=[id], esn='full', outputschema=NAMESPACES['gmd'])
+def get_record_element_by_id(csw, ident):
+    csw.getrecordbyid(id=[ident], esn='full', outputschema=NAMESPACES['gmd'])
     xml = csw._exml
-    els = xml.xpath(f"//gmd:MD_Metadata[gmd:fileIdentifier/gco:CharacterString/text() = '{id}']", namespaces=NAMESPACES)
+    els = xml.xpath(f"//gmd:MD_Metadata[gmd:fileIdentifier/gco:CharacterString/text() = '{ident}']", namespaces=NAMESPACES)
     # current_app.logger.info(f"Number of md records id={id}: {len(els)}")
     result = els[0] if len(els) > 0 else None
     return result
@@ -608,14 +608,14 @@ def get_number_of_records(record_id, use_authn):
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-number-of-records-template.xml')
     xml_str = fill_template_as_str(template_path, {'record_id': record_id})
 
-    r = requests.post(settings.CSW_URL,
-                      auth=authn,
-                      data=xml_str,
-                      timeout=5,
-                      )
-    r.raise_for_status()
+    response = requests.post(settings.CSW_URL,
+                             auth=authn,
+                             data=xml_str,
+                             timeout=5,
+                             )
+    response.raise_for_status()
     parser = ET.XMLParser(remove_blank_text=True)
-    tree = ET.fromstring(r.text.encode('utf-8'), parser=parser)
+    tree = ET.fromstring(response.text.encode('utf-8'), parser=parser)
     num_records = int(tree.xpath("/csw:GetRecordsResponse/csw:SearchResults/@numberOfRecordsMatched", namespaces=NAMESPACES)[0])
     return num_records
 

@@ -40,8 +40,8 @@ def delete_layer(workspace, layername):
 
 
 def get_layer_info(workspace, layername):
-    r = get_style_response(workspace, layername, gs_util.headers_sld, settings.LAYMAN_GS_AUTH)
-    if r and r.status_code == 200:
+    response = get_style_response(workspace, layername, gs_util.headers_sld, settings.LAYMAN_GS_AUTH)
+    if response and response.status_code == 200:
         url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=layername)
         info = {
             'style': {

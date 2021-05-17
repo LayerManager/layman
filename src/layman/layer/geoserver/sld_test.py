@@ -27,12 +27,12 @@ def test_sld_style_in_wms_workspace():
 
     url = urljoin(GS_REST, f'workspaces/{workspace}_wms/styles/{layer}')
 
-    r = requests.get(url,
-                     auth=GS_AUTH,
-                     headers=headers_sld,
-                     timeout=5,
-                     )
-    r.raise_for_status()
+    response = requests.get(url,
+                            auth=GS_AUTH,
+                            headers=headers_sld,
+                            timeout=5,
+                            )
+    response.raise_for_status()
     process_client.delete_workspace_layer(workspace,
                                           layer)
 

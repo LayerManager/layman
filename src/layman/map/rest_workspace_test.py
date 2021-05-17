@@ -38,7 +38,7 @@ METADATA_PROPERTIES = {
 
 METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES
 
-num_maps_before_test = 0
+num_maps_before_test = 0  # pylint: disable=invalid-name
 
 
 def wait_till_ready(username, mapname):
@@ -51,23 +51,24 @@ def wait_till_ready(username, mapname):
 def check_metadata(client, username, mapname, props_equal, expected_values):
     with app.app_context():
         rest_path = url_for('rest_workspace_map_metadata_comparison.get', workspace=username, mapname=mapname)
-        rv = client.get(rest_path)
-        assert rv.status_code == 200, rv.get_json()
-        resp_json = rv.get_json()
+        response = client.get(rest_path)
+        assert response.status_code == 200, response.get_json()
+        resp_json = response.get_json()
         assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
         # for k, v in resp_json['metadata_properties'].items():
         #     print(f"'{k}': {json.dumps(list(v['values'].values())[0], indent=2)},")
-        for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (
-                k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
-            assert v['equal'] == (
-                k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+        for key, value in resp_json['metadata_properties'].items():
+            assert value['equal_or_null'] == (
+                key in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {key}: {json.dumps(value, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+            assert value['equal'] == (
+                key in props_equal), f"Metadata property values have unexpected 'equal' value: {key}: {json.dumps(value, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
             # print(f"'{k}': {json.dumps(list(v['values'].values())[0], indent=2)},")
-            if k in expected_values:
-                vals = list(v['values'].values())
-                vals.append(expected_values[k])
-                assert prop_equals_strict(vals, equals_fn=PROPERTIES[k].get('equals_fn',
-                                                                            None)), f"Property {k} has unexpected values {json.dumps(vals, indent=2)}"
+            if key in expected_values:
+                vals = list(value['values'].values())
+                vals.append(expected_values[key])
+                assert prop_equals_strict(vals, equals_fn=PROPERTIES[key].get('equals_fn',
+                                                                              None)),\
+                    f"Property {key} has unexpected values {json.dumps(vals, indent=2)}"
 
 
 @pytest.fixture(scope="module")
@@ -83,7 +84,7 @@ def client():
     # print('before app.app_context()')
     with app.app_context():
         publs_by_type = uuid.check_redis_consistency()
-        global num_maps_before_test
+        global num_maps_before_test  # pylint: disable=invalid-name
         num_maps_before_test = len(publs_by_type[MAP_TYPE])
     yield client
 
@@ -99,9 +100,9 @@ def test_get_maps_empty(client):
     username = 'testuser1'
     flask_client.ensure_workspace(username, client)
     with app.app_context():
-        rv = client.get(url_for('rest_workspace_maps.get', workspace=username))
-        resp_json = rv.get_json()
-        assert rv.status_code == 200, rv.data
+        response = client.get(url_for('rest_workspace_maps.get', workspace=username))
+        resp_json = response.get_json()
+        assert response.status_code == 200, response.data
         assert len(resp_json) == 0
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{MAP_TYPE}': num_maps_before_test + 0
@@ -113,20 +114,20 @@ def test_wrong_value_of_mapname(client):
     username = 'testuser1'
     mapnames = [' ', '2a', 'ě', ';', '?', 'ABC']
     for mapname in mapnames:
-        rv = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
-        resp_json = rv.get_json()
+        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        resp_json = response.get_json()
         # print('username', username)
         # print(resp_json)
-        assert rv.status_code == 400
+        assert response.status_code == 400
         assert resp_json['code'] == 2
         assert resp_json['detail']['parameter'] == 'mapname'
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_no_file(client):
-    rv = client.post(url_for('rest_workspace_maps.post', workspace='testuser1'))
-    assert rv.status_code == 400
-    resp_json = rv.get_json()
+    response = client.post(url_for('rest_workspace_maps.post', workspace='testuser1'))
+    assert response.status_code == 400
+    resp_json = response.get_json()
     # print('resp_json', resp_json)
     assert resp_json['code'] == 1
     assert resp_json['detail']['parameter'] == 'file'
@@ -139,23 +140,23 @@ def test_post_maps_invalid_file(client):
     file_paths = [
         'sample/style/generic-blue_sld.xml',
     ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
+    for file_path in file_paths:
+        assert os.path.isfile(file_path)
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
+        response = client.post(rest_path, data={
             'file': files,
         })
-        assert rv.status_code == 400
-        resp_json = rv.get_json()
+        assert response.status_code == 400
+        resp_json = response.get_json()
         # print('resp_json', resp_json)
         assert resp_json['code'] == 2
         assert resp_json['detail']['parameter'] == 'file'
         assert resp_json['detail']['reason'] == 'Invalid JSON syntax'
     finally:
-        for fp in files:
-            fp[0].close()
+        for file_path in files:
+            file_path[0].close()
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
@@ -165,24 +166,24 @@ def test_post_maps_invalid_json(client):
     file_paths = [
         'sample/layman.map/invalid-missing-title-email.json',
     ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
+    for file_path in file_paths:
+        assert os.path.isfile(file_path)
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
+        response = client.post(rest_path, data={
             'file': files,
         })
-        assert rv.status_code == 400
-        resp_json = rv.get_json()
+        assert response.status_code == 400
+        resp_json = response.get_json()
         # print('resp_json', resp_json)
         assert resp_json['code'] == 2
         assert resp_json['detail']['parameter'] == 'file'
         assert resp_json['detail']['reason'] == 'JSON not valid against schema layman/map/schema.draft-07.json'
         assert len(resp_json['detail']['validation-errors']) == 2
     finally:
-        for fp in files:
-            fp[0].close()
+        for file_path in files:
+            file_path[0].close()
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{MAP_TYPE}': num_maps_before_test + 0
     })
@@ -198,24 +199,24 @@ def test_post_maps_simple(client):
         file_paths = [
             'sample/layman.map/full.json',
         ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file_path in file_paths:
+            assert os.path.isfile(file_path)
         files = []
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
+            response = client.post(rest_path, data={
                 'file': files,
             })
-            assert rv.status_code == 200
-            resp_json = rv.get_json()
+            assert response.status_code == 200
+            resp_json = response.get_json()
             # print('resp_json', resp_json)
             assert len(resp_json) == 1
             assert resp_json[0]['name'] == expected_mapname
             mapname = resp_json[0]['name']
             uuid_str = resp_json[0]['uuid']
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
 
         assert uuid.is_valid_uuid(uuid_str)
 
@@ -224,9 +225,9 @@ def test_post_maps_simple(client):
         })
 
     with app.app_context():
-        rv = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
+        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        assert response.status_code == 200
+        resp_json = response.get_json()
         assert resp_json['name'] == mapname
         assert resp_json['uuid'] == uuid_str
         assert resp_json['url'] == url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname)
@@ -252,18 +253,18 @@ def test_post_maps_simple(client):
                                           mapname=mapname)).get_json()
 
     with app.app_context():
-        rv = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
+        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        assert response.status_code == 200
+        resp_json = response.get_json()
         thumbnail = resp_json['thumbnail']
         assert 'status' not in thumbnail
         assert 'path' in thumbnail
         assert thumbnail['url'] == url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname)
 
     with app.app_context():
-        rv = client.get(url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname))
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
+        response = client.get(url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname))
+        assert response.status_code == 200
+        resp_json = response.get_json()
         assert resp_json['name'] == mapname
 
     with app.app_context():
@@ -279,9 +280,9 @@ def test_post_maps_simple(client):
     assert map_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
     md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
     assert map_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
-    r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
-    r.raise_for_status()
-    assert mapname in r.text
+    response = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
+    response.raise_for_status()
+    assert mapname in response.text
 
     with app.app_context():
         expected_md_values = {
@@ -322,34 +323,34 @@ def test_post_maps_complex(client):
         file_paths = [
             'sample/layman.map/full.json',
         ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file_path in file_paths:
+            assert os.path.isfile(file_path)
         files = []
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
+            response = client.post(rest_path, data={
                 'file': files,
                 'name': mapname,
                 'title': title,
                 'description': description,
             })
-            assert rv.status_code == 200
-            resp_json = rv.get_json()
+            assert response.status_code == 200
+            resp_json = response.get_json()
             # print('resp_json', resp_json)
             assert len(resp_json) == 1
             assert resp_json[0]['name'] == mapname
             uuid_str = resp_json[0]['uuid']
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{MAP_TYPE}': num_maps_before_test + 2
         })
 
     with app.app_context():
-        rv = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
+        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        assert response.status_code == 200
+        resp_json = response.get_json()
         assert resp_json['name'] == mapname
         assert resp_json['uuid'] == uuid_str
         assert resp_json['url'] == url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname)
@@ -365,11 +366,11 @@ def test_post_maps_complex(client):
 
     with app.app_context():
         # assert another PATCH is not possible now
-        rv = client.patch(url_for('rest_workspace_map.patch', workspace=username, mapname=mapname), data={
+        response = client.patch(url_for('rest_workspace_map.patch', workspace=username, mapname=mapname), data={
             'title': 'abcd',
         })
-        assert rv.status_code == 400
-        resp_json = rv.get_json()
+        assert response.status_code == 400
+        resp_json = response.get_json()
         assert resp_json['code'] == 29
 
     # continue with thumbnail assertion
@@ -382,18 +383,18 @@ def test_post_maps_complex(client):
                                           mapname=mapname)).get_json()
 
     with app.app_context():
-        rv = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
+        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        assert response.status_code == 200
+        resp_json = response.get_json()
         thumbnail = resp_json['thumbnail']
         assert 'status' not in thumbnail
         assert 'path' in thumbnail
         assert thumbnail['url'] == url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname)
 
     with app.app_context():
-        rv = client.get(url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname))
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
+        response = client.get(url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname))
+        assert response.status_code == 200
+        resp_json = response.get_json()
         assert resp_json['name'] == mapname
         assert resp_json['title'] == title
         assert resp_json['abstract'] == description
@@ -451,20 +452,20 @@ def test_patch_map(client):
         file_paths = [
             'sample/layman.map/full2.json',
         ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file in file_paths:
+            assert os.path.isfile(file)
         files = []
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.patch(rest_path, data={
+            response = client.patch(rest_path, data={
                 'file': files,
             })
-            assert rv.status_code == 200
-            resp_json = rv.get_json()
+            assert response.status_code == 200
+            resp_json = response.get_json()
             # print('resp_json', resp_json)
         finally:
-            for fp in files:
-                fp[0].close()
+            for file in files:
+                file[0].close()
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{MAP_TYPE}': num_maps_before_test + 2
@@ -491,18 +492,18 @@ def test_patch_map(client):
                                           mapname=mapname)).get_json()
 
     with app.app_context():
-        rv = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
+        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        assert response.status_code == 200
+        resp_json = response.get_json()
         thumbnail = resp_json['thumbnail']
         assert 'status' not in thumbnail
         assert 'path' in thumbnail
         assert thumbnail['url'] == url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname)
 
     with app.app_context():
-        rv = client.get(url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname))
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
+        response = client.get(url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname))
+        assert response.status_code == 200
+        resp_json = response.get_json()
         assert resp_json['name'] == mapname
         assert resp_json['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
         assert resp_json['abstract'] == "Jiný popis"
@@ -522,21 +523,21 @@ def test_patch_map(client):
 
     with app.app_context():
         title = 'Nový název'
-        rv = client.patch(rest_path, data={
+        response = client.patch(rest_path, data={
             'title': title,
         })
-        assert rv.status_code == 200, rv.get_json()
-        resp_json = rv.get_json()
+        assert response.status_code == 200, response.get_json()
+        resp_json = response.get_json()
         assert resp_json['title'] == "Nový název"
         assert resp_json['description'] == "Jiný popis"
 
     with app.app_context():
         description = 'Nový popis'
-        rv = client.patch(rest_path, data={
+        response = client.patch(rest_path, data={
             'description': description,
         })
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
+        assert response.status_code == 200
+        resp_json = response.get_json()
         assert resp_json['title'] == "Nový název"
         assert resp_json['description'] == "Nový popis"
 
@@ -578,15 +579,15 @@ def test_delete_map(client):
         username = 'testuser1'
         mapname = 'administrativni_cleneni_libereckeho_kraje'
         rest_path = url_for('rest_workspace_map.delete_map', workspace=username, mapname=mapname)
-        rv = client.delete(rest_path)
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
+        response = client.delete(rest_path)
+        assert response.status_code == 200
+        resp_json = response.get_json()
         uuid_str = resp_json['uuid']
         md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
-        r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
-        r.raise_for_status()
-        assert 'Záznam nenalezen' in r.text
-        assert mapname not in r.text
+        response = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
+        response.raise_for_status()
+        assert 'Záznam nenalezen' in response.text
+        assert mapname not in response.text
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{MAP_TYPE}': num_maps_before_test + 1
@@ -594,9 +595,9 @@ def test_delete_map(client):
 
     with app.app_context():
         rest_path = url_for('rest_workspace_map.delete_map', workspace=username, mapname=mapname)
-        rv = client.delete(rest_path)
-        assert rv.status_code == 404
-        resp_json = rv.get_json()
+        response = client.delete(rest_path)
+        assert response.status_code == 404
+        resp_json = response.get_json()
         assert resp_json['code'] == 26
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -614,20 +615,20 @@ def test_map_composed_from_local_layers(client):
         pattern = os.path.join(os.getcwd(), 'tmp/naturalearth/110m/cultural/ne_110m_populated_places.*')
         file_paths = glob.glob(pattern)
         assert len(file_paths) > 0
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file in file_paths:
+            assert os.path.isfile(file)
         files = []
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
+            response = client.post(rest_path, data={
                 'file': files,
                 'name': layername1,
             })
-            assert rv.status_code == 200
-            layer1uuid = rv.get_json()[0]['uuid']
+            assert response.status_code == 200
+            layer1uuid = response.get_json()[0]['uuid']
         finally:
-            for fp in files:
-                fp[0].close()
+            for file in files:
+                file[0].close()
 
     # If no sleep, Micka throws 500
     # [2020-03-26 09-54-11] Dibi\UniqueConstraintViolationException: duplicate key value violates unique constraint "edit_md_pkey" DETAIL:  Key (recno)=(17) already exists. SCHEMA NAME:  public TABLE NAME:  edit_md CONSTRAINT NAME:  edit_md_pkey LOCATION:  _bt_check_unique, nbtinsert.c:434 #23505 in /var/www/html/Micka/php/vendor/dibi/dibi/src/Dibi/Drivers/PostgreDriver.php:150  @  http://localhost:3080/csw  @@  exception--2020-03-26--09-54--3f034f5a61.html
@@ -641,20 +642,20 @@ def test_map_composed_from_local_layers(client):
         pattern = os.path.join(os.getcwd(), 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.*')
         file_paths = glob.glob(pattern)
         assert len(file_paths) > 0
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file in file_paths:
+            assert os.path.isfile(file)
         files = []
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
+            response = client.post(rest_path, data={
                 'file': files,
                 'name': layername2,
             })
-            assert rv.status_code == 200
-            layer2uuid = rv.get_json()[0]['uuid']
+            assert response.status_code == 200
+            layer2uuid = response.get_json()[0]['uuid']
         finally:
-            for fp in files:
-                fp[0].close()
+            for file in files:
+                file[0].close()
 
     with app.app_context():
         keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
@@ -692,23 +693,23 @@ def test_map_composed_from_local_layers(client):
         file_paths = [
             'sample/layman.map/internal_url.json',
         ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file in file_paths:
+            assert os.path.isfile(file)
         files = []
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
+            response = client.post(rest_path, data={
                 'file': files,
                 'name': mapname,
             })
-            assert rv.status_code == 200
-            resp_json = rv.get_json()
+            assert response.status_code == 200
+            resp_json = response.get_json()
             # print('resp_json', resp_json)
             assert len(resp_json) == 1
             assert resp_json[0]['name'] == mapname
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
 
     with app.app_context():
         map_info = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname)).get_json()
@@ -725,9 +726,9 @@ def test_map_composed_from_local_layers(client):
                                           mapname=mapname)).get_json()
 
     with app.app_context():
-        rv = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
+        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        assert response.status_code == 200
+        resp_json = response.get_json()
         thumbnail = resp_json['thumbnail']
         assert 'status' not in thumbnail
         assert 'path' in thumbnail
@@ -751,8 +752,8 @@ def test_map_composed_from_local_layers(client):
         xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values,
                                                                                     csw.METADATA_PROPERTIES)
         expected_path = 'src/layman/map/rest_test_filled_template.xml'
-        with open(expected_path) as f:
-            expected_lines = f.readlines()
+        with open(expected_path) as file:
+            expected_lines = file.readlines()
         diff_lines = list(
             difflib.unified_diff([line.decode('utf-8') for line in xml_file_object.readlines()], expected_lines))
         assert len(diff_lines) == 40, ''.join(diff_lines)

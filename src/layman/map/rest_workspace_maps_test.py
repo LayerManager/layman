@@ -24,12 +24,12 @@ def test_get_map_title():
     with app.app_context():
         url_get = url_for('rest_workspace_maps.get', workspace=username)
     # maps.GET
-    rv = requests.get(url_get)
-    assert rv.status_code == 200, rv.json()
+    response = requests.get(url_get)
+    assert response.status_code == 200, response.json()
 
     for i in range(0, len(sorted_maps) - 1):
-        assert rv.json()[i]["name"] == sorted_maps[i][0]
-        assert rv.json()[i]["title"] == sorted_maps[i][1]
+        assert response.json()[i]["name"] == sorted_maps[i][0]
+        assert response.json()[i]["title"] == sorted_maps[i][1]
 
     for (name, title) in maps:
         process_client.delete_workspace_map(username, name)
@@ -45,13 +45,13 @@ def test_get_maps():
     with app.app_context():
         url_get = url_for('rest_workspace_maps.get', workspace=username)
     # maps.GET
-    rv = requests.get(url_get)
-    assert rv.status_code == 200, rv.json()
+    response = requests.get(url_get)
+    assert response.status_code == 200, response.json()
 
-    assert rv.json()[0]['name'] == mapname
-    assert rv.json()[0]['title'] == mapname
+    assert response.json()[0]['name'] == mapname
+    assert response.json()[0]['title'] == mapname
     with app.app_context():
-        assert rv.json()[0]['url'] == url_for('rest_workspace_map.get', workspace=username, mapname=mapname,
-                                              internal=False)
+        assert response.json()[0]['url'] == url_for('rest_workspace_map.get', workspace=username, mapname=mapname,
+                                                    internal=False)
 
     process_client.delete_workspace_map(username, mapname)

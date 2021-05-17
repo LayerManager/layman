@@ -46,8 +46,8 @@ def to_safe_names(unsafe_names, type_name):
     values = [slugify(n) for n in unsafe_names]
     values = [v for v in values if len(v) > 0]
     values_letter_prefix, values_other_prefix = [], []
-    for v in values:
-        (values_other_prefix if re.match(r'^[^a-z].*', v) else values_letter_prefix).append(v)
+    for value in values:
+        (values_other_prefix if re.match(r'^[^a-z].*', value) else values_letter_prefix).append(value)
     values = values_letter_prefix + [f'{type_name}_{v}' for v in values_other_prefix]
     if len(values) == 0:
         values = [type_name]
@@ -62,12 +62,12 @@ def check_deprecated_url(response):
     return response
 
 
-def check_username_decorator(f):
-    @wraps(f)
+def check_username_decorator(func):
+    @wraps(func)
     def decorated_function(*args, **kwargs):
         workspace = request.view_args['workspace']
         check_username(workspace, pattern_only=True)
-        result = f(*args, **kwargs)
+        result = func(*args, **kwargs)
         return result
 
     return decorated_function
@@ -99,8 +99,8 @@ def get_usernames(use_cache=True, skip_modules=None):
         providers = get_providers_from_source_names(all_sources, skip_modules)
     results = call_modules_fn(providers, 'get_usernames')
     usernames = []
-    for r in results.values():
-        usernames += r
+    for result in results.values():
+        usernames += result
     usernames = list(set(usernames))
     return usernames
 
@@ -116,8 +116,8 @@ def get_workspaces(use_cache=True, skip_modules=None):
         providers = get_providers_from_source_names(all_sources, skip_modules)
     results = call_modules_fn(providers, 'get_workspaces')
     workspaces = []
-    for r in results.values():
-        workspaces += r
+    for response in results.values():
+        workspaces += response
     workspaces = list(set(workspaces))
     return workspaces
 
@@ -219,25 +219,25 @@ def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_cal
     if kwargs is None:
         kwargs = {}
 
-    fns = []
-    for m in modules:
-        fn = getattr(m, fn_name, None)
-        if fn is None:
+    functions = []
+    for module in modules:
+        func = getattr(module, fn_name, None)
+        if func is None:
             raise Exception(
-                f'Module {m.__name__} does not have {fn_name} method.')
-        if fn not in fns or not omit_duplicate_calls:
-            fns.append(fn)
+                f'Module {module.__name__} does not have {fn_name} method.')
+        if func not in functions or not omit_duplicate_calls:
+            functions.append(func)
 
     results = dict()
-    for fn in fns:
-        fullargspec = inspect.getfullargspec(fn)
+    for func in functions:
+        fullargspec = inspect.getfullargspec(func)
         fn_arg_names = fullargspec[0]
         final_kwargs = {
             k: v for k, v in kwargs.items()
             if k in fn_arg_names
         }
-        res = fn(*args, **final_kwargs)
-        results[inspect.getmodule(fn)] = res
+        res = func(*args, **final_kwargs)
+        results[inspect.getmodule(func)] = res
         if until is not None and until(res):
             return results
 
@@ -305,8 +305,8 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
     partial_infos = call_modules_fn(sources, info_method, [workspace, publ_name])
 
     result = {}
-    for pi in partial_infos.values():
-        result.update(pi)
+    for partial_info in partial_infos.values():
+        result.update(partial_info)
 
     if 'actor_name' in context and result:
         actor = context['actor_name']
@@ -368,13 +368,13 @@ def delete_publications(user,
             delete_publication_fn(user, publication)
             if is_chain_ready_fn(user, publication):
                 redis.unlock_publication(user, publ_type, publication)
-        except Exception as e:
+        except Exception as exc:
             try:
                 if is_chain_ready_fn(user, publication):
                     redis.unlock_publication(user, publ_type, publication)
             finally:
                 redis.unlock_publication(user, publ_type, publication)
-            raise e
+            raise exc
 
     infos = [
         {

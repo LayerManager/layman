@@ -13,7 +13,7 @@ from layman.layer.filesystem import input_chunk
 from layman import celery as celery_util
 from layman.common import tasks as tasks_util
 
-min_geojson = """
+MIN_GEOJSON = """
 {
   "type": "Feature",
   "geometry": null,
@@ -21,7 +21,7 @@ min_geojson = """
 }
 """
 
-num_layers_before_test = 0
+NUM_LAYERS_BEFORE_TEST = 0
 
 client = flask_client.client
 

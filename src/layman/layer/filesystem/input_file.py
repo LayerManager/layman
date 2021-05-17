@@ -80,17 +80,17 @@ def get_ogr_driver(main_filepath):
 
 def check_main_file(main_filepath):
     # check feature layers in source file
-    inDriver = get_ogr_driver(main_filepath)
-    inDataSource = inDriver.Open(main_filepath, 0)
-    n_layers = inDataSource.GetLayerCount()
+    in_driver = get_ogr_driver(main_filepath)
+    in_data_source = in_driver.Open(main_filepath, 0)
+    n_layers = in_data_source.GetLayerCount()
     if n_layers != 1:
         raise LaymanError(5, {'found': n_layers, 'expected': 1})
 
 
 def check_layer_crs(main_filepath):
-    inDriver = get_ogr_driver(main_filepath)
-    inDataSource = inDriver.Open(main_filepath, 0)
-    feature_layer = inDataSource.GetLayerByIndex(0)
+    in_driver = get_ogr_driver(main_filepath)
+    in_data_source = in_driver.Open(main_filepath, 0)
+    feature_layer = in_data_source.GetLayerByIndex(0)
 
     crs = feature_layer.GetSpatialRef()
     crs_auth_name = crs.GetAuthorityName(None)

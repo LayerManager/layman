@@ -53,26 +53,26 @@ def provide_map(client):
         file_paths = [
             'sample/layman.map/full.json',
         ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file_path in file_paths:
+            assert os.path.isfile(file_path)
         files = []
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
+            response = client.post(rest_path, data={
                 'file': files,
                 'name': mapname,
             })
-            assert rv.status_code == 200
+            assert response.status_code == 200
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
 
     wait_till_ready(username, mapname)
-    yield rv.get_json()[0]
+    yield response.get_json()[0]
     with app.app_context():
         rest_path = url_for('rest_workspace_map.delete_map', workspace=username, mapname=mapname)
-        rv = client.delete(rest_path)
-        assert rv.status_code == 200
+        response = client.delete(rest_path)
+        assert response.status_code == 200
 
 
 def patch_map(client):
@@ -83,19 +83,19 @@ def patch_map(client):
         file_paths = [
             'sample/layman.map/full.json',
         ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file_path in file_paths:
+            assert os.path.isfile(file_path)
         files = []
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.patch(rest_path, data={
+            response = client.patch(rest_path, data={
                 'file': files,
                 'title': 'patched map',
             })
-            assert rv.status_code == 200
+            assert response.status_code == 200
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
 
     wait_till_ready(username, mapname)
 
@@ -188,6 +188,6 @@ def test_public_metadata(provide_map):
     uuid = provide_map['uuid']
     muuid = get_metadata_uuid(uuid)
     micka_url = urljoin(settings.CSW_URL, "./")
-    r = requests.get(micka_url)
-    r.raise_for_status()
-    assert muuid in r.text, f"Metadata record {muuid} is not public!"
+    response = requests.get(micka_url)
+    response.raise_for_status()
+    assert muuid in response.text, f"Metadata record {muuid} is not public!"

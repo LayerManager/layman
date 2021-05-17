@@ -18,11 +18,11 @@ def test_get_layer_style_sld():
 
     with app.app_context():
         rest_url = url_for('rest_workspace_layer_style.get', workspace=username, layername=layername)
-    rv = requests.get(rest_url)
-    assert rv.status_code == 200, rv.text
+    response = requests.get(rest_url)
+    assert response.status_code == 200, response.text
     # lxml does not support importing from utf8 string
-    xml_tree = ET.fromstring(bytes(rv.text, encoding='utf8'))
-    assert ET.QName(xml_tree) == "{http://www.opengis.net/sld}StyledLayerDescriptor", rv.text
+    xml_tree = ET.fromstring(bytes(response.text, encoding='utf8'))
+    assert ET.QName(xml_tree) == "{http://www.opengis.net/sld}StyledLayerDescriptor", response.text
     process_client.delete_workspace_layer(username, layername)
 
 
@@ -39,12 +39,12 @@ def test_get_layer_style_qml():
 
     with app.app_context():
         rest_url = url_for('rest_workspace_layer_style.get', workspace=username, layername=layername)
-    rv = requests.get(rest_url)
-    assert rv.status_code == 200, rv.text
+    response = requests.get(rest_url)
+    assert response.status_code == 200, response.text
     # lxml does not support importing from utf8 string
-    xml_el = ET.fromstring(bytes(rv.text, encoding='utf8'))
-    assert ET.QName(xml_el), rv.text
-    assert ET.QName(xml_el) == "qgis", rv.text
-    assert len(xml_el.xpath('/qgis/renderer-v2')) == 1, rv.text
-    assert xml_el.attrib, rv.text
+    xml_el = ET.fromstring(bytes(response.text, encoding='utf8'))
+    assert ET.QName(xml_el), response.text
+    assert ET.QName(xml_el) == "qgis", response.text
+    assert len(xml_el.xpath('/qgis/renderer-v2')) == 1, response.text
+    assert xml_el.attrib, response.text
     process_client.delete_workspace_layer(username, layername)

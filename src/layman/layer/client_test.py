@@ -14,14 +14,14 @@ from layman.layer.filesystem import input_chunk
 from layman import settings, app
 
 
-username = 'testuser1'
-layername = 'country_chunks'
+USERNAME = 'testuser1'
+LAYERNAME = 'country_chunks'
 
 
 @pytest.fixture(scope="module")
 def clear_country_chunks():
     yield
-    process_client.delete_workspace_layer(username, layername, skip_404=True)
+    process_client.delete_workspace_layer(USERNAME, LAYERNAME, skip_404=True)
 
 
 @pytest.fixture(scope="module")
@@ -49,13 +49,13 @@ def test_post_layers_chunk(chrome):
         'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]))
-    for fp in file_paths:
-        assert os.path.isfile(fp)
+    for file_path in file_paths:
+        assert os.path.isfile(file_path)
 
     client_url = settings.LAYMAN_CLIENT_URL
 
-    r = requests.get(client_url)
-    assert r.status_code == 200
+    response = requests.get(client_url)
+    assert response.status_code == 200
 
     chrome.get(client_url)
     chrome.set_window_size(1000, 2000)
@@ -71,13 +71,13 @@ def test_post_layers_chunk(chrome):
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
-    user_input.send_keys(username)
+    user_input.send_keys(USERNAME)
 
     layername_input = chrome.find_elements_by_name('name')
     assert len(layername_input) == 1
     layername_input = layername_input[0]
     layername_input.clear()
-    layername_input.send_keys(layername)
+    layername_input.send_keys(LAYERNAME)
 
     file_input = chrome.find_elements_by_name('file')
     assert len(file_input) == 1
@@ -94,17 +94,17 @@ def test_post_layers_chunk(chrome):
     time.sleep(0.5)
 
     with app.app_context():
-        layer_url = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
-    r = requests.get(layer_url)
+        layer_url = url_for('rest_workspace_layer.get', workspace=USERNAME, layername=LAYERNAME)
+    response = requests.get(layer_url)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
     max_attempts = 20
     attempts = 1
-    while not (r.status_code == 200 and all(
-            'status' not in r.json()[k] for k in keys_to_check
+    while not (response.status_code == 200 and all(
+            'status' not in response.json()[k] for k in keys_to_check
     )):
         # print('waiting')
         time.sleep(0.5)
-        r = requests.get(layer_url)
+        response = requests.get(layer_url)
         attempts += 1
         if attempts > max_attempts:
             chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-2.5.png')
@@ -116,11 +116,11 @@ def test_post_layers_chunk(chrome):
     for entry in entries:
         # print(entry)
         assert entry['level'] == 'INFO' or (
-            entry['level'] == 'SEVERE' and entry['message'].startswith(f'{client_url}rest/workspaces/{username}/layers/{layername}/chunk?')
+            entry['level'] == 'SEVERE' and entry['message'].startswith(f'{client_url}rest/workspaces/{USERNAME}/layers/{LAYERNAME}/chunk?')
             and entry['message'].endswith(
                 'Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
-    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(username, layername)
+    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(USERNAME, LAYERNAME)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
 
 
@@ -134,14 +134,14 @@ def test_patch_layer_chunk(chrome):
     # file_paths = list(map(lambda fp: os.path.join(os.getcwd(), fp), [
     #     'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
     # ]))
-    for fp in file_paths:
-        print('fp', fp)
-        assert os.path.isfile(fp)
+    for file_path in file_paths:
+        print('fp', file_path)
+        assert os.path.isfile(file_path)
 
     client_url = settings.LAYMAN_CLIENT_URL
 
-    r = requests.get(client_url)
-    assert r.status_code == 200
+    response = requests.get(client_url)
+    assert response.status_code == 200
 
     chrome.get(client_url)
     chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-1.png')
@@ -156,13 +156,13 @@ def test_patch_layer_chunk(chrome):
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
-    user_input.send_keys(username)
+    user_input.send_keys(USERNAME)
 
     layername_input = chrome.find_elements_by_name('name')
     assert len(layername_input) == 1
     layername_input = layername_input[0]
     layername_input.clear()
-    layername_input.send_keys(layername)
+    layername_input.send_keys(LAYERNAME)
 
     file_input = chrome.find_elements_by_name('file')
     assert len(file_input) == 1
@@ -179,17 +179,17 @@ def test_patch_layer_chunk(chrome):
     time.sleep(0.5)
 
     with app.app_context():
-        layer_url = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
-    r = requests.get(layer_url)
+        layer_url = url_for('rest_workspace_layer.get', workspace=USERNAME, layername=LAYERNAME)
+    response = requests.get(layer_url)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
     max_attempts = 20
     attempts = 1
-    while not (r.status_code == 200 and all(
-            'status' not in r.json()[k] for k in keys_to_check
+    while not (response.status_code == 200 and all(
+            'status' not in response.json()[k] for k in keys_to_check
     )):
         # print('waiting')
         time.sleep(0.5)
-        r = requests.get(layer_url)
+        response = requests.get(layer_url)
         attempts += 1
         if attempts > max_attempts:
             chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.5.png')
@@ -203,8 +203,8 @@ def test_patch_layer_chunk(chrome):
         assert entry['level'] == 'INFO' or (
             entry['level'] == 'SEVERE'
             and entry['message'].startswith(
-                f'{client_url}rest/{settings.REST_WORKSPACES_PREFIX}/{username}/layers/{layername}/chunk?'
+                f'{client_url}rest/{settings.REST_WORKSPACES_PREFIX}/{USERNAME}/layers/{LAYERNAME}/chunk?'
             ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
-    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(username, layername)
+    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(USERNAME, LAYERNAME)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)

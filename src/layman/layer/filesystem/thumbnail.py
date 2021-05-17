@@ -82,9 +82,9 @@ def generate_layer_thumbnail(workspace, layername):
     # out.close()
 
     from layman.layer.geoserver.wms import VERSION
-    r = gs_util.get_layer_thumbnail(wms_url, layername, tn_bbox, headers=headers, wms_version=VERSION)
-    if "png" not in r.headers['content-type'].lower():
-        raise LaymanError("Thumbnail rendering failed", data=r.content)
-    r.raise_for_status()
+    response = gs_util.get_layer_thumbnail(wms_url, layername, tn_bbox, headers=headers, wms_version=VERSION)
+    if "png" not in response.headers['content-type'].lower():
+        raise LaymanError("Thumbnail rendering failed", data=response.content)
+    response.raise_for_status()
     with open(tn_path, "wb") as out_file:
-        out_file.write(r.content)
+        out_file.write(response.content)

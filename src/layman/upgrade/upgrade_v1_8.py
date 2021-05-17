@@ -40,13 +40,13 @@ def upgrade_1_8():
             }
 
             for type in ['w', 'r']:
-                r = requests.delete(
+                response = requests.delete(
                     urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, username + '.*.' + type),
                     headers=headers_json,
                     auth=settings.LAYMAN_GS_AUTH
                 )
-                if r.status_code != 404:
-                    r.raise_for_status()
+                if response.status_code != 404:
+                    response.raise_for_status()
 
         # Create rules for publications/layers
         for username in all_usernames:

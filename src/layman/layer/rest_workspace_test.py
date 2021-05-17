@@ -55,7 +55,7 @@ METADATA_PROPERTIES = {
 
 METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES
 
-min_geojson = """
+MIN_GEOJSON = """
 {
   "type": "Feature",
   "geometry": null,
@@ -63,27 +63,27 @@ min_geojson = """
 }
 """
 
-num_layers_before_test = 0
+num_layers_before_test = 0  # pylint: disable=invalid-name
 
 
 def check_metadata(client, username, layername, props_equal, expected_values):
     with app.app_context():
         rest_path = url_for('rest_workspace_layer_metadata_comparison.get', workspace=username, layername=layername)
-        rv = client.get(rest_path)
-        assert rv.status_code == 200, rv.get_json()
-        resp_json = rv.get_json()
+        response = client.get(rest_path)
+        assert response.status_code == 200, response.get_json()
+        resp_json = response.get_json()
         assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
-        for k, v in resp_json['metadata_properties'].items():
-            assert v['equal_or_null'] == (
-                k in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
-            assert v['equal'] == (
-                k in props_equal), f"Metadata property values have unexpected 'equal' value: {k}: {json.dumps(v, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+        for key, value in resp_json['metadata_properties'].items():
+            assert value['equal_or_null'] == (
+                key in props_equal), f"Metadata property values have unexpected 'equal_or_null' value: {key}: {json.dumps(value, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
+            assert value['equal'] == (
+                key in props_equal), f"Metadata property values have unexpected 'equal' value: {key}: {json.dumps(value, indent=2)}, sources: {json.dumps(resp_json['metadata_sources'], indent=2)}"
             # print(f"'{k}': {json.dumps(list(v['values'].values())[0], indent=2)},")
-            if k in expected_values:
-                vals = list(v['values'].values())
-                vals.append(expected_values[k])
-                assert prop_equals_strict(vals, equals_fn=PROPERTIES[k].get('equals_fn',
-                                                                            None)), f"Property {k} has unexpected values {json.dumps(v, indent=2)}"
+            if key in expected_values:
+                vals = list(value['values'].values())
+                vals.append(expected_values[key])
+                assert prop_equals_strict(vals, equals_fn=PROPERTIES[key].get('equals_fn',
+                                                                              None)), f"Property {key} has unexpected values {json.dumps(value, indent=2)}"
 
 
 @pytest.fixture(scope="module")
@@ -99,7 +99,7 @@ def client():
     # print('before app.app_context()')
     with app.app_context():
         publs_by_type = uuid.check_redis_consistency()
-        global num_layers_before_test
+        global num_layers_before_test  # pylint: disable=invalid-name
         num_layers_before_test = len(publs_by_type[LAYER_TYPE])
     yield client
 
@@ -114,11 +114,11 @@ def app_context():
 def test_wrong_value_of_user(client):
     usernames = [' ', '2a', 'ě', ';', '?', 'ABC']
     for username in usernames:
-        rv = client.post(url_for('rest_workspace_layers.post', workspace=username))
-        resp_json = rv.get_json()
+        response = client.post(url_for('rest_workspace_layers.post', workspace=username))
+        resp_json = response.get_json()
         # print('username', username)
         # print(resp_json)
-        assert rv.status_code == 400
+        assert response.status_code == 400
         assert resp_json['code'] == 2
         assert resp_json['detail']['parameter'] == 'user'
 
@@ -136,21 +136,21 @@ def test_layman_gs_user_conflict(client):
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
     ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
+    for file_path in file_paths:
+        assert os.path.isfile(file_path)
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
+        response = client.post(rest_path, data={
             'file': files,
             'name': layername,
         })
-        resp_json = rv.get_json()
-        assert rv.status_code == 409
+        resp_json = response.get_json()
+        assert response.status_code == 409
         assert resp_json['code'] == 41
     finally:
-        for fp in files:
-            fp[0].close()
+        for file_path in files:
+            file_path[0].close()
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -163,18 +163,18 @@ def test_wrong_value_of_layername(client):
     layernames = [' ', '2a', 'ě', ';', '?', 'ABC']
     for layername in layernames:
         with app.app_context():
-            rv = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername))
-        resp_json = rv.get_json()
-        assert rv.status_code == 400, resp_json
+            response = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername))
+        resp_json = response.get_json()
+        assert response.status_code == 400, resp_json
         assert resp_json['code'] == 2
         assert resp_json['detail']['parameter'] == 'layername'
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_no_file(client):
-    rv = client.post(url_for('rest_workspace_layers.post', workspace='testuser1'))
-    assert rv.status_code == 400
-    resp_json = rv.get_json()
+    response = client.post(url_for('rest_workspace_layers.post', workspace='testuser1'))
+    assert response.status_code == 400
+    resp_json = response.get_json()
     # print('resp_json', resp_json)
     assert resp_json['code'] == 1
     assert resp_json['detail']['parameter'] == 'file'
@@ -184,9 +184,9 @@ def test_no_file(client):
 def test_username_schema_conflict(client):
     if len(settings.PG_NON_USER_SCHEMAS) == 0:
         return
-    rv = client.post(url_for('rest_workspace_layers.post', workspace=settings.PG_NON_USER_SCHEMAS[0]))
-    assert rv.status_code == 409
-    resp_json = rv.get_json()
+    response = client.post(url_for('rest_workspace_layers.post', workspace=settings.PG_NON_USER_SCHEMAS[0]))
+    assert response.status_code == 409
+    resp_json = response.get_json()
     # print(resp_json)
     assert resp_json['code'] == 35
     assert resp_json['detail']['reserved_by'] == db.__name__
@@ -196,14 +196,14 @@ def test_username_schema_conflict(client):
         'pg_toast',
         'information_schema',
     ]:
-        rv = client.post(url_for('rest_workspace_layers.post', workspace=schema_name), data={
+        response = client.post(url_for('rest_workspace_layers.post', workspace=schema_name), data={
             'file': [
-                (io.BytesIO(min_geojson.encode()), '/file.geojson')
+                (io.BytesIO(MIN_GEOJSON.encode()), '/file.geojson')
             ]
         })
-        resp_json = rv.get_json()
+        resp_json = response.get_json()
         # print(resp_json)
-        assert rv.status_code == 409
+        assert response.status_code == 409
         assert resp_json['code'] == 35
         assert resp_json['detail']['reserved_by'] == db.__name__
 
@@ -213,21 +213,21 @@ def test_layername_db_object_conflict(client):
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
+    for file_path in file_paths:
+        assert os.path.isfile(file_path)
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(url_for('rest_workspace_layers.post', workspace='testuser1'), data={
+        response = client.post(url_for('rest_workspace_layers.post', workspace='testuser1'), data={
             'file': files,
             'name': 'spatial_ref_sys',
         })
-        assert rv.status_code == 409
-        resp_json = rv.get_json()
+        assert response.status_code == 409
+        resp_json = response.get_json()
         assert resp_json['code'] == 9
     finally:
-        for fp in files:
-            fp[0].close()
+        for file_path in files:
+            file_path[0].close()
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
@@ -237,8 +237,8 @@ def test_get_layers_testuser1_v1(client):
     # publish and delete layer to ensure that username exists
     flask_client.publish_layer(username, layername, client)
     flask_client.delete_layer(username, layername, client)
-    rv = client.get(url_for('rest_workspace_layers.get', workspace=username))
-    assert rv.status_code == 200, rv.get_json()
+    response = client.get(url_for('rest_workspace_layers.get', workspace=username))
+    assert response.status_code == 200, response.get_json()
     # assert len(resp_json) == 0
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 0
@@ -254,18 +254,18 @@ def test_post_layers_simple(client):
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
         ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file_path in file_paths:
+            assert os.path.isfile(file_path)
         files = []
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
+            response = client.post(rest_path, data={
                 'file': files,
             })
-            assert rv.status_code == 200
+            assert response.status_code == 200
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
 
         layername = 'ne_110m_admin_0_countries'
 
@@ -298,8 +298,8 @@ def test_post_layers_simple(client):
             get_layer_type_def()['type'], username, layername)
         assert os.path.isfile(uuid_filename)
         uuid_str = None
-        with open(uuid_filename, "r") as f:
-            uuid_str = f.read().strip()
+        with open(uuid_filename, "r") as file:
+            uuid_str = file.read().strip()
         assert uuid.is_valid_uuid(uuid_str)
         assert settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
         assert settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
@@ -319,9 +319,9 @@ def test_post_layers_simple(client):
         assert 'id' not in layer_info.keys()
         assert 'type' not in layer_info.keys()
 
-        r = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
-        r.raise_for_status()
-        assert layername in r.text
+        response = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
+        response.raise_for_status()
+        assert layername in response.text
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': num_layers_before_test + 1
@@ -356,35 +356,35 @@ def test_post_layers_concurrent(client):
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
+    for file_path in file_paths:
+        assert os.path.isfile(file_path)
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
+        response = client.post(rest_path, data={
             'file': files,
             'name': layername,
         })
-        assert rv.status_code == 200
+        assert response.status_code == 200
     finally:
-        for fp in files:
-            fp[0].close()
+        for file_path in files:
+            file_path[0].close()
 
     chain_info = util._get_layer_chain(username, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
 
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
+        response = client.post(rest_path, data={
             'file': files,
             'name': layername,
         })
-        assert rv.status_code == 409
-        resp_json = rv.get_json()
+        assert response.status_code == 409
+        resp_json = response.get_json()
         assert resp_json['code'] == 17
     finally:
-        for fp in files:
-            fp[0].close()
+        for file_path in files:
+            file_path[0].close()
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 2
     })
@@ -399,24 +399,24 @@ def test_post_layers_shp_missing_extensions(client):
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp',
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.VERSION.txt',
     ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
+    for file_path in file_paths:
+        assert os.path.isfile(file_path)
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
+        response = client.post(rest_path, data={
             'file': files,
             'name': 'ne_110m_admin_0_countries_shp',
         })
-        resp_json = rv.get_json()
+        resp_json = response.get_json()
         # print(resp_json)
-        assert rv.status_code == 400
+        assert response.status_code == 400
         assert resp_json['code'] == 18
         assert sorted(resp_json['detail']['missing_extensions']) == [
             '.prj', '.shx']
     finally:
-        for fp in files:
-            fp[0].close()
+        for file_path in files:
+            file_path[0].close()
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 2
     })
@@ -436,19 +436,19 @@ def test_post_layers_shp(client):
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shx',
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.VERSION.txt',
     ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
+    for file_path in file_paths:
+        assert os.path.isfile(file_path)
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
+        response = client.post(rest_path, data={
             'file': files,
             'name': layername,
         })
-        assert rv.status_code == 200
+        assert response.status_code == 200
     finally:
-        for fp in files:
-            fp[0].close()
+        for file_path in files:
+            file_path[0].close()
 
     chain_info = util._get_layer_chain(username, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
@@ -467,8 +467,8 @@ def test_post_layers_shp(client):
     xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values,
                                                                                 csw.METADATA_PROPERTIES)
     expected_path = 'src/layman/layer/rest_test_filled_template.xml'
-    with open(expected_path) as f:
-        expected_lines = f.readlines()
+    with open(expected_path) as file:
+        expected_lines = file.readlines()
     diff_lines = list(difflib.unified_diff([line.decode('utf-8') for line in xml_file_object.readlines()], expected_lines))
     plus_lines = [line for line in diff_lines if line.startswith('+ ')]
     assert len(plus_lines) == 3, ''.join(diff_lines)
@@ -499,20 +499,20 @@ def test_post_layers_layer_exists(client):
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
+    for file_path in file_paths:
+        assert os.path.isfile(file_path)
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
+        response = client.post(rest_path, data={
             'file': files,
         })
-        assert rv.status_code == 409
-        resp_json = rv.get_json()
+        assert response.status_code == 409
+        resp_json = response.get_json()
         assert resp_json['code'] == 17
     finally:
-        for fp in files:
-            fp[0].close()
+        for file_path in files:
+            file_path[0].close()
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 3
     })
@@ -526,28 +526,28 @@ def test_post_layers_complex(client):
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
         ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file_path in file_paths:
+            assert os.path.isfile(file_path)
         files = []
         sld_path = 'sample/style/generic-blue_sld.xml'
         assert os.path.isfile(sld_path)
         layername = ''
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
+            response = client.post(rest_path, data={
                 'file': files,
                 'name': 'countries',
                 'title': 'staty',
                 'description': 'popis států',
                 'style': (open(sld_path, 'rb'), os.path.basename(sld_path)),
             })
-            assert rv.status_code == 200
-            resp_json = rv.get_json()
+            assert response.status_code == 200
+            resp_json = response.get_json()
             # print(resp_json)
             layername = resp_json[0]['name']
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
 
         chain_info = util._get_layer_chain(username, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
@@ -564,9 +564,9 @@ def test_post_layers_complex(client):
 
         assert layername != ''
         rest_path = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
-        rv = client.get(rest_path)
-        assert 200 <= rv.status_code < 300
-        resp_json = rv.get_json()
+        response = client.get(rest_path)
+        assert 200 <= response.status_code < 300
+        resp_json = response.get_json()
         # print(resp_json)
         assert resp_json['title'] == 'staty'
         assert resp_json['description'] == 'popis států'
@@ -581,11 +581,11 @@ def test_post_layers_complex(client):
             assert 'status' not in resp_json[source]
 
         style_url = geoserver_sld.get_workspace_style_url(username, layername)
-        r = requests.get(style_url + '.sld',
-                         auth=settings.LAYMAN_GS_AUTH
-                         )
-        r.raise_for_status()
-        sld_file = io.BytesIO(r.content)
+        response = requests.get(style_url + '.sld',
+                                auth=settings.LAYMAN_GS_AUTH
+                                )
+        response.raise_for_status()
+        sld_file = io.BytesIO(response.content)
         tree = ET.parse(sld_file)
         root = tree.getroot()
         assert root.attrib['version'] == '1.0.0'
@@ -628,25 +628,25 @@ def test_uppercase_attr(client):
         file_paths = [
             'sample/data/upper_attr.geojson',
         ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file_path in file_paths:
+            assert os.path.isfile(file_path)
         files = []
         sld_path = 'sample/data/upper_attr.sld'
         assert os.path.isfile(sld_path)
         layername = 'upper_attr'
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
+            response = client.post(rest_path, data={
                 'file': files,
                 'name': layername,
                 'style': (open(sld_path, 'rb'), os.path.basename(sld_path)),
             })
-            assert rv.status_code == 200
-            resp_json = rv.get_json()
+            assert response.status_code == 200
+            resp_json = response.get_json()
             # print(resp_json)
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
 
         chain_info = util._get_layer_chain(username, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
@@ -656,9 +656,9 @@ def test_uppercase_attr(client):
 
     with app.app_context():
         rest_path = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
-        rv = client.get(rest_path)
-        assert 200 <= rv.status_code < 300
-        resp_json = rv.get_json()
+        response = client.get(rest_path)
+        assert 200 <= response.status_code < 300
+        resp_json = response.get_json()
         # print(resp_json)
         for source in [
             'wms',
@@ -671,11 +671,11 @@ def test_uppercase_attr(client):
             assert 'status' not in resp_json[source], f"{source}: {resp_json[source]}"
 
         style_url = geoserver_sld.get_workspace_style_url(username, layername)
-        r = requests.get(style_url + '.sld',
-                         auth=settings.LAYMAN_GS_AUTH
-                         )
-        r.raise_for_status()
-        sld_file = io.BytesIO(r.content)
+        response = requests.get(style_url + '.sld',
+                                auth=settings.LAYMAN_GS_AUTH
+                                )
+        response.raise_for_status()
+        sld_file = io.BytesIO(response.content)
         tree = ET.parse(sld_file)
         root = tree.getroot()
         assert root.attrib['version'] == '1.0.0'
@@ -695,8 +695,8 @@ def test_uppercase_attr(client):
 
     with app.app_context():
         rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
-        rv = client.delete(rest_path)
-        assert 200 <= rv.status_code < 300
+        response = client.delete(rest_path)
+        assert 200 <= response.status_code < 300
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': num_layers_before_test + 4
@@ -709,22 +709,22 @@ def test_get_layers_testuser1_v2(client):
     layer1 = 'countries_concurrent'
     layer2 = 'ne_110m_admin_0_countries'
     layer3 = 'ne_110m_admin_0_countries_shp'
-    rv = client.get(url_for('rest_workspace_layers.get', workspace=username))
-    assert rv.status_code == 200
-    resp_json = rv.get_json()
+    response = client.get(url_for('rest_workspace_layers.get', workspace=username))
+    assert response.status_code == 200
+    resp_json = response.get_json()
     # assert len(resp_json) == 3
     layernames = [layer['name'] for layer in resp_json]
-    for ln in [
+    for layer in [
         layer1,
         layer2,
         layer3,
     ]:
-        assert ln in layernames
+        assert layer in layernames
 
     username = 'testuser2'
-    rv = client.get(url_for('rest_workspace_layers.get', workspace=username))
-    resp_json = rv.get_json()
-    assert rv.status_code == 200
+    response = client.get(url_for('rest_workspace_layers.get', workspace=username))
+    resp_json = response.get_json()
+    assert response.status_code == 200
     assert len(resp_json) == 1
     assert resp_json[0]['name'] == 'countries'
 
@@ -741,16 +741,16 @@ def test_patch_layer_title(client):
         rest_path = url_for('rest_workspace_layer.patch', workspace=username, layername=layername)
         new_title = "New Title of Countries"
         new_description = "and new description"
-        rv = client.patch(rest_path, data={
+        response = client.patch(rest_path, data={
             'title': new_title,
             'description': new_description,
         })
-        assert rv.status_code == 200, rv.get_json()
+        assert response.status_code == 200, response.get_json()
 
         chain_info = util._get_layer_chain(username, layername)
         assert chain_info is not None and celery_util.is_chain_ready(chain_info)
 
-        resp_json = rv.get_json()
+        resp_json = response.get_json()
         assert resp_json['title'] == new_title
         assert resp_json['description'] == new_description
 
@@ -788,11 +788,11 @@ def test_patch_layer_style(client):
         rest_path = url_for('rest_workspace_layer.patch', workspace=username, layername=layername)
         sld_path = 'sample/style/generic-blue_sld.xml'
         assert os.path.isfile(sld_path)
-        rv = client.patch(rest_path, data={
+        response = client.patch(rest_path, data={
             'style': (open(sld_path, 'rb'), os.path.basename(sld_path)),
             'title': 'countries in blue'
         })
-        assert rv.status_code == 200
+        assert response.status_code == 200
 
         # last_task = util._get_layer_task(username, layername)
 
@@ -807,7 +807,7 @@ def test_patch_layer_style(client):
         flask_client.wait_till_layer_ready(username, layername)
         # last_task['last'].get()
 
-        resp_json = rv.get_json()
+        resp_json = response.get_json()
         assert resp_json['title'] == "countries in blue"
 
         wms_url = geoserver_wms.get_wms_url(username)
@@ -850,25 +850,25 @@ def test_post_layers_sld_1_1_0(client):
     file_paths = [
         'sample/data/test_layer4.geojson',
     ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
+    for file_path in file_paths:
+        assert os.path.isfile(file_path)
     files = []
     sld_path = 'sample/style/sld_1_1_0.xml'
     assert os.path.isfile(sld_path)
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
+        response = client.post(rest_path, data={
             'file': files,
             'name': layername,
             'style': (open(sld_path, 'rb'), os.path.basename(sld_path)),
         })
-        assert rv.status_code == 200
-        resp_json = rv.get_json()
+        assert response.status_code == 200
+        resp_json = response.get_json()
         # print(resp_json)
         assert layername == resp_json[0]['name']
     finally:
-        for fp in files:
-            fp[0].close()
+        for file_path in files:
+            file_path[0].close()
 
     layer_info = util.get_layer_info(username, layername)
     while ('status' in layer_info['wms'] and layer_info['wms']['status'] in ['PENDING', 'STARTED'])\
@@ -882,11 +882,11 @@ def test_post_layers_sld_1_1_0(client):
     assert wms[layername].title == 'countries_sld_1_1_0'
 
     style_url = geoserver_sld.get_workspace_style_url(username, layername)
-    r = requests.get(style_url + '.sld',
-                     auth=settings.LAYMAN_GS_AUTH
-                     )
-    r.raise_for_status()
-    sld_file = io.BytesIO(r.content)
+    response = requests.get(style_url + '.sld',
+                            auth=settings.LAYMAN_GS_AUTH
+                            )
+    response.raise_for_status()
+    sld_file = io.BytesIO(response.content)
     tree = ET.parse(sld_file)
     root = tree.getroot()
     # for some reason, GeoServer REST API in 2.13.0 transforms SLD 1.1.0 to 1.0.0
@@ -902,8 +902,8 @@ def test_post_layers_sld_1_1_0(client):
     })
 
     rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
-    rv = client.delete(rest_path)
-    assert rv.status_code == 200
+    response = client.delete(rest_path)
+    assert response.status_code == 200
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 4
     })
@@ -918,24 +918,24 @@ def test_patch_layer_data(client):
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
         ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file_path in file_paths:
+            assert os.path.isfile(file_path)
         files = []
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
                      file_paths]
-            rv = client.patch(rest_path, data={
+            response = client.patch(rest_path, data={
                 'file': files,
                 'title': 'populated places'
             })
-            assert rv.status_code == 200
+            assert response.status_code == 200
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
 
         chain_info = util._get_layer_chain(username, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
-        resp_json = rv.get_json()
+        resp_json = response.get_json()
         keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
         for key_to_check in keys_to_check:
             assert 'status' in resp_json[key_to_check]
@@ -944,10 +944,10 @@ def test_patch_layer_data(client):
 
     with app.app_context():
         rest_path = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
-        rv = client.get(rest_path)
-        assert 200 <= rv.status_code < 300
+        response = client.get(rest_path)
+        assert 200 <= response.status_code < 300
 
-        resp_json = rv.get_json()
+        resp_json = response.get_json()
         assert resp_json['title'] == "populated places"
         feature_type = get_feature_type(username, 'postgresql', layername)
         attributes = feature_type['attributes']['attribute']
@@ -991,8 +991,8 @@ def test_patch_layer_concurrent_and_delete_it(client):
         file_paths = [
             'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
         ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file_path in file_paths:
+            assert os.path.isfile(file_path)
 
         uuid_str = layer_uuid.get_layer_uuid(username, layername)
         assert uuid.is_valid_uuid(uuid_str)
@@ -1001,14 +1001,14 @@ def test_patch_layer_concurrent_and_delete_it(client):
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
                      file_paths]
-            rv = client.patch(rest_path, data={
+            response = client.patch(rest_path, data={
                 'file': files,
                 'title': 'populated places'
             })
-            assert rv.status_code == 200
+            assert response.status_code == 200
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': num_layers_before_test + 4
         })
@@ -1020,23 +1020,23 @@ def test_patch_layer_concurrent_and_delete_it(client):
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
                      file_paths]
-            rv = client.patch(rest_path, data={
+            response = client.patch(rest_path, data={
                 'file': files,
             })
-            assert rv.status_code == 400, rv.get_json()
-            resp_json = rv.get_json()
+            assert response.status_code == 400, response.get_json()
+            resp_json = response.get_json()
             assert resp_json['code'] == 19
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': num_layers_before_test + 4
         })
 
     with app.app_context():
         rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
-        rv = client.delete(rest_path)
-        assert rv.status_code == 200
+        response = client.delete(rest_path)
+        assert response.status_code == 200
 
         from layman.layer import get_layer_type_def
         from layman.common.filesystem import uuid as common_uuid
@@ -1061,18 +1061,18 @@ def test_post_layers_long_and_delete_it(client):
     file_paths = [
         'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
     ]
-    for fp in file_paths:
-        assert os.path.isfile(fp)
+    for file_path in file_paths:
+        assert os.path.isfile(file_path)
     files = []
     try:
         files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        rv = client.post(rest_path, data={
+        response = client.post(rest_path, data={
             'file': files,
         })
-        assert rv.status_code == 200
+        assert response.status_code == 200
     finally:
-        for fp in files:
-            fp[0].close()
+        for file_path in files:
+            file_path[0].close()
 
     layername = 'ne_10m_admin_0_countries'
 
@@ -1086,11 +1086,11 @@ def test_post_layers_long_and_delete_it(client):
         assert 'status' in layer_info[key_to_check]
 
     rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
-    rv = client.delete(rest_path)
-    assert rv.status_code == 200
-    rv = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername))
+    response = client.delete(rest_path)
+    assert response.status_code == 200
+    response = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername))
     # print(resp_json)
-    assert rv.status_code == 404
+    assert response.status_code == 404
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 3
     })
@@ -1101,16 +1101,16 @@ def test_delete_layer(client):
     username = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
     rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
-    rv = client.delete(rest_path)
-    assert rv.status_code == 200
+    response = client.delete(rest_path)
+    assert response.status_code == 200
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 2
     })
 
     rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
-    rv = client.delete(rest_path)
-    assert rv.status_code == 404
-    resp_json = rv.get_json()
+    response = client.delete(rest_path)
+    assert response.status_code == 404
+    resp_json = response.get_json()
     assert resp_json['code'] == 15
 
 
@@ -1141,9 +1141,9 @@ def test_post_layers_zero_length_attribute():
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_get_layers_testuser2(client):
     username = 'testuser2'
-    rv = client.get(url_for('rest_workspace_layers.get', workspace=username))
-    assert rv.status_code == 200
-    resp_json = rv.get_json()
+    response = client.get(url_for('rest_workspace_layers.get', workspace=username))
+    assert response.status_code == 200
+    resp_json = response.get_json()
     assert len(resp_json) == 0
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': num_layers_before_test + 2
@@ -1175,33 +1175,33 @@ def test_layer_with_different_geometry():
 
     data_xml = data_wfs.get_wfs20_insert_points(username, layername)
 
-    r = requests.post(url_path_ows,
-                      data=data_xml,
-                      headers=headers_wfs,
-                      auth=settings.LAYMAN_GS_AUTH
-                      )
-    r.raise_for_status()
+    response = requests.post(url_path_ows,
+                             data=data_xml,
+                             headers=headers_wfs,
+                             auth=settings.LAYMAN_GS_AUTH
+                             )
+    response.raise_for_status()
 
-    r = requests.post(url_path_wfs,
-                      data=data_xml,
-                      headers=headers_wfs,
-                      auth=settings.LAYMAN_GS_AUTH
-                      )
-    assert r.status_code == 200, f"HTTP Error {r.status_code}\n{r.text}"
+    response = requests.post(url_path_wfs,
+                             data=data_xml,
+                             headers=headers_wfs,
+                             auth=settings.LAYMAN_GS_AUTH
+                             )
+    assert response.status_code == 200, f"HTTP Error {response.status_code}\n{response.text}"
 
     data_xml2 = data_wfs.get_wfs20_insert_lines(username, layername)
 
-    r = requests.post(url_path_ows,
-                      data=data_xml2,
-                      headers=headers_wfs,
-                      auth=settings.LAYMAN_GS_AUTH
-                      )
-    assert r.status_code == 200, f"HTTP Error {r.status_code}\n{r.text}"
+    response = requests.post(url_path_ows,
+                             data=data_xml2,
+                             headers=headers_wfs,
+                             auth=settings.LAYMAN_GS_AUTH
+                             )
+    assert response.status_code == 200, f"HTTP Error {response.status_code}\n{response.text}"
 
-    r = requests.post(url_path_wfs,
-                      data=data_xml2,
-                      headers=headers_wfs,
-                      auth=settings.LAYMAN_GS_AUTH
-                      )
-    assert r.status_code == 200, f"HTTP Error {r.status_code}\n{r.text}"
+    response = requests.post(url_path_wfs,
+                             data=data_xml2,
+                             headers=headers_wfs,
+                             auth=settings.LAYMAN_GS_AUTH
+                             )
+    assert response.status_code == 200, f"HTTP Error {response.status_code}\n{response.text}"
     process_client.delete_workspace_layer(username, layername)

@@ -91,13 +91,13 @@ where p.type = %s
             logger.warning(f'        Layer DB table not available, not migrating.')
             continue
 
-        r = requests.get(
+        response = requests.get(
             urljoin(GS_REST_WORKSPACES,
                     geoserver_workspace + '/layers/' + layer),
             auth=settings.LAYMAN_GS_AUTH,
             timeout=5,
         )
-        if r.status_code == 404:
+        if response.status_code == 404:
             geoserver.publish_layer_from_db(workspace,
                                             layer,
                                             info.get('description'),
@@ -106,7 +106,7 @@ where p.type = %s
                                             geoserver_workspace=geoserver_workspace)
             wms.clear_cache(workspace)
         else:
-            r.raise_for_status()
+            response.raise_for_status()
             logger.info(f'        Layer already migrated.')
 
         sld_wms_r = gs_util.get_workspace_style_response(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH)

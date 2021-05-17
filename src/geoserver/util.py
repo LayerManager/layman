@@ -52,13 +52,13 @@ DEFAULT_DB_STORE_NAME = 'postgresql'
 
 def get_roles(auth):
     r_url = GS_REST_ROLES
-    r = requests.get(r_url,
-                     headers=headers_json,
-                     auth=auth,
-                     timeout=5,
-                     )
-    r.raise_for_status()
-    return r.json()['roleNames']
+    response = requests.get(r_url,
+                            headers=headers_json,
+                            auth=auth,
+                            timeout=5,
+                            )
+    response.raise_for_status()
+    return response.json()['roleNames']
 
 
 def ensure_role(role, auth):
@@ -66,13 +66,13 @@ def ensure_role(role, auth):
     role_exists = role in roles
     if not role_exists:
         logger.info(f"Role {role} does not exist yet, creating.")
-        r = requests.post(
+        response = requests.post(
             urljoin(GS_REST_ROLES, 'role/' + role),
             headers=headers_json,
             auth=auth,
             timeout=5,
         )
-        r.raise_for_status()
+        response.raise_for_status()
     else:
         logger.info(f"Role {role} already exists")
     role_created = not role_exists
@@ -80,29 +80,29 @@ def ensure_role(role, auth):
 
 
 def delete_role(role, auth):
-    r = requests.delete(
+    response = requests.delete(
         urljoin(GS_REST_ROLES, 'role/' + role),
         headers=headers_json,
         auth=auth,
         timeout=5,
     )
-    role_not_exists = r.status_code == 404
+    role_not_exists = response.status_code == 404
     if not role_not_exists:
-        r.raise_for_status()
+        response.raise_for_status()
     role_deleted = not role_not_exists
     return role_deleted
 
 
 def get_usernames(auth):
     r_url = GS_REST_USERS
-    r = requests.get(r_url,
-                     headers=headers_json,
-                     auth=auth,
-                     timeout=5,
-                     )
-    r.raise_for_status()
+    response = requests.get(r_url,
+                            headers=headers_json,
+                            auth=auth,
+                            timeout=5,
+                            )
+    response.raise_for_status()
     # logger.info(f"users={r.text}")
-    usernames = [u['userName'] for u in r.json()['users']]
+    usernames = [u['userName'] for u in response.json()['users']]
     return usernames
 
 
@@ -117,7 +117,7 @@ def ensure_user(user, password, auth):
             password = ''.join(secrets.choice(string.ascii_lowercase + string.digits) for _ in range(32))
             # we usually don't want to log passwords
             # logger.info(f"User {user}'s automatically generated password is {password}")
-        r = requests.post(
+        response = requests.post(
             GS_REST_USERS,
             # https://osgeo-org.atlassian.net/browse/GEOS-8486
             # seems as it's not fixed in 2.13.0
@@ -132,7 +132,7 @@ def ensure_user(user, password, auth):
             auth=auth,
             timeout=5,
         )
-        r.raise_for_status()
+        response.raise_for_status()
     else:
         logger.info(f"User {user} already exists")
     user_created = not user_exists
@@ -144,14 +144,14 @@ def get_workspace_security_roles(workspace, type, auth):
 
 
 def get_security_roles(rule, auth):
-    r = requests.get(
+    response = requests.get(
         GS_REST_SECURITY_ACL_LAYERS,
         headers=headers_json,
         auth=auth,
         timeout=5,
     )
-    r.raise_for_status()
-    rules = r.json()
+    response.raise_for_status()
+    rules = response.json()
     try:
         roles_string = rules[rule]
         roles = set(roles_string.split(','))
@@ -164,7 +164,7 @@ def ensure_security_roles(rule, roles, auth):
     roles_str = ', '.join(roles)
 
     logger.info(f"Ensure_security_roles rule={rule}, roles={roles}, roles_str={roles_str}")
-    r = requests.delete(
+    response = requests.delete(
         urljoin(GS_REST_SECURITY_ACL_LAYERS, rule),
         data=json.dumps(
             {rule: roles_str}),
@@ -172,10 +172,10 @@ def ensure_security_roles(rule, roles, auth):
         auth=auth,
         timeout=5,
     )
-    if r.status_code != 404:
-        r.raise_for_status()
+    if response.status_code != 404:
+        response.raise_for_status()
 
-    r = requests.post(
+    response = requests.post(
         GS_REST_SECURITY_ACL_LAYERS,
         data=json.dumps(
             {rule: roles_str}),
@@ -183,7 +183,7 @@ def ensure_security_roles(rule, roles, auth):
         auth=auth,
         timeout=5,
     )
-    r.raise_for_status()
+    response.raise_for_status()
 
 
 def ensure_workspace_security_roles(workspace, roles, type, auth):
@@ -197,7 +197,7 @@ def ensure_layer_security_roles(workspace, layername, roles, type, auth):
 
 
 def delete_feature_type(geoserver_workspace, feature_type_name, auth):
-    r = requests.delete(
+    response = requests.delete(
         urljoin(GS_REST_WORKSPACES,
                 geoserver_workspace + f'/datastores/{DEFAULT_DB_STORE_NAME}/featuretypes/' + feature_type_name),
         headers=headers_json,
@@ -207,8 +207,8 @@ def delete_feature_type(geoserver_workspace, feature_type_name, auth):
         },
         timeout=5,
     )
-    if r.status_code != 404:
-        r.raise_for_status()
+    if response.status_code != 404:
+        response.raise_for_status()
 
 
 def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, description=None, bbox=None, auth):
@@ -234,7 +234,7 @@ def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, de
     body = {
         "featureType": ftype
     }
-    r = requests.put(
+    response = requests.put(
         urljoin(GS_REST_WORKSPACES,
                 geoserver_workspace + '/datastores/postgresql/featuretypes/' + feature_type_name),
         data=json.dumps(body),
@@ -242,32 +242,32 @@ def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, de
         auth=auth,
         timeout=5,
     )
-    r.raise_for_status()
+    response.raise_for_status()
 
 
 def delete_security_roles(rule, auth):
-    r = requests.delete(
+    response = requests.delete(
         urljoin(GS_REST_SECURITY_ACL_LAYERS, rule),
         headers=headers_json,
         auth=auth,
         timeout=5,
     )
-    if r.status_code != 404:
-        r.raise_for_status()
+    if response.status_code != 404:
+        response.raise_for_status()
 
 
 def get_all_workspaces(auth):
-    r = requests.get(
+    response = requests.get(
         GS_REST_WORKSPACES,
         headers=headers_json,
         auth=auth,
         timeout=5,
     )
-    r.raise_for_status()
-    if r.json()['workspaces'] == "":
+    response.raise_for_status()
+    if response.json()['workspaces'] == "":
         all_workspaces = []
     else:
-        all_workspaces = [workspace["name"] for workspace in r.json()['workspaces']['workspace']]
+        all_workspaces = [workspace["name"] for workspace in response.json()['workspaces']['workspace']]
 
     return all_workspaces
 
@@ -286,14 +286,14 @@ def get_workspace_style_url(geoserver_workspace, style=None):
 
 def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_function):
     if sld_file is None:
-        r = requests.get(
+        response = requests.get(
             urljoin(GS_REST_STYLES, 'generic.sld'),
             auth=GS_AUTH,
             timeout=5,
         )
-        r.raise_for_status()
-        sld_file = io.BytesIO(r.content)
-    r = requests.post(
+        response.raise_for_status()
+        sld_file = io.BytesIO(response.content)
+    response = requests.post(
         get_workspace_style_url(geoserver_workspace),
         data=json.dumps(
             {
@@ -308,7 +308,7 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
         auth=GS_AUTH,
         timeout=5,
     )
-    r.raise_for_status()
+    response.raise_for_status()
 
     tree = ET.parse(sld_file)
     root = tree.getroot()
@@ -319,8 +319,8 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
 
     propertname_els = tree.findall('.//{http://www.opengis.net/ogc}PropertyName')
     if launder_function:
-        for el in propertname_els:
-            el.text = launder_function(el.text)
+        for element in propertname_els:
+            element.text = launder_function(element.text)
 
     sld_file = io.BytesIO()
     tree.write(
@@ -330,7 +330,7 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
     )
     sld_file.seek(0)
 
-    r = requests.put(
+    response = requests.put(
         get_workspace_style_url(geoserver_workspace, layername),
         data=sld_file.read(),
         headers={
@@ -340,65 +340,65 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
         auth=GS_AUTH,
         timeout=5,
     )
-    if r.status_code == 400:
-        raise Error(1, data=r.text)
-    r.raise_for_status()
-    r = requests.put(get_workspace_layer_url(geoserver_workspace, layername),
-                     data=json.dumps(
-                         {
-                             "layer": {
-                                 "defaultStyle": {
-                                     "name": geoserver_workspace + ':' + layername,
-                                     "workspace": geoserver_workspace,
-                                 },
-                             }
-                         }),
-                     headers=headers_json,
-                     auth=GS_AUTH,
-                     timeout=5,
-                     )
+    if response.status_code == 400:
+        raise Error(1, data=response.text)
+    response.raise_for_status()
+    response = requests.put(get_workspace_layer_url(geoserver_workspace, layername),
+                            data=json.dumps(
+                                {
+                                    "layer": {
+                                        "defaultStyle": {
+                                            "name": geoserver_workspace + ':' + layername,
+                                            "workspace": geoserver_workspace,
+                                        },
+                                    }
+                                }),
+                            headers=headers_json,
+                            auth=GS_AUTH,
+                            timeout=5,
+                            )
     # app.logger.info(r.text)
-    r.raise_for_status()
+    response.raise_for_status()
 
 
 def get_workspace_style_response(geoserver_workspace, stylename, headers=None, auth=None):
     if headers is None:
         headers = headers_sld
     url = get_workspace_style_url(geoserver_workspace, stylename)
-    r = requests.get(url,
-                     auth=auth,
-                     headers=headers,
-                     timeout=5,
-                     )
-    return r
+    response = requests.get(url,
+                            auth=auth,
+                            headers=headers,
+                            timeout=5,
+                            )
+    return response
 
 
 def delete_workspace_style(geoserver_workspace, stylename, auth=None):
-    r = get_workspace_style_response(geoserver_workspace, stylename, auth=auth)
-    if r.status_code == 404:
+    response = get_workspace_style_response(geoserver_workspace, stylename, auth=auth)
+    if response.status_code == 404:
         return {}
-    r.raise_for_status()
-    sld_stream = io.BytesIO(r.content)
+    response.raise_for_status()
+    sld_stream = io.BytesIO(response.content)
 
     style_url = get_workspace_style_url(geoserver_workspace, stylename)
-    r = requests.delete(style_url,
-                        headers=headers_json,
-                        auth=GS_AUTH,
-                        params={
-                            'purge': 'true',
-                            'recurse': 'true',
-                        },
-                        timeout=5,
-                        )
-    if r.status_code == 404:
+    response = requests.delete(style_url,
+                               headers=headers_json,
+                               auth=GS_AUTH,
+                               params={
+                                   'purge': 'true',
+                                   'recurse': 'true',
+                               },
+                               timeout=5,
+                               )
+    if response.status_code == 404:
         return {}
-    r.raise_for_status()
+    response.raise_for_status()
     return sld_stream
 
 
 def create_db_store(geoserver_workspace, auth, db_schema=None, pg_conn=None, ):
     db_schema = db_schema or geoserver_workspace
-    r = requests.post(
+    response = requests.post(
         urljoin(GS_REST_WORKSPACES, geoserver_workspace + '/datastores'),
         data=json.dumps({
             "dataStore": {
@@ -441,22 +441,22 @@ def create_db_store(geoserver_workspace, auth, db_schema=None, pg_conn=None, ):
         auth=auth,
         timeout=5,
     )
-    r.raise_for_status()
+    response.raise_for_status()
 
 
 def delete_db_store(geoserver_workspace, auth):
-    r = requests.delete(
+    response = requests.delete(
         urljoin(GS_REST_WORKSPACES, geoserver_workspace + f'/datastores/{DEFAULT_DB_STORE_NAME}'),
         headers=headers_json,
         auth=auth,
         timeout=5,
     )
-    if r.status_code != 404:
-        r.raise_for_status()
+    if response.status_code != 404:
+        response.raise_for_status()
 
 
 def create_wms_store(geoserver_workspace, auth, wms_store_name, get_capabilities_url):
-    r = requests.post(
+    response = requests.post(
         urljoin(GS_REST_WORKSPACES, geoserver_workspace + '/wmsstores'),
         data=json.dumps({
             "wmsStore": {
@@ -469,24 +469,24 @@ def create_wms_store(geoserver_workspace, auth, wms_store_name, get_capabilities
         auth=auth,
         timeout=5,
     )
-    r.raise_for_status()
+    response.raise_for_status()
 
 
 def delete_wms_store(geoserver_workspace, auth, wms_store_name):
     url = urljoin(GS_REST_WORKSPACES, geoserver_workspace + f'/wmsstores/{wms_store_name}')
-    r = requests.delete(
+    response = requests.delete(
         url,
         headers=headers_json,
         auth=auth,
         timeout=5,
     )
-    if r.status_code != 404:
-        r.raise_for_status()
+    if response.status_code != 404:
+        response.raise_for_status()
 
 
 def delete_wms_layer(geoserver_workspace, layer, auth):
     url = urljoin(GS_REST_WORKSPACES, geoserver_workspace + f'/wmslayers/{layer}')
-    r = requests.delete(
+    response = requests.delete(
         url,
         headers=headers_json,
         auth=auth,
@@ -495,8 +495,8 @@ def delete_wms_layer(geoserver_workspace, layer, auth):
             'recurse': 'true'
         }
     )
-    if r.status_code != 404:
-        r.raise_for_status()
+    if response.status_code != 404:
+        response.raise_for_status()
 
 
 def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox):
@@ -505,41 +505,41 @@ def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox):
         wms_layer['nativeBoundingBox'] = bbox_to_native_bbox(bbox)
         wms_layer['nativeCRS'] = 'EPSG:3857'
         # automatically recalculates also 'latLonBoundingBox'
-    r = requests.put(urljoin(GS_REST_WORKSPACES,
-                             f'{geoserver_workspace}/wmslayers/{layer}'),
-                     data=json.dumps({
-                         "wmsLayer": wms_layer
-                     }),
-                     headers=headers_json,
-                     auth=auth,
-                     timeout=5,
-                     )
-    r.raise_for_status()
+    response = requests.put(urljoin(GS_REST_WORKSPACES,
+                            f'{geoserver_workspace}/wmslayers/{layer}'),
+                            data=json.dumps({
+                                "wmsLayer": wms_layer
+                            }),
+                            headers=headers_json,
+                            auth=auth,
+                            timeout=5,
+                            )
+    response.raise_for_status()
 
 
 def get_wms_layer(geoserver_workspace, layer, *, auth):
-    r = requests.get(urljoin(GS_REST_WORKSPACES,
-                             f'{geoserver_workspace}/wmslayers/{layer}'),
-                     headers=headers_json,
-                     auth=auth,
-                     timeout=5,
-                     )
-    r.raise_for_status()
-    return r.json()['wmsLayer']
+    response = requests.get(urljoin(GS_REST_WORKSPACES,
+                            f'{geoserver_workspace}/wmslayers/{layer}'),
+                            headers=headers_json,
+                            auth=auth,
+                            timeout=5,
+                            )
+    response.raise_for_status()
+    return response.json()['wmsLayer']
 
 
 def ensure_workspace(geoserver_workspace, auth=None):
     auth = auth or GS_AUTH
     all_workspaces = get_all_workspaces(auth)
     if geoserver_workspace not in all_workspaces:
-        r = requests.post(
+        response = requests.post(
             GS_REST_WORKSPACES,
             data=json.dumps({'workspace': {'name': geoserver_workspace}}),
             headers=headers_json,
             auth=auth,
             timeout=5,
         )
-        r.raise_for_status()
+        response.raise_for_status()
         return True
     return False
 
@@ -549,14 +549,14 @@ def delete_workspace(geoserver_workspace, auth=None):
     delete_security_roles(geoserver_workspace + '.*.r', auth)
     delete_security_roles(geoserver_workspace + '.*.w', auth)
 
-    r = requests.delete(
+    response = requests.delete(
         urljoin(GS_REST_WORKSPACES, geoserver_workspace),
         headers=headers_json,
         auth=auth,
         timeout=5,
     )
-    if r.status_code != 404:
-        r.raise_for_status()
+    if response.status_code != 404:
+        response.raise_for_status()
 
 
 def username_to_rolename(username):
@@ -565,15 +565,15 @@ def username_to_rolename(username):
 
 def delete_user(user, auth):
     r_url = urljoin(GS_REST_USER, user)
-    r = requests.delete(
+    response = requests.delete(
         r_url,
         headers=headers_json,
         auth=auth,
         timeout=5,
     )
-    user_not_exists = r.status_code == 404
+    user_not_exists = response.status_code == 404
     if not user_not_exists:
-        r.raise_for_status()
+        response.raise_for_status()
     user_deleted = not user_not_exists
     return user_deleted
 
@@ -591,13 +591,13 @@ def get_usernames_by_role(role, auth, usernames_to_ignore=None):
 
 def get_user_roles(user, auth):
     r_url = urljoin(GS_REST_ROLES, f'user/{user}/')
-    r = requests.get(r_url,
-                     headers=headers_json,
-                     auth=auth,
-                     timeout=5,
-                     )
-    r.raise_for_status()
-    return r.json()['roleNames']
+    response = requests.get(r_url,
+                            headers=headers_json,
+                            auth=auth,
+                            timeout=5,
+                            )
+    response.raise_for_status()
+    return response.json()['roleNames']
 
 
 def ensure_user_role(user, role, auth):
@@ -606,13 +606,13 @@ def ensure_user_role(user, role, auth):
     if not association_exists:
         logger.info(f"Role {role} not associated with user {user} yet, associating.")
         r_url = urljoin(GS_REST_ROLES, f'role/{role}/user/{user}/')
-        r = requests.post(
+        response = requests.post(
             r_url,
             headers=headers_json,
             auth=auth,
             timeout=5,
         )
-        r.raise_for_status()
+        response.raise_for_status()
     else:
         logger.info(f"Role {role} already associated with user {user}")
     association_created = not association_exists
@@ -621,15 +621,15 @@ def ensure_user_role(user, role, auth):
 
 def delete_user_role(user, role, auth):
     r_url = urljoin(GS_REST_ROLES, f'role/{role}/user/{user}/')
-    r = requests.delete(
+    response = requests.delete(
         r_url,
         headers=headers_json,
         auth=auth,
         timeout=5,
     )
-    association_not_exists = r.status_code == 404
+    association_not_exists = response.status_code == 404
     if not association_not_exists:
-        r.raise_for_status()
+        response.raise_for_status()
     association_deleted = not association_not_exists
     return association_deleted
 
@@ -643,13 +643,13 @@ def get_service_url(service):
 
 def get_service_settings(service, auth):
     r_url = get_service_url(service)
-    r = requests.get(r_url,
-                     headers=headers_json,
-                     auth=auth,
-                     timeout=5,
-                     )
-    r.raise_for_status()
-    return r.json()[service]
+    response = requests.get(r_url,
+                            headers=headers_json,
+                            auth=auth,
+                            timeout=5,
+                            )
+    response.raise_for_status()
+    return response.json()[service]
 
 
 get_wms_settings = partial(get_service_settings, WMS_SERVICE_TYPE)
@@ -678,7 +678,7 @@ def ensure_service_srs_list(service, srs_list, auth):
         }
         logger.info(f"Service {service}: Current SRS list {current_srs_list} not equals to requested {srs_list}, changing.")
         r_url = get_service_url(service)
-        r = requests.put(
+        response = requests.put(
             r_url,
             data=json.dumps({
                 service: service_settings,
@@ -687,7 +687,7 @@ def ensure_service_srs_list(service, srs_list, auth):
             auth=auth,
             timeout=5,
         )
-        r.raise_for_status()
+        response.raise_for_status()
     else:
         logger.info(f"Service {service}: Current SRS list {current_srs_list} already corresponds with requested one.")
     return list_change
@@ -699,13 +699,13 @@ ensure_wfs_srs_list = partial(ensure_service_srs_list, WFS_SERVICE_TYPE)
 
 def get_global_settings(auth):
     r_url = GS_REST_SETTINGS
-    r = requests.get(r_url,
-                     headers=headers_json,
-                     auth=auth,
-                     timeout=5,
-                     )
-    r.raise_for_status()
-    return r.json()['global']
+    response = requests.get(r_url,
+                            headers=headers_json,
+                            auth=auth,
+                            timeout=5,
+                            )
+    response.raise_for_status()
+    return response.json()['global']
 
 
 def get_proxy_base_url(auth, global_settings=None):
@@ -722,7 +722,7 @@ def ensure_proxy_base_url(proxy_base_url, auth):
         global_settings['settings']['proxyBaseUrl'] = proxy_base_url
         logger.info(f"Current Proxy Base URL {current_url} not equals to requested {proxy_base_url}, changing.")
         r_url = GS_REST_SETTINGS
-        r = requests.put(
+        response = requests.put(
             r_url,
             data=json.dumps({
                 'global': global_settings
@@ -731,7 +731,7 @@ def ensure_proxy_base_url(proxy_base_url, auth):
             auth=auth,
             timeout=5,
         )
-        r.raise_for_status()
+        response.raise_for_status()
     else:
         logger.info(f"Current Proxy Base URL {current_url} already corresponds with requested one.")
     url_changed = not url_equals
@@ -741,24 +741,24 @@ def ensure_proxy_base_url(proxy_base_url, auth):
 def reset(auth):
     logger.info(f"Resetting GeoServer")
     r_url = GS_REST + 'reset'
-    r = requests.post(r_url,
-                      headers=headers_json,
-                      auth=auth,
-                      timeout=5,
-                      )
-    r.raise_for_status()
+    response = requests.post(r_url,
+                             headers=headers_json,
+                             auth=auth,
+                             timeout=5,
+                             )
+    response.raise_for_status()
     logger.info(f"Resetting GeoServer done")
 
 
 def reload(auth):
     logger.info(f"Reloading GeoServer")
     r_url = GS_REST + 'reload'
-    r = requests.post(r_url,
-                      headers=headers_json,
-                      auth=auth,
-                      timeout=20,
-                      )
-    r.raise_for_status()
+    response = requests.post(r_url,
+                             headers=headers_json,
+                             auth=auth,
+                             timeout=20,
+                             )
+    response.raise_for_status()
     logger.info(f"Reloading GeoServer done")
 
 
@@ -775,7 +775,7 @@ def get_square_bbox(bbox):
 
 
 def get_layer_thumbnail(wms_url, layername, bbox, headers=None, wms_version='1.3.0'):
-    r = requests.get(wms_url, params={
+    response = requests.get(wms_url, params={
         'SERVICE': 'WMS',
         'REQUEST': 'GetMap',
         'VERSION': wms_version,
@@ -787,7 +787,7 @@ def get_layer_thumbnail(wms_url, layername, bbox, headers=None, wms_version='1.3
         'FORMAT': 'image/png',
         'TRANSPARENT': 'TRUE',
     }, headers=headers, timeout=5,)
-    return r
+    return response
 
 
 def get_feature_type(
@@ -795,13 +795,13 @@ def get_feature_type(
         gs_rest_workspaces=GS_REST_WORKSPACES):
     r_url = urljoin(gs_rest_workspaces,
                     f'{workspace}/datastores/{data_store}/featuretypes/{feature_type}')
-    r = requests.get(r_url,
-                     headers=headers_json,
-                     auth=GS_AUTH,
-                     timeout=5,
-                     )
-    r.raise_for_status()
-    return r.json()['featureType']
+    response = requests.get(r_url,
+                            headers=headers_json,
+                            auth=GS_AUTH,
+                            timeout=5,
+                            )
+    response.raise_for_status()
+    return response.json()['featureType']
 
 
 def bbox_to_native_bbox(bbox):

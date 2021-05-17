@@ -64,8 +64,8 @@ def test_get_users_workspaces():
 def assert_module_methods(module, methods):
     for method in methods:
         # print(f'test_module_methods: module={module.__name__}, method={method}')
-        fn = getattr(module, method, None)
-        if fn is None:
+        func = getattr(module, method, None)
+        if func is None:
             raise Exception(
                 f'Module {module.__name__} does not have {method} method.')
 

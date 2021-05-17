@@ -117,13 +117,13 @@ def post(workspace):
             kwargs,
             'layman.map.filesystem.input_file'
         )
-    except Exception as e:
+    except Exception as exception:
         try:
             if util.is_map_chain_ready(workspace, mapname):
                 redis_util.unlock_publication(workspace, MAP_TYPE, mapname)
         finally:
             redis_util.unlock_publication(workspace, MAP_TYPE, mapname)
-        raise e
+        raise exception
 
     # app.logger.info('uploaded map '+mapname)
     return jsonify([map_result]), 200

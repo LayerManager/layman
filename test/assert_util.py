@@ -10,14 +10,14 @@ from .util import compare_images
 
 
 def assert_same_images(img_url, tmp_file_path, expected_file_path, diff_threshold):
-    r = requests.get(img_url,
-                     timeout=5,
-                     )
-    r.raise_for_status()
+    response = requests.get(img_url,
+                            timeout=5,
+                            )
+    response.raise_for_status()
     pathlib.Path(os.path.dirname(tmp_file_path)).mkdir(parents=True, exist_ok=True)
-    with open(tmp_file_path, 'wb') as f:
-        for chunk in r:
-            f.write(chunk)
+    with open(tmp_file_path, 'wb') as file:
+        for chunk in response:
+            file.write(chunk)
 
     diffs = compare_images(expected_file_path, tmp_file_path)
 

@@ -74,15 +74,15 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
 
 def wait_for_rest(url, max_attempts, sleeping_time, check_response, headers=None):
     headers = headers or None
-    r = requests.get(url, headers=headers, timeout=5)
+    response = requests.get(url, headers=headers, timeout=5)
 
     attempts = 1
-    while not check_response(r):
+    while not check_response(response):
         time.sleep(sleeping_time)
-        r = requests.get(url, headers=headers, timeout=5)
+        response = requests.get(url, headers=headers, timeout=5)
         attempts += 1
         if attempts > max_attempts:
-            logger.error(f"r.status_code={r.status_code}\nrltest={r.text}")
+            logger.error(f"r.status_code={response.status_code}\nrltest={response.text}")
             raise Exception('Max attempts reached!')
 
 
@@ -124,8 +124,8 @@ def patch_workspace_publication(publication_type,
                         workspace=workspace,
                         **{publication_type_def.url_param_name: name})
 
-    for fp in file_paths:
-        assert os.path.isfile(fp), fp
+    for file_path in file_paths:
+        assert os.path.isfile(file_path), file_path
     files = []
     try:
         files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
@@ -139,19 +139,19 @@ def patch_workspace_publication(publication_type,
         if style_file:
             files.append(('style', (os.path.basename(style_file), open(style_file, 'rb'))))
 
-        r = requests.patch(r_url,
-                           files=files,
-                           headers=headers,
-                           data=data)
-        raise_layman_error(r)
+        response = requests.patch(r_url,
+                                  files=files,
+                                  headers=headers,
+                                  data=data)
+        raise_layman_error(response)
     finally:
-        for fp in files:
-            fp[1][1].close()
+        for file_path in files:
+            file_path[1][1].close()
 
     wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn, headers=headers)
     wfs.clear_cache(workspace)
     wms.clear_cache(workspace)
-    return r.json()
+    return response.json()
 
 
 patch_workspace_map = partial(patch_workspace_publication, MAP_TYPE)
@@ -167,9 +167,9 @@ def ensure_workspace_publication(publication_type,
                                  ):
     headers = headers or {}
 
-    r = get_workspace_publications(publication_type, workspace, headers=headers, )
-    publication_obj = next((publication for publication in r.json() if publication['name'] == name), None)
-    if r.status_code == 200 and publication_obj:
+    resposne = get_workspace_publications(publication_type, workspace, headers=headers, )
+    publication_obj = next((publication for publication in resposne.json() if publication['name'] == name), None)
+    if resposne.status_code == 200 and publication_obj:
         patch_needed = False
         if access_rights is not None:
             if 'read' in access_rights and set(access_rights['read'].split(',')) != set(publication_obj['access_rights']['read']):
@@ -211,8 +211,8 @@ def publish_workspace_publication(publication_type,
     with app.app_context():
         r_url = url_for(publication_type_def.post_workspace_publication_url, workspace=workspace)
 
-    for fp in file_paths:
-        assert os.path.isfile(fp), fp
+    for file_path in file_paths:
+        assert os.path.isfile(file_path), file_path
     files = []
     try:
         files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
@@ -227,19 +227,19 @@ def publish_workspace_publication(publication_type,
             files.append(('style', (os.path.basename(style_file), open(style_file, 'rb'))))
         if description:
             data['description'] = description
-        r = requests.post(r_url,
-                          files=files,
-                          data=data,
-                          headers=headers)
-        raise_layman_error(r)
-        assert r.json()[0]['name'] == name
+        response = requests.post(r_url,
+                                 files=files,
+                                 data=data,
+                                 headers=headers)
+        raise_layman_error(response)
+        assert response.json()[0]['name'] == name
 
     finally:
-        for fp in files:
-            fp[1][1].close()
+        for file_path in files:
+            file_path[1][1].close()
 
     wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn, headers=headers)
-    return r.json()[0]
+    return response.json()[0]
 
 
 publish_workspace_map = partial(publish_workspace_publication, MAP_TYPE)
@@ -253,9 +253,9 @@ def get_workspace_publications_response(publication_type, workspace, *, headers=
 
     with app.app_context():
         r_url = url_for(publication_type_def.get_workspace_publications_url, workspace=workspace)
-    r = requests.get(r_url, headers=headers, params=query_params)
-    raise_layman_error(r)
-    return r
+    response = requests.get(r_url, headers=headers, params=query_params)
+    raise_layman_error(response)
+    return response
 
 
 def get_workspace_publications(publication_type, workspace, *, headers=None, query_params=None, ):
@@ -273,9 +273,9 @@ def get_publications_response(publication_type, *, headers=None, query_params=No
 
     with app.app_context():
         r_url = url_for(publication_type_def.get_publications_url)
-    r = requests.get(r_url, headers=headers, params=query_params)
-    raise_layman_error(r)
-    return r
+    response = requests.get(r_url, headers=headers, params=query_params)
+    raise_layman_error(response)
+    return response
 
 
 def get_publications(publication_type, *, headers=None, query_params=None):
@@ -294,9 +294,9 @@ def get_workspace_publication(publication_type, workspace, name, headers=None, )
         r_url = url_for(publication_type_def.get_workspace_publication_url,
                         workspace=workspace,
                         **{publication_type_def.url_param_name: name})
-    r = requests.get(r_url, headers=headers)
-    raise_layman_error(r)
-    return r.json()
+    response = requests.get(r_url, headers=headers)
+    raise_layman_error(response)
+    return response.json()
 
 
 get_workspace_map = partial(get_workspace_publication, MAP_TYPE)
@@ -308,18 +308,18 @@ def get_workspace_layer_style(workspace, layer, headers=None):
         r_url = url_for('rest_workspace_layer_style.get',
                         workspace=workspace,
                         layername=layer)
-    r = requests.get(r_url, headers=headers)
-    raise_layman_error(r)
-    return ET.parse(io.BytesIO(r.content))
+    response = requests.get(r_url, headers=headers)
+    raise_layman_error(response)
+    return ET.parse(io.BytesIO(response.content))
 
 
 def finish_delete(workspace, url, headers, skip_404=False, ):
-    r = requests.delete(url, headers=headers)
+    response = requests.delete(url, headers=headers)
     status_codes_to_skip = {404} if skip_404 else set()
-    raise_layman_error(r, status_codes_to_skip)
+    raise_layman_error(response, status_codes_to_skip)
     wfs.clear_cache(workspace)
     wms.clear_cache(workspace)
-    return r.json()
+    return response.json()
 
 
 def delete_workspace_publication(publication_type, workspace, name, *, headers=None, skip_404=False, ):
@@ -355,10 +355,10 @@ delete_workspace_layers = partial(delete_workspace_publications, LAYER_TYPE)
 
 
 def assert_workspace_publications(publication_type, workspace, expected_publication_names, headers=None):
-    r = get_workspace_publications(publication_type, workspace, headers=headers)
-    publication_names = [li['name'] for li in r]
+    response = get_workspace_publications(publication_type, workspace, headers=headers)
+    publication_names = [li['name'] for li in response]
     assert set(publication_names) == set(expected_publication_names),\
-        f"Publications {expected_publication_names} not equal to {r.text}. publication_type={publication_type}"
+        f"Publications {expected_publication_names} not equal to {response.text}. publication_type={publication_type}"
 
 
 assert_workspace_layers = partial(assert_workspace_publications, LAYER_TYPE)
@@ -369,9 +369,9 @@ def get_workspace_publication_metadata_comparison(publication_type, workspace, n
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     with app.app_context():
         r_url = url_for(publication_type_def.get_workspace_metadata_comparison_url, **{publication_type_def.url_param_name: name}, workspace=workspace)
-    r = requests.get(r_url, headers=headers)
-    raise_layman_error(r)
-    return r.json()
+    response = requests.get(r_url, headers=headers)
+    raise_layman_error(response)
+    return response.json()
 
 
 get_workspace_layer_metadata_comparison = partial(get_workspace_publication_metadata_comparison, LAYER_TYPE)
@@ -385,9 +385,9 @@ def reserve_username(username, headers=None):
     data = {
         'username': username,
     }
-    r = requests.patch(r_url, headers=headers, data=data)
-    raise_layman_error(r)
-    claimed_username = r.json()['username']
+    response = requests.patch(r_url, headers=headers, data=data)
+    raise_layman_error(response)
+    claimed_username = response.json()['username']
     assert claimed_username == username
 
 
@@ -395,9 +395,9 @@ def get_current_user(headers=None):
     headers = headers or {}
     with app.app_context():
         r_url = url_for('rest_current_user.get')
-    r = requests.get(r_url, headers=headers)
-    r.raise_for_status()
-    return r.json()
+    response = requests.get(r_url, headers=headers)
+    response.raise_for_status()
+    return response.json()
 
 
 def ensure_reserved_username(username, headers=None):

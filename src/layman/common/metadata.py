@@ -12,8 +12,8 @@ def get_syncable_prop_names(publ_type):
     return prop_names
 
 
-def extent_equals(a, b):
-    return bbox_util.are_similar(a, b, no_area_bbox_padding=settings.NO_AREA_BBOX_PADDING, limit=0.95)
+def extent_equals(ext1, ext2):
+    return bbox_util.are_similar(ext1, ext2, no_area_bbox_padding=settings.NO_AREA_BBOX_PADDING, limit=0.95)
 
 
 PROPERTIES = {
@@ -121,9 +121,9 @@ def prop_equals_strict(values, equals_fn=None):
         return True
     result = True
     for idx in range(len(values) - 1):
-        v1 = values[idx]
-        v2 = values[idx + 1]
-        result = v1 is v2 if (v1 is None or v2 is None) else equals_fn(v1, v2)
+        val1 = values[idx]
+        val2 = values[idx + 1]
+        result = val1 is val2 if (val1 is None or val2 is None) else equals_fn(val1, val2)
         if not result:
             break
     return result
@@ -143,25 +143,25 @@ def transform_metadata_props_to_comparison(all_props):
         for idx, k in enumerate(sorted(list(all_props.keys())))
     }
     src_url_to_idx = {}
-    for k, v in sources.items():
-        src_url_to_idx[v['url']] = k
+    for key, value in sources.items():
+        src_url_to_idx[value['url']] = key
     all_props = {
         'metadata_sources': sources,
         'metadata_properties': {
-            pn: {
+            prop_key: {
                 'values': {
-                    f"{src_url_to_idx[src]}": prop_object[pn]
+                    f"{src_url_to_idx[src]}": prop_object[prop_key]
                     for src, prop_object in all_props.items()
-                    if pn in prop_object
+                    if prop_key in prop_object
                 },
             }
-            for pn in prop_names
+            for prop_key in prop_names
         }
     }
-    for pn, po in all_props['metadata_properties'].items():
-        equals_fn = PROPERTIES[pn].get('equals_fn', None)
-        po['equal_or_null'] = prop_equals_or_none(po['values'].values(), equals_fn=equals_fn)
-        po['equal'] = prop_equals_strict(list(po['values'].values()), equals_fn=equals_fn)
+    for prop_key, prop_object in all_props['metadata_properties'].items():
+        equals_fn = PROPERTIES[prop_key].get('equals_fn', None)
+        prop_object['equal_or_null'] = prop_equals_or_none(prop_object['values'].values(), equals_fn=equals_fn)
+        prop_object['equal'] = prop_equals_strict(list(prop_object['values'].values()), equals_fn=equals_fn)
     return all_props
 
 
@@ -175,5 +175,5 @@ def get_same_or_missing_prop_names(prop_names, comparison):
     return prop_names
 
 
-def is_empty(v, prop_name):
-    return v is None or PROPERTIES[prop_name].get('empty_fn', lambda _: False)(v)
+def is_empty(value, prop_name):
+    return value is None or PROPERTIES[prop_name].get('empty_fn', lambda _: False)(value)

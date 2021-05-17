@@ -14,23 +14,23 @@ def create_lock(workspace, publication_type, publication_name, error_code, metho
 
 
 def create_lock_decorator(publication_type, publication_name_key, error_code, is_chain_ready_fn):
-    def lock_decorator(f):
-        @wraps(f)
+    def lock_decorator(func):
+        @wraps(func)
         def decorated_function(*args, **kwargs):
             username = request.view_args['workspace']
             publication_name = request.view_args[publication_name_key]
             create_lock(username, publication_type, publication_name, error_code, request.method)
             try:
-                result = f(*args, **kwargs)
+                result = func(*args, **kwargs)
                 if is_chain_ready_fn(username, publication_name):
                     unlock_publication(username, publication_type, publication_name)
-            except Exception as e:
+            except Exception as exception:
                 try:
                     if is_chain_ready_fn(username, publication_name):
                         unlock_publication(username, publication_type, publication_name)
                 finally:
                     unlock_publication(username, publication_type, publication_name)
-                raise e
+                raise exception
             return result
 
         return decorated_function

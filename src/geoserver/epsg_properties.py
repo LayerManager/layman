@@ -56,8 +56,8 @@ EPSG_PROPERTIES_DEFAULT = {
 def get_srs_list_from_epsg_file(file_path):
     result = set()
     if os.path.exists(file_path):
-        with open(file_path, 'r', encoding=EPSG_ENCODING) as f:
-            epsg_props = f.read()
+        with open(file_path, 'r', encoding=EPSG_ENCODING) as file:
+            epsg_props = file.read()
         epsg_defs = re.finditer(r'^([1-9][0-9]+)=', epsg_props, re.MULTILINE)
         result = {int(epsg_def.group(1)) for epsg_def in epsg_defs}
     return result
@@ -92,7 +92,7 @@ def setup_epsg(data_dir, srs_list):
         except BaseException as ex:
             logger.warning(f'Not able to download EPSG definition from epsg.io for code={code}. Reason={ex}')
 
-    with open(file_path, "a", encoding=EPSG_ENCODING) as f:
+    with open(file_path, "a", encoding=EPSG_ENCODING) as file:
         for epsg_definition in new_epsg.values():
-            f.write(epsg_definition)
-            f.write('\n')
+            file.write(epsg_definition)
+            file.write('\n')

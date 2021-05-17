@@ -77,15 +77,15 @@ def authenticate():
                     }.items()
                     if v is not None
                 }
-                r = requests.post(provider_module.INTROSPECTION_URL, data=request_data,
-                                  timeout=min(25 / len(clients), 15))
-                if r.status_code != 200:
+                response = requests.post(provider_module.INTROSPECTION_URL, data=request_data,
+                                         timeout=min(25 / len(clients), 15))
+                if response.status_code != 200:
                     continue
                 all_connection_errors = False
             except ConnectionError:
                 continue
             try:
-                r_json = r.json()
+                r_json = response.json()
                 # current_app.logger.info(f"r_json={r_json}")
                 if r_json['active'] is True and r_json['token_type'] == 'Bearer':
                     valid_resp = r_json

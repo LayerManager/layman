@@ -7,8 +7,8 @@ settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 def create_app(app_config):
     app = Flask(__name__)
-    for k, v in app_config.items():
-        app.config[k] = v
+    for key, value in app_config.items():
+        app.config[key] = value
     app.register_blueprint(csw_bp)
     return app
 

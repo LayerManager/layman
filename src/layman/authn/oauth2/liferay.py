@@ -8,11 +8,11 @@ USER_PROFILE_URL = settings.OAUTH2_LIFERAY_USER_PROFILE_URL
 
 def get_open_id_claims(access_token):
     result = {}
-    r = requests.get(USER_PROFILE_URL, headers={
+    resposne = requests.get(USER_PROFILE_URL, headers={
         'Authorization': f'Bearer {access_token}',
     })
-    r.raise_for_status()
-    r_json = r.json()
+    resposne.raise_for_status()
+    r_json = resposne.json()
     result['sub'] = r_json['userId']
     result['email'] = r_json['emailAddress']
     result['email_verified'] = r_json['emailAddressVerified']

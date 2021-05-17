@@ -29,5 +29,5 @@ def test_get_language():
 
 
 def test_tokenize():
-    t = language.tokenize('ne_110m-admin 0+countries')
-    assert t == ['ne', 'admin', 'countries']
+    tokens_list = language.tokenize('ne_110m-admin 0+countries')
+    assert tokens_list == ['ne', 'admin', 'countries']

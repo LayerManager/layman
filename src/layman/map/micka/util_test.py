@@ -44,8 +44,8 @@ def test_fill_template():
     with open(xml_path, 'wb') as out:
         out.write(file_object.read())
 
-    def get_diff(p1, p2):
-        diff = difflib.unified_diff(open(p1).readlines(), open(p2).readlines())
+    def get_diff(path1, path2):
+        diff = difflib.unified_diff(open(path1).readlines(), open(path2).readlines())
         return f"diff={''.join(diff)}"
 
     expected_path = 'src/layman/map/micka/util_test_filled_template.xml'
@@ -147,8 +147,8 @@ def test_fill_xml_template():
         }, METADATA_PROPERTIES)
 
     expected_path = 'src/layman/map/micka/record-template-filled.xml'
-    with open(expected_path) as f:
-        expected_lines = f.readlines()
+    with open(expected_path) as file:
+        expected_lines = file.readlines()
     lines = [line.decode('utf-8') for line in xml_file_object.readlines()]
     # print(f"FILE:\n{''.join(lines)}")
     diff_lines = list(difflib.unified_diff(expected_lines, lines))

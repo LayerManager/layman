@@ -9,8 +9,8 @@ def main():
 
     prop_names = set(PROPERTIES.keys())
 
-    with open(path_to_doc) as f:
-        md_lines = f.readlines()
+    with open(path_to_doc) as file:
+        md_lines = file.readlines()
 
     prop_pattern = re.compile(r"^###\s*([a-z0-9_]+)\s*$")
 
@@ -53,9 +53,9 @@ def main():
 
     assert len(prop_names) == 0
 
-    with open(path_to_doc, 'w') as f:
+    with open(path_to_doc, 'w') as file:
         for line in md_lines_out:
-            f.write(line)
+            file.write(line)
 
 
 if __name__ == "__main__":

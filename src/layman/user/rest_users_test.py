@@ -28,6 +28,6 @@ def test_get_users():
         url = url_for('rest_users.get')
         assert url.endswith('/' + settings.REST_USERS_PREFIX)
 
-    rv = requests.get(url)
-    assert rv.status_code == 200, rv.json()
-    assert username in [info["username"] for info in rv.json()]
+    response = requests.get(url)
+    assert response.status_code == 200, response.json()
+    assert username in [info["username"] for info in response.json()]

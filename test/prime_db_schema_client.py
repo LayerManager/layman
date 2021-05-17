@@ -2,7 +2,7 @@ import uuid
 from layman import settings, app
 from layman.common.prime_db_schema import publications, workspaces, users
 
-latest_oauth2_sub = 0
+latest_oauth2_sub = 0  # pylint: disable=invalid-name
 
 
 def ensure_workspace(workspace):
@@ -12,7 +12,7 @@ def ensure_workspace(workspace):
 
 def ensure_user(workspace):
     workspace_id = ensure_workspace(workspace)
-    global latest_oauth2_sub
+    global latest_oauth2_sub  # pylint: disable=invalid-name
     latest_oauth2_sub += 1
     user_info = {
         'sub': latest_oauth2_sub,

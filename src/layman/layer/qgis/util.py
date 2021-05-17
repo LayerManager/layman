@@ -217,15 +217,15 @@ FIELD_XML_ATTRIBUTES = [
 
 def launder_attribute_names(qml):
     for el_path, attr_name in FIELD_XML_ATTRIBUTES:
-        for el in qml.xpath(f'{el_path}[@{attr_name}]'):
-            el.attrib[attr_name] = db_common.launder_attribute_name(el.attrib[attr_name])
+        for element in qml.xpath(f'{el_path}[@{attr_name}]'):
+            element.attrib[attr_name] = db_common.launder_attribute_name(element.attrib[attr_name])
 
 
 def get_attribute_names_from_qml(qml):
     result = set()
     for el_path, attr_name in FIELD_XML_ATTRIBUTES:
-        for el in qml.xpath(f'{el_path}[@{attr_name}]'):
-            result.add(el.attrib[attr_name])
+        for element in qml.xpath(f'{el_path}[@{attr_name}]'):
+            result.add(element.attrib[attr_name])
     return result
 
 
@@ -257,8 +257,8 @@ def ensure_attributes_in_qml(qml, attrs_to_ensure):
 
 def get_attribute_names_from_qgs(qgs):
     result = set()
-    for el in qgs.xpath(f'/qgis/projectlayers/maplayer/fieldConfiguration/field'):
-        result.add(el.attrib['name'])
+    for element in qgs.xpath(f'/qgis/projectlayers/maplayer/fieldConfiguration/field'):
+        result.add(element.attrib['name'])
     return result
 
 
@@ -290,9 +290,9 @@ def get_current_style_xml(style_template_file, layer_template_file, layer_projec
     for name, value in original_qml.attrib.items():
         qml_xml.attrib[name] = value
 
-    for el in qgs_maplayer:
-        if el.tag not in elements_not_copy:
-            qml_xml.append(copy.deepcopy(el))
+    for element in qgs_maplayer:
+        if element.tag not in elements_not_copy:
+            qml_xml.append(copy.deepcopy(element))
 
     full_xml_str = ET.tostring(qml_xml, encoding='unicode', pretty_print=True)
     return full_xml_str

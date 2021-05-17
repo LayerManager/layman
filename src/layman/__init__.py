@@ -12,7 +12,7 @@ IN_PYTEST_PROCESS = sys.argv and sys.argv[0].endswith('/pytest/__main__.py')
 IN_FLOWER_PROCESS = sys.argv and sys.argv[0].endswith('/flower/__main__.py')
 IN_FLASK_PROCESS = sys.argv and (sys.argv[0].endswith('/flask') or sys.argv[0].endswith('/gunicorn'))
 IN_UPGRADE_PROCESS = sys.argv and sys.argv[0].endswith('standalone_upgrade.py')
-IN_UTIL_PROCESS = sys.argv and sys.argv[0].endswith('refresh-doc-metadata-xpath.py')
+IN_UTIL_PROCESS = sys.argv and sys.argv[0].endswith('refresh_doc_metadata_xpath.py')
 assert [
     IN_CELERY_WORKER_PROCESS,
     IN_PYTEST_PROCESS,
@@ -62,7 +62,7 @@ logger.info(f"IN_UTIL_PROCESS={IN_UTIL_PROCESS}")
 LAYMAN_DEPS_ADJUSTED_KEY = f"{__name__}:LAYMAN_DEPS_ADJUSTED"
 
 with settings.LAYMAN_REDIS.pipeline() as pipe:
-    wait_for_other_process = False
+    wait_for_other_process = False  # pylint: disable=invalid-name
     try:
         pipe.watch(LAYMAN_DEPS_ADJUSTED_KEY)
 
@@ -88,7 +88,7 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
 
                     if not IN_UPGRADE_PROCESS:
                         logger.info(f'Adjusting GeoServer SRS')
-                        any_srs_list_changed = False
+                        any_srs_list_changed = False  # pylint: disable=invalid-name
                         for service in gs_util.SERVICE_TYPES:
                             service_srs_list_changed = gs_util.ensure_service_srs_list(service, settings.LAYMAN_OUTPUT_SRS_LIST, settings.LAYMAN_GS_AUTH)
                             any_srs_list_changed = service_srs_list_changed or any_srs_list_changed
@@ -115,10 +115,10 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                 pipe.execute()
 
             else:
-                wait_for_other_process = True
+                wait_for_other_process = True  # pylint: disable=invalid-name
     except WatchError:
         logger.info(f"WatchError during layman's startup")
-        wait_for_other_process = True
+        wait_for_other_process = True  # pylint: disable=invalid-name
 
     if wait_for_other_process:
         while settings.LAYMAN_REDIS.get(LAYMAN_DEPS_ADJUSTED_KEY) != 'done':

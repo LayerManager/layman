@@ -276,8 +276,8 @@ def test_migrate_wms_workspace_metadata(ensure_layer):
     csw_src_key = process_client.get_source_key_from_metadata_comparison(md_comparison, csw_prefix)
     assert csw_src_key is not None
     assert md_props['wms_url']['values'][csw_src_key].startswith(wms_new_prefix)
-    for v in md_props['wms_url']['values'].values():
-        assert v.startswith(wms_new_prefix)
+    for value in md_props['wms_url']['values'].values():
+        assert value.startswith(wms_new_prefix)
     assert md_props['wms_url']['equal'] is True
     assert md_props['wms_url']['equal_or_null'] is True
     process_client.delete_workspace_layer(workspace, layer)
