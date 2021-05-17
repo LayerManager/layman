@@ -1,5 +1,7 @@
 import json
 import importlib
+
+import celery.exceptions
 from flask import current_app
 from celery.contrib.abortable import AbortableAsyncResult
 
@@ -224,7 +226,10 @@ def abort_task_chain(results_by_order, results_by_name=None):
             current_app.logger.info(
                 f'waiting for result of {task_name} {task_result.id} with state {task_result.state}')
             # if hangs forever, see comment in src/layman/layer/rest_workspace_test.py::test_post_layers_simple
-            task_result.get(propagate=False)
+            try:
+                task_result.get(propagate=False, timeout=2)
+            except celery.exceptions.TimeoutError:
+                pass
         current_app.logger.info(f'aborted result {task_name} {task_result.id} with state {task_result.state}')
 
 
