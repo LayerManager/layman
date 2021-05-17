@@ -85,7 +85,7 @@ def solve_locks(workspace, publication_type, publication_name, error_code, reque
             raise LaymanError(error_code)
     if requested_lock not in [common.PUBLICATION_LOCK_DELETE, ]:
         if requested_lock == common.PUBLICATION_LOCK_FEATURE_CHANGE:
-            raise LaymanError(19, private_data={'can_run_later': True})
+            raise LaymanError(error_code, private_data={'can_run_later': True})
         if current_lock == common.PUBLICATION_LOCK_FEATURE_CHANGE and requested_lock in [common.REQUEST_METHOD_PATCH, common.REQUEST_METHOD_POST, ]:
             celery_util.abort_publication_chain(workspace, publication_type, publication_name)
             celery_util.push_step_to_run_after_chain(workspace, publication_type, publication_name, 'layman.util::patch_after_feature_change')
