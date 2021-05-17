@@ -83,8 +83,10 @@ Publish vector data file as new layer of WMS and WFS.
 
 Processing chain consists of few steps:
 - save file to workspace directory within Layman data directory
+- save basic information (name, title, access_rights) into PostgreSQL
 - import the file to PostgreSQL database as new table into workspace schema, including geometry transformation to EPSG:3857
 - publish the table as new layer (feature type) within appropriate WFS workspaces of GeoServer
+- save bounding box into PostgreSQL
 - for layers with SLD or none style:
   - publish the table as new layer (feature type) within appropriate WMS workspaces of GeoServer
 - else for layers with QML style:
@@ -92,7 +94,7 @@ Processing chain consists of few steps:
   - publish the layer on GeoServer through WMS cascade from QGIS server
 - generate thumbnail image
 - publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
-- save basic information (name, title, access_rights) into PostgreSQL
+- update thumbnail of each [map](models.md#map) that points to this layer
 
 If workspace directory, database schema, GeoServer's workspaces, or GeoServer's datastores does not exist yet, it is created on demand.
 
@@ -542,6 +544,8 @@ JSON object with following structure:
 Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Maps](#post-workspace-maps), including [asynchronous tasks](async-tasks.md),
 
 Calling concurrent PATCH requests is not supported, as well as calling PATCH when [POST/PATCH async chain](async-tasks.md) is still running, is not allowed. In such cases, error is returned.
+
+Calling PATCH request when [WFS-T async chain](async-tasks.md) is still running causes abortion of WFS-T async chain and ensures another run of WFS-T async chain after PATCH async chain is finished.
 
 #### Request
 Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
