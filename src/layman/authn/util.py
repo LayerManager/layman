@@ -7,8 +7,8 @@ from layman.util import call_modules_fn, get_modules_from_names
 FLASK_MODULES_KEY = f'{__name__}:MODULES'
 
 
-def authenticate(f):
-    @wraps(f)
+def authenticate(function):
+    @wraps(function)
     def decorated_function(*args, **kwargs):
         # current_app.logger.info(f"authenticate ARGS {args} KWARGS {kwargs}")
         authn_modules = get_authn_modules()
@@ -19,18 +19,18 @@ def authenticate(f):
             g.user['AUTHN_MODULE'] = authn_module.__name__
         else:
             g.user = None
-        return f(*args, **kwargs)
+        return function(*args, **kwargs)
 
     return decorated_function
 
 
-def login_required(f):
-    @wraps(f)
+def login_required(function):
+    @wraps(function)
     def decorated_function(*args, **kwargs):
         # print(f"login_required ARGS {args} KWARGS {kwargs}")
         if g.user is None:
             raise LaymanError(30)
-        return f(*args, **kwargs)
+        return function(*args, **kwargs)
 
     return decorated_function
 

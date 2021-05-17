@@ -20,24 +20,24 @@ def publish_layer(workspace,
     with app.app_context():
         rest_path = url_for('rest_workspace_layers.post', workspace=workspace)
 
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file_path in file_paths:
+            assert os.path.isfile(file_path)
         files = []
 
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path, data={
+            response = client.post(rest_path, data={
                 'file': files,
                 'name': layername,
                 'title': title,
             })
-            assert rv.status_code == 200, (rv.status_code, rv.get_json())
+            assert response.status_code == 200, (response.status_code, response.get_json())
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
 
     wait_till_layer_ready(workspace, layername)
-    return rv.get_json()[0]
+    return response.get_json()[0]
 
 
 @pytest.fixture()
@@ -56,16 +56,16 @@ def delete_layer(workspace, layername, client, headers=None):
     headers = headers or {}
     with app.app_context():
         r_url = url_for('rest_workspace_layers.delete', workspace=workspace, layername=layername)
-        r = client.delete(r_url, headers=headers)
-    assert r.status_code == 200, (r.status_code, r.get_json())
+        response = client.delete(r_url, headers=headers)
+    assert response.status_code == 200, (response.status_code, response.get_json())
 
 
 def delete_map(workspace, mapname, client, headers=None):
     headers = headers or {}
     with app.app_context():
         r_url = url_for('rest_workspace_maps.delete', workspace=workspace, mapname=mapname)
-        r = client.delete(r_url, headers=headers)
-    assert r.status_code == 200, (r.status_code, r.get_json())
+        response = client.delete(r_url, headers=headers)
+    assert response.status_code == 200, (response.status_code, response.get_json())
 
 
 def publish_map(workspace,
@@ -83,22 +83,22 @@ def publish_map(workspace,
             'sample/layman.map/full.json',
         ]
 
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file_path in file_paths:
+            assert os.path.isfile(file_path)
         files = []
 
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.post(rest_path,
-                             data={'file': files,
-                                   'name': mapname,
-                                   'title': maptitle,
-                                   },
-                             headers=headers)
-            assert rv.status_code == 200, (rv.status_code, rv.get_json())
+            response = client.post(rest_path,
+                                   data={'file': files,
+                                         'name': mapname,
+                                         'title': maptitle,
+                                         },
+                                   headers=headers)
+            assert response.status_code == 200, (response.status_code, response.get_json())
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
 
     wait_till_map_ready(workspace, mapname)
 
@@ -119,10 +119,10 @@ def wait_till_layer_ready(workspace, layername):
 
 def ensure_workspace(workspace, client):
     with app.app_context():
-        r = client.get(url_for('rest_workspace_layers.post', workspace=workspace))
-    if r.status_code == 404 and r.get_json()['code'] == 40:
+        response = client.get(url_for('rest_workspace_layers.post', workspace=workspace))
+    if response.status_code == 404 and response.get_json()['code'] == 40:
         tmp_layername = 'tmp_layername'
         publish_layer(workspace, tmp_layername, client)
         delete_layer(workspace, tmp_layername, client)
-    elif r.status_code != 200:
-        raise Exception(r.data)
+    elif response.status_code != 200:
+        raise Exception(response.data)

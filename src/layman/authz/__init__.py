@@ -103,8 +103,8 @@ def can_i_edit(publ_type, workspace, publication_name):
     return can_user_write_publication(actor_name, workspace, publ_type, publication_name)
 
 
-def authorize_workspace_publications_decorator(f):
-    @wraps(f)
+def authorize_workspace_publications_decorator(func):
+    @wraps(func)
     def decorated_function(*args, **kwargs):
         # print(f"authorize ARGS {args} KWARGS {kwargs}")
         req_path = request.script_root + request.path
@@ -119,13 +119,13 @@ def authorize_workspace_publications_decorator(f):
             @after_this_request
             def authorize_after_request_tmp(response):
                 return authorize_after_multi_get_request(actor_name, response)
-        return f(*args, **kwargs)
+        return func(*args, **kwargs)
 
     return decorated_function
 
 
-def authorize_publications_decorator(f):
-    @wraps(f)
+def authorize_publications_decorator(func):
+    @wraps(func)
     def decorated_function(*args, **kwargs):
         # print(f"authorize ARGS {args} KWARGS {kwargs}")
         req_path = request.script_root + request.path
@@ -138,7 +138,7 @@ def authorize_publications_decorator(f):
             @after_this_request
             def authorize_after_request_tmp(response):
                 return authorize_after_multi_get_request(actor_name, response)
-        return f(*args, **kwargs)
+        return func(*args, **kwargs)
 
     return decorated_function
 

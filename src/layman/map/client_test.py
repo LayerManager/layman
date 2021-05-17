@@ -13,7 +13,7 @@ from layman import app, settings
 from layman.map import MAP_TYPE
 from layman.uuid import check_redis_consistency
 
-num_maps_before_test = 0
+num_maps_before_test = 0  # pylint: disable=invalid-name
 
 
 @pytest.fixture(scope="module")
@@ -29,7 +29,7 @@ def client():
     # print('before app.app_context()')
     with app.app_context():
         publs_by_type = check_redis_consistency()
-        global num_maps_before_test
+        global num_maps_before_test  # pylint: disable=invalid-name
         num_maps_before_test = len(publs_by_type[MAP_TYPE])
         yield client
 
@@ -61,8 +61,8 @@ def test_post_no_file(chrome):
     username = 'testuser2'
     client_url = settings.LAYMAN_CLIENT_URL
 
-    r = requests.get(client_url)
-    assert r.status_code == 200
+    response = requests.get(client_url)
+    assert response.status_code == 200
 
     chrome.get(client_url)
     chrome.set_window_size(1000, 2000)

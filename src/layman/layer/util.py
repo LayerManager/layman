@@ -23,18 +23,18 @@ def to_safe_layer_name(value):
     return to_safe_name(value, 'layer')
 
 
-def check_layername_decorator(f):
-    @wraps(f)
+def check_layername_decorator(func):
+    @wraps(func)
     def decorated_function(*args, **kwargs):
         check_layername(request.view_args['layername'])
-        result = f(*args, **kwargs)
+        result = func(*args, **kwargs)
         return result
 
     return decorated_function
 
 
-def info_decorator(f):
-    @wraps(f)
+def info_decorator(func):
+    @wraps(func)
     def decorated_function(*args, **kwargs):
         workspace = request.view_args['workspace']
         layername = request.view_args['layername']
@@ -42,7 +42,7 @@ def info_decorator(f):
         assert FLASK_INFO_KEY not in g, g.get(FLASK_INFO_KEY)
         # current_app.logger.info(f"Setting INFO of layer {username}:{layername}")
         g.setdefault(FLASK_INFO_KEY, info)
-        result = f(*args, **kwargs)
+        result = func(*args, **kwargs)
         return result
 
     return decorated_function
@@ -200,9 +200,9 @@ def delete_layer(workspace, layername, source=None, http_method='delete'):
 
     result = {}
     results = call_modules_fn(sources, 'delete_layer', [workspace, layername])
-    for r in results.values():
-        if r is not None:
-            result.update(r)
+    for partial_result in results.values():
+        if partial_result is not None:
+            result.update(partial_result)
     celery_util.delete_publication(workspace, LAYER_TYPE, layername)
     return result
 
@@ -248,9 +248,9 @@ def get_metadata_comparison(workspace, layername):
     }
     sources = get_sources()
     partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [workspace, layername])
-    for pi in partial_infos.values():
-        if pi is not None:
-            all_props.update(pi)
+    for partial_info in partial_infos.values():
+        if partial_info is not None:
+            all_props.update(partial_info)
 
     return metadata_common.transform_metadata_props_to_comparison(all_props)
 

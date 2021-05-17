@@ -28,8 +28,8 @@ def main():
             rds.ping()
             print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
             break
-        except redis.exceptions.ConnectionError as e:
-            handle_exception(e, attempt, wait_for_msg)
+        except redis.exceptions.ConnectionError as exc:
+            handle_exception(exc, attempt, wait_for_msg)
             attempt += 1
     print()
 
@@ -45,8 +45,8 @@ def main():
                 pass
             print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
             break
-        except psycopg2.OperationalError as e:
-            handle_exception(e, attempt, wait_for_msg)
+        except psycopg2.OperationalError as exc:
+            handle_exception(exc, attempt, wait_for_msg)
             attempt += 1
     print()
 
@@ -56,17 +56,17 @@ def main():
     while True:
         import requests
         try:
-            r = requests.get(
+            response = requests.get(
                 settings.LAYMAN_QGIS_URL,
                 timeout=0.1
             )
             expected_text = "<ServerException>Project file error. For OWS services: please provide a SERVICE and a MAP parameter pointing to a valid QGIS project file</ServerException>"
-            if r.status_code == 500 and expected_text in r.text:
+            if response.status_code == 500 and expected_text in response.text:
                 print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
                 break
-            r.raise_for_status()
-        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout, requests.exceptions.HTTPError) as e:
-            handle_exception(e, attempt, wait_for_msg)
+            response.raise_for_status()
+        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout, requests.exceptions.HTTPError) as exc:
+            handle_exception(exc, attempt, wait_for_msg)
             attempt += 1
     print()
 
@@ -81,17 +81,17 @@ def main():
     while True:
         import requests
         try:
-            r = requests.get(
+            response = requests.get(
                 geoserver.GS_REST_WORKSPACES,
                 headers=headers_json,
                 auth=auth,
                 timeout=0.1
             )
-            r.raise_for_status()
+            response.raise_for_status()
             print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
             break
-        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
-            handle_exception(e, attempt, wait_for_msg)
+        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as exc:
+            handle_exception(exc, attempt, wait_for_msg)
             attempt += 1
     print()
 
@@ -101,16 +101,16 @@ def main():
     print(f"Waiting for {wait_for_msg}")
     while True:
         try:
-            r = requests.get(
+            response = requests.get(
                 ltc_url,
                 allow_redirects=False,
                 timeout=0.1
             )
-            r.raise_for_status()
+            response.raise_for_status()
             print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
             break
-        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
-            handle_exception(e, attempt, wait_for_msg)
+        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as exc:
+            handle_exception(exc, attempt, wait_for_msg)
             attempt += 1
     print()
 
@@ -120,13 +120,13 @@ def main():
     print(f"Waiting for {wait_for_msg}")
     while True:
         try:
-            r = requests.get(
+            response = requests.get(
                 micka_url,
                 allow_redirects=False,
                 timeout=0.1
             )
-            r.raise_for_status()
-            response = r.text
+            response.raise_for_status()
+            response = response.text
             version_match = re.search(MICKA_VERSION_RE, response)
             assert (version_match and len(version_match.groups()) == 2), 'Unknown version of Micka!'
             found_version = version_match.groups()
@@ -135,8 +135,8 @@ def main():
 
             print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
             break
-        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
-            handle_exception(e, attempt, wait_for_msg)
+        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as exc:
+            handle_exception(exc, attempt, wait_for_msg)
             attempt += 1
     print()
 

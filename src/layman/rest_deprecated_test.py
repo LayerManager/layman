@@ -32,15 +32,15 @@ def test_deprecated_header(method,
     workspace = 'test_deprecated_header_workspace'
     publication = 'test_deprecated_header_publication'
     url = f'http://{settings.LAYMAN_SERVER_NAME}' + path.format(workspace=workspace, publication=publication)
-    r = method(url)
-    if r.status_code == 405:
+    response = method(url)
+    if response.status_code == 405:
         return
-    assert all(header in r.headers.keys() for header in depr_headers), (r.headers, r.status_code, r.text)
+    assert all(header in response.headers.keys() for header in depr_headers), (response.headers, response.status_code, response.text)
 
-    link_header = r.headers['Link']
+    link_header = response.headers['Link']
     alternate_link = re.search('<(.+?)>;', link_header).group(1)
 
     url_new = url.replace('/rest/', f'/rest/{settings.REST_WORKSPACES_PREFIX}/')
     assert alternate_link == url_new, link_header
-    r = method(url_new)
-    assert all(header not in r.headers.keys() for header in depr_headers), (r.headers, r.status_code, r.text)
+    response = method(url_new)
+    assert all(header not in response.headers.keys() for header in depr_headers), (response.headers, response.status_code, response.text)

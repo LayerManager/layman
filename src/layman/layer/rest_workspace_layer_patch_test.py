@@ -51,15 +51,15 @@ def assert_wms_access(workspace, authn_headers, expected_layers):
     assert set(wms.contents) == set(expected_layers)
 
 
-username = 'test_gs_rules_user'
-username2 = 'test_gs_rules_other_user'
-layername = 'test_gs_rules_layer'
+USERNAME = 'test_gs_rules_user'
+USERNAME2 = 'test_gs_rules_other_user'
+LAYERNAME = 'test_gs_rules_layer'
 
 
 @pytest.fixture(scope="module")
 def ensure_user():
     # needs liferay_mock and ensure_layman fixtures
-    for tmp_username in [username, username2]:
+    for tmp_username in [USERNAME, USERNAME2]:
         authn_headers1 = client_util.get_authz_headers(tmp_username)
 
         client_util.ensure_reserved_username(tmp_username, headers=authn_headers1)
@@ -71,74 +71,74 @@ def ensure_user():
     [
         {'read': {settings.RIGHTS_EVERYONE_ROLE},
          'write': {settings.RIGHTS_EVERYONE_ROLE},
-         'expected_other_user_layers': [layername],
-         'expected_anonymous_layers': [layername], },
+         'expected_other_user_layers': [LAYERNAME],
+         'expected_anonymous_layers': [LAYERNAME], },
         {'read': {settings.RIGHTS_EVERYONE_ROLE},
          'write': {settings.RIGHTS_EVERYONE_ROLE},
-         'expected_other_user_layers': [layername],
-         'expected_anonymous_layers': [layername], },
-    ], [
-        {'read': {settings.RIGHTS_EVERYONE_ROLE},
-         'write': {settings.RIGHTS_EVERYONE_ROLE},
-         'expected_other_user_layers': [layername],
-         'expected_anonymous_layers': [layername], },
-        {'expected_other_user_layers': [layername],
-         'expected_anonymous_layers': [layername], },
-    ], [
-        {'read': {username},
-         'write': {username},
-         'expected_other_user_layers': [],
-         'expected_anonymous_layers': [], },
-        {'read': {username},
-         'write': {username},
-         'expected_other_user_layers': [],
-         'expected_anonymous_layers': [], },
+         'expected_other_user_layers': [LAYERNAME],
+         'expected_anonymous_layers': [LAYERNAME], },
     ], [
         {'read': {settings.RIGHTS_EVERYONE_ROLE},
          'write': {settings.RIGHTS_EVERYONE_ROLE},
-         'expected_other_user_layers': [layername],
-         'expected_anonymous_layers': [layername], },
-        {'read': {username},
-         'write': {username},
+         'expected_other_user_layers': [LAYERNAME],
+         'expected_anonymous_layers': [LAYERNAME], },
+        {'expected_other_user_layers': [LAYERNAME],
+         'expected_anonymous_layers': [LAYERNAME], },
+    ], [
+        {'read': {USERNAME},
+         'write': {USERNAME},
+         'expected_other_user_layers': [],
+         'expected_anonymous_layers': [], },
+        {'read': {USERNAME},
+         'write': {USERNAME},
          'expected_other_user_layers': [],
          'expected_anonymous_layers': [], },
     ], [
-        {'read': {username},
-         'write': {username},
+        {'read': {settings.RIGHTS_EVERYONE_ROLE},
+         'write': {settings.RIGHTS_EVERYONE_ROLE},
+         'expected_other_user_layers': [LAYERNAME],
+         'expected_anonymous_layers': [LAYERNAME], },
+        {'read': {USERNAME},
+         'write': {USERNAME},
+         'expected_other_user_layers': [],
+         'expected_anonymous_layers': [], },
+    ], [
+        {'read': {USERNAME},
+         'write': {USERNAME},
          'expected_other_user_layers': [],
          'expected_anonymous_layers': [], },
         {'read': {settings.RIGHTS_EVERYONE_ROLE},
          'write': {settings.RIGHTS_EVERYONE_ROLE},
-         'expected_other_user_layers': [layername],
-         'expected_anonymous_layers': [layername], },
+         'expected_other_user_layers': [LAYERNAME],
+         'expected_anonymous_layers': [LAYERNAME], },
     ], [
         {'read': {settings.RIGHTS_EVERYONE_ROLE},
          'write': {settings.RIGHTS_EVERYONE_ROLE},
-         'expected_other_user_layers': [layername],
-         'expected_anonymous_layers': [layername], },
-        {'write': {username},
-         'expected_other_user_layers': [layername],
-         'expected_anonymous_layers': [layername], },
-        {'read': {username},
+         'expected_other_user_layers': [LAYERNAME],
+         'expected_anonymous_layers': [LAYERNAME], },
+        {'write': {USERNAME},
+         'expected_other_user_layers': [LAYERNAME],
+         'expected_anonymous_layers': [LAYERNAME], },
+        {'read': {USERNAME},
          'expected_other_user_layers': [],
          'expected_anonymous_layers': [], },
-        {'read': {username, username2},
-         'expected_other_user_layers': [layername],
+        {'read': {USERNAME, USERNAME2},
+         'expected_other_user_layers': [LAYERNAME],
          'expected_anonymous_layers': [], },
-        {'read': {username, username2, settings.RIGHTS_EVERYONE_ROLE},
-         'expected_other_user_layers': [layername],
-         'expected_anonymous_layers': [layername], },
+        {'read': {USERNAME, USERNAME2, settings.RIGHTS_EVERYONE_ROLE},
+         'expected_other_user_layers': [LAYERNAME],
+         'expected_anonymous_layers': [LAYERNAME], },
     ], [
-        {'read': {username},
-         'write': {username},
+        {'read': {USERNAME},
+         'write': {USERNAME},
          'expected_other_user_layers': [],
          'expected_anonymous_layers': [], },
         {'read': {settings.RIGHTS_EVERYONE_ROLE},
-         'expected_other_user_layers': [layername],
-         'expected_anonymous_layers': [layername], },
+         'expected_other_user_layers': [LAYERNAME],
+         'expected_anonymous_layers': [LAYERNAME], },
     ], [
-        {'read': {username},
-         'write': {username},
+        {'read': {USERNAME},
+         'write': {USERNAME},
          'expected_other_user_layers': [],
          'expected_anonymous_layers': [], },
     ]
@@ -146,8 +146,8 @@ def ensure_user():
 @pytest.mark.parametrize("use_file", [False, True])
 def test_access_rights(access_rights_and_expected_list, use_file):
 
-    owner_authn_headers = client_util.get_authz_headers(username)
-    other_authn_headers = client_util.get_authz_headers(username2)
+    owner_authn_headers = client_util.get_authz_headers(USERNAME)
+    other_authn_headers = client_util.get_authz_headers(USERNAME2)
 
     post_method = client_util.publish_workspace_layer
     patch_method = client_util.patch_workspace_layer
@@ -163,20 +163,20 @@ def test_access_rights(access_rights_and_expected_list, use_file):
             if access_rights_and_expected.get(right_type):
                 roles_to_test[right_type] = access_rights_and_expected[right_type]
                 access_rights[right_type] = access_rights_and_expected[right_type]
-        write_method(username,
-                     layername,
+        write_method(USERNAME,
+                     LAYERNAME,
                      access_rights={key: ','.join(value) for key, value in access_rights.items()},
                      headers=owner_authn_headers,
                      file_paths=[
                          'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
                      ] if use_file else None)
 
-        client_util.assert_workspace_layers(username, [layername], owner_authn_headers)
-        assert_gs_user_and_roles(username)
-        assert_gs_layer_data_security(username, layername, roles_to_test)
-        assert_layman_layer_access_rights(username, layername, roles_to_test)
-        assert_wms_access(username, owner_authn_headers, [layername])
-        assert_wms_access(username, other_authn_headers, access_rights_and_expected['expected_other_user_layers'])
-        assert_wms_access(username, None, access_rights_and_expected['expected_anonymous_layers'])
+        client_util.assert_workspace_layers(USERNAME, [LAYERNAME], owner_authn_headers)
+        assert_gs_user_and_roles(USERNAME)
+        assert_gs_layer_data_security(USERNAME, LAYERNAME, roles_to_test)
+        assert_layman_layer_access_rights(USERNAME, LAYERNAME, roles_to_test)
+        assert_wms_access(USERNAME, owner_authn_headers, [LAYERNAME])
+        assert_wms_access(USERNAME, other_authn_headers, access_rights_and_expected['expected_other_user_layers'])
+        assert_wms_access(USERNAME, None, access_rights_and_expected['expected_anonymous_layers'])
 
-    client_util.delete_workspace_layer(username, layername, headers=owner_authn_headers)
+    client_util.delete_workspace_layer(USERNAME, LAYERNAME, headers=owner_authn_headers)

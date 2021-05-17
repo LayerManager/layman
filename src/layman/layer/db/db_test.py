@@ -163,16 +163,16 @@ def test_abort_import_layer_vector_file():
     )
 
     def abort_layer_import():
-        p = db.import_layer_vector_file_async(username, layername, main_filepath,
-                                              crs_id)
+        process = db.import_layer_vector_file_async(username, layername, main_filepath,
+                                                    crs_id)
         time1 = time.time()
-        while p.poll() is None:
+        while process.poll() is None:
             if time.time() - time1 > 0.1:
                 # print('terminating process')
-                p.terminate()
+                process.terminate()
             time.sleep(0.1)
 
-        return_code = p.poll()
+        return_code = process.poll()
         return return_code
 
     return_code = abort_layer_import()

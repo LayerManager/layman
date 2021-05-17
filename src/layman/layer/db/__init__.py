@@ -81,13 +81,13 @@ def delete_whole_user(username):
 
 # def import_layer_vector_file(username, layername, main):
 def import_layer_vector_file(username, layername, main_filepath, crs_id):
-    p = import_layer_vector_file_async(username, layername, main_filepath,
-                                       crs_id)
-    while p.poll() is None:
+    process = import_layer_vector_file_async(username, layername, main_filepath,
+                                             crs_id)
+    while process.poll() is None:
         pass
-    return_code = p.poll()
+    return_code = process.poll()
     if return_code != 0:
-        pg_error = str(p.stdout.read())
+        pg_error = str(process.stdout.read())
         raise LaymanError(11, private_data=pg_error)
 
 
@@ -121,9 +121,9 @@ def import_layer_vector_file_async(username, layername, main_filepath,
     ])
 
     # print(' '.join(bash_args))
-    p = subprocess.Popen(bash_args, stdout=subprocess.PIPE,
-                         stderr=subprocess.STDOUT)
-    return p
+    process = subprocess.Popen(bash_args, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT)
+    return process
 
 
 def check_new_layername(workspace, layername, conn_cur=None):
@@ -222,9 +222,9 @@ limit {limit}
     col_texts = defaultdict(list)
     for row in rows:
         for idx, col_name in enumerate(col_names):
-            v = row[idx]
-            if v is not None and len(v) > 0:
-                col_texts[col_name].append(v)
+            val = row[idx]
+            if val is not None and len(val) > 0:
+                col_texts[col_name].append(val)
     col_texts = [
         ' '.join(texts)
         for _, texts in col_texts.items()
@@ -236,11 +236,11 @@ limit {limit}
 def get_text_languages(username, layername):
     texts, num_rows = get_text_data(username, layername)
     all_langs = set()
-    for t in texts:
+    for text in texts:
         # skip short texts
-        if len(t) < num_rows:
+        if len(text) < num_rows:
             continue
-        langs = get_languages_iso639_2(t)
+        langs = get_languages_iso639_2(text)
         if langs:
             lang = langs[0]
             # print(f"text={t}\nlanguage={lang}")
@@ -393,10 +393,10 @@ def guess_scale_denominator(username, layername):
         log_dist = math.log10(distance * coef)
         sd_log = min(log_sd_list, key=lambda x: abs(x - log_dist))
         sd_idx = log_sd_list.index(sd_log)
-        sd = SCALE_DENOMINATORS[sd_idx]
+        scale_denominator = SCALE_DENOMINATORS[sd_idx]
     else:
-        sd = None
-    return sd
+        scale_denominator = None
+    return scale_denominator
 
 
 def get_most_frequent_lower_distance2(username, layername, conn_cur=None):

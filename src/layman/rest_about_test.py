@@ -10,9 +10,9 @@ from layman import app
 def test_version():
     with app.app_context():
         r_url = url_for('rest_about.get_version')
-    r = requests.get(r_url)
-    process_client.raise_layman_error(r)
-    result = r.json()
+    response = requests.get(r_url)
+    process_client.raise_layman_error(response)
+    result = response.json()
     assert 'about' in result.keys()
     assert 'applications' in result['about'].keys()
     assert 'layman' in result['about']['applications'].keys()

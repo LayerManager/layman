@@ -81,19 +81,19 @@ def get_wms_proxy(username):
     ows_url = get_wms_url(username)
 
     def create_string_value():
-        r = requests.get(ows_url, params={
+        response = requests.get(ows_url, params={
             'SERVICE': 'WMS',
             'REQUEST': 'GetCapabilities',
             'VERSION': VERSION,
         }, headers=headers, timeout=5,)
-        if r.status_code != 200:
+        if response.status_code != 200:
             result = None
-            if r.status_code != 404:
-                r.raise_for_status()
-                raise Exception(f'Status code = {r.status_code}')
+            if response.status_code != 404:
+                response.raise_for_status()
+                raise Exception(f'Status code = {response.status_code}')
         else:
-            r.encoding = 'UTF-8'
-            result = r.text
+            response.encoding = 'UTF-8'
+            result = response.text
         return result
 
     def mem_value_from_string_value(string_value):
@@ -170,8 +170,8 @@ def get_metadata_comparison(workspace, layername):
             if crs.split(':')[0] == 'EPSG'
         ])
         reference_system = crs_list
-    except BaseException as e:
-        current_app.logger.error(e)
+    except BaseException as exc:
+        current_app.logger.error(exc)
         reference_system = None
     props = {
         'wms_url': wms_url,
@@ -198,13 +198,13 @@ def add_params_to_url(url, params):
 
 def strip_params_from_url(url, params):
     params = [p.lower() for p in params]
-    u = urlparse(url)
-    query = parse_qs(u.query, keep_blank_values=True)
-    for p in list(query.keys()):
-        if p.lower() in params:
-            query.pop(p, None)
-    u = u._replace(query=urlencode(query, True))
-    url = urlunparse(u)
+    url_parsed = urlparse(url)
+    query = parse_qs(url_parsed.query, keep_blank_values=True)
+    for param_key in list(query.keys()):
+        if param_key.lower() in params:
+            query.pop(param_key, None)
+    url_parsed = url_parsed._replace(query=urlencode(query, True))
+    url = urlunparse(url_parsed)
     return url
 
 

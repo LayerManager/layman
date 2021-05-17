@@ -58,8 +58,8 @@ def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_nam
     if uuid is None or csw is None:
         return None
     muuid = get_metadata_uuid(uuid)
-    el = common_util.get_record_element_by_id(csw, muuid)
-    if el is None:
+    element = common_util.get_record_element_by_id(csw, muuid)
+    if element is None:
         if create_if_not_exists:
             return csw_insert(workspace, layername)
         return None
@@ -72,9 +72,9 @@ def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_nam
     }
     # current_app.logger.info(f"patch_layer prop_values={prop_values}")
     basic_template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), './record-template.xml')
-    el = common_util.fill_xml_template_obj(el, prop_values, METADATA_PROPERTIES,
-                                           basic_template_path=basic_template_path)
-    record = ET.tostring(el, encoding='unicode', pretty_print=True)
+    element = common_util.fill_xml_template_obj(element, prop_values, METADATA_PROPERTIES,
+                                                basic_template_path=basic_template_path)
+    record = ET.tostring(element, encoding='unicode', pretty_print=True)
     # current_app.logger.info(f"patch_layer record=\n{record}")
     try:
         common_util.csw_update({
@@ -189,8 +189,8 @@ def _get_property_values(
         md_language=None,
 ):
     epsg_codes = epsg_codes or [3857, 4326]
-    w, s, e, n = extent or [11.87, 48.12, 19.13, 51.59]
-    extent = [max(w, -180), max(s, -90), min(e, 180), min(n, 90)]
+    west, south, east, north = extent or [11.87, 48.12, 19.13, 51.59]
+    extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
     languages = languages or []
 
     result = {
@@ -365,13 +365,13 @@ def get_metadata_comparison(workspace, layername):
     if uuid is None or csw is None:
         return {}
     muuid = get_metadata_uuid(uuid)
-    el = common_util.get_record_element_by_id(csw, muuid)
-    if el is None:
+    element = common_util.get_record_element_by_id(csw, muuid)
+    if element is None:
         return {}
 
     # current_app.logger.info(f"xml\n{ET.tostring(el)}")
 
-    props = common_util.parse_md_properties(el, [
+    props = common_util.parse_md_properties(element, [
         'abstract',
         'extent',
         'graphic_url',

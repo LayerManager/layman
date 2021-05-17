@@ -61,19 +61,19 @@ def server2():
 @pytest.mark.usefixtures('server', 'server2')
 def test_mock():
     url1 = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT1}/rest/test-oauth2/user-profile"
-    rv = requests.get(url1, headers={
+    response = requests.get(url1, headers={
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc'
     })
-    assert rv.status_code == 200
-    resp_json = rv.json()
+    assert response.status_code == 200
+    resp_json = response.json()
     assert resp_json['FLASK_ENV'] == 'development'
 
     url2 = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT2}/rest/test-oauth2/user-profile"
-    rv = requests.get(url2, headers={
+    response = requests.get(url2, headers={
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc'
     })
-    assert rv.status_code == 200
-    resp_json = rv.json()
+    assert response.status_code == 200
+    resp_json = response.json()
     assert resp_json['FLASK_ENV'] == 'production'

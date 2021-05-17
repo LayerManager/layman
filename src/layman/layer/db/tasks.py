@@ -31,18 +31,18 @@ def refresh_table(
     if self.is_aborted():
         raise AbortedException
     main_filepath = get_layer_main_file_path(username, layername)
-    p = db.import_layer_vector_file_async(username, layername, main_filepath, crs_id)
-    while p.poll() is None and not self.is_aborted():
+    process = db.import_layer_vector_file_async(username, layername, main_filepath, crs_id)
+    while process.poll() is None and not self.is_aborted():
         pass
     if self.is_aborted():
         logger.info(f'terminating {username} {layername}')
-        p.terminate()
+        process.terminate()
         logger.info(f'terminating {username} {layername}')
         delete_layer(username, layername)
         raise AbortedException
-    return_code = p.poll()
+    return_code = process.poll()
     if return_code != 0:
-        pg_error = str(p.stdout.read())
+        pg_error = str(process.stdout.read())
         logger.error(f"STDOUT: {pg_error}")
         if "ERROR:  zero-length delimited identifier at or near" in pg_error:
             err_code = 28

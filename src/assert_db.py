@@ -26,8 +26,8 @@ def main():
                 pass
             print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
             break
-        except psycopg2.OperationalError as e:
-            handle_exception(e, attempt, wait_for_msg)
+        except psycopg2.OperationalError as exc:
+            handle_exception(exc, attempt, wait_for_msg)
             attempt += 1
 
     try:

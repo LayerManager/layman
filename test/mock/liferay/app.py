@@ -10,14 +10,14 @@ TOKEN_HEADER = 'Authorization'
 def create_app(app_config):
     app = Flask(__name__)
     app_config.setdefault('OAUTH2_USERS', {})
-    for k, v in app_config.items():
-        if k == 'OAUTH2_USERS':
+    for key, value in app_config.items():
+        if key == 'OAUTH2_USERS':
             tok2is = {}
             tok2is.update(token_2_introspection)
             tok2prof = {}
             tok2prof.update(token_2_profile)
             u_idx = 30000
-            for username, userdef in v.items():
+            for username, userdef in value.items():
                 sub = userdef.get('sub') if userdef and userdef.get('sub') else f'{u_idx}'
                 assert sub not in [
                     introsp['sub'] for introsp in tok2is.values()
@@ -39,7 +39,7 @@ def create_app(app_config):
             app.config['OAUTH2_TOKEN_2_INTROSPECTION'] = tok2is
             app.config['OAUTH2_TOKEN_2_PROFILE'] = tok2prof
         else:
-            app.config[k] = v
+            app.config[key] = value
     app.register_blueprint(introspection_bp, url_prefix='/rest/test-oauth2/')
     app.register_blueprint(user_profile_bp, url_prefix='/rest/test-oauth2/')
     return app

@@ -45,32 +45,32 @@ def delete_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
 
 def ensure_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
     geoserver_wms_workspace = wms.get_geoserver_workspace(workspace)
-    for ws in [workspace, geoserver_wms_workspace]:
-        created = gs_util.ensure_workspace(ws, auth)
+    for wspace in [workspace, geoserver_wms_workspace]:
+        created = gs_util.ensure_workspace(wspace, auth)
         if created:
-            gs_util.create_db_store(ws, auth, workspace, pg_conn=settings.PG_CONN)
+            gs_util.create_db_store(wspace, auth, workspace, pg_conn=settings.PG_CONN)
 
 
 def delete_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
     geoserver_wms_workspace = wms.get_geoserver_workspace(workspace)
-    for ws in [workspace, geoserver_wms_workspace]:
-        gs_util.delete_db_store(ws, auth)
-        gs_util.delete_workspace(ws, auth)
+    for wspace in [workspace, geoserver_wms_workspace]:
+        gs_util.delete_db_store(wspace, auth)
+        gs_util.delete_workspace(wspace, auth)
 
 
 def get_all_rules(auth):
     key = FLASK_RULES_KEY
     if key not in g:
-        r = requests.get(
+        response = requests.get(
             settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
             # data=json.dumps(payload),
             headers=headers_json,
             auth=auth,
             timeout=5,
         )
-        r.raise_for_status()
+        response.raise_for_status()
         # app.logger.info(r.text)
-        all_rules = r.json()
+        all_rules = response.json()
         g.setdefault(key, all_rules)
 
     return g.get(key)
@@ -143,16 +143,16 @@ def publish_layer_from_db(workspace, layername, description, title, access_right
         },
         'nativeBoundingBox': get_layer_native_bbox(workspace, layername),
     }
-    r = requests.post(urljoin(GS_REST_WORKSPACES,
-                              geoserver_workspace + '/datastores/postgresql/featuretypes/'),
-                      data=json.dumps({
-                          "featureType": feature_type_def
-                      }),
-                      headers=headers_json,
-                      auth=settings.LAYMAN_GS_AUTH,
-                      timeout=5,
-                      )
-    r.raise_for_status()
+    response = requests.post(urljoin(GS_REST_WORKSPACES,
+                                     geoserver_workspace + '/datastores/postgresql/featuretypes/'),
+                             data=json.dumps({
+                                 "featureType": feature_type_def
+                             }),
+                             headers=headers_json,
+                             auth=settings.LAYMAN_GS_AUTH,
+                             timeout=5,
+                             )
+    response.raise_for_status()
 
     set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 
@@ -189,16 +189,16 @@ def publish_layer_from_qgis(workspace, layer, description, title, access_rights,
         },
         'nativeBoundingBox': get_layer_native_bbox(workspace, layer),
     }
-    r = requests.post(urljoin(GS_REST_WORKSPACES,
-                              geoserver_workspace + '/wmslayers/'),
-                      data=json.dumps({
-                          "wmsLayer": wms_layer_def
-                      }),
-                      headers=headers_json,
-                      auth=settings.LAYMAN_GS_AUTH,
-                      timeout=5,
-                      )
-    r.raise_for_status()
+    response = requests.post(urljoin(GS_REST_WORKSPACES,
+                                     geoserver_workspace + '/wmslayers/'),
+                             data=json.dumps({
+                                 "wmsLayer": wms_layer_def
+                             }),
+                             headers=headers_json,
+                             auth=settings.LAYMAN_GS_AUTH,
+                             timeout=5,
+                             )
+    response.raise_for_status()
 
     set_security_rules(workspace, layer, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 

@@ -16,7 +16,7 @@ from .oauth2 import liferay
 
 LIFERAY_PORT = process.LIFERAY_PORT
 
-num_layers_before_test = 0
+num_layers_before_test = 0  # pylint: disable=invalid-name
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -75,7 +75,7 @@ def client():
 
     with app.app_context():
         publs_by_type = uuid.check_redis_consistency()
-        global num_layers_before_test
+        global num_layers_before_test  # pylint: disable=invalid-name
         num_layers_before_test = len(publs_by_type[LAYER_TYPE])
     yield client
 
@@ -96,11 +96,11 @@ def test_two_clients():
 @pytest.mark.usefixtures('app_context')
 def test_no_auth_header(client):
     username = 'testuser1'
-    rv = client.get(url_for('rest_workspace_layers.get', workspace=username), headers={
+    response = client.get(url_for('rest_workspace_layers.get', workspace=username), headers={
         f'{ISS_URL_HEADER}': 'abc'
     })
-    assert rv.status_code == 403
-    resp_json = rv.get_json()
+    assert response.status_code == 403
+    resp_json = response.get_json()
     assert resp_json['code'] == 32
     assert resp_json['sub_code'] == 2
 
@@ -116,9 +116,9 @@ def test_no_auth_header(client):
 @pytest.mark.usefixtures('app_context')
 def test_auth_header_one_part(client, headers):
     username = 'testuser1'
-    rv = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
-    assert rv.status_code == 403
-    resp_json = rv.get_json()
+    response = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
+    assert response.status_code == 403
+    resp_json = response.get_json()
     assert resp_json['code'] == 32
     assert resp_json['sub_code'] == 3
 
@@ -134,9 +134,9 @@ def test_auth_header_one_part(client, headers):
 @pytest.mark.usefixtures('app_context')
 def test_auth_header_bad_first_part(client, headers):
     username = 'testuser1'
-    rv = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
-    assert rv.status_code == 403
-    resp_json = rv.get_json()
+    response = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
+    assert response.status_code == 403
+    resp_json = response.get_json()
     assert resp_json['code'] == 32
     assert resp_json['sub_code'] == 4
 
@@ -152,9 +152,9 @@ def test_auth_header_bad_first_part(client, headers):
 @pytest.mark.usefixtures('app_context')
 def test_auth_header_no_access_token(client, headers):
     username = 'testuser1'
-    rv = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
-    assert rv.status_code == 403
-    resp_json = rv.get_json()
+    response = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
+    assert response.status_code == 403
+    resp_json = response.get_json()
     assert resp_json['code'] == 32
     assert resp_json['sub_code'] == 5
 
@@ -168,9 +168,9 @@ def test_auth_header_no_access_token(client, headers):
 @pytest.mark.usefixtures('app_context')
 def test_no_provider_found(client, headers):
     username = 'testuser1'
-    rv = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
-    assert rv.status_code == 403
-    resp_json = rv.get_json()
+    response = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
+    assert response.status_code == 403
+    resp_json = response.get_json()
     assert resp_json['code'] == 32
     assert resp_json['sub_code'] == 6
 
@@ -186,9 +186,9 @@ def test_no_provider_found(client, headers):
 @pytest.mark.usefixtures('app_context', 'unexisting_introspection_url')
 def test_unexisting_introspection_url(client, headers):
     username = 'testuser1'
-    rv = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
-    assert rv.status_code == 403
-    resp_json = rv.get_json()
+    response = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
+    assert response.status_code == 403
+    resp_json = response.get_json()
     assert resp_json['code'] == 32
     assert resp_json['sub_code'] == 8
 
@@ -205,9 +205,9 @@ def test_unexisting_introspection_url(client, headers):
 def test_token_inactive(client, headers):
     username = 'testuser1'
     url = url_for('rest_workspace_layers.get', workspace=username)
-    rv = client.get(url, headers=headers)
-    assert rv.status_code == 403
-    resp_json = rv.get_json()
+    response = client.get(url, headers=headers)
+    assert response.status_code == 403
+    resp_json = response.get_json()
     assert resp_json['code'] == 32
     assert resp_json['sub_code'] == 9
 
@@ -224,21 +224,21 @@ def test_token_inactive(client, headers):
 def test_token_active(client, headers):
     username = 'testuser1'
     url = url_for('rest_workspace_layers.get', workspace=username)
-    rv = client.get(url, headers=headers)
-    assert rv.status_code == 404
-    resp_json = rv.get_json()
+    response = client.get(url, headers=headers)
+    assert response.status_code == 404
+    resp_json = response.get_json()
     assert resp_json['code'] == 40
 
 
 @pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url', 'ensure_layman')
 def test_authn_get_current_user_without_username(client):
     rest_path = url_for('rest_current_user.get')
-    rv = client.get(rest_path, headers={
+    response = client.get(rest_path, headers={
         f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
     })
-    assert rv.status_code == 200
-    resp_json = rv.get_json()
+    assert response.status_code == 200
+    resp_json = response.get_json()
     assert resp_json['authenticated'] is True
     assert {'authenticated', 'claims'} == set(resp_json.keys())
     claims = resp_json['claims']
@@ -260,9 +260,9 @@ def test_authn_get_current_user_without_username(client):
 @pytest.mark.usefixtures('app_context')
 def test_get_current_user_anonymous(client):
     rest_path = url_for('rest_current_user.get')
-    rv = client.get(rest_path)
-    assert rv.status_code == 200
-    resp_json = rv.get_json()
+    response = client.get(rest_path)
+    assert response.status_code == 200
+    resp_json = response.get_json()
     assert resp_json['authenticated'] is False, resp_json
     assert {'authenticated', 'claims'} == set(resp_json.keys()), resp_json
     claims = resp_json['claims']
@@ -276,9 +276,9 @@ def test_get_current_user_anonymous(client):
 @pytest.mark.usefixtures('app_context')
 def test_patch_current_user_anonymous(client):
     rest_path = url_for('rest_current_user.patch')
-    rv = client.patch(rest_path)
-    assert rv.status_code == 403
-    resp_json = rv.get_json()
+    response = client.patch(rest_path)
+    assert response.status_code == 403
+    resp_json = response.get_json()
     assert resp_json['code'] == 30
 
 
@@ -294,15 +294,15 @@ def test_patch_current_user_without_username():
     # reserve username
     with app.app_context():
         rest_path = url_for('rest_current_user.patch', adjust_username='true')
-    r = requests.patch(rest_path, headers=user1_authn_headers)
-    assert r.status_code == 200, r.text
+    response = requests.patch(rest_path, headers=user1_authn_headers)
+    assert response.status_code == 200, response.text
 
     # check if it was reserved
     with app.app_context():
         rest_path = url_for('rest_current_user.get')
-    r = requests.get(rest_path, headers=user1_authn_headers)
-    assert r.status_code == 200, r.text
-    resp_json = r.json()
+    response = requests.get(rest_path, headers=user1_authn_headers)
+    assert response.status_code == 200, response.text
+    resp_json = response.json()
     assert resp_json['authenticated'] is True
     assert 'username' in resp_json
     exp_username = 'test_patch_current_user_user1_screen_name'
@@ -324,20 +324,20 @@ def test_patch_current_user_without_username():
     # re-reserve username
     with app.app_context():
         rest_path = url_for('rest_current_user.patch', adjust_username='true')
-    r = requests.patch(rest_path, headers=user1_authn_headers)
-    assert r.status_code == 400, r.text
-    r_json = r.json()
+    response = requests.patch(rest_path, headers=user1_authn_headers)
+    assert response.status_code == 400, response.text
+    r_json = response.json()
     assert r_json['code'] == 34
     assert r_json['detail']['username'] == exp_username
 
     # reserve same username by other user
     with app.app_context():
         rest_path = url_for('rest_current_user.patch')
-    r = requests.patch(rest_path, data={
+    response = requests.patch(rest_path, data={
         'username': exp_username,
     }, headers=user2_authn_headers)
-    assert r.status_code == 409, r.text
-    r_json = r.json()
+    assert response.status_code == 409, response.text
+    r_json = response.json()
     assert r_json['code'] == 35
     assert 'detail' not in r_json
 
@@ -346,11 +346,11 @@ def test_patch_current_user_without_username():
         rest_path = url_for('rest_current_user.patch')
     exp_username2 = 'test_patch_current_user_user2'
     exp_sub2 = '20143'
-    r = requests.patch(rest_path, data={
+    response = requests.patch(rest_path, data={
         'username': exp_username2,
     }, headers=user2_authn_headers)
-    assert r.status_code == 200, r.text
-    resp_json = r.json()
+    assert response.status_code == 200, response.text
+    resp_json = response.json()
     assert 'username' in resp_json
     assert resp_json['username'] == exp_username2
     assert resp_json['claims']['sub'] == exp_sub2
@@ -364,9 +364,9 @@ def test_patch_current_user_without_username():
 
     with app.app_context():
         rest_path = url_for('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)
-    r = requests.get(rest_path, headers=user1_authn_headers)
-    assert r.status_code == 200, r.text
-    resp_json = r.json()
+    response = requests.get(rest_path, headers=user1_authn_headers)
+    assert response.status_code == 200, response.text
+    resp_json = response.json()
     assert resp_json['name'] == mapname
     user_info = resp_json['user']
     assert {'email', 'name'} == set(user_info.keys())

@@ -37,9 +37,9 @@ def reserve_username(username, adjust=False):
             ensure_whole_user(username)
             claims = get_open_id_claims()
             _save_reservation(username, claims)
-        except LaymanError as e:
+        except LaymanError as exc:
             delete_whole_user(username)
-            raise e
+            raise exc
         return
     claims = get_open_id_claims()
     suggestions = [username] + get_username_suggestions_from_claims(claims)
@@ -56,9 +56,9 @@ def reserve_username(username, adjust=False):
                 suggestion = f"{suggestion}{idx}"
             try:
                 check_username(suggestion)
-            except LaymanError as e:
-                if not (e.code == 2 or e.code == 35):
-                    raise e
+            except LaymanError as exc:
+                if not (exc.code == 2 or exc.code == 35):
+                    raise exc
             if suggestion in usernames:
                 continue
             try:

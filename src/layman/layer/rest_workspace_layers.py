@@ -157,13 +157,13 @@ def post(workspace):
             task_options,
             'layman.layer.filesystem.input_chunk' if use_chunk_upload else 'layman.layer.filesystem.input_file'
         )
-    except Exception as e:
+    except Exception as exc:
         try:
             if util.is_layer_chain_ready(workspace, layername):
                 redis_util.unlock_publication(workspace, LAYER_TYPE, layername)
         finally:
             redis_util.unlock_publication(workspace, LAYER_TYPE, layername)
-        raise e
+        raise exc
 
     # app.logger.info('uploaded layer '+layername)
     return jsonify([layer_result]), 200

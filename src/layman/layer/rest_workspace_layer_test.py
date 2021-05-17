@@ -21,16 +21,16 @@ def test_style_value():
         layer_url = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
         expected_style_url = url_for('rest_workspace_layer_style.get', workspace=username, layername=layername,
                                      internal=False)
-    r = requests.get(layer_url)
-    assert r.status_code == 200, r.text
-    resp_json = json.loads(r.text)
+    response = requests.get(layer_url)
+    assert response.status_code == 200, response.text
+    resp_json = json.loads(response.text)
 
-    assert 'style' in resp_json, r.text
-    assert 'url' in resp_json['style'], r.text
-    assert 'status' not in resp_json['style'], r.text
+    assert 'style' in resp_json, response.text
+    assert 'url' in resp_json['style'], response.text
+    assert 'status' not in resp_json['style'], response.text
 
     external_style_url = resp_json['style']['url']
-    assert external_style_url == expected_style_url, (r.text, external_style_url)
+    assert external_style_url == expected_style_url, (response.text, external_style_url)
 
     with app.app_context():
         style_url = url_for('rest_workspace_layer_style.get', workspace=username, layername=layername)

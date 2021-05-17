@@ -31,18 +31,18 @@ def to_safe_map_name(value):
     return to_safe_name(value, 'map')
 
 
-def check_mapname_decorator(f):
-    @wraps(f)
+def check_mapname_decorator(function):
+    @wraps(function)
     def decorated_function(*args, **kwargs):
         check_mapname(request.view_args['mapname'])
-        result = f(*args, **kwargs)
+        result = function(*args, **kwargs)
         return result
 
     return decorated_function
 
 
-def info_decorator(f):
-    @wraps(f)
+def info_decorator(function):
+    @wraps(function)
     def decorated_function(*args, **kwargs):
         workspace = request.view_args['workspace']
         mapname = request.view_args['mapname']
@@ -50,7 +50,7 @@ def info_decorator(f):
         assert FLASK_INFO_KEY not in g, g.get(FLASK_INFO_KEY)
         # current_app.logger.info(f"Setting INFO of map {username}:{mapname}")
         g.setdefault(FLASK_INFO_KEY, info)
-        result = f(*args, **kwargs)
+        result = function(*args, **kwargs)
         return result
 
     return decorated_function
@@ -283,9 +283,9 @@ def get_metadata_comparison(workspace, mapname):
     }
     sources = get_sources()
     partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [workspace, mapname])
-    for pi in partial_infos.values():
-        if pi is not None:
-            all_props.update(pi)
+    for partial_info in partial_infos.values():
+        if partial_info is not None:
+            all_props.update(partial_info)
     map_json = get_map_file_json(workspace, mapname)
     if map_json:
         soap_operates_on = next(iter(partial_infos[csw].values()))['operates_on'] if partial_infos[csw] else []
@@ -314,8 +314,8 @@ def get_map_file_json(username, mapname):
 def find_maps_by_grep(regexp):
     data_dir = settings.LAYMAN_DATA_DIR
     grep_cmd = f"grep -r -E '{regexp}' {data_dir} || [ $? = 1 ]"
-    p = subprocess.check_output(grep_cmd, shell=True,).decode('ascii')
-    map_paths = [line.split(':')[0] for line in p.split('\n')
+    grep_process = subprocess.check_output(grep_cmd, shell=True,).decode('ascii')
+    map_paths = [line.split(':')[0] for line in grep_process.split('\n')
                  if line.split(':')[0]]
 
     maps = {(map_path.split('/')[-5], map_path.split('/')[-3]) for map_path in map_paths}

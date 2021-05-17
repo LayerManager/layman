@@ -72,12 +72,12 @@ def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_nam
     if uuid is None or csw is None:
         return None
     muuid = get_metadata_uuid(uuid)
-    el = common_util.get_record_element_by_id(csw, muuid)
-    if el is None:
+    element = common_util.get_record_element_by_id(csw, muuid)
+    if element is None:
         if create_if_not_exists:
             return csw_insert(workspace, mapname, actor_name=actor_name)
         return None
-    # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
+    # current_app.logger.info(f"Current element=\n{ET.tostring(element, encoding='unicode', pretty_print=True)}")
 
     _, prop_values = get_template_path_and_values(workspace, mapname, http_method=common.REQUEST_METHOD_PATCH, actor_name=actor_name)
     prop_values = {
@@ -86,9 +86,9 @@ def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_nam
     }
     # current_app.logger.info(f"update_map prop_values={prop_values}")
     basic_template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), './record-template.xml')
-    el = common_util.fill_xml_template_obj(el, prop_values, METADATA_PROPERTIES,
-                                           basic_template_path=basic_template_path)
-    record = ET.tostring(el, encoding='unicode', pretty_print=True)
+    element = common_util.fill_xml_template_obj(element, prop_values, METADATA_PROPERTIES,
+                                                basic_template_path=basic_template_path)
+    record = ET.tostring(element, encoding='unicode', pretty_print=True)
     # current_app.logger.info(f"update_map record=\n{record}")
     try:
         common_util.csw_update({
@@ -233,14 +233,14 @@ def _get_property_values(
         md_date_stamp='2007-05-25',
         identifier='http://www.env.cz/data/liberec/admin-cleneni',
         identifier_label='Liberec-AdminUnits',
-        extent=None,  # w, s, e, n
+        extent=None,  # west, south, east, north
         epsg_codes=None,
         operates_on=None,
         md_language=None,
 ):
     epsg_codes = epsg_codes or ['3857']
-    w, s, e, n = extent or [14.62, 50.58, 15.42, 50.82]
-    extent = [max(w, -180), max(s, -90), min(e, 180), min(n, 90)]
+    west, south, east, north = extent or [14.62, 50.58, 15.42, 50.82]
+    extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
 
     # list of dictionaries, possible keys are 'xlink:title', 'xlink:href', 'uuidref'
     operates_on = operates_on or []
@@ -410,13 +410,13 @@ def get_metadata_comparison(workspace, mapname):
     if uuid is None or csw is None:
         return {}
     muuid = get_metadata_uuid(uuid)
-    el = common_util.get_record_element_by_id(csw, muuid)
-    if el is None:
+    element = common_util.get_record_element_by_id(csw, muuid)
+    if element is None:
         return {}
 
     # current_app.logger.info(f"xml\n{ET.tostring(el)}")
 
-    props = common_util.parse_md_properties(el, [
+    props = common_util.parse_md_properties(element, [
         'abstract',
         'extent',
         'graphic_url',

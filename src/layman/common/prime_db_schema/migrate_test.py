@@ -11,9 +11,9 @@ from .schema_initialization import ensure_schema
 
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
-username = 'test_schema_user'
-layername = 'test_schema_layer'
-mapname = 'test_schema_map'
+USERNAME = 'test_schema_user'
+LAYERNAME = 'test_schema_layer'
+MAPNAME = 'test_schema_map'
 
 logger = logging.getLogger(__name__)
 
@@ -40,14 +40,14 @@ def save_upgrade_status():
 
 @pytest.fixture()
 def prepare_publications():
-    process_client.publish_workspace_layer(username, layername)
-    process_client.publish_workspace_map(username, mapname)
+    process_client.publish_workspace_layer(USERNAME, LAYERNAME)
+    process_client.publish_workspace_map(USERNAME, MAPNAME)
     yield
-    process_client.delete_workspace_layer(username, layername)
-    process_client.delete_workspace_map(username, mapname)
+    process_client.delete_workspace_layer(USERNAME, LAYERNAME)
+    process_client.delete_workspace_map(USERNAME, MAPNAME)
 
     with app.app_context():
-        pubs = pub_util.get_publication_infos(username)
+        pubs = pub_util.get_publication_infos(USERNAME)
         assert len(pubs) == 0
 
 
@@ -62,8 +62,8 @@ def test_schema():
         assert workspaces[0][0] == len(util.get_workspaces())
         users = run_query(f'select count(*) from {DB_SCHEMA}.users;')
         assert users[0][0] == len(util.get_usernames(use_cache=False))
-        user_infos = workspaces_util.get_workspace_infos(username)
-        assert username in user_infos
+        user_infos = workspaces_util.get_workspace_infos(USERNAME)
+        assert USERNAME in user_infos
         select_publications = f"""with const as (select %s workspace_name)
 select w.name as workspace_name,
        p.type,
@@ -73,6 +73,6 @@ from const c inner join
      {DB_SCHEMA}.publications p on p.id_workspace = w.id left join
      {DB_SCHEMA}.users u on u.id_workspace = w.id
 ;"""
-        pub_infos = run_query(select_publications, (username, ))
-        assert (username, LAYER_TYPE, layername) in pub_infos
-        assert (username, MAP_TYPE, mapname) in pub_infos
+        pub_infos = run_query(select_publications, (USERNAME,))
+        assert (USERNAME, LAYER_TYPE, LAYERNAME) in pub_infos
+        assert (USERNAME, MAP_TYPE, MAPNAME) in pub_infos

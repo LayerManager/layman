@@ -25,8 +25,8 @@ def get_authn_file(username):
 def get_authn_info(username):
     authn_path = get_authn_file(username)
     if os.path.isfile(authn_path):
-        with open(authn_path) as f:
-            result = json.load(f)
+        with open(authn_path) as file:
+            result = json.load(file)
     else:
         result = {}
     return result

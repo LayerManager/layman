@@ -74,19 +74,19 @@ def get_wfs_proxy(username):
     ows_url = get_wfs_url(username)
 
     def create_string_value():
-        r = requests.get(ows_url, params={
+        response = requests.get(ows_url, params={
             'SERVICE': 'WFS',
             'REQUEST': 'GetCapabilities',
             'VERSION': VERSION,
         }, headers=headers, timeout=5,)
-        if r.status_code != 200:
+        if response.status_code != 200:
             result = None
-            if r.status_code != 404:
-                r.raise_for_status()
-                raise Exception(f'Status code = {r.status_code}')
+            if response.status_code != 404:
+                response.raise_for_status()
+                raise Exception(f'Status code = {response.status_code}')
         else:
-            r.encoding = 'UTF-8'
-            result = r.text
+            response.encoding = 'UTF-8'
+            result = response.text
         return result
 
     def mem_value_from_string_value(string_value):
@@ -161,8 +161,8 @@ def get_metadata_comparison(workspace, layername):
         crs_list.append(4326)
         crs_list = sorted(list(set(crs_list)))
         reference_system = crs_list
-    except BaseException as e:
-        current_app.logger.error(e)
+    except BaseException as exception:
+        current_app.logger.error(exception)
         reference_system = None
     props = {
         'wfs_url': wfs_url,

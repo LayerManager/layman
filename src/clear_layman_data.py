@@ -61,41 +61,41 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
     }
 
     auth = settings.GEOSERVER_ADMIN_AUTH or settings.LAYMAN_GS_AUTH
-    r = requests.get(geoserver.GS_REST_USERS,
-                     headers=headers_json,
-                     auth=auth
-                     )
-    r.raise_for_status()
-    all_users = [u['userName'] for u in r.json()['users']]
+    response = requests.get(geoserver.GS_REST_USERS,
+                            headers=headers_json,
+                            auth=auth
+                            )
+    response.raise_for_status()
+    all_users = [u['userName'] for u in response.json()['users']]
     if settings.LAYMAN_GS_USER in all_users:
         all_users.remove(settings.LAYMAN_GS_USER)
 
     for user in all_users:
-        r = requests.get(urljoin(geoserver.GS_REST_ROLES, f'user/{user}/'),
-                         headers=headers_json,
-                         auth=auth
-                         )
-        r.raise_for_status()
-        roles = r.json()['roleNames']
+        response = requests.get(urljoin(geoserver.GS_REST_ROLES, f'user/{user}/'),
+                                headers=headers_json,
+                                auth=auth
+                                )
+        response.raise_for_status()
+        roles = response.json()['roleNames']
 
         if settings.LAYMAN_GS_ROLE in roles:
-            r = requests.delete(
+            response = requests.delete(
                 urljoin(geoserver.GS_REST_SECURITY_ACL_LAYERS, user + '.*.r'),
                 headers=headers_json,
                 auth=auth
             )
-            if r.status_code != 404:
-                r.raise_for_status()
+            if response.status_code != 404:
+                response.raise_for_status()
 
-            r = requests.delete(
+            response = requests.delete(
                 urljoin(geoserver.GS_REST_SECURITY_ACL_LAYERS, user + '.*.w'),
                 headers=headers_json,
                 auth=auth
             )
-            if r.status_code != 404:
-                r.raise_for_status()
+            if response.status_code != 404:
+                response.raise_for_status()
 
-            r = requests.delete(
+            response = requests.delete(
                 urljoin(geoserver.GS_REST_WORKSPACES, user),
                 headers=headers_json,
                 auth=auth,
@@ -103,41 +103,41 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
                     'recurse': 'true'
                 }
             )
-            r.raise_for_status()
+            response.raise_for_status()
 
             for role in roles:
-                r = requests.delete(
+                response = requests.delete(
                     urljoin(geoserver.GS_REST_ROLES, f'role/{role}/user/{user}/'),
                     headers=headers_json,
                     auth=auth,
                 )
-                r.raise_for_status()
+                response.raise_for_status()
 
-            r = requests.delete(
+            response = requests.delete(
                 urljoin(geoserver.GS_REST_ROLES, 'role/' + f"USER_{user.upper()}"),
                 headers=headers_json,
                 auth=auth,
             )
-            if r.status_code != 404:
-                r.raise_for_status()
+            if response.status_code != 404:
+                response.raise_for_status()
 
-            r = requests.delete(
+            response = requests.delete(
                 urljoin(geoserver.GS_REST_USER, user),
                 headers=headers_json,
                 auth=auth,
             )
-            r.raise_for_status()
+            response.raise_for_status()
 
-    r = requests.get(geoserver.GS_REST_WORKSPACES,
-                     headers=headers_json,
-                     auth=auth
-                     )
-    r.raise_for_status()
+    response = requests.get(geoserver.GS_REST_WORKSPACES,
+                            headers=headers_json,
+                            auth=auth
+                            )
+    response.raise_for_status()
 
-    if r.json()['workspaces'] != "":
-        all_workspaces = [workspace["name"] for workspace in r.json()['workspaces']['workspace']]
+    if response.json()['workspaces'] != "":
+        all_workspaces = [workspace["name"] for workspace in response.json()['workspaces']['workspace']]
         for workspace in all_workspaces:
-            r = requests.delete(
+            response = requests.delete(
                 urljoin(geoserver.GS_REST_WORKSPACES, workspace),
                 headers=headers_json,
                 auth=auth,
@@ -145,7 +145,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
                     'recurse': 'true'
                 }
             )
-            r.raise_for_status()
+            response.raise_for_status()
 
     # micka
     opts = {} if settings.CSW_BASIC_AUTHN is None else {

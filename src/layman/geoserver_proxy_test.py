@@ -102,9 +102,9 @@ def test_wms_ows_proxy(service_endpoint):
     tn_bbox = get_square_bbox(layer_info['bounding_box'])
 
     from layman.layer.geoserver.wms import VERSION
-    r = get_layer_thumbnail(wms_url, layername, tn_bbox, headers=authn_headers, wms_version=VERSION)
-    r.raise_for_status()
-    assert 'image' in r.headers['content-type']
+    response = get_layer_thumbnail(wms_url, layername, tn_bbox, headers=authn_headers, wms_version=VERSION)
+    response.raise_for_status()
+    assert 'image' in response.headers['content-type']
 
     process_client.delete_workspace_layer(username, layername, headers=authn_headers)
 

@@ -164,14 +164,14 @@ def layer_file_chunk_info(username, layername):
             files_to_upload = info['files_to_upload']
 
             r_key = get_layer_redis_total_chunks_key(username, layername)
-            for fi in files_to_upload:
-                rh_key = f'{fi["layman_original_parameter"]}:{fi["target_file"]}'
+            for file in files_to_upload:
+                rh_key = f'{file["layman_original_parameter"]}:{file["target_file"]}'
                 total_chunks = settings.LAYMAN_REDIS.hget(r_key, rh_key)
                 # print(f'file {rh_key} {total_chunks}')
                 if total_chunks is None:
                     continue
                 total_chunks = int(total_chunks)
-                target_fn = os.path.basename(fi['target_file'])
+                target_fn = os.path.basename(file['target_file'])
                 chunk_paths = [
                     os.path.join(chunk_dir, _get_chunk_name(target_fn, x))
                     for x in range(1, total_chunks + 1)
@@ -181,7 +181,7 @@ def layer_file_chunk_info(username, layername):
                 if file_upload_complete:
                     current_app.logger.info(
                         'file_upload_complete ' + target_fn)
-                    target_fp = fi['target_file']
+                    target_fp = file['target_file']
                     input_file.ensure_layer_input_file_dir(username, layername)
                     with open(target_fp, "ab") as target_file:
                         for chunk_path in chunk_paths:

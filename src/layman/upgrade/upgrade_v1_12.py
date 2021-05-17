@@ -69,7 +69,7 @@ from {DB_SCHEMA}.publications p inner join
      {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
 ;'''
     publications = db_util.run_query(query)
-    for (id, workspace, type, name, ) in publications:
+    for (row_id, workspace, type, name, ) in publications:
         publ_dir = os.path.join(
             fs_util.get_workspaces_dir(),
             workspace,
@@ -85,7 +85,7 @@ from {DB_SCHEMA}.publications p inner join
             if updated_at else datetime.datetime.now(datetime.timezone.utc)
 
         update = f'update {DB_SCHEMA}.publications set updated_at = %s where id = %s;'
-        db_util.run_statement(update, (updated_at, id, ))
+        db_util.run_statement(update, (updated_at, row_id, ))
 
     statement = f'ALTER TABLE {DB_SCHEMA}.publications ALTER COLUMN updated_at SET NOT NULL;'
     db_util.run_statement(statement)

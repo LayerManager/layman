@@ -46,8 +46,8 @@ class TestDeletePublicationsClass:
             process_client.publish_workspace_publication(publ_type, owner, name, access_rights=access_rights,
                                                          headers=authn_headers_owner)
 
-        rv = process_client.get_workspace_publications(publ_type, workspace=owner, headers=authn_headers_owner)
-        assert len(rv) == len(publications)
+        response = process_client.get_workspace_publications(publ_type, workspace=owner, headers=authn_headers_owner)
+        assert len(response) == len(publications)
 
         # Delete by other user with rights only for one layer
         check_delete(authn_headers_deleter,

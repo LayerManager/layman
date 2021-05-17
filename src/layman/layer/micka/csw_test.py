@@ -66,19 +66,19 @@ def patch_layer(client):
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
         ]
-        for fp in file_paths:
-            assert os.path.isfile(fp)
+        for file_path in file_paths:
+            assert os.path.isfile(file_path)
         files = []
         try:
             files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-            rv = client.patch(rest_path, data={
+            response = client.patch(rest_path, data={
                 'file': files,
                 'title': 'patched layer',
             })
-            assert rv.status_code == 200
+            assert response.status_code == 200
         finally:
-            for fp in files:
-                fp[0].close()
+            for file_path in files:
+                file_path[0].close()
 
     flask_client.wait_till_layer_ready(username, layername)
 
@@ -171,6 +171,6 @@ def test_public_metadata(provide_layer):
     uuid = provide_layer['uuid']
     muuid = get_metadata_uuid(uuid)
     micka_url = urljoin(settings.CSW_URL, "./")
-    r = requests.get(micka_url)
-    r.raise_for_status()
-    assert muuid in r.text, f"Metadata record {muuid} is not public!"
+    response = requests.get(micka_url)
+    response.raise_for_status()
+    assert muuid in response.text, f"Metadata record {muuid} is not public!"

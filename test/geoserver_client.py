@@ -32,7 +32,7 @@ def get_wms_capabilities(workspace=None, service_endpoint='ows', headers=None):
 def get_features(workspace, feature_type, epsg_code=3857):
     wfs_url = get_wfs_url(workspace)
     epsg_name = f"urn:ogc:def:crs:EPSG::{epsg_code}"
-    r = requests.get(wfs_url, params={
+    response = requests.get(wfs_url, params={
         'service': 'WFS',
         'request': 'GetFeature',
         'version': wfs.VERSION,
@@ -40,7 +40,7 @@ def get_features(workspace, feature_type, epsg_code=3857):
         'outputFormat': f"application/json",
         'srsName': epsg_name,
     })
-    r.raise_for_status()
-    result = r.json()
+    response.raise_for_status()
+    result = response.json()
     assert result['crs']['properties']['name'] == epsg_name
     return result

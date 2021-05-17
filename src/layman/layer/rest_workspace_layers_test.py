@@ -31,12 +31,12 @@ def test_get_layer_title():
     # layers.GET
     with app.app_context():
         url = url_for('rest_workspace_layers.get', workspace=username)
-    rv = requests.get(url)
-    assert rv.status_code == 200, rv.text
+    response = requests.get(url)
+    assert response.status_code == 200, response.text
 
     for i in range(0, len(sorted_layers) - 1):
-        assert rv.json()[i]["name"] == sorted_layers[i][0]
-        assert rv.json()[i]["title"] == sorted_layers[i][1]
+        assert response.json()[i]["name"] == sorted_layers[i][0]
+        assert response.json()[i]["title"] == sorted_layers[i][1]
 
     for (name, title) in layers:
         process_client.delete_workspace_layer(username, name)
@@ -125,21 +125,21 @@ class TestQgisCascadeWmsClass:
         assert info['style']['type'] == style if style else 'sld', info.get('style')
         assert info['style']['url'], info.get('style')
 
-        rv = requests.get(wms_stores_url,
-                          auth=settings.LAYMAN_GS_AUTH,
-                          timeout=5,
-                          )
-        assert rv.status_code == 200, rv.json()
+        response = requests.get(wms_stores_url,
+                                auth=settings.LAYMAN_GS_AUTH,
+                                timeout=5,
+                                )
+        assert response.status_code == 200, response.json()
         if style == 'qml':
-            assert rv.json()['wmsStores']['wmsStore'][0]['name'] == f'{DEFAULT_WMS_STORE_PREFIX}_{layer}', rv.json()
+            assert response.json()['wmsStores']['wmsStore'][0]['name'] == f'{DEFAULT_WMS_STORE_PREFIX}_{layer}', response.json()
 
-        rv = requests.get(wms_layers_url,
-                          auth=settings.LAYMAN_GS_AUTH,
-                          timeout=5,
-                          )
-        assert rv.status_code == 200, rv.json()
+        response = requests.get(wms_layers_url,
+                                auth=settings.LAYMAN_GS_AUTH,
+                                timeout=5,
+                                )
+        assert response.status_code == 200, response.json()
         if style == 'qgis':
-            assert rv.json()['wmsLayers']['wmsLayer'][0]['name'] == layer, rv.json()
+            assert response.json()['wmsLayers']['wmsLayer'][0]['name'] == layer, response.json()
 
         if expected_thumbnail_path:
             diffs = test_util.compare_images(thumbnail_path, expected_thumbnail_path)
