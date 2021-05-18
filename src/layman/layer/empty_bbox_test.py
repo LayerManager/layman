@@ -59,6 +59,4 @@ def test_empty_shapefile(layername, file_paths):
     assert wms_layer.boundingBox == native_bbox
     assert wms_layer.boundingBoxWGS84 == wgs_bbox
 
-    process_client.wait_for_publication_status(workspace, process_client.LAYER_TYPE, layername)
-
     process_client.delete_workspace_layer(workspace, layername)

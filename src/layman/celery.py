@@ -6,7 +6,7 @@ from flask import current_app
 from celery.contrib.abortable import AbortableAsyncResult
 
 from layman.publication_relation.util import update_related_publications_after_change
-from layman import settings, common
+from layman import settings, common, util as layman_util
 from layman.common import redis as redis_util
 
 REDIS_CURRENT_TASK_NAMES = f"{__name__}:CURRENT_TASK_NAMES"
@@ -47,6 +47,14 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
             last_task_id = chain_info['last']
             finish_publication_chain(last_task_id)
             clear_steps_to_run_after_chain(workspace, publication_type, publication_name)
+    # Sometimes, when delete request run just after other request for the same publication (for example WFS-T),
+    # the aborted task keep running and finish after end of delete task for the same source. This part make sure,
+    # that in that case we delete it.
+    info = layman_util.get_publication_info(workspace, publication_type, publication_name, context={'keys': ['name']})
+    if not info:
+        current_app.logger.warning(f"POST task={task_name}, workspace={workspace}, publication_type={publication_type},"
+                                   f"publication_name={publication_name} Publication does not exist, so we delete it")
+        layman_util.delete_workspace_publication(workspace, publication_type, publication_name)
 
 
 def _get_task_hash(task_name, workspace, publication_name):

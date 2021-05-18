@@ -87,8 +87,10 @@ def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_nam
     return muuid
 
 
-def delete_layer(workspace, layername):
-    uuid = get_layer_uuid(workspace, layername)
+def delete_layer(workspace, layername, *, backup_uuid=None):
+    uuid = get_layer_uuid(workspace, layername) or backup_uuid
+    if backup_uuid and uuid:
+        assert backup_uuid == uuid
     muuid = get_metadata_uuid(uuid)
     if muuid is None:
         return
