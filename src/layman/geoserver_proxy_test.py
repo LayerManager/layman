@@ -238,7 +238,6 @@ def test_missing_attribute(style_file, ):
     data_xml = data_wfs.get_wfs11_insert_polygon_new_attr(username, layername, attr_names10)
     wfs_post(username, [(layername, attr_names10)], data_xml)
 
-    process_client.wait_for_publication_status(username, process_client.LAYER_TYPE, layername, headers=authn_headers)
     process_client.delete_workspace_layer(username, layername, headers=authn_headers)
     process_client.delete_workspace_layer(username, layername2, headers=authn_headers)
 
@@ -293,7 +292,6 @@ def test_missing_attribute_authz():
     data_xml = data_wfs.get_wfs20_update_points_new_attr(username, layername1, attr_names)
     do_test(data_xml, attr_names)
 
-    process_client.wait_for_publication_status(username, process_client.LAYER_TYPE, layername1, headers=authn_headers1)
     process_client.delete_workspace_layer(username, layername1, headers=authn_headers1)
 
 
