@@ -62,7 +62,7 @@
 ### Node.js dependencies
 | name | license | used by | env | bin or src | purpose |
 | --- | --- | --- | --- | --- | --- |
-| [layman-test-client](https://github.com/jirik/layman-test-client) | GNU GPL v3 | client/docker/Dockerfile | opt | bin | to demonstrate communication with REST API |
+| [layman-test-client](https://github.com/LayerManager/layman-test-client) | GNU GPL v3 | client/docker/Dockerfile | opt | bin | to demonstrate communication with REST API |
 | [openlayers](https://openlayers.org/) | BSD 2-Clause | timgen/package.json | prod | bin | for client-side map rendering in Timgen |
 | [http-server](https://www.npmjs.com/package/http-server) | MIT | timgen/package.json | prod | bin | as static HTTP server for Timgen |
 | [cors-anywhere](https://www.npmjs.com/package/cors-anywhere) | MIT | timgen/package.json | prod | bin | for proxying Timgen requests |
@@ -78,9 +78,9 @@
 | [libxslt](http://xmlsoft.org/libxslt/) | MIT | python3-lxml | prod | bin | |
 | [geographicags/docker-gdal2](https://github.com/GeographicaGS/Docker-GDAL2) | MIT License | Dockerfile | prod | bin | |
 | [kartoza/docker-geoserver](https://github.com/kartoza/docker-geoserver) | GNU GPL v2 | docker-compose.yml | dev | bin | |
-| [jirikcz/qgis-server](https://github.com/jirik/docker-qgis-server) | GNU GPL v3 | docker-compose.yml | dev | bin | |
+| [jirikcz/qgis-server](https://github.com/LayerManager/docker-qgis-server) | GNU GPL v3 | docker-compose.yml | dev | bin | |
 | [kartoza/docker-postgis](https://github.com/kartoza/docker-postgis) | - | docker-compose.yml | dev | bin | |
 | [liferay/portal](https://github.com/docker-library/redis) | GNU GPL v2 | docker-compose.yml | opt | bin | |
-| [jirikcz/micka](https://github.com/jirik/docker-micka) | GNU GPL v3 | docker-compose.yml | prod-external | bin | |
+| [jirikcz/micka](https://github.com/LayerManager/docker-micka) | GNU GPL v3 | docker-compose.yml | prod-external | bin | |
 | [samtux/micka](https://github.com/samtux/docker-micka) | GNU GPL v3 | jirikcz/micka | prod-external | src | |
 | [docker-library/redis](https://github.com/docker-library/redis) | BSD 3-Clause | docker-compose.yml | prod | bin | |
