@@ -127,7 +127,7 @@ def test_wrong_value_of_user(client):
 def test_layman_gs_user_conflict(client):
     """Tests that Layman detects that reserved username is in conflict with LAYMAN_GS_USER.
 
-    See https://github.com/jirik/layman/pull/97
+    See https://github.com/LayerManager/layman/pull/97
     """
 
     username = settings.LAYMAN_GS_USER

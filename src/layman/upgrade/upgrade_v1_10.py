@@ -51,7 +51,7 @@ def check_workspace_names():
             raise LaymanError(f"A workspace has name with reserved suffix '{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'. "
                               f"In that case, please downgrade to the previous minor release version of Layman and contact Layman "
                               f"contributors. One way how to do that is to create an issue in Layman repository: "
-                              f"https://github.com/jirik/layman/issues/",
+                              f"https://github.com/LayerManager/layman/issues/",
                               data={'workspace': workspace,
                                     }
                               )
@@ -59,7 +59,7 @@ def check_workspace_names():
         raise LaymanError(f"A workspace has reserved name '{settings.REST_WORKSPACES_PREFIX}'. "
                           f"In that case, please downgrade to the previous minor release version of Layman and contact Layman "
                           f"contributors. One way how to do that is to create an issue in Layman repository: "
-                          f"https://github.com/jirik/layman/issues/",
+                          f"https://github.com/LayerManager/layman/issues/",
                           data={'workspace': settings.REST_WORKSPACES_PREFIX
                                 }
                           )

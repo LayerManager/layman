@@ -35,7 +35,7 @@ Layman acts as *resource server*. On every request to REST API, Layman accepts O
 [Liferay Portal](https://portal.liferay.dev/docs/7-1/deploy/-/knowledge_base/d/oauth-2-0) acts as *authorization server*.
 
 ### Layman Test Client
-[Layman Test Client](https://github.com/jirik/layman-test-client) (LTC) acts as *client*. It is responsible for
+[Layman Test Client](https://github.com/LayerManager/layman-test-client) (LTC) acts as *client*. It is responsible for
 - asking appropriate [authorization grant](https://tools.ietf.org/html/rfc6749#section-1.3) from *resource server* to get valid access token
 - safely storing access token and [refresh token](https://oauth.net/2/grant-types/refresh-token/) during end-user's session
 - fetching user-related metadata from Layman's [GET Current User](../rest.md#get-current-user)
@@ -54,7 +54,7 @@ Although LTC is currently the only OAuth2 client for Layman, there is an intenti
 
 Schema specific for LTC, distinguishing client side and server side of LTC:
 
-![auth-code.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/master/doc/oauth2/auth-code.puml) 
+![auth-code.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/LayerManager/layman/master/doc/oauth2/auth-code.puml) 
 
 ### Request Layman REST API
 After successful authorization, *client* is able to communicate with Layman REST API. To authenticate using OAuth2, every request to Layman REST API must contain two HTTP headers:
@@ -69,13 +69,13 @@ Because access token is known only on server side of LTC and not to client side,
  
 General schema of any request to Layman REST API:
 
-![rest.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/master/doc/oauth2/rest.puml)
+![rest.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/LayerManager/layman/master/doc/oauth2/rest.puml)
 
 
 ### Fetch User-Related Metadata
 Fetching user-related metadata happens automatically immediately after successful initial authorization by [GET Current User](../rest.md#get-current-user).
 
-![get-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/master/doc/oauth2/get-current-user.puml)
+![get-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/LayerManager/layman/master/doc/oauth2/get-current-user.puml)
 
 The fetch should happen regularly during end-user session to test if authentication (access token) is still valid. 
  
@@ -85,7 +85,7 @@ Immediately after the first [fetch of user-related metadata](#fetch-user-related
 
 Username is reserved by [PATCH Current User](../rest.md#patch-current-user). Username can be either generated automatically (this approach is used by LTC) or set manually; this is controlled by `adjust_username` parameter.
 
-![patch-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/master/doc/oauth2/patch-current-user.puml) 
+![patch-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/LayerManager/layman/master/doc/oauth2/patch-current-user.puml) 
 
 ### Refresh Access Token
 During end-user's session, *client* keeps both access tokens and refresh token. When access token expires or it's lifetime is close, *client* should use refresh token to generate new access token at [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2).
@@ -94,7 +94,7 @@ Refreshing flow between *client* and *authorization server* is described in [Lif
 
 Schema specific for LTC:
 
-![refresh.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/jirik/layman/master/doc/oauth2/refresh.puml) 
+![refresh.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/LayerManager/layman/master/doc/oauth2/refresh.puml) 
 
 
 ## Settings

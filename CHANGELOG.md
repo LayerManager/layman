@@ -8,22 +8,27 @@
 make build-dev
 make timgen-build
 ```
+- If you are getting Layman using Git, run
+```
+git remote set-url origin git@github.com:layermanager/layman.git
+```
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
 - Rename filesystem directory containing workspaces from `users` to `workspaces`
 ### Changes
-- [#159](https://github.com/jirik/layman/issues/159) Object `layman_metadata` was added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) responses. Attribute `layman_metadata.publication_status` can be used for watching global state of publication (updating, complete, incomplete).
-- [#159](https://github.com/jirik/layman/issues/159) Bounding box is sent explicitly to GeoServer for every layer.
-- [#159](https://github.com/jirik/layman/issues/159) [WFS-T](doc/endpoints.md#web-feature-service) or [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) request causes
+- [#159](https://github.com/LayerManager/layman/issues/159) Object `layman_metadata` was added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) responses. Attribute `layman_metadata.publication_status` can be used for watching global state of publication (updating, complete, incomplete).
+- [#159](https://github.com/LayerManager/layman/issues/159) Bounding box is sent explicitly to GeoServer for every layer.
+- [#159](https://github.com/LayerManager/layman/issues/159) [WFS-T](doc/endpoints.md#web-feature-service) or [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) request causes
   - update of bounding box and thumbnail of each edited [layer](doc/models.md#layer)
      - bounding box is updated in DB, QGIS file, WMS/WFS capabilities, and CSW metadata record
      - thumbnail is updated in filesystem and it is accessible using [GET Workspace Layer Thumbnail](doc/rest.md#get-workspace-layer-thumbnail)
   - update of thumbnail of each [map](doc/models.md#map) that points to at least one edited layer (thumbnail is updated in filesystem and accessible using [GET Workspace Map Thumbnail](doc/rest.md#get-workspace-map-thumbnail))  
   These updates run in [asynchronous chain](doc/async-tasks.md). Documentation describes concurrency of WFS-T request and its asynchronous chains with another [WFS-T request](doc/endpoints.md#web-feature-service), [POST Workspace Layers](doc/rest.md#post-workspace-layers), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [DELETE Workspace Layer](doc/rest.md#delete-workspace-layer), [DELETE Workspace Layers](doc/rest.md#delete-workspace-layers), [PATCH Workspace Map](doc/rest.md#patch-workspace-map), [DELETE Workspace Map](doc/rest.md#delete-workspace-map), and [DELETE Workspace Maps](doc/rest.md#delete-workspace-maps).
-- [#331](https://github.com/jirik/layman/issues/331) Query parameter *full_text_filter* is also used for substring search in all endpoints with filtering.
+- [#331](https://github.com/LayerManager/layman/issues/331) Query parameter *full_text_filter* is also used for substring search in all endpoints with filtering.
 - Filesystem directory containing workspaces was renamed from `users` to `workspaces`
-- [#72](https://github.com/jirik/layman/issues/72) Pipenv upgraded to v2020.11.15
+- [#72](https://github.com/LayerManager/layman/issues/72) Pipenv upgraded to v2020.11.15
+- Move Layman GitHub repository from `https://github.com/jirik/layman` to https://github.com/LayerManager/layman. Thanks to GitHub redirect functionality, all former urls are deprecated and still works. The same change is done for Layman Test Client (https://github.com/LayerManager/layman-test-client)
 
 ## v1.12.0
  2021-04-21
@@ -35,19 +40,19 @@ make timgen-build
 - Schema migrations (e.g. `ALTER TABLE ...` statements) and data migrations are split into separate lists. All schema migrations run before data migrations.
 #### Schema migrations
 - Adjust prime DB schema for two migration types, schema and data. Add new data type `enum_migration_type`, add new column `migration_type` to table `data_version` , insert second record to the table.
-- [#257](https://github.com/jirik/layman/issues/257) Adjust prime DB schema for full-text filtering (install [unaccent](https://www.postgresql.org/docs/10/unaccent.html), create immutable `my_unaccent` function, index unaccented `title` column in `publications` table).
-- [#257](https://github.com/jirik/layman/issues/257) Create new column `updated_at` in `publications` table.
-- [#257](https://github.com/jirik/layman/issues/257) Create new column `bbox` in `publications` table.
+- [#257](https://github.com/LayerManager/layman/issues/257) Adjust prime DB schema for full-text filtering (install [unaccent](https://www.postgresql.org/docs/10/unaccent.html), create immutable `my_unaccent` function, index unaccented `title` column in `publications` table).
+- [#257](https://github.com/LayerManager/layman/issues/257) Create new column `updated_at` in `publications` table.
+- [#257](https://github.com/LayerManager/layman/issues/257) Create new column `bbox` in `publications` table.
 #### Data migrations
-- [#257](https://github.com/jirik/layman/issues/257) Fill column `updated_at` in `publications` table.
-- [#302](https://github.com/jirik/layman/issues/302) Add URL parameter `LAYERS` to metadata properties [wms_url](doc/metadata.md#wms_url) and [wfs_url](doc/metadata.md#wfs_url) in existing metadata record of each layer. This non-standard parameter holds name of the layer at given WMS/WFS.
-- [#257](https://github.com/jirik/layman/issues/257) Fill column `bbox` in `publications` table.
+- [#257](https://github.com/LayerManager/layman/issues/257) Fill column `updated_at` in `publications` table.
+- [#302](https://github.com/LayerManager/layman/issues/302) Add URL parameter `LAYERS` to metadata properties [wms_url](doc/metadata.md#wms_url) and [wfs_url](doc/metadata.md#wfs_url) in existing metadata record of each layer. This non-standard parameter holds name of the layer at given WMS/WFS.
+- [#257](https://github.com/LayerManager/layman/issues/257) Fill column `bbox` in `publications` table.
 ### Changes
-- [#257](https://github.com/jirik/layman/issues/257) Endpoints [GET Layers](doc/rest.md#get-layers), [GET Worksapce Layers](doc/rest.md#get-workspace-layers), [GET Maps](doc/rest.md#get-maps) and [GET Workspace Maps](doc/rest.md#get-workspace-maps) can filter, order, and paginate results according to new query parameters. All request parameters, response structure and response headers are described in [GET Layers](doc/rest.md#get-layers) documentation.
-- [#257](https://github.com/jirik/layman/issues/257) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-maps), [GET Workspace Map](doc/rest.md#get-workspace-map), and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) contains new attributes
+- [#257](https://github.com/LayerManager/layman/issues/257) Endpoints [GET Layers](doc/rest.md#get-layers), [GET Worksapce Layers](doc/rest.md#get-workspace-layers), [GET Maps](doc/rest.md#get-maps) and [GET Workspace Maps](doc/rest.md#get-workspace-maps) can filter, order, and paginate results according to new query parameters. All request parameters, response structure and response headers are described in [GET Layers](doc/rest.md#get-layers) documentation.
+- [#257](https://github.com/LayerManager/layman/issues/257) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-maps), [GET Workspace Map](doc/rest.md#get-workspace-map), and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) contains new attributes
    - `updated_at` with date and time of last PATCH/POST request to given publication
    - `bounding_box` with bounding box coordinates in EPSG:3857
-- [#302](https://github.com/jirik/layman/issues/302) Metadata properties [wms_url](doc/metadata.md#wms_url) and [wfs_url](doc/metadata.md#wfs_url) contain new URL parameter `LAYERS` whose value is name of the layer. It's non-standard way how to store name of the layer at given WMS/WFS instance within metadata record.
+- [#302](https://github.com/LayerManager/layman/issues/302) Metadata properties [wms_url](doc/metadata.md#wms_url) and [wfs_url](doc/metadata.md#wfs_url) contain new URL parameter `LAYERS` whose value is name of the layer. It's non-standard way how to store name of the layer at given WMS/WFS instance within metadata record.
 - Migration version was split in [GET Version](doc/rest.md#get-version) to **last-schema-migration** and **last-data-migration**. Original **last-migration** stays as deprecated alias to **last-schema-migration**.
 
 ## v1.11.0
@@ -56,14 +61,14 @@ make timgen-build
 - Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.6.1`
     - If you are running Layman with development settings, run also `make client-build`.
 ### Changes
-- [#273](https://github.com/jirik/layman/issues/273) New endpoints [GET Layers](doc/rest.md#get-layers) and [GET Layers](doc/rest.md#get-maps) to query publications in all [workspaces](doc/models.md#workspace).
-- [#273](https://github.com/jirik/layman/issues/273) All Layer(s) and Map(s) endpoints with `<workspace_name>` in their URL were renamed to 'Workspace Layer...' and 'Workspace Map' in the documentation.
-- [#273](https://github.com/jirik/layman/issues/273)  Item **workspace** was added to response of [GET Workspace Layers](doc/rest.md#get-workspace-layers) and [GET Workspace Maps](doc/rest.md#get-workspace-maps)
+- [#273](https://github.com/LayerManager/layman/issues/273) New endpoints [GET Layers](doc/rest.md#get-layers) and [GET Layers](doc/rest.md#get-maps) to query publications in all [workspaces](doc/models.md#workspace).
+- [#273](https://github.com/LayerManager/layman/issues/273) All Layer(s) and Map(s) endpoints with `<workspace_name>` in their URL were renamed to 'Workspace Layer...' and 'Workspace Map' in the documentation.
+- [#273](https://github.com/LayerManager/layman/issues/273)  Item **workspace** was added to response of [GET Workspace Layers](doc/rest.md#get-workspace-layers) and [GET Workspace Maps](doc/rest.md#get-workspace-maps)
 
 ## v1.10.1
  2021-03-10
 ### Changes
-- [#285](https://github.com/jirik/layman/issues/285) Fix upgrade 1.10.0 error (CSW get_template_path_and_values now works even if the layer is not in GeoServer and/or in DB).
+- [#285](https://github.com/LayerManager/layman/issues/285) Fix upgrade 1.10.0 error (CSW get_template_path_and_values now works even if the layer is not in GeoServer and/or in DB).
 
 ## v1.10.0
  2021-03-04
@@ -82,17 +87,17 @@ make timgen-build
     - If you are running Layman with development settings, run also `make client-build`.
 - Run [standalone upgrade](README.md#upgrade) before starting Layman.
 ### Migrations and checks
-- [#154](https://github.com/jirik/layman/issues/154) New column `style_type` in `publications` table is created.
-- [#154](https://github.com/jirik/layman/issues/154) All workspaces are checked, that their name did not end with `_wms` and is not equal to `workspaces`. If there is any conflict found, startup process is stopped with error code 45. In that case, please downgrade to the previous minor release version and contact Layman contributors.
-- [#154](https://github.com/jirik/layman/issues/154) All layers are copied into [dedicated WMS GeoServer workspace](doc/data-storage.md#geoserver). Styles are also moved into that workspace.
-- [#154](https://github.com/jirik/layman/issues/154) Maps with URLs pointing to any layer stored in GeoServer are rewritten to dedicated [WMS workspace](doc/data-storage.md#geoserver).
-- [#154](https://github.com/jirik/layman/issues/154) Following metadata properties are updated:
+- [#154](https://github.com/LayerManager/layman/issues/154) New column `style_type` in `publications` table is created.
+- [#154](https://github.com/LayerManager/layman/issues/154) All workspaces are checked, that their name did not end with `_wms` and is not equal to `workspaces`. If there is any conflict found, startup process is stopped with error code 45. In that case, please downgrade to the previous minor release version and contact Layman contributors.
+- [#154](https://github.com/LayerManager/layman/issues/154) All layers are copied into [dedicated WMS GeoServer workspace](doc/data-storage.md#geoserver). Styles are also moved into that workspace.
+- [#154](https://github.com/LayerManager/layman/issues/154) Maps with URLs pointing to any layer stored in GeoServer are rewritten to dedicated [WMS workspace](doc/data-storage.md#geoserver).
+- [#154](https://github.com/LayerManager/layman/issues/154) Following metadata properties are updated:
    - layers: [`wms_url`](doc/metadata.md#wms_url), [`graphic_url`](doc/metadata.md#graphic_url), [`identifier`](doc/metadata.md#identifier), [`layer_endpoint`](doc/metadata.md#layer_endpoint)
    - maps: [`graphic_url`](doc/metadata.md#graphic_url), [`identifier`](doc/metadata.md#identifier), [`map_endpoint`](doc/metadata.md#map_endpoint), [`map_file_endpoint`](doc/metadata.md#map_file_endpoint)
-- [#154](https://github.com/jirik/layman/issues/154) Rename internal directories from `/users/{workspace}/layers/{layer}/input_sld` to `/users/{workspace}/layers/{layer}/input_style`
-- [#154](https://github.com/jirik/layman/issues/154) Fill column `style_type` with `"sld"` for all layers.
+- [#154](https://github.com/LayerManager/layman/issues/154) Rename internal directories from `/users/{workspace}/layers/{layer}/input_sld` to `/users/{workspace}/layers/{layer}/input_style`
+- [#154](https://github.com/LayerManager/layman/issues/154) Fill column `style_type` with `"sld"` for all layers.
 ### Changes
-- [#154](https://github.com/jirik/layman/issues/154) Enable to publish QGIS layer styles (QML)
+- [#154](https://github.com/LayerManager/layman/issues/154) Enable to publish QGIS layer styles (QML)
     - For endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), parameter *sld* is replaced with the new parameter *style* and marked as deprecated. In response to endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), *sld* is replaced by the new *style* item and marked as deprecated. Layman Test Client now uses *style* parameter.
     - Parameter *style* accepts also QGIS layer style (QML). Layman Test Client enables to select also `*.qml` files.
     - Endpoint [GET Workspace Layer](doc/rest.md#get-workspace-layer) returns in `style` attribute also `type`, either `"sld"` or `"qml"`.
@@ -106,8 +111,8 @@ make timgen-build
     - New environment variables [LAYMAN_QGIS_HOST](doc/env-settings.md#LAYMAN_QGIS_HOST), [LAYMAN_QGIS_PORT](doc/env-settings.md#LAYMAN_QGIS_PORT), [LAYMAN_QGIS_PATH](doc/env-settings.md#LAYMAN_QGIS_PATH), and [LAYMAN_QGIS_DATA_DIR](doc/env-settings.md#LAYMAN_QGIS_DATA_DIR).
     - Workspace name can not end with '_wms'. In such case, error with code 45 is raised.
     - During startup, [LAYMAN_OUTPUT_SRS_LIST](doc/env-settings.md#LAYMAN_OUTPUT_SRS_LIST) is ensured for all QGIS layers.
-- [#67](https://github.com/jirik/layman/issues/67) Workspace-related [REST API endpoints](doc/rest.md) (maps, layers) were moved from `/rest/*` to `/rest/workspaces/*`. Whole path is for example: `/rest/workspaces/<workspace_name>/layers`. Old endpoints are marked as deprecated (with `Deprecation` header in response) and will be removed with next major release.
-- [#99](https://github.com/jirik/layman/issues/99) New endpoint [GET Version](doc/rest.md#get-version). It is also available in Layman Test Client.
+- [#67](https://github.com/LayerManager/layman/issues/67) Workspace-related [REST API endpoints](doc/rest.md) (maps, layers) were moved from `/rest/*` to `/rest/workspaces/*`. Whole path is for example: `/rest/workspaces/<workspace_name>/layers`. Old endpoints are marked as deprecated (with `Deprecation` header in response) and will be removed with next major release.
+- [#99](https://github.com/LayerManager/layman/issues/99) New endpoint [GET Version](doc/rest.md#get-version). It is also available in Layman Test Client.
 - Endpoint [GET Workspace Layer](doc/rest.md#get-workspace-layer) returns JSON object for **db_table** item. Previously incorrectly returns DB table name directly in **db_table** instead of *name* subitem.
 - Undocumented attributes `type` and `id` were removed from GET Workspace Layer and Get Workspace Map responses.
 - To indicated if Layman is running, you can call [GET Version](doc/rest.md#get-version).
@@ -123,8 +128,8 @@ make timgen-build
     and restart GeoServer.
 
 ### Changes
-- [#228](https://github.com/jirik/layman/issues/228) Fixed shift in EPSG:5514.
-- [#227](https://github.com/jirik/layman/issues/227) Flower is accessible in demo configuration again.
+- [#228](https://github.com/LayerManager/layman/issues/228) Fixed shift in EPSG:5514.
+- [#227](https://github.com/LayerManager/layman/issues/227) Flower is accessible in demo configuration again.
 
 ## v1.9.0
  2021-01-14
@@ -143,7 +148,7 @@ make timgen-build
 ### Migrations
 Data manipulations that automatically run at first start of Layman:
 - [Data version table](doc/data-storage.md#data-version) is created. 
-- GeoServer's security rules of each publication are recalculated according to publication's access rights. It fixes [#200](https://github.com/jirik/layman/issues/200) also for existing layers.
+- GeoServer's security rules of each publication are recalculated according to publication's access rights. It fixes [#200](https://github.com/LayerManager/layman/issues/200) also for existing layers.
 - Mistakenly created users and roles in GeoServer, created for public workspaces, are deleted.
 
 ### Changes
@@ -154,9 +159,9 @@ Data manipulations that automatically run at first start of Layman:
 ## v1.8.1
  2021-01-06
 ### Upgrade notes
-- The fix of [#200](https://github.com/jirik/layman/issues/200) affects only newly posted or patched layers. To fix access rights on existing layers, you can either wait for 1.9 release (2021-01-15), or manually add ROLE_AUTHENTICATED for every [layer security rule](https://docs.geoserver.org/stable/en/user/security/layer.html) which already contains ROLE_ANONYMOUS.
+- The fix of [#200](https://github.com/LayerManager/layman/issues/200) affects only newly posted or patched layers. To fix access rights on existing layers, you can either wait for 1.9 release (2021-01-15), or manually add ROLE_AUTHENTICATED for every [layer security rule](https://docs.geoserver.org/stable/en/user/security/layer.html) which already contains ROLE_ANONYMOUS.
 ### Changes
-- [#200](https://github.com/jirik/layman/issues/200) Access rights EVERYONE is correctly propagated to GeoServer also for authenticated users. Only newly posted or patched layers are affected by the fix.
+- [#200](https://github.com/LayerManager/layman/issues/200) Access rights EVERYONE is correctly propagated to GeoServer also for authenticated users. Only newly posted or patched layers are affected by the fix.
 - One of [OAuth2 HTTP headers](doc/oauth2/index.md#request-layman-rest-api), `AuthorizationIssUrl`, is optional if and only if there is only one OAuth2 authorization server registered at Layman. The header was mandatory before 1.8.1 in any case.
 
 ## v1.8.0
@@ -180,41 +185,41 @@ Data manipulations that automatically run at first start of Layman:
     - In REST API documentation, `username` was replaced with `workspace_name`. It's not breaking change, as it's only naming of part of URL path. 
     - Error messages and data, as well as Layman Test Client, also distinguishes workspace and user/username.
 - Each workspace is now either [personal](doc/models.md#personal-workspace), or [public](doc/models.md#public-workspace). Personal workspace is automatically created when user reserves his username. Creation of and posting new publication to public workspaces is controlled by [GRANT_CREATE_PUBLIC_WORKSPACE](doc/env-settings.md#GRANT_CREATE_PUBLIC_WORKSPACE) and [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](doc/env-settings.md#GRANT_PUBLISH_IN_PUBLIC_WORKSPACE).
-- [#28](https://github.com/jirik/layman/issues/28) It is possible to control also [read access](doc/security.md#publication-access-rights) to any publication per user.
+- [#28](https://github.com/LayerManager/layman/issues/28) It is possible to control also [read access](doc/security.md#publication-access-rights) to any publication per user.
    - New attribute `access_rights` added to [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [GET Workspace Maps](doc/rest.md#get-workspace-maps) and [GET Workspace Map](doc/rest.md#get-workspace-map) responses.
    - New parameters `access_rights.read` and `access_rights.write` added to [POST Workspace Layers](doc/rest.md#post-workspace-layers), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [POST Workspace Maps](doc/rest.md#post-workspace-maps) and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) requests. These new parameters are added to Test Client GUI.
    - Default values of access rights parameters (both read and write) of newly created publications are set to current authenticated user, or EVERYONE if published by anonymous.
-- [#28](https://github.com/jirik/layman/issues/28) At first start of Layman, access rights of existing publications are set in following way:
+- [#28](https://github.com/LayerManager/layman/issues/28) At first start of Layman, access rights of existing publications are set in following way:
     - [everyone can read and only owner of the workspace can edit](doc/security.md#Authorization) publications in [personal workspaces](doc/models.md#personal-workspace)
     - [anyone can read or edit](doc/security.md#Authorization) publications in [public workspaces](doc/models.md#public-workspace).
     - Security rules on GeoServer on [workspace level (workspace.*.r/w)](https://docs.geoserver.org/stable/en/user/security/layer.html) are deleted and replaced with security rules on [layer level (workspace.layername.r/w)](https://docs.geoserver.org/stable/en/user/security/layer.html) according to rules on Layman side.
-- [#28](https://github.com/jirik/layman/issues/28) Only publications with [read access](doc/security.md#publication-access-rights) for EVERYONE are published to Micka as public.
-- [#28](https://github.com/jirik/layman/issues/28) New REST endpoint [GET Users](doc/rest.md#get-users) with list of all users registered in Layman. This new endpoint was added to Test Client into tab "Others".
-- [#28](https://github.com/jirik/layman/issues/28) [WMS endpoint](doc/endpoints.md#web-map-service) accepts same [authentication](doc/security.md#authentication) credentials (e.g. [OAuth2 headers](doc/oauth2/index.md#request-layman-rest-api)) as Layman REST API endpoints. It's implemented using Layman's WFS proxy. This proxy authenticates the user and send user identification to GeoServer.
-- [#161](https://github.com/jirik/layman/issues/161) New method DELETE was implemented for endpoints [DELETE Workspace Maps](doc/rest.md#delete-workspace-maps) and [DELETE Workspace Layers](doc/rest.md#delete-workspace-layers).
-- [#178](https://github.com/jirik/layman/issues/178) New attribute `screen_name` is part of response for [GET Users](doc/rest.md#get-users) and [Get Current User](doc/rest.md#get-current-user).
-- [#178](https://github.com/jirik/layman/issues/178) LifeRay attribute `screen_name` is preferred for creating username in Layman. Previously it was first part of email.
+- [#28](https://github.com/LayerManager/layman/issues/28) Only publications with [read access](doc/security.md#publication-access-rights) for EVERYONE are published to Micka as public.
+- [#28](https://github.com/LayerManager/layman/issues/28) New REST endpoint [GET Users](doc/rest.md#get-users) with list of all users registered in Layman. This new endpoint was added to Test Client into tab "Others".
+- [#28](https://github.com/LayerManager/layman/issues/28) [WMS endpoint](doc/endpoints.md#web-map-service) accepts same [authentication](doc/security.md#authentication) credentials (e.g. [OAuth2 headers](doc/oauth2/index.md#request-layman-rest-api)) as Layman REST API endpoints. It's implemented using Layman's WFS proxy. This proxy authenticates the user and send user identification to GeoServer.
+- [#161](https://github.com/LayerManager/layman/issues/161) New method DELETE was implemented for endpoints [DELETE Workspace Maps](doc/rest.md#delete-workspace-maps) and [DELETE Workspace Layers](doc/rest.md#delete-workspace-layers).
+- [#178](https://github.com/LayerManager/layman/issues/178) New attribute `screen_name` is part of response for [GET Users](doc/rest.md#get-users) and [Get Current User](doc/rest.md#get-current-user).
+- [#178](https://github.com/LayerManager/layman/issues/178) LifeRay attribute `screen_name` is preferred for creating username in Layman. Previously it was first part of email.
 - Attribute `groups` is no longer returned in [GET Workspace Map File](doc/rest.md#get-workspace-map-file) response.
-- [#28](https://github.com/jirik/layman/issues/28) New environment variable [LAYMAN_PRIME_SCHEMA](doc/env-settings.md#LAYMAN_PRIME_SCHEMA). 
+- [#28](https://github.com/LayerManager/layman/issues/28) New environment variable [LAYMAN_PRIME_SCHEMA](doc/env-settings.md#LAYMAN_PRIME_SCHEMA). 
 
 ## v1.7.4
 2020-12-14
 ### Changes
-- [#175](https://github.com/jirik/layman/issues/175) Fix posting new layer caused by [v1.7.3](#v173).
+- [#175](https://github.com/LayerManager/layman/issues/175) Fix posting new layer caused by [v1.7.3](#v173).
 
 ## v1.7.3
 2020-11-30
 ### :warning: Attention :warning:
-There is a critical bug in this release, posting new layer breaks Layman: https://github.com/jirik/layman/issues/175 It's solved in [v1.7.4](#v174).
+There is a critical bug in this release, posting new layer breaks Layman: https://github.com/LayerManager/layman/issues/175 It's solved in [v1.7.4](#v174).
 
 ### Changes
 - If published [layer](doc/models.md#layer) has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World. This happens on [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer).
-- [#40](https://github.com/jirik/layman/issues/40) Enable to upload empty ShapeFile.
+- [#40](https://github.com/LayerManager/layman/issues/40) Enable to upload empty ShapeFile.
 
 ## v1.7.2
 2020-11-09
 ### Changes
-- [#133](https://github.com/jirik/layman/issues/133) Attribute `url` of [GET Workspace Maps](doc/rest.md#get-workspace-maps) response was repaired. Previously, it incorrectly used map name instead of username in the URL path.
+- [#133](https://github.com/LayerManager/layman/issues/133) Attribute `url` of [GET Workspace Maps](doc/rest.md#get-workspace-maps) response was repaired. Previously, it incorrectly used map name instead of username in the URL path.
 
 ## v1.7.1
 2020-09-30
@@ -224,25 +229,25 @@ There is a critical bug in this release, posting new layer breaks Layman: https:
 ### Changes
 - Test Client contains also GET Workspace Layer Style endpoint.
 - Return real SLD style in GET Workspace Layer Style instead of just metadata
-- [#109](https://github.com/jirik/layman/issues/109) Handle records without title in GET Workspace Layers / GET Workspace Maps
+- [#109](https://github.com/LayerManager/layman/issues/109) Handle records without title in GET Workspace Layers / GET Workspace Maps
 
 ## v1.7.0
 2020-09-30
 ### Upgrade requirements
-- [#65](https://github.com/jirik/layman/issues/65) Set environment variable [LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE](doc/env-settings.md#LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE). Only combination of lowercase characters and numbers must be used for the value.
-- [#101](https://github.com/jirik/layman/issues/101) Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) from `v1.1.2` to `v1.2.0`
+- [#65](https://github.com/LayerManager/layman/issues/65) Set environment variable [LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE](doc/env-settings.md#LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE). Only combination of lowercase characters and numbers must be used for the value.
+- [#101](https://github.com/LayerManager/layman/issues/101) Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) from `v1.1.2` to `v1.2.0`
     - If you are running Layman with development settings, run also `make client-build`.
 ### Changes
-- [#65](https://github.com/jirik/layman/issues/65) [WFS endpoint](doc/endpoints.md#web-feature-service) accepts same [authentication](doc/security.md#authentication) credentials (e.g. [OAuth2 headers](doc/oauth2/index.md#request-layman-rest-api)) as Layman REST API endpoints. It's implemented using Layman's WFS proxy. This proxy authenticates the user and send user identification to GeoServer. In combination with changes in v1.6.0, Layman's [`read-everyone-write-owner` authorization](doc/security.md#authorization) (when active) is propagated to GeoServer and user can change only hers layers.
-- [#88](https://github.com/jirik/layman/issues/88) Attribute **title** was added to REST endpoints [GET Workspace Layers](doc/rest.md#get-workspace-layers) and [GET Workspace Maps](doc/rest.md#get-workspace-maps).
-- [#95](https://github.com/jirik/layman/issues/95) When calling WFS Transaction, Layman will automatically create missing attributes in DB before redirecting request to GeoServer. Each missing attribute is created as `VARCHAR(1024)`. Works for WFS-T 1.0, 1.1 and 2.0, actions Insert, Update and Replace. If creating attribute fails for any reason, warning is logged and request is redirected nevertheless.
-- [#96](https://github.com/jirik/layman/issues/96) New REST API endpoint [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style) is created, which returns Layer default SLD. New attribute ```sld.url``` is added to [GET Workspace Layer endpoint](doc/rest.md#get-workspace-layer), where URL of Layer default SLD can be obtained. It points to above mentioned [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style).
-- [#101](https://github.com/jirik/layman/issues/101) Test Client has new page for WFS proxy and is capable to send authenticated queries.
-- [#65](https://github.com/jirik/layman/issues/65) Layman automatically setup [HTTP authentication attribute](https://docs.geoserver.org/stable/en/user/security/tutorials/httpheaderproxy/index.html) and chain filter at startup. Secret value of this attribute can be changed in [LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE](doc/env-settings.md#LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE) and is used by Layman's WFS proxy.
+- [#65](https://github.com/LayerManager/layman/issues/65) [WFS endpoint](doc/endpoints.md#web-feature-service) accepts same [authentication](doc/security.md#authentication) credentials (e.g. [OAuth2 headers](doc/oauth2/index.md#request-layman-rest-api)) as Layman REST API endpoints. It's implemented using Layman's WFS proxy. This proxy authenticates the user and send user identification to GeoServer. In combination with changes in v1.6.0, Layman's [`read-everyone-write-owner` authorization](doc/security.md#authorization) (when active) is propagated to GeoServer and user can change only hers layers.
+- [#88](https://github.com/LayerManager/layman/issues/88) Attribute **title** was added to REST endpoints [GET Workspace Layers](doc/rest.md#get-workspace-layers) and [GET Workspace Maps](doc/rest.md#get-workspace-maps).
+- [#95](https://github.com/LayerManager/layman/issues/95) When calling WFS Transaction, Layman will automatically create missing attributes in DB before redirecting request to GeoServer. Each missing attribute is created as `VARCHAR(1024)`. Works for WFS-T 1.0, 1.1 and 2.0, actions Insert, Update and Replace. If creating attribute fails for any reason, warning is logged and request is redirected nevertheless.
+- [#96](https://github.com/LayerManager/layman/issues/96) New REST API endpoint [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style) is created, which returns Layer default SLD. New attribute ```sld.url``` is added to [GET Workspace Layer endpoint](doc/rest.md#get-workspace-layer), where URL of Layer default SLD can be obtained. It points to above mentioned [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style).
+- [#101](https://github.com/LayerManager/layman/issues/101) Test Client has new page for WFS proxy and is capable to send authenticated queries.
+- [#65](https://github.com/LayerManager/layman/issues/65) Layman automatically setup [HTTP authentication attribute](https://docs.geoserver.org/stable/en/user/security/tutorials/httpheaderproxy/index.html) and chain filter at startup. Secret value of this attribute can be changed in [LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE](doc/env-settings.md#LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE) and is used by Layman's WFS proxy.
 
 ## v1.6.1
 2020-08-19
-- [#97](https://github.com/jirik/layman/issues/97) Before v1.6, [reserved `username`](doc/rest.md#patch-current-user) could be the same as LAYMAN_GS_USER. Starting at 1.6, this leads to conflict of two GeoServer users with the same name. This patch release comes with detection of this conflict (Layman error code 41).
+- [#97](https://github.com/LayerManager/layman/issues/97) Before v1.6, [reserved `username`](doc/rest.md#patch-current-user) could be the same as LAYMAN_GS_USER. Starting at 1.6, this leads to conflict of two GeoServer users with the same name. This patch release comes with detection of this conflict (Layman error code 41).
    - If you encounter error 41, you can resolve the conflict by following steps:
        - In GeoServer GUI, create new GeoServer user with another name to become new LAYMAN_GS_USER and give him LAYMAN_GS_ROLE and ADMIN roles
        - In GeoServer GUI, remove the old LAYMAN_GS_USER user
@@ -252,16 +257,16 @@ There is a critical bug in this release, posting new layer breaks Layman: https:
 ## v1.6.0
 2020-08-19
 ### Upgrade requirements
-- [#69](https://github.com/jirik/layman/issues/69) If you are running Layman with development or test settings, set [LAYMAN_SETTINGS_MODULE](doc/env-settings.md#LAYMAN_SETTINGS_MODULE) in your `.env` file to `layman_settings`. No action is required if you are running Layman based on demo settings (probably all production instances).
+- [#69](https://github.com/LayerManager/layman/issues/69) If you are running Layman with development or test settings, set [LAYMAN_SETTINGS_MODULE](doc/env-settings.md#LAYMAN_SETTINGS_MODULE) in your `.env` file to `layman_settings`. No action is required if you are running Layman based on demo settings (probably all production instances).
 ### Changes
-- [#74](https://github.com/jirik/layman/issues/74) Layman user and role at GeoServer defined by [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE) are now created automatically on Layman's startup if an only if new environment variable [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) is provided. There is no need to set [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) for other reason than automatically creating Layman user and Layman role.
+- [#74](https://github.com/LayerManager/layman/issues/74) Layman user and role at GeoServer defined by [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE) are now created automatically on Layman's startup if an only if new environment variable [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) is provided. There is no need to set [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) for other reason than automatically creating Layman user and Layman role.
    - No change is required. If you are migrating existing instance, Layman user and role are already created, so you don't need to set [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD). If this is your first Layman release, [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) is set in `.env` files starting with this version, so Layman user and role at GeoServer will be automatically created on startup.
    - No need to run command `make geoserver-reset-default-datadir` from now on. This command was removed from make options.
-- [#62](https://github.com/jirik/layman/issues/62) GeoServer [Proxy Base URL](https://docs.geoserver.org/stable/en/user/configuration/globalsettings.html) is now automatically set on Layman's startup according to [LAYMAN_GS_PROXY_BASE_URL](doc/env-settings.md#LAYMAN_GS_PROXY_BASE_URL). If you do not set the variable, value is calculated as [LAYMAN_CLIENT_PUBLIC_URL](doc/env-settings.md#LAYMAN_CLIENT_PUBLIC_URL)+[LAYMAN_GS_PATH](doc/env-settings.md#LAYMAN_GS_PATH). If you set it to empty string, no change of Proxy Base URL will be done on GeoServer side.
-- [#83](https://github.com/jirik/layman/issues/89) All layers are created as `GEOMETRY` type, so any other type can be added (for example polygons can be added to points).
-- [#73](https://github.com/jirik/layman/issues/73) Layman users are automatically created on GeoServer (either at start up of Layman or when reserved) with separate role and workspace. Username is the same as in Layman, name of role is `"USER_"+username`, name of workspace is the same as username. Read and write permissions for workspace are set according to Layman's authorization (as of now read-everyone-write-everyone or read-everyone-write-owner).
+- [#62](https://github.com/LayerManager/layman/issues/62) GeoServer [Proxy Base URL](https://docs.geoserver.org/stable/en/user/configuration/globalsettings.html) is now automatically set on Layman's startup according to [LAYMAN_GS_PROXY_BASE_URL](doc/env-settings.md#LAYMAN_GS_PROXY_BASE_URL). If you do not set the variable, value is calculated as [LAYMAN_CLIENT_PUBLIC_URL](doc/env-settings.md#LAYMAN_CLIENT_PUBLIC_URL)+[LAYMAN_GS_PATH](doc/env-settings.md#LAYMAN_GS_PATH). If you set it to empty string, no change of Proxy Base URL will be done on GeoServer side.
+- [#83](https://github.com/LayerManager/layman/issues/89) All layers are created as `GEOMETRY` type, so any other type can be added (for example polygons can be added to points).
+- [#73](https://github.com/LayerManager/layman/issues/73) Layman users are automatically created on GeoServer (either at start up of Layman or when reserved) with separate role and workspace. Username is the same as in Layman, name of role is `"USER_"+username`, name of workspace is the same as username. Read and write permissions for workspace are set according to Layman's authorization (as of now read-everyone-write-everyone or read-everyone-write-owner).
 - New environment variables [LAYMAN_GS_USER_GROUP_SERVICE](doc/env-settings.md#LAYMAN_GS_USER_GROUP_SERVICE) and [LAYMAN_GS_ROLE_SERVICE](doc/env-settings.md#LAYMAN_GS_ROLE_SERVICE) enable to control which user/group and role services are used at GeoServer. Not setting these variables means to use default services. 
-- [#69](https://github.com/jirik/layman/issues/69) Three separate identical settings files (`layman_settings_demo.py`, `layman_settings_dev.py`, `layman_settings_test.py`) were merged into one file `layman_settings.py`.
+- [#69](https://github.com/LayerManager/layman/issues/69) Three separate identical settings files (`layman_settings_demo.py`, `layman_settings_dev.py`, `layman_settings_test.py`) were merged into one file `layman_settings.py`.
 - If username used in REST API request path is not yet reserved, HTTP requests other than POST returns (e.g. GET) HTTP error 404 (Layman code 40). Previously in case of GET request, empty list was returned.
 - List of GeoServer reserved workspace names was moved from `layman_settings.py` into source code (`src\layman\common\geoserver\__init__.py`)
 - Undocumented authentication module `layman.authn.url_path.py` that was unused for a long time, was removed.
@@ -316,7 +321,7 @@ There is a critical bug in this release, posting new layer breaks Layman: https:
 2020-03-29
 ### Upgrade requirements
 - Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) from `v1.0.0` to `v1.1.1`
-- Remove [CSW_ORGANISATION_NAME_REQUIRED](https://github.com/jirik/layman/blob/v1.2.1/doc/env-settings.md) from environment settings
+- Remove [CSW_ORGANISATION_NAME_REQUIRED](https://github.com/LayerManager/layman/blob/v1.2.1/doc/env-settings.md) from environment settings
 - If you are using Layman's `make` commands with `-d` suffix, use these commands without the `-d` suffix from now on (e.g. `make start-demo-full-d` becomes `make start-demo-full`).
 
 ### Changes
@@ -326,7 +331,7 @@ There is a critical bug in this release, posting new layer breaks Layman: https:
 - Add [`revision_date`](doc/metadata.md#revision_date) metadata property
 - Add `metadata.comparison_url` to [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [GET Workspace Map](doc/rest.md#get-workspace-map) responses.
 - Upgrade Layman test client to version 1.1.1
-- Environment settings [CSW_ORGANISATION_NAME_REQUIRED](https://github.com/jirik/layman/blob/v1.2.1/doc/env-settings.md) is not used anymore as Micka v2020 accepts records without organisation names. 
+- Environment settings [CSW_ORGANISATION_NAME_REQUIRED](https://github.com/LayerManager/layman/blob/v1.2.1/doc/env-settings.md) is not used anymore as Micka v2020 accepts records without organisation names. 
 - Metadata properties [wms_url](doc/metadata.md#wms_url) and [wfs_url](doc/metadata.md#wfs_url) point directly to GetCapabilities documents. 
 - Layman now uses WMS 1.3.0 and WFS 2.0.0 in communication with GeoServer and in CSW metadata records.
 - All `make` commands with `docker-compose up` now run in the background. Foreground running was removed. Use `docker logs` to inspect container logs. 
@@ -338,7 +343,7 @@ There is a critical bug in this release, posting new layer breaks Layman: https:
 - Change [CSW_URL](doc/env-settings.md#CSW_URL) from `http://micka:80/csw` to `http://micka:80/micka/csw`
 
 ### Changes
-- Fix URL prefix of Micka GUI in Layman v1.2.0, [#49](https://github.com/jirik/layman/issues/49) 
+- Fix URL prefix of Micka GUI in Layman v1.2.0, [#49](https://github.com/LayerManager/layman/issues/49) 
 
 ## v1.2.0
 2020-03-18
@@ -369,16 +374,16 @@ There is a critical bug in this release, posting new layer breaks Layman: https:
     |`organisation_name`|`md_organisation_name`|
 
 - Add LaymanError 38 (Micka HTTP or connection error)
-- Treat attribute names in SLD (aka 'launder'), [#45](https://github.com/jirik/layman/issues/45)
+- Treat attribute names in SLD (aka 'launder'), [#45](https://github.com/LayerManager/layman/issues/45)
 - Fix Micka's About URL in wait_for_deps
 - Assert version of Micka on startup.
 - Load data into redis on startup even in Flower.
-- Better handle Micka's HTTP errors, [#43](https://github.com/jirik/layman/issues/43)
+- Better handle Micka's HTTP errors, [#43](https://github.com/LayerManager/layman/issues/43)
 - Rename hslayers container to timgen (Thumbnail Image Generator)
 
 ## v1.1.8
 2020-03-16
-- Treat attribute names in SLD (aka 'launder'), [#45](https://github.com/jirik/layman/issues/45)
+- Treat attribute names in SLD (aka 'launder'), [#45](https://github.com/LayerManager/layman/issues/45)
 - Fix Micka's About URL in wait_for_deps
 
 ## v1.1.7
@@ -396,7 +401,7 @@ Prior to 1.1.5, existing usernames, layers and maps **were not imported sometime
 
 ## v1.1.4
 2020-02-19
-- Better handle Micka's HTTP errors, [#43](https://github.com/jirik/layman/issues/43)
+- Better handle Micka's HTTP errors, [#43](https://github.com/LayerManager/layman/issues/43)
 
 ## v1.1.3
 2020-01-31
@@ -407,7 +412,7 @@ Prior to 1.1.5, existing usernames, layers and maps **were not imported sometime
 
 ## v1.1.2
 2019-12-26
-- Allow requesting layman from other docker containers (fix [#38](https://github.com/jirik/layman/issues/38))
+- Allow requesting layman from other docker containers (fix [#38](https://github.com/LayerManager/layman/issues/38))
 
 ## v1.1.1
 2019-12-23

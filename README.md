@@ -1,5 +1,5 @@
 # layman
-![IntegrationTests](https://github.com/jirik/layman/workflows/IntegrationTests/badge.svg?branch=master)
+![IntegrationTests](https://github.com/LayerManager/layman/workflows/IntegrationTests/badge.svg?branch=master)
 
 Publishing geospatial data online through [REST API](doc/rest.md).
 
@@ -44,7 +44,7 @@ Publishing geospatial data online through [REST API](doc/rest.md).
 
 ## Installation
 ```bash
-git clone https://github.com/jirik/layman.git
+git clone https://github.com/LayerManager/layman.git
 cd layman
 # checkout the latest release in current branch
 git checkout $(git describe --abbrev=0 --tags)
@@ -146,7 +146,7 @@ When providing **external dependencies**, check their production-related documen
 - [QGIS Server 3.16.1](https://docs.qgis.org/3.10/en/docs/user_manual/working_with_ogc/server/index.html)
 - [GeoServer 2.13.0](https://docs.geoserver.org/2.13.0/user/production/index.html#production)
 - [Redis 4.0](https://redis.io/topics/admin)
-- [Micka v2020.014](https://github.com/hsrs-cz/Micka/releases/tag/v2020.014), see also [configuration](deps/micka/sample/confs/config.local.neon) of [dockerized Micka](https://github.com/jirik/docker-micka).
+- [Micka v2020.014](https://github.com/hsrs-cz/Micka/releases/tag/v2020.014), see also [configuration](deps/micka/sample/confs/config.local.neon) of [dockerized Micka](https://github.com/LayerManager/docker-micka).
 
 Within PostgreSQL, you need to provide one database for Layman and one database for Micka. For Layman, you also need to provide one user [LAYMAN_PG_USER](doc/env-settings.md#LAYMAN_PG_USER) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME) database. The user also needs access to `public` schema where PostGIS must be installed.
 

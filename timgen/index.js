@@ -2,7 +2,7 @@
 import {json_to_map, adjust_map_url} from './src/map';
 import { saveAs } from 'file-saver';
 
-// const map_def_url = 'https://raw.githubusercontent.com/jirik/layman/1252fad2677f55182478c2206f47fbacb922fb97/sample/layman.map/full.json';
+// const map_def_url = 'https://raw.githubusercontent.com/LayerManager/layman/1252fad2677f55182478c2206f47fbacb922fb97/sample/layman.map/full.json';
 
 const url_params = new URLSearchParams(window.location.search);
 const get_url_param = (param_name) => {
