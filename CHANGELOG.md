@@ -12,6 +12,8 @@ make timgen-build
 ```
 git remote set-url origin git@github.com:layermanager/layman.git
 ```
+- Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.8.0`
+    - If you are running Layman with development settings, run also `make client-build`.
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
