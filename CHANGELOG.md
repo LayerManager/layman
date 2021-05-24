@@ -3,34 +3,33 @@
 ## v1.13.0
 {release_date}
 ### Upgrade requirements
+- Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.8.0`
+    - If you are running Layman with development settings, run also `make client-build`.
+- If you are getting Layman using Git, run
+```
+git remote set-url origin git@github.com:layermanager/layman.git
+```
 - If you are running Layman with development settings, run  
 ```
 make build-dev
 make timgen-build
 ```
-- If you are getting Layman using Git, run
-```
-git remote set-url origin git@github.com:layermanager/layman.git
-```
-- Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.8.0`
-    - If you are running Layman with development settings, run also `make client-build`.
 ### Migrations and checks
-#### Schema migrations
 #### Data migrations
 - Rename filesystem directory containing workspaces from `users` to `workspaces`
 ### Changes
-- [#159](https://github.com/LayerManager/layman/issues/159) Object `layman_metadata` was added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) responses. Attribute `layman_metadata.publication_status` can be used for watching global state of publication (updating, complete, incomplete).
-- [#159](https://github.com/LayerManager/layman/issues/159) Bounding box is sent explicitly to GeoServer for every layer.
+- Layman GitHub repository was moved from `https://github.com/jirik/layman` to https://github.com/LayerManager/layman. Thanks to GitHub redirect functionality, all former urls are deprecated and still work. The same change is done for Layman Test Client (https://github.com/LayerManager/layman-test-client)
 - [#159](https://github.com/LayerManager/layman/issues/159) [WFS-T](doc/endpoints.md#web-feature-service) or [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) request causes
   - update of bounding box and thumbnail of each edited [layer](doc/models.md#layer)
      - bounding box is updated in DB, QGIS file, WMS/WFS capabilities, and CSW metadata record
      - thumbnail is updated in filesystem and it is accessible using [GET Workspace Layer Thumbnail](doc/rest.md#get-workspace-layer-thumbnail)
   - update of thumbnail of each [map](doc/models.md#map) that points to at least one edited layer (thumbnail is updated in filesystem and accessible using [GET Workspace Map Thumbnail](doc/rest.md#get-workspace-map-thumbnail))  
   These updates run in [asynchronous chain](doc/async-tasks.md). Documentation describes concurrency of WFS-T request and its asynchronous chains with another [WFS-T request](doc/endpoints.md#web-feature-service), [POST Workspace Layers](doc/rest.md#post-workspace-layers), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [DELETE Workspace Layer](doc/rest.md#delete-workspace-layer), [DELETE Workspace Layers](doc/rest.md#delete-workspace-layers), [PATCH Workspace Map](doc/rest.md#patch-workspace-map), [DELETE Workspace Map](doc/rest.md#delete-workspace-map), and [DELETE Workspace Maps](doc/rest.md#delete-workspace-maps).
-- [#331](https://github.com/LayerManager/layman/issues/331) Query parameter *full_text_filter* is also used for substring search in all endpoints with filtering.
+- [#159](https://github.com/LayerManager/layman/issues/159) Object `layman_metadata` was added to [GET Workspace Layer](doc/rest.md#get-workspace-layer), [GET Workspace Map](doc/rest.md#get-workspace-map), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) responses. Attribute `layman_metadata.publication_status` can be used for watching global state of publication (updating, complete, incomplete).
+- [#331](https://github.com/LayerManager/layman/issues/331) Query parameter *full_text_filter* is also used for substring search in endpoints [GET Layers](doc/rest.md#get-layers), [GET Worksapce Layers](doc/rest.md#get-workspace-layers), [GET Maps](doc/rest.md#get-maps) and [GET Workspace Maps](doc/rest.md#get-workspace-maps).
 - Filesystem directory containing workspaces was renamed from `users` to `workspaces`
+- [#159](https://github.com/LayerManager/layman/issues/159) Bounding box is sent explicitly to GeoServer for every layer.
 - [#72](https://github.com/LayerManager/layman/issues/72) Pipenv upgraded to v2020.11.15
-- Move Layman GitHub repository from `https://github.com/jirik/layman` to https://github.com/LayerManager/layman. Thanks to GitHub redirect functionality, all former urls are deprecated and still works. The same change is done for Layman Test Client (https://github.com/LayerManager/layman-test-client)
 
 ## v1.12.0
  2021-04-21
