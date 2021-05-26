@@ -221,7 +221,7 @@ def is_layer_chain_ready(username, layername):
     return chain_info is None or celery_util.is_chain_ready(chain_info)
 
 
-lock_decorator = redis_util.create_lock_decorator(LAYER_TYPE, 'layername', 19, is_layer_chain_ready)
+lock_decorator = redis_util.create_lock_decorator(LAYER_TYPE, 'layername', is_layer_chain_ready)
 
 
 def layer_info_to_metadata_properties(info):

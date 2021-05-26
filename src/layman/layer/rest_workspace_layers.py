@@ -126,7 +126,7 @@ def post(workspace):
         filenames = [f.filename for f in files]
     input_file.check_filenames(workspace, layername, filenames, check_crs)
 
-    redis_util.create_lock(workspace, LAYER_TYPE, layername, 19, request.method)
+    redis_util.create_lock(workspace, LAYER_TYPE, layername, request.method)
 
     try:
         # register layer uuid
@@ -175,7 +175,6 @@ def delete(workspace):
 
     infos = layman_util.delete_publications(workspace,
                                             LAYER_TYPE,
-                                            19,
                                             util.is_layer_chain_ready,
                                             util.abort_layer_chain,
                                             util.delete_layer,

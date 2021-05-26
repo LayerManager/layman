@@ -7,19 +7,19 @@ from layman import LaymanError
 PUBLICATION_LOCKS_KEY = f'{__name__}:PUBLICATION_LOCKS'
 
 
-def create_lock(workspace, publication_type, publication_name, error_code, method):
+def create_lock(workspace, publication_type, publication_name, method):
     method = method.lower()
-    solve_locks(workspace, publication_type, publication_name, error_code, method)
+    solve_locks(workspace, publication_type, publication_name, method)
     lock_publication(workspace, publication_type, publication_name, method)
 
 
-def create_lock_decorator(publication_type, publication_name_key, error_code, is_chain_ready_fn):
+def create_lock_decorator(publication_type, publication_name_key, is_chain_ready_fn):
     def lock_decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):
             username = request.view_args['workspace']
             publication_name = request.view_args[publication_name_key]
-            create_lock(username, publication_type, publication_name, error_code, request.method)
+            create_lock(username, publication_type, publication_name, request.method)
             try:
                 result = func(*args, **kwargs)
                 if is_chain_ready_fn(username, publication_name):
@@ -62,7 +62,7 @@ def unlock_publication(workspace, publication_type, publication_name):
     rds.hdel(key, hash)
 
 
-def solve_locks(workspace, publication_type, publication_name, error_code, requested_lock):
+def solve_locks(workspace, publication_type, publication_name, requested_lock):
     current_lock = get_publication_lock(
         workspace,
         publication_type,
@@ -79,13 +79,13 @@ def solve_locks(workspace, publication_type, publication_name, error_code, reque
         raise Exception(f"Unknown current lock: {current_lock}")
     if current_lock in [common.PUBLICATION_LOCK_PATCH, common.PUBLICATION_LOCK_POST, ]:
         if requested_lock in [common.PUBLICATION_LOCK_PATCH, common.PUBLICATION_LOCK_POST, ]:
-            raise LaymanError(error_code)
+            raise LaymanError(49)
     elif current_lock in [common.PUBLICATION_LOCK_DELETE, ]:
         if requested_lock in [common.PUBLICATION_LOCK_PATCH, common.PUBLICATION_LOCK_POST, ]:
-            raise LaymanError(error_code)
+            raise LaymanError(49)
     if requested_lock not in [common.PUBLICATION_LOCK_DELETE, ]:
         if requested_lock == common.PUBLICATION_LOCK_FEATURE_CHANGE:
-            raise LaymanError(error_code, private_data={'can_run_later': True})
+            raise LaymanError(49, private_data={'can_run_later': True})
         if current_lock == common.PUBLICATION_LOCK_FEATURE_CHANGE and requested_lock in [common.REQUEST_METHOD_PATCH, common.REQUEST_METHOD_POST, ]:
             celery_util.abort_publication_chain(workspace, publication_type, publication_name)
             celery_util.push_step_to_run_after_chain(workspace, publication_type, publication_name, 'layman.util::patch_after_feature_change')

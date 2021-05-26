@@ -17,7 +17,7 @@ ERROR_LIST = {
     16: (404, 'Thumbnail was not found'),
     17: (409, 'Layer already exists'),
     18: (400, 'Missing one or more ShapeFile files.'),
-    19: (400, 'Layer is already in process.'),
+    # 19: (400, 'Layer is already in process.'),
     20: (400, 'Chunk upload is not active for this layer.'),
     21: (400, 'Unknown combination of resumableFilename and '
               'layman_original_parameter.'),
@@ -29,7 +29,7 @@ ERROR_LIST = {
     27: (404, 'File was not found'),
     28: (400,
          'Zero-length identifier found. Data file probably contains attribute with zero-length name (e.g. empty string).'),
-    29: (400, 'Map is already in process.'),
+    # 29: (400, 'Map is already in process.'),
     30: (403, 'Unauthorized access'),
     31: (400, 'Unexpected HTTP method.'),
     32: (403, 'Unsuccessful OAuth2 authentication.'),
@@ -49,4 +49,5 @@ ERROR_LIST = {
     46: (400, 'Unknown style file. Can recognize only SLD and QML files.'),
     47: (400, 'Error in QML'),
     48: (400, 'Wrong combination of parameters'),
+    49: (400, 'Publication is already in process.'),
 }

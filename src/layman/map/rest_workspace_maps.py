@@ -75,7 +75,7 @@ def post(workspace):
 
     mapurl = url_for('rest_workspace_map.get', mapname=mapname, workspace=workspace)
 
-    redis_util.create_lock(workspace, MAP_TYPE, mapname, 29, request.method)
+    redis_util.create_lock(workspace, MAP_TYPE, mapname, request.method)
 
     try:
         map_result = {
@@ -135,7 +135,6 @@ def delete(workspace):
 
     infos = layman_util.delete_publications(workspace,
                                             MAP_TYPE,
-                                            29,
                                             util.is_map_chain_ready,
                                             util.abort_map_chain,
                                             util.delete_map,

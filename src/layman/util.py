@@ -361,7 +361,6 @@ def delete_workspace_publication(workspace, publication_type, publication):
 
 def delete_publications(user,
                         publ_type,
-                        error_code,
                         is_chain_ready_fn,
                         abort_publication_fn,
                         delete_publication_fn,
@@ -374,7 +373,7 @@ def delete_publications(user,
     whole_infos = get_publication_infos(user, publ_type, {'actor_name': actor_name, 'access_type': 'write'})
 
     for (_, _, publication) in whole_infos.keys():
-        redis.create_lock(user, publ_type, publication, error_code, method)
+        redis.create_lock(user, publ_type, publication, method)
         try:
             abort_publication_fn(user, publication)
             delete_publication_fn(user, publication)
@@ -403,9 +402,9 @@ def delete_publications(user,
 
 def patch_after_feature_change(workspace, publication_type, publication, **kwargs):
     try:
-        redis.create_lock(workspace, publication_type, publication, 19, common.PUBLICATION_LOCK_FEATURE_CHANGE)
+        redis.create_lock(workspace, publication_type, publication, common.PUBLICATION_LOCK_FEATURE_CHANGE)
     except LaymanError as exc:
-        if exc.code == 19 and exc.private_data.get('can_run_later', False):
+        if exc.code == 49 and exc.private_data.get('can_run_later', False):
             celery_util.push_step_to_run_after_chain(workspace, publication_type, publication,
                                                      'layman.util::patch_after_feature_change')
             return

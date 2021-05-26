@@ -1033,7 +1033,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
             })
             assert response.status_code == 400, response.get_json()
             resp_json = response.get_json()
-            assert resp_json['code'] == 19
+            assert resp_json['code'] == 49
         finally:
             for file_path in files:
                 file_path[0].close()
