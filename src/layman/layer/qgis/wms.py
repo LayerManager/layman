@@ -27,6 +27,9 @@ def get_layer_info(workspace, layername):
                 'url': url,
                 'type': 'qml',
             },
+            '_wms': {
+                'qgis_capabilities_url': get_layer_capabilities_url(workspace, layername),
+            }
         }
     return result
 
