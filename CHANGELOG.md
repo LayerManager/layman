@@ -7,7 +7,7 @@
     - If you are running Layman with development settings, run also `make client-build`.
 - If you are getting Layman using Git, run
 ```
-git remote set-url origin git@github.com:layermanager/layman.git
+git remote set-url origin https://github.com/layermanager/layman.git
 ```
 - If you are running Layman with development settings, run  
 ```
