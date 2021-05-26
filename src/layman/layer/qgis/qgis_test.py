@@ -29,6 +29,9 @@ def test_qgis_rest():
         assert wms.get_layer_info(workspace, layer) == {'name': layer,
                                                         'style': {'type': 'qml',
                                                                   'url': url},
+                                                        '_wms': {
+                                                            'qgis_capabilities_url': f'{settings.LAYMAN_QGIS_URL}?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.1.1&map=/qgis/data/test/workspaces/{workspace}/layers/{layer}/{layer}.qgis'
+                                                        }
                                                         }
         assert workspace in qgis.get_workspaces()
 
