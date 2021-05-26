@@ -240,7 +240,7 @@ def get_map_owner_info(username):
     return result
 
 
-lock_decorator = redis_util.create_lock_decorator(MAP_TYPE, 'mapname', 29, is_map_chain_ready)
+lock_decorator = redis_util.create_lock_decorator(MAP_TYPE, 'mapname', is_map_chain_ready)
 
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, MAP_TYPE)
 

@@ -7,6 +7,7 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- Errors `19`: 'Layer is already in process.' and `29`: 'Map is already in process.' are merged into `49`: 'Publication is already in process.'.
 
 ## v1.13.0
  2021-05-26

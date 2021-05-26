@@ -371,7 +371,7 @@ def test_post_maps_complex(client):
         })
         assert response.status_code == 400
         resp_json = response.get_json()
-        assert resp_json['code'] == 29
+        assert resp_json['code'] == 49
 
     # continue with thumbnail assertion
     with app.app_context():
