@@ -6,7 +6,7 @@ import time
 import difflib
 import sys
 from test import flask_client
-from test.util import url_for, url_for_external
+from test.util import url_for, url_for_external, PublicationCounter
 import requests
 import pytest
 
@@ -38,7 +38,7 @@ METADATA_PROPERTIES = {
 
 METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES
 
-num_maps_before_test = 0  # pylint: disable=invalid-name
+num_of_publications = PublicationCounter()
 
 
 def wait_till_ready(username, mapname):
@@ -81,11 +81,6 @@ def client():
     app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
     app.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
 
-    # print('before app.app_context()')
-    with app.app_context():
-        publs_by_type = uuid.check_redis_consistency()
-        global num_maps_before_test  # pylint: disable=invalid-name
-        num_maps_before_test = len(publs_by_type[MAP_TYPE])
     yield client
 
 
@@ -104,8 +99,9 @@ def test_get_maps_empty(client):
         resp_json = response.get_json()
         assert response.status_code == 200, response.data
         assert len(resp_json) == 0
+
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_maps_before_test + 0
+            f'{MAP_TYPE}': num_of_publications.get()
         })
 
 
@@ -184,8 +180,9 @@ def test_post_maps_invalid_json(client):
     finally:
         for file_path in files:
             file_path[0].close()
+
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{MAP_TYPE}': num_maps_before_test + 0
+        f'{MAP_TYPE}': num_of_publications.get()
     })
 
 
@@ -220,8 +217,9 @@ def test_post_maps_simple(client):
 
         assert uuid.is_valid_uuid(uuid_str)
 
+        num_of_publications.increase()
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_maps_before_test + 1
+            f'{MAP_TYPE}': num_of_publications.get()
         })
 
     with app.app_context():
@@ -343,8 +341,10 @@ def test_post_maps_complex(client):
         finally:
             for file_path in files:
                 file_path[0].close()
+
+        num_of_publications.increase()
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_maps_before_test + 2
+            f'{MAP_TYPE}': num_of_publications.get()
         })
 
     with app.app_context():
@@ -468,7 +468,7 @@ def test_patch_map(client):
                 file[0].close()
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_maps_before_test + 2
+            f'{MAP_TYPE}': num_of_publications.get()
         })
 
         assert resp_json['uuid'] == uuid_str
@@ -542,7 +542,7 @@ def test_patch_map(client):
         assert resp_json['description'] == "Nový popis"
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_maps_before_test + 2
+            f'{MAP_TYPE}': num_of_publications.get()
         })
 
     with app.app_context():
@@ -589,8 +589,9 @@ def test_delete_map(client):
         assert 'Záznam nenalezen' in response.text
         assert mapname not in response.text
 
+        num_of_publications.decrease()
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_maps_before_test + 1
+            f'{MAP_TYPE}': num_of_publications.get()
         })
 
     with app.app_context():
@@ -601,7 +602,7 @@ def test_delete_map(client):
         assert resp_json['code'] == 26
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_maps_before_test + 1
+            f'{MAP_TYPE}': num_of_publications.get()
         })
 
 

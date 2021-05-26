@@ -10,7 +10,7 @@ import logging
 import sys
 from test import flask_client, process_client
 from test.data import wfs as data_wfs
-from test.util import url_for, url_for_external
+from test.util import url_for, url_for_external, PublicationCounter
 import requests
 import pytest
 
@@ -63,7 +63,7 @@ MIN_GEOJSON = """
 }
 """
 
-num_layers_before_test = 0  # pylint: disable=invalid-name
+num_of_publications = PublicationCounter()
 
 
 def check_metadata(client, username, layername, props_equal, expected_values):
@@ -96,11 +96,6 @@ def client():
     app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
     app.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
 
-    # print('before app.app_context()')
-    with app.app_context():
-        publs_by_type = uuid.check_redis_consistency()
-        global num_layers_before_test  # pylint: disable=invalid-name
-        num_layers_before_test = len(publs_by_type[LAYER_TYPE])
     yield client
 
 
@@ -241,7 +236,7 @@ def test_get_layers_testuser1_v1(client):
     assert response.status_code == 200, response.get_json()
     # assert len(resp_json) == 0
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 0
+        f'{LAYER_TYPE}': num_of_publications.get()
     })
 
 
@@ -323,8 +318,9 @@ def test_post_layers_simple(client):
         response.raise_for_status()
         assert layername in response.text
 
+        num_of_publications.increase()
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': num_layers_before_test + 1
+            f'{LAYER_TYPE}': num_of_publications.get()
         })
 
     with app.app_context():
@@ -385,8 +381,10 @@ def test_post_layers_concurrent(client):
     finally:
         for file_path in files:
             file_path[0].close()
+
+    num_of_publications.increase()
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 2
+        f'{LAYER_TYPE}': num_of_publications.get()
     })
 
 
@@ -417,8 +415,9 @@ def test_post_layers_shp_missing_extensions(client):
     finally:
         for file_path in files:
             file_path[0].close()
+
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 2
+        f'{LAYER_TYPE}': num_of_publications.get()
     })
 
 
@@ -458,8 +457,10 @@ def test_post_layers_shp(client):
     wms_url = geoserver_wms.get_wms_url(username)
     wms = wms_proxy(wms_url)
     assert 'ne_110m_admin_0_countries_shp' in wms.contents
+
+    num_of_publications.increase()
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 3
+        f'{LAYER_TYPE}': num_of_publications.get()
     })
 
     # assert metadata file is the same as filled template except for UUID
@@ -513,8 +514,9 @@ def test_post_layers_layer_exists(client):
     finally:
         for file_path in files:
             file_path[0].close()
+
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 3
+        f'{LAYER_TYPE}': num_of_publications.get()
     })
 
 
@@ -595,8 +597,10 @@ def test_post_layers_complex(client):
         assert next((
             a for a in attributes if a['name'] == 'sovereignt'
         ), None) is not None
+
+        num_of_publications.increase()
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': num_layers_before_test + 4
+            f'{LAYER_TYPE}': num_of_publications.get()
         })
 
     with app.app_context():
@@ -699,7 +703,7 @@ def test_uppercase_attr(client):
         assert 200 <= response.status_code < 300
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': num_layers_before_test + 4
+            f'{LAYER_TYPE}': num_of_publications.get()
         })
 
 
@@ -729,7 +733,7 @@ def test_get_layers_testuser1_v2(client):
     assert resp_json[0]['name'] == 'countries'
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 4
+        f'{LAYER_TYPE}': num_of_publications.get()
     })
 
 
@@ -772,11 +776,10 @@ def test_patch_layer_title(client):
             'scale_denominator': 100000000,
             'title': "New Title of Countries",
         }
-    check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
+        check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
-    with app.app_context():
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': num_layers_before_test + 4
+            f'{LAYER_TYPE}': num_of_publications.get()
         })
 
 
@@ -816,11 +819,11 @@ def test_patch_layer_style(client):
         assert wms[layername].title == 'countries in blue'
         assert wms[layername].styles[
             username + '_wms:' + layername]['title'] == 'Generic Blue'
+
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': num_layers_before_test + 4
+            f'{LAYER_TYPE}': num_of_publications.get()
         })
 
-    with app.app_context():
         expected_md_values = {
             'abstract': "and new description",
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
@@ -897,15 +900,18 @@ def test_post_layers_sld_1_1_0(client):
     # assert wms[layername].styles[
     #     username+':'+layername]['title'] == 'test_layer2'
 
+    num_of_publications.increase()
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 5
+        f'{LAYER_TYPE}': num_of_publications.get()
     })
 
     rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
     response = client.delete(rest_path)
     assert response.status_code == 200
+
+    num_of_publications.decrease()
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 4
+        f'{LAYER_TYPE}': num_of_publications.get()
     })
 
 
@@ -957,8 +963,9 @@ def test_patch_layer_data(client):
         assert next((
             a for a in attributes if a['name'] == 'adm0cap'
         ), None) is not None
+
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': num_layers_before_test + 4
+            f'{LAYER_TYPE}': num_of_publications.get()
         })
 
     with app.app_context():
@@ -1009,8 +1016,9 @@ def test_patch_layer_concurrent_and_delete_it(client):
         finally:
             for file_path in files:
                 file_path[0].close()
+
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': num_layers_before_test + 4
+            f'{LAYER_TYPE}': num_of_publications.get()
         })
 
         chain_info = util._get_layer_chain(username, layername)
@@ -1029,8 +1037,9 @@ def test_patch_layer_concurrent_and_delete_it(client):
         finally:
             for file_path in files:
                 file_path[0].close()
+
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': num_layers_before_test + 4
+            f'{LAYER_TYPE}': num_of_publications.get()
         })
 
     with app.app_context():
@@ -1049,8 +1058,10 @@ def test_patch_layer_concurrent_and_delete_it(client):
             uuid.get_user_type_names_key(username, '.'.join(__name__.split('.')[:-1])),
             layername
         )
+
+        num_of_publications.decrease()
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{LAYER_TYPE}': num_layers_before_test + 3
+            f'{LAYER_TYPE}': num_of_publications.get()
         })
 
 
@@ -1091,8 +1102,9 @@ def test_post_layers_long_and_delete_it(client):
     response = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername))
     # print(resp_json)
     assert response.status_code == 404
+
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 3
+        f'{LAYER_TYPE}': num_of_publications.get()
     })
 
 
@@ -1103,8 +1115,10 @@ def test_delete_layer(client):
     rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
     response = client.delete(rest_path)
     assert response.status_code == 200
+
+    num_of_publications.decrease()
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 2
+        f'{LAYER_TYPE}': num_of_publications.get()
     })
 
     rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
@@ -1133,8 +1147,9 @@ def test_post_layers_zero_length_attribute():
     assert layer_info['db_table']['error']['code'] == 28, f'layer_info={layer_info}'
 
     process_client.delete_workspace_layer(workspace, layername)
+
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 2
+        f'{LAYER_TYPE}': num_of_publications.get()
     })
 
 
@@ -1145,8 +1160,9 @@ def test_get_layers_testuser2(client):
     assert response.status_code == 200
     resp_json = response.get_json()
     assert len(resp_json) == 0
+
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': num_layers_before_test + 2
+        f'{LAYER_TYPE}': num_of_publications.get()
     })
 
 
