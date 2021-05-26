@@ -48,3 +48,17 @@ def compare_images(image1, image2):
                 diffs += 1
 
     return diffs
+
+
+class PublicationCounter:
+    def __init__(self):
+        self.expected_publ_num = 0
+
+    def increase(self):
+        self.expected_publ_num += 1
+
+    def decrease(self):
+        self.expected_publ_num -= 1
+
+    def get(self):
+        return self.expected_publ_num
