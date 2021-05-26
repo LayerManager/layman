@@ -8,7 +8,6 @@ from layman.http import LaymanError
 from layman import settings, util as layman_util
 from layman.common import bbox as bbox_util, geoserver as gs_common, empty_method
 from layman.layer import LAYER_TYPE
-from layman.layer.qgis import wms as qgis_wms
 from . import wms
 
 FLASK_RULES_KEY = f"{__name__}:RULES"
@@ -160,10 +159,11 @@ def publish_layer_from_db(workspace, layername, description, title, access_right
 def publish_layer_from_qgis(workspace, layer, description, title, access_rights, geoserver_workspace=None):
     geoserver_workspace = geoserver_workspace or workspace
     store_name = wms.get_qgis_store_name(layer)
+    layer_capabilities_url = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['wms']})['_wms']['qgis_capabilities_url']
     gs_util.create_wms_store(geoserver_workspace,
                              settings.LAYMAN_GS_AUTH,
                              store_name,
-                             qgis_wms.get_layer_capabilities_url(workspace, layer))
+                             layer_capabilities_url)
 
     keywords = [
         "features",
