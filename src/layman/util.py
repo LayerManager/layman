@@ -272,6 +272,14 @@ def get_internal_sources(publ_type):
     return get_modules_from_names(get_publication_types()[publ_type]['internal_sources'])
 
 
+def merge_infos(target_info, partial_info, *, comment=None):
+    for key, value in partial_info.items():
+        if isinstance(value, dict) and isinstance(target_info.get(key), dict):
+            merge_infos(target_info[key], value, comment=comment)
+        else:
+            target_info[key] = value
+
+
 def get_publication_info(workspace, publ_type, publ_name, context=None):
     from layman import authz
     from layman.layer import LAYER_TYPE
@@ -305,8 +313,8 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
     partial_infos = call_modules_fn(sources, info_method, [workspace, publ_name])
 
     result = {}
-    for partial_info in partial_infos.values():
-        result.update(partial_info)
+    for source, partial_info in partial_infos.items():
+        merge_infos(result, partial_info, comment=f'source={source}')
 
     if 'actor_name' in context and result:
         actor = context['actor_name']
