@@ -63,7 +63,7 @@ def fill_xml_template(template_path, prop_values, publ_properties):
 
 
 def fill_xml_template_obj(tree_or_el, prop_values, publ_properties, basic_template_path=None):
-    is_el = isinstance(tree_or_el, ET._Element)
+    is_el = ET.iselement(tree_or_el)
     tmp_tree = None
     for prop_name, prop_value in prop_values.items():
         # current_app.logger.info(f'prop_name={prop_name}')
@@ -375,8 +375,8 @@ def csw_delete(muuid):
 
 def parse_md_properties(file_obj, property_names, publ_properties):
     # print('xml_str', xml_str)
-    root_el = ET.parse(file_obj) if type(file_obj) not in [ET._Element, ET._ElementTree] else file_obj
-    root_is_el = isinstance(root_el, ET._Element)
+    root_el = ET.parse(file_obj) if type(file_obj) not in [ET._Element, ET._ElementTree] else file_obj  # pylint: disable=protected-access
+    root_is_el = ET.iselement(root_el)
     # print(f"root_el={root_el}")
     result = {}
     for prop_name in property_names:
@@ -596,7 +596,7 @@ def adjust_operates_on(prop_el, prop_value):
 
 def get_record_element_by_id(csw, ident):
     csw.getrecordbyid(id=[ident], esn='full', outputschema=NAMESPACES['gmd'])
-    xml = csw._exml
+    xml = csw._exml  # pylint: disable=protected-access
     els = xml.xpath(f"//gmd:MD_Metadata[gmd:fileIdentifier/gco:CharacterString/text() = '{ident}']", namespaces=NAMESPACES)
     # current_app.logger.info(f"Number of md records id={id}: {len(els)}")
     result = els[0] if len(els) > 0 else None
