@@ -3,11 +3,12 @@ import subprocess
 import os
 import logging
 import time
+
 from test import util
 from test.mock.liferay import run
 import pytest
 
-from layman import settings
+from layman import settings, util as layman_util
 
 
 logger = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ AUTHN_SETTINGS = {
 
 LAYMAN_SETTING = None
 LAYMAN_DEFAULT_SETTINGS = AUTHN_SETTINGS
-LAYMAN_START_COUNT = 0
+layman_start_counter = layman_util.SimpleCounter()
 
 
 @pytest.fixture(scope="session")
@@ -89,7 +90,7 @@ def ensure_layman_session():
     print(f'\n\nEnsure_layman_session is starting\n\n')
     yield
     stop_process(list(SUBPROCESSES))
-    print(f'\n\nEnsure_layman_session is ending - {LAYMAN_START_COUNT}\n\n')
+    print(f'\n\nEnsure_layman_session is ending - {layman_start_counter.get()}\n\n')
 
 
 def ensure_layman_function(env_vars):
@@ -115,9 +116,8 @@ def ensure_layman_module():
 
 
 def start_layman(env_vars=None):
-    global LAYMAN_START_COUNT
-    LAYMAN_START_COUNT = LAYMAN_START_COUNT + 1
-    print(f'\nstart_layman: Really starting Layman for the {LAYMAN_START_COUNT}th time.')
+    layman_start_counter.increase()
+    print(f'\nstart_layman: Really starting Layman for the {layman_start_counter.get()}th time.')
     # first flush redis DB
     settings.LAYMAN_REDIS.flushdb()
     port = settings.LAYMAN_SERVER_NAME.split(':')[1]
