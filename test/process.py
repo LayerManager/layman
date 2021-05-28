@@ -26,7 +26,7 @@ AUTHN_SETTINGS = {
     'OAUTH2_LIFERAY_USER_PROFILE_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile",
 }
 
-LAYMAN_SETTING = None
+LAYMAN_SETTING = layman_util.SimpleStorage()
 LAYMAN_DEFAULT_SETTINGS = AUTHN_SETTINGS
 layman_start_counter = layman_util.SimpleCounter()
 
@@ -94,12 +94,11 @@ def ensure_layman_session():
 
 
 def ensure_layman_function(env_vars):
-    global LAYMAN_SETTING
-    if LAYMAN_SETTING != env_vars:
-        print(f'\nReally starting Layman LAYMAN_SETTING={LAYMAN_SETTING}, settings={env_vars}')
+    if LAYMAN_SETTING.get() != env_vars:
+        print(f'\nReally starting Layman LAYMAN_SETTING={LAYMAN_SETTING.get()}, settings={env_vars}')
         stop_process(list(SUBPROCESSES))
         start_layman(env_vars)
-        LAYMAN_SETTING = env_vars
+        LAYMAN_SETTING.set(env_vars)
 
 
 # If you need fixture with different scope, create new fixture with such scope
