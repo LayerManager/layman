@@ -51,12 +51,12 @@ def get_source_task_methods(publ_type, method_name):
 
 def get_chain_of_methods(workspace, publ_name, task_methods, task_options, publ_param_name):
     return chain(*[
-        _get_task_signature(workspace, publ_name, t, task_options, publ_param_name)
+        get_task_signature(workspace, publ_name, t, task_options, publ_param_name)
         for t in task_methods
     ])
 
 
-def _get_task_signature(workspace, publ_name, task, task_options, publ_param_name):
+def get_task_signature(workspace, publ_name, task, task_options, publ_param_name):
     param_names = [
         pname
         for pname in inspect.signature(task).parameters.keys()

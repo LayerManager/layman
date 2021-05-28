@@ -265,7 +265,7 @@ def test_post_layers_simple(client):
 
         layername = 'ne_110m_admin_0_countries'
 
-        chain_info = util._get_layer_chain(username, layername)
+        chain_info = util.get_layer_chain(username, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
         layer_info = util.get_layer_info(username, layername)
         keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
@@ -367,7 +367,7 @@ def test_post_layers_concurrent(client):
         for file_path in files:
             file_path[0].close()
 
-    chain_info = util._get_layer_chain(username, layername)
+    chain_info = util.get_layer_chain(username, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
 
     try:
@@ -450,7 +450,7 @@ def test_post_layers_shp(client):
         for file_path in files:
             file_path[0].close()
 
-    chain_info = util._get_layer_chain(username, layername)
+    chain_info = util.get_layer_chain(username, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     flask_client.wait_till_layer_ready(username, layername)
     # last_task['last'].get()
@@ -552,7 +552,7 @@ def test_post_layers_complex(client):
             for file_path in files:
                 file_path[0].close()
 
-        chain_info = util._get_layer_chain(username, layername)
+        chain_info = util.get_layer_chain(username, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
         flask_client.wait_till_layer_ready(username, layername)
         # last_task['last'].get()
@@ -653,7 +653,7 @@ def test_uppercase_attr(client):
             for file_path in files:
                 file_path[0].close()
 
-        chain_info = util._get_layer_chain(username, layername)
+        chain_info = util.get_layer_chain(username, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
         flask_client.wait_till_layer_ready(username, layername)
         # last_task['last'].get()
@@ -752,7 +752,7 @@ def test_patch_layer_title(client):
         })
         assert response.status_code == 200, response.get_json()
 
-        chain_info = util._get_layer_chain(username, layername)
+        chain_info = util.get_layer_chain(username, layername)
         assert chain_info is not None and celery_util.is_chain_ready(chain_info)
 
         resp_json = response.get_json()
@@ -940,7 +940,7 @@ def test_patch_layer_data(client):
             for file_path in files:
                 file_path[0].close()
 
-        chain_info = util._get_layer_chain(username, layername)
+        chain_info = util.get_layer_chain(username, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
         resp_json = response.get_json()
         keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
@@ -1022,7 +1022,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
             f'{LAYER_TYPE}': num_of_publications.get()
         })
 
-        chain_info = util._get_layer_chain(username, layername)
+        chain_info = util.get_layer_chain(username, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
 
     with app.app_context():
@@ -1090,7 +1090,7 @@ def test_post_layers_long_and_delete_it(client):
 
     time.sleep(1)
 
-    chain_info = util._get_layer_chain(username, layername)
+    chain_info = util.get_layer_chain(username, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     layer_info = util.get_layer_info(username, layername)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']

@@ -43,10 +43,10 @@ num_of_publications = SimpleCounter()
 
 
 def wait_till_ready(username, mapname):
-    chain_info = util._get_map_chain(username, mapname)
+    chain_info = util.get_map_chain(username, mapname)
     while chain_info is not None and not celery_util.is_chain_ready(chain_info):
         time.sleep(0.1)
-        chain_info = util._get_map_chain(username, mapname)
+        chain_info = util.get_map_chain(username, mapname)
 
 
 def check_metadata(client, username, mapname, props_equal, expected_values):

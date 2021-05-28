@@ -76,7 +76,7 @@ def check_new_layername(workspace, layername):
 def get_layer_info(workspace, layername, context=None):
     partial_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context)
 
-    chain_info = _get_layer_chain(workspace, layername)
+    chain_info = get_layer_chain(workspace, layername)
     if chain_info is None or celery_util.is_chain_successful(chain_info):
         return partial_info
 
@@ -207,7 +207,7 @@ def delete_layer(workspace, layername, source=None, http_method='delete'):
     return result
 
 
-def _get_layer_chain(username, layername):
+def get_layer_chain(username, layername):
     chain_info = celery_util.get_publication_chain_info(username, LAYER_TYPE, layername)
     return chain_info
 
@@ -217,7 +217,7 @@ def abort_layer_chain(username, layername):
 
 
 def is_layer_chain_ready(username, layername):
-    chain_info = _get_layer_chain(username, layername)
+    chain_info = get_layer_chain(username, layername)
     return chain_info is None or celery_util.is_chain_ready(chain_info)
 
 

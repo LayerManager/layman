@@ -85,7 +85,7 @@ TASKS_TO_MAP_INFO_KEYS = {
 def get_map_info(workspace, mapname, context=None):
     partial_info = layman_util.get_publication_info(workspace, MAP_TYPE, mapname, context)
 
-    chain_info = _get_map_chain(workspace, mapname)
+    chain_info = get_map_chain(workspace, mapname)
     if chain_info is None or celery_util.is_chain_successful(chain_info):
         return partial_info
 
@@ -215,7 +215,7 @@ def check_file(file):
         }) from exc
 
 
-def _get_map_chain(username, mapname):
+def get_map_chain(username, mapname):
     chain_info = celery_util.get_publication_chain_info(username, MAP_TYPE, mapname)
     return chain_info
 
@@ -225,7 +225,7 @@ def abort_map_chain(username, mapname):
 
 
 def is_map_chain_ready(username, mapname):
-    chain_info = _get_map_chain(username, mapname)
+    chain_info = get_map_chain(username, mapname)
     return chain_info is None or celery_util.is_chain_ready(chain_info)
 
 
