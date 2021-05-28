@@ -25,6 +25,31 @@ FLASK_PUBLICATION_TYPES_KEY = f'{__name__}:PUBLICATION_TYPES'
 FLASK_PUBLICATION_MODULES_KEY = f'{__name__}:PUBLICATION_MODULES'
 
 
+class SimpleStorage:
+    def __init__(self):
+        self.value = None
+
+    def set(self, value):
+        self.value = value
+
+    def get(self):
+        return self.value
+
+
+class SimpleCounter:
+    def __init__(self):
+        self.counter = 0
+
+    def increase(self):
+        self.counter += 1
+
+    def decrease(self):
+        self.counter -= 1
+
+    def get(self):
+        return self.counter
+
+
 def slugify(value):
     value = unidecode(value)
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
@@ -438,17 +463,3 @@ def get_publication_status(workspace, publication_type, publication_name, comple
     else:
         publication_status = 'COMPLETE'
     return publication_status
-
-
-class SimpleCounter:
-    def __init__(self):
-        self.counter = 0
-
-    def increase(self):
-        self.counter += 1
-
-    def decrease(self):
-        self.counter -= 1
-
-    def get(self):
-        return self.counter
