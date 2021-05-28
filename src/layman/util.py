@@ -438,3 +438,17 @@ def get_publication_status(workspace, publication_type, publication_name, comple
     else:
         publication_status = 'COMPLETE'
     return publication_status
+
+
+class SimpleCounter:
+    def __init__(self):
+        self.counter = 0
+
+    def increase(self):
+        self.counter += 1
+
+    def decrease(self):
+        self.counter -= 1
+
+    def get(self):
+        return self.counter

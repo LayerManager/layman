@@ -48,17 +48,3 @@ def compare_images(image1, image2):
                 diffs += 1
 
     return diffs
-
-
-class SimpleCounter:
-    def __init__(self):
-        self.counter = 0
-
-    def increase(self):
-        self.counter += 1
-
-    def decrease(self):
-        self.counter -= 1
-
-    def get(self):
-        return self.counter

@@ -10,7 +10,7 @@ import logging
 import sys
 from test import flask_client, process_client
 from test.data import wfs as data_wfs
-from test.util import url_for, url_for_external, SimpleCounter
+from test.util import url_for, url_for_external
 import requests
 import pytest
 
@@ -27,6 +27,7 @@ from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld
 from layman import celery as celery_util
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
+from layman.util import SimpleCounter
 from . import util, LAYER_TYPE
 from .geoserver.util import wms_proxy
 from .micka import csw
