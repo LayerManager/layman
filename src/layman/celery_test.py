@@ -51,7 +51,7 @@ def test_single_abortable_task():
     with app.app_context():
         input_chunk.save_layer_files_str(workspace, layername, filenames, check_crs)
     task_chain = chain(*[
-        tasks_util._get_task_signature(workspace, layername, t, task_options, 'layername')
+        tasks_util.get_task_signature(workspace, layername, t, task_options, 'layername')
         for t in tasks
     ])
     task_result = task_chain()
@@ -104,7 +104,7 @@ def test_abortable_task_chain():
     with app.app_context():
         input_chunk.save_layer_files_str(workspace, layername, filenames, check_crs)
     task_chain = chain(*[
-        tasks_util._get_task_signature(workspace, layername, t, task_options, 'layername')
+        tasks_util.get_task_signature(workspace, layername, t, task_options, 'layername')
         for t in tasks
     ])
     task_result = task_chain()
