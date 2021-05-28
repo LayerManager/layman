@@ -6,17 +6,13 @@ import pytest
 
 del sys.modules['layman']
 
-from layman.layer import LAYER_TYPE
 from layman import app
 from layman import settings
-from layman import uuid
 from .oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
 from .oauth2 import liferay
 
 
 LIFERAY_PORT = process.LIFERAY_PORT
-
-num_layers_before_test = 0  # pylint: disable=invalid-name
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -73,10 +69,6 @@ def client():
     app.config['SERVER_NAME'] = settings.LAYMAN_SERVER_NAME
     app.config['SESSION_COOKIE_DOMAIN'] = settings.LAYMAN_SERVER_NAME
 
-    with app.app_context():
-        publs_by_type = uuid.check_redis_consistency()
-        global num_layers_before_test  # pylint: disable=invalid-name
-        num_layers_before_test = len(publs_by_type[LAYER_TYPE])
     yield client
 
 
