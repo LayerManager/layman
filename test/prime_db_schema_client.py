@@ -1,8 +1,8 @@
 import uuid
-from layman import settings, app
+from layman import settings, app, util as layman_util
 from layman.common.prime_db_schema import publications, workspaces, users
 
-latest_oauth2_sub = 0  # pylint: disable=invalid-name
+oauth2_sub_counter = layman_util.SimpleCounter()
 
 
 def ensure_workspace(workspace):
@@ -12,10 +12,9 @@ def ensure_workspace(workspace):
 
 def ensure_user(workspace):
     workspace_id = ensure_workspace(workspace)
-    global latest_oauth2_sub  # pylint: disable=invalid-name
-    latest_oauth2_sub += 1
+    oauth2_sub_counter.increase()
     user_info = {
-        'sub': latest_oauth2_sub,
+        'sub': oauth2_sub_counter.get(),
         'issuer_id': 'layman',
         'claims': {
             'email': f"{workspace}@liferay.com",
