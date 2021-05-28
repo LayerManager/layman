@@ -10,10 +10,8 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 del sys.modules['layman']
 
 from layman import app, settings
-from layman.map import MAP_TYPE
 from layman.uuid import check_redis_consistency
-
-num_maps_before_test = 0  # pylint: disable=invalid-name
+from . import MAP_TYPE
 
 
 @pytest.fixture(scope="module")
@@ -28,9 +26,6 @@ def client():
 
     # print('before app.app_context()')
     with app.app_context():
-        publs_by_type = check_redis_consistency()
-        global num_maps_before_test  # pylint: disable=invalid-name
-        num_maps_before_test = len(publs_by_type[MAP_TYPE])
         yield client
 
 
@@ -54,9 +49,7 @@ def chrome():
 @pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'client')
 def test_post_no_file(chrome):
-    check_redis_consistency(expected_publ_num_by_type={
-        f'{MAP_TYPE}': num_maps_before_test
-    })
+    check_redis_consistency(expected_publ_num_by_type={f'{MAP_TYPE}': 0})
 
     username = 'testuser2'
     client_url = settings.LAYMAN_CLIENT_URL
@@ -110,6 +103,4 @@ def test_post_no_file(chrome):
                                            ) and entry['message'].endswith(
             'Failed to load resource: the server responded with a status of 400 (BAD REQUEST)')
 
-    check_redis_consistency(expected_publ_num_by_type={
-        f'{MAP_TYPE}': num_maps_before_test
-    })
+    check_redis_consistency(expected_publ_num_by_type={f'{MAP_TYPE}': 0})
