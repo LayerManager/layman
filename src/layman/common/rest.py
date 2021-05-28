@@ -19,44 +19,40 @@ def _get_workspace_multi_publication_path_pattern():
     return f"^/rest/({settings.REST_WORKSPACES_PREFIX}/)?" + workspace_pattern + "/" + _get_pub_type_pattern()
 
 
-_MULTI_PUBLICATION_PATH_PATTERN = None
-_WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN = None
-_WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN = None
-_URL_NAME_TO_PUBLICATION_TYPE = None
+_MULTI_PUBLICATION_PATH_PATTERN = layman_util.SimpleStorage()
+_WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN = layman_util.SimpleStorage()
+_WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN = layman_util.SimpleStorage()
+_URL_NAME_TO_PUBLICATION_TYPE = layman_util.SimpleStorage()
 
 
 def get_multipublication_path_pattern():
-    global _MULTI_PUBLICATION_PATH_PATTERN
-    if _MULTI_PUBLICATION_PATH_PATTERN is None:
-        _MULTI_PUBLICATION_PATH_PATTERN = re.compile(f"^/rest/" + _get_pub_type_pattern() + r"/?$")
-    return _MULTI_PUBLICATION_PATH_PATTERN
+    if _MULTI_PUBLICATION_PATH_PATTERN.get() is None:
+        _MULTI_PUBLICATION_PATH_PATTERN.set(re.compile(f"^/rest/" + _get_pub_type_pattern() + r"/?$"))
+    return _MULTI_PUBLICATION_PATH_PATTERN.get()
 
 
 def get_workspace_multipublication_path_pattern():
-    global _WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN
-    if _WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN is None:
-        _WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN = re.compile(_get_workspace_multi_publication_path_pattern() + r"/?$")
-    return _WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN
+    if _WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN.get() is None:
+        _WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN.set(re.compile(_get_workspace_multi_publication_path_pattern() + r"/?$"))
+    return _WORKSPACE_MULTI_PUBLICATION_PATH_PATTERN.get()
 
 
 def get_singlepublication_path_pattern():
-    global _WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN
-    if _WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN is None:
-        _WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN = re.compile(
+    if _WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN.get() is None:
+        _WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN.set(re.compile(
             _get_workspace_multi_publication_path_pattern()
             + r"/(?P<publication_name>" + PUBLICATION_NAME_ONLY_PATTERN + r")(?:/.*)?$"
-        )
-    return _WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN
+        ))
+    return _WORKSPACE_SINGLE_PUBLICATION_PATH_PATTERN.get()
 
 
 def get_url_name_to_publication_type():
-    global _URL_NAME_TO_PUBLICATION_TYPE
-    if _URL_NAME_TO_PUBLICATION_TYPE is None:
-        _URL_NAME_TO_PUBLICATION_TYPE = {
+    if _URL_NAME_TO_PUBLICATION_TYPE.get() is None:
+        _URL_NAME_TO_PUBLICATION_TYPE.set({
             publ_type['rest_path_name']: publ_type
             for publ_type in layman_util.get_publication_types().values()
-        }
-    return _URL_NAME_TO_PUBLICATION_TYPE
+        })
+    return _URL_NAME_TO_PUBLICATION_TYPE.get()
 
 
 def parse_request_path(request_path):
