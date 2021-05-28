@@ -10,7 +10,7 @@ import logging
 import sys
 from test import flask_client, process_client
 from test.data import wfs as data_wfs
-from test.util import url_for, url_for_external, PublicationCounter
+from test.util import url_for, url_for_external, SimpleCounter
 import requests
 import pytest
 
@@ -63,7 +63,7 @@ MIN_GEOJSON = """
 }
 """
 
-num_of_publications = PublicationCounter()
+num_of_publications = SimpleCounter()
 
 
 def check_metadata(client, username, layername, props_equal, expected_values):

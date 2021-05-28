@@ -50,15 +50,15 @@ def compare_images(image1, image2):
     return diffs
 
 
-class PublicationCounter:
+class SimpleCounter:
     def __init__(self):
-        self.expected_publ_num = 0
+        self.counter = 0
 
     def increase(self):
-        self.expected_publ_num += 1
+        self.counter += 1
 
     def decrease(self):
-        self.expected_publ_num -= 1
+        self.counter -= 1
 
     def get(self):
-        return self.expected_publ_num
+        return self.counter

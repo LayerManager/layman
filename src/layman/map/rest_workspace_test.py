@@ -6,7 +6,7 @@ import time
 import difflib
 import sys
 from test import flask_client
-from test.util import url_for, url_for_external, PublicationCounter
+from test.util import url_for, url_for_external, SimpleCounter
 import requests
 import pytest
 
@@ -38,7 +38,7 @@ METADATA_PROPERTIES = {
 
 METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES
 
-num_of_publications = PublicationCounter()
+num_of_publications = SimpleCounter()
 
 
 def wait_till_ready(username, mapname):
