@@ -39,7 +39,7 @@ METADATA_PROPERTIES = {
 
 METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES
 
-num_of_publications = SimpleCounter()
+publication_counter = SimpleCounter()
 
 
 def wait_till_ready(username, mapname):
@@ -102,7 +102,7 @@ def test_get_maps_empty(client):
         assert len(resp_json) == 0
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_of_publications.get()
+            f'{MAP_TYPE}': publication_counter.get()
         })
 
 
@@ -183,7 +183,7 @@ def test_post_maps_invalid_json(client):
             file_path[0].close()
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{MAP_TYPE}': num_of_publications.get()
+        f'{MAP_TYPE}': publication_counter.get()
     })
 
 
@@ -218,9 +218,9 @@ def test_post_maps_simple(client):
 
         assert uuid.is_valid_uuid(uuid_str)
 
-        num_of_publications.increase()
+        publication_counter.increase()
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_of_publications.get()
+            f'{MAP_TYPE}': publication_counter.get()
         })
 
     with app.app_context():
@@ -343,9 +343,9 @@ def test_post_maps_complex(client):
             for file_path in files:
                 file_path[0].close()
 
-        num_of_publications.increase()
+        publication_counter.increase()
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_of_publications.get()
+            f'{MAP_TYPE}': publication_counter.get()
         })
 
     with app.app_context():
@@ -469,7 +469,7 @@ def test_patch_map(client):
                 file[0].close()
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_of_publications.get()
+            f'{MAP_TYPE}': publication_counter.get()
         })
 
         assert resp_json['uuid'] == uuid_str
@@ -543,7 +543,7 @@ def test_patch_map(client):
         assert resp_json['description'] == "Nový popis"
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_of_publications.get()
+            f'{MAP_TYPE}': publication_counter.get()
         })
 
     with app.app_context():
@@ -590,9 +590,9 @@ def test_delete_map(client):
         assert 'Záznam nenalezen' in response.text
         assert mapname not in response.text
 
-        num_of_publications.decrease()
+        publication_counter.decrease()
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_of_publications.get()
+            f'{MAP_TYPE}': publication_counter.get()
         })
 
     with app.app_context():
@@ -603,7 +603,7 @@ def test_delete_map(client):
         assert resp_json['code'] == 26
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
-            f'{MAP_TYPE}': num_of_publications.get()
+            f'{MAP_TYPE}': publication_counter.get()
         })
 
 
