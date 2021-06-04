@@ -1,6 +1,12 @@
 name: CodeQuality
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - '[1-9].*.x'
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   ReMark:
