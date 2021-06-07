@@ -1,12 +1,9 @@
 # Changelog
 
 ## v1.13.1
- {release_date}
-### Upgrade requirements
-### Migrations and checks
-#### Schema migrations
-#### Data migrations
+ 2021-06-07
 ### Changes
+- [Map composition schema](https://github.com/LayerManager/layman/blob/master/src/layman/map/schema.draft-07.json) allows new properties `hs.format.externalWFS` and `workspace` ([#382](https://github.com/LayerManager/layman/pull/382)). The `style` property can be specified using a string in SLD format, URL to SLD file or JSON object ([#385](https://github.com/LayerManager/layman/pull/385)).
 
 ## v1.13.0
  2021-05-26
