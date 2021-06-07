@@ -3,8 +3,8 @@
 
 | name | version | license | used by | env | bin or src | purpose |
 | --- | --- | --- | --- | --- | --- | --- |
-| [postgresql](https://www.postgresql.org/) | 10.0 | PostgreSQL | kartoza/docker-postgis | prod-external | bin | to store vector data effectively |
-| [postgis](https://postgis.net/) | 2.4 | GNU GPL v2 | kartoza/docker-postgis | prod-external | bin | to store vector data effectively |
+| [postgresql](https://www.postgresql.org/) | 13.3 | PostgreSQL | layermanager/docker-postgis | prod-external | bin | to store vector data effectively |
+| [postgis](https://postgis.net/) | 3.1 | GNU GPL v2 | layermanager/docker-postgis | prod-external | bin | to store vector data effectively |
 | [geoserver](https://github.com/geoserver/geoserver) | 2.13.0 | GNU GPL v2 | kartoza/docker-geoserver | prod-external | bin | to provide WMS/WFS endpoints |
 | [qgis-server](https://docs.qgis.org/3.16/en/docs/server_manual/index.html) | 3.16 | GNU GPL v2 | jirikcz/qgis-server | prod-external | bin | to provide WMS endpoint |
 | [redis](https://redis.io/) | 4.0.11 | BSD 3-Clause | docker-library/redis | prod-external | bin | celery message broker, source of truth for server side |
@@ -79,7 +79,7 @@
 | [geographicags/docker-gdal2](https://github.com/GeographicaGS/Docker-GDAL2) | MIT License | Dockerfile | prod | bin | |
 | [kartoza/docker-geoserver](https://github.com/kartoza/docker-geoserver) | GNU GPL v2 | docker-compose.yml | dev | bin | |
 | [jirikcz/qgis-server](https://github.com/LayerManager/docker-qgis-server) | GNU GPL v3 | docker-compose.yml | dev | bin | |
-| [kartoza/docker-postgis](https://github.com/kartoza/docker-postgis) | - | docker-compose.yml | dev | bin | |
+| [layermanager/docker-postgis](https://github.com/layermanager/docker-postgis) | MIT | docker-compose.yml | dev | bin | |
 | [liferay/portal](https://github.com/docker-library/redis) | GNU GPL v2 | docker-compose.yml | opt | bin | |
 | [jirikcz/micka](https://github.com/LayerManager/docker-micka) | GNU GPL v3 | docker-compose.yml | prod-external | bin | |
 | [samtux/micka](https://github.com/samtux/docker-micka) | GNU GPL v3 | jirikcz/micka | prod-external | src | |
