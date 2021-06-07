@@ -5,14 +5,13 @@ volumes:
 
 services:
    postgresql:
-      image: kartoza/postgis:10.0-2.4
+      image: layermanager/postgis:13.3-3.1-20210608
       volumes:
-        - ./deps/postgresql/data:/var/lib/postgresql
+        - ./deps/postgresql/data:/var/lib/postgresql/data
       environment:
-         - USERNAME=docker
-         - PASS=docker
-         - ALLOW_IP_RANGE=0.0.0.0/0
-         - POSTGRES_TEMPLATE_EXTENSIONS=true
+         - POSTGRES_USER=docker
+         - POSTGRES_PASSWORD=docker
+         - POSTGRES_DB=gis
       restart: on-failure
 
    qgis:

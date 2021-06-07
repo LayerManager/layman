@@ -7,6 +7,8 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [#347](https://github.com/LayerManager/layman/issues/347) Upgrade PostgreSQL 10 to 13.3 and PostGIS 2.4 to 3.1. Use docker image from [layermanager/postgis@hub.docker.com](https://hub.docker.com/repository/docker/layermanager/postgis@github.com), source is located at [layermanager/docker-postgis@github.com](https://github.com/LayerManager/docker-postgis).
+- [#347](https://github.com/LayerManager/layman/issues/347) When ordering publications by title, consider only letters, numbers, and spaces.
 - [Map composition schema](https://github.com/LayerManager/layman/blob/master/src/layman/map/schema.draft-07.json) allows new properties `hs.format.externalWFS` and `workspace` ([#382](https://github.com/LayerManager/layman/pull/382)). The `style` property can be specified using a string in SLD format, URL to SLD file or JSON object ([#385](https://github.com/LayerManager/layman/pull/385)). Both was already introduced in v1.13.1.
 - Errors `19`: 'Layer is already in process.' and `29`: 'Map is already in process.' are merged into `49`: 'Publication is already in process.'.
 
