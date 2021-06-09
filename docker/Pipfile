@@ -30,4 +30,4 @@ pyproj = "<3.0.0"
 pycld2 = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.8"

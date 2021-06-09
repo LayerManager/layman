@@ -18,11 +18,11 @@
 
 | name | version | license | used by | env | bin or src | purpose |
 | --- | --- | --- | --- | --- | --- | --- |
-| [python](http://www.gdal.org/) | 3.6 | Python Software Foundation License | geographicags/docker-gdal2 | prod | bin | to run Layman |
-| [python3-lxml](https://lxml.de/installation.html) | 4.2 | BSD 3-Clause | Dockerfile | prod | bin | to query XML with full XPath 1.0 |
-| [gdal](http://www.gdal.org/) | 2.4.0 | MIT License | geographicags/docker-gdal2 | prod | bin | to import vector files into DB |
-| [chromium](https://www.chromium.org/) | 77+ | BSD and others | Dockerfile | prod | bin | for client-side map rendering and integration testing |
-| [chromedriver](http://chromedriver.chromium.org/) | 77+ | BSD and others | Dockerfile | prod | bin | for client-side map rendering and integration testing |
+| [python](http://www.gdal.org/) | 3.8 | Python Software Foundation License | gdal/docker | prod | bin | to run Layman |
+| [python3-lxml](https://lxml.de/installation.html) | 4.5 | BSD 3-Clause | Dockerfile | prod | bin | to query XML with full XPath 1.0 |
+| [gdal](http://www.gdal.org/) | 3.3.0 | MIT License | gdal/docker | prod | bin | to import vector files into DB |
+| [chromium](https://www.chromium.org/) | 90+ | BSD and others | Dockerfile | prod | bin | for client-side map rendering and integration testing |
+| [chromedriver](http://chromedriver.chromium.org/) | 90+ | BSD and others | Dockerfile | prod | bin | for client-side map rendering and integration testing |
 | [pipenv](https://pipenv.pypa.io/en/latest/) | 2020.11.15 | MIT | Dockerfile | prod | bin | to install Python dependencies |
 | [node.js](https://nodejs.org/) | 10 | MIT | timgen/Dockerfile | prod | bin | to run Timgen |
 | [npm](https://www.npmjs.com/get-npm) | 6 | Artistic License 2.0 | timgen/Dockerfile | prod | bin | to install node.js dependencies |
@@ -74,9 +74,9 @@
 | --- | --- | --- | --- | --- | --- |
 | [python3-pip](https://packages.debian.org/jessie/python3-pip) | MIT | Dockerfile | prod | bin | for installing pipenv and gunicorn |
 | [hslayers-ng](https://github.com/hslayers/hslayers-ng) | MIT | schema.draft-07.json | prod | src | |
-| [libxml](http://xmlsoft.org/) | MIT | python3-lxml | prod | bin | |
-| [libxslt](http://xmlsoft.org/libxslt/) | MIT | python3-lxml | prod | bin | |
-| [geographicags/docker-gdal2](https://github.com/GeographicaGS/Docker-GDAL2) | MIT License | Dockerfile | prod | bin | |
+| [libxml2](http://xmlsoft.org/) | MIT | python3-lxml | prod | bin | |
+| [libxslt1.1](http://xmlsoft.org/libxslt/) | MIT | python3-lxml | prod | bin | |
+| [gdal/docker](https://github.com/OSGeo/gdal/tree/master/gdal/docker) | MIT License | Dockerfile | prod | bin | |
 | [kartoza/docker-geoserver](https://github.com/kartoza/docker-geoserver) | GNU GPL v2 | docker-compose.yml | dev | bin | |
 | [jirikcz/qgis-server](https://github.com/LayerManager/docker-qgis-server) | GNU GPL v3 | docker-compose.yml | dev | bin | |
 | [layermanager/docker-postgis](https://github.com/layermanager/docker-postgis) | MIT | docker-compose.yml | dev | bin | |

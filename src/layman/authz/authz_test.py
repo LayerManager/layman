@@ -54,6 +54,7 @@ def test_authorize_publications_decorator_does_not_accept_path(request_path):
 ])
 def test_authorize_publications_decorator_accepts_path(request_path):
     with app.test_request_context(request_path):
+        # pylint: disable=assigning-non-slot
         g.user = None
         with pytest.raises(Exception) as exc_info:
             mock_method()

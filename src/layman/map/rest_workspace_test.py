@@ -312,6 +312,7 @@ def test_post_maps_simple(client):
 
 
 @pytest.mark.usefixtures('ensure_layman')
+@pytest.mark.timeout(60)
 def test_post_maps_complex(client):
     with app.app_context():
         username = 'testuser1'

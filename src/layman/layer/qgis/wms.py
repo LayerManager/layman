@@ -4,7 +4,7 @@ from owslib.wms import WebMapService
 from layman import patch_mode, settings, util as layman_util
 from layman.common import bbox as bbox_util, empty_method, empty_method_returns_none, empty_method_returns_dict
 from . import util
-from .. import db, qgis, util as layer_util
+from .. import db, qgis, util as layer_util, LAYER_TYPE
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = "1.1.1"
@@ -61,7 +61,7 @@ def save_qgs_file(workspace, layer):
     info = layer_util.get_layer_info(workspace, layer)
     uuid = info['uuid']
     qgis.ensure_layer_dir(workspace, layer)
-    layer_bbox = db.get_bbox(workspace, layer)
+    layer_bbox = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['bounding_box']})['bounding_box']
     layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
     qml = util.get_original_style_xml(workspace, layer)
     qml_geometry = util.get_qml_geometry_from_qml(qml)

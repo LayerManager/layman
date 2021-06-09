@@ -10,6 +10,7 @@ FLASK_MODULES_KEY = f'{__name__}:MODULES'
 def authenticate(function):
     @wraps(function)
     def decorated_function(*args, **kwargs):
+        # pylint: disable=assigning-non-slot
         # current_app.logger.info(f"authenticate ARGS {args} KWARGS {kwargs}")
         authn_modules = get_authn_modules()
         results = list(call_modules_fn(authn_modules, 'authenticate', until=lambda r: r is not None).values())
@@ -46,6 +47,7 @@ def get_open_id_claims():
     else:
         authn_module = get_authn_module()
         result = authn_module.get_open_id_claims()
+    # pylint: disable=assigning-non-slot
     g.open_id_claims = result
     return result
 

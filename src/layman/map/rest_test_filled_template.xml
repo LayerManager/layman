@@ -168,7 +168,7 @@
           <gmd:geographicElement>
             <gmd:EX_GeographicBoundingBox>
               <gmd:westBoundLongitude>
-                <gco:Decimal>-35.0</gco:Decimal>
+                <gco:Decimal>-34.99999999999999</gco:Decimal>
               </gmd:westBoundLongitude>
               <gmd:eastBoundLongitude>
                 <gco:Decimal>179.0</gco:Decimal>
@@ -177,7 +177,7 @@
                 <gco:Decimal>-48.5</gco:Decimal>
               </gmd:southBoundLatitude>
               <gmd:northBoundLatitude>
-                <gco:Decimal>81.4999999999999</gco:Decimal>
+                <gco:Decimal>81.50000000000001</gco:Decimal>
               </gmd:northBoundLatitude>
             </gmd:EX_GeographicBoundingBox>
           </gmd:geographicElement>
