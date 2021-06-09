@@ -7,7 +7,13 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [Map composition schema](https://github.com/LayerManager/layman/blob/master/src/layman/map/schema.draft-07.json) allows new properties `hs.format.externalWFS` and `workspace` ([#382](https://github.com/LayerManager/layman/pull/382)). The `style` property can be specified using a string in SLD format, URL to SLD file or JSON object ([#385](https://github.com/LayerManager/layman/pull/385)). Both was already introduced in v1.13.1.
 - Errors `19`: 'Layer is already in process.' and `29`: 'Map is already in process.' are merged into `49`: 'Publication is already in process.'.
+
+## v1.13.1
+ 2021-06-07
+### Changes
+- [Map composition schema](https://github.com/LayerManager/layman/blob/master/src/layman/map/schema.draft-07.json) allows new properties `hs.format.externalWFS` and `workspace` ([#382](https://github.com/LayerManager/layman/pull/382)). The `style` property can be specified using a string in SLD format, URL to SLD file or JSON object ([#385](https://github.com/LayerManager/layman/pull/385)).
 
 ## v1.13.0
  2021-05-26
