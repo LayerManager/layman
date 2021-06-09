@@ -1,14 +1,37 @@
-FROM geographica/gdal2:2.4.0
+FROM osgeo/gdal:ubuntu-small-3.3.0
+
+# Configure apt for installing chromium and chromedriver from debian repos - START
+# https://askubuntu.com/a/1206502
 
 RUN apt-get clean && apt-get update && \
-    apt-get -y -qq install unzip curl python3-pip chromium-browser python3-lxml && \
-    pip3 install pipenv==2020.11.15
+    apt-get -y -qq install debian-archive-keyring
 
-RUN export MAIN_CHROME_VERSION=$(apt-cache policy chromium-browser | grep -oP "Installed: \K\w+") && \
-    echo "Installed chromium-browser ${MAIN_CHROME_VERSION}" && \
-    export CHROMEDRIVER_VERSION=$(curl https://chromedriver.storage.googleapis.com/ | grep -oP "(?<=<Key>)${MAIN_CHROME_VERSION}\.[0-9.]+(?=/chromedriver_linux64.zip</Key>)" | tail -1) && \
-    echo "Installing chromedriver version ${CHROMEDRIVER_VERSION}" && \
-    (cd /tmp && curl -O "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" && unzip chromedriver_linux64.zip -d /usr/bin && rm chromedriver_linux64.zip)
+RUN echo 'deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian stable main\n\
+deb-src [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian stable main\n\
+\n\
+deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian-security/ stable/updates main\n\
+deb-src [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian-security/ stable/updates main\n\
+\n\
+deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian stable-updates main\n\
+deb-src [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian stable-updates main\n'\
+>> /etc/apt/sources.list.d/debian-stable.list
+
+RUN echo 'Explanation: Allow installing chromium from the debian repo.\n\
+Package: chromium*\n\
+Pin: origin "*.debian.org"\n\
+Pin-Priority: 100\n\
+\n\
+Explanation: Avoid other packages from the debian repo.\n\
+Package: *\n\
+Pin: origin "*.debian.org"\n\
+Pin-Priority: 1\n'\
+>> /etc/apt/preferences.d/debian-chromium
+
+# Configure apt for installing chromium and chromedriver from debian repos - END
+
+RUN apt-get clean && apt-get update && \
+    apt-get -y -qq install chromium chromium-driver nano python3-pip python3-lxml && \
+    pip install pipenv==2020.11.15
 
 RUN mkdir /code
 WORKDIR /code
@@ -21,7 +44,7 @@ COPY docker/Pipfile* /code/
 COPY docker/requirements.production.txt /code/
 
 RUN pipenv install --system
-RUN pip3 install -r requirements.production.txt
+RUN pip install -r requirements.production.txt
 
 COPY src /code/src
 

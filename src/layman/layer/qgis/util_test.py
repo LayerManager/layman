@@ -141,6 +141,6 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
             with app.app_context():
                 thumbnail_path = thumbnail.get_layer_thumbnail_path(workspace, layer)
             diff_pixels = test_util.compare_images(thumbnail_path, exp_file_path)
-            assert diff_pixels == 0
+            assert diff_pixels == 0, f"thumbnail_path={thumbnail_path}, exp_file_path={exp_file_path}"
 
     process_client.delete_workspace_layer(workspace, layer)

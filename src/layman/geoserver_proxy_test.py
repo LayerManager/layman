@@ -308,7 +308,7 @@ def test_wfs_bbox(style_file, thumbnail_style_postfix):
 
     assert_util.assert_all_sources_bbox(workspace, layer, SMALL_LAYER_BBOX)
 
-    expected_bbox = (1571000.0, 6268800.0, 1572590.8542062, 6269876.33561699)
+    expected_bbox = (1571000.0, 6268800.0, 1572590.854206196, 6269876.33561699)
     method_bbox_thumbnail_tuples = [
         (data_wfs.get_wfs20_insert_points, expected_bbox, '_bigger'),
         (data_wfs.get_wfs20_delete_point, SMALL_LAYER_BBOX, ''),

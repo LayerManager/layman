@@ -130,6 +130,7 @@ def authenticate():
     user = {}
     if username is not None:
         user['username'] = username
+    # pylint: disable=assigning-non-slot
     g.user = user
     return user
 

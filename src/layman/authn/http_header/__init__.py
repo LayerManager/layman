@@ -17,6 +17,7 @@ def authenticate():
     user = {
         'username': username
     }
+    # pylint: disable=assigning-non-slot
     g.user = user
     return user
 
