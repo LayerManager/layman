@@ -3,6 +3,23 @@
 ## v1.14.0
  {release_date}
 ### Upgrade requirements
+- It's strongly recommended to backup data directories, especially `deps/postgresql/data`, because of database upgrade.
+- After stopping layman and backing up data directories, you need to migrate PostgreSQL data directory from v10 to v13. We created script that automatically migrates two databases:
+    - `gis` (Layman's database)
+    - `hsrs_micka6` (Micka's database, only if exists)  
+    If you use other databases in the postgres instance, their migration is up to you (you can inspire inside our script).
+
+    **Migration script:**   
+    ```
+    # Enter your layman's root directory.
+    cd /path/to/your/layman/instance
+    
+    # Upgrade PostgreSQL and PostGIS database.
+    # It's necessary to run this script from layman's root directory
+    ./src/layman/upgrade/upgrade_v1_14_postgres.sh
+    ```
+
+    It may take some time to run this script and it will produce large temporary files (database dumps).
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
