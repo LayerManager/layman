@@ -18,7 +18,7 @@
 
 | name | version | license | used by | env | bin or src | purpose |
 | --- | --- | --- | --- | --- | --- | --- |
-| [python](http://www.gdal.org/) | 3.8 | Python Software Foundation License | gdal/docker | prod | bin | to run Layman |
+| [python](https://www.python.org/) | 3.8 | Python Software Foundation License | gdal/docker | prod | bin | to run Layman |
 | [python3-lxml](https://lxml.de/installation.html) | 4.5 | BSD 3-Clause | Dockerfile | prod | bin | to query XML with full XPath 1.0 |
 | [gdal](http://www.gdal.org/) | 3.3.0 | MIT License | gdal/docker | prod | bin | to import vector files into DB |
 | [chromium](https://www.chromium.org/) | 90+ | BSD and others | Dockerfile | prod | bin | for client-side map rendering and integration testing |
