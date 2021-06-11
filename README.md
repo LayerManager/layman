@@ -115,7 +115,7 @@ Layman has [many dependencies](doc/dependencies.md). Most of them are shipped wi
 These external dependencies are shipped with Layman for development, testing and demo purposes. They are grouped in `docker-compose.deps*.yml` files.
 
 However, if you want to run Layman in production, it is strongly recommended to install external dependencies separately. Recommended (i.e. tested) versions are:
-- PostgreSQL 10.0 & PostGIS 2.4
+- PostgreSQL 13.3 & PostGIS 3.1
 - QGIS Server 3.16.1
 - GeoServer 2.13.0
 - Redis 4.0
@@ -142,7 +142,7 @@ General steps to upgrade layman to MINOR or PATCH version:
 To run layman in production, you need to provide [external dependencies](#dependencies) and [configure](#configuration) layman manually.
 
 When providing **external dependencies**, check their production-related documentation:
-- [PostgreSQL 10.0](https://www.postgresql.org/docs/10/admin.html) & [PostGIS 2.4](http://postgis.net/docs/manual-2.4/performance_tips.html)
+- [PostgreSQL 13.3](https://www.postgresql.org/docs/13/admin.html) & [PostGIS 3.1](http://postgis.net/docs/manual-3.1/performance_tips.html)
 - [QGIS Server 3.16.1](https://docs.qgis.org/3.10/en/docs/user_manual/working_with_ogc/server/index.html)
 - [GeoServer 2.13.0](https://docs.geoserver.org/2.13.0/user/production/index.html#production)
 - [Redis 4.0](https://redis.io/topics/admin)
@@ -161,10 +161,10 @@ Within Micka, you need to provide one user with editor privileges, whose credent
 After providing external dependencies there is time to provide **internal dependencies** (system-level, python-level and node.js-level dependencies). You can either use our docker and docker-compose configuration to generate docker images that already provides internal dependencies, or you can provide internal dependencies by yourself (if you prefer not to use docker in production).
 
 **System-level** dependencies includes
-- python 3.6+
+- python 3.8+
 - [python3-lxml](https://lxml.de/installation.html)
-- [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) utility of [gdal](https://gdal.org/) 2.4+
-- [chromium-browser](https://chromium.org/) 77+ and corresponding version of [chromedriver](https://chromedriver.chromium.org/)
+- [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) utility of [gdal](https://gdal.org/) 3.3+
+- [chromium-browser](https://chromium.org/) 90+ and corresponding version of [chromedriver](https://chromedriver.chromium.org/)
 - [pipenv](https://pipenv.pypa.io/en/latest/)
 - [node.js](https://nodejs.org/) 10 & npm 6 for running Timgen
 - [node.js](https://nodejs.org/) 12 & npm 6 for running Layman Test Client

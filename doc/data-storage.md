@@ -92,8 +92,8 @@ Layman uses directly **one database** specified by [LAYMAN_PG_DBNAME](env-settin
    - users, workspaces, and publications including access rights
    - data version including migration ID
 - Schemas holding vector layer data.
-    - One **[workspace schema](https://www.postgresql.org/docs/9.1/ddl-schemas.html)** is created for every created [workspace](models.md#workspace). Name of workspace schema is always the same as workspace name.
-    - One **[table](https://www.postgresql.org/docs/9.1/sql-createtable.html)** is created in workspace schema for each published layer. Name of the table is the same as layername. The table contains data from vector data files.
+    - One **[workspace schema](https://www.postgresql.org/docs/13/ddl-schemas.html)** is created for every created [workspace](models.md#workspace). Name of workspace schema is always the same as workspace name.
+    - One **[table](https://www.postgresql.org/docs/13/sql-createtable.html)** is created in workspace schema for each published layer. Name of the table is the same as layername. The table contains data from vector data files.
 
 **Second database** is used by Micka to store metadata records. The database including its structure is completely managed by Micka. By default, it's named `hsrs_micka6`.
 
