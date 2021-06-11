@@ -122,10 +122,10 @@ Internal URL host of PostgreSQL instance.
 Internal URL port of PostgreSQL instance.
 
 ### LAYMAN_PG_DBNAME
-Name of [PostgreSQL database](https://www.postgresql.org/docs/9.5/sql-createdatabase.html) in which Layman publishes layer vector data.
+Name of [PostgreSQL database](https://www.postgresql.org/docs/13/sql-createdatabase.html) in which Layman publishes layer vector data.
 
 ### LAYMAN_PG_USER
-Name of [PostgreSQL user](https://www.postgresql.org/docs/9.5/sql-createuser.html) that Layman uses for authentication and communication with PostgreSQL. The user needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](#LAYMAN_PG_DBNAME) database. The LAYMAN_PG_USER must be another user than default `postgres` user! The user also needs access to `public` schema where PostGIS must be installed.
+Name of [PostgreSQL user](https://www.postgresql.org/docs/13/sql-createuser.html) that Layman uses for authentication and communication with PostgreSQL. The user needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](#LAYMAN_PG_DBNAME) database. The LAYMAN_PG_USER must be another user than default `postgres` user! The user also needs access to `public` schema where PostGIS must be installed.
 
 ### LAYMAN_PG_PASSWORD
 Password of [LAYMAN_PG_USER](#LAYMAN_PG_USER).
