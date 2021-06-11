@@ -74,6 +74,7 @@
 | --- | --- | --- | --- | --- | --- |
 | [python3-pip](https://packages.debian.org/jessie/python3-pip) | MIT | Dockerfile | prod | bin | for installing pipenv and gunicorn |
 | [hslayers-ng](https://github.com/hslayers/hslayers-ng) | MIT | schema.draft-07.json | prod | src | |
+| [postgis_restore.pl](https://github.com/postgis/postgis/blob/3.1.2/utils/postgis_restore.pl.in) | GNU GPL v2 | upgrade_v1_14_postgis_restore.pl | upgrade | src | |
 | [libxml2](http://xmlsoft.org/) | MIT | python3-lxml | prod | bin | |
 | [libxslt1.1](http://xmlsoft.org/libxslt/) | MIT | python3-lxml | prod | bin | |
 | [gdal/docker](https://github.com/OSGeo/gdal/tree/master/gdal/docker) | MIT License | Dockerfile | prod | bin | |
