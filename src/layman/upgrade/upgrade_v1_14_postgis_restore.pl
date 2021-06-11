@@ -160,11 +160,11 @@ if ( $hasTopology ) {
 }
 
 # Drop the spatial_ref_sys_srid_check to allow for custom invalid SRIDs in the dump
-print STDOUT "ALTER TABLE spatial_ref_sys DROP constraint "
+print STDOUT "ALTER TABLE spatial_ref_sys DROP constraint IF EXISTS "
            . "spatial_ref_sys_srid_check;\n";
 # Drop the spatial_ref_sys primary key to allow for SRID conversions
 # which possibly end up taking the same spot
-print STDOUT "ALTER TABLE spatial_ref_sys DROP constraint "
+print STDOUT "ALTER TABLE spatial_ref_sys DROP constraint IF EXISTS "
            . "spatial_ref_sys_pkey;\n";
 
 # Backup entries found in new spatial_ref_sys for later updating the
@@ -1335,6 +1335,8 @@ FUNCTION area2d(geometry)
 FUNCTION area(geometry)
 FUNCTION asbinary(geometry)
 FUNCTION asbinary(geometry,text)
+FUNCTION asbinary(public.geometry)
+FUNCTION asbinary(public.geometry, text)
 FUNCTION asewkb(geometry)
 FUNCTION asewkb(geometry,text)
 FUNCTION asewkt(geometry)
@@ -1371,6 +1373,7 @@ FUNCTION assvg(geometry)
 FUNCTION assvg(geometry,integer)
 FUNCTION assvg(geometry,integer,integer)
 FUNCTION astext(geometry)
+FUNCTION astext(public.geometry)
 FUNCTION asukml(geometry)
 FUNCTION asukml(geometry,integer)
 FUNCTION asukml(geometry,integer,integer)
@@ -1735,6 +1738,7 @@ FUNCTION multipolyfromwkb(bytea,integer)
 FUNCTION multipolygonfromtext(text)
 FUNCTION multipolygonfromtext(text,integer)
 FUNCTION ndims(geometry)
+FUNCTION ndims(public.geometry)
 FUNCTION noop(geometry)
 FUNCTION npoints(geometry)
 FUNCTION nrings(geometry)
@@ -1865,6 +1869,7 @@ FUNCTION setfactor(chip,real)
 FUNCTION setpoint(geometry,integer,geometry)
 FUNCTION setsrid(chip,integer)
 FUNCTION setsrid(geometry,integer)
+FUNCTION setsrid(public.geometry,integer)
 FUNCTION se_z(geometry)
 FUNCTION shift_longitude(geometry)
 FUNCTION simplify(geometry,double precision)
@@ -1876,6 +1881,7 @@ FUNCTION spheroid_in(cstring)
 FUNCTION spheroid_out(spheroid)
 FUNCTION srid(chip)
 FUNCTION srid(geometry)
+FUNCTION srid(public.geometry)
 FUNCTION st_3dclosestpoint(geometry,geometry)
 FUNCTION _st_3ddfullywithin(geometry,geometry,double precision)
 FUNCTION st_3ddfullywithin(geometry,geometry,double precision)
@@ -2074,6 +2080,7 @@ FUNCTION st_assvg(geometry,integer,integer)
 FUNCTION st_assvg(text)
 FUNCTION st_astext(geography)
 FUNCTION st_astext(geometry)
+FUNCTION st_astext(bytea)
 FUNCTION st_astext(text)
 FUNCTION st_astiff(raster,integer[],text,integer)
 FUNCTION st_astiff(raster,integer[],text[],integer)
@@ -2942,6 +2949,7 @@ RULE geometry_columns_delete
 RULE geometry_columns_insert
 RULE geometry_columns_update
 SCHEMA topology
+SCHEMA public
 SEQUENCE topology_id_seq
 SHELLTYPE box2d
 SHELLTYPE box2df
