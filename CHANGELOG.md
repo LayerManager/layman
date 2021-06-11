@@ -39,6 +39,7 @@
   - jinja2 from 2 to 3
   - markupsafe from 1 to 2
   - pytest-rerunfailures from 9 to 10
+  - gunicorn from 19 to 20
 - [#367](https://github.com/LayerManager/layman/issues/367) Limit bounding boxes of layers and maps to EPSG:3857 extent in all sources except DB table and filesystem.
 - [#347](https://github.com/LayerManager/layman/issues/347) Upgrade PostgreSQL 10 to 13.3 and PostGIS 2.4 to 3.1. Use docker image from [layermanager/postgis@hub.docker.com](https://hub.docker.com/repository/docker/layermanager/postgis@github.com), source is located at [layermanager/docker-postgis@github.com](https://github.com/LayerManager/docker-postgis).
 - [#347](https://github.com/LayerManager/layman/issues/347) When ordering publications by title, consider only letters, numbers, and spaces.
