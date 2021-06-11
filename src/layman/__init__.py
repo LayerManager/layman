@@ -38,7 +38,7 @@ from .util import get_workspace_blueprints, get_blueprints
 
 for bp in get_workspace_blueprints():
     app.register_blueprint(bp, url_prefix=f'/rest/{settings.REST_WORKSPACES_PREFIX}/<workspace>')
-    app.register_blueprint(bp, url_prefix='/rest/<workspace>')
+    app.register_blueprint(bp, url_prefix='/rest/<workspace>', name=bp.name + '_deprecated')
 
 for bp in get_blueprints():
     app.register_blueprint(bp, url_prefix=f'/rest')
