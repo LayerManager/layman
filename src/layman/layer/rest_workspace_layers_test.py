@@ -9,7 +9,7 @@ import pytest
 del sys.modules['layman']
 
 from geoserver import GS_REST_WORKSPACES
-from layman import app, settings
+from layman import app, settings, util as layman_util
 from layman.layer import util as layer_util
 from layman.layer.filesystem import input_style, input_file
 from layman.layer.geoserver.wms import DEFAULT_WMS_STORE_PREFIX
@@ -182,7 +182,9 @@ class TestQgisCascadeWmsClass:
 
 def assert_raster_layer(workspace, layer, file_names):
     with app.app_context():
+        info = layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['file']})
         directory_path = input_file.get_layer_input_file_dir(workspace, layer)
+    assert info.get('file', dict()).get('file_type') == 'raster', info
     for file in file_names:
         file_path = os.path.join(directory_path, layer + os.path.splitext(file)[1])
         assert os.path.exists(file_path), file_path

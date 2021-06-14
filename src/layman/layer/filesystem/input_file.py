@@ -42,10 +42,12 @@ def get_layer_info(workspace, layername):
     main_filename = get_main_file_name(filenames)
     if main_filename is not None:
         main_filename = os.path.relpath(main_filename, common_util.get_workspace_dir(workspace))
+        file_type = get_file_type(main_filename)
         result = {
             'file': {
-                'path': main_filename
-            }
+                'path': main_filename,
+                'file_type': file_type,
+            },
         }
     elif os.path.exists(util.get_layer_dir(workspace, layername)):
         result = {

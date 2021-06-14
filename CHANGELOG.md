@@ -25,6 +25,7 @@
 #### Data migrations
 ### Changes
 - [#167](https://github.com/LayerManager/layman/issues/167) Allow publishing also raster geospatial data from `GeoTiff` and `JPEG2000` formats using [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer).
+- [#167](https://github.com/LayerManager/layman/issues/167) Add `file_type` item to `file` item in [GET Workspace Layer](doc/rest.md#get-workspace-layer) response to distinguish raster and vector layer.
 - [#367](https://github.com/LayerManager/layman/issues/367) Upgrade gdal from 2.4 to 3.3. Use docker image from [osgeo/gdal@hub.docker.com](https://hub.docker.com/r/osgeo/gdal), source is located at [osgeo/gdal@github.com](https://github.com/OSGeo/gdal/tree/master/gdal/docker).
 - [#367](https://github.com/LayerManager/layman/issues/367) Upgrade also
   - python from 3.6 to 3.8
