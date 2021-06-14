@@ -98,7 +98,9 @@ class TestResponsesClass:
         **expected_common,
         'bounding_box': list(test_data.SMALL_LAYER_BBOX),
         'db_table': {'name': publication},
-        'file': {'path': f'layers/{publication}/input_file/{publication}.geojson'},
+        'file': {'path': f'layers/{publication}/input_file/{publication}.geojson',
+                 'file_type': 'vector',
+                 },
         'metadata': {'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/'
                                        f'metadata-comparison',
                      'csw_url': f'{settings.CSW_PROXY_URL}',

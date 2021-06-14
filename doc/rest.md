@@ -226,6 +226,7 @@ JSON object with following structure:
   - *error*: If status is FAILURE, this may contain error object.
 - **file**
   - *path*: String. Path to input vector data file that was imported to the DB table. Path is relative to workspace directory.
+  - *file_type*: String. Either `vector` or `raster` depends on source file type.
   - *status*: Status information about saving and availability of files. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **db_table**
