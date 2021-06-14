@@ -2,7 +2,7 @@ import glob
 import os
 import pathlib
 
-from osgeo import ogr
+from osgeo import ogr, gdal
 
 from layman.http import LaymanError
 from layman import settings, patch_mode
@@ -68,37 +68,55 @@ def get_layer_main_file_path(username, layername):
     return get_main_file_name(filenames)
 
 
-def get_ogr_driver(main_filepath):
-    ext_to_ogr_driver = {
-        '.shp': "ESRI Shapefile",
-        '.geojson': "GeoJSON",
-    }
+def get_file_type(main_filepath):
     ext = os.path.splitext(main_filepath)[1]
-    driver_name = ext_to_ogr_driver.get(ext, None)
-    return ogr.GetDriverByName(driver_name)
+    file_type = settings.MAIN_FILE_EXTENSIONS[ext]
+    return file_type
 
 
-def check_main_file(main_filepath):
-    # check feature layers in source file
-    in_driver = get_ogr_driver(main_filepath)
-    in_data_source = in_driver.Open(main_filepath, 0)
+def check_vector_main_file(main_filepath):
+    in_data_source = ogr.Open(main_filepath, 0)
     n_layers = in_data_source.GetLayerCount()
     if n_layers != 1:
         raise LaymanError(5, {'found': n_layers, 'expected': 1})
 
 
-def check_layer_crs(main_filepath):
-    in_driver = get_ogr_driver(main_filepath)
-    in_data_source = in_driver.Open(main_filepath, 0)
-    feature_layer = in_data_source.GetLayerByIndex(0)
+def check_raster_main_file(main_filepath):
+    in_data_source = gdal.Open(main_filepath)
+    assert in_data_source is not None
+    n_bands = in_data_source.RasterCount
+    if n_bands not in (1, 2, 3, 4):
+        raise LaymanError(5, {'found': n_bands, 'expected': 1})
 
-    crs = feature_layer.GetSpatialRef()
-    crs_auth_name = crs.GetAuthorityName(None)
-    crs_code = crs.GetAuthorityCode(None)
+
+def check_spatial_ref_crs(spatial_ref):
+    crs_auth_name = spatial_ref.GetAuthorityName(None)
+    crs_code = spatial_ref.GetAuthorityCode(None)
     crs_id = crs_auth_name + ":" + crs_code
     if crs_id not in settings.INPUT_SRS_LIST:
         raise LaymanError(4, {'found': crs_id,
                               'supported_values': settings.INPUT_SRS_LIST})
+
+
+def check_vector_layer_crs(main_filepath):
+    in_data_source = ogr.Open(main_filepath, 0)
+    feature_layer = in_data_source.GetLayerByIndex(0)
+    crs = feature_layer.GetSpatialRef()
+    check_spatial_ref_crs(crs)
+
+
+def check_raster_layer_crs(main_filepath):
+    in_data_source = gdal.Open(main_filepath)
+    crs = in_data_source.GetSpatialRef()
+    check_spatial_ref_crs(crs)
+
+
+def check_layer_crs(main_filepath):
+    file_type = get_file_type(main_filepath)
+    if file_type == settings.FILE_TYPE_VECTOR:
+        check_vector_layer_crs(main_filepath)
+    elif file_type == settings.FILE_TYPE_RASTER:
+        check_raster_layer_crs(main_filepath)
 
 
 def check_filenames(username, layername, filenames, check_crs, ignore_existing_files=False):
@@ -106,7 +124,7 @@ def check_filenames(username, layername, filenames, check_crs, ignore_existing_f
     if main_filename is None:
         raise LaymanError(2, {'parameter': 'file',
                               'expected': 'At least one file with any of extensions: '
-                                          + ', '.join(settings.MAIN_FILE_EXTENSIONS)})
+                                          + ', '.join(get_all_allowed_main_extensions())})
     basename, ext = map(
         lambda s: s.lower(),
         os.path.splitext(main_filename)
@@ -153,14 +171,17 @@ def save_layer_files(username, layername, files, check_crs):
     )
 
     common.save_files(files, filepath_mapping)
-    # n_uploaded_files = len({k:v
-    #                         for k, v in filepath_mapping.items()
-    #                         if v is not None})
 
-    check_main_file(filepath_mapping[main_filename])
+    main_filepath = filepath_mapping[main_filename]
+    file_type = get_file_type(main_filepath)
+    if file_type == settings.FILE_TYPE_VECTOR:
+        check_vector_main_file(main_filepath)
+    elif file_type == settings.FILE_TYPE_RASTER:
+        check_raster_main_file(main_filepath)
+
     if check_crs:
         check_layer_crs(filepath_mapping[main_filename])
-    # main_filename = filename_mapping[main_filename]
+
     target_file_paths = [
         fp for k, fp in filepath_mapping.items() if fp is not None
     ]
@@ -179,9 +200,14 @@ def get_unsafe_layername(files):
     return unsafe_layername
 
 
+def get_all_allowed_main_extensions():
+    result = list(settings.MAIN_FILE_EXTENSIONS.keys())
+    return result
+
+
 def get_main_file_name(filenames):
     return next((fn for fn in filenames if os.path.splitext(fn)[1]
-                 in settings.MAIN_FILE_EXTENSIONS), None)
+                 in get_all_allowed_main_extensions()), None)
 
 
 def get_file_name_mappings(file_names, main_file_name, layer_name, output_dir):

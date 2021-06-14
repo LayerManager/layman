@@ -11,7 +11,7 @@ del sys.modules['layman']
 from geoserver import GS_REST_WORKSPACES
 from layman import app, settings
 from layman.layer import util as layer_util
-from layman.layer.filesystem import input_style
+from layman.layer.filesystem import input_style, input_file
 from layman.layer.geoserver.wms import DEFAULT_WMS_STORE_PREFIX
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
@@ -178,3 +178,33 @@ class TestQgisCascadeWmsClass:
             self.assert_wms_layer(workspace, layer, expected_style, expected_thumbnail)
 
         process_client.delete_workspace_layer(workspace, layer)
+
+
+def assert_raster_layer(workspace, layer, file_names):
+    with app.app_context():
+        directory_path = input_file.get_layer_input_file_dir(workspace, layer)
+    for file in file_names:
+        file_path = os.path.join(directory_path, layer + os.path.splitext(file)[1])
+        assert os.path.exists(file_path), file_path
+
+
+@pytest.mark.parametrize('layer_suffix, file_paths', [
+    ('jp2', ['sample/layman.layer/sample_jp2_rgb.jp2', ],),
+    ('tif', ['sample/layman.layer/sample_tif_rgb.tif', ],),
+    ('tiff', ['sample/layman.layer/sample_tiff_rgba.tiff', ],),
+    ('tif_tfw', ['sample/layman.layer/sample_tif_tfw_rgba.tif', 'sample/layman.layer/sample_tif_tfw_rgba.tfw'],),
+])
+@pytest.mark.usefixtures('ensure_layman')
+def test_post_raster(layer_suffix, file_paths):
+    workspace = 'test_post_raster_workspace'
+    layer_prefix = 'test_post_raster'
+    layer = layer_prefix + '_' + layer_suffix
+
+    process_client.publish_workspace_layer(workspace, layer, file_paths=file_paths)
+    assert_raster_layer(workspace, layer, file_paths)
+    process_client.delete_workspace_layer(workspace, layer)
+
+    process_client.publish_workspace_layer(workspace, layer)
+    process_client.patch_workspace_layer(workspace, layer, file_paths=file_paths)
+    assert_raster_layer(workspace, layer, file_paths)
+    process_client.delete_workspace_layer(workspace, layer)
