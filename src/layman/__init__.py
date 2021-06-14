@@ -40,6 +40,9 @@ for bp in get_workspace_blueprints():
     app.register_blueprint(bp, url_prefix=f'/rest/{settings.REST_WORKSPACES_PREFIX}/<workspace>')
     app.register_blueprint(bp, url_prefix='/rest/<workspace>', name=bp.name + '_deprecated')
 
+logger.info(f"app.url_map={app.url_map}")
+
+
 for bp in get_blueprints():
     app.register_blueprint(bp, url_prefix=f'/rest')
 

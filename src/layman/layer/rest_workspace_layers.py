@@ -23,6 +23,7 @@ def before_request():
 
 @bp.after_request
 def after_request(response):
+    app.logger.info(f"After request request.path={request.path}")
     layman_util.check_deprecated_url(response)
     return response
 

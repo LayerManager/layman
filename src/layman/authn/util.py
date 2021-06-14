@@ -15,6 +15,7 @@ def authenticate(function):
         authn_modules = get_authn_modules()
         results = list(call_modules_fn(authn_modules, 'authenticate', until=lambda r: r is not None).values())
         authenticated = len(results) > 0 and results[-1] is not None
+        current_app.logger.info(f"authenticate ARGS {args} KWARGS {kwargs} authenticated={authenticated}")
         if authenticated:
             authn_module = authn_modules[len(results) - 1]
             g.user['AUTHN_MODULE'] = authn_module.__name__

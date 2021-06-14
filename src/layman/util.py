@@ -80,6 +80,7 @@ def to_safe_names(unsafe_names, type_name):
 
 
 def check_deprecated_url(response):
+    logger.info(f"check_deprecated_url request.path={request.path}")
     regexp = rf'^/rest/{settings.REST_WORKSPACES_PREFIX}\b.*$'
     if not re.match(regexp, request.path):
         response.headers['Deprecation'] = 'version=v2'
