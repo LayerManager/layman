@@ -9,10 +9,16 @@ from layman_settings_util import read_clients_dict_from_env
 
 LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
 
-MAIN_FILE_EXTENSIONS = [
-    '.geojson',
-    '.shp'
-]
+FILE_TYPE_VECTOR = 'vector'
+FILE_TYPE_RASTER = 'raster'
+
+MAIN_FILE_EXTENSIONS = {
+    '.geojson': FILE_TYPE_VECTOR,
+    '.shp': FILE_TYPE_VECTOR,
+    '.tiff': FILE_TYPE_RASTER,
+    '.tif': FILE_TYPE_RASTER,
+    '.jp2': FILE_TYPE_RASTER,
+}
 
 INPUT_SRS_LIST = [
     'EPSG:3857',

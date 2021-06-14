@@ -115,6 +115,8 @@ Body parameters:
    - one of following options is expected:
       - GeoJSON file
       - ShapeFile files (at least three files: .shp, .shx, .dbf)
+      - GeoTIFF (.tif or .tiff, with or without .tfw)
+      - JPEG 2000 (.jp2, with or without .jgw)
       - file names, i.e. array of strings
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
@@ -269,10 +271,7 @@ Parameters have same meaning as in case of [POST Workspace Layers](#post-workspa
 Body parameters:
 - *file*, file(s) or file name(s)
    - If provided, current layer vector data file will be deleted and replaced by this file. GeoServer feature types, DB table, and thumbnail will be deleted and created again using the new file.
-   - one of following options is expected:
-      - GeoJSON file
-      - ShapeFile files (at least three files: .shp, .shx, .dbf)
-      - file names, i.e. array of strings
+   - same file types as in [POST Workspace Layers](#post-workspace-layers) are expected
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - if QML style is used (either directly within this request, or indirectly from previous state on server), it must list all attributes contained in given data file
