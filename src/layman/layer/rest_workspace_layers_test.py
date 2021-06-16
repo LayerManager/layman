@@ -9,7 +9,7 @@ import pytest
 del sys.modules['layman']
 
 from geoserver import GS_REST_WORKSPACES
-from layman import app, settings, util as layman_util
+from layman import app, settings, util as layman_util, LaymanError
 from layman.layer import util as layer_util
 from layman.layer.filesystem import input_style, input_file
 from layman.layer.geoserver.wms import DEFAULT_WMS_STORE_PREFIX
@@ -210,3 +210,24 @@ def test_post_raster(layer_suffix, file_paths):
     process_client.patch_workspace_layer(workspace, layer, file_paths=file_paths)
     assert_raster_layer(workspace, layer, file_paths)
     process_client.delete_workspace_layer(workspace, layer)
+
+
+@pytest.mark.parametrize('post_params, expected_exc', [
+    ({'file_paths': ['sample/layman.layer/sample_tif_rgb.tif', ],
+      'style_file': 'sample/style/ne_10m_admin_0_countries.qml',
+      },
+     {'http_code': 400,
+      'code': 48,
+      'message': 'Wrong combination of parameters',
+      'detail': 'Raster layers are not allowed to have QML style.',
+      },
+     )
+])
+@pytest.mark.usefixtures('ensure_layman')
+def test_error(post_params, expected_exc):
+    workspace = 'test_error_workspace'
+    layer = 'test_error_layer'
+
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.publish_workspace_layer(workspace, layer, **post_params)
+    test_util.assert_error(expected_exc, exc_info)
