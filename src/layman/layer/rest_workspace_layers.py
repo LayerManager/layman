@@ -81,6 +81,7 @@ def post(workspace):
         filenames = files
     else:
         filenames = [f.filename for f in files]
+    file_type = input_file.get_file_type(input_file.get_main_file_name(filenames))
     input_file.check_filenames(workspace, layername, filenames, check_crs)
 
     # TITLE
@@ -99,6 +100,9 @@ def post(workspace):
     elif 'sld' in request.files and not request.files['sld'].filename == '':
         style_file = request.files['sld']
     style_type = input_style.get_style_type_from_file_storage(style_file)
+
+    if file_type == settings.FILE_TYPE_RASTER and style_type.code == 'qml':
+        raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
 
     actor_name = authn.get_authn_username()
 

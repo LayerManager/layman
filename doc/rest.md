@@ -138,6 +138,7 @@ Body parameters:
 - *style*, style file
    - by default default SLD style of GeoServer is used
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
+     - vector layers can have SLD or QML style, raster layers can not have QML style
    - uploading of additional style files, e.g. point-symbol images or fonts is not supported
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
 - *access_rights.read*, string
