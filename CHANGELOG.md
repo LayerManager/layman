@@ -14,7 +14,7 @@
     # Enter your layman's root directory.
     cd /path/to/your/layman/instance
     
-    # Upgrade PostgreSQL and PostGIS database.
+    # Run script for DB migration.
     # It's necessary to run this script from layman's root directory
     ./src/layman/upgrade/upgrade_v1_14_postgres.sh
     ```
