@@ -283,6 +283,7 @@ Body parameters:
    - Taken into account only if `file` is provided.
 - *style*, style file
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
+     - vector layers can have SLD or QML style, raster layers can not have QML style
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 - *access_rights.read*, string
