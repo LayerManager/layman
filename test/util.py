@@ -48,3 +48,12 @@ def compare_images(image1, image2):
                 diffs += 1
 
     return diffs
+
+
+def assert_error(expected, thrown):
+    thrown_dict = thrown.value.to_dict()
+    for key, value in expected.items():
+        if key == 'http_code':
+            assert thrown.value.http_code == value
+        else:
+            assert thrown_dict[key] == value
