@@ -1,4 +1,3 @@
-import glob
 import time
 import os
 from test import process_client
@@ -44,11 +43,11 @@ def chrome():
 @pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
 def test_post_layers_chunk(chrome):
-
-    file_paths = list(map(lambda fp: os.path.join(os.getcwd(), fp), [
+    relative_file_paths = [
         'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
-    ]))
+    ]
+    file_paths = [os.path.join(os.getcwd(), fp) for fp in relative_file_paths]
+
     for file_path in file_paths:
         assert os.path.isfile(file_path)
 
@@ -127,13 +126,15 @@ def test_post_layers_chunk(chrome):
 @pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
 def test_patch_layer_chunk(chrome):
+    relative_file_paths = [
+        'tmp/naturalearth/110m/cultural/ne_110m_populated_places.cpg',
+        'tmp/naturalearth/110m/cultural/ne_110m_populated_places.dbf',
+        'tmp/naturalearth/110m/cultural/ne_110m_populated_places.prj',
+        'tmp/naturalearth/110m/cultural/ne_110m_populated_places.shp',
+        'tmp/naturalearth/110m/cultural/ne_110m_populated_places.shx',
+    ]
+    file_paths = [os.path.join(os.getcwd(), fp) for fp in relative_file_paths]
 
-    pattern = os.path.join(os.getcwd(), 'tmp/naturalearth/110m/cultural/*')
-    file_paths = glob.glob(pattern)
-
-    # file_paths = list(map(lambda fp: os.path.join(os.getcwd(), fp), [
-    #     'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
-    # ]))
     for file_path in file_paths:
         print('fp', file_path)
         assert os.path.isfile(file_path)

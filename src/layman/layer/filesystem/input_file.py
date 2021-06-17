@@ -63,6 +63,16 @@ from . import uuid
 get_publication_uuid = uuid.get_publication_uuid
 
 
+def get_all_allowed_main_extensions():
+    result = list(settings.MAIN_FILE_EXTENSIONS.keys())
+    return result
+
+
+def get_main_file_name(filenames):
+    return next((fn for fn in filenames if os.path.splitext(fn)[1]
+                 in get_all_allowed_main_extensions()), None)
+
+
 def get_layer_main_file_path(username, layername):
     input_file_dir = get_layer_input_file_dir(username, layername)
     pattern = os.path.join(input_file_dir, layername + '.*')
@@ -122,11 +132,19 @@ def check_layer_crs(main_filepath):
 
 
 def check_filenames(username, layername, filenames, check_crs, ignore_existing_files=False):
-    main_filename = get_main_file_name(filenames)
-    if main_filename is None:
+    main_files = [fn for fn in filenames if os.path.splitext(fn)[1] in get_all_allowed_main_extensions()]
+    if len(main_files) > 1:
+        raise LaymanError(2, {'parameter': 'file',
+                              'expected': 'At most one file with any of extensions: '
+                                          + ', '.join(get_all_allowed_main_extensions()),
+                              'files': main_files,
+                              })
+
+    if not main_files:
         raise LaymanError(2, {'parameter': 'file',
                               'expected': 'At least one file with any of extensions: '
                                           + ', '.join(get_all_allowed_main_extensions())})
+    main_filename = main_files[0]
     basename, ext = map(
         lambda s: s.lower(),
         os.path.splitext(main_filename)
@@ -200,16 +218,6 @@ def get_unsafe_layername(files):
     if main_filename is not None:
         unsafe_layername = os.path.splitext(main_filename)[0]
     return unsafe_layername
-
-
-def get_all_allowed_main_extensions():
-    result = list(settings.MAIN_FILE_EXTENSIONS.keys())
-    return result
-
-
-def get_main_file_name(filenames):
-    return next((fn for fn in filenames if os.path.splitext(fn)[1]
-                 in get_all_allowed_main_extensions()), None)
 
 
 def get_file_name_mappings(file_names, main_file_name, layer_name, output_dir):
