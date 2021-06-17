@@ -44,7 +44,7 @@ PUBLICATION_TYPES = {
             ('layman.layer.filesystem.uuid', InternalSourceTypeDef(info_items=[]),),
             ('layman.layer.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'title', 'uuid',
                                                                                      'bounding_box', 'style_type', ]),),
-            ('layman.layer.filesystem.input_chunk', InternalSourceTypeDef(info_items=[]),),
+            ('layman.layer.filesystem.input_chunk', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_file', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_style', InternalSourceTypeDef(info_items=[]),),
             ('layman.layer.db.table', InternalSourceTypeDef(info_items=['db_table', ]),),
