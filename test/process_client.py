@@ -44,6 +44,7 @@ PublicationTypeDef = namedtuple('PublicationTypeDef', ['url_param_name',
                                                        'keys_to_check',
                                                        'source_path',
                                                        'get_workspace_metadata_comparison_url',
+                                                       'post_workspace_publication_chunk',
                                                        ])
 PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                       'rest_maps.get',
@@ -56,6 +57,7 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                       map_keys_to_check,
                                                       'sample/layman.map/small_map.json',
                                                       'rest_workspace_map_metadata_comparison.get',
+                                                      None,
                                                       ),
                          LAYER_TYPE: PublicationTypeDef('layername',
                                                         'rest_layers.get',
@@ -68,6 +70,7 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                         layer_keys_to_check,
                                                         'sample/layman.layer/small_layer.geojson',
                                                         'rest_workspace_layer_metadata_comparison.get',
+                                                        'rest_workspace_layer_chunk.post',
                                                         ),
                          }
 
@@ -200,6 +203,7 @@ def publish_workspace_publication(publication_type,
                                   style_file=None,
                                   description=None,
                                   check_response_fn=None,
+                                  with_chunks=False,
                                   ):
     title = title or name
     headers = headers or {}
@@ -208,23 +212,29 @@ def publish_workspace_publication(publication_type,
     if style_file:
         assert publication_type == LAYER_TYPE
 
+    # Only Layer files can be uploaded by chunks
+    assert not with_chunks or publication_type == LAYER_TYPE
+
     with app.app_context():
         r_url = url_for(publication_type_def.post_workspace_publication_url, workspace=workspace)
 
-    for file_path in file_paths:
-        assert os.path.isfile(file_path), file_path
     files = []
     try:
-        files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
         data = {'name': name,
                 'title': title,
                 }
+        if not with_chunks:
+            for file_path in file_paths:
+                assert os.path.isfile(file_path), file_path
+            files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
+        else:
+            data['file'] = [os.path.basename(file) for file in file_paths]
+        if style_file:
+            files.append(('style', (os.path.basename(style_file), open(style_file, 'rb'))))
         if access_rights and access_rights.get('read'):
             data["access_rights.read"] = access_rights['read']
         if access_rights and access_rights.get('write'):
             data["access_rights.write"] = access_rights['write']
-        if style_file:
-            files.append(('style', (os.path.basename(style_file), open(style_file, 'rb'))))
         if description:
             data['description'] = description
         response = requests.post(r_url,
@@ -237,6 +247,34 @@ def publish_workspace_publication(publication_type,
     finally:
         for file_path in files:
             file_path[1][1].close()
+
+    if with_chunks:
+        time.sleep(0.5)
+        with app.app_context():
+            chunk_url = url_for(publication_type_def.post_workspace_publication_chunk,
+                                workspace=workspace,
+                                **{publication_type_def.url_param_name: name},
+                                )
+
+        file_chunks = [('file', file_name) for file_name in file_paths]
+        for file_type, file_name in file_chunks:
+            try:
+                basename = os.path.basename(file_name)
+                file_dict = {file_type: (basename, open(file_name, 'rb')), }
+                data = {
+                    'file': basename,
+                    'resumableFilename': basename,
+                    'layman_original_parameter': file_type,
+                    'resumableChunkNumber': 1,
+                    'resumableTotalChunks': 1
+                }
+
+                chunk_response = requests.post(chunk_url,
+                                               files=file_dict,
+                                               data=data)
+                raise_layman_error(chunk_response)
+            finally:
+                file_dict[file_type][1].close()
 
     wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn, headers=headers)
     return response.json()[0]
