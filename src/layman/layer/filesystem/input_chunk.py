@@ -120,36 +120,44 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
         raise LaymanError(20)
 
 
-def layer_file_chunk_exists(username, layername, parameter_name, filename,
-                            chunk_number):
+def get_info_json(username, layername):
     resumable_dir = get_layer_resumable_dir(username, layername)
     info_path = os.path.join(resumable_dir, 'info.json')
-    chunk_dir = os.path.join(resumable_dir, 'chunks')
     if os.path.isfile(info_path):
         with open(info_path, 'r') as info_file:
-            info = json.load(info_file)
-            files_to_upload = info['files_to_upload']
-            file_info = next(
-                (
-                    fi for fi in files_to_upload
-                    if fi['input_file'] == filename and fi[
-                        'layman_original_parameter'] == parameter_name
-                ),
-                None
-            )
-            if file_info is None:
-                raise LaymanError(21, {
-                    'file': filename,
-                    'layman_original_parameter': parameter_name,
-                })
-            target_filepath = file_info['target_file']
-            target_filename = os.path.basename(target_filepath)
-            chunk_name = _get_chunk_name(target_filename, chunk_number)
-            chunk_path = os.path.join(chunk_dir, chunk_name)
-            return os.path.exists(chunk_path) or os.path.exists(
-                target_filepath)
+            result = json.load(info_file)
     else:
-        raise LaymanError(20)
+        result = None
+    return result
+
+
+def layer_file_chunk_exists(username, layername, parameter_name, filename,
+                            chunk_number):
+    info = get_info_json(username, layername)
+    resumable_dir = get_layer_resumable_dir(username, layername)
+    chunk_dir = os.path.join(resumable_dir, 'chunks')
+    if info:
+        files_to_upload = info['files_to_upload']
+        file_info = next(
+            (
+                fi for fi in files_to_upload
+                if fi['input_file'] == filename and fi[
+                    'layman_original_parameter'] == parameter_name
+            ),
+            None
+        )
+        if file_info is None:
+            raise LaymanError(21, {
+                'file': filename,
+                'layman_original_parameter': parameter_name,
+            })
+        target_filepath = file_info['target_file']
+        target_filename = os.path.basename(target_filepath)
+        chunk_name = _get_chunk_name(target_filename, chunk_number)
+        chunk_path = os.path.join(chunk_dir, chunk_name)
+        return os.path.exists(chunk_path) or os.path.exists(
+            target_filepath)
+    raise LaymanError(20)
 
 
 def layer_file_chunk_info(username, layername):
