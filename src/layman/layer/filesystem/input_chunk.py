@@ -38,7 +38,6 @@ def delete_layer(workspace, layername):
     settings.LAYMAN_REDIS.delete(chunk_key)
 
 
-get_layer_info = input_file.get_layer_info
 get_publication_uuid = input_file.get_publication_uuid
 
 
@@ -128,6 +127,17 @@ def get_info_json(username, layername):
             result = json.load(info_file)
     else:
         result = None
+    return result
+
+
+def get_layer_info(workspace, layername):
+    info = get_info_json(workspace, layername)
+    result = dict()
+    if info:
+        files_to_upload = info['files_to_upload']
+        file_names = [file['input_file'] for file in files_to_upload]
+        file_type = input_file.get_file_type(input_file.get_main_file_name(file_names))
+        result = {'file': {'file_type': file_type}}
     return result
 
 
