@@ -76,6 +76,13 @@ def post(workspace):
             raise LaymanError(2, {'parameter': 'crs', 'supported_values': settings.INPUT_SRS_LIST})
     check_crs = crs_id is None
 
+    # FILE NAMES
+    if use_chunk_upload:
+        filenames = files
+    else:
+        filenames = [f.filename for f in files]
+    input_file.check_filenames(workspace, layername, filenames, check_crs)
+
     # TITLE
     if len(request.form.get('title', '')) > 0:
         title = request.form['title']
@@ -118,13 +125,6 @@ def post(workspace):
         'name': layername,
         'url': layerurl,
     }
-
-    # FILE NAMES
-    if use_chunk_upload:
-        filenames = files
-    else:
-        filenames = [f.filename for f in files]
-    input_file.check_filenames(workspace, layername, filenames, check_crs)
 
     redis_util.create_lock(workspace, LAYER_TYPE, layername, request.method)
 
