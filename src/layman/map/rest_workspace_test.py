@@ -615,9 +615,14 @@ def test_map_composed_from_local_layers(client):
         rest_path = url_for('rest_workspace_layers.post', workspace=username)
 
         layername1 = 'mista'
-        pattern = os.path.join(os.getcwd(), 'tmp/naturalearth/110m/cultural/ne_110m_populated_places.*')
-        file_paths = glob.glob(pattern)
-        assert len(file_paths) > 0
+        relative_file_paths = [
+            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.cpg',
+            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.dbf',
+            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.prj',
+            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.shp',
+            'tmp/naturalearth/110m/cultural/ne_110m_populated_places.shx',
+        ]
+        file_paths = [os.path.join(os.getcwd(), fp) for fp in relative_file_paths]
         for file in file_paths:
             assert os.path.isfile(file)
         files = []

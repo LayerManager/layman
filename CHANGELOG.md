@@ -45,6 +45,7 @@
 - [#347](https://github.com/LayerManager/layman/issues/347) When ordering publications by title, consider only letters, numbers, and spaces.
 - [Map composition schema](https://github.com/LayerManager/layman/blob/master/src/layman/map/schema.draft-07.json) allows new properties `hs.format.externalWFS` and `workspace` ([#382](https://github.com/LayerManager/layman/pull/382)). The `style` property can be specified using a string in SLD format, URL to SLD file or JSON object ([#385](https://github.com/LayerManager/layman/pull/385)). Both was already introduced in v1.13.1.
 - Errors `19`: 'Layer is already in process.' and `29`: 'Map is already in process.' are merged into `49`: 'Publication is already in process.'.
+- Fix: Raise error when more than one main layer file is sent in [POST Workspace Layers](doc/rest.md#post-workspace-layers) or [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer).
 
 ## v1.13.1
  2021-06-07
