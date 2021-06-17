@@ -6,7 +6,7 @@ from layman.util import check_username_decorator
 from layman import settings, authn, util as layman_util
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
-from . import util, LAYER_REST_PATH_NAME
+from . import util, LAYER_REST_PATH_NAME, LAYER_TYPE
 from .filesystem import input_file, input_style, input_chunk
 
 bp = Blueprint('rest_workspace_layer', __name__)
@@ -89,6 +89,7 @@ def patch(workspace, layername):
         style_file = request.files['sld']
 
     delete_from = None
+    style_type = None
     if style_file:
         style_type = input_style.get_style_type_from_file_storage(style_file)
         kwargs['style_type'] = style_type
@@ -98,6 +99,7 @@ def patch(workspace, layername):
         delete_from = 'layman.layer.filesystem.input_file'
 
     # FILE NAMES
+    filenames = None
     if delete_from == 'layman.layer.filesystem.input_file':
         if use_chunk_upload:
             filenames = files
@@ -105,6 +107,17 @@ def patch(workspace, layername):
             filenames = [f.filename for f in files]
         input_file.check_filenames(workspace, layername, filenames,
                                    check_crs, ignore_existing_files=True)
+
+    if filenames:
+        file_type = input_file.get_file_type(input_file.get_main_file_name(filenames))
+    else:
+        file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
+    if style_type:
+        style_type_for_check = style_type.code
+    else:
+        style_type_for_check = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style']})['style']['type']
+    if file_type == settings.FILE_TYPE_RASTER and style_type_for_check == 'qml':
+        raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
 
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
