@@ -8,6 +8,8 @@ services:
       command: bash test.sh
       env_file:
          - .env.test
+      environment:
+        - CI=${CI}
       volumes:
         - ./layman_data_test:/layman_data_test
         - ./sample:/code/sample
