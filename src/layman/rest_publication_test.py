@@ -81,6 +81,7 @@ class TestSoapClass:
         [(access_rights_rewe, True), (access_rights_rowo, False)],
     ])
     @pytest.mark.parametrize('publ_type', process_client.PUBLICATION_TYPES)
+    @pytest.mark.irritating
     def test_soap_authz(self, publ_type, params_and_expected_list):
         username = self.username
         publ_name_prefix = self.publ_name_prefix
