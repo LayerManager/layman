@@ -50,4 +50,5 @@ ERROR_LIST = {
     47: (400, 'Error in QML'),
     48: (400, 'Wrong combination of parameters'),
     49: (400, 'Publication is already in process.'),
+    50: (500, 'Error when normalizing raster file'),
 }
