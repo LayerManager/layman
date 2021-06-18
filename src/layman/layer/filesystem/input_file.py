@@ -38,14 +38,14 @@ def delete_layer(workspace, layername):
 def get_layer_info(workspace, layername):
     input_file_dir = get_layer_input_file_dir(workspace, layername)
     pattern = os.path.join(input_file_dir, layername + '.*')
-    filenames = glob.glob(pattern)
-    main_filename = get_main_file_name(filenames)
-    if main_filename is not None:
-        main_filename = os.path.relpath(main_filename, common_util.get_workspace_dir(workspace))
-        file_type = get_file_type(main_filename)
+    filepaths = glob.glob(pattern)
+    abs_main_filepath = get_main_file_name(filepaths)
+    if abs_main_filepath is not None:
+        rel_main_filepath = os.path.relpath(abs_main_filepath, common_util.get_workspace_dir(workspace))
+        file_type = get_file_type(rel_main_filepath)
         result = {
             'file': {
-                'path': main_filename,
+                'path': rel_main_filepath,
                 'file_type': file_type,
             },
         }
