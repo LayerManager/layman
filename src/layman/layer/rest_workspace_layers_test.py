@@ -11,7 +11,7 @@ del sys.modules['layman']
 from geoserver import GS_REST_WORKSPACES
 from layman import app, settings, util as layman_util, LaymanError
 from layman.layer import util as layer_util
-from layman.layer.filesystem import input_style, input_file
+from layman.layer.filesystem import input_style, input_file, util as fs_util
 from layman.layer.geoserver.wms import DEFAULT_WMS_STORE_PREFIX
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
@@ -188,15 +188,27 @@ def assert_raster_layer(workspace, layer, file_names):
     for file in file_names:
         file_path = os.path.join(directory_path, layer + os.path.splitext(file)[1])
         assert os.path.exists(file_path), file_path
+    norm_file_path = fs_util.get_normalized_raster_layer_main_filepath(workspace, layer)
+    assert os.path.exists(norm_file_path), norm_file_path
+
+
+@pytest.fixture(scope="class")
+def clear_after_test(ensure_layman):
+    # pylint: disable=unused-argument
+    yield
+    process_client.delete_workspace_layers('test_post_raster_workspace')
 
 
 @pytest.mark.parametrize('layer_suffix, file_paths', [
     ('jp2', ['sample/layman.layer/sample_jp2_rgb.jp2', ],),
     ('tif', ['sample/layman.layer/sample_tif_rgb.tif', ],),
-    ('tiff', ['sample/layman.layer/sample_tiff_rgba.tiff', ],),
-    ('tif_tfw', ['sample/layman.layer/sample_tif_tfw_rgba.tif', 'sample/layman.layer/sample_tif_tfw_rgba.tfw'],),
+    pytest.param('tiff', ['sample/layman.layer/sample_tiff_rgba.tiff', ],
+                 marks=pytest.mark.xfail(reason="RGBA not yet normalized")),
+    pytest.param('tif_tfw',
+                 ['sample/layman.layer/sample_tif_tfw_rgba.tif', 'sample/layman.layer/sample_tif_tfw_rgba.tfw'],
+                 marks=pytest.mark.xfail(reason="RGBA not yet normalized")),
 ])
-@pytest.mark.usefixtures('ensure_layman')
+@pytest.mark.usefixtures('ensure_layman', 'clear_after_test')
 def test_post_raster(layer_suffix, file_paths):
     workspace = 'test_post_raster_workspace'
     layer_prefix = 'test_post_raster'
