@@ -48,6 +48,9 @@ def get_layer_info(workspace, layername):
                 'path': rel_main_filepath,
                 'file_type': file_type,
             },
+            '_file': {
+                'path': abs_main_filepath,
+            },
         }
     elif os.path.exists(util.get_layer_dir(workspace, layername)):
         result = {
