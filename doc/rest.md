@@ -85,14 +85,13 @@ Processing chain consists of few steps:
 - save file to workspace directory within Layman data directory
 - save basic information (name, title, access_rights) into PostgreSQL
 - for vector layers import the file to PostgreSQL database as new table into workspace schema, including geometry transformation to EPSG:3857
-- for vector layers publish the table as new layer (feature type) within appropriate WFS workspaces of GeoServer
+- publish the table as new layer (feature type) within appropriate WFS workspaces of GeoServer
 - for vector layers save bounding box into PostgreSQL
-- for vector layers
-  - for layers with SLD or none style:
-    - publish the table as new layer (feature type) within appropriate WMS workspaces of GeoServer
-  - else for layers with QML style:
-    - create QGS file on QGIS server filesystem with appropriate style
-    - publish the layer on GeoServer through WMS cascade from QGIS server
+- for layers with SLD or none style:
+  - publish the table as new layer (feature type) within appropriate WMS workspaces of GeoServer
+- else for layers with QML style:
+  - create QGS file on QGIS server filesystem with appropriate style
+  - publish the layer on GeoServer through WMS cascade from QGIS server
 - generate thumbnail image
 - publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
 - update thumbnail of each [map](models.md#map) that points to this layer
