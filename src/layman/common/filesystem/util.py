@@ -59,8 +59,7 @@ def ensure_whole_user(username):
     ensure_workspace(username)
 
 
-def delete_whole_user(username):
-    delete_workspace(username)
+delete_whole_user = delete_workspace
 
 
 def get_publications_dir(publ_type, workspace):
