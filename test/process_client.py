@@ -487,4 +487,4 @@ def wait_for_publication_status(workspace, publication_type, publication, *, che
                       workspace=workspace,
                       **{publication_type_def.url_param_name: publication})
     check_response_fn = check_response_fn or check_publication_status
-    wait_for_rest(url, 30, 0.5, check_response=check_response_fn, headers=headers)
+    wait_for_rest(url, 60, 0.5, check_response=check_response_fn, headers=headers)
