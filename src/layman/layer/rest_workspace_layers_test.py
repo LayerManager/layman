@@ -11,7 +11,7 @@ del sys.modules['layman']
 from geoserver import GS_REST_WORKSPACES
 from layman import app, settings, util as layman_util, LaymanError
 from layman.layer import util as layer_util
-from layman.layer.filesystem import input_style, input_file, util as fs_util
+from layman.layer.filesystem import input_style, input_file, gdal
 from layman.layer.geoserver.wms import DEFAULT_WMS_STORE_PREFIX
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
@@ -188,7 +188,7 @@ def assert_raster_layer(workspace, layer, file_names):
     for file in file_names:
         file_path = os.path.join(directory_path, layer + os.path.splitext(file)[1])
         assert os.path.exists(file_path), file_path
-    norm_file_path = fs_util.get_normalized_raster_layer_main_filepath(workspace, layer)
+    norm_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, layer)
     assert os.path.exists(norm_file_path), norm_file_path
 
 
