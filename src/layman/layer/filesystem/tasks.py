@@ -6,7 +6,7 @@ from layman import celery_app, settings, util as layman_util
 from layman.celery import AbortedException
 from layman.common import empty_method_returns_true
 from layman.http import LaymanError
-from . import input_file, input_chunk, thumbnail, util, gdal
+from . import input_file, input_chunk, thumbnail, gdal
 from .. import LAYER_TYPE
 
 logger = get_task_logger(__name__)
@@ -70,7 +70,7 @@ def refresh_gdal(self, username, layername, crs_id=None):
     if file_type != settings.FILE_TYPE_RASTER:
         return
 
-    util.ensure_normalized_raster_layer_dir(username, layername)
+    gdal.ensure_normalized_raster_layer_dir(username, layername)
 
     if self.is_aborted():
         raise AbortedException
