@@ -3,9 +3,9 @@ from celery.utils.log import get_task_logger
 from layman.celery import AbortedException
 from layman.common import empty_method_returns_true
 from layman.layer.filesystem.input_file import get_layer_main_file_path
-from layman import celery_app
+from layman import celery_app, util as layman_util, settings
 from layman.http import LaymanError
-from .. import db
+from .. import db, LAYER_TYPE
 from .table import delete_layer
 
 
@@ -30,6 +30,14 @@ def refresh_table(
         db.ensure_workspace(username)
     if self.is_aborted():
         raise AbortedException
+
+    file_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
+    if file_type != settings.FILE_TYPE_VECTOR:
+        return
+
+    if self.is_aborted():
+        raise AbortedException
+
     main_filepath = get_layer_main_file_path(username, layername)
     process = db.import_layer_vector_file_async(username, layername, main_filepath, crs_id)
     while process.poll() is None and not self.is_aborted():
