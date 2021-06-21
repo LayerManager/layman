@@ -85,7 +85,7 @@ Processing chain consists of few steps:
 - save file to workspace directory within Layman data directory
 - save basic information (name, title, access_rights) into PostgreSQL
 - for vector layers import the file to PostgreSQL database as new table into workspace schema, including geometry transformation to EPSG:3857
-- publish the table as new layer (feature type) within appropriate WFS workspaces of GeoServer
+- for vector layers publish the table as new layer (feature type) within appropriate WFS workspaces of GeoServer
 - for vector layers save bounding box into PostgreSQL
 - for layers with SLD or none style:
   - publish the table as new layer (feature type) within appropriate WMS workspaces of GeoServer

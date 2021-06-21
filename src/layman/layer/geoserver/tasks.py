@@ -80,6 +80,10 @@ def refresh_wfs(
         ensure_user=False,
         access_rights=None,
 ):
+    file_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
+    if file_type != settings.FILE_TYPE_VECTOR:
+        return
+
     if description is None:
         description = layername
     if title is None:
