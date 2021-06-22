@@ -1,7 +1,7 @@
 import os
 import sys
 from urllib.parse import urljoin
-from test import process_client, util as test_util
+from test import process_client, util as test_util, assert_util
 from test.util import url_for
 import requests
 import pytest
@@ -180,7 +180,7 @@ class TestQgisCascadeWmsClass:
         process_client.delete_workspace_layer(workspace, layer)
 
 
-def assert_raster_layer(workspace, layer, file_names):
+def assert_raster_layer(workspace, layer, file_names, exp_bbox, ):
     with app.app_context():
         info = layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['file']})
         directory_path = input_file.get_layer_input_file_dir(workspace, layer)
@@ -190,6 +190,8 @@ def assert_raster_layer(workspace, layer, file_names):
         assert os.path.exists(file_path), file_path
     norm_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, layer)
     assert os.path.exists(norm_file_path), norm_file_path
+    bbox = gdal.get_bbox(workspace, layer)
+    assert_util.assert_same_bboxes(bbox, exp_bbox, 0.01)
 
 
 @pytest.fixture(scope="class")
@@ -199,28 +201,31 @@ def clear_after_test(ensure_layman):
     process_client.delete_workspace_layers('test_post_raster_workspace')
 
 
-@pytest.mark.parametrize('layer_suffix, file_paths', [
-    ('jp2', ['sample/layman.layer/sample_jp2_rgb.jp2', ],),
-    ('tif', ['sample/layman.layer/sample_tif_rgb.tif', ],),
-    pytest.param('tiff', ['sample/layman.layer/sample_tiff_rgba.tiff', ],
+@pytest.mark.parametrize('layer_suffix, file_paths, bbox', [
+    ('jp2', ['sample/layman.layer/sample_jp2_rgb.jp2', ], (1829708.000, 6308828.724, 1833166.272, 6310848.600), ),
+    ('tif', ['sample/layman.layer/sample_tif_rgb.tif', ], (1679391.080, 6562360.443, 1679416.233, 6562381.790), ),
+    pytest.param('tiff',
+                 ['sample/layman.layer/sample_tiff_rgba.tiff', ],
+                 (1669480, 6580973, 1675352, 6586999, ),
                  marks=pytest.mark.xfail(reason="RGBA not yet normalized")),
     pytest.param('tif_tfw',
                  ['sample/layman.layer/sample_tif_tfw_rgba.tif', 'sample/layman.layer/sample_tif_tfw_rgba.tfw'],
+                 (1669480, 6580973, 1675352, 6586999, ),
                  marks=pytest.mark.xfail(reason="RGBA not yet normalized")),
 ])
 @pytest.mark.usefixtures('ensure_layman', 'clear_after_test')
-def test_post_raster(layer_suffix, file_paths):
+def test_post_raster(layer_suffix, file_paths, bbox, ):
     workspace = 'test_post_raster_workspace'
     layer_prefix = 'test_post_raster'
     layer = layer_prefix + '_' + layer_suffix
 
     process_client.publish_workspace_layer(workspace, layer, file_paths=file_paths)
-    assert_raster_layer(workspace, layer, file_paths)
+    assert_raster_layer(workspace, layer, file_paths, bbox, )
     process_client.delete_workspace_layer(workspace, layer)
 
     process_client.publish_workspace_layer(workspace, layer)
     process_client.patch_workspace_layer(workspace, layer, file_paths=file_paths)
-    assert_raster_layer(workspace, layer, file_paths)
+    assert_raster_layer(workspace, layer, file_paths, bbox, )
     process_client.delete_workspace_layer(workspace, layer)
 
 

@@ -1,7 +1,7 @@
 import os
 import shutil
 import subprocess
-from osgeo import gdal
+from osgeo import gdal, gdalconst
 from layman import patch_mode, settings
 from layman.common import empty_method, empty_method_returns_dict
 from . import input_file
@@ -99,3 +99,15 @@ def delete_normalized_raster_workspace(workspace):
         os.rmdir(get_normalized_raster_workspace_dir(workspace))
     except FileNotFoundError:
         pass
+
+
+def get_bbox(workspace, layer):
+    filepath = get_normalized_raster_layer_main_filepath(workspace, layer)
+    data = gdal.Open(filepath, gdalconst.GA_ReadOnly)
+    geo_transform = data.GetGeoTransform()
+    minx = geo_transform[0]
+    maxy = geo_transform[3]
+    maxx = minx + geo_transform[1] * data.RasterXSize
+    miny = maxy + geo_transform[5] * data.RasterYSize
+    result = (minx, miny, maxx, maxy)
+    return result
