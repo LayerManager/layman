@@ -87,7 +87,7 @@ Processing chain consists of few steps:
 - for vector layers import the vector file to PostgreSQL database as new table into workspace schema, including geometry transformation to EPSG:3857
 - for raster layers normalize raster file to GeoTiff in EPSG:3857 with overviews (pyramids)
 - for vector layers publish the vector table as new layer (feature type) within appropriate WFS workspaces of GeoServer
-- for vector layers save bounding box into PostgreSQL
+- save bounding box into PostgreSQL
 - for vector layers
   - for layers with SLD or none style:
     - publish the table as new layer (feature type) within appropriate WMS workspaces of GeoServer

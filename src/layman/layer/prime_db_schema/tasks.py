@@ -5,6 +5,7 @@ from layman.common import empty_method_returns_true
 from layman import celery_app, util as layman_util, settings
 from .. import LAYER_TYPE
 from ..db import get_bbox as db_get_bbox
+from ..filesystem.gdal import get_bbox as gdal_get_bbox
 from ...common.prime_db_schema.publications import set_bbox
 
 logger = get_task_logger(__name__)
@@ -29,7 +30,7 @@ def refresh_bbox(
     if file_type == settings.FILE_TYPE_VECTOR:
         bbox = db_get_bbox(username, layername)
     else:
-        bbox = None
+        bbox = gdal_get_bbox(username, layername)
 
     if self.is_aborted():
         raise AbortedException
