@@ -140,6 +140,7 @@ def test_fill_xml_template():
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman', 'client')
+@pytest.mark.irritating
 def test_num_records():
     publs_by_type = uuid.check_redis_consistency()
     num_publications = sum([len(publs) for publs in publs_by_type.values()])
