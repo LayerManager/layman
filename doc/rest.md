@@ -84,8 +84,9 @@ Publish vector data file as new layer of WMS and WFS.
 Processing chain consists of few steps:
 - save file to workspace directory within Layman data directory
 - save basic information (name, title, access_rights) into PostgreSQL
-- for vector layers import the file to PostgreSQL database as new table into workspace schema, including geometry transformation to EPSG:3857
-- for vector layers publish the table as new layer (feature type) within appropriate WFS workspaces of GeoServer
+- for vector layers import the vector file to PostgreSQL database as new table into workspace schema, including geometry transformation to EPSG:3857
+- for raster layers normalize raster file to GeoTiff in EPSG:3857 with overviews (pyramids)
+- for vector layers publish the vector table as new layer (feature type) within appropriate WFS workspaces of GeoServer
 - for vector layers save bounding box into PostgreSQL
 - for vector layers
   - for layers with SLD or none style:

@@ -32,8 +32,9 @@ When user [publishes new layer](rest.md#post-workspace-layers)
 - and asynchronous [tasks](#tasks) are saved in [Redis](#redis).
 
 Subsequently, when asynchronous tasks run,
-- vector data file chunks and completed vector data files are saved to [filesystem](#filesystem) (if sent [asynchronously](async-file-upload.md)),
+- data file chunks and completed data files are saved to [filesystem](#filesystem) (if sent [asynchronously](async-file-upload.md)),
 - vector data files are imported to [PostgreSQL](#postgresql),
+- raster files are normalized to GeoTiff in EPSG:3857 with overviews (pyramids)
 - PostgreSQL table with vector data is registered to, access rights are synchronized to, and visualization file is saved to [GeoServer](#geoserver) for WFS,
 - PostgreSQL table with vector data is registered to, access rights are synchronized to, and visualization file is saved to [GeoServer](#geoserver) for WMS of layers with SLD style,
 - QGS file is created on [filesystem](#filesystem) and through QGIS server registered to [GeoServer](#geoserver) with WMS cascade, access rights are synchronized, for WMS of layers with QGIS style,
@@ -83,6 +84,12 @@ Data is saved to LAYMAN_DATA_DIR directory.
 **QGIS workspace directory** is created in LAYMAN_QGIS_DATA_DIR directory for every created [workspace](models.md#workspace). Name of the workspace directory is the same as workspace name.
 
 **QGIS layer directory** is created inside QGIS workspace directory for each layer with QGIS style the user published. Name of the publication directory is the same as name of the layer. QGS project with style definition is stored in this directory for WMS purpose.
+
+**Normalized raster directory** named `normalized_raster_data` is created in LAYMAN_DATA_DIR directory.
+
+**Normalized raster workspace directory** is created in Normalized raster directory for every [workspace](models.md#workspace) with at least one raster layer. Name of the workspace directory is the same as workspace name.
+
+**Normalized raster layer directory** is created inside Normalized raster workspace directory for every raster layer. Name of the publication directory is the same as name of the layer. Normalized raster is stored in this directory for WMS purpose.
 
 Filesystem is used as persistent data store, so data survives Layman restart.
  
