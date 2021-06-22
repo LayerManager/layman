@@ -182,7 +182,7 @@ class TestQgisCascadeWmsClass:
 
 def assert_raster_layer(workspace, layer, file_names, exp_bbox, ):
     with app.app_context():
-        info = layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['file']})
+        info = layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['file', 'bounding_box']})
         directory_path = input_file.get_layer_input_file_dir(workspace, layer)
     assert info.get('file', dict()).get('file_type') == 'raster', info
     for file in file_names:
@@ -190,8 +190,11 @@ def assert_raster_layer(workspace, layer, file_names, exp_bbox, ):
         assert os.path.exists(file_path), file_path
     norm_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, layer)
     assert os.path.exists(norm_file_path), norm_file_path
+
     bbox = gdal.get_bbox(workspace, layer)
     assert_util.assert_same_bboxes(bbox, exp_bbox, 0.01)
+    info_bbox = info['bounding_box']
+    assert_util.assert_same_bboxes(info_bbox, exp_bbox, 0.01)
 
 
 @pytest.fixture(scope="class")
