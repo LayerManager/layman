@@ -76,6 +76,7 @@ def refresh_gdal(self, username, layername, crs_id=None):
         raise AbortedException
 
     input_path = layer_info['_file']['path']
+    gdal.assert_valid_raster(input_path)
     process = gdal.normalize_raster_file_async(username, layername, input_path, crs_id)
     while process.poll() is None and not self.is_aborted():
         pass
