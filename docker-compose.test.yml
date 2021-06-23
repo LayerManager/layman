@@ -42,6 +42,7 @@ services:
         - ./src:/code/src
         - ./tmp:/code/tmp
         - ./deps/qgis/data:/qgis/data
+        - ./deps/geoserver/data:/geoserver/data_dir
       depends_on:
         - redis
         - postgresql
