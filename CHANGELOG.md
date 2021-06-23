@@ -20,6 +20,10 @@
     ```
 
     It may take some time to run this script and it will produce large temporary files (database dumps).
+- Set environment variables
+  - [LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY](doc/env-settings.md#LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY)=normalized_raster_data
+- If you are running Layman with development settings, set environment variables
+  - [LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY](doc/env-settings.md#LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY)=normalized_raster_data_dev
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations

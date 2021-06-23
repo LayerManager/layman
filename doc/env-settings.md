@@ -168,6 +168,9 @@ Name of [role service](https://docs.geoserver.org/stable/en/user/security/usergr
 ### LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE
 Secret value of [GeoServer HTTP authentication request header attribute](https://docs.geoserver.org/stable/en/user/security/tutorials/httpheaderproxy/index.html) used for WFS proxy. Only combination of lowercase characters and numbers must be used for the value. If you change an existing value, you have to change it also in GeoServer GUI manually.
 
+### LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY
+Filesystem directory name where normalized raster files are stored. The directory will be created inside GeoServer data directory.
+
 ## Connection to QGIS
 
 ### LAYMAN_QGIS_HOST
