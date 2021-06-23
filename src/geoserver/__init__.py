@@ -15,9 +15,13 @@ GS_REST_WMS_SETTINGS = None
 GS_REST_WFS_SETTINGS = None
 
 
-def ensure_data_dir(data_dir, data_dir_initial):
+def ensure_data_dir(data_dir, data_dir_initial, normalized_raster_data_dir):
     if not os.listdir(data_dir):
         copy_tree(data_dir_initial, data_dir)
+    norm_data_path = os.path.join(data_dir, normalized_raster_data_dir)
+    if not os.path.exists(norm_data_path):
+        os.mkdir(norm_data_path)
+    os.chmod(norm_data_path, mode=0o777)
 
 
 def set_settings(gs_url, role_service, user_group_service, ):

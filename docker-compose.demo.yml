@@ -46,6 +46,7 @@ services:
         - ./layman_data:/layman_data
         - ./src/layman_settings.py:/code/src/layman_settings.py
         - ./deps/qgis/data:/qgis/data
+        - ./deps/geoserver/data:/geoserver/data_dir
       depends_on:
         - layman
 

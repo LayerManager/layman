@@ -17,7 +17,8 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 def main():
     geoserver.ensure_data_dir(settings.GEOSERVER_DATADIR,
-                              settings.GEOSERVER_INITIAL_DATADIR)
+                              settings.GEOSERVER_INITIAL_DATADIR,
+                              settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR_NAME)
     authn.setup_authn(settings.GEOSERVER_DATADIR,
                       settings.LAYMAN_GS_AUTHN_FILTER_NAME,
                       settings.LAYMAN_GS_AUTHN_HTTP_HEADER_NAME,
