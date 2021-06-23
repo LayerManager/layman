@@ -56,4 +56,4 @@ def assert_error(expected, thrown):
         if key == 'http_code':
             assert thrown.value.http_code == value
         else:
-            assert thrown_dict[key] == value
+            assert thrown_dict[key] == value, thrown_dict[key]

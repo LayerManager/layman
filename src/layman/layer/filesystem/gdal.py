@@ -2,7 +2,7 @@ import os
 import shutil
 import subprocess
 from osgeo import gdal, gdalconst
-from layman import patch_mode, settings
+from layman import patch_mode, settings, LaymanError
 from layman.common import empty_method, empty_method_returns_dict
 from . import input_file
 
@@ -46,6 +46,24 @@ def get_color_interpretations(filepath):
         color_interpretation = gdal.GetColorInterpretationName(band.GetColorInterpretation())
         result.append(color_interpretation)
     return result
+
+
+def assert_valid_raster(input_path):
+    color_interp = get_color_interpretations(input_path)
+    supported_color_interps = {
+        ('Red', 'Green', 'Blue'),
+        ('Red', 'Green', 'Blue', 'Alpha'),
+        ('Gray', ),
+        ('Gray', 'Alpha'),
+        ('Palette', ),
+    }
+    if tuple(color_interp) not in supported_color_interps:
+        supported_color_interps_str = ', '.join([f"[{', '.join(ci)}]" for ci in sorted(supported_color_interps)])
+        raise LaymanError(2, data={
+            'parameter': 'file',
+            'expected': f"Any of color interpretations {supported_color_interps_str}.",
+            'found': color_interp,
+        })
 
 
 def normalize_raster_file_async(workspace, layer, input_path, crs_id):
