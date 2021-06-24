@@ -8,9 +8,12 @@ from . import gdal
 @pytest.mark.parametrize('file_path, exp_error', [
     ('sample/layman.layer/sample_jp2_rgb.jp2', None),
     ('sample/layman.layer/sample_tif_rgb.tif', None),
+    ('sample/layman.layer/sample_tif_rgb_nodata.tif', None),
+    ('sample/layman.layer/sample_tif_rgba.tif', None),
     ('sample/layman.layer/sample_tiff_rgba.tiff', None),
     ('sample/layman.layer/sample_tif_tfw_rgba.tif', None),
     ('sample/layman.layer/sample_tif_colortable_nodata.tif', None),
+    ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', None),
     ('sample/layman.layer/sample_tif_grayscale_nodata.tif', None),
     ('sample/layman.layer/sample_tif_rg.tif', {'http_code': 400,
                                                'code': 2,
@@ -22,7 +25,6 @@ from . import gdal
                                                           },
                                                }),
 ])
-@pytest.mark.usefixtures('ensure_layman')
 def test_assert_valid_raster(file_path, exp_error):
     exp_exception = pytest.raises(LaymanError) if exp_error else does_not_raise()
 
