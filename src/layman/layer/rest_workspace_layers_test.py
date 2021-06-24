@@ -205,8 +205,8 @@ def clear_after_test(ensure_layman):
 
 
 @pytest.mark.parametrize('layer_suffix, file_paths, bbox', [
-    ('jp2', ['sample/layman.layer/sample_jp2_rgb.jp2', ], (1829708.000, 6308828.724, 1833166.272, 6310848.600), ),
-    ('tif', ['sample/layman.layer/sample_tif_rgb.tif', ], (1679391.080, 6562360.443, 1679416.233, 6562381.790), ),
+    ('jp2', ['sample/layman.layer/sample_jp2_rgb.jp2', ], (1829708, 6308828.600, 1833166.200, 6310848.600),),
+    ('tif', ['sample/layman.layer/sample_tif_rgb.tif', ], (1679391.080, 6562360.440, 1679416.230, 6562381.790),),
     pytest.param('tiff',
                  ['sample/layman.layer/sample_tiff_rgba.tiff', ],
                  (1669480, 6580973, 1675352, 6586999, ),
