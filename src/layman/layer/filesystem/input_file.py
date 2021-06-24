@@ -104,10 +104,14 @@ def check_raster_main_file(main_filepath):
         raise LaymanError(5, {'found': n_bands, 'expected': 1})
 
 
-def check_spatial_ref_crs(spatial_ref):
+def spatial_ref_crs_to_crs_id(spatial_ref):
     crs_auth_name = spatial_ref.GetAuthorityName(None)
     crs_code = spatial_ref.GetAuthorityCode(None)
-    crs_id = crs_auth_name + ":" + crs_code
+    return crs_auth_name + ":" + crs_code
+
+
+def check_spatial_ref_crs(spatial_ref):
+    crs_id = spatial_ref_crs_to_crs_id(spatial_ref)
     if crs_id not in settings.INPUT_SRS_LIST:
         raise LaymanError(4, {'found': crs_id,
                               'supported_values': settings.INPUT_SRS_LIST})
