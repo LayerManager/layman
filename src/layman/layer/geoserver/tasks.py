@@ -3,7 +3,7 @@ from celery.utils.log import get_task_logger
 from geoserver import util as gs_util
 from layman.celery import AbortedException
 from layman import celery_app, settings, util as layman_util
-from layman.common import empty_method_returns_true
+from layman.common import empty_method_returns_true, bbox as bbox_util
 from . import wms, wfs, sld
 from .. import geoserver, LAYER_TYPE
 
@@ -30,7 +30,9 @@ def refresh_wms(
         ensure_user=False,
         access_rights=None,
 ):
-    file_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
+    info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file', 'bounding_box']})
+    file_type = info['file']['file_type']
+
     if description is None:
         description = layername
     if title is None:
@@ -42,6 +44,7 @@ def refresh_wms(
     if self.is_aborted():
         raise AbortedException
 
+    coverage_store_name = wms.get_geotiff_store_name(layername)
     if file_type == settings.FILE_TYPE_VECTOR:
         if store_in_geoserver:
             gs_util.delete_wms_layer(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
@@ -50,7 +53,6 @@ def refresh_wms(
                                             layername,
                                             description,
                                             title,
-                                            access_rights,
                                             geoserver_workspace=geoserver_workspace,
                                             )
         else:
@@ -59,9 +61,15 @@ def refresh_wms(
                                               layername,
                                               description,
                                               title,
-                                              access_rights,
                                               geoserver_workspace=geoserver_workspace,
                                               )
+    elif file_type == settings.FILE_TYPE_RASTER:
+        file_path = info['_file']['normalized_file']['gs_path']
+        real_bbox = info['bounding_box']
+        bbox = bbox_util.ensure_bbox_with_area(real_bbox, settings.NO_AREA_BBOX_PADDING)\
+            if not bbox_util.is_empty(real_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+        gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, file_path)
+        gs_util.publish_coverage(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, layername, title, description, bbox)
 
     geoserver.set_security_rules(username, layername, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 

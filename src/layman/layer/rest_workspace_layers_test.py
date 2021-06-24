@@ -11,7 +11,7 @@ del sys.modules['layman']
 from geoserver import GS_REST_WORKSPACES
 from layman import app, settings, util as layman_util, LaymanError
 from layman.layer import util as layer_util
-from layman.layer.filesystem import input_style, input_file, gdal
+from layman.layer.filesystem import input_style, input_file, gdal, thumbnail as fs_thumbnail
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
@@ -180,9 +180,9 @@ class TestQgisCascadeWmsClass:
         process_client.delete_workspace_layer(workspace, layer)
 
 
-def assert_raster_layer(workspace, layer, file_names, exp_bbox, ):
+def assert_raster_layer(workspace, layer, file_names, exp_bbox, exp_thumbnail):
     with app.app_context():
-        info = layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['file', 'bounding_box']})
+        info = layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['file', 'bounding_box', 'wms']})
         directory_path = input_file.get_layer_input_file_dir(workspace, layer)
     assert info.get('file', dict()).get('file_type') == 'raster', info
     for file in file_names:
@@ -196,29 +196,35 @@ def assert_raster_layer(workspace, layer, file_names, exp_bbox, ):
     info_bbox = info['bounding_box']
     assert_util.assert_same_bboxes(info_bbox, exp_bbox, 0.01)
 
-    # TODO: assert
+    assert 'wms' in info, info
+    assert 'url' in info['wms'], info
+
+    with app.app_context():
+        thumbnail_path = fs_thumbnail.get_layer_thumbnail_path(workspace, layer)
+    diffs = test_util.compare_images(exp_thumbnail, thumbnail_path)
+    assert diffs < 1000
 
 
-@pytest.mark.parametrize('layer_suffix, file_paths, bbox', [
-    ('jp2', ['sample/layman.layer/sample_jp2_rgb.jp2', ], (1829708, 6308828.600, 1833166.200, 6310848.600),),
-    ('tif', ['sample/layman.layer/sample_tif_rgb.tif', ], (1679391.080, 6562360.440, 1679416.230, 6562381.790),),
-    ('tiff', ['sample/layman.layer/sample_tiff_rgba.tiff', ], (1669480, 6580973, 1675352, 6586999,),),
+@pytest.mark.parametrize('layer_suffix, file_paths, bbox, thumbnail', [
+    ('jp2', ['sample/layman.layer/sample_jp2_rgb.jp2', ], (1829708, 6308828.600, 1833166.200, 6310848.600), '/code/test/data/thumbnail/raster_layer_jp2.png', ),
+    ('tif', ['sample/layman.layer/sample_tif_rgb.tif', ], (1679391.080, 6562360.440, 1679416.230, 6562381.790), '/code/test/data/thumbnail/raster_layer_tif.png', ),
+    ('tiff', ['sample/layman.layer/sample_tiff_rgba.tiff', ], (1669480, 6580973, 1675352, 6586999,), '/code/test/data/thumbnail/raster_layer_tiff.png', ),
     ('tif_tfw', ['sample/layman.layer/sample_tif_tfw_rgba.tif', 'sample/layman.layer/sample_tif_tfw_rgba.tfw'],
-     (1669480, 6580973, 1675352, 6586999,),),
+     (1669480, 6580973, 1675352, 6586999,), '/code/test/data/thumbnail/raster_layer_tiff.png', ),
 ])
 @pytest.mark.usefixtures('ensure_layman')
-def test_post_raster(layer_suffix, file_paths, bbox, ):
+def test_post_raster(layer_suffix, file_paths, bbox, thumbnail, ):
     workspace = 'test_post_raster_workspace'
     layer_prefix = 'test_post_raster'
     layer = layer_prefix + '_' + layer_suffix
 
     process_client.publish_workspace_layer(workspace, layer, file_paths=file_paths)
-    assert_raster_layer(workspace, layer, file_paths, bbox, )
+    assert_raster_layer(workspace, layer, file_paths, bbox, thumbnail, )
     process_client.delete_workspace_layer(workspace, layer)
 
     process_client.publish_workspace_layer(workspace, layer)
     process_client.patch_workspace_layer(workspace, layer, file_paths=file_paths)
-    assert_raster_layer(workspace, layer, file_paths, bbox, )
+    assert_raster_layer(workspace, layer, file_paths, bbox, thumbnail, )
     process_client.delete_workspace_layer(workspace, layer)
 
 
