@@ -84,7 +84,6 @@ def get_pixel_size(filepath):
 
 def normalize_raster_file_async(workspace, layer, input_path, crs_id):
     color_interp = get_color_interpretations(input_path)
-    assert color_interp == ['Red', 'Green', 'Blue']
     result_path = get_normalized_raster_layer_main_filepath(workspace, layer)
     bash_args = [
         'gdalwarp',
