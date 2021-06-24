@@ -29,7 +29,11 @@
 #### Data migrations
 ### Changes
 - [#167](https://github.com/LayerManager/layman/issues/167) Allow publishing also raster geospatial data from `GeoTiff` and `JPEG2000` formats using [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer). Following input combinations of bands and color interpretations are supported:
+  - 1 band: Gray
+  - 1 band: Palette
+  - 2 bands: Gray, Alpha
   - 3 bands: Red, Green, Blue
+  - 4 bands: Red, Green, Blue, Alpha
 - [#167](https://github.com/LayerManager/layman/issues/167) Published raster files are normalized before registering to GeoServer. Normalization includes conversion to GeoTiff in EPSG:3857 with overviews (pyramids). NoData values are normalized as transparent only if Alpha band is not available and NoData is set for each band. Normalized rasters are stored in `normalized_raster_data` directory inside [LAYMAN_DATA_DIR](doc/env-settings.md#LAYMAN_DATA_DIR).
 - [#167](https://github.com/LayerManager/layman/issues/167) Add `file_type` item to `file` item in [GET Workspace Layer](doc/rest.md#get-workspace-layer) response to distinguish raster and vector layer.
 - [#167](https://github.com/LayerManager/layman/issues/167) Raster layers are not stored in DB table, for WFS and for WMS.
