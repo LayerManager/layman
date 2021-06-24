@@ -12,7 +12,7 @@ from geoserver import GS_REST_WORKSPACES
 from layman import app, settings, util as layman_util, LaymanError
 from layman.layer import util as layer_util
 from layman.layer.filesystem import input_style, input_file, gdal
-from layman.layer.geoserver.wms import DEFAULT_WMS_STORE_PREFIX
+from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
@@ -131,7 +131,7 @@ class TestQgisCascadeWmsClass:
                                 )
         assert response.status_code == 200, response.json()
         if style == 'qml':
-            assert response.json()['wmsStores']['wmsStore'][0]['name'] == f'{DEFAULT_WMS_STORE_PREFIX}_{layer}', response.json()
+            assert response.json()['wmsStores']['wmsStore'][0]['name'] == f'{DEFAULT_WMS_QGIS_STORE_PREFIX}_{layer}', response.json()
 
         response = requests.get(wms_layers_url,
                                 auth=settings.LAYMAN_GS_AUTH,

@@ -12,7 +12,7 @@ from layman.layer import LAYER_TYPE, util as layer_util
 from .util import get_gs_proxy_base_url
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
-DEFAULT_WMS_STORE_PREFIX = 'qgis'
+DEFAULT_WMS_QGIS_STORE_PREFIX = 'qgis'
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = '1.3.0'
@@ -225,4 +225,4 @@ def get_geoserver_workspace(workspace):
 
 
 def get_qgis_store_name(layer):
-    return f'{DEFAULT_WMS_STORE_PREFIX}_{layer}'
+    return f'{DEFAULT_WMS_QGIS_STORE_PREFIX}_{layer}'
