@@ -255,6 +255,7 @@ make start-dev
 :warning: It will delete
 - all files within [LAYMAN_DATA_DIR](doc/env-settings.md#LAYMAN_DATA_DIR)!
 - all files within [LAYMAN_QGIS_DATA_DIR](doc/env-settings.md#LAYMAN_QGIS_DATA_DIR)!
+- all files within [LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY](doc/env-settings.md#LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY)!
 - all layman-related schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME)!
 - all workspaces in [GeoServer](doc/data-storage.md#geoserver)!
 - all keys in Redis logical database identified by [LAYMAN_REDIS_URL](doc/env-settings.md#LAYMAN_REDIS_URL)!

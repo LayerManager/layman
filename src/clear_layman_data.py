@@ -27,6 +27,9 @@ def main():
     # qgis
     clear_directory(settings.LAYMAN_QGIS_DATA_DIR)
 
+    # normalized raster data
+    clear_directory(settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR)
+
     # postgresql
     import psycopg2
     conn_dict = settings.PG_CONN.copy()
