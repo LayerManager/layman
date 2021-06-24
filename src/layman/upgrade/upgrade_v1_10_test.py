@@ -93,7 +93,8 @@ def ensure_layer():
             created = gs_util.ensure_workspace(workspace, settings.LAYMAN_GS_AUTH)
             if created:
                 gs_util.create_db_store(workspace, settings.LAYMAN_GS_AUTH, db_schema=workspace, pg_conn=settings.PG_CONN)
-            gs_layer.publish_layer_from_db(workspace, layer, layer, layer, None, workspace)
+            gs_layer.publish_layer_from_db(workspace, layer, layer, layer, geoserver_workspace=workspace)
+            gs_layer.set_security_rules(workspace, layer, None, settings.LAYMAN_GS_AUTH, workspace)
             sld_file_path = 'sample/style/generic-blue_sld.xml'
             with open(sld_file_path, 'rb') as sld_file:
                 gs_util.post_workspace_sld_style(workspace, layer, sld_file, launder_attribute_name)
