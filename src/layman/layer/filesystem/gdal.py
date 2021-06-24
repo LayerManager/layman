@@ -76,6 +76,12 @@ def get_nodata_values(filepath):
     return result
 
 
+def get_pixel_size(filepath):
+    dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
+    geo_transform = dataset.GetGeoTransform()
+    return [geo_transform[1], geo_transform[5]]
+
+
 def normalize_raster_file_async(workspace, layer, input_path, crs_id):
     color_interp = get_color_interpretations(input_path)
     assert color_interp == ['Red', 'Green', 'Blue']

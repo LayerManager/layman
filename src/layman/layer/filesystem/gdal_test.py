@@ -49,3 +49,19 @@ def test_assert_valid_raster(file_path, exp_error):
 ])
 def test_get_nodata_values(file_path, exp_result):
     assert gdal.get_nodata_values(file_path) == exp_result
+
+
+@pytest.mark.parametrize('file_path, exp_result', [
+    ('sample/layman.layer/sample_jp2_rgb.jp2', [15.301769911504218, -15.303030303030303]),
+    ('sample/layman.layer/sample_tif_rgb.tif', [0.04373913043462064, -0.04374999999923662]),
+    ('sample/layman.layer/sample_tif_rgb_nodata.tif', [0.04373913043462064, -0.04374999999923662]),
+    ('sample/layman.layer/sample_tif_rgba.tif', [0.04373913043462064, -0.04374999999923662]),
+    ('sample/layman.layer/sample_tiff_rgba.tiff', [14.716791979949875, -14.733496332518337]),
+    ('sample/layman.layer/sample_tif_tfw_rgba.tif', [14.716791979949875, -14.733496332518337]),
+    ('sample/layman.layer/sample_tif_colortable_nodata.tif', [92.930501930501933, -92.976470588235287]),
+    ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', [15.293650793650794, -15.308571428571428]),
+    ('sample/layman.layer/sample_tif_grayscale_nodata.tif', [15.293650793650794, -15.308571428571428]),
+    ('sample/layman.layer/sample_tif_rg.tif', [0.04373913043462064, -0.04374999999923662]),
+])
+def test_get_pixel_size(file_path, exp_result):
+    assert gdal.get_pixel_size(file_path) == exp_result
