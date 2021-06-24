@@ -110,9 +110,13 @@ def spatial_ref_crs_to_crs_id(spatial_ref):
     return crs_auth_name + ":" + crs_code
 
 
-def get_raster_crs_id(main_filepath):
+def get_raster_crs(main_filepath):
     in_data_source = gdal.Open(main_filepath)
-    crs = in_data_source.GetSpatialRef()
+    return in_data_source.GetSpatialRef()
+
+
+def get_raster_crs_id(main_filepath):
+    crs = get_raster_crs(main_filepath)
     return spatial_ref_crs_to_crs_id(crs)
 
 
@@ -131,8 +135,7 @@ def check_vector_layer_crs(main_filepath):
 
 
 def check_raster_layer_crs(main_filepath):
-    in_data_source = gdal.Open(main_filepath)
-    crs = in_data_source.GetSpatialRef()
+    crs = get_raster_crs(main_filepath)
     check_spatial_ref_crs(crs)
 
 
