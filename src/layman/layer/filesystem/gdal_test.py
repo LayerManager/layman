@@ -33,3 +33,19 @@ def test_assert_valid_raster(file_path, exp_error):
 
     if exp_error:
         test_util.assert_error(exp_error, exc_info)
+
+
+@pytest.mark.parametrize('file_path, exp_result', [
+    ('sample/layman.layer/sample_jp2_rgb.jp2', [None, None, None]),
+    ('sample/layman.layer/sample_tif_rgb.tif', [None, None, None]),
+    ('sample/layman.layer/sample_tif_rgb_nodata.tif', [0, 0, 0]),
+    ('sample/layman.layer/sample_tif_rgba.tif', [None, None, None, None]),
+    ('sample/layman.layer/sample_tiff_rgba.tiff', [None, None, None, None]),
+    ('sample/layman.layer/sample_tif_tfw_rgba.tif', [None, None, None, None]),
+    ('sample/layman.layer/sample_tif_colortable_nodata.tif', [255]),
+    ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', [3.402823466e+38, 3.402823466e+38]),
+    ('sample/layman.layer/sample_tif_grayscale_nodata.tif', [3.402823466e+38]),
+    ('sample/layman.layer/sample_tif_rg.tif', [None, None]),
+])
+def test_get_nodata_values(file_path, exp_result):
+    assert gdal.get_nodata_values(file_path) == exp_result
