@@ -31,17 +31,18 @@ def refresh_wms(
         access_rights=None,
 ):
     file_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
-    if file_type == settings.FILE_TYPE_VECTOR:
-        if description is None:
-            description = layername
-        if title is None:
-            title = layername
-        geoserver_workspace = wms.get_geoserver_workspace(username)
-        if ensure_user:
-            geoserver.ensure_workspace(username)
+    if description is None:
+        description = layername
+    if title is None:
+        title = layername
+    geoserver_workspace = wms.get_geoserver_workspace(username)
+    if ensure_user:
+        geoserver.ensure_workspace(username)
 
-        if self.is_aborted():
-            raise AbortedException
+    if self.is_aborted():
+        raise AbortedException
+
+    if file_type == settings.FILE_TYPE_VECTOR:
         if store_in_geoserver:
             gs_util.delete_wms_layer(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
             gs_util.delete_wms_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, wms.get_qgis_store_name(layername))
