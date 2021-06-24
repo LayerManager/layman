@@ -66,6 +66,16 @@ def assert_valid_raster(input_path):
         })
 
 
+def get_nodata_values(filepath):
+    dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
+    result = []
+    for band_id in range(1, dataset.RasterCount + 1):
+        band = dataset.GetRasterBand(band_id)
+        nodata_value = band.GetNoDataValue()
+        result.append(nodata_value)
+    return result
+
+
 def normalize_raster_file_async(workspace, layer, input_path, crs_id):
     color_interp = get_color_interpretations(input_path)
     assert color_interp == ['Red', 'Green', 'Blue']
