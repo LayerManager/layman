@@ -94,6 +94,7 @@ Processing chain consists of few steps:
   - else for layers with QML style:
     - create QGS file on QGIS server filesystem with appropriate style
     - publish the layer on GeoServer through WMS cascade from QGIS server
+- for raster layers publish normalized GeoTiff as new layer (coverage) on GeoServer WMS workspace
 - generate thumbnail image
 - publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
 - update thumbnail of each [map](models.md#map) that points to this layer
