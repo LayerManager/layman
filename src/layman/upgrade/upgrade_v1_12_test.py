@@ -38,13 +38,15 @@ def ensure_layer():
             created = gs_util.ensure_workspace(workspace, settings.LAYMAN_GS_AUTH)
             if created:
                 gs_util.create_db_store(workspace, settings.LAYMAN_GS_AUTH, db_schema=workspace, pg_conn=settings.PG_CONN)
-            gs_layer.publish_layer_from_db(workspace, layer, layer, layer, None, workspace)
+            gs_layer.publish_layer_from_db(workspace, layer, layer, layer, geoserver_workspace=workspace)
+            gs_layer.set_security_rules(workspace, layer, None, settings.LAYMAN_GS_AUTH, workspace)
             # wms
             geoserver_workspace = wms.get_geoserver_workspace(workspace)
             created = gs_util.ensure_workspace(geoserver_workspace, settings.LAYMAN_GS_AUTH)
             if created:
                 gs_util.create_db_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, db_schema=workspace, pg_conn=settings.PG_CONN)
-            gs_layer.publish_layer_from_db(workspace, layer, layer, layer, None, geoserver_workspace)
+            gs_layer.publish_layer_from_db(workspace, layer, layer, layer, geoserver_workspace=geoserver_workspace)
+            gs_layer.set_security_rules(workspace, layer, None, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 
             md_path = '/code/src/layman/upgrade/upgrade_v1_12_test_layer_metadata.xml'
             with open(md_path, 'r') as template_file:

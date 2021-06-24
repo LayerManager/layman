@@ -118,7 +118,7 @@ def get_layer_native_bbox(workspace, layer):
     return gs_util.bbox_to_native_bbox(bbox)
 
 
-def publish_layer_from_db(workspace, layername, description, title, access_rights, geoserver_workspace=None):
+def publish_layer_from_db(workspace, layername, description, title, *, geoserver_workspace=None):
     geoserver_workspace = geoserver_workspace or workspace
     keywords = [
         "features",
@@ -153,10 +153,8 @@ def publish_layer_from_db(workspace, layername, description, title, access_right
                              )
     response.raise_for_status()
 
-    set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 
-
-def publish_layer_from_qgis(workspace, layer, description, title, access_rights, geoserver_workspace=None):
+def publish_layer_from_qgis(workspace, layer, description, title, *, geoserver_workspace=None):
     geoserver_workspace = geoserver_workspace or workspace
     store_name = wms.get_qgis_store_name(layer)
     layer_capabilities_url = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['wms']})['_wms']['qgis_capabilities_url']
@@ -199,8 +197,6 @@ def publish_layer_from_qgis(workspace, layer, description, title, access_rights,
                              timeout=5,
                              )
     response.raise_for_status()
-
-    set_security_rules(workspace, layer, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 
 
 def get_usernames():

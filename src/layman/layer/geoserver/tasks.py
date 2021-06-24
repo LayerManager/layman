@@ -62,6 +62,9 @@ def refresh_wms(
                                               access_rights,
                                               geoserver_workspace=geoserver_workspace,
                                               )
+
+    geoserver.set_security_rules(username, layername, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
+
     wms.clear_cache(username)
 
     if self.is_aborted():
@@ -96,7 +99,8 @@ def refresh_wfs(
 
     if self.is_aborted():
         raise AbortedException
-    geoserver.publish_layer_from_db(username, layername, description, title, access_rights)
+    geoserver.publish_layer_from_db(username, layername, description, title)
+    geoserver.set_security_rules(username, layername, access_rights, settings.LAYMAN_GS_AUTH, username)
     wfs.clear_cache(username)
 
     if self.is_aborted():
