@@ -110,6 +110,12 @@ def spatial_ref_crs_to_crs_id(spatial_ref):
     return crs_auth_name + ":" + crs_code
 
 
+def get_raster_crs_id(main_filepath):
+    in_data_source = gdal.Open(main_filepath)
+    crs = in_data_source.GetSpatialRef()
+    return spatial_ref_crs_to_crs_id(crs)
+
+
 def check_spatial_ref_crs(spatial_ref):
     crs_id = spatial_ref_crs_to_crs_id(spatial_ref)
     if crs_id not in settings.INPUT_SRS_LIST:
