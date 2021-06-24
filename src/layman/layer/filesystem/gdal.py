@@ -105,6 +105,12 @@ def normalize_raster_file_async(workspace, layer, input_path, crs_id):
         '-dstnodata', 'None',
         '-dstalpha',
     ])
+    # if output EPSG is the same as input EPSG, set pixel size (-tr) explicitly to the value of input
+    if crs_id == "EPSG:3857" or (crs_id is None and input_file.get_raster_crs_id(input_path) == "EPSG:3857"):
+        pixel_size = get_pixel_size(input_path)
+        tr_list = [str(ps) for ps in pixel_size]
+        tr_list.insert(0, '-tr')
+        bash_args.extend(tr_list)
     if crs_id is not None:
         bash_args.extend([
             '-s_srs', f'{crs_id}',
