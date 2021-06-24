@@ -455,6 +455,77 @@ def delete_db_store(geoserver_workspace, auth):
         response.raise_for_status()
 
 
+def create_coverage_store(geoserver_workspace, auth, name, file):
+    data = {
+        "coverageStore": {
+            "workspace": geoserver_workspace,
+            "name": name,
+            "type": "GeoTIFF",
+            "enabled": "true",
+            "url": "file:" + file,
+        }
+    }
+    response = requests.post(
+        urljoin(GS_REST_WORKSPACES, geoserver_workspace + '/coveragestores'),
+        data=json.dumps(data),
+        headers=headers_json,
+        auth=auth,
+        timeout=5,
+    )
+    response.raise_for_status()
+
+
+def delete_coverage_store(geoserver_workspace, auth, name):
+    response = requests.delete(
+        urljoin(GS_REST_WORKSPACES, geoserver_workspace + f'/coveragestores/{name}'),
+        headers=headers_json,
+        params={
+            'purge': 'true',
+            'recurse': 'true',
+        },
+        auth=auth,
+        timeout=5,
+    )
+    if response.status_code != 404:
+        response.raise_for_status()
+
+
+def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, description, bbox):
+    keywords = [
+        "features",
+        layer,
+        title
+    ]
+    native_bbox = bbox_to_native_bbox(bbox)
+    data = {
+        "coverage": {
+            "abstract": description,
+            "enabled": "true",
+            "keywords": {
+                "string": keywords
+            },
+            "name": layer,
+            'nativeBoundingBox': native_bbox,
+            "nativeFormat": "GeoTIFF",
+            "srs": "EPSG:3857",
+            "store": {
+                "@class": "coverageStore",
+                "href": urljoin(GS_REST_WORKSPACES, geoserver_workspace, f'/coveragestores/coverages/{coverage_store}.json'),
+                "name": f"{geoserver_workspace}:{coverage_store}"
+            },
+            "title": title
+        }
+    }
+    response = requests.post(
+        urljoin(GS_REST_WORKSPACES, geoserver_workspace + f'/coverages'),
+        data=json.dumps(data),
+        headers=headers_json,
+        auth=auth,
+        timeout=5,
+    )
+    response.raise_for_status()
+
+
 def create_wms_store(geoserver_workspace, auth, wms_store_name, get_capabilities_url):
     response = requests.post(
         urljoin(GS_REST_WORKSPACES, geoserver_workspace + '/wmsstores'),
