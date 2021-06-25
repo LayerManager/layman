@@ -11,12 +11,14 @@ PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 def get_layer_info(workspace, layer):
     gdal_path = get_normalized_raster_layer_main_filepath(workspace, layer)
+    gdal_gs_path = get_normalized_raster_layer_main_filepath(workspace, layer, geoserver=True)
     if os.path.exists(gdal_path):
         return {
             'layername': layer,
             '_file': {
                 'normalized_file': {
                     'path': gdal_path,
+                    'gs_path': gdal_gs_path,
                 }
             }
         }
@@ -125,16 +127,17 @@ def normalize_raster_file_async(workspace, layer, input_path, crs_id):
     return process
 
 
-def get_normalized_raster_workspace_dir(workspace):
-    return os.path.join(settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR, 'workspaces', workspace)
+def get_normalized_raster_workspace_dir(workspace, *, geoserver=False):
+    base_path = settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR if not geoserver else settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR_NAME
+    return os.path.join(base_path, 'workspaces', workspace)
 
 
-def get_normalized_raster_layer_dir(workspace, layer):
-    return os.path.join(get_normalized_raster_workspace_dir(workspace), 'layers', layer)
+def get_normalized_raster_layer_dir(workspace, layer, *, geoserver=False):
+    return os.path.join(get_normalized_raster_workspace_dir(workspace, geoserver=geoserver), 'layers', layer)
 
 
-def get_normalized_raster_layer_main_filepath(workspace, layer):
-    return os.path.join(get_normalized_raster_layer_dir(workspace, layer), f"{layer}.tif")
+def get_normalized_raster_layer_main_filepath(workspace, layer, *, geoserver=False):
+    return os.path.join(get_normalized_raster_layer_dir(workspace, layer, geoserver=geoserver), f"{layer}.tif")
 
 
 def ensure_normalized_raster_layer_dir(workspace, layer):
