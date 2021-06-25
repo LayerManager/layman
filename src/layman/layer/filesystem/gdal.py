@@ -97,7 +97,7 @@ def normalize_raster_file_async(workspace, layer, input_path, crs_id):
     ]
     # interpret NoData as transparent only if Alpha band is not available and NoData is set for each band
     src_nodata = 'None'
-    if color_interp[:-1] != 'Alpha':
+    if color_interp[-1] != 'Alpha':
         nodata_values = get_nodata_values(input_path)
         if all(val is not None for val in nodata_values):
             src_nodata = ' '.join([str(val) for val in nodata_values])
