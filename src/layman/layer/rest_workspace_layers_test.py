@@ -196,12 +196,7 @@ def assert_raster_layer(workspace, layer, file_names, exp_bbox, ):
     info_bbox = info['bounding_box']
     assert_util.assert_same_bboxes(info_bbox, exp_bbox, 0.01)
 
-
-@pytest.fixture(scope="class")
-def clear_after_test(ensure_layman):
-    # pylint: disable=unused-argument
-    yield
-    process_client.delete_workspace_layers('test_post_raster_workspace')
+    # TODO: assert
 
 
 @pytest.mark.parametrize('layer_suffix, file_paths, bbox', [
@@ -211,7 +206,7 @@ def clear_after_test(ensure_layman):
     ('tif_tfw', ['sample/layman.layer/sample_tif_tfw_rgba.tif', 'sample/layman.layer/sample_tif_tfw_rgba.tfw'],
      (1669480, 6580973, 1675352, 6586999,),),
 ])
-@pytest.mark.usefixtures('ensure_layman', 'clear_after_test')
+@pytest.mark.usefixtures('ensure_layman')
 def test_post_raster(layer_suffix, file_paths, bbox, ):
     workspace = 'test_post_raster_workspace'
     layer_prefix = 'test_post_raster'
