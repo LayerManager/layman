@@ -1,3 +1,4 @@
+import os
 from contextlib import nullcontext as does_not_raise
 from test import util as test_util
 import pytest
@@ -119,3 +120,24 @@ def test_is_normalized_alpha_needed(file_path, exp_result):
 def test_is_nodata_out_of_min_max(file_path, exp_result):
     nodata_values = gdal.get_nodata_values(file_path)
     assert gdal.is_nodata_out_of_min_max(file_path, nodata_values=nodata_values) == exp_result
+
+
+@pytest.mark.parametrize('file_path, exp_result', [
+    ('sample/layman.layer/sample_jp2_rgb.jp2', None),
+    ('sample/layman.layer/sample_tif_rgb.tif', None),
+    ('sample/layman.layer/sample_tif_rgb_nodata.tif', None),
+    ('sample/layman.layer/sample_tif_rgba.tif', None),
+    ('sample/layman.layer/sample_tiff_rgba.tiff', 'sample/layman.layer/sample_tiff_rgba.vrt'),
+    ('sample/layman.layer/sample_tif_tfw_rgba.tif', 'sample/layman.layer/sample_tif_tfw_rgba.vrt'),
+    ('sample/layman.layer/sample_tif_colortable_nodata.tif', None),
+    ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', None),
+    ('sample/layman.layer/sample_tif_grayscale_nodata.tif', None),
+])
+def test_create_vrt_file_if_needed(file_path, exp_result):
+    if exp_result:
+        assert not os.path.exists(exp_result)
+    result = gdal.create_vrt_file_if_needed(file_path)
+    assert result == exp_result
+    if result:
+        assert os.path.exists(exp_result)
+        os.remove(exp_result)
