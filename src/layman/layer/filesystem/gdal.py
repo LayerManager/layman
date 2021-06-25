@@ -128,6 +128,20 @@ def is_normalized_alpha_needed(filepath, *, color_interp, nodata_values):
     return result
 
 
+def create_vrt_file_if_needed(filepath):
+    color_interp = get_color_interpretations(filepath)
+    nodata_values = get_nodata_values(filepath)
+    if color_interp[-1] == 'Alpha' and not is_normalized_alpha_needed(filepath, color_interp=color_interp, nodata_values=nodata_values):
+        base_name = os.path.splitext(filepath)[0]
+        vrt_file_path = base_name + '.vrt'
+        band_list = list(range(1, len(color_interp)))
+        vrt_options = gdal.BuildVRTOptions(bandList=band_list)
+        gdal.BuildVRT(vrt_file_path, [filepath], options=vrt_options)
+    else:
+        vrt_file_path = None
+    return vrt_file_path
+
+
 def normalize_raster_file_async(workspace, layer, input_path, crs_id):
     color_interp = get_color_interpretations(input_path)
     result_path = get_normalized_raster_layer_main_filepath(workspace, layer)
