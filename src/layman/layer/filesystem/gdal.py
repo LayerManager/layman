@@ -149,10 +149,13 @@ def normalize_raster_file_async(workspace, layer, input_path, crs_id):
         'gdalwarp',
         '-of', 'GTiff',
         '-co', 'PROFILE=GeoTIFF',
-        '-co', 'PHOTOMETRIC=RGB',
         '-co', 'INTERLEAVE=PIXEL',
         '-co', 'TILED=YES',
     ]
+    if color_interp[:3] == ['Red', 'Green', 'Blue']:
+        bash_args.extend([
+            '-co', 'PHOTOMETRIC=RGB',
+        ])
     # interpret NoData as transparent only if Alpha band is not available and NoData is set for each band
     src_nodata = 'None'
     nodata_values = None
@@ -168,6 +171,10 @@ def normalize_raster_file_async(workspace, layer, input_path, crs_id):
         bash_args.extend([
             '-dstalpha',
         ])
+        if color_interp[-1] == 'Alpha':
+            bash_args.extend([
+                '-co', 'ALPHA=YES',
+            ])
     # if output EPSG is the same as input EPSG, set pixel size (-tr) explicitly to the value of input
     if crs_id == "EPSG:3857" or (crs_id is None and input_file.get_raster_crs_id(input_path) == "EPSG:3857"):
         pixel_size = get_pixel_size(input_path)
