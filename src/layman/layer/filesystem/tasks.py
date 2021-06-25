@@ -1,3 +1,4 @@
+import os
 import time
 
 from celery.utils.log import get_task_logger
@@ -77,9 +78,15 @@ def refresh_gdal(self, username, layername, crs_id=None):
 
     input_path = layer_info['_file']['path']
     gdal.assert_valid_raster(input_path)
-    process = gdal.normalize_raster_file_async(username, layername, input_path, crs_id)
+    vrt_file_path = gdal.create_vrt_file_if_needed(input_path)
+    process = gdal.normalize_raster_file_async(username, layername, vrt_file_path or input_path, crs_id)
     while process.poll() is None and not self.is_aborted():
         pass
+    if vrt_file_path:
+        try:
+            os.remove(vrt_file_path)
+        except OSError:
+            pass
     if self.is_aborted():
         logger.info(f'terminating GDAL process workspace.layer={username}.{layername}')
         process.terminate()
