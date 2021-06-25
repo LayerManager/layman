@@ -65,3 +65,22 @@ def test_get_nodata_values(file_path, exp_result):
 ])
 def test_get_pixel_size(file_path, exp_result):
     assert gdal.get_pixel_size(file_path) == exp_result
+
+
+@pytest.mark.parametrize('file_path, exp_result', [
+    ('sample/layman.layer/sample_jp2_rgb.jp2', [[17, 255], [30, 255], [16, 255]]),  # [min, max] for each band
+    ('sample/layman.layer/sample_tif_rgb.tif', [[0, 251], [0, 253], [0, 254]]),
+    ('sample/layman.layer/sample_tif_rgb_nodata.tif', [[33, 251], [57, 253], [1, 254]]),
+    ('sample/layman.layer/sample_tif_rgba.tif', [[0, 251], [0, 253], [0, 254], [0, 127]]),
+    ('sample/layman.layer/sample_tiff_rgba.tiff', [[0, 254], [0, 222], [0, 216], [255, 255]]),
+    ('sample/layman.layer/sample_tif_tfw_rgba.tif', [[0, 254], [0, 222], [0, 216], [255, 255]]),
+    ('sample/layman.layer/sample_tif_colortable_nodata.tif', [[0, 20]]),
+    ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', [[-0.0094339624047279, 0.91247737407684], [0, 255]]),
+    ('sample/layman.layer/sample_tif_grayscale_nodata.tif', [[-0.040201004594564, 0.91754120588303]]),
+    ('sample/layman.layer/sample_tif_rg.tif', [[0, 251], [0, 253]]),
+])
+def test_get_statistics(file_path, exp_result):
+    stats = gdal.get_statistics(file_path)
+    assert len(stats) == len(exp_result), stats
+    for band_idx, exp_band_stats in enumerate(exp_result):
+        assert stats[band_idx][:len(exp_band_stats)] == exp_band_stats

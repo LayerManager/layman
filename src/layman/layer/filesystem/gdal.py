@@ -84,6 +84,21 @@ def get_pixel_size(filepath):
     return [geo_transform[1], geo_transform[5]]
 
 
+def get_statistics(filepath):
+    # If Nodata is set and it's lowest value in dataset and at least one pixel has Nodata value,
+    # GetStatistics does not return Nodata value as MIN, but lowest value that is not Nodata value.
+    # It's probably similar for MAX.
+    dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
+    result = []
+    for band_id in range(1, dataset.RasterCount + 1):
+        band = dataset.GetRasterBand(band_id)
+        stats = band.GetStatistics(False, True)  # (approx_ok, force), see
+        # https://gdal.org/doxygen/classGDALRasterBand.html#a6aa58b6f0a0c17722b9bf763a96ff069
+        # stats = [min, max, mean, stddev]
+        result.append(stats)
+    return result
+
+
 def normalize_raster_file_async(workspace, layer, input_path, crs_id):
     color_interp = get_color_interpretations(input_path)
     result_path = get_normalized_raster_layer_main_filepath(workspace, layer)
