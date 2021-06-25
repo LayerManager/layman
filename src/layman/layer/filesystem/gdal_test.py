@@ -87,6 +87,24 @@ def test_get_statistics(file_path, exp_result):
 
 
 @pytest.mark.parametrize('file_path, exp_result', [
+    ('sample/layman.layer/sample_jp2_rgb.jp2', False),  # no alpha, no nodata
+    ('sample/layman.layer/sample_tif_rgb.tif', False),  # no alpha, no nodata
+    ('sample/layman.layer/sample_tif_rgb_nodata.tif', True),  # no alpha, min <= nodata <= max
+    ('sample/layman.layer/sample_tif_rgba.tif', True),  # alpha with at least one value < 255
+    ('sample/layman.layer/sample_tiff_rgba.tiff', False),  # alpha with all values = 255, no nodata
+    ('sample/layman.layer/sample_tif_tfw_rgba.tif', False),  # alpha with all values = 255, no nodata
+    ('sample/layman.layer/sample_tif_colortable_nodata.tif', False),  # no alpha, nodata > max in each band
+    ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', True),  # alpha with at least one value < 255
+    ('sample/layman.layer/sample_tif_grayscale_nodata.tif', False),  # no alpha, nodata > max in each band
+    ('sample/layman.layer/sample_tif_rg.tif', False),  # no alpha, no nodata
+])
+def test_is_normalized_alpha_needed(file_path, exp_result):
+    color_interp = gdal.get_color_interpretations(file_path)
+    nodata_values = gdal.get_nodata_values(file_path)
+    assert gdal.is_normalized_alpha_needed(file_path, color_interp=color_interp, nodata_values=nodata_values) == exp_result
+
+
+@pytest.mark.parametrize('file_path, exp_result', [
     ('sample/layman.layer/sample_jp2_rgb.jp2', False),
     ('sample/layman.layer/sample_tif_rgb.tif', False),
     ('sample/layman.layer/sample_tif_rgb_nodata.tif', False),

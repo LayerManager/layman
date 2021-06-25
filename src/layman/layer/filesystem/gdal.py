@@ -115,6 +115,19 @@ def is_nodata_out_of_min_max(filepath, *, nodata_values):
     return result
 
 
+def is_normalized_alpha_needed(filepath, *, color_interp, nodata_values):
+    if color_interp[-1] == 'Alpha':
+        stats = get_statistics(filepath)
+        alpha_min, alpha_max, _, _ = stats[-1]
+        result = not alpha_min == alpha_max == 255
+    else:
+        if any(val is None for val in nodata_values):
+            result = False
+        else:
+            result = not is_nodata_out_of_min_max(filepath, nodata_values=nodata_values)
+    return result
+
+
 def normalize_raster_file_async(workspace, layer, input_path, crs_id):
     color_interp = get_color_interpretations(input_path)
     result_path = get_normalized_raster_layer_main_filepath(workspace, layer)
@@ -128,6 +141,7 @@ def normalize_raster_file_async(workspace, layer, input_path, crs_id):
     ]
     # interpret NoData as transparent only if Alpha band is not available and NoData is set for each band
     src_nodata = 'None'
+    nodata_values = None
     if color_interp[-1] != 'Alpha':
         nodata_values = get_nodata_values(input_path)
         if all(val is not None for val in nodata_values):
@@ -135,8 +149,11 @@ def normalize_raster_file_async(workspace, layer, input_path, crs_id):
     bash_args.extend([
         '-srcnodata', src_nodata,
         '-dstnodata', 'None',
-        '-dstalpha',
     ])
+    if is_normalized_alpha_needed(input_path, color_interp=color_interp, nodata_values=nodata_values):
+        bash_args.extend([
+            '-dstalpha',
+        ])
     # if output EPSG is the same as input EPSG, set pixel size (-tr) explicitly to the value of input
     if crs_id == "EPSG:3857" or (crs_id is None and input_file.get_raster_crs_id(input_path) == "EPSG:3857"):
         pixel_size = get_pixel_size(input_path)
