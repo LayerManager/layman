@@ -220,6 +220,9 @@ def test_post_raster(layer_suffix, file_paths, bbox, thumbnail, ):
 
     process_client.publish_workspace_layer(workspace, layer, file_paths=file_paths)
     assert_raster_layer(workspace, layer, file_paths, bbox, thumbnail, )
+    process_client.patch_workspace_layer(workspace, layer, file_paths=['sample/layman.layer/small_layer.geojson'])
+    info = process_client.get_workspace_layer(workspace, layer)
+    assert info['layman_metadata']['publication_status'] == 'COMPLETE', info
     process_client.delete_workspace_layer(workspace, layer)
 
     process_client.publish_workspace_layer(workspace, layer)
