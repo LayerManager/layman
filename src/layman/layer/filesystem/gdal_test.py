@@ -84,7 +84,8 @@ def test_get_statistics(file_path, exp_result):
     stats = gdal.get_statistics(file_path)
     assert len(stats) == len(exp_result), stats
     for band_idx, exp_band_stats in enumerate(exp_result):
-        assert stats[band_idx][:len(exp_band_stats)] == exp_band_stats
+        assert all((stats[band_idx][i] - exp_band_stats[i]) <= 0.00000000000001
+                   for i in range(0, len(exp_band_stats))), f"band_idx={band_idx}, stats={stats[band_idx]}"
 
 
 @pytest.mark.parametrize('file_path, exp_result', [
