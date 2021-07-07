@@ -200,10 +200,11 @@ def assert_raster_layer(workspace, layer, file_names, exp_bbox, normalized_color
     assert 'wms' in info, info
     assert 'url' in info['wms'], info
 
-    with app.app_context():
-        thumbnail_path = fs_thumbnail.get_layer_thumbnail_path(workspace, layer)
-    diffs = test_util.compare_images(exp_thumbnail, thumbnail_path)
-    assert diffs < 1000
+    if exp_thumbnail:
+        with app.app_context():
+            thumbnail_path = fs_thumbnail.get_layer_thumbnail_path(workspace, layer)
+        diffs = test_util.compare_images(exp_thumbnail, thumbnail_path)
+        assert diffs < 1000
 
 
 @pytest.mark.parametrize('layer_suffix, file_paths, bbox, normalized_color_interp, thumbnail', [
@@ -224,6 +225,8 @@ def assert_raster_layer(workspace, layer, file_names, exp_bbox, normalized_color
     ('tif_colortable_nodata_opaque', ['sample/layman.layer/sample_tif_colortable_nodata_opaque.tif'],
      (868376, 522128, 940583, 593255), ['Palette'],
      '/code/test/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png', ),
+    ('tif_colortable_nodata', ['sample/layman.layer/sample_tif_colortable_nodata.tif'],
+     (868376, 522128, 940583, 593255), ['Palette'], None, ),
     ('tif_grayscale_alpha_nodata', ['sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif'],
      (1823049.056, 6310009.44, 1826918.349, 6312703.749), ['Gray', 'Alpha'],
      '/code/test/data/thumbnail/raster_layer_tif_grayscale_alpha_nodata.png', ),

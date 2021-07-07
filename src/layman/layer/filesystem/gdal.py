@@ -120,6 +120,8 @@ def is_normalized_alpha_needed(filepath, *, color_interp, nodata_values):
         stats = get_statistics(filepath)
         alpha_min, alpha_max, _, _ = stats[-1]
         result = not alpha_min == alpha_max == 255
+    elif color_interp == ['Palette']:
+        result = False
     else:
         if any(val is None for val in nodata_values):
             result = False
@@ -165,8 +167,11 @@ def normalize_raster_file_async(workspace, layer, input_path, crs_id):
             src_nodata = ' '.join([str(val) for val in nodata_values])
     bash_args.extend([
         '-srcnodata', src_nodata,
-        '-dstnodata', 'None',
     ])
+    if color_interp != ['Palette']:
+        bash_args.extend([
+            '-dstnodata', 'None',
+        ])
     if is_normalized_alpha_needed(input_path, color_interp=color_interp, nodata_values=nodata_values):
         bash_args.extend([
             '-dstalpha',

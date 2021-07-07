@@ -1,0 +1,256 @@
+<PAMDataset>
+  <PAMRasterBand band="1">
+    <GDALRasterAttributeTable tableType="thematic">
+      <FieldDefn index="0">
+        <Name>OBJECTID</Name>
+        <Type>0</Type>
+        <Usage>0</Usage>
+      </FieldDefn>
+      <FieldDefn index="1">
+        <Name>Value</Name>
+        <Type>0</Type>
+        <Usage>0</Usage>
+      </FieldDefn>
+      <FieldDefn index="2">
+        <Name>Count_</Name>
+        <Type>1</Type>
+        <Usage>0</Usage>
+      </FieldDefn>
+      <FieldDefn index="3">
+        <Name>Red</Name>
+        <Type>0</Type>
+        <Usage>6</Usage>
+      </FieldDefn>
+      <FieldDefn index="4">
+        <Name>Green</Name>
+        <Type>0</Type>
+        <Usage>7</Usage>
+      </FieldDefn>
+      <FieldDefn index="5">
+        <Name>Blue</Name>
+        <Type>0</Type>
+        <Usage>8</Usage>
+      </FieldDefn>
+      <FieldDefn index="6">
+        <Name>Opacity</Name>
+        <Type>1</Type>
+        <Usage>0</Usage>
+      </FieldDefn>
+      <FieldDefn index="7">
+        <Name>Lithology</Name>
+        <Type>2</Type>
+        <Usage>0</Usage>
+      </FieldDefn>
+      <Row index="0">
+        <F>1</F>
+        <F>0</F>
+        <F>7131446162</F>
+        <F>1</F>
+        <F>1</F>
+        <F>1</F>
+        <F>0</F>
+        <F>0. n/a</F>
+      </Row>
+      <Row index="1">
+        <F>2</F>
+        <F>1</F>
+        <F>256178434</F>
+        <F>1</F>
+        <F>0</F>
+        <F>1</F>
+        <F>1</F>
+        <F>1. Carbonate</F>
+      </Row>
+      <Row index="2">
+        <F>3</F>
+        <F>2</F>
+        <F>53396957</F>
+        <F>0</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>2. Karst</F>
+      </Row>
+      <Row index="3">
+        <F>4</F>
+        <F>3</F>
+        <F>657439844</F>
+        <F>0</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>3. Non-Carbonate</F>
+      </Row>
+      <Row index="4">
+        <F>5</F>
+        <F>4</F>
+        <F>330742583</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>1</F>
+        <F>4. Metasedimentary</F>
+      </Row>
+      <Row index="5">
+        <F>6</F>
+        <F>5</F>
+        <F>13965400</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>1</F>
+        <F>5. Alkaline Intrusive Volcanic</F>
+      </Row>
+      <Row index="6">
+        <F>7</F>
+        <F>6</F>
+        <F>165862910</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>1</F>
+        <F>6. Silicic</F>
+      </Row>
+      <Row index="7">
+        <F>8</F>
+        <F>7</F>
+        <F>501921411</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>1</F>
+        <F>7. Metaigneous</F>
+      </Row>
+      <Row index="8">
+        <F>9</F>
+        <F>8</F>
+        <F>1498987</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>1</F>
+        <F>8. Ultramafic</F>
+      </Row>
+      <Row index="9">
+        <F>10</F>
+        <F>9</F>
+        <F>109658881</F>
+        <F>0</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>9. Extrusive Volcanic</F>
+      </Row>
+      <Row index="10">
+        <F>11</F>
+        <F>10</F>
+        <F>162115525</F>
+        <F>1</F>
+        <F>1</F>
+        <F>0</F>
+        <F>1</F>
+        <F>10. Colluvium</F>
+      </Row>
+      <Row index="11">
+        <F>12</F>
+        <F>11</F>
+        <F>4974680</F>
+        <F>0</F>
+        <F>1</F>
+        <F>0</F>
+        <F>1</F>
+        <F>11. Hydric - Organic</F>
+      </Row>
+      <Row index="12">
+        <F>13</F>
+        <F>12</F>
+        <F>724950905</F>
+        <F>0</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>12. Aeolian Sediments</F>
+      </Row>
+      <Row index="13">
+        <F>14</F>
+        <F>13</F>
+        <F>1498203</F>
+        <F>0</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>13. Alluvium - Fan Deposit</F>
+      </Row>
+      <Row index="14">
+        <F>15</F>
+        <F>14</F>
+        <F>131392202</F>
+        <F>0</F>
+        <F>1</F>
+        <F>0</F>
+        <F>1</F>
+        <F>14. Alluvium - Fluvial</F>
+      </Row>
+      <Row index="15">
+        <F>16</F>
+        <F>15</F>
+        <F>13596751</F>
+        <F>0</F>
+        <F>1</F>
+        <F>0</F>
+        <F>1</F>
+        <F>15. Alluvium - Beach, Strand, Coastal Dune</F>
+      </Row>
+      <Row index="16">
+        <F>17</F>
+        <F>16</F>
+        <F>36197455</F>
+        <F>0</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>16. Alluvium - Saline</F>
+      </Row>
+      <Row index="17">
+        <F>18</F>
+        <F>17</F>
+        <F>17167192</F>
+        <F>0</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>17. Alluvium - Gypsum</F>
+      </Row>
+      <Row index="18">
+        <F>19</F>
+        <F>18</F>
+        <F>424185090</F>
+        <F>1</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>18. Alluvium - Other</F>
+      </Row>
+      <Row index="19">
+        <F>20</F>
+        <F>19</F>
+        <F>44626823</F>
+        <F>1</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>19. Volcanic - Ash, Tuff, Mudflow</F>
+      </Row>
+      <Row index="20">
+        <F>21</F>
+        <F>20</F>
+        <F>33273085</F>
+        <F>1</F>
+        <F>0</F>
+        <F>0</F>
+        <F>1</F>
+        <F>20. Water</F>
+      </Row>
+    </GDALRasterAttributeTable>
+  </PAMRasterBand>
+</PAMDataset>
