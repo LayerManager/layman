@@ -84,3 +84,20 @@ def test_get_statistics(file_path, exp_result):
     assert len(stats) == len(exp_result), stats
     for band_idx, exp_band_stats in enumerate(exp_result):
         assert stats[band_idx][:len(exp_band_stats)] == exp_band_stats
+
+
+@pytest.mark.parametrize('file_path, exp_result', [
+    ('sample/layman.layer/sample_jp2_rgb.jp2', False),
+    ('sample/layman.layer/sample_tif_rgb.tif', False),
+    ('sample/layman.layer/sample_tif_rgb_nodata.tif', False),
+    ('sample/layman.layer/sample_tif_rgba.tif', False),
+    ('sample/layman.layer/sample_tiff_rgba.tiff', False),
+    ('sample/layman.layer/sample_tif_tfw_rgba.tif', False),
+    ('sample/layman.layer/sample_tif_colortable_nodata.tif', True),
+    ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', True),
+    ('sample/layman.layer/sample_tif_grayscale_nodata.tif', True),
+    ('sample/layman.layer/sample_tif_rg.tif', False),
+])
+def test_is_nodata_out_of_min_max(file_path, exp_result):
+    nodata_values = gdal.get_nodata_values(file_path)
+    assert gdal.is_nodata_out_of_min_max(file_path, nodata_values=nodata_values) == exp_result
