@@ -99,6 +99,22 @@ def get_statistics(filepath):
     return result
 
 
+def is_nodata_out_of_min_max(filepath, *, nodata_values):
+    if any(val is None for val in nodata_values):
+        result = False
+    else:
+        base_name = os.path.splitext(filepath)[0]
+        vrt_file_path = base_name + '.ignore_nodata.vrt'
+        vrt_options = gdal.BuildVRTOptions(hideNodata=True)
+        gdal.BuildVRT(vrt_file_path, [filepath], options=vrt_options)
+        stats = get_statistics(vrt_file_path)
+        result = any(nodata_val < stats[band_idx][0]  # nodata_val < min
+                     or nodata_val > stats[band_idx][1]  # nodata_val > max
+                     for band_idx, nodata_val in enumerate(nodata_values) if nodata_val is not None)
+        os.remove(vrt_file_path)
+    return result
+
+
 def normalize_raster_file_async(workspace, layer, input_path, crs_id):
     color_interp = get_color_interpretations(input_path)
     result_path = get_normalized_raster_layer_main_filepath(workspace, layer)
