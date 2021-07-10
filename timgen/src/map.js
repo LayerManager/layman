@@ -187,7 +187,9 @@ export const json_to_map = ({
 
   const layers = json_to_layers(map_json.layers, gs_public_url, gs_url, headers);
   layers.forEach(layer => {
-    ol_map.addLayer(layer);
+    if(layer) {
+      ol_map.addLayer(layer);
+    }
   });
 
   return ol_map;
