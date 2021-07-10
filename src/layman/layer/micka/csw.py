@@ -117,7 +117,7 @@ def csw_insert(workspace, layername):
 def get_template_path_and_values(workspace, layername, http_method=None):
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
     publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
-        'keys': ['title', 'bounding_box', 'description'],
+        'keys': ['title', 'bounding_box', 'description', 'file', ],
     })
     title = publ_info['title']
     abstract = publ_info.get('description')
@@ -133,13 +133,18 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         title or '',
         abstract or ''
     ]))), None)
-    try:
-        languages = db.get_text_languages(workspace, layername)
-    except LaymanError:
+
+    if publ_info.get('file', dict()).get('file_type') == settings.FILE_TYPE_VECTOR:
+        try:
+            languages = db.get_text_languages(workspace, layername)
+        except LaymanError:
+            languages = []
+        try:
+            scale_denominator = db.guess_scale_denominator(workspace, layername)
+        except LaymanError:
+            scale_denominator = None
+    else:
         languages = []
-    try:
-        scale_denominator = db.guess_scale_denominator(workspace, layername)
-    except LaymanError:
         scale_denominator = None
 
     prop_values = _get_property_values(
