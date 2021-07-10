@@ -10,7 +10,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import \
     DesiredCapabilities
 
-from layman import settings
+from layman import settings, LaymanError
 from layman.authn import is_user_with_name
 from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import util as common_util
@@ -108,6 +108,9 @@ def generate_map_thumbnail(username, mapname, editor):
         current_app.logger.info(f"max attempts reach")
         return
     for entry in entries:
+        if entry.get('level') == 'SEVERE' and entry.get('source') == 'javascript':
+            current_app.logger.error(f"timgen error {entry}")
+            raise LaymanError(51, private_data=entry)
         current_app.logger.info(f"browser entry {entry}")
 
     # chrome.save_screenshot(f'/code/tmp/{username}.{mapname}.png')
