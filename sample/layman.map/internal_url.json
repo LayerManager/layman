@@ -57,6 +57,28 @@
         "LAYERS": "mista",
         "FORMAT": "image\/png"
       }
+    },
+    {
+      "className": "OpenLayers.Layer.Vector",
+      "dimensions": {},
+      "legends": [
+        ""
+      ],
+      "maxResolution": null,
+      "metadata": {},
+      "minResolution": 0,
+      "name": "Hranice",
+      "opacity": 1,
+      "path": "group2",
+      "protocol": {
+        "format": "hs.format.WFS",
+        "url": "http://localhost:8000/geoserver/testuser1_wms/wfs"
+      },
+      "ratio": 1.5,
+      "singleTile": true,
+      "title": "Hranice",
+      "visibility": false,
+      "wmsMaxScale": 0
     }
   ]
 }
