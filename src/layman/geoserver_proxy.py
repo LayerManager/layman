@@ -7,7 +7,7 @@ from lxml import etree as ET
 from flask import Blueprint, g, current_app as app, request, Response
 
 from geoserver.util import reset as gs_reset
-from layman import authn, authz, settings
+from layman import authn, authz, settings, util as layman_util
 from layman.authn import authenticate, is_user_with_name
 from layman.layer import db, LAYER_TYPE, util as layer_util
 from layman.layer.qgis import wms as qgis_wms
@@ -196,7 +196,8 @@ def proxy(subpath):
 
     if response.status_code == 200:
         for workspace, layername in wfs_t_layers:
-            if authz.can_i_edit(LAYER_TYPE, workspace, layername):
+            file_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['file']
+            if authz.can_i_edit(LAYER_TYPE, workspace, layername) and file_info['file_type'] == settings.FILE_TYPE_VECTOR:
                 patch_after_feature_change(workspace, layername)
 
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
