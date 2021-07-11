@@ -114,7 +114,8 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
     if not any(partial_info):
         raise LaymanError(15, {'layername': layername})
 
-    item_keys = get_layer_info_keys()
+    file_type = partial_info['file']['file_type']
+    item_keys = get_layer_info_keys(file_type)
 
     complete_info = {
         'name': layername,

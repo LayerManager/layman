@@ -10,13 +10,14 @@ def get_layer_sources():
     return get_layer_type_def()['internal_sources']
 
 
-def get_layer_info_keys():
-    return get_layer_type_def()['info_keys']
+def get_layer_info_keys(file_type):
+    return get_layer_type_def()['info_keys'][file_type]
 
 
 LAYER_REST_PATH_NAME = "layers"
 
 
+from layman import settings
 from layman.util import url_for
 from ..common import InternalSourceTypeDef
 from .rest_workspace_layers import bp as workspace_layers_bp
@@ -91,7 +92,9 @@ PUBLICATION_TYPES = {
                 'wms_url',
             }
         },
-        'info_keys': ['wms', 'wfs', 'thumbnail', 'file', 'db_table', 'metadata', 'style', ],
+        'info_keys': {settings.FILE_TYPE_VECTOR: ['wms', 'wfs', 'thumbnail', 'file', 'db_table', 'metadata', 'style', ],
+                      settings.FILE_TYPE_RASTER: ['wms', 'thumbnail', 'file', 'metadata', 'style', ],
+                      },
     }
 }
 
