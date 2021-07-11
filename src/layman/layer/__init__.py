@@ -10,6 +10,10 @@ def get_layer_sources():
     return get_layer_type_def()['internal_sources']
 
 
+def get_layer_info_keys():
+    return get_layer_type_def()['info_keys']
+
+
 LAYER_REST_PATH_NAME = "layers"
 
 
@@ -87,6 +91,7 @@ PUBLICATION_TYPES = {
                 'wms_url',
             }
         },
+        'info_keys': ['wms', 'wfs', 'thumbnail', 'file', 'db_table', 'metadata', 'style', ],
     }
 }
 

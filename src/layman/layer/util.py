@@ -9,7 +9,7 @@ from layman.util import call_modules_fn, get_providers_from_source_names, get_in
 from layman import celery as celery_util, common
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common.util import PUBLICATION_NAME_PATTERN, clear_publication_info
-from . import get_layer_sources, LAYER_TYPE, get_layer_type_def
+from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_keys
 
 LAYERNAME_PATTERN = PUBLICATION_NAME_PATTERN
 ATTRNAME_PATTERN = PUBLICATION_NAME_PATTERN
@@ -114,7 +114,7 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
     if not any(partial_info):
         raise LaymanError(15, {'layername': layername})
 
-    item_keys = ['wms', 'wfs', 'thumbnail', 'file', 'db_table', 'metadata', 'style', ]
+    item_keys = get_layer_info_keys()
 
     complete_info = {
         'name': layername,
