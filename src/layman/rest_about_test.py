@@ -1,5 +1,5 @@
-from test import process_client
-from test.util import url_for
+from test_tools import process_client
+from test_tools.util import url_for
 import requests
 import pytest
 

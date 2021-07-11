@@ -2,7 +2,7 @@ import os
 import filecmp
 import difflib
 import sys
-from test.util import url_for
+from test_tools.util import url_for
 import pytest
 
 del sys.modules['layman']

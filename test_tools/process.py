@@ -4,8 +4,8 @@ import os
 import logging
 import time
 
-from test import util
-from test.mock.liferay import run
+from test_tools import util
+from test_tools.mock.liferay import run
 import pytest
 
 from layman import settings, util as layman_util

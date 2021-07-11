@@ -14,7 +14,7 @@ services:
         - ./layman_data_test:/layman_data_test
         - ./sample:/code/sample
         - ./src:/code/src
-        - ./test:/code/test
+        - ./test_tools:/code/test_tools
         - ./tmp:/code/tmp
         - ./test.sh:/code/test.sh
         - ./pytest.ini:/code/pytest.ini

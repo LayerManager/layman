@@ -1,5 +1,5 @@
 import os
-from test import process_client
+from test_tools import process_client
 import pytest
 
 from layman import app
@@ -8,7 +8,7 @@ from . import util
 
 class TestFindMapsContainingLayer:
     workspace = 'test_find_maps_containing_layer_workspace'
-    directory = f'/code/test/data/maps/publication_relation_util_test/'
+    directory = f'/code/test_tools/data/maps/publication_relation_util_test/'
     maps = set()
     layers = [('testuser1', 'mista')]
 

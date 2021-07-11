@@ -1,7 +1,7 @@
 import importlib
 import time
 import sys
-from test import flask_client
+from test_tools import flask_client
 import pytest
 from celery import chain
 from celery.contrib.abortable import AbortableAsyncResult

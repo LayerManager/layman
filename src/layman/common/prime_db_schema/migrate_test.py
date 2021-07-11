@@ -1,5 +1,5 @@
 import logging
-from test import process_client
+from test_tools import process_client
 import pytest
 
 from db.util import run_query, run_statement

@@ -1,7 +1,7 @@
 import json
 import sys
-from test import process_client, util as test_util
-from test.util import url_for
+from test_tools import process_client, util as test_util
+from test_tools.util import url_for
 import requests
 import pytest
 

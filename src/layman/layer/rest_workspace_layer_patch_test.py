@@ -1,4 +1,4 @@
-from test import geoserver_client, process_client as client_util
+from test_tools import geoserver_client, process_client as client_util
 import pytest
 
 from geoserver import util as gs_util
