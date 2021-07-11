@@ -1,6 +1,6 @@
 import os
 from contextlib import nullcontext as does_not_raise
-from test import util as test_util
+from test_tools import util as test_util
 import pytest
 from layman import LaymanError
 from . import gdal

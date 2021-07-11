@@ -8,9 +8,9 @@ from urllib.parse import urljoin
 import difflib
 import logging
 import sys
-from test import flask_client, process_client
-from test.data import wfs as data_wfs
-from test.util import url_for, url_for_external
+from test_tools import flask_client, process_client
+from test_tools.data import wfs as data_wfs
+from test_tools.util import url_for, url_for_external
 import requests
 import pytest
 

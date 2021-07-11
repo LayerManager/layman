@@ -1,7 +1,7 @@
 from multiprocessing import Process
 import time
 import sys
-from test.mock.liferay import run
+from test_tools.mock.liferay import run
 import requests
 import pytest
 

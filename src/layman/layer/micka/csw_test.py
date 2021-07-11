@@ -3,8 +3,8 @@ import os
 import time
 from urllib.parse import urljoin
 import sys
-from test.mock.micka import run
-from test import flask_client
+from test_tools.mock.micka import run
+from test_tools import flask_client
 import requests
 from flask import url_for
 import pytest

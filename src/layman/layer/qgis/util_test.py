@@ -1,5 +1,5 @@
 import os
-from test import process_client, util as test_util
+from test_tools import process_client, util as test_util
 from lxml import etree as ET
 import requests
 from owslib.wms import WebMapService

@@ -1,8 +1,8 @@
 import os
 import sys
 from urllib.parse import urljoin
-from test import process_client, util as test_util, assert_util
-from test.util import url_for
+from test_tools import process_client, util as test_util, assert_util
+from test_tools.util import url_for
 import requests
 import pytest
 
@@ -211,30 +211,30 @@ def assert_raster_layer(workspace, layer, file_names, exp_bbox, normalized_color
 
 @pytest.mark.parametrize('layer_suffix, file_paths, bbox, normalized_color_interp, thumbnail', [
     ('jp2', ['sample/layman.layer/sample_jp2_rgb.jp2', ], (1829708, 6308828.600, 1833166.200, 6310848.600),
-     ['Red', 'Green', 'Blue'], '/code/test/data/thumbnail/raster_layer_jp2.png', ),
+     ['Red', 'Green', 'Blue'], '/code/test_tools/data/thumbnail/raster_layer_jp2.png', ),
     ('tif_rgb', ['sample/layman.layer/sample_tif_rgb.tif', ], (1679391.080, 6562360.440, 1679416.230, 6562381.790),
-     ['Red', 'Green', 'Blue'], '/code/test/data/thumbnail/raster_layer_tif.png', ),
+     ['Red', 'Green', 'Blue'], '/code/test_tools/data/thumbnail/raster_layer_tif.png', ),
     ('tif_rgb_nodata', ['sample/layman.layer/sample_tif_rgb_nodata.tif', ], (1679391.080, 6562360.440, 1679416.230, 6562381.790),
-     ['Red', 'Green', 'Blue', 'Alpha'], '/code/test/data/thumbnail/raster_layer_tif_rgb_nodata.png', ),
+     ['Red', 'Green', 'Blue', 'Alpha'], '/code/test_tools/data/thumbnail/raster_layer_tif_rgb_nodata.png', ),
     ('tif_rgba', ['sample/layman.layer/sample_tif_rgba.tif', ], (1679391.075, 6562360.437, 1679416.269, 6562381.831),
-     ['Red', 'Green', 'Blue', 'Alpha'], '/code/test/data/thumbnail/raster_layer_tif_rgba.png', ),
+     ['Red', 'Green', 'Blue', 'Alpha'], '/code/test_tools/data/thumbnail/raster_layer_tif_rgba.png', ),
     ('tiff', ['sample/layman.layer/sample_tiff_rgba_opaque.tiff', ], (1669480, 6580973, 1675352, 6586999,),
-     ['Red', 'Green', 'Blue'], '/code/test/data/thumbnail/raster_layer_tiff.png', ),
+     ['Red', 'Green', 'Blue'], '/code/test_tools/data/thumbnail/raster_layer_tiff.png', ),
     ('tif_tfw', ['sample/layman.layer/sample_tif_tfw_rgba_opaque.tif',
                  'sample/layman.layer/sample_tif_tfw_rgba_opaque.tfw'],
      (1669480, 6580973, 1675352, 6586999,), ['Red', 'Green', 'Blue'],
-     '/code/test/data/thumbnail/raster_layer_tiff.png', ),
+     '/code/test_tools/data/thumbnail/raster_layer_tiff.png', ),
     ('tif_colortable_nodata_opaque', ['sample/layman.layer/sample_tif_colortable_nodata_opaque.tif'],
      (868376, 522128, 940583, 593255), ['Palette'],
-     '/code/test/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png', ),
+     '/code/test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png', ),
     ('tif_colortable_nodata', ['sample/layman.layer/sample_tif_colortable_nodata.tif'],
      (868376, 522128, 940583, 593255), ['Palette'], None, ),
     ('tif_grayscale_alpha_nodata', ['sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif'],
      (1823049.056, 6310009.44, 1826918.349, 6312703.749), ['Gray', 'Alpha'],
-     '/code/test/data/thumbnail/raster_layer_tif_grayscale_alpha_nodata.png', ),
+     '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_alpha_nodata.png', ),
     ('tif_grayscale_nodata_opaque', ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
      (1823060, 6310012, 1826914, 6312691), ['Gray'],
-     '/code/test/data/thumbnail/raster_layer_tif_grayscale_nodata_opaque.png', ),
+     '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_nodata_opaque.png', ),
 ])
 @pytest.mark.usefixtures('ensure_layman')
 def test_post_raster(layer_suffix, file_paths, bbox, normalized_color_interp, thumbnail):

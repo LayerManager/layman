@@ -2,7 +2,7 @@ from multiprocessing import Process
 import os
 import time
 import sys
-from test.mock.micka import run
+from test_tools.mock.micka import run
 from urllib.parse import urljoin
 import requests
 from flask import url_for
