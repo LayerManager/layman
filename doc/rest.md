@@ -220,7 +220,7 @@ JSON object with following structure:
     - FAILURE: publishing process failed
     - NOT_AVAILABLE: source is not available, e.g. because publishing process failed
   - *error*: If status is FAILURE, this may contain error object.
-- **wfs**
+- *wfs*, available only for vector layers
   - *url*: String. URL of WFS endpoint. It points to WFS endpoint of appropriate GeoServer workspace.
   - *status*: Status information about GeoServer import and availability of WFS feature type. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
@@ -233,7 +233,7 @@ JSON object with following structure:
   - *file_type*: String. Either `vector` or `raster` depends on source file type.
   - *status*: Status information about saving and availability of files. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
-- **db_table**
+- *db_table*, available only for vector layers
   - *name*: String. DB table name within PostgreSQL workspace schema. This table is used as GeoServer source of layer.
   - *status*: Status information about DB import and availability of the table. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.

@@ -9,7 +9,7 @@ import pytest
 del sys.modules['layman']
 
 from geoserver import GS_REST_WORKSPACES
-from layman import app, settings, util as layman_util, LaymanError
+from layman import app, settings, LaymanError
 from layman.layer import util as layer_util
 from layman.layer.filesystem import input_style, input_file, gdal, thumbnail as fs_thumbnail
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX
@@ -181,8 +181,8 @@ class TestQgisCascadeWmsClass:
 
 
 def assert_raster_layer(workspace, layer, file_names, exp_bbox, normalized_color_interp, exp_thumbnail):
+    info = process_client.get_workspace_layer(workspace, layer)
     with app.app_context():
-        info = layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['file', 'bounding_box', 'wms']})
         directory_path = input_file.get_layer_input_file_dir(workspace, layer)
     assert info.get('file', dict()).get('file_type') == 'raster', info
     for file in file_names:
@@ -197,8 +197,10 @@ def assert_raster_layer(workspace, layer, file_names, exp_bbox, normalized_color
     info_bbox = info['bounding_box']
     assert_util.assert_same_bboxes(info_bbox, exp_bbox, 0.01)
 
-    assert 'wms' in info, info
-    assert 'url' in info['wms'], info
+    assert 'wms' in info, f'info={info}'
+    assert 'url' in info['wms'], f'info={info}'
+    assert 'wfs' not in info, f'info={info}'
+    assert 'db_table' not in info, f'info={info}'
 
     if exp_thumbnail:
         with app.app_context():
