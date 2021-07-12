@@ -17,6 +17,7 @@ services:
         - ./test_tools:/code/test_tools
         - ./tmp:/code/tmp
         - ./test.sh:/code/test.sh
+        - ./test_separated.sh:/code/test_separated.sh
         - ./pytest.ini:/code/pytest.ini
         - ./.pylintrc:/code/.pylintrc
         - ./version.txt:/code/version.txt
