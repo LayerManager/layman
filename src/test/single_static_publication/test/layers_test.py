@@ -8,17 +8,34 @@ from ... import single_static_publication as data
 from ..data import ensure_publication
 
 
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
+@pytest.mark.usefixtures('ensure_layman')
+def test_info(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+    wms_url = f"http://localhost:8000/geoserver/{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows"
+    wfs_url = f"http://localhost:8000/geoserver/{workspace}/wfs"
+
+    info = process_client.get_workspace_publication(publ_type, workspace, publication)
+
+    assert info['wms'].get('url') == wms_url, f'r_json={info}, wms_url={wms_url}'
+    assert 'wms' in info, f'info={info}'
+    assert 'url' in info['wms'], f'info={info}'
+
+    if data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type') == 'vector':
+        assert info.get('file', dict()).get('file_type') == 'vector', info
+        assert 'wfs' in info, f'info={info}'
+        assert 'url' in info['wms'], f'info={info}'
+        assert info['wfs'].get('url') == wfs_url, f'r_json={info}, wfs_url={wfs_url}'
+    elif data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type') == 'raster':
+        assert info.get('file', dict()).get('file_type') == 'raster', info
+        assert 'wfs' not in info, f'info={info}'
+        assert 'db_table' not in info, f'info={info}'
+
+
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_VECTOR_LAYERS)
 @pytest.mark.usefixtures('ensure_layman')
 def test_wms_workspace(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
-
-    wms_url = f"http://localhost:8000/geoserver/{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows"
-    wfs_url = f"http://localhost:8000/geoserver/{workspace}/wfs"
-
-    r_json = process_client.get_workspace_layer(workspace, publication)
-    assert r_json['wms'].get('url') == wms_url, f'r_json={r_json}, wms_url={wms_url}'
-    assert r_json['wfs'].get('url') == wfs_url, f'r_json={r_json}, wfs_url={wfs_url}'
 
     with app.app_context():
         internal_wms_url = url_for('geoserver_proxy_bp.proxy', subpath=workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + '/ows')
