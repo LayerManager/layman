@@ -2,22 +2,8 @@ import os
 import pytest
 from layman import app
 from layman.layer.filesystem import gdal, input_file
-from test_tools import process_client
 from ... import single_static_publication as data
 from ..data import ensure_publication
-
-
-@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_RASTER_LAYERS)
-@pytest.mark.usefixtures('ensure_layman')
-def test_info(workspace, publ_type, publication):
-    ensure_publication(workspace, publ_type, publication)
-    info = process_client.get_workspace_publication(publ_type, workspace, publication)
-    assert info.get('file', dict()).get('file_type') == 'raster', info
-
-    assert 'wms' in info, f'info={info}'
-    assert 'url' in info['wms'], f'info={info}'
-    assert 'wfs' not in info, f'info={info}'
-    assert 'db_table' not in info, f'info={info}'
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_RASTER_LAYERS)
