@@ -32,9 +32,9 @@ def test_info(workspace, publ_type, publication):
         assert 'db_table' not in info, f'info={info}'
 
 
-@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_VECTOR_LAYERS)
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
 @pytest.mark.usefixtures('ensure_layman')
-def test_wms_workspace(workspace, publ_type, publication):
+def test_geoserver_workspace(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
     with app.app_context():
@@ -48,9 +48,10 @@ def test_wms_workspace(workspace, publ_type, publication):
     })
     assert r_wms.status_code == 200
 
-    r_wfs = requests.get(internal_wfs_url, params={
-        'service': 'WFS',
-        'request': 'GetCapabilities',
-        'version': '2.0.0',
-    })
-    assert r_wfs.status_code == 200
+    if data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type') == 'vector':
+        r_wfs = requests.get(internal_wfs_url, params={
+            'service': 'WFS',
+            'request': 'GetCapabilities',
+            'version': '2.0.0',
+        })
+        assert r_wfs.status_code == 200
