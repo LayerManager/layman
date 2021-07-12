@@ -13,12 +13,12 @@ def test_bbox(workspace, publ_type, publication):
     with app.app_context():
         info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['bounding_box']})
 
-    exp_bbox = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['bbox']
+    exp_bbox = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('bbox')
+    if exp_bbox:
+        info_bbox = info['bounding_box']
+        assert_util.assert_same_bboxes(info_bbox, exp_bbox, 0.01)
 
-    info_bbox = info['bounding_box']
-    assert_util.assert_same_bboxes(info_bbox, exp_bbox, 0.01)
-
-    file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
-    if file_type == settings.FILE_TYPE_RASTER:
-        bbox = gdal.get_bbox(workspace, publication)
-        assert_util.assert_same_bboxes(bbox, exp_bbox, 0.01)
+        file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
+        if file_type == settings.FILE_TYPE_RASTER:
+            bbox = gdal.get_bbox(workspace, publication)
+            assert_util.assert_same_bboxes(bbox, exp_bbox, 0.01)
