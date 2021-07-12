@@ -3,11 +3,15 @@ from test_tools import process_client
 COMMON_WORKSPACE = 'test_workspace'
 
 LAYER_TYPE = process_client.LAYER_TYPE
+MAP_TYPE = process_client.MAP_TYPE
 DEFINITION = 'definition'
 TEST_DATA = 'test_data'
 
 
 PUBLICATIONS = {
+    ################################################################################
+    #################################### LAYERS ####################################
+    ################################################################################
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_sld'): {
         DEFINITION: [
             {},
@@ -159,6 +163,26 @@ PUBLICATIONS = {
             'normalized_color_interp': ['Gray'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_nodata_opaque.png',
             'file_type': 'raster',
+        },
+    },
+    ################################################################################
+    ##################################### MAPS #####################################
+    ################################################################################
+    (COMMON_WORKSPACE, MAP_TYPE, 'post_common'): {
+        DEFINITION: [
+            {},
+        ],
+        TEST_DATA: {
+            'bbox': (1627490.9553976597, 6547334.172794042, 1716546.5480322787, 6589515.35758913),
+        },
+    },
+    (COMMON_WORKSPACE, MAP_TYPE, 'patch_3355bbox'): {
+        DEFINITION: [
+            {},
+            {'file_paths': ['test_tools/data/bbox/map_3_3-5_5.json', ]},
+        ],
+        TEST_DATA: {
+            'bbox': (3000, 3000, 5000, 5000),
         },
     },
 }
