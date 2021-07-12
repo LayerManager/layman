@@ -171,6 +171,7 @@ PUBLICATIONS = {
              'style_file': 'sample/style/generic-blue_sld.xml'},
         ],
         TEST_DATA: {
+            'thumbnail': 'sample/style/test_sld_style_applied_in_thumbnail_layer.png',
             'file_type': 'vector',
         },
     },
