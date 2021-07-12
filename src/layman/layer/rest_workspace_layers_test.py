@@ -1,7 +1,7 @@
 import os
 import sys
 from urllib.parse import urljoin
-from test_tools import process_client, util as test_util, assert_util
+from test_tools import process_client, util as test_util
 from test_tools.util import url_for
 import requests
 import pytest
@@ -11,7 +11,7 @@ del sys.modules['layman']
 from geoserver import GS_REST_WORKSPACES
 from layman import app, settings, LaymanError
 from layman.layer import util as layer_util
-from layman.layer.filesystem import input_style, input_file, gdal, thumbnail as fs_thumbnail
+from layman.layer.filesystem import input_style
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
@@ -178,81 +178,6 @@ class TestQgisCascadeWmsClass:
             self.assert_wms_layer(workspace, layer, expected_style, expected_thumbnail)
 
         process_client.delete_workspace_layer(workspace, layer)
-
-
-def assert_raster_layer(workspace, layer, file_names, exp_bbox, normalized_color_interp, exp_thumbnail):
-    info = process_client.get_workspace_layer(workspace, layer)
-    with app.app_context():
-        directory_path = input_file.get_layer_input_file_dir(workspace, layer)
-    assert info.get('file', dict()).get('file_type') == 'raster', info
-    for file in file_names:
-        file_path = os.path.join(directory_path, layer + os.path.splitext(file)[1])
-        assert os.path.exists(file_path), file_path
-    norm_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, layer)
-    assert os.path.exists(norm_file_path), norm_file_path
-    assert normalized_color_interp == gdal.get_color_interpretations(norm_file_path)
-
-    bbox = gdal.get_bbox(workspace, layer)
-    assert_util.assert_same_bboxes(bbox, exp_bbox, 0.01)
-    info_bbox = info['bounding_box']
-    assert_util.assert_same_bboxes(info_bbox, exp_bbox, 0.01)
-
-    assert 'wms' in info, f'info={info}'
-    assert 'url' in info['wms'], f'info={info}'
-    assert 'wfs' not in info, f'info={info}'
-    assert 'db_table' not in info, f'info={info}'
-
-    if exp_thumbnail:
-        with app.app_context():
-            thumbnail_path = fs_thumbnail.get_layer_thumbnail_path(workspace, layer)
-        diffs = test_util.compare_images(exp_thumbnail, thumbnail_path)
-        assert diffs < 1000
-
-
-@pytest.mark.parametrize('layer_suffix, file_paths, bbox, normalized_color_interp, thumbnail', [
-    ('jp2', ['sample/layman.layer/sample_jp2_rgb.jp2', ], (1829708, 6308828.600, 1833166.200, 6310848.600),
-     ['Red', 'Green', 'Blue'], '/code/test_tools/data/thumbnail/raster_layer_jp2.png', ),
-    ('tif_rgb', ['sample/layman.layer/sample_tif_rgb.tif', ], (1679391.080, 6562360.440, 1679416.230, 6562381.790),
-     ['Red', 'Green', 'Blue'], '/code/test_tools/data/thumbnail/raster_layer_tif.png', ),
-    ('tif_rgb_nodata', ['sample/layman.layer/sample_tif_rgb_nodata.tif', ], (1679391.080, 6562360.440, 1679416.230, 6562381.790),
-     ['Red', 'Green', 'Blue', 'Alpha'], '/code/test_tools/data/thumbnail/raster_layer_tif_rgb_nodata.png', ),
-    ('tif_rgba', ['sample/layman.layer/sample_tif_rgba.tif', ], (1679391.075, 6562360.437, 1679416.269, 6562381.831),
-     ['Red', 'Green', 'Blue', 'Alpha'], '/code/test_tools/data/thumbnail/raster_layer_tif_rgba.png', ),
-    ('tiff', ['sample/layman.layer/sample_tiff_rgba_opaque.tiff', ], (1669480, 6580973, 1675352, 6586999,),
-     ['Red', 'Green', 'Blue'], '/code/test_tools/data/thumbnail/raster_layer_tiff.png', ),
-    ('tif_tfw', ['sample/layman.layer/sample_tif_tfw_rgba_opaque.tif',
-                 'sample/layman.layer/sample_tif_tfw_rgba_opaque.tfw'],
-     (1669480, 6580973, 1675352, 6586999,), ['Red', 'Green', 'Blue'],
-     '/code/test_tools/data/thumbnail/raster_layer_tiff.png', ),
-    ('tif_colortable_nodata_opaque', ['sample/layman.layer/sample_tif_colortable_nodata_opaque.tif'],
-     (868376, 522128, 940583, 593255), ['Palette'],
-     '/code/test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png', ),
-    ('tif_colortable_nodata', ['sample/layman.layer/sample_tif_colortable_nodata.tif'],
-     (868376, 522128, 940583, 593255), ['Palette'], None, ),
-    ('tif_grayscale_alpha_nodata', ['sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif'],
-     (1823049.056, 6310009.44, 1826918.349, 6312703.749), ['Gray', 'Alpha'],
-     '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_alpha_nodata.png', ),
-    ('tif_grayscale_nodata_opaque', ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
-     (1823060, 6310012, 1826914, 6312691), ['Gray'],
-     '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_nodata_opaque.png', ),
-])
-@pytest.mark.usefixtures('ensure_layman')
-def test_post_raster(layer_suffix, file_paths, bbox, normalized_color_interp, thumbnail):
-    workspace = 'test_post_raster_workspace'
-    layer_prefix = 'test_post_raster'
-    layer = layer_prefix + '_' + layer_suffix
-
-    process_client.publish_workspace_layer(workspace, layer, file_paths=file_paths)
-    assert_raster_layer(workspace, layer, file_paths, bbox, normalized_color_interp, thumbnail)
-    process_client.patch_workspace_layer(workspace, layer, file_paths=['sample/layman.layer/small_layer.geojson'])
-    info = process_client.get_workspace_layer(workspace, layer)
-    assert info['layman_metadata']['publication_status'] == 'COMPLETE', info
-    process_client.delete_workspace_layer(workspace, layer)
-
-    process_client.publish_workspace_layer(workspace, layer)
-    process_client.patch_workspace_layer(workspace, layer, file_paths=file_paths)
-    assert_raster_layer(workspace, layer, file_paths, bbox, normalized_color_interp, thumbnail)
-    process_client.delete_workspace_layer(workspace, layer)
 
 
 @pytest.mark.parametrize('post_params, expected_exc', [
