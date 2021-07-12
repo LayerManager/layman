@@ -1,9 +1,9 @@
-from test_tools.util import url_for
 import requests
 import pytest
 
 from layman import app, settings
 from layman.common.prime_db_schema import ensure_whole_user
+from test_tools.util import url_for
 
 
 @pytest.mark.usefixtures('ensure_layman')

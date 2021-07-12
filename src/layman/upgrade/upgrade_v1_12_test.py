@@ -1,5 +1,4 @@
 import datetime
-from test_tools import process_client, assert_util, data as test_data
 import pytest
 from werkzeug.datastructures import FileStorage
 
@@ -13,6 +12,7 @@ from layman.layer.filesystem import input_file as layer_in_file
 from layman.layer.geoserver import wms
 from layman.layer.prime_db_schema import table as prime_db_schema_table
 from layman.uuid import generate_uuid
+from test_tools import process_client, assert_util, data as test_data
 from . import upgrade_v1_12
 
 db_schema = settings.LAYMAN_PRIME_SCHEMA

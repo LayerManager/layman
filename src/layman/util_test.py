@@ -1,8 +1,8 @@
-from test_tools import process_client
 import importlib
 import pytest
 
 from layman.layer import LAYER_TYPE
+from test_tools import process_client
 from . import app, settings, LaymanError, util
 
 

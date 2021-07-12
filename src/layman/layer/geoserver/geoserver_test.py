@@ -1,9 +1,9 @@
-from test_tools import process_client, assert_util, data as test_data
 import pytest
 
 from layman import app, settings
 from layman.common.prime_db_schema import publications
 from layman.http import LaymanError
+from test_tools import process_client, assert_util, data as test_data
 from . import wfs, wms, tasks
 
 

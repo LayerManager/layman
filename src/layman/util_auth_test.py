@@ -1,8 +1,8 @@
-from test_tools import process_client
 import pytest
 
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
+from test_tools import process_client
 from . import util, app
 
 

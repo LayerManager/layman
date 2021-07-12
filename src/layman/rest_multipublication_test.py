@@ -1,7 +1,7 @@
-from test_tools import process_client, prime_db_schema_client
 import pytest
 
 from layman import LaymanError, settings
+from test_tools import process_client, prime_db_schema_client
 
 
 class TestDeletePublicationsClass:

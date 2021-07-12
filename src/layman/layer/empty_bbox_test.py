@@ -1,9 +1,10 @@
 import os
-from test_tools import process_client
-from test_tools.data import wfs as wfs_data_util
 from owslib.wms import WebMapService
 import pytest
+
 from layman.layer.geoserver import wms as gs_wms
+from test_tools import process_client
+from test_tools.data import wfs as wfs_data_util
 
 
 def get_shp_file_paths(shp_file_path):

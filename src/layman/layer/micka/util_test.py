@@ -2,7 +2,6 @@ import os
 import filecmp
 import difflib
 import sys
-from test_tools.util import url_for
 import pytest
 
 del sys.modules['layman']
@@ -10,6 +9,7 @@ del sys.modules['layman']
 from layman import uuid, app, settings
 from layman.common.micka import util as common_util
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals
+from test_tools.util import url_for
 from .csw import _get_property_values, METADATA_PROPERTIES
 
 

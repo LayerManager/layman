@@ -1,7 +1,5 @@
 import time
 import os
-from test_tools import process_client
-from test_tools.util import url_for
 import requests
 import pytest
 
@@ -11,6 +9,8 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from layman.layer.filesystem import input_chunk
 from layman import settings, app
+from test_tools import process_client
+from test_tools.util import url_for
 
 
 USERNAME = 'testuser1'

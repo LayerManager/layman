@@ -1,6 +1,4 @@
 import sys
-from test_tools import process, process_client
-from test_tools.util import url_for
 import requests
 import pytest
 
@@ -8,6 +6,8 @@ del sys.modules['layman']
 
 from layman import app
 from layman import settings
+from test_tools import process, process_client
+from test_tools.util import url_for
 from .oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
 from .oauth2 import liferay
 

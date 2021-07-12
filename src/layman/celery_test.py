@@ -1,7 +1,6 @@
 import importlib
 import time
 import sys
-from test_tools import flask_client
 import pytest
 from celery import chain
 from celery.contrib.abortable import AbortableAsyncResult
@@ -12,6 +11,7 @@ from layman import app, celery_app
 from layman.layer.filesystem import input_chunk
 from layman import celery as celery_util
 from layman.common import tasks as tasks_util
+from test_tools import flask_client
 
 MIN_GEOJSON = """
 {

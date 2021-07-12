@@ -1,11 +1,12 @@
 import os
-from test_tools import process_client, util as test_util
 from lxml import etree as ET
 import requests
 from owslib.wms import WebMapService
 import pytest
+
 from layman import app, settings, LaymanError
 from layman.common import bbox as bbox_util
+from test_tools import process_client, util as test_util
 from . import util
 from .. import db
 from ..filesystem import thumbnail

@@ -1,9 +1,9 @@
-from test_tools import process_client, util as test_util
-from test_tools.data import map as map_data, wfs as data_wfs
 import pytest
 
 from layman import app
 from layman.map.filesystem import thumbnail
+from test_tools import process_client, util as test_util
+from test_tools.data import map as map_data, wfs as data_wfs
 
 
 def assert_map_thumbnail(workspace, map, expected_thumbnail_path):

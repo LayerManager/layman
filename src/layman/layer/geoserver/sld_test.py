@@ -1,10 +1,10 @@
 from urllib.parse import urljoin
-from test_tools import process_client, assert_util
 import requests
 import pytest
 
 from geoserver import GS_REST, GS_AUTH
 from layman import settings
+from test_tools import process_client, assert_util
 
 
 headers_sld = {

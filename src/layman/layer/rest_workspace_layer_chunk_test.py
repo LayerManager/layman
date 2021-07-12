@@ -1,5 +1,6 @@
-from test_tools import process_client
 import pytest
+
+from test_tools import process_client
 
 
 @pytest.mark.parametrize('file_path', [
