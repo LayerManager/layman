@@ -137,7 +137,7 @@ PUBLICATIONS = {
             'bbox': (868376, 522128, 940583, 593255),
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Palette'],
-            # 'thumbnail': '',
+            'thumbnail': '',
             'file_type': 'raster',
         },
     },
@@ -165,6 +165,15 @@ PUBLICATIONS = {
             'file_type': 'raster',
         },
     },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'): {
+        DEFINITION: [
+            {'file_paths': ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'],
+             'style_file': 'sample/style/generic-blue_sld.xml'},
+        ],
+        TEST_DATA: {
+            'file_type': 'vector',
+        },
+    },
     ################################################################################
     ##################################### MAPS #####################################
     ################################################################################
@@ -174,6 +183,14 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1627490.9553976597, 6547334.172794042, 1716546.5480322787, 6589515.35758913),
+        },
+    },
+    (COMMON_WORKSPACE, MAP_TYPE, 'post_internal_layer'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.map/internal_url_thumbnail.json', ]},
+        ],
+        TEST_DATA: {
+            'thumbnail': 'sample/style/test_sld_style_applied_in_map_thumbnail_map.png',
         },
     },
     (COMMON_WORKSPACE, MAP_TYPE, 'patch_3355bbox'): {
