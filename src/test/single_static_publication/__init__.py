@@ -8,6 +8,25 @@ TEST_DATA = 'test_data'
 
 
 PUBLICATIONS = {
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_sld'): {
+        DEFINITION: [
+            {},
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+        },
+    },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'patch_3355bbox_sld'): {
+        DEFINITION: [
+            {},
+            {'file_paths': ['test_tools/data/bbox/layer_3_3-5_5.geojson', ]},
+        ],
+        TEST_DATA: {
+            'bbox': (3000, 3000, 5000, 5000),
+            'file_type': 'vector',
+        },
+    },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_jp2'): {
         DEFINITION: [
             {'file_paths': ['sample/layman.layer/sample_jp2_rgb.jp2', ]},
