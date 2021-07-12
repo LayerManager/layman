@@ -16,9 +16,9 @@
       "title": "Staty",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://localhost:8000/geoserver/test_sld_style_applied_in_map_thumbnail_workspace_wms/ows",
+      "url": "http://localhost:8000/geoserver/test_workspace_wms/ows",
       "params": {
-        "LAYERS": "test_sld_style_applied_in_map_thumbnail_layer",
+        "LAYERS": "post_blue_style",
         "FORMAT": "image\/png"
       }
     },
