@@ -3,12 +3,11 @@ import subprocess
 import os
 import logging
 import time
-
-from test_tools import util
-from test_tools.mock.liferay import run
 import pytest
 
 from layman import settings, util as layman_util
+from test_tools import util
+from test_tools.mock.liferay import run
 
 
 logger = logging.getLogger(__name__)

@@ -1,13 +1,11 @@
 import datetime
-
-from test_tools import process_client, data as test_data
-
 import pytest
 from dateutil.parser import parse
 
 from db import util as db_util
 from layman import app, settings
 from layman.rest_publication_test import db_schema
+from test_tools import process_client, data as test_data
 
 
 @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)

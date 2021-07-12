@@ -1,8 +1,6 @@
 import os
 import sys
 from urllib.parse import urljoin
-from test_tools import process_client, util as test_util
-from test_tools.util import url_for
 import requests
 import pytest
 
@@ -13,6 +11,8 @@ from layman import app, settings, LaymanError
 from layman.layer import util as layer_util
 from layman.layer.filesystem import input_style
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX
+from test_tools import process_client, util as test_util
+from test_tools.util import url_for
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 

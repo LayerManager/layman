@@ -2,7 +2,6 @@ from multiprocessing import Process
 import os
 import time
 import sys
-from test_tools.mock.micka import run
 from urllib.parse import urljoin
 import requests
 from flask import url_for
@@ -13,6 +12,7 @@ del sys.modules['layman']
 from layman import app, LaymanError
 from layman import settings
 from layman.map.rest_workspace_test import wait_till_ready
+from test_tools.mock.micka import run
 from .csw import get_map_info, delete_map, get_metadata_uuid
 
 MICKA_PORT = 8020

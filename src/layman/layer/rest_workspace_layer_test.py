@@ -1,13 +1,12 @@
 import json
 import sys
-from test_tools import process_client, util as test_util
-from test_tools.util import url_for
 import requests
 import pytest
 
 del sys.modules['layman']
-
 from layman import app, LaymanError
+from test_tools import process_client, util as test_util
+from test_tools.util import url_for
 
 
 @pytest.mark.usefixtures('ensure_layman')

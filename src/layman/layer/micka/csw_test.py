@@ -3,8 +3,6 @@ import os
 import time
 from urllib.parse import urljoin
 import sys
-from test_tools.mock.micka import run
-from test_tools import flask_client
 import requests
 from flask import url_for
 import pytest
@@ -13,6 +11,8 @@ del sys.modules['layman']
 
 from layman import app, LaymanError
 from layman import settings
+from test_tools import flask_client
+from test_tools.mock.micka import run
 from .csw import get_layer_info, delete_layer, get_metadata_uuid
 
 MICKA_PORT = 8020

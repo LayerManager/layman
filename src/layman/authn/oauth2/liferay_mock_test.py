@@ -1,11 +1,11 @@
 from multiprocessing import Process
 import time
 import sys
-from test_tools.mock.liferay import run
 import requests
 import pytest
 
 from layman import settings
+from test_tools.mock.liferay import run
 
 del sys.modules['layman']
 from .util import TOKEN_HEADER, ISS_URL_HEADER

@@ -1,5 +1,6 @@
-from test_tools import process_client
 import pytest
+
+from test_tools import process_client
 
 headers_sld = {
     'Accept': 'application/vnd.ogc.sld+xml',

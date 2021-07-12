@@ -1,11 +1,11 @@
 from multiprocessing import Process
 import time
 import sys
-from test_tools.mock.micka import run
 import requests
 import pytest
 
 from layman import settings
+from test_tools.mock.micka import run
 del sys.modules['layman']
 
 

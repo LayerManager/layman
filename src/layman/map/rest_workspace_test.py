@@ -5,8 +5,6 @@ import os
 import time
 import difflib
 import sys
-from test_tools import flask_client
-from test_tools.util import url_for, url_for_external
 import requests
 import pytest
 
@@ -16,6 +14,8 @@ from layman import app, settings, uuid, celery as celery_util
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from layman.util import SimpleCounter
+from test_tools import flask_client
+from test_tools.util import url_for, url_for_external
 from . import util, MAP_TYPE
 from .micka import csw
 from .filesystem import uuid as map_uuid

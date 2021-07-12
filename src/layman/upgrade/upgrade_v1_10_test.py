@@ -3,8 +3,6 @@ import pathlib
 import shutil
 import os
 from collections import namedtuple
-from test_tools import process_client, util, assert_util
-from test_tools.util import url_for
 import pytest
 from werkzeug.datastructures import FileStorage
 
@@ -23,6 +21,8 @@ from layman.common.db import launder_attribute_name
 from layman.common.micka import util as micka_util
 from layman.common.filesystem import uuid as uuid_common
 from layman.uuid import generate_uuid
+from test_tools import process_client, util, assert_util
+from test_tools.util import url_for
 from . import upgrade_v1_10
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 

@@ -1,9 +1,9 @@
-from test_tools import process_client
 import pytest
 
 from geoserver import util as gs_util
 from layman import settings, app
 from layman.layer import geoserver as gs_provider
+from test_tools import process_client
 from . import upgrade_v1_9
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 

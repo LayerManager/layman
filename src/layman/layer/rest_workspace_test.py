@@ -8,9 +8,6 @@ from urllib.parse import urljoin
 import difflib
 import logging
 import sys
-from test_tools import flask_client, process_client
-from test_tools.data import wfs as data_wfs
-from test_tools.util import url_for, url_for_external
 import requests
 import pytest
 
@@ -28,6 +25,9 @@ from layman import celery as celery_util
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from layman.util import SimpleCounter
+from test_tools import flask_client, process_client
+from test_tools.data import wfs as data_wfs
+from test_tools.util import url_for, url_for_external
 from . import util, LAYER_TYPE
 from .geoserver.util import wms_proxy
 from .micka import csw

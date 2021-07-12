@@ -1,8 +1,8 @@
-from test_tools import process_client
 import pytest
 
 from layman import LaymanError, settings, common
 from layman.common.micka import util as micka_util
+from test_tools import process_client
 
 db_schema = settings.LAYMAN_PRIME_SCHEMA
 

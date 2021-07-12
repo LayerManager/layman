@@ -1,11 +1,11 @@
 import logging
-from test_tools import process_client
 import pytest
 
 from db.util import run_query, run_statement
 from layman import settings, app, util, upgrade
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
+from test_tools import process_client
 from . import model, publications as pub_util, workspaces as workspaces_util
 from .schema_initialization import ensure_schema
 

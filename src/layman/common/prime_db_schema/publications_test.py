@@ -1,10 +1,10 @@
 import uuid
-from test_tools import process_client, prime_db_schema_client
 import pytest
 
 from layman import settings, app as app, LaymanError
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
+from test_tools import process_client, prime_db_schema_client
 from . import publications, workspaces, users
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA

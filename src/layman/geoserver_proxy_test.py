@@ -1,6 +1,3 @@
-from test_tools import process_client, geoserver_client, util as test_util, assert_util
-from test_tools.process_client import get_authz_headers
-from test_tools.data import wfs as data_wfs, SMALL_LAYER_BBOX
 from owslib.feature.schema import get_schema as get_wfs_schema
 import pytest
 
@@ -11,6 +8,9 @@ from layman.layer import db, util as layer_util
 from layman.layer.filesystem import thumbnail
 from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
+from test_tools import process_client, geoserver_client, util as test_util, assert_util
+from test_tools.data import wfs as data_wfs, SMALL_LAYER_BBOX
+from test_tools.process_client import get_authz_headers
 
 
 @pytest.mark.usefixtures('ensure_layman')
