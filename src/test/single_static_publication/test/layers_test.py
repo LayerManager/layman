@@ -4,20 +4,21 @@ import pytest
 from layman import settings, app
 from test_tools import process_client
 from test_tools.util import url_for
+from ... import single_static_publication as data
+from ..data import ensure_publication
 
 
-@pytest.mark.usefixtures('ensure_layman_module')
-def test_wms_workspace():
-    workspace = 'test_wms_workspace_workspace'
-    layername = 'test_wms_workspace_layer'
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_VECTOR_LAYERS)
+@pytest.mark.usefixtures('ensure_layman')
+def test_wms_workspace(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
 
-    wms_url = f"http://localhost:8000/geoserver/test_wms_workspace_workspace{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows"
-    wfs_url = f"http://localhost:8000/geoserver/test_wms_workspace_workspace/wfs"
+    wms_url = f"http://localhost:8000/geoserver/{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows"
+    wfs_url = f"http://localhost:8000/geoserver/{workspace}/wfs"
 
-    process_client.publish_workspace_layer(workspace, layername)
-    r_json = process_client.get_workspace_layer(workspace, layername)
-    assert r_json['wms']['url'] == wms_url
-    assert r_json['wfs']['url'] == wfs_url
+    r_json = process_client.get_workspace_layer(workspace, publication)
+    assert r_json['wms'].get('url') == wms_url, f'r_json={r_json}, wms_url={wms_url}'
+    assert r_json['wfs'].get('url') == wfs_url, f'r_json={r_json}, wfs_url={wfs_url}'
 
     with app.app_context():
         internal_wms_url = url_for('geoserver_proxy_bp.proxy', subpath=workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + '/ows')
@@ -36,5 +37,3 @@ def test_wms_workspace():
         'version': '2.0.0',
     })
     assert r_wfs.status_code == 200
-
-    process_client.delete_workspace_layer(workspace, layername)
