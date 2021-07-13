@@ -31,6 +31,16 @@ PUBLICATIONS = {
             'file_type': 'vector',
         },
     },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_qml'): {
+        DEFINITION: [
+            {'style_file': 'sample/style/small_layer.qml'},
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'qml',
+        },
+    },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_jp2'): {
         DEFINITION: [
             {'file_paths': ['sample/layman.layer/sample_jp2_rgb.jp2', ]},
@@ -212,3 +222,5 @@ LIST_RASTER_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_t
                       if publ_type == LAYER_TYPE and values[TEST_DATA].get('file_type') == 'raster']
 LIST_VECTOR_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
                       if publ_type == LAYER_TYPE and values[TEST_DATA].get('file_type') == 'vector']
+LIST_QML_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
+                   if publ_type == LAYER_TYPE and values[TEST_DATA].get('style_type') == 'qml']
