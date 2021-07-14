@@ -287,5 +287,7 @@ LIST_RASTER_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_t
                       if publ_type == LAYER_TYPE and values[TEST_DATA].get('file_type') == 'raster']
 LIST_VECTOR_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
                       if publ_type == LAYER_TYPE and values[TEST_DATA].get('file_type') == 'vector']
+LIST_SLD_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
+                   if publ_type == LAYER_TYPE and values[TEST_DATA].get('style_type') == 'sld']
 LIST_QML_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
                    if publ_type == LAYER_TYPE and values[TEST_DATA].get('style_type') == 'qml']
