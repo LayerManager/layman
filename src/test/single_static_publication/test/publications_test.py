@@ -83,3 +83,22 @@ def test_get_publication_infos(context,
         infos = layman_util.get_publication_infos(data.OWNER, process_client.LAYER_TYPE, context)
     publ_set = set(publication_name for (workspace, publication_type, publication_name) in infos.keys())
     assert expected_publications.issubset(publ_set), publ_set
+
+
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman',)
+def test_get_publication_info_items(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+    with app.app_context():
+        all_items = layman_util.get_publication_types()[publ_type]['internal_sources'].values()
+        for source_def in all_items:
+            for key in source_def.info_items:
+                context = {'keys': [key]}
+                info = layman_util.get_publication_info(workspace, publ_type, publication, context)
+                assert key in info or not info, info
+
+                all_sibling_keys = set(sibling_key for item_list in all_items for sibling_key in item_list.info_items
+                                       if key in item_list.info_items)
+                internal_keys = [key[1:] for key in info if key.startswith('_')]
+                assert set(internal_keys) <= all_sibling_keys,\
+                    f'internal_keys={set(internal_keys)}, all_sibling_keys={all_sibling_keys}, key={key}, info={info}'

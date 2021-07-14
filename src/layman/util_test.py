@@ -1,8 +1,6 @@
 import importlib
 import pytest
 
-from layman.layer import LAYER_TYPE
-from test_tools import process_client
 from . import app, settings, LaymanError, util
 
 
@@ -106,26 +104,6 @@ def test_publication_interface_methods():
             methods = interface['methods']
             for module in modules:
                 assert_module_methods(module, methods)
-
-
-@pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
-@pytest.mark.usefixtures('ensure_layman')
-def test_get_publication_info_items(publication_type):
-    workspace = 'test_get_publication_info_items_workspace'
-    publication = 'test_get_publication_info_items_publication'
-
-    process_client.publish_workspace_publication(publication_type, workspace, publication)
-
-    with app.app_context():
-        for _, source_def in util.get_publication_types()[publication_type]['internal_sources'].items():
-            for key in source_def.info_items:
-                context = {'keys': [key]}
-                info = util.get_publication_info(workspace, publication_type, publication, context)
-                assert key in info, info
-                internal_keys = [key[1:] for key in info if key.startswith('_')]
-                assert set(internal_keys) <= set(source_def.info_items)
-
-    process_client.delete_workspace_publication(publication_type, workspace, publication)
 
 
 @pytest.mark.parametrize('endpoint, internal, params, expected_url', [
