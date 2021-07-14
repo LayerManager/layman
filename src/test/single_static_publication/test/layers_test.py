@@ -4,7 +4,7 @@ import requests
 from lxml import etree as ET
 import pytest
 
-from geoserver import GS_REST_WORKSPACES
+from geoserver import GS_REST_WORKSPACES, GS_REST, GS_AUTH
 from layman import settings, app
 from layman.layer import util as layer_util
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX
@@ -12,6 +12,12 @@ from test_tools import process_client
 from test_tools.util import url_for
 from ... import single_static_publication as data
 from ..data import ensure_publication
+
+
+headers_sld = {
+    'Accept': 'application/vnd.ogc.sld+xml',
+    'Content-type': 'application/xml',
+}
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
@@ -118,6 +124,15 @@ def test_wms_layer(workspace, publ_type, publication):
     if style == 'qml':
         wms_stores = [stores['name'] for stores in response.json()['wmsStores']['wmsStore']]
         assert f'{DEFAULT_WMS_QGIS_STORE_PREFIX}_{publication}' in wms_stores, response.json()
+    elif style == 'sld':
+        url = urljoin(GS_REST, f'workspaces/{workspace}_wms/styles/{publication}')
+
+        response = requests.get(url,
+                                auth=GS_AUTH,
+                                headers=headers_sld,
+                                timeout=5,
+                                )
+        response.raise_for_status()
 
     response = requests.get(wms_layers_url,
                             auth=settings.LAYMAN_GS_AUTH,
