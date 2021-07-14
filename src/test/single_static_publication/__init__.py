@@ -22,6 +22,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
             'file_type': 'vector',
+            'style_type': 'sld',
         },
     },
     (OWNER, LAYER_TYPE, 'post_private_sld'): {
@@ -44,6 +45,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'bbox': (3000, 3000, 5000, 5000),
             'file_type': 'vector',
+            'style_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_qml'): {
@@ -66,6 +68,7 @@ PUBLICATIONS = {
             'normalized_color_interp': ['Red', 'Green', 'Blue'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_jp2.png',
             'file_type': 'raster',
+            'style_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_jp2'): {
@@ -79,6 +82,7 @@ PUBLICATIONS = {
             'normalized_color_interp': ['Red', 'Green', 'Blue'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_jp2.png',
             'file_type': 'raster',
+            'style_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_rgb'): {
@@ -91,6 +95,7 @@ PUBLICATIONS = {
             'normalized_color_interp': ['Red', 'Green', 'Blue'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif.png',
             'file_type': 'raster',
+            'style_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_rgb_nodata'): {
@@ -103,6 +108,7 @@ PUBLICATIONS = {
             'normalized_color_interp': ['Red', 'Green', 'Blue', 'Alpha'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_rgb_nodata.png',
             'file_type': 'raster',
+            'style_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_rgba'): {
@@ -115,6 +121,7 @@ PUBLICATIONS = {
             'normalized_color_interp': ['Red', 'Green', 'Blue', 'Alpha'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_rgba.png',
             'file_type': 'raster',
+            'style_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tiff'): {
@@ -127,6 +134,7 @@ PUBLICATIONS = {
             'normalized_color_interp': ['Red', 'Green', 'Blue'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tiff.png',
             'file_type': 'raster',
+            'style_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_tfw'): {
@@ -140,6 +148,7 @@ PUBLICATIONS = {
             'normalized_color_interp': ['Red', 'Green', 'Blue'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tiff.png',
             'file_type': 'raster',
+            'style_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_colortable_nodata_opaque'): {
@@ -152,6 +161,7 @@ PUBLICATIONS = {
             'normalized_color_interp': ['Palette'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
             'file_type': 'raster',
+            'style_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_colortable_nodata'): {
@@ -164,6 +174,7 @@ PUBLICATIONS = {
             'normalized_color_interp': ['Palette'],
             'thumbnail': '',
             'file_type': 'raster',
+            'style_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_grayscale_alpha_nodata'): {
@@ -176,6 +187,7 @@ PUBLICATIONS = {
             'normalized_color_interp': ['Gray', 'Alpha'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_alpha_nodata.png',
             'file_type': 'raster',
+            'style_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_grayscale_nodata_opaque'): {
@@ -188,6 +200,7 @@ PUBLICATIONS = {
             'normalized_color_interp': ['Gray'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_nodata_opaque.png',
             'file_type': 'raster',
+            'style_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'): {
@@ -198,6 +211,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'thumbnail': 'sample/style/test_sld_style_applied_in_thumbnail_layer.png',
             'file_type': 'vector',
+            'style_type': 'sld',
         },
     },
     ################################################################################
