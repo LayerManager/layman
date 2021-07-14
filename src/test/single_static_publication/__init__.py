@@ -233,6 +233,16 @@ PUBLICATIONS = {
             'thumbnail': 'sample/style/test_sld_style_applied_in_map_thumbnail_map.png',
         },
     },
+    (OWNER, MAP_TYPE, 'post_private_sld'): {
+        DEFINITION: [
+            {'headers': owner_headers},
+        ],
+        TEST_DATA: {
+            'bbox': (1627490.9553976597, 6547334.172794042, 1716546.5480322787, 6589515.35758913),
+            'private': True,
+            'headers': owner_headers,
+        },
+    },
     (COMMON_WORKSPACE, MAP_TYPE, 'patch_3355bbox'): {
         DEFINITION: [
             {},

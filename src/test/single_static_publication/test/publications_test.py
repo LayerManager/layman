@@ -39,3 +39,30 @@ def test_thumbnail(workspace, publ_type, publication):
             thumbnail_path = thumbnail_path_method[publ_type](workspace, publication)
         diffs = test_util.compare_images(exp_thumbnail, thumbnail_path)
         assert diffs < 1000
+
+
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+def test_user_workspace(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+    is_private = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('private')
+
+    all_sources = []
+    for type_def in layman_util.get_publication_types(use_cache=False).values():
+        all_sources += type_def['internal_sources']
+    providers = layman_util.get_providers_from_source_names(all_sources)
+    for provider in providers:
+        with app.app_context():
+            usernames = provider.get_usernames()
+        if not is_private:
+            assert workspace not in usernames, (publ_type, provider)
+
+    with app.app_context():
+        usernames = layman_util.get_usernames(use_cache=False)
+        workspaces = layman_util.get_workspaces(use_cache=False)
+
+    if is_private:
+        assert workspace in usernames
+    else:
+        assert workspace not in usernames
+    assert workspace in workspaces
