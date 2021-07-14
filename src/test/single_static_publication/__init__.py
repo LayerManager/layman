@@ -298,6 +298,33 @@ PUBLICATIONS = {
             'style_file': 'sld',
         },
     },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_chunks_geojson_sld'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.layer/small_layer.geojson'],
+             'with_chunks': True,
+             },
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+        },
+    },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_chunks_tif_sld'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.layer/sample_tif_rgb.tif'],
+             'with_chunks': True,
+             },
+        ],
+        TEST_DATA: {
+            'bbox': (1679391.080, 6562360.440, 1679416.230, 6562381.790),
+            'file_extensions': ['.tif'],
+            'normalized_color_interp': ['Red', 'Green', 'Blue'],
+            'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif.png',
+            'file_type': 'raster',
+            'style_type': 'sld',
+        },
+    },
     ################################################################################
     #                                     MAPS
     ################################################################################
