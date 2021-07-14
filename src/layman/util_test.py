@@ -108,46 +108,6 @@ def test_publication_interface_methods():
                 assert_module_methods(module, methods)
 
 
-class TestGetPublicationInfosClass:
-    layer_both = 'test_get_publication_infos_layer_both'
-    layer_read = 'test_get_publication_infos_layer_read'
-    layer_none = 'test_get_publication_infos_layer_none'
-    owner = 'test_get_publication_infos_user_owner'
-    actor = 'test_get_publication_infos_user_actor'
-    authz_headers_owner = process_client.get_authz_headers(owner)
-    authz_headers_actor = process_client.get_authz_headers(actor)
-
-    @pytest.fixture(scope="class")
-    def provide_publications(self):
-        username = self.owner
-        authz_headers = self.authz_headers_owner
-        layer_both = self.layer_both
-        layer_read = self.layer_read
-        layer_none = self.layer_none
-        process_client.ensure_reserved_username(username, headers=authz_headers)
-        process_client.publish_workspace_layer(username, layer_both, headers=authz_headers, access_rights={'read': 'EVERYONE', 'write': 'EVERYONE'})
-        process_client.publish_workspace_layer(username, layer_read, headers=authz_headers, access_rights={'read': 'EVERYONE', 'write': username})
-        process_client.publish_workspace_layer(username, layer_none, headers=authz_headers, access_rights={'read': username, 'write': username})
-        yield
-        process_client.delete_workspace_layer(username, layer_both, headers=authz_headers)
-        process_client.delete_workspace_layer(username, layer_read, headers=authz_headers)
-        process_client.delete_workspace_layer(username, layer_none, headers=authz_headers)
-
-    @pytest.mark.parametrize('publ_type, context, expected_publications', [
-        (LAYER_TYPE, {'actor_name': actor, 'access_type': 'read'}, {layer_both, layer_read},),
-        (LAYER_TYPE, {'actor_name': actor, 'access_type': 'write'}, {layer_both},),
-    ], )
-    @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_publications')
-    def test_get_publication_infos(self,
-                                   publ_type,
-                                   context,
-                                   expected_publications):
-        with app.app_context():
-            infos = util.get_publication_infos(self.owner, publ_type, context)
-        publ_set = set(publication_name for (workspace, publication_type, publication_name) in infos.keys())
-        assert publ_set == expected_publications, publ_set
-
-
 @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
 @pytest.mark.usefixtures('ensure_layman')
 def test_get_publication_info_items(publication_type):

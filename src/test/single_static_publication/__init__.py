@@ -37,6 +37,32 @@ PUBLICATIONS = {
             'headers': owner_headers,
         },
     },
+    (OWNER, LAYER_TYPE, 'post_private_write_sld'): {
+        DEFINITION: [
+            {'headers': owner_headers,
+             'access_rights': {'read': 'EVERYONE', 'write': OWNER},
+             },
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+            'private': True,
+        },
+    },
+    (OWNER, LAYER_TYPE, 'post_public_sld'): {
+        DEFINITION: [
+            {'headers': owner_headers,
+             'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'},
+             },
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+            'private': True,
+        },
+    },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_3355bbox_sld'): {
         DEFINITION: [
             {},
