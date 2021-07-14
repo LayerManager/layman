@@ -7,6 +7,9 @@ MAP_TYPE = process_client.MAP_TYPE
 DEFINITION = 'definition'
 TEST_DATA = 'test_data'
 
+OWNER = 'test_owner'
+owner_headers = process_client.get_authz_headers(OWNER)
+
 
 PUBLICATIONS = {
     ################################################################################
@@ -19,6 +22,18 @@ PUBLICATIONS = {
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
             'file_type': 'vector',
+        },
+    },
+    (OWNER, LAYER_TYPE, 'post_private_sld'): {
+        DEFINITION: [
+            {'headers': owner_headers},
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+            'private': True,
+            'headers': owner_headers,
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_3355bbox_sld'): {

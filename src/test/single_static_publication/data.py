@@ -16,4 +16,7 @@ def ensure_publication(workspace, publ_type, publication):
         for idx, params in enumerate(data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION]):
 
             write_method = process_client.patch_workspace_publication if idx > 0 else process_client.publish_workspace_publication
+            headers = params.get('headers')
+            if headers:
+                process_client.ensure_reserved_username(workspace, headers=params['headers'])
             write_method(publ_type, workspace, publication, **params)
