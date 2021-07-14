@@ -118,6 +118,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'thumbnail': 'sample/style/test_sld_style_applied_in_thumbnail_layer.png',
+            'wms_expected': 'sample/style/countries_wms_blue.png',
             'file_type': 'vector',
             'style_type': 'sld',
             'style_file': 'sld',
@@ -133,6 +134,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'thumbnail': 'sample/style/test_sld_style_applied_in_thumbnail_layer.png',
+            'wms_expected': 'sample/style/countries_wms_blue.png',
             'file_type': 'vector',
             'style_type': 'sld',
             'style_file': 'sld',
@@ -290,6 +292,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'thumbnail': 'sample/style/test_sld_style_applied_in_thumbnail_layer.png',
+            'wms_expected': 'sample/style/countries_wms_blue.png',
             'file_type': 'vector',
             'style_type': 'sld',
             'style_file': 'sld',
