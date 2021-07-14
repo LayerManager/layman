@@ -8,7 +8,7 @@ from geoserver import GS_REST_WORKSPACES, GS_REST, GS_AUTH
 from layman import settings, app
 from layman.layer import util as layer_util
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX
-from test_tools import process_client
+from test_tools import process_client, assert_util
 from test_tools.util import url_for
 from ... import single_static_publication as data
 from ..data import ensure_publication
@@ -142,3 +142,10 @@ def test_wms_layer(workspace, publ_type, publication):
     if style == 'qml':
         wms_layers = [stores['name'] for stores in response.json()['wmsLayers']['wmsLayer']]
         assert publication in wms_layers, response.json()
+
+    wms_expected = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('wms_expected')
+    if wms_expected:
+        url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&STYLES=&LAYERS={workspace}:{publication}&SRS=EPSG:3857&WIDTH=768&HEIGHT=752&BBOX=-30022616.05686392,-30569903.32873383,30022616.05686392,28224386.44929134"
+        obtained_file = f'tmp/artifacts/test_sld_style_applied_in_wms_{publication}.png'
+
+        assert_util.assert_same_images(url, obtained_file, wms_expected, 2000)
