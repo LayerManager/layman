@@ -72,6 +72,7 @@ PUBLICATIONS = {
             'bbox': (3000, 3000, 5000, 5000),
             'file_type': 'vector',
             'style_type': 'sld',
+            'style_file': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_qml'): {
@@ -82,6 +83,59 @@ PUBLICATIONS = {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
             'file_type': 'vector',
             'style_type': 'qml',
+            'style_file': 'qml',
+        },
+    },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_countries_qml'): {
+        DEFINITION: [
+            {'file_paths': ['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson'],
+             'style_file': 'sample/style/ne_10m_admin_0_countries.qml'},
+        ],
+        TEST_DATA: {
+            'thumbnail': 'sample/style/test_qgis_style_applied_in_thumbnail_layer.png',
+            'file_type': 'vector',
+            'style_type': 'qml',
+            'style_file': 'qml',
+        },
+    },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'patch_style_countries_qml'): {
+        DEFINITION: [
+            {'file_paths': ['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson']},
+            {'style_file': 'sample/style/ne_10m_admin_0_countries.qml'},
+            {'title': 'Title defined'}
+        ],
+        TEST_DATA: {
+            'thumbnail': 'sample/style/test_qgis_style_applied_in_thumbnail_layer.png',
+            'file_type': 'vector',
+            'style_type': 'qml',
+            'style_file': 'qml',
+        },
+    },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_countries_sld'): {
+        DEFINITION: [
+            {'file_paths': ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'],
+             'style_file': 'sample/style/generic-blue_sld.xml'},
+        ],
+        TEST_DATA: {
+            'thumbnail': 'sample/style/test_sld_style_applied_in_thumbnail_layer.png',
+            'file_type': 'vector',
+            'style_type': 'sld',
+            'style_file': 'sld',
+        },
+    },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'patch_style_countries_sld'): {
+        DEFINITION: [
+            {'file_paths': ['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson']},
+            {'style_file': 'sample/style/ne_10m_admin_0_countries.qml'},
+            {'title': 'Title defined'},
+            {'file_paths': ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']},
+            {'style_file': 'sample/style/generic-blue_sld.xml'},
+        ],
+        TEST_DATA: {
+            'thumbnail': 'sample/style/test_sld_style_applied_in_thumbnail_layer.png',
+            'file_type': 'vector',
+            'style_type': 'sld',
+            'style_file': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_jp2'): {
@@ -238,6 +292,7 @@ PUBLICATIONS = {
             'thumbnail': 'sample/style/test_sld_style_applied_in_thumbnail_layer.png',
             'file_type': 'vector',
             'style_type': 'sld',
+            'style_file': 'sld',
         },
     },
     ################################################################################
