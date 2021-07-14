@@ -1,16 +1,12 @@
-import os
 import sys
-from urllib.parse import urljoin
 import requests
 import pytest
 
 del sys.modules['layman']
 
-from geoserver import GS_REST_WORKSPACES
 from layman import app, settings, LaymanError
 from layman.layer import util as layer_util
 from layman.layer.filesystem import input_style
-from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX
 from test_tools import process_client, util as test_util
 from test_tools.util import url_for
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -95,89 +91,6 @@ def test_style_correctly_saved(source_style_file_path,
     assert info['style_type'] == expected_style_type
 
     process_client.delete_workspace_layer(workspace, layer)
-
-
-class TestQgisCascadeWmsClass:
-    workspace = 'test_qgis_cascade_wms_workspace'
-    layer = 'test_qgis_cascade_wms_layer'
-    qgis_layer_files = ['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson']
-    qml_style_file = 'sample/style/ne_10m_admin_0_countries.qml'
-    sld_layer_files = ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']
-    sld_style_file = 'sample/style/generic-blue_sld.xml'
-    expected_qgis_thumbnail = 'sample/style/test_qgis_style_applied_in_thumbnail_layer.png'
-    expected_sld_thumbnail = 'sample/style/test_sld_style_applied_in_thumbnail_layer.png'
-
-    @staticmethod
-    def assert_wms_layer(workspace, layer, style, expected_thumbnail_path=None):
-        expected_style_file = f'/layman_data_test/workspaces/{workspace}/layers/{layer}/input_style/{layer}'
-        expected_qgis_file = f'/qgis/data/test/workspaces/{workspace}/layers/{layer}/{layer}.qgis'
-        thumbnail_path = f'/layman_data_test/workspaces/{workspace}/layers/{layer}/thumbnail/{layer}.png'
-        wms_stores_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmsstores/')
-        wms_layers_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmslayers/')
-
-        with app.app_context():
-            info = layer_util.get_layer_info(workspace, layer, context={'keys': ['style_type', 'style'], })
-        assert (info['style_type'] == 'qml') == (style == 'qml'), info.get('style_type', None)
-
-        assert (os.path.exists(expected_style_file + '.qml')) == (style == 'qml')
-        assert (os.path.exists(expected_style_file + '.sld')) == (style == 'sld')
-        assert (os.path.exists(expected_qgis_file)) == (style == 'qml')
-        assert info['style']['type'] == style if style else 'sld', info.get('style')
-        assert info['style']['url'], info.get('style')
-
-        response = requests.get(wms_stores_url,
-                                auth=settings.LAYMAN_GS_AUTH,
-                                timeout=5,
-                                )
-        assert response.status_code == 200, response.json()
-        if style == 'qml':
-            assert response.json()['wmsStores']['wmsStore'][0]['name'] == f'{DEFAULT_WMS_QGIS_STORE_PREFIX}_{layer}', response.json()
-
-        response = requests.get(wms_layers_url,
-                                auth=settings.LAYMAN_GS_AUTH,
-                                timeout=5,
-                                )
-        assert response.status_code == 200, response.json()
-        if style == 'qgis':
-            assert response.json()['wmsLayers']['wmsLayer'][0]['name'] == layer, response.json()
-
-        if expected_thumbnail_path:
-            diffs = test_util.compare_images(thumbnail_path, expected_thumbnail_path)
-            assert diffs < 100
-
-    @pytest.mark.timeout(60)
-    @pytest.mark.usefixtures('ensure_layman')
-    @pytest.mark.parametrize('operations', [
-        [
-            ({'file_paths': qgis_layer_files, 'style_file': qml_style_file, }, 'qml', expected_qgis_thumbnail),
-        ],
-        [
-            ({'file_paths': qgis_layer_files, }, None, None),
-            ({'style_file': qml_style_file, }, 'qml', expected_qgis_thumbnail),
-            ({'title': 'Title defined', }, 'qml', expected_qgis_thumbnail),
-            ({'file_paths': sld_layer_files, }, 'qml', None),
-            ({'style_file': sld_style_file, }, 'sld', expected_sld_thumbnail),
-            ({'file_paths': qgis_layer_files, }, 'sld', None),
-            ({'style_file': qml_style_file, }, 'qml', expected_qgis_thumbnail),
-        ],
-    ])
-    def test_qgis_cascade_wms(self,
-                              operations):
-        workspace = self.workspace
-        layer = self.layer
-
-        for i, (params, expected_style, expected_thumbnail) in enumerate(operations):
-            if i == 0:
-                process_client.publish_workspace_layer(workspace,
-                                                       layer,
-                                                       **params)
-            else:
-                process_client.patch_workspace_layer(workspace,
-                                                     layer,
-                                                     **params)
-            self.assert_wms_layer(workspace, layer, expected_style, expected_thumbnail)
-
-        process_client.delete_workspace_layer(workspace, layer)
 
 
 @pytest.mark.parametrize('post_params, expected_exc', [

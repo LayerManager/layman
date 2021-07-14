@@ -1,8 +1,13 @@
+import os
+from urllib.parse import urljoin
 import requests
 from lxml import etree as ET
 import pytest
 
+from geoserver import GS_REST_WORKSPACES
 from layman import settings, app
+from layman.layer import util as layer_util
+from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX
 from test_tools import process_client
 from test_tools.util import url_for
 from ... import single_static_publication as data
@@ -80,3 +85,45 @@ def test_get_layer_style(workspace, publ_type, publication):
         assert ET.QName(xml_tree) == "qgis", response.text
         assert len(xml_tree.xpath('/qgis/renderer-v2')) == 1, response.text
         assert xml_tree.attrib, response.text
+
+
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+def test_wms_layer(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+
+    style = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['style_type']
+    style_file = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('style_file')
+    expected_style_file = f'/layman_data_test/workspaces/{workspace}/layers/{publication}/input_style/{publication}'
+    expected_qgis_file = f'/qgis/data/test/workspaces/{workspace}/layers/{publication}/{publication}.qgis'
+    wms_stores_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmsstores/')
+    wms_layers_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmslayers/')
+
+    with app.app_context():
+        info = layer_util.get_layer_info(workspace, publication, context={'keys': ['style_type', 'style'], })
+    assert (info['style_type'] == 'qml') == (style == 'qml'), info.get('style_type', None)
+
+    if style_file:
+        assert (os.path.exists(expected_style_file + '.qml')) == (style_file == 'qml')
+        assert (os.path.exists(expected_style_file + '.sld')) == (style_file == 'sld')
+    assert (os.path.exists(expected_qgis_file)) == (style == 'qml')
+    assert info['style']['type'] == style if style else 'sld', info.get('style')
+    assert info['style']['url'], info.get('style')
+
+    response = requests.get(wms_stores_url,
+                            auth=settings.LAYMAN_GS_AUTH,
+                            timeout=5,
+                            )
+    assert response.status_code == 200, response.json()
+    if style == 'qml':
+        wms_stores = [stores['name'] for stores in response.json()['wmsStores']['wmsStore']]
+        assert f'{DEFAULT_WMS_QGIS_STORE_PREFIX}_{publication}' in wms_stores, response.json()
+
+    response = requests.get(wms_layers_url,
+                            auth=settings.LAYMAN_GS_AUTH,
+                            timeout=5,
+                            )
+    assert response.status_code == 200, response.json()
+    if style == 'qml':
+        wms_layers = [stores['name'] for stores in response.json()['wmsLayers']['wmsLayer']]
+        assert publication in wms_layers, response.json()
