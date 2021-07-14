@@ -1,4 +1,5 @@
 import requests
+from lxml import etree as ET
 import pytest
 
 from layman import settings, app
@@ -56,3 +57,18 @@ def test_geoserver_workspace(workspace, publ_type, publication):
             'version': '2.0.0',
         })
         assert r_wfs.status_code == 200
+
+
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_SLD_LAYERS)
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+def test_get_layer_style_sld(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+
+    with app.app_context():
+        headers = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('headers')
+        rest_url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=publication)
+    response = requests.get(rest_url, headers=headers)
+    assert response.status_code == 200, response.text
+    # lxml does not support importing from utf8 string
+    xml_tree = ET.fromstring(bytes(response.text, encoding='utf8'))
+    assert ET.QName(xml_tree) == "{http://www.opengis.net/sld}StyledLayerDescriptor", response.text
