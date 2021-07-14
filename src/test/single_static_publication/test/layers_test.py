@@ -9,13 +9,14 @@ from ..data import ensure_publication
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
-@pytest.mark.usefixtures('ensure_layman')
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     wms_url = f"http://localhost:8000/geoserver/{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows"
     wfs_url = f"http://localhost:8000/geoserver/{workspace}/wfs"
 
-    info = process_client.get_workspace_publication(publ_type, workspace, publication)
+    headers = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('headers')
+    info = process_client.get_workspace_publication(publ_type, workspace, publication, headers=headers)
 
     assert info['wms'].get('url') == wms_url, f'r_json={info}, wms_url={wms_url}'
     assert 'wms' in info, f'info={info}'
@@ -33,7 +34,7 @@ def test_info(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
-@pytest.mark.usefixtures('ensure_layman')
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_geoserver_workspace(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 

@@ -8,7 +8,7 @@ from ..data import ensure_publication
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
-@pytest.mark.usefixtures('ensure_layman')
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_bbox(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     with app.app_context():
@@ -26,7 +26,7 @@ def test_bbox(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
-@pytest.mark.usefixtures('ensure_layman')
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_thumbnail(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
