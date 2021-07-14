@@ -72,3 +72,21 @@ def test_get_layer_style_sld(workspace, publ_type, publication):
     # lxml does not support importing from utf8 string
     xml_tree = ET.fromstring(bytes(response.text, encoding='utf8'))
     assert ET.QName(xml_tree) == "{http://www.opengis.net/sld}StyledLayerDescriptor", response.text
+
+
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_QML_LAYERS)
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+def test_get_layer_style_qml(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+
+    with app.app_context():
+        headers = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('headers')
+        rest_url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=publication)
+    response = requests.get(rest_url, headers=headers)
+    assert response.status_code == 200, response.text
+    # lxml does not support importing from utf8 string
+    xml_el = ET.fromstring(bytes(response.text, encoding='utf8'))
+    assert ET.QName(xml_el), response.text
+    assert ET.QName(xml_el) == "qgis", response.text
+    assert len(xml_el.xpath('/qgis/renderer-v2')) == 1, response.text
+    assert xml_el.attrib, response.text
