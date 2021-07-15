@@ -124,7 +124,7 @@ PUBLICATIONS = {
             'style_file': 'sld',
         },
     },
-    (COMMON_WORKSPACE, LAYER_TYPE, 'patch_style_countries_sld'): {
+    (COMMON_WORKSPACE, LAYER_TYPE, 'patch_style_110countries_sld'): {
         DEFINITION: [
             {'file_paths': ['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson']},
             {'style_file': 'sample/style/ne_10m_admin_0_countries.qml'},
@@ -138,6 +138,15 @@ PUBLICATIONS = {
             'file_type': 'vector',
             'style_type': 'sld',
             'style_file': 'sld',
+        },
+    },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_10countries_sld'): {
+        DEFINITION: [
+            {'file_paths': ['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson']},
+        ],
+        TEST_DATA: {
+            'file_type': 'vector',
+            'style_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_jp2'): {
@@ -376,3 +385,4 @@ LIST_SLD_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type
                    if publ_type == LAYER_TYPE and values[TEST_DATA].get('style_type') == 'sld']
 LIST_QML_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
                    if publ_type == LAYER_TYPE and values[TEST_DATA].get('style_type') == 'qml']
+LIST_SLD_COUNTRIES_10m_SLD_LAYERS = [(COMMON_WORKSPACE, LAYER_TYPE, 'post_10countries_sld')]

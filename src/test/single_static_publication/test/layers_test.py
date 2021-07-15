@@ -2,12 +2,15 @@ import os
 from urllib.parse import urljoin
 import requests
 from lxml import etree as ET
+from owslib.wms import WebMapService
 import pytest
 
 from geoserver import GS_REST_WORKSPACES, GS_REST, GS_AUTH
 from layman import settings, app
-from layman.layer import util as layer_util
+from layman.common import bbox as bbox_util
+from layman.layer import util as layer_util, db as layer_db
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX
+from layman.layer.qgis import util as qgis_util
 from test_tools import process_client, assert_util
 from test_tools.util import url_for
 from ... import single_static_publication as data
@@ -149,3 +152,62 @@ def test_wms_layer(workspace, publ_type, publication):
         obtained_file = f'tmp/artifacts/test_sld_style_applied_in_wms_{publication}.png'
 
         assert_util.assert_same_images(url, obtained_file, wms_expected, 2000)
+
+
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_SLD_COUNTRIES_10m_SLD_LAYERS)
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+def test_fill_project_template(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+
+    qgs_path = f'{settings.LAYMAN_QGIS_DATA_DIR}/{publication}.qgs'
+    wms_url = f'{settings.LAYMAN_QGIS_URL}?MAP={qgs_path}'
+    wms_version = '1.3.0'
+
+    layer_info = process_client.get_workspace_publication(publ_type, workspace, publication)
+    layer_uuid = layer_info['uuid']
+
+    with pytest.raises(requests.exceptions.HTTPError) as excinfo:
+        WebMapService(wms_url, version=wms_version)
+    assert excinfo.value.response.status_code == 500
+
+    with app.app_context():
+        layer_bbox = layer_db.get_bbox(workspace, publication)
+    layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+    qml_path = '/code/sample/style/ne_10m_admin_0_countries.qml'
+    parser = ET.XMLParser(remove_blank_text=True)
+    qml_xml = ET.parse(qml_path, parser=parser)
+    exp_min_scale = '200000000'
+    template_xml = ET.parse(qgis_util.get_layer_template_path(), parser=parser)
+    assert qml_xml.getroot().attrib['minScale'] == exp_min_scale
+    assert template_xml.getroot().attrib['minScale'] != exp_min_scale
+    with app.app_context():
+        db_types = layer_db.get_geometry_types(workspace, publication)
+        db_cols = [
+            col for col in layer_db.get_all_column_infos(workspace, publication)
+            if col.name not in ['wkb_geometry', 'ogc_fid']
+        ]
+    qml_geometry = qgis_util.get_qml_geometry_from_qml(qml_xml)
+    source_type = qgis_util.get_source_type(db_types, qml_geometry)
+    layer_qml_str = qgis_util.fill_layer_template(workspace, publication, layer_uuid, layer_bbox, qml_xml, source_type, db_cols)
+    layer_qml = ET.fromstring(layer_qml_str.encode('utf-8'), parser=parser)
+    assert layer_qml.attrib['minScale'] == exp_min_scale
+    qgs_str = qgis_util.fill_project_template(workspace, publication, layer_uuid, layer_qml_str, settings.LAYMAN_OUTPUT_SRS_LIST,
+                                              layer_bbox, source_type)
+    with open(qgs_path, "w") as qgs_file:
+        print(qgs_str, file=qgs_file)
+
+    wmsi = WebMapService(wms_url, version=wms_version)
+    assert publication in wmsi.contents
+    wms_layer = wmsi.contents[publication]
+    for expected_output_srs in settings.LAYMAN_OUTPUT_SRS_LIST:
+        assert f"EPSG:{expected_output_srs}" in wms_layer.crsOptions
+    wms_layer_bbox = next((tuple(bbox_crs[:4]) for bbox_crs in wms_layer.crs_list if bbox_crs[4] == f"EPSG:3857"))
+    precision = 0.1
+    for idx, expected_coordinate in enumerate(layer_bbox):
+        assert abs(expected_coordinate - wms_layer_bbox[idx]) <= precision
+
+    os.remove(qgs_path)
+
+    with pytest.raises(requests.exceptions.HTTPError) as excinfo:
+        WebMapService(wms_url, version=wms_version)
+    assert excinfo.value.response.status_code == 500
