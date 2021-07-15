@@ -399,6 +399,21 @@ PUBLICATIONS = {
             'operates_on': [(OWNER, LAYER_TYPE, 'post_private_sld'), ],
         },
     },
+    (OWNER, MAP_TYPE, 'patch_unauthorized_layer'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.map/internal_url_unauthorized_layer.json'],
+             'access_rights': {'read': 'EVERYONE',
+                               'write': f"{OWNER},{OWNER2}",
+                               },
+             'headers': HEADERS[OWNER],
+             },
+            {'headers': HEADERS[OWNER2], }
+        ],
+        TEST_DATA: {
+            'layers': [(OWNER, LAYER_TYPE, 'post_private_sld'), (OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
+            'operates_on': [(OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
+        },
+    },
 }
 
 LIST_ALL_PUBLICATIONS = list(PUBLICATIONS.keys())
