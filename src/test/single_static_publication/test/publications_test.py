@@ -125,3 +125,27 @@ def test_infos(workspace, publ_type, publication):
         expected_url = test_util.url_for(get_workspace_publication_url, workspace=workspace, **{param_name: publication},
                                          internal=False)
         assert info['url'] == expected_url, f'publication_infos={publication_infos}, expected_url={expected_url}'
+
+
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+def test_ownership(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+
+    users_can_read = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_read')
+    if users_can_read:
+        headers_list_in = [header for user, header in data.HEADERS.items() if user in users_can_read]
+        headers_list_out = [header for user, header in data.HEADERS.items() if user not in users_can_read] + [None]
+    else:
+        headers_list_in = list(data.HEADERS.values()) + [None]
+        headers_list_out = []
+
+    for in_headers in headers_list_in:
+        infos = process_client.get_workspace_publications(publ_type, workspace, headers=in_headers)
+        publication_names = [li['name'] for li in infos]
+        assert publication in publication_names, in_headers
+
+    for out_headers in headers_list_out:
+        infos = process_client.get_workspace_publications(publ_type, workspace, headers=out_headers)
+        publication_names = [li['name'] for li in infos]
+        assert publication not in publication_names, out_headers
