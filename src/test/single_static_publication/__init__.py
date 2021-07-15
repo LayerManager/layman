@@ -105,6 +105,7 @@ PUBLICATIONS = {
             {'title': 'Title defined'}
         ],
         TEST_DATA: {
+            'title': 'Title defined',
             'thumbnail': 'sample/style/test_qgis_style_applied_in_thumbnail_layer.png',
             'file_type': 'vector',
             'style_type': 'qml',
@@ -369,6 +370,7 @@ PUBLICATIONS = {
             {'file_paths': ['test_tools/data/bbox/map_3_3-5_5.json', ]},
         ],
         TEST_DATA: {
+            'title': 'Administrativní členění Libereckého kraje',
             'bbox': (3000, 3000, 5000, 5000),
         },
     },
