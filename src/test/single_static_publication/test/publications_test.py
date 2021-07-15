@@ -102,3 +102,26 @@ def test_get_publication_info_items(workspace, publ_type, publication):
                 internal_keys = [key[1:] for key in info if key.startswith('_')]
                 assert set(internal_keys) <= all_sibling_keys,\
                     f'internal_keys={set(internal_keys)}, all_sibling_keys={all_sibling_keys}, key={key}, info={info}'
+
+
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+def test_infos(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+
+    title = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('title') or publication
+    headers = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('headers')
+    infos = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
+
+    publication_infos = [info for info in infos if info['name'] == publication]
+    assert len(publication_infos) == 1, f'publication_infos={publication_infos}'
+
+    info = next(iter(publication_infos))
+    assert info['title'] == title, f'publication_infos={publication_infos}'
+
+    get_workspace_publication_url = process_client.PUBLICATION_TYPES_DEF[publ_type].get_workspace_publication_url
+    param_name = process_client.PUBLICATION_TYPES_DEF[publ_type].url_param_name
+    with app.app_context():
+        expected_url = test_util.url_for(get_workspace_publication_url, workspace=workspace, **{param_name: publication},
+                                         internal=False)
+        assert info['url'] == expected_url, f'publication_infos={publication_infos}, expected_url={expected_url}'

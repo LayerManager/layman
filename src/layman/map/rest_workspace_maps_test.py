@@ -32,25 +32,3 @@ def test_get_map_title():
 
     for (name, title) in maps:
         process_client.delete_workspace_map(username, name)
-
-
-@pytest.mark.usefixtures('ensure_layman')
-def test_get_maps():
-    username = 'test_get_maps_user'
-    mapname = 'test_get_maps_map'
-
-    process_client.publish_workspace_map(username, mapname, title=mapname)
-
-    with app.app_context():
-        url_get = url_for('rest_workspace_maps.get', workspace=username)
-    # maps.GET
-    response = requests.get(url_get)
-    assert response.status_code == 200, response.json()
-
-    assert response.json()[0]['name'] == mapname
-    assert response.json()[0]['title'] == mapname
-    with app.app_context():
-        assert response.json()[0]['url'] == url_for('rest_workspace_map.get', workspace=username, mapname=mapname,
-                                                    internal=False)
-
-    process_client.delete_workspace_map(username, mapname)
