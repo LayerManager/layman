@@ -8,7 +8,12 @@ DEFINITION = 'definition'
 TEST_DATA = 'test_data'
 
 OWNER = 'test_owner'
+OWNER2 = 'test_owner2'
 owner_headers = process_client.get_authz_headers(OWNER)
+owner_headers2 = process_client.get_authz_headers(OWNER2)
+
+LIST_HEADERS = [owner_headers, owner_headers2, ]
+LIST_USERS = [(OWNER, owner_headers), (OWNER2, owner_headers2)]
 
 
 PUBLICATIONS = {
@@ -35,6 +40,18 @@ PUBLICATIONS = {
             'style_type': 'sld',
             'private': True,
             'headers': owner_headers,
+        },
+    },
+    (OWNER2, LAYER_TYPE, 'post_private_sld2'): {
+        DEFINITION: [
+            {'headers': owner_headers2},
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+            'private': True,
+            'headers': owner_headers2,
         },
     },
     (OWNER, LAYER_TYPE, 'post_private_write_sld'): {
@@ -351,6 +368,8 @@ PUBLICATIONS = {
             {'file_paths': ['sample/layman.map/internal_url_thumbnail.json', ]},
         ],
         TEST_DATA: {
+            'layers': [(COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'), ],
+            'operates_on': [(COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'), ],
             'thumbnail': 'sample/style/test_sld_style_applied_in_map_thumbnail_map.png',
         },
     },
@@ -374,6 +393,23 @@ PUBLICATIONS = {
             'bbox': (3000, 3000, 5000, 5000),
         },
     },
+    (OWNER, MAP_TYPE, 'post_unauthorized_layer'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.map/internal_url_unauthorized_layer.json'],
+             'access_rights': {
+                                 'read': 'EVERYONE',
+                                 'write': f"{OWNER},{OWNER2}",
+                             },
+             'headers': owner_headers,
+             },
+        ],
+        TEST_DATA: {
+            'layers': [(OWNER, LAYER_TYPE, 'post_private_sld'), (OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
+            'operates_on': [(OWNER, LAYER_TYPE, 'post_private_sld'), ],
+            'private': True,
+            'headers': owner_headers,
+        },
+    },
 }
 
 LIST_ALL_PUBLICATIONS = list(PUBLICATIONS.keys())
@@ -388,3 +424,6 @@ LIST_SLD_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type
 LIST_QML_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
                    if publ_type == LAYER_TYPE and values[TEST_DATA].get('style_type') == 'qml']
 LIST_SLD_COUNTRIES_10m_SLD_LAYERS = [(COMMON_WORKSPACE, LAYER_TYPE, 'post_10countries_sld')]
+
+LIST_INTERNAL_MAPS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
+                      if publ_type == MAP_TYPE and values[TEST_DATA].get('layers')]
