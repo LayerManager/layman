@@ -2,13 +2,12 @@ from owslib.feature.schema import get_schema as get_wfs_schema
 import pytest
 
 from geoserver.error import Error as GS_Error
-from geoserver.util import get_layer_thumbnail, get_square_bbox
 from layman import app, settings
 from layman.layer import db, util as layer_util
 from layman.layer.filesystem import thumbnail
 from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
-from test_tools import process_client, geoserver_client, util as test_util, assert_util
+from test_tools import process_client, util as test_util, assert_util
 from test_tools.data import wfs as data_wfs, SMALL_LAYER_BBOX
 from test_tools.process_client import get_authz_headers
 
@@ -83,30 +82,6 @@ def test_wfs_proxy():
     assert exc.value.data['status_code'] == 400
 
     process_client.delete_workspace_layer(username, layername1, headers=authn_headers1)
-
-
-@pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
-@pytest.mark.parametrize('service_endpoint', ['ows', 'wms'])
-def test_wms_ows_proxy(service_endpoint):
-    username = 'test_wms_ows_proxy_user'
-    layername = 'test_wms_ows_proxy_layer'
-
-    authn_headers = get_authz_headers(username)
-
-    process_client.ensure_reserved_username(username, headers=authn_headers)
-    process_client.publish_workspace_layer(username, layername, headers=authn_headers)
-
-    wms_url = geoserver_client.get_wms_url(username, service_endpoint)
-
-    layer_info = process_client.get_workspace_layer(username, layername, headers=authn_headers)
-    tn_bbox = get_square_bbox(layer_info['bounding_box'])
-
-    from layman.layer.geoserver.wms import VERSION
-    response = get_layer_thumbnail(wms_url, layername, tn_bbox, headers=authn_headers, wms_version=VERSION)
-    response.raise_for_status()
-    assert 'image' in response.headers['content-type']
-
-    process_client.delete_workspace_layer(username, layername, headers=authn_headers)
 
 
 @pytest.mark.timeout(60)
