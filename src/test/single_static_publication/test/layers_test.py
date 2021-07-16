@@ -5,13 +5,13 @@ from lxml import etree as ET
 from owslib.wms import WebMapService
 import pytest
 
-from geoserver import GS_REST_WORKSPACES, GS_REST, GS_AUTH
+from geoserver import GS_REST_WORKSPACES, GS_REST, GS_AUTH, util as gs_util
 from layman import settings, app
 from layman.common import bbox as bbox_util
 from layman.layer import util as layer_util, db as layer_db
-from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX
+from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX, VERSION
 from layman.layer.qgis import util as qgis_util
-from test_tools import process_client, assert_util
+from test_tools import process_client, assert_util, geoserver_client
 from test_tools.util import url_for
 from ... import single_static_publication as data
 from ..data import ensure_publication
@@ -160,6 +160,19 @@ def test_wms_layer(workspace, publ_type, publication):
         obtained_file = f'tmp/artifacts/test_sld_style_applied_in_wms_{publication}.png'
 
         assert_util.assert_same_images(url, obtained_file, wms_expected, 2000)
+
+    file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
+    if file_type != settings.FILE_TYPE_RASTER:
+        authn_headers = data.HEADERS.get(workspace)
+        for service_endpoint in {'ows', 'wms'}:
+            wms_url = geoserver_client.get_wms_url(workspace, service_endpoint)
+
+            layer_info = process_client.get_workspace_layer(workspace, publication, headers=authn_headers)
+            tn_bbox = gs_util.get_square_bbox(layer_info['bounding_box'])
+
+            response = gs_util.get_layer_thumbnail(wms_url, publication, tn_bbox, headers=authn_headers, wms_version=VERSION)
+            response.raise_for_status()
+            assert 'image' in response.headers['content-type']
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_SLD_COUNTRIES_10m_SLD_LAYERS)
