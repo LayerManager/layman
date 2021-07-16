@@ -35,8 +35,7 @@ PUBLICATIONS = {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
             'file_type': 'vector',
             'style_type': 'sld',
-            'private': True,
-            'headers': HEADERS[OWNER],
+            'users_can_read': [OWNER],
         },
     },
     (OWNER2, LAYER_TYPE, 'post_private_sld2'): {
@@ -47,8 +46,7 @@ PUBLICATIONS = {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
             'file_type': 'vector',
             'style_type': 'sld',
-            'private': True,
-            'headers': HEADERS[OWNER2],
+            'users_can_read': [OWNER2],
         },
     },
     (OWNER, LAYER_TYPE, 'post_private_write_sld'): {
@@ -61,7 +59,6 @@ PUBLICATIONS = {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
             'file_type': 'vector',
             'style_type': 'sld',
-            'private': True,
         },
     },
     (OWNER, LAYER_TYPE, 'post_public_sld'): {
@@ -74,7 +71,6 @@ PUBLICATIONS = {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
             'file_type': 'vector',
             'style_type': 'sld',
-            'private': True,
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_3355bbox_sld'): {
@@ -376,8 +372,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1627490.9553976597, 6547334.172794042, 1716546.5480322787, 6589515.35758913),
-            'private': True,
-            'headers': HEADERS[OWNER],
+            'users_can_read': [OWNER],
         },
     },
     (COMMON_WORKSPACE, MAP_TYPE, 'patch_3355bbox'): {
@@ -402,8 +397,6 @@ PUBLICATIONS = {
         TEST_DATA: {
             'layers': [(OWNER, LAYER_TYPE, 'post_private_sld'), (OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
             'operates_on': [(OWNER, LAYER_TYPE, 'post_private_sld'), ],
-            'private': True,
-            'headers': HEADERS[OWNER],
         },
     },
 }

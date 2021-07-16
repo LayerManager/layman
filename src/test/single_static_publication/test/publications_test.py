@@ -45,7 +45,7 @@ def test_thumbnail(workspace, publ_type, publication):
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_user_workspace(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
-    is_private = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('private')
+    is_private = data.HEADERS.get(workspace) is not None
 
     all_sources = []
     for type_def in layman_util.get_publication_types(use_cache=False).values():
@@ -110,7 +110,7 @@ def test_infos(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
     title = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('title') or publication
-    headers = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('headers')
+    headers = data.HEADERS.get(workspace)
     infos = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
 
     publication_infos = [info for info in infos if info['name'] == publication]
