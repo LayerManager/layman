@@ -470,3 +470,15 @@ LIST_SLD_COUNTRIES_10m_SLD_LAYERS = [(COMMON_WORKSPACE, LAYER_TYPE, 'post_10coun
 
 LIST_INTERNAL_MAPS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
                       if publ_type == MAP_TYPE and values[TEST_DATA].get('layers')]
+
+assert len(USERS) > 0, USERS
+assert len(HEADERS) > 0, HEADERS
+
+assert len(LIST_ALL_PUBLICATIONS) > 0, LIST_ALL_PUBLICATIONS
+assert len(LIST_LAYERS) > 0, LIST_LAYERS
+assert len(LIST_RASTER_LAYERS) > 0, LIST_RASTER_LAYERS
+assert len(LIST_VECTOR_LAYERS) > 0, LIST_VECTOR_LAYERS
+assert len(LIST_SLD_LAYERS) > 0, LIST_SLD_LAYERS
+assert len(LIST_QML_LAYERS) > 0, LIST_QML_LAYERS
+assert len(LIST_SLD_COUNTRIES_10m_SLD_LAYERS) > 0, LIST_SLD_COUNTRIES_10m_SLD_LAYERS
+assert len(LIST_INTERNAL_MAPS) > 0, LIST_INTERNAL_MAPS
