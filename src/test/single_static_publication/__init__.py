@@ -1,6 +1,8 @@
 from test_tools import process_client
 
 COMMON_WORKSPACE = 'test_workspace'
+WORKSPACE1 = 'test_workspace_1'
+WORKSPACE2 = 'test_workspace_2'
 
 LAYER_TYPE = process_client.LAYER_TYPE
 MAP_TYPE = process_client.MAP_TYPE
@@ -346,6 +348,26 @@ PUBLICATIONS = {
             'style_type': 'sld',
         },
     },
+    (WORKSPACE1, LAYER_TYPE, 'test_publications_same_name_publ'): {
+        DEFINITION: [
+            {},
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+        },
+    },
+    (WORKSPACE2, LAYER_TYPE, 'test_publications_same_name_publ'): {
+        DEFINITION: [
+            {},
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+        },
+    },
     ################################################################################
     #                                     MAPS
     ################################################################################
@@ -413,6 +435,22 @@ PUBLICATIONS = {
         TEST_DATA: {
             'layers': [(OWNER, LAYER_TYPE, 'post_private_sld'), (OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
             'operates_on': [(OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
+        },
+    },
+    (WORKSPACE1, MAP_TYPE, 'test_publications_same_name_publ'): {
+        DEFINITION: [
+            {},
+        ],
+        TEST_DATA: {
+            'bbox': (1627490.9553976597, 6547334.172794042, 1716546.5480322787, 6589515.35758913),
+        },
+    },
+    (WORKSPACE2, MAP_TYPE, 'test_publications_same_name_publ'): {
+        DEFINITION: [
+            {},
+        ],
+        TEST_DATA: {
+            'bbox': (1627490.9553976597, 6547334.172794042, 1716546.5480322787, 6589515.35758913),
         },
     },
 }
