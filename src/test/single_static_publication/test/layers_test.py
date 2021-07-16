@@ -29,7 +29,7 @@ def test_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     wms_url = f"http://localhost:8000/geoserver/{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows"
     wfs_url = f"http://localhost:8000/geoserver/{workspace}/wfs"
-    headers = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('headers')
+    headers = data.HEADERS.get(workspace)
     style = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['style_type']
 
     info = process_client.get_workspace_publication(publ_type, workspace, publication, headers=headers)
@@ -87,9 +87,9 @@ def test_geoserver_workspace(workspace, publ_type, publication):
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_get_layer_style(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
+    headers = data.HEADERS.get(workspace)
 
     with app.app_context():
-        headers = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('headers')
         rest_url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=publication)
     response = requests.get(rest_url, headers=headers)
     assert response.status_code == 200, response.text
