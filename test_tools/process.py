@@ -64,6 +64,7 @@ def liferay_mock():
                 'test_select_publications_complex_workspace2': None,
                 'test_owner': None,
                 'test_owner2': None,
+                'test_not_owner': None,
             },
         },
         'host': '0.0.0.0',
