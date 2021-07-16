@@ -6,8 +6,8 @@ from .. import single_static_publication as data
 
 
 def ensure_publication(workspace, publ_type, publication):
-    for user, headers in data.LIST_USERS:
-        process_client.ensure_reserved_username(user, headers=headers)
+    for user in data.USERS:
+        process_client.ensure_reserved_username(user, headers=data.HEADERS[user])
 
     with app.app_context():
         info = util.get_publication_info(workspace, publ_type, publication, context={'keys': ['name']})

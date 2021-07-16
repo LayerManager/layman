@@ -9,12 +9,9 @@ TEST_DATA = 'test_data'
 
 OWNER = 'test_owner'
 OWNER2 = 'test_owner2'
-owner_headers = process_client.get_authz_headers(OWNER)
-owner_headers2 = process_client.get_authz_headers(OWNER2)
 
-LIST_HEADERS = [owner_headers, owner_headers2, ]
-LIST_USERS = [(OWNER, owner_headers), (OWNER2, owner_headers2)]
-
+USERS = {OWNER, OWNER2}
+HEADERS = {user: process_client.get_authz_headers(user) for user in USERS}
 
 PUBLICATIONS = {
     ################################################################################
@@ -32,31 +29,31 @@ PUBLICATIONS = {
     },
     (OWNER, LAYER_TYPE, 'post_private_sld'): {
         DEFINITION: [
-            {'headers': owner_headers},
+            {'headers': HEADERS[OWNER]},
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
             'file_type': 'vector',
             'style_type': 'sld',
             'private': True,
-            'headers': owner_headers,
+            'headers': HEADERS[OWNER],
         },
     },
     (OWNER2, LAYER_TYPE, 'post_private_sld2'): {
         DEFINITION: [
-            {'headers': owner_headers2},
+            {'headers': HEADERS[OWNER2]},
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
             'file_type': 'vector',
             'style_type': 'sld',
             'private': True,
-            'headers': owner_headers2,
+            'headers': HEADERS[OWNER2],
         },
     },
     (OWNER, LAYER_TYPE, 'post_private_write_sld'): {
         DEFINITION: [
-            {'headers': owner_headers,
+            {'headers': HEADERS[OWNER],
              'access_rights': {'read': 'EVERYONE', 'write': OWNER},
              },
         ],
@@ -69,7 +66,7 @@ PUBLICATIONS = {
     },
     (OWNER, LAYER_TYPE, 'post_public_sld'): {
         DEFINITION: [
-            {'headers': owner_headers,
+            {'headers': HEADERS[OWNER],
              'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'},
              },
         ],
@@ -375,12 +372,12 @@ PUBLICATIONS = {
     },
     (OWNER, MAP_TYPE, 'post_private_sld'): {
         DEFINITION: [
-            {'headers': owner_headers},
+            {'headers': HEADERS[OWNER]},
         ],
         TEST_DATA: {
             'bbox': (1627490.9553976597, 6547334.172794042, 1716546.5480322787, 6589515.35758913),
             'private': True,
-            'headers': owner_headers,
+            'headers': HEADERS[OWNER],
         },
     },
     (COMMON_WORKSPACE, MAP_TYPE, 'patch_3355bbox'): {
@@ -396,18 +393,17 @@ PUBLICATIONS = {
     (OWNER, MAP_TYPE, 'post_unauthorized_layer'): {
         DEFINITION: [
             {'file_paths': ['sample/layman.map/internal_url_unauthorized_layer.json'],
-             'access_rights': {
-                                 'read': 'EVERYONE',
-                                 'write': f"{OWNER},{OWNER2}",
-                             },
-             'headers': owner_headers,
+             'access_rights': {'read': 'EVERYONE',
+                               'write': f"{OWNER},{OWNER2}",
+                               },
+             'headers': HEADERS[OWNER],
              },
         ],
         TEST_DATA: {
             'layers': [(OWNER, LAYER_TYPE, 'post_private_sld'), (OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
             'operates_on': [(OWNER, LAYER_TYPE, 'post_private_sld'), ],
             'private': True,
-            'headers': owner_headers,
+            'headers': HEADERS[OWNER],
         },
     },
 }
