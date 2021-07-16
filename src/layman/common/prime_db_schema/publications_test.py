@@ -923,28 +923,3 @@ def test_update_rights():
         users.delete_user(username)
         users.delete_user(username2)
         workspaces.delete_workspace(workspace_name)
-
-
-@pytest.mark.usefixtures('ensure_layman')
-def test_publications_same_name():
-    publ_name = 'test_publications_same_name_publ'
-    username = 'test_publications_same_name_user'
-    username2 = 'test_publications_same_name_user2'
-
-    process_client.publish_workspace_layer(username, publ_name)
-    process_client.publish_workspace_map(username, publ_name)
-    process_client.publish_workspace_layer(username2, publ_name)
-    process_client.publish_workspace_map(username2, publ_name)
-
-    with app.app_context():
-        pubs = publications.get_publication_infos(username)
-        assert len(pubs) == 2
-        pubs = publications.get_publication_infos(username2)
-        assert len(pubs) == 2
-        pubs = publications.get_publication_infos()
-        assert len(pubs) >= 4
-
-    process_client.delete_workspace_layer(username, publ_name)
-    process_client.delete_workspace_map(username, publ_name)
-    process_client.delete_workspace_layer(username2, publ_name)
-    process_client.delete_workspace_map(username2, publ_name)
