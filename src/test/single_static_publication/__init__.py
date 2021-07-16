@@ -368,6 +368,166 @@ PUBLICATIONS = {
             'style_type': 'sld',
         },
     },
+    (OWNER, LAYER_TYPE, 'patch_common_public_sld'): {
+        DEFINITION: [
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'}, },
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'}, },
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+        },
+    },
+    (OWNER, LAYER_TYPE, 'patch_common_public_sld2'): {
+        DEFINITION: [
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'}, },
+            {'headers': HEADERS[OWNER],
+             },
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+        },
+    },
+    (OWNER, LAYER_TYPE, 'patch_common_public_sld3'): {
+        DEFINITION: [
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': OWNER, 'write': OWNER}, },
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'}, },
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+        },
+    },
+    (OWNER, LAYER_TYPE, 'patch_private_sld'): {
+        DEFINITION: [
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': OWNER, 'write': OWNER},
+             },
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': OWNER, 'write': OWNER},
+             },
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+            'users_can_read': [OWNER],
+        },
+    },
+    (OWNER, LAYER_TYPE, 'patch_private_sld2'): {
+        DEFINITION: [
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': OWNER, 'write': OWNER},
+             },
+            {'headers': HEADERS[OWNER],
+             },
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+            'users_can_read': [OWNER],
+        },
+    },
+    (OWNER, LAYER_TYPE, 'patch_private_sld3'): {
+        DEFINITION: [
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': OWNER, 'write': OWNER},
+             },
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': 'EVERYONE', },
+             },
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+        },
+    },
+    (OWNER, LAYER_TYPE, 'patch_private_sld4'): {
+        DEFINITION: [
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'},
+             },
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': OWNER, 'write': OWNER},
+             },
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+            'users_can_read': [OWNER],
+        },
+    },
+    (OWNER, LAYER_TYPE, 'patch_private_sld5'): {
+        DEFINITION: [
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'},
+             },
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'write': OWNER},
+             },
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': OWNER},
+             },
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+            'users_can_read': [OWNER],
+        },
+    },
+    (OWNER, LAYER_TYPE, 'patch_private_sld6'): {
+        DEFINITION: [
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'},
+             },
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'write': OWNER},
+             },
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': f'{OWNER}, {OWNER2}'},
+             },
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+            'users_can_read': [OWNER, OWNER2],
+        },
+    },
+    (OWNER, LAYER_TYPE, 'patch_common_public_sld4'): {
+        DEFINITION: [
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'},
+             },
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'write': OWNER},
+             },
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': f'{OWNER}, {OWNER2}, EVERYONE'},
+             },
+            {'headers': HEADERS[OWNER],
+             'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'},
+             },
+        ],
+        TEST_DATA: {
+            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'file_type': 'vector',
+            'style_type': 'sld',
+        },
+    },
     ################################################################################
     #                                     MAPS
     ################################################################################
