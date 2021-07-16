@@ -9,8 +9,9 @@ TEST_DATA = 'test_data'
 
 OWNER = 'test_owner'
 OWNER2 = 'test_owner2'
+NOT_OWNER = 'test_not_owner'
 
-USERS = {OWNER, OWNER2}
+USERS = {OWNER, OWNER2, NOT_OWNER, }
 HEADERS = {user: process_client.get_authz_headers(user) for user in USERS}
 
 PUBLICATIONS = {
@@ -366,7 +367,7 @@ PUBLICATIONS = {
             'thumbnail': 'sample/style/test_sld_style_applied_in_map_thumbnail_map.png',
         },
     },
-    (OWNER, MAP_TYPE, 'post_private_sld'): {
+    (OWNER, MAP_TYPE, 'post_private'): {
         DEFINITION: [
             {'headers': HEADERS[OWNER]},
         ],
