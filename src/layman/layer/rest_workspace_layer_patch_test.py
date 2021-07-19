@@ -1,27 +1,9 @@
 import pytest
 
-from geoserver import util as gs_util
 from layman import settings, app
 from layman.layer.prime_db_schema import table as prime_db_schema
-from layman.common import geoserver as gs_common
 from layman.common.prime_db_schema import users
 from test_tools import geoserver_client, process_client as client_util
-
-
-def assert_gs_layer_data_security(username,
-                                  layername,
-                                  expected_roles):
-    auth = settings.LAYMAN_GS_AUTH
-    with app.app_context():
-        is_personal_workspace = users.get_user_infos(username)
-    owner_and_everyone_roles = gs_common.layman_users_to_geoserver_roles({username, settings.RIGHTS_EVERYONE_ROLE})
-    owner_role_set = gs_common.layman_users_to_geoserver_roles({username})
-    for right_type in ['read', 'write']:
-        gs_expected_roles = gs_common.layman_users_to_geoserver_roles(expected_roles[right_type])
-        gs_roles = gs_util.get_security_roles(f'{username}.{layername}.{right_type[0]}', auth)
-        assert gs_expected_roles == gs_roles\
-            or (is_personal_workspace
-                and gs_expected_roles == owner_and_everyone_roles == gs_roles.union(owner_role_set)), right_type
 
 
 def assert_layman_layer_access_rights(username,
@@ -160,7 +142,6 @@ def test_access_rights(access_rights_and_expected_list, use_file):
                          'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
                      ] if use_file else None)
 
-        assert_gs_layer_data_security(USERNAME, LAYERNAME, roles_to_test)
         assert_layman_layer_access_rights(USERNAME, LAYERNAME, roles_to_test)
         assert_wms_access(USERNAME, owner_authn_headers, [LAYERNAME])
         assert_wms_access(USERNAME, other_authn_headers, access_rights_and_expected['expected_other_user_layers'])
