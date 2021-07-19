@@ -122,6 +122,9 @@ def test_wms_layer(workspace, publ_type, publication):
     wms_stores_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmsstores/')
     wms_layers_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmslayers/')
 
+    with app.app_context():
+        info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['wms']})
+
     if style_file:
         assert (os.path.exists(expected_style_file + '.qml')) == (style_file == 'qml')
         assert (os.path.exists(expected_style_file + '.sld')) == (style_file == 'sld')
@@ -173,6 +176,23 @@ def test_wms_layer(workspace, publ_type, publication):
             response = gs_util.get_layer_thumbnail(wms_url, publication, tn_bbox, headers=authn_headers, wms_version=VERSION)
             response.raise_for_status()
             assert 'image' in response.headers['content-type']
+
+    gs_workspace = info['_wms']['workspace']
+    users_can_read = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_read')
+    if users_can_read:
+        headers_list_in = [header for user, header in data.HEADERS.items() if user in users_can_read]
+        headers_list_out = [header for user, header in data.HEADERS.items() if user not in users_can_read] + [None]
+    else:
+        headers_list_in = list(data.HEADERS.values()) + [None]
+        headers_list_out = []
+
+    for in_headers in headers_list_in:
+        wms = geoserver_client.get_wms_capabilities(gs_workspace, headers=in_headers)
+        assert publication in set(wms.contents)
+
+    for out_headers in headers_list_out:
+        wms = geoserver_client.get_wms_capabilities(gs_workspace, headers=out_headers)
+        assert publication not in set(wms.contents)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_SLD_COUNTRIES_10m_SLD_LAYERS)
