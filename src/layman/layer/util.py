@@ -97,8 +97,10 @@ def get_layer_info(workspace, layername, context=None):
         if task_name not in TASKS_TO_LAYER_INFO_KEYS:
             continue
         for layerinfo_key in TASKS_TO_LAYER_INFO_KEYS[task_name]:
-            if layerinfo_key not in partial_info or not res.successful():
+            if layerinfo_key not in partial_info:
                 partial_info[layerinfo_key] = source_state
+            elif not res.successful():
+                partial_info[layerinfo_key].update(source_state)
 
     return partial_info
 
