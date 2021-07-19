@@ -8,16 +8,6 @@ from layman.common.prime_db_schema import users
 from test_tools import geoserver_client, process_client as client_util
 
 
-def assert_gs_user_and_roles(username):
-    auth = settings.LAYMAN_GS_AUTH
-    gs_usernames = gs_util.get_usernames(auth)
-    assert username in gs_usernames
-    gs_user_roles = gs_util.get_user_roles(username, auth)
-    user_role = f"USER_{username.upper()}"
-    assert user_role in gs_user_roles
-    assert settings.LAYMAN_GS_ROLE in gs_user_roles
-
-
 def assert_gs_layer_data_security(username,
                                   layername,
                                   expected_roles):
@@ -63,7 +53,6 @@ def ensure_user():
         authn_headers1 = client_util.get_authz_headers(tmp_username)
 
         client_util.ensure_reserved_username(tmp_username, headers=authn_headers1)
-        assert_gs_user_and_roles(tmp_username)
 
 
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman_module', 'ensure_user')
@@ -171,8 +160,6 @@ def test_access_rights(access_rights_and_expected_list, use_file):
                          'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
                      ] if use_file else None)
 
-        client_util.assert_workspace_layers(USERNAME, [LAYERNAME], owner_authn_headers)
-        assert_gs_user_and_roles(USERNAME)
         assert_gs_layer_data_security(USERNAME, LAYERNAME, roles_to_test)
         assert_layman_layer_access_rights(USERNAME, LAYERNAME, roles_to_test)
         assert_wms_access(USERNAME, owner_authn_headers, [LAYERNAME])
