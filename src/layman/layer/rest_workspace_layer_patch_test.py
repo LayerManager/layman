@@ -1,21 +1,7 @@
 import pytest
 
 from layman import settings, app
-from layman.layer.prime_db_schema import table as prime_db_schema
-from layman.common.prime_db_schema import users
 from test_tools import geoserver_client, process_client as client_util
-
-
-def assert_layman_layer_access_rights(username,
-                                      layername,
-                                      roles_to_test):
-    with app.app_context():
-        access_rights = prime_db_schema.get_layer_info(username, layername)['access_rights']
-        if users.get_user_infos(username):
-            roles_to_test['read'].add(username)
-            roles_to_test['write'].add(username)
-    assert set(access_rights['read']) == roles_to_test['read']
-    assert set(access_rights['write']) == roles_to_test['write']
 
 
 def assert_wms_access(workspace, authn_headers, expected_layers):
@@ -142,7 +128,6 @@ def test_access_rights(access_rights_and_expected_list, use_file):
                          'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
                      ] if use_file else None)
 
-        assert_layman_layer_access_rights(USERNAME, LAYERNAME, roles_to_test)
         assert_wms_access(USERNAME, owner_authn_headers, [LAYERNAME])
         assert_wms_access(USERNAME, other_authn_headers, access_rights_and_expected['expected_other_user_layers'])
         assert_wms_access(USERNAME, None, access_rights_and_expected['expected_anonymous_layers'])

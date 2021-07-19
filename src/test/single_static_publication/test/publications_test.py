@@ -221,3 +221,22 @@ def test_publications_same_name():
     for workspace, publ_type, publication in data.PUBLICATIONS:
         if workspace in {data.WORKSPACE1, data.WORKSPACE2}:
             assert pubs[(workspace, publ_type, publication)]['name'] == publication, f'pubs={pubs}'
+
+
+@pytest.mark.parametrize('workspace, publ_type, publication', data.PUBLICATIONS)
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+def test_info(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+
+    is_personal_workspace = workspace in data.USERS
+    with app.app_context():
+        info = layman_util.get_publication_info(workspace, publ_type, publication, )
+
+    for right in ['read', 'write']:
+        users_can = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_' + right)
+        if not users_can:
+            users_can = {settings.RIGHTS_EVERYONE_ROLE}
+            if is_personal_workspace:
+                users_can.add(workspace)
+
+        assert set(users_can) == set(info['access_rights'][right])
