@@ -39,6 +39,7 @@ PUBLICATIONS = {
             'file_type': 'vector',
             'style_type': 'sld',
             'users_can_read': [OWNER],
+            'users_can_write': [OWNER],
         },
     },
     (OWNER2, LAYER_TYPE, 'post_private_sld2'): {
@@ -50,6 +51,7 @@ PUBLICATIONS = {
             'file_type': 'vector',
             'style_type': 'sld',
             'users_can_read': [OWNER2],
+            'users_can_write': [OWNER2],
         },
     },
     (OWNER, LAYER_TYPE, 'post_private_write_sld'): {
@@ -62,6 +64,7 @@ PUBLICATIONS = {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
             'file_type': 'vector',
             'style_type': 'sld',
+            'users_can_write': [OWNER],
         },
     },
     (OWNER, LAYER_TYPE, 'post_public_sld'): {
@@ -421,6 +424,7 @@ PUBLICATIONS = {
             'file_type': 'vector',
             'style_type': 'sld',
             'users_can_read': [OWNER],
+            'users_can_write': [OWNER],
         },
     },
     (OWNER, LAYER_TYPE, 'patch_private_sld2'): {
@@ -436,6 +440,7 @@ PUBLICATIONS = {
             'file_type': 'vector',
             'style_type': 'sld',
             'users_can_read': [OWNER],
+            'users_can_write': [OWNER],
         },
     },
     (OWNER, LAYER_TYPE, 'patch_private_sld3'): {
@@ -451,6 +456,7 @@ PUBLICATIONS = {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
             'file_type': 'vector',
             'style_type': 'sld',
+            'users_can_write': [OWNER],
         },
     },
     (OWNER, LAYER_TYPE, 'patch_private_sld4'): {
@@ -467,6 +473,7 @@ PUBLICATIONS = {
             'file_type': 'vector',
             'style_type': 'sld',
             'users_can_read': [OWNER],
+            'users_can_write': [OWNER],
         },
     },
     (OWNER, LAYER_TYPE, 'patch_private_sld5'): {
@@ -486,6 +493,7 @@ PUBLICATIONS = {
             'file_type': 'vector',
             'style_type': 'sld',
             'users_can_read': [OWNER],
+            'users_can_write': [OWNER],
         },
     },
     (OWNER, LAYER_TYPE, 'patch_private_sld6'): {
@@ -505,6 +513,7 @@ PUBLICATIONS = {
             'file_type': 'vector',
             'style_type': 'sld',
             'users_can_read': [OWNER, OWNER2],
+            'users_can_write': [OWNER],
         },
     },
     (OWNER, LAYER_TYPE, 'patch_common_public_sld4'): {
@@ -556,6 +565,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'bbox': (1627490.9553976597, 6547334.172794042, 1716546.5480322787, 6589515.35758913),
             'users_can_read': [OWNER],
+            'users_can_write': [OWNER],
         },
     },
     (COMMON_WORKSPACE, MAP_TYPE, 'patch_3355bbox'): {
@@ -580,6 +590,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'layers': [(OWNER, LAYER_TYPE, 'post_private_sld'), (OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
             'operates_on': [(OWNER, LAYER_TYPE, 'post_private_sld'), ],
+            'users_can_write': [OWNER, OWNER2],
         },
     },
     (OWNER, MAP_TYPE, 'patch_unauthorized_layer'): {
@@ -595,6 +606,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'layers': [(OWNER, LAYER_TYPE, 'post_private_sld'), (OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
             'operates_on': [(OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
+            'users_can_write': [OWNER, OWNER2],
         },
     },
     (WORKSPACE1, MAP_TYPE, 'test_publications_same_name_publ'): {
