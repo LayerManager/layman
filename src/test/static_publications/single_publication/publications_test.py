@@ -28,7 +28,7 @@ def test_thumbnail(workspace, publ_type, publication):
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_user_workspace(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
-    is_private = data.HEADERS.get(workspace) is not None
+    is_private_workspace = workspace in data.USERS
 
     all_sources = []
     for type_def in layman_util.get_publication_types(use_cache=False).values():
@@ -37,14 +37,14 @@ def test_user_workspace(workspace, publ_type, publication):
     for provider in providers:
         with app.app_context():
             usernames = provider.get_usernames()
-        if not is_private:
+        if not is_private_workspace:
             assert workspace not in usernames, (publ_type, provider)
 
     with app.app_context():
         usernames = layman_util.get_usernames(use_cache=False)
         workspaces = layman_util.get_workspaces(use_cache=False)
 
-    if is_private:
+    if is_private_workspace:
         assert workspace in usernames
     else:
         assert workspace not in usernames
