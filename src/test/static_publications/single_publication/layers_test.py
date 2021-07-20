@@ -159,10 +159,11 @@ def test_wms_layer(workspace, publ_type, publication):
 
     get_map = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('get_map')
     if get_map:
-        url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&STYLES=&LAYERS={workspace}:{publication}&SRS=EPSG:3857&WIDTH=768&HEIGHT=752&BBOX=-30022616.05686392,-30569903.32873383,30022616.05686392,28224386.44929134"
+        url_detail, expected_file, pixel_tolerance = get_map
+        url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&STYLES=&LAYERS={workspace}:{publication}&" + url_detail
         obtained_file = f'tmp/artifacts/test_sld_style_applied_in_wms_{publication}.png'
 
-        assert_util.assert_same_images(url, obtained_file, get_map, 2000)
+        assert_util.assert_same_images(url, obtained_file, expected_file, pixel_tolerance)
 
     file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
     if file_type != settings.FILE_TYPE_RASTER:
