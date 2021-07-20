@@ -643,6 +643,8 @@ LIST_SLD_COUNTRIES_10m_SLD_LAYERS = [(COMMON_WORKSPACE, LAYER_TYPE, 'post_10coun
 LIST_INTERNAL_MAPS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
                       if publ_type == MAP_TYPE and values[TEST_DATA].get('layers')]
 
+WORKSPACES = {workspace for workspace, _, _ in PUBLICATIONS}
+
 assert len(USERS) > 0, USERS
 assert len(HEADERS) > 0, HEADERS
 

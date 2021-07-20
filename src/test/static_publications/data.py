@@ -24,3 +24,8 @@ def ensure_publication(workspace, publ_type, publication):
         for idx, params in enumerate(data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION]):
             write_method = process_client.patch_workspace_publication if idx > 0 else process_client.publish_workspace_publication
             write_method(publ_type, workspace, publication, **params)
+
+
+def ensure_all_publications():
+    for workspace, publ_type, publication in data.PUBLICATIONS:
+        ensure_publication(workspace, publ_type, publication)
