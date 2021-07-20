@@ -52,7 +52,7 @@ def test_info(workspace, publ_type, publication):
         assert 'wfs' not in info, f'info={info}'
         assert 'db_table' not in info, f'info={info}'
 
-    assert (info_internal['style_type'] == 'qml') == (style == 'qml'), f'info={info}'
+    assert info_internal['style_type'] == style, f'info_internal={info_internal}'
     assert info['style']['type'] == style if style else 'sld', info.get('style')
     external_style_url = info['style']['url']
     assert external_style_url == expected_style_url, (info, external_style_url)
