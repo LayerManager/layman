@@ -10,24 +10,6 @@ from ..data import ensure_publication
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
-def test_bbox(workspace, publ_type, publication):
-    ensure_publication(workspace, publ_type, publication)
-    with app.app_context():
-        info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['bounding_box']})
-
-    exp_bbox = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('bbox')
-    if exp_bbox:
-        info_bbox = info['bounding_box']
-        assert_util.assert_same_bboxes(info_bbox, exp_bbox, 0.01)
-
-        file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
-        if file_type == settings.FILE_TYPE_RASTER:
-            bbox = gdal.get_bbox(workspace, publication)
-            assert_util.assert_same_bboxes(bbox, exp_bbox, 0.01)
-
-
-@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_thumbnail(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
@@ -229,9 +211,11 @@ def test_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
     is_personal_workspace = workspace in data.USERS
+    headers = data.HEADERS.get(workspace)
     with app.app_context():
-        info = layman_util.get_publication_info(workspace, publ_type, publication, )
+        info = process_client.get_workspace_publication(publ_type, workspace, publication, headers)
 
+    # Access rights
     for right in ['read', 'write']:
         users_can = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_' + right)
         if not users_can:
@@ -240,3 +224,14 @@ def test_info(workspace, publ_type, publication):
                 users_can.add(workspace)
 
         assert set(users_can) == set(info['access_rights'][right])
+
+    # Bounding box
+    exp_bbox = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('bbox')
+    if exp_bbox:
+        info_bbox = info['bounding_box']
+        assert_util.assert_same_bboxes(info_bbox, exp_bbox, 0.01)
+
+        file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
+        if file_type == settings.FILE_TYPE_RASTER:
+            bbox = gdal.get_bbox(workspace, publication)
+            assert_util.assert_same_bboxes(bbox, exp_bbox, 0.01)
