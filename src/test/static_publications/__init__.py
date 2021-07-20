@@ -106,8 +106,10 @@ PUBLICATIONS = {
         DEFINITION: [
             {'file_paths': ['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson'],
              'style_file': 'sample/style/ne_10m_admin_0_countries.qml'},
+            {'title': 'Title defined'},
         ],
         TEST_DATA: {
+            'title': 'Title defined',
             'thumbnail': 'sample/style/test_qgis_style_applied_in_thumbnail_layer.png',
             'file_type': 'vector',
             'style_type': 'qml',
@@ -145,7 +147,6 @@ PUBLICATIONS = {
         DEFINITION: [
             {'file_paths': ['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson']},
             {'style_file': 'sample/style/ne_10m_admin_0_countries.qml'},
-            {'title': 'Title defined'},
             {'file_paths': ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson']},
             {'style_file': 'sample/style/generic-blue_sld.xml'},
         ],
