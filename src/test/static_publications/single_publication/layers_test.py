@@ -116,7 +116,7 @@ def test_wms_layer(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
     style = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['style_type']
-    style_file = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('style_file')
+    style_file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('style_file_type')
     expected_style_file = f'/layman_data_test/workspaces/{workspace}/layers/{publication}/input_style/{publication}'
     expected_qgis_file = f'/qgis/data/test/workspaces/{workspace}/layers/{publication}/{publication}.qgis'
     wms_stores_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmsstores/')
@@ -125,9 +125,9 @@ def test_wms_layer(workspace, publ_type, publication):
     with app.app_context():
         info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['wms']})
 
-    if style_file:
-        assert (os.path.exists(expected_style_file + '.qml')) == (style_file == 'qml')
-        assert (os.path.exists(expected_style_file + '.sld')) == (style_file == 'sld')
+    if style_file_type:
+        assert (os.path.exists(expected_style_file + '.qml')) == (style_file_type == 'qml')
+        assert (os.path.exists(expected_style_file + '.sld')) == (style_file_type == 'sld')
     assert (os.path.exists(expected_qgis_file)) == (style == 'qml')
 
     response = requests.get(wms_stores_url,
