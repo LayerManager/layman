@@ -88,7 +88,7 @@ PUBLICATIONS = {
             'bbox': (3000, 3000, 5000, 5000),
             'file_type': 'vector',
             'style_type': 'sld',
-            'style_file': 'sld',
+            'style_file_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_qml'): {
@@ -99,7 +99,7 @@ PUBLICATIONS = {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
             'file_type': 'vector',
             'style_type': 'qml',
-            'style_file': 'qml',
+            'style_file_type': 'qml',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_countries_qml'): {
@@ -111,7 +111,7 @@ PUBLICATIONS = {
             'thumbnail': 'sample/style/test_qgis_style_applied_in_thumbnail_layer.png',
             'file_type': 'vector',
             'style_type': 'qml',
-            'style_file': 'qml',
+            'style_file_type': 'qml',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_style_countries_qml'): {
@@ -125,7 +125,7 @@ PUBLICATIONS = {
             'thumbnail': 'sample/style/test_qgis_style_applied_in_thumbnail_layer.png',
             'file_type': 'vector',
             'style_type': 'qml',
-            'style_file': 'qml',
+            'style_file_type': 'qml',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_countries_sld'): {
@@ -138,7 +138,7 @@ PUBLICATIONS = {
             'wms_expected': 'sample/style/countries_wms_blue.png',
             'file_type': 'vector',
             'style_type': 'sld',
-            'style_file': 'sld',
+            'style_file_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_style_110countries_sld'): {
@@ -154,7 +154,7 @@ PUBLICATIONS = {
             'wms_expected': 'sample/style/countries_wms_blue.png',
             'file_type': 'vector',
             'style_type': 'sld',
-            'style_file': 'sld',
+            'style_file_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_10countries_sld'): {
@@ -321,7 +321,7 @@ PUBLICATIONS = {
             'wms_expected': 'sample/style/countries_wms_blue.png',
             'file_type': 'vector',
             'style_type': 'sld',
-            'style_file': 'sld',
+            'style_file_type': 'sld',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_chunks_geojson_sld'): {
