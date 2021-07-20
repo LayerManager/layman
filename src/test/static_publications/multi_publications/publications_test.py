@@ -37,3 +37,8 @@ def test_get_publication_infos():
                     assert all(p_workspace == workspace and p_type == publ_type for p_workspace, p_type, _ in publications.keys())
                     publications_set = {name for _, _, name in publications.keys()}
                     assert publications_set == expected[user][workspace][publ_type][access_type]
+
+                headers = data.HEADERS.get(user)
+                publications = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
+                publication_set = {publication['name'] for publication in publications}
+                assert publication_set == expected[user][workspace][publ_type]['read']
