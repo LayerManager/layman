@@ -2,7 +2,7 @@ import os
 
 from layman import util, app, settings
 from test_tools import process_client
-from .. import single_static_publication as data
+from .. import static_publications as data
 
 
 def ensure_publication(workspace, publ_type, publication):
