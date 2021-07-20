@@ -4,7 +4,7 @@ from layman import app
 from layman.publication_relation import util
 from test_tools import process_client
 from ..data import ensure_publication
-from ... import single_static_publication as data
+from ... import static_publications as data
 
 
 @pytest.mark.parametrize('layer_workspace, layer_name, expected_maps', [

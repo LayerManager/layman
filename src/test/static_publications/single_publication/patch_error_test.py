@@ -2,7 +2,7 @@ import pytest
 
 from layman import LaymanError
 from test_tools import process_client, util as test_util
-from ... import single_static_publication as data
+from ... import static_publications as data
 from ..data import ensure_publication
 
 

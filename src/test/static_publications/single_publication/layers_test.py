@@ -13,7 +13,7 @@ from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX, VERSION
 from layman.layer.qgis import util as qgis_util
 from test_tools import process_client, assert_util, geoserver_client
 from test_tools.util import url_for
-from ... import single_static_publication as data
+from ... import static_publications as data
 from ..data import ensure_publication
 
 
