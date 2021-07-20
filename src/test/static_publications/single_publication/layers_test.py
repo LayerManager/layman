@@ -136,7 +136,7 @@ def test_wms_layer(workspace, publ_type, publication):
                             )
     assert response.status_code == 200, response.json()
     if style == 'qml':
-        wms_stores = [stores['name'] for stores in response.json()['wmsStores']['wmsStore']]
+        wms_stores = [store['name'] for store in response.json()['wmsStores']['wmsStore']]
         assert f'{DEFAULT_WMS_QGIS_STORE_PREFIX}_{publication}' in wms_stores, response.json()
     elif style == 'sld':
         url = urljoin(GS_REST, f'workspaces/{workspace}_wms/styles/{publication}')
@@ -154,7 +154,7 @@ def test_wms_layer(workspace, publ_type, publication):
                             )
     assert response.status_code == 200, response.json()
     if style == 'qml':
-        wms_layers = [stores['name'] for stores in response.json()['wmsLayers']['wmsLayer']]
+        wms_layers = [layer['name'] for layer in response.json()['wmsLayers']['wmsLayer']]
         assert publication in wms_layers, response.json()
 
     wms_expected = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('wms_expected')
