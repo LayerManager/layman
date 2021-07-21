@@ -32,8 +32,10 @@ def test_map_with_unauthorized_layer(workspace, publ_type, publication):
     exp_operates_on = []
     for layer_workspace, layer_type, layer in operates_on_layers:
         with app.app_context():
-            uuid = layman_util.get_publication_info(layer_workspace, layer_type, layer, context={'keys': ['uuid']})['uuid']
-        exp_operates_on.append((uuid, layer))
+            info = layman_util.get_publication_info(layer_workspace, layer_type, layer, context={'keys': ['uuid', 'title']})
+            uuid = info['uuid']
+            title = info['title']
+        exp_operates_on.append((uuid, title))
 
     for headers in data.HEADERS.values():
         assert_operates_on(workspace, publication, exp_operates_on, authz_headers=headers)
