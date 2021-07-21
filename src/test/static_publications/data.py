@@ -1,13 +1,17 @@
 import os
 
 from layman import util, app, settings
+from layman.common.prime_db_schema import workspaces
 from test_tools import process_client
 from .. import static_publications as data
 
 
 def ensure_publication(workspace, publ_type, publication):
+    with app.app_context():
+        workspaces_in_db = workspaces.get_workspace_names()
     for user in data.USERS:
-        process_client.ensure_reserved_username(user, headers=data.HEADERS[user])
+        if user not in workspaces_in_db:
+            process_client.ensure_reserved_username(user, headers=data.HEADERS[user])
 
     with app.app_context():
         info = util.get_publication_info(workspace, publ_type, publication, context={'keys': ['name']})
