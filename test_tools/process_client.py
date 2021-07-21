@@ -476,7 +476,11 @@ def post_wfst(xml, *, headers=None, url=None, workspace=None):
 
 
 def check_publication_status(response):
-    current_status = response.json().get('layman_metadata', dict()).get('publication_status')
+    try:
+        current_status = response.json().get('layman_metadata', dict()).get('publication_status')
+    except json.JSONDecodeError as exc:
+        print(f'response={response.text}')
+        raise exc
     return current_status in {'COMPLETE', 'INCOMPLETE'}
 
 
