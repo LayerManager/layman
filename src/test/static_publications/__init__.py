@@ -640,6 +640,7 @@ LIST_INTERNAL_MAPS = [(workspace, publ_type, publication) for (workspace, publ_t
 
 WORKSPACES = {workspace for workspace, _, _ in PUBLICATIONS}
 
+assert len(WORKSPACES) > 0, WORKSPACES
 assert len(USERS) > 0, USERS
 assert len(HEADERS) > 0, HEADERS
 
@@ -651,3 +652,6 @@ assert len(LIST_SLD_LAYERS) > 0, LIST_SLD_LAYERS
 assert len(LIST_QML_LAYERS) > 0, LIST_QML_LAYERS
 assert len(LIST_SLD_COUNTRIES_10m_SLD_LAYERS) > 0, LIST_SLD_COUNTRIES_10m_SLD_LAYERS
 assert len(LIST_INTERNAL_MAPS) > 0, LIST_INTERNAL_MAPS
+
+assert all(set(test_data.get('users_can_read', set())).issubset(USERS) for test_data in PUBLICATIONS.values())
+assert all(set(test_data.get('users_can_write', set())).issubset(USERS) for test_data in PUBLICATIONS.values())
