@@ -212,6 +212,10 @@ def test_info(workspace, publ_type, publication):
     with app.app_context():
         info = process_client.get_workspace_publication(publ_type, workspace, publication, headers)
 
+    # Items
+    for item in {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}:
+        assert item in info, (item, info)
+
     # Access rights
     for right in ['read', 'write']:
         users_can = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_' + right)
