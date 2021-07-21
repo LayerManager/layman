@@ -43,13 +43,13 @@ def test_info(workspace, publ_type, publication):
     assert 'wms' in info, f'info={info}'
     assert 'url' in info['wms'], f'info={info}'
 
-    if data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type') == 'vector':
-        assert info.get('file', dict()).get('file_type') == 'vector', info
+    if data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type') == settings.FILE_TYPE_VECTOR:
+        assert info.get('file', dict()).get('file_type') == settings.FILE_TYPE_VECTOR, info
         assert 'wfs' in info, f'info={info}'
         assert 'url' in info['wms'], f'info={info}'
         assert info['wfs'].get('url') == wfs_url, f'r_json={info}, wfs_url={wfs_url}'
-    elif data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type') == 'raster':
-        assert info.get('file', dict()).get('file_type') == 'raster', info
+    elif data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type') == settings.FILE_TYPE_RASTER:
+        assert info.get('file', dict()).get('file_type') == settings.FILE_TYPE_RASTER, info
         assert 'wfs' not in info, f'info={info}'
         assert 'db_table' not in info, f'info={info}'
 
@@ -75,7 +75,7 @@ def test_geoserver_workspace(workspace, publ_type, publication):
     })
     assert r_wms.status_code == 200
 
-    if data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type') == 'vector':
+    if data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type') == settings.FILE_TYPE_VECTOR:
         r_wfs = requests.get(internal_wfs_url, params={
             'service': 'WFS',
             'request': 'GetCapabilities',
