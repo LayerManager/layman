@@ -13,6 +13,7 @@ from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX, VERSION
 from layman.layer.qgis import util as qgis_util
 from test_tools import process_client, assert_util, geoserver_client
 from test_tools.util import url_for
+from .. import util
 from ... import static_publications as data
 from ..data import ensure_publication
 
@@ -179,13 +180,9 @@ def test_wms_layer(workspace, publ_type, publication):
             assert 'image' in response.headers['content-type']
 
     gs_workspace = info['_wms']['workspace']
-    users_can_read = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_read')
-    if users_can_read:
-        headers_list_in = [header for user, header in data.HEADERS.items() if user in users_can_read]
-        headers_list_out = [header for user, header in data.HEADERS.items() if user not in users_can_read] + [None]
-    else:
-        headers_list_in = list(data.HEADERS.values()) + [None]
-        headers_list_out = []
+    all_auth_info = util.get_users_and_headers_for_publication(workspace, publ_type, publication)
+    headers_list_in = all_auth_info['read'][util.KEY_AUTH][util.KEY_HEADERS]
+    headers_list_out = all_auth_info['read'][util.KEY_NOT_AUTH][util.KEY_HEADERS]
 
     for in_headers in headers_list_in:
         wms = geoserver_client.get_wms_capabilities(gs_workspace, headers=in_headers)

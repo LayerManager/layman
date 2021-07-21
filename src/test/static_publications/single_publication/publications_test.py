@@ -3,6 +3,7 @@ from layman import app, util as layman_util, settings
 from layman.layer.filesystem import gdal, thumbnail as layer_thumbnail
 from layman.map.filesystem import thumbnail as map_thumbnail
 from test_tools import assert_util, util as test_util, process_client
+from .. import util
 from ... import static_publications as data
 from ..data import ensure_publication
 
@@ -97,13 +98,9 @@ def test_infos(workspace, publ_type, publication):
 def test_auth_get_publications(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
-    users_can_read = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_read')
-    if users_can_read:
-        headers_list_in = [header for user, header in data.HEADERS.items() if user in users_can_read]
-        headers_list_out = [header for user, header in data.HEADERS.items() if user not in users_can_read] + [None]
-    else:
-        headers_list_in = list(data.HEADERS.values()) + [None]
-        headers_list_out = []
+    all_auth_info = util.get_users_and_headers_for_publication(workspace, publ_type, publication)
+    headers_list_in = all_auth_info['read'][util.KEY_AUTH][util.KEY_HEADERS]
+    headers_list_out = all_auth_info['read'][util.KEY_NOT_AUTH][util.KEY_HEADERS]
 
     for in_headers in headers_list_in:
         infos = process_client.get_workspace_publications(publ_type, workspace, headers=in_headers)
@@ -121,14 +118,9 @@ def test_auth_get_publications(workspace, publ_type, publication):
 def test_auth_get_publication(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
-    users_can_read = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_read')
-    users = data.USERS | {settings.ANONYM_USER, settings.NONAME_USER}
-    if users_can_read:
-        readers = users_can_read
-        non_readers = {item for item in users if item not in users_can_read}
-    else:
-        readers = users
-        non_readers = set()
+    all_auth_info = util.get_users_and_headers_for_publication(workspace, publ_type, publication)
+    readers = all_auth_info['read'][util.KEY_AUTH][util.KEY_USERS]
+    non_readers = all_auth_info['read'][util.KEY_NOT_AUTH][util.KEY_USERS]
 
     for user in readers:
         with app.app_context():
@@ -187,7 +179,6 @@ def test_internal_info(workspace, publ_type, publication):
 def test_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
-    is_personal_workspace = workspace in data.USERS
     headers = data.HEADERS.get(workspace)
     with app.app_context():
         info = process_client.get_workspace_publication(publ_type, workspace, publication, headers)
@@ -197,14 +188,10 @@ def test_info(workspace, publ_type, publication):
         assert item in info, (item, info)
 
     # Access rights
+    all_auth_info = util.get_users_and_headers_for_publication(workspace, publ_type, publication)
     for right in ['read', 'write']:
-        users_can = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_' + right)
-        if not users_can:
-            users_can = {settings.RIGHTS_EVERYONE_ROLE}
-            if is_personal_workspace:
-                users_can.add(workspace)
-
-        assert set(users_can) == set(info['access_rights'][right])
+        exp_list = all_auth_info[right][util.KEY_AUTH][util.KEY_EXP_LIST]
+        assert set(exp_list) == set(info['access_rights'][right])
 
     # Bounding box
     exp_bbox = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('bbox')
