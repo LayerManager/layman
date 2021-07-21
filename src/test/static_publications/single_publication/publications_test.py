@@ -1,6 +1,5 @@
 import pytest
 from layman import app, util as layman_util, settings
-from layman.common.prime_db_schema import publications
 from layman.layer.filesystem import gdal, thumbnail as layer_thumbnail
 from layman.map.filesystem import thumbnail as map_thumbnail
 from test_tools import assert_util, util as test_util, process_client
@@ -141,25 +140,6 @@ def test_auth_get_publication(workspace, publ_type, publication):
         with app.app_context():
             pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user})
         assert pub_info == dict(), pub_info
-
-
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
-def test_publications_same_name():
-    for workspace, publ_type, publication in data.PUBLICATIONS:
-        if workspace in {data.WORKSPACE1, data.WORKSPACE2}:
-            ensure_publication(workspace, publ_type, publication)
-
-    with app.app_context():
-        pubs = publications.get_publication_infos(data.WORKSPACE1)
-        assert len(pubs) == 2
-        pubs = publications.get_publication_infos(data.WORKSPACE2)
-        assert len(pubs) == 2
-        pubs = publications.get_publication_infos()
-        assert len(pubs) >= 4
-
-    for workspace, publ_type, publication in data.PUBLICATIONS:
-        if workspace in {data.WORKSPACE1, data.WORKSPACE2}:
-            assert pubs[(workspace, publ_type, publication)]['name'] == publication, f'pubs={pubs}'
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
