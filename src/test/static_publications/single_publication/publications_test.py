@@ -123,11 +123,12 @@ def test_auth_get_publication(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
     users_can_read = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_read')
+    users = data.USERS | {settings.ANONYM_USER, settings.NONAME_USER}
     if users_can_read:
         readers = users_can_read
-        non_readers = {item for item in data.USERS if item not in users_can_read}
+        non_readers = {item for item in users if item not in users_can_read}
     else:
-        readers = data.USERS
+        readers = users
         non_readers = set()
 
     for user in readers:
