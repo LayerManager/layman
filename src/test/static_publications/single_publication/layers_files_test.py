@@ -4,7 +4,6 @@ from layman import app, settings
 from layman.layer import qgis
 from layman.layer.qgis import wms
 from layman.layer.filesystem import gdal, input_file
-from test_tools import process_client
 from test_tools.util import url_for
 from ... import static_publications as data
 from ..data import ensure_publication
@@ -44,11 +43,4 @@ def test_qml_files(workspace, publ_type, publication):
                                                                                            f'map=/qgis/data/test/workspaces/{workspace}/layers/{publication}/{publication}.qgis'
                                                               }
                                                               }
-        assert workspace in qgis.get_workspaces()
-
-    process_client.delete_workspace_layer(workspace, publication)
-    assert os.path.exists(workspace_directory)
-    assert not os.path.exists(layer_directory)
-    with app.app_context():
-        assert wms.get_layer_info(workspace, publication) == {}
         assert workspace in qgis.get_workspaces()
