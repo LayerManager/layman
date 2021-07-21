@@ -1,3 +1,4 @@
+from layman import settings
 from test_tools import process_client
 
 COMMON_WORKSPACE = 'test_workspace'
@@ -26,7 +27,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
         },
     },
@@ -36,7 +37,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'users_can_read': [OWNER],
             'users_can_write': [OWNER],
@@ -48,7 +49,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'users_can_read': [OWNER2],
             'users_can_write': [OWNER2],
@@ -62,7 +63,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'users_can_write': [OWNER],
         },
@@ -75,7 +76,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
         },
     },
@@ -86,7 +87,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (3000, 3000, 5000, 5000),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'style_file_type': 'sld',
         },
@@ -97,7 +98,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'qml',
             'style_file_type': 'qml',
         },
@@ -111,7 +112,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'title': 'Title defined',
             'thumbnail': 'sample/style/test_qgis_style_applied_in_thumbnail_layer.png',
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'qml',
             'style_file_type': 'qml',
         },
@@ -125,7 +126,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'title': 'Title defined',
             'thumbnail': 'sample/style/test_qgis_style_applied_in_thumbnail_layer.png',
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'qml',
             'style_file_type': 'qml',
         },
@@ -141,7 +142,7 @@ PUBLICATIONS = {
                         'sample/style/countries_wms_blue.png',
                         2000,
                         ),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'style_file_type': 'sld',
         },
@@ -159,7 +160,7 @@ PUBLICATIONS = {
                         'sample/style/countries_wms_blue.png',
                         2000,
                         ),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'style_file_type': 'sld',
         },
@@ -169,7 +170,7 @@ PUBLICATIONS = {
             {'file_paths': ['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson']},
         ],
         TEST_DATA: {
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
         },
     },
@@ -182,7 +183,7 @@ PUBLICATIONS = {
             'file_extensions': ['.jp2'],
             'normalized_color_interp': ['Red', 'Green', 'Blue'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_jp2.png',
-            'file_type': 'raster',
+            'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
     },
@@ -196,7 +197,7 @@ PUBLICATIONS = {
             'file_extensions': ['.jp2'],
             'normalized_color_interp': ['Red', 'Green', 'Blue'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_jp2.png',
-            'file_type': 'raster',
+            'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
     },
@@ -209,7 +210,7 @@ PUBLICATIONS = {
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Red', 'Green', 'Blue'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif.png',
-            'file_type': 'raster',
+            'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
     },
@@ -222,7 +223,7 @@ PUBLICATIONS = {
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Red', 'Green', 'Blue', 'Alpha'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_rgb_nodata.png',
-            'file_type': 'raster',
+            'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
     },
@@ -235,7 +236,7 @@ PUBLICATIONS = {
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Red', 'Green', 'Blue', 'Alpha'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_rgba.png',
-            'file_type': 'raster',
+            'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
     },
@@ -248,7 +249,7 @@ PUBLICATIONS = {
             'file_extensions': ['.tiff'],
             'normalized_color_interp': ['Red', 'Green', 'Blue'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tiff.png',
-            'file_type': 'raster',
+            'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
     },
@@ -262,7 +263,7 @@ PUBLICATIONS = {
             'file_extensions': ['.tif', '.tfw'],
             'normalized_color_interp': ['Red', 'Green', 'Blue'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tiff.png',
-            'file_type': 'raster',
+            'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
     },
@@ -275,7 +276,7 @@ PUBLICATIONS = {
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Palette'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
-            'file_type': 'raster',
+            'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
     },
@@ -288,7 +289,7 @@ PUBLICATIONS = {
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Palette'],
             'thumbnail': '',
-            'file_type': 'raster',
+            'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
     },
@@ -301,7 +302,7 @@ PUBLICATIONS = {
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Gray', 'Alpha'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_alpha_nodata.png',
-            'file_type': 'raster',
+            'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
     },
@@ -314,7 +315,7 @@ PUBLICATIONS = {
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Gray'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_nodata_opaque.png',
-            'file_type': 'raster',
+            'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
     },
@@ -329,7 +330,7 @@ PUBLICATIONS = {
                         'sample/style/countries_wms_blue.png',
                         2000,
                         ),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'style_file_type': 'sld',
         },
@@ -342,7 +343,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
         },
     },
@@ -357,7 +358,7 @@ PUBLICATIONS = {
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Red', 'Green', 'Blue'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif.png',
-            'file_type': 'raster',
+            'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
     },
@@ -367,7 +368,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
         },
     },
@@ -377,7 +378,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
         },
     },
@@ -390,7 +391,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
         },
     },
@@ -403,7 +404,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
         },
     },
@@ -416,7 +417,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
         },
     },
@@ -431,7 +432,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'users_can_read': [OWNER],
             'users_can_write': [OWNER],
@@ -447,7 +448,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'users_can_read': [OWNER],
             'users_can_write': [OWNER],
@@ -464,7 +465,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'users_can_write': [OWNER],
         },
@@ -480,7 +481,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'users_can_read': [OWNER],
             'users_can_write': [OWNER],
@@ -500,7 +501,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'users_can_read': [OWNER],
             'users_can_write': [OWNER],
@@ -520,7 +521,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'users_can_read': [OWNER, OWNER2],
             'users_can_write': [OWNER],
@@ -543,7 +544,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
-            'file_type': 'vector',
+            'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
         },
     },
@@ -641,9 +642,9 @@ LIST_ALL_PUBLICATIONS = list(PUBLICATIONS.keys())
 LIST_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication) in PUBLICATIONS
                if publ_type == LAYER_TYPE]
 LIST_RASTER_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
-                      if publ_type == LAYER_TYPE and values[TEST_DATA].get('file_type') == 'raster']
+                      if publ_type == LAYER_TYPE and values[TEST_DATA].get('file_type') == settings.FILE_TYPE_RASTER]
 LIST_VECTOR_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
-                      if publ_type == LAYER_TYPE and values[TEST_DATA].get('file_type') == 'vector']
+                      if publ_type == LAYER_TYPE and values[TEST_DATA].get('file_type') == settings.FILE_TYPE_VECTOR]
 LIST_SLD_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
                    if publ_type == LAYER_TYPE and values[TEST_DATA].get('style_type') == 'sld']
 LIST_QML_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
