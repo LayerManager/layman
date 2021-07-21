@@ -122,25 +122,6 @@ def test_auth_get_publications(workspace, publ_type, publication):
 def test_auth_get_publication(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
-    with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, publication)
-        for item in {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}:
-            assert item in pub_info, (item, pub_info)
-
-    with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'keys': ['metadata']})
-        for item in {'metadata', }:
-            assert item in pub_info, (item, pub_info)
-        for item in {'name', 'title', 'access_rights', 'uuid', 'file', }:
-            assert item not in pub_info, (item, pub_info)
-
-    with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'keys': ['thumbnail']})
-        for item in {'thumbnail'}:
-            assert item in pub_info, (item, pub_info)
-        for item in {'name', 'title', 'access_rights', 'uuid', 'file', 'metadata', }:
-            assert item not in pub_info, (item, pub_info)
-
     users_can_read = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_read')
     if users_can_read:
         readers = users_can_read
@@ -152,21 +133,13 @@ def test_auth_get_publication(workspace, publ_type, publication):
     for user in readers:
         with app.app_context():
             pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user})
-        for item in {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}:
-            assert item in pub_info, (item, pub_info)
-
-        with app.app_context():
-            pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user, 'keys': []})
-        for item in {'name', 'title', 'access_rights', 'uuid', }:
-            assert item in pub_info, (item, pub_info)
-        for item in {'metadata', 'file', }:
-            assert item not in pub_info, (item, pub_info)
+        assert pub_info['name'] == publication, f'pub_info={pub_info}'
+        assert pub_info['type'] == publ_type, f'pub_info={pub_info}'
 
     for user in non_readers:
         with app.app_context():
             pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user})
-        for item in {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}:
-            assert item not in pub_info, (item, pub_info)
+        assert pub_info == dict(), pub_info
 
 
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
@@ -188,7 +161,47 @@ def test_publications_same_name():
             assert pubs[(workspace, publ_type, publication)]['name'] == publication, f'pubs={pubs}'
 
 
-@pytest.mark.parametrize('workspace, publ_type, publication', data.PUBLICATIONS)
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+def test_internal_info(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+
+    is_personal_workspace = workspace in data.USERS
+    # Items
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, publication)
+    for item in {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}:
+        assert item in pub_info, (item, pub_info)
+
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'keys': ['metadata']})
+    for item in {'metadata', }:
+        assert item in pub_info, (item, pub_info)
+    for item in {'name', 'title', 'access_rights', 'uuid', 'file', }:
+        assert item not in pub_info, (item, pub_info)
+
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'keys': ['thumbnail']})
+    for item in {'thumbnail'}:
+        assert item in pub_info, (item, pub_info)
+    for item in {'name', 'title', 'access_rights', 'uuid', 'file', 'metadata', }:
+        assert item not in pub_info, (item, pub_info)
+
+    user = workspace if is_personal_workspace else settings.ANONYM_USER
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user, 'keys': []})
+    for item in {'name', 'title', 'access_rights', 'uuid', }:
+        assert item in pub_info, (item, pub_info)
+    for item in {'metadata', 'file', }:
+        assert item not in pub_info, (item, pub_info)
+
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user})
+    for item in {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}:
+        assert item in pub_info, (item, pub_info)
+
+
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
