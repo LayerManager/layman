@@ -1,6 +1,7 @@
 import pytest
 from layman import app, util as layman_util, settings
 from layman.common.prime_db_schema import publications
+from layman.publication_relation import util as pr_util
 from test_tools import process_client
 from ... import static_publications as data
 from ..data import ensure_all_publications
@@ -64,3 +65,18 @@ def test_publications_same_name():
     assert len(pubs) == len(data.PUBLICATIONS)
     for key in data.PUBLICATIONS:
         assert key in pubs
+
+
+@pytest.mark.timeout(600)
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+def test_find_maps_containing_layer():
+    ensure_all_publications()
+
+    for l_workspace, l_type, layer in data.LIST_LAYERS:
+        expected_maps = {(workspace, publication)
+                         for (workspace, publ_type, publication), values in data.PUBLICATIONS.items()
+                         if publ_type == data.MAP_TYPE and (l_workspace, l_type, layer) in values[data.TEST_DATA].get('layers', list())}
+
+        with app.app_context():
+            result_maps = pr_util.find_maps_containing_layer(l_workspace, layer)
+        assert result_maps == expected_maps
