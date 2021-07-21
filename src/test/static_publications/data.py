@@ -1,9 +1,23 @@
 import os
+import pytest
 
 from layman import util, app, settings
 from layman.common.prime_db_schema import workspaces
-from test_tools import process_client
+from test_tools import process_client, process
 from .. import static_publications as data
+
+
+@pytest.fixture(scope="session", autouse=True)
+def ensure_test_data(liferay_mock):
+    # pylint: disable=unused-argument
+    yield
+    process.ensure_layman_function(process.LAYMAN_DEFAULT_SETTINGS)
+    with app.app_context():
+        info = util.get_publication_infos()
+
+    for workspace, publ_type, publication in info:
+        headers = data.HEADERS.get(workspace)
+        process_client.delete_workspace_publication(publ_type, workspace, publication, headers=headers)
 
 
 def ensure_publication(workspace, publ_type, publication):
