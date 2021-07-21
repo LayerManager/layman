@@ -131,22 +131,6 @@ PUBLICATIONS = {
             'style_file_type': 'qml',
         },
     },
-    (COMMON_WORKSPACE, LAYER_TYPE, 'post_countries_sld'): {
-        DEFINITION: [
-            {'file_paths': ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'],
-             'style_file': 'sample/style/generic-blue_sld.xml'},
-        ],
-        TEST_DATA: {
-            'thumbnail': 'sample/style/test_sld_style_applied_in_thumbnail_layer.png',
-            'get_map': ('SRS=EPSG:3857&WIDTH=768&HEIGHT=752&BBOX=-30022616.05686392,-30569903.32873383,30022616.05686392,28224386.44929134',
-                        'sample/style/countries_wms_blue.png',
-                        2000,
-                        ),
-            'file_type': settings.FILE_TYPE_VECTOR,
-            'style_type': 'sld',
-            'style_file_type': 'sld',
-        },
-    },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_style_110countries_sld'): {
         DEFINITION: [
             {'file_paths': ['/code/tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson']},
