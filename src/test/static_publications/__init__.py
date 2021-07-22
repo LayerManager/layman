@@ -552,7 +552,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'layers': [(COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'), ],
-            'operates_on': [(COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'), ],
+            'operates_on': {(COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'), },
             'thumbnail': 'sample/style/test_sld_style_applied_in_map_thumbnail_map.png',
         },
     },
@@ -587,7 +587,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'layers': [(OWNER, LAYER_TYPE, 'post_private_sld'), (OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
-            'operates_on': [(OWNER, LAYER_TYPE, 'post_private_sld'), ],
+            'operates_on': {(OWNER, LAYER_TYPE, 'post_private_sld'), },
             'users_can_write': [OWNER, OWNER2],
         },
     },
@@ -603,7 +603,7 @@ PUBLICATIONS = {
         ],
         TEST_DATA: {
             'layers': [(OWNER, LAYER_TYPE, 'post_private_sld'), (OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
-            'operates_on': [(OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
+            'operates_on': {(OWNER2, LAYER_TYPE, 'post_private_sld2'), },
             'users_can_write': [OWNER, OWNER2],
         },
     },

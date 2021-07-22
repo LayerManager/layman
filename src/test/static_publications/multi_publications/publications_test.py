@@ -63,8 +63,7 @@ def test_publications_same_name():
     with app.app_context():
         pubs = publications.get_publication_infos()
     assert len(pubs) == len(data.PUBLICATIONS)
-    for key in data.PUBLICATIONS:
-        assert key in pubs
+    assert set(data.PUBLICATIONS) == set(pubs)
 
 
 @pytest.mark.timeout(600)
