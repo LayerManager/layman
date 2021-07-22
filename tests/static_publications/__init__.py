@@ -625,6 +625,15 @@ PUBLICATIONS = {
     },
 }
 
+# PUBLICATIONS = {(ws, pt, pn): value for (ws, pt, pn), value in PUBLICATIONS.items()
+#                 if (ws, pt, pn) in {(COMMON_WORKSPACE, LAYER_TYPE, 'post_common_sld'),
+#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_qml'),
+#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_jp2'),
+#                                     (COMMON_WORKSPACE, MAP_TYPE, 'post_internal_layer'),
+#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'),
+#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_10countries_sld'),
+#                                     }}
+
 LIST_ALL_PUBLICATIONS = list(PUBLICATIONS.keys())
 LIST_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication) in PUBLICATIONS
                if publ_type == LAYER_TYPE]
