@@ -1,7 +1,10 @@
 import os
+import json
+import time
 import pytest
 
 from layman import util, app, settings
+from layman.common import empty_method_returns_true
 from layman.common.prime_db_schema import workspaces
 from layman.layer import qgis
 from layman.layer.geoserver import wms
@@ -52,12 +55,16 @@ def ensure_test_data(liferay_mock):
         assert_publication_after_delete(workspace, publ_type, publication)
 
 
-def ensure_publication(workspace, publ_type, publication):
+def ensure_all_users():
     with app.app_context():
         workspaces_in_db = workspaces.get_workspace_names()
     for user in data.USERS:
         if user not in workspaces_in_db:
             process_client.ensure_reserved_username(user, headers=data.HEADERS[user])
+
+
+def ensure_publication(workspace, publ_type, publication):
+    ensure_all_users()
 
     with app.app_context():
         info = util.get_publication_info(workspace, publ_type, publication, context={'keys': ['name']})
@@ -68,6 +75,43 @@ def ensure_publication(workspace, publ_type, publication):
             write_method(publ_type, workspace, publication, **params)
 
 
+def check_publication_status(response):
+    try:
+        current_status = response.json().get('layman_metadata', dict()).get('publication_status')
+    except json.JSONDecodeError as exc:
+        print(f'response={response.text}')
+        raise exc
+    assert current_status != 'INCOMPLETE', response.json()
+    return current_status in {'COMPLETE'}
+
+
+def publish_publications_step(publications_set, step_num):
+    done_publications = set()
+    for workspace, publ_type, publication in publications_set:
+        write_method = process_client.patch_workspace_publication if step_num > 0 else process_client.publish_workspace_publication
+        data_def = data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION]
+        params = data_def[step_num]
+        write_method(publ_type, workspace, publication, **params, check_response_fn=empty_method_returns_true)
+        time.sleep(1)
+        if len(data_def) == step_num + 1:
+            done_publications.add((workspace, publ_type, publication))
+    for workspace, publ_type, publication in publications_set:
+        headers = data.HEADERS.get(workspace)
+        process_client.wait_for_publication_status(workspace, publ_type, publication, headers=headers, check_response_fn=check_publication_status)
+    return done_publications
+
+
 def ensure_all_publications():
-    for workspace, publ_type, publication in data.PUBLICATIONS:
-        ensure_publication(workspace, publ_type, publication)
+    ensure_all_users()
+    with app.app_context():
+        already_created_publications = util.get_publication_infos()
+    publications_to_publish = set(data.PUBLICATIONS) - set(already_created_publications)
+    for p_type in [data.LAYER_TYPE, data.MAP_TYPE]:
+        publications_by_type = {(workspace, publ_type, publication)
+                                for workspace, publ_type, publication in publications_to_publish
+                                if publ_type == p_type}
+        step_num = 0
+        while publications_by_type:
+            done_publications = publish_publications_step(publications_by_type, step_num)
+            publications_by_type -= done_publications
+            step_num += 1
