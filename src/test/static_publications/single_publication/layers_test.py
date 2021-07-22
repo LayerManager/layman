@@ -193,7 +193,7 @@ def test_wms_layer(workspace, publ_type, publication):
         assert publication not in set(wms.contents)
 
 
-@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_SLD_COUNTRIES_10m_SLD_LAYERS)
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_QML_LAYERS)
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_fill_project_template(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
@@ -212,13 +212,12 @@ def test_fill_project_template(workspace, publ_type, publication):
     with app.app_context():
         layer_bbox = layer_db.get_bbox(workspace, publication)
     layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
-    qml_path = '/code/sample/style/ne_10m_admin_0_countries.qml'
+    with app.app_context():
+        qml_path = qgis_util.get_original_style_path(workspace, publication)
     parser = ET.XMLParser(remove_blank_text=True)
     qml_xml = ET.parse(qml_path, parser=parser)
-    exp_min_scale = '200000000'
-    template_xml = ET.parse(qgis_util.get_layer_template_path(), parser=parser)
+    exp_min_scale = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('min_scale')
     assert qml_xml.getroot().attrib['minScale'] == exp_min_scale
-    assert template_xml.getroot().attrib['minScale'] != exp_min_scale
     with app.app_context():
         db_types = layer_db.get_geometry_types(workspace, publication)
         db_cols = [

@@ -101,6 +101,7 @@ PUBLICATIONS = {
             'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'qml',
             'style_file_type': 'qml',
+            'min_scale': '100000000',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_countries_qml'): {
@@ -115,6 +116,7 @@ PUBLICATIONS = {
             'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'qml',
             'style_file_type': 'qml',
+            'min_scale': '200000000',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_style_countries_qml'): {
@@ -129,6 +131,7 @@ PUBLICATIONS = {
             'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'qml',
             'style_file_type': 'qml',
+            'min_scale': '200000000',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_style_110countries_sld'): {
