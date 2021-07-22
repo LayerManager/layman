@@ -116,35 +116,27 @@ def test_internal_info(workspace, publ_type, publication):
     # Items
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, publication)
-    for item in {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}:
-        assert item in pub_info, (item, pub_info)
+    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
 
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'keys': ['metadata']})
-    for item in {'metadata', }:
-        assert item in pub_info, (item, pub_info)
-    for item in {'name', 'title', 'access_rights', 'uuid', 'file', }:
-        assert item not in pub_info, (item, pub_info)
+    assert {'metadata', }.issubset(set(pub_info)), pub_info
+    assert all(item not in pub_info for item in {'name', 'title', 'access_rights', 'uuid', 'file', }), pub_info
 
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'keys': ['thumbnail']})
-    for item in {'thumbnail'}:
-        assert item in pub_info, (item, pub_info)
-    for item in {'name', 'title', 'access_rights', 'uuid', 'file', 'metadata', }:
-        assert item not in pub_info, (item, pub_info)
+    assert {'thumbnail', }.issubset(set(pub_info)), pub_info
+    assert all(item not in pub_info for item in {'name', 'title', 'access_rights', 'uuid', 'file', 'metadata', }), pub_info
 
     user = workspace if is_personal_workspace else settings.ANONYM_USER
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user, 'keys': []})
-    for item in {'name', 'title', 'access_rights', 'uuid', }:
-        assert item in pub_info, (item, pub_info)
-    for item in {'metadata', 'file', }:
-        assert item not in pub_info, (item, pub_info)
+    assert {'name', 'title', 'access_rights', 'uuid', }.issubset(set(pub_info)), pub_info
+    assert all(item not in pub_info for item in {'metadata', 'file', }), pub_info
 
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user})
-    for item in {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}:
-        assert item in pub_info, (item, pub_info)
+    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
@@ -157,8 +149,7 @@ def test_info(workspace, publ_type, publication):
         info = process_client.get_workspace_publication(publ_type, workspace, publication, headers)
 
     # Items
-    for item in {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}:
-        assert item in info, (item, info)
+    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}.issubset(set(info)), info
 
     # Access rights
     all_auth_info = util.get_users_and_headers_for_publication(workspace, publ_type, publication)
