@@ -45,14 +45,14 @@ def assert_publication_before_post(workspace, publ_type, publication):
 def ensure_test_data(liferay_mock):
     # pylint: disable=unused-argument
     yield
-    process.ensure_layman_function(process.LAYMAN_DEFAULT_SETTINGS)
-    with app.app_context():
-        info = util.get_publication_infos()
-
-    for workspace, publ_type, publication in info:
-        headers = data.HEADERS.get(workspace)
-        process_client.delete_workspace_publication(publ_type, workspace, publication, headers=headers)
-        assert_publication_after_delete(workspace, publ_type, publication)
+    # process.ensure_layman_function(process.LAYMAN_DEFAULT_SETTINGS)
+    # with app.app_context():
+    #     info = util.get_publication_infos()
+    #
+    # for workspace, publ_type, publication in info:
+    #     headers = data.HEADERS.get(workspace)
+    #     process_client.delete_workspace_publication(publ_type, workspace, publication, headers=headers)
+    #     assert_publication_after_delete(workspace, publ_type, publication)
 
 
 def ensure_all_users():
@@ -85,20 +85,70 @@ def check_publication_status(response):
     return current_status in {'COMPLETE'}
 
 
-def publish_publications_step(publications_set, step_num):
+def publish_publications_step(publications_set, step_num, *, write_method=None):
     done_publications = set()
-    for workspace, publ_type, publication in publications_set:
+    publications_with_error = set()
+    if not write_method:
         write_method = process_client.patch_workspace_publication if step_num > 0 else process_client.publish_workspace_publication
+    for workspace, publ_type, publication in publications_set:
         data_def = data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION]
         params = data_def[step_num]
-        write_method(publ_type, workspace, publication, **params, check_response_fn=empty_method_returns_true)
-        time.sleep(1)
+        try:
+            write_method(publ_type, workspace, publication, **params, check_response_fn=empty_method_returns_true)
+        except BaseException:
+            publications_with_error.add((workspace, publ_type, publication))
         if len(data_def) == step_num + 1:
             done_publications.add((workspace, publ_type, publication))
-    for workspace, publ_type, publication in publications_set:
-        headers = data.HEADERS.get(workspace)
-        process_client.wait_for_publication_status(workspace, publ_type, publication, headers=headers, check_response_fn=check_publication_status)
-    return done_publications
+    return done_publications, publications_with_error
+
+
+def ensure_publication_set(publication_set):
+    if not publication_set:
+        return
+    publications_to_publish = publication_set.copy()
+    publications_to_repatch = set()
+    step_num = 0
+    while publications_to_publish:
+        last_step_publications, publications_with_error = publish_publications_step(publications_to_publish, step_num)
+        publications_to_repatch |= publications_with_error
+
+        publications_to_check = publications_to_publish.copy() - publications_with_error
+        attempts = 0
+        while publications_to_check:
+            done_publications = set()
+            for workspace, publ_type, publication in publications_to_check:
+                headers = data.HEADERS.get(workspace)
+                info = process_client.get_workspace_publication(publ_type, workspace, publication, headers=headers)
+                status = info.get('layman_metadata', dict()).get('publication_status')
+                if status == 'INCOMPLETE':
+                    publications_to_repatch.add((workspace, publ_type, publication))
+                elif status == 'COMPLETE':
+                    done_publications.add((workspace, publ_type, publication))
+            publications_to_check -= done_publications
+            publications_to_check -= publications_to_repatch
+            attempts += 1
+            time.sleep(0.5)
+            if attempts >= 60:
+                workspace, publ_type, publication = next(iter(publications_to_check))
+                headers = data.HEADERS.get(workspace)
+                info = process_client.get_workspace_publication(publ_type, workspace, publication, headers=headers)
+                print(
+                    f'\n\ninfo={info}\n\n&&&&&&&&&&&&&&&&&')
+            assert attempts <= 60, f'\n\nPublications: \npublication_set={publication_set}\npublications_to_repatch={publications_to_repatch}\ndone_publications={done_publications}\npublications_to_check={publications_to_check}\nstep_num={step_num}\n\n&&&&&&&&&&&&&&&&&'
+
+        publications_to_publish -= last_step_publications
+        publications_to_publish -= publications_to_repatch
+        step_num += 1
+
+    print(f'\n\nPublications: \npublication_set={publication_set}\npublications_to_repatch={publications_to_repatch}\n\n&&&&&&&&&&&&&&&&&')
+
+    if publications_to_repatch:
+        assert len(publications_to_repatch) < len(
+            publication_set), f'publications_to_repatch={publications_to_repatch}, publication_set={publication_set}'
+        for workspace, publ_type, publication in publications_to_repatch:
+            headers = data.HEADERS.get(workspace)
+            process_client.delete_workspace_publication(publ_type, workspace, publication, headers=headers)
+            ensure_publication(workspace, publ_type, publication, )
 
 
 def ensure_all_publications():
@@ -106,12 +156,11 @@ def ensure_all_publications():
     with app.app_context():
         already_created_publications = util.get_publication_infos()
     publications_to_publish = set(data.PUBLICATIONS) - set(already_created_publications)
+    print(
+        f'\n\nPublications: \npublications_to_publish={len(publications_to_publish)}\ndata.PUBLICATIONS={len(data.PUBLICATIONS)}\nalready_created_publications={len(already_created_publications)}\n\n&&&&&&&&&&&&&&&&&')
     for p_type in [data.LAYER_TYPE, data.MAP_TYPE]:
         publications_by_type = {(workspace, publ_type, publication)
                                 for workspace, publ_type, publication in publications_to_publish
                                 if publ_type == p_type}
-        step_num = 0
-        while publications_by_type:
-            done_publications = publish_publications_step(publications_by_type, step_num)
-            publications_by_type -= done_publications
-            step_num += 1
+        if publications_by_type:
+            ensure_publication_set(publications_by_type)
