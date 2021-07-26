@@ -24,6 +24,8 @@
   - [LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY](doc/env-settings.md#LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY)=normalized_raster_data
 - If you are running Layman with development settings, set environment variables
   - [LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY](doc/env-settings.md#LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY)=normalized_raster_data_dev
+- Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.9.0`
+    - If you are running Layman with development settings, run also `make client-build`.
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
