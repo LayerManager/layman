@@ -98,7 +98,8 @@ def generate_map_thumbnail(username, mapname, editor):
     attempts = 0
     while next((
             e for e in entries
-            if e['level'] != 'INFO' or (e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message'])
+            if (e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message']) or
+               (e.get('level') == 'SEVERE' and e.get('source') == 'javascript')
     ), None) is None and attempts < max_attempts:
         current_app.logger.info(f"waiting for entries")
         time.sleep(0.5)
@@ -106,7 +107,7 @@ def generate_map_thumbnail(username, mapname, editor):
         entries = chrome.get_log('browser')
     if attempts >= max_attempts:
         current_app.logger.info(f"max attempts reach")
-        return
+        raise LaymanError(51, data="Max attempts reached when generating thumbnail")
     for entry in entries:
         if entry.get('level') == 'SEVERE' and entry.get('source') == 'javascript':
             current_app.logger.error(f"timgen error {entry}")
@@ -119,14 +120,11 @@ def generate_map_thumbnail(username, mapname, editor):
 
     entry = next((e for e in entries if e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message']),
                  None)
-    if entry is None:
-        return
+    assert entry is not None
     match = re.match(r'.*\"dataurl\" \"data:image/png;base64,(.+)\"', entry['message'])
-    if not match:
-        return
+    assert match
     groups = match.groups()
-    if len(groups) < 1:
-        return
+    assert len(groups) >= 1
     data_url = groups[0]
     # current_app.logger.info(f"data_url {data_url}")
     # current_app.logger.info(f"len(data_url) {len(data_url)}")
