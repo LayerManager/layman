@@ -610,6 +610,11 @@ def ensure_workspace(geoserver_workspace, auth=None):
             auth=auth,
             timeout=5,
         )
+        if response.status_code == 401:
+            # if GS returns 401, it seems that workspace was just created by concurrent request
+            all_workspaces = get_all_workspaces(auth)
+            assert geoserver_workspace in all_workspaces
+            return False
         response.raise_for_status()
         return True
     return False
