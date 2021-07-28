@@ -610,8 +610,13 @@ def ensure_workspace(geoserver_workspace, auth=None):
             auth=auth,
             timeout=5,
         )
-        response.raise_for_status()
-        return True
+        if response.status_code == 401:
+            all_workspaces = get_all_workspaces(auth)
+            assert geoserver_workspace in all_workspaces
+            return False
+        else:
+            response.raise_for_status()
+            return True
     return False
 
 
