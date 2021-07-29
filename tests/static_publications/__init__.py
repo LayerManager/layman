@@ -281,6 +281,19 @@ PUBLICATIONS = {
             'style_type': 'sld',
         },
     },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_colortable_nodata_opaque_4326'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.layer/sample_tif_colortable_nodata_opaque_4326.tif']},
+        ],
+        TEST_DATA: {
+            'bbox': (868376.00, 522145.76, 940600.68, 593255.00),
+            'file_extensions': ['.tif'],
+            'normalized_color_interp': ['Palette'],
+            'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque_4326.png',
+            'file_type': settings.FILE_TYPE_RASTER,
+            'style_type': 'sld',
+        },
+    },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_colortable_nodata'): {
         DEFINITION: [
             {'file_paths': ['sample/layman.layer/sample_tif_colortable_nodata.tif']},
