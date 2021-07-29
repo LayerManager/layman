@@ -188,6 +188,20 @@ PUBLICATIONS = {
             'style_type': 'sld',
         },
     },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_jp2_j2w'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.jp2',
+                            'sample/layman.layer/sample_jp2_j2w_rgb.j2w', ], 'crs': 'EPSG:3857'},
+        ],
+        TEST_DATA: {
+            'bbox': (1829708, 6308828.600, 1833166.200, 6310848.600),
+            'file_extensions': ['.jp2', '.j2w'],
+            'normalized_color_interp': ['Red', 'Green', 'Blue'],
+            'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_jp2_j2w.png',
+            'file_type': settings.FILE_TYPE_RASTER,
+            'style_type': 'sld',
+        },
+    },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_rgb'): {
         DEFINITION: [
             {'file_paths': ['sample/layman.layer/sample_tif_rgb.tif', ]},
