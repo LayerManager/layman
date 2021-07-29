@@ -204,6 +204,7 @@ def publish_workspace_publication(publication_type,
                                   description=None,
                                   check_response_fn=None,
                                   with_chunks=False,
+                                  crs=None,
                                   ):
     title = title or name
     headers = headers or {}
@@ -237,6 +238,8 @@ def publish_workspace_publication(publication_type,
             data["access_rights.write"] = access_rights['write']
         if description:
             data['description'] = description
+        if crs:
+            data['crs'] = crs
         response = requests.post(r_url,
                                  files=files,
                                  data=data,
