@@ -59,7 +59,7 @@ def test_get_nodata_values(file_path, exp_result):
     ('sample/layman.layer/sample_tif_rgb_nodata.tif', [0.04373913043462064, -0.04374999999923662]),
     ('sample/layman.layer/sample_tif_rgba.tif', [0.04373913043462064, -0.04374999999923662]),
     ('sample/layman.layer/sample_tiff_rgba_opaque.tiff', [14.716791979949875, -14.733496332518337]),
-    ('sample/layman.layer/sample_tif_tfw_rgba_opaque.tif', [14.716791979949875, -14.733496332518337]),
+    ('sample/layman.layer/sample_tif_tfw_rgba_opaque.tif', [14.7167919799, -14.7334963325]),
     ('sample/layman.layer/sample_tif_colortable_nodata_opaque.tif', [92.930501930501933, -92.976470588235287]),
     ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', [15.293650793650794, -15.308571428571428]),
     ('sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif', [15.293650793650794, -15.308571428571428]),
