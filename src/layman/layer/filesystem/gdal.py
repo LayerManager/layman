@@ -213,6 +213,30 @@ def normalize_raster_file_async(workspace, layer, input_path, crs_id):
     return process
 
 
+def add_overview_async(workspace, layer):
+    normalized_path = get_normalized_raster_layer_main_filepath(workspace, layer)
+    color_interp = get_color_interpretations(normalized_path)
+    bash_args = [
+        'gdaladdo',
+    ]
+    # resampling
+    if color_interp == ['Palette']:
+        resampling_method = 'mode'
+    else:
+        resampling_method = 'average'
+    bash_args.extend([
+        '-r', resampling_method,
+    ])
+
+    bash_args.extend([
+        normalized_path,
+    ])
+    # print(' '.join(bash_args))
+    process = subprocess.Popen(bash_args, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT)
+    return process
+
+
 def get_normalized_raster_workspace_dir(workspace, *, geoserver=False):
     base_path = settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR if not geoserver else settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR_NAME
     return os.path.join(base_path, 'workspaces', workspace)
