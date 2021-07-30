@@ -333,6 +333,19 @@ PUBLICATIONS = {
             'style_type': 'sld',
         },
     },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_grayscale_alpha_nodata_4326'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.layer/sample_tif_grayscale_alpha_nodata_4326.tif']},
+        ],
+        TEST_DATA: {
+            'bbox': (1823049.06, 6309995.31, 1826920.44, 6312703.75),
+            'file_extensions': ['.tif'],
+            'normalized_color_interp': ['Gray', 'Alpha'],
+            'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_alpha_nodata_4326.png',
+            'file_type': settings.FILE_TYPE_RASTER,
+            'style_type': 'sld',
+        },
+    },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_grayscale_nodata_opaque'): {
         DEFINITION: [
             {'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif']},
