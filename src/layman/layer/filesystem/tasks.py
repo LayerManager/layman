@@ -64,6 +64,19 @@ def refresh_input_chunk(self, username, layername, check_crs=True):
     base=celery_app.AbortableTask
 )
 def refresh_gdal(self, username, layername, crs_id=None):
+    def finish_gdal_process(process):
+        if self.is_aborted():
+            logger.info(f'terminating GDAL process workspace.layer={username}.{layername}')
+            process.terminate()
+            logger.info(f'terminated GDAL process workspace.layer={username}.{layername}')
+            gdal.delete_layer(username, layername)
+            raise AbortedException
+        return_code = process.poll()
+        if return_code != 0:
+            gdal_error = str(process.stdout.read())
+            logger.error(f"STDOUT: {gdal_error}")
+            raise LaymanError(50, private_data=gdal_error)
+
     if self.is_aborted():
         raise AbortedException
     layer_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})
@@ -87,17 +100,12 @@ def refresh_gdal(self, username, layername, crs_id=None):
             os.remove(vrt_file_path)
         except OSError:
             pass
-    if self.is_aborted():
-        logger.info(f'terminating GDAL process workspace.layer={username}.{layername}')
-        process.terminate()
-        logger.info(f'terminated GDAL process workspace.layer={username}.{layername}')
-        gdal.delete_layer(username, layername)
-        raise AbortedException
-    return_code = process.poll()
-    if return_code != 0:
-        gdal_error = str(process.stdout.read())
-        logger.error(f"STDOUT: {gdal_error}")
-        raise LaymanError(50, private_data=gdal_error)
+    finish_gdal_process(process)
+
+    process = gdal.add_overview_async(username, layername)
+    while process.poll() is None and not self.is_aborted():
+        pass
+    finish_gdal_process(process)
 
 
 @celery_app.task(
