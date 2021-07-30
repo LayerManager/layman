@@ -241,6 +241,19 @@ PUBLICATIONS = {
             'style_type': 'sld',
         },
     },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_rgba_4326'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.layer/sample_tif_rgba_4326.tif', ]},
+        ],
+        TEST_DATA: {
+            'bbox': (1679391.075, 6562360.437, 1679416.269, 6562381.831),
+            'file_extensions': ['.tif'],
+            'normalized_color_interp': ['Red', 'Green', 'Blue', 'Alpha'],
+            'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_rgba_4326.png',
+            'file_type': settings.FILE_TYPE_RASTER,
+            'style_type': 'sld',
+        },
+    },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tiff'): {
         DEFINITION: [
             {'file_paths': ['sample/layman.layer/sample_tiff_rgba_opaque.tiff', ]},
