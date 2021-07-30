@@ -50,6 +50,16 @@ def get_color_interpretations(filepath):
     return result
 
 
+def get_overview_counts(filepath):
+    dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
+    result = []
+    for band_id in range(1, dataset.RasterCount + 1):
+        band = dataset.GetRasterBand(band_id)
+        overview_count = band.GetOverviewCount()
+        result.append(overview_count)
+    return result
+
+
 def assert_valid_raster(input_path):
     color_interp = get_color_interpretations(input_path)
     supported_color_interps = {
@@ -82,6 +92,13 @@ def get_pixel_size(filepath):
     dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
     geo_transform = dataset.GetGeoTransform()
     return [geo_transform[1], geo_transform[5]]
+
+
+def get_raster_size(filepath):
+    dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
+    x_size = dataset.RasterXSize
+    y_size = dataset.RasterYSize
+    return [x_size, y_size]
 
 
 def get_statistics(filepath):
