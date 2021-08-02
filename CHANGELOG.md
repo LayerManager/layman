@@ -22,6 +22,7 @@
     It may take some time to run this script and it will produce large temporary files (database dumps).
 - Set environment variables
   - [LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY](doc/env-settings.md#LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY)=normalized_raster_data
+  - [DEFAULT_CONNECTION_TIMEOUT](doc/env-settings.md#DEFAULT_CONNECTION_TIMEOUT)=10
 - If you are running Layman with development settings, set environment variables
   - [LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY](doc/env-settings.md#LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY)=normalized_raster_data_dev
 - Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.9.0`

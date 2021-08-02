@@ -8,6 +8,9 @@ Dotted path to a Python module with Layman settings for Python level.
 ### LAYMAN_DATA_DIR
 Filesystem directory where most of published data is stored, including data about authentication credentials, users, and publications.
 
+### DEFAULT_CONNECTION_TIMEOUT
+Timeout for GeoServer and Micka calls in seconds.
+
 ### LAYMAN_SERVER_NAME
 String with internal domain and port `<domain>:<port>` of Layman's main instance (not celery worker). Used by thumbnail image generator (Timgen) to call Layman internally. See also [LAYMAN_PROXY_SERVER_NAME](#LAYMAN_PROXY_SERVER_NAME).
 
