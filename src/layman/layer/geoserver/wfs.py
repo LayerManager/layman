@@ -78,7 +78,7 @@ def get_wfs_proxy(username):
             'SERVICE': 'WFS',
             'REQUEST': 'GetCapabilities',
             'VERSION': VERSION,
-        }, headers=headers, timeout=5,)
+        }, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT,)
         if response.status_code != 200:
             result = None
             if response.status_code != 404:

@@ -11,7 +11,7 @@ from .util import compare_images
 
 def assert_same_images(img_url, tmp_file_path, expected_file_path, diff_threshold):
     response = requests.get(img_url,
-                            timeout=5,
+                            timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                             )
     response.raise_for_status()
     pathlib.Path(os.path.dirname(tmp_file_path)).mkdir(parents=True, exist_ok=True)

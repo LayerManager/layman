@@ -87,7 +87,7 @@ def get_wms_proxy(username):
             'SERVICE': 'WMS',
             'REQUEST': 'GetCapabilities',
             'VERSION': VERSION,
-        }, headers=headers, timeout=5,)
+        }, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT,)
         if response.status_code != 200:
             result = None
             if response.status_code != 404:

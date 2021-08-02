@@ -62,7 +62,8 @@ def delete_map(workspace, mapname):
         raise LaymanError(38) from exc
 
 
-def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_name=None, create_if_not_exists=True, timeout=5):
+def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_name=None, create_if_not_exists=True, timeout=None):
+    timeout = timeout or settings.DEFAULT_CONNECTION_TIMEOUT
     # current_app.logger.info(f"patch_map metadata_properties_to_refresh={metadata_properties_to_refresh}")
     metadata_properties_to_refresh = metadata_properties_to_refresh or []
     if len(metadata_properties_to_refresh) == 0:

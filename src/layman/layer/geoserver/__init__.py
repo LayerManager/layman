@@ -65,7 +65,7 @@ def get_all_rules(auth):
             # data=json.dumps(payload),
             headers=headers_json,
             auth=auth,
-            timeout=5,
+            timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
         )
         response.raise_for_status()
         # app.logger.info(r.text)
@@ -149,7 +149,7 @@ def publish_layer_from_db(workspace, layername, description, title, *, geoserver
                              }),
                              headers=headers_json,
                              auth=settings.LAYMAN_GS_AUTH,
-                             timeout=5,
+                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                              )
     response.raise_for_status()
 
@@ -194,7 +194,7 @@ def publish_layer_from_qgis(workspace, layer, description, title, *, geoserver_w
                              }),
                              headers=headers_json,
                              auth=settings.LAYMAN_GS_AUTH,
-                             timeout=5,
+                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                              )
     response.raise_for_status()
 

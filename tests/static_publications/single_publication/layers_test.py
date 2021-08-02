@@ -133,7 +133,7 @@ def test_wms_layer(workspace, publ_type, publication):
 
     response = requests.get(wms_stores_url,
                             auth=settings.LAYMAN_GS_AUTH,
-                            timeout=5,
+                            timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                             )
     assert response.status_code == 200, response.json()
     if style == 'qml':
@@ -145,13 +145,13 @@ def test_wms_layer(workspace, publ_type, publication):
         response = requests.get(url,
                                 auth=GS_AUTH,
                                 headers=headers_sld,
-                                timeout=5,
+                                timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                                 )
         response.raise_for_status()
 
     response = requests.get(wms_layers_url,
                             auth=settings.LAYMAN_GS_AUTH,
-                            timeout=5,
+                            timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                             )
     assert response.status_code == 200, response.json()
     if style == 'qml':
