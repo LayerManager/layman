@@ -85,7 +85,7 @@ Processing chain consists of few steps:
 - save file to workspace directory within Layman data directory
 - save basic information (name, title, access_rights) into PostgreSQL
 - for vector layers import the vector file to PostgreSQL database as new table into workspace schema, including geometry transformation to EPSG:3857
-- for raster layers normalize raster file to GeoTiff in EPSG:3857 with overviews (pyramids); NoData values are normalized as transparent only if Alpha band is not available and NoData is set for each band
+- for raster layers normalize raster file to GeoTIFF in EPSG:3857 with overviews (pyramids); NoData values are normalized as transparent only if Alpha band is not available and NoData is set for each band
 - for vector layers publish the vector table as new layer (feature type) within appropriate WFS workspaces of GeoServer
 - save bounding box into PostgreSQL
 - for vector layers
@@ -94,7 +94,7 @@ Processing chain consists of few steps:
   - else for layers with QML style:
     - create QGS file on QGIS server filesystem with appropriate style
     - publish the layer on GeoServer through WMS cascade from QGIS server
-- for raster layers publish normalized GeoTiff as new layer (coverage) on GeoServer WMS workspace
+- for raster layers publish normalized GeoTIFF as new layer (coverage) on GeoServer WMS workspace
 - generate thumbnail image
 - publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
 - update thumbnail of each [map](models.md#map) that points to this layer
@@ -119,7 +119,7 @@ Body parameters:
       - GeoJSON file
       - ShapeFile files (at least three files: .shp, .shx, .dbf)
       - GeoTIFF (.tif or .tiff, with or without .tfw)
-      - JPEG 2000 (.jp2, with or without .jgw)
+      - JPEG 2000 (.jp2, with or without .j2w)
       - file names, i.e. array of strings
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World

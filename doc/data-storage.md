@@ -34,7 +34,7 @@ When user [publishes new layer](rest.md#post-workspace-layers)
 Subsequently, when asynchronous tasks run,
 - data file chunks and completed data files are saved to [filesystem](#filesystem) (if sent [asynchronously](async-file-upload.md)),
 - vector data files are imported to [PostgreSQL](#postgresql),
-- raster files are normalized to GeoTiff in EPSG:3857 with overviews (pyramids) and saved to [GeoServer](#geoserver) for WMS
+- raster files are normalized to GeoTIFF in EPSG:3857 with overviews (pyramids) and saved to [GeoServer](#geoserver) for WMS
 - PostgreSQL table with vector data is registered to, access rights are synchronized to, and visualization file is saved to [GeoServer](#geoserver) for WFS,
 - PostgreSQL table with vector data is registered to, access rights are synchronized to, and visualization file is saved to [GeoServer](#geoserver) for WMS of layers with SLD style,
 - QGS file is created on [filesystem](#filesystem) and through QGIS server registered to [GeoServer](#geoserver) with WMS cascade, access rights are synchronized, for WMS of layers with QGIS style,
