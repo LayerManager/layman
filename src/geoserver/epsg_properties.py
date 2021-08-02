@@ -6,6 +6,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_CONNECTION_TIMEOUT = int(os.environ['DEFAULT_CONNECTION_TIMEOUT'])
 EPSG_ENCODING = 'iso-8859-1'
 
 EPSG_PROPERTIES_DEFAULT = {
@@ -86,7 +87,7 @@ def setup_epsg(data_dir, srs_list):
         try:
             url = f'http://epsg.io/{code}.geoserver'
             res = requests.get(url,
-                               timeout=5)
+                               timeout=DEFAULT_CONNECTION_TIMEOUT)
             res.raise_for_status()
             new_epsg[code] = res.text
         except BaseException as ex:
