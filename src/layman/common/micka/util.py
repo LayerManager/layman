@@ -248,7 +248,7 @@ def base_insert(xml_str):
     response = requests.post(settings.CSW_URL,
                              auth=settings.CSW_BASIC_AUTHN,
                              data=xml_str.encode('utf-8'),
-                             timeout=5,)
+                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,)
     # print(f"Micka insert response=\n{r.text}")
     response.raise_for_status()
     root_el = ET.fromstring(response.content)
@@ -313,7 +313,8 @@ def soap_insert_record_from_template(template_path, prop_values, metadata_proper
     return soap_insert_record(record, is_public)
 
 
-def csw_update(template_values, timeout=5):
+def csw_update(template_values, timeout=None):
+    timeout = timeout or settings.DEFAULT_CONNECTION_TIMEOUT
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-update-template.xml')
     xml_str = fill_template_as_str(template_path, template_values)
     # print(f"CSW update request=\n{xml_str}")
@@ -357,7 +358,7 @@ def csw_delete(muuid):
     response = requests.post(settings.CSW_URL,
                              auth=settings.CSW_BASIC_AUTHN,
                              data=xml_str.encode('utf-8'),
-                             timeout=5,
+                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                              )
     # print(f"CSW delete response=\n{r.text}")
     response.raise_for_status()
@@ -611,7 +612,7 @@ def get_number_of_records(record_id, use_authn):
     response = requests.post(settings.CSW_URL,
                              auth=authn,
                              data=xml_str,
-                             timeout=5,
+                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                              )
     response.raise_for_status()
     parser = ET.XMLParser(remove_blank_text=True)

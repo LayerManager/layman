@@ -77,12 +77,12 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
 
 def wait_for_rest(url, max_attempts, sleeping_time, check_response, headers=None):
     headers = headers or None
-    response = requests.get(url, headers=headers, timeout=5)
+    response = requests.get(url, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
 
     attempts = 1
     while not check_response(response):
         time.sleep(sleeping_time)
-        response = requests.get(url, headers=headers, timeout=5)
+        response = requests.get(url, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
         attempts += 1
         if attempts > max_attempts:
             logger.error(f"r.status_code={response.status_code}\nrltest={response.text}")
