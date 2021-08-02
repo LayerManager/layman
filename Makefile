@@ -107,7 +107,7 @@ bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_dev bash
 
 refresh-doc-metadata-xpath:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_dev bash -c "cd src && python3 refresh-doc-metadata-xpath.py"
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm layman_dev bash -c "cd src && python3 refresh_doc_metadata_xpath.py"
 
 bash-root:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm -u root layman_dev bash
