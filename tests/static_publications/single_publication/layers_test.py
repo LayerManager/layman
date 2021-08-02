@@ -166,20 +166,18 @@ def test_wms_layer(workspace, publ_type, publication):
 
         assert_util.assert_same_images(url, obtained_file, expected_file, pixel_tolerance)
 
-    file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
-    if file_type != settings.FILE_TYPE_RASTER:
-        authn_headers = data.HEADERS.get(workspace)
-        for service_endpoint in {'ows', 'wms'}:
-            wms_url = geoserver_client.get_wms_url(workspace, service_endpoint)
-
-            layer_info = process_client.get_workspace_layer(workspace, publication, headers=authn_headers)
-            tn_bbox = gs_util.get_square_bbox(layer_info['bounding_box'])
-
-            response = gs_util.get_layer_thumbnail(wms_url, publication, tn_bbox, headers=authn_headers, wms_version=VERSION)
-            response.raise_for_status()
-            assert 'image' in response.headers['content-type']
-
     gs_workspace = info['_wms']['workspace']
+    authn_headers = data.HEADERS.get(workspace)
+    for service_endpoint in {'ows', 'wms'}:
+        wms_url = geoserver_client.get_wms_url(gs_workspace, service_endpoint)
+
+        layer_info = process_client.get_workspace_layer(workspace, publication, headers=authn_headers)
+        tn_bbox = gs_util.get_square_bbox(layer_info['bounding_box'])
+
+        response = gs_util.get_layer_thumbnail(wms_url, publication, tn_bbox, headers=authn_headers, wms_version=VERSION)
+        response.raise_for_status()
+        assert 'image' in response.headers['content-type'], f'response.headers={response.headers}, response.content={response.content}'
+
     all_auth_info = util.get_users_and_headers_for_publication(workspace, publ_type, publication)
     headers_list_in = all_auth_info['read'][util.KEY_AUTH][util.KEY_HEADERS]
     headers_list_out = all_auth_info['read'][util.KEY_NOT_AUTH][util.KEY_HEADERS]
