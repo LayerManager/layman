@@ -35,7 +35,7 @@ jobs:
         run: |
           docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps -u root layman_test bash -c "cd src && python3 -B setup_geoserver.py"
           docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml up --force-recreate --no-deps -d celery_worker_test
-          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test bash -c "python3 src/assert_db.py && python3 src/wait_for_deps.py && python3 src/clear_layman_data.py && python3 -m pytest -m irritating -W ignore::DeprecationWarning -xvv"
+          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test bash -c "python3 src/assert_db.py && python3 src/wait_for_deps.py && python3 src/clear_layman_data.py && python3 -m pytest -m irritating -W ignore::DeprecationWarning -vv"
 
 
       - name: Save logs to files
