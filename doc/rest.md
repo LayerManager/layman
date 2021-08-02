@@ -242,7 +242,7 @@ JSON object with following structure:
   - *type*: String. Type of used style. Either 'sld' or 'qml'.
   - *status*: Status information about publishing style. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
-- **~~style~~**
+- **~~sld~~**
   - **Deprecated**
   - Replaced by **style**, contains same info
 - *metadata*
