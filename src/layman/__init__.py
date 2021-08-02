@@ -114,6 +114,9 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                 pipe.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
                 pipe.execute()
 
+            elif IN_UTIL_PROCESS:
+                wait_for_other_process = False  # pylint: disable=invalid-name
+
             else:
                 wait_for_other_process = True  # pylint: disable=invalid-name
     except WatchError:
