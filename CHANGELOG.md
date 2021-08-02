@@ -63,6 +63,7 @@
 - Errors `19`: 'Layer is already in process.' and `29`: 'Map is already in process.' are merged into `49`: 'Publication is already in process.'.
 - Fix: Raise error when more than one main layer file is sent in [POST Workspace Layers](doc/rest.md#post-workspace-layers) or [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer).
 - Fix [#408](https://github.com/LayerManager/layman/issues/408) Skip non WMS layers in thumbnail generation. Previously thumbnail generation failed.
+- Fix [GET Workspace Layer](doc/rest.md#get-workspace-layer) documentation, where was incorrectly `style` item instead of `sld`.
 
 ## v1.13.2
  2021-06-25
