@@ -13,6 +13,7 @@ GS_REST_USERS = None
 GS_REST_USER = None
 GS_REST_WMS_SETTINGS = None
 GS_REST_WFS_SETTINGS = None
+GS_REST_TIMEOUT = None
 
 
 def ensure_data_dir(data_dir, data_dir_initial, normalized_raster_data_dir):
@@ -24,13 +25,13 @@ def ensure_data_dir(data_dir, data_dir_initial, normalized_raster_data_dir):
     os.chmod(norm_data_path, mode=0o777)
 
 
-def set_settings(gs_url, role_service, user_group_service, ):
+def set_settings(gs_url, role_service, user_group_service, timeout):
     role_service = role_service or 'default'
     user_group_service = user_group_service or 'default'
     # pylint: disable=global-statement
     global GS_REST, GS_REST_STYLES, GS_REST_WORKSPACES, GS_REST_SETTINGS,\
         GS_REST_SECURITY_ACL_LAYERS, GS_REST_ROLES, GS_REST_USERS, GS_REST_USER, \
-        GS_REST_WMS_SETTINGS, GS_REST_WFS_SETTINGS
+        GS_REST_WMS_SETTINGS, GS_REST_WFS_SETTINGS, GS_REST_TIMEOUT
 
     GS_REST = urljoin(gs_url, 'rest/')
     GS_REST_STYLES = urljoin(GS_REST, 'styles/')
@@ -42,3 +43,5 @@ def set_settings(gs_url, role_service, user_group_service, ):
     GS_REST_USER = urljoin(GS_REST, f'security/usergroup/service/{user_group_service}/user/')
     GS_REST_WMS_SETTINGS = urljoin(GS_REST, f'services/wms/settings/')
     GS_REST_WFS_SETTINGS = urljoin(GS_REST, f'services/wfs/settings/')
+
+    GS_REST_TIMEOUT = timeout
