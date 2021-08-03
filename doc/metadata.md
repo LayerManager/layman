@@ -244,12 +244,26 @@ Multiplicity: 1
 
 Shape: Object with one of following keys:
 - *scale_denominator*: Integer. Scale denominator, used for vector data, guessed from distances between vertices of line and polygon features.
+- *ground_sample_distance*: Object. Ground sample distance, used for raster data.  
+  Keys:
+  - **value**: Float. Value of ground sample distance.
+  - **uom**: String. Unit of measurement of ground sample distance.
 
 Example: 
 ```json5
 // Spatial resolution of vector data:
 {
     "scale_denominator": 10000
+}
+```
+
+```json5
+// Spatial resolution of raster data:
+{
+    "ground_sample_distance": {
+        "value": 123.45,
+        "uom": "m"
+    }
 }
 ```
 

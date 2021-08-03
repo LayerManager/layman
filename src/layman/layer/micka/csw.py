@@ -193,6 +193,7 @@ def _get_property_values(
         wfs_url="http://www.env.cz/corine/data/download.zip",
         epsg_codes=None,
         scale_denominator=None,
+        ground_sample_distance=None,  # tuple (value, unit_of_measurement), e.g. (123.45, "m')
         languages=None,
         md_language=None,
 ):
@@ -200,9 +201,20 @@ def _get_property_values(
     west, south, east, north = extent or [11.87, 48.12, 19.13, 51.59]
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
     languages = languages or []
-    spatial_resolution = {
-        'scale_denominator': scale_denominator,
-    } if scale_denominator else None
+    assert scale_denominator is None or ground_sample_distance is None
+    if scale_denominator is not None:
+        spatial_resolution = {
+            'scale_denominator': scale_denominator,
+        }
+    elif ground_sample_distance is not None:
+        spatial_resolution = {
+            'ground_sample_distance': {
+                'value': ground_sample_distance[0],
+                'uom': ground_sample_distance[1],
+            }
+        }
+    else:
+        spatial_resolution = None
 
     result = {
         'md_file_identifier': get_metadata_uuid(uuid),

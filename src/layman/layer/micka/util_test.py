@@ -40,7 +40,9 @@ def test_fill_template():
     except OSError:
         pass
     file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml',
-                                                                      _get_property_values(), METADATA_PROPERTIES)
+                                                                      _get_property_values(
+                                                                          ground_sample_distance=(123.45, "m"),
+                                                                      ), METADATA_PROPERTIES)
     with open(xml_path, 'wb') as out:
         out.write(file_object.read())
 
@@ -79,7 +81,12 @@ def test_parse_md_properties():
             'md_date_stamp': '2007-05-25',
             'md_organisation_name': None,
             'organisation_name': None,
-            'spatial_resolution': None,
+            'spatial_resolution': {
+                'ground_sample_distance': {
+                    'value': 123.45,
+                    'uom': "m",
+                }
+            },
             'language': [],
             'reference_system': [4326, 3857],
             'title': 'CORINE - Krajinný pokryv CLC 90',
@@ -122,7 +129,12 @@ def test_fill_xml_template():
                                                                               'abstract': None,
                                                                               'organisation_name': 'My Organization',
                                                                               'graphic_url': 'https://example.com/myimage.png',
-                                                                              'spatial_resolution': None,
+                                                                              'spatial_resolution': {
+                                                                                  'ground_sample_distance': {
+                                                                                      'value': 123.45,
+                                                                                      'uom': "m",
+                                                                                  }
+                                                                              },
                                                                               'language': ['cze', 'eng'],
                                                                               'extent': [11.87, 48.12, 19.13, 51.59],
                                                                               'wms_url': 'https://example.com/wms',

@@ -597,14 +597,29 @@ def adjust_operates_on(prop_el, prop_value):
 
 def extract_spatial_resolution(prop_els):
     scale_denominator = None
+    ground_sample_distance = None
     if prop_els:
         prop_el = prop_els[0]
         scale_strings = prop_el.xpath('./gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/'
                                       'gmd:denominator/gco:Integer/text()', namespaces=NAMESPACES)
         scale_denominator = int(scale_strings[0]) if scale_strings else None
+        distance_els = prop_el.xpath('./gmd:MD_Resolution/gmd:distance/gco:Distance', namespaces=NAMESPACES)
+        if distance_els:
+            distance_el = distance_els[0]
+            distance_value_strings = distance_el.xpath('./text()', namespaces=NAMESPACES)
+            uom_strings = distance_el.xpath('./@uom', namespaces=NAMESPACES)
+            if distance_value_strings and uom_strings:
+                distance_value = float(distance_value_strings[0])
+                uom = str(uom_strings[0])
+                ground_sample_distance = {
+                    'value': distance_value,
+                    'uom': uom,
+                }
     result = {}
     if scale_denominator:
         result['scale_denominator'] = scale_denominator
+    if ground_sample_distance:
+        result['ground_sample_distance'] = ground_sample_distance
     result = result or None
     return result
 
@@ -615,6 +630,8 @@ def adjust_spatial_resolution(prop_el, prop_value):
     if prop_value is not None:
         parser = ET.XMLParser(remove_blank_text=True)
         scale_denominator = prop_value.get('scale_denominator')
+        ground_sample_distance = prop_value.get('ground_sample_distance')
+        assert scale_denominator is None or ground_sample_distance is None
         if scale_denominator is not None:
             child_el = ET.fromstring(f"""
                 <gmd:MD_Resolution xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gco="{NAMESPACES['gco']}">
@@ -625,6 +642,19 @@ def adjust_spatial_resolution(prop_el, prop_value):
                       </gmd:denominator>
                     </gmd:MD_RepresentativeFraction>
                   </gmd:equivalentScale>
+                </gmd:MD_Resolution>
+            """, parser=parser)
+        if ground_sample_distance is not None:
+            distance_value = ground_sample_distance.get('value')
+            uom = ground_sample_distance.get('uom')
+            assert distance_value is not None and uom is not None
+            child_el = ET.fromstring(f"""
+                <gmd:MD_Resolution xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gco="{NAMESPACES['gco']}">
+                  <gmd:distance>
+                    <gco:Distance
+                                  uom="{escape(uom)}"
+                                  >{escape(str(distance_value))}</gco:Distance>
+                  </gmd:distance>
                 </gmd:MD_Resolution>
             """, parser=parser)
     if child_el:
