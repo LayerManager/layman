@@ -356,12 +356,21 @@ PUBLICATIONS = {
     },
     (WORKSPACE1, LAYER_TYPE, 'test_publications_same_name_publ'): {
         DEFINITION: [
-            {},
+            {'file_paths': [
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.prj',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.README.html',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shx',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.VERSION.txt',
+            ]},
         ],
         TEST_DATA: {
-            'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
+            'bbox': (-20026376.39, -20048966.1, 20026376.39, 18440002.895114236),
             'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
+            'micka_filled_template': 'test_tools/data/micka/rest_test_filled_template.xml',
         },
     },
     (WORKSPACE2, LAYER_TYPE, 'test_publications_same_name_publ'): {
