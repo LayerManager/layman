@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
-      - run: npm install --global remark-cli remark-validate-links remark-lint-no-dead-urls
+      - run: npm install --global remark-cli@9 remark-validate-links remark-lint-no-dead-urls
       - run: make remark
 
   Flake_8_syntax_errors:
