@@ -17,8 +17,9 @@ def test_patch_raster_qml(workspace, publ_type, publication):
                     'detail': 'Raster layers are not allowed to have QML style.',
                     }
 
+    headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
     with pytest.raises(LaymanError) as exc_info:
-        process_client.patch_workspace_layer(workspace, publication, style_file='sample/style/ne_10m_admin_0_countries.qml')
+        process_client.patch_workspace_layer(workspace, publication, style_file='sample/style/ne_10m_admin_0_countries.qml', headers=headers)
     test_util.assert_error(expected_exc, exc_info)
 
 
