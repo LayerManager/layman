@@ -276,7 +276,7 @@ def test_gs_data_security(workspace, publ_type, publication):
 
 @pytest.mark.parametrize('workspace, publ_type, publication', [(wspace, ptype, pub)
                                                                for wspace, ptype, pub in data.LIST_LAYERS
-                                                               if data.PUBLICATIONS[(wspace, ptype, pub)][data.TEST_DATA].get('micka_filled_template')])
+                                                               if data.PUBLICATIONS[(wspace, ptype, pub)][data.TEST_DATA].get('micka_xml')])
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_micka_xml(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
@@ -286,27 +286,21 @@ def test_micka_xml(workspace, publ_type, publication):
         template_path, prop_values = csw.get_template_path_and_values(workspace, publication, http_method='post')
     xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values,
                                                                                 csw.METADATA_PROPERTIES)
-    expected_path = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('micka_filled_template')
+    micka_xml_def = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['micka_xml']
+    expected_path = micka_xml_def['filled_template']
     with open(expected_path) as file:
         expected_lines = file.readlines()
+    exp_diff_lines = micka_xml_def['diff_lines']
     diff_lines = list(difflib.unified_diff([line.decode('utf-8') for line in xml_file_object.readlines()], expected_lines))
     plus_lines = [line for line in diff_lines if line.startswith('+ ')]
-    assert len(plus_lines) == 3, ''.join(diff_lines)
+    assert len(plus_lines) == len(exp_diff_lines), ''.join(diff_lines)
     minus_lines = [line for line in diff_lines if line.startswith('- ')]
-    assert len(minus_lines) == 3, ''.join(diff_lines)
-    plus_line = plus_lines[0]
-    assert plus_line == '+    <gco:CharacterString>m-81c0debe-b2ea-4829-9b16-581083b29907</gco:CharacterString>\n', ''.join(
-        diff_lines)
-    minus_line = minus_lines[0]
-    assert minus_line.startswith('-    <gco:CharacterString>m') and minus_line.endswith(
-        '</gco:CharacterString>\n'), ''.join(diff_lines)
-    plus_line = plus_lines[1]
-    assert plus_line == '+    <gco:Date>2007-05-25</gco:Date>\n', ''.join(diff_lines)
-    minus_line = minus_lines[1]
-    assert minus_line.startswith('-    <gco:Date>') and minus_line.endswith('</gco:Date>\n'), ''.join(diff_lines)
-    plus_line = plus_lines[2]
-    assert plus_line == '+                <gco:Date>2019-12-07</gco:Date>\n', ''.join(diff_lines)
-    minus_line = minus_lines[2]
-    assert minus_line.startswith('-                <gco:Date>') and minus_line.endswith('</gco:Date>\n'), ''.join(
-        diff_lines)
-    assert len(diff_lines) == 29, ''.join(diff_lines)
+    assert len(minus_lines) == len(exp_diff_lines), ''.join(diff_lines)
+    for idx, diff_line in enumerate(exp_diff_lines):
+        plus_line = plus_lines[idx]
+        minus_line = minus_lines[idx]
+        assert plus_line == diff_line['plus_line'], f'diff_lines={"".join(diff_lines)}, idx={idx}, diff_line={diff_line}'
+        assert minus_line.startswith(diff_line['minus_line_starts_with']), f'diff_lines={"".join(diff_lines)}, idx={idx}, diff_line={diff_line}'
+        assert minus_line.endswith(diff_line['minus_line_ends_with']), f'diff_lines={"".join(diff_lines)}, idx={idx}, diff_line={diff_line}'
+
+    assert len(diff_lines) == micka_xml_def['diff_lines_len'], ''.join(diff_lines)
