@@ -170,7 +170,13 @@
       <gmd:spatialRepresentationType>
         <gmd:MD_SpatialRepresentationTypeCode codeListValue="vector" codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_SpatialRepresentationTypeCode">vector</gmd:MD_SpatialRepresentationTypeCode>
       </gmd:spatialRepresentationType>
-      <gmd:spatialResolution gco:nilReason="unknown"/>
+      <gmd:spatialResolution>
+        <gmd:MD_Resolution>
+          <gmd:distance>
+            <gco:Distance uom="m">123.45</gco:Distance>
+          </gmd:distance>
+        </gmd:MD_Resolution>
+      </gmd:spatialResolution>
       <gmd:language>
         <gmd:LanguageCode codeListValue="cze" codeList="http://www.loc.gov/standards/iso639-2/">cze</gmd:LanguageCode>
       </gmd:language>

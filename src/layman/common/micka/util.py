@@ -599,6 +599,8 @@ def extract_spatial_resolution(prop_els):
     result = {}
     if prop_els:
         prop_el = prop_els[0]
+
+        # scale_denominator
         denominator_els = prop_el.xpath('./gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/'
                                         'gmd:denominator', namespaces=NAMESPACES)
         if denominator_els:
@@ -606,6 +608,26 @@ def extract_spatial_resolution(prop_els):
             scale_strings = denominator_el.xpath('./gco:Integer/text()', namespaces=NAMESPACES)
             scale_denominator = int(scale_strings[0]) if scale_strings else None
             result['scale_denominator'] = scale_denominator
+
+        # ground_sample_distance
+        distance_prop_els = prop_el.xpath('./gmd:MD_Resolution/gmd:distance', namespaces=NAMESPACES)
+        if distance_prop_els:
+            ground_sample_distance = None
+            distance_prop_el = distance_prop_els[0]
+            distance_value_els = distance_prop_el.xpath('./gco:Distance', namespaces=NAMESPACES)
+            if distance_value_els:
+                distance_value_el = distance_value_els[0]
+                distance_value_strings = distance_value_el.xpath('./text()', namespaces=NAMESPACES)
+                uom_strings = distance_value_el.xpath('./@uom', namespaces=NAMESPACES)
+                if distance_value_strings and uom_strings:
+                    distance_value = float(distance_value_strings[0])
+                    uom = str(uom_strings[0])
+                    ground_sample_distance = {
+                        'value': distance_value,
+                        'uom': uom,
+                    }
+            result['ground_sample_distance'] = ground_sample_distance
+
     result = result or None
     return result
 
@@ -615,6 +637,7 @@ def adjust_spatial_resolution(prop_el, prop_value):
     child_el = None
     if prop_value is not None:
         parser = ET.XMLParser(remove_blank_text=True)
+        assert set(prop_value.keys()).issubset({'scale_denominator', 'ground_sample_distance'}) and len(prop_value) <= 1
         if 'scale_denominator' in prop_value:
             scale_denominator = prop_value['scale_denominator']
             denominator_el_str = f"""
@@ -629,6 +652,24 @@ def adjust_spatial_resolution(prop_el, prop_value):
                       {denominator_el_str}
                     </gmd:MD_RepresentativeFraction>
                   </gmd:equivalentScale>
+                </gmd:MD_Resolution>
+            """, parser=parser)
+        if 'ground_sample_distance' in prop_value:
+            ground_sample_distance = prop_value['ground_sample_distance']
+            if ground_sample_distance is not None:
+                distance_value = ground_sample_distance.get('value')
+                uom = ground_sample_distance.get('uom')
+                assert distance_value is not None and uom is not None
+                distance_el_str = f"""
+                  <gmd:distance>
+                    <gco:Distance uom="{escape(uom)}">{escape(str(distance_value))}</gco:Distance>
+                  </gmd:distance>
+                """
+            else:
+                distance_el_str = '<gmd:distance gco:nilReason="unknown" />'
+            child_el = ET.fromstring(f"""
+                <gmd:MD_Resolution xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gco="{NAMESPACES['gco']}">
+                  {distance_el_str}
                 </gmd:MD_Resolution>
             """, parser=parser)
     if child_el:
