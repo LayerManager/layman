@@ -135,7 +135,8 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         abstract or ''
     ]))), None)
 
-    if publ_info.get('file', dict()).get('file_type') == settings.FILE_TYPE_VECTOR:
+    file_type = publ_info.get('file', dict()).get('file_type')
+    if file_type == settings.FILE_TYPE_VECTOR:
         try:
             languages = db.get_text_languages(workspace, layername)
         except LaymanError:
@@ -147,9 +148,13 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         spatial_resolution = {
             'scale_denominator': scale_denominator,
         }
-    else:
+    elif file_type == settings.FILE_TYPE_RASTER:
         languages = []
-        spatial_resolution = None
+        spatial_resolution = {
+            'ground_sample_distance': None,
+        }
+    else:
+        raise NotImplementedError(f"Unknown file type: {file_type}")
 
     prop_values = _get_property_values(
         workspace=workspace,
@@ -203,9 +208,6 @@ def _get_property_values(
     west, south, east, north = extent or [11.87, 48.12, 19.13, 51.59]
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
     languages = languages or []
-    spatial_resolution = spatial_resolution or {
-        'scale_denominator': None,
-    }
 
     result = {
         'md_file_identifier': get_metadata_uuid(uuid),

@@ -71,7 +71,9 @@
 - Fix: Raise error when more than one main layer file is sent in [POST Workspace Layers](doc/rest.md#post-workspace-layers) or [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer).
 - Fix [#408](https://github.com/LayerManager/layman/issues/408) Skip non WMS layers in thumbnail generation. Previously thumbnail generation failed.
 - Fix [GET Workspace Layer](doc/rest.md#get-workspace-layer) documentation, where was incorrectly `style` item instead of `sld`.
-- New metadata property [`spatial_resolution`](doc/metadata.md#spatial_resolution) is available.
+- [#167](https://github.com/LayerManager/layman/issues/167) New metadata property [`spatial_resolution`](doc/metadata.md#spatial_resolution) is available. It has one of two subproperties:
+  - `scale_denominator` used for vector data
+  - `ground_sample_distance` used for raster data (not yet filled)
 - Metadata property `scale_denominator` was removed. Its value is now accessible as subproperty of new [`spatial_resolution`](doc/metadata.md#spatial_resolution) metadata property.
 
 ## v1.13.2
