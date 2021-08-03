@@ -952,7 +952,7 @@ def test_patch_layer_data(client):
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
             'revision_date': TODAY_DATE,
-            'scale_denominator': None,
+            'scale_denominator': None,  # it's point data now and we can't guess scale from point data
             'title': 'populated places',
         }
     check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
