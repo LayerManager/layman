@@ -54,7 +54,7 @@ PROPERTIES = {
     'graphic_url': {
         'upper_mp': '1',
     },
-    'scale_denominator': {
+    'spatial_resolution': {
         'upper_mp': '1',
     },
     'language': {

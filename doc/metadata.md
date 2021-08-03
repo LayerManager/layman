@@ -239,18 +239,23 @@ XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentificat
 XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" and @codeListValue="revision"]]/gmd:CI_Date/gmd:date/gco:Date/text()`
 
 
-### scale_denominator
-Guessed from distances between vertices of line and polygon features.
-
+### spatial_resolution
 Multiplicity: 1
 
-Shape: Integer
+Shape: Object with one of following keys:
+- *scale_denominator*: Integer. Scale denominator, used for vector data, guessed from distances between vertices of line and polygon features.
 
-Example: `25000`
+Example: 
+```json5
+// Spatial resolution of vector data:
+{
+    "scale_denominator": 10000
+}
+```
 
 Synchronizable: yes
 
-XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/gmd:denominator/gco:Integer/text()`
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution`
 
 
 ### title

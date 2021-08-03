@@ -595,6 +595,48 @@ def adjust_operates_on(prop_el, prop_value):
         _add_unknown_reason(prop_el)
 
 
+def extract_spatial_resolution(prop_els):
+    result = {}
+    if prop_els:
+        prop_el = prop_els[0]
+        denominator_els = prop_el.xpath('./gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/'
+                                        'gmd:denominator', namespaces=NAMESPACES)
+        if denominator_els:
+            denominator_el = denominator_els[0]
+            scale_strings = denominator_el.xpath('./gco:Integer/text()', namespaces=NAMESPACES)
+            scale_denominator = int(scale_strings[0]) if scale_strings else None
+            result['scale_denominator'] = scale_denominator
+    result = result or None
+    return result
+
+
+def adjust_spatial_resolution(prop_el, prop_value):
+    _clear_el(prop_el)
+    child_el = None
+    if prop_value is not None:
+        parser = ET.XMLParser(remove_blank_text=True)
+        if 'scale_denominator' in prop_value:
+            scale_denominator = prop_value['scale_denominator']
+            denominator_el_str = f"""
+                <gmd:denominator>
+                    <gco:Integer>{str(scale_denominator)}</gco:Integer>
+                </gmd:denominator>
+            """ if scale_denominator is not None else '<gmd:denominator gco:nilReason="unknown" />'
+            child_el = ET.fromstring(f"""
+                <gmd:MD_Resolution xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gco="{NAMESPACES['gco']}">
+                  <gmd:equivalentScale>
+                    <gmd:MD_RepresentativeFraction>
+                      {denominator_el_str}
+                    </gmd:MD_RepresentativeFraction>
+                  </gmd:equivalentScale>
+                </gmd:MD_Resolution>
+            """, parser=parser)
+    if child_el:
+        prop_el.append(child_el)
+    else:
+        _add_unknown_reason(prop_el)
+
+
 def get_record_element_by_id(csw, ident):
     csw.getrecordbyid(id=[ident], esn='full', outputschema=NAMESPACES['gmd'])
     xml = csw._exml  # pylint: disable=protected-access

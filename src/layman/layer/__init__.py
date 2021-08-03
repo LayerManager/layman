@@ -86,7 +86,7 @@ PUBLICATION_TYPES = {
                 'language',
                 'revision_date',
                 'reference_system',
-                'scale_denominator',
+                'spatial_resolution',
                 'title',
                 'wfs_url',
                 'wms_url',

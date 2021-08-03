@@ -71,6 +71,8 @@
 - Fix: Raise error when more than one main layer file is sent in [POST Workspace Layers](doc/rest.md#post-workspace-layers) or [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer).
 - Fix [#408](https://github.com/LayerManager/layman/issues/408) Skip non WMS layers in thumbnail generation. Previously thumbnail generation failed.
 - Fix [GET Workspace Layer](doc/rest.md#get-workspace-layer) documentation, where was incorrectly `style` item instead of `sld`.
+- New metadata property [`spatial_resolution`](doc/metadata.md#spatial_resolution) is available.
+- Metadata property `scale_denominator` was removed. Its value is now accessible as subproperty of new [`spatial_resolution`](doc/metadata.md#spatial_resolution) metadata property.
 
 ## v1.13.2
  2021-06-25
@@ -370,7 +372,7 @@ There is a critical bug in this release, posting new layer breaks Layman: https:
 - Guess metadata properties
   - [`md_language`](doc/metadata.md#md_language) of both Layer and Map using pycld2 library
   - [`language`](doc/metadata.md#language) of Layer using pycld2 library
-  - [`scale_denominator`](doc/metadata.md#scale_denominator) of Layer using distanced between vertices
+  - [`scale_denominator`](doc/metadata.md#spatial_resolution) of Layer using distanced between vertices
 - Change multiplicity of [`language`](doc/metadata.md#language) metadata property from `1` to `1..n` according to XML Schema
 - Remove [`language`](doc/metadata.md#language) metadata property from Map according to XML Schema
 - Build Layman as a part of `make start-demo*` commands.

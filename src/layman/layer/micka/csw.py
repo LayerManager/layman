@@ -144,9 +144,12 @@ def get_template_path_and_values(workspace, layername, http_method=None):
             scale_denominator = db.guess_scale_denominator(workspace, layername)
         except LaymanError:
             scale_denominator = None
+        spatial_resolution = {
+            'scale_denominator': scale_denominator,
+        }
     else:
         languages = []
-        scale_denominator = None
+        spatial_resolution = None
 
     prop_values = _get_property_values(
         workspace=workspace,
@@ -166,7 +169,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         organisation_name=None,
         md_language=md_language,
         languages=languages,
-        scale_denominator=scale_denominator,
+        spatial_resolution=spatial_resolution,
         epsg_codes=settings.LAYMAN_OUTPUT_SRS_LIST,
     )
     if http_method == common.REQUEST_METHOD_POST:
@@ -192,7 +195,7 @@ def _get_property_values(
         wms_url="http://www.env.cz/corine/data/download.zip",
         wfs_url="http://www.env.cz/corine/data/download.zip",
         epsg_codes=None,
-        scale_denominator=None,
+        spatial_resolution=None,
         languages=None,
         md_language=None,
 ):
@@ -200,6 +203,9 @@ def _get_property_values(
     west, south, east, north = extent or [11.87, 48.12, 19.13, 51.59]
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
     languages = languages or []
+    spatial_resolution = spatial_resolution or {
+        'scale_denominator': None,
+    }
 
     result = {
         'md_file_identifier': get_metadata_uuid(uuid),
@@ -220,7 +226,7 @@ def _get_property_values(
         'wms_url': f"{wms.add_capabilities_params_to_url(wms_url)}&LAYERS={layername}",
         'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={layername}",
         'layer_endpoint': url_for('rest_workspace_layer.get', workspace=workspace, layername=layername),
-        'scale_denominator': scale_denominator,
+        'spatial_resolution': spatial_resolution,
         'language': languages,
         'md_organisation_name': md_organisation_name,
         'organisation_name': organisation_name,
@@ -317,12 +323,12 @@ METADATA_PROPERTIES = {
         'xpath_extract_fn': lambda l: l[0] if l else None,
         'adjust_property_element': common_util.adjust_graphic_url,
     },
-    'scale_denominator': {
-        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction',
-        'xpath_property': './gmd:denominator',
-        'xpath_extract': './gco:Integer/text()',
-        'xpath_extract_fn': lambda l: int(l[0]) if l else None,
-        'adjust_property_element': common_util.adjust_integer,
+    'spatial_resolution': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification',
+        'xpath_property': './gmd:spatialResolution',
+        'xpath_extract': '.',
+        'xpath_extract_fn': common_util.extract_spatial_resolution,
+        'adjust_property_element': common_util.adjust_spatial_resolution,
     },
     'language': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification',
@@ -390,7 +396,7 @@ def get_metadata_comparison(workspace, layername):
         'publication_date',
         'revision_date',
         'reference_system',
-        'scale_denominator',
+        'spatial_resolution',
         'title',
         'wfs_url',
         'wms_url',
