@@ -49,7 +49,7 @@ def test_infos(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
     title = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('title') or publication
-    headers = data.HEADERS.get(workspace)
+    headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
     infos = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
 
     publication_infos = [info for info in infos if info['name'] == publication]
@@ -112,7 +112,6 @@ def test_auth_get_publication(workspace, publ_type, publication):
 def test_internal_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
-    is_personal_workspace = workspace in data.USERS
     # Items
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, publication)
@@ -128,7 +127,7 @@ def test_internal_info(workspace, publ_type, publication):
     assert {'thumbnail', }.issubset(set(pub_info)), pub_info
     assert all(item not in pub_info for item in {'name', 'title', 'access_rights', 'uuid', 'file', 'metadata', }), pub_info
 
-    user = workspace if is_personal_workspace else settings.ANONYM_USER
+    user = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_read', [settings.ANONYM_USER])[0]
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user, 'keys': []})
     assert {'name', 'title', 'access_rights', 'uuid', }.issubset(set(pub_info)), pub_info
@@ -144,7 +143,7 @@ def test_internal_info(workspace, publ_type, publication):
 def test_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
-    headers = data.HEADERS.get(workspace)
+    headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
     with app.app_context():
         info = process_client.get_workspace_publication(publ_type, workspace, publication, headers)
 

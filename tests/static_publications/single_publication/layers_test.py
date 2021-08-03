@@ -30,7 +30,7 @@ def test_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     wms_url = f"http://localhost:8000/geoserver/{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows"
     wfs_url = f"http://localhost:8000/geoserver/{workspace}/wfs"
-    headers = data.HEADERS.get(workspace)
+    headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
     style = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['style_type']
 
     info = process_client.get_workspace_publication(publ_type, workspace, publication, headers=headers)
@@ -88,7 +88,7 @@ def test_geoserver_workspace(workspace, publ_type, publication):
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_get_layer_style(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
-    headers = data.HEADERS.get(workspace)
+    headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
 
     with app.app_context():
         rest_url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=publication)
@@ -167,7 +167,7 @@ def test_wms_layer(workspace, publ_type, publication):
         assert_util.assert_same_images(url, obtained_file, expected_file, pixel_tolerance)
 
     gs_workspace = info['_wms']['workspace']
-    authn_headers = data.HEADERS.get(workspace)
+    authn_headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
     for service_endpoint in {'ows', 'wms'}:
         wms_url = geoserver_client.get_wms_url(gs_workspace, service_endpoint)
 

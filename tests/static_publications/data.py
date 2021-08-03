@@ -47,7 +47,7 @@ def ensure_test_data(liferay_mock):
         info = util.get_publication_infos()
 
     for workspace, publ_type, publication in info:
-        headers = data.HEADERS.get(workspace)
+        headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
         process_client.delete_workspace_publication(publ_type, workspace, publication, headers=headers)
         assert_publication_after_delete(workspace, publ_type, publication)
 

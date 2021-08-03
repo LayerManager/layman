@@ -163,7 +163,10 @@ PUBLICATIONS = {
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_jp2'): {
         DEFINITION: [
-            {'file_paths': ['sample/layman.layer/sample_jp2_rgb.jp2', ]},
+            {'file_paths': ['sample/layman.layer/sample_jp2_rgb.jp2', ],
+             'headers': HEADERS[OWNER],
+             'access_rights': {'read': OWNER, 'write': OWNER},
+             },
         ],
         TEST_DATA: {
             'bbox': (1829708, 6308828.600, 1833166.200, 6310848.600),
@@ -172,6 +175,8 @@ PUBLICATIONS = {
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_jp2.png',
             'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
+            'users_can_read': [OWNER],
+            'users_can_write': [OWNER],
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_jp2'): {
