@@ -595,6 +595,44 @@ def adjust_operates_on(prop_el, prop_value):
         _add_unknown_reason(prop_el)
 
 
+def extract_spatial_resolution(prop_els):
+    scale_denominator = None
+    if prop_els:
+        prop_el = prop_els[0]
+        scale_strings = prop_el.xpath('./gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/'
+                                      'gmd:denominator/gco:Integer/text()', namespaces=NAMESPACES)
+        scale_denominator = int(scale_strings[0]) if scale_strings else None
+    result = {}
+    if scale_denominator:
+        result['scale_denominator'] = scale_denominator
+    result = result or None
+    return result
+
+
+def adjust_spatial_resolution(prop_el, prop_value):
+    _clear_el(prop_el)
+    child_el = None
+    if prop_value is not None:
+        parser = ET.XMLParser(remove_blank_text=True)
+        scale_denominator = prop_value.get('scale_denominator')
+        if scale_denominator is not None:
+            child_el = ET.fromstring(f"""
+                <gmd:MD_Resolution xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gco="{NAMESPACES['gco']}">
+                  <gmd:equivalentScale>
+                    <gmd:MD_RepresentativeFraction>
+                      <gmd:denominator>
+                        <gco:Integer>{str(scale_denominator)}</gco:Integer>
+                      </gmd:denominator>
+                    </gmd:MD_RepresentativeFraction>
+                  </gmd:equivalentScale>
+                </gmd:MD_Resolution>
+            """, parser=parser)
+    if child_el:
+        prop_el.append(child_el)
+    else:
+        _add_unknown_reason(prop_el)
+
+
 def get_record_element_by_id(csw, ident):
     csw.getrecordbyid(id=[ident], esn='full', outputschema=NAMESPACES['gmd'])
     xml = csw._exml  # pylint: disable=protected-access
