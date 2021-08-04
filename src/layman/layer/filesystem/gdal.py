@@ -14,7 +14,7 @@ def get_layer_info(workspace, layer):
     gdal_gs_path = get_normalized_raster_layer_main_filepath(workspace, layer, geoserver=True)
     if os.path.exists(gdal_path):
         return {
-            'layername': layer,
+            'name': layer,
             '_file': {
                 'normalized_file': {
                     'path': gdal_path,
