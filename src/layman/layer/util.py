@@ -80,6 +80,9 @@ def get_layer_info(workspace, layername, context=None):
     if chain_info is None or celery_util.is_chain_successful(chain_info):
         return partial_info
 
+    file_type = partial_info['file']['file_type']
+    item_keys = get_layer_info_keys(file_type)
+
     failed = False
     for res in chain_info['by_order']:
         task_name = next(k for k, v in chain_info['by_name'].items() if v == res)
@@ -98,7 +101,8 @@ def get_layer_info(workspace, layername, context=None):
             continue
         for layerinfo_key in TASKS_TO_LAYER_INFO_KEYS[task_name]:
             if layerinfo_key not in partial_info:
-                partial_info[layerinfo_key] = source_state
+                if layerinfo_key in item_keys:
+                    partial_info[layerinfo_key] = source_state
             elif not res.successful():
                 partial_info[layerinfo_key].update(source_state)
 
@@ -117,24 +121,24 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
     file_type = partial_info['file']['file_type']
     item_keys = get_layer_info_keys(file_type)
 
-    complete_info = {
+    complete_info = dict()
+    for key in item_keys:
+        complete_info[key] = {'status': 'NOT_AVAILABLE'}
+
+    complete_info.update({
         'name': layername,
         'url': url_for('rest_workspace_layer.get', layername=layername, workspace=username),
         'title': layername,
         'description': '',
-    }
-
-    for key in item_keys:
-        complete_info[key] = {'status': 'NOT_AVAILABLE'}
+    })
 
     complete_info.update(partial_info)
-
-    complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(username, LAYER_TYPE, layername,
-                                                                                                 complete_info, item_keys)}
-
+    complete_info['sld'] = complete_info['style']
     complete_info = clear_publication_info(complete_info)
 
-    complete_info['sld'] = complete_info['style']
+    complete_info.pop('layman_metadata')
+    complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(username, LAYER_TYPE, layername,
+                                                                                                 complete_info, item_keys)}
     return complete_info
 
 

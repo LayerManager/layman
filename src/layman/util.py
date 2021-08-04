@@ -457,7 +457,7 @@ def get_publication_status(workspace, publication_type, publication_name, comple
 
     if (chain_info and not celery_util.is_chain_ready(chain_info)) or current_lock:
         publication_status = 'UPDATING'
-    elif any(complete_info.get(v, dict()).get('status') for v in item_keys):
+    elif any(complete_info.get(v, dict()).get('status') for v in item_keys if isinstance(complete_info.get(v, dict()), dict)):
         publication_status = 'INCOMPLETE'
     else:
         publication_status = 'COMPLETE'
