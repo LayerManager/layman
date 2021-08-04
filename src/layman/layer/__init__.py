@@ -92,8 +92,12 @@ PUBLICATION_TYPES = {
                 'wms_url',
             }
         },
-        'info_keys': {settings.FILE_TYPE_VECTOR: ['wms', 'wfs', 'thumbnail', 'file', 'db_table', 'metadata', 'style', ],
-                      settings.FILE_TYPE_RASTER: ['wms', 'thumbnail', 'file', 'metadata', 'style', ],
+        'info_keys': {settings.FILE_TYPE_VECTOR: {'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at',
+                                                  'wms', 'wfs', 'thumbnail', 'file', 'db_table', 'metadata', 'style', 'sld',
+                                                  'access_rights', 'bounding_box', },
+                      settings.FILE_TYPE_RASTER: {'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at',
+                                                  'wms', 'thumbnail', 'file', 'metadata', 'style', 'sld', 'access_rights',
+                                                  'bounding_box', },
                       },
     }
 }
