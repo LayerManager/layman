@@ -9,6 +9,7 @@ from flask import current_app
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util
 from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
+from layman.layer.filesystem import gdal
 from layman.layer.filesystem.uuid import get_layer_uuid
 from layman.layer import db
 from layman.layer.geoserver import wms
@@ -150,8 +151,12 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         }
     elif file_type == settings.FILE_TYPE_RASTER:
         languages = []
+        distance_value = gdal.get_normalized_ground_sample_distance(workspace, layername)
         spatial_resolution = {
-            'ground_sample_distance': None,
+            'ground_sample_distance': {
+                'value': distance_value,
+                'uom': 'm',  # EPSG:3857
+            }
         }
     else:
         raise NotImplementedError(f"Unknown file type: {file_type}")

@@ -274,6 +274,10 @@ PUBLICATIONS = {
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_rgba_4326.png',
             'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
+            'micka_xml': {'filled_template': 'test_tools/data/micka/rest_test_filled_raster_template.xml',
+                          'diff_lines': MICKA_XML_LAYER_DIFF_LINES,
+                          'diff_lines_len': 29,
+                          },
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tiff'): {
