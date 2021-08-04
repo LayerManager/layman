@@ -289,3 +289,11 @@ def get_bbox(workspace, layer):
     miny = maxy + geo_transform[5] * data.RasterYSize
     result = (minx, miny, maxx, maxy)
     return result
+
+
+def get_normalized_ground_sample_distance(workspace, layer):
+    filepath = get_normalized_raster_layer_main_filepath(workspace, layer)
+    pixel_size = get_pixel_size(filepath)
+    abs_pixel_size = [abs(size) for size in pixel_size]
+    distance_value = sum(abs_pixel_size) / len(abs_pixel_size)
+    return distance_value

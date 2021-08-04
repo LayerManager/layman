@@ -244,7 +244,7 @@ Multiplicity: 1
 
 Shape: Object with one of following keys:
 - *scale_denominator*: Integer. Scale denominator, used for vector data, guessed from distances between vertices of line and polygon features.
-- *ground_sample_distance*: Object. Ground sample distance, used for raster data.  
+- *ground_sample_distance*: Object. Ground sample distance, used for raster data, read from normalized raster.  
   Keys:
   - **value**: Float. Value of ground sample distance.
   - **uom**: String. Unit of measurement of ground sample distance.
