@@ -10,7 +10,7 @@ from geoserver import GS_REST_WORKSPACES, GS_REST, GS_AUTH, util as gs_util
 from layman import settings, app, util as layman_util
 from layman.common import bbox as bbox_util, geoserver as gs_common
 from layman.common.micka import util as micka_common_util
-from layman.layer import util as layer_util, db as layer_db
+from layman.layer import util as layer_util, db as layer_db, get_layer_info_keys
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX, VERSION
 from layman.layer.micka import csw
 from layman.layer.qgis import util as qgis_util
@@ -42,19 +42,15 @@ def test_info(workspace, publ_type, publication):
         expected_style_url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=publication,
                                      internal=False)
 
-    assert info['wms'].get('url') == wms_url, f'r_json={info}, wms_url={wms_url}'
-    assert 'wms' in info, f'info={info}'
-    assert 'url' in info['wms'], f'info={info}'
+    file_type = info_internal['file']['file_type']
+    item_keys = get_layer_info_keys(file_type)
 
-    if data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type') == settings.FILE_TYPE_VECTOR:
-        assert info.get('file', dict()).get('file_type') == settings.FILE_TYPE_VECTOR, info
-        assert 'wfs' in info, f'info={info}'
-        assert 'url' in info['wms'], f'info={info}'
+    assert set(info.keys()) == item_keys, f'info={info}'
+    assert info['wms'].get('url') == wms_url, f'r_json={info}, wms_url={wms_url}'
+    assert 'url' in info['wms'], f'info={info}'
+    assert info.get('file', dict()).get('file_type') == data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
+    if 'wfs' in info:
         assert info['wfs'].get('url') == wfs_url, f'r_json={info}, wfs_url={wfs_url}'
-    elif data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type') == settings.FILE_TYPE_RASTER:
-        assert info.get('file', dict()).get('file_type') == settings.FILE_TYPE_RASTER, info
-        assert 'wfs' not in info, f'info={info}'
-        assert 'db_table' not in info, f'info={info}'
 
     assert info_internal['style_type'] == style, f'info_internal={info_internal}'
     assert info['style']['type'] == style, info.get('style')
