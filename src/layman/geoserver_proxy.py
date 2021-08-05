@@ -9,7 +9,7 @@ from flask import Blueprint, g, current_app as app, request, Response
 from geoserver.util import reset as gs_reset
 from layman import authn, authz, settings, util as layman_util
 from layman.authn import authenticate, is_user_with_name
-from layman.layer import db, LAYER_TYPE, util as layer_util
+from layman.layer import db, LAYER_TYPE
 from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import LAYERNAME_PATTERN, ATTRNAME_PATTERN, patch_after_feature_change
 from layman.util import USERNAME_ONLY_PATTERN
@@ -67,7 +67,7 @@ def ensure_wfs_t_attributes(attribs):
     if created_attributes:
         changed_layers = {(workspace, layer) for workspace, layer, _ in created_attributes}
         qgis_changed_layers = {(workspace, layer) for workspace, layer in changed_layers
-                               if layer_util.get_layer_info(workspace, layer, context={'keys': ['style_type'], })['style_type'] == 'qml'}
+                               if layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['style_type'], })['style_type'] == 'qml'}
         for workspace, layer in qgis_changed_layers:
             qgis_wms.save_qgs_file(workspace, layer)
         gs_reset(settings.LAYMAN_GS_AUTH)

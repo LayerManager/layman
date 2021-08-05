@@ -2,8 +2,8 @@ from owslib.feature.schema import get_schema as get_wfs_schema
 import pytest
 
 from geoserver.error import Error as GS_Error
-from layman import app, settings
-from layman.layer import db, util as layer_util
+from layman import app, settings, util as layman_util
+from layman.layer import db
 from layman.layer.filesystem import thumbnail
 from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
@@ -112,7 +112,7 @@ def test_missing_attribute(style_file, ):
                                            )
 
     with app.app_context():
-        style_type = layer_util.get_layer_info(username, layername, context={'keys': ['style_type'], })['style_type']
+        style_type = layman_util.get_publication_info(username, process_client.LAYER_TYPE, layername, context={'keys': ['style_type'], })['style_type']
 
     def wfs_post(workspace, attr_names_list, data_xml):
         with app.app_context():

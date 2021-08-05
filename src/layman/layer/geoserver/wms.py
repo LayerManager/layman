@@ -8,7 +8,7 @@ from layman import settings, patch_mode, util as layman_util
 from layman.cache import mem_redis
 from layman.common import geoserver as gs_common, empty_method_returns_none, empty_method
 from layman.layer.util import is_layer_chain_ready
-from layman.layer import LAYER_TYPE, util as layer_util
+from layman.layer import LAYER_TYPE
 from .util import get_gs_proxy_base_url
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
@@ -29,7 +29,7 @@ def get_flask_proxy_key(username):
 
 def patch_layer(workspace, layername, title, description, access_rights=None):
     geoserver_workspace = get_geoserver_workspace(workspace)
-    info = layer_util.get_layer_info(workspace, layername, context={'keys': ['style_type'], })
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type'], })
     if info['style_type'] == 'sld':
         gs_util.patch_feature_type(geoserver_workspace, layername, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
         clear_cache(workspace)
