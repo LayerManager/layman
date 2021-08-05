@@ -265,6 +265,7 @@ PUBLICATIONS = {
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_rgba_4326'): {
         DEFINITION: [
+            {},
             {'file_paths': ['sample/layman.layer/sample_tif_rgba_4326.tif', ]},
         ],
         TEST_DATA: {
@@ -432,6 +433,7 @@ PUBLICATIONS = {
     },
     (WORKSPACE1, LAYER_TYPE, 'test_publications_same_name_publ'): {
         DEFINITION: [
+            {'file_paths': ['sample/layman.layer/sample_tif_rgba_4326.tif', ]},
             {'file_paths': [
                 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
                 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
