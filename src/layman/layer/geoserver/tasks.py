@@ -33,10 +33,8 @@ def refresh_wms(
     info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file', 'bounding_box']})
     file_type = info['file']['file_type']
 
-    if description is None:
-        description = layername
-    if title is None:
-        title = layername
+    assert description is not None
+    assert title is not None
     geoserver_workspace = wms.get_geoserver_workspace(username)
     if ensure_user:
         geoserver.ensure_workspace(username)
@@ -98,10 +96,8 @@ def refresh_wfs(
     if file_type != settings.FILE_TYPE_VECTOR:
         return
 
-    if description is None:
-        description = layername
-    if title is None:
-        title = layername
+    assert description is not None
+    assert title is not None
     if ensure_user:
         geoserver.ensure_workspace(username)
 
