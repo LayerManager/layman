@@ -43,7 +43,8 @@ def test_fill_template():
                                                                       _get_property_values(
                                                                           spatial_resolution={
                                                                               'scale_denominator': None,
-                                                                          }
+                                                                          },
+                                                                          wfs_url='http://www.env.cz/corine/data/download.zip',
                                                                       ), METADATA_PROPERTIES)
     with open(xml_path, 'wb') as out:
         out.write(file_object.read())
