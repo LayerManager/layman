@@ -1119,7 +1119,7 @@ def test_post_layers_zero_length_attribute():
 
     process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths, check_response_fn=wait_for_db_finish)
 
-    layer_info = util.get_layer_info(workspace, layername, context={'keys': ['db_table']})
+    layer_info = util.get_layer_info(workspace, layername)
     assert layer_info['db_table']['status'] == 'FAILURE', f'layer_info={layer_info}'
     assert layer_info['db_table']['error']['code'] == 28, f'layer_info={layer_info}'
 

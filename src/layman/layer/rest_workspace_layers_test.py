@@ -4,7 +4,7 @@ import pytest
 
 del sys.modules['layman']
 
-from layman import app, settings, LaymanError
+from layman import app, settings, LaymanError, util as layman_util
 from layman.layer import util as layer_util
 from layman.layer.filesystem import input_style
 from test_tools import process_client, util as test_util
@@ -68,7 +68,7 @@ def test_style_correctly_saved(source_style_file_path,
                                            style_file=source_style_file_path)
     assert_style_file(workspace, layer, expected_style_file)
     with app.app_context():
-        info = layer_util.get_layer_info(workspace, layer, context={'keys': ['style_type', 'style'], })
+        info = layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['style_type', 'style'], })
     assert info['style_type'] == expected_style_type
 
     process_client.delete_workspace_layer(workspace, layer)
