@@ -27,6 +27,11 @@ def get_flask_proxy_key(username):
 
 
 def patch_layer(workspace, layername, title, description, access_rights=None):
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', ]})
+    file_type = info['file']['file_type']
+    if file_type != settings.FILE_TYPE_VECTOR:
+        return
+
     gs_util.patch_feature_type(workspace, layername, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     clear_cache(workspace)
 

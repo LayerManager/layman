@@ -375,9 +375,16 @@ PUBLICATIONS = {
             'style_type': 'sld',
         },
     },
-    (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_grayscale_nodata_opaque'): {
+    (OWNER, LAYER_TYPE, 'post_tif_grayscale_nodata_opaque'): {
         DEFINITION: [
-            {'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif']},
+            {'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
+             'headers': HEADERS[OWNER],
+             'title': 'None title',
+             },
+            {
+             'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'},
+             'headers': HEADERS[OWNER],
+            }
         ],
         TEST_DATA: {
             'bbox': (1823060, 6310012, 1826914, 6312691),

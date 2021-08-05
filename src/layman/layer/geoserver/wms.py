@@ -29,8 +29,8 @@ def get_flask_proxy_key(username):
 
 def patch_layer(workspace, layername, title, description, access_rights=None):
     geoserver_workspace = get_geoserver_workspace(workspace)
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type'], })
-    if info['style_type'] == 'sld':
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type', 'file', ], })
+    if info['style_type'] == 'sld' and info['file']['file_type'] == settings.FILE_TYPE_VECTOR:
         gs_util.patch_feature_type(geoserver_workspace, layername, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
         clear_cache(workspace)
 
