@@ -45,8 +45,8 @@ def patch(workspace, layername):
 
     info = util.get_complete_layer_info(cached=True)
     kwargs = {
-        'title': info.get('title', info['name']),
-        'description': info.get('description', ''),
+        'title': info.get('title', info['name']) or '',
+        'description': info.get('description', '') or '',
     }
 
     # FILE

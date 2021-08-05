@@ -49,6 +49,13 @@ def test_geoserver_bbox():
     assert_util.assert_wfs_bbox(workspace, layer, expected_bbox_1)
     assert_util.assert_wms_bbox(workspace, layer, expected_bbox_1)
 
+    kwargs = {
+        'description': '',
+        'title': layer,
+        'ensure_user': False,
+        'access_rights': None,
+    }
+
     # test WFS
     for bbox, expected_bbox in expected_bboxes:
         wfs.delete_layer(workspace, layer)
@@ -56,10 +63,7 @@ def test_geoserver_bbox():
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox)
             wfs.delete_layer(workspace, layer)
             tasks.refresh_wfs.apply(args=[workspace, layer],
-                                    description=layer,
-                                    title=layer,
-                                    ensure_user=False,
-                                    access_rights=None,
+                                    kwargs=kwargs,
                                     )
         assert_util.assert_wfs_bbox(workspace, layer, expected_bbox)
 
@@ -69,10 +73,7 @@ def test_geoserver_bbox():
         with app.app_context():
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox)
             tasks.refresh_wms.apply(args=[workspace, layer, True],
-                                    description=layer,
-                                    title=layer,
-                                    ensure_user=False,
-                                    access_rights=None,
+                                    kwargs=kwargs,
                                     )
         assert_util.assert_wms_bbox(workspace, layer, expected_bbox)
 
@@ -83,10 +84,7 @@ def test_geoserver_bbox():
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox)
             wms.delete_layer(workspace, layer)
             tasks.refresh_wms.apply(args=[workspace, layer, False],
-                                    description=layer,
-                                    title=layer,
-                                    ensure_user=False,
-                                    access_rights=None,
+                                    kwargs=kwargs,
                                     )
         assert_util.assert_wms_bbox(workspace, layer, expected_bbox)
 
