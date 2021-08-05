@@ -287,7 +287,7 @@ XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentifica
 
 
 ### wfs_url
-It contains standard SERVICE, REQUEST, and VERSION parameters and non-standard LAYERS parameter that holds name of the feature type at given WFS instance.
+It contains standard SERVICE, REQUEST, and VERSION parameters and non-standard LAYERS parameter that holds name of the feature type at given WFS instance. It is filled for vector layers, not raster ones.
 
 Multiplicity: 1
 

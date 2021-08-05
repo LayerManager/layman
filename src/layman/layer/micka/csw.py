@@ -149,6 +149,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         spatial_resolution = {
             'scale_denominator': scale_denominator,
         }
+        wfs_url = wfs.get_wfs_url(workspace, external_url=True)
     elif file_type == settings.FILE_TYPE_RASTER:
         languages = []
         distance_value = gdal.get_normalized_ground_sample_distance(workspace, layername)
@@ -158,6 +159,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
                 'uom': 'm',  # EPSG:3857
             }
         }
+        wfs_url = None
     else:
         raise NotImplementedError(f"Unknown file type: {file_type}")
 
@@ -174,7 +176,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         identifier_label=layername,
         extent=extent,
         wms_url=wms.get_wms_url(workspace, external_url=True),
-        wfs_url=wfs.get_wfs_url(workspace, external_url=True),
+        wfs_url=wfs_url,
         md_organisation_name=None,
         organisation_name=None,
         md_language=md_language,
@@ -203,7 +205,7 @@ def _get_property_values(
         identifier_label='MZP-CORINE',
         extent=None,  # w, s, e, n
         wms_url="http://www.env.cz/corine/data/download.zip",
-        wfs_url="http://www.env.cz/corine/data/download.zip",
+        wfs_url=None,
         epsg_codes=None,
         spatial_resolution=None,
         languages=None,
@@ -231,7 +233,7 @@ def _get_property_values(
         'extent': extent,
 
         'wms_url': f"{wms.add_capabilities_params_to_url(wms_url)}&LAYERS={layername}",
-        'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={layername}",
+        'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={layername}" if wfs_url else None,
         'layer_endpoint': url_for('rest_workspace_layer.get', workspace=workspace, layername=layername),
         'spatial_resolution': spatial_resolution,
         'language': languages,
