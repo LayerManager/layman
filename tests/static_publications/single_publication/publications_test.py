@@ -169,3 +169,32 @@ def test_info(workspace, publ_type, publication):
         if file_type == settings.FILE_TYPE_RASTER:
             bbox = gdal.get_bbox(workspace, publication)
             assert_util.assert_same_bboxes(bbox, exp_bbox, 0.01)
+
+
+def same_infos(expected, tested):
+    if isinstance(tested, dict) and isinstance(expected, dict):
+        return all(same_infos(expected[key], tested[key]) for key in tested if key in expected)
+    return expected == tested
+
+
+@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+def test_all_source_info(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+
+    with app.app_context():
+        sources = layman_util.get_internal_sources(publ_type)
+        info = layman_util.get_publication_info(workspace, publ_type, publication)
+
+    info_method = {
+        data.LAYER_TYPE: 'get_layer_info',
+        data.MAP_TYPE: 'get_map_info',
+    }[publ_type]
+    with app.app_context():
+        partial_infos = layman_util.call_modules_fn(sources, info_method, [workspace, publication])
+
+    for source, source_info in partial_infos.items():
+        for key, value in source_info.items():
+            if key in info:
+                assert same_infos(info[key], value), f'{source}: key={key}, info={info[key]}, source={value}, ' \
+                                                     f'all={[(lsource, lsource_info[key]) for lsource, lsource_info in partial_infos.items() if key in lsource_info]}'
