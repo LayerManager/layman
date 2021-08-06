@@ -570,12 +570,26 @@ def delete_wms_layer(geoserver_workspace, layer, auth):
         response.raise_for_status()
 
 
-def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox):
+def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox=None, title=None, description=None):
     wms_layer = get_wms_layer(geoserver_workspace, layer, auth=auth)
     if bbox:
         wms_layer['nativeBoundingBox'] = bbox_to_native_bbox(bbox)
         wms_layer['nativeCRS'] = 'EPSG:3857'
         # automatically recalculates also 'latLonBoundingBox'
+    if title:
+        wms_layer['title'] = title
+        keywords = [
+            "features",
+            layer,
+            title
+        ]
+        keywords = list(set(keywords))
+        wms_layer['keywords'] = {
+            "string": keywords
+        }
+    if description:
+        wms_layer['abstract'] = description
+
     response = requests.put(urljoin(GS_REST_WORKSPACES,
                             f'{geoserver_workspace}/wmslayers/{layer}'),
                             data=json.dumps({
