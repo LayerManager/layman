@@ -381,10 +381,12 @@ PUBLICATIONS = {
              'headers': HEADERS[OWNER],
              'title': 'None title',
              },
-            {
-             'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'},
+            {'title': 'Some title',
              'headers': HEADERS[OWNER],
-            }
+             },
+            {'access_rights': {'read': 'EVERYONE', 'write': 'EVERYONE'},
+             'headers': HEADERS[OWNER],
+             }
         ],
         TEST_DATA: {
             'bbox': (1823060, 6310012, 1826914, 6312691),
@@ -393,6 +395,7 @@ PUBLICATIONS = {
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_nodata_opaque.png',
             'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
+            'title': 'Some title',
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'): {
