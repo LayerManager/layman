@@ -131,6 +131,11 @@ def get_layer_info(workspace, layername):
 
 
 def get_metadata_comparison(workspace, layername):
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', ]})
+    file_type = info['file']['file_type']
+    if file_type != settings.FILE_TYPE_VECTOR:
+        return dict()
+
     wfs = get_wfs_direct(workspace)
     if wfs is None:
         return {}
