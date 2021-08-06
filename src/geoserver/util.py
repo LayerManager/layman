@@ -455,6 +455,40 @@ def delete_db_store(geoserver_workspace, auth):
         response.raise_for_status()
 
 
+def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, description=None, bbox=None, auth):
+    coverage = dict()
+
+    if title:
+        coverage['title'] = title
+        keywords = [
+            "features",
+            layer,
+            title
+        ]
+        keywords = list(set(keywords))
+        coverage['keywords'] = {
+            "string": keywords
+        }
+    if description:
+        coverage['abstract'] = description
+    if bbox:
+        coverage['nativeBoundingBox'] = bbox_to_native_bbox(bbox)
+
+    coverage = {k: v for k, v in coverage.items() if v is not None}
+    body = {
+        "coverage": coverage
+    }
+    response = requests.put(
+        urljoin(GS_REST_WORKSPACES,
+                geoserver_workspace + f'/coveragestores/{coverage_store}/coverages/{layer}'),
+        data=json.dumps(body),
+        headers=headers_json,
+        auth=auth,
+        timeout=GS_REST_TIMEOUT,
+    )
+    response.raise_for_status()
+
+
 def create_coverage_store(geoserver_workspace, auth, name, file):
     data = {
         "coverageStore": {
