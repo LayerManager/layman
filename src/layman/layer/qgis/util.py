@@ -176,21 +176,21 @@ def get_source_type(db_types, qml_geometry):
     if qml_geometry == "Point":
         if "ST_MultiPoint" in db_types:
             result = "MultiPoint"
-        elif "ST_Point" in db_types:
+        elif "ST_Point" in db_types or not db_types:
             result = "Point"
     elif qml_geometry == "Line":
         if "ST_LineString" in db_types and "ST_MultiLineString" not in db_types:
             result = "LineString"
         elif "ST_LineString" in db_types and "ST_MultiLineString" in db_types:
             result = "MultiCurve"
-        elif "ST_LineString" not in db_types and "ST_MultiLineString" in db_types:
+        elif ("ST_LineString" not in db_types and "ST_MultiLineString" in db_types) or not db_types:
             result = "MultiLineString"
     elif qml_geometry == "Polygon":
         if "ST_Polygon" in db_types and "ST_MultiPolygon" not in db_types:
             result = "Polygon"
         elif "ST_Polygon" in db_types and "ST_MultiPolygon" in db_types:
             result = "MultiSurface"
-        elif "ST_Polygon" not in db_types and "ST_MultiPolygon" in db_types:
+        elif ("ST_Polygon" not in db_types and "ST_MultiPolygon" in db_types) or not db_types:
             result = "MultiPolygon"
     elif qml_geometry == "Unknown geometry":
         if "ST_GeometryCollection" in db_types:
