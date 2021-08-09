@@ -36,6 +36,11 @@ from ..filesystem import thumbnail
     ('polygon', {'ST_Polygon'}, {
         'Polygon': ('Polygon', 'polygon'),
     }),
+    ('none_geometry', set(), {
+        'Point': ('Point', None),
+        'Line': ('MultiLineString', None),
+        'Polygon': ('MultiPolygon', None),
+    }),
 ])
 @pytest.mark.usefixtures('ensure_layman')
 def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
