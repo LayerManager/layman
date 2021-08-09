@@ -214,7 +214,7 @@ def delete_feature_type(geoserver_workspace, feature_type_name, auth):
 def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, description=None, bbox=None, auth):
     ftype = dict()
 
-    if title:
+    if title is not None:
         ftype['title'] = title
         keywords = [
             "features",
@@ -225,7 +225,7 @@ def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, de
         ftype['keywords'] = {
             "string": keywords
         }
-    if description:
+    if description is not None:
         ftype['abstract'] = description
     if bbox:
         ftype['nativeBoundingBox'] = bbox_to_native_bbox(bbox)
@@ -458,7 +458,7 @@ def delete_db_store(geoserver_workspace, auth):
 def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, description=None, bbox=None, auth):
     coverage = dict()
 
-    if title:
+    if title is not None:
         coverage['title'] = title
         keywords = [
             "features",
@@ -469,7 +469,7 @@ def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, de
         coverage['keywords'] = {
             "string": keywords
         }
-    if description:
+    if description is not None:
         coverage['abstract'] = description
     if bbox:
         coverage['nativeBoundingBox'] = bbox_to_native_bbox(bbox)
@@ -610,7 +610,7 @@ def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox=None, title=None, 
         wms_layer['nativeBoundingBox'] = bbox_to_native_bbox(bbox)
         wms_layer['nativeCRS'] = 'EPSG:3857'
         # automatically recalculates also 'latLonBoundingBox'
-    if title:
+    if title is not None:
         wms_layer['title'] = title
         keywords = [
             "features",
@@ -621,7 +621,7 @@ def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox=None, title=None, 
         wms_layer['keywords'] = {
             "string": keywords
         }
-    if description:
+    if description is not None:
         wms_layer['abstract'] = description
 
     response = requests.put(urljoin(GS_REST_WORKSPACES,
