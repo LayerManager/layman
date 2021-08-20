@@ -120,7 +120,7 @@ Body parameters:
       - ShapeFile files (at least three files: .shp, .shx, .dbf)
       - GeoTIFF (.tif or .tiff, with or without .tfw)
       - JPEG 2000 (.jp2, with or without .j2w)
-      - PNG (.png, with .png.aux.xml)
+      - PNG (.png, with .png.aux.xml or .pgw)
       - file names, i.e. array of strings
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
