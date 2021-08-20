@@ -36,6 +36,7 @@
      - [GeoTIFF](https://gdal.org/drivers/raster/gtiff.html) 
      - [JPEG2000](https://gdal.org/drivers/raster/jp2openjpeg.html)
      - [PNG](https://gdal.org/drivers/raster/png.html)
+     - [JPEG](https://gdal.org/drivers/raster/jpeg.html)
   - Following input combinations of bands and color interpretations are supported:
     - 1 band: Gray
     - 1 band: Palette
