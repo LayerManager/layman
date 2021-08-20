@@ -18,6 +18,7 @@ from . import gdal
     ('sample/layman.layer/sample_tif_colortable_nodata_opaque.tif', None),
     ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', None),
     ('sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif', None),
+    ('sample/layman.layer/sample_jpg_aux_rgba.jpg', None),
     ('sample/layman.layer/sample_tif_rg.tif', {'http_code': 400,
                                                'code': 2,
                                                'detail': {'parameter': 'file',
@@ -49,6 +50,7 @@ def test_assert_valid_raster(file_path, exp_error):
     ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', [3.402823466e+38, 3.402823466e+38]),
     ('sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif', [3.402823466e+38]),
     ('sample/layman.layer/sample_tif_rg.tif', [None, None]),
+    ('sample/layman.layer/sample_jpg_aux_rgba.jpg', [None, None, None]),
 ])
 def test_get_nodata_values(file_path, exp_result):
     assert gdal.get_nodata_values(file_path) == exp_result
@@ -101,6 +103,7 @@ def test_get_statistics(file_path, exp_result):
     ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', True),  # alpha with at least one value < 255
     ('sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif', False),  # no alpha, nodata > max in each band
     ('sample/layman.layer/sample_tif_rg.tif', False),  # no alpha, no nodata
+    ('sample/layman.layer/sample_jpg_aux_rgba.jpg', True),  # no alpha, no nodata
 ])
 def test_is_normalized_alpha_needed(file_path, exp_result):
     color_interp = gdal.get_color_interpretations(file_path)
@@ -121,6 +124,7 @@ def test_is_normalized_alpha_needed(file_path, exp_result):
     ('sample/layman.layer/sample_tif_colortable_nodata_opaque.tif', [{gdalconst.GMF_NODATA}]),
     ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', [{gdalconst.GMF_NODATA}] * 2),
     ('sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif', [{gdalconst.GMF_NODATA}]),
+    ('sample/layman.layer/sample_jpg_aux_rgba.jpg', [{gdalconst.GMF_PER_DATASET}] * 3),
 ])
 def test_get_mask_flags(file_path, exp_result):
     mask_flags = gdal.get_mask_flags(file_path)
