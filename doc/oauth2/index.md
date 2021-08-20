@@ -1,6 +1,6 @@
 # Authentication with OAuth2
 
-Layman is able to authenticate against [OAuth 2.0](https://oauth.net/2/) provider. [Liferay Portal](https://portal.liferay.dev/docs/7-1/deploy/-/knowledge_base/d/oauth-2-0) is currently the only supported OAuth2 provider, however supporting [other OAuth2 providers](https://en.wikipedia.org/wiki/List_of_OAuth_providers) (e.g. Google or Facebook) should be quite straightforward in future.
+Layman is able to authenticate against [OAuth 2.0](https://oauth.net/2/) provider. [Liferay Portal](https://help.liferay.com/hc/en-us/articles/360018176491-OAuth-2-0) is currently the only supported OAuth2 provider, however supporting [other OAuth2 providers](https://en.wikipedia.org/wiki/List_of_OAuth_providers) (e.g. Google or Facebook) should be quite straightforward in future.
 
 
 ## Roles
@@ -32,7 +32,7 @@ From [RFC6749](https://tools.ietf.org/html/rfc6749#section-1.1):
 Layman acts as *resource server*. On every request to REST API, Layman accepts OAuth2 [access token](https://tools.ietf.org/html/rfc6749#section-1.4) from a *client* and validates access token against *authorization server* to authenticate *resource owner* (i.e. end-user). The access token is validated token against *authorization server* by OAuth2 mechanism called [Token Introspection](https://oauth.net/2/token-introspection/) (RFC 7662). Furthermore, Layman is responsible for fetching user-related metadata from *authorization server* using provider-specific endpoint.
 
 ### Liferay Portal
-[Liferay Portal](https://portal.liferay.dev/docs/7-1/deploy/-/knowledge_base/d/oauth-2-0) acts as *authorization server*.
+[Liferay Portal](https://help.liferay.com/hc/en-us/articles/360018176491-OAuth-2-0) acts as *authorization server*.
 
 ### Layman Test Client
 [Layman Test Client](https://github.com/LayerManager/layman-test-client) (LTC) acts as *client*. It is responsible for
@@ -50,7 +50,7 @@ Although LTC is currently the only OAuth2 client for Layman, there is an intenti
 
 ## Communication
 ### Initial Authorization using Authorization Code
-[**Authorization Code**](https://oauth.net/2/grant-types/authorization-code/) grant flow between *client* and *authorization server* is described in [Liferay documentation](https://portal.liferay.dev/docs/7-1/deploy/-/knowledge_base/d/authorizing-account-access-with-oauth2#authorization-code-flow).
+[**Authorization Code**](https://oauth.net/2/grant-types/authorization-code/) grant flow between *client* and *authorization server* is described in [Liferay documentation](https://help.liferay.com/hc/en-us/articles/360018176511-Authorizing-Account-Access-with-OAuth2#authorization-code-flow).
 
 Schema specific for LTC, distinguishing client side and server side of LTC:
 
@@ -113,7 +113,7 @@ To enable OAuth2 authentication in Layman, adjust following [environment setting
 Sample values for OAuth2 authentication can be found in [`layman_settings.py`](../../src/layman_settings.py).
 
 ### Liferay Settings
-Every *client* must be registered in Liferay as *application*, as described in [Liferay documentation](https://portal.liferay.dev/docs/7-1/deploy/-/knowledge_base/d/oauth-2-0#creating-an-application). For LTC, fill in following settings:
+Every *client* must be registered in Liferay as *application*, as described in [Liferay documentation](https://help.liferay.com/hc/en-us/articles/360018176491-OAuth-2-0#creating-an-application). For LTC, fill in following settings:
 - **Website URL** should point to application's home page, e.g. `http://localhost:3000/`.
 - **Callback URIs** must contain URL of OAuth2 [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2). In case of LTC, the value is the same as LTC setting OAUTH2_LIFERAY_CALLBACK_URL.
 - **Client Profile**: Web Application
