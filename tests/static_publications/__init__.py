@@ -398,6 +398,20 @@ PUBLICATIONS = {
             'title': 'Some title',
         },
     },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_png_aux_rgba'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.layer/sample_png_aux_rgba.png',
+                            'sample/layman.layer/sample_png_aux_rgba.png.aux.xml', ]},
+        ],
+        TEST_DATA: {
+            'bbox': (2707260.9569237595, 7740717.799460372, 2708414.90486888, 7741573.954387397),
+            'file_extensions': ['.png', '.png.aux.xml'],
+            'normalized_color_interp': ['Red', 'Green', 'Blue', 'Alpha'],
+            'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_png_rgba.png',
+            'file_type': settings.FILE_TYPE_RASTER,
+            'style_type': 'sld',
+        },
+    },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'): {
         DEFINITION: [
             {'file_paths': ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'],
