@@ -5,7 +5,7 @@ Any Layman's client (web, user-agent, mobile, or desktop) that implements [OAuth
 ## Appropriate Code Grant
 OAuth2 specifies many ways how to authorize *client* and how *client* obtains access and refresh tokens. These ways are called [authorization grants](https://tools.ietf.org/html/rfc6749#section-1.3). For LTC, the **Authorization Code** grant was chosen. For [native clients (desktop and mobile)](https://tools.ietf.org/html/draft-ietf-oauth-security-topics-13#section-3.1.1), as well as for [user agent applications](https://tools.ietf.org/html/draft-ietf-oauth-browser-based-apps-04#section-7.1), [**Authorization Code with PKCE**](https://tools.ietf.org/html/rfc7636) (RFC7636) is recommended.
 
-Both **Authorization Code** and **Authorization Code with PKCE** grant flows between *client* and *authorization server* are described in [Liferay documentation](https://portal.liferay.dev/docs/7-1/deploy/-/knowledge_base/d/authorizing-account-access-with-oauth2).
+Both **Authorization Code** and **Authorization Code with PKCE** grant flows between *client* and *authorization server* are described in [Liferay documentation](https://help.liferay.com/hc/en-us/articles/360018176511-Authorizing-Account-Access-with-OAuth2).
 
 ## Storing Tokens on a Client
 An important decision when implementing OAuth2 *client* is where to store access tokens and refresh tokens. The recommendations differ based on [*client profile*](https://tools.ietf.org/html/rfc6749#section-2.1).
