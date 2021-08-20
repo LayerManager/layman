@@ -4,7 +4,10 @@
   "plugins": {
     "validate-links": null,
     "lint-no-dead-urls": {
-      "skipLocalhost": true
+      "skipLocalhost": true,
+      "skipUrlPatterns": [
+        "https://help.liferay.com"
+      ]
     }
   }
 }
