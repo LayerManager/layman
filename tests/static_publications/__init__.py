@@ -426,6 +426,20 @@ PUBLICATIONS = {
             'style_type': 'sld',
         },
     },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_png_aux_rgba_opaque'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.layer/sample_png_aux_rgba_opaque.png',
+                            'sample/layman.layer/sample_png_aux_rgba_opaque.png.aux.xml', ]},
+        ],
+        TEST_DATA: {
+            'bbox': (1731751.7587133494671434, 6535237.5194635167717934, 1741920.6898681195452809, 6544154.1191952852532268),
+            'file_extensions': ['.png', '.png.aux.xml'],
+            'normalized_color_interp': ['Red', 'Green', 'Blue'],
+            'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_png_rgba_opaque.png',
+            'file_type': settings.FILE_TYPE_RASTER,
+            'style_type': 'sld',
+        },
+    },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'): {
         DEFINITION: [
             {'file_paths': ['/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'],
