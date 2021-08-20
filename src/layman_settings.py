@@ -18,6 +18,7 @@ MAIN_FILE_EXTENSIONS = {
     '.tiff': FILE_TYPE_RASTER,
     '.tif': FILE_TYPE_RASTER,
     '.jp2': FILE_TYPE_RASTER,
+    '.png': FILE_TYPE_RASTER,
 }
 
 INPUT_SRS_LIST = [
