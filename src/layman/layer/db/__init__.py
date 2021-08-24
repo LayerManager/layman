@@ -105,6 +105,7 @@ def import_layer_vector_file_async(username, layername, main_filepath,
         '-lco', f'SCHEMA={username}',
         # '-clipsrc', '-180', '-85.06', '180', '85.06',
         '-f', 'PostgreSQL',
+        '-unsetFid',
         f'PG:{pg_conn}',
         # 'PG:{} active_schema={}'.format(PG_CONN, username),
     ]

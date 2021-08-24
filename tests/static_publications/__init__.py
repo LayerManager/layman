@@ -48,7 +48,9 @@ PUBLICATIONS = {
     },
     (OWNER, LAYER_TYPE, 'post_private_sld'): {
         DEFINITION: [
-            {'headers': HEADERS[OWNER]},
+            {'headers': HEADERS[OWNER],
+             'file_paths': ['sample/layman.layer/small_layer_with_id.geojson'],
+             },
         ],
         TEST_DATA: {
             'bbox': (1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699),
