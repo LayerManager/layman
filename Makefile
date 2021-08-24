@@ -44,6 +44,9 @@ upgrade-demo-full:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps postgresql qgis geoserver redis timgen layman_client micka nginx
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps layman bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
 
+upgrade-after-timeout:
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps layman bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
+
 deps-start:
 	docker-compose -f docker-compose.deps.yml up --force-recreate -d
 

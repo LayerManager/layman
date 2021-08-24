@@ -79,6 +79,7 @@
 - Metadata property `scale_denominator` was removed. Its value is now accessible as subproperty of new [`spatial_resolution`](doc/metadata.md#spatial_resolution) metadata property.
 - [#418](https://github.com/LayerManager/layman/issues/418) Combination of none geometry type in layer file and any geometry type in qml file is from now allowed.
 - [#380](https://github.com/LayerManager/layman/issues/380) Enable to upload geojson with "id" attribute with non-unique values.
+- [#383](https://github.com/LayerManager/layman/issues/383) Add new Makefile target `upgrade-after-timeout` to finish upgrade in case of GeoServer call timeout.
 
 ## v1.13.2
  2021-06-25

@@ -136,6 +136,7 @@ General steps to upgrade layman to MINOR or PATCH version:
    - If you are starting Layman with `make start-demo-full` or `make start-demo-full-with-optional-deps`, run `make upgrade-demo-full`.
    - If you are starting Layman with `make start-dev`, you don't need to run standalone migration.
 1. Start Layman.
+> **_NOTE:_** If upgrade failed due to timeout of request to GeoServer, run `make upgrade-after-timeout` to finish upgrade.
 > **_NOTE:_** If you run in problems during upgrade process, especially before v1.12.0, you can try to upgrade gradually through individual minor versions.
 
 ## Run in production
