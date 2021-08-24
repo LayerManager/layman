@@ -5,8 +5,8 @@ from layman.common import empty_method_returns_true
 from layman.layer.filesystem.input_file import get_layer_main_file_path
 from layman import celery_app, util as layman_util, settings
 from layman.http import LaymanError
+from . import table
 from .. import db, LAYER_TYPE
-from .table import delete_layer
 
 
 logger = get_task_logger(__name__)
@@ -46,14 +46,17 @@ def refresh_table(
         logger.info(f'terminating {username} {layername}')
         process.terminate()
         logger.info(f'terminating {username} {layername}')
-        delete_layer(username, layername)
+        table.delete_layer(username, layername)
         raise AbortedException
     return_code = process.poll()
-    if return_code != 0:
-        pg_error = str(process.stdout.read())
-        logger.error(f"STDOUT: {pg_error}")
-        if "ERROR:  zero-length delimited identifier at or near" in pg_error:
-            err_code = 28
-        else:
-            err_code = 11
-        raise LaymanError(err_code, private_data=pg_error)
+    output = process.stdout.read()
+    if return_code != 0 or output:
+        info = table.get_layer_info(username, layername)
+        if not info:
+            pg_error = str(output)
+            logger.error(f"STDOUT: {pg_error}")
+            if "ERROR:  zero-length delimited identifier at or near" in pg_error:
+                err_code = 28
+            else:
+                err_code = 11
+            raise LaymanError(err_code, private_data=pg_error)
