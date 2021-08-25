@@ -145,6 +145,8 @@ def check_layer_crs(main_filepath):
         check_vector_layer_crs(main_filepath)
     elif file_type == settings.FILE_TYPE_RASTER:
         check_raster_layer_crs(main_filepath)
+    else:
+        raise NotImplementedError(f"Unknown file type: {file_type}")
 
 
 def check_filenames(username, layername, filenames, check_crs, ignore_existing_files=False):
@@ -214,6 +216,8 @@ def save_layer_files(username, layername, files, check_crs):
         check_vector_main_file(main_filepath)
     elif file_type == settings.FILE_TYPE_RASTER:
         check_raster_main_file(main_filepath)
+    else:
+        raise NotImplementedError(f"Unknown file type: {file_type}")
 
     if check_crs:
         check_layer_crs(filepath_mapping[main_filename])

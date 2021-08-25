@@ -21,8 +21,10 @@ def patch_after_feature_change(
         raise AbortedException
 
     file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['file']})['file']['file_type']
-    if file_type != settings.FILE_TYPE_VECTOR:
+    if file_type == settings.FILE_TYPE_RASTER:
         return
+    if file_type != settings.FILE_TYPE_VECTOR:
+        raise NotImplementedError(f"Unknown file type: {file_type}")
 
     bbox = geoserver.get_layer_bbox(workspace, layer)
     gs_util.patch_feature_type(workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox)

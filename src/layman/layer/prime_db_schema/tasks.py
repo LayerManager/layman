@@ -29,8 +29,10 @@ def refresh_bbox(
     file_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
     if file_type == settings.FILE_TYPE_VECTOR:
         bbox = db_get_bbox(username, layername)
-    else:
+    elif file_type == settings.FILE_TYPE_RASTER:
         bbox = gdal_get_bbox(username, layername)
+    else:
+        raise NotImplementedError(f"Unknown file type: {file_type}")
 
     if self.is_aborted():
         raise AbortedException
