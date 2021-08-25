@@ -68,6 +68,8 @@ def refresh_wms(
             if not bbox_util.is_empty(real_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
         gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, file_path)
         gs_util.publish_coverage(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, layername, title, description, bbox)
+    else:
+        raise NotImplementedError(f"Unknown file type: {file_type}")
 
     geoserver.set_security_rules(username, layername, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 
@@ -93,8 +95,10 @@ def refresh_wfs(
         access_rights=None,
 ):
     file_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
-    if file_type != settings.FILE_TYPE_VECTOR:
+    if file_type == settings.FILE_TYPE_RASTER:
         return
+    if file_type != settings.FILE_TYPE_VECTOR:
+        raise NotImplementedError(f"Unknown file type: {file_type}")
 
     assert description is not None
     assert title is not None

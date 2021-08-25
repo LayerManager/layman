@@ -32,8 +32,10 @@ def refresh_table(
         raise AbortedException
 
     file_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
-    if file_type != settings.FILE_TYPE_VECTOR:
+    if file_type == settings.FILE_TYPE_RASTER:
         return
+    if file_type != settings.FILE_TYPE_VECTOR:
+        raise NotImplementedError(f"Unknown file type: {file_type}")
 
     if self.is_aborted():
         raise AbortedException

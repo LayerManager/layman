@@ -29,6 +29,8 @@ def patch_after_feature_change(
             gs_util.patch_feature_type(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox)
         elif style_type == 'qml':
             gs_util.patch_wms_layer(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox)
+    elif file_type != settings.FILE_TYPE_RASTER:
+        raise NotImplementedError(f"Unknown file type: {file_type}")
 
     wms.clear_cache(workspace)
 
