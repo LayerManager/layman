@@ -1,5 +1,6 @@
 import os
 from contextlib import nullcontext as does_not_raise
+from osgeo import gdalconst
 import pytest
 
 from layman import LaymanError
@@ -105,6 +106,25 @@ def test_is_normalized_alpha_needed(file_path, exp_result):
     color_interp = gdal.get_color_interpretations(file_path)
     nodata_values = gdal.get_nodata_values(file_path)
     assert gdal.is_normalized_alpha_needed(file_path, color_interp=color_interp, nodata_values=nodata_values) == exp_result
+
+
+@pytest.mark.parametrize('file_path, exp_result', [
+    ('sample/layman.layer/sample_jp2_rgb.jp2', [{gdalconst.GMF_ALL_VALID}] * 3),
+    ('sample/layman.layer/sample_tif_rgb.tif', [{gdalconst.GMF_ALL_VALID}] * 3),
+    ('sample/layman.layer/sample_tif_rgb_nodata.tif', [{gdalconst.GMF_NODATA}] * 3),
+    ('sample/layman.layer/sample_tif_rgba.tif',
+     [{gdalconst.GMF_PER_DATASET, gdalconst.GMF_ALPHA}] * 3 + [{gdalconst.GMF_ALL_VALID}]),
+    ('sample/layman.layer/sample_tiff_rgba_opaque.tiff',
+     [{gdalconst.GMF_PER_DATASET, gdalconst.GMF_ALPHA}] * 3 + [{gdalconst.GMF_ALL_VALID}]),
+    ('sample/layman.layer/sample_tif_tfw_rgba_opaque.tif',
+     [{gdalconst.GMF_PER_DATASET, gdalconst.GMF_ALPHA}] * 3 + [{gdalconst.GMF_ALL_VALID}]),
+    ('sample/layman.layer/sample_tif_colortable_nodata_opaque.tif', [{gdalconst.GMF_NODATA}]),
+    ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', [{gdalconst.GMF_NODATA}] * 2),
+    ('sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif', [{gdalconst.GMF_NODATA}]),
+])
+def test_get_mask_flags(file_path, exp_result):
+    mask_flags = gdal.get_mask_flags(file_path)
+    assert mask_flags == exp_result
 
 
 @pytest.mark.parametrize('file_path, exp_result', [

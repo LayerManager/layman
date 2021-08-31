@@ -88,6 +88,23 @@ def get_nodata_values(filepath):
     return result
 
 
+def get_mask_flags(filepath):
+    dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
+    all_mask_flags = [
+        gdalconst.GMF_ALL_VALID,
+        gdalconst.GMF_ALPHA,
+        gdalconst.GMF_NODATA,
+        gdalconst.GMF_PER_DATASET,
+    ]
+    result = []
+    for band_id in range(1, dataset.RasterCount + 1):
+        band = dataset.GetRasterBand(band_id)
+        mask_flags_int = band.GetMaskFlags()
+        mask_flag_set = set(mask_flag_int for mask_flag_int in all_mask_flags if mask_flag_int & mask_flags_int)
+        result.append(mask_flag_set)
+    return result
+
+
 def get_pixel_size(filepath):
     dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
     geo_transform = dataset.GetGeoTransform()
