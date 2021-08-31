@@ -150,12 +150,15 @@ def is_nodata_out_of_min_max(filepath, *, nodata_values):
 
 
 def is_normalized_alpha_needed(filepath, *, color_interp, nodata_values):
+    mask_flags = get_mask_flags(filepath)
     if color_interp[-1] == 'Alpha':
         stats = get_statistics(filepath)
         alpha_min, alpha_max, _, _ = stats[-1]
         result = not alpha_min == alpha_max == 255
     elif color_interp == ['Palette']:
         result = False
+    elif mask_flags == [{gdalconst.GMF_PER_DATASET}] * 3:  # e.g. transparent JPG
+        result = True
     else:
         if any(val is None for val in nodata_values):
             result = False
