@@ -31,14 +31,11 @@ https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m
 https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_populated_places.README.html
 https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_populated_places.shp
 https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_populated_places.shx
-https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_populated_places.VERSION.txt" > tmp/naturalearth/110m/files.txt
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_populated_places.VERSION.txt
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/geojson/ne_110m_admin_0_countries.geojson
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/geojson/ne_110m_populated_places.geojson" > tmp/naturalearth/110m/files.txt
 
   (cd tmp/naturalearth/110m/cultural; xargs -n 1 curl -L -O < ../files.txt)
-fi
-
-ne_110m_cultural_admin_0_countries=tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson
-if ! [ -f $ne_110m_cultural_admin_0_countries ]; then
-  curl -L -o $ne_110m_cultural_admin_0_countries "https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/geojson/ne_110m_admin_0_countries.geojson"
 fi
 
 ne_10m_cultural_admin_0_countries=tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson
@@ -49,11 +46,6 @@ fi
 ne_50m_cultural_admin_0_countries=tmp/naturalearth/50m/cultural/ne_50m_admin_0_countries.geojson
 if ! [ -f $ne_50m_cultural_admin_0_countries ]; then
   curl -L -o $ne_50m_cultural_admin_0_countries "https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/geojson/ne_50m_admin_0_countries.geojson"
-fi
-
-ne_110m_cultural_populated_places=tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson
-if ! [ -f $ne_110m_cultural_populated_places ]; then
-  curl -L -o $ne_110m_cultural_populated_places "https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/geojson/ne_110m_populated_places.geojson"
 fi
 
 data200trans=tmp/data200/trans/trans-jtsk.zip
