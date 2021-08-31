@@ -6,7 +6,7 @@ In case of [POST Workspace Layers](rest.md#post-workspace-layers) and [PATCH Wor
 You need some HTML form for user to choose files he wants to publish and fill some additional parametes:
 ```html
 <form id="post-workspace-layers-form" >
-  Vector data file:
+  Data file:
   <input name="file" type="file" multiple />
 
   Layer name:
