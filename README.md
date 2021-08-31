@@ -268,5 +268,9 @@ make start-dev
 
 Default values are defined in [.env.test](.env.test)
 ```bash
+# test related to static layers and maps
+make test-separated
+
+# other tests
 make test
 ```
