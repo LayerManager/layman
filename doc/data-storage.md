@@ -23,23 +23,25 @@ Information about users includes their names, contacts, and authentication crede
 When user [reserves his username](rest.md#patch-current-user), names, contacts and other relevant metadata are [obtained from authorization provider](oauth2/index.md#fetch-user-related-metadata) and saved to [filesystem](#filesystem), [Redis](#redis), [PostgreSQL](#postgresql), and [GeoServer](#geoserver). User's [personal workspace](models.md#personal-workspace) is created too.
 
 ### Layers
-Information about [layers](models.md#layer) includes vector data and visualization.
+Information about [layers](models.md#layer) includes vector or raster data and visualization.
 
 When user [publishes new layer](rest.md#post-workspace-layers)
 - UUID and name is saved to [Redis](#redis) and [filesystem](#filesystem),
 - UUID, name, title and access rights are to [PostgreSQL](#postgresql),
-- vector data files and visualization file is saved to [filesystem](#filesystem) (if uploaded [synchronously](async-file-upload.md)),
+- data files and visualization file is saved to [filesystem](#filesystem) (if uploaded [synchronously](async-file-upload.md)),
 - and asynchronous [tasks](#tasks) are saved in [Redis](#redis).
 
-Subsequently, when asynchronous tasks run,
-- data file chunks and completed data files are saved to [filesystem](#filesystem) (if sent [asynchronously](async-file-upload.md)),
-- vector data files are imported to [PostgreSQL](#postgresql),
-- raster files are normalized to GeoTIFF in EPSG:3857 with overviews (pyramids) and saved to [GeoServer](#geoserver) for WMS
-- PostgreSQL table with vector data is registered to, access rights are synchronized to, and visualization file is saved to [GeoServer](#geoserver) for WFS,
-- PostgreSQL table with vector data is registered to, access rights are synchronized to, and visualization file is saved to [GeoServer](#geoserver) for WMS of layers with SLD style,
-- QGS file is created on [filesystem](#filesystem) and through QGIS server registered to [GeoServer](#geoserver) with WMS cascade, access rights are synchronized, for WMS of layers with QGIS style,
-- thumbnail file is saved to [filesystem](#filesystem),
-- and metadata record is saved to [PostgreSQL](#postgresql) using Micka's CSW.
+Subsequently, asynchronous tasks ensure following steps:
+- data file chunks and completed data files are saved to [filesystem](#filesystem) (if sent [asynchronously](async-file-upload.md))
+- vector data files are imported to [PostgreSQL](#postgresql)
+   - PostgreSQL table with vector data is registered to [GeoServer](#geoserver)
+- raster files are normalized to GeoTIFF in EPSG:3857 with overviews (pyramids)
+   - normalized GeoTIFF is registered to [GeoServer](#geoserver)
+- SLD file is saved to [GeoServer](#geoserver) and registered to WMS layer
+- QGS file is created on [filesystem](#filesystem) and through QGIS server registered to [GeoServer](#geoserver)
+- access rights are synchronized to [GeoServer](#geoserver)
+- thumbnail file is saved to [filesystem](#filesystem)
+- metadata record is saved to [PostgreSQL](#postgresql) using Micka's CSW
 
 When user [patches existing layer](rest.md#patch-workspace-layer), data is saved in the same way.
 
