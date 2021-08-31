@@ -10,31 +10,50 @@ mkdir -p tmp/naturalearth/10m/cultural
 mkdir -p tmp/data200/trans/jtsk
 mkdir -p tmp/sm5/vektor/jtsk
 
-ne_110m_cultural=tmp/naturalearth/110m_cultural.zip
-if ! [ -f $ne_110m_cultural ]; then
-  # https://github.com/nvkelso/natural-earth-vector/issues/434
-  curl -L -o $ne_110m_cultural -e "https://www.naturalearthdata.com/downloads/110m-cultural-vectors/" "https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/110m_cultural.zip" || curl -L -o $ne_110m_cultural "https://hosting.scalablemap.com/layman/naturalearth/110m_cultural.zip"
-  unzip -q $ne_110m_cultural -d tmp/naturalearth/110m/cultural
+if ! [ -f tmp/naturalearth/110m/files.txt ]; then
+  echo "https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_boundary_lines_land.cpg
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_boundary_lines_land.dbf
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_boundary_lines_land.prj
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_boundary_lines_land.README.html
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_boundary_lines_land.shp
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_boundary_lines_land.shx
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_boundary_lines_land.VERSION.txt
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_countries.cpg
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_countries.dbf
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_countries.prj
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_countries.README.html
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_countries.shp
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_countries.shx
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_admin_0_countries.VERSION.txt
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_populated_places.cpg
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_populated_places.dbf
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_populated_places.prj
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_populated_places.README.html
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_populated_places.shp
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_populated_places.shx
+https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/110m_cultural/ne_110m_populated_places.VERSION.txt" > tmp/naturalearth/110m/files.txt
+
+  (cd tmp/naturalearth/110m/cultural; xargs -n 1 curl -L -O < ../files.txt)
 fi
 
 ne_110m_cultural_admin_0_countries=tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson
 if ! [ -f $ne_110m_cultural_admin_0_countries ]; then
-  curl -L -o $ne_110m_cultural_admin_0_countries "https://github.com/nvkelso/natural-earth-vector/raw/master/geojson/ne_110m_admin_0_countries.geojson"
+  curl -L -o $ne_110m_cultural_admin_0_countries "https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/geojson/ne_110m_admin_0_countries.geojson"
 fi
 
 ne_10m_cultural_admin_0_countries=tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson
 if ! [ -f $ne_10m_cultural_admin_0_countries ]; then
-  curl -L -o $ne_10m_cultural_admin_0_countries "https://github.com/nvkelso/natural-earth-vector/raw/master/geojson/ne_10m_admin_0_countries.geojson"
+  curl -L -o $ne_10m_cultural_admin_0_countries "https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/geojson/ne_10m_admin_0_countries.geojson"
 fi
 
 ne_50m_cultural_admin_0_countries=tmp/naturalearth/50m/cultural/ne_50m_admin_0_countries.geojson
 if ! [ -f $ne_50m_cultural_admin_0_countries ]; then
-  curl -L -o $ne_50m_cultural_admin_0_countries "https://github.com/nvkelso/natural-earth-vector/raw/master/geojson/ne_50m_admin_0_countries.geojson"
+  curl -L -o $ne_50m_cultural_admin_0_countries "https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/geojson/ne_50m_admin_0_countries.geojson"
 fi
 
 ne_110m_cultural_populated_places=tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson
 if ! [ -f $ne_110m_cultural_populated_places ]; then
-  curl -L -o $ne_110m_cultural_populated_places "https://github.com/nvkelso/natural-earth-vector/raw/master/geojson/ne_110m_populated_places.geojson"
+  curl -L -o $ne_110m_cultural_populated_places "https://github.com/nvkelso/natural-earth-vector/raw/v4.1.0/geojson/ne_110m_populated_places.geojson"
 fi
 
 data200trans=tmp/data200/trans/trans-jtsk.zip
