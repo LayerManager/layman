@@ -124,6 +124,14 @@ Body parameters:
       - JPEG (.jpg, with .jpg.aux.xml or .jgw)
       - file names, i.e. array of strings
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
+   - in case of raster data input, following input combinations of bands and color interpretations are supported:
+      - 1 band: Gray
+      - 1 band: Palette
+         - Transparency will be ignored. See [#466](https://github.com/LayerManager/layman/issues/446) for details.
+      - 2 bands: Gray, Alpha
+         - Float data type with min/max values other than 0/255 may result in unexpected WMS output. See [#466](https://github.com/LayerManager/layman/issues/446) for details.
+      - 3 bands: Red, Green, Blue
+      - 4 bands: Red, Green, Blue, Alpha
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be safely stored in DB
    - if QML style is used in this request, it must list all attributes contained in given data file

@@ -40,7 +40,9 @@
   - Following input combinations of bands and color interpretations are supported:
     - 1 band: Gray
     - 1 band: Palette
+      - Transparency will be ignored. See [#466](https://github.com/LayerManager/layman/issues/446) for details.
     - 2 bands: Gray, Alpha
+      - Float data type with min/max values other than 0/255 may result in unexpected WMS output. See [#466](https://github.com/LayerManager/layman/issues/446) for details.
     - 3 bands: Red, Green, Blue
     - 4 bands: Red, Green, Blue, Alpha
   - Following input CRS are supported:
