@@ -79,7 +79,7 @@ Get list of published layers.
 Have the same request parameters and response structure and headers as [GET Layers](#get-layers).
 
 ### POST Workspace Layers
-Publish vector data file as new layer of WMS and WFS.
+Publish vector or raster data file as new layer of WMS, in case of vector also new feature type of WFS.
 
 Processing chain consists of few steps:
 - save file to workspace directory within Layman data directory
@@ -91,7 +91,7 @@ Processing chain consists of few steps:
 - for vector layers
   - for layers with SLD or none style:
     - publish the table as new layer (feature type) within appropriate WMS workspaces of GeoServer
-  - else for layers with QML style:
+  - for layers with QML style:
     - create QGS file on QGIS server filesystem with appropriate style
     - publish the layer on GeoServer through WMS cascade from QGIS server
 - for raster layers publish normalized GeoTIFF as new layer (coverage) on GeoServer WMS workspace
@@ -151,7 +151,7 @@ Body parameters:
 - *style*, style file
    - by default default SLD style of GeoServer is used
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
-     - vector layers can have SLD or QML style, raster layers can not have QML style
+     - QML style for raster data file is not supported
    - uploading of additional style files, e.g. point-symbol images or fonts is not supported
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
 - *access_rights.read*, string
@@ -176,7 +176,7 @@ JSON array of objects representing posted layers with following structure:
    - **layman_original_parameter**: name of the request parameter that contained the file name; currently, the only possible value is `file`
 
 ### DELETE Workspace Layers
-Delete existing layers and all associated sources, including vector data file and DB table for all layers in the workspace. The currently running [asynchronous tasks](async-tasks.md) of affected layers are aborted. Only layers on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
+Delete existing layers and all associated sources, including data file, vector DB table or normalized raster files for all layers in the workspace. The currently running [asynchronous tasks](async-tasks.md) of affected layers are aborted. Only layers on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
 
 #### Request
 No action parameters.
@@ -239,7 +239,7 @@ JSON object with following structure:
   - *status*: Status information about generating and availability of thumbnail. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **file**
-  - *path*: String. Path to input vector data file that was imported to the DB table. Path is relative to workspace directory.
+  - *path*: String. Path to input data file. Path is relative to workspace directory.
   - *file_type*: String. Either `vector` or `raster` depends on source file type.
   - *status*: Status information about saving and availability of files. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
@@ -285,7 +285,7 @@ Parameters have same meaning as in case of [POST Workspace Layers](#post-workspa
 
 Body parameters:
 - *file*, file(s) or file name(s)
-   - If provided, current layer vector data file will be deleted and replaced by this file. GeoServer feature types, DB table, and thumbnail will be deleted and created again using the new file.
+   - If provided, current data file will be deleted and replaced by this file. GeoServer feature types, DB table, normalized raster file, and thumbnail will be deleted and created again using the new file.
    - same file types as in [POST Workspace Layers](#post-workspace-layers) are expected
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
@@ -296,7 +296,7 @@ Body parameters:
    - Taken into account only if `file` is provided.
 - *style*, style file
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
-     - vector layers can have SLD or QML style, raster layers can not have QML style
+     - QML style for raster data file is not supported
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 - *access_rights.read*, string
@@ -313,7 +313,7 @@ JSON object, same as in case of [GET Workspace Layer](#get-workspace-layer), pos
 - *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. See [POST Workspace Layers](#post-workspace-layers) response to find out more.
 
 ### DELETE Workspace Layer
-Delete existing layer and all associated sources, including vector data file and DB table. The currently running [asynchronous tasks](async-tasks.md) of affected layer are aborted.
+Delete existing layer and all associated sources, including data file, vector DB table or normalized raster file. The currently running [asynchronous tasks](async-tasks.md) of affected layer are aborted.
 
 #### Request
 No action parameters.
