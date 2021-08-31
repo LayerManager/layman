@@ -84,7 +84,7 @@ XPath for Map: `/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentifica
 
 
 ### language
-Guessed from text attributes.
+Guessed from text attributes. Always empty for raster layers.
 
 Multiplicity: 1..n
 
