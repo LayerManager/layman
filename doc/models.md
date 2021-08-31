@@ -6,7 +6,7 @@
 - Each publication is placed in one [workspace](#workspace). 
 
 ## Layer
-- Layer is [publication](#publication) created from combination of vector data (GeoJSON or ShapeFile) and visualization (SLD or SE style)
+- Layer is [publication](#publication) created from combination of vector or raster data (GeoJSON, ShapeFile, GeoTIFF, JPEG2000, PNG or JPEG) and visualization (SLD, SE, or QML style)
 - Published layer can be accessed by standardized OGC interfaces
   - [Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms)
   - [Web Feature Service (WFS)](https://www.opengeospatial.org/standards/wfs)
