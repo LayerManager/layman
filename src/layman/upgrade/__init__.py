@@ -2,7 +2,7 @@ import logging
 import psycopg2
 
 from db import util as db_util
-from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_13
+from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_13, upgrade_v1_14
 from layman import settings
 from . import consts
 
@@ -41,6 +41,9 @@ MIGRATIONS = {
             upgrade_v1_12.adjust_data_for_last_change_search,
             upgrade_v1_12.migrate_layer_metadata,
             upgrade_v1_12.adjust_data_for_bbox_search,
+        ]),
+        ((1, 14, 0), [
+            upgrade_v1_14.crop_bbox,
         ]),
     ],
 }

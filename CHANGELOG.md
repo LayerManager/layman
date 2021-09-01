@@ -30,6 +30,7 @@
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
+- All bounding boxes are cropped not to exceed world boundaries ([-20026376.39, -20048966.10, 20026376.39, 20048966.10] in EPSG:3857).
 ### Changes
 - [#167](https://github.com/LayerManager/layman/issues/167) Allow publishing also raster geospatial data using [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer).
   - Following formats are supported:
