@@ -248,8 +248,8 @@ def layer_info_to_metadata_properties(info):
     return result
 
 
-def get_metadata_comparison(workspace, layername):
-    layman_info = get_complete_layer_info(cached=True)
+def get_metadata_comparison(workspace, layername, *, cached=True):
+    layman_info = get_complete_layer_info(workspace, layername, cached=cached)
     layman_props = layer_info_to_metadata_properties(layman_info)
     all_props = {
         f"{layman_props['layer_endpoint']}": layman_props,
