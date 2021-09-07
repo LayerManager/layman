@@ -14,7 +14,7 @@ Asynchronous tasks are started by following requests:
 - [PATCH Workspace Map](rest.md#patch-workspace-map)
    - tasks related to patched map
 - [WFS-T](endpoints.md#web-feature-service)
-   - tasks related to each edited layer
-   - tasks related to each map that points to at least one edited layer
+   - tasks related to each edited vector layer
+   - tasks related to each map that points to at least one edited vector layer
 
 Each request starts series of asynchronous tasks called **chain**.
