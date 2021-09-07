@@ -103,14 +103,14 @@ def check_reserved_workspace_names(workspace_name):
         raise LaymanError(35, {'reserved_by': 'RESERVED_WORKSPACE_NAMES', 'workspace': workspace_name})
 
 
-def check_username(username, pattern_only=False):
-    if not re.match(WORKSPACE_NAME_PATTERN, username):
+def check_username(workspace, pattern_only=False):
+    if not re.match(WORKSPACE_NAME_PATTERN, workspace):
         raise LaymanError(2, {'parameter': 'user', 'expected': WORKSPACE_NAME_PATTERN})
     if pattern_only:
         return
-    check_reserved_workspace_names(username)
+    check_reserved_workspace_names(workspace)
     providers = get_internal_providers()
-    call_modules_fn(providers, 'check_username', [username])
+    call_modules_fn(providers, 'check_username', [workspace])
 
 
 def get_usernames(use_cache=True, skip_modules=None):
