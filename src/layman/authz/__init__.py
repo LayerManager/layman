@@ -29,7 +29,7 @@ def authorize(workspace, publication_type, publication_name, request_method, act
                     return
                 if can_user_create_public_workspace(actor_name):  # workspaces can be created by actor
                     # raises exception if new workspace is not correct
-                    layman_util.check_username(workspace)
+                    layman_util.check_workspace_name(workspace)
                 else:
                     raise LaymanError(30)  # unauthorized request
             else:

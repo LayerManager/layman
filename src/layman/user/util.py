@@ -1,7 +1,7 @@
 from flask import g
 from layman import LaymanError, authn
 from layman.authn import get_open_id_claims, get_iss_id, get_sub, is_user_with_name
-from layman.util import slugify, to_safe_names, check_username, get_workspaces, ensure_whole_user, delete_whole_user
+from layman.util import slugify, to_safe_names, check_workspace_name, get_workspaces, ensure_whole_user, delete_whole_user
 from layman.authn import redis as authn_redis, filesystem as authn_filesystem, prime_db_schema as authn_prime_db_schema
 
 
@@ -29,7 +29,7 @@ def reserve_username(username, adjust=False):
     if is_user_with_name(current_username):
         raise LaymanError(34, {'username': current_username})
     if adjust is not True:
-        check_username(username)
+        check_workspace_name(username)
         usernames = get_workspaces()
         if username in usernames:
             raise LaymanError(35)
@@ -55,7 +55,7 @@ def reserve_username(username, adjust=False):
             if idx > 0:
                 suggestion = f"{suggestion}{idx}"
             try:
-                check_username(suggestion)
+                check_workspace_name(suggestion)
             except LaymanError as exc:
                 if not (exc.code == 2 or exc.code == 35):
                     raise exc

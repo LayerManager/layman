@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request, current_app as app, g
 
 from layman.common import rest as rest_util
 from layman.http import LaymanError
-from layman.util import check_username_decorator
+from layman.util import check_workspace_name_decorator
 from layman import settings, authn, util as layman_util
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
@@ -15,7 +15,7 @@ bp = Blueprint('rest_workspace_layer', __name__)
 
 
 @bp.before_request
-@check_username_decorator
+@check_workspace_name_decorator
 @util.check_layername_decorator
 @authenticate
 @authorize_workspace_publications_decorator
