@@ -110,18 +110,18 @@ def finish_publication_chain(last_task_id_in_chain, state):
     publ_hash = rds.hget(key, hash)
     if publ_hash is None:
         return
-    username, publication_type, publication_name = _hash_to_publication(publ_hash)
+    workspace, publication_type, publication_name = _hash_to_publication(publ_hash)
 
-    chain_info = get_publication_chain_info_dict(username, publication_type, publication_name)
+    chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
     chain_info['finished'] = True
     chain_info['state'] = state
-    set_publication_chain_info_dict(username, publication_type, publication_name, chain_info)
+    set_publication_chain_info_dict(workspace, publication_type, publication_name, chain_info)
 
     rds.hdel(key, hash)
 
-    lock = redis_util.get_publication_lock(username, publication_type, publication_name)
+    lock = redis_util.get_publication_lock(workspace, publication_type, publication_name)
     if lock in [common.REQUEST_METHOD_PATCH, common.REQUEST_METHOD_POST, common.PUBLICATION_LOCK_FEATURE_CHANGE, ]:
-        redis_util.unlock_publication(username, publication_type, publication_name)
+        redis_util.unlock_publication(workspace, publication_type, publication_name)
 
 
 def _hash_to_publication(hash):
