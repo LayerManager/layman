@@ -1,10 +1,10 @@
 # Changelog
 
 ## v1.14.0
- {release_date}
+ 2021-09-07
 ### Upgrade requirements
 - It's strongly recommended to backup data directories, especially `deps/postgresql/data`, because of database upgrade.
-- After stopping layman and backing up data directories, you need to migrate PostgreSQL data directory from v10 to v13. We created script that automatically migrates two databases:
+- After [stopping layman and backing up data directories](README.md#upgrade), you need to migrate PostgreSQL data directory from v10 to v13. We created script that automatically migrates two databases:
     - `gis` (Layman's database)
     - `hsrs_micka6` (Micka's database, only if exists)  
     If you use other databases in the postgres instance, their migration is up to you (you can inspire inside our script).
@@ -20,17 +20,15 @@
     ```
 
     It may take some time to run this script and it will produce large temporary files (database dumps).
-- Set environment variables
-  - [LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY](doc/env-settings.md#LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY)=normalized_raster_data
-  - [DEFAULT_CONNECTION_TIMEOUT](doc/env-settings.md#DEFAULT_CONNECTION_TIMEOUT)=10
-- If you are running Layman with development settings, set environment variables
-  - [LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY](doc/env-settings.md#LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY)=normalized_raster_data_dev
 - Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.9.0`
     - If you are running Layman with development settings, run also `make client-build`.
+- Set new environment variables
+  - [LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY](doc/env-settings.md#LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY)=normalized_raster_data
+    - If you are running Layman with development settings, set value to `normalized_raster_data_dev` instead
+  - [DEFAULT_CONNECTION_TIMEOUT](doc/env-settings.md#DEFAULT_CONNECTION_TIMEOUT)=10
 ### Migrations and checks
-#### Schema migrations
 #### Data migrations
-- All bounding boxes are cropped not to exceed world boundaries ([-20026376.39, -20048966.10, 20026376.39, 20048966.10] in EPSG:3857).
+- All bounding boxes are cropped not to exceed extent of EPSG:3857 projection ([-20026376.39, -20048966.10, 20026376.39, 20048966.10]) in all sources except filesystem and DB table. Only bounding boxes are affected, not data itself.
 ### Changes
 - [#167](https://github.com/LayerManager/layman/issues/167) Allow publishing also raster geospatial data using [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer).
   - Following formats are supported:
@@ -49,11 +47,25 @@
   - Following input CRS are supported:
     - EPSG:3857
     - EPSG:4326
-- [#167](https://github.com/LayerManager/layman/issues/167) Published raster files are normalized before registering to GeoServer. Normalization includes conversion to GeoTIFF in EPSG:3857 with overviews (pyramids). NoData values are normalized as transparent only if Alpha band is not available and NoData is set for each band. Normalized rasters are stored in `normalized_raster_data` directory inside [LAYMAN_DATA_DIR](doc/env-settings.md#LAYMAN_DATA_DIR). Normalized GeoTiff is then published as new layer (coverage) on GeoServer. 
-- [#167](https://github.com/LayerManager/layman/issues/167) Add `file_type` item to `file` item in [GET Workspace Layer](doc/rest.md#get-workspace-layer) response to distinguish raster and vector layer.
-- [#167](https://github.com/LayerManager/layman/issues/167) Raster layers are not stored in DB table. WFS is not available for raster layers.
-- [#167](https://github.com/LayerManager/layman/issues/167) [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) do not return items `wfs` and `db_table` for raster layers.
-- [#167](https://github.com/LayerManager/layman/issues/167) Calling [WFS-T](doc/endpoints.md#web-feature-service) endpoint causes [asynchronous tasks](doc/async-tasks.md) only for vector layers. 
+  - Published raster files are normalized before registering to GeoServer. Normalization includes conversion to GeoTIFF in EPSG:3857 with overviews (pyramids). NoData values are normalized as transparent only if Alpha band is not available and NoData is set for each band. Normalized rasters are stored in `normalized_raster_data` directory inside [LAYMAN_DATA_DIR](doc/env-settings.md#LAYMAN_DATA_DIR). Normalized GeoTiff is then published as new layer (coverage) on GeoServer. 
+  - Raster layers are not stored in DB table. WFS is not available for raster layers. [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) do not return items `wfs` and `db_table` for raster layers.
+  - Calling [WFS-T](doc/endpoints.md#web-feature-service) endpoint starts [asynchronous tasks](doc/async-tasks.md) only for vector layers.
+- [#167](https://github.com/LayerManager/layman/issues/167) Add `file_type` item to `file` item in [GET Workspace Layer](doc/rest.md#get-workspace-layer) response to distinguish raster and vector layers.
+- [#167](https://github.com/LayerManager/layman/issues/167) Metadata property `scale_denominator` was removed. Its value is now accessible as subproperty of new [`spatial_resolution`](doc/metadata.md#spatial_resolution) metadata property. The new metadata property `spatial_resolution` has one of two subproperties:
+  - `scale_denominator` used for vector data
+  - `ground_sample_distance` used for raster data
+- [#367](https://github.com/LayerManager/layman/issues/367) When publishing or patching layer or map, it's bounding box is limited to extent of EPSG:3857 projection in all sources except filesystem and DB table. Only bounding box is affected, not data itself.
+- [#347](https://github.com/LayerManager/layman/issues/347) When ordering publications by title, only letters, numbers, and spaces are considered.
+- [#382](https://github.com/LayerManager/layman/pull/382) [Map composition schema](https://github.com/LayerManager/layman/blob/master/src/layman/map/schema.draft-07.json) allows new properties `hs.format.externalWFS` and `workspace`. It was already introduced in v1.13.1.
+- [#385](https://github.com/LayerManager/layman/pull/385) The `style` property can be specified using a string in SLD format, URL to SLD file or JSON object. It was already introduced in v1.13.1.
+- Errors `19`: 'Layer is already in process.' and `29`: 'Map is already in process.' are merged into `49`: 'Publication is already in process.'.
+- Fix: Raise error when more than one main layer file is sent in [POST Workspace Layers](doc/rest.md#post-workspace-layers) or [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer).
+- Fix [#408](https://github.com/LayerManager/layman/issues/408): Skip non-WMS layers in thumbnail generation. Previously thumbnail generation failed.
+- [#418](https://github.com/LayerManager/layman/issues/418) Combination of none geometry type in layer file and any geometry type in QML file is allowed from now.
+- [#380](https://github.com/LayerManager/layman/issues/380) Enable to upload geojson with "id" attribute with non-unique values.
+- [#383](https://github.com/LayerManager/layman/issues/383) Add new Makefile target `upgrade-after-timeout` to finish upgrade in case of GeoServer call timeout.
+- Fix [GET Workspace Layer](doc/rest.md#get-workspace-layer) documentation; `style` item was incorrectly used instead of `sld`.
+- [#347](https://github.com/LayerManager/layman/issues/347) Upgrade PostgreSQL 10 to 13.3 and PostGIS 2.4 to 3.1. Use docker image from [layermanager/postgis@hub.docker.com](https://hub.docker.com/repository/docker/layermanager/postgis@github.com), source is located at [layermanager/docker-postgis@github.com](https://github.com/LayerManager/docker-postgis).
 - [#367](https://github.com/LayerManager/layman/issues/367) Upgrade gdal from 2.4 to 3.3. Use docker image from [osgeo/gdal@hub.docker.com](https://hub.docker.com/r/osgeo/gdal), source is located at [osgeo/gdal@github.com](https://github.com/OSGeo/gdal/tree/master/gdal/docker).
 - [#367](https://github.com/LayerManager/layman/issues/367) Upgrade also
   - python from 3.6 to 3.8
@@ -68,21 +80,6 @@
   - markupsafe from 1 to 2
   - pytest-rerunfailures from 9 to 10
   - gunicorn from 19 to 20
-- [#367](https://github.com/LayerManager/layman/issues/367) Limit bounding boxes of layers and maps to EPSG:3857 extent in all sources except DB table and filesystem.
-- [#347](https://github.com/LayerManager/layman/issues/347) Upgrade PostgreSQL 10 to 13.3 and PostGIS 2.4 to 3.1. Use docker image from [layermanager/postgis@hub.docker.com](https://hub.docker.com/repository/docker/layermanager/postgis@github.com), source is located at [layermanager/docker-postgis@github.com](https://github.com/LayerManager/docker-postgis).
-- [#347](https://github.com/LayerManager/layman/issues/347) When ordering publications by title, consider only letters, numbers, and spaces.
-- [Map composition schema](https://github.com/LayerManager/layman/blob/master/src/layman/map/schema.draft-07.json) allows new properties `hs.format.externalWFS` and `workspace` ([#382](https://github.com/LayerManager/layman/pull/382)). The `style` property can be specified using a string in SLD format, URL to SLD file or JSON object ([#385](https://github.com/LayerManager/layman/pull/385)). Both was already introduced in v1.13.1.
-- Errors `19`: 'Layer is already in process.' and `29`: 'Map is already in process.' are merged into `49`: 'Publication is already in process.'.
-- Fix: Raise error when more than one main layer file is sent in [POST Workspace Layers](doc/rest.md#post-workspace-layers) or [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer).
-- Fix [#408](https://github.com/LayerManager/layman/issues/408): Skip non-WMS layers in thumbnail generation. Previously thumbnail generation failed.
-- Fix [GET Workspace Layer](doc/rest.md#get-workspace-layer) documentation; `style` item was incorrectly used instead of `sld`.
-- [#167](https://github.com/LayerManager/layman/issues/167) New metadata property [`spatial_resolution`](doc/metadata.md#spatial_resolution) is available. It has one of two subproperties:
-  - `scale_denominator` used for vector data
-  - `ground_sample_distance` used for raster data
-- Metadata property `scale_denominator` was removed. Its value is now accessible as subproperty of new [`spatial_resolution`](doc/metadata.md#spatial_resolution) metadata property.
-- [#418](https://github.com/LayerManager/layman/issues/418) Combination of none geometry type in layer file and any geometry type in qml file is allowed from now.
-- [#380](https://github.com/LayerManager/layman/issues/380) Enable to upload geojson with "id" attribute with non-unique values.
-- [#383](https://github.com/LayerManager/layman/issues/383) Add new Makefile target `upgrade-after-timeout` to finish upgrade in case of GeoServer call timeout.
 
 ## v1.13.2
  2021-06-25
