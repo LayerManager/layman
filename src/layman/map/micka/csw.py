@@ -17,7 +17,7 @@ from layman.map.filesystem.uuid import get_map_uuid
 from layman.map.filesystem.input_file import get_map_json, unquote_urls
 from layman.layer import LAYER_TYPE
 from layman.layer.geoserver.util import get_gs_proxy_base_url
-from layman.util import url_for, USERNAME_ONLY_PATTERN, get_publication_info
+from layman.util import url_for, WORKSPACE_NAME_ONLY_PATTERN, get_publication_info
 
 get_publication_uuid = empty_method_returns_none
 post_map = empty_method
@@ -121,7 +121,7 @@ def map_json_to_operates_on(map_json, operates_on_muuids_filter=None, editor=Non
     unquote_urls(map_json)
     gs_url = get_gs_proxy_base_url()
     gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
-    gs_wms_url_pattern = r'^' + re.escape(gs_url) + r'(' + USERNAME_ONLY_PATTERN + r')' + \
+    gs_wms_url_pattern = r'^' + re.escape(gs_url) + r'(' + WORKSPACE_NAME_ONLY_PATTERN + r')' + \
                          settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + r'/(?:ows|wms|wfs).*$'
     layman_layer_names = []
     for map_layer in map_json['layers']:

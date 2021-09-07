@@ -139,7 +139,7 @@ def migrate_maps_on_wms_workspace():
     publications = db_util.run_query(query, params)
     gs_url = layer_gs_util.get_gs_proxy_base_url()
     gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
-    gs_wms_url_pattern = r'^' + re.escape(gs_url) + r'(' + util.USERNAME_ONLY_PATTERN + r')' + r'(/(?:ows|wms|wfs).*)$'
+    gs_wms_url_pattern = r'^' + re.escape(gs_url) + r'(' + util.WORKSPACE_NAME_ONLY_PATTERN + r')' + r'(/(?:ows|wms|wfs).*)$'
     all_workspaces = workspaces.get_workspace_names()
     for (workspace, map) in publications:
         file_path = input_file.get_map_file(workspace, map)

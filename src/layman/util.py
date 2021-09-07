@@ -16,9 +16,9 @@ from layman.http import LaymanError
 
 logger = logging.getLogger(__name__)
 
-USERNAME_ONLY_PATTERN = r"[a-z][a-z0-9]*(?:_[a-z0-9]+)*"
+WORKSPACE_NAME_ONLY_PATTERN = r"[a-z][a-z0-9]*(?:_[a-z0-9]+)*"
 
-USERNAME_PATTERN = r"^" + USERNAME_ONLY_PATTERN + r"$"
+WORKSPACE_NAME_PATTERN = r"^" + WORKSPACE_NAME_ONLY_PATTERN + r"$"
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_PUBLICATION_TYPES_KEY = f'{__name__}:PUBLICATION_TYPES'
@@ -104,8 +104,8 @@ def check_reserved_workspace_names(workspace_name):
 
 
 def check_username(username, pattern_only=False):
-    if not re.match(USERNAME_PATTERN, username):
-        raise LaymanError(2, {'parameter': 'user', 'expected': USERNAME_PATTERN})
+    if not re.match(WORKSPACE_NAME_PATTERN, username):
+        raise LaymanError(2, {'parameter': 'user', 'expected': WORKSPACE_NAME_PATTERN})
     if pattern_only:
         return
     check_reserved_workspace_names(username)
