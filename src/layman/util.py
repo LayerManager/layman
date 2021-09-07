@@ -87,11 +87,11 @@ def check_deprecated_url(response):
     return response
 
 
-def check_username_decorator(func):
+def check_workspace_name_decorator(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         workspace = request.view_args['workspace']
-        check_username(workspace, pattern_only=True)
+        check_workspace_name(workspace, pattern_only=True)
         result = func(*args, **kwargs)
         return result
 
@@ -103,14 +103,14 @@ def check_reserved_workspace_names(workspace_name):
         raise LaymanError(35, {'reserved_by': 'RESERVED_WORKSPACE_NAMES', 'workspace': workspace_name})
 
 
-def check_username(workspace, pattern_only=False):
+def check_workspace_name(workspace, pattern_only=False):
     if not re.match(WORKSPACE_NAME_PATTERN, workspace):
         raise LaymanError(2, {'parameter': 'user', 'expected': WORKSPACE_NAME_PATTERN})
     if pattern_only:
         return
     check_reserved_workspace_names(workspace)
     providers = get_internal_providers()
-    call_modules_fn(providers, 'check_username', [workspace])
+    call_modules_fn(providers, 'check_workspace_name', [workspace])
 
 
 def get_usernames(use_cache=True, skip_modules=None):

@@ -44,9 +44,9 @@ def publications_constraint():
 
 
 @pytest.mark.usefixtures('ensure_layman')
-def test_check_usernames_wms_suffix():
-    username = 'test_check_usernames_wms_suffix'
-    username_wms = 'test_check_usernames_wms_suffix' + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
+def test_check_workspace_names_wms_suffix():
+    username = 'test_check_workspace_names_wms_suffix'
+    username_wms = 'test_check_workspace_names_wms_suffix' + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
 
     with app.app_context():
         prime_db_schema.ensure_workspace(username)
@@ -61,7 +61,7 @@ def test_check_usernames_wms_suffix():
 
 
 @pytest.mark.usefixtures('ensure_layman')
-def test_check_usernames_workspaces():
+def test_check_workspace_names_workspaces():
     username = 'workspaces'
 
     with app.app_context():

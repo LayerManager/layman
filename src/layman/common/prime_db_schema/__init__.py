@@ -28,6 +28,5 @@ def ensure_workspace(workspace):
     workspaces_util.ensure_workspace(workspace)
 
 
-def check_username(username):
-    users_util.check_username(username)
-    workspaces_util.check_workspace_name(username)
+def check_workspace_name(workspace):
+    workspaces_util.check_workspace_name(workspace)

@@ -24,11 +24,11 @@ def upgrade_1_8():
         schema_initialization.ensure_schema(settings.LAYMAN_PRIME_SCHEMA)
 
         logger.info(f'  Ensuring users')
-        from ..util import get_usernames, ensure_whole_user, check_username
+        from ..util import get_usernames, ensure_whole_user, check_workspace_name
         all_usernames = get_usernames()
         for username in all_usernames:
             logger.info(f'    Ensuring user {username}')
-            check_username(username)
+            check_workspace_name(username)
             ensure_whole_user(username)
 
         logger.info(f'  Ensuring GS rules')

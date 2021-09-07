@@ -10,7 +10,7 @@ from layman.layer import LAYER_TYPE
 
 PUBL_TYPE_DEF_KEY = __name__
 
-check_username = empty_method
+check_workspace_name = empty_method
 check_new_layername = empty_method
 
 

@@ -9,7 +9,7 @@ bp = Blueprint('rest_workspace_map_metadata_comparison', __name__)
 
 
 @bp.before_request
-@layman_util.check_username_decorator
+@layman_util.check_workspace_name_decorator
 @util.check_mapname_decorator
 @authenticate
 @authorize_workspace_publications_decorator
