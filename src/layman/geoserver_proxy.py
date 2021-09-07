@@ -12,7 +12,7 @@ from layman.authn import authenticate, is_user_with_name
 from layman.layer import db, LAYER_TYPE
 from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import LAYERNAME_PATTERN, ATTRNAME_PATTERN, patch_after_feature_change
-from layman.util import USERNAME_ONLY_PATTERN
+from layman.util import WORKSPACE_NAME_ONLY_PATTERN
 
 
 bp = Blueprint('geoserver_proxy_bp', __name__)
@@ -83,7 +83,7 @@ def extract_layer_info_from_wfs_t_update_delete(action):
     result = (None, None, None)
     layer_qname = action.get('typeName').split(':')
     ws_namespace = layer_qname[0]
-    ws_match = re.match(r"^(" + USERNAME_ONLY_PATTERN + ")$", ws_namespace)
+    ws_match = re.match(r"^(" + WORKSPACE_NAME_ONLY_PATTERN + ")$", ws_namespace)
     if ws_match:
         ws_name = ws_match.group(1)
     else:
@@ -136,7 +136,7 @@ def extract_attributes_from_wfs_t_insert_replace(action):
     for layer in action:
         layer_qname = ET.QName(layer)
         ws_namespace = layer_qname.namespace
-        ws_match = re.match(r"^http://(" + USERNAME_ONLY_PATTERN + ")$", ws_namespace)
+        ws_match = re.match(r"^http://(" + WORKSPACE_NAME_ONLY_PATTERN + ")$", ws_namespace)
         if ws_match:
             ws_name = ws_match.group(1)
         else:

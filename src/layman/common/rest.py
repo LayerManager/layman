@@ -15,7 +15,7 @@ def _get_pub_type_pattern():
 
 
 def _get_workspace_multi_publication_path_pattern():
-    workspace_pattern = r"(?P<workspace>" + layman_util.USERNAME_ONLY_PATTERN + r")"
+    workspace_pattern = r"(?P<workspace>" + layman_util.WORKSPACE_NAME_ONLY_PATTERN + r")"
     return f"^/rest/({settings.REST_WORKSPACES_PREFIX}/)?" + workspace_pattern + "/" + _get_pub_type_pattern()
 
 
