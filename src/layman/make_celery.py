@@ -68,10 +68,10 @@ def on_task_prerun(**kwargs):
         )
         if publication_type is None:
             return
-        username = kwargs['args'][0]
+        workspace = kwargs['args'][0]
         publication_name = kwargs['args'][1]
         task_id = kwargs['task_id']
-        task_prerun(username, publication_type, publication_name, task_id, task_name)
+        task_prerun(workspace, publication_type, publication_name, task_id, task_name)
 
 
 @signals.task_postrun.connect
@@ -90,7 +90,7 @@ def on_task_postrun(**kwargs):
         )
         if publication_type is None:
             return
-        username = kwargs['args'][0]
+        workspace = kwargs['args'][0]
         publication_name = kwargs['args'][1]
         task_id = kwargs['task_id']
-        task_postrun(username, publication_type, publication_name, task_id, task_name, kwargs['state'])
+        task_postrun(workspace, publication_type, publication_name, task_id, task_name, kwargs['state'])
