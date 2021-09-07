@@ -391,7 +391,7 @@ def delete_workspace_publication(workspace, publication_type, publication):
     delete_method(workspace, publication)
 
 
-def delete_publications(user,
+def delete_publications(workspace,
                         publ_type,
                         is_chain_ready_fn,
                         abort_publication_fn,
@@ -402,28 +402,28 @@ def delete_publications(user,
                         ):
     from layman import authn
     actor_name = authn.get_authn_username()
-    whole_infos = get_publication_infos(user, publ_type, {'actor_name': actor_name, 'access_type': 'write'})
+    whole_infos = get_publication_infos(workspace, publ_type, {'actor_name': actor_name, 'access_type': 'write'})
 
     for (_, _, publication) in whole_infos.keys():
-        redis.create_lock(user, publ_type, publication, method)
+        redis.create_lock(workspace, publ_type, publication, method)
         try:
-            abort_publication_fn(user, publication)
-            delete_publication_fn(user, publication)
-            if is_chain_ready_fn(user, publication):
-                redis.unlock_publication(user, publ_type, publication)
+            abort_publication_fn(workspace, publication)
+            delete_publication_fn(workspace, publication)
+            if is_chain_ready_fn(workspace, publication):
+                redis.unlock_publication(workspace, publ_type, publication)
         except Exception as exc:
             try:
-                if is_chain_ready_fn(user, publication):
-                    redis.unlock_publication(user, publ_type, publication)
+                if is_chain_ready_fn(workspace, publication):
+                    redis.unlock_publication(workspace, publ_type, publication)
             finally:
-                redis.unlock_publication(user, publ_type, publication)
+                redis.unlock_publication(workspace, publ_type, publication)
             raise exc
 
     infos = [
         {
             'name': info["name"],
             'title': info.get("title", None),
-            'url': url_for(**{'endpoint': url_path, publ_param: name, 'workspace': user}),
+            'url': url_for(**{'endpoint': url_path, publ_param: name, 'workspace': workspace}),
             'uuid': info["uuid"],
             'access_rights': info['access_rights'],
         }

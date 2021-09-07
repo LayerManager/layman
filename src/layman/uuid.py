@@ -30,11 +30,11 @@ def generate_uuid():
     return str(uuid4())
 
 
-def register_publication_uuid(username, publication_type, publication_name, uuid_str=None, ignore_duplicate=False):
+def register_publication_uuid(workspace, publication_type, publication_name, uuid_str=None, ignore_duplicate=False):
     if uuid_str is None:
         uuid_str = generate_uuid()
 
-    user_type_names_key = get_user_type_names_key(username, publication_type)
+    user_type_names_key = get_user_type_names_key(workspace, publication_type)
     uuid_metadata_key = get_uuid_metadata_key(uuid_str)
 
     with settings.LAYMAN_REDIS.pipeline() as pipe:
@@ -51,14 +51,14 @@ def register_publication_uuid(username, publication_type, publication_name, uuid
 
                     if pipe.hexists(user_type_names_key, publication_name):
                         raise LaymanError(23, {
-                            'message': f'Redis already contains publication type/user/name {publication_type}/{username}/{publication_name}'})
+                            'message': f'Redis already contains publication type/user/name {publication_type}/{workspace}/{publication_name}'})
 
                 pipe.multi()
                 pipe.sadd(UUID_SET_KEY, uuid_str)
                 pipe.hmset(
                     uuid_metadata_key,
                     {
-                        'username': username,
+                        'username': workspace,
                         'publication_type': publication_type,
                         'publication_name': publication_name,
                     }
@@ -76,8 +76,8 @@ def register_publication_uuid(username, publication_type, publication_name, uuid
     return uuid_str
 
 
-def delete_publication_uuid(username, publication_type, publication_name, uuid_str):
-    user_type_names_key = get_user_type_names_key(username, publication_type)
+def delete_publication_uuid(workspace, publication_type, publication_name, uuid_str):
+    user_type_names_key = get_user_type_names_key(workspace, publication_type)
     uuid_metadata_key = get_uuid_metadata_key(uuid_str)
 
     settings.LAYMAN_REDIS.srem(UUID_SET_KEY, uuid_str)
@@ -89,9 +89,9 @@ def get_uuid_metadata_key(uuid_str):
     return UUID_METADATA_KEY.format(uuid=uuid_str)
 
 
-def get_user_type_names_key(username, publication_type):
+def get_user_type_names_key(workspace, publication_type):
     return USER_TYPE_NAMES_KEY.format(
-        username=username,
+        username=workspace,
         publication_type=publication_type,
     )
 
@@ -155,23 +155,23 @@ def check_redis_consistency(expected_publ_num_by_type=None):
         h.split(':') for h in redis.smembers(celery_util.REDIS_CURRENT_TASK_NAMES)
     ]
 
-    for username, publ_type_name, pubname in total_publs:
-        chain_info = celery_util.get_publication_chain_info(username, publ_type_name, pubname)
+    for workspace, publ_type_name, pubname in total_publs:
+        chain_info = celery_util.get_publication_chain_info(workspace, publ_type_name, pubname)
         is_ready = celery_util.is_chain_ready(chain_info)
         assert chain_info['finished'] is is_ready
         assert (next((
             t for t in task_names_tuples
-            if t[1] == username and t[2] == pubname and t[0].startswith(publ_type_name)
-        ), None) is None) is is_ready, f"{username}, {publ_type_name}, {pubname}: {is_ready}, {task_names_tuples}"
+            if t[1] == workspace and t[2] == pubname and t[0].startswith(publ_type_name)
+        ), None) is None) is is_ready, f"{workspace}, {publ_type_name}, {pubname}: {is_ready}, {task_names_tuples}"
         assert (redis.hget(celery_util.LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION, chain_info['last'].task_id) is None) is is_ready
 
     # publication locks
     locks = redis.hgetall(redis_util.PUBLICATION_LOCKS_KEY)
     assert len(locks) == len(task_names_tuples), f"{locks} != {task_names_tuples}"
     for k, _ in locks.items():
-        username, publication_type, publication_name = k.split(':')
+        workspace, publication_type, publication_name = k.split(':')
         assert next((
             t for t in task_names_tuples
-            if t[1] == username and t[2] == publication_name and t[0].startswith(publication_type)
+            if t[1] == workspace and t[2] == publication_name and t[0].startswith(publication_type)
         ), None) is not None
     return total_publs_by_type
