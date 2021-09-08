@@ -20,6 +20,19 @@ LAYER_DEFINITIONS = [
             'async_error': ASYNC_ERROR,
         }
     },
+    {
+        DEFINITION: {'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
+                     'style_file': 'sample/style/ne_10m_admin_0_countries.qml'},
+        TEST_DATA: {
+            'expected_exc': {'http_code': 400,
+                             'code': 48,
+                             'message': 'Wrong combination of parameters',
+                             'detail': 'Raster layers are not allowed to have QML style.',
+                             },
+            'error_async_part': 'file',
+            'async_error': SYNC_ERROR,
+        }
+    },
 ]
 
 LAYER_ASYNC_ERROR_DEFINITIONS = [layer_def for layer_def in LAYER_DEFINITIONS
