@@ -141,7 +141,7 @@ def get_integer_from_param(request_args, param_name, negative=True, zero=True, p
     return result
 
 
-def get_publications(publication_type, user, request_args=None, workspace=None):
+def get_publications(publication_type, actor, request_args=None, workspace=None):
     request_args = request_args or {}
     known_order_by_values = [consts.ORDER_BY_TITLE, consts.ORDER_BY_FULL_TEXT, consts.ORDER_BY_LAST_CHANGE,
                              consts.ORDER_BY_BBOX, ]
@@ -200,7 +200,7 @@ def get_publications(publication_type, user, request_args=None, workspace=None):
     #########################################################
     publication_infos_whole = layman_util.get_publication_infos_with_metainfo(publ_type=publication_type,
                                                                               workspace=workspace,
-                                                                              context={'actor_name': user,
+                                                                              context={'actor_name': actor,
                                                                                        'access_type': 'read'
                                                                                        },
                                                                               limit=limit, offset=offset,
