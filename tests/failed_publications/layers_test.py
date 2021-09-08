@@ -8,6 +8,7 @@ COMMON_WORKSPACE = 'failed_publications_workspace'
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_png_without_crs():
+    publ_type = process_client.LAYER_TYPE
     workspace = COMMON_WORKSPACE
     layer = 'test_png_without_crs_layer'
 
@@ -17,8 +18,20 @@ def test_png_without_crs():
                     'detail': {'found': 'None', 'supported_values': settings.INPUT_SRS_LIST},
                     }
 
+    # Synchronous POST
     with pytest.raises(LaymanError) as exc_info:
-        process_client.publish_workspace_layer(workspace, layer,
-                                               file_paths=['sample/layman.layer/sample_png_pgw_rgba.pgw',
-                                                           'sample/layman.layer/sample_png_pgw_rgba.png', ], )
+        process_client.publish_workspace_publication(publ_type, workspace, layer,
+                                                     file_paths=['sample/layman.layer/sample_png_pgw_rgba.pgw',
+                                                                 'sample/layman.layer/sample_png_pgw_rgba.png', ], )
     test_util.assert_error(expected_exc, exc_info)
+
+    # Asynchronous POST
+    process_client.publish_workspace_publication(publ_type, workspace, layer,
+                                                 file_paths=['sample/layman.layer/sample_png_pgw_rgba.pgw',
+                                                             'sample/layman.layer/sample_png_pgw_rgba.png', ],
+                                                 with_chunks=True,
+                                                 )
+    info = process_client.get_workspace_publication(publ_type, workspace, layer, )
+    test_util.assert_async_error(expected_exc, info['file']['error'])
+
+    process_client.delete_workspace_layer(workspace, layer)
