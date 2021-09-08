@@ -57,3 +57,10 @@ def assert_error(expected, thrown):
             assert thrown.value.http_code == value, f'thrown_dict={thrown_dict}, expected={expected}'
         else:
             assert thrown_dict[key] == value, f'key={key}, thrown_dict={thrown_dict}, expected={expected}'
+
+
+def assert_async_error(expected, thrown):
+    expected = expected.copy()
+    expected.pop('http_code')
+    for key, value in expected.items():
+        assert thrown[key] == value, f'key={key}, thrown_dict={thrown}, expected={expected}'
