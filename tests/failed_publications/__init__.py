@@ -3,18 +3,26 @@ from layman import settings
 DEFINITION = 'definition'
 TEST_DATA = 'test_data'
 
+ASYNC_ERROR = 'async_error'
+SYNC_ERROR = 'sync_error'
 
 LAYER_DEFINITIONS = [
     {
-            DEFINITION: {'file_paths': ['sample/layman.layer/sample_png_pgw_rgba.pgw',
-                                        'sample/layman.layer/sample_png_pgw_rgba.png', ]},
-            TEST_DATA:{
-                'expected_exc': {'http_code': 400,
-                                 'code': 4,
-                                 'message': 'Unsupported CRS of data file',
-                                 'detail': {'found': 'None', 'supported_values': settings.INPUT_SRS_LIST},
-                                 },
-                'error_async_part': 'file',
-            }
+        DEFINITION: {'file_paths': ['sample/layman.layer/sample_png_pgw_rgba.pgw',
+                                    'sample/layman.layer/sample_png_pgw_rgba.png', ]},
+        TEST_DATA: {
+            'expected_exc': {'http_code': 400,
+                             'code': 4,
+                             'message': 'Unsupported CRS of data file',
+                             'detail': {'found': 'None', 'supported_values': settings.INPUT_SRS_LIST},
+                             },
+            'error_async_part': 'file',
+            'async_error': ASYNC_ERROR,
+        }
     },
 ]
+
+LAYER_ASYNC_ERROR_DEFINITIONS = [layer_def for layer_def in LAYER_DEFINITIONS
+                                 if layer_def[TEST_DATA]['async_error'] == ASYNC_ERROR]
+LAYER_SYNC_ERROR_DEFINITIONS = [layer_def for layer_def in LAYER_DEFINITIONS
+                                if layer_def[TEST_DATA]['async_error'] == SYNC_ERROR]

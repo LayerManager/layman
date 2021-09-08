@@ -22,9 +22,9 @@ def test_publication_error_sync_post(layer_def):
     test_util.assert_error(layer_def[failed_publications.TEST_DATA]['expected_exc'], exc_info)
 
 
-@pytest.mark.parametrize('layer_def', failed_publications.LAYER_DEFINITIONS)
+@pytest.mark.parametrize('layer_def', failed_publications.LAYER_ASYNC_ERROR_DEFINITIONS)
 @pytest.mark.usefixtures('ensure_layman')
-def test_publication_error_async_post(layer_def):
+def test_publication_error_async_post_async_error(layer_def):
     publ_type = LAYER_TYPE
     workspace = COMMON_WORKSPACE
     layer = LAYER
@@ -38,6 +38,21 @@ def test_publication_error_async_post(layer_def):
                                  info[layer_def[failed_publications.TEST_DATA]['error_async_part']]['error'])
 
     process_client.delete_workspace_layer(workspace, layer)
+
+
+@pytest.mark.parametrize('layer_def', failed_publications.LAYER_SYNC_ERROR_DEFINITIONS)
+@pytest.mark.usefixtures('ensure_layman')
+def test_publication_error_async_post_sync_error(layer_def):
+    publ_type = LAYER_TYPE
+    workspace = COMMON_WORKSPACE
+    layer = LAYER
+
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.publish_workspace_publication(publ_type, workspace, layer,
+                                                     **layer_def[failed_publications.DEFINITION],
+                                                     with_chunks=True,
+                                                     )
+    test_util.assert_error(layer_def[failed_publications.TEST_DATA]['expected_exc'], exc_info)
 
 
 @pytest.mark.parametrize('layer_def', failed_publications.LAYER_DEFINITIONS)
@@ -57,9 +72,8 @@ def test_publication_error_sync_patch(layer_def):
     process_client.delete_workspace_layer(workspace, layer)
 
 
-@pytest.mark.parametrize('layer_def', failed_publications.LAYER_DEFINITIONS)
-@pytest.mark.usefixtures('ensure_layman')
-def test_publication_error_async_patch(layer_def):
+@pytest.mark.parametrize('layer_def', failed_publications.LAYER_ASYNC_ERROR_DEFINITIONS)
+def test_publication_error_async_patch_async_error(layer_def):
     publ_type = LAYER_TYPE
     workspace = COMMON_WORKSPACE
     layer = LAYER
@@ -73,5 +87,24 @@ def test_publication_error_async_patch(layer_def):
     info = process_client.get_workspace_publication(publ_type, workspace, layer, )
     test_util.assert_async_error(layer_def[failed_publications.TEST_DATA]['expected_exc'],
                                  info[layer_def[failed_publications.TEST_DATA]['error_async_part']]['error'])
+
+    process_client.delete_workspace_layer(workspace, layer)
+
+
+@pytest.mark.parametrize('layer_def', failed_publications.LAYER_SYNC_ERROR_DEFINITIONS)
+@pytest.mark.usefixtures('ensure_layman')
+def test_publication_error_async_patch_sync_error(layer_def):
+    publ_type = LAYER_TYPE
+    workspace = COMMON_WORKSPACE
+    layer = LAYER
+
+    process_client.publish_workspace_publication(publ_type, workspace, layer,)
+
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.patch_workspace_publication(publ_type, workspace, layer,
+                                                   **layer_def[failed_publications.DEFINITION],
+                                                   with_chunks=True,
+                                                   )
+    test_util.assert_error(layer_def[failed_publications.TEST_DATA]['expected_exc'], exc_info)
 
     process_client.delete_workspace_layer(workspace, layer)
