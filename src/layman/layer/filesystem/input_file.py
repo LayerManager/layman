@@ -136,6 +136,9 @@ def check_vector_layer_crs(main_filepath):
 
 def check_raster_layer_crs(main_filepath):
     crs = get_raster_crs(main_filepath)
+    if not crs:
+        raise LaymanError(4, {'found': 'None',
+                              'supported_values': settings.INPUT_SRS_LIST})
     check_spatial_ref_crs(crs)
 
 
