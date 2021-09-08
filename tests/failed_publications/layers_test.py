@@ -3,7 +3,9 @@ import pytest
 from layman import LaymanError, settings
 from test_tools import process_client, util as test_util
 
+LAYER_TYPE = process_client.LAYER_TYPE
 COMMON_WORKSPACE = 'failed_publications_workspace'
+LAYER = 'test_png_without_crs_layer'
 
 
 @pytest.mark.parametrize('params, expected_exc, error_async_part', [
@@ -20,9 +22,9 @@ COMMON_WORKSPACE = 'failed_publications_workspace'
 ])
 @pytest.mark.usefixtures('ensure_layman')
 def test_publication_error(params, expected_exc, error_async_part):
-    publ_type = process_client.LAYER_TYPE
+    publ_type = LAYER_TYPE
     workspace = COMMON_WORKSPACE
-    layer = 'test_png_without_crs_layer'
+    layer = LAYER
 
     # Synchronous POST
     with pytest.raises(LaymanError) as exc_info:
