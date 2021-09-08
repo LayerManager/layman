@@ -203,12 +203,12 @@ def check_filenames(username, layername, filenames, check_crs, ignore_existing_f
             raise LaymanError(3, conflict_paths)
 
 
-def save_layer_files(username, layername, files, check_crs):
+def save_layer_files(username, layername, files, check_crs, *, output_dir=None):
     filenames = list(map(lambda f: f.filename, files))
     main_filename = get_main_file_name(filenames)
-    input_file_dir = ensure_layer_input_file_dir(username, layername)
+    output_dir = output_dir or ensure_layer_input_file_dir(username, layername)
     _, filepath_mapping = get_file_name_mappings(
-        filenames, main_filename, layername, input_file_dir
+        filenames, main_filename, layername, output_dir
     )
 
     common.save_files(files, filepath_mapping)
