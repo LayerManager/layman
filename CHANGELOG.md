@@ -21,11 +21,16 @@
 
     It may take some time to run this script and it will produce large temporary files (database dumps).
 - Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.9.0`
-    - If you are running Layman with development settings, run also `make client-build`.
 - Set new environment variables
   - [LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY](doc/env-settings.md#LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY)=normalized_raster_data
     - If you are running Layman with development settings, set value to `normalized_raster_data_dev` instead
   - [DEFAULT_CONNECTION_TIMEOUT](doc/env-settings.md#DEFAULT_CONNECTION_TIMEOUT)=10
+- If you are running Layman with development settings, run  
+```
+make build-dev
+make client-build
+make timgen-build
+```
 ### Migrations and checks
 #### Data migrations
 - All bounding boxes are cropped not to exceed extent of EPSG:3857 projection ([-20026376.39, -20048966.10, 20026376.39, 20048966.10]) in all sources except filesystem and DB table. Only bounding boxes are affected, not data itself.
