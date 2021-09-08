@@ -1,7 +1,7 @@
 # Changelog
 
 ## v1.14.0
- 2021-09-07
+ 2021-09-08
 ### Upgrade requirements
 - It's strongly recommended to backup data directories, especially `deps/postgresql/data`, because of database upgrade.
 - After [stopping layman and backing up data directories](README.md#upgrade), you need to migrate PostgreSQL data directory from v10 to v13. We created script that automatically migrates two databases:
