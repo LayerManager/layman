@@ -45,4 +45,17 @@ def test_png_without_crs():
                                                                'sample/layman.layer/sample_png_pgw_rgba.png', ], )
     test_util.assert_error(expected_exc, exc_info)
 
+    # Preparation for PATCH tests
+    process_client.delete_workspace_layer(workspace, layer)
+    process_client.publish_workspace_publication(publ_type, workspace, layer,)
+
+    # Asynchronous PATCH
+    process_client.patch_workspace_publication(publ_type, workspace, layer,
+                                               file_paths=['sample/layman.layer/sample_png_pgw_rgba.pgw',
+                                                           'sample/layman.layer/sample_png_pgw_rgba.png', ],
+                                               with_chunks=True,
+                                               )
+    info = process_client.get_workspace_publication(publ_type, workspace, layer, )
+    test_util.assert_async_error(expected_exc, info['file']['error'])
+
     process_client.delete_workspace_layer(workspace, layer)
