@@ -17,19 +17,19 @@ def create_lock_decorator(publication_type, publication_name_key, is_chain_ready
     def lock_decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):
-            username = request.view_args['workspace']
+            workspace = request.view_args['workspace']
             publication_name = request.view_args[publication_name_key]
-            create_lock(username, publication_type, publication_name, request.method)
+            create_lock(workspace, publication_type, publication_name, request.method)
             try:
                 result = func(*args, **kwargs)
-                if is_chain_ready_fn(username, publication_name):
-                    unlock_publication(username, publication_type, publication_name)
+                if is_chain_ready_fn(workspace, publication_name):
+                    unlock_publication(workspace, publication_type, publication_name)
             except Exception as exception:
                 try:
-                    if is_chain_ready_fn(username, publication_name):
-                        unlock_publication(username, publication_type, publication_name)
+                    if is_chain_ready_fn(workspace, publication_name):
+                        unlock_publication(workspace, publication_type, publication_name)
                 finally:
-                    unlock_publication(username, publication_type, publication_name)
+                    unlock_publication(workspace, publication_type, publication_name)
                 raise exception
             return result
 

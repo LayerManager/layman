@@ -15,11 +15,11 @@ def get_publication_info(publ_type, workspace, publication_name):
     return {}
 
 
-def delete_publication(publ_type, username, publication_name):
-    uuid_str = get_publication_uuid(publ_type, username, publ_type, publication_name)
+def delete_publication(publ_type, workspace, publication_name):
+    uuid_str = get_publication_uuid(publ_type, workspace, publ_type, publication_name)
     if uuid_str is not None:
-        delete_publication_uuid(username, publ_type, publication_name, uuid_str)
-    util.delete_publication_subfile(publ_type, username, publication_name, PUBLICATION_SUBFILE)
+        delete_publication_uuid(workspace, publ_type, publication_name, uuid_str)
+    util.delete_publication_subfile(publ_type, workspace, publication_name, PUBLICATION_SUBFILE)
 
 
 def get_publication_uuid(publ_type, workspace, publication_type, publication_name):
