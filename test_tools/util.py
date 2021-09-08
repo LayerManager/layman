@@ -54,6 +54,6 @@ def assert_error(expected, thrown):
     thrown_dict = thrown.value.to_dict()
     for key, value in expected.items():
         if key == 'http_code':
-            assert thrown.value.http_code == value
+            assert thrown.value.http_code == value, f'thrown_dict={thrown_dict}, expected={expected}'
         else:
-            assert thrown_dict[key] == value, thrown_dict[key]
+            assert thrown_dict[key] == value, f'key={key}, thrown_dict={thrown_dict}, expected={expected}'
