@@ -225,11 +225,6 @@ def save_layer_files(username, layername, files, check_crs):
     if check_crs:
         check_layer_crs(filepath_mapping[main_filename])
 
-    target_file_paths = [
-        fp for k, fp in filepath_mapping.items() if fp is not None
-    ]
-    return target_file_paths
-
 
 def get_unsafe_layername(files):
     filenames = list(map(
