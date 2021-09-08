@@ -17,7 +17,7 @@ LAYER_DEFINITIONS = [
                              'detail': {'found': 'None', 'supported_values': settings.INPUT_SRS_LIST},
                              },
             'error_async_part': 'file',
-            'async_error': ASYNC_ERROR,
+            'chunk_error_type': ASYNC_ERROR,
         }
     },
     {
@@ -30,12 +30,12 @@ LAYER_DEFINITIONS = [
                              'detail': 'Raster layers are not allowed to have QML style.',
                              },
             'error_async_part': 'file',
-            'async_error': SYNC_ERROR,
+            'chunk_error_type': SYNC_ERROR,
         }
     },
 ]
 
-LAYER_ASYNC_ERROR_DEFINITIONS = [layer_def for layer_def in LAYER_DEFINITIONS
-                                 if layer_def[TEST_DATA]['async_error'] == ASYNC_ERROR]
-LAYER_SYNC_ERROR_DEFINITIONS = [layer_def for layer_def in LAYER_DEFINITIONS
-                                if layer_def[TEST_DATA]['async_error'] == SYNC_ERROR]
+LAYER_CHUNK_ASYNC_ERROR_DEFINITIONS = [layer_def for layer_def in LAYER_DEFINITIONS
+                                       if layer_def[TEST_DATA]['chunk_error_type'] == ASYNC_ERROR]
+LAYER_CHUNK_SYNC_ERROR_DEFINITIONS = [layer_def for layer_def in LAYER_DEFINITIONS
+                                      if layer_def[TEST_DATA]['chunk_error_type'] == SYNC_ERROR]
