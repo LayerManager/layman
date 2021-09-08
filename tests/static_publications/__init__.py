@@ -353,13 +353,14 @@ PUBLICATIONS = {
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_grayscale_alpha_nodata'): {
         DEFINITION: [
-            {'file_paths': ['sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif']},
+            {'file_paths': ['sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif'],
+             'style_file': 'sample/style/sample_tif_grayscale_alpha_nodata.sld'},
         ],
         TEST_DATA: {
             'bbox': (1823049.056, 6310009.44, 1826918.349, 6312703.749),
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Gray', 'Alpha'],
-            'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_alpha_nodata.png',
+            'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_alpha_nodata_styled.png',
             'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
