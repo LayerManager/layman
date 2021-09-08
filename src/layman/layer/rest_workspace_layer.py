@@ -1,3 +1,5 @@
+import shutil
+import tempfile
 from flask import Blueprint, jsonify, request, current_app as app, g
 
 from layman.common import rest as rest_util
@@ -107,6 +109,10 @@ def patch(workspace, layername):
             filenames = [f.filename for f in files]
         input_file.check_filenames(workspace, layername, filenames,
                                    check_crs, ignore_existing_files=True)
+        # file checks
+        if not use_chunk_upload:
+            temp_dir = tempfile.mkdtemp(prefix="layman_")
+            input_file.save_layer_files(workspace, layername, files, check_crs, output_dir=temp_dir)
 
     if filenames:
         file_type = input_file.get_file_type(input_file.get_main_file_name(filenames))
@@ -157,8 +163,7 @@ def patch(workspace, layername):
                     'check_crs': check_crs,
                 })
             else:
-                input_file.save_layer_files(
-                    workspace, layername, files, check_crs)
+                shutil.move(temp_dir, input_file.get_layer_input_file_dir(workspace, layername))
     kwargs.update({'actor_name': authn.get_authn_username()})
 
     rest_util.setup_patch_access_rights(request.form, kwargs)
