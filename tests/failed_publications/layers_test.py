@@ -11,7 +11,7 @@ LAYER = 'test_png_without_crs_layer'
 
 @pytest.mark.parametrize('layer_def', failed_publications.LAYER_DEFINITIONS)
 @pytest.mark.usefixtures('ensure_layman')
-def test_publication_error_sync_post(layer_def):
+def test_publication_error_post(layer_def):
     publ_type = LAYER_TYPE
     workspace = COMMON_WORKSPACE
     layer = LAYER
@@ -22,9 +22,9 @@ def test_publication_error_sync_post(layer_def):
     test_util.assert_error(layer_def[failed_publications.TEST_DATA]['expected_exc'], exc_info)
 
 
-@pytest.mark.parametrize('layer_def', failed_publications.LAYER_ASYNC_ERROR_DEFINITIONS)
+@pytest.mark.parametrize('layer_def', failed_publications.LAYER_CHUNK_ASYNC_ERROR_DEFINITIONS)
 @pytest.mark.usefixtures('ensure_layman')
-def test_publication_error_async_post_async_error(layer_def):
+def test_publication_error_chunk_post_async_error(layer_def):
     publ_type = LAYER_TYPE
     workspace = COMMON_WORKSPACE
     layer = LAYER
@@ -40,9 +40,9 @@ def test_publication_error_async_post_async_error(layer_def):
     process_client.delete_workspace_layer(workspace, layer)
 
 
-@pytest.mark.parametrize('layer_def', failed_publications.LAYER_SYNC_ERROR_DEFINITIONS)
+@pytest.mark.parametrize('layer_def', failed_publications.LAYER_CHUNK_SYNC_ERROR_DEFINITIONS)
 @pytest.mark.usefixtures('ensure_layman')
-def test_publication_error_async_post_sync_error(layer_def):
+def test_publication_error_chunk_post(layer_def):
     publ_type = LAYER_TYPE
     workspace = COMMON_WORKSPACE
     layer = LAYER
@@ -57,7 +57,7 @@ def test_publication_error_async_post_sync_error(layer_def):
 
 @pytest.mark.parametrize('layer_def', failed_publications.LAYER_DEFINITIONS)
 @pytest.mark.usefixtures('ensure_layman')
-def test_publication_error_sync_patch(layer_def):
+def test_publication_error_patch(layer_def):
     publ_type = LAYER_TYPE
     workspace = COMMON_WORKSPACE
     layer = LAYER
@@ -72,8 +72,9 @@ def test_publication_error_sync_patch(layer_def):
     process_client.delete_workspace_layer(workspace, layer)
 
 
-@pytest.mark.parametrize('layer_def', failed_publications.LAYER_ASYNC_ERROR_DEFINITIONS)
-def test_publication_error_async_patch_async_error(layer_def):
+@pytest.mark.parametrize('layer_def', failed_publications.LAYER_CHUNK_ASYNC_ERROR_DEFINITIONS)
+@pytest.mark.usefixtures('ensure_layman')
+def test_publication_error_chunk_patch_async_error(layer_def):
     publ_type = LAYER_TYPE
     workspace = COMMON_WORKSPACE
     layer = LAYER
@@ -91,9 +92,9 @@ def test_publication_error_async_patch_async_error(layer_def):
     process_client.delete_workspace_layer(workspace, layer)
 
 
-@pytest.mark.parametrize('layer_def', failed_publications.LAYER_SYNC_ERROR_DEFINITIONS)
+@pytest.mark.parametrize('layer_def', failed_publications.LAYER_CHUNK_SYNC_ERROR_DEFINITIONS)
 @pytest.mark.usefixtures('ensure_layman')
-def test_publication_error_async_patch_sync_error(layer_def):
+def test_publication_error_chunk_patch(layer_def):
     publ_type = LAYER_TYPE
     workspace = COMMON_WORKSPACE
     layer = LAYER
