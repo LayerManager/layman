@@ -152,8 +152,13 @@ def post(workspace):
                 'check_crs': check_crs,
             })
         else:
-            input_file.save_layer_files(
-                workspace, layername, files, check_crs)
+            try:
+                input_file.save_layer_files(
+                    workspace, layername, files, check_crs)
+            except BaseException as exc:
+                uuid.delete_layer(workspace, layername)
+                input_file.delete_layer(workspace, layername)
+                raise exc
 
         util.post_layer(
             workspace,
