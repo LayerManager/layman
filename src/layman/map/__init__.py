@@ -15,6 +15,10 @@ def get_map_type_def():
     return PUBLICATION_TYPES[MAP_TYPE]
 
 
+def get_map_info_keys():
+    return get_map_type_def()['info_keys']
+
+
 MAP_REST_PATH_NAME = "maps"
 
 
@@ -72,6 +76,8 @@ PUBLICATION_TYPES = {
                 'title',
             }
         },
+        'info_keys': {'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at',
+                      'thumbnail', 'file', 'metadata', 'access_rights', 'bounding_box', },
     }
 }
 
