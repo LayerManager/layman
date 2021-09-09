@@ -11,7 +11,7 @@ from .schema_initialization import ensure_schema
 
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
-USERNAME = 'test_schema_user'
+WORKSPACE = 'test_schema_workspace'
 LAYERNAME = 'test_schema_layer'
 MAPNAME = 'test_schema_map'
 
@@ -40,14 +40,14 @@ def save_upgrade_status():
 
 @pytest.fixture()
 def prepare_publications():
-    process_client.publish_workspace_layer(USERNAME, LAYERNAME)
-    process_client.publish_workspace_map(USERNAME, MAPNAME)
+    process_client.publish_workspace_layer(WORKSPACE, LAYERNAME)
+    process_client.publish_workspace_map(WORKSPACE, MAPNAME)
     yield
-    process_client.delete_workspace_layer(USERNAME, LAYERNAME)
-    process_client.delete_workspace_map(USERNAME, MAPNAME)
+    process_client.delete_workspace_layer(WORKSPACE, LAYERNAME)
+    process_client.delete_workspace_map(WORKSPACE, MAPNAME)
 
     with app.app_context():
-        pubs = pub_util.get_publication_infos(USERNAME)
+        pubs = pub_util.get_publication_infos(WORKSPACE)
         assert len(pubs) == 0
 
 
@@ -62,8 +62,8 @@ def test_schema():
         assert workspaces[0][0] == len(util.get_workspaces())
         users = run_query(f'select count(*) from {DB_SCHEMA}.users;')
         assert users[0][0] == len(util.get_usernames(use_cache=False))
-        user_infos = workspaces_util.get_workspace_infos(USERNAME)
-        assert USERNAME in user_infos
+        user_infos = workspaces_util.get_workspace_infos(WORKSPACE)
+        assert WORKSPACE in user_infos
         select_publications = f"""with const as (select %s workspace_name)
 select w.name as workspace_name,
        p.type,
@@ -73,6 +73,6 @@ from const c inner join
      {DB_SCHEMA}.publications p on p.id_workspace = w.id left join
      {DB_SCHEMA}.users u on u.id_workspace = w.id
 ;"""
-        pub_infos = run_query(select_publications, (USERNAME,))
-        assert (USERNAME, LAYER_TYPE, LAYERNAME) in pub_infos
-        assert (USERNAME, MAP_TYPE, MAPNAME) in pub_infos
+        pub_infos = run_query(select_publications, (WORKSPACE,))
+        assert (WORKSPACE, LAYER_TYPE, LAYERNAME) in pub_infos
+        assert (WORKSPACE, MAP_TYPE, MAPNAME) in pub_infos

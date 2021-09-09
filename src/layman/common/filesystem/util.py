@@ -9,13 +9,13 @@ PUBL_TYPE_DEF_KEY = '.'.join(__name__.split('.')[:-1])
 
 
 def get_usernames():
-    usersdir = get_workspaces_dir()
-    if not os.path.exists(usersdir):
+    workspaces_dir = get_workspaces_dir()
+    if not os.path.exists(workspaces_dir):
         return []
     user_names = [
-        subfile for subfile in os.listdir(usersdir)
-        if os.path.isdir(os.path.join(usersdir, subfile))
-        and os.path.exists(os.path.join(usersdir, subfile, 'authn.txt'))
+        subfile for subfile in os.listdir(workspaces_dir)
+        if os.path.isdir(os.path.join(workspaces_dir, subfile))
+        and os.path.exists(os.path.join(workspaces_dir, subfile, 'authn.txt'))
     ]
     return user_names
 
