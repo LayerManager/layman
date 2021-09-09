@@ -260,6 +260,11 @@ def is_chain_ready(chain_info):
         is_chain_failed(chain_info)
 
 
+def is_chain_failed_without_info(chain_info):
+    return chain_info['finished'] is True and chain_info['state'] == states.FAILURE and \
+        not any(res.state == states.FAILURE for res in chain_info['by_order'])
+
+
 def _get_publication_hash(workspace, publication_type, publication_name):
     hash = f"{workspace}:{publication_type}:{publication_name}"
     return hash
