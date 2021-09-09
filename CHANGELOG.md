@@ -7,10 +7,17 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
-- [#465](https://github.com/LayerManager/layman/issues/465) Fix situation, when Layman does not start if *.qgis file of the first layer with QML style does not exist.
-- [#464](https://github.com/LayerManager/layman/issues/464) Fix publishing layers with strange layer names (e.g. `x,` or `Číslo`) and QML styles.
-- [#459](https://github.com/LayerManager/layman/issues/459) Fix situation, when sometimes publication stayed in PENDING status after failure
+- [#465](https://github.com/LayerManager/layman/issues/465) Fix situation, when Layman does not start if *.qgis file of the first layer with QML style does not exist. It was already fixed in v1.14.1.
+- [#464](https://github.com/LayerManager/layman/issues/464) Fix publishing layers with unusual attribute  names (e.g. `x,` or `Číslo`) and QML styles. It was already fixed in v1.14.1.
+- [#459](https://github.com/LayerManager/layman/issues/459) Fix situation, when sometimes publication stayed in PENDING status after failure. It was already fixed in v1.14.1.
 - Rename item `username` to `workspace` in error 41.
+
+## v1.14.1
+ 2021-09-14
+### Changes
+- [#465](https://github.com/LayerManager/layman/issues/465) Fix situation, when Layman does not start if *.qgis file of the first layer with QML style does not exist.
+- [#464](https://github.com/LayerManager/layman/issues/464) Fix publishing layers with unusual attribute names (e.g. `x,` or `Číslo`) and QML styles.
+- [#459](https://github.com/LayerManager/layman/issues/459) Fix situation, when sometimes publication stayed in PENDING status after failure
 
 ## v1.14.0
  2021-09-08
