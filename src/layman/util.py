@@ -462,3 +462,48 @@ def get_publication_status(workspace, publication_type, publication_name, comple
     else:
         publication_status = 'COMPLETE'
     return publication_status
+
+
+def fill_in_partial_info_statuses(info, chain_info, task_to_layer_info_keys, item_keys):
+    filled_info = info
+
+    if chain_info is None or celery_util.is_chain_successful(chain_info):
+        return filled_info
+
+    if celery_util.is_chain_failed_without_info(chain_info):
+        for res in chain_info['by_order']:
+            task_name = next(k for k, v in chain_info['by_name'].items() if v == res)
+            source_state = {
+                'status': 'NOT_AVAILABLE'
+            }
+            if task_name not in task_to_layer_info_keys:
+                continue
+            for layerinfo_key in task_to_layer_info_keys[task_name]:
+                if layerinfo_key not in filled_info:
+                    filled_info[layerinfo_key] = source_state
+
+        return filled_info
+
+    failed = False
+    for res in chain_info['by_order']:
+        task_name = next(k for k, v in chain_info['by_name'].items() if v == res)
+        source_state = {
+            'status': res.state if not failed else 'NOT_AVAILABLE'
+        }
+        if res.failed():
+            failed = True
+            res_exc = res.get(propagate=False)
+            # current_app.logger.info(f"Exception catched: {str(res_exc)}")
+            if isinstance(res_exc, LaymanError):
+                source_state.update({
+                    'error': res_exc.to_dict()
+                })
+        if task_name not in task_to_layer_info_keys:
+            continue
+        for layerinfo_key in task_to_layer_info_keys[task_name]:
+            if layerinfo_key not in filled_info:
+                if layerinfo_key in item_keys:
+                    filled_info[layerinfo_key] = source_state
+            elif not res.successful():
+                filled_info[layerinfo_key].update(source_state)
+    return filled_info
