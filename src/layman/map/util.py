@@ -13,7 +13,7 @@ from layman.common import redis as redis_util, tasks as tasks_util, metadata as 
 from layman.common.util import PUBLICATION_NAME_PATTERN, clear_publication_info
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for
-from . import get_map_sources, MAP_TYPE, get_map_type_def
+from . import get_map_sources, MAP_TYPE, get_map_type_def, get_map_info_keys
 from .filesystem import input_file
 from .micka import csw
 from .micka.csw import map_json_to_operates_on, map_json_to_epsg_codes
@@ -82,33 +82,17 @@ TASKS_TO_MAP_INFO_KEYS = {
 }
 
 
+def fill_in_partial_info_statuses(info, chain_info):
+    item_keys = get_map_info_keys()
+    return layman_util.fill_in_partial_info_statuses(info, chain_info, TASKS_TO_MAP_INFO_KEYS, item_keys)
+
+
 def get_map_info(workspace, mapname, context=None):
     partial_info = layman_util.get_publication_info(workspace, MAP_TYPE, mapname, context)
 
     chain_info = get_map_chain(workspace, mapname)
-    if chain_info is None or celery_util.is_chain_successful(chain_info):
-        return partial_info
-
-    failed = False
-    for res in chain_info['by_order']:
-        task_name = next(k for k, v in chain_info['by_name'].items() if v == res)
-        source_state = {
-            'status': res.state if not failed else 'NOT_AVAILABLE'
-        }
-        if res.failed():
-            failed = True
-            res_exc = res.get(propagate=False)
-            if isinstance(res_exc, LaymanError):
-                source_state.update({
-                    'error': res_exc.to_dict()
-                })
-        if task_name not in TASKS_TO_MAP_INFO_KEYS:
-            continue
-        for mapinfo_key in TASKS_TO_MAP_INFO_KEYS[task_name]:
-            if mapinfo_key not in partial_info or not res.successful():
-                partial_info[mapinfo_key] = source_state
-
-    return partial_info
+    filled_partial_info = fill_in_partial_info_statuses(partial_info, chain_info)
+    return filled_partial_info
 
 
 def pre_publication_action_check(workspace, mapname, task_options):
