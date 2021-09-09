@@ -81,6 +81,21 @@ def fill_in_partial_info_statuses(info, chain_info):
 
     file_type = filled_info['file']['file_type']
     item_keys = get_layer_info_keys(file_type)
+
+    if celery_util.is_chain_failed_without_info(chain_info):
+        for res in chain_info['by_order']:
+            task_name = next(k for k, v in chain_info['by_name'].items() if v == res)
+            source_state = {
+                'status': 'NOT_AVAILABLE'
+            }
+            if task_name not in TASKS_TO_LAYER_INFO_KEYS:
+                continue
+            for layerinfo_key in TASKS_TO_LAYER_INFO_KEYS[task_name]:
+                if layerinfo_key not in filled_info:
+                    filled_info[layerinfo_key] = source_state
+
+        return filled_info
+
     failed = False
     for res in chain_info['by_order']:
         task_name = next(k for k, v in chain_info['by_name'].items() if v == res)
