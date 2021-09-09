@@ -74,51 +74,10 @@ def check_new_layername(workspace, layername):
 
 
 def fill_in_partial_info_statuses(info, chain_info):
-    filled_info = info
+    file_type = info.get('file', dict()).get('file_type')
+    item_keys = get_layer_info_keys(file_type) if file_type else None
 
-    if chain_info is None or celery_util.is_chain_successful(chain_info):
-        return filled_info
-
-    file_type = filled_info['file']['file_type']
-    item_keys = get_layer_info_keys(file_type)
-
-    if celery_util.is_chain_failed_without_info(chain_info):
-        for res in chain_info['by_order']:
-            task_name = next(k for k, v in chain_info['by_name'].items() if v == res)
-            source_state = {
-                'status': 'NOT_AVAILABLE'
-            }
-            if task_name not in TASKS_TO_LAYER_INFO_KEYS:
-                continue
-            for layerinfo_key in TASKS_TO_LAYER_INFO_KEYS[task_name]:
-                if layerinfo_key not in filled_info:
-                    filled_info[layerinfo_key] = source_state
-
-        return filled_info
-
-    failed = False
-    for res in chain_info['by_order']:
-        task_name = next(k for k, v in chain_info['by_name'].items() if v == res)
-        source_state = {
-            'status': res.state if not failed else 'NOT_AVAILABLE'
-        }
-        if res.failed():
-            failed = True
-            res_exc = res.get(propagate=False)
-            # current_app.logger.info(f"Exception catched: {str(res_exc)}")
-            if isinstance(res_exc, LaymanError):
-                source_state.update({
-                    'error': res_exc.to_dict()
-                })
-        if task_name not in TASKS_TO_LAYER_INFO_KEYS:
-            continue
-        for layerinfo_key in TASKS_TO_LAYER_INFO_KEYS[task_name]:
-            if layerinfo_key not in filled_info:
-                if layerinfo_key in item_keys:
-                    filled_info[layerinfo_key] = source_state
-            elif not res.successful():
-                filled_info[layerinfo_key].update(source_state)
-    return filled_info
+    return layman_util.fill_in_partial_info_statuses(info, chain_info, TASKS_TO_LAYER_INFO_KEYS, item_keys)
 
 
 def get_layer_info(workspace, layername, context=None):
