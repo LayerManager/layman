@@ -30,8 +30,8 @@ def reserve_username(username, adjust=False):
         raise LaymanError(34, {'username': current_username})
     if adjust is not True:
         check_workspace_name(username)
-        usernames = get_workspaces()
-        if username in usernames:
+        workspaces = get_workspaces()
+        if username in workspaces:
             raise LaymanError(35)
         try:
             ensure_whole_user(username)
@@ -47,7 +47,7 @@ def reserve_username(username, adjust=False):
         slugify(s) for s in suggestions if s is not None and len(s) > 0
     ]
     suggestions = to_safe_names(suggestions, 'user')
-    usernames = get_workspaces()
+    workspaces = get_workspaces()
     username = None
     idx = 0
     while True:
@@ -59,7 +59,7 @@ def reserve_username(username, adjust=False):
             except LaymanError as exc:
                 if not (exc.code == 2 or exc.code == 35):
                     raise exc
-            if suggestion in usernames:
+            if suggestion in workspaces:
                 continue
             try:
                 ensure_whole_user(suggestion)
