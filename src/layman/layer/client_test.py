@@ -13,14 +13,14 @@ from test_tools import process_client
 from test_tools.util import url_for
 
 
-USERNAME = 'testuser1'
+WORKSPACE = 'test_layer_client_test_workspace'
 LAYERNAME = 'country_chunks'
 
 
 @pytest.fixture(scope="module")
 def clear_country_chunks():
     yield
-    process_client.delete_workspace_layer(USERNAME, LAYERNAME, skip_404=True)
+    process_client.delete_workspace_layer(WORKSPACE, LAYERNAME, skip_404=True)
 
 
 @pytest.fixture(scope="module")
@@ -70,7 +70,7 @@ def test_post_layers_chunk(chrome):
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
-    user_input.send_keys(USERNAME)
+    user_input.send_keys(WORKSPACE)
 
     layername_input = chrome.find_elements_by_name('name')
     assert len(layername_input) == 1
@@ -93,7 +93,7 @@ def test_post_layers_chunk(chrome):
     time.sleep(0.5)
 
     with app.app_context():
-        layer_url = url_for('rest_workspace_layer.get', workspace=USERNAME, layername=LAYERNAME)
+        layer_url = url_for('rest_workspace_layer.get', workspace=WORKSPACE, layername=LAYERNAME)
     response = requests.get(layer_url)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
     max_attempts = 20
@@ -115,11 +115,11 @@ def test_post_layers_chunk(chrome):
     for entry in entries:
         # print(entry)
         assert entry['level'] == 'INFO' or (
-            entry['level'] == 'SEVERE' and entry['message'].startswith(f'{client_url}rest/workspaces/{USERNAME}/layers/{LAYERNAME}/chunk?')
+            entry['level'] == 'SEVERE' and entry['message'].startswith(f'{client_url}rest/workspaces/{WORKSPACE}/layers/{LAYERNAME}/chunk?')
             and entry['message'].endswith(
                 'Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
-    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(USERNAME, LAYERNAME)
+    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(WORKSPACE, LAYERNAME)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
 
 
@@ -157,7 +157,7 @@ def test_patch_layer_chunk(chrome):
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
-    user_input.send_keys(USERNAME)
+    user_input.send_keys(WORKSPACE)
 
     layername_input = chrome.find_elements_by_name('name')
     assert len(layername_input) == 1
@@ -180,7 +180,7 @@ def test_patch_layer_chunk(chrome):
     time.sleep(0.5)
 
     with app.app_context():
-        layer_url = url_for('rest_workspace_layer.get', workspace=USERNAME, layername=LAYERNAME)
+        layer_url = url_for('rest_workspace_layer.get', workspace=WORKSPACE, layername=LAYERNAME)
     response = requests.get(layer_url)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
     max_attempts = 20
@@ -204,8 +204,8 @@ def test_patch_layer_chunk(chrome):
         assert entry['level'] == 'INFO' or (
             entry['level'] == 'SEVERE'
             and entry['message'].startswith(
-                f'{client_url}rest/{settings.REST_WORKSPACES_PREFIX}/{USERNAME}/layers/{LAYERNAME}/chunk?'
+                f'{client_url}rest/{settings.REST_WORKSPACES_PREFIX}/{WORKSPACE}/layers/{LAYERNAME}/chunk?'
             ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
         )
-    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(USERNAME, LAYERNAME)
+    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(WORKSPACE, LAYERNAME)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
