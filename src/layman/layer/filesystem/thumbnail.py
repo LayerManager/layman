@@ -19,14 +19,14 @@ post_layer = empty_method
 patch_layer = empty_method
 
 
-def get_layer_thumbnail_dir(username, layername):
-    thumbnail_dir = os.path.join(util.get_layer_dir(username, layername),
+def get_layer_thumbnail_dir(workspace, layername):
+    thumbnail_dir = os.path.join(util.get_layer_dir(workspace, layername),
                                  'thumbnail')
     return thumbnail_dir
 
 
-def ensure_layer_thumbnail_dir(username, layername):
-    thumbnail_dir = get_layer_thumbnail_dir(username, layername)
+def ensure_layer_thumbnail_dir(workspace, layername):
+    thumbnail_dir = get_layer_thumbnail_dir(workspace, layername)
     pathlib.Path(thumbnail_dir).mkdir(parents=True, exist_ok=True)
     return thumbnail_dir
 
@@ -51,8 +51,8 @@ def delete_layer(workspace, layername):
     util.delete_layer_subdir(workspace, layername, LAYER_SUBDIR)
 
 
-def get_layer_thumbnail_path(username, layername):
-    thumbnail_dir = get_layer_thumbnail_dir(username, layername)
+def get_layer_thumbnail_path(workspace, layername):
+    thumbnail_dir = get_layer_thumbnail_dir(workspace, layername)
     return os.path.join(thumbnail_dir, layername + '.png')
 
 

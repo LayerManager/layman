@@ -33,9 +33,9 @@ post_layer = empty_method
 patch_layer = empty_method
 
 
-def delete_layer(username, layername):
+def delete_layer(workspace, layername):
     try:
-        shutil.rmtree(get_normalized_raster_layer_dir(username, layername))
+        shutil.rmtree(get_normalized_raster_layer_dir(workspace, layername))
     except FileNotFoundError:
         pass
 

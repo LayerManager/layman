@@ -19,5 +19,5 @@ get_publication_uuid = partial(common_uuid.get_publication_uuid, LAYER_TYPE)
 assign_layer_uuid = partial(common_uuid.assign_publication_uuid, LAYER_TYPE)
 
 
-def get_layer_uuid(username, layername):
-    return get_publication_uuid(username, LAYER_TYPE, layername)
+def get_layer_uuid(workspace, layername):
+    return get_publication_uuid(workspace, LAYER_TYPE, layername)

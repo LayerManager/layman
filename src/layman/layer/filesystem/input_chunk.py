@@ -21,13 +21,13 @@ post_layer = empty_method
 patch_layer = empty_method
 
 
-def get_layer_resumable_dir(username, layername):
-    resumable_dir = os.path.join(util.get_layer_dir(username, layername), LAYER_SUBDIR)
+def get_layer_resumable_dir(workspace, layername):
+    resumable_dir = os.path.join(util.get_layer_dir(workspace, layername), LAYER_SUBDIR)
     return resumable_dir
 
 
-def ensure_layer_resumable_dir(username, layername):
-    resumable_dir = get_layer_resumable_dir(username, layername)
+def ensure_layer_resumable_dir(workspace, layername):
+    resumable_dir = get_layer_resumable_dir(workspace, layername)
     pathlib.Path(resumable_dir).mkdir(parents=True, exist_ok=True)
     return resumable_dir
 
@@ -41,10 +41,10 @@ def delete_layer(workspace, layername):
 get_publication_uuid = input_file.get_publication_uuid
 
 
-def save_layer_files_str(username, layername, files_str, check_crs):
+def save_layer_files_str(workspace, layername, files_str, check_crs):
     filenames = files_str
     main_filename = input_file.get_main_file_name(filenames)
-    input_file_dir = input_file.get_layer_input_file_dir(username, layername)
+    input_file_dir = input_file.get_layer_input_file_dir(workspace, layername)
     _, filepath_mapping = input_file.get_file_name_mappings(
         filenames, main_filename, layername, input_file_dir
     )
@@ -64,7 +64,7 @@ def save_layer_files_str(username, layername, files_str, check_crs):
         'files_to_upload': files_to_upload,
         'check_crs': check_crs,
     }
-    resumable_dir = ensure_layer_resumable_dir(username, layername)
+    resumable_dir = ensure_layer_resumable_dir(workspace, layername)
     os.mkdir(os.path.join(resumable_dir, 'chunks'))
     info_path = os.path.join(resumable_dir, 'info.json')
     with open(info_path, 'w') as file:
@@ -77,13 +77,13 @@ def save_layer_files_str(username, layername, files_str, check_crs):
     ]
 
 
-def get_layer_redis_total_chunks_key(username, layername):
-    return f'layman.users.{username}.layers.{layername}.total_chunks'
+def get_layer_redis_total_chunks_key(workspace, layername):
+    return f'layman.users.{workspace}.layers.{layername}.total_chunks'
 
 
-def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
+def save_layer_file_chunk(workspace, layername, parameter_name, filename, chunk,
                           chunk_number, total_chunks):
-    resumable_dir = get_layer_resumable_dir(username, layername)
+    resumable_dir = get_layer_resumable_dir(workspace, layername)
     info_path = os.path.join(resumable_dir, 'info.json')
     chunk_dir = os.path.join(resumable_dir, 'chunks')
     if os.path.isfile(info_path):
@@ -104,7 +104,7 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
                     'layman_original_parameter': parameter_name,
                 })
             settings.LAYMAN_REDIS.hset(
-                get_layer_redis_total_chunks_key(username, layername),
+                get_layer_redis_total_chunks_key(workspace, layername),
                 f'{parameter_name}:{file_info["target_file"]}',
                 total_chunks
             )
@@ -119,8 +119,8 @@ def save_layer_file_chunk(username, layername, parameter_name, filename, chunk,
         raise LaymanError(20)
 
 
-def get_info_json(username, layername):
-    resumable_dir = get_layer_resumable_dir(username, layername)
+def get_info_json(workspace, layername):
+    resumable_dir = get_layer_resumable_dir(workspace, layername)
     info_path = os.path.join(resumable_dir, 'info.json')
     if os.path.isfile(info_path):
         with open(info_path, 'r') as info_file:
@@ -141,10 +141,10 @@ def get_layer_info(workspace, layername):
     return result
 
 
-def layer_file_chunk_exists(username, layername, parameter_name, filename,
+def layer_file_chunk_exists(workspace, layername, parameter_name, filename,
                             chunk_number):
-    info = get_info_json(username, layername)
-    resumable_dir = get_layer_resumable_dir(username, layername)
+    info = get_info_json(workspace, layername)
+    resumable_dir = get_layer_resumable_dir(workspace, layername)
     chunk_dir = os.path.join(resumable_dir, 'chunks')
     if info:
         files_to_upload = info['files_to_upload']
@@ -170,9 +170,9 @@ def layer_file_chunk_exists(username, layername, parameter_name, filename,
     raise LaymanError(20)
 
 
-def layer_file_chunk_info(username, layername):
+def layer_file_chunk_info(workspace, layername):
     # print('print layer_file_chunk_info')
-    resumable_dir = get_layer_resumable_dir(username, layername)
+    resumable_dir = get_layer_resumable_dir(workspace, layername)
     info_path = os.path.join(resumable_dir, 'info.json')
     chunk_dir = os.path.join(resumable_dir, 'chunks')
     if os.path.isfile(info_path):
@@ -181,7 +181,7 @@ def layer_file_chunk_info(username, layername):
             info = json.load(info_file)
             files_to_upload = info['files_to_upload']
 
-            r_key = get_layer_redis_total_chunks_key(username, layername)
+            r_key = get_layer_redis_total_chunks_key(workspace, layername)
             for file in files_to_upload:
                 rh_key = f'{file["layman_original_parameter"]}:{file["target_file"]}'
                 total_chunks = settings.LAYMAN_REDIS.hget(r_key, rh_key)
@@ -200,7 +200,7 @@ def layer_file_chunk_info(username, layername):
                     current_app.logger.info(
                         'file_upload_complete ' + target_fn)
                     target_fp = file['target_file']
-                    input_file.ensure_layer_input_file_dir(username, layername)
+                    input_file.ensure_layer_input_file_dir(workspace, layername)
                     with open(target_fp, "ab") as target_file:
                         for chunk_path in chunk_paths:
                             stored_chunk_file = open(chunk_path, 'rb')
@@ -218,7 +218,7 @@ def layer_file_chunk_info(username, layername):
             ])
             all_files_saved = num_files_saved == len(files_to_upload)
             if all_files_saved:
-                delete_layer(username, layername)
+                delete_layer(workspace, layername)
                 num_chunks_saved = 0
             else:
                 num_chunks_saved = len(os.listdir(chunk_dir))
