@@ -89,11 +89,11 @@ def get_layer_info(workspace, layername, context=None):
     return filled_partial_info
 
 
-def get_complete_layer_info(username=None, layername=None, cached=False):
-    assert (username is not None and layername is not None) or cached
+def get_complete_layer_info(workspace=None, layername=None, cached=False):
+    assert (workspace is not None and layername is not None) or cached
     if cached:
         return g.get(FLASK_INFO_KEY)
-    partial_info = get_layer_info(username, layername)
+    partial_info = get_layer_info(workspace, layername)
 
     if not any(partial_info):
         raise LaymanError(15, {'layername': layername})
@@ -107,7 +107,7 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
 
     complete_info.update({
         'name': layername,
-        'url': url_for('rest_workspace_layer.get', layername=layername, workspace=username),
+        'url': url_for('rest_workspace_layer.get', layername=layername, workspace=workspace),
         'title': layername,
         'description': '',
     })
@@ -117,7 +117,7 @@ def get_complete_layer_info(username=None, layername=None, cached=False):
     complete_info = clear_publication_info(complete_info)
 
     complete_info.pop('layman_metadata')
-    complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(username, LAYER_TYPE, layername,
+    complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(workspace, LAYER_TYPE, layername,
                                                                                                  complete_info, item_keys)}
     return complete_info
 
@@ -195,17 +195,17 @@ def delete_layer(workspace, layername, source=None, http_method='delete'):
     return result
 
 
-def get_layer_chain(username, layername):
-    chain_info = celery_util.get_publication_chain_info(username, LAYER_TYPE, layername)
+def get_layer_chain(workspace, layername):
+    chain_info = celery_util.get_publication_chain_info(workspace, LAYER_TYPE, layername)
     return chain_info
 
 
-def abort_layer_chain(username, layername):
-    celery_util.abort_publication_chain(username, LAYER_TYPE, layername)
+def abort_layer_chain(workspace, layername):
+    celery_util.abort_publication_chain(workspace, LAYER_TYPE, layername)
 
 
-def is_layer_chain_ready(username, layername):
-    chain_info = get_layer_chain(username, layername)
+def is_layer_chain_ready(workspace, layername):
+    chain_info = get_layer_chain(workspace, layername)
     return chain_info is None or celery_util.is_chain_ready(chain_info)
 
 
@@ -246,7 +246,7 @@ def get_metadata_comparison(workspace, layername, *, cached=True):
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, LAYER_TYPE)
 
 
-def get_same_or_missing_prop_names(username, layername):
-    md_comparison = get_metadata_comparison(username, layername)
+def get_same_or_missing_prop_names(workspace, layername):
+    md_comparison = get_metadata_comparison(workspace, layername)
     prop_names = get_syncable_prop_names()
     return metadata_common.get_same_or_missing_prop_names(prop_names, md_comparison)
