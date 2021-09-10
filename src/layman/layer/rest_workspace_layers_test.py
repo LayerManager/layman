@@ -14,7 +14,7 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_get_layer_title():
-    username = 'test_get_layer_title_user'
+    workspace = 'test_get_layer_title_workspace'
     layers = [("c_test_get_layer_title_layer", "C Test get layer title - map layer íářžý"),
               ("a_test_get_layer_title_layer", "A Test get layer title - map layer íářžý"),
               ("b_test_get_layer_title_layer", "B Test get layer title - map layer íářžý")
@@ -22,11 +22,11 @@ def test_get_layer_title():
     sorted_layers = sorted(layers)
 
     for (name, title) in layers:
-        process_client.publish_workspace_layer(username, name, title=title)
+        process_client.publish_workspace_layer(workspace, name, title=title)
 
     # layers.GET
     with app.app_context():
-        url = url_for('rest_workspace_layers.get', workspace=username)
+        url = url_for('rest_workspace_layers.get', workspace=workspace)
     response = requests.get(url)
     assert response.status_code == 200, response.text
 
@@ -35,7 +35,7 @@ def test_get_layer_title():
         assert response.json()[i]["title"] == sorted_layers[i][1]
 
     for (name, title) in layers:
-        process_client.delete_workspace_layer(username, name)
+        process_client.delete_workspace_layer(workspace, name)
 
 
 def assert_style_file(workspace,

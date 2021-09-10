@@ -29,7 +29,7 @@ def after_request(response):
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/style", methods=['GET'])
 def get(workspace, layername):
-    app.logger.info(f"GET Style, user={g.user}, workspace={workspace}, layername={layername}")
+    app.logger.info(f"GET Style, actor={g.user}, workspace={workspace}, layername={layername}")
 
     style_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type'], })['style_type']
     result = None
