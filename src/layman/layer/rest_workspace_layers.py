@@ -29,15 +29,15 @@ def after_request(response):
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}", methods=['GET'])
 def get(workspace):
-    app.logger.info(f"GET Layers, user={g.user}")
+    app.logger.info(f"GET Layers, actor={g.user}")
 
-    user = get_authn_username()
-    return rest_common.get_publications(LAYER_TYPE, user, request_args=request.args, workspace=workspace)
+    actor = get_authn_username()
+    return rest_common.get_publications(LAYER_TYPE, actor, request_args=request.args, workspace=workspace)
 
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}", methods=['POST'])
 def post(workspace):
-    app.logger.info(f"POST Layers, user={g.user}")
+    app.logger.info(f"POST Layers, actor={g.user}")
 
     # FILE
     use_chunk_upload = False
@@ -180,7 +180,7 @@ def post(workspace):
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}", methods=['DELETE'])
 def delete(workspace):
-    app.logger.info(f"DELETE Layers, user={g.user}")
+    app.logger.info(f"DELETE Layers, actor={g.user}")
 
     infos = layman_util.delete_publications(workspace,
                                             LAYER_TYPE,

@@ -33,7 +33,7 @@ def after_request(response):
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['GET'])
 def get(workspace, layername):
     # pylint: disable=unused-argument
-    app.logger.info(f"GET Layer, user={g.user}")
+    app.logger.info(f"GET Layer, actor={g.user}")
 
     info = util.get_complete_layer_info(cached=True)
 
@@ -43,7 +43,7 @@ def get(workspace, layername):
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['PATCH'])
 @util.lock_decorator
 def patch(workspace, layername):
-    app.logger.info(f"PATCH Layer, user={g.user}")
+    app.logger.info(f"PATCH Layer, actor={g.user}")
 
     info = util.get_complete_layer_info(cached=True)
     kwargs = {
@@ -190,7 +190,7 @@ def patch(workspace, layername):
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['DELETE'])
 @util.lock_decorator
 def delete_layer(workspace, layername):
-    app.logger.info(f"DELETE Layer, user={g.user}")
+    app.logger.info(f"DELETE Layer, actor={g.user}")
 
     info = util.get_complete_layer_info(cached=True)
 

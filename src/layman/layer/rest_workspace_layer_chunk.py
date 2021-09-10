@@ -27,7 +27,7 @@ def after_request(response):
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/chunk", methods=['POST'])
 def post(workspace, layername):
-    app.logger.info(f"POST Layer Chunk, user={g.user}")
+    app.logger.info(f"POST Layer Chunk, actor={g.user}")
 
     total_chunks = request.form.get('resumableTotalChunks', type=int)
     if total_chunks > 999:
@@ -55,7 +55,7 @@ def post(workspace, layername):
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/chunk", methods=['GET'])
 def get(workspace, layername):
-    app.logger.info(f"GET Layer Chunk, user={g.user}")
+    app.logger.info(f"GET Layer Chunk, actor={g.user}")
 
     chunk_number = request.args.get('resumableChunkNumber', default=1,
                                     type=int)

@@ -31,13 +31,13 @@ def after_request(response):
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/thumbnail", methods=['GET'])
 def get(workspace, layername):
-    app.logger.info(f"GET Layer Thumbnail, user={g.user}")
+    app.logger.info(f"GET Layer Thumbnail, actor={g.user}")
 
     thumbnail_info = thumbnail.get_layer_info(workspace, layername)
     if thumbnail_info:
-        userdir = get_workspace_dir(workspace)
+        workspace_dir = get_workspace_dir(workspace)
         thumbnail_path = thumbnail_info['thumbnail']['path']
-        thumbnail_path = os.path.join(userdir, thumbnail_path)
+        thumbnail_path = os.path.join(workspace_dir, thumbnail_path)
         return send_file(thumbnail_path, mimetype='image/png')
 
     raise LaymanError(16, {'layername': layername})
