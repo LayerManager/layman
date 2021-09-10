@@ -20,14 +20,14 @@ patch_layer = empty_method
 get_metadata_comparison = empty_method_returns_dict
 
 
-def get_layer_input_style_dir(username, layername):
-    input_style_dir = os.path.join(util.get_layer_dir(username, layername),
+def get_layer_input_style_dir(workspace, layername):
+    input_style_dir = os.path.join(util.get_layer_dir(workspace, layername),
                                    LAYER_SUBDIR)
     return input_style_dir
 
 
-def ensure_layer_input_style_dir(username, layername):
-    input_style_dir = get_layer_input_style_dir(username, layername)
+def ensure_layer_input_style_dir(workspace, layername):
+    input_style_dir = get_layer_input_style_dir(workspace, layername)
     pathlib.Path(input_style_dir).mkdir(parents=True, exist_ok=True)
     return input_style_dir
 
@@ -40,8 +40,8 @@ def delete_layer(workspace, layername):
     util.delete_layer_subdir(workspace, layername, LAYER_SUBDIR)
 
 
-def get_file_path(username, layername, with_extension=True):
-    input_style_dir = get_layer_input_style_dir(username, layername)
+def get_file_path(workspace, layername, with_extension=True):
+    input_style_dir = get_layer_input_style_dir(workspace, layername)
     style_files = glob.glob(os.path.join(input_style_dir, layername + '.*'))
     if with_extension:
         result = style_files[0] if style_files else None
@@ -50,12 +50,12 @@ def get_file_path(username, layername, with_extension=True):
     return result
 
 
-def save_layer_file(username, layername, style_file, style_type):
-    delete_layer(username, layername)
+def save_layer_file(workspace, layername, style_file, style_type):
+    delete_layer(workspace, layername)
     if style_file:
-        style_path_clear = get_file_path(username, layername, with_extension=False)
+        style_path_clear = get_file_path(workspace, layername, with_extension=False)
         style_path = style_path_clear + '.' + style_type.extension
-        ensure_layer_input_style_dir(username, layername)
+        ensure_layer_input_style_dir(workspace, layername)
         if isinstance(style_file, FileStorage):
             style_file.save(style_path)
         else:
@@ -63,8 +63,8 @@ def save_layer_file(username, layername, style_file, style_type):
                 out.write(style_file.read())
 
 
-def get_layer_file(username, layername):
-    style_path = get_file_path(username, layername)
+def get_layer_file(workspace, layername):
+    style_path = get_file_path(workspace, layername)
 
     if style_path and os.path.exists(style_path):
         return open(style_path, 'rb')

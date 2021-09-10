@@ -19,14 +19,14 @@ patch_layer = empty_method
 get_metadata_comparison = empty_method_returns_dict
 
 
-def get_layer_input_file_dir(username, layername):
-    resumable_dir = os.path.join(util.get_layer_dir(username, layername),
+def get_layer_input_file_dir(workspace, layername):
+    resumable_dir = os.path.join(util.get_layer_dir(workspace, layername),
                                  LAYER_SUBDIR)
     return resumable_dir
 
 
-def ensure_layer_input_file_dir(username, layername):
-    input_file_dir = get_layer_input_file_dir(username, layername)
+def ensure_layer_input_file_dir(workspace, layername):
+    input_file_dir = get_layer_input_file_dir(workspace, layername)
     pathlib.Path(input_file_dir).mkdir(parents=True, exist_ok=True)
     return input_file_dir
 
@@ -76,8 +76,8 @@ def get_main_file_name(filenames):
                  in get_all_allowed_main_extensions()), None)
 
 
-def get_layer_main_file_path(username, layername):
-    input_file_dir = get_layer_input_file_dir(username, layername)
+def get_layer_main_file_path(workspace, layername):
+    input_file_dir = get_layer_input_file_dir(workspace, layername)
     pattern = os.path.join(input_file_dir, layername + '.*')
     filenames = glob.glob(pattern)
     return get_main_file_name(filenames)
@@ -152,7 +152,7 @@ def check_layer_crs(main_filepath):
         raise NotImplementedError(f"Unknown file type: {file_type}")
 
 
-def check_filenames(username, layername, filenames, check_crs, ignore_existing_files=False):
+def check_filenames(workspace, layername, filenames, check_crs, ignore_existing_files=False):
     main_files = [fn for fn in filenames if os.path.splitext(fn)[1] in get_all_allowed_main_extensions()]
     if len(main_files) > 1:
         raise LaymanError(2, {'parameter': 'file',
@@ -190,7 +190,7 @@ def check_filenames(username, layername, filenames, check_crs, ignore_existing_f
                 detail['suggestion'] = 'Missing .prj file can be fixed also ' \
                                        'by setting "crs" parameter.'
             raise LaymanError(18, detail)
-    input_file_dir = get_layer_input_file_dir(username, layername)
+    input_file_dir = get_layer_input_file_dir(workspace, layername)
     filename_mapping, _ = get_file_name_mappings(
         filenames, main_filename, layername, input_file_dir
     )
@@ -203,10 +203,10 @@ def check_filenames(username, layername, filenames, check_crs, ignore_existing_f
             raise LaymanError(3, conflict_paths)
 
 
-def save_layer_files(username, layername, files, check_crs, *, output_dir=None):
+def save_layer_files(workspace, layername, files, check_crs, *, output_dir=None):
     filenames = list(map(lambda f: f.filename, files))
     main_filename = get_main_file_name(filenames)
-    output_dir = output_dir or ensure_layer_input_file_dir(username, layername)
+    output_dir = output_dir or ensure_layer_input_file_dir(workspace, layername)
     _, filepath_mapping = get_file_name_mappings(
         filenames, main_filename, layername, output_dir
     )
