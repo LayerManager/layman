@@ -64,9 +64,9 @@ MIN_GEOJSON = """
 publication_counter = SimpleCounter()
 
 
-def check_metadata(client, username, layername, props_equal, expected_values):
+def check_metadata(client, workspace, layername, props_equal, expected_values):
     with app.app_context():
-        rest_path = url_for('rest_workspace_layer_metadata_comparison.get', workspace=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer_metadata_comparison.get', workspace=workspace, layername=layername)
         response = client.get(rest_path)
         assert response.status_code == 200, response.get_json()
         resp_json = response.get_json()
@@ -104,10 +104,10 @@ def app_context():
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
-def test_wrong_value_of_user(client):
-    usernames = [' ', '2a', 'ě', ';', '?', 'ABC']
-    for username in usernames:
-        response = client.post(url_for('rest_workspace_layers.post', workspace=username))
+def test_wrong_value_of_workspace(client):
+    workspaces = [' ', '2a', 'ě', ';', '?', 'ABC']
+    for workspace in workspaces:
+        response = client.post(url_for('rest_workspace_layers.post', workspace=workspace))
         resp_json = response.get_json()
         # print('username', username)
         # print(resp_json)
@@ -123,9 +123,9 @@ def test_layman_gs_user_conflict(client):
     See https://github.com/LayerManager/layman/pull/97
     """
 
-    username = settings.LAYMAN_GS_USER
+    workspace = settings.LAYMAN_GS_USER
     layername = 'layer1'
-    rest_path = url_for('rest_workspace_layers.post', workspace=username)
+    rest_path = url_for('rest_workspace_layers.post', workspace=workspace)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
     ]
@@ -148,15 +148,15 @@ def test_layman_gs_user_conflict(client):
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_wrong_value_of_layername(client):
-    username = 'test_wrong_value_of_layername_user'
+    workspace = 'test_wrong_value_of_layername_user'
     layername = 'layer1'
     # publish and delete layer to ensure that username exists
-    flask_client.publish_layer(username, layername, client)
-    flask_client.delete_layer(username, layername, client)
+    flask_client.publish_layer(workspace, layername, client)
+    flask_client.delete_layer(workspace, layername, client)
     layernames = [' ', '2a', 'ě', ';', '?', 'ABC']
     for layername in layernames:
         with app.app_context():
-            response = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername))
+            response = client.get(url_for('rest_workspace_layer.get', workspace=workspace, layername=layername))
         resp_json = response.get_json()
         assert response.status_code == 400, resp_json
         assert resp_json['code'] == 2
@@ -174,7 +174,7 @@ def test_no_file(client):
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
-def test_username_schema_conflict(client):
+def test_workspace_schema_conflict(client):
     if len(settings.PG_NON_USER_SCHEMAS) == 0:
         return
     response = client.post(url_for('rest_workspace_layers.post', workspace=settings.PG_NON_USER_SCHEMAS[0]))
@@ -225,12 +225,12 @@ def test_layername_db_object_conflict(client):
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_get_layers_testuser1_v1(client):
-    username = 'test_get_layers_testuser1_v1_user'
+    workspace = 'test_get_layers_testuser1_v1_user'
     layername = 'layer1'
     # publish and delete layer to ensure that username exists
-    flask_client.publish_layer(username, layername, client)
-    flask_client.delete_layer(username, layername, client)
-    response = client.get(url_for('rest_workspace_layers.get', workspace=username))
+    flask_client.publish_layer(workspace, layername, client)
+    flask_client.delete_layer(workspace, layername, client)
+    response = client.get(url_for('rest_workspace_layers.get', workspace=workspace))
     assert response.status_code == 200, response.get_json()
     # assert len(resp_json) == 0
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -241,9 +241,9 @@ def test_get_layers_testuser1_v1(client):
 @pytest.mark.usefixtures('ensure_layman')
 def test_post_layers_simple(client):
     with app.app_context():
-        username = 'testuser1'
+        workspace = 'testuser1'
 
-        rest_path = url_for('rest_workspace_layers.post', workspace=username)
+        rest_path = url_for('rest_workspace_layers.post', workspace=workspace)
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
         ]
@@ -262,9 +262,9 @@ def test_post_layers_simple(client):
 
         layername = 'ne_110m_admin_0_countries'
 
-        chain_info = util.get_layer_chain(username, layername)
+        chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
-        layer_info = util.get_layer_info(username, layername)
+        layer_info = util.get_layer_info(workspace, layername)
         keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
         for key_to_check in keys_to_check:
             assert 'status' in layer_info[key_to_check]
@@ -274,21 +274,21 @@ def test_post_layers_simple(client):
         # e.g. python3 -m pytest -W ignore::DeprecationWarning -xsvv src/layman/authn/oauth2_test.py::test_patch_current_user_without_username src/layman/layer/rest_workspace_test.py::test_post_layers_simple
         # this can badly affect also .get(propagate=False) in layman.celery.abort_task_chain
         # but hopefully this is only related to magic flask&celery test suite
-        flask_client.wait_till_layer_ready(username, layername)
+        flask_client.wait_till_layer_ready(workspace, layername)
 
-        layer_info = util.get_layer_info(username, layername)
+        layer_info = util.get_layer_info(workspace, layername)
         for key_to_check in keys_to_check:
             assert isinstance(layer_info[key_to_check], str) \
                 or 'status' not in layer_info[key_to_check]
 
-        wms_url = geoserver_wms.get_wms_url(username)
+        wms_url = geoserver_wms.get_wms_url(workspace)
         wms = wms_proxy(wms_url)
         assert layername in wms.contents
 
         from layman.layer import get_layer_type_def
         from layman.common.filesystem import uuid as common_uuid
         uuid_filename = common_uuid.get_publication_uuid_file(
-            get_layer_type_def()['type'], username, layername)
+            get_layer_type_def()['type'], workspace, layername)
         assert os.path.isfile(uuid_filename)
         uuid_str = None
         with open(uuid_filename, "r") as file:
@@ -297,18 +297,18 @@ def test_post_layers_simple(client):
         assert settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
         assert settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
         assert settings.LAYMAN_REDIS.hexists(
-            uuid.get_user_type_names_key(username, '.'.join(__name__.split('.')[:-1])),
+            uuid.get_user_type_names_key(workspace, '.'.join(__name__.split('.')[:-1])),
             layername
         )
 
-        layer_info = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername)).get_json()
+        layer_info = client.get(url_for('rest_workspace_layer.get', workspace=workspace, layername=layername)).get_json()
         assert set(layer_info['metadata'].keys()) == {'identifier', 'csw_url', 'record_url', 'comparison_url'}
         assert layer_info['metadata']['identifier'] == f"m-{uuid_str}"
         assert layer_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
         md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
         assert layer_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
         assert layer_info['metadata']['comparison_url'] == url_for_external('rest_workspace_layer_metadata_comparison.get',
-                                                                            workspace=username, layername=layername)
+                                                                            workspace=workspace, layername=layername)
         assert 'id' not in layer_info.keys()
         assert 'type' not in layer_info.keys()
 
@@ -325,13 +325,13 @@ def test_post_layers_simple(client):
         expected_md_values = {
             'abstract': None,
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
+            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
             'identifier': {
-                'identifier': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
+                'identifier': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
                 'label': 'ne_110m_admin_0_countries'
             },
             'language': ['eng'],
-            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
+            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -341,14 +341,14 @@ def test_post_layers_simple(client):
             },
             'title': 'ne_110m_admin_0_countries',
         }
-    check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(client, workspace, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 @pytest.mark.usefixtures('app_context')
 def test_post_layers_concurrent(client):
-    username = 'testuser1'
+    workspace = 'testuser1'
     layername = 'countries_concurrent'
-    rest_path = url_for('rest_workspace_layers.post', workspace=username)
+    rest_path = url_for('rest_workspace_layers.post', workspace=workspace)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
@@ -366,7 +366,7 @@ def test_post_layers_concurrent(client):
         for file_path in files:
             file_path[0].close()
 
-    chain_info = util.get_layer_chain(username, layername)
+    chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
 
     try:
@@ -390,8 +390,8 @@ def test_post_layers_concurrent(client):
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_shp_missing_extensions(client):
-    username = 'testuser1'
-    rest_path = url_for('rest_workspace_layers.post', workspace=username)
+    workspace = 'testuser1'
+    rest_path = url_for('rest_workspace_layers.post', workspace=workspace)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp',
@@ -423,9 +423,9 @@ def test_post_layers_shp_missing_extensions(client):
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_shp(client):
-    username = 'testuser1'
+    workspace = 'testuser1'
     layername = 'ne_110m_admin_0_countries_shp'
-    rest_path = url_for('rest_workspace_layers.post', workspace=username)
+    rest_path = url_for('rest_workspace_layers.post', workspace=workspace)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
@@ -449,12 +449,12 @@ def test_post_layers_shp(client):
         for file_path in files:
             file_path[0].close()
 
-    chain_info = util.get_layer_chain(username, layername)
+    chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
-    flask_client.wait_till_layer_ready(username, layername)
+    flask_client.wait_till_layer_ready(workspace, layername)
     # last_task['last'].get()
 
-    wms_url = geoserver_wms.get_wms_url(username)
+    wms_url = geoserver_wms.get_wms_url(workspace)
     wms = wms_proxy(wms_url)
     assert 'ne_110m_admin_0_countries_shp' in wms.contents
 
@@ -466,8 +466,8 @@ def test_post_layers_shp(client):
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_layer_exists(client):
-    username = 'testuser1'
-    rest_path = url_for('rest_workspace_layers.post', workspace=username)
+    workspace = 'testuser1'
+    rest_path = url_for('rest_workspace_layers.post', workspace=workspace)
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
     ]
@@ -494,8 +494,8 @@ def test_post_layers_layer_exists(client):
 @pytest.mark.usefixtures('ensure_layman')
 def test_post_layers_complex(client):
     with app.app_context():
-        username = 'testuser2'
-        rest_path = url_for('rest_workspace_layers.post', workspace=username)
+        workspace = 'testuser2'
+        rest_path = url_for('rest_workspace_layers.post', workspace=workspace)
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
         ]
@@ -522,21 +522,21 @@ def test_post_layers_complex(client):
             for file_path in files:
                 file_path[0].close()
 
-        chain_info = util.get_layer_chain(username, layername)
+        chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
-        flask_client.wait_till_layer_ready(username, layername)
+        flask_client.wait_till_layer_ready(workspace, layername)
         # last_task['last'].get()
         assert celery_util.is_chain_ready(chain_info)
 
-        wms_url = geoserver_wms.get_wms_url(username)
+        wms_url = geoserver_wms.get_wms_url(workspace)
         wms = wms_proxy(wms_url)
         assert 'countries' in wms.contents
         assert wms['countries'].title == 'staty'
         assert wms['countries'].abstract == 'popis států'
-        assert wms['countries'].styles[username + '_wms:countries']['title'] == 'Generic Blue'
+        assert wms['countries'].styles[workspace + '_wms:countries']['title'] == 'Generic Blue'
 
         assert layername != ''
-        rest_path = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.get', workspace=workspace, layername=layername)
         response = client.get(rest_path)
         assert 200 <= response.status_code < 300
         resp_json = response.get_json()
@@ -553,7 +553,7 @@ def test_post_layers_complex(client):
         ]:
             assert 'status' not in resp_json[source]
 
-        style_url = geoserver_sld.get_workspace_style_url(username, layername)
+        style_url = geoserver_sld.get_workspace_style_url(workspace, layername)
         response = requests.get(style_url + '.sld',
                                 auth=settings.LAYMAN_GS_AUTH
                                 )
@@ -563,7 +563,7 @@ def test_post_layers_complex(client):
         root = tree.getroot()
         assert root.attrib['version'] == '1.0.0'
 
-        feature_type = get_feature_type(username, 'postgresql', layername)
+        feature_type = get_feature_type(workspace, 'postgresql', layername)
         attributes = feature_type['attributes']['attribute']
         assert next((
             a for a in attributes if a['name'] == 'sovereignt'
@@ -578,13 +578,13 @@ def test_post_layers_complex(client):
         expected_md_values = {
             'abstract': "popis st\u00e1t\u016f",
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
+            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
             'identifier': {
-                "identifier": url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
+                "identifier": url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
                 "label": "countries"
             },
             'language': ["eng"],
-            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
+            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -594,14 +594,14 @@ def test_post_layers_complex(client):
             },
             'title': "staty",
         }
-    check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(client, workspace, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_uppercase_attr(client):
     with app.app_context():
-        username = 'testuser2'
-        rest_path = url_for('rest_workspace_layers.post', workspace=username)
+        workspace = 'testuser2'
+        rest_path = url_for('rest_workspace_layers.post', workspace=workspace)
         file_paths = [
             'sample/data/upper_attr.geojson',
         ]
@@ -625,14 +625,14 @@ def test_uppercase_attr(client):
             for file_path in files:
                 file_path[0].close()
 
-        chain_info = util.get_layer_chain(username, layername)
+        chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
-        flask_client.wait_till_layer_ready(username, layername)
+        flask_client.wait_till_layer_ready(workspace, layername)
         # last_task['last'].get()
         assert celery_util.is_chain_ready(chain_info)
 
     with app.app_context():
-        rest_path = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.get', workspace=workspace, layername=layername)
         response = client.get(rest_path)
         assert 200 <= response.status_code < 300
         resp_json = response.get_json()
@@ -647,7 +647,7 @@ def test_uppercase_attr(client):
         ]:
             assert 'status' not in resp_json[source], f"{source}: {resp_json[source]}"
 
-        style_url = geoserver_sld.get_workspace_style_url(username, layername)
+        style_url = geoserver_sld.get_workspace_style_url(workspace, layername)
         response = requests.get(style_url + '.sld',
                                 auth=settings.LAYMAN_GS_AUTH
                                 )
@@ -657,7 +657,7 @@ def test_uppercase_attr(client):
         root = tree.getroot()
         assert root.attrib['version'] == '1.0.0'
 
-        feature_type = get_feature_type(username, 'postgresql', layername)
+        feature_type = get_feature_type(workspace, 'postgresql', layername)
         attributes = feature_type['attributes']['attribute']
         attr_names = ["id", "dpr_smer_k", "fid_zbg", "silnice", "silnice_bs", "typsil_p", "cislouseku", "jmeno",
                       "typsil_k", "peazkom1", "peazkom2", "peazkom3", "peazkom4", "vym_tahy_k", "vym_tahy_p",
@@ -667,11 +667,11 @@ def test_uppercase_attr(client):
                 a for a in attributes if a['name'] == attr_name
             ), None) is not None
 
-        th_path = get_layer_thumbnail_path(username, layername)
+        th_path = get_layer_thumbnail_path(workspace, layername)
         assert os.path.getsize(th_path) > 5000
 
     with app.app_context():
-        rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.delete_layer', workspace=workspace, layername=layername)
         response = client.delete(rest_path)
         assert 200 <= response.status_code < 300
 
@@ -682,11 +682,11 @@ def test_uppercase_attr(client):
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_get_layers_testuser1_v2(client):
-    username = 'testuser1'
+    workspace = 'testuser1'
     layer1 = 'countries_concurrent'
     layer2 = 'ne_110m_admin_0_countries'
     layer3 = 'ne_110m_admin_0_countries_shp'
-    response = client.get(url_for('rest_workspace_layers.get', workspace=username))
+    response = client.get(url_for('rest_workspace_layers.get', workspace=workspace))
     assert response.status_code == 200
     resp_json = response.get_json()
     # assert len(resp_json) == 3
@@ -698,8 +698,8 @@ def test_get_layers_testuser1_v2(client):
     ]:
         assert layer in layernames
 
-    username = 'testuser2'
-    response = client.get(url_for('rest_workspace_layers.get', workspace=username))
+    workspace = 'testuser2'
+    response = client.get(url_for('rest_workspace_layers.get', workspace=workspace))
     resp_json = response.get_json()
     assert response.status_code == 200
     assert len(resp_json) == 1
@@ -713,9 +713,9 @@ def test_get_layers_testuser1_v2(client):
 @pytest.mark.usefixtures('ensure_layman')
 def test_patch_layer_title(client):
     with app.app_context():
-        username = 'testuser1'
+        workspace = 'testuser1'
         layername = 'ne_110m_admin_0_countries'
-        rest_path = url_for('rest_workspace_layer.patch', workspace=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.patch', workspace=workspace, layername=layername)
         new_title = "New Title of Countries"
         new_description = "and new description"
         response = client.patch(rest_path, data={
@@ -724,7 +724,7 @@ def test_patch_layer_title(client):
         })
         assert response.status_code == 200, response.get_json()
 
-        chain_info = util.get_layer_chain(username, layername)
+        chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and celery_util.is_chain_ready(chain_info)
 
         resp_json = response.get_json()
@@ -735,13 +735,13 @@ def test_patch_layer_title(client):
         expected_md_values = {
             'abstract': "and new description",
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
+            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
             'identifier': {
-                'identifier': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
+                'identifier': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
                 'label': 'ne_110m_admin_0_countries'
             },
             'language': ['eng'],
-            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
+            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -751,7 +751,7 @@ def test_patch_layer_title(client):
             },
             'title': "New Title of Countries",
         }
-        check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
+        check_metadata(client, workspace, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': publication_counter.get()
@@ -761,9 +761,9 @@ def test_patch_layer_title(client):
 @pytest.mark.usefixtures('ensure_layman')
 def test_patch_layer_style(client):
     with app.app_context():
-        username = 'testuser1'
+        workspace = 'testuser1'
         layername = 'ne_110m_admin_0_countries'
-        rest_path = url_for('rest_workspace_layer.patch', workspace=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.patch', workspace=workspace, layername=layername)
         sld_path = 'sample/style/generic-blue_sld.xml'
         assert os.path.isfile(sld_path)
         response = client.patch(rest_path, data={
@@ -782,18 +782,18 @@ def test_patch_layer_style(client):
         # keys_to_check = ['thumbnail']
         # for key_to_check in keys_to_check:
         #         assert 'status' in resp_json[key_to_check]
-        flask_client.wait_till_layer_ready(username, layername)
+        flask_client.wait_till_layer_ready(workspace, layername)
         # last_task['last'].get()
 
         resp_json = response.get_json()
         assert resp_json['title'] == "countries in blue"
 
-        wms_url = geoserver_wms.get_wms_url(username)
+        wms_url = geoserver_wms.get_wms_url(workspace)
         wms = wms_proxy(wms_url)
         assert layername in wms.contents
         assert wms[layername].title == 'countries in blue'
         assert wms[layername].styles[
-            username + '_wms:' + layername]['title'] == 'Generic Blue'
+            workspace + '_wms:' + layername]['title'] == 'Generic Blue'
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': publication_counter.get()
@@ -802,13 +802,13 @@ def test_patch_layer_style(client):
         expected_md_values = {
             'abstract': "and new description",
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
+            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
             'identifier': {
-                'identifier': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
+                'identifier': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
                 'label': 'ne_110m_admin_0_countries'
             },
             'language': ['eng'],
-            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
+            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -818,14 +818,14 @@ def test_patch_layer_style(client):
             },
             'title': 'countries in blue',
         }
-    check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(client, workspace, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_sld_1_1_0(client):
-    username = 'testuser1'
+    workspace = 'testuser1'
     layername = 'countries_sld_1_1_0'
-    rest_path = url_for('rest_workspace_layers.post', workspace=username, layername=layername)
+    rest_path = url_for('rest_workspace_layers.post', workspace=workspace, layername=layername)
 
     file_paths = [
         'sample/data/test_layer4.geojson',
@@ -850,18 +850,18 @@ def test_post_layers_sld_1_1_0(client):
         for file_path in files:
             file_path[0].close()
 
-    layer_info = util.get_layer_info(username, layername)
+    layer_info = util.get_layer_info(workspace, layername)
     while ('status' in layer_info['wms'] and layer_info['wms']['status'] in ['PENDING', 'STARTED'])\
             or ('status' in layer_info['style'] and layer_info['style']['status'] in ['PENDING', 'STARTED']):
         time.sleep(0.1)
-        layer_info = util.get_layer_info(username, layername)
+        layer_info = util.get_layer_info(workspace, layername)
 
-    wms_url = geoserver_wms.get_wms_url(username)
+    wms_url = geoserver_wms.get_wms_url(workspace)
     wms = wms_proxy(wms_url)
     assert layername in wms.contents
     assert wms[layername].title == 'countries_sld_1_1_0'
 
-    style_url = geoserver_sld.get_workspace_style_url(username, layername)
+    style_url = geoserver_sld.get_workspace_style_url(workspace, layername)
     response = requests.get(style_url + '.sld',
                             auth=settings.LAYMAN_GS_AUTH
                             )
@@ -882,7 +882,7 @@ def test_post_layers_sld_1_1_0(client):
         f'{LAYER_TYPE}': publication_counter.get()
     })
 
-    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
+    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=workspace, layername=layername)
     response = client.delete(rest_path)
     assert response.status_code == 200
 
@@ -895,9 +895,9 @@ def test_post_layers_sld_1_1_0(client):
 @pytest.mark.usefixtures('ensure_layman')
 def test_patch_layer_data(client):
     with app.app_context():
-        username = 'testuser2'
+        workspace = 'testuser2'
         layername = 'countries'
-        rest_path = url_for('rest_workspace_layer.patch', workspace=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.patch', workspace=workspace, layername=layername)
         file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
         ]
@@ -916,23 +916,23 @@ def test_patch_layer_data(client):
             for file_path in files:
                 file_path[0].close()
 
-        chain_info = util.get_layer_chain(username, layername)
+        chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
         resp_json = response.get_json()
         keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
         for key_to_check in keys_to_check:
             assert 'status' in resp_json[key_to_check]
-        flask_client.wait_till_layer_ready(username, layername)
+        flask_client.wait_till_layer_ready(workspace, layername)
         # last_task['last'].get()
 
     with app.app_context():
-        rest_path = url_for('rest_workspace_layer.get', workspace=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.get', workspace=workspace, layername=layername)
         response = client.get(rest_path)
         assert 200 <= response.status_code < 300
 
         resp_json = response.get_json()
         assert resp_json['title'] == "populated places"
-        feature_type = get_feature_type(username, 'postgresql', layername)
+        feature_type = get_feature_type(workspace, 'postgresql', layername)
         attributes = feature_type['attributes']['attribute']
         assert next((
             a for a in attributes if a['name'] == 'sovereignt'
@@ -949,13 +949,13 @@ def test_patch_layer_data(client):
         expected_md_values = {
             'abstract': "popis st\u00e1t\u016f",
             'extent': [-175.22056435043098, -41.29999116752133, 179.21664802661394, 64.15002486626597],
-            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=username, layername=layername),
+            'graphic_url': url_for_external('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
             'identifier': {
-                'identifier': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
+                'identifier': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
                 "label": "countries"
             },
             'language': ["eng", 'chi', 'rus'],
-            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=username, layername=layername),
+            'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [3857, 4326, 5514],
@@ -963,22 +963,22 @@ def test_patch_layer_data(client):
             'spatial_resolution': None,  # it's point data now and we can't guess scale from point data
             'title': 'populated places',
         }
-    check_metadata(client, username, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(client, workspace, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_patch_layer_concurrent_and_delete_it(client):
     with app.app_context():
-        username = 'testuser2'
+        workspace = 'testuser2'
         layername = 'countries'
-        rest_path = url_for('rest_workspace_layer.patch', workspace=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.patch', workspace=workspace, layername=layername)
         file_paths = [
             'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
         ]
         for file_path in file_paths:
             assert os.path.isfile(file_path)
 
-        uuid_str = layer_uuid.get_layer_uuid(username, layername)
+        uuid_str = layer_uuid.get_layer_uuid(workspace, layername)
         assert uuid.is_valid_uuid(uuid_str)
 
         files = []
@@ -998,7 +998,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
             f'{LAYER_TYPE}': publication_counter.get()
         })
 
-        chain_info = util.get_layer_chain(username, layername)
+        chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
 
     with app.app_context():
@@ -1020,19 +1020,19 @@ def test_patch_layer_concurrent_and_delete_it(client):
         })
 
     with app.app_context():
-        rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
+        rest_path = url_for('rest_workspace_layer.delete_layer', workspace=workspace, layername=layername)
         response = client.delete(rest_path)
         assert response.status_code == 200
 
         from layman.layer import get_layer_type_def
         from layman.common.filesystem import uuid as common_uuid
         uuid_filename = common_uuid.get_publication_uuid_file(
-            get_layer_type_def()['type'], username, layername)
+            get_layer_type_def()['type'], workspace, layername)
         assert not os.path.isfile(uuid_filename)
         assert not settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
         assert not settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
         assert not settings.LAYMAN_REDIS.hexists(
-            uuid.get_user_type_names_key(username, '.'.join(__name__.split('.')[:-1])),
+            uuid.get_user_type_names_key(workspace, '.'.join(__name__.split('.')[:-1])),
             layername
         )
 
@@ -1044,8 +1044,8 @@ def test_patch_layer_concurrent_and_delete_it(client):
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_layers_long_and_delete_it(client):
-    username = 'testuser1'
-    rest_path = url_for('rest_workspace_layers.post', workspace=username)
+    workspace = 'testuser1'
+    rest_path = url_for('rest_workspace_layers.post', workspace=workspace)
     file_paths = [
         'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
     ]
@@ -1066,17 +1066,17 @@ def test_post_layers_long_and_delete_it(client):
 
     time.sleep(1)
 
-    chain_info = util.get_layer_chain(username, layername)
+    chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
-    layer_info = util.get_layer_info(username, layername)
+    layer_info = util.get_layer_info(workspace, layername)
     keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
     for key_to_check in keys_to_check:
         assert 'status' in layer_info[key_to_check]
 
-    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
+    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=workspace, layername=layername)
     response = client.delete(rest_path)
     assert response.status_code == 200
-    response = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername))
+    response = client.get(url_for('rest_workspace_layer.get', workspace=workspace, layername=layername))
     # print(resp_json)
     assert response.status_code == 404
 
@@ -1087,9 +1087,9 @@ def test_post_layers_long_and_delete_it(client):
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_delete_layer(client):
-    username = 'testuser1'
+    workspace = 'testuser1'
     layername = 'ne_110m_admin_0_countries'
-    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
+    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=workspace, layername=layername)
     response = client.delete(rest_path)
     assert response.status_code == 200
 
@@ -1098,7 +1098,7 @@ def test_delete_layer(client):
         f'{LAYER_TYPE}': publication_counter.get()
     })
 
-    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=username, layername=layername)
+    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=workspace, layername=layername)
     response = client.delete(rest_path)
     assert response.status_code == 404
     resp_json = response.get_json()
@@ -1132,8 +1132,8 @@ def test_post_layers_zero_length_attribute():
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_get_layers_testuser2(client):
-    username = 'testuser2'
-    response = client.get(url_for('rest_workspace_layers.get', workspace=username))
+    workspace = 'testuser2'
+    response = client.get(url_for('rest_workspace_layers.get', workspace=workspace))
     assert response.status_code == 200
     resp_json = response.get_json()
     assert len(resp_json) == 0
@@ -1151,22 +1151,22 @@ def test_just_delete_layers(client):
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_layer_with_different_geometry():
-    username = 'testgeometryuser1'
+    workspace = 'testgeometryuser1'
     layername = 'layer_with_different_geometry'
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
     ]
-    process_client.publish_workspace_layer(username, layername, file_paths=file_paths)
+    process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths)
 
-    url_path_ows = urljoin(urljoin(settings.LAYMAN_GS_URL, username), 'ows?service=WFS&request=Transaction')
-    url_path_wfs = urljoin(urljoin(settings.LAYMAN_GS_URL, username), 'wfs?request=Transaction')
+    url_path_ows = urljoin(urljoin(settings.LAYMAN_GS_URL, workspace), 'ows?service=WFS&request=Transaction')
+    url_path_wfs = urljoin(urljoin(settings.LAYMAN_GS_URL, workspace), 'wfs?request=Transaction')
 
     headers_wfs = {
         'Accept': 'text/xml',
         'Content-type': 'text/xml',
     }
 
-    data_xml = data_wfs.get_wfs20_insert_points(username, layername)
+    data_xml = data_wfs.get_wfs20_insert_points(workspace, layername)
 
     response = requests.post(url_path_ows,
                              data=data_xml,
@@ -1182,7 +1182,7 @@ def test_layer_with_different_geometry():
                              )
     assert response.status_code == 200, f"HTTP Error {response.status_code}\n{response.text}"
 
-    data_xml2 = data_wfs.get_wfs20_insert_lines(username, layername)
+    data_xml2 = data_wfs.get_wfs20_insert_lines(workspace, layername)
 
     response = requests.post(url_path_ows,
                              data=data_xml2,
@@ -1197,4 +1197,4 @@ def test_layer_with_different_geometry():
                              auth=settings.LAYMAN_GS_AUTH
                              )
     assert response.status_code == 200, f"HTTP Error {response.status_code}\n{response.text}"
-    process_client.delete_workspace_layer(username, layername)
+    process_client.delete_workspace_layer(workspace, layername)
