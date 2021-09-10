@@ -333,7 +333,7 @@ limit 1
     order_by_prefix = ''.join([f"{method}(" for method in order_by_methods])
     order_by_suffix = ')' * len(order_by_methods)
 
-    query = query.format(username=workspace,
+    query = query.format(workspace=workspace,
                          layername=layername,
                          order_by_prefix=order_by_prefix,
                          order_by_suffix=order_by_suffix,

@@ -21,17 +21,17 @@ refresh_table_needed = empty_method_returns_true
 )
 def refresh_table(
         self,
-        username,
+        workspace,
         layername,
         crs_id=None,
         ensure_user=False
 ):
     if ensure_user:
-        db.ensure_workspace(username)
+        db.ensure_workspace(workspace)
     if self.is_aborted():
         raise AbortedException
 
-    file_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
+    file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
     if file_type == settings.FILE_TYPE_RASTER:
         return
     if file_type != settings.FILE_TYPE_VECTOR:
@@ -40,20 +40,20 @@ def refresh_table(
     if self.is_aborted():
         raise AbortedException
 
-    main_filepath = get_layer_main_file_path(username, layername)
-    process = db.import_layer_vector_file_async(username, layername, main_filepath, crs_id)
+    main_filepath = get_layer_main_file_path(workspace, layername)
+    process = db.import_layer_vector_file_async(workspace, layername, main_filepath, crs_id)
     while process.poll() is None and not self.is_aborted():
         pass
     if self.is_aborted():
-        logger.info(f'terminating {username} {layername}')
+        logger.info(f'terminating {workspace} {layername}')
         process.terminate()
-        logger.info(f'terminating {username} {layername}')
-        table.delete_layer(username, layername)
+        logger.info(f'terminating {workspace} {layername}')
+        table.delete_layer(workspace, layername)
         raise AbortedException
     return_code = process.poll()
     output = process.stdout.read()
     if return_code != 0 or output:
-        info = table.get_layer_info(username, layername)
+        info = table.get_layer_info(workspace, layername)
         if not info:
             pg_error = str(output)
             logger.error(f"STDOUT: {pg_error}")
