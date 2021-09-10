@@ -25,134 +25,150 @@ def client():
         yield client
 
 
-@pytest.fixture(scope="module")
-def testuser1():
-    username = 'db_testuser'
-    db.ensure_whole_user(username)
-    yield username
-    db.delete_whole_user(username)
+WORKSPACE = 'db_testuser'
 
 
 @pytest.fixture()
-def boundary_table(testuser1):
+def boundary_table():
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp'
-    username = testuser1
+    workspace = WORKSPACE
     layername = 'hranice'
-    db.import_layer_vector_file(username, layername, file_path, None)
-    yield username, layername
-    delete_layer(username, layername)
+    db.ensure_workspace(workspace)
+    ensure_layer_input_file_dir(workspace, layername)
+    db.import_layer_vector_file(workspace, layername, file_path, None)
+    yield workspace, layername
+    delete_layer(workspace, layername)
 
 
 @pytest.fixture()
-def road_table(testuser1):
+def road_table():
     file_path = 'sample/data/upper_attr.geojson'
-    username = testuser1
+    workspace = WORKSPACE
     layername = 'silnice'
-    db.import_layer_vector_file(username, layername, file_path, None)
-    yield username, layername
-    delete_layer(username, layername)
+    db.ensure_workspace(workspace)
+    ensure_layer_input_file_dir(workspace, layername)
+    db.import_layer_vector_file(workspace, layername, file_path, None)
+    yield workspace, layername
+    delete_layer(workspace, layername)
 
 
 @pytest.fixture()
-def country_table(testuser1):
+def country_table():
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp'
-    username = testuser1
+    workspace = WORKSPACE
     layername = 'staty'
-    db.import_layer_vector_file(username, layername, file_path, None)
-    yield username, layername
-    delete_layer(username, layername)
+    db.ensure_workspace(workspace)
+    ensure_layer_input_file_dir(workspace, layername)
+    db.import_layer_vector_file(workspace, layername, file_path, None)
+    yield workspace, layername
+    delete_layer(workspace, layername)
 
 
 @pytest.fixture()
-def country110m_table(testuser1):
+def country110m_table():
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
-    username = testuser1
+    workspace = WORKSPACE
     layername = 'staty110m'
-    db.import_layer_vector_file(username, layername, file_path, None)
-    yield username, layername
-    delete_layer(username, layername)
+    db.ensure_workspace(workspace)
+    ensure_layer_input_file_dir(workspace, layername)
+    db.import_layer_vector_file(workspace, layername, file_path, None)
+    yield workspace, layername
+    delete_layer(workspace, layername)
 
 
 @pytest.fixture()
-def country50m_table(testuser1):
+def country50m_table():
     file_path = 'tmp/naturalearth/50m/cultural/ne_50m_admin_0_countries.geojson'
-    username = testuser1
+    workspace = WORKSPACE
     layername = 'staty50m'
-    db.import_layer_vector_file(username, layername, file_path, None)
-    yield username, layername
-    delete_layer(username, layername)
+    db.ensure_workspace(workspace)
+    ensure_layer_input_file_dir(workspace, layername)
+    db.import_layer_vector_file(workspace, layername, file_path, None)
+    yield workspace, layername
+    delete_layer(workspace, layername)
 
 
 @pytest.fixture()
-def country10m_table(testuser1):
+def country10m_table():
     file_path = 'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson'
-    username = testuser1
+    workspace = WORKSPACE
     layername = 'staty10m'
-    db.import_layer_vector_file(username, layername, file_path, None)
-    yield username, layername
-    delete_layer(username, layername)
+    db.ensure_workspace(workspace)
+    ensure_layer_input_file_dir(workspace, layername)
+    db.import_layer_vector_file(workspace, layername, file_path, None)
+    yield workspace, layername
+    delete_layer(workspace, layername)
 
 
 @pytest.fixture()
-def data200road_table(testuser1):
+def data200road_table():
     file_path = 'tmp/data200/trans/RoadL.shp'
-    username = testuser1
+    workspace = WORKSPACE
     layername = 'data200_road'
-    db.import_layer_vector_file(username, layername, file_path, None)
-    yield username, layername
-    delete_layer(username, layername)
+    db.ensure_workspace(workspace)
+    ensure_layer_input_file_dir(workspace, layername)
+    db.import_layer_vector_file(workspace, layername, file_path, None)
+    yield workspace, layername
+    delete_layer(workspace, layername)
 
 
 @pytest.fixture()
-def sm5building_table(testuser1):
+def sm5building_table():
     file_path = 'tmp/sm5/vektor/Budova.shp'
-    username = testuser1
+    workspace = WORKSPACE
     layername = 'sm5_building'
-    db.import_layer_vector_file(username, layername, file_path, None)
-    yield username, layername
-    delete_layer(username, layername)
+    db.ensure_workspace(workspace)
+    ensure_layer_input_file_dir(workspace, layername)
+    db.import_layer_vector_file(workspace, layername, file_path, None)
+    yield workspace, layername
+    delete_layer(workspace, layername)
 
 
 @pytest.fixture()
-def populated_places_table(testuser1):
+def populated_places_table():
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson'
-    username = testuser1
+    workspace = WORKSPACE
     layername = 'ne_110m_populated_places'
-    db.import_layer_vector_file(username, layername, file_path, None)
-    yield username, layername
-    delete_layer(username, layername)
+    db.ensure_workspace(workspace)
+    ensure_layer_input_file_dir(workspace, layername)
+    db.import_layer_vector_file(workspace, layername, file_path, None)
+    yield workspace, layername
+    delete_layer(workspace, layername)
 
 
 @pytest.fixture()
-def empty_table(testuser1):
+def empty_table():
     file_path = 'sample/layman.layer/empty.shp'
-    username = testuser1
+    workspace = WORKSPACE
     layername = 'empty'
+    db.ensure_workspace(workspace)
+    ensure_layer_input_file_dir(workspace, layername)
     with layman.app_context():
-        db.import_layer_vector_file(username, layername, file_path, None)
-    yield username, layername
+        db.import_layer_vector_file(workspace, layername, file_path, None)
+    yield workspace, layername
     with layman.app_context():
-        delete_layer(username, layername)
+        delete_layer(workspace, layername)
 
 
 @pytest.fixture()
-def single_point_table(testuser1):
+def single_point_table():
     file_path = 'sample/layman.layer/single_point.shp'
-    username = testuser1
+    workspace = WORKSPACE
     layername = 'single_point'
+    ensure_layer_input_file_dir(workspace, layername)
     with layman.app_context():
-        db.import_layer_vector_file(username, layername, file_path, None)
-    yield username, layername
+        db.import_layer_vector_file(workspace, layername, file_path, None)
+    yield workspace, layername
     with layman.app_context():
-        delete_layer(username, layername)
+        delete_layer(workspace, layername)
 
 
 @pytest.mark.usefixtures('client')
 def test_abort_import_layer_vector_file():
-    username = 'testuser1'
+    workspace = 'testuser1'
     layername = 'ne_10m_admin_0_countries'
     src_dir = 'tmp/naturalearth/10m/cultural'
-    input_file_dir = ensure_layer_input_file_dir(username, layername)
+    input_file_dir = ensure_layer_input_file_dir(workspace, layername)
     filename = layername + '.geojson'
     main_filepath = os.path.join(input_file_dir, filename)
 
@@ -163,7 +179,7 @@ def test_abort_import_layer_vector_file():
     )
 
     def abort_layer_import():
-        process = db.import_layer_vector_file_async(username, layername, main_filepath,
+        process = db.import_layer_vector_file_async(workspace, layername, main_filepath,
                                                     crs_id)
         time1 = time.time()
         while process.poll() is None:
@@ -177,28 +193,28 @@ def test_abort_import_layer_vector_file():
 
     return_code = abort_layer_import()
     assert return_code != 0
-    layerdir = get_layer_dir(username, layername)
+    layerdir = get_layer_dir(workspace, layername)
     shutil.rmtree(layerdir)
 
 
 @pytest.mark.usefixtures('client')
 def test_data_language(boundary_table):
-    username, layername = boundary_table
+    workspace, layername = boundary_table
     # print(f"username={username}, layername={layername}")
-    col_names = db.get_text_column_names(username, layername)
+    col_names = db.get_text_column_names(workspace, layername)
     assert set(col_names) == set(['featurecla', 'name', 'name_alt'])
-    text_data, _ = db.get_text_data(username, layername)
+    text_data, _ = db.get_text_data(workspace, layername)
     # print(f"num_rows={num_rows}")
     assert len(text_data) == 1
     assert text_data[0].startswith(' '.join(['International boundary (verify)'] * 100))
-    langs = db.get_text_languages(username, layername)
+    langs = db.get_text_languages(workspace, layername)
     assert langs == ['eng']
 
 
 def test_data_language_roads(road_table):
-    username, layername = road_table
+    workspace, layername = road_table
     # print(f"username={username}, layername={layername}")
-    col_names = db.get_text_column_names(username, layername)
+    col_names = db.get_text_column_names(workspace, layername)
     assert set(col_names) == set([
         'cislouseku',
         'dpr_smer_p',
@@ -222,26 +238,26 @@ def test_data_language_roads(road_table):
         'vym_tahy_k',
         'vym_tahy_p'
     ])
-    langs = db.get_text_languages(username, layername)
+    langs = db.get_text_languages(workspace, layername)
     assert langs == ['cze']
 
 
 @pytest.mark.usefixtures('client')
 def test_populated_places_table(populated_places_table):
-    username, layername = populated_places_table
-    print(f"username={username}, layername={layername}")
-    col_names = db.get_text_column_names(username, layername)
+    workspace, layername = populated_places_table
+    print(f"username={workspace}, layername={layername}")
+    col_names = db.get_text_column_names(workspace, layername)
     assert len(col_names) == 31
-    langs = db.get_text_languages(username, layername)
+    langs = db.get_text_languages(workspace, layername)
     assert set(langs) == set(['chi', 'eng', 'rus'])
 
 
 def test_data_language_countries(country_table):
-    username, layername = country_table
+    workspace, layername = country_table
     # print(f"username={username}, layername={layername}")
-    col_names = db.get_text_column_names(username, layername)
+    col_names = db.get_text_column_names(workspace, layername)
     assert len(col_names) == 63
-    langs = db.get_text_languages(username, layername)
+    langs = db.get_text_languages(workspace, layername)
     assert set(langs) == set([
         'ara',
         'ben',
@@ -262,49 +278,49 @@ def test_data_language_countries(country_table):
 
 
 def test_data_language_countries2(country110m_table):
-    username, layername = country110m_table
+    workspace, layername = country110m_table
     # print(f"username={username}, layername={layername}")
     # col_names = db.get_text_column_names(username, layername)
     # print(col_names)
     # assert len(col_names) == 63
-    langs = db.get_text_languages(username, layername)
+    langs = db.get_text_languages(workspace, layername)
     assert set(langs) == set(['eng'])
 
 
 @pytest.mark.usefixtures('client')
 def test_get_most_frequent_lower_distance(country110m_table, country50m_table, country10m_table,
                                           data200road_table, sm5building_table):
-    username, layername_110m = country110m_table
-    username, layername_50m = country50m_table
-    username, layername_10m = country10m_table
-    username, layername_200k = data200road_table
-    username, layername_5k = sm5building_table
-    sd_110m = db.guess_scale_denominator(username, layername_110m)
+    _, layername_110m = country110m_table
+    _, layername_50m = country50m_table
+    _, layername_10m = country10m_table
+    _, layername_200k = data200road_table
+    workspace, layername_5k = sm5building_table
+    sd_110m = db.guess_scale_denominator(workspace, layername_110m)
     assert 25000000 <= sd_110m <= 500000000
     assert sd_110m == 100000000
-    sd_50m = db.guess_scale_denominator(username, layername_50m)
+    sd_50m = db.guess_scale_denominator(workspace, layername_50m)
     assert 10000000 <= sd_50m <= 250000000
     assert sd_50m == 10000000
-    sd_10m = db.guess_scale_denominator(username, layername_10m)
+    sd_10m = db.guess_scale_denominator(workspace, layername_10m)
     assert 2500000 <= sd_10m <= 50000000
     assert sd_10m == 2500000
-    sd_200k = db.guess_scale_denominator(username, layername_200k)
+    sd_200k = db.guess_scale_denominator(workspace, layername_200k)
     assert 50000 <= sd_200k <= 1000000
     assert sd_200k == 250000
-    sd_5k = db.guess_scale_denominator(username, layername_5k)
+    sd_5k = db.guess_scale_denominator(workspace, layername_5k)
     assert 1000 <= sd_5k <= 25000
     assert sd_5k == 5000
 
 
 def test_empty_table_bbox(empty_table):
-    username, layername = empty_table
+    workspace, layername = empty_table
     with layman.app_context():
-        bbox = db.get_bbox(username, layername)
+        bbox = db.get_bbox(workspace, layername)
     assert bbox_util.is_empty(bbox), bbox
 
 
 def test_single_point_table_bbox(single_point_table):
-    username, layername = single_point_table
+    workspace, layername = single_point_table
     with layman.app_context():
-        bbox = db.get_bbox(username, layername)
+        bbox = db.get_bbox(workspace, layername)
     assert bbox[0] == bbox[2] and bbox[1] == bbox[3], bbox
