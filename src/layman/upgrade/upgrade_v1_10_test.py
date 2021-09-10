@@ -45,31 +45,31 @@ def publications_constraint():
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_check_workspace_names_wms_suffix():
-    username = 'test_check_workspace_names_wms_suffix'
-    username_wms = 'test_check_workspace_names_wms_suffix' + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
+    workspace = 'test_check_workspace_names_wms_suffix'
+    workspace_wms = 'test_check_workspace_names_wms_suffix' + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
 
     with app.app_context():
-        prime_db_schema.ensure_workspace(username)
+        prime_db_schema.ensure_workspace(workspace)
         upgrade_v1_10.check_workspace_names()
 
-        prime_db_schema.ensure_workspace(username_wms)
+        prime_db_schema.ensure_workspace(workspace_wms)
         with pytest.raises(LaymanError) as exc_info:
             upgrade_v1_10.check_workspace_names()
-        assert exc_info.value.data['workspace'] == username_wms
-        prime_db_schema.delete_workspace(username)
-        prime_db_schema.delete_workspace(username_wms)
+        assert exc_info.value.data['workspace'] == workspace_wms
+        prime_db_schema.delete_workspace(workspace)
+        prime_db_schema.delete_workspace(workspace_wms)
 
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_check_workspace_names_workspaces():
-    username = 'workspaces'
+    workspace = 'workspaces'
 
     with app.app_context():
-        prime_db_schema.ensure_workspace(username)
+        prime_db_schema.ensure_workspace(workspace)
         with pytest.raises(LaymanError) as exc_info:
             upgrade_v1_10.check_workspace_names()
-        assert exc_info.value.data['workspace'] == username
-        prime_db_schema.delete_workspace(username)
+        assert exc_info.value.data['workspace'] == workspace
+        prime_db_schema.delete_workspace(workspace)
 
 
 @pytest.fixture()
