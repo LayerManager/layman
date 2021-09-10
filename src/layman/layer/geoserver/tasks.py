@@ -22,7 +22,7 @@ refresh_sld_needed = empty_method_returns_true
 )
 def refresh_wms(
         self,
-        username,
+        workspace,
         layername,
         store_in_geoserver,
         description=None,
@@ -30,14 +30,14 @@ def refresh_wms(
         ensure_user=False,
         access_rights=None,
 ):
-    info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file', 'bounding_box']})
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'bounding_box']})
     file_type = info['file']['file_type']
 
     assert description is not None
     assert title is not None
-    geoserver_workspace = wms.get_geoserver_workspace(username)
+    geoserver_workspace = wms.get_geoserver_workspace(workspace)
     if ensure_user:
-        geoserver.ensure_workspace(username)
+        geoserver.ensure_workspace(workspace)
 
     if self.is_aborted():
         raise AbortedException
@@ -47,7 +47,7 @@ def refresh_wms(
         if store_in_geoserver:
             gs_util.delete_wms_layer(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
             gs_util.delete_wms_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, wms.get_qgis_store_name(layername))
-            geoserver.publish_layer_from_db(username,
+            geoserver.publish_layer_from_db(workspace,
                                             layername,
                                             description,
                                             title,
@@ -55,7 +55,7 @@ def refresh_wms(
                                             )
         else:
             gs_util.delete_feature_type(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
-            geoserver.publish_layer_from_qgis(username,
+            geoserver.publish_layer_from_qgis(workspace,
                                               layername,
                                               description,
                                               title,
@@ -71,12 +71,12 @@ def refresh_wms(
     else:
         raise NotImplementedError(f"Unknown file type: {file_type}")
 
-    geoserver.set_security_rules(username, layername, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
+    geoserver.set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 
-    wms.clear_cache(username)
+    wms.clear_cache(workspace)
 
     if self.is_aborted():
-        wms.delete_layer(username, layername)
+        wms.delete_layer(workspace, layername)
         raise AbortedException
 
 
@@ -87,14 +87,14 @@ def refresh_wms(
 )
 def refresh_wfs(
         self,
-        username,
+        workspace,
         layername,
         description=None,
         title=None,
         ensure_user=False,
         access_rights=None,
 ):
-    file_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
+    file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
     if file_type == settings.FILE_TYPE_RASTER:
         return
     if file_type != settings.FILE_TYPE_VECTOR:
@@ -103,16 +103,16 @@ def refresh_wfs(
     assert description is not None
     assert title is not None
     if ensure_user:
-        geoserver.ensure_workspace(username)
+        geoserver.ensure_workspace(workspace)
 
     if self.is_aborted():
         raise AbortedException
-    geoserver.publish_layer_from_db(username, layername, description, title)
-    geoserver.set_security_rules(username, layername, access_rights, settings.LAYMAN_GS_AUTH, username)
-    wfs.clear_cache(username)
+    geoserver.publish_layer_from_db(workspace, layername, description, title)
+    geoserver.set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, workspace)
+    wfs.clear_cache(workspace)
 
     if self.is_aborted():
-        wfs.delete_layer(username, layername)
+        wfs.delete_layer(workspace, layername)
         raise AbortedException
 
 
@@ -121,12 +121,12 @@ def refresh_wfs(
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_sld(self, username, layername, store_in_geoserver):
+def refresh_sld(self, workspace, layername, store_in_geoserver):
     if self.is_aborted():
         raise AbortedException
     if store_in_geoserver:
-        sld.create_layer_style(username, layername)
+        sld.create_layer_style(workspace, layername)
 
     if self.is_aborted():
-        sld.delete_layer(username, layername)
+        sld.delete_layer(workspace, layername)
         raise AbortedException

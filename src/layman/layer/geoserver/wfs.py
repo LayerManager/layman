@@ -12,7 +12,7 @@ from layman.layer import LAYER_TYPE
 from .util import get_gs_proxy_base_url
 from . import wms
 
-FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
+FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = '2.0.0'
@@ -22,8 +22,8 @@ pre_publication_action_check = empty_method
 post_layer = empty_method
 
 
-def get_flask_proxy_key(username):
-    return FLASK_PROXY_KEY.format(username=username)
+def get_flask_proxy_key(workspace):
+    return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
 def patch_layer(workspace, layername, title, description, access_rights=None):
@@ -60,25 +60,25 @@ def get_wfs_url(workspace, external_url=False):
     return urljoin(base_url, workspace + '/wfs')
 
 
-def get_wfs_direct(username):
+def get_wfs_direct(workspace):
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
-    ows_url = get_wfs_url(username)
+    ows_url = get_wfs_url(workspace)
     from .util import wfs_direct
-    key = get_flask_proxy_key(username)
+    key = get_flask_proxy_key(workspace)
     redis_obj = settings.LAYMAN_REDIS.hgetall(key)
     string_value = redis_obj['value'] if redis_obj else None
     return wfs_direct(ows_url, xml=string_value, headers=headers)
 
 
-def get_wfs_proxy(username):
+def get_wfs_proxy(workspace):
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
-    key = get_flask_proxy_key(username)
+    key = get_flask_proxy_key(workspace)
 
-    ows_url = get_wfs_url(username)
+    ows_url = get_wfs_url(workspace)
 
     def create_string_value():
         response = requests.get(ows_url, params={
@@ -102,9 +102,9 @@ def get_wfs_proxy(username):
         return wfs_proxy
 
     def currently_changing():
-        layerinfos = layman_util.get_publication_infos(username, LAYER_TYPE)
+        layerinfos = layman_util.get_publication_infos(workspace, LAYER_TYPE)
         result = any((
-            not is_layer_chain_ready(username, layername)
+            not is_layer_chain_ready(workspace, layername)
             for (_, _, layername) in layerinfos
         ))
         return result
@@ -114,8 +114,8 @@ def get_wfs_proxy(username):
     return wfs_proxy
 
 
-def clear_cache(username):
-    key = get_flask_proxy_key(username)
+def clear_cache(workspace):
+    key = get_flask_proxy_key(workspace)
     mem_redis.delete(key)
 
 
@@ -198,7 +198,7 @@ def add_capabilities_params_to_url(url):
     return url
 
 
-def get_capabilities_url(username):
-    url = get_wfs_url(username, external_url=True)
+def get_capabilities_url(workspace):
+    url = get_wfs_url(workspace, external_url=True)
     url = add_capabilities_params_to_url(url)
     return url
