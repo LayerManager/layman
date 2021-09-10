@@ -11,7 +11,7 @@ from layman.layer.util import is_layer_chain_ready
 from layman.layer import LAYER_TYPE
 from .util import get_gs_proxy_base_url
 
-FLASK_PROXY_KEY = f'{__name__}:PROXY:{{username}}'
+FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
 DEFAULT_WMS_QGIS_STORE_PREFIX = 'qgis'
 DEFAULT_GEOTIFF_STORE_PREFIX = 'geotiff'
 
@@ -23,8 +23,8 @@ post_layer = empty_method
 get_publication_uuid = empty_method_returns_none
 
 
-def get_flask_proxy_key(username):
-    return FLASK_PROXY_KEY.format(username=username)
+def get_flask_proxy_key(workspace):
+    return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
 def patch_layer(workspace, layername, title, description, access_rights=None):
@@ -71,25 +71,25 @@ def get_wms_url(workspace, external_url=False):
     return urljoin(base_url, geoserver_workspace + '/ows')
 
 
-def get_wms_direct(username):
+def get_wms_direct(workspace):
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
-    ows_url = get_wms_url(username)
+    ows_url = get_wms_url(workspace)
     from .util import wms_direct
-    key = get_flask_proxy_key(username)
+    key = get_flask_proxy_key(workspace)
     redis_obj = settings.LAYMAN_REDIS.hgetall(key)
     string_value = redis_obj['value'] if redis_obj else None
     return wms_direct(ows_url, xml=string_value, headers=headers)
 
 
-def get_wms_proxy(username):
+def get_wms_proxy(workspace):
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
-    key = get_flask_proxy_key(username)
+    key = get_flask_proxy_key(workspace)
 
-    ows_url = get_wms_url(username)
+    ows_url = get_wms_url(workspace)
 
     def create_string_value():
         response = requests.get(ows_url, params={
@@ -113,9 +113,9 @@ def get_wms_proxy(username):
         return wms_proxy
 
     def currently_changing():
-        layerinfos = layman_util.get_publication_infos(username, LAYER_TYPE)
+        layerinfos = layman_util.get_publication_infos(workspace, LAYER_TYPE)
         result = any((
-            not is_layer_chain_ready(username, layername)
+            not is_layer_chain_ready(workspace, layername)
             for (_, _, layername) in layerinfos
         ))
         return result
@@ -124,8 +124,8 @@ def get_wms_proxy(username):
     return wms_proxy
 
 
-def clear_cache(username):
-    key = get_flask_proxy_key(username)
+def clear_cache(workspace):
+    key = get_flask_proxy_key(workspace)
     mem_redis.delete(key)
 
 
@@ -225,8 +225,8 @@ def add_capabilities_params_to_url(url):
     return url
 
 
-def get_capabilities_url(username):
-    url = get_wms_url(username, external_url=True)
+def get_capabilities_url(workspace):
+    url = get_wms_url(workspace, external_url=True)
     url = add_capabilities_params_to_url(url)
     return url
 
