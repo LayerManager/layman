@@ -102,8 +102,8 @@ def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_nam
     return muuid
 
 
-def csw_insert(username, mapname, actor_name):
-    template_path, prop_values = get_template_path_and_values(username, mapname, http_method=common.REQUEST_METHOD_POST, actor_name=actor_name)
+def csw_insert(workspace, mapname, actor_name):
+    template_path, prop_values = get_template_path_and_values(workspace, mapname, http_method=common.REQUEST_METHOD_POST, actor_name=actor_name)
     record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
     try:
         muuid = common_util.csw_insert({
@@ -132,10 +132,10 @@ def map_json_to_operates_on(map_json, operates_on_muuids_filter=None, editor=Non
         match = re.match(gs_wms_url_pattern, layer_url)
         if not match:
             continue
-        layer_username = match.group(1)
-        if not layer_username:
+        layer_workspace = match.group(1)
+        if not layer_workspace:
             continue
-        # print(f"layer_username={layer_username}")
+        # print(f"layer_workspace={layer_workspace}")
         layer_names = [
             n for n in map_layer.get('params', {}).get('LAYERS', '').split(',')
             if len(n) > 0
@@ -143,19 +143,19 @@ def map_json_to_operates_on(map_json, operates_on_muuids_filter=None, editor=Non
         if not layer_names:
             continue
         for layername in layer_names:
-            layman_layer_names.append((layer_username, layername))
+            layman_layer_names.append((layer_workspace, layername))
     operates_on = []
     csw_url = settings.CSW_PROXY_URL
-    for (layer_username, layername) in layman_layer_names:
-        layer_md_info = get_publication_info(layer_username, LAYER_TYPE, layername, context={'keys': ['metadata', ], })
+    for (layer_workspace, layername) in layman_layer_names:
+        layer_md_info = get_publication_info(layer_workspace, LAYER_TYPE, layername, context={'keys': ['metadata', ], })
         layer_muuid = layer_md_info.get('metadata', {}).get('identifier')
         if operates_on_muuids_filter is not None:
             if layer_muuid not in operates_on_muuids_filter:
                 continue
-            layer_wms_info = get_publication_info(layer_username, LAYER_TYPE, layername, context={'keys': ['wms', ], })
+            layer_wms_info = get_publication_info(layer_workspace, LAYER_TYPE, layername, context={'keys': ['wms', ], })
         else:
-            layer_wms_info = get_publication_info(layer_username, LAYER_TYPE, layername, context={'keys': ['wfs', ],
-                                                                                                  'actor_name': editor, })
+            layer_wms_info = get_publication_info(layer_workspace, LAYER_TYPE, layername, context={'keys': ['wfs', ],
+                                                                                                   'actor_name': editor, })
             if not (layer_muuid and layer_wms_info):
                 continue
         layer_title = layer_wms_info['title']
@@ -176,14 +176,14 @@ def map_json_to_epsg_codes(map_json):
     return [epsg_code] if epsg_code else None
 
 
-def get_template_path_and_values(username, mapname, http_method=None, actor_name=None):
+def get_template_path_and_values(workspace, mapname, http_method=None, actor_name=None):
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
-    uuid_file_path = get_publication_uuid_file(MAP_TYPE, username, mapname)
+    uuid_file_path = get_publication_uuid_file(MAP_TYPE, workspace, mapname)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
     revision_date = datetime.now()
-    map_json = get_map_json(username, mapname)
+    map_json = get_map_json(workspace, mapname)
     operates_on = map_json_to_operates_on(map_json, editor=actor_name)
-    publ_info = get_publication_info(username, MAP_TYPE, mapname, context={
+    publ_info = get_publication_info(workspace, MAP_TYPE, mapname, context={
         'keys': ['title', 'bounding_box', 'description'],
     })
     bbox_3857 = publ_info.get('bounding_box')
@@ -198,15 +198,15 @@ def get_template_path_and_values(username, mapname, http_method=None, actor_name
     ]))), None)
 
     prop_values = _get_property_values(
-        username=username,
+        workspace=workspace,
         mapname=mapname,
-        uuid=get_map_uuid(username, mapname),
+        uuid=get_map_uuid(workspace, mapname),
         title=title,
         abstract=abstract or None,
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         revision_date=revision_date.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
-        identifier=url_for('rest_workspace_map.get', workspace=username, mapname=mapname),
+        identifier=url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname),
         identifier_label=mapname,
         extent=extent,
         epsg_codes=map_json_to_epsg_codes(map_json),
@@ -222,7 +222,7 @@ def get_template_path_and_values(username, mapname, http_method=None, actor_name
 
 
 def _get_property_values(
-        username='browser',
+        workspace='browser',
         mapname='map',
         uuid='af238200-8200-1a23-9399-42c9fca53543',
         title='Administrativní členění Libereckého kraje',
@@ -266,11 +266,11 @@ def _get_property_values(
             'label': identifier_label,
         },
         'abstract': abstract,
-        'graphic_url': url_for('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
+        'graphic_url': url_for('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname),
         'extent': extent,
 
-        'map_endpoint': escape(url_for('rest_workspace_map.get', workspace=username, mapname=mapname)),
-        'map_file_endpoint': escape(url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname)),
+        'map_endpoint': escape(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)),
+        'map_file_endpoint': escape(url_for('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)),
         'operates_on': operates_on,
         'md_organisation_name': md_organisation_name,
         'organisation_name': organisation_name,
