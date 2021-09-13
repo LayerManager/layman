@@ -18,7 +18,7 @@ refresh_wms_needed = empty_method_returns_true
 )
 def refresh_wms(
         self,
-        username,
+        workspace,
         layername,
         store_in_geoserver
 ):
@@ -26,8 +26,8 @@ def refresh_wms(
         raise AbortedException
 
     if not store_in_geoserver:
-        wms.save_qgs_file(username, layername)
+        wms.save_qgs_file(workspace, layername)
 
     if self.is_aborted():
-        wms.delete_layer(username, layername)
+        wms.delete_layer(workspace, layername)
         raise AbortedException
