@@ -14,14 +14,14 @@ pre_publication_action_check = empty_method
 get_metadata_comparison = empty_method_returns_dict
 
 
-def get_map_input_file_dir(username, mapname):
-    resumable_dir = os.path.join(util.get_map_dir(username, mapname),
+def get_map_input_file_dir(workspace, mapname):
+    resumable_dir = os.path.join(util.get_map_dir(workspace, mapname),
                                  MAP_SUBDIR)
     return resumable_dir
 
 
-def ensure_map_input_file_dir(username, mapname):
-    input_file_dir = get_map_input_file_dir(username, mapname)
+def ensure_map_input_file_dir(workspace, mapname):
+    input_file_dir = get_map_input_file_dir(workspace, mapname)
     pathlib.Path(input_file_dir).mkdir(parents=True, exist_ok=True)
     return input_file_dir
 
@@ -30,8 +30,8 @@ def delete_map(workspace, mapname):
     util.delete_map_subdir(workspace, mapname, MAP_SUBDIR)
 
 
-def get_map_file(username, mapname):
-    input_file_dir = get_map_input_file_dir(username, mapname)
+def get_map_file(workspace, mapname):
+    input_file_dir = get_map_input_file_dir(workspace, mapname)
     mapfile_path = os.path.join(input_file_dir, mapname + '.json')
     return mapfile_path
 
@@ -66,10 +66,10 @@ from . import uuid
 get_publication_uuid = uuid.get_publication_uuid
 
 
-def save_map_files(username, mapname, files):
+def save_map_files(workspace, mapname, files):
     filenames = list(map(lambda f: f.filename, files))
     assert len(filenames) == 1
-    input_file_dir = ensure_map_input_file_dir(username, mapname)
+    input_file_dir = ensure_map_input_file_dir(workspace, mapname)
     filepath_mapping = {
         f'{fn}': os.path.join(input_file_dir, f'{mapname}.json')
         for fn in filenames
@@ -103,8 +103,8 @@ def get_file_name_mappings(file_names, main_file_name, map_name, output_dir):
     return (filename_mapping, filepath_mapping)
 
 
-def get_map_json(username, mapname):
-    map_file_path = get_map_file(username, mapname)
+def get_map_json(workspace, mapname):
+    map_file_path = get_map_file(workspace, mapname)
     try:
         with open(map_file_path, 'r') as map_file:
             map_json = json.load(map_file)

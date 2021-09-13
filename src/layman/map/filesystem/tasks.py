@@ -14,11 +14,11 @@ refresh_thumbnail_needed = empty_method_returns_true
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_thumbnail(self, username, mapname, actor_name=None):
+def refresh_thumbnail(self, workspace, mapname, actor_name=None):
     if self.is_aborted():
         raise AbortedException
-    thumbnail.generate_map_thumbnail(username, mapname, actor_name)
+    thumbnail.generate_map_thumbnail(workspace, mapname, actor_name)
 
     if self.is_aborted():
-        thumbnail.delete_map(username, mapname)
+        thumbnail.delete_map(workspace, mapname)
         raise AbortedException
