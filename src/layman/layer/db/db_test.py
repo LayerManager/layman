@@ -245,7 +245,7 @@ def test_data_language_roads(road_table):
 @pytest.mark.usefixtures('client')
 def test_populated_places_table(populated_places_table):
     workspace, layername = populated_places_table
-    print(f"username={workspace}, layername={layername}")
+    print(f"workspace={workspace}, layername={layername}")
     col_names = db.get_text_column_names(workspace, layername)
     assert len(col_names) == 31
     langs = db.get_text_languages(workspace, layername)
