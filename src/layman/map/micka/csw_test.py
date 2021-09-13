@@ -39,7 +39,7 @@ def create_server(port, env='development'):
     return server
 
 
-TEST_USER = 'testuser_micka'
+TEST_WORKSPACE = 'testuser_micka'
 
 TEST_MAP = 'samplemap'
 
@@ -47,9 +47,9 @@ TEST_MAP = 'samplemap'
 @pytest.fixture()
 def provide_map(client):
     with app.app_context():
-        username = TEST_USER
+        workspace = TEST_WORKSPACE
         mapname = TEST_MAP
-        rest_path = url_for('rest_workspace_maps.post', workspace=username)
+        rest_path = url_for('rest_workspace_maps.post', workspace=workspace)
         file_paths = [
             'sample/layman.map/full.json',
         ]
@@ -67,19 +67,19 @@ def provide_map(client):
             for file_path in files:
                 file_path[0].close()
 
-    wait_till_ready(username, mapname)
+    wait_till_ready(workspace, mapname)
     yield response.get_json()[0]
     with app.app_context():
-        rest_path = url_for('rest_workspace_map.delete_map', workspace=username, mapname=mapname)
+        rest_path = url_for('rest_workspace_map.delete_map', workspace=workspace, mapname=mapname)
         response = client.delete(rest_path)
         assert response.status_code == 200
 
 
 def patch_map(client):
     with app.app_context():
-        username = TEST_USER
+        workspace = TEST_WORKSPACE
         mapname = TEST_MAP
-        rest_path = url_for('rest_workspace_map.patch', workspace=username, mapname=mapname)
+        rest_path = url_for('rest_workspace_map.patch', workspace=workspace, mapname=mapname)
         file_paths = [
             'sample/layman.map/full.json',
         ]
@@ -97,7 +97,7 @@ def patch_map(client):
             for file_path in files:
                 file_path[0].close()
 
-    wait_till_ready(username, mapname)
+    wait_till_ready(workspace, mapname)
 
 
 @pytest.fixture(scope="module")
@@ -152,7 +152,7 @@ def no_micka_url():
 def test_delete_map_broken_micka():
     with pytest.raises(LaymanError) as exc_info:
         with app.app_context():
-            delete_map(TEST_USER, TEST_MAP)
+            delete_map(TEST_WORKSPACE, TEST_MAP)
     assert exc_info.value.code == 38
 
 
@@ -172,14 +172,14 @@ def test_get_map_info_no_micka():
 def test_delete_map_no_micka():
     with pytest.raises(LaymanError) as exc_info:
         with app.app_context():
-            delete_map(TEST_USER, TEST_MAP)
+            delete_map(TEST_WORKSPACE, TEST_MAP)
     assert exc_info.value.code == 38
 
 
 @pytest.mark.usefixtures('ensure_layman', 'provide_map')
 def test_patch_map_without_metadata(client):
     with app.app_context():
-        delete_map(TEST_USER, TEST_MAP)
+        delete_map(TEST_WORKSPACE, TEST_MAP)
     patch_map(client)
 
 
