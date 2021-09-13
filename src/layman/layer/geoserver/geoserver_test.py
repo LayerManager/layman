@@ -9,7 +9,7 @@ from . import wfs, wms, tasks
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_check_workspace_wms():
-    workspace = 'test_check_workspace_wms_user' + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
+    workspace = 'test_check_workspace_wms_workspace' + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
     layer = 'test_check_workspace_wms_layer'
     with pytest.raises(LaymanError) as exc_info:
         process_client.publish_workspace_layer(workspace, layer)

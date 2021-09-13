@@ -78,7 +78,7 @@ def save_layer_files_str(workspace, layername, files_str, check_crs):
 
 
 def get_layer_redis_total_chunks_key(workspace, layername):
-    return f'layman.users.{workspace}.layers.{layername}.total_chunks'
+    return f'layman.workspaces.{workspace}.layers.{layername}.total_chunks'
 
 
 def save_layer_file_chunk(workspace, layername, parameter_name, filename, chunk,

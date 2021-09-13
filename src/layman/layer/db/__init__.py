@@ -257,7 +257,7 @@ select
 from (
   SELECT
     ogc_fid, (st_dump(wkb_geometry)).geom as geometry
-  FROM {{username}}.{{layername}}
+  FROM {{workspace}}.{{layername}}
 ) sub_view
 order by {{order_by_prefix}}geometry{{order_by_suffix}}, ogc_fid, dump_id
 limit 5000
@@ -440,8 +440,8 @@ def get_missing_attributes(attribute_tuples, conn_cur=None):
 
     # Find all triples which do not already exist
     query = f"""select attribs.*
-from (""" + "\n union all\n".join([f"select '{workspace}' username, '{layername}' layername, '{attrname}' attrname" for workspace, layername, attrname in attribute_tuples]) + """) attribs left join
-    information_schema.columns c on c.table_schema = attribs.username
+from (""" + "\n union all\n".join([f"select '{workspace}' workspace, '{layername}' layername, '{attrname}' attrname" for workspace, layername, attrname in attribute_tuples]) + """) attribs left join
+    information_schema.columns c on c.table_schema = attribs.workspace
                                 and c.table_name = attribs.layername
                                 and c.column_name = attribs.attrname
 where c.column_name is null"""

@@ -148,7 +148,7 @@ def test_layman_gs_user_conflict(client):
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_wrong_value_of_layername(client):
-    workspace = 'test_wrong_value_of_layername_user'
+    workspace = 'test_wrong_value_of_layername_workspace'
     layername = 'layer1'
     # publish and delete layer to ensure that username exists
     flask_client.publish_layer(workspace, layername, client)
@@ -772,7 +772,7 @@ def test_patch_layer_style(client):
         })
         assert response.status_code == 200
 
-        # last_task = util._get_layer_task(username, layername)
+        # last_task = util._get_layer_task(workspace, layername)
 
         # Time to generate testing thumbnail is probably shorter than getting & parsing WMS/WFS capabilities documents
         # so it's finished before PATCH request is completed
