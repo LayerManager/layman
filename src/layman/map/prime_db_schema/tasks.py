@@ -18,16 +18,16 @@ refresh_bbox_needed = empty_method_returns_true
 )
 def refresh_bbox(
         self,
-        username,
+        workspace,
         mapname,
 ):
     if self.is_aborted():
         raise AbortedException
 
-    mapjson = util.get_map_file_json(username, mapname)
+    mapjson = util.get_map_file_json(workspace, mapname)
     bbox_4326 = util.get_bbox_from_json(mapjson)
     bbox_3857 = bbox_util.transform(bbox_4326, 4326, 3857)
-    set_bbox(username, MAP_TYPE, mapname, bbox_3857, )
+    set_bbox(workspace, MAP_TYPE, mapname, bbox_3857, )
 
     if self.is_aborted():
         raise AbortedException
