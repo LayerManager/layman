@@ -34,7 +34,7 @@ def after_request(response):
 @bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>", methods=['GET'])
 def get(workspace, mapname):
     # pylint: disable=unused-argument
-    app.logger.info(f"GET Map, user={g.user}")
+    app.logger.info(f"GET Map, actor={g.user}")
 
     info = util.get_complete_map_info(cached=True)
 
@@ -44,7 +44,7 @@ def get(workspace, mapname):
 @bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>", methods=['PATCH'])
 @util.lock_decorator
 def patch(workspace, mapname):
-    app.logger.info(f"PATCH Map, user={g.user}")
+    app.logger.info(f"PATCH Map, actor={g.user}")
 
     info = util.get_complete_map_info(cached=True)
 
@@ -114,7 +114,7 @@ def patch(workspace, mapname):
 @bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>", methods=['DELETE'])
 @util.lock_decorator
 def delete_map(workspace, mapname):
-    app.logger.info(f"DELETE Map, user={g.user}")
+    app.logger.info(f"DELETE Map, actor={g.user}")
 
     # raise exception if map does not exist
     info = util.get_complete_map_info(cached=True)

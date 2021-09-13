@@ -17,7 +17,7 @@ def before_request():
 
 @bp.route(f"/{MAP_REST_PATH_NAME}", methods=['GET'])
 def get():
-    app.logger.info(f"GET Maps, user={g.user}")
+    app.logger.info(f"GET Maps, actor={g.user}")
 
-    user = get_authn_username()
-    return rest_common.get_publications(MAP_TYPE, user, request_args=request.args)
+    actor = get_authn_username()
+    return rest_common.get_publications(MAP_TYPE, actor, request_args=request.args)

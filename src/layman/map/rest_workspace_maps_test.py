@@ -10,7 +10,7 @@ from test_tools.util import url_for
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_get_map_title():
-    username = 'test_get_map_title_user'
+    workspace = 'test_get_map_title_user'
     maps = [("c_test_get_map_title_map", "C Test get map title - map title íářžý"),
             ("a_test_get_map_title_map", "A Test get map title - map title íářžý"),
             ("b_test_get_map_title_map", "B Test get map title - map title íářžý")
@@ -18,10 +18,10 @@ def test_get_map_title():
     sorted_maps = sorted(maps)
 
     for (name, title) in maps:
-        process_client.publish_workspace_map(username, name, title=title)
+        process_client.publish_workspace_map(workspace, name, title=title)
 
     with app.app_context():
-        url_get = url_for('rest_workspace_maps.get', workspace=username)
+        url_get = url_for('rest_workspace_maps.get', workspace=workspace)
     # maps.GET
     response = requests.get(url_get)
     assert response.status_code == 200, response.json()
@@ -31,4 +31,4 @@ def test_get_map_title():
         assert response.json()[i]["title"] == sorted_maps[i][1]
 
     for (name, title) in maps:
-        process_client.delete_workspace_map(username, name)
+        process_client.delete_workspace_map(workspace, name)

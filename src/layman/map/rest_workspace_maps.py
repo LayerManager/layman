@@ -32,15 +32,15 @@ def after_request(response):
 
 @bp.route(f"/{MAP_REST_PATH_NAME}", methods=['GET'])
 def get(workspace):
-    app.logger.info(f"GET Maps, user={g.user}")
+    app.logger.info(f"GET Maps, actor={g.user}")
 
-    user = get_authn_username()
-    return rest_common.get_publications(MAP_TYPE, user, request_args=request.args, workspace=workspace)
+    actor = get_authn_username()
+    return rest_common.get_publications(MAP_TYPE, actor, request_args=request.args, workspace=workspace)
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}", methods=['POST'])
 def post(workspace):
-    app.logger.info(f"POST Maps, user={g.user}")
+    app.logger.info(f"POST Maps, actor={g.user}")
 
     # FILE
     if 'file' in request.files and not request.files['file'].filename == '':
@@ -131,7 +131,7 @@ def post(workspace):
 
 @bp.route(f"/{MAP_REST_PATH_NAME}", methods=['DELETE'])
 def delete(workspace):
-    app.logger.info(f"DELETE Maps, user={g.user}")
+    app.logger.info(f"DELETE Maps, actor={g.user}")
 
     infos = layman_util.delete_publications(workspace,
                                             MAP_TYPE,

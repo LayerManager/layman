@@ -26,7 +26,7 @@ def after_request(response):
 
 @bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>/metadata-comparison", methods=['GET'])
 def get(workspace, mapname):
-    app.logger.info(f"GET Map Metadata Comparison, user={g.user}")
+    app.logger.info(f"GET Map Metadata Comparison, actor={g.user}")
 
     md_props = util.get_metadata_comparison(workspace, mapname)
 

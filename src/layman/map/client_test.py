@@ -51,7 +51,7 @@ def chrome():
 def test_post_no_file(chrome):
     check_redis_consistency(expected_publ_num_by_type={f'{MAP_TYPE}': 0})
 
-    username = 'testuser2'
+    workspace = 'testuser2'
     client_url = settings.LAYMAN_CLIENT_URL
 
     response = requests.get(client_url)
@@ -75,7 +75,7 @@ def test_post_no_file(chrome):
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
-    user_input.send_keys(username)
+    user_input.send_keys(workspace)
 
     button = chrome.find_elements_by_xpath('//button[@type="submit"]')
     assert len(button) == 1
@@ -99,7 +99,7 @@ def test_post_no_file(chrome):
     severe_entries = [e for e in entries if e['level'] == 'SEVERE']
     assert len(severe_entries) == 1
     for entry in severe_entries:
-        assert entry['message'].startswith(f'{client_url}rest/{settings.REST_WORKSPACES_PREFIX}/{username}/maps?'
+        assert entry['message'].startswith(f'{client_url}rest/{settings.REST_WORKSPACES_PREFIX}/{workspace}/maps?'
                                            ) and entry['message'].endswith(
             'Failed to load resource: the server responded with a status of 400 (BAD REQUEST)')
 
