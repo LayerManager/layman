@@ -77,7 +77,7 @@ def get_all_rules(auth):
 
 def check_workspace_name(workspace):
     if workspace == settings.LAYMAN_GS_USER:
-        raise LaymanError(41, {'username': workspace})
+        raise LaymanError(41, {'workspace': workspace})
 
     if workspace in gs_util.RESERVED_WORKSPACE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'workspace': workspace})
