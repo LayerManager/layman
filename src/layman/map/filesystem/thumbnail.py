@@ -24,14 +24,14 @@ pre_publication_action_check = empty_method
 post_map = empty_method
 
 
-def get_map_thumbnail_dir(username, mapname):
-    thumbnail_dir = os.path.join(util.get_map_dir(username, mapname),
+def get_map_thumbnail_dir(workspace, mapname):
+    thumbnail_dir = os.path.join(util.get_map_dir(workspace, mapname),
                                  'thumbnail')
     return thumbnail_dir
 
 
-def ensure_map_thumbnail_dir(username, mapname):
-    thumbnail_dir = get_map_thumbnail_dir(username, mapname)
+def ensure_map_thumbnail_dir(workspace, mapname):
+    thumbnail_dir = get_map_thumbnail_dir(workspace, mapname)
     pathlib.Path(thumbnail_dir).mkdir(parents=True, exist_ok=True)
     return thumbnail_dir
 
@@ -61,13 +61,13 @@ def delete_map(workspace, mapname):
     util.delete_map_subdir(workspace, mapname, MAP_SUBDIR)
 
 
-def get_map_thumbnail_path(username, mapname):
-    thumbnail_dir = get_map_thumbnail_dir(username, mapname)
+def get_map_thumbnail_path(workspace, mapname):
+    thumbnail_dir = get_map_thumbnail_dir(workspace, mapname)
     return os.path.join(thumbnail_dir, mapname + '.png')
 
 
-def generate_map_thumbnail(username, mapname, editor):
-    map_info = get_publication_info(username, MAP_TYPE, mapname, context={'keys': ['file']})
+def generate_map_thumbnail(workspace, mapname, editor):
+    map_info = get_publication_info(workspace, MAP_TYPE, mapname, context={'keys': ['file']})
     map_file_get_url = map_info['_file']['url']
 
     params = urlencode({
@@ -113,7 +113,7 @@ def generate_map_thumbnail(username, mapname, editor):
             raise LaymanError(51, private_data=entry)
         current_app.logger.info(f"browser entry {entry}")
 
-    # chrome.save_screenshot(f'/code/tmp/{username}.{mapname}.png')
+    # chrome.save_screenshot(f'/code/tmp/{workspace}.{mapname}.png')
     chrome.close()
     chrome.quit()
 
@@ -124,8 +124,8 @@ def generate_map_thumbnail(username, mapname, editor):
     # current_app.logger.info(f"data_url {data_url}")
     # current_app.logger.info(f"len(data_url) {len(data_url)}")
 
-    ensure_map_thumbnail_dir(username, mapname)
-    file_path = get_map_thumbnail_path(username, mapname)
+    ensure_map_thumbnail_dir(workspace, mapname)
+    file_path = get_map_thumbnail_path(workspace, mapname)
     try:
         os.remove(file_path)
     except OSError:
