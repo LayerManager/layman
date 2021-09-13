@@ -48,7 +48,7 @@ def info_decorator(function):
         mapname = request.view_args['mapname']
         info = get_complete_map_info(workspace, mapname)
         assert FLASK_INFO_KEY not in g, g.get(FLASK_INFO_KEY)
-        # current_app.logger.info(f"Setting INFO of map {username}:{mapname}")
+        # current_app.logger.info(f"Setting INFO of map {workspace}:{mapname}")
         g.setdefault(FLASK_INFO_KEY, info)
         result = function(*args, **kwargs)
         return result
@@ -135,11 +135,11 @@ def delete_map(workspace, mapname, kwargs=None):
     celery_util.delete_publication(workspace, MAP_TYPE, mapname)
 
 
-def get_complete_map_info(username=None, mapname=None, cached=False):
-    assert (username is not None and mapname is not None) or cached
+def get_complete_map_info(workspace=None, mapname=None, cached=False):
+    assert (workspace is not None and mapname is not None) or cached
     if cached:
         return g.get(FLASK_INFO_KEY)
-    partial_info = get_map_info(username, mapname)
+    partial_info = get_map_info(workspace, mapname)
 
     if not any(partial_info):
         raise LaymanError(26, {'mapname': mapname})
@@ -148,7 +148,7 @@ def get_complete_map_info(username=None, mapname=None, cached=False):
 
     complete_info = {
         'name': mapname,
-        'url': url_for('rest_workspace_map.get', mapname=mapname, workspace=username),
+        'url': url_for('rest_workspace_map.get', mapname=mapname, workspace=workspace),
         'title': mapname,
         'description': '',
     }
@@ -158,7 +158,7 @@ def get_complete_map_info(username=None, mapname=None, cached=False):
 
     complete_info.update(partial_info)
 
-    complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(username, MAP_TYPE, mapname,
+    complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(workspace, MAP_TYPE, mapname,
                                                                                                  complete_info, item_keys)}
 
     complete_info = clear_publication_info(complete_info)
@@ -199,17 +199,17 @@ def check_file(file):
         }) from exc
 
 
-def get_map_chain(username, mapname):
-    chain_info = celery_util.get_publication_chain_info(username, MAP_TYPE, mapname)
+def get_map_chain(workspace, mapname):
+    chain_info = celery_util.get_publication_chain_info(workspace, MAP_TYPE, mapname)
     return chain_info
 
 
-def abort_map_chain(username, mapname):
-    celery_util.abort_publication_chain(username, MAP_TYPE, mapname)
+def abort_map_chain(workspace, mapname):
+    celery_util.abort_publication_chain(workspace, MAP_TYPE, mapname)
 
 
-def is_map_chain_ready(username, mapname):
-    chain_info = get_map_chain(username, mapname)
+def is_map_chain_ready(workspace, mapname):
+    chain_info = get_map_chain(workspace, mapname)
     return chain_info is None or celery_util.is_chain_ready(chain_info)
 
 
@@ -281,16 +281,16 @@ def get_metadata_comparison(workspace, mapname):
     return metadata_common.transform_metadata_props_to_comparison(all_props)
 
 
-def get_same_or_missing_prop_names(username, mapname):
-    md_comparison = get_metadata_comparison(username, mapname)
+def get_same_or_missing_prop_names(workspace, mapname):
+    md_comparison = get_metadata_comparison(workspace, mapname)
     prop_names = get_syncable_prop_names()
     return metadata_common.get_same_or_missing_prop_names(prop_names, md_comparison)
 
 
-def get_map_file_json(username, mapname):
-    map_json = input_file.get_map_json(username, mapname)
+def get_map_file_json(workspace, mapname):
+    map_json = input_file.get_map_json(workspace, mapname)
     if map_json is not None:
-        map_json['user'] = get_map_owner_info(username)
+        map_json['user'] = get_map_owner_info(workspace)
         map_json.pop("groups", None)
     return map_json
 

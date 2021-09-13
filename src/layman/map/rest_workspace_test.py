@@ -42,16 +42,16 @@ METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES
 publication_counter = SimpleCounter()
 
 
-def wait_till_ready(username, mapname):
-    chain_info = util.get_map_chain(username, mapname)
+def wait_till_ready(workspace, mapname):
+    chain_info = util.get_map_chain(workspace, mapname)
     while chain_info is not None and not celery_util.is_chain_ready(chain_info):
         time.sleep(0.1)
-        chain_info = util.get_map_chain(username, mapname)
+        chain_info = util.get_map_chain(workspace, mapname)
 
 
-def check_metadata(client, username, mapname, props_equal, expected_values):
+def check_metadata(client, workspace, mapname, props_equal, expected_values):
     with app.app_context():
-        rest_path = url_for('rest_workspace_map_metadata_comparison.get', workspace=username, mapname=mapname)
+        rest_path = url_for('rest_workspace_map_metadata_comparison.get', workspace=workspace, mapname=mapname)
         response = client.get(rest_path)
         assert response.status_code == 200, response.get_json()
         resp_json = response.get_json()
@@ -93,10 +93,10 @@ def app_context():
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_get_maps_empty(client):
-    username = 'testuser1'
-    flask_client.ensure_workspace(username, client)
+    workspace = 'testuser1'
+    flask_client.ensure_workspace(workspace, client)
     with app.app_context():
-        response = client.get(url_for('rest_workspace_maps.get', workspace=username))
+        response = client.get(url_for('rest_workspace_maps.get', workspace=workspace))
         resp_json = response.get_json()
         assert response.status_code == 200, response.data
         assert len(resp_json) == 0
@@ -108,12 +108,12 @@ def test_get_maps_empty(client):
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_wrong_value_of_mapname(client):
-    username = 'testuser1'
+    workspace = 'testuser1'
     mapnames = [' ', '2a', 'ě', ';', '?', 'ABC']
     for mapname in mapnames:
-        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        response = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname))
         resp_json = response.get_json()
-        # print('username', username)
+        # print('workspace', workspace)
         # print(resp_json)
         assert response.status_code == 400
         assert resp_json['code'] == 2
@@ -132,8 +132,8 @@ def test_no_file(client):
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_maps_invalid_file(client):
-    username = 'testuser1'
-    rest_path = url_for('rest_workspace_maps.post', workspace=username)
+    workspace = 'testuser1'
+    rest_path = url_for('rest_workspace_maps.post', workspace=workspace)
     file_paths = [
         'sample/style/generic-blue_sld.xml',
     ]
@@ -158,8 +158,8 @@ def test_post_maps_invalid_file(client):
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_post_maps_invalid_json(client):
-    username = 'testuser1'
-    rest_path = url_for('rest_workspace_maps.post', workspace=username)
+    workspace = 'testuser1'
+    rest_path = url_for('rest_workspace_maps.post', workspace=workspace)
     file_paths = [
         'sample/layman.map/invalid-missing-title-email.json',
     ]
@@ -190,10 +190,10 @@ def test_post_maps_invalid_json(client):
 @pytest.mark.usefixtures('ensure_layman')
 def test_post_maps_simple(client):
     with app.app_context():
-        username = 'testuser1'
+        workspace = 'testuser1'
         mapname = None
         expected_mapname = 'administrativni_cleneni_libereckeho_kraje'
-        rest_path = url_for('rest_workspace_maps.post', workspace=username)
+        rest_path = url_for('rest_workspace_maps.post', workspace=workspace)
         file_paths = [
             'sample/layman.map/full.json',
         ]
@@ -224,19 +224,19 @@ def test_post_maps_simple(client):
         })
 
     with app.app_context():
-        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        response = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname))
         assert response.status_code == 200
         resp_json = response.get_json()
         assert resp_json['name'] == mapname
         assert resp_json['uuid'] == uuid_str
-        assert resp_json['url'] == url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname)
+        assert resp_json['url'] == url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname)
         assert resp_json['title'] == "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
         assert resp_json[
             'description'] == "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce."
         map_file = resp_json['file']
         assert 'status' not in map_file
         assert 'path' in map_file
-        assert map_file['url'] == url_for_external('rest_workspace_map_file.get', workspace=username, mapname=mapname)
+        assert map_file['url'] == url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)
         thumbnail = resp_json['thumbnail']
         assert 'status' in thumbnail
         assert thumbnail['status'] in ['PENDING', 'STARTED']
@@ -244,34 +244,34 @@ def test_post_maps_simple(client):
         assert 'type' not in resp_json.keys()
 
     with app.app_context():
-        map_info = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname)).get_json()
+        map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)).get_json()
     while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] in ['PENDING', 'STARTED']:
         time.sleep(0.1)
         with app.app_context():
-            map_info = client.get(url_for('rest_workspace_map.get', workspace=username,
+            map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace,
                                           mapname=mapname)).get_json()
 
     with app.app_context():
-        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        response = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname))
         assert response.status_code == 200
         resp_json = response.get_json()
         thumbnail = resp_json['thumbnail']
         assert 'status' not in thumbnail
         assert 'path' in thumbnail
-        assert thumbnail['url'] == url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname)
+        assert thumbnail['url'] == url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname)
 
     with app.app_context():
-        response = client.get(url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname))
+        response = client.get(url_for('rest_workspace_map_file.get', workspace=workspace, mapname=mapname))
         assert response.status_code == 200
         resp_json = response.get_json()
         assert resp_json['name'] == mapname
 
     with app.app_context():
-        map_info = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname)).get_json()
+        map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)).get_json()
     while 'status' in map_info['metadata'] and map_info['metadata']['status'] in ['PENDING', 'STARTED']:
         time.sleep(0.1)
         with app.app_context():
-            map_info = client.get(url_for('rest_workspace_map.get', workspace=username,
+            map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace,
                                           mapname=mapname)).get_json()
 
     assert set(map_info['metadata'].keys()) == {'identifier', 'csw_url', 'record_url', 'comparison_url'}
@@ -292,13 +292,13 @@ def test_post_maps_simple(client):
                 15.42,
                 50.82
             ],
-            'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
+            'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname),
             'identifier': {
-                "identifier": url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
+                "identifier": url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
                 "label": "administrativni_cleneni_libereckeho_kraje"
             },
-            'map_endpoint': url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
-            'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=username, mapname=mapname),
+            'map_endpoint': url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
+            'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
             'operates_on': [],
             'organisation_name': None,
             'publication_date': TODAY_DATE,
@@ -308,18 +308,18 @@ def test_post_maps_simple(client):
             'revision_date': None,
             'title': "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje",
         }
-    check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(client, workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 @pytest.mark.usefixtures('ensure_layman')
 @pytest.mark.timeout(60)
 def test_post_maps_complex(client):
     with app.app_context():
-        username = 'testuser1'
+        workspace = 'testuser1'
         mapname = 'libe'
         title = 'Liberecký kraj: Administrativní členění'
         description = 'Libovolný popis'
-        rest_path = url_for('rest_workspace_maps.post', workspace=username)
+        rest_path = url_for('rest_workspace_maps.post', workspace=workspace)
         file_paths = [
             'sample/layman.map/full.json',
         ]
@@ -350,25 +350,25 @@ def test_post_maps_complex(client):
         })
 
     with app.app_context():
-        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        response = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname))
         assert response.status_code == 200
         resp_json = response.get_json()
         assert resp_json['name'] == mapname
         assert resp_json['uuid'] == uuid_str
-        assert resp_json['url'] == url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname)
+        assert resp_json['url'] == url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname)
         assert resp_json['title'] == title
         assert resp_json['description'] == description
         map_file = resp_json['file']
         assert 'status' not in map_file
         assert 'path' in map_file
-        assert map_file['url'] == url_for_external('rest_workspace_map_file.get', workspace=username, mapname=mapname)
+        assert map_file['url'] == url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)
         thumbnail = resp_json['thumbnail']
         assert 'status' in thumbnail
         assert thumbnail['status'] in ['PENDING', 'STARTED']
 
     with app.app_context():
         # assert another PATCH is not possible now
-        response = client.patch(url_for('rest_workspace_map.patch', workspace=username, mapname=mapname), data={
+        response = client.patch(url_for('rest_workspace_map.patch', workspace=workspace, mapname=mapname), data={
             'title': 'abcd',
         })
         assert response.status_code == 400
@@ -377,42 +377,42 @@ def test_post_maps_complex(client):
 
     # continue with thumbnail assertion
     with app.app_context():
-        map_info = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname)).get_json()
+        map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)).get_json()
     while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] in ['PENDING', 'STARTED']:
         time.sleep(0.1)
         with app.app_context():
-            map_info = client.get(url_for('rest_workspace_map.get', workspace=username,
+            map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace,
                                           mapname=mapname)).get_json()
 
     with app.app_context():
-        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        response = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname))
         assert response.status_code == 200
         resp_json = response.get_json()
         thumbnail = resp_json['thumbnail']
         assert 'status' not in thumbnail
         assert 'path' in thumbnail
-        assert thumbnail['url'] == url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname)
+        assert thumbnail['url'] == url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname)
 
     with app.app_context():
-        response = client.get(url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname))
+        response = client.get(url_for('rest_workspace_map_file.get', workspace=workspace, mapname=mapname))
         assert response.status_code == 200
         resp_json = response.get_json()
         assert resp_json['name'] == mapname
         assert resp_json['title'] == title
         assert resp_json['abstract'] == description
         user_json = resp_json['user']
-        assert user_json['name'] == username
+        assert user_json['name'] == workspace
         assert user_json['email'] == ''
         assert len(user_json) == 2
         assert 'groups' not in resp_json
 
     # continue with metadata assertion
     with app.app_context():
-        map_info = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname)).get_json()
+        map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)).get_json()
     while 'status' in map_info['metadata'] and map_info['metadata']['status'] in ['PENDING', 'STARTED']:
         time.sleep(0.1)
         with app.app_context():
-            map_info = client.get(url_for('rest_workspace_map.get', workspace=username,
+            map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace,
                                           mapname=mapname)).get_json()
 
     with app.app_context():
@@ -424,13 +424,13 @@ def test_post_maps_complex(client):
                 15.42,
                 50.82
             ],
-            'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
+            'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname),
             'identifier': {
-                "identifier": url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
+                "identifier": url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
                 "label": "libe"
             },
-            'map_endpoint': url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
-            'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=username, mapname=mapname),
+            'map_endpoint': url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
+            'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
             'operates_on': [],
             'organisation_name': None,
             'publication_date': TODAY_DATE,
@@ -440,16 +440,16 @@ def test_post_maps_complex(client):
             'revision_date': None,
             'title': "Libereck\u00fd kraj: Administrativn\u00ed \u010dlen\u011bn\u00ed",
         }
-    check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(client, workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_patch_map(client):
     with app.app_context():
-        username = 'testuser1'
+        workspace = 'testuser1'
         mapname = 'administrativni_cleneni_libereckeho_kraje'
-        uuid_str = map_uuid.get_map_uuid(username, mapname)
-        rest_path = url_for('rest_workspace_map.patch', workspace=username, mapname=mapname)
+        uuid_str = map_uuid.get_map_uuid(workspace, mapname)
+        rest_path = url_for('rest_workspace_map.patch', workspace=workspace, mapname=mapname)
 
         file_paths = [
             'sample/layman.map/full2.json',
@@ -474,53 +474,53 @@ def test_patch_map(client):
         })
 
         assert resp_json['uuid'] == uuid_str
-        assert resp_json['url'] == url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname)
+        assert resp_json['url'] == url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname)
         assert resp_json['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
         assert resp_json['description'] == "Jiný popis"
         map_file = resp_json['file']
         assert 'status' not in map_file
         assert 'path' in map_file
-        assert map_file['url'] == url_for_external('rest_workspace_map_file.get', workspace=username, mapname=mapname)
+        assert map_file['url'] == url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)
         thumbnail = resp_json['thumbnail']
         assert 'status' in thumbnail
         assert thumbnail['status'] in ['PENDING', 'STARTED']
 
     with app.app_context():
-        map_info = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname)).get_json()
+        map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)).get_json()
     while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] in ['PENDING', 'STARTED']:
         time.sleep(0.1)
         with app.app_context():
-            map_info = client.get(url_for('rest_workspace_map.get', workspace=username,
+            map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace,
                                           mapname=mapname)).get_json()
 
     with app.app_context():
-        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        response = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname))
         assert response.status_code == 200
         resp_json = response.get_json()
         thumbnail = resp_json['thumbnail']
         assert 'status' not in thumbnail
         assert 'path' in thumbnail
-        assert thumbnail['url'] == url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname)
+        assert thumbnail['url'] == url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname)
 
     with app.app_context():
-        response = client.get(url_for('rest_workspace_map_file.get', workspace=username, mapname=mapname))
+        response = client.get(url_for('rest_workspace_map_file.get', workspace=workspace, mapname=mapname))
         assert response.status_code == 200
         resp_json = response.get_json()
         assert resp_json['name'] == mapname
         assert resp_json['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
         assert resp_json['abstract'] == "Jiný popis"
         user_json = resp_json['user']
-        assert user_json['name'] == username
+        assert user_json['name'] == workspace
         assert user_json['email'] == ''
         assert len(user_json) == 2
         assert 'groups' not in resp_json
 
     with app.app_context():
-        map_info = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname)).get_json()
+        map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)).get_json()
     while 'status' in map_info['metadata'] and map_info['metadata']['status'] in ['PENDING', 'STARTED']:
         time.sleep(0.1)
         with app.app_context():
-            map_info = client.get(url_for('rest_workspace_map.get', workspace=username,
+            map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace,
                                           mapname=mapname)).get_json()
 
     with app.app_context():
@@ -556,13 +556,13 @@ def test_patch_map(client):
                 15.42,
                 50.82
             ],
-            'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
+            'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname),
             'identifier': {
-                "identifier": url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
+                "identifier": url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
                 "label": "administrativni_cleneni_libereckeho_kraje"
             },
-            'map_endpoint': url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
-            'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=username, mapname=mapname),
+            'map_endpoint': url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
+            'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
             'operates_on': [],
             'organisation_name': None,
             'publication_date': TODAY_DATE,
@@ -572,15 +572,15 @@ def test_patch_map(client):
             'revision_date': TODAY_DATE,
             'title': "Nov\u00fd n\u00e1zev",
         }
-    check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(client, workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_delete_map(client):
     with app.app_context():
-        username = 'testuser1'
+        workspace = 'testuser1'
         mapname = 'administrativni_cleneni_libereckeho_kraje'
-        rest_path = url_for('rest_workspace_map.delete_map', workspace=username, mapname=mapname)
+        rest_path = url_for('rest_workspace_map.delete_map', workspace=workspace, mapname=mapname)
         response = client.delete(rest_path)
         assert response.status_code == 200
         resp_json = response.get_json()
@@ -597,7 +597,7 @@ def test_delete_map(client):
         })
 
     with app.app_context():
-        rest_path = url_for('rest_workspace_map.delete_map', workspace=username, mapname=mapname)
+        rest_path = url_for('rest_workspace_map.delete_map', workspace=workspace, mapname=mapname)
         response = client.delete(rest_path)
         assert response.status_code == 404
         resp_json = response.get_json()
@@ -611,8 +611,8 @@ def test_delete_map(client):
 @pytest.mark.usefixtures('ensure_layman')
 def test_map_composed_from_local_layers(client):
     with app.app_context():
-        username = 'testuser1'
-        rest_path = url_for('rest_workspace_layers.post', workspace=username)
+        workspace = 'testuser1'
+        rest_path = url_for('rest_workspace_layers.post', workspace=workspace)
 
         layername1 = 'mista'
         relative_file_paths = [
@@ -667,26 +667,26 @@ def test_map_composed_from_local_layers(client):
 
     with app.app_context():
         keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
-        layer_info = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername1)).get_json()
+        layer_info = client.get(url_for('rest_workspace_layer.get', workspace=workspace, layername=layername1)).get_json()
         max_attempts = 100
         num_attempts = 1
     while num_attempts < max_attempts and any(('status' in layer_info[key] for key in keys_to_check)):
         time.sleep(0.1)
         # print('layer_info1', layer_info)
         with app.app_context():
-            layer_info = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername1)).get_json()
+            layer_info = client.get(url_for('rest_workspace_layer.get', workspace=workspace, layername=layername1)).get_json()
         num_attempts += 1
     assert num_attempts < max_attempts, f"Max attempts reached, layer1info={layer_info}"
     wms_url1 = layer_info['wms']['url']
 
     with app.app_context():
-        layer_info = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername2)).get_json()
+        layer_info = client.get(url_for('rest_workspace_layer.get', workspace=workspace, layername=layername2)).get_json()
         num_attempts = 1
     while any(('status' in layer_info[key] for key in keys_to_check)):
         time.sleep(0.1)
         # print('layer_info2', layer_info)
         with app.app_context():
-            layer_info = client.get(url_for('rest_workspace_layer.get', workspace=username, layername=layername2)).get_json()
+            layer_info = client.get(url_for('rest_workspace_layer.get', workspace=workspace, layername=layername2)).get_json()
         num_attempts += 1
     assert num_attempts < max_attempts, f"Max attempts reached, layer2info={layer_info}"
     wms_url2 = layer_info['wms']['url']
@@ -697,7 +697,7 @@ def test_map_composed_from_local_layers(client):
 
     with app.app_context():
         mapname = 'svet'
-        rest_path = url_for('rest_workspace_maps.post', workspace=username)
+        rest_path = url_for('rest_workspace_maps.post', workspace=workspace)
         file_paths = [
             'sample/layman.map/internal_url.json',
         ]
@@ -720,43 +720,43 @@ def test_map_composed_from_local_layers(client):
                 file_path[0].close()
 
     with app.app_context():
-        map_info = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname)).get_json()
+        map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)).get_json()
         thumbnail = map_info['thumbnail']
         assert 'status' in thumbnail
         assert thumbnail['status'] in ['PENDING', 'STARTED']
 
     with app.app_context():
-        map_info = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname)).get_json()
+        map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)).get_json()
     while 'status' in map_info['thumbnail'] and map_info['thumbnail']['status'] in ['PENDING', 'STARTED', 'SUCCESS']:
         time.sleep(0.1)
         with app.app_context():
-            map_info = client.get(url_for('rest_workspace_map.get', workspace=username,
+            map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace,
                                           mapname=mapname)).get_json()
 
     with app.app_context():
-        response = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname))
+        response = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname))
         assert response.status_code == 200
         resp_json = response.get_json()
         thumbnail = resp_json['thumbnail']
         assert 'status' not in thumbnail
         assert 'path' in thumbnail
-        assert thumbnail['url'] == url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname)
+        assert thumbnail['url'] == url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname)
 
         # uuid.check_redis_consistency(expected_publ_num_by_type={
         #     f'{MAP_TYPE}': num_maps_before_test + 2
         # })
 
     with app.app_context():
-        map_info = client.get(url_for('rest_workspace_map.get', workspace=username, mapname=mapname)).get_json()
+        map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)).get_json()
     while 'status' in map_info['metadata'] and map_info['metadata']['status'] in ['PENDING', 'STARTED']:
         time.sleep(0.1)
         with app.app_context():
-            map_info = client.get(url_for('rest_workspace_map.get', workspace=username,
+            map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace,
                                           mapname=mapname)).get_json()
 
     with app.app_context():
         # assert metadata file is the same as filled template except for UUID and dates
-        template_path, prop_values = csw.get_template_path_and_values(username, mapname, http_method='post')
+        template_path, prop_values = csw.get_template_path_and_values(workspace, mapname, http_method='post')
         xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values,
                                                                                     csw.METADATA_PROPERTIES)
         expected_path = 'src/layman/map/rest_test_filled_template.xml'
@@ -812,13 +812,13 @@ def test_map_composed_from_local_layers(client):
                 179.0,
                 81.5
             ],
-            'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=username, mapname=mapname),
+            'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname),
             'identifier': {
-                "identifier": url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
+                "identifier": url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
                 "label": "svet"
             },
-            'map_endpoint': url_for_external('rest_workspace_map.get', workspace=username, mapname=mapname),
-            'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=username, mapname=mapname),
+            'map_endpoint': url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
+            'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
             'operates_on': [
                 {
                     "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{layer2uuid}#_m-{layer2uuid}",
@@ -837,7 +837,7 @@ def test_map_composed_from_local_layers(client):
             'revision_date': None,
             'title': "World places and boundaries",
         }
-    check_metadata(client, username, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(client, workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 @pytest.mark.usefixtures('ensure_layman')

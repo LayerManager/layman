@@ -27,7 +27,7 @@ def after_request(response):
 
 @bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>/file", methods=['GET'])
 def get(workspace, mapname):
-    app.logger.info(f"GET Map File, user={g.user}")
+    app.logger.info(f"GET Map File, actor={g.user}")
 
     map_json = util.get_map_file_json(workspace, mapname)
 
