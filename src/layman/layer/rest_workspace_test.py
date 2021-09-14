@@ -113,7 +113,7 @@ def test_wrong_value_of_workspace(client):
         # print(resp_json)
         assert response.status_code == 400
         assert resp_json['code'] == 2
-        assert resp_json['detail']['parameter'] == 'user'
+        assert resp_json['detail']['parameter'] == 'workspace'
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
@@ -297,7 +297,7 @@ def test_post_layers_simple(client):
         assert settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
         assert settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
         assert settings.LAYMAN_REDIS.hexists(
-            uuid.get_user_type_names_key(workspace, '.'.join(__name__.split('.')[:-1])),
+            uuid.get_workspace_type_names_key(workspace, '.'.join(__name__.split('.')[:-1])),
             layername
         )
 
@@ -1032,7 +1032,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
         assert not settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
         assert not settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
         assert not settings.LAYMAN_REDIS.hexists(
-            uuid.get_user_type_names_key(workspace, '.'.join(__name__.split('.')[:-1])),
+            uuid.get_workspace_type_names_key(workspace, '.'.join(__name__.split('.')[:-1])),
             layername
         )
 
