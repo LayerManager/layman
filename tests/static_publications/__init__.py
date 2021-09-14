@@ -60,6 +60,18 @@ PUBLICATIONS = {
             'users_can_write': [OWNER],
         },
     },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_strange_attributes_qml'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.layer/strange_attribute_names.geojson'],
+             'style_file': 'sample/style/strange_attribute_names.qml',
+             },
+        ],
+        TEST_DATA: {
+            'file_type': settings.FILE_TYPE_VECTOR,
+            'style_type': 'qml',
+            'attributes': {'atraktivita geoturizmu', 'info', 'x,', 'y,', 'z,', 'ČÍslo'},
+        },
+    },
     (OWNER2, LAYER_TYPE, 'post_private_sld2'): {
         DEFINITION: [
             {'headers': HEADERS[OWNER2]},
