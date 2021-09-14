@@ -1,14 +1,10 @@
 # Changelog
 
 ## v1.14.1
- {release_date}
-### Upgrade requirements
-### Migrations and checks
-#### Schema migrations
-#### Data migrations
+ 2021-09-14
 ### Changes
 - [#465](https://github.com/LayerManager/layman/issues/465) Fix situation, when Layman does not start if *.qgis file of the first layer with QML style does not exist.
-- [#464](https://github.com/LayerManager/layman/issues/464) Fix publishing layers with strange layer names (e.g. `x,` or `Číslo`) and QML styles.
+- [#464](https://github.com/LayerManager/layman/issues/464) Fix publishing layers with unusual attribute names (e.g. `x,` or `Číslo`) and QML styles.
 - [#459](https://github.com/LayerManager/layman/issues/459) Fix situation, when sometimes publication stayed in PENDING status after failure
 
 ## v1.14.0
