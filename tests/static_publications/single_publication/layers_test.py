@@ -217,7 +217,8 @@ def test_fill_project_template(workspace, publ_type, publication):
     parser = ET.XMLParser(remove_blank_text=True)
     qml_xml = ET.parse(qml_path, parser=parser)
     exp_min_scale = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('min_scale')
-    assert qml_xml.getroot().attrib['minScale'] == exp_min_scale
+    if exp_min_scale is not None:
+        assert qml_xml.getroot().attrib['minScale'] == exp_min_scale
     with app.app_context():
         db_types = layer_db.get_geometry_types(workspace, publication)
         db_cols = [
@@ -228,7 +229,8 @@ def test_fill_project_template(workspace, publ_type, publication):
     source_type = qgis_util.get_source_type(db_types, qml_geometry)
     layer_qml_str = qgis_util.fill_layer_template(workspace, publication, layer_uuid, layer_bbox, qml_xml, source_type, db_cols)
     layer_qml = ET.fromstring(layer_qml_str.encode('utf-8'), parser=parser)
-    assert layer_qml.attrib['minScale'] == exp_min_scale
+    if exp_min_scale is not None:
+        assert layer_qml.attrib['minScale'] == exp_min_scale
     qgs_str = qgis_util.fill_project_template(workspace, publication, layer_uuid, layer_qml_str, settings.LAYMAN_OUTPUT_SRS_LIST,
                                               layer_bbox, source_type)
     with open(qgs_path, "w") as qgs_file:
