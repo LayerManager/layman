@@ -171,7 +171,10 @@ def test_wms_layer(workspace, publ_type, publication):
         wms_url = geoserver_client.get_wms_url(gs_workspace, service_endpoint)
 
         layer_info = process_client.get_workspace_layer(workspace, publication, headers=authn_headers)
-        tn_bbox = gs_util.get_square_bbox(layer_info['bounding_box'])
+        raw_bbox = layer_info['bounding_box'] if not bbox_util.is_empty(layer_info['bounding_box']) \
+            else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+        bbox = bbox_util.ensure_bbox_with_area(raw_bbox, settings.NO_AREA_BBOX_PADDING)
+        tn_bbox = gs_util.get_square_bbox(bbox)
 
         response = gs_util.get_layer_thumbnail(wms_url, publication, tn_bbox, headers=authn_headers, wms_version=VERSION)
         response.raise_for_status()
