@@ -305,3 +305,19 @@ def test_micka_xml(workspace, publ_type, publication):
         assert minus_line.endswith(diff_line['minus_line_ends_with']), f'diff_lines={"".join(diff_lines)}, idx={idx}, diff_line={diff_line}'
 
     assert len(diff_lines) == micka_xml_def['diff_lines_len'], ''.join(diff_lines)
+
+
+@pytest.mark.parametrize('workspace, publ_type, publication', [
+    publ_tuple for publ_tuple in data.LIST_LAYERS
+    if data.PUBLICATIONS[publ_tuple][data.TEST_DATA].get('attributes') is not None
+])
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+def test_layer_attributes_in_db(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+    generated_names = {'wkb_geometry', 'ogc_fid'}
+    expected_names = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['attributes']
+    expected_names.update(generated_names)
+
+    with app.app_context():
+        attr_names = {col.name for col in layer_db.get_all_column_infos(workspace, publication)}
+    assert attr_names == expected_names
