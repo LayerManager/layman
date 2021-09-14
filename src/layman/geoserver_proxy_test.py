@@ -14,18 +14,18 @@ from test_tools.process_client import get_authz_headers
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_rest_get():
-    username = 'wfs_proxy_test'
+    workspace = 'wfs_proxy_test'
     layername = 'layer_wfs_proxy_test'
 
-    process_client.publish_workspace_layer(username, layername)
+    process_client.publish_workspace_layer(workspace, layername)
 
-    data_xml = data_wfs.get_wfs20_insert_points(username, layername)
+    data_xml = data_wfs.get_wfs20_insert_points(workspace, layername)
 
-    process_client.post_wfst(data_xml, workspace=username)
+    process_client.post_wfst(data_xml, workspace=workspace)
 
     process_client.post_wfst(data_xml)
 
-    process_client.delete_workspace_layer(username, layername)
+    process_client.delete_workspace_layer(workspace, layername)
 
 
 def setup_user_layer(username, layername, authn_headers):

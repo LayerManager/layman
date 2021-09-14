@@ -10,7 +10,7 @@ from . import settings
 
 UUID_SET_KEY = f'{__name__}:UUID_SET'
 UUID_METADATA_KEY = f'{__name__}:UUID_METADATA:{{uuid}}'
-USER_TYPE_NAMES_KEY = f'{__name__}:USER_TYPE_NAMES:{{username}}:{{publication_type}}'
+WORKSPACE_TYPE_NAMES_KEY = f'{__name__}:WORKSPACE_TYPE_NAMES:{{workspace}}:{{publication_type}}'
 
 
 def import_uuids_to_redis():
@@ -34,13 +34,13 @@ def register_publication_uuid(workspace, publication_type, publication_name, uui
     if uuid_str is None:
         uuid_str = generate_uuid()
 
-    user_type_names_key = get_user_type_names_key(workspace, publication_type)
+    workspace_type_names_key = get_workspace_type_names_key(workspace, publication_type)
     uuid_metadata_key = get_uuid_metadata_key(uuid_str)
 
     with settings.LAYMAN_REDIS.pipeline() as pipe:
         while True:
             try:
-                pipe.watch(UUID_SET_KEY, uuid_metadata_key, user_type_names_key)
+                pipe.watch(UUID_SET_KEY, uuid_metadata_key, workspace_type_names_key)
 
                 if not ignore_duplicate:
                     if pipe.sismember(UUID_SET_KEY, uuid_str):
@@ -49,22 +49,22 @@ def register_publication_uuid(workspace, publication_type, publication_name, uui
                     if pipe.exists(uuid_metadata_key):
                         raise LaymanError(23, {'message': f'Redis already contains metadata of UUID {uuid_str}'})
 
-                    if pipe.hexists(user_type_names_key, publication_name):
+                    if pipe.hexists(workspace_type_names_key, publication_name):
                         raise LaymanError(23, {
-                            'message': f'Redis already contains publication type/user/name {publication_type}/{workspace}/{publication_name}'})
+                            'message': f'Redis already contains publication type/workspace/name {publication_type}/{workspace}/{publication_name}'})
 
                 pipe.multi()
                 pipe.sadd(UUID_SET_KEY, uuid_str)
                 pipe.hmset(
                     uuid_metadata_key,
                     {
-                        'username': workspace,
+                        'workspace': workspace,
                         'publication_type': publication_type,
                         'publication_name': publication_name,
                     }
                 )
                 pipe.hset(
-                    user_type_names_key,
+                    workspace_type_names_key,
                     publication_name,
                     uuid_str
                 )
@@ -77,21 +77,21 @@ def register_publication_uuid(workspace, publication_type, publication_name, uui
 
 
 def delete_publication_uuid(workspace, publication_type, publication_name, uuid_str):
-    user_type_names_key = get_user_type_names_key(workspace, publication_type)
+    workspace_type_names_key = get_workspace_type_names_key(workspace, publication_type)
     uuid_metadata_key = get_uuid_metadata_key(uuid_str)
 
     settings.LAYMAN_REDIS.srem(UUID_SET_KEY, uuid_str)
     settings.LAYMAN_REDIS.delete(uuid_metadata_key)
-    settings.LAYMAN_REDIS.hdel(user_type_names_key, publication_name)
+    settings.LAYMAN_REDIS.hdel(workspace_type_names_key, publication_name)
 
 
 def get_uuid_metadata_key(uuid_str):
     return UUID_METADATA_KEY.format(uuid=uuid_str)
 
 
-def get_user_type_names_key(workspace, publication_type):
-    return USER_TYPE_NAMES_KEY.format(
-        username=workspace,
+def get_workspace_type_names_key(workspace, publication_type):
+    return WORKSPACE_TYPE_NAMES_KEY.format(
+        workspace=workspace,
         publication_type=publication_type,
     )
 
@@ -112,7 +112,7 @@ def check_redis_consistency(expected_publ_num_by_type=None):
 
     # publication types and names
     redis = settings.LAYMAN_REDIS
-    user_publ_keys = redis.keys(':'.join(USER_TYPE_NAMES_KEY.split(':')[:2]) + ':*')
+    workspace_publ_keys = redis.keys(':'.join(WORKSPACE_TYPE_NAMES_KEY.split(':')[:2]) + ':*')
     uuid_keys = redis.keys(':'.join(UUID_METADATA_KEY.split(':')[:2]) + ':*')
     assert num_total_publs == len(uuid_keys), f"total_publs={total_publs}, uuid_keys={uuid_keys}"
 
@@ -126,8 +126,8 @@ def check_redis_consistency(expected_publ_num_by_type=None):
             assert publ_num == found_publ_num, f"expected {publ_num} of {publ_type}, found {found_publ_num}: {total_publs}"
 
     num_publ = 0
-    for user_publ_key in user_publ_keys:
-        num_publ += redis.hlen(user_publ_key)
+    for workspace_publ_key in workspace_publ_keys:
+        num_publ += redis.hlen(workspace_publ_key)
     assert num_publ == len(uuid_keys)
 
     # publication uuids
@@ -140,8 +140,8 @@ def check_redis_consistency(expected_publ_num_by_type=None):
     for uuid_key in uuid_keys:
         uuid_dict = redis.hgetall(uuid_key)
         assert redis.hexists(
-            get_user_type_names_key(
-                uuid_dict['username'],
+            get_workspace_type_names_key(
+                uuid_dict['workspace'],
                 uuid_dict['publication_type']
             ),
             uuid_dict['publication_name'],

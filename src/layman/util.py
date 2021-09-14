@@ -105,7 +105,7 @@ def check_reserved_workspace_names(workspace_name):
 
 def check_workspace_name(workspace, pattern_only=False):
     if not re.match(WORKSPACE_NAME_PATTERN, workspace):
-        raise LaymanError(2, {'parameter': 'user', 'expected': WORKSPACE_NAME_PATTERN})
+        raise LaymanError(2, {'parameter': 'workspace', 'expected': WORKSPACE_NAME_PATTERN})
     if pattern_only:
         return
     check_reserved_workspace_names(workspace)

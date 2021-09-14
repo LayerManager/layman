@@ -5,21 +5,21 @@ from layman.common.prime_db_schema import users
 
 
 def authenticate():
-    user = None
-    username = request.headers.get(settings.LAYMAN_AUTHN_HTTP_HEADER_NAME, None)
-    if username is None:
-        return user
-    user = users.get_user_infos(username).get(username)
-    if not user:
+    actor = None
+    actor_name = request.headers.get(settings.LAYMAN_AUTHN_HTTP_HEADER_NAME, None)
+    if actor_name is None:
+        return actor
+    actor = users.get_user_infos(actor_name).get(actor_name)
+    if not actor:
         raise LaymanError(44,
-                          f'Username {username} not recognized.',
+                          f'Username {actor_name} not recognized.',
                           sub_code=1)
-    user = {
-        'username': username
+    actor = {
+        'username': actor_name
     }
     # pylint: disable=assigning-non-slot
-    g.user = user
-    return user
+    g.user = actor
+    return actor
 
 
 def get_open_id_claims():

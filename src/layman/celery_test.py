@@ -46,7 +46,7 @@ def test_single_abortable_task():
         'check_crs': check_crs,
     }
     filenames = ['abc.geojson']
-    workspace = 'test_abort_user'
+    workspace = 'test_abort_workspace'
     layername = 'test_abort_layer'
     with app.app_context():
         input_chunk.save_layer_files_str(workspace, layername, filenames, check_crs)
@@ -99,7 +99,7 @@ def test_abortable_task_chain():
         'check_crs': check_crs,
     }
     filenames = ['abc.geojson']
-    workspace = 'test_abort_user'
+    workspace = 'test_abort_workspace'
     layername = 'test_abort_layer2'
     with app.app_context():
         input_chunk.save_layer_files_str(workspace, layername, filenames, check_crs)
