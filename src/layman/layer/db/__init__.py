@@ -173,7 +173,7 @@ def get_all_column_infos(username, layername, conn_cur=None):
 
     try:
         cur.execute(f"""
-SELECT QUOTE_IDENT(column_name) AS column_name, data_type
+SELECT column_name AS column_name, data_type
 FROM information_schema.columns
 WHERE table_schema = '{username}'
 AND table_name = '{layername}'
