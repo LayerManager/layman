@@ -84,3 +84,15 @@ def get_style_type_from_file_storage(file_storage):
     else:
         result = layer.NO_STYLE_DEF
     return result
+
+
+def get_external_files_from_qml(qml):
+    image_prop_files = qml.xpath('.//prop[@k="imageFile" or @k="svgFile"]/@v')
+    image_option_files = qml.xpath('.//Option[@name="imageFile" or @name="svgFile"]/@value')
+    external_files = set(image_prop_files + image_option_files)
+    return external_files
+
+
+def get_external_files_from_qml_file(file_path):
+    qml = etree.parse(file_path)
+    return get_external_files_from_qml(qml)
