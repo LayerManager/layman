@@ -18,6 +18,7 @@
 |Workspace Map Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-map-metadata-comparison) | x | x | x |
 |Users|`/rest/users`|[GET](#get-users)| x | x | x |
 |Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | [DELETE](#delete-current-user) |
+|Style Info|`/rest/tools/style-info`| x |[POST](#post-style-info)| x | x |
 |Version|`/rest/about/version`|[GET](#get-version)| x | x | x |
 
 #### REST path parameters
@@ -723,6 +724,24 @@ No action parameters.
 Content-Type: `application/json`
 
 HTTP status code 200 if credentials were deleted.
+
+## Style Info
+### URL
+`/rest/tools/style-info`
+
+### POST Style Info
+Get information about style file.
+
+#### Request
+Query parameters:
+- *style*, QML or SLD style file
+
+#### Response
+Content-Type: `application/json`
+
+JSON object representing style file information:
+- **type**: String. Type of sent style. Either 'sld' or 'qml'.
+- *external_files*: Array of strings. Paths to external files used in sent style, extracted from style file with these xpath expresions: `.//prop[@k="imageFile" or @k="svgFile"]/@v` and `.//Option[@name="imageFile" or @name="svgFile"]/@value`. Available only for qml files.
 
 ## Version
 ### URL
