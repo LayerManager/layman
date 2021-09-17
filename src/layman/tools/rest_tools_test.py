@@ -6,23 +6,18 @@ from test_tools import process_client, util as test_util
 
 @pytest.mark.parametrize('style_file, expected_json', [
     ('test_tools/data/style/small_layer_external_circle.qml', {'type': 'qml',
-                                                               'external_files': ['./circle-15.svg', ]})
+                                                               'external_files': {'./circle-15.svg', }}),
+    ('sample/style/generic-blue_sld.xml', {'type': 'sld', }),
 ])
 @pytest.mark.usefixtures('ensure_layman')
 def test_get_style_info(style_file, expected_json):
     style_info = process_client.get_style_info(style_file=style_file)
+    if 'external_files' in style_info:
+        style_info['external_files'] = set(style_info['external_files'])
     assert style_info == expected_json
 
 
 @pytest.mark.parametrize('params, expected_exc', [
-    ({'style_file': 'sample/style/generic-blue_sld.xml',
-      },
-     {'http_code': 400,
-      'code': 2,
-      'message': 'Wrong parameter value',
-      'detail': {'parameter': 'style', 'supported_values': ['qml']},
-      },
-     ),
     (dict(),
      {'http_code': 400,
       'code': 1,
