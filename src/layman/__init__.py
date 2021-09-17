@@ -131,6 +131,9 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
 from .rest_about import bp as about_bp
 app.register_blueprint(about_bp, url_prefix=f'/rest/about')
 
+from .tools.rest_tools import bp as tools_bp
+app.register_blueprint(tools_bp, url_prefix=f'/rest/tools')
+
 logger.info(f'Layman successfully started!')
 
 
