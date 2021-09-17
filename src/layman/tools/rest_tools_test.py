@@ -9,9 +9,14 @@ from test_tools.util import url_for
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_get_style_info():
+    style_file = 'test_tools/data/style/small_layer_external_circle.qml'
     with app.app_context():
         r_url = url_for('rest_tools.get_style_info')
-    response = requests.get(r_url)
+
+    files = [('style', (os.path.basename(style_file), open(style_file, 'rb')))]
+
+    response = requests.get(r_url,
+                            files=files)
     process_client.raise_layman_error(response)
 
     expected_json = {'type': 'qml',
