@@ -10,8 +10,8 @@ from test_tools import process_client, util as test_util
     ('sample/style/generic-blue_sld.xml', {'type': 'sld', }),
 ])
 @pytest.mark.usefixtures('ensure_layman')
-def test_get_style_info(style_file, expected_json):
-    style_info = process_client.get_style_info(style_file=style_file)
+def test_post_style_info(style_file, expected_json):
+    style_info = process_client.post_style_info(style_file=style_file)
     if 'external_files' in style_info:
         style_info['external_files'] = set(style_info['external_files'])
     assert style_info == expected_json
@@ -27,7 +27,7 @@ def test_get_style_info(style_file, expected_json):
      ),
 ])
 @pytest.mark.usefixtures('ensure_layman')
-def test_get_style_info_error(params, expected_exc):
+def test_post_style_info_error(params, expected_exc):
     with pytest.raises(LaymanError) as exc_info:
-        process_client.get_style_info(**params)
+        process_client.post_style_info(**params)
     test_util.assert_error(expected_exc, exc_info)
