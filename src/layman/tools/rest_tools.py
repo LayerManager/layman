@@ -6,8 +6,8 @@ from layman.layer.filesystem import input_style
 bp = Blueprint('rest_tools', __name__)
 
 
-@bp.route('/style-info', methods=['GET'])
-def get_style_info():
+@bp.route('/style-info', methods=['POST'])
+def post_style_info():
     supported_style_types_for_external_files = ['qml']
 
     style_file = None

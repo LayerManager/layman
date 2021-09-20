@@ -506,16 +506,16 @@ def post_wfst(xml, *, headers=None, url=None, workspace=None):
         raise gs_error.Error(code_or_message='WFS-T error', data={'status_code': response.status_code})
 
 
-def get_style_info(*, style_file=None):
+def post_style_info(*, style_file=None):
     with app.app_context():
-        r_url = url_for('rest_tools.get_style_info')
+        r_url = url_for('rest_tools.post_style_info')
 
     if style_file:
         assert os.path.isfile(style_file), style_file
     files = [('style', (os.path.basename(style_file), open(style_file, 'rb')))] if style_file else []
 
-    response = requests.get(r_url,
-                            files=files)
+    response = requests.post(r_url,
+                             files=files)
     raise_layman_error(response)
     return response.json()
 
