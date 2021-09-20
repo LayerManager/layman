@@ -849,7 +849,6 @@ LIST_SLD_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type
                    if publ_type == LAYER_TYPE and values[TEST_DATA].get('style_type') == 'sld']
 LIST_QML_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
                    if publ_type == LAYER_TYPE and values[TEST_DATA].get('style_type') == 'qml']
-LIST_SLD_COUNTRIES_10m_SLD_LAYERS = [(COMMON_WORKSPACE, LAYER_TYPE, 'post_10countries_sld')]
 
 LIST_INTERNAL_MAPS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
                       if publ_type == MAP_TYPE and values[TEST_DATA].get('layers')]
@@ -866,7 +865,6 @@ assert len(LIST_RASTER_LAYERS) > 0, LIST_RASTER_LAYERS
 assert len(LIST_VECTOR_LAYERS) > 0, LIST_VECTOR_LAYERS
 assert len(LIST_SLD_LAYERS) > 0, LIST_SLD_LAYERS
 assert len(LIST_QML_LAYERS) > 0, LIST_QML_LAYERS
-assert len(LIST_SLD_COUNTRIES_10m_SLD_LAYERS) > 0, LIST_SLD_COUNTRIES_10m_SLD_LAYERS
 assert len(LIST_INTERNAL_MAPS) > 0, LIST_INTERNAL_MAPS
 
 assert all(set(test_data.get('users_can_read', set())).issubset(USERS) for test_data in PUBLICATIONS.values())
