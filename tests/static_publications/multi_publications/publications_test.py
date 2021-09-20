@@ -45,6 +45,12 @@ def test_get_publication_infos():
                 publication_set = {publication['name'] for publication in publications}
                 assert publication_set == expected[actor][workspace][publ_type]['read']
 
+            publications = process_client.get_publications(publ_type, headers=headers)
+            for workspace in data.WORKSPACES:
+                publication_set = {publication['name'] for publication in publications
+                                   if publication['workspace'] == workspace}
+                assert publication_set == expected[actor][workspace][publ_type]['read']
+
 
 @pytest.mark.timeout(600)
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
