@@ -1,6 +1,5 @@
 import pytest
 from layman import app, util as layman_util, settings
-from layman.common.prime_db_schema import publications
 from layman.publication_relation import util as pr_util
 from test_tools import process_client
 from ... import static_publications as data
@@ -50,26 +49,6 @@ def test_get_publication_infos():
                 publication_set = {publication['name'] for publication in publications
                                    if publication['workspace'] == workspace}
                 assert publication_set == expected[actor][workspace][publ_type]['read']
-
-
-@pytest.mark.timeout(600)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
-def test_publications_same_name():
-    ensure_all_publications()
-
-    for workspace in data.WORKSPACES:
-        exp_pubs = [(wspace, ptype, publication) for wspace, ptype, publication in data.PUBLICATIONS
-                    if wspace == workspace]
-        with app.app_context():
-            pubs = publications.get_publication_infos(workspace)
-        assert len(pubs) == len(exp_pubs)
-        for key in exp_pubs:
-            assert key in pubs
-
-    with app.app_context():
-        pubs = publications.get_publication_infos()
-    assert len(pubs) == len(data.PUBLICATIONS)
-    assert set(data.PUBLICATIONS) == set(pubs)
 
 
 @pytest.mark.timeout(600)
