@@ -31,6 +31,7 @@ def test_get_publication_infos():
                 expected[actor][workspace][publ_type][access_type].add(publication)
 
     for actor in users:
+        headers = data.HEADERS.get(actor)
         for publ_type in [process_client.LAYER_TYPE, process_client.MAP_TYPE]:
             for workspace in data.WORKSPACES:
                 for access_type in ['read', 'write']:
@@ -40,7 +41,6 @@ def test_get_publication_infos():
                     publications_set = {name for _, _, name in publications.keys()}
                     assert publications_set == expected[actor][workspace][publ_type][access_type]
 
-                headers = data.HEADERS.get(actor)
                 publications = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
                 publication_set = {publication['name'] for publication in publications}
                 assert publication_set == expected[actor][workspace][publ_type]['read']
