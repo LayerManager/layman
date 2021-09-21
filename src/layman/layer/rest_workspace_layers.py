@@ -94,12 +94,19 @@ def post(workspace):
     description = request.form.get('description', '')
 
     # Style
-    style_file = None
+    style_files = None
     if 'style' in request.files and not request.files['style'].filename == '':
-        style_file = request.files['style']
+        style_files = [
+            f for f in request.files.getlist("style")
+            if len(f.filename) > 0
+        ]
     elif 'sld' in request.files and not request.files['sld'].filename == '':
-        style_file = request.files['sld']
-    style_type = input_style.get_style_type_from_file_storage(style_file)
+        style_files = [
+            f for f in request.files.getlist("sld")
+            if len(f.filename) > 0
+        ]
+    main_style_file = style_files[0] if style_files else None
+    style_type = input_style.get_style_type_from_file_storage(main_style_file)
 
     if file_type == settings.FILE_TYPE_RASTER and style_type.code == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
@@ -141,7 +148,7 @@ def post(workspace):
         task_options.update({'uuid': uuid_str, })
 
         # save files
-        input_style.save_layer_file(workspace, layername, style_file, style_type)
+        input_style.save_layer_file(workspace, layername, main_style_file, style_type)
         if use_chunk_upload:
             files_to_upload = input_chunk.save_layer_files_str(
                 workspace, layername, files, check_crs)
