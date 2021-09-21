@@ -17,11 +17,10 @@ def test_get_publication_infos():
         expected[actor] = dict()
         for workspace in data.WORKSPACES:
             expected[actor][workspace] = dict()
-            for publ_type in [process_client.LAYER_TYPE, process_client.MAP_TYPE]:
+            for publ_type in process_client.PUBLICATION_TYPES:
                 expected[actor][workspace][publ_type] = dict()
                 for access_type in ['read', 'write']:
                     expected[actor][workspace][publ_type][access_type] = set()
-
     for (workspace, publ_type, publication), value in data.PUBLICATIONS.items():
         for access_type in ['read', 'write']:
             users_with_right = value[data.TEST_DATA].get('users_can_' + access_type)
@@ -31,7 +30,7 @@ def test_get_publication_infos():
 
     for actor in users:
         headers = data.HEADERS.get(actor)
-        for publ_type in [process_client.LAYER_TYPE, process_client.MAP_TYPE]:
+        for publ_type in process_client.PUBLICATION_TYPES:
             for workspace in data.WORKSPACES:
                 for access_type in ['read', 'write']:
                     with app.app_context():
