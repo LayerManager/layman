@@ -6,7 +6,7 @@ from test_tools import process_client, util as test_util
 
 @pytest.mark.parametrize('style_file, expected_json', [
     ('test_tools/data/style/small_layer_external_circle.qml', {'type': 'qml',
-                                                               'external_files': {'./circle-15.svg', }}),
+                                                               'external_files': {'/home/work/PycharmProjects/layman/test_tools/data/style/circle.svg', }}),
     ('sample/style/generic-blue_sld.xml', {'type': 'sld', }),
 ])
 @pytest.mark.usefixtures('ensure_layman')
