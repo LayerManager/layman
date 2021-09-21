@@ -21,6 +21,7 @@ def test_get_publication_infos():
                 expected[actor][workspace][publ_type] = dict()
                 for access_type in ['read', 'write']:
                     expected[actor][workspace][publ_type][access_type] = set()
+
     for (workspace, publ_type, publication), value in data.PUBLICATIONS.items():
         for access_type in ['read', 'write']:
             users_with_right = value[data.TEST_DATA].get('users_can_' + access_type)
@@ -30,6 +31,18 @@ def test_get_publication_infos():
 
     for actor in users:
         headers = data.HEADERS.get(actor)
+
+        for access_type in ['read', 'write']:
+            with app.app_context():
+                publications = layman_util.get_publication_infos(context={'actor_name': actor,
+                                                                          'access_type': access_type})
+                assert {publ_type for _, publ_type, _ in publications.keys()} == set(process_client.PUBLICATION_TYPES)
+                for publ_type in process_client.PUBLICATION_TYPES:
+                    for workspace in data.WORKSPACES:
+                        publications_set = {name for ws, p_type, name in publications.keys()
+                                            if ws == workspace and p_type == publ_type}
+                        assert publications_set == expected[actor][workspace][publ_type][access_type]
+
         for publ_type in process_client.PUBLICATION_TYPES:
             for workspace in data.WORKSPACES:
                 for access_type in ['read', 'write']:
