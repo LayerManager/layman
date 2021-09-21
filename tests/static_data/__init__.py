@@ -867,6 +867,7 @@ assert len(LIST_VECTOR_LAYERS) > 0, LIST_VECTOR_LAYERS
 assert len(LIST_SLD_LAYERS) > 0, LIST_SLD_LAYERS
 assert len(LIST_QML_LAYERS) > 0, LIST_QML_LAYERS
 assert len(LIST_INTERNAL_MAPS) > 0, LIST_INTERNAL_MAPS
+assert any('normalized_overviews' in v[TEST_DATA] for v in PUBLICATIONS.values())
 
 
 def assert_same_name_publications(publications):
