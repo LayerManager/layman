@@ -6,7 +6,7 @@ from layman.common.prime_db_schema import workspaces
 from layman.layer import qgis
 from layman.layer.geoserver import wms
 from test_tools import process_client, process
-from .. import static_publications as data
+from .. import static_data as data
 
 
 def assert_publication_after_delete(workspace, publ_type, publication):

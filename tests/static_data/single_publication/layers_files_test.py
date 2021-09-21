@@ -6,7 +6,7 @@ from layman.layer import qgis
 from layman.layer.qgis import wms
 from layman.layer.filesystem import gdal, input_file
 from test_tools.util import url_for
-from ... import static_publications as data
+from ... import static_data as data
 from ..data import ensure_publication
 
 
