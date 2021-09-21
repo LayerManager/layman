@@ -1,6 +1,6 @@
 import pytest
 from layman import app, util as layman_util
-from ... import static_publications as data
+from ... import static_data as data
 from ..data import ensure_all_publications
 
 

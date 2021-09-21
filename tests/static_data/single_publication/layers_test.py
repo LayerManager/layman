@@ -17,7 +17,7 @@ from layman.layer.qgis import util as qgis_util
 from test_tools import process_client, assert_util, geoserver_client
 from test_tools.util import url_for
 from .. import util
-from ... import static_publications as data
+from ... import static_data as data
 from ..data import ensure_publication
 
 
