@@ -1,20 +1,20 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis simplifyDrawingTol="1" maxScale="0" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyLocal="1" simplifyMaxScale="1" simplifyAlgorithm="0" minScale="100000000" readOnly="0" version="3.20.1-Odense" styleCategories="AllStyleCategories" simplifyDrawingHints="1">
+<qgis simplifyDrawingTol="1" simplifyMaxScale="1" readOnly="0" version="3.20.1-Odense" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="0" styleCategories="AllStyleCategories" minScale="100000000" simplifyDrawingHints="1" maxScale="0" labelsEnabled="0" simplifyLocal="1">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
     <Private>0</Private>
   </flags>
-  <temporal enabled="0" durationUnit="min" endField="" mode="0" endExpression="" startExpression="" fixedDuration="0" accumulate="0" startField="" durationField="">
+  <temporal mode="0" startField="" durationUnit="min" accumulate="0" endField="" fixedDuration="0" durationField="" startExpression="" endExpression="" enabled="0">
     <fixedRange>
       <start></start>
       <end></end>
     </fixedRange>
   </temporal>
-  <renderer-v2 symbollevels="0" forceraster="0" type="singleSymbol" enableorderby="0">
+  <renderer-v2 symbollevels="0" type="singleSymbol" enableorderby="0" forceraster="0">
     <symbols>
-      <symbol name="0" force_rhr="0" alpha="1" type="fill" clip_to_extent="1">
+      <symbol name="0" alpha="1" force_rhr="0" type="fill" clip_to_extent="1">
         <data_defined_properties>
           <Option type="Map">
             <Option name="name" type="QString" value=""/>
@@ -22,10 +22,10 @@
             <Option name="type" type="QString" value="collection"/>
           </Option>
         </data_defined_properties>
-        <layer enabled="1" pass="0" class="SVGFill" locked="0">
+        <layer class="SVGFill" locked="0" pass="0" enabled="1">
           <Option type="Map">
             <Option name="angle" type="QString" value="0"/>
-            <Option name="color" type="QString" value="232,113,141,255"/>
+            <Option name="color" type="QString" value="225,89,137,255"/>
             <Option name="outline_color" type="QString" value="35,35,35,255"/>
             <Option name="outline_width" type="QString" value="0.26"/>
             <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
@@ -33,24 +33,24 @@
             <Option name="parameters"/>
             <Option name="pattern_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
             <Option name="pattern_width_unit" type="QString" value="MM"/>
-            <Option name="svgFile" type="QString" value="./circle-15.svg"/>
+            <Option name="svgFile" type="QString" value="/home/work/PycharmProjects/layman/test_tools/data/style/circle.svg"/>
             <Option name="svg_outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
             <Option name="svg_outline_width_unit" type="QString" value="MM"/>
             <Option name="width" type="QString" value="20"/>
           </Option>
-          <prop v="0" k="angle"/>
-          <prop v="232,113,141,255" k="color"/>
-          <prop v="35,35,35,255" k="outline_color"/>
-          <prop v="0.26" k="outline_width"/>
-          <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
-          <prop v="MM" k="outline_width_unit"/>
-          <prop v="" k="parameters"/>
-          <prop v="3x:0,0,0,0,0,0" k="pattern_width_map_unit_scale"/>
-          <prop v="MM" k="pattern_width_unit"/>
-          <prop v="./circle-15.svg" k="svgFile"/>
-          <prop v="3x:0,0,0,0,0,0" k="svg_outline_width_map_unit_scale"/>
-          <prop v="MM" k="svg_outline_width_unit"/>
-          <prop v="20" k="width"/>
+          <prop k="angle" v="0"/>
+          <prop k="color" v="225,89,137,255"/>
+          <prop k="outline_color" v="35,35,35,255"/>
+          <prop k="outline_width" v="0.26"/>
+          <prop k="outline_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="outline_width_unit" v="MM"/>
+          <prop k="parameters" v=""/>
+          <prop k="pattern_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="pattern_width_unit" v="MM"/>
+          <prop k="svgFile" v="/home/work/PycharmProjects/layman/test_tools/data/style/circle.svg"/>
+          <prop k="svg_outline_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="svg_outline_width_unit" v="MM"/>
+          <prop k="width" v="20"/>
           <data_defined_properties>
             <Option type="Map">
               <Option name="name" type="QString" value=""/>
@@ -58,7 +58,7 @@
               <Option name="type" type="QString" value="collection"/>
             </Option>
           </data_defined_properties>
-          <symbol name="@0@0" force_rhr="0" alpha="1" type="line" clip_to_extent="1">
+          <symbol name="@0@0" alpha="1" force_rhr="0" type="line" clip_to_extent="1">
             <data_defined_properties>
               <Option type="Map">
                 <Option name="name" type="QString" value=""/>
@@ -66,7 +66,7 @@
                 <Option name="type" type="QString" value="collection"/>
               </Option>
             </data_defined_properties>
-            <layer enabled="1" pass="0" class="SimpleLine" locked="0">
+            <layer class="SimpleLine" locked="0" pass="0" enabled="1">
               <Option type="Map">
                 <Option name="align_dash_pattern" type="QString" value="0"/>
                 <Option name="capstyle" type="QString" value="square"/>
@@ -96,33 +96,33 @@
                 <Option name="use_custom_dash" type="QString" value="0"/>
                 <Option name="width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
               </Option>
-              <prop v="0" k="align_dash_pattern"/>
-              <prop v="square" k="capstyle"/>
-              <prop v="5;2" k="customdash"/>
-              <prop v="3x:0,0,0,0,0,0" k="customdash_map_unit_scale"/>
-              <prop v="MM" k="customdash_unit"/>
-              <prop v="0" k="dash_pattern_offset"/>
-              <prop v="3x:0,0,0,0,0,0" k="dash_pattern_offset_map_unit_scale"/>
-              <prop v="MM" k="dash_pattern_offset_unit"/>
-              <prop v="0" k="draw_inside_polygon"/>
-              <prop v="bevel" k="joinstyle"/>
-              <prop v="35,35,35,255" k="line_color"/>
-              <prop v="solid" k="line_style"/>
-              <prop v="0.26" k="line_width"/>
-              <prop v="MM" k="line_width_unit"/>
-              <prop v="0" k="offset"/>
-              <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
-              <prop v="MM" k="offset_unit"/>
-              <prop v="0" k="ring_filter"/>
-              <prop v="0" k="trim_distance_end"/>
-              <prop v="3x:0,0,0,0,0,0" k="trim_distance_end_map_unit_scale"/>
-              <prop v="MM" k="trim_distance_end_unit"/>
-              <prop v="0" k="trim_distance_start"/>
-              <prop v="3x:0,0,0,0,0,0" k="trim_distance_start_map_unit_scale"/>
-              <prop v="MM" k="trim_distance_start_unit"/>
-              <prop v="0" k="tweak_dash_pattern_on_corners"/>
-              <prop v="0" k="use_custom_dash"/>
-              <prop v="3x:0,0,0,0,0,0" k="width_map_unit_scale"/>
+              <prop k="align_dash_pattern" v="0"/>
+              <prop k="capstyle" v="square"/>
+              <prop k="customdash" v="5;2"/>
+              <prop k="customdash_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+              <prop k="customdash_unit" v="MM"/>
+              <prop k="dash_pattern_offset" v="0"/>
+              <prop k="dash_pattern_offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+              <prop k="dash_pattern_offset_unit" v="MM"/>
+              <prop k="draw_inside_polygon" v="0"/>
+              <prop k="joinstyle" v="bevel"/>
+              <prop k="line_color" v="35,35,35,255"/>
+              <prop k="line_style" v="solid"/>
+              <prop k="line_width" v="0.26"/>
+              <prop k="line_width_unit" v="MM"/>
+              <prop k="offset" v="0"/>
+              <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+              <prop k="offset_unit" v="MM"/>
+              <prop k="ring_filter" v="0"/>
+              <prop k="trim_distance_end" v="0"/>
+              <prop k="trim_distance_end_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+              <prop k="trim_distance_end_unit" v="MM"/>
+              <prop k="trim_distance_start" v="0"/>
+              <prop k="trim_distance_start_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+              <prop k="trim_distance_start_unit" v="MM"/>
+              <prop k="tweak_dash_pattern_on_corners" v="0"/>
+              <prop k="use_custom_dash" v="0"/>
+              <prop k="width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
               <data_defined_properties>
                 <Option type="Map">
                   <Option name="name" type="QString" value=""/>
@@ -148,11 +148,11 @@
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerOpacity>1</layerOpacity>
-  <SingleCategoryDiagramRenderer attributeLegend="1" diagramType="Histogram">
-    <DiagramCategory penWidth="0" opacity="1" showAxis="1" spacing="5" penColor="#000000" scaleBasedVisibility="0" labelPlacementMethod="XHeight" sizeType="MM" diagramOrientation="Up" spacingUnit="MM" enabled="0" penAlpha="255" spacingUnitScale="3x:0,0,0,0,0,0" width="15" minScaleDenominator="0" barWidth="5" lineSizeScale="3x:0,0,0,0,0,0" scaleDependency="Area" backgroundAlpha="255" height="15" rotationOffset="270" sizeScale="3x:0,0,0,0,0,0" backgroundColor="#ffffff" direction="0" minimumSize="0" lineSizeType="MM" maxScaleDenominator="1e+08">
+  <SingleCategoryDiagramRenderer diagramType="Histogram" attributeLegend="1">
+    <DiagramCategory spacing="5" labelPlacementMethod="XHeight" direction="0" opacity="1" spacingUnit="MM" backgroundColor="#ffffff" maxScaleDenominator="1e+08" rotationOffset="270" scaleDependency="Area" diagramOrientation="Up" minScaleDenominator="0" sizeScale="3x:0,0,0,0,0,0" lineSizeType="MM" barWidth="5" penAlpha="255" penWidth="0" height="15" scaleBasedVisibility="0" penColor="#000000" sizeType="MM" enabled="0" lineSizeScale="3x:0,0,0,0,0,0" minimumSize="0" backgroundAlpha="255" showAxis="1" width="15" spacingUnitScale="3x:0,0,0,0,0,0">
       <fontProperties style="" description="Ubuntu,11,-1,5,50,0,0,0,0,0"/>
       <axisSymbol>
-        <symbol name="" force_rhr="0" alpha="1" type="line" clip_to_extent="1">
+        <symbol name="" alpha="1" force_rhr="0" type="line" clip_to_extent="1">
           <data_defined_properties>
             <Option type="Map">
               <Option name="name" type="QString" value=""/>
@@ -160,7 +160,7 @@
               <Option name="type" type="QString" value="collection"/>
             </Option>
           </data_defined_properties>
-          <layer enabled="1" pass="0" class="SimpleLine" locked="0">
+          <layer class="SimpleLine" locked="0" pass="0" enabled="1">
             <Option type="Map">
               <Option name="align_dash_pattern" type="QString" value="0"/>
               <Option name="capstyle" type="QString" value="square"/>
@@ -190,33 +190,33 @@
               <Option name="use_custom_dash" type="QString" value="0"/>
               <Option name="width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
             </Option>
-            <prop v="0" k="align_dash_pattern"/>
-            <prop v="square" k="capstyle"/>
-            <prop v="5;2" k="customdash"/>
-            <prop v="3x:0,0,0,0,0,0" k="customdash_map_unit_scale"/>
-            <prop v="MM" k="customdash_unit"/>
-            <prop v="0" k="dash_pattern_offset"/>
-            <prop v="3x:0,0,0,0,0,0" k="dash_pattern_offset_map_unit_scale"/>
-            <prop v="MM" k="dash_pattern_offset_unit"/>
-            <prop v="0" k="draw_inside_polygon"/>
-            <prop v="bevel" k="joinstyle"/>
-            <prop v="35,35,35,255" k="line_color"/>
-            <prop v="solid" k="line_style"/>
-            <prop v="0.26" k="line_width"/>
-            <prop v="MM" k="line_width_unit"/>
-            <prop v="0" k="offset"/>
-            <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
-            <prop v="MM" k="offset_unit"/>
-            <prop v="0" k="ring_filter"/>
-            <prop v="0" k="trim_distance_end"/>
-            <prop v="3x:0,0,0,0,0,0" k="trim_distance_end_map_unit_scale"/>
-            <prop v="MM" k="trim_distance_end_unit"/>
-            <prop v="0" k="trim_distance_start"/>
-            <prop v="3x:0,0,0,0,0,0" k="trim_distance_start_map_unit_scale"/>
-            <prop v="MM" k="trim_distance_start_unit"/>
-            <prop v="0" k="tweak_dash_pattern_on_corners"/>
-            <prop v="0" k="use_custom_dash"/>
-            <prop v="3x:0,0,0,0,0,0" k="width_map_unit_scale"/>
+            <prop k="align_dash_pattern" v="0"/>
+            <prop k="capstyle" v="square"/>
+            <prop k="customdash" v="5;2"/>
+            <prop k="customdash_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+            <prop k="customdash_unit" v="MM"/>
+            <prop k="dash_pattern_offset" v="0"/>
+            <prop k="dash_pattern_offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+            <prop k="dash_pattern_offset_unit" v="MM"/>
+            <prop k="draw_inside_polygon" v="0"/>
+            <prop k="joinstyle" v="bevel"/>
+            <prop k="line_color" v="35,35,35,255"/>
+            <prop k="line_style" v="solid"/>
+            <prop k="line_width" v="0.26"/>
+            <prop k="line_width_unit" v="MM"/>
+            <prop k="offset" v="0"/>
+            <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+            <prop k="offset_unit" v="MM"/>
+            <prop k="ring_filter" v="0"/>
+            <prop k="trim_distance_end" v="0"/>
+            <prop k="trim_distance_end_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+            <prop k="trim_distance_end_unit" v="MM"/>
+            <prop k="trim_distance_start" v="0"/>
+            <prop k="trim_distance_start_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+            <prop k="trim_distance_start_unit" v="MM"/>
+            <prop k="tweak_dash_pattern_on_corners" v="0"/>
+            <prop k="use_custom_dash" v="0"/>
+            <prop k="width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
             <data_defined_properties>
               <Option type="Map">
                 <Option name="name" type="QString" value=""/>
@@ -229,7 +229,7 @@
       </axisSymbol>
     </DiagramCategory>
   </SingleCategoryDiagramRenderer>
-  <DiagramLayerSettings zIndex="0" dist="0" placement="1" linePlacementFlags="18" showAll="1" priority="0" obstacle="0">
+  <DiagramLayerSettings linePlacementFlags="18" priority="0" showAll="1" obstacle="0" placement="1" dist="0" zIndex="0">
     <properties>
       <Option type="Map">
         <Option name="name" type="QString" value=""/>
@@ -238,7 +238,7 @@
       </Option>
     </properties>
   </DiagramLayerSettings>
-  <geometryOptions removeDuplicateNodes="0" geometryPrecision="0">
+  <geometryOptions geometryPrecision="0" removeDuplicateNodes="0">
     <activeChecks/>
     <checkConfiguration type="Map">
       <Option name="QgsGeometryGapCheck" type="Map">
@@ -248,7 +248,7 @@
       </Option>
     </checkConfiguration>
   </geometryOptions>
-  <legend type="default-vector" showLabelLegend="0"/>
+  <legend showLabelLegend="0" type="default-vector"/>
   <referencedLayers/>
   <fieldConfiguration>
     <field name="cartodb_id" configurationFlags="None">
@@ -263,22 +263,22 @@
     <alias name="" field="cartodb_id" index="0"/>
   </aliases>
   <defaults>
-    <default applyOnUpdate="0" field="cartodb_id" expression=""/>
+    <default field="cartodb_id" expression="" applyOnUpdate="0"/>
   </defaults>
   <constraints>
-    <constraint notnull_strength="0" unique_strength="0" field="cartodb_id" constraints="0" exp_strength="0"/>
+    <constraint constraints="0" notnull_strength="0" exp_strength="0" unique_strength="0" field="cartodb_id"/>
   </constraints>
   <constraintExpressions>
-    <constraint desc="" exp="" field="cartodb_id"/>
+    <constraint exp="" desc="" field="cartodb_id"/>
   </constraintExpressions>
   <expressionfields/>
   <attributeactions>
-    <defaultAction key="Canvas" value="{00000000-0000-0000-0000-000000000000}"/>
+    <defaultAction value="{00000000-0000-0000-0000-000000000000}" key="Canvas"/>
   </attributeactions>
-  <attributetableconfig sortOrder="0" actionWidgetStyle="dropDown" sortExpression="">
+  <attributetableconfig sortExpression="" actionWidgetStyle="dropDown" sortOrder="0">
     <columns>
-      <column name="cartodb_id" width="-1" hidden="0" type="field"/>
-      <column width="-1" hidden="1" type="actions"/>
+      <column name="cartodb_id" width="-1" type="field" hidden="0"/>
+      <column width="-1" type="actions" hidden="1"/>
     </columns>
   </attributetableconfig>
   <conditionalstyles>
@@ -316,7 +316,7 @@ def my_form_open(dialog, layer, feature):
     <field name="cartodb_id" labelOnTop="0"/>
   </labelOnTop>
   <reuseLastValue>
-    <field name="cartodb_id" reuseLastValue="0"/>
+    <field reuseLastValue="0" name="cartodb_id"/>
   </reuseLastValue>
   <dataDefinedFieldProperties/>
   <widgets/>
