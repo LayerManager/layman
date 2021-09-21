@@ -4,7 +4,7 @@ from layman.layer.filesystem import gdal, thumbnail as layer_thumbnail
 from layman.map.filesystem import thumbnail as map_thumbnail
 from test_tools import assert_util, util as test_util, process_client
 from .. import util
-from ... import static_publications as data
+from ... import static_data as data
 from ..data import ensure_publication
 
 

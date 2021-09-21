@@ -3,7 +3,7 @@ import pytest
 
 from layman import app, util as layman_util
 from test_tools import process_client
-from ... import static_publications as data
+from ... import static_data as data
 from ..data import ensure_publication
 
 

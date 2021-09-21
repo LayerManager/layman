@@ -1,5 +1,5 @@
 from layman import settings
-from .. import static_publications as data
+from .. import static_data as data
 
 KEY_AUTH = 'can'
 KEY_NOT_AUTH = 'cannot'

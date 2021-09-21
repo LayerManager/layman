@@ -3,7 +3,7 @@ import pytest
 from geoserver import util as gs_util
 from layman import settings
 from test_tools import process_client
-from ... import static_publications as data
+from ... import static_data as data
 
 
 @pytest.mark.parametrize('username', data.USERS)
