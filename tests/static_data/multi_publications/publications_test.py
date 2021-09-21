@@ -12,6 +12,7 @@ def test_get_publication_infos():
     ensure_all_publications()
 
     users = data.USERS | {settings.ANONYM_USER, settings.NONAME_USER}
+    # prepare expected data
     expected = dict()
     for actor in users:
         expected[actor] = dict()
@@ -21,7 +22,6 @@ def test_get_publication_infos():
                 expected[actor][workspace][publ_type] = dict()
                 for access_type in ['read', 'write']:
                     expected[actor][workspace][publ_type][access_type] = set()
-
     for (workspace, publ_type, publication), value in data.PUBLICATIONS.items():
         for access_type in ['read', 'write']:
             users_with_right = value[data.TEST_DATA].get('users_can_' + access_type)
@@ -32,6 +32,7 @@ def test_get_publication_infos():
     for actor in users:
         headers = data.HEADERS.get(actor)
 
+        # test internal get_publication_infos only with actor and access type
         for access_type in ['read', 'write']:
             with app.app_context():
                 publications = layman_util.get_publication_infos(context={'actor_name': actor,
@@ -45,6 +46,7 @@ def test_get_publication_infos():
 
         for publ_type in process_client.PUBLICATION_TYPES:
             for workspace in data.WORKSPACES:
+                # test internal get_publication_infos with workspace, publication type. actor and access type
                 for access_type in ['read', 'write']:
                     with app.app_context():
                         publications = layman_util.get_publication_infos(workspace, publ_type, {'actor_name': actor, 'access_type': access_type})
@@ -52,10 +54,12 @@ def test_get_publication_infos():
                     publications_set = {name for _, _, name in publications.keys()}
                     assert publications_set == expected[actor][workspace][publ_type][access_type]
 
+                # test authenticated GET Workspace Layers/Maps
                 publications = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
                 publication_set = {publication['name'] for publication in publications}
                 assert publication_set == expected[actor][workspace][publ_type]['read']
 
+            # test authenticated GET Layers/Maps
             publications = process_client.get_publications(publ_type, headers=headers)
             for workspace in data.WORKSPACES:
                 publication_set = {publication['name'] for publication in publications
