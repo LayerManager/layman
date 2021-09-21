@@ -31,8 +31,8 @@ def test_get_publication_infos():
                 expected[actor][workspace][publ_type][access_type].add(publication)
 
     for actor in users:
-        for workspace in data.WORKSPACES:
-            for publ_type in [process_client.LAYER_TYPE, process_client.MAP_TYPE]:
+        for publ_type in [process_client.LAYER_TYPE, process_client.MAP_TYPE]:
+            for workspace in data.WORKSPACES:
                 for access_type in ['read', 'write']:
                     with app.app_context():
                         publications = layman_util.get_publication_infos(workspace, publ_type, {'actor_name': actor, 'access_type': access_type})
