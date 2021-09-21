@@ -1,3 +1,4 @@
+from collections import defaultdict
 from layman import settings
 from test_tools import process_client
 
@@ -866,6 +867,23 @@ assert len(LIST_VECTOR_LAYERS) > 0, LIST_VECTOR_LAYERS
 assert len(LIST_SLD_LAYERS) > 0, LIST_SLD_LAYERS
 assert len(LIST_QML_LAYERS) > 0, LIST_QML_LAYERS
 assert len(LIST_INTERNAL_MAPS) > 0, LIST_INTERNAL_MAPS
+
+
+def assert_same_name_publications(publications):
+    types_by_workspace_and_name = defaultdict(set)
+    for workspace, publ_type, publ_name in publications:
+        types_by_workspace_and_name[(workspace, publ_name)].add(publ_type)
+    same_name_same_workspace = {k: v for k, v in types_by_workspace_and_name.items() if len(v) > 1}
+    assert len(same_name_same_workspace) > 0
+
+    workspaces_by_type_and_name = defaultdict(set)
+    for workspace, publ_type, publ_name in publications:
+        workspaces_by_type_and_name[(publ_type, publ_name)].add(workspace)
+    same_name_same_type = {k: v for k, v in workspaces_by_type_and_name.items() if len(v) > 1}
+    assert len(same_name_same_type) > 0
+
+
+assert_same_name_publications(PUBLICATIONS)
 
 assert all(set(test_data.get('users_can_read', set())).issubset(USERS) for test_data in PUBLICATIONS.values())
 assert all(set(test_data.get('users_can_write', set())).issubset(USERS) for test_data in PUBLICATIONS.values())
