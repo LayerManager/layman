@@ -19,6 +19,9 @@ post_layer = empty_method
 patch_layer = empty_method
 get_metadata_comparison = empty_method_returns_dict
 
+EXTERNAL_IMAGES_XPATHS = {('.//prop[@k="imageFile" or @k="svgFile"]', 'v', ),
+                          ('.//Option[@name="imageFile" or @name="svgFile"]', 'value',)}
+
 
 def get_layer_input_style_dir(workspace, layername):
     input_style_dir = os.path.join(util.get_layer_dir(workspace, layername),
@@ -87,9 +90,10 @@ def get_style_type_from_file_storage(file_storage):
 
 
 def get_external_files_from_qml(qml):
-    image_prop_files = qml.xpath('.//prop[@k="imageFile" or @k="svgFile"]/@v')
-    image_option_files = qml.xpath('.//Option[@name="imageFile" or @name="svgFile"]/@value')
-    external_files = set(image_prop_files + image_option_files)
+    external_files = set()
+    for xpath, attr_name in EXTERNAL_IMAGES_XPATHS:
+        part_external_files = qml.xpath(f'{xpath}/@{attr_name}')
+        external_files.update(part_external_files)
     return external_files
 
 
