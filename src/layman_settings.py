@@ -22,6 +22,8 @@ MAIN_FILE_EXTENSIONS = {
     '.jpg': FILE_TYPE_RASTER,
 }
 
+STYLE_FILE_EXTENSIONS = {'.sld', '.xml', '.qml'}
+
 INPUT_SRS_LIST = [
     'EPSG:3857',
     'EPSG:4326',

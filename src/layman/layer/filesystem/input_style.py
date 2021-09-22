@@ -5,7 +5,7 @@ import glob
 from lxml import etree
 from werkzeug.datastructures import FileStorage
 
-from layman import patch_mode, LaymanError, layer
+from layman import patch_mode, LaymanError, layer, settings
 from layman.common import empty_method, empty_method_returns_dict
 from . import util
 from . import input_file
@@ -96,3 +96,12 @@ def get_external_files_from_qml(qml):
 def get_external_files_from_qml_file(file_path):
     qml = etree.parse(file_path)
     return get_external_files_from_qml(qml)
+
+
+def get_all_allowed_main_extensions():
+    return settings.STYLE_FILE_EXTENSIONS
+
+
+def get_main_file(filestorages):
+    return next((fn for fn in filestorages if os.path.splitext(fn.filename)[1]
+                 in get_all_allowed_main_extensions()), None)
