@@ -11,6 +11,7 @@
 - [#464](https://github.com/LayerManager/layman/issues/464) Fix publishing layers with unusual attribute  names (e.g. `x,` or `Číslo`) and QML styles. It was already fixed in v1.14.1.
 - [#459](https://github.com/LayerManager/layman/issues/459) Fix situation, when sometimes publication stayed in PENDING status after failure. It was already fixed in v1.14.1.
 - Rename item `username` to `workspace` in error 41.
+- Detailed [test-related documentation for developers](tests/README.md).
 
 ## v1.14.1
  2021-09-14
