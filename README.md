@@ -274,3 +274,5 @@ make test-separated
 # other tests
 make test
 ```
+
+For more information about tests, look at [test-related documentation for developers](tests/README.md).
