@@ -1,3 +1,4 @@
+from collections import namedtuple
 import lxml
 import pytest
 from werkzeug.datastructures import FileStorage
@@ -43,3 +44,25 @@ def test_get_style_type_from_xml_file_errors(file_path,
 def test_get_external_files_from_qml_file(filepath, exp_set):
     found_files = input_style.get_external_files_from_qml_file(filepath)
     assert found_files == exp_set
+
+
+FileStorageMockTypeDef = namedtuple('FileStorageMock', ['filename', ])
+
+
+@pytest.mark.parametrize('filestorages, exp_filename', [
+    ([FileStorageMockTypeDef('/layman/test_tools/data/style/circle.svg'),
+      FileStorageMockTypeDef('/layman/test_tools/data/style/small_layer_external_circle.qml'),
+      ], '/layman/test_tools/data/style/small_layer_external_circle.qml', ),
+    ([FileStorageMockTypeDef('/layman/test_tools/data/style/circle.svg'),
+      FileStorageMockTypeDef('/layman/test_tools/data/style/small_layer_external_circle.sld'),
+      ], '/layman/test_tools/data/style/small_layer_external_circle.sld', ),
+    ([FileStorageMockTypeDef('/layman/test_tools/data/style/circle.svg'),
+      FileStorageMockTypeDef('/layman/test_tools/data/style/small_layer_external_circle.xml'),
+      ], '/layman/test_tools/data/style/small_layer_external_circle.xml', ),
+    ([FileStorageMockTypeDef('/layman/test_tools/data/style/circle.sld'),
+      FileStorageMockTypeDef('/layman/test_tools/data/style/small_layer_external_circle.qml'),
+      ], '/layman/test_tools/data/style/circle.sld', ),
+])
+def test_get_main_file(filestorages, exp_filename):
+    main_file = input_style.get_main_file(filestorages)
+    assert main_file.filename == exp_filename, f'filestorages={filestorages}, exp_filename={exp_filename}, main_file={main_file}'
