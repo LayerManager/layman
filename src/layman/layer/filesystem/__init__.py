@@ -2,6 +2,8 @@ from layman.common import empty_method
 from layman.common.filesystem import util as common_util
 from . import util, gdal
 
+EXTERNAL_IMAGES_DIR = 'external_images'
+
 check_workspace_name = empty_method
 check_new_layername = empty_method
 
