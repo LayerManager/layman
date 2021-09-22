@@ -51,7 +51,7 @@ PUBLICATION_TYPES = {
                                                                                      'bounding_box', 'style_type', ]),),
             ('layman.layer.filesystem.input_chunk', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_file', InternalSourceTypeDef(info_items=['file', ]),),
-            ('layman.layer.filesystem.input_style', InternalSourceTypeDef(info_items=[]),),
+            ('layman.layer.filesystem.input_style', InternalSourceTypeDef(info_items=['style', ]),),
             ('layman.layer.filesystem.gdal', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.db.table', InternalSourceTypeDef(info_items=['db_table', ]),),
             ('layman.layer.prime_db_schema.bbox', InternalSourceTypeDef(info_items=[]),),
