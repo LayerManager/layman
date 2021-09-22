@@ -37,8 +37,19 @@ def ensure_layer_input_style_dir(workspace, layername):
     return input_style_dir
 
 
-get_layer_info = input_file.get_layer_info
 get_publication_uuid = input_file.get_publication_uuid
+
+
+def get_layer_info(workspace, layername):
+    input_style_dir = get_layer_input_style_dir(workspace, layername)
+    if os.path.exists(input_style_dir):
+        result = {'name': layername}
+        external_images_dir = get_external_images_dir(workspace, layername)
+        if os.path.exists(external_images_dir):
+            result['_style'] = {'external_images_dir': external_images_dir}
+    else:
+        result = dict()
+    return result
 
 
 def get_external_images_dir(workspace, layername):
