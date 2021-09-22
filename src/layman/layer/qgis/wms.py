@@ -1,4 +1,5 @@
 import os
+from distutils.dir_util import copy_tree
 from owslib.wms import WebMapService
 
 from layman import patch_mode, settings, util as layman_util
@@ -61,7 +62,8 @@ def save_qgs_file(workspace, layer):
     info = layer_util.get_layer_info(workspace, layer)
     uuid = info['uuid']
     qgis.ensure_layer_dir(workspace, layer)
-    layer_bbox = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['bounding_box']})['bounding_box']
+    layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['bounding_box', 'style']})
+    layer_bbox = layer_info['bounding_box']
     layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
     qml = util.get_original_style_xml(workspace, layer)
     qml_geometry = util.get_qml_geometry_from_qml(qml)
@@ -76,6 +78,11 @@ def save_qgs_file(workspace, layer):
                                          layer_bbox, source_type)
     with open(get_layer_file_path(workspace, layer), "w") as qgs_file:
         print(qgs_str, file=qgs_file)
+    external_images_original_path = layer_info.get('_style', dict()).get('external_images_dir')
+    if external_images_original_path:
+        external_images_dir_name = os.path.basename(external_images_original_path)
+        external_images_target_path = os.path.join(qgis.get_layer_dir(workspace, layer), external_images_dir_name)
+        copy_tree(external_images_original_path, external_images_target_path)
 
 
 def get_style_qml(workspace, layer):
