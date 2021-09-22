@@ -7,8 +7,10 @@ from werkzeug.datastructures import FileStorage
 
 from layman import patch_mode, LaymanError, layer, settings
 from layman.common import empty_method, empty_method_returns_dict
+from layman.common.filesystem import input_file as common_input_file
 from . import util
 from . import input_file
+from .. import filesystem
 
 LAYER_SUBDIR = __name__.split('.')[-1]
 
@@ -39,6 +41,11 @@ get_layer_info = input_file.get_layer_info
 get_publication_uuid = input_file.get_publication_uuid
 
 
+def get_external_images_dir(workspace, layername):
+    input_style_dir = get_layer_input_style_dir(workspace, layername)
+    return os.path.join(input_style_dir, filesystem.EXTERNAL_IMAGES_DIR)
+
+
 def delete_layer(workspace, layername):
     util.delete_layer_subdir(workspace, layername, LAYER_SUBDIR)
 
@@ -64,6 +71,49 @@ def save_layer_file(workspace, layername, style_file, style_type):
         else:
             with open(style_path, 'wb') as out:
                 out.write(style_file.read())
+
+
+def get_mapping_from_external_image_list(external_images):
+    return {path: os.path.join(filesystem.EXTERNAL_IMAGES_DIR, f'image_{idx}{os.path.splitext(path)[1]}') for idx, path in
+            enumerate(external_images)}
+
+
+def adjust_qml_external_image_paths(xml_etree, image_mapping):
+    for xpath, attr_name in EXTERNAL_IMAGES_XPATHS:
+        for element in xml_etree.xpath(xpath):
+            original_path = element.attrib[attr_name]
+            if original_path in image_mapping:
+                element.attrib[attr_name] = f'./{image_mapping[original_path]}'
+
+
+def save_layer_files(workspace, layername, style_file, style_type, style_files, external_image_paths, ):
+    delete_layer(workspace, layername)
+
+    if style_file:
+        ensure_layer_input_style_dir(workspace, layername)
+        style_path_clear = get_file_path(workspace, layername, with_extension=False)
+        style_path = style_path_clear + '.' + style_type.extension
+
+        if isinstance(style_file, FileStorage):
+            xml = style_file.read()
+            style_file.seek(0)
+            xml_tree = etree.fromstring(xml)
+        else:
+            xml_tree = etree.parse(style_file)
+
+        if external_image_paths:
+            external_images = [ext_image for ext_image in style_files if
+                               ext_image != style_file and ext_image.filename in external_image_paths]
+            if external_images:
+                assert style_type.code == 'qml', f'workspace={workspace}, layername={layername}, style_type={style_type}'
+                ext_image_mapping = get_mapping_from_external_image_list(external_image_paths)
+                input_style_dir = get_layer_input_style_dir(workspace, layername)
+                common_input_file.save_files(external_images, ext_image_mapping, prefix=input_style_dir)
+                adjust_qml_external_image_paths(xml_tree, ext_image_mapping)
+
+        full_xml_str = etree.tostring(xml_tree, encoding='unicode', pretty_print=True)
+        with open(style_path, "w") as opened_style_file:
+            print(full_xml_str, file=opened_style_file)
 
 
 def get_layer_file(workspace, layername):

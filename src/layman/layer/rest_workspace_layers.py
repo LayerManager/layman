@@ -95,17 +95,20 @@ def post(workspace):
 
     # Style
     style_files = None
-    if 'style' in request.files and not request.files['style'].filename == '':
+    if 'style' in request.files:
         style_files = [
             f for f in request.files.getlist("style")
             if len(f.filename) > 0
         ]
-    elif 'sld' in request.files and not request.files['sld'].filename == '':
+    elif 'sld' in request.files:
         style_files = [
             f for f in request.files.getlist("sld")
             if len(f.filename) > 0
         ]
-    main_style_file = style_files[0] if style_files else None
+    if style_files:
+        main_style_file = input_style.get_main_file(style_files)
+    else:
+        main_style_file = None
     style_type = input_style.get_style_type_from_file_storage(main_style_file)
 
     if file_type == settings.FILE_TYPE_RASTER and style_type.code == 'qml':
@@ -148,7 +151,9 @@ def post(workspace):
         task_options.update({'uuid': uuid_str, })
 
         # save files
-        input_style.save_layer_file(workspace, layername, main_style_file, style_type)
+        if main_style_file:
+            external_images = input_style.get_external_files_from_qml_file(main_style_file)
+            input_style.save_layer_files(workspace, layername, main_style_file, style_type, style_files, external_images, )
         if use_chunk_upload:
             files_to_upload = input_chunk.save_layer_files_str(
                 workspace, layername, files, check_crs)

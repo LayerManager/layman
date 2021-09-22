@@ -5,6 +5,7 @@ from werkzeug.datastructures import FileStorage
 
 from layman import LaymanError
 from layman.layer.filesystem import input_style
+from .. import filesystem
 
 
 @pytest.mark.parametrize('file_path, expected_type', [
@@ -66,3 +67,19 @@ FileStorageMockTypeDef = namedtuple('FileStorageMock', ['filename', ])
 def test_get_main_file(filestorages, exp_filename):
     main_file = input_style.get_main_file(filestorages)
     assert main_file.filename == exp_filename, f'filestorages={filestorages}, exp_filename={exp_filename}, main_file={main_file}'
+
+
+@pytest.mark.parametrize('external_images, exp_mapping', [
+    (['/layman/test_tools/data/style/circle_a.svg',
+      '/layman/test_tools/data/style/circle_b.bmp',
+      '/layman/test_tools/data/circle_a.svg',
+      ],
+     {'/layman/test_tools/data/style/circle_a.svg': f'{filesystem.EXTERNAL_IMAGES_DIR}/image_0.svg',
+      '/layman/test_tools/data/style/circle_b.bmp': f'{filesystem.EXTERNAL_IMAGES_DIR}/image_1.bmp',
+      '/layman/test_tools/data/circle_a.svg': f'{filesystem.EXTERNAL_IMAGES_DIR}/image_2.svg',
+      },
+     ),
+])
+def test_get_mapping_from_external_image_list(external_images, exp_mapping):
+    mapping = input_style.get_mapping_from_external_image_list(external_images)
+    assert mapping == exp_mapping, f'external_images={external_images}, exp_mapping={exp_mapping}, mapping={mapping}'
