@@ -149,11 +149,13 @@ Body parameters:
 - *crs*, string `EPSG:3857` or `EPSG:4326`
    - CRS of the file
    - by default it is read/guessed from input file
-- *style*, style file
+- *style*, style files
    - by default default SLD style of GeoServer is used
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
      - QML style for raster data file is not supported
-   - uploading of additional style files, e.g. point-symbol images or fonts is not supported
+   - uploading of external images linked from style is supported only for QML style file
+     - such external files should be also uploaded through this parameter; file name of each sent external file must be the same as its file path inside QML style (including directories in path)
+     - list of external image paths of any style can be obtained by [POST Style Info](#post-style-info)
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
 - *access_rights.read*, string
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
