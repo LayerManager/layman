@@ -740,6 +740,20 @@ PUBLICATIONS = {
             'style_type': 'sld',
         },
     },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_sld_external_svg'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.layer/small_layer_square.geojson', ],
+             'style_files': ['test_tools/data/style/small_layer_external_circle.qml',
+                             ('test_tools/data/style/circle.svg', '/home/work/PycharmProjects/layman/test_tools/data/style/circle.svg',),
+                             ]},
+        ],
+        TEST_DATA: {
+            'bbox': (1558472.87110583, 6106854.834885074, 1781111.852692377, 6446275.841017161),
+            'thumbnail': 'test_tools/data/thumbnail/layer_square_external_svg.png',
+            'file_type': settings.FILE_TYPE_VECTOR,
+            'style_type': 'qml',
+        },
+    },
     ################################################################################
     #                                     MAPS
     ################################################################################
@@ -868,6 +882,7 @@ assert len(LIST_SLD_LAYERS) > 0, LIST_SLD_LAYERS
 assert len(LIST_QML_LAYERS) > 0, LIST_QML_LAYERS
 assert len(LIST_INTERNAL_MAPS) > 0, LIST_INTERNAL_MAPS
 assert any('normalized_overviews' in v[TEST_DATA] for v in PUBLICATIONS.values())
+assert any('style_files' in v[DEFINITION][0] for v in PUBLICATIONS.values())
 
 
 def assert_same_name_publications(publications):
