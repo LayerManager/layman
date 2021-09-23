@@ -254,13 +254,17 @@ def publish_workspace_publication(publication_type,
                                   check_response_fn=None,
                                   with_chunks=False,
                                   crs=None,
+                                  style_files=None,
                                   ):
     title = title or name
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     file_paths = file_paths or [publication_type_def.source_path, ]
-    if style_file:
+    if style_file or style_files:
         assert publication_type == LAYER_TYPE
+    assert not(style_file and style_files)
+    if style_file:
+        style_files = [style_file, ]
 
     # Only Layer files can be uploaded by chunks
     assert not with_chunks or publication_type == LAYER_TYPE
@@ -279,8 +283,15 @@ def publish_workspace_publication(publication_type,
             files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
         else:
             data['file'] = [os.path.basename(file) for file in file_paths]
-        if style_file:
-            files.append(('style', (os.path.basename(style_file), open(style_file, 'rb'))))
+        if style_files:
+            for file in style_files:
+                if isinstance(file, tuple):
+                    file_path, file_alias = file
+                else:
+                    file_alias = os.path.basename(file)
+                    file_path = file
+                assert os.path.isfile(file_path), file_path
+                files.append(('style', (file_alias, open(file_path, 'rb'))))
         if access_rights and access_rights.get('read'):
             data["access_rights.read"] = access_rights['read']
         if access_rights and access_rights.get('write'):
