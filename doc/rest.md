@@ -735,7 +735,9 @@ HTTP status code 200 if credentials were deleted.
 Get information about style file.
 
 #### Request
-Query parameters:
+Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
+
+Body parameters:
 - *style*, QML or SLD style file
 
 #### Response
