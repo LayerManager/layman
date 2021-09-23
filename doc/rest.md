@@ -569,7 +569,7 @@ Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
 Parameters have same meaning as in case of [POST Workspace Maps](#post-workspace-maps).
 
 Body parameters:
-*file*, JSON file
+- *file*, JSON file
    - If provided, thumbnail will be deleted and created again using the new file.
    - must be valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema)
 - *title*, string `.+`
