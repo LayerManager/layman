@@ -86,8 +86,9 @@ def test_get_mapping_from_external_image_list(external_images, exp_mapping):
     assert mapping == exp_mapping, f'external_images={external_images}, exp_mapping={exp_mapping}, mapping={mapping}'
 
 
-@pytest.mark.parametrize('style_files, expected_error', [
-    ([FileStorageMockTypeDef('/layman/test_tools/data/style/circle.svg'),
+@pytest.mark.parametrize('external_files_from_style, style_files, expected_error', [
+    (None,
+     [FileStorageMockTypeDef('/layman/test_tools/data/style/circle.svg'),
       FileStorageMockTypeDef('/layman/test_tools/data/style/small_layer_external_circle.qml'),
       FileStorageMockTypeDef('/layman/test_tools/data/style/small_layer_internal_circle.xml'),
       ], {'http_code': 400,
@@ -96,8 +97,15 @@ def test_get_mapping_from_external_image_list(external_images, exp_mapping):
           'detail': {'found_style_files': ['/layman/test_tools/data/style/small_layer_external_circle.qml',
                                            '/layman/test_tools/data/style/small_layer_internal_circle.xml']},
           }),
+    (['/layman/test_tools/data/style/circle.svg'],
+     [FileStorageMockTypeDef('/layman/test_tools/data/style/small_layer_external_circle.qml'),
+      ], {'http_code': 400,
+          'code': 53,
+          'message': 'Missing external image',
+          'detail': {'missing_files': ['/layman/test_tools/data/style/circle.svg'], },
+          }),
 ])
-def test_check_file_styles(style_files, expected_error, ):
+def test_check_file_styles(external_files_from_style, style_files, expected_error, ):
     with pytest.raises(LaymanError) as exc_info:
-        input_style.check_file_styles(style_files, )
+        input_style.check_file_styles(external_files_from_style, style_files, )
     test_util.assert_error(expected_error, exc_info)

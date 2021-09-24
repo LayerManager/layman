@@ -115,7 +115,7 @@ def post(workspace):
             external_images = input_style.get_external_files_from_qml_file(main_style_file)
         else:
             external_images = None
-        input_style.check_file_styles(style_files, )
+        input_style.check_file_styles(external_images, style_files, )
 
     if file_type == settings.FILE_TYPE_RASTER and style_type.code == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
