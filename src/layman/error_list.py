@@ -52,4 +52,5 @@ ERROR_LIST = {
     49: (400, 'Publication is already in process.'),
     50: (500, 'Error when normalizing raster file'),
     51: (500, 'Error when generating thumbnail'),
+    52: (400, 'Too many style files'),
 }

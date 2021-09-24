@@ -5,6 +5,7 @@ from werkzeug.datastructures import FileStorage
 
 from layman import LaymanError
 from layman.layer.filesystem import input_style
+from test_tools import util as test_util
 from .. import filesystem
 
 
@@ -83,3 +84,20 @@ def test_get_main_file(filestorages, exp_filename):
 def test_get_mapping_from_external_image_list(external_images, exp_mapping):
     mapping = input_style.get_mapping_from_external_image_list(external_images)
     assert mapping == exp_mapping, f'external_images={external_images}, exp_mapping={exp_mapping}, mapping={mapping}'
+
+
+@pytest.mark.parametrize('style_files, expected_error', [
+    ([FileStorageMockTypeDef('/layman/test_tools/data/style/circle.svg'),
+      FileStorageMockTypeDef('/layman/test_tools/data/style/small_layer_external_circle.qml'),
+      FileStorageMockTypeDef('/layman/test_tools/data/style/small_layer_internal_circle.xml'),
+      ], {'http_code': 400,
+          'code': 52,
+          'message': 'Too many style files',
+          'detail': {'found_style_files': ['/layman/test_tools/data/style/small_layer_external_circle.qml',
+                                           '/layman/test_tools/data/style/small_layer_internal_circle.xml']},
+          }),
+])
+def test_check_file_styles(style_files, expected_error, ):
+    with pytest.raises(LaymanError) as exc_info:
+        input_style.check_file_styles(style_files, )
+    test_util.assert_error(expected_error, exc_info)

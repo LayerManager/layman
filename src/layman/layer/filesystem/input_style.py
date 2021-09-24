@@ -170,3 +170,10 @@ def get_all_allowed_main_extensions():
 def get_main_file(filestorages):
     return next((fn for fn in filestorages if os.path.splitext(fn.filename)[1]
                  in get_all_allowed_main_extensions()), None)
+
+
+def check_file_styles(style_files, ):
+    all_main_files = [fn.filename for fn in style_files if os.path.splitext(fn.filename)[1]
+                      in get_all_allowed_main_extensions()]
+    if len(all_main_files) > 1:
+        raise LaymanError(52, data={'found_style_files': all_main_files})
