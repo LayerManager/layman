@@ -110,6 +110,12 @@ def post(workspace):
     else:
         main_style_file = None
     style_type = input_style.get_style_type_from_file_storage(main_style_file)
+    if main_style_file:
+        if style_type.code == 'qml':
+            external_images = input_style.get_external_files_from_qml_file(main_style_file)
+        else:
+            external_images = None
+        input_style.check_file_styles(style_files, )
 
     if file_type == settings.FILE_TYPE_RASTER and style_type.code == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
@@ -152,10 +158,6 @@ def post(workspace):
 
         # save files
         if main_style_file:
-            if style_type.code == 'qml':
-                external_images = input_style.get_external_files_from_qml_file(main_style_file)
-            else:
-                external_images = None
             input_style.save_layer_files(workspace, layername, main_style_file, style_type, style_files, external_images, )
         if use_chunk_upload:
             files_to_upload = input_chunk.save_layer_files_str(
