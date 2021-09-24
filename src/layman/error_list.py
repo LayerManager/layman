@@ -53,4 +53,5 @@ ERROR_LIST = {
     50: (500, 'Error when normalizing raster file'),
     51: (500, 'Error when generating thumbnail'),
     52: (400, 'Too many style files'),
+    53: (400, 'Missing external image'),
 }

@@ -155,6 +155,7 @@ Body parameters:
      - QML style for raster data file is not supported
    - uploading of external images linked from style is supported only for QML style file
      - such external files should be also uploaded through this parameter; file name of each sent external file must be the same as its file path inside QML style (including directories in path)
+     - all used external images have to be uploaded with request
      - list of external image paths of any style can be obtained by [POST Style Info](#post-style-info)
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
 - *access_rights.read*, string

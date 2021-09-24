@@ -172,8 +172,13 @@ def get_main_file(filestorages):
                  in get_all_allowed_main_extensions()), None)
 
 
-def check_file_styles(style_files, ):
-    all_main_files = [fn.filename for fn in style_files if os.path.splitext(fn.filename)[1]
+def check_file_styles(external_files_from_style, style_files, ):
+    style_file_names = [fn.filename for fn in style_files]
+    all_main_files = [fn for fn in style_file_names if os.path.splitext(fn)[1]
                       in get_all_allowed_main_extensions()]
     if len(all_main_files) > 1:
         raise LaymanError(52, data={'found_style_files': all_main_files})
+    if external_files_from_style:
+        missing_files = [file_path for file_path in external_files_from_style if file_path not in style_file_names]
+        if missing_files:
+            raise LaymanError(53, data={'missing_files': missing_files})
