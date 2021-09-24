@@ -1,4 +1,5 @@
 from collections import namedtuple
+from contextlib import nullcontext as does_not_raise
 import lxml
 import pytest
 from werkzeug.datastructures import FileStorage
@@ -104,8 +105,15 @@ def test_get_mapping_from_external_image_list(external_images, exp_mapping):
           'message': 'Missing external image',
           'detail': {'missing_files': ['/layman/test_tools/data/style/circle.svg'], },
           }),
+    (['/layman/test_tools/data/style/circle.svg'],
+     [FileStorageMockTypeDef('/layman/test_tools/data/style/circle.svg'),
+      FileStorageMockTypeDef('/layman/test_tools/data/style/small_layer_external_circle.qml'),
+      ],
+     None),
 ])
 def test_check_file_styles(external_files_from_style, style_files, expected_error, ):
-    with pytest.raises(LaymanError) as exc_info:
+    expectation = pytest.raises(LaymanError) if expected_error else does_not_raise()
+    with expectation as exc_info:
         input_style.check_file_styles(external_files_from_style, style_files, )
-    test_util.assert_error(expected_error, exc_info)
+    if expected_error:
+        test_util.assert_error(expected_error, exc_info)
