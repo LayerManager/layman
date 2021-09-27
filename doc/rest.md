@@ -301,6 +301,9 @@ Body parameters:
 - *style*, style file
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
      - QML style for raster data file is not supported
+   - uploading of external images linked from style is supported only for QML style file
+     - such external files should be also uploaded through this parameter; file name of each sent external file must be the same as its file path inside QML style (including directories in path)
+     - list of external image paths of any style can be obtained by [POST Style Info](#post-style-info)
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 - *access_rights.read*, string
