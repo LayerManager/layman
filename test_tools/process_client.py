@@ -150,12 +150,16 @@ def patch_workspace_publication(publication_type,
                                 style_file=None,
                                 check_response_fn=None,
                                 with_chunks=False,
+                                style_files=None,
                                 ):
     headers = headers or {}
     file_paths = file_paths or []
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
-    if style_file:
+    if style_file or style_files:
         assert publication_type == LAYER_TYPE
+    assert not(style_file and style_files)
+    if style_file:
+        style_files = [style_file, ]
 
     # Only Layer files can be uploaded by chunks
     assert not with_chunks or publication_type == LAYER_TYPE
@@ -182,8 +186,15 @@ def patch_workspace_publication(publication_type,
             data["access_rights.write"] = access_rights['write']
         if title:
             data['title'] = title
-        if style_file:
-            files.append(('style', (os.path.basename(style_file), open(style_file, 'rb'))))
+        if style_files:
+            for file in style_files:
+                if isinstance(file, tuple):
+                    file_path, file_alias = file
+                else:
+                    file_alias = os.path.basename(file)
+                    file_path = file
+                assert os.path.isfile(file_path), file_path
+                files.append(('style', (file_alias, open(file_path, 'rb'))))
 
         response = requests.patch(r_url,
                                   files=files,
