@@ -188,3 +188,11 @@ def check_file_styles(external_files_from_style, style_files, ):
         missing_files = [file_path for file_path in external_files_from_style if file_path not in style_file_names]
         if missing_files:
             raise LaymanError(53, data={'missing_files': missing_files})
+
+
+def get_external_image_path(workspace, layername, image):
+    external_images_dir = get_external_images_dir(workspace, layername)
+    image_path = os.path.join(external_images_dir, image)
+    if os.path.exists(image_path):
+        return image_path
+    return None

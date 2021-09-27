@@ -332,10 +332,15 @@ def test_layer_attributes_in_db(workspace, publ_type, publication):
 def test_layer_style_external_images(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
+    exp_external_images = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['external_images']
     with app.app_context():
         external_images_dir = input_style.get_external_images_dir(workspace, publication)
     external_images = os.listdir(external_images_dir)
-    assert set(external_images) == data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['external_images']
+    assert set(external_images) == set(exp_external_images.keys())
 
-    for image_file in data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['external_images']:
-        process_client.get_workspace_layer_style_external_image(workspace, publication, image_file)
+    for image_file, exp_data in exp_external_images.items():
+        response = process_client.get_workspace_layer_style_external_image(workspace, publication, image_file)
+        assert response.headers['Content-Type'] == exp_data['mimetype']
+        with open(exp_data['file'], 'rb') as exp_image_file:
+            exp_image = exp_image_file.read()
+        assert exp_image == response.content
