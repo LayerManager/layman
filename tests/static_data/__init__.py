@@ -752,6 +752,7 @@ PUBLICATIONS = {
             'thumbnail': 'test_tools/data/thumbnail/layer_square_external_svg.png',
             'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'qml',
+            'external_images': {'image_0.svg', },
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_common_sld_external_svg'): {
@@ -767,6 +768,7 @@ PUBLICATIONS = {
             'thumbnail': 'test_tools/data/thumbnail/layer_square_external_svg.png',
             'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'qml',
+            'external_images': {'image_0.svg', },
         },
     },
     ################################################################################
@@ -904,6 +906,7 @@ assert len(LIST_QML_LAYERS) > 0, LIST_QML_LAYERS
 assert len(LIST_INTERNAL_MAPS) > 0, LIST_INTERNAL_MAPS
 assert any('normalized_overviews' in v[TEST_DATA] for v in PUBLICATIONS.values())
 assert any('style_files' in v[DEFINITION][0] for v in PUBLICATIONS.values())
+assert any('external_images' in v[TEST_DATA] for v in PUBLICATIONS.values())
 
 
 def assert_same_name_publications(publications):
