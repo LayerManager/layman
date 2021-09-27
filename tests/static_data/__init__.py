@@ -890,13 +890,13 @@ def assert_same_name_publications(publications):
     for workspace, publ_type, publ_name in publications:
         types_by_workspace_and_name[(workspace, publ_name)].add(publ_type)
     same_name_same_workspace = {k: v for k, v in types_by_workspace_and_name.items() if len(v) > 1}
-    assert len(same_name_same_workspace) > 0
+    assert len(same_name_same_workspace) > 0, f'No two publications with same workspace and name, but different type'
 
     workspaces_by_type_and_name = defaultdict(set)
     for workspace, publ_type, publ_name in publications:
         workspaces_by_type_and_name[(publ_type, publ_name)].add(workspace)
     same_name_same_type = {k: v for k, v in workspaces_by_type_and_name.items() if len(v) > 1}
-    assert len(same_name_same_type) > 0
+    assert len(same_name_same_type) > 0, f'No two publications with same type and name, but different workspace'
 
 
 assert_same_name_publications(PUBLICATIONS)
