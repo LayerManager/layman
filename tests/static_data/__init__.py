@@ -754,6 +754,20 @@ PUBLICATIONS = {
             'style_type': 'qml',
         },
     },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'post_point_sld_external_svg'): {
+        DEFINITION: [
+            {'file_paths': ['sample/layman.layer/sample_point_cz.geojson', ],
+             'style_files': ['test_tools/data/style/sample_point_layer_external_circle.qml',
+                             ('test_tools/data/style/circle.svg', '/home/work/PycharmProjects/layman/test_tools/data/style/circle.svg',),
+                             ]},
+        ],
+        TEST_DATA: {
+            'bbox': (1848641.3277258177, 6308684.223766193, 1848661.9177672109, 6308703.364768418),
+            'thumbnail': 'test_tools/data/thumbnail/layer_points_external_svg.png',
+            'file_type': settings.FILE_TYPE_VECTOR,
+            'style_type': 'qml',
+        },
+    },
     ################################################################################
     #                                     MAPS
     ################################################################################
