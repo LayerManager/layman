@@ -21,8 +21,11 @@ post_layer = empty_method
 patch_layer = empty_method
 get_metadata_comparison = empty_method_returns_dict
 
-EXTERNAL_IMAGES_XPATHS = {('.//prop[@k="imageFile" or @k="svgFile"]', 'v', ),
-                          ('.//Option[@name="imageFile" or @name="svgFile"]', 'value',)}
+EXTERNAL_IMAGES_XPATHS = {('.//prop[(@k="imageFile" or @k="svgFile") and string-length(@v) > 0]', 'v', ),
+                          ('.//layer[@class="SvgMarker"]/prop[@k="name" and string-length(@v) > 0]', 'v', ),
+                          ('.//Option[(@name="imageFile" or @name="svgFile") and string-length(@value) > 0]', 'value',),
+                          ('.//layer[@class="SvgMarker"]/Option[@type="map"]/Option[@name="name" and string-length(@value) > 0]', 'value',),
+                          }
 
 
 def get_layer_input_style_dir(workspace, layername):

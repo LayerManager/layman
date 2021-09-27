@@ -749,7 +749,7 @@ Content-Type: `application/json`
 
 JSON object representing style file information:
 - **type**: String. Type of sent style. Either 'sld' or 'qml'.
-- *external_files*: Array of strings. Paths to external files used in sent style, extracted from style file with these xpath expresions: `.//prop[@k="imageFile" or @k="svgFile"]/@v` and `.//Option[@name="imageFile" or @name="svgFile"]/@value`. Available only for qml files.
+- *external_files*: Array of strings. Paths to external files used in sent style, extracted from style file with these xpath expresions: `'.//prop[(@k="imageFile" or @k="svgFile") and string-length(@v) > 0]/@v`, `.//layer[@class="SvgMarker"]/prop[@k="name" and string-length(@v) > 0]/@v`, `..//Option[(@name="imageFile" or @name="svgFile") and string-length(@value) > 0]/@value` and `.//layer[@class="SvgMarker"]/Option[@type="map"]/Option[@name="name" and string-length(@value) > 0]/@value`. Available only for qml files.
 
 ## Version
 ### URL
