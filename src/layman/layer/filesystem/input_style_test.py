@@ -1,6 +1,5 @@
 from collections import namedtuple
 from contextlib import nullcontext as does_not_raise
-import lxml
 import pytest
 from werkzeug.datastructures import FileStorage
 
@@ -29,7 +28,7 @@ def test_get_style_type_from_xml_file(file_path,
 
 @pytest.mark.parametrize('file_path, expected_error, expected_code', [
     ('sample/style/no_style.xml', LaymanError, 46),
-    ('sample/style/countries_wms_blue.png', lxml.etree.XMLSyntaxError, 4),
+    ('sample/style/countries_wms_blue.png', LaymanError, 46),
 ])
 def test_get_style_type_from_xml_file_errors(file_path,
                                              expected_error,

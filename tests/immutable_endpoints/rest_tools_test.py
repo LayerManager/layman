@@ -25,6 +25,12 @@ def test_post_style_info(style_file, expected_json):
       'detail': {'parameter': 'style', },
       },
      ),
+    ({'style_file': 'test_tools/data/thumbnail/layer_square_external_svg.png'},
+     {'http_code': 400,
+      'code': 46,
+      'message': 'Unknown style file. Can recognize only SLD and QML files.',
+      },
+     ),
 ])
 @pytest.mark.usefixtures('ensure_layman')
 def test_post_style_info_error(params, expected_exc):

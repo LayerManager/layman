@@ -139,7 +139,10 @@ def get_style_type_from_file_storage(file_storage):
     if file_storage:
         xml = file_storage.read()
         file_storage.seek(0)
-        xml_tree = etree.fromstring(xml)
+        try:
+            xml_tree = etree.fromstring(xml)
+        except etree.XMLSyntaxError as exc:
+            raise LaymanError(46) from exc
         root_tag = xml_tree.tag
         root_attribute = etree.QName(root_tag).localname
         result = next((sd for sd in layer.STYLE_TYPES_DEF if sd.root_element == root_attribute), None)
