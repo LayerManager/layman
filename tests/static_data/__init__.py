@@ -851,6 +851,11 @@ PUBLICATIONS = {
 #                                     (COMMON_WORKSPACE, MAP_TYPE, 'post_internal_layer'),
 #                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'),
 #                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_10countries_sld'),
+#                                     (WORKSPACE1, LAYER_TYPE, 'test_publications_same_name_publ'),
+#                                     (WORKSPACE2, LAYER_TYPE, 'test_publications_same_name_publ'),
+#                                     (WORKSPACE1, MAP_TYPE, 'test_publications_same_name_publ'),
+#                                     (WORKSPACE2, MAP_TYPE, 'test_publications_same_name_publ'),
+#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_sld_external_svg'),
 #                                     }}
 
 LIST_ALL_PUBLICATIONS = list(PUBLICATIONS.keys())
