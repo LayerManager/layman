@@ -752,7 +752,8 @@ PUBLICATIONS = {
             'thumbnail': 'test_tools/data/thumbnail/layer_square_external_svg.png',
             'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'qml',
-            'external_images': {'image_0.svg', },
+            'external_images': {'image_0.svg': {'mimetype': 'image/svg+xml; charset=utf-8',
+                                                'file': 'test_tools/data/style/circle.svg'}, },
         },
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_common_sld_external_svg'): {
@@ -768,7 +769,8 @@ PUBLICATIONS = {
             'thumbnail': 'test_tools/data/thumbnail/layer_square_external_svg.png',
             'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'qml',
-            'external_images': {'image_0.svg', },
+            'external_images': {'image_0.svg': {'mimetype': 'image/svg+xml; charset=utf-8',
+                                                'file': 'test_tools/data/style/circle.svg'}, },
         },
     },
     ################################################################################

@@ -8,6 +8,7 @@
 |[Workspace Layer](models.md#layer)|`/rest/workspaces/<workspace_name>/layers/<layername>`|[GET](#get-workspace-layer)| x | [PATCH](#patch-workspace-layer) | [DELETE](#delete-workspace-layer) |
 |Workspace Layer Thumbnail|`/rest/workspaces/<workspace_name>/layers/<layername>/thumbnail`|[GET](#get-workspace-layer-thumbnail)| x | x | x |
 |Workspace Layer Style|`/rest/workspaces/<workspace_name>/layers/<layername>/style`|[GET](#get-workspace-layer-style)| x | x | x |
+|Workspace Layer Style External Image|`/rest/workspaces/<workspace_name>/layers/<layername>/style/external_images/<filename>`|[GET](#get-workspace-layer-style-external-image)| x | x | x |
 |Workspace Layer Chunk|`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`|[GET](#get-workspace-layer-chunk)| [POST](#post-workspace-layer-chunk) | x | x |
 |Workspace Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-layer-metadata-comparison) | x | x | x |
 |Maps|`/rest/maps`|[GET](#get-maps)| x | x | x |
@@ -360,6 +361,20 @@ No action parameters.
 Content-Type:
   - `application/vnd.ogc.sld+xml` or `application/vnd.ogc.se+xml` for SLD
   - `application/x-qgis-layer-settings` for QML
+
+
+## Workspace Layer Style External Image
+### URL
+`/rest/workspaces/<workspace_name>/layers/<layername>/style/external_images/<filename>`
+### GET Workspace Layer Style External Image
+Get image used in layer style.
+
+#### Request
+No action parameters.
+#### Response
+Content-Type: `image/svg+xml` or other image MIME types
+
+External image.
 
 
 ## Workspace Layer Chunk
