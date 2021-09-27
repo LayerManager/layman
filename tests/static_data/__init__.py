@@ -754,6 +754,21 @@ PUBLICATIONS = {
             'style_type': 'qml',
         },
     },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'patch_common_sld_external_svg'): {
+        DEFINITION: [
+            {},
+            {'file_paths': ['sample/layman.layer/small_layer_square.geojson', ],
+             'style_files': ['test_tools/data/style/small_layer_external_circle.qml',
+                             ('test_tools/data/style/circle.svg', '/home/work/PycharmProjects/layman/test_tools/data/style/circle.svg',),
+                             ]},
+        ],
+        TEST_DATA: {
+            'bbox': (1558472.87110583, 6106854.834885074, 1781111.852692377, 6446275.841017161),
+            'thumbnail': 'test_tools/data/thumbnail/layer_square_external_svg.png',
+            'file_type': settings.FILE_TYPE_VECTOR,
+            'style_type': 'qml',
+        },
+    },
     ################################################################################
     #                                     MAPS
     ################################################################################
@@ -856,6 +871,7 @@ PUBLICATIONS = {
 #                                     (WORKSPACE1, MAP_TYPE, 'test_publications_same_name_publ'),
 #                                     (WORKSPACE2, MAP_TYPE, 'test_publications_same_name_publ'),
 #                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_sld_external_svg'),
+#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_common_sld_external_svg'),
 #                                     }}
 
 LIST_ALL_PUBLICATIONS = list(PUBLICATIONS.keys())
