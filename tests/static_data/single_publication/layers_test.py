@@ -11,6 +11,7 @@ from layman import settings, app, util as layman_util
 from layman.common import bbox as bbox_util, geoserver as gs_common
 from layman.common.micka import util as micka_common_util
 from layman.layer import util as layer_util, db as layer_db, get_layer_info_keys
+from layman.layer.filesystem import input_style
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX, VERSION
 from layman.layer.micka import csw
 from layman.layer.qgis import util as qgis_util
@@ -321,3 +322,20 @@ def test_layer_attributes_in_db(workspace, publ_type, publication):
     with app.app_context():
         attr_names = {col.name for col in layer_db.get_all_column_infos(workspace, publication)}
     assert attr_names == expected_names
+
+
+@pytest.mark.parametrize('workspace, publ_type, publication', [
+    publ_tuple for publ_tuple in data.LIST_LAYERS
+    if data.PUBLICATIONS[publ_tuple][data.TEST_DATA].get('external_images') is not None
+])
+@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+def test_layer_style_external_images(workspace, publ_type, publication):
+    ensure_publication(workspace, publ_type, publication)
+
+    with app.app_context():
+        external_images_dir = input_style.get_external_images_dir(workspace, publication)
+    external_images = os.listdir(external_images_dir)
+    assert set(external_images) == data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['external_images']
+
+    for image_file in data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['external_images']:
+        process_client.get_workspace_layer_style_external_image(workspace, publication, image_file)

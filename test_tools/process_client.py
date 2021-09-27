@@ -542,6 +542,18 @@ def post_style_info(*, style_file=None):
     return response.json()
 
 
+def get_workspace_layer_style_external_image(workspace, layer, image, *, headers=None,):
+    with app.app_context():
+        r_url = url_for('rest_workspace_layer_style_external_image.get',
+                        workspace=workspace,
+                        layername=layer,
+                        filename=image,
+                        )
+    response = requests.get(r_url, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+    raise_layman_error(response)
+    return response
+
+
 def check_publication_status(response):
     try:
         current_status = response.json().get('layman_metadata', dict()).get('publication_status')
