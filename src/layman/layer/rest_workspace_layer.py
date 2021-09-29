@@ -84,16 +84,26 @@ def patch(workspace, layername):
         kwargs['description'] = request.form['description']
 
     # SLD
-    style_file = None
-    if 'style' in request.files and not request.files['style'].filename == '':
-        style_file = request.files['style']
-    elif 'sld' in request.files and not request.files['sld'].filename == '':
-        style_file = request.files['sld']
+    style_files = None
+    if 'style' in request.files:
+        style_files = [
+            f for f in request.files.getlist("style")
+            if len(f.filename) > 0
+        ]
+    elif 'sld' in request.files:
+        style_files = [
+            f for f in request.files.getlist("sld")
+            if len(f.filename) > 0
+        ]
+    if style_files:
+        main_style_file = input_style.get_main_file(style_files)
+    else:
+        main_style_file = None
 
     delete_from = None
     style_type = None
-    if style_file:
-        style_type = input_style.get_style_type_from_file_storage(style_file)
+    if style_files:
+        style_type = input_style.get_style_type_from_file_storage(main_style_file)
         kwargs['style_type'] = style_type
         kwargs['store_in_geoserver'] = style_type.store_in_geoserver
         delete_from = 'layman.layer.qgis.wms'
@@ -133,16 +143,18 @@ def patch(workspace, layername):
     if delete_from is not None:
         request_method = request.method.lower()
         deleted = util.delete_layer(workspace, layername, source=delete_from, http_method=request_method)
-        if style_file is None:
+        if not style_files:
             try:
-                style_file = deleted['style']['file']
+                main_style_file = deleted['style']['file']
+                style_type = input_style.get_style_type_from_file_storage(main_style_file)
+                kwargs['style_type'] = style_type
+                kwargs['store_in_geoserver'] = style_type.store_in_geoserver
             except KeyError:
                 pass
-        style_type = input_style.get_style_type_from_file_storage(style_file)
-        kwargs['style_type'] = style_type
-        kwargs['store_in_geoserver'] = style_type.store_in_geoserver
-        if style_file:
-            input_style.save_layer_file(workspace, layername, style_file, style_type)
+        # save files
+        if main_style_file:
+            external_images = input_style.get_external_files_from_qml_file(main_style_file)
+            input_style.save_layer_files(workspace, layername, main_style_file, style_type, style_files, external_images, )
 
         kwargs.update({
             'crs_id': crs_id,

@@ -758,12 +758,24 @@ PUBLICATIONS = {
         DEFINITION: [
             {'file_paths': ['sample/layman.layer/sample_point_cz.geojson', ],
              'style_files': ['test_tools/data/style/sample_point_layer_external_circle.qml',
-                             ('test_tools/data/style/circle.svg', '/home/work/PycharmProjects/layman/test_tools/data/style/circle.svg',),
-                             ]},
         ],
         TEST_DATA: {
             'bbox': (1848641.3277258177, 6308684.223766193, 1848661.9177672109, 6308703.364768418),
             'thumbnail': 'test_tools/data/thumbnail/layer_points_external_svg.png',
+            'file_type': settings.FILE_TYPE_VECTOR,
+            'style_type': 'qml',
+        },
+    (COMMON_WORKSPACE, LAYER_TYPE, 'patch_common_sld_external_svg'): {
+        DEFINITION: [
+            {},
+            {'file_paths': ['sample/layman.layer/small_layer_square.geojson', ],
+             'style_files': ['test_tools/data/style/small_layer_external_circle.qml',
+                             ('test_tools/data/style/circle.svg', '/home/work/PycharmProjects/layman/test_tools/data/style/circle.svg',),
+                             ]},
+        ],
+        TEST_DATA: {
+            'bbox': (1558472.87110583, 6106854.834885074, 1781111.852692377, 6446275.841017161),
+            'thumbnail': 'test_tools/data/thumbnail/layer_square_external_svg.png',
             'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'qml',
         },
@@ -865,6 +877,12 @@ PUBLICATIONS = {
 #                                     (COMMON_WORKSPACE, MAP_TYPE, 'post_internal_layer'),
 #                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'),
 #                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_10countries_sld'),
+#                                     (WORKSPACE1, LAYER_TYPE, 'test_publications_same_name_publ'),
+#                                     (WORKSPACE2, LAYER_TYPE, 'test_publications_same_name_publ'),
+#                                     (WORKSPACE1, MAP_TYPE, 'test_publications_same_name_publ'),
+#                                     (WORKSPACE2, MAP_TYPE, 'test_publications_same_name_publ'),
+#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_sld_external_svg'),
+#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_common_sld_external_svg'),
 #                                     }}
 
 LIST_ALL_PUBLICATIONS = list(PUBLICATIONS.keys())
@@ -904,13 +922,13 @@ def assert_same_name_publications(publications):
     for workspace, publ_type, publ_name in publications:
         types_by_workspace_and_name[(workspace, publ_name)].add(publ_type)
     same_name_same_workspace = {k: v for k, v in types_by_workspace_and_name.items() if len(v) > 1}
-    assert len(same_name_same_workspace) > 0
+    assert len(same_name_same_workspace) > 0, f'No two publications with same workspace and name, but different type'
 
     workspaces_by_type_and_name = defaultdict(set)
     for workspace, publ_type, publ_name in publications:
         workspaces_by_type_and_name[(publ_type, publ_name)].add(workspace)
     same_name_same_type = {k: v for k, v in workspaces_by_type_and_name.items() if len(v) > 1}
-    assert len(same_name_same_type) > 0
+    assert len(same_name_same_type) > 0, f'No two publications with same type and name, but different workspace'
 
 
 assert_same_name_publications(PUBLICATIONS)
