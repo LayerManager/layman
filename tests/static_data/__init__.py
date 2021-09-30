@@ -756,7 +756,7 @@ PUBLICATIONS = {
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_common_sld_external_svg'): {
         DEFINITION: [
-            {},
+            {'style_file': 'test_tools/data/style/small_layer.qml'},
             {'file_paths': ['sample/layman.layer/small_layer_square.geojson', ],
              'style_files': ['test_tools/data/style/small_layer_external_circle.qml',
                              ('test_tools/data/style/circle.svg', '/home/work/PycharmProjects/layman/test_tools/data/style/circle.svg',),
