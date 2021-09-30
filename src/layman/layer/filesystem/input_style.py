@@ -156,17 +156,17 @@ def get_style_type_from_file_storage(file_storage):
     return result
 
 
-def get_external_files_from_qml(qml):
-    external_files = set()
+def get_external_images_from_qml(qml):
+    external_images = set()
     for xpath, attr_name in EXTERNAL_IMAGES_XPATHS:
-        part_external_files = qml.xpath(f'{xpath}/@{attr_name}')
-        external_files.update(part_external_files)
-    return external_files
+        part_external_image = qml.xpath(f'{xpath}/@{attr_name}')
+        external_images.update(part_external_image)
+    return external_images
 
 
 def get_external_files_from_qml_file(file_path):
     qml = etree.parse(file_path)
-    return get_external_files_from_qml(qml)
+    return get_external_images_from_qml(qml)
 
 
 def get_all_allowed_main_extensions():
