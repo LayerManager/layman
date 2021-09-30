@@ -859,20 +859,10 @@ PUBLICATIONS = {
     },
 }
 
-# PUBLICATIONS = {(ws, pt, pn): value for (ws, pt, pn), value in PUBLICATIONS.items()
-#                 if (ws, pt, pn) in {(COMMON_WORKSPACE, LAYER_TYPE, 'post_common_sld'),
-#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_qml'),
-#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_jp2'),
-#                                     (COMMON_WORKSPACE, MAP_TYPE, 'post_internal_layer'),
-#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'),
-#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_10countries_sld'),
-#                                     (WORKSPACE1, LAYER_TYPE, 'test_publications_same_name_publ'),
-#                                     (WORKSPACE2, LAYER_TYPE, 'test_publications_same_name_publ'),
-#                                     (WORKSPACE1, MAP_TYPE, 'test_publications_same_name_publ'),
-#                                     (WORKSPACE2, MAP_TYPE, 'test_publications_same_name_publ'),
-#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_sld_external_svg'),
-#                                     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_common_sld_external_svg'),
-#                                     }}
+PUBLICATIONS = {(ws, pt, pn): value for (ws, pt, pn), value in PUBLICATIONS.items()
+                if (ws, pt, pn) in {
+                    (COMMON_WORKSPACE, LAYER_TYPE, 'patch_common_sld_external_svg'),
+                }}
 
 LIST_ALL_PUBLICATIONS = list(PUBLICATIONS.keys())
 LIST_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication) in PUBLICATIONS
@@ -891,36 +881,36 @@ LIST_INTERNAL_MAPS = [(workspace, publ_type, publication) for (workspace, publ_t
 
 WORKSPACES = {workspace for workspace, _, _ in PUBLICATIONS}
 
-assert len(WORKSPACES) > 0, WORKSPACES
-assert len(USERS) > 0, USERS
-assert len(HEADERS) > 0, HEADERS
-
-assert len(LIST_ALL_PUBLICATIONS) > 0, LIST_ALL_PUBLICATIONS
-assert len(LIST_LAYERS) > 0, LIST_LAYERS
-assert len(LIST_RASTER_LAYERS) > 0, LIST_RASTER_LAYERS
-assert len(LIST_VECTOR_LAYERS) > 0, LIST_VECTOR_LAYERS
-assert len(LIST_SLD_LAYERS) > 0, LIST_SLD_LAYERS
-assert len(LIST_QML_LAYERS) > 0, LIST_QML_LAYERS
-assert len(LIST_INTERNAL_MAPS) > 0, LIST_INTERNAL_MAPS
-assert any('normalized_overviews' in v[TEST_DATA] for v in PUBLICATIONS.values())
-assert any('style_files' in v[DEFINITION][0] for v in PUBLICATIONS.values())
-
-
-def assert_same_name_publications(publications):
-    types_by_workspace_and_name = defaultdict(set)
-    for workspace, publ_type, publ_name in publications:
-        types_by_workspace_and_name[(workspace, publ_name)].add(publ_type)
-    same_name_same_workspace = {k: v for k, v in types_by_workspace_and_name.items() if len(v) > 1}
-    assert len(same_name_same_workspace) > 0, f'No two publications with same workspace and name, but different type'
-
-    workspaces_by_type_and_name = defaultdict(set)
-    for workspace, publ_type, publ_name in publications:
-        workspaces_by_type_and_name[(publ_type, publ_name)].add(workspace)
-    same_name_same_type = {k: v for k, v in workspaces_by_type_and_name.items() if len(v) > 1}
-    assert len(same_name_same_type) > 0, f'No two publications with same type and name, but different workspace'
-
-
-assert_same_name_publications(PUBLICATIONS)
-
-assert all(set(test_data.get('users_can_read', set())).issubset(USERS) for test_data in PUBLICATIONS.values())
-assert all(set(test_data.get('users_can_write', set())).issubset(USERS) for test_data in PUBLICATIONS.values())
+# assert len(WORKSPACES) > 0, WORKSPACES
+# assert len(USERS) > 0, USERS
+# assert len(HEADERS) > 0, HEADERS
+#
+# assert len(LIST_ALL_PUBLICATIONS) > 0, LIST_ALL_PUBLICATIONS
+# assert len(LIST_LAYERS) > 0, LIST_LAYERS
+# assert len(LIST_RASTER_LAYERS) > 0, LIST_RASTER_LAYERS
+# assert len(LIST_VECTOR_LAYERS) > 0, LIST_VECTOR_LAYERS
+# assert len(LIST_SLD_LAYERS) > 0, LIST_SLD_LAYERS
+# assert len(LIST_QML_LAYERS) > 0, LIST_QML_LAYERS
+# assert len(LIST_INTERNAL_MAPS) > 0, LIST_INTERNAL_MAPS
+# assert any('normalized_overviews' in v[TEST_DATA] for v in PUBLICATIONS.values())
+# assert any('style_files' in v[DEFINITION][0] for v in PUBLICATIONS.values())
+#
+#
+# def assert_same_name_publications(publications):
+#     types_by_workspace_and_name = defaultdict(set)
+#     for workspace, publ_type, publ_name in publications:
+#         types_by_workspace_and_name[(workspace, publ_name)].add(publ_type)
+#     same_name_same_workspace = {k: v for k, v in types_by_workspace_and_name.items() if len(v) > 1}
+#     assert len(same_name_same_workspace) > 0, f'No two publications with same workspace and name, but different type'
+#
+#     workspaces_by_type_and_name = defaultdict(set)
+#     for workspace, publ_type, publ_name in publications:
+#         workspaces_by_type_and_name[(publ_type, publ_name)].add(workspace)
+#     same_name_same_type = {k: v for k, v in workspaces_by_type_and_name.items() if len(v) > 1}
+#     assert len(same_name_same_type) > 0, f'No two publications with same type and name, but different workspace'
+#
+#
+# assert_same_name_publications(PUBLICATIONS)
+#
+# assert all(set(test_data.get('users_can_read', set())).issubset(USERS) for test_data in PUBLICATIONS.values())
+# assert all(set(test_data.get('users_can_write', set())).issubset(USERS) for test_data in PUBLICATIONS.values())
