@@ -153,7 +153,7 @@ def patch(workspace, layername):
                 pass
         # save files
         if main_style_file:
-            external_images = input_style.get_external_files_from_qml_file(main_style_file)
+            external_images = input_style.get_categorized_external_images_from_qml_file(main_style_file)
             input_style.save_layer_files(workspace, layername, main_style_file, style_type, style_files, external_images, )
 
         kwargs.update({

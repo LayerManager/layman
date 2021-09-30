@@ -43,9 +43,9 @@ def test_get_style_type_from_xml_file_errors(file_path,
 @pytest.mark.parametrize('filepath, exp_set', [
     ('test_tools/data/style/small_layer_external_circle.qml', {'/home/work/PycharmProjects/layman/test_tools/data/style/circle.svg', }),
 ])
-def test_get_external_files_from_qml_file(filepath, exp_set):
-    found_files = input_style.get_external_files_from_qml_file(filepath)
-    assert found_files == exp_set
+def test_get_categorized_external_images_from_qml_file(filepath, exp_set):
+    found_images = input_style.get_categorized_external_images_from_qml_file(filepath)
+    assert found_images == exp_set
 
 
 FileStorageMockTypeDef = namedtuple('FileStorageMock', ['filename', ])
