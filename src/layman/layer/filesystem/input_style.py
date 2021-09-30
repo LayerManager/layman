@@ -164,9 +164,20 @@ def get_external_images_from_qml(qml):
     return external_images
 
 
+def categorize_external_images(all_external_images):
+    result = {'qgis_files': {},
+              'other_files': all_external_images,
+              'layman_urls': {},
+              'others': {},
+              }
+    return result
+
+
 def get_categorized_external_images_from_qml_file(file_path):
     qml = etree.parse(file_path)
-    return get_external_images_from_qml(qml)
+    all_external_images = get_external_images_from_qml(qml)
+    categorized_external_images = categorize_external_images(all_external_images)
+    return categorized_external_images
 
 
 def get_all_allowed_main_extensions():

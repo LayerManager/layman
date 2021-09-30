@@ -764,7 +764,14 @@ Content-Type: `application/json`
 
 JSON object representing style file information:
 - **type**: String. Type of sent style. Either 'sld' or 'qml'.
-- *external_files*: Array of strings. Paths to external files used in sent style, extracted from style file with these xpath expresions: `'.//prop[(@k="imageFile" or @k="svgFile") and string-length(@v) > 0]/@v`, `.//layer[@class="SvgMarker"]/prop[@k="name" and string-length(@v) > 0]/@v`, `..//Option[(@name="imageFile" or @name="svgFile") and string-length(@value) > 0]/@value` and `.//layer[@class="SvgMarker"]/Option[@type="map"]/Option[@name="name" and string-length(@value) > 0]/@value`. Available only for qml files.
+- *external_image_paths*: Dictionary of lists. Paths to external files used in sent style categorized by destination. Extracted from style file with these xpath expresions: `'.//prop[(@k="imageFile" or @k="svgFile") and string-length(@v) > 0]/@v`, `.//layer[@class="SvgMarker"]/prop[@k="name" and string-length(@v) > 0]/@v`, `..//Option[(@name="imageFile" or @name="svgFile") and string-length(@value) > 0]/@value` and `.//layer[@class="SvgMarker"]/Option[@type="map"]/Option[@name="name" and string-length(@value) > 0]/@value`. Available only for qml files.
+  - **qgis_files**: List of strings. File-system paths of image files included in QGIS.
+  - **other_files**: List of strings. File-system paths of other image files. These files have to be uploaded with this style.
+  - **layman_urls**: List of objects. URLs to [GET Workspace Layer Style External Images](#get-workspace-layer-style-external-image) endpoint of this Layman instance.
+    - **workspace**: String.
+    - **layer**: String.
+    - **image_file**: String.
+  - **others**: List of strings. Rest of the URLs and other strings.
 
 ## Version
 ### URL

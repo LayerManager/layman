@@ -41,7 +41,12 @@ def test_get_style_type_from_xml_file_errors(file_path,
 
 
 @pytest.mark.parametrize('filepath, exp_set', [
-    ('test_tools/data/style/small_layer_external_circle.qml', {'/home/work/PycharmProjects/layman/test_tools/data/style/circle.svg', }),
+    ('test_tools/data/style/small_layer_external_circle.qml', {'qgis_files': {},
+                                                               'other_files': {
+                                                                   '/home/work/PycharmProjects/layman/test_tools/data/style/circle.svg', },
+                                                               'layman_urls': {},
+                                                               'others': {},
+                                                               }),
 ])
 def test_get_categorized_external_images_from_qml_file(filepath, exp_set):
     found_images = input_style.get_categorized_external_images_from_qml_file(filepath)

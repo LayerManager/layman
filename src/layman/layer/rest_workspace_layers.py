@@ -112,7 +112,7 @@ def post(workspace):
     style_type = input_style.get_style_type_from_file_storage(main_style_file)
     if main_style_file:
         if style_type.code == 'qml':
-            external_images = input_style.get_categorized_external_images_from_qml_file(main_style_file)
+            external_images = input_style.get_categorized_external_images_from_qml_file(main_style_file)['other_files']
         else:
             external_images = None
         input_style.check_file_styles(external_images, style_files, )
