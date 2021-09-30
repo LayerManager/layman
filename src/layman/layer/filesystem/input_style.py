@@ -164,7 +164,7 @@ def get_external_images_from_qml(qml):
     return external_images
 
 
-def get_external_files_from_qml_file(file_path):
+def get_categorized_external_images_from_qml_file(file_path):
     qml = etree.parse(file_path)
     return get_external_images_from_qml(qml)
 

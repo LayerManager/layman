@@ -19,6 +19,6 @@ def post_style_info():
     detected_type = input_style.get_style_type_from_file_storage(style_file).code
     result = {'type': detected_type, }
     if detected_type in supported_style_types_for_external_files:
-        external_files = input_style.get_external_files_from_qml_file(style_file)
-        result['external_files'] = list(external_files)
+        external_images = input_style.get_categorized_external_images_from_qml_file(style_file)
+        result['external_files'] = list(external_images)
     return jsonify(result), 200
