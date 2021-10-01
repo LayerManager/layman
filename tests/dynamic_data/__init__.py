@@ -23,6 +23,9 @@ PUBLICATIONS = {
             KEY_FINAL_ASSERTS: [
                 Action(publication.source_has_its_key_or_it_is_empty, dict()),
                 Action(publication.source_internal_keys_are_subset_of_source_sibling_keys, dict()),
+                Action(publication.same_title_in_source_and_rest_multi, dict()),
+                Action(publication.is_in_rest_multi, dict()),
+                Action(publication.correct_url_in_rest_multi, dict()),
             ],
         },
     ],
