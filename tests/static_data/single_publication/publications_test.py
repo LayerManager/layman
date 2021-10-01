@@ -89,31 +89,13 @@ def test_auth_get_publication(workspace, publ_type, publication):
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_internal_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
-
-    # Items
-    with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, publication)
-    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
-
-    with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'keys': ['metadata']})
-    assert {'metadata', }.issubset(set(pub_info)), pub_info
-    assert all(item not in pub_info for item in {'name', 'title', 'access_rights', 'uuid', 'file', }), pub_info
-
-    with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'keys': ['thumbnail']})
-    assert {'thumbnail', }.issubset(set(pub_info)), pub_info
-    assert all(item not in pub_info for item in {'name', 'title', 'access_rights', 'uuid', 'file', 'metadata', }), pub_info
-
-    user = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_read', [settings.ANONYM_USER])[0]
-    with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user, 'keys': []})
-    assert {'name', 'title', 'access_rights', 'uuid', }.issubset(set(pub_info)), pub_info
-    assert all(item not in pub_info for item in {'metadata', 'file', }), pub_info
-
-    with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user})
-    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
+    asserts.mandatory_keys_in_all_sources(workspace, publ_type, publication)
+    asserts.metadata_key_sources_do_not_contain_other_keys(workspace, publ_type, publication)
+    asserts.metadata_key_sources_do_not_contain_other_keys(workspace, publ_type, publication)
+    asserts.thumbnail_key_sources_do_not_contain_other_keys(workspace, publ_type, publication)
+    actor = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0]
+    asserts.mandatory_keys_in_primary_db_schema_of_first_reader(workspace, publ_type, publication, actor)
+    asserts.other_keys_not_in_primary_db_schema_of_first_reader(workspace, publ_type, publication, actor)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
