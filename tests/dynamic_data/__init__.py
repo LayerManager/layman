@@ -31,6 +31,8 @@ PUBLICATIONS = {
                 Action(publication.other_keys_not_in_primary_db_schema_of_first_reader, dict()),
                 Action(publication.is_complete_in_rest, dict()),
                 Action(publication.mandatory_keys_in_rest, dict()),
+                Action(publication.workspace_wms_1_3_0_capabilities_available, dict()),
+                Action(publication.workspace_wfs_2_0_0_capabilities_available_if_vector, dict()),
             ],
         },
     ],

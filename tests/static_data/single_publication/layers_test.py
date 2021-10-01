@@ -18,6 +18,7 @@ from test_tools import process_client, assert_util, geoserver_client
 from test_tools.util import url_for
 from .. import util
 from ... import static_data as data
+from ...asserts.final import publication as asserts
 from ..data import ensure_publication
 
 
@@ -62,25 +63,8 @@ def test_info(workspace, publ_type, publication):
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_geoserver_workspace(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
-
-    with app.app_context():
-        internal_wms_url = url_for('geoserver_proxy_bp.proxy', subpath=workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + '/ows')
-        internal_wfs_url = url_for('geoserver_proxy_bp.proxy', subpath=workspace + '/wfs')
-
-    r_wms = requests.get(internal_wms_url, params={
-        'service': 'WMS',
-        'request': 'GetCapabilities',
-        'version': '1.3.0',
-    })
-    assert r_wms.status_code == 200
-
-    if data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type') == settings.FILE_TYPE_VECTOR:
-        r_wfs = requests.get(internal_wfs_url, params={
-            'service': 'WFS',
-            'request': 'GetCapabilities',
-            'version': '2.0.0',
-        })
-        assert r_wfs.status_code == 200
+    asserts.workspace_wms_1_3_0_capabilities_available(workspace, )
+    asserts.workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, publication)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
