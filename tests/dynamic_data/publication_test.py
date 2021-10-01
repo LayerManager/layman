@@ -1,6 +1,19 @@
 import inspect
 import pytest
+from test_tools import process_client, process
 from .. import dynamic_data as data
+
+
+@pytest.fixture(scope="session", autouse=True)
+def clear_test_data(liferay_mock, request):
+    # pylint: disable=unused-argument
+    yield
+
+    if request.node.testsfailed == 0:
+        process.ensure_layman_function(process.LAYMAN_DEFAULT_SETTINGS)
+
+        for publication in data.PUBLICATIONS:
+            process_client.delete_workspace_publication(publication.type, publication.workspace, publication.name, )
 
 
 def run_action(publication, action):
