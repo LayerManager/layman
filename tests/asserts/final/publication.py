@@ -118,3 +118,12 @@ def mandatory_keys_in_all_sources_of_first_reader(workspace, publ_type, name, ac
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor})
     assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
+
+
+def is_complete_in_rest(rest_publication_detail):
+    assert 'layman_metadata' in rest_publication_detail, f'rest_publication_detail={rest_publication_detail}'
+    assert rest_publication_detail['layman_metadata']['publication_status'] == 'COMPLETE', f'rest_publication_detail={rest_publication_detail}'
+
+
+def mandatory_keys_in_rest(rest_publication_detail):
+    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}.issubset(set(rest_publication_detail)), rest_publication_detail
