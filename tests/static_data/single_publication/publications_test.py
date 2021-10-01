@@ -5,6 +5,7 @@ from layman.map.filesystem import thumbnail as map_thumbnail
 from test_tools import assert_util, util as test_util, process_client
 from .. import util
 from ... import static_data as data
+from ...asserts.final import publication as asserts
 from ..data import ensure_publication
 
 
@@ -28,19 +29,8 @@ def test_thumbnail(workspace, publ_type, publication):
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman',)
 def test_get_publication_info_items(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
-    with app.app_context():
-        all_items = layman_util.get_publication_types()[publ_type]['internal_sources'].values()
-        for source_def in all_items:
-            for key in source_def.info_items:
-                context = {'keys': [key]}
-                info = layman_util.get_publication_info(workspace, publ_type, publication, context)
-                assert key in info or not info, info
-
-                all_sibling_keys = set(sibling_key for item_list in all_items for sibling_key in item_list.info_items
-                                       if key in item_list.info_items)
-                internal_keys = [key[1:] for key in info if key.startswith('_')]
-                assert set(internal_keys) <= all_sibling_keys,\
-                    f'internal_keys={set(internal_keys)}, all_sibling_keys={all_sibling_keys}, key={key}, info={info}'
+    asserts.source_has_its_key_or_it_is_empty(workspace, publ_type, publication)
+    asserts.source_internal_keys_are_subset_of_source_sibling_keys(workspace, publ_type, publication)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
