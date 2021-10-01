@@ -29,6 +29,8 @@ PUBLICATIONS = {
                 Action(publication.thumbnail_key_sources_do_not_contain_other_keys, dict()),
                 Action(publication.mandatory_keys_in_primary_db_schema_of_first_reader, dict()),
                 Action(publication.other_keys_not_in_primary_db_schema_of_first_reader, dict()),
+                Action(publication.is_complete_in_rest, dict()),
+                Action(publication.mandatory_keys_in_rest, dict()),
             ],
         },
     ],

@@ -107,11 +107,8 @@ def test_info(workspace, publ_type, publication):
     with app.app_context():
         info = process_client.get_workspace_publication(publ_type, workspace, publication, headers)
 
-    assert 'layman_metadata' in info, f'info={info}'
-    assert info['layman_metadata']['publication_status'] == 'COMPLETE', f'info={info}'
-
-    # Items
-    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}.issubset(set(info)), info
+    asserts.is_complete_in_rest(info)
+    asserts.mandatory_keys_in_rest(info)
 
     # Access rights
     all_auth_info = util.get_users_and_headers_for_publication(workspace, publ_type, publication)
