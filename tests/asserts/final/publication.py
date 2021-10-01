@@ -1,4 +1,4 @@
-from layman import app, util as layman_util
+from layman import app, util as layman_util, settings
 from test_tools import util as test_util, process_client
 
 
@@ -79,3 +79,42 @@ def same_value_of_key_in_all_sources(workspace, publ_type, name):
             if key in info:
                 assert same_infos(info[key], value), f'{source}: key={key}, info={info[key]}, source={value}, ' \
                                                      f'all={[(lsource, lsource_info[key]) for lsource, lsource_info in partial_infos.items() if key in lsource_info]}'
+
+
+def mandatory_keys_in_all_sources(workspace, publ_type, name):
+    # Items
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, name)
+    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
+
+
+def metadata_key_sources_do_not_contain_other_keys(workspace, publ_type, name):
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['metadata']})
+    assert {'metadata', }.issubset(set(pub_info)), pub_info
+    assert all(item not in pub_info for item in {'name', 'title', 'access_rights', 'uuid', 'file', }), pub_info
+
+
+def thumbnail_key_sources_do_not_contain_other_keys(workspace, publ_type, name):
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['thumbnail']})
+    assert {'thumbnail', }.issubset(set(pub_info)), pub_info
+    assert all(item not in pub_info for item in {'name', 'title', 'access_rights', 'uuid', 'file', 'metadata', }), pub_info
+
+
+def mandatory_keys_in_primary_db_schema_of_first_reader(workspace, publ_type, name, actor, ):
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor, 'keys': []})
+    assert {'name', 'title', 'access_rights', 'uuid', }.issubset(set(pub_info)), pub_info
+
+
+def other_keys_not_in_primary_db_schema_of_first_reader(workspace, publ_type, name, actor, ):
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor, 'keys': []})
+    assert all(item not in pub_info for item in {'metadata', 'file', }), pub_info
+
+
+def mandatory_keys_in_all_sources_of_first_reader(workspace, publ_type, name, actor, ):
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor})
+    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info

@@ -52,7 +52,7 @@ Připravit framework
 1. Krok
 [x] tests/static_data/single_publication/publications_test.py::test_get_publication_info_items[test_workspace-layman.layer-post_common_sld] PASSED
 [x] tests/static_data/single_publication/publications_test.py::test_infos[test_workspace-layman.layer-post_common_sld] PASSED
-tests/static_data/single_publication/publications_test.py::test_internal_info[test_workspace-layman.layer-post_common_sld] PASSED
+[x] tests/static_data/single_publication/publications_test.py::test_internal_info[test_workspace-layman.layer-post_common_sld] PASSED
 tests/static_data/single_publication/publications_test.py::test_info[test_workspace-layman.layer-post_common_sld] PASSED
 [x] tests/static_data/single_publication/publications_test.py::test_all_source_info[test_workspace-layman.layer-post_common_sld] PASSED
 tests/static_data/single_publication/layers_test.py::test_geoserver_workspace[test_workspace-layman.layer-post_common_sld] PASSED
