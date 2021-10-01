@@ -26,6 +26,7 @@ PUBLICATIONS = {
                 Action(publication.same_title_in_source_and_rest_multi, dict()),
                 Action(publication.is_in_rest_multi, dict()),
                 Action(publication.correct_url_in_rest_multi, dict()),
+                Action(publication.same_value_of_key_in_all_sources, dict()),
             ],
         },
     ],

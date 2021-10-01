@@ -54,3 +54,28 @@ def correct_url_in_rest_multi(workspace, publ_type, name, headers):
         expected_url = test_util.url_for(get_workspace_publication_url, workspace=workspace, **{param_name: name},
                                          internal=False)
         assert info['url'] == expected_url, f'publication_infos={publication_infos}, expected_url={expected_url}'
+
+
+def same_infos(expected, tested):
+    if isinstance(tested, dict) and isinstance(expected, dict):
+        return all(same_infos(expected[key], tested[key]) for key in tested if key in expected)
+    return expected == tested
+
+
+def same_value_of_key_in_all_sources(workspace, publ_type, name):
+    with app.app_context():
+        sources = layman_util.get_internal_sources(publ_type)
+        info = layman_util.get_publication_info(workspace, publ_type, name)
+
+    info_method = {
+        process_client.LAYER_TYPE: 'get_layer_info',
+        process_client.MAP_TYPE: 'get_map_info',
+    }[publ_type]
+    with app.app_context():
+        partial_infos = layman_util.call_modules_fn(sources, info_method, [workspace, name])
+
+    for source, source_info in partial_infos.items():
+        for key, value in source_info.items():
+            if key in info:
+                assert same_infos(info[key], value), f'{source}: key={key}, info={info[key]}, source={value}, ' \
+                                                     f'all={[(lsource, lsource_info[key]) for lsource, lsource_info in partial_infos.items() if key in lsource_info]}'
