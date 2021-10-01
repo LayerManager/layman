@@ -1,6 +1,6 @@
-import inspect
 import pytest
 from test_tools import process_client, process
+from ..asserts import util
 from .. import dynamic_data as data
 
 
@@ -13,19 +13,8 @@ def clear_test_data(liferay_mock, request):
         process.ensure_layman_function(process.LAYMAN_DEFAULT_SETTINGS)
 
         for publication in data.PUBLICATIONS:
-            process_client.delete_workspace_publication(publication.type, publication.workspace, publication.name, )
-
-
-def run_action(publication, action):
-    method_params = inspect.getfullargspec(action.method)
-    publ_type_param = 'publication_type' if 'publication_type' in method_params[0] else 'publ_type'
-    params = {
-        publ_type_param: publication.type,
-        'workspace': publication.workspace,
-        'name': publication.name,
-    }
-    params.update(action.params)
-    action.method(**params)
+            headers = util.get_publication_header(publication)
+            process_client.delete_workspace_publication(publication.type, publication.workspace, publication.name, headers=headers)
 
 
 def publication_id(publication):
@@ -38,7 +27,7 @@ def test_action_chain(publication):
     for step in data.PUBLICATIONS[publication]:
         action = step[data.KEY_ACTION]
         action_call = action[data.KEY_CALL]
-        run_action(publication, action_call)
+        util.run_action(publication, action_call)
 
         for assert_call in step[data.KEY_FINAL_ASSERTS]:
-            run_action(publication, assert_call)
+            util.run_action(publication, assert_call)
