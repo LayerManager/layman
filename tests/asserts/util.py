@@ -11,9 +11,18 @@ def get_publication_header(publication):
     return headers
 
 
+def get_publication_actor(publication):
+    with app.app_context():
+        info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name, context={'keys': ['access_rights']})
+    writer = info['access_rights']['write'][0]
+    actor = settings.ANONYM_USER if writer == settings.RIGHTS_EVERYONE_ROLE else writer
+    return actor
+
+
 def run_action(publication, action, *, cache=None):
     param_def = {
         'headers': get_publication_header,
+        'actor': get_publication_header,
     }
     method_params = inspect.getfullargspec(action.method)
     publ_type_param = 'publication_type' if 'publication_type' in method_params[0] else 'publ_type'
