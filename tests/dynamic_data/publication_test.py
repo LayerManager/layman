@@ -29,5 +29,6 @@ def test_action_chain(publication):
         action_call = action[data.KEY_CALL]
         util.run_action(publication, action_call)
 
+        data_cache = dict()
         for assert_call in step[data.KEY_FINAL_ASSERTS]:
-            util.run_action(publication, assert_call)
+            util.run_action(publication, assert_call, cache=data_cache)
