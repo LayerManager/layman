@@ -1,6 +1,7 @@
 import inspect
 from layman import util as layman_util, settings, app
 from test_tools import process_client
+from .. import Action
 
 
 def get_publication_header(publication):
@@ -21,23 +22,27 @@ def get_publication_actor(publication):
 
 def run_action(publication, action, *, cache=None):
     param_def = {
-        'headers': get_publication_header,
-        'actor': get_publication_header,
+        'headers': Action(get_publication_header, dict()),
+        'actor': Action(get_publication_actor, dict()),
+        'rest_publication_detail': Action(process_client.get_workspace_publication, dict())
     }
     method_params = inspect.getfullargspec(action.method)
     publ_type_param = 'publication_type' if 'publication_type' in method_params[0] else 'publ_type'
-    params = {
-        publ_type_param: publication.type,
-        'workspace': publication.workspace,
-        'name': publication.name,
-    }
-    for param, param_method in param_def.items():
-        if param in method_params[0]:
-            if param in cache:
-                value = cache[param]
+    params = {}
+    for key, value in {publ_type_param: publication.type,
+                       'workspace': publication.workspace,
+                       'name': publication.name,
+                       'publication': publication, }.items():
+        if key in method_params[0]:
+            params[key] = value
+
+    for key, param_method in param_def.items():
+        if key in method_params[0]:
+            if key in cache:
+                value = cache[key]
             else:
-                value = param_method(publication)
-                cache[param] = value
-            params[param] = value
+                value = run_action(publication, param_method, cache=cache)
+                cache[key] = value
+            params[key] = value
     params.update(action.params)
-    action.method(**params)
+    return action.method(**params)
