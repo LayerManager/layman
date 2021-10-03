@@ -1,5 +1,5 @@
-from collections import namedtuple
 from test_tools import process_client
+from .. import Action, Publication
 from ..asserts.final import publication
 
 LAYER_TYPE = process_client.LAYER_TYPE
@@ -8,9 +8,6 @@ MAP_TYPE = process_client.MAP_TYPE
 KEY_ACTION = 'action'
 KEY_CALL = 'call'
 KEY_FINAL_ASSERTS = 'final_asserts'
-
-Action = namedtuple('ActionTypeDef', ['method', 'params', ])
-Publication = namedtuple('PublicationTypeDef', ['workspace', 'type', 'name'])
 
 COMMON_WORKSPACE = 'dynamic_test_workspace'
 
