@@ -11,7 +11,10 @@ def get_publication_header(publication):
     return headers
 
 
-def run_action(publication, action):
+def run_action(publication, action, *, cache=None):
+    param_def = {
+        'headers': get_publication_header,
+    }
     method_params = inspect.getfullargspec(action.method)
     publ_type_param = 'publication_type' if 'publication_type' in method_params[0] else 'publ_type'
     params = {
@@ -19,5 +22,13 @@ def run_action(publication, action):
         'workspace': publication.workspace,
         'name': publication.name,
     }
+    for param, param_method in param_def.items():
+        if param in method_params[0]:
+            if param in cache:
+                value = cache[param]
+            else:
+                value = param_method(publication)
+                cache[param] = value
+            params[param] = value
     params.update(action.params)
     action.method(**params)
