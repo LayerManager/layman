@@ -88,3 +88,9 @@ def mandatory_keys_in_all_sources_of_first_reader(workspace, publ_type, name, ac
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor})
     assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
+
+
+def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail):
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, name)
+    assert same_infos(exp_publication_detail, pub_info), f'exp_publication_detail={exp_publication_detail}, pub_info={pub_info}'
