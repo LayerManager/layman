@@ -94,3 +94,9 @@ def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail)
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
     assert same_infos(exp_publication_detail, pub_info), f'exp_publication_detail={exp_publication_detail}, pub_info={pub_info}'
+
+
+def does_not_exist(workspace, publ_type, name, ):
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, name)
+    assert not pub_info, pub_info
