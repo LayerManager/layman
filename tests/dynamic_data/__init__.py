@@ -1,23 +1,49 @@
+from layman import LaymanError
 import tests.asserts.final.publication as publication
 import tests.asserts.final.publication.internal
 import tests.asserts.final.publication.internal_rest
 import tests.asserts.final.publication.rest
 import tests.asserts.final.publication.geoserver
+import tests.asserts.processing as processing
+import tests.asserts.processing.exception
 from test_tools import process_client
 from .. import Action, Publication
-
 
 LAYER_TYPE = process_client.LAYER_TYPE
 MAP_TYPE = process_client.MAP_TYPE
 
 KEY_ACTION = 'action'
 KEY_CALL = 'call'
+KEY_CALL_EXCEPTION = 'call_exception'
+KEY_EXCEPTION = 'exception'
+KEY_EXCEPTION_ASSERTS = 'exception_asserts'
 KEY_FINAL_ASSERTS = 'final_asserts'
 
 COMMON_WORKSPACE = 'dynamic_test_workspace'
 
 PUBLICATIONS = {
     Publication(COMMON_WORKSPACE, LAYER_TYPE, 'basic_sld'): [
+        {
+            KEY_ACTION: {
+                KEY_CALL: Action(process_client.publish_workspace_publication, {
+                    'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
+                    'style_file': 'sample/style/ne_10m_admin_0_countries.qml',
+                }),
+                KEY_CALL_EXCEPTION: {
+                    KEY_EXCEPTION: LaymanError,
+                    KEY_EXCEPTION_ASSERTS: [
+                        Action(processing.exception.response_exception, {'expected': {'http_code': 400,
+                                                                                      'code': 48,
+                                                                                      'message': 'Wrong combination of parameters',
+                                                                                      'detail': 'Raster layers are not allowed to have QML style.',
+                                                                                      }, }, ),
+                    ],
+                },
+            },
+            KEY_FINAL_ASSERTS: [
+                Action(publication.internal.does_not_exist, dict())
+            ],
+        },
         {
             KEY_ACTION: {
                 KEY_CALL: Action(process_client.publish_workspace_publication, dict()),
