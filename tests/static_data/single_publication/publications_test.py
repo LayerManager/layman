@@ -1,11 +1,12 @@
 import pytest
+
 from layman import app, util as layman_util, settings
 from layman.layer.filesystem import gdal, thumbnail as layer_thumbnail
 from layman.map.filesystem import thumbnail as map_thumbnail
 from test_tools import assert_util, util as test_util, process_client
 from .. import util
 from ... import static_data as data
-from ...asserts.final import publication as asserts
+from ...asserts.final.publication import internal as asserts_internal, rest as asserts_rest, internal_rest as asserts_internal_rest
 from ..data import ensure_publication
 
 
@@ -29,8 +30,8 @@ def test_thumbnail(workspace, publ_type, publication):
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman',)
 def test_get_publication_info_items(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
-    asserts.source_has_its_key_or_it_is_empty(workspace, publ_type, publication)
-    asserts.source_internal_keys_are_subset_of_source_sibling_keys(workspace, publ_type, publication)
+    asserts_internal.source_has_its_key_or_it_is_empty(workspace, publ_type, publication)
+    asserts_internal.source_internal_keys_are_subset_of_source_sibling_keys(workspace, publ_type, publication)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
@@ -39,9 +40,9 @@ def test_infos(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
     headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
-    asserts.same_title_in_source_and_rest_multi(workspace, publ_type, publication, headers)
-    asserts.is_in_rest_multi(workspace, publ_type, publication, headers)
-    asserts.correct_url_in_rest_multi(workspace, publ_type, publication, headers)
+    asserts_internal_rest.same_title_in_source_and_rest_multi(workspace, publ_type, publication, headers)
+    asserts_rest.is_in_rest_multi(workspace, publ_type, publication, headers)
+    asserts_rest.correct_url_in_rest_multi(workspace, publ_type, publication, headers)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
@@ -89,13 +90,13 @@ def test_auth_get_publication(workspace, publ_type, publication):
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_internal_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
-    asserts.mandatory_keys_in_all_sources(workspace, publ_type, publication)
-    asserts.metadata_key_sources_do_not_contain_other_keys(workspace, publ_type, publication)
-    asserts.metadata_key_sources_do_not_contain_other_keys(workspace, publ_type, publication)
-    asserts.thumbnail_key_sources_do_not_contain_other_keys(workspace, publ_type, publication)
+    asserts_internal.mandatory_keys_in_all_sources(workspace, publ_type, publication)
+    asserts_internal.metadata_key_sources_do_not_contain_other_keys(workspace, publ_type, publication)
+    asserts_internal.metadata_key_sources_do_not_contain_other_keys(workspace, publ_type, publication)
+    asserts_internal.thumbnail_key_sources_do_not_contain_other_keys(workspace, publ_type, publication)
     actor = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0]
-    asserts.mandatory_keys_in_primary_db_schema_of_first_reader(workspace, publ_type, publication, actor)
-    asserts.other_keys_not_in_primary_db_schema_of_first_reader(workspace, publ_type, publication, actor)
+    asserts_internal.mandatory_keys_in_primary_db_schema_of_first_reader(workspace, publ_type, publication, actor)
+    asserts_internal.other_keys_not_in_primary_db_schema_of_first_reader(workspace, publ_type, publication, actor)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
@@ -107,8 +108,8 @@ def test_info(workspace, publ_type, publication):
     with app.app_context():
         info = process_client.get_workspace_publication(publ_type, workspace, publication, headers)
 
-    asserts.is_complete_in_rest(info)
-    asserts.mandatory_keys_in_rest(info)
+    asserts_rest.is_complete_in_rest(info)
+    asserts_rest.mandatory_keys_in_rest(info)
 
     # Access rights
     all_auth_info = util.get_users_and_headers_for_publication(workspace, publ_type, publication)
@@ -132,4 +133,4 @@ def test_info(workspace, publ_type, publication):
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_all_source_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
-    asserts.same_value_of_key_in_all_sources(workspace, publ_type, publication)
+    asserts_internal.same_value_of_key_in_all_sources(workspace, publ_type, publication)
