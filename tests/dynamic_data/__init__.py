@@ -38,6 +38,32 @@ PUBLICATIONS = {
                 Action(publication.rest.mandatory_keys_in_rest, dict()),
                 Action(publication.geoserver.workspace_wms_1_3_0_capabilities_available, dict()),
                 Action(publication.geoserver.workspace_wfs_2_0_0_capabilities_available_if_vector, dict()),
+                Action(publication.internal.correct_values_in_detail, {
+                    'exp_publication_detail': {'name': 'basic_sld',
+                                               'title': 'basic_sld',
+                                               'type': 'layman.layer',
+                                               'style_type': 'sld',
+                                               'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196,
+                                                                6269876.33561699],
+                                               'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
+                                               'file': {'path': 'layers/basic_sld/input_file/basic_sld.geojson', 'file_type': 'vector'},
+                                               '_file': {
+                                                   'path': '/layman_data_test/workspaces/dynamic_test_workspace/layers/basic_sld/input_file/basic_sld.geojson'},
+                                               'db_table': {'name': 'basic_sld'},
+                                               'description': None,
+                                               'wfs': {'url': 'http://localhost:8000/geoserver/dynamic_test_workspace/wfs'},
+                                               'wms': {'url': 'http://localhost:8000/geoserver/dynamic_test_workspace_wms/ows'},
+                                               '_wms': {'url': 'http://geoserver:8080/geoserver/dynamic_test_workspace_wms/ows',
+                                                        'workspace': 'dynamic_test_workspace_wms'},
+                                               'style': {
+                                                   'url': 'http://enjoychallenge.tech/rest/workspaces/dynamic_test_workspace/layers/basic_sld/style',
+                                                   'type': 'sld'},
+                                               'thumbnail': {
+                                                   'url': 'http://enjoychallenge.tech/rest/workspaces/dynamic_test_workspace/layers/basic_sld/thumbnail',
+                                                   'path': 'layers/basic_sld/thumbnail/basic_sld.png'},
+                                               'metadata': {'csw_url': 'http://localhost:3080/csw',
+                                                            'comparison_url': 'http://enjoychallenge.tech/rest/workspaces/dynamic_test_workspace/layers/basic_sld/metadata-comparison'}}
+                }),
             ],
         },
     ],
