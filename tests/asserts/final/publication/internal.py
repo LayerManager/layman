@@ -1,7 +1,5 @@
-import requests
-
-from layman import app, util as layman_util, settings
-from test_tools import util as test_util, process_client
+from layman import app, util as layman_util
+from test_tools import process_client
 
 
 def source_has_its_key_or_it_is_empty(workspace, publ_type, name):
@@ -26,36 +24,6 @@ def source_internal_keys_are_subset_of_source_sibling_keys(workspace, publ_type,
                 internal_keys = [key[1:] for key in info if key.startswith('_')]
                 assert set(internal_keys) <= all_sibling_keys,\
                     f'internal_keys={set(internal_keys)}, all_sibling_keys={all_sibling_keys}, key={key}, info={info}'
-
-
-def same_title_in_source_and_rest_multi(workspace, publ_type, name, headers):
-    with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, context={'keys': ['title']})
-    title = publ_info['title']
-    infos = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
-
-    publication_infos = [info for info in infos if info['name'] == name]
-    info = next(iter(publication_infos))
-    assert info['title'] == title, f'publication_infos={publication_infos}'
-
-
-def is_in_rest_multi(workspace, publ_type, name, headers):
-    infos = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
-
-    publication_infos = [info for info in infos if info['name'] == name]
-    assert len(publication_infos) == 1, f'publication_infos={publication_infos}'
-
-
-def correct_url_in_rest_multi(workspace, publ_type, name, headers):
-    infos = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
-    publication_infos = [info for info in infos if info['name'] == name]
-    info = next(iter(publication_infos))
-    get_workspace_publication_url = process_client.PUBLICATION_TYPES_DEF[publ_type].get_workspace_publication_url
-    param_name = process_client.PUBLICATION_TYPES_DEF[publ_type].url_param_name
-    with app.app_context():
-        expected_url = test_util.url_for(get_workspace_publication_url, workspace=workspace, **{param_name: name},
-                                         internal=False)
-        assert info['url'] == expected_url, f'publication_infos={publication_infos}, expected_url={expected_url}'
 
 
 def same_infos(expected, tested):
@@ -120,40 +88,3 @@ def mandatory_keys_in_all_sources_of_first_reader(workspace, publ_type, name, ac
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor})
     assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
-
-
-def is_complete_in_rest(rest_publication_detail):
-    assert 'layman_metadata' in rest_publication_detail, f'rest_publication_detail={rest_publication_detail}'
-    assert rest_publication_detail['layman_metadata']['publication_status'] == 'COMPLETE', f'rest_publication_detail={rest_publication_detail}'
-
-
-def mandatory_keys_in_rest(rest_publication_detail):
-    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}.issubset(set(rest_publication_detail)), rest_publication_detail
-
-
-def workspace_wms_1_3_0_capabilities_available(workspace):
-    with app.app_context():
-        internal_wms_url = test_util.url_for('geoserver_proxy_bp.proxy', subpath=workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + '/ows')
-
-    r_wms = requests.get(internal_wms_url, params={
-        'service': 'WMS',
-        'request': 'GetCapabilities',
-        'version': '1.3.0',
-    })
-    assert r_wms.status_code == 200
-
-
-def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, name):
-    with app.app_context():
-        internal_wfs_url = test_util.url_for('geoserver_proxy_bp.proxy', subpath=workspace + '/wfs')
-
-    with app.app_context():
-        file_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file']})['file']
-    file_type = file_info['file_type']
-    if file_type == settings.FILE_TYPE_VECTOR:
-        r_wfs = requests.get(internal_wfs_url, params={
-            'service': 'WFS',
-            'request': 'GetCapabilities',
-            'version': '2.0.0',
-        })
-        assert r_wfs.status_code == 200
