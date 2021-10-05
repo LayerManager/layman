@@ -20,6 +20,12 @@ def get_publication_actor(publication):
     return actor
 
 
+def same_infos(expected, tested):
+    if isinstance(tested, dict) and isinstance(expected, dict):
+        return all(same_infos(expected[key], tested[key]) for key in tested if key in expected)
+    return expected == tested
+
+
 def run_action(publication, action, *, cache=None):
     param_def = {
         'headers': Action(get_publication_header, dict()),

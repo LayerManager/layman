@@ -1,5 +1,6 @@
 from layman import app, util as layman_util
 from test_tools import process_client
+from ... import util as assert_util
 
 
 def source_has_its_key_or_it_is_empty(workspace, publ_type, name):
@@ -26,12 +27,6 @@ def source_internal_keys_are_subset_of_source_sibling_keys(workspace, publ_type,
                     f'internal_keys={set(internal_keys)}, all_sibling_keys={all_sibling_keys}, key={key}, info={info}'
 
 
-def same_infos(expected, tested):
-    if isinstance(tested, dict) and isinstance(expected, dict):
-        return all(same_infos(expected[key], tested[key]) for key in tested if key in expected)
-    return expected == tested
-
-
 def same_value_of_key_in_all_sources(workspace, publ_type, name):
     with app.app_context():
         sources = layman_util.get_internal_sources(publ_type)
@@ -47,8 +42,8 @@ def same_value_of_key_in_all_sources(workspace, publ_type, name):
     for source, source_info in partial_infos.items():
         for key, value in source_info.items():
             if key in info:
-                assert same_infos(info[key], value), f'{source}: key={key}, info={info[key]}, source={value}, ' \
-                                                     f'all={[(lsource, lsource_info[key]) for lsource, lsource_info in partial_infos.items() if key in lsource_info]}'
+                assert assert_util.same_infos(info[key], value), f'{source}: key={key}, info={info[key]}, source={value}, ' \
+                                                                 f'all={[(lsource, lsource_info[key]) for lsource, lsource_info in partial_infos.items() if key in lsource_info]}'
 
 
 def mandatory_keys_in_all_sources(workspace, publ_type, name):
@@ -93,7 +88,7 @@ def mandatory_keys_in_all_sources_of_first_reader(workspace, publ_type, name, ac
 def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail):
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
-    assert same_infos(exp_publication_detail, pub_info), f'exp_publication_detail={exp_publication_detail}, pub_info={pub_info}'
+    assert assert_util.same_infos(exp_publication_detail, pub_info), f'exp_publication_detail={exp_publication_detail}, pub_info={pub_info}'
 
 
 def does_not_exist(workspace, publ_type, name, ):
