@@ -6,6 +6,7 @@ import tests.asserts.final.publication.rest
 import tests.asserts.final.publication.geoserver
 import tests.asserts.processing as processing
 import tests.asserts.processing.exception
+import tests.asserts.processing.response
 from test_tools import process_client
 from .. import Action, Publication
 
@@ -15,6 +16,7 @@ MAP_TYPE = process_client.MAP_TYPE
 KEY_ACTION = 'action'
 KEY_CALL = 'call'
 KEY_CALL_EXCEPTION = 'call_exception'
+KEY_RESPONSE_ASSERTS = 'response_asserts'
 KEY_EXCEPTION = 'exception'
 KEY_EXCEPTION_ASSERTS = 'exception_asserts'
 KEY_FINAL_ASSERTS = 'final_asserts'
@@ -47,6 +49,10 @@ PUBLICATIONS = {
         {
             KEY_ACTION: {
                 KEY_CALL: Action(process_client.publish_workspace_publication, dict()),
+                KEY_RESPONSE_ASSERTS: [
+                    Action(processing.response.same_infos, {'expected': {'name': 'basic_sld',
+                                                                         'url': 'http://enjoychallenge.tech/rest/workspaces/dynamic_test_workspace/layers/basic_sld', }}),
+                ],
             },
             KEY_FINAL_ASSERTS: [
                 Action(publication.internal.source_has_its_key_or_it_is_empty, dict()),
