@@ -27,15 +27,22 @@ def publication_id(publication):
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_action_chain(publication):
     for step in data.PUBLICATIONS[publication]:
+        response = None
         action = step[data.KEY_ACTION]
         exp_exception = pytest.raises(action[data.KEY_CALL_EXCEPTION][data.KEY_EXCEPTION]) if data.KEY_CALL_EXCEPTION in action else does_not_raise()
         with exp_exception as exception_info:
             action_call = action[data.KEY_CALL]
-            util.run_action(publication, action_call)
+            response = util.run_action(publication, action_call)
         exception_assert_param = {'thrown': exception_info}
         for assert_call in action.get(data.KEY_CALL_EXCEPTION, dict()).get(data.KEY_EXCEPTION_ASSERTS, list()):
             params = dict(**exception_assert_param, **assert_call.params)
             util.run_action(publication, Action(assert_call.method, params))
+
+        if not exception_info:
+            response_assert_param = {'response': response}
+            for assert_response in action.get(data.KEY_RESPONSE_ASSERTS, list()):
+                params = dict(**response_assert_param, **assert_response.params)
+                util.run_action(publication, Action(assert_response.method, params))
 
         data_cache = dict()
         for assert_call in step[data.KEY_FINAL_ASSERTS]:
