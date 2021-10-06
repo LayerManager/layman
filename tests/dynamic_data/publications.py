@@ -17,8 +17,7 @@ PUBLICATIONS = {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, dict()),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.same_infos, {'expected': {'name': 'basic_sld',
-                                                                         'url': 'http://enjoychallenge.tech/rest/workspaces/dynamic_test_workspace/layers/basic_sld', }}),
+                    Action(processing.response.valid_post, dict()),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
