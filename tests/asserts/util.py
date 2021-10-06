@@ -31,6 +31,10 @@ def same_value_for_keys(*, expected, tested, missing_key_is_ok=False):
     return expected == tested or (missing_key_is_ok and not tested)
 
 
+def get_directory_name_from_publ_type(publ_type):
+    return publ_type.split('.')[1] + 's'
+
+
 def run_action(publication, action, *, cache=None):
     param_def = {
         'headers': Action(get_publication_header, dict()),
