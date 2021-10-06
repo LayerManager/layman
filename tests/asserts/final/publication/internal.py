@@ -87,7 +87,7 @@ def mandatory_keys_in_all_sources_of_first_reader(workspace, publ_type, name, ac
 
 
 def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail):
-    publ_type_dir = publ_type.split('.')[1] + 's'
+    publ_type_dir = assert_util.get_directory_name_from_publ_type(publ_type)
     expected_detail = {
         'name': name,
         'type': publ_type,
