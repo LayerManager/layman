@@ -1,28 +1,14 @@
-from layman import LaymanError
 import tests.asserts.final.publication as publication
 import tests.asserts.processing as processing
 from test_tools import process_client
+from . import predefined_actions
 from .. import Action, Publication, dynamic_data as consts
+
 
 PUBLICATIONS = {
     Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'basic_sld'): [
         {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
-                    'style_file': 'sample/style/ne_10m_admin_0_countries.qml',
-                }),
-                consts.KEY_CALL_EXCEPTION: {
-                    consts.KEY_EXCEPTION: LaymanError,
-                    consts.KEY_EXCEPTION_ASSERTS: [
-                        Action(processing.exception.response_exception, {'expected': {'http_code': 400,
-                                                                                      'code': 48,
-                                                                                      'message': 'Wrong combination of parameters',
-                                                                                      'detail': 'Raster layers are not allowed to have QML style.',
-                                                                                      }, }, ),
-                    ],
-                },
-            },
+            consts.KEY_ACTION: predefined_actions.POST_TIF_WITH_QML,
             consts.KEY_FINAL_ASSERTS: [
                 Action(publication.internal.does_not_exist, dict())
             ],
@@ -55,22 +41,7 @@ PUBLICATIONS = {
             ],
         },
         {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
-                    'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
-                    'style_file': 'sample/style/ne_10m_admin_0_countries.qml',
-                }),
-                consts.KEY_CALL_EXCEPTION: {
-                    consts.KEY_EXCEPTION: LaymanError,
-                    consts.KEY_EXCEPTION_ASSERTS: [
-                        Action(processing.exception.response_exception, {'expected': {'http_code': 400,
-                                                                                      'code': 48,
-                                                                                      'message': 'Wrong combination of parameters',
-                                                                                      'detail': 'Raster layers are not allowed to have QML style.',
-                                                                                      }, }, ),
-                    ],
-                },
-            },
+            consts.KEY_ACTION: predefined_actions.PATCH_TIF_WITH_QML,
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
