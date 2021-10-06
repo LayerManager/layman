@@ -109,11 +109,7 @@ def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail)
             '_wms': {'url': f'{settings.LAYMAN_GS_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows',
                      'workspace': f'{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'},
         })
-    for key, item in exp_publication_detail.items():
-        if isinstance(item, dict) and isinstance(expected_detail.get(key), dict):
-            expected_detail[key].update(item)
-        else:
-            expected_detail[key] = item
+    expected_detail = assert_util.recursive_dict_update(expected_detail, exp_publication_detail)
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
     assert assert_util.same_value_for_keys(expected=expected_detail,
