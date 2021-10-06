@@ -20,10 +20,15 @@ def get_publication_actor(publication):
     return actor
 
 
-def same_infos(expected, tested):
+def same_value_for_keys(*, expected, tested, missing_key_is_ok=False):
     if isinstance(tested, dict) and isinstance(expected, dict):
-        return all(same_infos(expected[key], tested[key]) for key in tested if key in expected)
-    return expected == tested
+        return all(
+            key in tested and same_value_for_keys(expected=expected[key],
+                                                  tested=tested.get(key),
+                                                  missing_key_is_ok=missing_key_is_ok)
+            for key in expected if
+            not missing_key_is_ok or key in tested)
+    return expected == tested or (missing_key_is_ok and not tested)
 
 
 def run_action(publication, action, *, cache=None):
