@@ -1,4 +1,4 @@
-from layman import app, util as layman_util
+from layman import app, util as layman_util, settings
 from test_tools import process_client
 from ... import util as assert_util
 
@@ -23,7 +23,7 @@ def source_internal_keys_are_subset_of_source_sibling_keys(workspace, publ_type,
                 all_sibling_keys = set(sibling_key for item_list in all_items for sibling_key in item_list.info_items
                                        if key in item_list.info_items)
                 internal_keys = [key[1:] for key in info if key.startswith('_')]
-                assert set(internal_keys) <= all_sibling_keys,\
+                assert set(internal_keys) <= all_sibling_keys, \
                     f'internal_keys={set(internal_keys)}, all_sibling_keys={all_sibling_keys}, key={key}, info={info}'
 
 
@@ -86,9 +86,37 @@ def mandatory_keys_in_all_sources_of_first_reader(workspace, publ_type, name, ac
 
 
 def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail):
+    publ_type_dir = publ_type.split('.')[1] + 's'
+    expected_detail = {
+        'name': name,
+        'type': publ_type,
+        'thumbnail': {
+            'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/thumbnail',
+            'path': f'{publ_type_dir}/{name}/thumbnail/{name}.png'
+        },
+        'metadata': {
+            'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/metadata-comparison'
+        },
+    }
+    if publ_type == process_client.LAYER_TYPE:
+        expected_detail.update({
+            'db_table': {'name': name},
+            'style': {
+                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/style',
+            },
+            'wms': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows'},
+            '_wms': {'url': f'{settings.LAYMAN_GS_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows',
+                     'workspace': f'{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'},
+        })
+    for key, item in exp_publication_detail.items():
+        if isinstance(item, dict) and isinstance(expected_detail.get(key), dict):
+            expected_detail[key].update(item)
+        else:
+            expected_detail[key] = item
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
-    assert assert_util.same_infos(exp_publication_detail, pub_info), f'exp_publication_detail={exp_publication_detail}, pub_info={pub_info}'
+    assert assert_util.same_infos(expected_detail, pub_info), f'expected_detail={expected_detail}\npub_info={pub_info}\n' \
+                                                              f'exp_publication_detail={exp_publication_detail}'
 
 
 def does_not_exist(workspace, publ_type, name, ):
