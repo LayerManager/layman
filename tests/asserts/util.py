@@ -35,6 +35,21 @@ def get_directory_name_from_publ_type(publ_type):
     return publ_type.split('.')[1] + 's'
 
 
+def recursive_dict_update(base, updater):
+    stack = [(base, updater)]
+    while stack:
+        current_dst, current_src = stack.pop()
+        for key in current_src:
+            if key not in current_dst:
+                current_dst[key] = current_src[key]
+            else:
+                if isinstance(current_src[key], dict) and isinstance(current_dst[key], dict):
+                    stack.append((current_dst[key], current_src[key]))
+                else:
+                    current_dst[key] = current_src[key]
+    return base
+
+
 def run_action(publication, action, *, cache=None):
     param_def = {
         'headers': Action(get_publication_header, dict()),
