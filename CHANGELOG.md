@@ -12,6 +12,15 @@
 - [#459](https://github.com/LayerManager/layman/issues/459) Fix situation, when sometimes publication stayed in PENDING status after failure. It was already fixed in v1.14.1.
 - Rename item `username` to `workspace` in error 41.
 - Detailed [test-related documentation for developers](tests/README.md).
+- [#487](https://github.com/LayerManager/layman/issues/487) Upgrade
+  - flask from 2.0 to 2.0.2+
+  - celery from 4.4.7 to 5.0.5
+  - kombu from 4.6.10 to 5.1.0
+  - flower from 0.9.7 to 1.0.0
+  - jsonschema from 3.2.0 to 4.0.1
+  - psycopg2-binary from 2.8.6 to 2.9.1
+  - requests from 2.25.1 to 2.26.0
+  - unidecode from 1.2.0 to 1.3.2
 
 ## v1.14.1
  2021-09-14

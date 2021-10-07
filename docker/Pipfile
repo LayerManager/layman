@@ -15,8 +15,8 @@ pytest-timeout = "*"
 pillow = "*"
 
 [packages]
-celery = {extras = ["redis"],version = "<5.0.0"}
-flask = "*"
+celery = {extras = ["redis"],version = "<5.1.0"}
+flask = ">=2.0.2"
 unidecode = "*"
 psycopg2-binary = "*"
 requests = "*"
@@ -25,7 +25,7 @@ jsonschema = "*"
 flower = "*"
 selenium = "*"
 cacheout = "*"
-kombu = "==4.6.10"
+kombu = "<6.0.0"
 pyproj = "<3.0.0"
 pycld2 = "*"
 
