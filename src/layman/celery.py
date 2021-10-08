@@ -1,5 +1,6 @@
 import json
 import importlib
+import time
 
 import celery.exceptions
 from flask import current_app
@@ -214,6 +215,7 @@ def abort_chain(chain_info):
 def abort_publication_chain(workspace, publication_type, publication_name):
     chain_info = get_publication_chain_info(workspace, publication_type, publication_name)
     abort_chain(chain_info)
+    time.sleep(1)
     clear_steps_to_run_after_chain(workspace, publication_type, publication_name)
 
 
