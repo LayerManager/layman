@@ -432,7 +432,7 @@ def delete_publications(workspace,
     return jsonify(infos)
 
 
-def patch_after_feature_change(workspace, publication_type, publication, **kwargs):
+def patch_after_feature_change(workspace, publication_type, publication, *, queue=None, **kwargs):
     try:
         redis.create_lock(workspace, publication_type, publication, common.PUBLICATION_LOCK_FEATURE_CHANGE)
     except LaymanError as exc:
@@ -442,7 +442,7 @@ def patch_after_feature_change(workspace, publication_type, publication, **kwarg
             return
         raise exc
     task_methods = tasks_util.get_source_task_methods(get_publication_types()[publication_type], 'patch_after_feature_change')
-    patch_chain = tasks_util.get_chain_of_methods(workspace, publication, task_methods, kwargs, 'layername')
+    patch_chain = tasks_util.get_chain_of_methods(workspace, publication, task_methods, kwargs, 'layername', queue=queue)
     res = patch_chain()
     celery_util.set_publication_chain_info(workspace, publication_type, publication, task_methods, res)
 

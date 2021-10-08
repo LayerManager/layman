@@ -49,14 +49,14 @@ def get_source_task_methods(publ_type, method_name):
     return task_methods
 
 
-def get_chain_of_methods(workspace, publ_name, task_methods, task_options, publ_param_name):
+def get_chain_of_methods(workspace, publ_name, task_methods, task_options, publ_param_name, *, queue=None):
     return chain(*[
-        get_task_signature(workspace, publ_name, t, task_options, publ_param_name)
+        get_task_signature(workspace, publ_name, t, task_options, publ_param_name, queue=queue)
         for t in task_methods
     ])
 
 
-def get_task_signature(workspace, publ_name, task, task_options, publ_param_name):
+def get_task_signature(workspace, publ_name, task, task_options, publ_param_name, *, queue=None):
     param_names = [
         pname
         for pname in inspect.signature(task).parameters.keys()
@@ -67,9 +67,10 @@ def get_task_signature(workspace, publ_name, task, task_options, publ_param_name
         for key, value in task_options.items()
         if key in param_names
     }
+    queue = queue or settings.LAYMAN_CELERY_QUEUE
     return task.signature(
         (workspace, publ_name),
         task_opts,
-        queue=settings.LAYMAN_CELERY_QUEUE,
+        queue=queue,
         immutable=True,
     )
