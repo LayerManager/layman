@@ -9,10 +9,11 @@ import xml.etree.ElementTree as ET
 import requests
 
 from geoserver import error as gs_error
-from layman import app, settings
+from layman import app, settings, util as layman_util
 from layman.layer.geoserver import wfs, wms
 from layman.http import LaymanError
 from .util import url_for
+from .process import LAYMAN_CELERY_QUEUE
 
 logger = logging.getLogger(__name__)
 
@@ -523,3 +524,9 @@ def wait_for_publication_status(workspace, publication_type, publication, *, che
                       **{publication_type_def.url_param_name: publication})
     check_response_fn = check_response_fn or check_publication_status
     wait_for_rest(url, 60, 0.5, check_response=check_response_fn, headers=headers)
+
+
+def patch_after_feature_change(workspace, publ_type, name):
+    queue = LAYMAN_CELERY_QUEUE
+    with app.app_context():
+        layman_util.patch_after_feature_change(workspace, publ_type, name, queue=queue)
