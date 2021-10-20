@@ -53,10 +53,8 @@ def get_layer_files(workspace, layername, *, only_physical_files=False):
 
 
 def get_layer_info(workspace, layername):
-    input_file_dir = get_layer_input_file_dir(workspace, layername)
-    pattern = os.path.join(input_file_dir, layername + '.*')
-    filepaths = glob.glob(pattern)
-    abs_main_filepath = get_main_file_name(filepaths)
+    abs_main_filepath = get_layer_main_file_path(workspace, layername, )
+
     if abs_main_filepath is not None:
         rel_main_filepath = os.path.relpath(abs_main_filepath, common_util.get_workspace_dir(workspace))
         file_type = get_file_type(rel_main_filepath)
@@ -93,11 +91,15 @@ def get_main_file_name(filenames):
                  in get_all_allowed_main_extensions()), None)
 
 
-def get_layer_main_file_path(workspace, layername):
-    input_file_dir = get_layer_input_file_dir(workspace, layername)
-    pattern = os.path.join(input_file_dir, layername + '.*')
-    filenames = glob.glob(pattern)
-    return get_main_file_name(filenames)
+def get_layer_main_file_path(workspace, layername, *, gdal_format=False):
+    filepaths = get_layer_files(workspace, layername)
+    main_file = get_main_file_name(filepaths)
+    physical_files = get_layer_files(workspace, layername, only_physical_files=True)
+    if len(physical_files) == 1 and gdal_format:
+        compress_type = get_compressed_main_file_extension(physical_files[0])
+        if compress_type:
+            main_file = settings.COMPRESSED_FILE_EXTENSIONS[compress_type] + main_file
+    return main_file
 
 
 def get_file_type(main_filepath):
