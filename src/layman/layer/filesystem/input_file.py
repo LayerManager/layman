@@ -35,6 +35,11 @@ def delete_layer(workspace, layername):
     util.delete_layer_subdir(workspace, layername, LAYER_SUBDIR)
 
 
+def get_compressed_main_file_extension(filepath):
+    file_ext = os.path.splitext(filepath)[1]
+    return file_ext if file_ext in settings.COMPRESSED_FILE_EXTENSIONS else None
+
+
 def get_layer_info(workspace, layername):
     input_file_dir = get_layer_input_file_dir(workspace, layername)
     pattern = os.path.join(input_file_dir, layername + '.*')
