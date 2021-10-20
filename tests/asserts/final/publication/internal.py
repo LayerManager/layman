@@ -1,5 +1,5 @@
 from layman import app, util as layman_util, settings
-from test_tools import process_client
+from test_tools import process_client, util as test_util
 from ... import util as assert_util
 
 
@@ -84,6 +84,14 @@ def mandatory_keys_in_all_sources_of_first_reader(workspace, publ_type, name, ac
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor})
     assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
+
+
+def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, ):
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['thumbnail']})
+
+    diffs = test_util.compare_images(exp_thumbnail, pub_info['_thumbnail']['path'])
+    assert diffs < 1000
 
 
 def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail):
