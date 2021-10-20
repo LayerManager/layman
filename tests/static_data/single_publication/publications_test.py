@@ -1,9 +1,8 @@
 import pytest
 
 from layman import app, util as layman_util, settings
-from layman.layer.filesystem import gdal, thumbnail as layer_thumbnail
-from layman.map.filesystem import thumbnail as map_thumbnail
-from test_tools import assert_util, util as test_util, process_client
+from layman.layer.filesystem import gdal
+from test_tools import assert_util, process_client
 from .. import util
 from ... import static_data as data
 from ...asserts.final.publication import internal as asserts_internal, rest as asserts_rest, internal_rest as asserts_internal_rest
@@ -15,15 +14,9 @@ from ..data import ensure_publication
 def test_thumbnail(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
-    thumbnail_path_method = {process_client.LAYER_TYPE: layer_thumbnail.get_layer_thumbnail_path,
-                             process_client.MAP_TYPE: map_thumbnail.get_map_thumbnail_path}
-
     exp_thumbnail = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('thumbnail')
     if exp_thumbnail:
-        with app.app_context():
-            thumbnail_path = thumbnail_path_method[publ_type](workspace, publication)
-        diffs = test_util.compare_images(exp_thumbnail, thumbnail_path)
-        assert diffs < 1000
+        asserts_internal.thumbnail_equals(workspace, publ_type, publication, exp_thumbnail)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
