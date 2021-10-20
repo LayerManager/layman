@@ -44,7 +44,10 @@ def get_map_info(workspace, mapname):
                 'url': url_for('rest_workspace_map_thumbnail.get', workspace=workspace,
                                mapname=mapname),
                 'path': os.path.relpath(thumbnail_path, common_util.get_workspace_dir(workspace))
-            }
+            },
+            '_thumbnail': {
+                'path': thumbnail_path,
+            },
         }
     return {}
 

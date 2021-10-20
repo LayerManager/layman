@@ -39,7 +39,10 @@ def get_layer_info(workspace, layername):
                 'url': url_for('rest_workspace_layer_thumbnail.get', workspace=workspace,
                                layername=layername),
                 'path': os.path.relpath(thumbnail_path, common_util.get_workspace_dir(workspace))
-            }
+            },
+            '_thumbnail': {
+                'path': thumbnail_path,
+            },
         }
     return {}
 
