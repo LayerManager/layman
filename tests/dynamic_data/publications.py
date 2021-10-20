@@ -37,4 +37,30 @@ PUBLICATIONS = {
             ],
         },
     ],
+    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_sld'): [
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
+                    'file_paths': ['sample/layman.layer/small_layer.zip'],
+                }),
+                consts.KEY_RESPONSE_ASSERTS: [
+                    Action(processing.response.valid_post, dict()),
+                ],
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                Action(publication.internal.correct_values_in_detail, {
+                    'exp_publication_detail': {
+                        **predefined_infos.BASIC_SLD_LAYER,
+                        '_file': {
+                            'path': '/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_sld/input_file/zipped_sld.zip/small_layer.geojson'
+                        },
+                        'file': {
+                            'path': 'layers/zipped_sld/input_file/zipped_sld.zip/small_layer.geojson'
+                        },
+                    },
+                }),
+            ],
+        },
+    ]
 }

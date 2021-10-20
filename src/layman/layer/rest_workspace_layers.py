@@ -8,7 +8,7 @@ from layman.authn import authenticate, get_authn_username
 from layman.authz import authorize_workspace_publications_decorator
 from layman.common import redis as redis_util, rest as rest_common
 from . import util, LAYER_TYPE, LAYER_REST_PATH_NAME
-from .filesystem import input_file, input_style, input_chunk, uuid
+from .filesystem import input_file, input_style, input_chunk, uuid, util as fs_util
 
 bp = Blueprint('rest_workspace_layers', __name__)
 
@@ -41,12 +41,15 @@ def post(workspace):
 
     # FILE
     use_chunk_upload = False
+    zipped_file = None
     files = []
     if 'file' in request.files:
         files = [
             f for f in request.files.getlist("file")
             if len(f.filename) > 0
         ]
+        if len(files) == 1 and input_file.get_compressed_main_file_extension(files[0].filename):
+            zipped_file = files[0]
     if len(files) == 0 and len(request.form.getlist('file')) > 0:
         files = [
             filename for filename in request.form.getlist('file')
@@ -79,6 +82,8 @@ def post(workspace):
     # FILE NAMES
     if use_chunk_upload:
         filenames = files
+    elif zipped_file:
+        filenames = fs_util.get_filenames_from_zip_storage(zipped_file)
     else:
         filenames = [f.filename for f in files]
     file_type = input_file.get_file_type(input_file.get_main_file_name(filenames))
@@ -153,8 +158,14 @@ def post(workspace):
             })
         else:
             try:
-                input_file.save_layer_files(
-                    workspace, layername, files, check_crs)
+                if zipped_file:
+                    input_file.save_layer_zip_file(
+                        workspace, layername, zipped_file,
+                    )
+                else:
+                    input_file.save_layer_files(
+                        workspace, layername, files, check_crs
+                    )
             except BaseException as exc:
                 uuid.delete_layer(workspace, layername)
                 input_file.delete_layer(workspace, layername)
