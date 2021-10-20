@@ -25,6 +25,9 @@ PUBLICATIONS = {
                 Action(publication.internal.correct_values_in_detail, {
                     'exp_publication_detail': predefined_infos.BASIC_SLD_LAYER
                 }),
+                Action(publication.internal.thumbnail_equals, {
+                    'exp_thumbnail': 'sample/style/test_wfs_bbox_layer_sld.png',
+                }),
             ],
         },
         {
@@ -33,6 +36,9 @@ PUBLICATIONS = {
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
                     'exp_publication_detail': predefined_infos.BASIC_SLD_LAYER
+                }),
+                Action(publication.internal.thumbnail_equals, {
+                    'exp_thumbnail': 'sample/style/test_wfs_bbox_layer_sld.png',
                 }),
             ],
         },
