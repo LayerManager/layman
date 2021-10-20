@@ -26,7 +26,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': predefined_infos.BASIC_SLD_LAYER
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/test_wfs_bbox_layer_sld.png',
+                    'exp_thumbnail': 'sample/style/basic_sld.png',
                 }),
             ],
         },
@@ -38,7 +38,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': predefined_infos.BASIC_SLD_LAYER
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/test_wfs_bbox_layer_sld.png',
+                    'exp_thumbnail': 'sample/style/basic_sld.png',
                 }),
             ],
         },
