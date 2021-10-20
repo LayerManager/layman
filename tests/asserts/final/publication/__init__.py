@@ -14,6 +14,7 @@ IS_LAYER_COMPLETE_AND_CONSISTENT = [
     Action(internal.thumbnail_key_sources_do_not_contain_other_keys, dict()),
     Action(internal.mandatory_keys_in_primary_db_schema_of_first_reader, dict()),
     Action(internal.other_keys_not_in_primary_db_schema_of_first_reader, dict()),
+    Action(internal.mandatory_keys_in_all_sources_of_first_reader, dict()),
     Action(rest.is_complete_in_rest, dict()),
     Action(rest.mandatory_keys_in_rest, dict()),
     Action(geoserver.workspace_wms_1_3_0_capabilities_available, dict()),
