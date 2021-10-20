@@ -22,6 +22,11 @@ MAIN_FILE_EXTENSIONS = {
     '.jpg': FILE_TYPE_RASTER,
 }
 
+# Files are opened with dedicated tools for each format, so adding new extension is not sufficient for new compress format to start working
+COMPRESSED_FILE_EXTENSIONS = {
+    '.zip': '/vsizip/',
+}
+
 INPUT_SRS_LIST = [
     'EPSG:3857',
     'EPSG:4326',
