@@ -1,5 +1,4 @@
 BASIC_SLD_LAYER = {
-    'title': 'basic_sld',
     'style_type': 'sld',
     'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196,
                      6269876.33561699],

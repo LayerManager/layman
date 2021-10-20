@@ -90,6 +90,7 @@ def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail)
     publ_type_dir = assert_util.get_directory_name_from_publ_type(publ_type)
     expected_detail = {
         'name': name,
+        'title': name,
         'type': publ_type,
         'thumbnail': {
             'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/thumbnail',
