@@ -24,7 +24,7 @@
 | [libwebpmux3](https://packages.debian.org/sid/libwebpmux3) | 0.6.1-2.1 | MIT | Dockerfile | prod | bin | dependency of chromium |
 | [chromium](https://www.chromium.org/) | 90+ | BSD and others | Dockerfile | prod | bin | for client-side map rendering and integration testing |
 | [chromedriver](http://chromedriver.chromium.org/) | 90+ | BSD and others | Dockerfile | prod | bin | for client-side map rendering and integration testing |
-| [pipenv](https://pipenv.pypa.io/en/latest/) | 2020.11.15 | MIT | Dockerfile | prod | bin | to install Python dependencies |
+| [pipenv](https://pypi.org/project/pipenv/) | 2020.11.15 | MIT | Dockerfile | prod | bin | to install Python dependencies |
 | [node.js](https://nodejs.org/) | 10 | MIT | timgen/Dockerfile | prod | bin | to run Timgen |
 | [npm](https://www.npmjs.com/get-npm) | 6 | Artistic License 2.0 | timgen/Dockerfile | prod | bin | to install node.js dependencies |
 | [node.js](https://nodejs.org/) | 12 | MIT | client/docker/Dockerfile | prod | bin | to run Layman Test Client |
