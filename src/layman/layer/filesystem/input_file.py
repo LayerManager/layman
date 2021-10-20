@@ -40,6 +40,18 @@ def get_compressed_main_file_extension(filepath):
     return file_ext if file_ext in settings.COMPRESSED_FILE_EXTENSIONS else None
 
 
+def get_layer_files(workspace, layername, *, only_physical_files=False):
+    input_file_dir = get_layer_input_file_dir(workspace, layername)
+    pattern = os.path.join(input_file_dir, layername + '.*')
+    filepaths = glob.glob(pattern)
+    if len(filepaths) == 1 and not only_physical_files:
+        compress_type = get_compressed_main_file_extension(filepaths[0])
+        if compress_type:
+            compressed_filenames = util.get_filenames_from_zip_storage(filepaths[0])
+            filepaths = [os.path.join(filepaths[0], fp) for fp in compressed_filenames]
+    return filepaths
+
+
 def get_layer_info(workspace, layername):
     input_file_dir = get_layer_input_file_dir(workspace, layername)
     pattern = os.path.join(input_file_dir, layername + '.*')
