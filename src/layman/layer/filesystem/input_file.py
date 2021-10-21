@@ -65,6 +65,7 @@ def get_layer_info(workspace, layername):
             },
             '_file': {
                 'path': abs_main_filepath,
+                'gdal_path': get_layer_main_file_path(workspace, layername, gdal_format=True),
             },
         }
     elif os.path.exists(util.get_layer_dir(workspace, layername)):
