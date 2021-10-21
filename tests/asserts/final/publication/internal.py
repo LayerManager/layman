@@ -93,7 +93,7 @@ def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, ):
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['thumbnail']})
 
     diffs = test_util.compare_images(exp_thumbnail, pub_info['_thumbnail']['path'])
-    assert diffs < 1000
+    assert diffs < 500
 
 
 def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail):
