@@ -112,7 +112,6 @@ def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail)
     }
     if publ_type == process_client.LAYER_TYPE:
         expected_detail.update({
-            'db_table': {'name': name},
             'style': {
                 'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/style',
             },
