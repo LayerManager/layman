@@ -89,7 +89,7 @@ def refresh_gdal(self, workspace, layername, crs_id=None):
     if self.is_aborted():
         raise AbortedException
 
-    input_path = layer_info['_file']['path']
+    input_path = layer_info['_file']['gdal_path']
     gdal.assert_valid_raster(input_path)
     vrt_file_path = gdal.create_vrt_file_if_needed(input_path)
     process = gdal.normalize_raster_file_async(workspace, layername, vrt_file_path or input_path, crs_id)
