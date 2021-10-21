@@ -1,7 +1,9 @@
+import os
 from zipfile import ZipFile
 from functools import partial
 from werkzeug.datastructures import FileStorage
 
+from layman import settings
 from layman.common.filesystem import util as publ_util
 
 LAYER_TYPE = '.'.join(__name__.split('.')[:-2])
@@ -28,4 +30,15 @@ def get_filenames_from_zip_storage(zip_file):
 
 
 def get_deepest_real_file(path):
-    return path
+    stripped_path = next((path[len(prefix):] for prefix in settings.COMPRESSED_FILE_EXTENSIONS.values() if path.startswith(prefix)), None)
+    if stripped_path:
+        path = stripped_path
+        while True:
+            base_path, _ = os.path.split(path)
+            if os.path.exists(base_path):
+                result = base_path
+                break
+            path = base_path
+    else:
+        result = path
+    return result
