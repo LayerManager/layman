@@ -57,7 +57,9 @@ PUBLICATIONS = {
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
                     'exp_publication_detail': {
-                        **predefined_infos.BASIC_SLD_LAYER,
+                        **predefined_infos.SLD_VECTOR_LAYER,
+                        'db_table': {'name': 'zipped_sld'},
+                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         '_file': {
                             'path': '/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_sld/input_file/zipped_sld.zip/small_layer.geojson'
                         },
@@ -86,7 +88,8 @@ PUBLICATIONS = {
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
                     'exp_publication_detail': {
-                        **predefined_infos.BASIC_SLD_LAYER,
+                        **predefined_infos.SLD_VECTOR_LAYER,
+                        'db_table': {'name': 'zipped_shp_sld'},
                         '_file': {
                             'path': '/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_shp_sld/input_file/zipped_shp_sld.zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin 0 boundary_lines_land ížě.shp'
                         },
