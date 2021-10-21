@@ -122,7 +122,7 @@ Body parameters:
       - JPEG 2000 (.jp2, with or without .j2w)
       - PNG (.png, with .png.aux.xml or .pgw)
       - JPEG (.jpg, with .jpg.aux.xml or .jgw)
-      - GeoJSON or ShapeFile in single ZIP file (.zip)
+      - any of above types in single ZIP file (.zip)
       - file names, i.e. array of strings (not supported for ZIP file)
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - in case of raster data input, following input combinations of bands and color interpretations are supported:
