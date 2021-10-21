@@ -66,6 +66,9 @@ PUBLICATIONS = {
                         },
                     },
                 }),
+                Action(publication.internal.thumbnail_equals, {
+                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                }),
             ],
         },
     ]
