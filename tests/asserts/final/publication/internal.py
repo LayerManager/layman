@@ -70,19 +70,19 @@ def thumbnail_key_sources_do_not_contain_other_keys(workspace, publ_type, name):
     assert all(item not in pub_info for item in {'name', 'title', 'access_rights', 'uuid', 'file', 'metadata', }), pub_info
 
 
-def mandatory_keys_in_primary_db_schema_of_first_reader(workspace, publ_type, name, actor, ):
+def mandatory_keys_in_primary_db_schema_of_actor(workspace, publ_type, name, actor, ):
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor, 'keys': []})
     assert {'name', 'title', 'access_rights', 'uuid', }.issubset(set(pub_info)), pub_info
 
 
-def other_keys_not_in_primary_db_schema_of_first_reader(workspace, publ_type, name, actor, ):
+def other_keys_not_in_primary_db_schema_of_actor(workspace, publ_type, name, actor, ):
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor, 'keys': []})
     assert all(item not in pub_info for item in {'metadata', 'file', }), pub_info
 
 
-def mandatory_keys_in_all_sources_of_first_reader(workspace, publ_type, name, actor, ):
+def mandatory_keys_in_all_sources_of_actor(workspace, publ_type, name, actor, ):
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor})
     assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
