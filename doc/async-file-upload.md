@@ -36,7 +36,7 @@ Brief overview:
 - before [POST Workspace Layers](rest.md#post-workspace-layers) request is sent to the server, check file sizes and decide if to make sync or async file upload
 - if async, switch from files to file names and save files for later async upload
 - send [POST Workspace Layers](rest.md#post-workspace-layers) request using AJAX
-- if async, read server response to setup [Resumable.js](http://www.resumablejs.com/) correctly, and start async upload of files
+- if async, read server response to setup [Resumable.js](https://github.com/23/resumable.js/) correctly, and start async upload of files
 
 Example:
 ```js
