@@ -1,6 +1,6 @@
 from layman import app, util as layman_util, settings
 from test_tools import process_client, util as test_util
-from ... import util as assert_util
+from ... import util
 
 
 def source_has_its_key_or_it_is_empty(workspace, publ_type, name):
@@ -42,9 +42,9 @@ def same_value_of_key_in_all_sources(workspace, publ_type, name):
     for source, source_info in partial_infos.items():
         for key, value in source_info.items():
             if key in info:
-                assert assert_util.same_value_for_keys(expected=info[key], tested=value,
-                                                       missing_key_is_ok=True), f'{source}: key={key}, info={info[key]}, source={value}, ' \
-                                                                                f'all={[(lsource, lsource_info[key]) for lsource, lsource_info in partial_infos.items() if key in lsource_info]}'
+                assert util.same_value_for_keys(expected=info[key], tested=value,
+                                                missing_key_is_ok=True), f'{source}: key={key}, info={info[key]}, source={value}, ' \
+                                                                         f'all={[(lsource, lsource_info[key]) for lsource, lsource_info in partial_infos.items() if key in lsource_info]}'
 
 
 def mandatory_keys_in_all_sources(workspace, publ_type, name):
@@ -95,7 +95,7 @@ def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, ):
 
 
 def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail):
-    publ_type_dir = assert_util.get_directory_name_from_publ_type(publ_type)
+    publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
     expected_detail = {
         'name': name,
         'title': name,
@@ -118,12 +118,12 @@ def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail)
             '_wms': {'url': f'{settings.LAYMAN_GS_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows',
                      'workspace': f'{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'},
         })
-    expected_detail = assert_util.recursive_dict_update(expected_detail, exp_publication_detail)
+    expected_detail = util.recursive_dict_update(expected_detail, exp_publication_detail)
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
-    assert assert_util.same_value_for_keys(expected=expected_detail,
-                                           tested=pub_info), f'expected_detail={expected_detail}\npub_info={pub_info}\n' \
-                                                             f'exp_publication_detail={exp_publication_detail}'
+    assert util.same_value_for_keys(expected=expected_detail,
+                                    tested=pub_info), f'expected_detail={expected_detail}\npub_info={pub_info}\n' \
+                                                      f'exp_publication_detail={exp_publication_detail}'
 
 
 def does_not_exist(workspace, publ_type, name, ):
