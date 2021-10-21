@@ -78,3 +78,17 @@ def assert_all_sources_bbox(workspace, layer, expected_bbox):
     assert md_props[prop_key]['equal_or_null'] is True, md_props[prop_key]
     csw_bbox_4326 = tuple(md_props[prop_key]['values'][csw_src_key])
     assert_same_bboxes(expected_bbox_4326, csw_bbox_4326, 0.001)
+
+
+def assert_same_values_for_keys(*, expected, tested, missing_key_is_ok=False, path=''):
+    if isinstance(tested, dict) and isinstance(expected, dict):
+        for key in expected:
+            key_path = path + f'.{key}'
+            if not missing_key_is_ok or key in tested:
+                assert key in tested, f'key_path={key_path}, expected={expected}, tested={tested}'
+                assert_same_values_for_keys(expected=expected[key],
+                                            tested=tested[key],
+                                            missing_key_is_ok=missing_key_is_ok,
+                                            path=key_path)
+    else:
+        assert expected == tested, f'path={path}, expected={expected}, tested={tested}'
