@@ -25,3 +25,7 @@ def get_filenames_from_zip_storage(zip_file):
     if isinstance(zip_file, FileStorage):
         zip_file.seek(0)
     return filenames
+
+
+def get_deepest_real_file(path):
+    return path

@@ -4,7 +4,7 @@ import subprocess
 from osgeo import gdal, gdalconst
 from layman import patch_mode, settings, LaymanError
 from layman.common import empty_method, empty_method_returns_dict
-from . import input_file
+from . import input_file, util
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
@@ -137,7 +137,7 @@ def is_nodata_out_of_min_max(filepath, *, nodata_values):
     if any(val is None for val in nodata_values):
         result = False
     else:
-        base_name = os.path.splitext(filepath)[0]
+        base_name = os.path.splitext(util.get_deepest_real_file(filepath))[0]
         vrt_file_path = base_name + '.ignore_nodata.vrt'
         vrt_options = gdal.BuildVRTOptions(hideNodata=True)
         gdal.BuildVRT(vrt_file_path, [filepath], options=vrt_options)
@@ -171,7 +171,7 @@ def create_vrt_file_if_needed(filepath):
     color_interp = get_color_interpretations(filepath)
     nodata_values = get_nodata_values(filepath)
     if color_interp[-1] == 'Alpha' and not is_normalized_alpha_needed(filepath, color_interp=color_interp, nodata_values=nodata_values):
-        base_name = os.path.splitext(filepath)[0]
+        base_name = os.path.splitext(util.get_deepest_real_file(filepath))[0]
         vrt_file_path = base_name + '.vrt'
         band_list = list(range(1, len(color_interp)))
         vrt_options = gdal.BuildVRTOptions(bandList=band_list)
