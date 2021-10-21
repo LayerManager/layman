@@ -122,7 +122,8 @@ Body parameters:
       - JPEG 2000 (.jp2, with or without .j2w)
       - PNG (.png, with .png.aux.xml or .pgw)
       - JPEG (.jpg, with .jpg.aux.xml or .jgw)
-      - file names, i.e. array of strings
+      - GeoJSON in single ZIP file (.zip)
+      - file names, i.e. array of strings (not supported for ZIP file)
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - in case of raster data input, following input combinations of bands and color interpretations are supported:
       - 1 band: Gray
@@ -239,7 +240,8 @@ JSON object with following structure:
   - *status*: Status information about generating and availability of thumbnail. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **file**
-  - *path*: String. Path to input data file. Path is relative to workspace directory.
+  - *path*: String. Path to input data file. Path is relative to workspace directory.  
+  If data file was sent in ZIP archive to the server, path includes also path to the main file inside ZIP file. E.g. `layers/zipped_shapefile/input_file/zipped_shapefile.zip/layer_main_file.shp`
   - *file_type*: String. Either `vector` or `raster` depends on source file type.
   - *status*: Status information about saving and availability of files. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
