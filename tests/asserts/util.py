@@ -20,17 +20,6 @@ def get_publication_actor(publication):
     return actor
 
 
-def same_value_for_keys(*, expected, tested, missing_key_is_ok=False):
-    if isinstance(tested, dict) and isinstance(expected, dict):
-        return all(
-            key in tested and same_value_for_keys(expected=expected[key],
-                                                  tested=tested.get(key),
-                                                  missing_key_is_ok=missing_key_is_ok)
-            for key in expected if
-            not missing_key_is_ok or key in tested)
-    return expected == tested or (missing_key_is_ok and not tested)
-
-
 def get_directory_name_from_publ_type(publ_type):
     return publ_type.split('.')[1] + 's'
 
