@@ -1,5 +1,5 @@
 from layman import app, util as layman_util, settings
-from test_tools import process_client, util as test_util
+from test_tools import process_client, util as test_util, assert_util
 from ... import util
 
 
@@ -42,9 +42,11 @@ def same_value_of_key_in_all_sources(workspace, publ_type, name):
     for source, source_info in partial_infos.items():
         for key, value in source_info.items():
             if key in info:
-                assert util.same_value_for_keys(expected=info[key], tested=value,
-                                                missing_key_is_ok=True), f'{source}: key={key}, info={info[key]}, source={value}, ' \
-                                                                         f'all={[(lsource, lsource_info[key]) for lsource, lsource_info in partial_infos.items() if key in lsource_info]}'
+                assert_util.assert_same_values_for_keys(expected=info[key],
+                                                        tested=value,
+                                                        missing_key_is_ok=True,
+                                                        path=f'[{source}]',
+                                                        )
 
 
 def mandatory_keys_in_all_sources(workspace, publ_type, name):
@@ -121,9 +123,9 @@ def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail)
     expected_detail = util.recursive_dict_update(expected_detail, exp_publication_detail)
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
-    assert util.same_value_for_keys(expected=expected_detail,
-                                    tested=pub_info), f'expected_detail={expected_detail}\npub_info={pub_info}\n' \
-                                                      f'exp_publication_detail={exp_publication_detail}'
+    assert_util.assert_same_values_for_keys(expected=expected_detail,
+                                            tested=pub_info,
+                                            )
 
 
 def does_not_exist(workspace, publ_type, name, ):
