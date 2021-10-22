@@ -140,4 +140,39 @@ PUBLICATIONS = {
             ],
         },
     ],
+    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_tif_colortable_nodata_opaque'): [
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
+                    'file_paths': ['sample/layman.layer/sample_tif_colortable_nodata_opaque.zip'],
+                }),
+                consts.KEY_RESPONSE_ASSERTS: [
+                    Action(processing.response.valid_post, dict()),
+                ],
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                Action(publication.internal.correct_values_in_detail, {
+                    'exp_publication_detail': {
+                        **predefined_infos.SLD_RASTER_LAYER,
+                        '_file': {
+                            'path': '/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_tif_colortable_nodata_opaque/input_file/zipped_tif_colortable_nodata_opaque.zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
+                            'gdal_path': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_tif_colortable_nodata_opaque/input_file/zipped_tif_colortable_nodata_opaque.zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
+                            'normalized_file': {
+                                'path': '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace/layers/zipped_tif_colortable_nodata_opaque/zipped_tif_colortable_nodata_opaque.tif',
+                                'gs_path': 'normalized_raster_data_test/workspaces/dynamic_test_workspace/layers/zipped_tif_colortable_nodata_opaque/zipped_tif_colortable_nodata_opaque.tif'
+                            },
+                        },
+                        'file': {
+                            'path': 'layers/zipped_tif_colortable_nodata_opaque/input_file/zipped_tif_colortable_nodata_opaque.zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif'
+                        },
+                        'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
+                    },
+                }),
+                Action(publication.internal.thumbnail_equals, {
+                    'exp_thumbnail': 'test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
+                }),
+            ],
+        },
+    ],
 }
