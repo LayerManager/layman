@@ -7,7 +7,7 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
-- [#169](https://github.com/LayerManager/layman/issues/169) [POST Workspace Layers](doc/rest.md#post-workspace-layers) accepts also compressed data files in ZIP format (`*.zip`) in `file` parameter. [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) accepts also data GeoJSON file in ZIP format (`*.zip`) in `file` parameter.
+- [#169](https://github.com/LayerManager/layman/issues/169) [POST Workspace Layers](doc/rest.md#post-workspace-layers) accepts also compressed data files in ZIP format (`*.zip`) in `file` parameter. [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) accepts also data file in ZIP format (`*.zip`) in `file` parameter.
 - [#169](https://github.com/LayerManager/layman/issues/169) [GET Workspace Layer](doc/rest.md#get-workspace-layer) returns path to main file inside archive if zipped file was sent (key `file.path`).
 - [#465](https://github.com/LayerManager/layman/issues/465) Fix situation, when Layman does not start if *.qgis file of the first layer with QML style does not exist. It was already fixed in v1.14.1.
 - [#464](https://github.com/LayerManager/layman/issues/464) Fix publishing layers with unusual attribute  names (e.g. `x,` or `Číslo`) and QML styles. It was already fixed in v1.14.1.
