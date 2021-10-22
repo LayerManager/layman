@@ -139,6 +139,35 @@ PUBLICATIONS = {
                 }),
             ],
         },
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
+                    'file_paths': ['sample/layman.layer/small_layer.zip'],
+                }),
+                consts.KEY_RESPONSE_ASSERTS: [
+                    Action(processing.response.valid_post, dict()),
+                ],
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                Action(publication.internal.correct_values_in_detail, {
+                    'exp_publication_detail': {
+                        **predefined_infos.SLD_VECTOR_LAYER,
+                        'db_table': {'name': 'zipped_tif_tfw_rgba_opaque'},
+                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
+                        '_file': {
+                            'path': '/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_tif_tfw_rgba_opaque/input_file/zipped_tif_tfw_rgba_opaque.zip/small_layer.geojson'
+                        },
+                        'file': {
+                            'path': 'layers/zipped_tif_tfw_rgba_opaque/input_file/zipped_tif_tfw_rgba_opaque.zip/small_layer.geojson'
+                        },
+                    },
+                }),
+                Action(publication.internal.thumbnail_equals, {
+                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                }),
+            ],
+        },
     ],
     Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_tif_colortable_nodata_opaque'): [
         {
