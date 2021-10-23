@@ -96,7 +96,8 @@ def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, ):
     assert diffs < 500
 
 
-def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail):
+def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_detail, publ_type_detail,
+                             file_extension=None, gdal_prefix='', ):
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
     expected_detail = {
         'name': name,
@@ -107,18 +108,69 @@ def correct_values_in_detail(workspace, publ_type, name, exp_publication_detail)
             'path': f'{publ_type_dir}/{name}/thumbnail/{name}.png'
         },
         'metadata': {
-            'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/metadata-comparison'
+            'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/metadata-comparison',
+            'csw_url': 'http://localhost:3080/csw',
         },
+        '_thumbnail': {'path': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/thumbnail/{name}.png'},
     }
     if publ_type == process_client.LAYER_TYPE:
-        expected_detail.update({
-            'style': {
-                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/style',
-            },
-            'wms': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows'},
-            '_wms': {'url': f'{settings.LAYMAN_GS_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows',
-                     'workspace': f'{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'},
-        })
+        util.recursive_dict_update(expected_detail,
+                                   {
+                                       'style': {
+                                           'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/style',
+                                       },
+                                       'wms': {
+                                           'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows'},
+                                       '_wms': {
+                                           'url': f'{settings.LAYMAN_GS_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows',
+                                           'workspace': f'{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'},
+                                       'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
+                                       'description': None,
+                                   })
+
+        if file_extension:
+            util.recursive_dict_update(expected_detail,
+                                       {
+                                           '_file': {
+                                               'path': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.{file_extension}',
+                                               'gdal_path': f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.{file_extension}',
+                                           },
+                                           'file': {
+                                               'path': f'{publ_type_dir}/{name}/input_file/{name}.{file_extension}'
+                                           },
+                                       })
+
+        file_type = publ_type_detail[0]
+        if file_type == settings.FILE_TYPE_VECTOR:
+            util.recursive_dict_update(expected_detail,
+                                       {
+                                           'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
+                                           'file': {'file_type': 'vector'},
+                                           'db_table': {'name': f'{name}'},
+                                       })
+        elif file_type == settings.FILE_TYPE_RASTER:
+            if file_extension:
+                util.recursive_dict_update(expected_detail,
+                                           {
+                                               'file': {'file_type': 'raster'},
+                                               '_file': {
+                                                   'normalized_file': {
+                                                       'path': f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif',
+                                                       'gs_path': f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif'
+                                                   },
+                                               },
+                                           })
+        else:
+            raise NotImplementedError(f"Unknown file type: {file_type}")
+
+        style_type = publ_type_detail[1]
+        if style_type:
+            util.recursive_dict_update(expected_detail,
+                                       {
+                                           'style_type': style_type,
+                                           'style': {'type': style_type},
+                                       })
+
     expected_detail = util.recursive_dict_update(expected_detail, exp_publication_detail)
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
