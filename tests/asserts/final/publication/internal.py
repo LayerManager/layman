@@ -96,7 +96,7 @@ def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, ):
     assert diffs < 500
 
 
-def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_detail, publ_type_detail,
+def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_detail, publ_type_detail, full_comparison=True,
                              file_extension=None, gdal_prefix='', ):
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
     expected_detail = {
@@ -174,9 +174,17 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
     expected_detail = util.recursive_dict_update(expected_detail, exp_publication_detail)
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
-    assert_util.assert_same_values_for_keys(expected=expected_detail,
-                                            tested=pub_info,
-                                            )
+
+    if full_comparison:
+        for key in {'id', 'uuid', 'updated_at', }:
+            pub_info.pop(key)
+        for key in {'identifier', 'record_url', }:
+            pub_info['metadata'].pop(key)
+        assert expected_detail == pub_info
+    else:
+        assert_util.assert_same_values_for_keys(expected=expected_detail,
+                                                tested=pub_info,
+                                                )
 
 
 def does_not_exist(workspace, publ_type, name, ):
