@@ -4,6 +4,18 @@ With increasing complexity and funcionality of Layman, number of tests using Lay
 
 We decided to structure tests according to simple decision tree introduced below. Our goal was better searchability of current tests and also better options of optimization to decrease tests duration.
 
+## Usage
+### Run tests in `src` folder
+```
+make test
+```
+### Run tests in `tests` folder
+```
+make test-separated
+```
+Additional parameters for pytest command line
+- `--nocleanup`: Do not delete publications after tests
+
 ## Rules
 - Every direct subfolder of `tests`, e.g. `static_data` or `failed_publications`, relies on that tests from other folders will not use their workspaces.
 - Each test in `tests` and `src` takes into account that other workspaces may be created in parallel. Also, in such other workspaces, publications can be created and deleted in parallel.
