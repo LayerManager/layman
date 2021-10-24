@@ -11,6 +11,7 @@ LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
 
 FILE_TYPE_VECTOR = 'vector'
 FILE_TYPE_RASTER = 'raster'
+FILE_TYPE_UNKNOWN = 'unknown'
 
 MAIN_FILE_EXTENSIONS = {
     '.geojson': FILE_TYPE_VECTOR,

@@ -98,6 +98,9 @@ PUBLICATION_TYPES = {
                       settings.FILE_TYPE_RASTER: {'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at',
                                                   'wms', 'thumbnail', 'file', 'metadata', 'style', 'sld', 'access_rights',
                                                   'bounding_box', },
+                      settings.FILE_TYPE_UNKNOWN: {'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at',
+                                                   'wms', 'thumbnail', 'file', 'metadata', 'style', 'sld', 'access_rights',
+                                                   'bounding_box', },
                       },
     }
 }
