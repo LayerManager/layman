@@ -104,8 +104,11 @@ def get_layer_main_file_path(workspace, layername, *, gdal_format=False):
 
 
 def get_file_type(main_filepath):
-    ext = os.path.splitext(main_filepath)[1]
-    file_type = settings.MAIN_FILE_EXTENSIONS[ext]
+    if main_filepath:
+        ext = os.path.splitext(main_filepath)[1]
+        file_type = settings.MAIN_FILE_EXTENSIONS[ext]
+    else:
+        file_type = settings.FILE_TYPE_UNKNOWN
     return file_type
 
 
