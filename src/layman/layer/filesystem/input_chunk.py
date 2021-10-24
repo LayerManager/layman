@@ -42,11 +42,13 @@ get_publication_uuid = input_file.get_publication_uuid
 
 
 def save_layer_files_str(workspace, layername, files_str, check_crs):
-    filenames = files_str
-    main_filename = input_file.get_main_file_name(filenames)
     input_file_dir = input_file.get_layer_input_file_dir(workspace, layername)
+    if len(files_str) == 1 and input_file.get_compressed_main_file_extension(files_str[0]):
+        main_filename = files_str[0]
+    else:
+        main_filename = input_file.get_main_file_name(files_str)
     _, filepath_mapping = input_file.get_file_name_mappings(
-        filenames, main_filename, layername, input_file_dir
+        files_str, main_filename, layername, input_file_dir
     )
     filepath_mapping = {
         k: v for k, v in filepath_mapping.items() if v is not None

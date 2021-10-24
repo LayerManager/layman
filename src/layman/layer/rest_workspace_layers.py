@@ -57,6 +57,8 @@ def post(workspace):
         ]
         if len(files) > 0:
             use_chunk_upload = True
+        if len(files) == 1 and input_file.get_compressed_main_file_extension(files[0]):
+            zipped_file = files[0]
     if len(files) == 0:
         raise LaymanError(1, {'parameter': 'file'})
 
@@ -80,14 +82,17 @@ def post(workspace):
     check_crs = crs_id is None
 
     # FILE NAMES
-    if use_chunk_upload:
+    if use_chunk_upload and zipped_file:
+        filenames = list()
+    elif use_chunk_upload:
         filenames = files
     elif zipped_file:
         filenames = fs_util.get_filenames_from_zip_storage(zipped_file)
     else:
         filenames = [f.filename for f in files]
     file_type = input_file.get_file_type(input_file.get_main_file_name(filenames))
-    input_file.check_filenames(workspace, layername, filenames, check_crs)
+    if not (use_chunk_upload and zipped_file):
+        input_file.check_filenames(workspace, layername, filenames, check_crs)
 
     # TITLE
     if len(request.form.get('title', '')) > 0:

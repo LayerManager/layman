@@ -257,4 +257,31 @@ PUBLICATIONS = {
             ],
         },
     ],
+    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_chunks_sld'): [
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
+                    'file_paths': ['sample/layman.layer/small_layer.zip'],
+                    'with_chunks': True,
+                }),
+                consts.KEY_RESPONSE_ASSERTS: [
+                    Action(processing.response.valid_post, dict()),
+                ],
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                Action(publication.internal.correct_values_in_detail, {
+                    'exp_publication_detail': {
+                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
+                    },
+                    'file_extension': 'zip/small_layer.geojson',
+                    'gdal_prefix': '/vsizip/',
+                    'publ_type_detail': ('vector', 'sld'),
+                }),
+                Action(publication.internal.thumbnail_equals, {
+                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                }),
+            ],
+        },
+    ],
 }
