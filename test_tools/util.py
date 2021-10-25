@@ -1,4 +1,6 @@
 import time
+from zipfile import ZipFile
+import os
 import requests
 from requests.exceptions import ConnectionError
 from PIL import Image, ImageChops
@@ -75,3 +77,20 @@ def assert_async_error(expected, thrown):
     expected.pop('http_code')
     for key, value in expected.items():
         assert thrown[key] == value, f'key={key}, thrown_dict={thrown}, expected={expected}'
+
+
+def compress_files(filepaths, *, compress_settings, output_dir):
+    file_name = (compress_settings.archive_name
+                 if compress_settings and compress_settings.archive_name is not None
+                 else 'temporary_zip_file') + '.zip'
+    inner_directory = compress_settings.inner_path if compress_settings else None
+    suffix = compress_settings.file_name_suffix if compress_settings and compress_settings.file_name_suffix else ''
+    zip_file = os.path.join(output_dir, file_name)
+    with ZipFile(zip_file, 'w') as zipfile:
+        for file in filepaths:
+            filename = os.path.split(file)[1]
+            basename, ext = filename.split('.', 1)
+            final_filename = basename + suffix + '.' + ext
+            inner_path = os.path.join(inner_directory, final_filename) if inner_directory else final_filename
+            zipfile.write(file, arcname=inner_path)
+    return zip_file
