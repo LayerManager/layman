@@ -1,7 +1,7 @@
 import tests.asserts.final.publication as publication
 import tests.asserts.processing as processing
 from test_tools import process_client
-from . import predefined_actions
+from . import predefined_actions, predefined_zip_files
 from .. import Action, Publication, dynamic_data as consts
 
 
@@ -55,8 +55,7 @@ PUBLICATIONS = {
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': ['sample/layman.layer/small_layer.geojson'],
-                    'compress': True,
+                    **predefined_zip_files.SMALL_LAYER_ZIP,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
                     Action(processing.response.valid_post, dict()),
@@ -82,20 +81,7 @@ PUBLICATIONS = {
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': [
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.dbf',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.prj',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.README.html',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.VERSION.txt',
-                    ],
-                    'compress': True,
-                    'compress_settings': process_client.CompressTypeDef(archive_name='ne_110m_admin_0_boundary lines land +ěščřžýáí',
-                                                                        inner_path='/ne_110m_admin_0_boundary lines land +ěščřžýáí/',
-                                                                        file_name_suffix=' ížě',
-                                                                        ),
+                    **predefined_zip_files.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
                     Action(processing.response.valid_post, dict()),
@@ -121,15 +107,7 @@ PUBLICATIONS = {
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': [
-                        'sample/layman.layer/sample_tif_tfw_rgba_opaque.tfw',
-                        'sample/layman.layer/sample_tif_tfw_rgba_opaque.tif',
-                    ],
-                    'compress': True,
-                    'compress_settings': process_client.CompressTypeDef(archive_name=None,
-                                                                        inner_path='/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/',
-                                                                        file_name_suffix=None,
-                                                                        ),
+                    **predefined_zip_files.SAMPLE_TIF_TFW_RGBA_OPAQUE,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
                     Action(processing.response.valid_post, dict()),
@@ -153,8 +131,7 @@ PUBLICATIONS = {
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
-                    'file_paths': ['sample/layman.layer/small_layer.geojson'],
-                    'compress': True,
+                    **predefined_zip_files.SMALL_LAYER_ZIP,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
                     Action(processing.response.valid_post, dict()),
@@ -184,15 +161,7 @@ PUBLICATIONS = {
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
-                    'file_paths': [
-                        'sample/layman.layer/sample_tif_colortable_nodata_opaque.tif',
-                        'sample/layman.layer/sample_tif_colortable_nodata_opaque.tif.aux.xml',
-                    ],
-                    'compress': True,
-                    'compress_settings': process_client.CompressTypeDef(archive_name=None,
-                                                                        inner_path='/sample_tif_colortable_nodata_opaque/',
-                                                                        file_name_suffix=None,
-                                                                        ),
+                    **predefined_zip_files.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
                     Action(processing.response.valid_post, dict()),
@@ -216,20 +185,7 @@ PUBLICATIONS = {
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
-                    'file_paths': [
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.dbf',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.prj',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.README.html',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.VERSION.txt',
-                    ],
-                    'compress': True,
-                    'compress_settings': process_client.CompressTypeDef(archive_name='ne_110m_admin_0_boundary lines land +ěščřžýáí',
-                                                                        inner_path='/ne_110m_admin_0_boundary lines land +ěščřžýáí/',
-                                                                        file_name_suffix=' ížě',
-                                                                        ),
+                    **predefined_zip_files.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
                     Action(processing.response.valid_post, dict()),
@@ -253,15 +209,7 @@ PUBLICATIONS = {
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
-                    'file_paths': [
-                        'sample/layman.layer/sample_tif_colortable_nodata_opaque.tif',
-                        'sample/layman.layer/sample_tif_colortable_nodata_opaque.tif.aux.xml',
-                    ],
-                    'compress': True,
-                    'compress_settings': process_client.CompressTypeDef(archive_name=None,
-                                                                        inner_path='/sample_tif_colortable_nodata_opaque/',
-                                                                        file_name_suffix=None,
-                                                                        ),
+                    **predefined_zip_files.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
                     Action(processing.response.valid_post, dict()),
@@ -287,15 +235,7 @@ PUBLICATIONS = {
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': [
-                        'sample/layman.layer/sample_tif_colortable_nodata_opaque.tif',
-                        'sample/layman.layer/sample_tif_colortable_nodata_opaque.tif.aux.xml',
-                    ],
-                    'compress': True,
-                    'compress_settings': process_client.CompressTypeDef(archive_name=None,
-                                                                        inner_path='/sample_tif_colortable_nodata_opaque/',
-                                                                        file_name_suffix=None,
-                                                                        ),
+                    **predefined_zip_files.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
                     Action(processing.response.valid_post, dict()),
@@ -321,8 +261,7 @@ PUBLICATIONS = {
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': ['sample/layman.layer/small_layer.geojson'],
-                    'compress': True,
+                    **predefined_zip_files.SMALL_LAYER_ZIP,
                     'with_chunks': True,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
@@ -349,20 +288,7 @@ PUBLICATIONS = {
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': [
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.dbf',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.prj',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.README.html',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.VERSION.txt',
-                    ],
-                    'compress': True,
-                    'compress_settings': process_client.CompressTypeDef(archive_name='ne_110m_admin_0_boundary lines land +ěščřžýáí',
-                                                                        inner_path='/ne_110m_admin_0_boundary lines land +ěščřžýáí/',
-                                                                        file_name_suffix=' ížě',
-                                                                        ),
+                    **predefined_zip_files.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND,
                     'with_chunks': True,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
@@ -389,15 +315,7 @@ PUBLICATIONS = {
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': [
-                        'sample/layman.layer/sample_tif_tfw_rgba_opaque.tfw',
-                        'sample/layman.layer/sample_tif_tfw_rgba_opaque.tif',
-                    ],
-                    'compress': True,
-                    'compress_settings': process_client.CompressTypeDef(archive_name=None,
-                                                                        inner_path='/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/',
-                                                                        file_name_suffix=None,
-                                                                        ),
+                    **predefined_zip_files.SAMPLE_TIF_TFW_RGBA_OPAQUE,
                     'with_chunks': True,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
@@ -424,15 +342,7 @@ PUBLICATIONS = {
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': [
-                        'sample/layman.layer/sample_tif_colortable_nodata_opaque.tif',
-                        'sample/layman.layer/sample_tif_colortable_nodata_opaque.tif.aux.xml',
-                    ],
-                    'compress': True,
-                    'compress_settings': process_client.CompressTypeDef(archive_name=None,
-                                                                        inner_path='/sample_tif_colortable_nodata_opaque/',
-                                                                        file_name_suffix=None,
-                                                                        ),
+                    **predefined_zip_files.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE,
                     'with_chunks': True,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
