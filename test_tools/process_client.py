@@ -6,12 +6,15 @@ import json
 from functools import partial
 from collections import namedtuple
 import xml.etree.ElementTree as ET
+import tempfile
+import shutil
 import requests
 
 from geoserver import error as gs_error
 from layman import app, settings, util as layman_util
 from layman.layer.geoserver import wfs, wms
 from layman.http import LaymanError
+from . import util
 from .util import url_for
 from .process import LAYMAN_CELERY_QUEUE
 
@@ -75,6 +78,12 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                         ),
                          }
 
+CompressTypeDef = namedtuple('CompressTypeDef', [
+    'archive_name',
+    'inner_path',
+    'file_name_suffix',
+])
+
 
 def wait_for_rest(url, max_attempts, sleeping_time, check_response, headers=None):
     headers = headers or None
@@ -120,6 +129,7 @@ def upload_file_chunks(publication_type,
                             )
 
     file_chunks = [('file', file_name) for file_name in file_paths]
+    file_dict = None
     for file_type, file_name in file_chunks:
         try:
             basename = os.path.basename(file_name)
@@ -137,7 +147,8 @@ def upload_file_chunks(publication_type,
                                            data=data)
             raise_layman_error(chunk_response)
         finally:
-            file_dict[file_type][1].close()
+            if file_dict:
+                file_dict[file_type][1].close()
 
 
 def patch_workspace_publication(publication_type,
@@ -150,6 +161,8 @@ def patch_workspace_publication(publication_type,
                                 title=None,
                                 style_file=None,
                                 check_response_fn=None,
+                                compress=False,
+                                compress_settings=None,
                                 with_chunks=False,
                                 ):
     headers = headers or {}
@@ -160,11 +173,19 @@ def patch_workspace_publication(publication_type,
 
     # Only Layer files can be uploaded by chunks
     assert not with_chunks or publication_type == LAYER_TYPE
+    # Compress settings can be used only with compress option
+    assert not compress_settings or compress
 
     with app.app_context():
         r_url = url_for(publication_type_def.patch_workspace_publication_url,
                         workspace=workspace,
                         **{publication_type_def.url_param_name: name})
+
+    temp_dir = None
+    if compress:
+        temp_dir = tempfile.mkdtemp(prefix="layman_zip_")
+        zip_file = util.compress_files(file_paths, compress_settings=compress_settings, output_dir=temp_dir)
+        file_paths = [zip_file]
 
     for file_path in file_paths:
         assert os.path.isfile(file_path), file_path
@@ -204,6 +225,8 @@ def patch_workspace_publication(publication_type,
     wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn, headers=headers)
     wfs.clear_cache(workspace)
     wms.clear_cache(workspace)
+    if temp_dir:
+        shutil.rmtree(temp_dir)
     return response.json()
 
 
@@ -254,6 +277,8 @@ def publish_workspace_publication(publication_type,
                                   description=None,
                                   check_response_fn=None,
                                   with_chunks=False,
+                                  compress=False,
+                                  compress_settings=None,
                                   crs=None,
                                   ):
     title = title or name
@@ -265,9 +290,17 @@ def publish_workspace_publication(publication_type,
 
     # Only Layer files can be uploaded by chunks
     assert not with_chunks or publication_type == LAYER_TYPE
+    # Compress settings can be used only with compress option
+    assert not compress_settings or compress
 
     with app.app_context():
         r_url = url_for(publication_type_def.post_workspace_publication_url, workspace=workspace)
+
+    temp_dir = None
+    if compress:
+        temp_dir = tempfile.mkdtemp(prefix="layman_zip_")
+        zip_file = util.compress_files(file_paths, compress_settings=compress_settings, output_dir=temp_dir)
+        file_paths = [zip_file]
 
     files = []
     try:
@@ -309,6 +342,8 @@ def publish_workspace_publication(publication_type,
                                file_paths, )
 
     wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn, headers=headers)
+    if temp_dir:
+        shutil.rmtree(temp_dir)
     return response.json()[0]
 
 
