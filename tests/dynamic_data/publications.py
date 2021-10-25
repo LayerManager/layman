@@ -81,6 +81,36 @@ PUBLICATIONS = {
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
+                    'file_paths': [
+                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
+                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.README.html',
+                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp',
+                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
+                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.VERSION.txt',
+                    ],
+                    'compress': True,
+                }),
+                consts.KEY_CALL_EXCEPTION: {
+                    consts.KEY_EXCEPTION: LaymanError,
+                    consts.KEY_EXCEPTION_ASSERTS: [
+                        Action(processing.exception.response_exception, {'expected': {'http_code': 400,
+                                                                                      'code': 18,
+                                                                                      'message': 'Missing one or more ShapeFile files.',
+                                                                                      'detail': {'missing_extensions': ['.dbf', '.prj'],
+                                                                                                 'suggestion': 'Missing .prj file can be fixed also by setting "crs" parameter.',
+                                                                                                 'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp',
+                                                                                                 },
+                                                                                      }, }, ),
+                    ],
+                },
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                Action(publication.internal.does_not_exist, dict())
+            ],
+        },
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
                     **predefined_zip_files.SMALL_LAYER_ZIP,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [

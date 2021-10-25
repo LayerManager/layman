@@ -207,7 +207,8 @@ def check_filenames(workspace, layername, filenames, check_crs, ignore_existing_
         ))
         if len(missing_exts) > 0:
             detail = {
-                'missing_extensions': missing_exts
+                'missing_extensions': missing_exts,
+                'path': main_filename,
             }
             if '.prj' in missing_exts:
                 detail['suggestion'] = 'Missing .prj file can be fixed also ' \
