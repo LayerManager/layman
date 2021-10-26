@@ -17,7 +17,7 @@ NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = {
     ],
     'compress': True,
     'compress_settings': process_client.CompressTypeDef(archive_name='ne_110m_admin_0_boundary lines land +ěščřžýáí',
-                                                        inner_path='/ne_110m_admin_0_boundary lines land +ěščřžýáí/',
+                                                        inner_directory='/ne_110m_admin_0_boundary lines land +ěščřžýáí/',
                                                         file_name_suffix=' ížě',
                                                         ),
 }
@@ -29,7 +29,7 @@ SAMPLE_TIF_TFW_RGBA_OPAQUE = {
     ],
     'compress': True,
     'compress_settings': process_client.CompressTypeDef(archive_name=None,
-                                                        inner_path='/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/',
+                                                        inner_directory='/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/',
                                                         file_name_suffix=None,
                                                         ),
 }
@@ -41,7 +41,7 @@ SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE = {
     ],
     'compress': True,
     'compress_settings': process_client.CompressTypeDef(archive_name=None,
-                                                        inner_path='/sample_tif_colortable_nodata_opaque/',
+                                                        inner_directory='/sample_tif_colortable_nodata_opaque/',
                                                         file_name_suffix=None,
                                                         ),
 }
