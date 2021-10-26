@@ -84,13 +84,13 @@ def compress_files(filepaths, *, compress_settings, output_dir):
                  if compress_settings and compress_settings.archive_name is not None
                  else 'temporary_zip_file') + '.zip'
     inner_directory = compress_settings.inner_directory if compress_settings else None
-    suffix = compress_settings.file_name_suffix if compress_settings and compress_settings.file_name_suffix else ''
+    inner_filename = compress_settings.file_name if compress_settings else None
     zip_file = os.path.join(output_dir, file_name)
     with ZipFile(zip_file, 'w') as zipfile:
         for file in filepaths:
             filename = os.path.split(file)[1]
-            basename, ext = filename.split('.', 1)
-            final_filename = basename + suffix + '.' + ext
+            _, ext = filename.split('.', 1)
+            final_filename = (inner_filename + '.' + ext) if inner_filename else filename
             inner_path = os.path.join(inner_directory, final_filename) if inner_directory else final_filename
             zipfile.write(file, arcname=inner_path)
     return zip_file
