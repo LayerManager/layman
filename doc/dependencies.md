@@ -78,7 +78,7 @@
 | [postgis_restore.pl](https://github.com/postgis/postgis/blob/3.1.2/utils/postgis_restore.pl.in) | GNU GPL v2 | upgrade_v1_14_postgis_restore.pl | upgrade | src | |
 | [libxml2](http://xmlsoft.org/) | MIT | python3-lxml | prod | bin | |
 | [libxslt1.1](http://xmlsoft.org/libxslt/) | MIT | python3-lxml | prod | bin | |
-| [gdal/docker](https://github.com/OSGeo/gdal/tree/master/gdal/docker) | MIT License | Dockerfile | prod | bin | |
+| [gdal/docker](https://github.com/OSGeo/gdal/tree/master/docker) | MIT License | Dockerfile | prod | bin | |
 | [kartoza/docker-geoserver](https://github.com/kartoza/docker-geoserver) | GNU GPL v2 | docker-compose.yml | dev | bin | |
 | [jirikcz/qgis-server](https://github.com/LayerManager/docker-qgis-server) | GNU GPL v3 | docker-compose.yml | dev | bin | |
 | [layermanager/docker-postgis](https://github.com/layermanager/docker-postgis) | MIT | docker-compose.yml | dev | bin | |
