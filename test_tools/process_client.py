@@ -78,11 +78,12 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                         ),
                          }
 
+# pylint: disable=unexpected-keyword-arg
 CompressTypeDef = namedtuple('CompressTypeDef', [
     'archive_name',
     'inner_directory',
     'file_name',
-])
+], defaults=[None, None, None])
 
 
 def wait_for_rest(url, max_attempts, sleeping_time, check_response, headers=None):

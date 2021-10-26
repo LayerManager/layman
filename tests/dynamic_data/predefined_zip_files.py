@@ -28,9 +28,7 @@ SAMPLE_TIF_TFW_RGBA_OPAQUE = {
         'sample/layman.layer/sample_tif_tfw_rgba_opaque.tif',
     ],
     'compress': True,
-    'compress_settings': process_client.CompressTypeDef(archive_name=None,
-                                                        inner_directory='/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/',
-                                                        file_name=None,
+    'compress_settings': process_client.CompressTypeDef(inner_directory='/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/',
                                                         ),
 }
 
@@ -40,8 +38,6 @@ SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE = {
         'sample/layman.layer/sample_tif_colortable_nodata_opaque.tif.aux.xml',
     ],
     'compress': True,
-    'compress_settings': process_client.CompressTypeDef(archive_name=None,
-                                                        inner_directory='/sample_tif_colortable_nodata_opaque/',
-                                                        file_name=None,
+    'compress_settings': process_client.CompressTypeDef(inner_directory='/sample_tif_colortable_nodata_opaque/',
                                                         ),
 }
