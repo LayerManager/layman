@@ -81,7 +81,7 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
 CompressTypeDef = namedtuple('CompressTypeDef', [
     'archive_name',
     'inner_directory',
-    'file_name_suffix',
+    'file_name',
 ])
 
 
