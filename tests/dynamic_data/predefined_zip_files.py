@@ -22,6 +22,16 @@ NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = {
                                                         ),
 }
 
+NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_WITHOUT_PRJ = {
+    'file_paths': [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.dbf',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
+    ],
+    'compress': True,
+}
+
 SAMPLE_TIF_TFW_RGBA_OPAQUE = {
     'file_paths': [
         'sample/layman.layer/sample_tif_tfw_rgba_opaque.tfw',
