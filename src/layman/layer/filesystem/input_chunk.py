@@ -138,7 +138,10 @@ def get_layer_info(workspace, layername):
     if info:
         files_to_upload = info['files_to_upload']
         file_names = [file['input_file'] for file in files_to_upload]
-        file_type = input_file.get_file_type(input_file.get_main_file_name(file_names))
+        if len(file_names) == 1 and input_file.get_compressed_main_file_extension(file_names[0]):
+            file_type = settings.FILE_TYPE_UNKNOWN
+        else:
+            file_type = input_file.get_file_type(input_file.get_main_file_name(file_names))
         result = {'file': {'file_type': file_type}}
     return result
 
