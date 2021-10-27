@@ -123,7 +123,7 @@ def patch(workspace, layername):
         if not use_chunk_upload:
             temp_dir = tempfile.mkdtemp(prefix="layman_")
             if zipped_file:
-                input_file.save_layer_zip_file(workspace, layername, zipped_file, output_dir=temp_dir)
+                input_file.save_layer_zip_file(workspace, layername, zipped_file, check_crs, output_dir=temp_dir)
             else:
                 input_file.save_layer_files(workspace, layername, files, check_crs, output_dir=temp_dir)
 

@@ -250,13 +250,17 @@ def save_layer_files(workspace, layername, files, check_crs, *, output_dir=None)
         check_layer_crs(filepath_mapping[main_filename])
 
 
-def save_layer_zip_file(workspace, layername, zip_file, *, output_dir=None):
+def save_layer_zip_file(workspace, layername, zip_file, check_crs, *, output_dir=None):
     output_dir = output_dir or ensure_layer_input_file_dir(workspace, layername)
     _, filepath_mapping = get_file_name_mappings(
         [zip_file.filename], zip_file.filename, layername, output_dir
     )
 
     common.save_files([zip_file], filepath_mapping)
+
+    main_filepath = get_layer_main_file_path(workspace, layername, gdal_format=True)
+    if check_crs:
+        check_layer_crs(main_filepath)
 
 
 def get_unsafe_layername(files):

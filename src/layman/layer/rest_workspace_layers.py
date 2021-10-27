@@ -165,7 +165,7 @@ def post(workspace):
             try:
                 if zipped_file:
                     input_file.save_layer_zip_file(
-                        workspace, layername, zipped_file,
+                        workspace, layername, zipped_file, check_crs,
                     )
                 else:
                     input_file.save_layer_files(
