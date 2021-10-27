@@ -521,4 +521,29 @@ PUBLICATIONS = {
             ],
         },
     ],
+    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_shp_without_prj'): [
+        {
+            consts.KEY_ACTION: predefined_actions.POST_ZIP_SHP_WITHOUT_PRJ,
+            consts.KEY_FINAL_ASSERTS: [
+                Action(publication.internal.does_not_exist, dict())
+            ],
+        },
+        {
+            consts.KEY_ACTION: predefined_actions.POST_ZIP_SHP_WITHOUT_PRJ_WITH_CRS,
+            consts.KEY_FINAL_ASSERTS: [
+                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                Action(publication.internal.correct_values_in_detail, {
+                    'exp_publication_detail': {
+                        'bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529],
+                    },
+                    'file_extension': 'zip/ne_110m_admin_0_boundary_lines_land.shp',
+                    'gdal_prefix': '/vsizip/',
+                    'publ_type_detail': ('vector', 'sld'),
+                }),
+                Action(publication.internal.thumbnail_equals, {
+                    'exp_thumbnail': 'test_tools/data/thumbnail/ne_110m_admin_0_boundary_lines_land.png',
+                }),
+            ],
+        },
+    ],
 }
