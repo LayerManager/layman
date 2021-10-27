@@ -16,8 +16,9 @@ def clear_test_data(liferay_mock, request):
         process.ensure_layman_function(process.LAYMAN_DEFAULT_SETTINGS)
 
         for publication in data.PUBLICATIONS:
-            headers = util.get_publication_header(publication)
-            process_client.delete_workspace_publication(publication.type, publication.workspace, publication.name, headers=headers)
+            if util.get_publication_exists(publication):
+                headers = util.get_publication_header(publication)
+                process_client.delete_workspace_publication(publication.type, publication.workspace, publication.name, headers=headers)
 
 
 def publication_id(publication):
