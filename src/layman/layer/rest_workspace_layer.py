@@ -69,6 +69,8 @@ def patch(workspace, layername):
         ]
         if len(files) > 0:
             use_chunk_upload = True
+        if len(files) == 1 and input_file.get_compressed_main_file_extension(files[0]):
+            zipped_file = files[0]
 
     # CRS
     crs_id = None
@@ -106,14 +108,17 @@ def patch(workspace, layername):
     # FILE NAMES
     filenames = None
     if delete_from == 'layman.layer.filesystem.input_file':
-        if use_chunk_upload:
+        if use_chunk_upload and zipped_file:
+            filenames = list()
+        elif use_chunk_upload:
             filenames = files
         elif zipped_file:
             filenames = fs_util.get_filenames_from_zip_storage(zipped_file, with_zip_in_path=True)
         else:
             filenames = [f.filename for f in files]
-        input_file.check_filenames(workspace, layername, filenames,
-                                   check_crs, ignore_existing_files=True)
+        if not (use_chunk_upload and zipped_file):
+            input_file.check_filenames(workspace, layername, filenames,
+                                       check_crs, ignore_existing_files=True)
         # file checks
         if not use_chunk_upload:
             temp_dir = tempfile.mkdtemp(prefix="layman_")
