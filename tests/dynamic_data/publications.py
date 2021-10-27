@@ -339,6 +339,31 @@ PUBLICATIONS = {
                 }),
             ],
         },
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
+                    **predefined_zip_files.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND,
+                    'with_chunks': True,
+                }),
+                consts.KEY_RESPONSE_ASSERTS: [
+                    Action(processing.response.valid_post, dict()),
+                ],
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                Action(publication.internal.correct_values_in_detail, {
+                    'exp_publication_detail': {
+                        'bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529],
+                    },
+                    'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
+                    'gdal_prefix': '/vsizip/',
+                    'publ_type_detail': ('vector', 'sld'),
+                }),
+                Action(publication.internal.thumbnail_equals, {
+                    'exp_thumbnail': 'test_tools/data/thumbnail/ne_110m_admin_0_boundary_lines_land.png',
+                }),
+            ],
+        },
     ],
     Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_chunks_shp_sld'): [
         {
@@ -418,6 +443,31 @@ PUBLICATIONS = {
                 }),
             ],
         },
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
+                    **predefined_zip_files.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE,
+                    'with_chunks': True,
+                }),
+                consts.KEY_RESPONSE_ASSERTS: [
+                    Action(processing.response.valid_post, dict()),
+                ],
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                Action(publication.internal.correct_values_in_detail, {
+                    'exp_publication_detail': {
+                        'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
+                    },
+                    'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
+                    'gdal_prefix': '/vsizip/',
+                    'publ_type_detail': ('raster', 'sld'),
+                }),
+                Action(publication.internal.thumbnail_equals, {
+                    'exp_thumbnail': 'test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
+                }),
+            ],
+        },
     ],
     Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_chunks_tif_colortable_nodata_opaque'): [
         {
@@ -442,6 +492,31 @@ PUBLICATIONS = {
                 }),
                 Action(publication.internal.thumbnail_equals, {
                     'exp_thumbnail': 'test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
+                }),
+            ],
+        },
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
+                    **predefined_zip_files.SAMPLE_TIF_TFW_RGBA_OPAQUE,
+                    'with_chunks': True,
+                }),
+                consts.KEY_RESPONSE_ASSERTS: [
+                    Action(processing.response.valid_post, dict()),
+                ],
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                Action(publication.internal.correct_values_in_detail, {
+                    'exp_publication_detail': {
+                        'bounding_box': [1669480.0, 6580973.000000007, 1675351.9999999802, 6586999.0],
+                    },
+                    'file_extension': 'zip/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque.tif',
+                    'gdal_prefix': '/vsizip/',
+                    'publ_type_detail': ('raster', 'sld'),
+                }),
+                Action(publication.internal.thumbnail_equals, {
+                    'exp_thumbnail': 'test_tools/data/thumbnail/raster_layer_tiff.png',
                 }),
             ],
         },
