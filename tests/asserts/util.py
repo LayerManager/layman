@@ -12,6 +12,12 @@ def get_publication_header(publication):
     return headers
 
 
+def get_publication_exists(publication):
+    with app.app_context():
+        info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name)
+    return bool(info)
+
+
 def get_publication_actor(publication):
     with app.app_context():
         info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name, context={'keys': ['access_rights']})
