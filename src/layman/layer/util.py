@@ -3,7 +3,7 @@ import re
 
 from flask import current_app, request, g
 
-from layman import LaymanError, patch_mode, util as layman_util
+from layman import LaymanError, patch_mode, util as layman_util, settings
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for
 from layman import celery as celery_util, common
@@ -75,7 +75,7 @@ def check_new_layername(workspace, layername):
 
 def fill_in_partial_info_statuses(info, chain_info):
     file_type = info.get('file', dict()).get('file_type')
-    item_keys = get_layer_info_keys(file_type) if file_type else None
+    item_keys = get_layer_info_keys(file_type) if file_type else settings.FILE_TYPE_UNKNOWN
 
     return layman_util.fill_in_partial_info_statuses(info, chain_info, TASKS_TO_LAYER_INFO_KEYS, item_keys)
 
