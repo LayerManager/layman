@@ -87,7 +87,7 @@ def post(workspace):
     elif use_chunk_upload:
         filenames = files
     elif zipped_file:
-        filenames = fs_util.get_filenames_from_zip_storage(zipped_file)
+        filenames = fs_util.get_filenames_from_zip_storage(zipped_file, with_zip_in_path=True)
     else:
         filenames = [f.filename for f in files]
     file_type = input_file.get_file_type(input_file.get_main_file_name(filenames))
