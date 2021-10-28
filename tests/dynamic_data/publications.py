@@ -132,6 +132,83 @@ PUBLICATIONS = {
                 }),
             ],
         },
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
+                    'file_paths': ['test_tools/data/layers/layer_with_two_main_files.zip'],
+                }),
+                consts.KEY_CALL_EXCEPTION: {
+                    consts.KEY_EXCEPTION: LaymanError,
+                    consts.KEY_EXCEPTION_ASSERTS: [
+                        Action(processing.exception.response_exception, {'expected': {'http_code': 400,
+                                                                                      'code': 2,
+                                                                                      'message': 'Wrong parameter value',
+                                                                                      'detail': {
+                                                                                          'expected': 'At most one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg',
+                                                                                          'files': [
+                                                                                              'layer_with_two_main_files.zip/layer_with_two_main_files/geojson/small_layer.geojson',
+                                                                                              'layer_with_two_main_files.zip/layer_with_two_main_files/raster/sample_tif_rgb.tif'],
+                                                                                          'parameter': 'file'},
+                                                                                      }, }, ),
+                    ],
+                },
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                Action(publication.internal.correct_values_in_detail, {
+                    'exp_publication_detail': {
+                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
+                    },
+                    'file_extension': 'zip/small_layer.geojson',
+                    'gdal_prefix': '/vsizip/',
+                    'publ_type_detail': ('vector', 'sld'),
+                }),
+                Action(publication.internal.thumbnail_equals, {
+                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                }),
+            ],
+        },
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
+                    'file_paths': [
+                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
+                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.README.html',
+                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp',
+                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
+                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.VERSION.txt',
+                    ],
+                    'compress': True,
+                }),
+                consts.KEY_CALL_EXCEPTION: {
+                    consts.KEY_EXCEPTION: LaymanError,
+                    consts.KEY_EXCEPTION_ASSERTS: [
+                        Action(processing.exception.response_exception, {'expected': {'http_code': 400,
+                                                                                      'code': 18,
+                                                                                      'message': 'Missing one or more ShapeFile files.',
+                                                                                      'detail': {'missing_extensions': ['.dbf', '.prj'],
+                                                                                                 'suggestion': 'Missing .prj file can be fixed also by setting "crs" parameter.',
+                                                                                                 'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp',
+                                                                                                 },
+                                                                                      }, }, ),
+                    ],
+                },
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                Action(publication.internal.correct_values_in_detail, {
+                    'exp_publication_detail': {
+                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
+                    },
+                    'file_extension': 'zip/small_layer.geojson',
+                    'gdal_prefix': '/vsizip/',
+                    'publ_type_detail': ('vector', 'sld'),
+                }),
+                Action(publication.internal.thumbnail_equals, {
+                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                }),
+            ],
+        },
     ],
     Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_shp_sld'): [
         {
