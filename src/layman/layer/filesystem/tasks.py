@@ -53,6 +53,9 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True):
             num_chunks_saved = chunk_info[2]
     logger.info(f'Layer chunks uploaded {workspace}.{layername}')
 
+    filepaths = input_file.get_layer_files(workspace, layername)
+    input_file.check_filenames(workspace, layername, filepaths, check_crs, ignore_existing_files=True)
+
     main_filepath = input_file.get_layer_main_file_path(workspace, layername, gdal_format=True)
     input_file.check_main_file(main_filepath, check_crs=check_crs)
 
