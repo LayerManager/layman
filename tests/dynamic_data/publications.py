@@ -900,4 +900,28 @@ PUBLICATIONS = {
             ],
         },
     ],
+    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_chunks_checks'): [
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
+                    'file_paths': ['test_tools/data/layers/layer_with_two_main_files.zip'],
+                    'with_chunks': True,
+                }),
+                consts.KEY_RESPONSE_ASSERTS: [
+                    Action(processing.response.valid_post, dict()),
+                ],
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                Action(publication.rest.async_error_in_info_key, {
+                    'info_key': 'file',
+                    'expected': {'code': 2,
+                                 'detail': {'expected': 'At most one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg',
+                                            'files': ['/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_chunks_checks/input_file/zipped_chunks_checks.zip/layer_with_two_main_files/geojson/small_layer.geojson',
+                                                      '/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_chunks_checks/input_file/zipped_chunks_checks.zip/layer_with_two_main_files/raster/sample_tif_rgb.tif'],
+                                            'parameter': 'file'},
+                                 'message': 'Wrong parameter value'}
+                }),
+            ],
+        },
+    ],
 }
