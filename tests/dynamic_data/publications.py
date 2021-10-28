@@ -652,4 +652,67 @@ PUBLICATIONS = {
             ],
         },
     ],
+    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'shp_with_unsupported_epsg'): [
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
+                    'file_paths': [
+                        'tmp/data200/trans/jtsk/TRANS/AirfldA.cpg',
+                        'tmp/data200/trans/jtsk/TRANS/AirfldA.dbf',
+                        'tmp/data200/trans/jtsk/TRANS/AirfldA.prj',
+                        'tmp/data200/trans/jtsk/TRANS/AirfldA.sbn',
+                        'tmp/data200/trans/jtsk/TRANS/AirfldA.shp',
+                        'tmp/data200/trans/jtsk/TRANS/AirfldA.shx',
+                    ],
+                }),
+                consts.KEY_CALL_EXCEPTION: {
+                    consts.KEY_EXCEPTION: LaymanError,
+                    consts.KEY_EXCEPTION_ASSERTS: [
+                        Action(processing.exception.response_exception, {'expected': {'http_code': 400,
+                                                                                      'code': 4,
+                                                                                      'message': 'Unsupported CRS of data file',
+                                                                                      'detail': {
+                                                                                          'found': 'EPSG:5514',
+                                                                                          'supported_values': ['EPSG:3857', 'EPSG:4326']
+                                                                                      }, }, }, ),
+                    ],
+                },
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                Action(publication.internal.does_not_exist, dict())
+            ],
+        },
+    ],
+    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_shp_with_unsupported_epsg'): [
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
+                    'file_paths': [
+                        'tmp/data200/trans/jtsk/TRANS/AirfldA.cpg',
+                        'tmp/data200/trans/jtsk/TRANS/AirfldA.dbf',
+                        'tmp/data200/trans/jtsk/TRANS/AirfldA.prj',
+                        'tmp/data200/trans/jtsk/TRANS/AirfldA.sbn',
+                        'tmp/data200/trans/jtsk/TRANS/AirfldA.shp',
+                        'tmp/data200/trans/jtsk/TRANS/AirfldA.shx',
+                    ],
+                    'compress': True,
+                }),
+                consts.KEY_CALL_EXCEPTION: {
+                    consts.KEY_EXCEPTION: LaymanError,
+                    consts.KEY_EXCEPTION_ASSERTS: [
+                        Action(processing.exception.response_exception, {'expected': {'http_code': 400,
+                                                                                      'code': 4,
+                                                                                      'message': 'Unsupported CRS of data file',
+                                                                                      'detail': {
+                                                                                          'found': 'EPSG:5514',
+                                                                                          'supported_values': ['EPSG:3857', 'EPSG:4326']
+                                                                                      }, }, }, ),
+                    ],
+                },
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                Action(publication.internal.does_not_exist, dict())
+            ],
+        },
+    ],
 }
