@@ -53,9 +53,8 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True):
             num_chunks_saved = chunk_info[2]
     logger.info(f'Layer chunks uploaded {workspace}.{layername}')
 
-    if check_crs:
-        main_filepath = input_file.get_layer_main_file_path(workspace, layername, gdal_format=True)
-        input_file.check_layer_crs(main_filepath)
+    main_filepath = input_file.get_layer_main_file_path(workspace, layername, gdal_format=True)
+    input_file.check_main_file(main_filepath, check_crs=check_crs)
 
 
 @celery_app.task(
@@ -90,7 +89,6 @@ def refresh_gdal(self, workspace, layername, crs_id=None):
         raise AbortedException
 
     input_path = layer_info['_file']['gdal_path']
-    gdal.assert_valid_raster(input_path)
     vrt_file_path = gdal.create_vrt_file_if_needed(input_path)
     process = gdal.normalize_raster_file_async(workspace, layername, vrt_file_path or input_path, crs_id)
     while process.poll() is None and not self.is_aborted():

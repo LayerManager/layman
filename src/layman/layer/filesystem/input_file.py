@@ -8,7 +8,7 @@ from layman.http import LaymanError
 from layman import settings, patch_mode
 from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import util as common_util, input_file as common
-from . import util
+from . import util, gdal as fs_gdal
 
 LAYER_SUBDIR = __name__.split('.')[-1]
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
@@ -112,19 +112,31 @@ def get_file_type(main_filepath):
     return file_type
 
 
-def check_vector_main_file(main_filepath):
+def check_main_file(main_filepath, *, check_crs=True):
+    file_type = get_file_type(main_filepath)
+    if file_type == settings.FILE_TYPE_VECTOR:
+        check_vector_main_file(main_filepath, check_crs=check_crs)
+    elif file_type == settings.FILE_TYPE_RASTER:
+        check_raster_main_file(main_filepath, check_crs=check_crs)
+    else:
+        raise NotImplementedError(f"Unknown file type: {file_type}")
+
+
+def check_vector_main_file(main_filepath, *, check_crs=True):
     in_data_source = ogr.Open(main_filepath, 0)
     n_layers = in_data_source.GetLayerCount()
     if n_layers != 1:
         raise LaymanError(5, {'found': n_layers, 'expected': 1})
+    if check_crs:
+        check_vector_layer_crs(main_filepath)
 
 
-def check_raster_main_file(main_filepath):
+def check_raster_main_file(main_filepath, *, check_crs=True):
     in_data_source = gdal.Open(main_filepath)
     assert in_data_source is not None
-    n_bands = in_data_source.RasterCount
-    if n_bands not in (1, 2, 3, 4):
-        raise LaymanError(5, {'found': n_bands, 'expected': 1})
+    fs_gdal.assert_valid_raster(main_filepath)
+    if check_crs:
+        check_raster_layer_crs(main_filepath)
 
 
 def spatial_ref_crs_to_crs_id(spatial_ref):
@@ -163,16 +175,6 @@ def check_raster_layer_crs(main_filepath):
         raise LaymanError(4, {'found': None,
                               'supported_values': settings.INPUT_SRS_LIST})
     check_spatial_ref_crs(crs)
-
-
-def check_layer_crs(main_filepath):
-    file_type = get_file_type(main_filepath)
-    if file_type == settings.FILE_TYPE_VECTOR:
-        check_vector_layer_crs(main_filepath)
-    elif file_type == settings.FILE_TYPE_RASTER:
-        check_raster_layer_crs(main_filepath)
-    else:
-        raise NotImplementedError(f"Unknown file type: {file_type}")
 
 
 def check_filenames(workspace, layername, filenames, check_crs, ignore_existing_files=False):
@@ -238,16 +240,7 @@ def save_layer_files(workspace, layername, files, check_crs, *, output_dir=None)
     common.save_files(files, filepath_mapping)
 
     main_filepath = filepath_mapping[main_filename]
-    file_type = get_file_type(main_filepath)
-    if file_type == settings.FILE_TYPE_VECTOR:
-        check_vector_main_file(main_filepath)
-    elif file_type == settings.FILE_TYPE_RASTER:
-        check_raster_main_file(main_filepath)
-    else:
-        raise NotImplementedError(f"Unknown file type: {file_type}")
-
-    if check_crs:
-        check_layer_crs(filepath_mapping[main_filename])
+    check_main_file(main_filepath, check_crs=check_crs)
 
 
 def save_layer_zip_file(workspace, layername, zip_file, check_crs, *, output_dir=None):
@@ -259,8 +252,7 @@ def save_layer_zip_file(workspace, layername, zip_file, check_crs, *, output_dir
     common.save_files([zip_file], filepath_mapping)
 
     main_filepath = get_layer_main_file_path(workspace, layername, gdal_format=True)
-    if check_crs:
-        check_layer_crs(main_filepath)
+    check_main_file(main_filepath, check_crs=check_crs)
 
 
 def get_unsafe_layername(files):
