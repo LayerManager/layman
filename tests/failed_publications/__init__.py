@@ -14,7 +14,7 @@ LAYER_DEFINITIONS = [
             'expected_exc': {'http_code': 400,
                              'code': 4,
                              'message': 'Unsupported CRS of data file',
-                             'detail': {'found': 'None', 'supported_values': settings.INPUT_SRS_LIST},
+                             'detail': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
                              },
             'error_async_part': 'file',
             'chunk_error_type': ASYNC_ERROR,

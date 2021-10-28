@@ -561,7 +561,7 @@ PUBLICATIONS = {
                                                                                       'code': 4,
                                                                                       'message': 'Unsupported CRS of data file',
                                                                                       'detail': {
-                                                                                          'found': 'None',
+                                                                                          'found': None,
                                                                                           'supported_values': ['EPSG:3857', 'EPSG:4326']
                                                                                       }, }, }, ),
                     ],
@@ -588,7 +588,7 @@ PUBLICATIONS = {
                                                                                       'code': 4,
                                                                                       'message': 'Unsupported CRS of data file',
                                                                                       'detail': {
-                                                                                          'found': 'None',
+                                                                                          'found': None,
                                                                                           'supported_values': ['EPSG:3857', 'EPSG:4326']
                                                                                       }, }, }, ),
                     ],
@@ -614,7 +614,7 @@ PUBLICATIONS = {
                                                                                       'code': 4,
                                                                                       'message': 'Unsupported CRS of data file',
                                                                                       'detail': {
-                                                                                          'found': 'None',
+                                                                                          'found': None,
                                                                                           'supported_values': ['EPSG:3857', 'EPSG:4326']
                                                                                       }, }, }, ),
                     ],
@@ -641,7 +641,7 @@ PUBLICATIONS = {
                                                                                       'code': 4,
                                                                                       'message': 'Unsupported CRS of data file',
                                                                                       'detail': {
-                                                                                          'found': 'None',
+                                                                                          'found': None,
                                                                                           'supported_values': ['EPSG:3857', 'EPSG:4326']
                                                                                       }, }, }, ),
                     ],
