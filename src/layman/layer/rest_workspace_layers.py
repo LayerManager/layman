@@ -163,14 +163,7 @@ def post(workspace):
             })
         else:
             try:
-                if zipped_file:
-                    input_file.save_layer_zip_file(
-                        workspace, layername, zipped_file, check_crs,
-                    )
-                else:
-                    input_file.save_layer_files(
-                        workspace, layername, files, check_crs
-                    )
+                input_file.save_layer_files(workspace, layername, files, check_crs, zipped=bool(zipped_file))
             except BaseException as exc:
                 uuid.delete_layer(workspace, layername)
                 input_file.delete_layer(workspace, layername)

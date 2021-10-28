@@ -97,10 +97,18 @@ def get_layer_main_file_path(workspace, layername, *, gdal_format=False):
     main_file = get_main_file_name(filepaths)
     physical_files = get_layer_files(workspace, layername, only_physical_files=True)
     if len(physical_files) == 1 and gdal_format:
-        compress_type = get_compressed_main_file_extension(physical_files[0])
-        if compress_type:
-            main_file = settings.COMPRESSED_FILE_EXTENSIONS[compress_type] + main_file
+        main_file = get_gdal_format_file_path(physical_files[0])
     return main_file
+
+
+def get_gdal_format_file_path(filepath):
+    compress_type = get_compressed_main_file_extension(filepath)
+    result = filepath
+    if compress_type:
+        main_file = get_main_file_name(util.get_filenames_from_zip_storage(filepath))
+        if main_file:
+            result = settings.COMPRESSED_FILE_EXTENSIONS[compress_type] + os.path.join(filepath, main_file)
+    return result
 
 
 def get_file_type(main_filepath):
@@ -229,9 +237,12 @@ def check_filenames(workspace, layername, filenames, check_crs, ignore_existing_
             raise LaymanError(3, conflict_paths)
 
 
-def save_layer_files(workspace, layername, files, check_crs, *, output_dir=None):
+def save_layer_files(workspace, layername, files, check_crs, *, output_dir=None, zipped=False):
     filenames = list(map(lambda f: f.filename, files))
-    main_filename = get_main_file_name(filenames)
+    if zipped:
+        main_filename = files[0].filename
+    else:
+        main_filename = get_main_file_name(filenames)
     output_dir = output_dir or ensure_layer_input_file_dir(workspace, layername)
     _, filepath_mapping = get_file_name_mappings(
         filenames, main_filename, layername, output_dir
@@ -239,19 +250,7 @@ def save_layer_files(workspace, layername, files, check_crs, *, output_dir=None)
 
     common.save_files(files, filepath_mapping)
 
-    main_filepath = filepath_mapping[main_filename]
-    check_main_file(main_filepath, check_crs=check_crs)
-
-
-def save_layer_zip_file(workspace, layername, zip_file, check_crs, *, output_dir=None):
-    output_dir = output_dir or ensure_layer_input_file_dir(workspace, layername)
-    _, filepath_mapping = get_file_name_mappings(
-        [zip_file.filename], zip_file.filename, layername, output_dir
-    )
-
-    common.save_files([zip_file], filepath_mapping)
-
-    main_filepath = get_layer_main_file_path(workspace, layername, gdal_format=True)
+    main_filepath = get_gdal_format_file_path(filepath_mapping[main_filename])
     check_main_file(main_filepath, check_crs=check_crs)
 
 
