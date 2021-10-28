@@ -1,3 +1,4 @@
+from celery import states
 from layman import app
 from test_tools import process_client, util as test_util
 
@@ -28,3 +29,10 @@ def is_complete_in_rest(rest_publication_detail):
 
 def mandatory_keys_in_rest(rest_publication_detail):
     assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}.issubset(set(rest_publication_detail)), rest_publication_detail
+
+
+def async_error_in_info_key(rest_publication_detail, info_key, expected):
+    assert rest_publication_detail['layman_metadata']['publication_status'] == 'INCOMPLETE'
+    assert rest_publication_detail[info_key]['status'] == states.FAILURE
+    test_util.assert_async_error(expected,
+                                 rest_publication_detail[info_key]['error'])
