@@ -916,8 +916,8 @@ PUBLICATIONS = {
                     'info_key': 'file',
                     'expected': {'code': 2,
                                  'detail': {'expected': 'At most one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg',
-                                            'files': ['/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_chunks_checks/input_file/zipped_chunks_checks.zip/layer_with_two_main_files/geojson/small_layer.geojson',
-                                                      '/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_chunks_checks/input_file/zipped_chunks_checks.zip/layer_with_two_main_files/raster/sample_tif_rgb.tif'],
+                                            'files': ['zipped_chunks_checks.zip/layer_with_two_main_files/geojson/small_layer.geojson',
+                                                      'zipped_chunks_checks.zip/layer_with_two_main_files/raster/sample_tif_rgb.tif'],
                                             'parameter': 'file'},
                                  'message': 'Wrong parameter value'}
                 }),

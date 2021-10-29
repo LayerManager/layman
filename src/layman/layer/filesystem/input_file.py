@@ -52,6 +52,13 @@ def get_layer_files(workspace, layername, *, only_physical_files=False):
     return filepaths
 
 
+def get_layer_input_files(workspace, layername):
+    input_file_dir = get_layer_input_file_dir(workspace, layername)
+    pattern = os.path.join(input_file_dir, layername + '.*')
+    filepaths = glob.glob(pattern)
+    return util.InputFiles(saved_paths=filepaths)
+
+
 def get_layer_info(workspace, layername):
     abs_main_filepath = get_layer_main_file_path(workspace, layername, )
 
@@ -180,8 +187,8 @@ def check_raster_layer_crs(main_filepath):
     check_spatial_ref_crs(crs)
 
 
-def check_filenames(workspace, layername, filenames, check_crs, ignore_existing_files=False):
-    main_files = [fn for fn in filenames if os.path.splitext(fn)[1] in get_all_allowed_main_extensions()]
+def check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=False):
+    main_files = input_files.raw_or_archived_main_file_paths
     if len(main_files) > 1:
         raise LaymanError(2, {'parameter': 'file',
                               'expected': 'At most one file with any of extensions: '
@@ -189,10 +196,20 @@ def check_filenames(workspace, layername, filenames, check_crs, ignore_existing_
                               'files': main_files,
                               })
 
+    filenames = input_files.raw_or_archived_paths
     if not main_files:
+        if len(input_files.raw_paths_to_archives) > 1:
+            raise LaymanError(2, {'parameter': 'file',
+                                  'expected': 'At most one file with extensions: '
+                                              + ', '.join(settings.COMPRESSED_FILE_EXTENSIONS.keys()),
+                                  'files': input_files.raw_paths_to_archives,
+                                  })
         raise LaymanError(2, {'parameter': 'file',
                               'expected': 'At least one file with any of extensions: '
-                                          + ', '.join(util.get_all_allowed_main_extensions())})
+                                          + ', '.join(util.get_all_allowed_main_extensions())
+                                          + '; or one of them in single .zip file.',
+                              'files': filenames,
+                              })
     main_filename = main_files[0]
     basename, ext = map(
         lambda s: s.lower(),
@@ -221,7 +238,7 @@ def check_filenames(workspace, layername, filenames, check_crs, ignore_existing_
             raise LaymanError(18, detail)
     input_file_dir = get_layer_input_file_dir(workspace, layername)
     filename_mapping, _ = get_file_name_mappings(
-        filenames, main_filename, layername, input_file_dir
+        input_files.raw_paths, main_filename, layername, input_file_dir
     )
 
     if not ignore_existing_files:
@@ -249,11 +266,7 @@ def save_layer_files(workspace, layername, files, check_crs, *, output_dir=None,
     check_main_file(main_filepath, check_crs=check_crs)
 
 
-def get_unsafe_layername(files):
-    filenames = list(map(
-        lambda f: f if isinstance(f, str) else f.filename,
-        files
-    ))
+def get_unsafe_layername(filenames):
     main_filename = get_main_file_name(filenames)
     unsafe_layername = ''
     if main_filename is not None:
