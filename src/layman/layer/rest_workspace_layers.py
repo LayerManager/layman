@@ -40,32 +40,26 @@ def post(workspace):
     app.logger.info(f"POST Layers, actor={g.user}")
 
     # FILE
-    use_chunk_upload = False
-    zipped_file = None
-    files = []
+    sent_file_streams = []
+    sent_file_paths = []
     if 'file' in request.files:
-        files = [
+        sent_file_streams = [
             f for f in request.files.getlist("file")
             if len(f.filename) > 0
         ]
-        if len(files) == 1 and input_file.get_compressed_main_file_extension(files[0].filename):
-            zipped_file = files[0]
-    if len(files) == 0 and len(request.form.getlist('file')) > 0:
-        files = [
+    if len(sent_file_streams) == 0 and len(request.form.getlist('file')) > 0:
+        sent_file_paths = [
             filename for filename in request.form.getlist('file')
             if len(filename) > 0
         ]
-        if len(files) > 0:
-            use_chunk_upload = True
-        if len(files) == 1 and input_file.get_compressed_main_file_extension(files[0]):
-            zipped_file = files[0]
-    if len(files) == 0:
+    input_files = fs_util.InputFiles(sent_streams=sent_file_streams, sent_paths=sent_file_paths)
+    if len(input_files.raw_paths) == 0:
         raise LaymanError(1, {'parameter': 'file'})
 
     # NAME
     unsafe_layername = request.form.get('name', '')
     if len(unsafe_layername) == 0:
-        unsafe_layername = input_file.get_unsafe_layername(files)
+        unsafe_layername = input_file.get_unsafe_layername(input_files.raw_paths)
     layername = util.to_safe_layer_name(unsafe_layername)
     util.check_layername(layername)
     info = util.get_layer_info(workspace, layername)
@@ -82,17 +76,10 @@ def post(workspace):
     check_crs = crs_id is None
 
     # FILE NAMES
-    if use_chunk_upload and zipped_file:
-        filenames = list()
-    elif use_chunk_upload:
-        filenames = files
-    elif zipped_file:
-        filenames = fs_util.get_filenames_from_zip_storage(zipped_file, with_zip_in_path=True)
-    else:
-        filenames = [f.filename for f in files]
-    file_type = input_file.get_file_type(input_file.get_main_file_name(filenames))
-    if not (use_chunk_upload and zipped_file):
-        input_file.check_filenames(workspace, layername, filenames, check_crs)
+    use_chunk_upload = not input_files.sent_streams
+    if not (use_chunk_upload and input_files.is_one_archive):
+        input_file.check_filenames(workspace, layername, input_files, check_crs)
+    file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
 
     # TITLE
     if len(request.form.get('title', '')) > 0:
@@ -154,7 +141,7 @@ def post(workspace):
         input_style.save_layer_file(workspace, layername, style_file, style_type)
         if use_chunk_upload:
             files_to_upload = input_chunk.save_layer_files_str(
-                workspace, layername, files, check_crs)
+                workspace, layername, input_files.sent_paths, check_crs)
             layer_result.update({
                 'files_to_upload': files_to_upload,
             })
@@ -163,7 +150,8 @@ def post(workspace):
             })
         else:
             try:
-                input_file.save_layer_files(workspace, layername, files, check_crs, zipped=bool(zipped_file))
+                input_file.save_layer_files(workspace, layername, input_files.sent_streams, check_crs,
+                                            zipped=input_files.is_one_archive)
             except BaseException as exc:
                 uuid.delete_layer(workspace, layername)
                 input_file.delete_layer(workspace, layername)

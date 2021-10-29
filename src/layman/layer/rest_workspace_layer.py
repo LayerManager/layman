@@ -52,29 +52,23 @@ def patch(workspace, layername):
     }
 
     # FILE
-    use_chunk_upload = False
-    zipped_file = None
-    files = []
+    sent_file_streams = []
+    sent_file_paths = []
     if 'file' in request.files:
-        files = [
+        sent_file_streams = [
             f for f in request.files.getlist("file")
             if len(f.filename) > 0
         ]
-        if len(files) == 1 and input_file.get_compressed_main_file_extension(files[0].filename):
-            zipped_file = files[0]
-    if len(files) == 0 and len(request.form.getlist('file')) > 0:
-        files = [
+    if len(sent_file_streams) == 0 and len(request.form.getlist('file')) > 0:
+        sent_file_paths = [
             filename for filename in request.form.getlist('file')
             if len(filename) > 0
         ]
-        if len(files) > 0:
-            use_chunk_upload = True
-        if len(files) == 1 and input_file.get_compressed_main_file_extension(files[0]):
-            zipped_file = files[0]
+    input_files = fs_util.InputFiles(sent_streams=sent_file_streams, sent_paths=sent_file_paths)
 
     # CRS
     crs_id = None
-    if len(files) > 0 and len(request.form.get('crs', '')) > 0:
+    if len(input_files.raw_paths) > 0 and len(request.form.get('crs', '')) > 0:
         crs_id = request.form['crs']
         if crs_id not in settings.INPUT_SRS_LIST:
             raise LaymanError(2, {'parameter': 'crs', 'supported_values': settings.INPUT_SRS_LIST})
@@ -102,31 +96,23 @@ def patch(workspace, layername):
         kwargs['style_type'] = style_type
         kwargs['store_in_geoserver'] = style_type.store_in_geoserver
         delete_from = 'layman.layer.qgis.wms'
-    if len(files) > 0:
+    if len(input_files.raw_paths) > 0:
         delete_from = 'layman.layer.filesystem.input_file'
 
     # FILE NAMES
-    filenames = None
+    use_chunk_upload = bool(input_files.sent_paths)
     if delete_from == 'layman.layer.filesystem.input_file':
-        if use_chunk_upload and zipped_file:
-            filenames = list()
-        elif use_chunk_upload:
-            filenames = files
-        elif zipped_file:
-            filenames = fs_util.get_filenames_from_zip_storage(zipped_file, with_zip_in_path=True)
-        else:
-            filenames = [f.filename for f in files]
-        if not (use_chunk_upload and zipped_file):
-            input_file.check_filenames(workspace, layername, filenames,
+        if not (use_chunk_upload and input_files.is_one_archive):
+            input_file.check_filenames(workspace, layername, input_files,
                                        check_crs, ignore_existing_files=True)
         # file checks
         if not use_chunk_upload:
             temp_dir = tempfile.mkdtemp(prefix="layman_")
-            input_file.save_layer_files(workspace, layername, files, check_crs, output_dir=temp_dir,
-                                        zipped=bool(zipped_file))
+            input_file.save_layer_files(workspace, layername, input_files.sent_streams, check_crs,
+                                        output_dir=temp_dir, zipped=input_files.is_one_archive)
 
-    if filenames:
-        file_type = input_file.get_file_type(input_file.get_main_file_name(filenames))
+    if input_files.raw_paths:
+        file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
     else:
         file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
     if style_type:
@@ -166,7 +152,7 @@ def patch(workspace, layername):
 
             if use_chunk_upload:
                 files_to_upload = input_chunk.save_layer_files_str(
-                    workspace, layername, files, check_crs)
+                    workspace, layername, input_files.sent_paths, check_crs)
                 layer_result.update({
                     'files_to_upload': files_to_upload,
                 })
