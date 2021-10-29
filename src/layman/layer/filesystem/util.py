@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import os
 from zipfile import ZipFile
 from functools import partial
@@ -19,6 +20,80 @@ ensure_layer_dir = partial(publ_util.ensure_publication_dir, LAYER_TYPE)
 
 # workspace, layername, subdir
 delete_layer_subdir = partial(publ_util.delete_publication_subdir, LAYER_TYPE)
+
+
+@dataclass(frozen=True)
+class InputFiles:
+    def __init__(self, *, sent_streams=None, sent_paths=None, saved_paths=None):
+        sent_streams = sent_streams or []
+        sent_paths = sent_paths or []
+        saved_paths = saved_paths or []
+        assert sum((len(lst) > 0 for lst in [sent_streams, sent_paths, saved_paths])) <= 1
+        object.__setattr__(self, '_sent_streams', sent_streams)
+        object.__setattr__(self, '_sent_paths', sent_paths)
+        object.__setattr__(self, '_saved_paths', saved_paths)
+
+    @property
+    def sent_streams(self):
+        # pylint: disable=no-member
+        return self._sent_streams
+
+    @property
+    def sent_paths(self):
+        # pylint: disable=no-member
+        return self._sent_paths
+
+    @property
+    def saved_paths(self):
+        # pylint: disable=no-member
+        return self._saved_paths
+
+    @property
+    def raw_paths(self):
+        return [f.filename for f in self.sent_streams] + self.sent_paths + self.saved_paths
+
+    @property
+    def raw_paths_to_archives(self):
+        return [fp for fp in self.raw_paths if os.path.splitext(fp)[1] in settings.COMPRESSED_FILE_EXTENSIONS]
+
+    @property
+    def archive_streams(self):
+        return [fs for fs in self.sent_streams
+                if os.path.splitext(fs.filename)[1] in settings.COMPRESSED_FILE_EXTENSIONS]
+
+    @property
+    def saved_paths_to_archives(self):
+        return [fp for fp in self.saved_paths
+                if os.path.splitext(fp)[1] in settings.COMPRESSED_FILE_EXTENSIONS]
+
+    @property
+    def is_one_archive(self):
+        return len(self.raw_paths) == 1 and len(self.raw_paths_to_archives) == 1
+
+    def archived_paths(self, *, with_zip_in_path=False):
+        return [
+            path_to_archived_file
+            for archives in self.archive_streams + self.saved_paths_to_archives
+            for path_to_archived_file in get_filenames_from_zip_storage(archives,
+                                                                        with_zip_in_path=with_zip_in_path)
+        ]
+
+    @property
+    def raw_or_archived_paths(self):
+        if self.is_one_archive:
+            return self.archived_paths(with_zip_in_path=True)
+        return self.raw_paths
+
+    @property
+    def raw_or_archived_main_file_paths(self):
+        return [fn for fn in self.raw_or_archived_paths
+                if os.path.splitext(fn)[1] in get_all_allowed_main_extensions()]
+
+    @property
+    def raw_or_archived_main_file_path(self):
+        paths = self.raw_or_archived_main_file_paths
+        assert len(paths) == 1
+        return paths[0]
 
 
 def get_filenames_from_zip_storage(zip_file, *, with_zip_in_path=False):
