@@ -505,5 +505,6 @@ def fill_in_partial_info_statuses(info, chain_info, task_to_layer_info_keys, ite
                 if layerinfo_key in item_keys:
                     filled_info[layerinfo_key] = source_state
             elif not res.successful():
-                filled_info[layerinfo_key].update(source_state)
+                if 'error' in source_state or 'error' not in filled_info[layerinfo_key]:
+                    filled_info[layerinfo_key].update(source_state)
     return filled_info
