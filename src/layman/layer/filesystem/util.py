@@ -47,3 +47,8 @@ def get_deepest_real_file(path):
     else:
         result = path
     return result
+
+
+def get_all_allowed_main_extensions():
+    result = list(settings.MAIN_FILE_EXTENSIONS.keys())
+    return result

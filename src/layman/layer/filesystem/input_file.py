@@ -82,14 +82,9 @@ from . import uuid
 get_publication_uuid = uuid.get_publication_uuid
 
 
-def get_all_allowed_main_extensions():
-    result = list(settings.MAIN_FILE_EXTENSIONS.keys())
-    return result
-
-
 def get_main_file_name(filenames):
     return next((fn for fn in filenames if os.path.splitext(fn)[1]
-                 in get_all_allowed_main_extensions()), None)
+                 in util.get_all_allowed_main_extensions()), None)
 
 
 def get_layer_main_file_path(workspace, layername, *, gdal_format=False):
@@ -190,14 +185,14 @@ def check_filenames(workspace, layername, filenames, check_crs, ignore_existing_
     if len(main_files) > 1:
         raise LaymanError(2, {'parameter': 'file',
                               'expected': 'At most one file with any of extensions: '
-                                          + ', '.join(get_all_allowed_main_extensions()),
+                                          + ', '.join(util.get_all_allowed_main_extensions()),
                               'files': main_files,
                               })
 
     if not main_files:
         raise LaymanError(2, {'parameter': 'file',
                               'expected': 'At least one file with any of extensions: '
-                                          + ', '.join(get_all_allowed_main_extensions())})
+                                          + ', '.join(util.get_all_allowed_main_extensions())})
     main_filename = main_files[0]
     basename, ext = map(
         lambda s: s.lower(),
