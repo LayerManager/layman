@@ -40,18 +40,6 @@ def get_compressed_main_file_extension(filepath):
     return file_ext if file_ext in settings.COMPRESSED_FILE_EXTENSIONS else None
 
 
-def get_layer_files(workspace, layername, *, only_physical_files=False):
-    input_file_dir = get_layer_input_file_dir(workspace, layername)
-    pattern = os.path.join(input_file_dir, layername + '.*')
-    filepaths = glob.glob(pattern)
-    if len(filepaths) == 1 and not only_physical_files:
-        compress_type = get_compressed_main_file_extension(filepaths[0])
-        if compress_type:
-            compressed_filenames = util.get_filenames_from_zip_storage(filepaths[0])
-            filepaths = [os.path.join(filepaths[0], fp) for fp in compressed_filenames]
-    return filepaths
-
-
 def get_layer_input_files(workspace, layername):
     input_file_dir = get_layer_input_file_dir(workspace, layername)
     pattern = os.path.join(input_file_dir, layername + '.*')
@@ -60,10 +48,12 @@ def get_layer_input_files(workspace, layername):
 
 
 def get_layer_info(workspace, layername):
-    abs_main_filepath = get_layer_main_file_path(workspace, layername, )
+    input_files = get_layer_input_files(workspace, layername, )
 
-    if abs_main_filepath is not None:
-        rel_main_filepath = os.path.relpath(abs_main_filepath, common_util.get_workspace_dir(workspace))
+    if input_files.saved_paths:
+        # input_files.raw_or_archived_main_file_path is None if user sent ZIP file by chunks without main file inside
+        main_file_path = input_files.raw_or_archived_main_file_path or input_files.saved_paths[0]
+        rel_main_filepath = os.path.relpath(main_file_path, common_util.get_workspace_dir(workspace))
         file_type = get_file_type(rel_main_filepath)
         result = {
             'file': {
@@ -71,8 +61,8 @@ def get_layer_info(workspace, layername):
                 'file_type': file_type,
             },
             '_file': {
-                'path': abs_main_filepath,
-                'gdal_path': get_layer_main_file_path(workspace, layername, gdal_format=True),
+                'path': main_file_path,
+                'gdal_path': input_files.main_file_path_for_gdal,
             },
         }
     elif os.path.exists(util.get_layer_dir(workspace, layername)):
@@ -94,15 +84,6 @@ def get_main_file_name(filenames):
                  in util.get_all_allowed_main_extensions()), None)
 
 
-def get_layer_main_file_path(workspace, layername, *, gdal_format=False):
-    filepaths = get_layer_files(workspace, layername)
-    main_file = get_main_file_name(filepaths)
-    physical_files = get_layer_files(workspace, layername, only_physical_files=True)
-    if len(physical_files) == 1 and gdal_format:
-        main_file = get_gdal_format_file_path(physical_files[0])
-    return main_file
-
-
 def get_gdal_format_file_path(filepath):
     compress_type = get_compressed_main_file_extension(filepath)
     result = filepath
@@ -116,7 +97,7 @@ def get_gdal_format_file_path(filepath):
 def get_file_type(main_filepath):
     if main_filepath:
         ext = os.path.splitext(main_filepath)[1]
-        file_type = settings.MAIN_FILE_EXTENSIONS[ext]
+        file_type = settings.MAIN_FILE_EXTENSIONS.get(ext, settings.FILE_TYPE_UNKNOWN)
     else:
         file_type = settings.FILE_TYPE_UNKNOWN
     return file_type
@@ -193,7 +174,7 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
         raise LaymanError(2, {'parameter': 'file',
                               'expected': 'At most one file with any of extensions: '
                                           + ', '.join(util.get_all_allowed_main_extensions()),
-                              'files': main_files,
+                              'files': [os.path.relpath(fp, input_files.saved_paths_dir) for fp in main_files],
                               })
 
     filenames = input_files.raw_or_archived_paths
@@ -202,13 +183,13 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
             raise LaymanError(2, {'parameter': 'file',
                                   'expected': 'At most one file with extensions: '
                                               + ', '.join(settings.COMPRESSED_FILE_EXTENSIONS.keys()),
-                                  'files': input_files.raw_paths_to_archives,
+                                  'files': [os.path.relpath(fp, input_files.saved_paths_dir) for fp in input_files.raw_paths_to_archives],
                                   })
         raise LaymanError(2, {'parameter': 'file',
                               'expected': 'At least one file with any of extensions: '
                                           + ', '.join(util.get_all_allowed_main_extensions())
                                           + '; or one of them in single .zip file.',
-                              'files': filenames,
+                              'files': [os.path.relpath(fp, input_files.saved_paths_dir) for fp in filenames],
                               })
     main_filename = main_files[0]
     basename, ext = map(
