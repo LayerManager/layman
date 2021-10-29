@@ -56,7 +56,7 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True):
     input_files = input_file.get_layer_input_files(workspace, layername)
     input_file.check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=True)
 
-    main_filepath = input_file.get_layer_main_file_path(workspace, layername, gdal_format=True)
+    main_filepath = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['_file']['gdal_path']
     input_file.check_main_file(main_filepath, check_crs=check_crs)
 
 
