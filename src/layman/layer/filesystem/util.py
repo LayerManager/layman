@@ -92,8 +92,29 @@ class InputFiles:
     @property
     def raw_or_archived_main_file_path(self):
         paths = self.raw_or_archived_main_file_paths
-        assert len(paths) == 1
-        return paths[0]
+        if len(paths) == 1:
+            return paths[0]
+        return None
+
+    @property
+    def archive_type(self):
+        return os.path.splitext(self.raw_paths[0])[1] if self.is_one_archive else None
+
+    @property
+    def main_file_path_for_gdal(self):
+        main_path = self.raw_or_archived_main_file_path
+        if self.archive_type is not None and main_path is not None:
+            return settings.COMPRESSED_FILE_EXTENSIONS[self.archive_type] + main_path
+        return main_path
+
+    @property
+    def saved_paths_dir(self):
+        result = None
+        if self.saved_paths:
+            first_dir = os.path.split(self.saved_paths[0])[0]
+            assert all(os.path.split(fp)[0] == first_dir for fp in self.saved_paths)
+            result = first_dir
+        return result
 
 
 def get_filenames_from_zip_storage(zip_file, *, with_zip_in_path=False):
@@ -103,7 +124,7 @@ def get_filenames_from_zip_storage(zip_file, *, with_zip_in_path=False):
         zip_file.seek(0)
         zip_name = zip_file.filename
     else:
-        zip_name = os.path.basename(zip_file)
+        zip_name = zip_file
     if with_zip_in_path:
         filenames = [os.path.join(zip_name, fn) for fn in filenames]
     return filenames
