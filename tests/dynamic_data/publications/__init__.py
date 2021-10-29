@@ -2,6 +2,7 @@ from layman import LaymanError
 import tests.asserts.final.publication as publication
 import tests.asserts.processing as processing
 from test_tools import process_client
+from . import wrong_input
 from .. import predefined_actions, predefined_zip_files
 from ... import Action, Publication, dynamic_data as consts
 
@@ -1043,4 +1044,5 @@ PUBLICATIONS = {
             ],
         },
     ],
+    **wrong_input.generate(consts.COMMON_WORKSPACE + '_generated_wrong_input'),
 }
