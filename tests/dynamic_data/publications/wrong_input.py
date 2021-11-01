@@ -37,11 +37,11 @@ TESTCASES = {
                                             },
                                  },
         KEY_EXPECTED_EXCEPTION_ZIPPED: {'detail': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
-        KEY_EXPECTED_EXCEPTION_CHUNKS_ZIPPED: {'detail': {'path': '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/shp_without_dbf_post_chunks_zipped/input_file/shp_without_dbf_post_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
+        KEY_EXPECTED_EXCEPTION_CHUNKS_ZIPPED: {'detail': {'path': 'shp_without_dbf_post_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
         KEY_PATCHES: {
             'all_files': {
                 KEY_PATCH_POST: dict(),
-                KEY_EXPECTED_EXCEPTION_CHUNKS_ZIPPED: {'detail': {'path': '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/shp_without_dbf_patch_all_files/input_file/shp_without_dbf_patch_all_files.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
+                KEY_EXPECTED_EXCEPTION_CHUNKS_ZIPPED: {'detail': {'path': 'shp_without_dbf_patch_all_files.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
             },
         },
     },
