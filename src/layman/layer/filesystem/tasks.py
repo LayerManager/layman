@@ -1,5 +1,6 @@
 import os
 import time
+import tempfile
 
 from celery.utils.log import get_task_logger
 
@@ -93,7 +94,13 @@ def refresh_gdal(self, workspace, layername, crs_id=None):
 
     input_path = layer_info['_file']['gdal_path']
     vrt_file_path = gdal.create_vrt_file_if_needed(input_path)
-    process = gdal.normalize_raster_file_async(workspace, layername, vrt_file_path or input_path, crs_id)
+    tmp_vrt_file = tempfile.mkstemp(suffix='.vrt')[1]
+    process = gdal.normalize_raster_file_async(vrt_file_path or input_path, crs_id, output_file=tmp_vrt_file)
+    while process.poll() is None and not self.is_aborted():
+        pass
+    finish_gdal_process(process)
+
+    process = gdal.compress_raster_file_async(workspace, layername, file_to_compress=tmp_vrt_file)
     while process.poll() is None and not self.is_aborted():
         pass
     if vrt_file_path:
@@ -101,6 +108,10 @@ def refresh_gdal(self, workspace, layername, crs_id=None):
             os.remove(vrt_file_path)
         except OSError:
             pass
+    try:
+        os.remove(tmp_vrt_file)
+    except OSError:
+        pass
     finish_gdal_process(process)
 
     process = gdal.add_overview_async(workspace, layername)

@@ -181,12 +181,11 @@ def create_vrt_file_if_needed(filepath):
     return vrt_file_path
 
 
-def normalize_raster_file_async(workspace, layer, input_path, crs_id):
+def normalize_raster_file_async(input_path, crs_id, output_file):
     color_interp = get_color_interpretations(input_path)
-    result_path = get_normalized_raster_layer_main_filepath(workspace, layer)
     bash_args = [
         'gdalwarp',
-        '-of', 'GTiff',
+        '-of', 'VRT',
         '-co', 'PROFILE=GeoTIFF',
         '-co', 'INTERLEAVE=PIXEL',
         '-co', 'TILED=YES',
@@ -242,9 +241,21 @@ def normalize_raster_file_async(workspace, layer, input_path, crs_id):
     bash_args.extend([
         '-t_srs', 'EPSG:3857',
         input_path,
-        result_path,
+        output_file,
     ])
-    # print(' '.join(bash_args))
+    process = subprocess.Popen(bash_args, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT)
+    return process
+
+
+def compress_raster_file_async(workspace, layer, *, file_to_compress):
+    result_path = get_normalized_raster_layer_main_filepath(workspace, layer)
+    bash_args = [
+        'gdal_translate',
+        '-co', 'compress=lzw',
+        file_to_compress,
+        result_path,
+    ]
     process = subprocess.Popen(bash_args, stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
     return process
