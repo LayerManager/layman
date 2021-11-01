@@ -123,7 +123,7 @@ Body parameters:
       - PNG (.png, with .png.aux.xml or .pgw)
       - JPEG (.jpg, with .jpg.aux.xml or .jgw)
       - any of above types in single ZIP file (.zip)
-      - file names, i.e. array of strings (not supported for ZIP file)
+      - file names, i.e. array of strings
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - in case of raster data input, following input combinations of bands and color interpretations are supported:
       - 1 band: Gray
