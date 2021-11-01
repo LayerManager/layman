@@ -41,14 +41,14 @@ def delete_layer(workspace, layername):
 get_publication_uuid = input_file.get_publication_uuid
 
 
-def save_layer_files_str(workspace, layername, files_str, check_crs):
+def save_layer_files_str(workspace, layername, input_files, check_crs):
     input_file_dir = input_file.get_layer_input_file_dir(workspace, layername)
-    if len(files_str) == 1 and input_file.get_compressed_main_file_extension(files_str[0]):
-        main_filename = files_str[0]
+    if input_files.is_one_archive:
+        main_filename = input_files.raw_paths_to_archives[0]
     else:
-        main_filename = input_file.get_main_file_name(files_str)
+        main_filename = input_files.raw_or_archived_main_file_path
     _, filepath_mapping = input_file.get_file_name_mappings(
-        files_str, main_filename, layername, input_file_dir
+        input_files.raw_paths, main_filename, layername, input_file_dir
     )
     filepath_mapping = {
         k: v for k, v in filepath_mapping.items() if v is not None

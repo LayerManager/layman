@@ -141,7 +141,7 @@ def post(workspace):
         input_style.save_layer_file(workspace, layername, style_file, style_type)
         if use_chunk_upload:
             files_to_upload = input_chunk.save_layer_files_str(
-                workspace, layername, input_files.sent_paths, check_crs)
+                workspace, layername, input_files, check_crs)
             layer_result.update({
                 'files_to_upload': files_to_upload,
             })
@@ -150,8 +150,7 @@ def post(workspace):
             })
         else:
             try:
-                input_file.save_layer_files(workspace, layername, input_files.sent_streams, check_crs,
-                                            zipped=input_files.is_one_archive)
+                input_file.save_layer_files(workspace, layername, input_files, check_crs)
             except BaseException as exc:
                 uuid.delete_layer(workspace, layername)
                 input_file.delete_layer(workspace, layername)

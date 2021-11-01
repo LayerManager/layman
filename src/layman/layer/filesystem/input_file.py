@@ -230,18 +230,17 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
             raise LaymanError(3, conflict_paths)
 
 
-def save_layer_files(workspace, layername, files, check_crs, *, output_dir=None, zipped=False):
-    filenames = list(map(lambda f: f.filename, files))
-    if zipped:
-        main_filename = files[0].filename
+def save_layer_files(workspace, layername, input_files, check_crs, *, output_dir=None):
+    if input_files.is_one_archive:
+        main_filename = input_files.raw_paths_to_archives[0]
     else:
-        main_filename = get_main_file_name(filenames)
+        main_filename = input_files.raw_or_archived_main_file_path
     output_dir = output_dir or ensure_layer_input_file_dir(workspace, layername)
     _, filepath_mapping = get_file_name_mappings(
-        filenames, main_filename, layername, output_dir
+        input_files.raw_paths, main_filename, layername, output_dir
     )
 
-    common.save_files(files, filepath_mapping)
+    common.save_files(input_files.sent_streams, filepath_mapping)
 
     main_filepath = get_gdal_format_file_path(filepath_mapping[main_filename])
     check_main_file(main_filepath, check_crs=check_crs)
