@@ -941,7 +941,7 @@ PUBLICATIONS = {
                             'expected': {'http_code': 400,
                                          'code': 2,
                                          'detail': {'parameter': 'file',
-                                                    'expected': 'At most one file with extensions: .zip',
+                                                    'expected': 'If sending archive file (.zip), no other files are expected.',
                                                     'files': [
                                                         'sm5.zip',
                                                         'layer_with_two_main_files.zip',
@@ -995,22 +995,24 @@ PUBLICATIONS = {
                         'sample/layman.layer/small_layer.geojson',
                     ],
                 }),
-                consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
-                ],
+                consts.KEY_CALL_EXCEPTION: {
+                    consts.KEY_EXCEPTION: LaymanError,
+                    consts.KEY_EXCEPTION_ASSERTS: [
+                        Action(processing.exception.response_exception, {
+                            'expected': {'http_code': 400,
+                                         'code': 2,
+                                         'detail': {'parameter': 'file',
+                                                    'expected': 'If sending archive file (.zip), no other files are expected.',
+                                                    'files': [
+                                                        'sm5.zip',
+                                                        'small_layer.geojson',
+                                                    ],
+                                                    }, }, }, ),
+                    ],
+                },
             },
             consts.KEY_FINAL_ASSERTS: [
-                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                    },
-                    'file_extension': 'geojson',
-                    'publ_type_detail': ('vector', 'sld'),
-                }),
-                Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
-                }),
+                Action(publication.internal.does_not_exist, dict())
             ],
         },
     ],

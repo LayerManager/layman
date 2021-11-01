@@ -170,6 +170,12 @@ def check_raster_layer_crs(main_filepath):
 
 def check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=False):
     main_files = input_files.raw_or_archived_main_file_paths
+    archive_extensions = ', '.join(settings.COMPRESSED_FILE_EXTENSIONS.keys())
+    if input_files.raw_paths_to_archives and len(input_files.raw_paths) > 1:
+        raise LaymanError(2, {'parameter': 'file',
+                              'expected': f"If sending archive file ({archive_extensions}), no other files are expected.",
+                              'files': [os.path.relpath(fp, input_files.saved_paths_dir) for fp in input_files.raw_paths],
+                              })
     if len(main_files) > 1:
         raise LaymanError(2, {'parameter': 'file',
                               'expected': 'At most one file with any of extensions: '
@@ -179,12 +185,6 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
 
     filenames = input_files.raw_or_archived_paths
     if not main_files:
-        if len(input_files.raw_paths_to_archives) > 1:
-            raise LaymanError(2, {'parameter': 'file',
-                                  'expected': 'At most one file with extensions: '
-                                              + ', '.join(settings.COMPRESSED_FILE_EXTENSIONS.keys()),
-                                  'files': [os.path.relpath(fp, input_files.saved_paths_dir) for fp in input_files.raw_paths_to_archives],
-                                  })
         raise LaymanError(2, {'parameter': 'file',
                               'expected': 'At least one file with any of extensions: '
                                           + ', '.join(util.get_all_allowed_main_extensions())
