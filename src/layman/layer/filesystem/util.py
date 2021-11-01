@@ -68,7 +68,7 @@ class InputFiles:
 
     @property
     def is_one_archive(self):
-        return len(self.raw_paths) == 1 and len(self.raw_paths_to_archives) == 1
+        return len(self.raw_paths_to_archives) == 1 and not self.raw_main_file_paths
 
     def archived_paths(self, *, with_zip_in_path=False):
         return [
@@ -103,7 +103,7 @@ class InputFiles:
 
     @property
     def archive_type(self):
-        return os.path.splitext(self.raw_paths[0])[1] if self.is_one_archive else None
+        return os.path.splitext(self.saved_paths_to_archives[0])[1] if self.is_one_archive else None
 
     @property
     def main_file_path_for_gdal(self):

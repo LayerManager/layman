@@ -185,12 +185,14 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
                                               + ', '.join(settings.COMPRESSED_FILE_EXTENSIONS.keys()),
                                   'files': [os.path.relpath(fp, input_files.saved_paths_dir) for fp in input_files.raw_paths_to_archives],
                                   })
-        raise LaymanError(2, {'parameter': 'file',
-                              'expected': 'At least one file with any of extensions: '
-                                          + ', '.join(util.get_all_allowed_main_extensions())
-                                          + '; or one of them in single .zip file.',
-                              'files': [os.path.relpath(fp, input_files.saved_paths_dir) for fp in filenames],
-                              })
+        if len(input_files.raw_paths_to_archives) == 0 or input_files.archived_paths:
+            raise LaymanError(2, {'parameter': 'file',
+                                  'expected': 'At least one file with any of extensions: '
+                                              + ', '.join(util.get_all_allowed_main_extensions())
+                                              + '; or one of them in single .zip file.',
+                                  'files': [os.path.relpath(fp, input_files.saved_paths_dir) for fp in filenames],
+                                  })
+        main_files = input_files.raw_paths_to_archives
     main_filename = main_files[0]
     basename, ext = map(
         lambda s: s.lower(),
