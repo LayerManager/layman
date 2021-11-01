@@ -8,7 +8,7 @@ from layman import app, settings
 from layman.common.filesystem import uuid as uuid_common
 from layman.common.micka import util as micka_util
 from layman.layer import geoserver as gs_layer, NO_STYLE_DEF, db
-from layman.layer.filesystem import input_file as layer_in_file
+from layman.layer.filesystem import input_file as layer_in_file, util as layer_fs_util
 from layman.layer.geoserver import wms
 from layman.layer.prime_db_schema import table as prime_db_schema_table
 from layman.uuid import generate_uuid
@@ -37,7 +37,7 @@ def ensure_layer():
             db.ensure_workspace(workspace)
             with open(file_path, 'rb') as file:
                 file = FileStorage(file)
-                layer_in_file.save_layer_files(workspace, layer, [file], False)
+                layer_in_file.save_layer_files(workspace, layer, layer_fs_util.InputFiles(sent_streams=[file]), False)
             db.import_layer_vector_file(workspace, layer, file_path, None)
             # wfs
             created = gs_util.ensure_workspace(workspace, settings.LAYMAN_GS_AUTH)

@@ -8,7 +8,7 @@ from celery.contrib.abortable import AbortableAsyncResult
 del sys.modules['layman']
 
 from layman import app, celery_app
-from layman.layer.filesystem import input_chunk
+from layman.layer.filesystem import input_chunk, util as fs_util
 from layman import celery as celery_util
 from layman.common import tasks as tasks_util
 from test_tools import flask_client
@@ -45,7 +45,7 @@ def test_single_abortable_task():
         'ensure_user': True,
         'check_crs': check_crs,
     }
-    filenames = ['abc.geojson']
+    filenames = fs_util.InputFiles(sent_paths=['abc.geojson'])
     workspace = 'test_abort_workspace'
     layername = 'test_abort_layer'
     with app.app_context():
@@ -98,7 +98,7 @@ def test_abortable_task_chain():
         'ensure_user': True,
         'check_crs': check_crs,
     }
-    filenames = ['abc.geojson']
+    filenames = fs_util.InputFiles(sent_paths=['abc.geojson'])
     workspace = 'test_abort_workspace'
     layername = 'test_abort_layer2'
     with app.app_context():

@@ -108,8 +108,7 @@ def patch(workspace, layername):
         # file checks
         if not use_chunk_upload:
             temp_dir = tempfile.mkdtemp(prefix="layman_")
-            input_file.save_layer_files(workspace, layername, input_files.sent_streams, check_crs,
-                                        output_dir=temp_dir, zipped=input_files.is_one_archive)
+            input_file.save_layer_files(workspace, layername, input_files, check_crs, output_dir=temp_dir)
 
     if input_files.raw_paths:
         file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
@@ -152,7 +151,7 @@ def patch(workspace, layername):
 
             if use_chunk_upload:
                 files_to_upload = input_chunk.save_layer_files_str(
-                    workspace, layername, input_files.sent_paths, check_crs)
+                    workspace, layername, input_files, check_crs)
                 layer_result.update({
                     'files_to_upload': files_to_upload,
                 })

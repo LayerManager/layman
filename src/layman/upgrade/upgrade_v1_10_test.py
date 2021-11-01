@@ -92,7 +92,7 @@ def ensure_layer():
             db.ensure_workspace(workspace)
             with open(file_path, 'rb') as file:
                 file = FileStorage(file)
-                layer_in_file.save_layer_files(workspace, layer, [file], False)
+                layer_in_file.save_layer_files(workspace, layer, layer_fs_util.InputFiles(sent_streams=[file]), False)
             db.import_layer_vector_file(workspace, layer, file_path, None)
             created = gs_util.ensure_workspace(workspace, settings.LAYMAN_GS_AUTH)
             if created:
