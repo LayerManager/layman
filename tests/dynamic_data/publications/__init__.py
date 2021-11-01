@@ -2,7 +2,7 @@ from layman import LaymanError
 import tests.asserts.final.publication as publication
 import tests.asserts.processing as processing
 from test_tools import process_client
-from . import wrong_input
+from . import wrong_input, file_input
 from .. import predefined_actions, predefined_zip_files
 from ... import Action, Publication, dynamic_data as consts
 
@@ -972,6 +972,7 @@ PUBLICATIONS = {
                             'expected': {'http_code': 400,
                                          'code': 2,
                                          'detail': {'parameter': 'file',
+                                                    'message': 'Zip file without data file inside.',
                                                     'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
                                                     'files': [
                                                         'temporary_zip_file.zip/sm5.zip',
@@ -1045,4 +1046,5 @@ PUBLICATIONS = {
         },
     ],
     **wrong_input.generate(consts.COMMON_WORKSPACE + '_generated_wrong_input'),
+    **file_input.generate(consts.COMMON_WORKSPACE + '_generated_file_input'),
 }
