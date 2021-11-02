@@ -203,7 +203,7 @@ CSW_BASIC_AUTHN = None if ':' not in os.getenv('CSW_BASIC_AUTHN', '') else tuple
 CSW_RECORD_URL = os.getenv('CSW_RECORD_URL', None)
 
 # # tuples like (version, revision)
-MICKA_ACCEPTED_VERSIONS = [
+MICKA_ACCEPTED_VERSION = [
     ('2020.014', '2020-04-15.01'),
 ] if ':' not in os.getenv('MICKA_ACCEPTED_VERSION', '') else [
     tuple(os.environ['MICKA_ACCEPTED_VERSION'].split(':'))
