@@ -89,19 +89,23 @@ TESTCASES = {
 }
 
 
+def dictionary_product(source):
+    names = list(source.keys())
+    all_values = [list(source[p_name].keys()) for p_name in names]
+    values = itertools.product(*all_values)
+    param_dict = [{names[idx]: value for idx, value in enumerate(vals)} for vals in values]
+    return param_dict
+
+
 def generate(workspace=None):
     workspace = workspace or consts.COMMON_WORKSPACE
 
-    rest_param_names = list(REST_PARAMETRIZATION.keys())
-    rest_param_all_values = [list(REST_PARAMETRIZATION[p_name].keys()) for p_name in rest_param_names]
-
     result = dict()
     for testcase, tc_params in TESTCASES.items():
-        for rest_param_values in itertools.product(*rest_param_all_values):
-            test_case_postfix = '_'.join([REST_PARAMETRIZATION[rest_param_names[idx]][value]
-                                          for idx, value in enumerate(rest_param_values)
-                                          if REST_PARAMETRIZATION[rest_param_names[idx]][value]])
-            rest_param_dict = {rest_param_names[idx]: value for idx, value in enumerate(rest_param_values)}
+        for rest_param_dict in dictionary_product(REST_PARAMETRIZATION):
+            test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
+                                          for key, value in rest_param_dict.items()
+                                          if REST_PARAMETRIZATION[key][value]])
             if any(k in rest_param_dict and rest_param_dict[k] != v for k, v in tc_params[KEY_ACTION_PARAMS].items()):
                 continue
             rest_param_frozen_set = frozenset(rest_param_dict.items())
@@ -158,8 +162,7 @@ def generate(workspace=None):
                     ]
                 },
             ]
-            for rest_param_values in itertools.product(*rest_param_all_values):
-                rest_param_dict = {rest_param_names[idx]: value for idx, value in enumerate(rest_param_values)}
+            for rest_param_dict in dictionary_product(REST_PARAMETRIZATION):
                 rest_param_frozen_set = frozenset(rest_param_dict.items())
                 default_exp_exception = copy.deepcopy(tc_params[KEY_EXPECTED_EXCEPTION][KEY_DEFAULT])
                 exception_diff = patch_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, dict())
