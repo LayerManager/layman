@@ -285,7 +285,7 @@ def publish_workspace_publication(publication_type,
     title = title or name
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
-    file_paths = file_paths or [publication_type_def.source_path, ]
+    file_paths = [publication_type_def.source_path] if file_paths is None else file_paths
     if style_file:
         assert publication_type == LAYER_TYPE
 
