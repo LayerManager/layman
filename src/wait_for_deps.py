@@ -130,7 +130,13 @@ def main():
             version_match = re.search(MICKA_VERSION_RE, response)
             assert (version_match and len(version_match.groups()) == 2), 'Unknown version of Micka!'
             found_version = version_match.groups()
-            assert found_version in settings.MICKA_ACCEPTED_VERSION, f"Found Micka version {found_version}, but expecting one of {settings.MICKA_ACCEPTED_VERSION}. Please use one of expected version, e.g. by upgrading/downgrading Micka. Take special care about Micka's database."
+            err_message = f"Found Micka version {found_version}, but expecting version fulfilling {settings.MICKA_ACCEPTED_VERSION}. Please use one of expected version, e.g. by upgrading/downgrading Micka. Take special care about Micka's database."
+            if settings.MICKA_ACCEPTED_VERSION[0] == '>=':
+                assert found_version[0] >= settings.MICKA_ACCEPTED_VERSION[1] and found_version[1] >= settings.MICKA_ACCEPTED_VERSION[2], err_message
+            elif settings.MICKA_ACCEPTED_VERSION[0] in ('==', ''):
+                assert found_version == settings.MICKA_ACCEPTED_VERSION[1:], err_message
+            else:
+                raise NotImplementedError(f"Unknown Micka version comparision: {settings.MICKA_ACCEPTED_VERSION[0]}")
             print(f"Found Micka version {found_version}.")
 
             print(f"Attempt {attempt}/{MAX_ATTEMPTS} successful.")
