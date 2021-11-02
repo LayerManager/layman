@@ -1045,6 +1045,34 @@ PUBLICATIONS = {
             ],
         },
     ],
+    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'empty_zip'): [
+        {
+            consts.KEY_ACTION: {
+                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
+                    'file_paths': [],
+                    'compress': True,
+                }),
+                consts.KEY_CALL_EXCEPTION: {
+                    consts.KEY_EXCEPTION: LaymanError,
+                    consts.KEY_EXCEPTION_ASSERTS: [
+                        Action(processing.exception.response_exception, {
+                            'expected': {'http_code': 400,
+                                         'code': 2,
+                                         'detail': {'parameter': 'file',
+                                                    'message': 'Zip file without data file inside.',
+                                                    'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
+                                                    'files': [
+                                                        'temporary_zip_file.zip',
+                                                    ],
+                                                    }, }, }, ),
+                    ],
+                },
+            },
+            consts.KEY_FINAL_ASSERTS: [
+                Action(publication.internal.does_not_exist, dict())
+            ],
+        },
+    ],
     **wrong_input.generate(consts.COMMON_WORKSPACE + '_generated_wrong_input'),
     **file_input.generate(consts.COMMON_WORKSPACE + '_generated_file_input'),
 }
