@@ -203,11 +203,12 @@ CSW_BASIC_AUTHN = None if ':' not in os.getenv('CSW_BASIC_AUTHN', '') else tuple
 CSW_RECORD_URL = os.getenv('CSW_RECORD_URL', None)
 
 # # tuples like (version, revision)
-MICKA_ACCEPTED_VERSION = [
-    ('2020.014', '2020-04-15.01'),
-] if ':' not in os.getenv('MICKA_ACCEPTED_VERSION', '') else [
-    tuple(os.environ['MICKA_ACCEPTED_VERSION'].split(':'))
-]
+MICKA_REGEXP = r"^(?P<operation>==|>=|)(?P<version>[0-9.]+):(?P<revision>[0-9-.]+)$"
+MICKA_REGEXP_MATCH = re.search(MICKA_REGEXP, os.getenv('MICKA_ACCEPTED_VERSION', None) or '==2020.014:2020-04-15.01')
+assert MICKA_REGEXP_MATCH, f'os.getenv(MICKA_ACCEPTED_VERSION)={os.getenv("MICKA_ACCEPTED_VERSION", "")}, MICKA_REGEXP_MATCH={MICKA_REGEXP_MATCH}'
+assert len(
+    MICKA_REGEXP_MATCH.groups()) == 3, f'os.getenv(MICKA_ACCEPTED_VERSION)={os.getenv("MICKA_ACCEPTED_VERSION", "")}, MICKA_REGEXP_MATCH={MICKA_REGEXP_MATCH}'
+MICKA_ACCEPTED_VERSION = MICKA_REGEXP_MATCH.groups()
 
 LAYMAN_PUBLIC_URL_SCHEME = urlparse(LAYMAN_CLIENT_PUBLIC_URL).scheme
 

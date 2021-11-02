@@ -203,7 +203,7 @@ Internal URL of [OGC Catalogue Service v2.0.2](https://www.opengeospatial.org/st
 Public URL of [OGC Catalogue Service v2.0.2](https://www.opengeospatial.org/standards/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
 
 ### MICKA_ACCEPTED_VERSION
-Version of Micka that Layman will accept on startup encoded as `version:revision`, e.g. `2020.014:2020-04-15.01`. If it is not set, a version defined in [LAYMAN_SETTINGS_MODULE](#LAYMAN_SETTINGS_MODULE) will be accepted.
+Version of Micka that Layman will accept on startup encoded as `version:revision`, e.g. `2020.014:2020-04-15.01`. Also, on one of '>=' or '==' prefixes can be used with obvious meaning, `e.g. >=2020.014:2020-04-15.01`. For prefix '>=', version and revision are compared independently as strings. If the variable is not set, a version defined in [LAYMAN_SETTINGS_MODULE](#LAYMAN_SETTINGS_MODULE) will be accepted. If none prefix is used, value is compared as with '=='.
 
 ### MICKA_HOSTPORT
 String with public domain and optionally port, e.g. `<domain>` or `<domain>:<port>`. Passed as configuration to Micka for demo purposes.
