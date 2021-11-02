@@ -62,6 +62,30 @@ TESTCASES = {
             },
         },
     },
+    'empty_zip': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': [],
+            'compress': True,
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'detail': {'parameter': 'file',
+                                     'message': 'Zip file without data file inside.',
+                                     'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
+                                     'files': [
+                                         'temporary_zip_file.zip',
+                                     ],
+                                     },
+                          },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+                'detail': {'files': ['empty_zip_post_chunks_zipped.zip']}}
+        },
+    },
 }
 
 
@@ -78,6 +102,8 @@ def generate(workspace=None):
                                           for idx, value in enumerate(rest_param_values)
                                           if REST_PARAMETRIZATION[rest_param_names[idx]][value]])
             rest_param_dict = {rest_param_names[idx]: value for idx, value in enumerate(rest_param_values)}
+            if any(k in rest_param_dict and rest_param_dict[k] != v for k, v in tc_params[KEY_ACTION_PARAMS].items()):
+                continue
             rest_param_frozen_set = frozenset(rest_param_dict.items())
             default_exp_exception = copy.deepcopy(tc_params[KEY_EXPECTED_EXCEPTION][KEY_DEFAULT])
             exception_diff = tc_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, dict())
