@@ -104,6 +104,16 @@ TESTCASES = {
                 'sync': False,
             }
         },
+        KEY_PATCHES: {
+            'data_and_style': {
+                KEY_PATCH_POST: dict(),
+                KEY_EXPECTED_EXCEPTION: {
+                    frozenset([('compress', True), ('with_chunks', True)]): {
+                        'sync': False,
+                    },
+                },
+            },
+        },
     },
 }
 
