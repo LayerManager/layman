@@ -1,7 +1,7 @@
 import inspect
 from layman import util as layman_util, settings, app
 from test_tools import process_client
-from .. import Action
+from .. import Action, Publication
 
 
 def get_publication_writer(publication):
@@ -49,6 +49,12 @@ def recursive_dict_update(base, updater):
 
 
 def run_action(publication, action, *, cache=None):
+    publication = Publication(
+        action.params.get('workspace', publication.workspace),
+        action.params.get('publ_type', publication.type),
+        action.params.get('name', publication.name),
+    )
+
     param_def = {
         'headers': Action(get_publication_header, dict()),
         'actor': Action(get_publication_actor, dict()),
@@ -73,4 +79,5 @@ def run_action(publication, action, *, cache=None):
                 cache[key] = value
             params[key] = value
     params.update(action.params)
+    params = {key: value for key, value in params.items() if key in method_params.kwonlyargs + method_params.args}
     return action.method(**params)
