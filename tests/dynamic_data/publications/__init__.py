@@ -1048,3 +1048,11 @@ PUBLICATIONS = {
     **wrong_input.generate(consts.COMMON_WORKSPACE + '_generated_wrong_input'),
     **file_input.generate(consts.COMMON_WORKSPACE + '_generated_file_input'),
 }
+
+# pylint: disable=unnecessary-comprehension
+PUBLICATIONS = {
+    publ: definition
+    for publ, definition in PUBLICATIONS.items()
+    # if publ.workspace == consts.COMMON_WORKSPACE
+    #    and publ.name in ('zip_without_explicit_name', 'zip_chunks_without_explicit_name')
+}
