@@ -113,6 +113,20 @@ TESTCASES = {
                     },
                 },
             },
+            'data_without_style': {
+                KEY_PATCH_POST: {
+                    'file_paths': ['sample/layman.layer/sample_point_cz.geojson'],
+                    'style_file': 'sample/layman.layer/sample_point_cz.qml',
+                },
+                KEY_ACTION_PARAMS: {
+                    'style_file': None,
+                },
+                KEY_EXPECTED_EXCEPTION: {
+                    frozenset([('compress', True), ('with_chunks', True)]): {
+                        'sync': False,
+                    },
+                },
+            },
         },
     },
 }
@@ -202,6 +216,7 @@ def generate(workspace=None):
                         consts.KEY_ACTION: {
                             consts.KEY_CALL: Action(process_client.patch_workspace_publication,
                                                     {**tc_params[KEY_ACTION_PARAMS],
+                                                     **patch_params.get(KEY_ACTION_PARAMS, dict()),
                                                      **rest_param_dict}),
                             consts.KEY_CALL_EXCEPTION: {
                                 consts.KEY_EXCEPTION: LaymanError,
@@ -218,6 +233,7 @@ def generate(workspace=None):
                         consts.KEY_ACTION: {
                             consts.KEY_CALL: Action(process_client.patch_workspace_publication,
                                                     {**tc_params[KEY_ACTION_PARAMS],
+                                                     **patch_params.get(KEY_ACTION_PARAMS, dict()),
                                                      **rest_param_dict}),
                             consts.KEY_RESPONSE_ASSERTS: [
                                 Action(processing.response.valid_post, dict()),
