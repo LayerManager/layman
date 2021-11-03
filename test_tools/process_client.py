@@ -329,7 +329,8 @@ def publish_workspace_publication(publication_type,
                                  data=data,
                                  headers=headers)
         raise_layman_error(response)
-        assert response.json()[0]['name'] == name
+        assert response.json()[0]['name'] == name or not name
+        name = name or response.json()[0]['name']
 
     finally:
         for file_path in files:
