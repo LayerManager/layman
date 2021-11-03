@@ -257,11 +257,12 @@ def save_layer_files(workspace, layername, input_files, check_crs, *, output_dir
     check_main_file(main_filepath, check_crs=check_crs)
 
 
-def get_unsafe_layername(filenames):
-    main_filename = get_main_file_name(filenames)
+def get_unsafe_layername(input_files):
+    main_filepath = input_files.raw_or_archived_main_file_path or input_files.raw_paths_to_archives[0]
     unsafe_layername = ''
-    if main_filename is not None:
-        unsafe_layername = os.path.splitext(main_filename)[0]
+    if main_filepath is not None:
+        basename = os.path.basename(main_filepath)
+        unsafe_layername = os.path.splitext(basename)[0]
     return unsafe_layername
 
 
