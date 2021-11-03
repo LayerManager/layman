@@ -60,6 +60,11 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True):
     main_filepath = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['_file']['gdal_path']
     input_file.check_main_file(main_filepath, check_crs=check_crs)
 
+    file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
+    style_type_for_check = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type']})['style_type']
+    if file_type == settings.FILE_TYPE_RASTER and style_type_for_check == 'qml':
+        raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
+
 
 @celery_app.task(
     name='layman.layer.filesystem.gdal.refresh',

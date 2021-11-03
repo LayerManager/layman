@@ -86,6 +86,25 @@ TESTCASES = {
                 'detail': {'files': ['empty_zip_post_chunks_zipped.zip']}}
         },
     },
+    'tif_with_qml': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
+            'style_file': 'sample/style/ne_10m_admin_0_countries.qml',
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 48,
+                          'message': 'Wrong combination of parameters',
+                          'detail': 'Raster layers are not allowed to have QML style.',
+                          },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+            }
+        },
+    },
 }
 
 
