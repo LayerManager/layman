@@ -59,7 +59,7 @@ def post(workspace):
     # NAME
     unsafe_layername = request.form.get('name', '')
     if len(unsafe_layername) == 0:
-        unsafe_layername = input_file.get_unsafe_layername(input_files.raw_paths)
+        unsafe_layername = input_file.get_unsafe_layername(input_files)
     layername = util.to_safe_layer_name(unsafe_layername)
     util.check_layername(layername)
     info = util.get_layer_info(workspace, layername)
