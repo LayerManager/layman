@@ -1,10 +1,16 @@
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client
+from . import util
 from ... import Action, Publication, dynamic_data as consts
 
 KEY_PUBLICATION_TYPE = 'publ_type'
 KEY_ACTION_PARAMS = 'action_params'
+
+REST_PARAMETRIZATION = {
+    'with_chunks': {False: 'sync', True: 'chunks'},
+    'compress': {False: '', True: 'zipped'},
+}
 
 TESTCASES = {
     'zip_and_other_than_main_file': {
@@ -14,6 +20,7 @@ TESTCASES = {
                 'sample/style/small_layer.qml',
                 'sample/layman.layer/small_layer.zip',
             ],
+            'compress': False,
         },
         consts.KEY_FINAL_ASSERTS: [
             Action(publication.internal.correct_values_in_detail, {
@@ -37,32 +44,29 @@ def generate(workspace=None):
 
     result = dict()
     for testcase, tc_params in TESTCASES.items():
-        post = [{
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication,
-                                        tc_params[KEY_ACTION_PARAMS]),
-                consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
-                ], },
-            consts.KEY_FINAL_ASSERTS: [
-                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                *tc_params[consts.KEY_FINAL_ASSERTS],
-            ],
-        }]
-        post_chunks = [{
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication,
-                                        {**tc_params[KEY_ACTION_PARAMS],
-                                         'with_chunks': True, }),
-                consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
-                ], },
-            consts.KEY_FINAL_ASSERTS: [
-                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                *tc_params[consts.KEY_FINAL_ASSERTS],
-            ],
-        }]
-        result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], testcase + '_post_sync')] = post
-        result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], testcase + '_post_chunks')] = post_chunks
-
+        parametrization = {key: values for key, values in REST_PARAMETRIZATION.items()
+                           if key not in tc_params.get(KEY_ACTION_PARAMS, list())}
+        rest_param_dicts = util.dictionary_product(parametrization)
+        for rest_param_dict in rest_param_dicts:
+            test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
+                                          for key, value in rest_param_dict.items()
+                                          if REST_PARAMETRIZATION[key][value]])
+            if any(k in rest_param_dict and rest_param_dict[k] != v for k, v in tc_params[KEY_ACTION_PARAMS].items()):
+                continue
+            action_def = {
+                consts.KEY_ACTION: {
+                    consts.KEY_CALL: Action(process_client.publish_workspace_publication,
+                                            {**tc_params[KEY_ACTION_PARAMS],
+                                             **rest_param_dict}),
+                    consts.KEY_RESPONSE_ASSERTS: [
+                        Action(processing.response.valid_post, dict()),
+                    ],
+                },
+                consts.KEY_FINAL_ASSERTS: [
+                    *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                    *tc_params[consts.KEY_FINAL_ASSERTS],
+                ]
+            }
+            publ_name = f"{testcase}_post_{test_case_postfix}"
+            result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = [action_def]
     return result
