@@ -1,11 +1,11 @@
 import copy
-import itertools
 
 from layman import LaymanError
 from tests.asserts import util as asserts_util
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client
+from . import util
 from ... import Action, Publication, dynamic_data as consts
 
 KEY_PUBLICATION_TYPE = 'publ_type'
@@ -165,20 +165,12 @@ TESTCASES = {
 }
 
 
-def dictionary_product(source):
-    names = list(source.keys())
-    all_values = [list(source[p_name].keys()) for p_name in names]
-    values = itertools.product(*all_values)
-    param_dict = [{names[idx]: value for idx, value in enumerate(vals)} for vals in values]
-    return param_dict
-
-
 def generate(workspace=None):
     workspace = workspace or consts.COMMON_WORKSPACE
 
     result = dict()
     for testcase, tc_params in TESTCASES.items():
-        for rest_param_dict in dictionary_product(REST_PARAMETRIZATION):
+        for rest_param_dict in util.dictionary_product(REST_PARAMETRIZATION):
             test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
                                           for key, value in rest_param_dict.items()
                                           if REST_PARAMETRIZATION[key][value]])
@@ -238,7 +230,7 @@ def generate(workspace=None):
                     ]
                 },
             ]
-            for rest_param_dict in dictionary_product(REST_PARAMETRIZATION):
+            for rest_param_dict in util.dictionary_product(REST_PARAMETRIZATION):
                 rest_param_frozen_set = frozenset(rest_param_dict.items())
                 default_exp_exception = copy.deepcopy(tc_params[KEY_EXPECTED_EXCEPTION][KEY_DEFAULT])
                 exception_diff = patch_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, dict())
