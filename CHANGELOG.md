@@ -14,6 +14,7 @@
 - [#465](https://github.com/LayerManager/layman/issues/465) Fix situation, when Layman does not start if *.qgis file of the first layer with QML style does not exist. It was already fixed in v1.14.1.
 - [#464](https://github.com/LayerManager/layman/issues/464) Fix publishing layers with unusual attribute  names (e.g. `x,` or `Číslo`) and QML styles. It was already fixed in v1.14.1.
 - [#459](https://github.com/LayerManager/layman/issues/459) Fix situation, when sometimes publication stayed in PENDING status after failure. It was already fixed in v1.14.1.
+- [#502](https://github.com/LayerManager/layman/issues/502) Fix error message, when invalid raster file is sent.
 - Rename item `username` to `workspace` in error 41.
 - Detailed [test-related documentation for developers](tests/README.md).
 - [#487](https://github.com/LayerManager/layman/issues/487) Upgrade
