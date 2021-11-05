@@ -129,6 +129,39 @@ TESTCASES = {
             },
         },
     },
+    'non_readable_raster': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': ['test_tools/data/layers/non_readable_raster.tif'],
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'message': 'Wrong parameter value',
+                          'detail': {'parameter': 'file',
+                                     'message': 'Unable to open raster file.',
+                                     'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
+                                     'file': '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_sync/input_file/non_readable_raster_post_sync.tif',
+                                     },
+                          },
+            frozenset([('compress', True), ('with_chunks', False)]): {
+                'detail': {'file': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_sync_zipped/input_file/non_readable_raster_post_sync_zipped.zip/non_readable_raster.tif',
+                           }
+            },
+            frozenset([('compress', False), ('with_chunks', True)]): {
+                'sync': False,
+                'detail': {'file': '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_chunks/input_file/non_readable_raster_post_chunks.tif',
+                           }
+            },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+                'detail': {'file': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_chunks_zipped/input_file/non_readable_raster_post_chunks_zipped.zip/non_readable_raster.tif',
+                           }
+            },
+        },
+    },
 }
 
 
