@@ -1,5 +1,6 @@
 from functools import wraps
 import importlib
+import copy
 import inspect
 import re
 import unicodedata
@@ -464,8 +465,8 @@ def get_publication_status(workspace, publication_type, publication_name, comple
     return publication_status
 
 
-def fill_in_partial_info_statuses(info, chain_info, task_to_layer_info_keys, item_keys):
-    filled_info = info
+def get_info_with_statuses(info, chain_info, task_to_layer_info_keys, item_keys):
+    filled_info = copy.deepcopy(info)
 
     if chain_info is None or celery_util.is_chain_successful(chain_info):
         return filled_info
