@@ -84,7 +84,7 @@ TASKS_TO_MAP_INFO_KEYS = {
 
 def fill_in_partial_info_statuses(info, chain_info):
     item_keys = get_map_info_keys()
-    return layman_util.fill_in_partial_info_statuses(info, chain_info, TASKS_TO_MAP_INFO_KEYS, item_keys)
+    return layman_util.get_info_with_statuses(info, chain_info, TASKS_TO_MAP_INFO_KEYS, item_keys)
 
 
 def get_map_info(workspace, mapname, context=None):

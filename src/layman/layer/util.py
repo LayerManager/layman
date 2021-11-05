@@ -77,7 +77,7 @@ def fill_in_partial_info_statuses(info, chain_info):
     file_type = info.get('file', dict()).get('file_type')
     item_keys = get_layer_info_keys(file_type) if file_type else settings.FILE_TYPE_UNKNOWN
 
-    return layman_util.fill_in_partial_info_statuses(info, chain_info, TASKS_TO_LAYER_INFO_KEYS, item_keys)
+    return layman_util.get_info_with_statuses(info, chain_info, TASKS_TO_LAYER_INFO_KEYS, item_keys)
 
 
 def get_layer_info(workspace, layername, context=None):
