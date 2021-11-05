@@ -2,7 +2,7 @@ import glob
 import os
 import pathlib
 
-from osgeo import ogr, gdal
+from osgeo import ogr
 
 from layman.http import LaymanError
 from layman import settings, patch_mode
@@ -123,8 +123,7 @@ def check_vector_main_file(main_filepath, *, check_crs=True):
 
 
 def check_raster_main_file(main_filepath, *, check_crs=True):
-    in_data_source = gdal.Open(main_filepath)
-    assert in_data_source is not None
+    fs_gdal.open_raster_file(main_filepath)
     fs_gdal.assert_valid_raster(main_filepath)
     if check_crs:
         check_raster_layer_crs(main_filepath)
@@ -137,7 +136,7 @@ def spatial_ref_crs_to_crs_id(spatial_ref):
 
 
 def get_raster_crs(main_filepath):
-    in_data_source = gdal.Open(main_filepath)
+    in_data_source = fs_gdal.open_raster_file(main_filepath)
     return in_data_source.GetSpatialRef()
 
 

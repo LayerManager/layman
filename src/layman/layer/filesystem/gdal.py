@@ -40,8 +40,20 @@ def delete_layer(workspace, layername):
         pass
 
 
+def open_raster_file(filepath, mode=gdal.GA_ReadOnly):
+    dataset = gdal.Open(filepath, mode)
+    if not dataset:
+        raise LaymanError(2, {
+            'parameter': 'file',
+            'message': f"Unable to open raster file.",
+            'expected': f"At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.",
+            'file': filepath,
+        })
+    return dataset
+
+
 def get_color_interpretations(filepath):
-    dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
+    dataset = open_raster_file(filepath)
     result = []
     for band_id in range(1, dataset.RasterCount + 1):
         band = dataset.GetRasterBand(band_id)
@@ -51,7 +63,7 @@ def get_color_interpretations(filepath):
 
 
 def get_overview_counts(filepath):
-    dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
+    dataset = open_raster_file(filepath)
     result = []
     for band_id in range(1, dataset.RasterCount + 1):
         band = dataset.GetRasterBand(band_id)
@@ -79,7 +91,7 @@ def assert_valid_raster(input_path):
 
 
 def get_nodata_values(filepath):
-    dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
+    dataset = open_raster_file(filepath, gdal.GA_ReadOnly)
     result = []
     for band_id in range(1, dataset.RasterCount + 1):
         band = dataset.GetRasterBand(band_id)
@@ -89,7 +101,7 @@ def get_nodata_values(filepath):
 
 
 def get_mask_flags(filepath):
-    dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
+    dataset = open_raster_file(filepath, gdal.GA_ReadOnly)
     all_mask_flags = [
         gdalconst.GMF_ALL_VALID,
         gdalconst.GMF_ALPHA,
@@ -106,13 +118,13 @@ def get_mask_flags(filepath):
 
 
 def get_pixel_size(filepath):
-    dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
+    dataset = open_raster_file(filepath, gdal.GA_ReadOnly)
     geo_transform = dataset.GetGeoTransform()
     return [geo_transform[1], geo_transform[5]]
 
 
 def get_raster_size(filepath):
-    dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
+    dataset = open_raster_file(filepath, gdal.GA_ReadOnly)
     x_size = dataset.RasterXSize
     y_size = dataset.RasterYSize
     return [x_size, y_size]
@@ -122,7 +134,7 @@ def get_statistics(filepath):
     # If Nodata is set and it's lowest value in dataset and at least one pixel has Nodata value,
     # GetStatistics does not return Nodata value as MIN, but lowest value that is not Nodata value.
     # It's probably similar for MAX.
-    dataset = gdal.Open(filepath, gdal.GA_ReadOnly)
+    dataset = open_raster_file(filepath, gdal.GA_ReadOnly)
     result = []
     for band_id in range(1, dataset.RasterCount + 1):
         band = dataset.GetRasterBand(band_id)
@@ -312,7 +324,7 @@ def delete_normalized_raster_workspace(workspace):
 
 def get_bbox(workspace, layer):
     filepath = get_normalized_raster_layer_main_filepath(workspace, layer)
-    data = gdal.Open(filepath, gdalconst.GA_ReadOnly)
+    data = open_raster_file(filepath, gdalconst.GA_ReadOnly)
     geo_transform = data.GetGeoTransform()
     minx = geo_transform[0]
     maxy = geo_transform[3]
