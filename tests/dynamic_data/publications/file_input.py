@@ -69,4 +69,40 @@ def generate(workspace=None):
             }
             publ_name = f"{testcase}_post_{test_case_postfix}"
             result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = [action_def]
+
+        patch = [
+            {
+                consts.KEY_ACTION: {
+                    consts.KEY_CALL: Action(process_client.publish_workspace_publication,
+                                            dict()),
+                    consts.KEY_RESPONSE_ASSERTS: [
+                        Action(processing.response.valid_post, dict()),
+                    ],
+                },
+                consts.KEY_FINAL_ASSERTS: [
+                    *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                ]
+            },
+        ]
+        for rest_param_dict in rest_param_dicts:
+            test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
+                                          for key, value in rest_param_dict.items()
+                                          if REST_PARAMETRIZATION[key][value]])
+            action_def = {
+                consts.KEY_ACTION: {
+                    consts.KEY_CALL: Action(process_client.patch_workspace_publication,
+                                            {**tc_params[KEY_ACTION_PARAMS],
+                                             **rest_param_dict}),
+                    consts.KEY_RESPONSE_ASSERTS: [
+                        Action(processing.response.valid_post, dict()),
+                    ],
+                },
+                consts.KEY_FINAL_ASSERTS: [
+                    *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                    *tc_params[consts.KEY_FINAL_ASSERTS],
+                ]
+            }
+            patch.append(action_def)
+            publ_name = f"{testcase}_patch_{test_case_postfix}"
+            result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = patch
     return result
