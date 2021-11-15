@@ -9,7 +9,7 @@ from redis import WatchError
 
 IN_CELERY_WORKER_PROCESS = sys.argv and sys.argv[0].endswith('/celery/__main__.py')
 IN_PYTEST_PROCESS = sys.argv and sys.argv[0].endswith('/pytest/__main__.py')
-IN_FLOWER_PROCESS = sys.argv and sys.argv[0].endswith('/flower/__main__.py')
+IN_FLOWER_PROCESS = sys.argv and sys.argv[0].endswith('/usr/local/bin/celery')
 IN_FLASK_PROCESS = sys.argv and (sys.argv[0].endswith('/flask') or sys.argv[0].endswith('/gunicorn'))
 IN_UPGRADE_PROCESS = sys.argv and sys.argv[0].endswith('standalone_upgrade.py')
 IN_UTIL_PROCESS = sys.argv and sys.argv[0].endswith('refresh_doc_metadata_xpath.py')
@@ -20,7 +20,7 @@ assert [
     IN_FLASK_PROCESS,
     IN_UPGRADE_PROCESS,
     IN_UTIL_PROCESS,
-].count(True) == 1, f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}, IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}, IN_FLOWER_PROCESS={IN_FLOWER_PROCESS}, IN_FLASK_PROCESS={IN_FLASK_PROCESS}, IN_UPGRADE_PROCESS={IN_UPGRADE_PROCESS}, IN_UTIL_PROCESS={IN_UTIL_PROCESS}"
+].count(True) == 1, f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}, IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}, IN_FLOWER_PROCESS={IN_FLOWER_PROCESS}, IN_FLASK_PROCESS={IN_FLASK_PROCESS}, IN_UPGRADE_PROCESS={IN_UPGRADE_PROCESS}, IN_UTIL_PROCESS={IN_UTIL_PROCESS}, sys.argv={sys.argv}"
 
 settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
