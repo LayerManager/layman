@@ -27,7 +27,6 @@ def refresh_wms(
         store_in_geoserver,
         description=None,
         title=None,
-        ensure_user=False,
         access_rights=None,
 ):
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'bounding_box']})
@@ -36,8 +35,7 @@ def refresh_wms(
     assert description is not None
     assert title is not None
     geoserver_workspace = wms.get_geoserver_workspace(workspace)
-    if ensure_user:
-        geoserver.ensure_workspace(workspace)
+    geoserver.ensure_workspace(workspace)
 
     if self.is_aborted():
         raise AbortedException
@@ -91,7 +89,6 @@ def refresh_wfs(
         layername,
         description=None,
         title=None,
-        ensure_user=False,
         access_rights=None,
 ):
     file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
@@ -102,8 +99,7 @@ def refresh_wfs(
 
     assert description is not None
     assert title is not None
-    if ensure_user:
-        geoserver.ensure_workspace(workspace)
+    geoserver.ensure_workspace(workspace)
 
     if self.is_aborted():
         raise AbortedException
