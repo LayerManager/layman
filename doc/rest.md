@@ -153,6 +153,7 @@ Body parameters:
    - by default default SLD style of GeoServer is used
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
      - QML style for raster data file is not supported
+     - It's possible to encode also external images in QML styles and use them in the style. To do so, each image needs to be encoded in Base64 encoding inside QML file. You can achieve it by selecting "Embed File" option in QGIS Layer Symbology window, see e.g. QGIS issues [2815](https://github.com/qgis/QGIS-Documentation/issues/2815) or [4563](https://github.com/qgis/QGIS-Documentation/pull/4563).
    - uploading of additional style files, e.g. point-symbol images or fonts is not supported
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
 - *access_rights.read*, string
@@ -299,6 +300,7 @@ Body parameters:
 - *style*, style file
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
      - QML style for raster data file is not supported
+     - It's possible to encode also external images in QML styles and use them in the style. See [POST Workspace Layers](#post-workspace-layers) body parameter *style* for details.
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 - *access_rights.read*, string
