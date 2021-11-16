@@ -12,6 +12,7 @@
 - [#464](https://github.com/LayerManager/layman/issues/464) Fix publishing layers with unusual attribute  names (e.g. `x,` or `Číslo`) and QML styles. It was already fixed in v1.14.1.
 - [#459](https://github.com/LayerManager/layman/issues/459) Fix situation, when sometimes publication stayed in PENDING status after failure. It was already fixed in v1.14.1.
 - [#502](https://github.com/LayerManager/layman/issues/502) Fix error message, when invalid raster file is sent.
+- Fix: Layers, which were created in Layman, but not published in GeoServer due to any validation/error can now be patched. Previously internal error was raised for every [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) call.
 - Rename item `username` to `workspace` in error 41.
 - Detailed [test-related documentation for developers](tests/README.md).
 - [#487](https://github.com/LayerManager/layman/issues/487) Upgrade
