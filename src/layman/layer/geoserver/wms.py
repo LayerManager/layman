@@ -28,6 +28,8 @@ def get_flask_proxy_key(workspace):
 
 
 def patch_layer(workspace, layername, title, description, access_rights=None):
+    if not get_layer_info(workspace, layername):
+        return
     geoserver_workspace = get_geoserver_workspace(workspace)
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type', 'file', ], })
     file_type = info['file']['file_type']
