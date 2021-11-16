@@ -1,12 +1,13 @@
 import os
 import pytest
 
-from layman import util, app, settings
+from layman import app, settings
 from layman.common.prime_db_schema import workspaces
 from layman.layer import qgis
 from layman.layer.geoserver import wms
 from test_tools import process_client, process
-from .. import static_data as data
+from .. import static_data as data, Publication
+from ..asserts import util as test_util
 
 
 def assert_publication_after_delete(workspace, publ_type, publication):
@@ -47,9 +48,11 @@ def ensure_test_data(liferay_mock, request):
         process.ensure_layman_function(process.LAYMAN_DEFAULT_SETTINGS)
 
         for workspace, publ_type, publication in data.PUBLICATIONS:
-            headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
-            process_client.delete_workspace_publication(publ_type, workspace, publication, headers=headers)
-            assert_publication_after_delete(workspace, publ_type, publication)
+            if test_util.get_publication_exists(Publication(workspace, publ_type, publication)):
+                headers = data.HEADERS.get(
+                    data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
+                process_client.delete_workspace_publication(publ_type, workspace, publication, headers=headers)
+                assert_publication_after_delete(workspace, publ_type, publication)
 
 
 def ensure_publication(workspace, publ_type, publication):
@@ -59,9 +62,7 @@ def ensure_publication(workspace, publ_type, publication):
         if user not in workspaces_in_db:
             process_client.ensure_reserved_username(user, headers=data.HEADERS[user])
 
-    with app.app_context():
-        info = util.get_publication_info(workspace, publ_type, publication, context={'keys': ['name']})
-    if not info.get('name'):
+    if not test_util.get_publication_exists(Publication(workspace, publ_type, publication)):
         assert_publication_before_post(workspace, publ_type, publication)
         for idx, params in enumerate(data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION]):
             write_method = process_client.patch_workspace_publication if idx > 0 else process_client.publish_workspace_publication
