@@ -23,10 +23,8 @@ def refresh_table(
         workspace,
         layername,
         crs_id=None,
-        ensure_user=False
 ):
-    if ensure_user:
-        db.ensure_workspace(workspace)
+    db.ensure_workspace(workspace)
     if self.is_aborted():
         raise AbortedException
 

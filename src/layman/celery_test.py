@@ -42,7 +42,6 @@ def test_single_abortable_task():
         'crs_id': 'EPSG:4326',
         'description': 'bla',
         'title': 'bla',
-        'ensure_user': True,
         'check_crs': check_crs,
     }
     filenames = fs_util.InputFiles(sent_paths=['abc.geojson'])
@@ -95,7 +94,6 @@ def test_abortable_task_chain():
         'crs_id': 'EPSG:4326',
         'description': 'bla',
         'title': 'bla',
-        'ensure_user': True,
         'check_crs': check_crs,
     }
     filenames = fs_util.InputFiles(sent_paths=['abc.geojson'])

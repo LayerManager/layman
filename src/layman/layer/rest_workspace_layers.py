@@ -107,7 +107,6 @@ def post(workspace):
         'crs_id': crs_id,
         'description': description,
         'title': title,
-        'ensure_user': True,
         'check_crs': False,
         'actor_name': actor_name,
         'style_type': style_type,

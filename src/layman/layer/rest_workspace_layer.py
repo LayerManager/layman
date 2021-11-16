@@ -142,7 +142,6 @@ def patch(workspace, layername):
 
         kwargs.update({
             'crs_id': crs_id,
-            'ensure_user': False,
             'http_method': request_method,
             'metadata_properties_to_refresh': props_to_refresh,
         })

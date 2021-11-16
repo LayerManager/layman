@@ -52,7 +52,6 @@ def test_geoserver_bbox():
     kwargs = {
         'description': '',
         'title': layer,
-        'ensure_user': False,
         'access_rights': None,
     }
 
