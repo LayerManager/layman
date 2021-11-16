@@ -1,7 +1,7 @@
 # Changelog
 
 ## v1.15.0
- {release_date}
+ 2021-11-18
 ### Changes
 - [#169](https://github.com/LayerManager/layman/issues/169) [POST Workspace Layers](doc/rest.md#post-workspace-layers) accepts also compressed data files in ZIP format (`*.zip`) in `file` parameter. [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) accepts also data file in ZIP format (`*.zip`) in `file` parameter. ZIP archives can be also uploaded by chunks.
 - [#503](https://github.com/LayerManager/layman/issues/503) Raster data (e.g. GeoTIFF, JPEG2000, PNG, JPEG) sent on [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) are compressed during normalization to decrease occupied disk space.
