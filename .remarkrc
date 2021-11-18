@@ -6,7 +6,8 @@
     "lint-no-dead-urls": {
       "skipLocalhost": true,
       "skipUrlPatterns": [
-        "https://help.liferay.com"
+        "https://help.liferay.com",
+        "https://github.com/LayerManager/layman/issues/"
       ]
     }
   }
