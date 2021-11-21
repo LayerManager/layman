@@ -78,14 +78,10 @@ def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_nam
                                                 basic_template_path=basic_template_path)
     record = ET.tostring(element, encoding='unicode', pretty_print=True)
     # current_app.logger.info(f"patch_layer record=\n{record}")
-    try:
-        common_util.csw_update({
-            'muuid': muuid,
-            'record': record,
-        }, timeout=timeout)
-    except (HTTPError, ConnectionError) as exc:
-        current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38) from exc
+    common_util.csw_update({
+        'muuid': muuid,
+        'record': record,
+    }, timeout=timeout)
     return muuid
 
 
@@ -96,23 +92,15 @@ def delete_layer(workspace, layername, *, backup_uuid=None):
     muuid = get_metadata_uuid(uuid)
     if muuid is None:
         return
-    try:
-        common_util.csw_delete(muuid)
-    except (HTTPError, ConnectionError) as exc:
-        current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38) from exc
+    common_util.csw_delete(muuid)
 
 
 def csw_insert(workspace, layername):
     template_path, prop_values = get_template_path_and_values(workspace, layername, http_method='post')
     record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
-    try:
-        muuid = common_util.csw_insert({
-            'record': record
-        })
-    except (HTTPError, ConnectionError) as exc:
-        current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38) from exc
+    muuid = common_util.csw_insert({
+        'record': record
+    })
     return muuid
 
 

@@ -261,6 +261,7 @@ def is_record_exists_exception(root_el):
         root_el[0][0].text.startswith('Record exists')
 
 
+@error_handling_decorator
 def base_insert(xml_str):
     # print(f"Micka insert=\n{xml_str}")
     response = requests.post(settings.CSW_URL,
@@ -313,16 +314,12 @@ def soap_insert(template_values):
 
 
 def soap_insert_record(record, is_public):
-    try:
-        muuid = soap_insert({
-            'public': '1' if is_public else '0',
-            'record': record,
-            'edit_user': settings.CSW_BASIC_AUTHN[0],
-            'read_user': settings.CSW_BASIC_AUTHN[0],
-        })
-    except (HTTPError, ConnectionError) as exc:
-        current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38) from exc
+    muuid = soap_insert({
+        'public': '1' if is_public else '0',
+        'record': record,
+        'edit_user': settings.CSW_BASIC_AUTHN[0],
+        'read_user': settings.CSW_BASIC_AUTHN[0],
+    })
     return muuid
 
 
@@ -331,6 +328,7 @@ def soap_insert_record_from_template(template_path, prop_values, metadata_proper
     return soap_insert_record(record, is_public)
 
 
+@error_handling_decorator
 def csw_update(template_values, timeout=None):
     timeout = timeout or settings.DEFAULT_CONNECTION_TIMEOUT
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-update-template.xml')
@@ -366,6 +364,7 @@ def is_record_does_not_exist_exception(root_el):
         root_el[0].text is None
 
 
+@error_handling_decorator
 def csw_delete(muuid):
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-delete-template.xml')
     template_values = {
