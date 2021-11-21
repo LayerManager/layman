@@ -35,7 +35,12 @@ def get_map_info(workspace, mapname):
             return {}
         muuid = get_metadata_uuid(uuid)
         csw.getrecordbyid(id=[muuid], esn='brief')
-    except (HTTPError, ConnectionError):
+    except HTTPError as exc:
+        current_app.logger.info(f'traceback={traceback.format_exc()},\n'
+                                f'response={exc.response.text},\n'
+                                f'http_code={exc.response.status_code}')
+        return {}
+    except ConnectionError:
         current_app.logger.info(traceback.format_exc())
         return {}
     if muuid in csw.records:
