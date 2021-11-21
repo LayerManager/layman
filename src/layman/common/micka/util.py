@@ -32,6 +32,24 @@ for k, v in NAMESPACES.items():
     ET.register_namespace(k, v)
 
 
+def error_handling_decorator(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except HTTPError as exc:
+            current_app.logger.info(f'traceback={traceback.format_exc()},\n'
+                                    f'response={exc.response.text},\n'
+                                    f'http_code={exc.response.status_code}')
+            raise LaymanError(38,
+                              data={'caused_by': exc.__class__.__name__, 'http_code': exc.response.status_code},
+                              private_data={'response_text': exc.response.text}) from exc
+        except ConnectionError as exc:
+            current_app.logger.info(traceback.format_exc())
+            raise LaymanError(38) from exc
+
+    return inner
+
+
 def get_single_prop_els(parent_el, prop_name, publ_properties):
     micka_prop = publ_properties[prop_name]
     single_prop_els = parent_el.xpath(micka_prop['xpath_property'], namespaces=NAMESPACES)
