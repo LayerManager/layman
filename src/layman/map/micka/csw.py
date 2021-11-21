@@ -8,7 +8,7 @@ from lxml import etree as ET
 from requests.exceptions import HTTPError, ConnectionError
 from flask import current_app
 
-from layman import common, settings, LaymanError
+from layman import common, settings
 from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util
@@ -55,11 +55,7 @@ def delete_map(workspace, mapname):
     muuid = get_metadata_uuid(uuid)
     if muuid is None:
         return
-    try:
-        common_util.csw_delete(muuid)
-    except (HTTPError, ConnectionError) as exc:
-        current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38) from exc
+    common_util.csw_delete(muuid)
 
 
 def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_name=None, create_if_not_exists=True, timeout=None):
@@ -91,27 +87,19 @@ def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_nam
                                                 basic_template_path=basic_template_path)
     record = ET.tostring(element, encoding='unicode', pretty_print=True)
     # current_app.logger.info(f"update_map record=\n{record}")
-    try:
-        common_util.csw_update({
-            'muuid': muuid,
-            'record': record,
-        }, timeout=timeout)
-    except (HTTPError, ConnectionError) as exc:
-        current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38) from exc
+    common_util.csw_update({
+        'muuid': muuid,
+        'record': record,
+    }, timeout=timeout)
     return muuid
 
 
 def csw_insert(workspace, mapname, actor_name):
     template_path, prop_values = get_template_path_and_values(workspace, mapname, http_method=common.REQUEST_METHOD_POST, actor_name=actor_name)
     record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
-    try:
-        muuid = common_util.csw_insert({
-            'record': record
-        })
-    except (HTTPError, ConnectionError) as exc:
-        current_app.logger.info(traceback.format_exc())
-        raise LaymanError(38) from exc
+    muuid = common_util.csw_insert({
+        'record': record
+    })
     return muuid
 
 
