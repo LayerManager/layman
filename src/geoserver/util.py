@@ -245,6 +245,41 @@ def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, de
     response.raise_for_status()
 
 
+def post_feature_type(geoserver_workspace, layername, description, title, bbox, auth):
+    keywords = [
+        "features",
+        layername,
+        title
+    ]
+    keywords = list(set(keywords))
+    feature_type_def = {
+        "name": layername,
+        "title": title,
+        "abstract": description,
+        "keywords": {
+            "string": keywords
+        },
+        "srs": "EPSG:3857",
+        "projectionPolicy": "FORCE_DECLARED",
+        "enabled": True,
+        "store": {
+            "@class": "dataStore",
+            "name": geoserver_workspace + ":postgresql",
+        },
+        'nativeBoundingBox': bbox_to_native_bbox(bbox),
+    }
+    response = requests.post(urljoin(GS_REST_WORKSPACES,
+                                     geoserver_workspace + '/datastores/postgresql/featuretypes/'),
+                             data=json.dumps({
+                                 "featureType": feature_type_def
+                             }),
+                             headers=headers_json,
+                             auth=auth,
+                             timeout=GS_REST_TIMEOUT,
+                             )
+    response.raise_for_status()
+
+
 def delete_security_roles(rule, auth):
     response = requests.delete(
         urljoin(GS_REST_SECURITY_ACL_LAYERS, rule),

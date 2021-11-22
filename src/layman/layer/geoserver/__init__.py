@@ -120,38 +120,8 @@ def get_layer_native_bbox(workspace, layer):
 
 def publish_layer_from_db(workspace, layername, description, title, *, geoserver_workspace=None):
     geoserver_workspace = geoserver_workspace or workspace
-    keywords = [
-        "features",
-        layername,
-        title
-    ]
-    keywords = list(set(keywords))
-    feature_type_def = {
-        "name": layername,
-        "title": title,
-        "abstract": description,
-        "keywords": {
-            "string": keywords
-        },
-        "srs": "EPSG:3857",
-        "projectionPolicy": "FORCE_DECLARED",
-        "enabled": True,
-        "store": {
-            "@class": "dataStore",
-            "name": geoserver_workspace + ":postgresql",
-        },
-        'nativeBoundingBox': get_layer_native_bbox(workspace, layername),
-    }
-    response = requests.post(urljoin(GS_REST_WORKSPACES,
-                                     geoserver_workspace + '/datastores/postgresql/featuretypes/'),
-                             data=json.dumps({
-                                 "featureType": feature_type_def
-                             }),
-                             headers=headers_json,
-                             auth=settings.LAYMAN_GS_AUTH,
-                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
-                             )
-    response.raise_for_status()
+    bbox = get_layer_bbox(workspace, layername)
+    gs_util.post_feature_type(geoserver_workspace, layername, description, title, bbox, settings.LAYMAN_GS_AUTH)
 
 
 def publish_layer_from_qgis(workspace, layer, description, title, *, geoserver_workspace=None):
