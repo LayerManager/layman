@@ -63,7 +63,9 @@ logger.info(f"IN_UTIL_PROCESS={IN_UTIL_PROCESS}")
 LAYMAN_DEPS_ADJUSTED_KEY = f"{__name__}:LAYMAN_DEPS_ADJUSTED"
 
 from . import error_handlers
+from .common.micka import util as micka_util
 error_handlers.decorate_all_in_module(gs_util, decorator=error_handlers.get_handler_for_error(52))
+error_handlers.decorate_all_in_module(micka_util, decorator=error_handlers.get_handler_for_error(38))
 
 with settings.LAYMAN_REDIS.pipeline() as pipe:
     wait_for_other_process = False  # pylint: disable=invalid-name
