@@ -3,14 +3,11 @@ import time
 from io import BytesIO
 from xml.sax.saxutils import escape
 import urllib.parse as urlparse
-import traceback
 from copy import deepcopy
 import requests
-from requests.exceptions import HTTPError, ConnectionError
 from owslib.csw import CatalogueServiceWeb
 from owslib.util import nspath_eval
 from lxml import etree as ET
-from flask import current_app
 
 from layman import settings, LaymanError, authz
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
@@ -30,24 +27,6 @@ NAMESPACES = {
 }
 for k, v in NAMESPACES.items():
     ET.register_namespace(k, v)
-
-
-def error_handling_decorator(func):
-    def inner(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except HTTPError as exc:
-            current_app.logger.info(f'traceback={traceback.format_exc()},\n'
-                                    f'response={exc.response.text},\n'
-                                    f'http_code={exc.response.status_code}')
-            raise LaymanError(38,
-                              data={'caused_by': exc.__class__.__name__, 'http_code': exc.response.status_code},
-                              private_data={'response_text': exc.response.text}) from exc
-        except ConnectionError as exc:
-            current_app.logger.info(traceback.format_exc())
-            raise LaymanError(38) from exc
-
-    return inner
 
 
 def get_single_prop_els(parent_el, prop_name, publ_properties):
@@ -261,7 +240,6 @@ def is_record_exists_exception(root_el):
         root_el[0][0].text.startswith('Record exists')
 
 
-@error_handling_decorator
 def base_insert(xml_str):
     # print(f"Micka insert=\n{xml_str}")
     response = requests.post(settings.CSW_URL,
@@ -328,7 +306,6 @@ def soap_insert_record_from_template(template_path, prop_values, metadata_proper
     return soap_insert_record(record, is_public)
 
 
-@error_handling_decorator
 def csw_update(template_values, timeout=None):
     timeout = timeout or settings.DEFAULT_CONNECTION_TIMEOUT
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-update-template.xml')
@@ -364,7 +341,6 @@ def is_record_does_not_exist_exception(root_el):
         root_el[0].text is None
 
 
-@error_handling_decorator
 def csw_delete(muuid):
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-delete-template.xml')
     template_values = {
