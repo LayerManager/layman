@@ -1,10 +1,7 @@
 import logging
 from urllib.parse import urlparse
-import requests.exceptions
-from owslib.wms import WebMapService
-from owslib.wfs import WebFeatureService
 
-from geoserver.util import get_proxy_base_url
+from geoserver.util import get_proxy_base_url, wms_direct, wfs_direct
 from layman.cache.mem import CACHE as MEM_CACHE
 
 
@@ -20,19 +17,6 @@ def get_gs_proxy_base_url():
         proxy_base_url = get_proxy_base_url(settings.LAYMAN_GS_AUTH)
         MEM_CACHE.set(CACHE_GS_PROXY_BASE_URL_KEY, proxy_base_url, ttl=settings.LAYMAN_CACHE_GS_TIMEOUT)
     return proxy_base_url
-
-
-def wms_direct(wms_url, xml=None, version=None, headers=None):
-    from layman.layer.geoserver.wms import VERSION
-    version = version or VERSION
-    try:
-        wms = WebMapService(wms_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version, headers=headers)
-    except requests.exceptions.HTTPError as exc:
-        if exc.response.status_code == 404:
-            wms = None
-        else:
-            raise exc
-    return wms
 
 
 def wms_proxy(wms_url, xml=None, version=None, headers=None):
@@ -52,19 +36,6 @@ def wms_proxy(wms_url, xml=None, version=None, headers=None):
             )
             method['url'] = method_url.geturl()
     return wms
-
-
-def wfs_direct(wfs_url, xml=None, version=None, headers=None):
-    from layman.layer.geoserver.wfs import VERSION
-    version = version or VERSION
-    try:
-        wfs = WebFeatureService(wfs_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version, headers=headers)
-    except requests.exceptions.HTTPError as exc:
-        if exc.response.status_code == 404:
-            wfs = None
-        else:
-            raise exc
-    return wfs
 
 
 def wfs_proxy(wfs_url, xml=None, version=None, headers=None):

@@ -7,6 +7,8 @@ import secrets
 import string
 from urllib.parse import urljoin
 import requests
+from owslib.wms import WebMapService
+from owslib.wfs import WebFeatureService
 
 from . import GS_REST_ROLES, GS_REST_USERS, GS_REST_SECURITY_ACL_LAYERS, GS_REST_WORKSPACES, GS_REST_STYLES, GS_AUTH,\
     GS_REST_WMS_SETTINGS, GS_REST_WFS_SETTINGS, GS_REST_USER, GS_REST_SETTINGS, GS_REST, GS_REST_TIMEOUT
@@ -1020,3 +1022,27 @@ def bbox_to_native_bbox(bbox):
         "maxy": bbox[3],
         "crs": "EPSG:3857",
     }
+
+
+def wms_direct(wms_url, xml=None, version=None, headers=None):
+    from layman.layer.geoserver.wms import VERSION
+    version = version or VERSION
+    try:
+        wms = WebMapService(wms_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version, headers=headers)
+    except requests.exceptions.HTTPError as exc:
+        if exc.response.status_code == 404:
+            return None
+        raise exc
+    return wms
+
+
+def wfs_direct(wfs_url, xml=None, version=None, headers=None):
+    from layman.layer.geoserver.wfs import VERSION
+    version = version or VERSION
+    try:
+        wfs = WebFeatureService(wfs_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version, headers=headers)
+    except requests.exceptions.HTTPError as exc:
+        if exc.response.status_code == 404:
+            return None
+        raise exc
+    return wfs
