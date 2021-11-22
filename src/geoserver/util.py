@@ -671,6 +671,43 @@ def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox=None, title=None, 
     response.raise_for_status()
 
 
+def post_wms_layer(geoserver_workspace, layer, store_name, title, description, bbox, auth):
+    keywords = [
+        "features",
+        layer,
+        title
+    ]
+    keywords = list(set(keywords))
+    wms_layer_def = {
+        "name": layer,
+        "nativeName": layer,
+        "title": title,
+        "abstract": description,
+        "keywords": {
+            "string": keywords
+        },
+        "nativeCRS": "EPSG:3857",
+        "srs": "EPSG:3857",
+        "projectionPolicy": "NONE",
+        "enabled": True,
+        "store": {
+            "@class": "wmsStore",
+            "name": geoserver_workspace + f":{store_name}",
+        },
+        'nativeBoundingBox': bbox_to_native_bbox(bbox),
+    }
+    response = requests.post(urljoin(GS_REST_WORKSPACES,
+                                     geoserver_workspace + '/wmslayers/'),
+                             data=json.dumps({
+                                 "wmsLayer": wms_layer_def
+                             }),
+                             headers=headers_json,
+                             auth=auth,
+                             timeout=GS_REST_TIMEOUT,
+                             )
+    response.raise_for_status()
+
+
 def get_wms_layer(geoserver_workspace, layer, *, auth):
     response = requests.get(urljoin(GS_REST_WORKSPACES,
                             f'{geoserver_workspace}/wmslayers/{layer}'),

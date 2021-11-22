@@ -132,41 +132,8 @@ def publish_layer_from_qgis(workspace, layer, description, title, *, geoserver_w
                              settings.LAYMAN_GS_AUTH,
                              store_name,
                              layer_capabilities_url)
-
-    keywords = [
-        "features",
-        layer,
-        title
-    ]
-    keywords = list(set(keywords))
-    wms_layer_def = {
-        "name": layer,
-        "nativeName": layer,
-        "title": title,
-        "abstract": description,
-        "keywords": {
-            "string": keywords
-        },
-        "nativeCRS": "EPSG:3857",
-        "srs": "EPSG:3857",
-        "projectionPolicy": "NONE",
-        "enabled": True,
-        "store": {
-            "@class": "wmsStore",
-            "name": geoserver_workspace + f":{store_name}",
-        },
-        'nativeBoundingBox': get_layer_native_bbox(workspace, layer),
-    }
-    response = requests.post(urljoin(GS_REST_WORKSPACES,
-                                     geoserver_workspace + '/wmslayers/'),
-                             data=json.dumps({
-                                 "wmsLayer": wms_layer_def
-                             }),
-                             headers=headers_json,
-                             auth=settings.LAYMAN_GS_AUTH,
-                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
-                             )
-    response.raise_for_status()
+    bbox = get_layer_bbox(workspace, layer)
+    gs_util.post_wms_layer(geoserver_workspace, layer, store_name, title, description, bbox, settings.LAYMAN_GS_AUTH)
 
 
 def get_usernames():
