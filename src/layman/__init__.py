@@ -29,6 +29,7 @@ app.secret_key = os.environ['FLASK_SECRET_KEY']
 app.config['PREFERRED_URL_SCHEME'] = settings.LAYMAN_PUBLIC_URL_SCHEME
 logger = create_logger(app)
 
+from geoserver import util as gs_util
 from .http import LaymanError
 from .make_celery import make_celery
 
@@ -61,6 +62,9 @@ logger.info(f"IN_UTIL_PROCESS={IN_UTIL_PROCESS}")
 # load UUIDs only once
 LAYMAN_DEPS_ADJUSTED_KEY = f"{__name__}:LAYMAN_DEPS_ADJUSTED"
 
+from . import error_handlers
+error_handlers.decorate_all_in_module(gs_util, decorator=error_handlers.get_handler_for_error(52))
+
 with settings.LAYMAN_REDIS.pipeline() as pipe:
     wait_for_other_process = False  # pylint: disable=invalid-name
     try:
@@ -75,7 +79,6 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
 
                 with app.app_context():
                     logger.info(f'Adjusting GeoServer roles')
-                    from geoserver import util as gs_util
 
                     if settings.GEOSERVER_ADMIN_AUTH:
                         gs_util.ensure_role(settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
