@@ -60,16 +60,7 @@ def delete_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
 def get_all_rules(auth):
     key = FLASK_RULES_KEY
     if key not in g:
-        response = requests.get(
-            settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS,
-            # data=json.dumps(payload),
-            headers=headers_json,
-            auth=auth,
-            timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
-        )
-        response.raise_for_status()
-        # app.logger.info(r.text)
-        all_rules = response.json()
+        all_rules = gs_util.get_all_security_acl_rules(auth)
         g.setdefault(key, all_rules)
 
     return g.get(key)

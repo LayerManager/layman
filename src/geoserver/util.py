@@ -160,6 +160,18 @@ def get_security_roles(rule, auth):
     return roles
 
 
+def get_all_security_acl_rules(auth):
+    response = requests.get(
+        GS_REST_SECURITY_ACL_LAYERS,
+        headers=headers_json,
+        auth=auth,
+        timeout=GS_REST_TIMEOUT,
+    )
+    response.raise_for_status()
+    all_rules = response.json()
+    return all_rules
+
+
 def ensure_security_roles(rule, roles, auth):
     roles_str = ', '.join(roles)
 
