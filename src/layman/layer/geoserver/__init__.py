@@ -1,9 +1,6 @@
-import json
-from urllib.parse import urljoin
-import requests
 from flask import g
 
-from geoserver import util as gs_util, GS_REST_WORKSPACES
+from geoserver import util as gs_util
 from layman.http import LaymanError
 from layman import settings, util as layman_util
 from layman.common import bbox as bbox_util, geoserver as gs_common, empty_method
@@ -11,15 +8,6 @@ from layman.layer import LAYER_TYPE
 from . import wms
 
 FLASK_RULES_KEY = f"{__name__}:RULES"
-
-headers_json = {
-    'Accept': 'application/json',
-    'Content-type': 'application/json',
-}
-headers_xml = {
-    'Accept': 'application/xml',
-    'Content-type': 'application/xml',
-}
 
 check_new_layername = empty_method
 
