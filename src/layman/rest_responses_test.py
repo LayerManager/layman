@@ -76,6 +76,7 @@ class TestResponsesClass:
         **expected_common_multi,
         'bounding_box': list(test_data.SMALL_LAYER_BBOX),
         'native_crs': 'EPSG:3857',
+        'native_bounding_box': list(test_data.SMALL_LAYER_BBOX) + ['EPSG:3857'],
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
     }
     expected_maps = {
