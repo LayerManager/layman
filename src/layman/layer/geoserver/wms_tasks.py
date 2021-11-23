@@ -4,7 +4,7 @@ from layman.celery import AbortedException
 from . import wms
 from .. import geoserver, LAYER_TYPE
 
-headers_json = geoserver.headers_json
+headers_json = gs_util.headers_json
 
 
 @celery_app.task(
