@@ -2,7 +2,7 @@ import logging
 import psycopg2
 
 from db import util as db_util
-from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_13, upgrade_v1_14
+from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_13, upgrade_v1_14, upgrade_v1_16
 from layman import settings
 from . import consts
 
@@ -34,6 +34,9 @@ MIGRATIONS = {
         ]),
         ((1, 13, 0), [
             upgrade_v1_13.rename_users_directory,
+        ]),
+        ((1, 16, 0), [
+            upgrade_v1_16.adjust_db_for_srid,
         ]),
     ],
     consts.MIGRATION_TYPE_DATA: [
