@@ -95,6 +95,7 @@ class TestResponsesClass:
     expected_layer = {
         **expected_common,
         'bounding_box': list(test_data.SMALL_LAYER_BBOX),
+        'native_crs': 'EPSG:3857',
         'db_table': {'name': publication},
         'file': {'path': f'layers/{publication}/input_file/{publication}.geojson',
                  'file_type': 'vector',

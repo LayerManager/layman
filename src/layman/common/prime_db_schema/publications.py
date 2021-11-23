@@ -192,6 +192,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'style_type': style_type,
                                    'updated_at': updated_at,
                                    'bounding_box': [xmin, ymin, xmax, ymax],
+                                   'native_crs': 'EPSG:3857',
                                    'access_rights': {'read': can_read_users.split(','),
                                                      'write': can_write_users.split(',')}
                                    }

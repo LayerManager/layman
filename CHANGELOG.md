@@ -7,6 +7,8 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [#64](https://github.com/LayerManager/layman/issues/64) Responses of [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) contains new attribute
+   - `native_crs` with code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326"
 
 ## v1.15.0
  2021-11-18
