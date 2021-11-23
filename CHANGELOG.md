@@ -5,6 +5,7 @@
 ### Upgrade requirements
 ### Migrations and checks
 #### Schema migrations
+- [#64](https://github.com/LayerManager/layman/issues/64) Create new column `srid` in `publication` table.
 #### Data migrations
 ### Changes
 - [#64](https://github.com/LayerManager/layman/issues/64) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-maps), [GET Workspace Map](doc/rest.md#get-workspace-map), [PATCH Workspace Map](doc/rest.md#patch-workspace-map) contains new attribute
