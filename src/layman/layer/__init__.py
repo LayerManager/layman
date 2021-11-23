@@ -48,7 +48,8 @@ PUBLICATION_TYPES = {
         'internal_sources': OrderedDict([  # internal sources to process when new source is published
             ('layman.layer.filesystem.uuid', InternalSourceTypeDef(info_items=[]),),
             ('layman.layer.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'title', 'uuid',
-                                                                                     'bounding_box', 'style_type', 'native_crs', ]),),
+                                                                                     'bounding_box', 'style_type', 'native_crs',
+                                                                                     'native_bounding_box', ]),),
             ('layman.layer.filesystem.input_chunk', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_file', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_style', InternalSourceTypeDef(info_items=[]),),
@@ -94,13 +95,13 @@ PUBLICATION_TYPES = {
         },
         'info_keys': {settings.FILE_TYPE_VECTOR: {'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at',
                                                   'wms', 'wfs', 'thumbnail', 'file', 'db_table', 'metadata', 'style', 'sld',
-                                                  'access_rights', 'bounding_box', 'native_crs', },
+                                                  'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', },
                       settings.FILE_TYPE_RASTER: {'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at',
                                                   'wms', 'thumbnail', 'file', 'metadata', 'style', 'sld', 'access_rights',
-                                                  'bounding_box', 'native_crs', },
+                                                  'bounding_box', 'native_crs', 'native_bounding_box', },
                       settings.FILE_TYPE_UNKNOWN: {'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at',
                                                    'wms', 'thumbnail', 'file', 'metadata', 'style', 'sld', 'access_rights',
-                                                   'bounding_box', 'native_crs', },
+                                                   'bounding_box', 'native_crs', 'native_bounding_box', },
                       },
     }
 }

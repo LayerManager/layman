@@ -40,6 +40,7 @@ def test_fill_in_partial_info_statuses():
                                                         tzinfo=tz.FixedOffsetTimezone(offset=0, name=None)),
                         'bounding_box': [1870322.81512642, 6281928.49798181, 1892002.82941466, 6304200.72172059],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1870322.81512642, 6281928.49798181, 1892002.82941466, 6304200.72172059, 'EPSG:3857'],
                         'access_rights': {'read': ['lay3', 'EVERYONE'], 'write': ['lay3', 'EVERYONE']},
                         'file': {'path': 'layers/name_of_layer/input_file/name_of_layer.geojson',
                                  'file_type': settings.FILE_TYPE_VECTOR},
@@ -95,6 +96,13 @@ def test_fill_in_partial_info_statuses():
             6304200.72172059
         ],
         'native_crs': 'EPSG:3857',
+        'native_bounding_box': [
+            1870322.81512642,
+            6281928.49798181,
+            1892002.82941466,
+            6304200.72172059,
+            'EPSG:3857',
+        ],
         'access_rights': {
             'read': [
                 'lay3',

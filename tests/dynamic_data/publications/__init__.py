@@ -28,6 +28,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
                     },
                     'file_extension': 'geojson',
                     'publ_type_detail': ('vector', 'sld'),
@@ -45,6 +46,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
                     },
                     'file_extension': 'geojson',
                     'publ_type_detail': ('vector', 'sld'),
@@ -126,6 +128,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
@@ -163,6 +166,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
@@ -205,6 +209,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
@@ -232,6 +237,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
                     'gdal_prefix': '/vsizip/',
@@ -259,6 +265,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1669480.0, 6580973.000000007, 1675351.9999999802, 6586999.0],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1669480.0, 6580973.000000007, 1675351.9999999802, 6586999.0, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque.tif',
                     'gdal_prefix': '/vsizip/',
@@ -284,6 +291,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
                         '_file': {
                             'path': '/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_tif_tfw_rgba_opaque/input_file/zipped_tif_tfw_rgba_opaque.zip/small_layer.geojson'
                         },
@@ -315,6 +323,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
@@ -340,6 +349,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
                     'gdal_prefix': '/vsizip/',
@@ -365,6 +375,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
@@ -392,6 +403,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
@@ -420,6 +432,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
@@ -446,6 +459,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
                     'gdal_prefix': '/vsizip/',
@@ -474,6 +488,8 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529,
+                                                'EPSG:3857'],
                     },
                     'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
                     'gdal_prefix': '/vsizip/',
@@ -500,6 +516,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
@@ -528,6 +545,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1669480.0, 6580973.000000007, 1675351.9999999802, 6586999.0],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1669480.0, 6580973.000000007, 1675351.9999999802, 6586999.0, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque.tif',
                     'gdal_prefix': '/vsizip/',
@@ -554,6 +572,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
@@ -582,6 +601,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
@@ -608,6 +628,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1669480.0, 6580973.000000007, 1675351.9999999802, 6586999.0],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1669480.0, 6580973.000000007, 1675351.9999999802, 6586999.0, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque.tif',
                     'gdal_prefix': '/vsizip/',
@@ -634,6 +655,7 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529, 'EPSG:3857'],
                     },
                     'file_extension': 'zip/ne_110m_admin_0_boundary_lines_land.shp',
                     'gdal_prefix': '/vsizip/',
@@ -1027,6 +1049,8 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
+                                                'EPSG:3857'],
                     },
                     'file_extension': 'geojson',
                     'publ_type_detail': ('vector', 'sld'),
@@ -1057,6 +1081,8 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
+                                                'EPSG:3857'],
                     },
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
@@ -1103,6 +1129,8 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
+                                                'EPSG:3857'],
                     },
                     'file_extension': 'geojson',
                     'publ_type_detail': ('vector', 'sld'),
@@ -1150,6 +1178,8 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
+                                                'EPSG:3857'],
                     },
                     'file_extension': 'zip/small_layer_with_id.geojson',
                     'gdal_prefix': '/vsizip/',
@@ -1199,6 +1229,8 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
+                                                'EPSG:3857'],
                     },
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
@@ -1225,6 +1257,8 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
+                                                'EPSG:3857'],
                     },
                     'file_extension': 'geojson',
                     'publ_type_detail': ('vector', 'sld'),
@@ -1272,6 +1306,8 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
+                                                'EPSG:3857'],
                     },
                     'file_extension': 'geojson',
                     'publ_type_detail': ('vector', 'sld'),
@@ -1321,6 +1357,8 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
                         'native_crs': 'EPSG:3857',
+                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
+                                                'EPSG:3857'],
                     },
                     'file_extension': 'geojson',
                     'publ_type_detail': ('vector', 'sld'),
@@ -1340,5 +1378,5 @@ PUBLICATIONS = {
     publ: definition
     for publ, definition in PUBLICATIONS.items()
     # if publ.workspace == consts.COMMON_WORKSPACE
-    #    and publ.name in ('zip_without_explicit_name', 'zip_chunks_without_explicit_name')
+    #    and publ.name in ('zipped_tif_tfw_rgba_opaque')
 }
