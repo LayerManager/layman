@@ -221,6 +221,7 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
             'access_rights': info['access_rights'],
             'updated_at': info['updated_at'].isoformat(),
             'bounding_box': info['bounding_box'],
+            'native_crs': info['native_crs'],
         }
         for (workspace, _, name), info in publication_infos_whole['items'].items()
     ]
