@@ -26,6 +26,7 @@ TESTCASES = {
             Action(publication.internal.correct_values_in_detail, {
                 'exp_publication_detail': {
                     'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
+                    'native_crs': 'EPSG:3857',
                 },
                 'file_extension': 'zip/small_layer.geojson',
                 'gdal_prefix': '/vsizip/',
