@@ -7,7 +7,7 @@ from lxml import etree as ET
 from flask import current_app
 
 from layman.common.filesystem.uuid import get_publication_uuid_file
-from layman.common.micka import util as common_util
+from layman.common.micka import util as common_util, requests as micka_requests
 from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
 from layman.layer.filesystem import gdal
 from layman.layer.filesystem.uuid import get_layer_uuid
@@ -83,7 +83,7 @@ def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_nam
                                                 basic_template_path=basic_template_path)
     record = ET.tostring(element, encoding='unicode', pretty_print=True)
     # current_app.logger.info(f"patch_layer record=\n{record}")
-    common_util.csw_update({
+    micka_requests.csw_update({
         'muuid': muuid,
         'record': record,
     }, timeout=timeout)
@@ -97,7 +97,7 @@ def delete_layer(workspace, layername, *, backup_uuid=None):
     muuid = get_metadata_uuid(uuid)
     if muuid is None:
         return
-    common_util.csw_delete(muuid)
+    micka_requests.csw_delete(muuid)
 
 
 def csw_insert(workspace, layername):

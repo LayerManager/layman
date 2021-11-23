@@ -11,7 +11,7 @@ from flask import current_app
 from layman import common, settings
 from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
 from layman.common.filesystem.uuid import get_publication_uuid_file
-from layman.common.micka import util as common_util
+from layman.common.micka import util as common_util, requests as micka_requests
 from layman.map import MAP_TYPE
 from layman.map.filesystem.uuid import get_map_uuid
 from layman.map.filesystem.input_file import get_map_json, unquote_urls
@@ -60,7 +60,7 @@ def delete_map(workspace, mapname):
     muuid = get_metadata_uuid(uuid)
     if muuid is None:
         return
-    common_util.csw_delete(muuid)
+    micka_requests.csw_delete(muuid)
 
 
 def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_name=None, create_if_not_exists=True, timeout=None):
@@ -92,7 +92,7 @@ def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_nam
                                                 basic_template_path=basic_template_path)
     record = ET.tostring(element, encoding='unicode', pretty_print=True)
     # current_app.logger.info(f"update_map record=\n{record}")
-    common_util.csw_update({
+    micka_requests.csw_update({
         'muuid': muuid,
         'record': record,
     }, timeout=timeout)
