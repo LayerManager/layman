@@ -485,6 +485,15 @@ def get_bbox(workspace, layername, conn_cur=None):
     return result
 
 
+def get_crs(workspace, layername, conn_cur=None):
+    query = f'''
+    select Find_SRID('{workspace}', '{layername}', 'wkb_geometry');
+    '''
+    srid = db_util.run_query(query, conn_cur=conn_cur)[0][0]
+    crs = db_util.get_crs(srid)
+    return crs
+
+
 def get_geometry_types(workspace, layername, conn_cur=None):
     conn, cur = conn_cur or db_util.get_connection_cursor()
     try:

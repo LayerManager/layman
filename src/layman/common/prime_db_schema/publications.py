@@ -433,3 +433,14 @@ def set_bbox(workspace, publication_type, publication, bbox):
       and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
     params = cropped_bbox + (publication_type, publication, workspace,)
     db_util.run_statement(query, params)
+
+
+def set_crs(workspace, publication_type, publication, crs):
+    srid = db_util.get_srid(crs)
+    query = f'''update {DB_SCHEMA}.publications set
+    srid = %s
+    where type = %s
+      and name = %s
+      and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
+    params = (srid, publication_type, publication, workspace,)
+    db_util.run_statement(query, params)

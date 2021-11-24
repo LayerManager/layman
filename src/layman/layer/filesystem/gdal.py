@@ -1,7 +1,7 @@
 import os
 import shutil
 import subprocess
-from osgeo import gdal, gdalconst
+from osgeo import gdal, gdalconst, osr
 from layman import patch_mode, settings, LaymanError
 from layman.common import empty_method, empty_method_returns_dict
 from . import input_file, util
@@ -332,6 +332,16 @@ def get_bbox(workspace, layer):
     miny = maxy + geo_transform[5] * data.RasterYSize
     result = (minx, miny, maxx, maxy)
     return result
+
+
+def get_crs(workspace, layer):
+    filepath = get_normalized_raster_layer_main_filepath(workspace, layer)
+    data = open_raster_file(filepath, gdalconst.GA_ReadOnly)
+    spatial_reference = osr.SpatialReference(wkt=data.GetProjection())
+    auth_name = spatial_reference.GetAttrValue('AUTHORITY')
+    auth_srid = spatial_reference.GetAttrValue('AUTHORITY', 1)
+    crs = f'{auth_name}:{auth_srid}'
+    return crs
 
 
 def get_normalized_ground_sample_distance(workspace, layer):
