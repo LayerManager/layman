@@ -248,6 +248,10 @@ def get_bbox_from_json(map_json):
     return float(map_json['extent'][0]), float(map_json['extent'][1]), float(map_json['extent'][2]), float(map_json['extent'][3])
 
 
+def get_crs_from_json(map_json):
+    return map_json['projection'].upper()
+
+
 def map_file_to_metadata_properties(map_json, operates_on_muuids_filter):
     result = {
         'title': map_json['title'],
