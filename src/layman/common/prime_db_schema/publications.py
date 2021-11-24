@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 ROLE_EVERYONE = settings.RIGHTS_EVERYONE_ROLE
+DEFAULT_BBOX_CRS = 'EPSG:3857'
 psycopg2.extras.register_uuid()
 
 
@@ -111,6 +112,7 @@ select p.id as id_publication,
        ST_YMIN(p.bbox) as ymin,
        ST_XMAX(p.bbox) as xmax,
        ST_YMAX(p.bbox) as ymax,
+       p.srid as srid,
        (select rtrim(concat(case when u.id is not null then w.name || ',' end,
                             string_agg(w2.name, ',') || ',',
                             case when p.everyone_can_read then %s || ',' end
@@ -191,15 +193,26 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'type': type,
                                    'style_type': style_type,
                                    'updated_at': updated_at,
-                                   'bounding_box': [xmin, ymin, xmax, ymax],
-                                   'native_crs': 'EPSG:3857',
-                                   'native_bounding_box': [xmin, ymin, xmax, ymax, 'EPSG:3857'],
+                                   '_native_bounding_box_short': [xmin, ymin, xmax, ymax],
+                                   'native_crs': db_util.get_crs(srid) if srid else None,
                                    'access_rights': {'read': can_read_users.split(','),
                                                      'write': can_write_users.split(',')}
                                    }
              for id_publication, workspace_name, type, publication_name, title, uuid, style_type, updated_at, xmin, ymin, xmax, ymax,
-             can_read_users, can_write_users, _
+             srid, can_read_users, can_write_users, _
              in values}
+
+    infos = {key: {**{in_key: in_value for in_key, in_value in value.items() if in_key not in {'_native_bounding_box_short'}},
+                   'native_bounding_box': value['_native_bounding_box_short'] + [value['native_crs']],
+                   'bounding_box': bbox_util.transform(value['_native_bounding_box_short'],
+                                                       value['native_crs'],
+                                                       DEFAULT_BBOX_CRS)
+                   if value['_native_bounding_box_short'][0]
+                   and value['native_crs']
+                   and DEFAULT_BBOX_CRS != value['native_crs']
+                   else value['_native_bounding_box_short'],
+                   }
+             for key, value in infos.items()}
 
     if values:
         total_count = values[0][-1]
