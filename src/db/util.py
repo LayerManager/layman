@@ -70,3 +70,17 @@ def to_tsquery_string(value):
     value = re.sub(r'[\W_]+', ' ', value, flags=re.UNICODE).strip()
     value = value.replace(' ', ' | ')
     return value
+
+
+def get_srid(crs):
+    auth_name, auth_srid = crs.split(':')
+    auth_srid = int(auth_srid)
+    sql = 'select srid from spatial_ref_sys where auth_name = %s and auth_srid = %s;'
+    srid = run_query(sql, (auth_name, auth_srid, ))[0][0]
+    return srid
+
+
+def get_crs(srid):
+    sql = 'select auth_name, auth_srid from spatial_ref_sys where srid = %s;'
+    auth_name, auth_srid = run_query(sql, (srid, ))[0]
+    return f'{auth_name}:{auth_srid}'
