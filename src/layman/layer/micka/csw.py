@@ -119,7 +119,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
     bbox_3857 = publ_info.get('bounding_box')
     if bbox_util.is_empty(bbox_3857):
         bbox_3857 = settings.LAYMAN_DEFAULT_OUTPUT_BBOX
-    extent = bbox_util.transform(tuple(bbox_3857), crs_from='EPSG:3857', crs_to='EPSG:4326')
+    extent = bbox_util.transform(bbox_3857, crs_from='EPSG:3857', crs_to='EPSG:4326')
 
     uuid_file_path = get_publication_uuid_file(LAYER_TYPE, workspace, layername)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))

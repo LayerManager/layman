@@ -76,7 +76,7 @@ def transform(bbox, crs_from, crs_to):
            st_ymax(bbox)
     from tmp
     ;'''
-    params = bbox + (srid_from, srid_to,)
+    params = tuple(bbox) + (srid_from, srid_to,)
     result = db_util.run_query(query, params)[0]
     return result
 
