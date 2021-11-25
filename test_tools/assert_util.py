@@ -39,7 +39,7 @@ def assert_wfs_bbox(workspace, layer, expected_bbox):
         wfs_get_capabilities = wfs.get_wfs_proxy(workspace)
     wfs_bbox_4326 = wfs_get_capabilities.contents[wfs_layer].boundingBoxWGS84
     with app.app_context():
-        wfs_bbox_3857 = bbox_util.transform(wfs_bbox_4326, 4326, 3857, )
+        wfs_bbox_3857 = bbox_util.transform(wfs_bbox_4326, crs_from='EPSG:4326', crs_to='EPSG:3857', )
     assert_same_bboxes(expected_bbox, wfs_bbox_3857, 0.00001)
 
 
@@ -51,7 +51,7 @@ def assert_wms_bbox(workspace, layer, expected_bbox):
     assert_same_bboxes(expected_bbox, bbox_3857, 0.00001)
 
     with app.app_context():
-        expected_bbox_4326 = bbox_util.transform(expected_bbox, 3857, 4326, )
+        expected_bbox_4326 = bbox_util.transform(expected_bbox, crs_from='EPSG:3857', crs_to='EPSG:4326', )
     wgs84_bboxes = [bbox[:4] for bbox in wms_layer.crs_list if bbox[4] in ['EPSG:4326', 'CRS:84']]
     wgs84_bboxes.append(wms_layer.boundingBoxWGS84)
     for wgs84_bbox in wgs84_bboxes:
@@ -67,7 +67,7 @@ def assert_all_sources_bbox(workspace, layer, expected_bbox):
     assert_wms_bbox(workspace, layer, expected_bbox)
 
     with app.app_context():
-        expected_bbox_4326 = bbox_util.transform(expected_bbox, 3857, 4326, )
+        expected_bbox_4326 = bbox_util.transform(expected_bbox, crs_from='EPSG:3857', crs_to='EPSG:4326', )
     md_comparison = get_workspace_layer_metadata_comparison(workspace, layer)
     csw_prefix = settings.CSW_PROXY_URL
     csw_src_key = get_source_key_from_metadata_comparison(md_comparison, csw_prefix)

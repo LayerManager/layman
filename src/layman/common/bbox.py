@@ -65,7 +65,9 @@ def ensure_bbox_with_area(bbox, no_area_padding):
     return result
 
 
-def transform(bbox, epsg_from=4326, epsg_to=3857):
+def transform(bbox, crs_from, crs_to):
+    srid_from = db_util.get_srid(crs_from)
+    srid_to = db_util.get_srid(crs_to)
     query = f'''
     with tmp as (select ST_Transform(ST_SetSRID(ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s, %s)), %s), %s) bbox)
     select st_xmin(bbox),
@@ -74,7 +76,7 @@ def transform(bbox, epsg_from=4326, epsg_to=3857):
            st_ymax(bbox)
     from tmp
     ;'''
-    params = bbox + (epsg_from, epsg_to,)
+    params = bbox + (srid_from, srid_to,)
     result = db_util.run_query(query, params)[0]
     return result
 
