@@ -16,7 +16,7 @@ DEFAULT_WMS_QGIS_STORE_PREFIX = 'qgis'
 DEFAULT_GEOTIFF_STORE_PREFIX = 'geotiff'
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
-VERSION = '1.3.0'
+VERSION = gs_util.WMS_VERSION
 
 pre_publication_action_check = empty_method
 post_layer = empty_method

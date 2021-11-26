@@ -18,6 +18,8 @@ from .error import Error
 logger = logging.getLogger(__name__)
 
 FLASK_RULES_KEY = f"{__name__}:RULES"
+WMS_VERSION = '1.3.0'
+WFS_VERSION = '2.0.0'
 
 RESERVED_WORKSPACE_NAMES = [
     'default',
@@ -1025,8 +1027,7 @@ def bbox_to_native_bbox(bbox):
 
 
 def wms_direct(wms_url, xml=None, version=None, headers=None):
-    from layman.layer.geoserver.wms import VERSION
-    version = version or VERSION
+    version = version or WMS_VERSION
     try:
         wms = WebMapService(wms_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version, headers=headers)
     except requests.exceptions.HTTPError as exc:
@@ -1037,8 +1038,7 @@ def wms_direct(wms_url, xml=None, version=None, headers=None):
 
 
 def wfs_direct(wfs_url, xml=None, version=None, headers=None):
-    from layman.layer.geoserver.wfs import VERSION
-    version = version or VERSION
+    version = version or WFS_VERSION
     try:
         wfs = WebFeatureService(wfs_url, xml=xml.encode('utf-8') if xml is not None else xml, version=version, headers=headers)
     except requests.exceptions.HTTPError as exc:

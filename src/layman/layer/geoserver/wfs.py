@@ -15,7 +15,7 @@ from . import wms
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
-VERSION = '2.0.0'
+VERSION = gs_util.WFS_VERSION
 
 get_publication_uuid = empty_method_returns_none
 pre_publication_action_check = empty_method
