@@ -3,6 +3,7 @@ import tests.asserts.final.publication as publication
 import tests.asserts.processing as processing
 from test_tools import process_client
 from . import wrong_input, file_input
+from .common_layers import LAYERS
 from .. import predefined_actions, predefined_zip_files
 from ... import Action, Publication, dynamic_data as consts
 
@@ -17,24 +18,16 @@ PUBLICATIONS = {
         },
         {
             consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, dict()),
+                consts.KEY_CALL: Action(process_client.publish_workspace_publication, LAYERS['small_layer'].definition),
                 consts.KEY_RESPONSE_ASSERTS: [
                     Action(processing.response.valid_post, dict()),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
-                    },
-                    'file_extension': 'geojson',
-                    'publ_type_detail': ('vector', 'sld'),
-                }),
+                Action(publication.internal.correct_values_in_detail, LAYERS['small_layer'].info_values),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -42,17 +35,9 @@ PUBLICATIONS = {
             consts.KEY_ACTION: predefined_actions.PATCH_TIF_WITH_QML,
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
-                    },
-                    'file_extension': 'geojson',
-                    'publ_type_detail': ('vector', 'sld'),
-                }),
+                Action(publication.internal.correct_values_in_detail, LAYERS['small_layer'].info_values),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -125,17 +110,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
-                    },
+                    **LAYERS['small_layer'].info_values,
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -163,17 +143,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
-                    },
+                    **LAYERS['small_layer'].info_values,
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -206,17 +181,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
-                    },
+                    **LAYERS['small_layer'].info_values,
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -288,10 +258,9 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
+                    **LAYERS['small_layer'].info_values,
                     'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
+                        **LAYERS['small_layer'].info_values['exp_publication_detail'],
                         '_file': {
                             'path': '/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_tif_tfw_rgba_opaque/input_file/zipped_tif_tfw_rgba_opaque.zip/small_layer.geojson'
                         },
@@ -301,10 +270,9 @@ PUBLICATIONS = {
                     },
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -429,17 +397,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
-                    },
+                    **LAYERS['small_layer'].info_values,
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -513,17 +476,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
-                    },
+                    **LAYERS['small_layer'].info_values,
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -1045,18 +1003,9 @@ PUBLICATIONS = {
             },
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
-                                                'EPSG:3857'],
-                    },
-                    'file_extension': 'geojson',
-                    'publ_type_detail': ('vector', 'sld'),
-                }),
+                Action(publication.internal.correct_values_in_detail, LAYERS['small_layer'].info_values),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -1078,18 +1027,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
-                                                'EPSG:3857'],
-                    },
+                    **LAYERS['small_layer'].info_values,
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -1125,19 +1068,12 @@ PUBLICATIONS = {
                 Action(publication.geoserver.workspace_wms_1_3_0_capabilities_available, {'name': 'small_layer'}),
                 Action(publication.geoserver.workspace_wfs_2_0_0_capabilities_available_if_vector, {'name': 'small_layer'}),
                 Action(publication.internal.correct_values_in_detail, {
+                    **LAYERS['small_layer'].info_values,
                     'name': 'small_layer',
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
-                                                'EPSG:3857'],
-                    },
-                    'file_extension': 'geojson',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
                     'name': 'small_layer',
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -1174,20 +1110,14 @@ PUBLICATIONS = {
                 Action(publication.geoserver.workspace_wms_1_3_0_capabilities_available, {'name': 'small_layer_with_id'}),
                 Action(publication.geoserver.workspace_wfs_2_0_0_capabilities_available_if_vector, {'name': 'small_layer_with_id'}),
                 Action(publication.internal.correct_values_in_detail, {
+                    **LAYERS['small_layer'].info_values,
                     'name': 'small_layer_with_id',
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
-                                                'EPSG:3857'],
-                    },
                     'file_extension': 'zip/small_layer_with_id.geojson',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
                     'name': 'small_layer_with_id',
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -1225,20 +1155,14 @@ PUBLICATIONS = {
                 Action(publication.geoserver.workspace_wms_1_3_0_capabilities_available, {'name': 'small_zip_layer'}),
                 Action(publication.geoserver.workspace_wfs_2_0_0_capabilities_available_if_vector, {'name': 'small_zip_layer'}),
                 Action(publication.internal.correct_values_in_detail, {
+                    **LAYERS['small_layer'].info_values,
                     'name': 'small_zip_layer',
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
-                                                'EPSG:3857'],
-                    },
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
                     'name': 'small_zip_layer',
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -1253,18 +1177,9 @@ PUBLICATIONS = {
             },
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
-                                                'EPSG:3857'],
-                    },
-                    'file_extension': 'geojson',
-                    'publ_type_detail': ('vector', 'sld'),
-                }),
+                Action(publication.internal.correct_values_in_detail, LAYERS['small_layer'].info_values),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -1302,18 +1217,9 @@ PUBLICATIONS = {
             },
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
-                                                'EPSG:3857'],
-                    },
-                    'file_extension': 'geojson',
-                    'publ_type_detail': ('vector', 'sld'),
-                }),
+                Action(publication.internal.correct_values_in_detail, LAYERS['small_layer'].info_values),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
@@ -1353,18 +1259,9 @@ PUBLICATIONS = {
             },
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699,
-                                                'EPSG:3857'],
-                    },
-                    'file_extension': 'geojson',
-                    'publ_type_detail': ('vector', 'sld'),
-                }),
+                Action(publication.internal.correct_values_in_detail, LAYERS['small_layer'].info_values),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'sample/style/basic_sld.png',
+                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
                 }),
             ],
         },
