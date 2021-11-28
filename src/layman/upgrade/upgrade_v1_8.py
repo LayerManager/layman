@@ -2,6 +2,7 @@ from urllib.parse import urljoin
 import logging
 import requests
 
+import geoserver
 from geoserver import util as gs_util
 from layman import app, settings
 from layman.common import geoserver as gs_common
@@ -41,7 +42,7 @@ def upgrade_1_8():
 
             for type in ['w', 'r']:
                 response = requests.delete(
-                    urljoin(settings.LAYMAN_GS_REST_SECURITY_ACL_LAYERS, username + '.*.' + type),
+                    urljoin(geoserver.GS_REST_SECURITY_ACL_LAYERS, username + '.*.' + type),
                     headers=headers_json,
                     auth=settings.LAYMAN_GS_AUTH
                 )
