@@ -8,8 +8,6 @@
 **/.pytest_cache
 /venv
 
-src/layman_settings.py
-
 /deps/*/data
 /deps/*/tmp
 /deps/*/log

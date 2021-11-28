@@ -1,11 +1,8 @@
-import importlib
 import os
 import shutil
 from urllib.parse import urljoin
-
 import geoserver
-
-settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
+import layman_settings as settings
 
 
 def clear_directory(directory):

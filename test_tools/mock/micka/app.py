@@ -1,8 +1,5 @@
 import os
-import importlib
 from flask import Flask, Blueprint
-
-settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 
 def create_app(app_config):
