@@ -204,17 +204,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529, 'EPSG:3857'],
-                    },
+                    **LAYERS['ne_110m_admin_0_boundary_lines_land'].info_values,
                     'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'test_tools/data/thumbnail/ne_110m_admin_0_boundary_lines_land.png',
+                    'exp_thumbnail': LAYERS['ne_110m_admin_0_boundary_lines_land'].thumbnail,
                 }),
             ],
         },
@@ -314,17 +309,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529, 'EPSG:3857'],
-                    },
+                    **LAYERS['ne_110m_admin_0_boundary_lines_land'].info_values,
                     'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'test_tools/data/thumbnail/ne_110m_admin_0_boundary_lines_land.png',
+                    'exp_thumbnail': LAYERS['ne_110m_admin_0_boundary_lines_land'].thumbnail,
                 }),
             ],
         },
@@ -419,17 +409,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529, 'EPSG:3857'],
-                    },
+                    **LAYERS['ne_110m_admin_0_boundary_lines_land'].info_values,
                     'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'test_tools/data/thumbnail/ne_110m_admin_0_boundary_lines_land.png',
+                    'exp_thumbnail': LAYERS['ne_110m_admin_0_boundary_lines_land'].thumbnail,
                 }),
             ],
         },
@@ -448,18 +433,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529,
-                                                'EPSG:3857'],
-                    },
+                    **LAYERS['ne_110m_admin_0_boundary_lines_land'].info_values,
                     'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'test_tools/data/thumbnail/ne_110m_admin_0_boundary_lines_land.png',
+                    'exp_thumbnail': LAYERS['ne_110m_admin_0_boundary_lines_land'].thumbnail,
                 }),
             ],
         },
@@ -610,17 +589,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529, 'EPSG:3857'],
-                    },
+                    **LAYERS['ne_110m_admin_0_boundary_lines_land'].info_values,
                     'file_extension': 'zip/ne_110m_admin_0_boundary_lines_land.shp',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('vector', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'test_tools/data/thumbnail/ne_110m_admin_0_boundary_lines_land.png',
+                    'exp_thumbnail': LAYERS['ne_110m_admin_0_boundary_lines_land'].thumbnail,
                 }),
             ],
         },
