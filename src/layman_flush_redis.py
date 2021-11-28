@@ -1,8 +1,6 @@
-import importlib
 import os
+import layman_settings as settings
 
-
-settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 ATTEMPT_INTERVAL = 2
 MAX_ATTEMPTS = 60

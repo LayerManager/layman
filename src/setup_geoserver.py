@@ -1,13 +1,10 @@
-import importlib
 import logging
-import os
 import sys
 
 import geoserver
 from geoserver import epsg_properties
 from geoserver import authn
-
-settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
+import layman_settings as settings
 
 
 logger = logging.getLogger(__name__)

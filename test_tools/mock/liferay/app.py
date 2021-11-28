@@ -1,8 +1,5 @@
-import os
-import importlib
 from flask import Flask, request, jsonify, Blueprint, current_app
 
-settings = importlib.import_module(os.environ['LAYMAN_SETTINGS_MODULE'])
 
 TOKEN_HEADER = 'Authorization'
 

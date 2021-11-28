@@ -3,6 +3,7 @@
 ## v1.16.0
  {release_date}
 ### Upgrade requirements
+- Unset environment variable [LAYMAN_SETTINGS_MODULE](https://github.com/LayerManager/layman/blob/v1.15.0/doc/env-settings.md), it has no effect anymore.
 ### Migrations and checks
 #### Schema migrations
 - [#64](https://github.com/LayerManager/layman/issues/64) Create new column `srid` in `publication` table.
@@ -12,6 +13,7 @@
    - `native_crs` with code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326"
    - `native_bounding_box` with coordinates and CRS of native CRS  [minx, miny, maxx, maxy, "EPSG:&lt;code&gt;"]
 - [#489](https://github.com/LayerManager/layman/issues/489) Error responses from Micka and GeoServer are logged into log and also propagated as part of raised exception, so they can be seen from flower.
+- Remove [LAYMAN_SETTINGS_MODULE](https://github.com/LayerManager/layman/blob/v1.15.0/doc/env-settings.md), import [`src/layman_settings.py`](src/layman_settings.py) directly.
 
 ## v1.15.0
  2021-11-18
@@ -400,7 +402,7 @@ There is a critical bug in this release, posting new layer breaks Layman: https:
 ## v1.6.0
 2020-08-19
 ### Upgrade requirements
-- [#69](https://github.com/LayerManager/layman/issues/69) If you are running Layman with development or test settings, set [LAYMAN_SETTINGS_MODULE](doc/env-settings.md#LAYMAN_SETTINGS_MODULE) in your `.env` file to `layman_settings`. No action is required if you are running Layman based on demo settings (probably all production instances).
+- [#69](https://github.com/LayerManager/layman/issues/69) If you are running Layman with development or test settings, set [LAYMAN_SETTINGS_MODULE](https://github.com/LayerManager/layman/blob/v1.6.0/doc/env-settings.md) in your `.env` file to `layman_settings`. No action is required if you are running Layman based on demo settings (probably all production instances).
 ### Changes
 - [#74](https://github.com/LayerManager/layman/issues/74) Layman user and role at GeoServer defined by [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE) are now created automatically on Layman's startup if an only if new environment variable [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) is provided. There is no need to set [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) for other reason than automatically creating Layman user and Layman role.
    - No change is required. If you are migrating existing instance, Layman user and role are already created, so you don't need to set [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD). If this is your first Layman release, [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) is set in `.env` files starting with this version, so Layman user and role at GeoServer will be automatically created on startup.
