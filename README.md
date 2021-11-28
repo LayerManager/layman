@@ -93,7 +93,7 @@ Layman's source code provides settings suitable for development, testing and dem
 Layman's configuration is split into three levels:
 - `docker-compose.*.yml` files used as [docker-compose configuration files](https://docs.docker.com/compose/compose-file/) with most general settings of docker containers including volume mappings, port mappings, container names and startup commands
 - `.env*` files with environment settings of both build stage and runtime of docker containers
-- `src/layman_settings*.py` Python modules with settings of Layman's Python modules for runtime
+- `src/layman_settings.py` Python module with settings of Layman's Python modules for runtime
 
 Files at all three levels are suffixed with strings that indicates what they are intended to:
 - `demo` to [demonstration purposes](#run-demo)
