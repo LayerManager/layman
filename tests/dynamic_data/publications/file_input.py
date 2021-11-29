@@ -1,7 +1,7 @@
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client
-from . import util
+from . import util, common_layers as layers
 from ... import Action, Publication, dynamic_data as consts
 
 KEY_PUBLICATION_TYPE = 'publ_type'
@@ -23,18 +23,9 @@ TESTCASES = {
             'compress': False,
         },
         consts.KEY_FINAL_ASSERTS: [
-            Action(publication.internal.correct_values_in_detail, {
-                'exp_publication_detail': {
-                    'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-                    'native_crs': 'EPSG:3857',
-                    'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857', ],
-                },
-                'file_extension': 'zip/small_layer.geojson',
-                'gdal_prefix': '/vsizip/',
-                'publ_type_detail': ('vector', 'sld'),
-            }),
+            Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER_ZIP.info_values),
             Action(publication.internal.thumbnail_equals, {
-                'exp_thumbnail': 'sample/style/basic_sld.png',
+                'exp_thumbnail': layers.SMALL_LAYER_ZIP.thumbnail,
             }),
         ],
     },
