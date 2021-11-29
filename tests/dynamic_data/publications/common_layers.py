@@ -54,4 +54,21 @@ LAYERS = {
         },
         thumbnail='test_tools/data/thumbnail/raster_layer_tiff.png',
     ),
+    'sample_tif_colortable_nodata_opaque': PublicationValues(
+        definition={
+            'file_paths': [
+                'sample/layman.layer/sample_tif_colortable_nodata_opaque.tif',
+                'sample/layman.layer/sample_tif_colortable_nodata_opaque.tif.aux.xml',
+            ],
+        },
+        info_values={
+            'exp_publication_detail': {
+                'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
+                'native_crs': 'EPSG:3857',
+                'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0, 'EPSG:3857'],
+            },
+            'publ_type_detail': ('raster', 'sld'),
+        },
+        thumbnail='test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
+    ),
 }

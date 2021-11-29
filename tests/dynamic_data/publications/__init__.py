@@ -278,17 +278,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0, 'EPSG:3857'],
-                    },
+                    **LAYERS['sample_tif_colortable_nodata_opaque'].info_values,
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('raster', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
+                    'exp_thumbnail': LAYERS['sample_tif_colortable_nodata_opaque'].thumbnail,
                 }),
             ],
         },
@@ -325,17 +320,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0, 'EPSG:3857'],
-                    },
+                    **LAYERS['sample_tif_colortable_nodata_opaque'].info_values,
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('raster', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
+                    'exp_thumbnail': LAYERS['sample_tif_colortable_nodata_opaque'].thumbnail,
                 }),
             ],
         },
@@ -353,17 +343,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0, 'EPSG:3857'],
-                    },
+                    **LAYERS['sample_tif_colortable_nodata_opaque'].info_values,
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('raster', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
+                    'exp_thumbnail': LAYERS['sample_tif_colortable_nodata_opaque'].thumbnail,
                 }),
             ],
         },
@@ -496,17 +481,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0, 'EPSG:3857'],
-                    },
+                    **LAYERS['sample_tif_colortable_nodata_opaque'].info_values,
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('raster', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
+                    'exp_thumbnail': LAYERS['sample_tif_colortable_nodata_opaque'].thumbnail,
                 }),
             ],
         },
@@ -525,17 +505,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    'exp_publication_detail': {
-                        'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
-                        'native_crs': 'EPSG:3857',
-                        'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0, 'EPSG:3857'],
-                    },
+                    **LAYERS['sample_tif_colortable_nodata_opaque'].info_values,
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
-                    'publ_type_detail': ('raster', 'sld'),
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': 'test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
+                    'exp_thumbnail': LAYERS['sample_tif_colortable_nodata_opaque'].thumbnail,
                 }),
             ],
         },
