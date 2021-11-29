@@ -33,7 +33,8 @@ where st_xMin(p.bbox) < -20026376.39
 ;'''
     publications = db_util.run_query(query, settings.LAYMAN_DEFAULT_OUTPUT_BBOX)
     for workspace, publ_type, publication, xmin, ymin, xmax, ymax in publications:
-        info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['style_type', 'file', 'uuid'], })
+        info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['style_type', 'file', 'uuid',
+                                                                                                     'native_crs', ], })
 
         original_bbox = (xmin, ymin, xmax, ymax)
         cropped_bbox = (
@@ -53,6 +54,7 @@ where st_xMin(p.bbox) < -20026376.39
         if publ_type == LAYER_TYPE:
             file_type = info['file']['file_type']
             assert file_type == settings.FILE_TYPE_VECTOR
+            crs = info['native_crs']
 
             #  WFS
             bbox = geoserver.get_layer_bbox(workspace, publication)
@@ -66,7 +68,7 @@ where st_xMin(p.bbox) < -20026376.39
                 gs_util.patch_feature_type(geoserver_workspace, publication, auth=settings.LAYMAN_GS_AUTH, bbox=bbox)
             elif style_type == 'qml':
                 qgis_wms.save_qgs_file(workspace, publication)
-                gs_util.patch_wms_layer(geoserver_workspace, publication, auth=settings.LAYMAN_GS_AUTH, bbox=bbox)
+                gs_util.patch_wms_layer(geoserver_workspace, publication, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs)
             gs_wms.clear_cache(workspace)
 
             # Thumbnail

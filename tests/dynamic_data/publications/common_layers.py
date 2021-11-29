@@ -5,9 +5,9 @@ SMALL_LAYER = PublicationValues(
     definition=dict(),
     info_values={
         'exp_publication_detail': {
-            'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699],
-            'native_crs': 'EPSG:3857',
-            'native_bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.33561699, 'EPSG:3857'],
+            'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.335616991],
+            'native_crs': 'EPSG:4326',
+            'native_bounding_box': [14.114369, 48.964832, 14.126824, 48.970612, 'EPSG:4326'],
         },
         'file_extension': 'geojson',
         'publ_type_detail': ('vector', 'sld'),
@@ -42,9 +42,9 @@ NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = PublicationValues(
     },
     info_values={
         'exp_publication_detail': {
-            'bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529],
-            'native_crs': 'EPSG:3857',
-            'native_bounding_box': [-15695801.072582014, -7341864.739114417, 15699816.562538767, 11122367.192100529, 'EPSG:3857'],
+            'bounding_box': [-15695801.072582014, -7341864.739114419, 15699816.562538767, 11122367.192100525],
+            'native_crs': 'EPSG:4326',
+            'native_bounding_box': [-140.99778, -54.89681, 141.03385176001382, 70.16419, 'EPSG:4326'],
         },
         'file_extension': 'shp',
         'publ_type_detail': ('vector', 'sld'),
