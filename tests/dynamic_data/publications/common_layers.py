@@ -1,3 +1,4 @@
+from test_tools import process_client
 from ... import PublicationValues
 
 SMALL_LAYER = PublicationValues(
@@ -12,6 +13,19 @@ SMALL_LAYER = PublicationValues(
         'publ_type_detail': ('vector', 'sld'),
     },
     thumbnail='sample/style/basic_sld.png',
+)
+
+SMALL_LAYER_ZIP = PublicationValues(
+    definition={
+        'file_paths': ['sample/layman.layer/small_layer.geojson'],
+        'compress': True,
+    },
+    info_values={
+        **SMALL_LAYER.info_values,
+        'file_extension': 'zip/small_layer.geojson',
+        'gdal_prefix': '/vsizip/',
+    },
+    thumbnail=SMALL_LAYER.thumbnail,
 )
 
 NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = PublicationValues(
@@ -38,6 +52,23 @@ NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = PublicationValues(
     thumbnail='test_tools/data/thumbnail/ne_110m_admin_0_boundary_lines_land.png',
 )
 
+NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_ZIP = PublicationValues(
+    definition={
+        **NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.definition,
+        'compress': True,
+        'compress_settings': process_client.CompressTypeDef(archive_name='ne_110m_admin_0_boundary lines land +ěščřžýáí',
+                                                            inner_directory='/ne_110m_admin_0_boundary lines land +ěščřžýáí/',
+                                                            file_name='ne_110m_admin_0_boundary_lines_land ížě',
+                                                            ),
+    },
+    info_values={
+        **NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.info_values,
+        'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
+        'gdal_prefix': '/vsizip/',
+    },
+    thumbnail=NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.thumbnail,
+)
+
 SAMPLE_TIF_TFW_RGBA_OPAQUE = PublicationValues(
     definition={
         'file_paths': [
@@ -56,6 +87,22 @@ SAMPLE_TIF_TFW_RGBA_OPAQUE = PublicationValues(
     thumbnail='test_tools/data/thumbnail/raster_layer_tiff.png',
 )
 
+SAMPLE_TIF_TFW_RGBA_OPAQUE_ZIP = PublicationValues(
+    definition={
+        **SAMPLE_TIF_TFW_RGBA_OPAQUE.definition,
+        'compress': True,
+        'compress_settings': process_client.CompressTypeDef(
+            inner_directory='/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/',
+        ),
+    },
+    info_values={
+        **SAMPLE_TIF_TFW_RGBA_OPAQUE.info_values,
+        'file_extension': 'zip/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque.tif',
+        'gdal_prefix': '/vsizip/',
+    },
+    thumbnail=SAMPLE_TIF_TFW_RGBA_OPAQUE.thumbnail,
+)
+
 SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE = PublicationValues(
     definition={
         'file_paths': [
@@ -72,4 +119,18 @@ SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE = PublicationValues(
         'publ_type_detail': ('raster', 'sld'),
     },
     thumbnail='test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
+)
+
+SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE_ZIP = PublicationValues(
+    definition={
+        **SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.definition,
+        'compress': True,
+        'compress_settings': process_client.CompressTypeDef(inner_directory='/sample_tif_colortable_nodata_opaque/', ),
+    },
+    info_values={
+        **SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.info_values,
+        'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
+        'gdal_prefix': '/vsizip/',
+    },
+    thumbnail=SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.thumbnail,
 )
