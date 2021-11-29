@@ -2,8 +2,7 @@ from layman import LaymanError
 import tests.asserts.final.publication as publication
 import tests.asserts.processing as processing
 from test_tools import process_client
-from . import wrong_input, file_input
-from .common_layers import LAYERS
+from . import wrong_input, file_input, common_layers as layers
 from .. import predefined_actions, predefined_zip_files
 from ... import Action, Publication, dynamic_data as consts
 
@@ -18,16 +17,16 @@ PUBLICATIONS = {
         },
         {
             consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, LAYERS['small_layer'].definition),
+                consts.KEY_CALL: Action(process_client.publish_workspace_publication, layers.SMALL_LAYER.definition),
                 consts.KEY_RESPONSE_ASSERTS: [
                     Action(processing.response.valid_post, dict()),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, LAYERS['small_layer'].info_values),
+                Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER.info_values),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -35,9 +34,9 @@ PUBLICATIONS = {
             consts.KEY_ACTION: predefined_actions.PATCH_TIF_WITH_QML,
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, LAYERS['small_layer'].info_values),
+                Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER.info_values),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -110,12 +109,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['small_layer'].info_values,
+                    **layers.SMALL_LAYER.info_values,
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -143,12 +142,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['small_layer'].info_values,
+                    **layers.SMALL_LAYER.info_values,
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -181,12 +180,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['small_layer'].info_values,
+                    **layers.SMALL_LAYER.info_values,
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -204,12 +203,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['ne_110m_admin_0_boundary_lines_land'].info_values,
+                    **layers.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.info_values,
                     'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['ne_110m_admin_0_boundary_lines_land'].thumbnail,
+                    'exp_thumbnail': layers.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.thumbnail,
                 }),
             ],
         },
@@ -227,12 +226,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['sample_tif_tfw_rgba_opaque'].info_values,
+                    **layers.SAMPLE_TIF_TFW_RGBA_OPAQUE.info_values,
                     'file_extension': 'zip/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque.tif',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['sample_tif_tfw_rgba_opaque'].thumbnail,
+                    'exp_thumbnail': layers.SAMPLE_TIF_TFW_RGBA_OPAQUE.thumbnail,
                 }),
             ],
         },
@@ -248,9 +247,9 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['small_layer'].info_values,
+                    **layers.SMALL_LAYER.info_values,
                     'exp_publication_detail': {
-                        **LAYERS['small_layer'].info_values['exp_publication_detail'],
+                        **layers.SMALL_LAYER.info_values['exp_publication_detail'],
                         '_file': {
                             'path': '/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_tif_tfw_rgba_opaque/input_file/zipped_tif_tfw_rgba_opaque.zip/small_layer.geojson'
                         },
@@ -262,7 +261,7 @@ PUBLICATIONS = {
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -278,12 +277,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['sample_tif_colortable_nodata_opaque'].info_values,
+                    **layers.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.info_values,
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['sample_tif_colortable_nodata_opaque'].thumbnail,
+                    'exp_thumbnail': layers.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.thumbnail,
                 }),
             ],
         },
@@ -299,12 +298,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['ne_110m_admin_0_boundary_lines_land'].info_values,
+                    **layers.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.info_values,
                     'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['ne_110m_admin_0_boundary_lines_land'].thumbnail,
+                    'exp_thumbnail': layers.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.thumbnail,
                 }),
             ],
         },
@@ -320,12 +319,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['sample_tif_colortable_nodata_opaque'].info_values,
+                    **layers.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.info_values,
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['sample_tif_colortable_nodata_opaque'].thumbnail,
+                    'exp_thumbnail': layers.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.thumbnail,
                 }),
             ],
         },
@@ -343,12 +342,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['sample_tif_colortable_nodata_opaque'].info_values,
+                    **layers.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.info_values,
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['sample_tif_colortable_nodata_opaque'].thumbnail,
+                    'exp_thumbnail': layers.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.thumbnail,
                 }),
             ],
         },
@@ -367,12 +366,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['small_layer'].info_values,
+                    **layers.SMALL_LAYER.info_values,
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -389,12 +388,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['ne_110m_admin_0_boundary_lines_land'].info_values,
+                    **layers.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.info_values,
                     'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['ne_110m_admin_0_boundary_lines_land'].thumbnail,
+                    'exp_thumbnail': layers.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.thumbnail,
                 }),
             ],
         },
@@ -413,12 +412,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['ne_110m_admin_0_boundary_lines_land'].info_values,
+                    **layers.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.info_values,
                     'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['ne_110m_admin_0_boundary_lines_land'].thumbnail,
+                    'exp_thumbnail': layers.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.thumbnail,
                 }),
             ],
         },
@@ -435,12 +434,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['small_layer'].info_values,
+                    **layers.SMALL_LAYER.info_values,
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -459,12 +458,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['sample_tif_tfw_rgba_opaque'].info_values,
+                    **layers.SAMPLE_TIF_TFW_RGBA_OPAQUE.info_values,
                     'file_extension': 'zip/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque.tif',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['sample_tif_tfw_rgba_opaque'].thumbnail,
+                    'exp_thumbnail': layers.SAMPLE_TIF_TFW_RGBA_OPAQUE.thumbnail,
                 }),
             ],
         },
@@ -481,12 +480,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['sample_tif_colortable_nodata_opaque'].info_values,
+                    **layers.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.info_values,
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['sample_tif_colortable_nodata_opaque'].thumbnail,
+                    'exp_thumbnail': layers.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.thumbnail,
                 }),
             ],
         },
@@ -505,12 +504,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['sample_tif_colortable_nodata_opaque'].info_values,
+                    **layers.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.info_values,
                     'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['sample_tif_colortable_nodata_opaque'].thumbnail,
+                    'exp_thumbnail': layers.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.thumbnail,
                 }),
             ],
         },
@@ -527,12 +526,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['sample_tif_tfw_rgba_opaque'].info_values,
+                    **layers.SAMPLE_TIF_TFW_RGBA_OPAQUE.info_values,
                     'file_extension': 'zip/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque.tif',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['sample_tif_tfw_rgba_opaque'].thumbnail,
+                    'exp_thumbnail': layers.SAMPLE_TIF_TFW_RGBA_OPAQUE.thumbnail,
                 }),
             ],
         },
@@ -549,12 +548,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['ne_110m_admin_0_boundary_lines_land'].info_values,
+                    **layers.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.info_values,
                     'file_extension': 'zip/ne_110m_admin_0_boundary_lines_land.shp',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['ne_110m_admin_0_boundary_lines_land'].thumbnail,
+                    'exp_thumbnail': layers.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.thumbnail,
                 }),
             ],
         },
@@ -937,9 +936,9 @@ PUBLICATIONS = {
             },
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, LAYERS['small_layer'].info_values),
+                Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER.info_values),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -961,12 +960,12 @@ PUBLICATIONS = {
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['small_layer'].info_values,
+                    **layers.SMALL_LAYER.info_values,
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -1002,12 +1001,12 @@ PUBLICATIONS = {
                 Action(publication.geoserver.workspace_wms_1_3_0_capabilities_available, {'name': 'small_layer'}),
                 Action(publication.geoserver.workspace_wfs_2_0_0_capabilities_available_if_vector, {'name': 'small_layer'}),
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['small_layer'].info_values,
+                    **layers.SMALL_LAYER.info_values,
                     'name': 'small_layer',
                 }),
                 Action(publication.internal.thumbnail_equals, {
                     'name': 'small_layer',
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -1044,14 +1043,14 @@ PUBLICATIONS = {
                 Action(publication.geoserver.workspace_wms_1_3_0_capabilities_available, {'name': 'small_layer_with_id'}),
                 Action(publication.geoserver.workspace_wfs_2_0_0_capabilities_available_if_vector, {'name': 'small_layer_with_id'}),
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['small_layer'].info_values,
+                    **layers.SMALL_LAYER.info_values,
                     'name': 'small_layer_with_id',
                     'file_extension': 'zip/small_layer_with_id.geojson',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
                     'name': 'small_layer_with_id',
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -1089,14 +1088,14 @@ PUBLICATIONS = {
                 Action(publication.geoserver.workspace_wms_1_3_0_capabilities_available, {'name': 'small_zip_layer'}),
                 Action(publication.geoserver.workspace_wfs_2_0_0_capabilities_available_if_vector, {'name': 'small_zip_layer'}),
                 Action(publication.internal.correct_values_in_detail, {
-                    **LAYERS['small_layer'].info_values,
+                    **layers.SMALL_LAYER.info_values,
                     'name': 'small_zip_layer',
                     'file_extension': 'zip/small_layer.geojson',
                     'gdal_prefix': '/vsizip/',
                 }),
                 Action(publication.internal.thumbnail_equals, {
                     'name': 'small_zip_layer',
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -1111,9 +1110,9 @@ PUBLICATIONS = {
             },
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, LAYERS['small_layer'].info_values),
+                Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER.info_values),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -1151,9 +1150,9 @@ PUBLICATIONS = {
             },
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, LAYERS['small_layer'].info_values),
+                Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER.info_values),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
@@ -1193,9 +1192,9 @@ PUBLICATIONS = {
             },
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, LAYERS['small_layer'].info_values),
+                Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER.info_values),
                 Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': LAYERS['small_layer'].thumbnail,
+                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
