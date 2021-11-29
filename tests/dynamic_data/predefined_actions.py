@@ -2,7 +2,6 @@ from layman import LaymanError
 import tests.asserts.processing as processing
 from test_tools import process_client
 from .. import dynamic_data as consts, Action
-from . import predefined_zip_files
 
 PATCH_TIF_WITH_QML = {
     consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
@@ -28,10 +27,18 @@ POST_TIF_WITH_QML = {**PATCH_TIF_WITH_QML, **{
     }),
 }}
 
+_POST_ZIP_SHP_WITHOUT_PRJ_DEFINITION = {
+    'file_paths': [
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.dbf',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp',
+        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
+    ],
+    'compress': True,
+}
+
 POST_ZIP_SHP_WITHOUT_PRJ = {
-    consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-        **predefined_zip_files.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_WITHOUT_PRJ,
-    }),
+    consts.KEY_CALL: Action(process_client.publish_workspace_publication, _POST_ZIP_SHP_WITHOUT_PRJ_DEFINITION),
     consts.KEY_CALL_EXCEPTION: {
         consts.KEY_EXCEPTION: LaymanError,
         consts.KEY_EXCEPTION_ASSERTS: [
@@ -50,7 +57,7 @@ POST_ZIP_SHP_WITHOUT_PRJ = {
 
 POST_ZIP_SHP_WITHOUT_PRJ_WITH_CRS = {
     consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-        **predefined_zip_files.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_WITHOUT_PRJ,
+        **_POST_ZIP_SHP_WITHOUT_PRJ_DEFINITION,
         'crs': 'EPSG:4326',
     }),
     consts.KEY_RESPONSE_ASSERTS: [
