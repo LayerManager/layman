@@ -36,5 +36,22 @@ LAYERS = {
                     'publ_type_detail': ('vector', 'sld'),
                 },
         thumbnail='test_tools/data/thumbnail/ne_110m_admin_0_boundary_lines_land.png',
-    )
+    ),
+    'sample_tif_tfw_rgba_opaque': PublicationValues(
+        definition={
+            'file_paths': [
+                'sample/layman.layer/sample_tif_tfw_rgba_opaque.tfw',
+                'sample/layman.layer/sample_tif_tfw_rgba_opaque.tif',
+            ],
+        },
+        info_values={
+            'exp_publication_detail': {
+                'bounding_box': [1669480.0, 6580973.000000007, 1675351.9999999802, 6586999.0],
+                'native_crs': 'EPSG:3857',
+                'native_bounding_box': [1669480.0, 6580973.000000007, 1675351.9999999802, 6586999.0, 'EPSG:3857'],
+            },
+            'publ_type_detail': ('raster', 'sld'),
+        },
+        thumbnail='test_tools/data/thumbnail/raster_layer_tiff.png',
+    ),
 }
