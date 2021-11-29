@@ -261,7 +261,7 @@ def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, de
     response.raise_for_status()
 
 
-def post_feature_type(geoserver_workspace, layername, description, title, bbox, auth):
+def post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, auth):
     keywords = [
         "features",
         layername,
@@ -275,7 +275,7 @@ def post_feature_type(geoserver_workspace, layername, description, title, bbox, 
         "keywords": {
             "string": keywords
         },
-        "srs": "EPSG:3857",
+        "srs": crs,
         "projectionPolicy": "FORCE_DECLARED",
         "enabled": True,
         "store": {
@@ -575,7 +575,7 @@ def delete_coverage_store(geoserver_workspace, auth, name):
         response.raise_for_status()
 
 
-def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, description, bbox):
+def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, description, bbox, crs):
     keywords = [
         "features",
         layer,
@@ -592,7 +592,7 @@ def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, de
             "name": layer,
             'nativeBoundingBox': native_bbox,
             "nativeFormat": "GeoTIFF",
-            "srs": "EPSG:3857",
+            "srs": crs,
             "store": {
                 "@class": "coverageStore",
                 "href": urljoin(GS_REST_WORKSPACES, geoserver_workspace, f'/coveragestores/coverages/{coverage_store}.json'),
@@ -655,11 +655,12 @@ def delete_wms_layer(geoserver_workspace, layer, auth):
         response.raise_for_status()
 
 
-def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox=None, title=None, description=None):
+def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox=None, title=None, description=None, crs=None):
     wms_layer = get_wms_layer(geoserver_workspace, layer, auth=auth)
+    assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
     if bbox:
         wms_layer['nativeBoundingBox'] = bbox_to_native_bbox(bbox)
-        wms_layer['nativeCRS'] = 'EPSG:3857'
+        wms_layer['nativeCRS'] = crs
         # automatically recalculates also 'latLonBoundingBox'
     if title is not None:
         wms_layer['title'] = title
@@ -687,7 +688,7 @@ def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox=None, title=None, 
     response.raise_for_status()
 
 
-def post_wms_layer(geoserver_workspace, layer, store_name, title, description, bbox, auth):
+def post_wms_layer(geoserver_workspace, layer, store_name, title, description, bbox, crs, auth):
     keywords = [
         "features",
         layer,
@@ -702,8 +703,8 @@ def post_wms_layer(geoserver_workspace, layer, store_name, title, description, b
         "keywords": {
             "string": keywords
         },
-        "nativeCRS": "EPSG:3857",
-        "srs": "EPSG:3857",
+        "nativeCRS": crs,
+        "srs": crs,
         "projectionPolicy": "NONE",
         "enabled": True,
         "store": {

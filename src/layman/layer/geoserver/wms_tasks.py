@@ -24,11 +24,13 @@ def patch_after_feature_change(
     if file_type == settings.FILE_TYPE_VECTOR:
         bbox = geoserver.get_layer_bbox(workspace, layer)
         geoserver_workspace = wms.get_geoserver_workspace(workspace)
-        style_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['style_type'], })['style_type']
+        info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['style_type', 'native_crs', ], })
+        style_type = info['style_type']
+        crs = info['native_crs']
         if style_type == 'sld':
             gs_util.patch_feature_type(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox)
         elif style_type == 'qml':
-            gs_util.patch_wms_layer(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox)
+            gs_util.patch_wms_layer(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs)
     elif file_type != settings.FILE_TYPE_RASTER:
         raise NotImplementedError(f"Unknown file type: {file_type}")
 

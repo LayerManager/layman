@@ -97,22 +97,24 @@ def get_layer_native_bbox(workspace, layer):
     return gs_util.bbox_to_native_bbox(bbox)
 
 
-def publish_layer_from_db(workspace, layername, description, title, *, geoserver_workspace=None):
+def publish_layer_from_db(workspace, layername, description, title, *, crs, geoserver_workspace=None):
     geoserver_workspace = geoserver_workspace or workspace
     bbox = get_layer_bbox(workspace, layername)
-    gs_util.post_feature_type(geoserver_workspace, layername, description, title, bbox, settings.LAYMAN_GS_AUTH)
+    gs_util.post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, settings.LAYMAN_GS_AUTH)
 
 
 def publish_layer_from_qgis(workspace, layer, description, title, *, geoserver_workspace=None):
     geoserver_workspace = geoserver_workspace or workspace
     store_name = wms.get_qgis_store_name(layer)
-    layer_capabilities_url = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['wms']})['_wms']['qgis_capabilities_url']
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['wms', 'native_crs', ]})
+    layer_capabilities_url = info['_wms']['qgis_capabilities_url']
+    crs = info['native_crs']
     gs_util.create_wms_store(geoserver_workspace,
                              settings.LAYMAN_GS_AUTH,
                              store_name,
                              layer_capabilities_url)
     bbox = get_layer_bbox(workspace, layer)
-    gs_util.post_wms_layer(geoserver_workspace, layer, store_name, title, description, bbox, settings.LAYMAN_GS_AUTH)
+    gs_util.post_wms_layer(geoserver_workspace, layer, store_name, title, description, bbox, crs, settings.LAYMAN_GS_AUTH)
 
 
 def get_usernames():

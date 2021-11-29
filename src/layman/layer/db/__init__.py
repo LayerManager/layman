@@ -97,7 +97,6 @@ def import_layer_vector_file_async(workspace, layername, main_filepath,
     pg_conn = ' '.join([f"{k}='{v}'" for k, v in PG_CONN.items()])
     bash_args = [
         'ogr2ogr',
-        '-t_srs', 'EPSG:3857',
         '-nln', layername,
         '-nlt', 'GEOMETRY',
         '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
@@ -111,6 +110,7 @@ def import_layer_vector_file_async(workspace, layername, main_filepath,
     if crs_id is not None:
         bash_args.extend([
             '-s_srs', crs_id,
+            '-t_srs', crs_id,
         ])
     if os.path.splitext(main_filepath)[1] == '.shp':
         bash_args.extend([

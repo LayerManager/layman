@@ -29,8 +29,9 @@ def refresh_wms(
         title=None,
         access_rights=None,
 ):
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'bounding_box']})
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'bounding_box', 'native_crs', ]})
     file_type = info['file']['file_type']
+    crs = info['native_crs']
 
     assert description is not None
     assert title is not None
@@ -49,6 +50,7 @@ def refresh_wms(
                                             layername,
                                             description,
                                             title,
+                                            crs=crs,
                                             geoserver_workspace=geoserver_workspace,
                                             )
         else:
@@ -65,7 +67,7 @@ def refresh_wms(
         bbox = bbox_util.ensure_bbox_with_area(real_bbox, settings.NO_AREA_BBOX_PADDING)\
             if not bbox_util.is_empty(real_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
         gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, file_path)
-        gs_util.publish_coverage(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, layername, title, description, bbox)
+        gs_util.publish_coverage(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, layername, title, description, bbox, crs, )
     else:
         raise NotImplementedError(f"Unknown file type: {file_type}")
 
@@ -91,7 +93,8 @@ def refresh_wfs(
         title=None,
         access_rights=None,
 ):
-    file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'native_crs', ]})
+    file_type = info['file']['file_type']
     if file_type == settings.FILE_TYPE_RASTER:
         return
     if file_type != settings.FILE_TYPE_VECTOR:
@@ -103,7 +106,8 @@ def refresh_wfs(
 
     if self.is_aborted():
         raise AbortedException
-    geoserver.publish_layer_from_db(workspace, layername, description, title)
+    crs = info['native_crs']
+    geoserver.publish_layer_from_db(workspace, layername, description, title, crs=crs)
     geoserver.set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, workspace)
     wfs.clear_cache(workspace)
 

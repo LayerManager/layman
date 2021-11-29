@@ -204,9 +204,9 @@ from {DB_SCHEMA}.workspaces w inner join
 
     infos = {key: {**{in_key: in_value for in_key, in_value in value.items() if in_key not in {'_native_bounding_box_short'}},
                    'native_bounding_box': value['_native_bounding_box_short'] + [value['native_crs']],
-                   'bounding_box': bbox_util.transform(value['_native_bounding_box_short'],
-                                                       value['native_crs'],
-                                                       DEFAULT_BBOX_CRS)
+                   'bounding_box': list(bbox_util.transform(value['_native_bounding_box_short'],
+                                                            value['native_crs'],
+                                                            DEFAULT_BBOX_CRS))
                    if value['_native_bounding_box_short'][0]
                    and value['native_crs']
                    and DEFAULT_BBOX_CRS != value['native_crs']
