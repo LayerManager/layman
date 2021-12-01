@@ -232,3 +232,7 @@ LAYMAN_DEFAULT_OUTPUT_BBOX = (
 # E.g. if bbox is [5, 100, 5, 200] and NO_AREA_BBOX_PADDING = 10,
 # thumbnail will be rendered with bbox [-5, 100, 15, 200].
 NO_AREA_BBOX_PADDING = 10
+NO_AREA_BBOX_PADDING_DICT = {
+    'EPSG:3857': 10,
+    'EPSG:4326': 0.00001
+}
