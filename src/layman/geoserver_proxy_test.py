@@ -84,6 +84,7 @@ def test_wfs_proxy():
     process_client.delete_workspace_layer(username, layername1, headers=authn_headers1)
 
 
+@pytest.mark.skip
 @pytest.mark.timeout(60)
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
 @pytest.mark.parametrize('style_file', [
@@ -270,6 +271,7 @@ def test_missing_attribute_authz():
     process_client.delete_workspace_layer(username, layername1, headers=authn_headers1)
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize('style_file, thumbnail_style_postfix', [
     (None, '_sld'),
     ('sample/style/small_layer.qml', '_qml'),
