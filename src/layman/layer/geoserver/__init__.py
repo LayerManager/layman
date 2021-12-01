@@ -94,7 +94,9 @@ def get_layer_bbox(workspace, layer):
 
 def get_layer_native_bbox(workspace, layer):
     bbox = get_layer_bbox(workspace, layer)
-    return gs_util.bbox_to_native_bbox(bbox)
+    crs = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['native_crs']})['native_crs']
+
+    return gs_util.bbox_to_native_bbox(bbox, crs)
 
 
 def publish_layer_from_db(workspace, layername, description, title, *, crs, geoserver_workspace=None):

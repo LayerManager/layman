@@ -227,7 +227,7 @@ def delete_feature_type(geoserver_workspace, feature_type_name, auth):
         response.raise_for_status()
 
 
-def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, description=None, bbox=None, auth):
+def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, description=None, bbox=None, crs=None, auth):
     ftype = dict()
 
     if title is not None:
@@ -244,7 +244,8 @@ def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, de
     if description is not None:
         ftype['abstract'] = description
     if bbox:
-        ftype['nativeBoundingBox'] = bbox_to_native_bbox(bbox)
+        assert crs is not None
+        ftype['nativeBoundingBox'] = bbox_to_native_bbox(bbox, crs)
 
     ftype = {k: v for k, v in ftype.items() if v is not None}
     body = {
@@ -282,7 +283,7 @@ def post_feature_type(geoserver_workspace, layername, description, title, bbox, 
             "@class": "dataStore",
             "name": geoserver_workspace + ":postgresql",
         },
-        'nativeBoundingBox': bbox_to_native_bbox(bbox),
+        'nativeBoundingBox': bbox_to_native_bbox(bbox, crs),
     }
     response = requests.post(urljoin(GS_REST_WORKSPACES,
                                      geoserver_workspace + '/datastores/postgresql/featuretypes/'),
@@ -506,7 +507,7 @@ def delete_db_store(geoserver_workspace, auth):
         response.raise_for_status()
 
 
-def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, description=None, bbox=None, auth):
+def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, description=None, bbox=None, crs=None, auth):
     coverage = dict()
 
     if title is not None:
@@ -523,7 +524,8 @@ def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, de
     if description is not None:
         coverage['abstract'] = description
     if bbox:
-        coverage['nativeBoundingBox'] = bbox_to_native_bbox(bbox)
+        assert crs is not None
+        coverage['nativeBoundingBox'] = bbox_to_native_bbox(bbox, crs)
 
     coverage = {k: v for k, v in coverage.items() if v is not None}
     body = {
@@ -581,7 +583,7 @@ def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, de
         layer,
         title
     ]
-    native_bbox = bbox_to_native_bbox(bbox)
+    native_bbox = bbox_to_native_bbox(bbox, crs)
     data = {
         "coverage": {
             "abstract": description,
@@ -659,7 +661,7 @@ def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox=None, title=None, 
     wms_layer = get_wms_layer(geoserver_workspace, layer, auth=auth)
     assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
     if bbox:
-        wms_layer['nativeBoundingBox'] = bbox_to_native_bbox(bbox)
+        wms_layer['nativeBoundingBox'] = bbox_to_native_bbox(bbox, crs)
         wms_layer['nativeCRS'] = crs
         # automatically recalculates also 'latLonBoundingBox'
     if title is not None:
@@ -711,7 +713,7 @@ def post_wms_layer(geoserver_workspace, layer, store_name, title, description, b
             "@class": "wmsStore",
             "name": geoserver_workspace + f":{store_name}",
         },
-        'nativeBoundingBox': bbox_to_native_bbox(bbox),
+        'nativeBoundingBox': bbox_to_native_bbox(bbox, crs),
     }
     response = requests.post(urljoin(GS_REST_WORKSPACES,
                                      geoserver_workspace + '/wmslayers/'),
@@ -1017,13 +1019,13 @@ def get_feature_type(
     return response.json()['featureType']
 
 
-def bbox_to_native_bbox(bbox):
+def bbox_to_native_bbox(bbox, crs):
     return {
         "minx": bbox[0],
         "miny": bbox[1],
         "maxx": bbox[2],
         "maxy": bbox[3],
-        "crs": "EPSG:3857",
+        "crs": crs,
     }
 
 
