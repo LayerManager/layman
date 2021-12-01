@@ -113,6 +113,7 @@ where w.name = %s
     process_client.delete_workspace_map(workspace, map)
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_migrate_layer_metadata(ensure_layer):
     def assert_md_keys(layer_info):
@@ -156,6 +157,7 @@ def test_migrate_layer_metadata(ensure_layer):
     process_client.delete_workspace_layer(workspace, layer)
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_adjust_prime_db_schema_for_bbox_search():
     workspace = 'test_adjust_prime_db_schema_for_bbox_search_workspace'

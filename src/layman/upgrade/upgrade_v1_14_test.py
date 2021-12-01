@@ -8,6 +8,7 @@ from . import upgrade_v1_14
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_bbox_crop():
     def assert_out_of_the_box_publications(expected_count):

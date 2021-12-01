@@ -121,6 +121,7 @@ def ensure_layer():
     yield ensure_layer_internal
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_migrate_layers_to_wms_workspace(ensure_layer):
     workspace = 'test_migrate_layers_to_wms_workspace_workspace'
@@ -239,6 +240,7 @@ def test_migrate_maps_on_wms_workspace(ensure_map):
     process_client.delete_workspace_map(workspace, map)
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_migrate_wms_workspace_metadata(ensure_layer):
     def assert_md_keys(layer_info):
