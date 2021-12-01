@@ -1,4 +1,7 @@
+import logging
 from db import util as db_util
+
+logger = logging.getLogger(__name__)
 
 
 def is_empty(bbox):
@@ -66,8 +69,13 @@ def ensure_bbox_with_area(bbox, no_area_padding):
 
 
 def transform(bbox, crs_from, crs_to):
+    assert (bbox is None) == (crs_from is None), f'bbox={bbox}, crs_from={crs_from}'
+    if not bbox and not crs_from:
+        return (None, None, None, None)
     srid_from = db_util.get_srid(crs_from)
     srid_to = db_util.get_srid(crs_to)
+    if srid_from == 4326 and srid_to == 3857:
+        bbox = (bbox[0], max(bbox[1], -89), bbox[2], min(bbox[3], 89))
     query = f'''
     with tmp as (select ST_Transform(ST_SetSRID(ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s, %s)), %s), %s) bbox)
     select st_xmin(bbox),
