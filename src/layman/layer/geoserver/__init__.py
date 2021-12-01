@@ -1,3 +1,4 @@
+import logging
 from flask import g
 
 from geoserver import util as gs_util
@@ -7,6 +8,7 @@ from layman.common import bbox as bbox_util, geoserver as gs_common, empty_metho
 from layman.layer import LAYER_TYPE
 from . import wms
 
+logger = logging.getLogger(__name__)
 FLASK_RULES_KEY = f"{__name__}:RULES"
 
 check_new_layername = empty_method
@@ -87,9 +89,12 @@ def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspac
 
 
 def get_layer_bbox(workspace, layer):
-    db_bbox = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['bounding_box']})['bounding_box']
+    full_bbox = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['native_bounding_box']})['native_bounding_box']
+    db_bbox = full_bbox[:4]
+    crs = full_bbox[4]
     # GeoServer is not working good with degradeted bbox
-    return bbox_util.ensure_bbox_with_area(db_bbox, settings.NO_AREA_BBOX_PADDING) if not bbox_util.is_empty(db_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+    result = bbox_util.ensure_bbox_with_area(db_bbox, settings.NO_AREA_BBOX_PADDING_DICT[crs]) if not bbox_util.is_empty(db_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+    return result
 
 
 def get_layer_native_bbox(workspace, layer):
