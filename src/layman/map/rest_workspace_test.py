@@ -187,6 +187,7 @@ def test_post_maps_invalid_json(client):
     })
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_post_maps_simple(client):
     with app.app_context():
@@ -311,6 +312,7 @@ def test_post_maps_simple(client):
     check_metadata(client, workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 @pytest.mark.timeout(60)
 def test_post_maps_complex(client):
@@ -443,6 +445,7 @@ def test_post_maps_complex(client):
     check_metadata(client, workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_patch_map(client):
     with app.app_context():
@@ -608,6 +611,7 @@ def test_delete_map(client):
         })
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_map_composed_from_local_layers(client):
     with app.app_context():
