@@ -29,7 +29,7 @@ def refresh_wms(
         title=None,
         access_rights=None,
 ):
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'bounding_box', 'native_crs', ]})
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'native_bounding_box', 'native_crs', ]})
     file_type = info['file']['file_type']
     crs = info['native_crs']
 
@@ -63,7 +63,7 @@ def refresh_wms(
                                               )
     elif file_type == settings.FILE_TYPE_RASTER:
         file_path = info['_file']['normalized_file']['gs_path']
-        real_bbox = info['bounding_box']
+        real_bbox = info['native_bounding_box'][:4]
         bbox = bbox_util.ensure_bbox_with_area(real_bbox, settings.NO_AREA_BBOX_PADDING)\
             if not bbox_util.is_empty(real_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
         gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, file_path)
