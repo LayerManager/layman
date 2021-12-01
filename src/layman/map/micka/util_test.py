@@ -32,6 +32,7 @@ def app_context():
         yield ctx
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures('app_context', 'ensure_layman', 'client')
 def test_fill_template():
     xml_path = 'tmp/record-template.xml'
@@ -110,6 +111,7 @@ def test_parse_md_properties():
                            equals_fn), f"Values of property {k} do not equal: {value} != {expected[k]}"
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures('app_context', 'ensure_layman', 'client')
 def test_fill_xml_template():
     with app.app_context():
