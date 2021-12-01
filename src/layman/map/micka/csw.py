@@ -177,12 +177,12 @@ def get_template_path_and_values(workspace, mapname, http_method=None, actor_nam
     map_json = get_map_json(workspace, mapname)
     operates_on = map_json_to_operates_on(map_json, editor=actor_name)
     publ_info = get_publication_info(workspace, MAP_TYPE, mapname, context={
-        'keys': ['title', 'bounding_box', 'description'],
+        'keys': ['title', 'native_bounding_box', 'description'],
     })
-    bbox_3857 = publ_info.get('bounding_box')
-    if bbox_util.is_empty(bbox_3857):
-        bbox_3857 = settings.LAYMAN_DEFAULT_OUTPUT_BBOX
-    extent = bbox_util.transform(bbox_3857, crs_from='EPSG:3857', crs_to='EPSG:4326')
+    native_bbox = publ_info.get('native_bounding_box')[:4]
+    if bbox_util.is_empty(native_bbox):
+        native_bbox = settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+    extent = bbox_util.transform(native_bbox, crs_from=publ_info.get('native_bounding_box')[4], crs_to='EPSG:4326')
     title = publ_info['title']
     abstract = publ_info.get('description')
     md_language = next(iter(common_language.get_languages_iso639_2(' '.join([
