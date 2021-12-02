@@ -58,14 +58,14 @@ where st_xMin(p.bbox) < -20026376.39
 
             #  WFS
             bbox = geoserver.get_layer_bbox(workspace, publication)
-            gs_util.patch_feature_type(workspace, publication, auth=settings.LAYMAN_GS_AUTH, bbox=bbox)
+            gs_util.patch_feature_type(workspace, publication, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs)
             gs_wfs.clear_cache(workspace)
 
             #  WMS
             style_type = info['style_type']
             geoserver_workspace = gs_wms.get_geoserver_workspace(workspace)
             if style_type == 'sld':
-                gs_util.patch_feature_type(geoserver_workspace, publication, auth=settings.LAYMAN_GS_AUTH, bbox=bbox)
+                gs_util.patch_feature_type(geoserver_workspace, publication, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs)
             elif style_type == 'qml':
                 qgis_wms.save_qgs_file(workspace, publication)
                 gs_util.patch_wms_layer(geoserver_workspace, publication, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs)
