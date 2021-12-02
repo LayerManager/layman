@@ -118,10 +118,11 @@ def get_template_path_and_values(workspace, layername, http_method=None):
     })
     title = publ_info['title']
     abstract = publ_info.get('description')
-    native_bbox = publ_info.get('native_bounding_box')
+    native_bbox = publ_info.get('native_bounding_box')[:4]
+    crs = publ_info.get('native_bounding_box')[4]
     if bbox_util.is_empty(native_bbox):
-        native_bbox = settings.LAYMAN_DEFAULT_OUTPUT_BBOX
-    extent = bbox_util.transform(native_bbox[:4], crs_from=native_bbox[4], crs_to='EPSG:4326')
+        native_bbox = settings.LAYMAN_DEFAULT_OUTPUT_BBOX_DICT[crs]
+    extent = bbox_util.transform(native_bbox, crs_from=crs, crs_to='EPSG:4326')
 
     uuid_file_path = get_publication_uuid_file(LAYER_TYPE, workspace, layername)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
@@ -207,7 +208,7 @@ def _get_property_values(
         md_language=None,
 ):
     epsg_codes = epsg_codes or ['EPSG:3857', 'EPSG:4326']
-    west, south, east, north = extent if extent and all(coord for coord in extent) else [11.87, 48.12, 19.13, 51.59]
+    west, south, east, north = extent or [11.87, 48.12, 19.13, 51.59]
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
     languages = languages or []
 
