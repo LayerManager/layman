@@ -61,7 +61,9 @@ def save_qgs_file(workspace, layer):
     info = layer_util.get_layer_info(workspace, layer)
     uuid = info['uuid']
     qgis.ensure_layer_dir(workspace, layer)
-    layer_bbox = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['bounding_box']})['bounding_box']
+    full_layer_bbox = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['native_bounding_box']})['native_bounding_box']
+    layer_bbox = full_layer_bbox[:4]
+    crs = full_layer_bbox[4]
     layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
     qml = util.get_original_style_xml(workspace, layer)
     qml_geometry = util.get_qml_geometry_from_qml(qml)
@@ -71,16 +73,17 @@ def save_qgs_file(workspace, layer):
         if col.name not in ['wkb_geometry', 'ogc_fid']
     ]
     source_type = util.get_source_type(db_types, qml_geometry)
-    layer_qml = util.fill_layer_template(workspace, layer, uuid, layer_bbox, qml, source_type, db_cols)
-    qgs_str = util.fill_project_template(workspace, layer, uuid, layer_qml, settings.LAYMAN_OUTPUT_SRS_LIST,
+    layer_qml = util.fill_layer_template(workspace, layer, uuid, layer_bbox, crs, qml, source_type, db_cols)
+    qgs_str = util.fill_project_template(workspace, layer, uuid, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
                                          layer_bbox, source_type)
     with open(get_layer_file_path(workspace, layer), "w") as qgs_file:
         print(qgs_str, file=qgs_file)
 
 
 def get_style_qml(workspace, layer):
+    crs = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['native_crs']})['native_crs']
     style_template_file = util.get_style_template_path()
-    layer_template_file = util.get_layer_template_path()
+    layer_template_file = util.get_layer_template_path(crs)
     layer_project_file = get_layer_file_path(workspace, layer)
     original_qml = util.get_original_style_path(workspace, layer)
     return util.get_current_style_xml(style_template_file, layer_template_file, layer_project_file, original_qml)

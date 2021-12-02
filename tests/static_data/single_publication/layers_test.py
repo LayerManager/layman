@@ -195,6 +195,7 @@ def test_fill_project_template(workspace, publ_type, publication):
 
     with app.app_context():
         layer_bbox = layer_db.get_bbox(workspace, publication)
+        layer_crs = layer_db.get_crs(workspace, publication)
     layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
     with app.app_context():
         qml_path = qgis_util.get_original_style_path(workspace, publication)
@@ -211,11 +212,11 @@ def test_fill_project_template(workspace, publ_type, publication):
         ]
     qml_geometry = qgis_util.get_qml_geometry_from_qml(qml_xml)
     source_type = qgis_util.get_source_type(db_types, qml_geometry)
-    layer_qml_str = qgis_util.fill_layer_template(workspace, publication, layer_uuid, layer_bbox, qml_xml, source_type, db_cols)
+    layer_qml_str = qgis_util.fill_layer_template(workspace, publication, layer_uuid, layer_bbox, layer_crs, qml_xml, source_type, db_cols)
     layer_qml = ET.fromstring(layer_qml_str.encode('utf-8'), parser=parser)
     if exp_min_scale is not None:
         assert layer_qml.attrib['minScale'] == exp_min_scale
-    qgs_str = qgis_util.fill_project_template(workspace, publication, layer_uuid, layer_qml_str, settings.LAYMAN_OUTPUT_SRS_LIST,
+    qgs_str = qgis_util.fill_project_template(workspace, publication, layer_uuid, layer_qml_str, layer_crs, settings.LAYMAN_OUTPUT_SRS_LIST,
                                               layer_bbox, source_type)
     with open(qgs_path, "w") as qgs_file:
         print(qgs_str, file=qgs_file)
