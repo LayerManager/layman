@@ -178,7 +178,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         md_language=md_language,
         languages=languages,
         spatial_resolution=spatial_resolution,
-        epsg_codes=[f'EPSG:{code}' for code in settings.LAYMAN_OUTPUT_SRS_LIST],
+        crs_list=[f'EPSG:{code}' for code in settings.LAYMAN_OUTPUT_SRS_LIST],
     )
     if http_method == common.REQUEST_METHOD_POST:
         prop_values.pop('revision_date', None)
@@ -202,12 +202,12 @@ def _get_property_values(
         extent=None,  # w, s, e, n
         wms_url="http://www.env.cz/corine/data/download.zip",
         wfs_url=None,
-        epsg_codes=None,
+        crs_list=None,
         spatial_resolution=None,
         languages=None,
         md_language=None,
 ):
-    epsg_codes = epsg_codes or ['EPSG:3857', 'EPSG:4326']
+    crs_list = crs_list or ['EPSG:3857', 'EPSG:4326']
     west, south, east, north = extent or [11.87, 48.12, 19.13, 51.59]
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
     languages = languages or []
@@ -216,7 +216,7 @@ def _get_property_values(
         'md_file_identifier': get_metadata_uuid(uuid),
         'md_language': md_language,
         'md_date_stamp': md_date_stamp,
-        'reference_system': epsg_codes,
+        'reference_system': crs_list,
         'title': title,
         'publication_date': publication_date,
         'revision_date': revision_date,
