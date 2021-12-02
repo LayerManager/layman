@@ -75,8 +75,8 @@ class TestResponsesClass:
     expected_layers = {
         **expected_common_multi,
         'bounding_box': list(test_data.SMALL_LAYER_BBOX),
-        'native_crs': 'EPSG:3857',
-        'native_bounding_box': list(test_data.SMALL_LAYER_BBOX) + ['EPSG:3857'],
+        'native_crs': 'EPSG:4326',
+        'native_bounding_box': list(test_data.SMALL_LAYER_NATIVE_BBOX),
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
     }
     expected_maps = {
@@ -99,8 +99,8 @@ class TestResponsesClass:
     expected_layer = {
         **expected_common,
         'bounding_box': list(test_data.SMALL_LAYER_BBOX),
-        'native_crs': 'EPSG:3857',
-        'native_bounding_box': list(test_data.SMALL_LAYER_BBOX) + ['EPSG:3857'],
+        'native_crs': 'EPSG:4326',
+        'native_bounding_box': list(test_data.SMALL_LAYER_NATIVE_BBOX),
         'db_table': {'name': publication},
         'file': {'path': f'layers/{publication}/input_file/{publication}.geojson',
                  'file_type': 'vector',
