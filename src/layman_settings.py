@@ -225,6 +225,20 @@ LAYMAN_DEFAULT_OUTPUT_BBOX = (
     20026376.39,
     20048966.10,
 )
+LAYMAN_DEFAULT_OUTPUT_BBOX_DICT = {
+    'EPSG:3857': (
+        -20026376.39,
+        -20048966.10,
+        20026376.39,
+        20048966.10,
+    ),
+    'EPSG:4326': (
+        -180,
+        -90,
+        180,
+        90,
+    )
+}
 
 # If bounding box of layman.layer has no area in at least one dimension,
 # this padding in meters will be added to all dimensions whose coordinates equal
