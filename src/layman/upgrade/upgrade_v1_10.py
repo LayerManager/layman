@@ -102,6 +102,7 @@ where p.type = %s
                                             layer,
                                             info.get('description'),
                                             info.get('title'),
+                                            crs='EPSG:3857',
                                             geoserver_workspace=geoserver_workspace)
             geoserver.set_security_rules(workspace, layer, info.get('access_rights'), settings.LAYMAN_GS_AUTH, geoserver_workspace)
             wms.clear_cache(workspace)
