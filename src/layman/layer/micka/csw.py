@@ -2,6 +2,7 @@ from datetime import datetime, date
 import os
 from functools import partial
 import traceback
+import logging
 from requests.exceptions import HTTPError, ConnectionError
 from lxml import etree as ET
 from flask import current_app
@@ -18,6 +19,7 @@ from layman.layer import LAYER_TYPE
 from layman import settings, patch_mode, LaymanError, common
 from layman.util import url_for, get_publication_info
 
+logger = logging.getLogger(__name__)
 PATCH_MODE = patch_mode.NO_DELETE
 get_publication_uuid = empty_method_returns_none
 post_layer = empty_method
@@ -175,7 +177,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         md_language=md_language,
         languages=languages,
         spatial_resolution=spatial_resolution,
-        epsg_codes=settings.LAYMAN_OUTPUT_SRS_LIST,
+        epsg_codes=[f'EPSG:{code}' for code in settings.LAYMAN_OUTPUT_SRS_LIST],
     )
     if http_method == common.REQUEST_METHOD_POST:
         prop_values.pop('revision_date', None)
@@ -204,8 +206,8 @@ def _get_property_values(
         languages=None,
         md_language=None,
 ):
-    epsg_codes = epsg_codes or [3857, 4326]
-    west, south, east, north = extent or [11.87, 48.12, 19.13, 51.59]
+    epsg_codes = epsg_codes or ['EPSG:3857', 'EPSG:4326']
+    west, south, east, north = extent if extent and all(coord for coord in extent) else [11.87, 48.12, 19.13, 51.59]
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
     languages = languages or []
 

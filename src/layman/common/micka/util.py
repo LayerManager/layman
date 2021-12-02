@@ -4,6 +4,7 @@ from io import BytesIO
 from xml.sax.saxutils import escape
 import urllib.parse as urlparse
 from copy import deepcopy
+import logging
 import requests
 from owslib.csw import CatalogueServiceWeb
 from owslib.util import nspath_eval
@@ -14,6 +15,9 @@ from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
 from layman.util import get_publication_info
 from . import NAMESPACES
 from .requests import base_insert, csw_delete, fill_template_as_str
+
+logger = logging.getLogger(__name__)
+
 
 for k, v in NAMESPACES.items():
     ET.register_namespace(k, v)
@@ -354,13 +358,15 @@ def adjust_date_string_with_type(prop_el, prop_value, date_type=None):
 def adjust_reference_system_info(prop_el, prop_value):
     _clear_el(prop_el)
     if prop_value is not None:
+        prop_epsg, prop_epsg_code = prop_value.upper().split(":")
+        assert prop_epsg == 'EPSG'
         parser = ET.XMLParser(remove_blank_text=True)
         child_el = ET.fromstring(f"""
 <gmd:MD_ReferenceSystem xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gmx="{NAMESPACES['gmx']}" xmlns:xlink="{NAMESPACES['xlink']}">
     <gmd:referenceSystemIdentifier>
         <gmd:RS_Identifier>
             <gmd:code>
-                <gmx:Anchor xlink:href="http://www.opengis.net/def/crs/EPSG/0/{prop_value}">EPSG:{prop_value}</gmx:Anchor>
+                <gmx:Anchor xlink:href="http://www.opengis.net/def/crs/EPSG/0/{prop_epsg_code}">{prop_value}</gmx:Anchor>
             </gmd:code>
         </gmd:RS_Identifier>
     </gmd:referenceSystemIdentifier>

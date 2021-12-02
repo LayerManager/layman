@@ -119,7 +119,7 @@ def test_fill_xml_template():
                                                                               'md_language': 'eng',
                                                                               'md_organisation_name': 'My Metadata Organization',
                                                                               'md_date_stamp': '2007-01-22',
-                                                                              'reference_system': [4326, 5514],
+                                                                              'reference_system': ['EPSG:4326', 'EPSG:5514'],
                                                                               'title': 'My title',
                                                                               'publication_date': '2006-12-12',
                                                                               'identifier': {
