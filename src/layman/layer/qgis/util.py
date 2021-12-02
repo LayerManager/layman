@@ -12,12 +12,14 @@ from . import wms
 ELEMENTS_TO_REWRITE = ['legend', 'expressionfields']
 
 
-def get_layer_template_path():
-    return os.path.join(os.path.dirname(os.path.realpath(__file__)), './layer-template.qml')
+def get_layer_template_path(crs):
+    file_name = './layer-template_4326.qml' if crs == 'EPSG:4326' else './layer-template.qml'
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), file_name)
 
 
-def get_project_template_path():
-    return os.path.join(os.path.dirname(os.path.realpath(__file__)), './project-template.qgs')
+def get_project_template_path(crs):
+    file_name = './project-template_4326.qgs' if crs == 'EPSG:4326' else './project-template.qgs'
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), file_name)
 
 
 def get_style_template_path():
@@ -54,14 +56,14 @@ def get_layer_original_style_stream(workspace, layer):
     return result
 
 
-def fill_layer_template(workspace, layer, uuid, native_bbox, qml_xml, source_type, attrs_to_ensure):
+def fill_layer_template(workspace, layer, uuid, native_bbox, crs, qml_xml, source_type, attrs_to_ensure):
     db_schema = workspace
     layer_name = layer
     wkb_type = source_type
     qml_geometry = get_qml_geometry_from_qml(qml_xml)
     db_table = layer
 
-    template_path = get_layer_template_path()
+    template_path = get_layer_template_path(crs)
     with open(template_path, 'r') as template_file:
         template_str = template_file.read()
     skeleton_xml_str = template_str.format(
@@ -109,14 +111,14 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, qml_xml, source_typ
     return full_xml_str
 
 
-def fill_project_template(workspace, layer, layer_uuid, layer_qml, epsg_codes, extent, source_type):
+def fill_project_template(workspace, layer, layer_uuid, layer_qml, crs, epsg_codes, extent, source_type):
     wms_crs_list_values = "\n".join((f"<value>EPSG:{code}</value>" for code in epsg_codes))
     db_schema = workspace
     layer_name = layer
     db_table = layer
     creation_iso_datetime = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
 
-    template_path = get_project_template_path()
+    template_path = get_project_template_path(crs)
     with open(template_path, 'r') as template_file:
         template_str = template_file.read()
     return template_str.format(
