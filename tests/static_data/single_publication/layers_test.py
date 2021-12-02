@@ -226,7 +226,7 @@ def test_fill_project_template(workspace, publ_type, publication):
     wms_layer = wmsi.contents[publication]
     exp_output_srs = {f"EPSG:{expected_output_srs}" for expected_output_srs in settings.LAYMAN_OUTPUT_SRS_LIST}
     assert exp_output_srs.issubset(set(wms_layer.crsOptions))
-    wms_layer_bbox = next((tuple(bbox_crs[:4]) for bbox_crs in wms_layer.crs_list if bbox_crs[4] == f"EPSG:3857"))
+    wms_layer_bbox = next((tuple(bbox_crs[:4]) for bbox_crs in wms_layer.crs_list if bbox_crs[4] == layer_crs))
     assert_util.assert_same_bboxes(wms_layer_bbox, layer_bbox, 0.1)
 
     os.remove(qgs_path)
