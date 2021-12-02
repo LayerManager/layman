@@ -228,6 +228,7 @@ def delete_feature_type(geoserver_workspace, feature_type_name, auth):
 
 
 def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, description=None, bbox=None, crs=None, auth):
+    assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
     ftype = dict()
 
     if title is not None:
@@ -244,7 +245,6 @@ def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, de
     if description is not None:
         ftype['abstract'] = description
     if bbox:
-        assert crs is not None
         ftype['nativeBoundingBox'] = bbox_to_native_bbox(bbox, crs)
 
     ftype = {k: v for k, v in ftype.items() if v is not None}
@@ -508,6 +508,7 @@ def delete_db_store(geoserver_workspace, auth):
 
 
 def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, description=None, bbox=None, crs=None, auth):
+    assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
     coverage = dict()
 
     if title is not None:
@@ -524,7 +525,6 @@ def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, de
     if description is not None:
         coverage['abstract'] = description
     if bbox:
-        assert crs is not None
         coverage['nativeBoundingBox'] = bbox_to_native_bbox(bbox, crs)
 
     coverage = {k: v for k, v in coverage.items() if v is not None}
