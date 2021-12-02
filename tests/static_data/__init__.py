@@ -174,7 +174,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'thumbnail': 'sample/style/test_sld_style_applied_in_thumbnail_layer.png',
             'get_map': ('SRS=EPSG:3857&WIDTH=768&HEIGHT=752&BBOX=-30022616.05686392,-30569903.32873383,30022616.05686392,28224386.44929134',
-                        'sample/style/countries_wms_blue.png',
+                        'test_tools/data/thumbnail/countries_wms_blue_map.png',
                         2000,
                         ),
             'file_type': settings.FILE_TYPE_VECTOR,
@@ -506,7 +506,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'thumbnail': 'sample/style/test_sld_style_applied_in_thumbnail_layer.png',
             'get_map': ('SRS=EPSG:3857&WIDTH=768&HEIGHT=752&BBOX=-30022616.05686392,-30569903.32873383,30022616.05686392,28224386.44929134',
-                        'sample/style/countries_wms_blue.png',
+                        'test_tools/data/thumbnail/countries_wms_blue_map.png',
                         2000,
                         ),
             'file_type': settings.FILE_TYPE_VECTOR,
@@ -555,7 +555,7 @@ PUBLICATIONS = {
             ]},
         ],
         TEST_DATA: {
-            'bbox': (-20026376.39, -20048966.1, 20026376.39, 18440002.895114236),
+            'bbox': (-20037508.342789244, -30240971.95838617, 20037508.342789248, 18440002.8951142476),
             'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'micka_xml': {'filled_template': 'test_tools/data/micka/rest_test_filled_template.xml',
