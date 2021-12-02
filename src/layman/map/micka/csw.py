@@ -162,10 +162,10 @@ def map_json_to_operates_on(map_json, operates_on_muuids_filter=None, editor=Non
 
 def map_json_to_epsg_codes(map_json):
     epsg_code = None
-    proj_pattern = re.compile(r'^epsg:(\d+)$', re.IGNORECASE)
+    proj_pattern = re.compile(r'^(epsg:\d+)$', re.IGNORECASE)
     proj_match = proj_pattern.match(map_json['projection'])
     if proj_match:
-        epsg_code = int(proj_match.group(1))
+        epsg_code = proj_match.group(1)
     return [epsg_code] if epsg_code else None
 
 
