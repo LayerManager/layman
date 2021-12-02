@@ -337,7 +337,7 @@ def test_post_layers_simple(client):
             'reference_system': [3857, 4326, 5514],
             'revision_date': None,
             'spatial_resolution': {
-                'scale_denominator': 100000000,
+                'scale_denominator': 5000,
             },
             'title': 'ne_110m_admin_0_countries',
         }
@@ -590,7 +590,7 @@ def test_post_layers_complex(client):
             'reference_system': [3857, 4326, 5514],
             'revision_date': None,
             'spatial_resolution': {
-                'scale_denominator': 100000000,
+                'scale_denominator': 5000,
             },
             'title': "staty",
         }
@@ -747,7 +747,7 @@ def test_patch_layer_title(client):
             'reference_system': [3857, 4326, 5514],
             'revision_date': TODAY_DATE,
             'spatial_resolution': {
-                'scale_denominator': 100000000,
+                'scale_denominator': 5000,
             },
             'title': "New Title of Countries",
         }
@@ -814,7 +814,7 @@ def test_patch_layer_style(client):
             'reference_system': [3857, 4326, 5514],
             'revision_date': TODAY_DATE,
             'spatial_resolution': {
-                'scale_denominator': 100000000,
+                'scale_denominator': 5000,
             },
             'title': 'countries in blue',
         }
