@@ -28,7 +28,7 @@ def patch_after_feature_change(
         style_type = info['style_type']
         crs = info['native_crs']
         if style_type == 'sld':
-            gs_util.patch_feature_type(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox)
+            gs_util.patch_feature_type(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs)
         elif style_type == 'qml':
             gs_util.patch_wms_layer(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs)
     elif file_type != settings.FILE_TYPE_RASTER:
