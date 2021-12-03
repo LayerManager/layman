@@ -6,6 +6,7 @@ from layman.layer import qgis
 from layman.layer.qgis import wms
 from layman.layer.filesystem import gdal, input_file
 from test_tools.util import url_for
+from ...asserts.final.publication import internal as asserts_internal
 from ... import static_data as data
 from ..data import ensure_publication
 
@@ -34,6 +35,8 @@ def test_raster_files(workspace, publ_type, publication):
     exp_def_overview_count = publ_test_data.get('normalized_overviews')
     if exp_def_overview_count is not None:
         assert overview_counts == [exp_def_overview_count] * len(overview_counts)
+
+    asserts_internal.nodata_preserved_in_normalized_raster(workspace, publ_type, publication)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_QML_LAYERS)
