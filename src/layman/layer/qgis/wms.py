@@ -61,7 +61,7 @@ def save_qgs_file(workspace, layer):
     info = layer_util.get_layer_info(workspace, layer)
     uuid = info['uuid']
     qgis.ensure_layer_dir(workspace, layer)
-    full_layer_bbox = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['native_bounding_box']})['native_bounding_box']
+    full_layer_bbox = info['native_bounding_box']
     layer_bbox = full_layer_bbox[:4]
     crs = full_layer_bbox[4]
     layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
