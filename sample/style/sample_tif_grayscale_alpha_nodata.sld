@@ -33,11 +33,12 @@
                             </sld:GrayChannel>
                         </sld:ChannelSelection>
                         <sld:ColorMap>
-                            <sld:ColorMapEntry color="#000000" quantity="0.0" opacity="0"/>
                             <sld:ColorMapEntry color="#0000ff" quantity="1"/>
                             <sld:ColorMapEntry color="#009933" quantity="100.0"/>
                             <sld:ColorMapEntry color="#ff9900" quantity="150.0"/>
                             <sld:ColorMapEntry color="#ff0000" quantity="200.0"/>
+                            <sld:ColorMapEntry color="#ff0000" quantity="254.0"/>
+                            <sld:ColorMapEntry color="#ff0000" quantity="255.0" opacity="0"/>
                         </sld:ColorMap>
                     </sld:RasterSymbolizer>
                 </sld:Rule>

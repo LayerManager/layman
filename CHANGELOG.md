@@ -15,6 +15,11 @@
 - [#489](https://github.com/LayerManager/layman/issues/489) Error responses from Micka and GeoServer are logged into log and also propagated as part of raised exception, so they can be seen from flower.
 - Remove [LAYMAN_SETTINGS_MODULE](https://github.com/LayerManager/layman/blob/v1.15.0/doc/env-settings.md), import [`src/layman_settings.py`](src/layman_settings.py) directly.
 
+## v1.15.1
+ 2021-12-06
+### Changes
+- [#525](https://github.com/LayerManager/layman/issues/525) Keep NoData value in normalized raster files. Also NoData values are normalized as transparent always, even if Alpha channel is available.
+
 ## v1.15.0
  2021-11-18
 ### Changes
