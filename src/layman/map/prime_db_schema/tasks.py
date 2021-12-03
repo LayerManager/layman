@@ -4,7 +4,7 @@ from layman import celery_app
 from layman.celery import AbortedException
 from layman.common import bbox as bbox_util, empty_method_returns_true
 from .. import util, MAP_TYPE
-from ...common.prime_db_schema.publications import set_bbox, set_crs
+from ...common.prime_db_schema.publications import set_bbox
 
 logger = get_task_logger(__name__)
 
@@ -29,8 +29,7 @@ def refresh_bbox(
     bbox_json = util.get_bbox_from_json(mapjson)
     crs = util.get_crs_from_json(mapjson)
     bbox = bbox_util.transform(bbox_json, JSON_EXTENT_CRS, crs)
-    set_bbox(workspace, MAP_TYPE, mapname, bbox, )
-    set_crs(workspace, MAP_TYPE, mapname, crs, )
+    set_bbox(workspace, MAP_TYPE, mapname, bbox, crs, )
 
     if self.is_aborted():
         raise AbortedException

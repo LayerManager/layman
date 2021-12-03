@@ -432,28 +432,19 @@ def delete_publication(workspace_name, type, name):
         logger.warning(f'Deleting publication for NON existing workspace. workspace_name={workspace_name}, type={type}, pub_name={name}')
 
 
-def set_bbox(workspace, publication_type, publication, bbox):
+def set_bbox(workspace, publication_type, publication, bbox, crs, ):
     cropped_bbox = (
         max(bbox[0], settings.LAYMAN_DEFAULT_OUTPUT_BBOX[0]),
         max(bbox[1], settings.LAYMAN_DEFAULT_OUTPUT_BBOX[1]),
         min(bbox[2], settings.LAYMAN_DEFAULT_OUTPUT_BBOX[2]),
         min(bbox[3], settings.LAYMAN_DEFAULT_OUTPUT_BBOX[3]),
     ) if not bbox_util.is_empty(bbox) else bbox
-    query = f'''update {DB_SCHEMA}.publications set
-    bbox = ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s ,%s))
-    where type = %s
-      and name = %s
-      and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
-    params = cropped_bbox + (publication_type, publication, workspace,)
-    db_util.run_statement(query, params)
-
-
-def set_crs(workspace, publication_type, publication, crs):
     srid = db_util.get_srid(crs)
     query = f'''update {DB_SCHEMA}.publications set
+    bbox = ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s ,%s)),
     srid = %s
     where type = %s
       and name = %s
       and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
-    params = (srid, publication_type, publication, workspace,)
+    params = cropped_bbox + (srid, publication_type, publication, workspace,)
     db_util.run_statement(query, params)

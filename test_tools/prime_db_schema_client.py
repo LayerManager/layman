@@ -30,7 +30,8 @@ def ensure_user(workspace):
 
 
 def post_workspace_publication(publication_type, workspace, name, *, actor=None, access_rights=None, title=None,
-                               bbox=None, style_type='sld'):
+                               bbox=None, crs=None, style_type='sld'):
+    assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
     access_rights = access_rights or {}
     default_access_rights = {settings.RIGHTS_EVERYONE_ROLE} if not actor else {actor}
     for right_type in ['read', 'write']:
@@ -47,7 +48,7 @@ def post_workspace_publication(publication_type, workspace, name, *, actor=None,
             'access_rights': access_rights,
         })
         if bbox:
-            publications.set_bbox(workspace, publication_type, name, bbox)
+            publications.set_bbox(workspace, publication_type, name, bbox, crs)
 
 
 def clear_workspace(workspace):

@@ -75,18 +75,22 @@ class TestGetPublications:
         (workspace1, publication_1e_2_4x6_6, {
             'title': 'Příliš jiný žluťoučký kůň úpěl ďábelské ódy (publication)',
             'bbox': (2000, 4000, 6000, 6000),
+            'crs': 'EPSG:3857',
         }),
         (workspace1, publication_1e_3_3x3_3, {
             'title': 'Jednobodová publikace (publication)',
             'bbox': (3000, 3000, 3000, 3000),
+            'crs': 'EPSG:3857',
         }),
         (workspace1, publication_1e_3_7x5_9, {
             'title': 'Public publication in public workspace (publication)',
             'bbox': (3000, 7000, 5000, 9000),
+            'crs': 'EPSG:3857',
         }),
         (workspace2, publication_2e_3_3x5_5, {
             'title': '\'Too yellow horse\' means "Příliš žluťoučký kůň". (publication)',
             'bbox': (3000, 3000, 5000, 5000),
+            'crs': 'EPSG:3857',
             'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
                               'write': {settings.RIGHTS_EVERYONE_ROLE}},
             'actor': workspace2,
@@ -98,6 +102,7 @@ class TestGetPublications:
             'access_rights': {'read': {workspace2},
                               'write': {workspace2}},
             'bbox': (2000, 2000, 4000, 4000),
+            'crs': 'EPSG:3857',
         },
         ),
     ]

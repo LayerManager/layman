@@ -6,7 +6,7 @@ from layman import celery_app, util as layman_util, settings
 from .. import LAYER_TYPE
 from ..db import get_bbox as db_get_bbox, get_crs as db_get_crs
 from ..filesystem.gdal import get_bbox as gdal_get_bbox, get_crs as gdal_get_crs
-from ...common.prime_db_schema.publications import set_bbox, set_crs
+from ...common.prime_db_schema.publications import set_bbox
 
 logger = get_task_logger(__name__)
 
@@ -39,8 +39,7 @@ def refresh_bbox(
     if self.is_aborted():
         raise AbortedException
 
-    set_bbox(username, LAYER_TYPE, layername, bbox, )
-    set_crs(username, LAYER_TYPE, layername, crs, )
+    set_bbox(username, LAYER_TYPE, layername, bbox, crs, )
 
     if self.is_aborted():
         raise AbortedException

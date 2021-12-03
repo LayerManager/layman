@@ -35,6 +35,7 @@ def test_geoserver_bbox():
     workspace = 'test_geoserver_bbox_workspace'
     layer = 'test_geoserver_bbox_layer'
     expected_bbox_1 = test_data.SMALL_LAYER_BBOX
+    crs = 'EPSG:3857'
     expected_bboxes = [((1571203, 6268895, 1572589, 6269864), (1571203, 6268895, 1572589, 6269864)),
                        ((1571203, 6268895, 1571203, 6269864), (1571203 - settings.NO_AREA_BBOX_PADDING, 6268895,
                                                                1571203 + settings.NO_AREA_BBOX_PADDING, 6269864)),  # line
@@ -60,7 +61,7 @@ def test_geoserver_bbox():
     for bbox, expected_bbox in expected_bboxes:
         wfs.delete_layer(workspace, layer)
         with app.app_context():
-            publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox)
+            publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
             wfs.delete_layer(workspace, layer)
             tasks.refresh_wfs.apply(args=[workspace, layer],
                                     kwargs=kwargs,
@@ -71,7 +72,7 @@ def test_geoserver_bbox():
     for bbox, expected_bbox in expected_bboxes:
         wms.delete_layer(workspace, layer)
         with app.app_context():
-            publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox)
+            publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
             tasks.refresh_wms.apply(args=[workspace, layer, True],
                                     kwargs=kwargs,
                                     )
@@ -81,7 +82,7 @@ def test_geoserver_bbox():
     for bbox, expected_bbox in expected_bboxes:
         wms.delete_layer(workspace, layer)
         with app.app_context():
-            publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox)
+            publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
             wms.delete_layer(workspace, layer)
             tasks.refresh_wms.apply(args=[workspace, layer, False],
                                     kwargs=kwargs,
