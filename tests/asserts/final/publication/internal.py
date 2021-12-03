@@ -1,3 +1,5 @@
+import pytest
+from layman.layer.filesystem import gdal
 from layman import app, util as layman_util, settings
 from test_tools import process_client, util as test_util, assert_util
 from ... import util
@@ -191,3 +193,13 @@ def does_not_exist(workspace, publ_type, name, ):
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
     assert not pub_info, pub_info
+
+
+def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
+    with app.app_context():
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file']})
+    file_type = publ_info['file']['file_type']
+    if file_type == settings.FILE_TYPE_RASTER:
+        input_nodata_value = gdal.get_nodata_value(publ_info['_file']['gdal_path'])
+        normalized_nodata_value = gdal.get_nodata_value(publ_info['_file']['normalized_file']['path'])
+        assert normalized_nodata_value == pytest.approx(input_nodata_value, 0.000000001)

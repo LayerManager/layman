@@ -217,20 +217,16 @@ def normalize_raster_file_async(input_path, crs_id, output_file):
         bash_args.extend([
             '-co', 'PHOTOMETRIC=RGB',
         ])
-    # interpret NoData as transparent only if Alpha band is not available and NoData is set for each band
     src_nodata = 'None'
-    nodata_values = None
-    if color_interp[-1] != 'Alpha':
-        nodata_values = get_nodata_values(input_path)
-        if to_nodata_value(nodata_values) is not None:
-            src_nodata = ' '.join([str(val) for val in nodata_values])
+    nodata_values = get_nodata_values(input_path)
+    if to_nodata_value(nodata_values) is not None:
+        src_nodata = ' '.join([str(val) for val in nodata_values])
     bash_args.extend([
         '-srcnodata', src_nodata,
     ])
-    if color_interp != ['Palette']:
-        bash_args.extend([
-            '-dstnodata', 'None',
-        ])
+    bash_args.extend([
+        '-dstnodata', src_nodata,
+    ])
     if is_normalized_alpha_needed(input_path, color_interp=color_interp, nodata_values=nodata_values):
         bash_args.extend([
             '-dstalpha',

@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.15.1
+ {release_date}
+### Changes
+- [#525](https://github.com/LayerManager/layman/issues/525) Keep NoData value in normalized raster files. Also NoData values are normalized as transparent always, even if Alpha channel is available.
+
 ## v1.15.0
  2021-11-18
 ### Changes
