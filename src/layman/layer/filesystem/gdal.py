@@ -157,7 +157,7 @@ def get_statistics(filepath):
 
 
 def is_nodata_out_of_min_max(filepath, *, nodata_values):
-    if any(val is None for val in nodata_values):
+    if to_nodata_value(nodata_values) is None:
         result = False
     else:
         base_name = os.path.splitext(util.get_deepest_real_file(filepath))[0]
@@ -183,7 +183,7 @@ def is_normalized_alpha_needed(filepath, *, color_interp, nodata_values):
     elif mask_flags == [{gdalconst.GMF_PER_DATASET}] * 3:  # e.g. transparent JPG
         result = True
     else:
-        if any(val is None for val in nodata_values):
+        if to_nodata_value(nodata_values) is None:
             result = False
         else:
             result = not is_nodata_out_of_min_max(filepath, nodata_values=nodata_values)
@@ -222,7 +222,7 @@ def normalize_raster_file_async(input_path, crs_id, output_file):
     nodata_values = None
     if color_interp[-1] != 'Alpha':
         nodata_values = get_nodata_values(input_path)
-        if all(val is not None for val in nodata_values):
+        if to_nodata_value(nodata_values) is not None:
             src_nodata = ' '.join([str(val) for val in nodata_values])
     bash_args.extend([
         '-srcnodata', src_nodata,
