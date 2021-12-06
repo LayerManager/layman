@@ -100,6 +100,13 @@ def get_nodata_values(filepath):
     return result
 
 
+def get_nodata_value(filepath):
+    nodata_values = get_nodata_values(filepath)
+    first_nodata_value = nodata_values[0]
+    assert all(v == first_nodata_value for v in nodata_values)
+    return first_nodata_value
+
+
 def get_mask_flags(filepath):
     dataset = open_raster_file(filepath, gdal.GA_ReadOnly)
     all_mask_flags = [
