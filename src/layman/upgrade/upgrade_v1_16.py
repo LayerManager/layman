@@ -12,3 +12,7 @@ def adjust_db_for_srid():
 
     statement = f'ALTER TABLE {DB_SCHEMA}.publications ADD COLUMN IF NOT EXISTS srid integer;'
     db_util.run_statement(statement)
+
+    statement = f'alter table {DB_SCHEMA}.publications add constraint bbox_with_crs_check CHECK ' \
+                f'(bbox is null or srid is not null);'
+    db_util.run_statement(statement)
