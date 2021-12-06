@@ -100,11 +100,15 @@ def get_nodata_values(filepath):
     return result
 
 
-def get_nodata_value(filepath):
-    nodata_values = get_nodata_values(filepath)
+def to_nodata_value(nodata_values):
     first_nodata_value = nodata_values[0]
     assert all(v == first_nodata_value for v in nodata_values)
     return first_nodata_value
+
+
+def get_nodata_value(filepath):
+    nodata_values = get_nodata_values(filepath)
+    return to_nodata_value(nodata_values)
 
 
 def get_mask_flags(filepath):
