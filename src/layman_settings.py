@@ -84,10 +84,10 @@ LAYMAN_GS_AUTHN_FILTER_NAME_OLD = ['laymanHttpFilter']
 LAYMAN_GS_WMS_WORKSPACE_POSTFIX = '_wms'
 
 LAYMAN_OUTPUT_SRS_LIST = [
-    int(code) for code in os.environ['LAYMAN_OUTPUT_SRS_LIST'].split(',')
+    f'EPSG:{int(code)}' for code in os.environ['LAYMAN_OUTPUT_SRS_LIST'].split(',')
     if len(code) > 0
 ]
-for mandatory_srs in [3857, 4326]:
+for mandatory_srs in INPUT_SRS_LIST:
     if mandatory_srs not in LAYMAN_OUTPUT_SRS_LIST:
         LAYMAN_OUTPUT_SRS_LIST.append(mandatory_srs)
 

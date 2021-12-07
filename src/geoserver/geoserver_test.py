@@ -5,7 +5,7 @@ from . import util as gs_util, GS_AUTH
 TEST_ROLE = 'test_role_abc'
 TEST_USER = 'test_user_abc'
 TEST_USER_PASSWORD = 'test_user_abc_pwd'
-TEST_SERVICE_SRS_LIST = [3035, 4326]
+TEST_SERVICE_SRS_LIST = ['EPSG:3035', 'EPSG:4326']
 TEST_PROXY_BASE_URL = 'https://example.com/geoserver/'
 
 
@@ -79,15 +79,17 @@ def test_user_role_management(gs_user, gs_role):
 
 @pytest.mark.parametrize('service', gs_util.SERVICE_TYPES)
 def test_service_srs_list_management(service):
-    init_service_srs_list = gs_util.get_service_srs_list(service, GS_AUTH)
+    init_service_epsg_codes = gs_util.get_service_srs_list(service, GS_AUTH)
     new_service_srs_list = TEST_SERVICE_SRS_LIST
-    assert set(init_service_srs_list) != set(new_service_srs_list)
+    new_service_epsg_codes = [gs_util.get_epsg_code(crs) for crs in new_service_srs_list]
+    assert set(init_service_epsg_codes) != set(new_service_epsg_codes)
     assert gs_util.ensure_service_srs_list(service, new_service_srs_list, GS_AUTH)
     service_srs_list = gs_util.get_service_srs_list(service, GS_AUTH)
-    assert set(service_srs_list) == set(new_service_srs_list)
-    assert gs_util.ensure_service_srs_list(service, init_service_srs_list, GS_AUTH)
+    assert set(service_srs_list) == set(new_service_epsg_codes)
+    init_service_crs_list = [f'EPSG:{srid}' for srid in init_service_epsg_codes]
+    assert gs_util.ensure_service_srs_list(service, init_service_crs_list, GS_AUTH)
     service_srs_list = gs_util.get_service_srs_list(service, GS_AUTH)
-    assert set(service_srs_list) == set(init_service_srs_list)
+    assert set(service_srs_list) == set(init_service_epsg_codes)
 
 
 def test_proxy_base_url_management():

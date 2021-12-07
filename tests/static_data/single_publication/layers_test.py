@@ -224,7 +224,7 @@ def test_fill_project_template(workspace, publ_type, publication):
     wmsi = WebMapService(wms_url, version=wms_version)
     assert publication in wmsi.contents
     wms_layer = wmsi.contents[publication]
-    exp_output_srs = {f"EPSG:{expected_output_srs}" for expected_output_srs in settings.LAYMAN_OUTPUT_SRS_LIST}
+    exp_output_srs = set(settings.LAYMAN_OUTPUT_SRS_LIST)
     assert exp_output_srs.issubset(set(wms_layer.crsOptions))
     wms_layer_bbox = next((tuple(bbox_crs[:4]) for bbox_crs in wms_layer.crs_list if bbox_crs[4] == layer_crs))
     assert_util.assert_same_bboxes(wms_layer_bbox, layer_bbox, 0.1)

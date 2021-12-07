@@ -178,7 +178,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         md_language=md_language,
         languages=languages,
         spatial_resolution=spatial_resolution,
-        crs_list=[f'EPSG:{code}' for code in settings.LAYMAN_OUTPUT_SRS_LIST],
+        crs_list=settings.LAYMAN_OUTPUT_SRS_LIST,
     )
     if http_method == common.REQUEST_METHOD_POST:
         prop_values.pop('revision_date', None)

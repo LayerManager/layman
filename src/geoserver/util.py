@@ -883,6 +883,7 @@ get_wfs_srs_list = partial(get_service_srs_list, WFS_SERVICE_TYPE)
 
 
 def ensure_service_srs_list(service, srs_list, auth):
+    srs_list = [get_epsg_code(crs) for crs in srs_list]
     # Maybe it's needed to call /reload after the change in WFS SRS list
     service_settings = get_service_settings(service, auth)
     current_srs_list = get_service_srs_list(service, auth, service_settings=service_settings)

@@ -4,6 +4,8 @@ import pathlib
 import re
 import requests
 
+from . import util
+
 logger = logging.getLogger(__name__)
 
 DEFAULT_CONNECTION_TIMEOUT = int(os.environ['DEFAULT_CONNECTION_TIMEOUT'])
@@ -67,6 +69,7 @@ def get_srs_list_from_epsg_file(file_path):
 def setup_epsg(data_dir, srs_list):
 
     file_name = 'epsg.properties'
+    srs_list = {util.get_epsg_code(crs) for crs in srs_list}
 
     file_path = os.path.join(data_dir, 'user_projections', file_name)
     pathlib.Path(os.path.dirname(file_path)).mkdir(parents=True, exist_ok=True)

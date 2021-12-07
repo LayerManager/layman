@@ -112,7 +112,7 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, crs, qml_xml, sourc
 
 
 def fill_project_template(workspace, layer, layer_uuid, layer_qml, crs, epsg_codes, extent, source_type):
-    wms_crs_list_values = "\n".join((f"<value>EPSG:{code}</value>" for code in epsg_codes))
+    wms_crs_list_values = "\n".join((f"<value>{code}</value>" for code in epsg_codes))
     db_schema = workspace
     layer_name = layer
     db_table = layer
@@ -145,11 +145,7 @@ def get_layer_wms_crs_list_values(workspace, layer):
     crs_elements = tree.xpath("/qgis/properties/WMSCrsList")
     assert len(crs_elements) == 1
     crs_element = crs_elements[0]
-    crs_list = set()
-    for element in crs_element.iter("value"):
-        split_element = element.text.split(':')
-        assert split_element[0] == 'EPSG', ET.tostring(crs_element)
-        crs_list.add(int(split_element[1]))
+    crs_list = {element.text for element in crs_element.iter("value")}
     return crs_list
 
 
