@@ -1049,3 +1049,9 @@ def wfs_direct(wfs_url, xml=None, version=None, headers=None):
             return None
         raise exc
     return wfs
+
+
+def get_epsg_code(crs):
+    authority, epsg_code = crs.split(':')
+    assert authority == 'EPSG'
+    return int(epsg_code)
