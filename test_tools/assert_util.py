@@ -21,7 +21,7 @@ def assert_same_images(img_url, tmp_file_path, expected_file_path, diff_threshol
 
     diffs = compare_images(expected_file_path, tmp_file_path)
 
-    assert diffs < diff_threshold, f"{diffs} >= {diff_threshold}"
+    assert diffs < diff_threshold, f"{diffs} >= {diff_threshold}, img_url={img_url}"
 
     os.remove(tmp_file_path)
 
