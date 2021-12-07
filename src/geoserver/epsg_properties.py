@@ -56,7 +56,7 @@ EPSG_PROPERTIES_DEFAULT = {
 }
 
 
-def get_srs_list_from_epsg_file(file_path):
+def get_epsg_codes_from_epsg_file(file_path):
     result = set()
     if os.path.exists(file_path):
         with open(file_path, 'r', encoding=EPSG_ENCODING) as file:
@@ -73,15 +73,15 @@ def setup_epsg(data_dir, srs_list):
 
     file_path = os.path.join(data_dir, 'user_projections', file_name)
     pathlib.Path(os.path.dirname(file_path)).mkdir(parents=True, exist_ok=True)
-    old_srs_list = get_srs_list_from_epsg_file(file_path)
-    missing_srs = srs_list.difference(old_srs_list)
+    old_epsg_codes = get_epsg_codes_from_epsg_file(file_path)
+    missing_srs = srs_list.difference(old_epsg_codes)
     new_epsg = {code: definition for code, definition in EPSG_PROPERTIES_DEFAULT.items()
                 if code in missing_srs}
 
     srs_to_download = missing_srs.difference(new_epsg.keys())
     if new_epsg or srs_to_download:
         logger.info(f"Ensuring GeoServer EPSG definition for SRS list: '{srs_list}'")
-        logger.info(f"  already in {file_name}: {old_srs_list}")
+        logger.info(f"  already in {file_name}: {old_epsg_codes}")
         logger.info(f"  found in Layman internal definition: {set(new_epsg.keys())}")
         logger.info(f"  to download from epsg.io: {srs_to_download}")
     else:
