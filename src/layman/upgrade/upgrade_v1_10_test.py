@@ -11,6 +11,7 @@ from geoserver import util as gs_util
 from layman import app, settings
 from layman.http import LaymanError
 from layman.common import prime_db_schema
+from layman.common.prime_db_schema import publications
 from layman.layer import geoserver as gs_layer, util as layer_util, db, NO_STYLE_DEF
 from layman.layer.prime_db_schema import table as prime_db_schema_table
 from layman.layer.geoserver import wms
@@ -87,6 +88,7 @@ def ensure_layer():
                                              None,
                                              NO_STYLE_DEF,
                                              )
+            publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, (None, None, None, None, ), 'EPSG:3857')
             file_path = '/code/tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
             uuid_common.assign_publication_uuid('layman.layer', workspace, layer, uuid_str=uuid_str)
             db.ensure_workspace(workspace)
@@ -240,7 +242,6 @@ def test_migrate_maps_on_wms_workspace(ensure_map):
     process_client.delete_workspace_map(workspace, map)
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_migrate_wms_workspace_metadata(ensure_layer):
     def assert_md_keys(layer_info):
