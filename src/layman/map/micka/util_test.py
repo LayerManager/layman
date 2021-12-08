@@ -111,7 +111,6 @@ def test_parse_md_properties():
                            equals_fn), f"Values of property {k} do not equal: {value} != {expected[k]}"
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures('app_context', 'ensure_layman', 'client')
 def test_fill_xml_template():
     with app.app_context():
@@ -119,7 +118,7 @@ def test_fill_xml_template():
             'md_file_identifier': 'm-91147a27-1ff4-4242-ba6d-faffb92224c6',
             'md_organisation_name': None,
             'md_date_stamp': '2007-05-25',
-            'reference_system': [3857],
+            'reference_system': ['EPSG:3857'],
             'title': 'World places and boundaries',
             'publication_date': '2007-05-25',
             'identifier': {
