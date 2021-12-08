@@ -7,6 +7,7 @@ from geoserver import util as gs_util
 from layman import app, settings
 from layman.common.filesystem import uuid as uuid_common
 from layman.common.micka import util as micka_util
+from layman.common.prime_db_schema import publications
 from layman.layer import geoserver as gs_layer, NO_STYLE_DEF, db
 from layman.layer.filesystem import input_file as layer_in_file, util as layer_fs_util
 from layman.layer.geoserver import wms
@@ -32,6 +33,7 @@ def ensure_layer():
                                              None,
                                              NO_STYLE_DEF,
                                              )
+            publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, (None, None, None, None, ), 'EPSG:3857')
             file_path = '/code/sample/layman.layer/small_layer.geojson'
             uuid_common.assign_publication_uuid('layman.layer', workspace, layer, uuid_str=uuid_str)
             db.ensure_workspace(workspace)
@@ -113,7 +115,6 @@ where w.name = %s
     process_client.delete_workspace_map(workspace, map)
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_migrate_layer_metadata(ensure_layer):
     def assert_md_keys(layer_info):
