@@ -46,8 +46,6 @@ def run_db_init():
     logger.info(f'  DB init')
     upgrade_v1_8.upgrade_1_8()
     upgrade_v1_9.initialize_data_versioning()
-    upgrade_v1_9.geoserver_everyone_rights_repair()
-    upgrade_v1_9.geoserver_remove_users_for_public_workspaces()
     upgrade_v1_10.alter_schema()
     upgrade_v1_10.check_workspace_names()
     upgrade_v1_10.migrate_layers_to_wms_workspace()
