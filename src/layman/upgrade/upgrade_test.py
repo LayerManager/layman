@@ -1,14 +1,32 @@
 import pytest
 
 from db import util as db_util
-from layman import upgrade, app, settings
+from layman import app, settings
 from . import consts
+from .. import upgrade
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
 def test_upgrade_run():
     with app.app_context():
         upgrade.upgrade()
+
+
+@pytest.mark.parametrize('mig_type, version_to_test', [
+    (consts.MIGRATION_TYPE_SCHEMA, (1, 11, 0, 0), ),
+    (consts.MIGRATION_TYPE_DATA, (1, 11, 0, 0),),
+])
+def test_check_version_upgradeability(mig_type, version_to_test):
+    with app.app_context():
+        current_version = upgrade.get_current_version(mig_type)
+        upgrade.check_version_upgradeability()
+
+        upgrade.set_current_migration_version(mig_type, version_to_test)
+        with pytest.raises(AssertionError):
+            upgrade.check_version_upgradeability()
+
+        upgrade.set_current_migration_version(mig_type, current_version)
+        upgrade.check_version_upgradeability()
 
 
 @pytest.mark.parametrize('sql_command, expected_value, migration_type', [
