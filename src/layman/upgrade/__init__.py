@@ -1,5 +1,4 @@
 import logging
-import psycopg2
 
 from db import util as db_util
 from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_13, upgrade_v1_14, upgrade_v1_16
@@ -82,54 +81,24 @@ def get_max_data_version(migration_type):
 
 
 def get_current_version(migration_type):
-    current_version = None
-    try:
-        sql_select = f'''select major_version, minor_version, patch_version, migration
-        from {DB_SCHEMA}.data_version
-        where migration_type = '{migration_type}';'''
-        sql_result = db_util.run_query(sql_select, encapsulate_exception=False)
-        row_count = len(sql_result)
-        if row_count == 1:
-            current_version = sql_result[0]
-        elif row_count == 0:
-            current_version = (-1, -1, -1, -1)
-        else:
-            assert row_count == 1
-    except psycopg2.errors.UndefinedTable:  # pylint: disable=no-member
-        current_version = (-1, -1, -1, -1)
-    except psycopg2.errors.UndefinedColumn:  # pylint: disable=no-member
-        assert migration_type == consts.MIGRATION_TYPE_SCHEMA
-        sql_select = f'''select major_version, minor_version, patch_version, migration
-        from {DB_SCHEMA}.data_version;'''
-        sql_result = db_util.run_query(sql_select, encapsulate_exception=False)
-        row_count = len(sql_result)
-        assert row_count == 1
-        current_version = sql_result[0]
+    sql_select = f'''select major_version, minor_version, patch_version, migration
+    from {DB_SCHEMA}.data_version
+    where migration_type = '{migration_type}';'''
+    sql_result = db_util.run_query(sql_select, encapsulate_exception=False)
+    row_count = len(sql_result)
+    assert row_count == 1
+    current_version = sql_result[0]
     return current_version
 
 
 def set_current_migration_version(migration_type, version):
-    try:
-        sql_insert = f'''update {DB_SCHEMA}.data_version set
-            major_version = %s,
-            minor_version = %s,
-            patch_version = %s,
-            migration = %s
-        where migration_type = '{migration_type}';'''
-        db_util.run_statement(sql_insert, version, encapsulate_exception=False)
-    except psycopg2.errors.UndefinedColumn:  # pylint: disable=no-member
-        assert migration_type == consts.MIGRATION_TYPE_SCHEMA
-
-        sql_select = f'''select count(*) from {DB_SCHEMA}.data_version;'''
-        sql_result = db_util.run_query(sql_select)
-        assert sql_result[0][0] == 1
-
-        sql_insert = f'''update {DB_SCHEMA}.data_version set
-            major_version = %s,
-            minor_version = %s,
-            patch_version = %s,
-            migration = %s;'''
-        db_util.run_statement(sql_insert, version)
+    sql_insert = f'''update {DB_SCHEMA}.data_version set
+        major_version = %s,
+        minor_version = %s,
+        patch_version = %s,
+        migration = %s
+    where migration_type = '{migration_type}';'''
+    db_util.run_statement(sql_insert, version, encapsulate_exception=False)
 
 
 def run_migrations(migration_type):

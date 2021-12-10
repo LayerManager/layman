@@ -12,35 +12,6 @@ def test_upgrade_run():
 
 
 @pytest.mark.parametrize('sql_command, expected_value, migration_type', [
-    (f'''DROP TABLE IF EXISTS {DB_SCHEMA}.data_version''', (-1, -1, -1, -1), consts.MIGRATION_TYPE_SCHEMA),
-    (f'''DROP TABLE IF EXISTS {DB_SCHEMA}.data_version; CREATE TABLE IF NOT EXISTS {DB_SCHEMA}.data_version
-        (
-            major_version integer not null,
-            minor_version integer not null,
-            patch_version integer not null,
-            migration integer not null
-        )
-    TABLESPACE pg_default;
-    insert into {DB_SCHEMA}.data_version (major_version, minor_version, patch_version, migration) values (1, 9, 0, 0);commit;
-    ''', (1, 9, 0, 0), consts.MIGRATION_TYPE_SCHEMA),
-    (f'''DROP TABLE IF EXISTS {DB_SCHEMA}.data_version; CREATE TABLE IF NOT EXISTS {DB_SCHEMA}.data_version
-        (
-            major_version integer not null,
-            minor_version integer not null,
-            patch_version integer not null,
-            migration integer not null,
-            migration_type {DB_SCHEMA}.enum_migration_type UNIQUE NOT NULL
-        )
-        TABLESPACE pg_default;''', (-1, -1, -1, -1), consts.MIGRATION_TYPE_SCHEMA),
-    (f'''DROP TABLE IF EXISTS {DB_SCHEMA}.data_version; CREATE TABLE IF NOT EXISTS {DB_SCHEMA}.data_version
-        (
-            major_version integer not null,
-            minor_version integer not null,
-            patch_version integer not null,
-            migration integer not null,
-            migration_type {DB_SCHEMA}.enum_migration_type UNIQUE NOT NULL
-        )
-        TABLESPACE pg_default;''', (-1, -1, -1, -1), consts.MIGRATION_TYPE_DATA),
     (f'''DROP TABLE IF EXISTS {DB_SCHEMA}.data_version; CREATE TABLE IF NOT EXISTS {DB_SCHEMA}.data_version
         (
             major_version integer not null,
