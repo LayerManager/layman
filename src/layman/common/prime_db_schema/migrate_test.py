@@ -32,7 +32,6 @@ def save_upgrade_status():
         upgrade.upgrade_v1_12.adjust_prime_db_schema_for_fulltext_search()
         upgrade.upgrade_v1_12.adjust_prime_db_schema_for_last_change_search()
         upgrade.upgrade_v1_12.adjust_prime_db_schema_for_bbox_search()
-        upgrade.upgrade_v1_12.adjust_data_for_last_change_search()
         upgrade.upgrade_v1_16.adjust_db_for_srid()
 
         for (migration_type, version) in current_versions:
