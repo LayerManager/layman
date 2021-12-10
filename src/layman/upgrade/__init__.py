@@ -10,28 +10,18 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 logger = logging.getLogger(__name__)
 
+
+MIGRATION_TYPES = [consts.MIGRATION_TYPE_SCHEMA, consts.MIGRATION_TYPE_DATA]
+
+MIN_UPGRADEABLE_VERSION = {
+    consts.MIGRATION_TYPE_DATA: (1, 12, 0, 3),
+    consts.MIGRATION_TYPE_SCHEMA: (1, 12, 0, 2),
+    consts.MORE_INFO_VERSION: '1.16.0',
+}
+
+
 MIGRATIONS = {
     consts.MIGRATION_TYPE_SCHEMA: [
-        ((1, 9, 0), [  # includes also data migrations
-            upgrade_v1_9.initialize_data_versioning,
-            upgrade_v1_9.geoserver_everyone_rights_repair,
-            upgrade_v1_9.geoserver_remove_users_for_public_workspaces,
-        ]),
-        ((1, 10, 0), [  # includes also data migrations
-            upgrade_v1_10.alter_schema,
-            upgrade_v1_10.check_workspace_names,
-            upgrade_v1_10.migrate_layers_to_wms_workspace,
-            upgrade_v1_10.migrate_maps_on_wms_workspace,
-            upgrade_v1_10.migrate_metadata_records,
-            upgrade_v1_10.migrate_input_sld_directory_to_input_style,
-            upgrade_v1_10.update_style_type_in_db,
-        ]),
-        ((1, 12, 0), [
-            upgrade_v1_12.adjust_db_for_schema_migrations,
-            upgrade_v1_12.adjust_prime_db_schema_for_fulltext_search,
-            upgrade_v1_12.adjust_prime_db_schema_for_last_change_search,
-            upgrade_v1_12.adjust_prime_db_schema_for_bbox_search,
-        ]),
         ((1, 13, 0), [
             upgrade_v1_13.rename_users_directory,
         ]),
@@ -40,16 +30,50 @@ MIGRATIONS = {
         ]),
     ],
     consts.MIGRATION_TYPE_DATA: [
-        ((1, 12, 0), [
-            upgrade_v1_12.adjust_data_for_last_change_search,
-            upgrade_v1_12.migrate_layer_metadata,
-            upgrade_v1_12.adjust_data_for_bbox_search,
-        ]),
         ((1, 14, 0), [
             upgrade_v1_14.crop_bbox,
         ]),
     ],
 }
+
+
+def is_new_installation():
+    query = "SELECT count(*) FROM information_schema.schemata WHERE schema_name = %s;"
+    count = db_util.run_query(query, (DB_SCHEMA, ))[0][0]
+    return count == 0
+
+
+def run_db_init():
+    logger.info(f'  DB init')
+    upgrade_v1_8.upgrade_1_8()
+    upgrade_v1_9.initialize_data_versioning()
+    upgrade_v1_9.geoserver_everyone_rights_repair()
+    upgrade_v1_9.geoserver_remove_users_for_public_workspaces()
+    upgrade_v1_10.alter_schema()
+    upgrade_v1_10.check_workspace_names()
+    upgrade_v1_10.migrate_layers_to_wms_workspace()
+    upgrade_v1_10.migrate_maps_on_wms_workspace()
+    upgrade_v1_10.migrate_metadata_records()
+    upgrade_v1_10.migrate_input_sld_directory_to_input_style()
+    upgrade_v1_10.update_style_type_in_db()
+    upgrade_v1_12.adjust_db_for_schema_migrations()
+    upgrade_v1_12.adjust_prime_db_schema_for_fulltext_search()
+    upgrade_v1_12.adjust_prime_db_schema_for_last_change_search()
+    upgrade_v1_12.adjust_prime_db_schema_for_bbox_search()
+    for mig_type in MIGRATION_TYPES:
+        set_current_migration_version(mig_type, MIN_UPGRADEABLE_VERSION[mig_type])
+
+
+def check_version_upgradeability():
+    more_info_version = MIN_UPGRADEABLE_VERSION[consts.MORE_INFO_VERSION]
+    for mig_type in MIGRATION_TYPES:
+        current_version = get_current_version(mig_type)
+        min_version = MIN_UPGRADEABLE_VERSION[mig_type]
+        assert current_version >= min_version, \
+            f'Layman is not able to upgrade from {mig_type} version {current_version}. ' \
+            f'Minimum upgradeable version is {min_version}. ' \
+            f'More info in Changelog for release v{more_info_version}: ' \
+            f'https://github.com/LayerManager/layman/blob/v{more_info_version}/CHANGELOG.md#upgrade-requirements'
 
 
 def get_max_data_version(migration_type):
@@ -129,9 +153,10 @@ def run_migrations(migration_type):
 
 def upgrade():
     logger.info(f'Checking all upgrades')
-    if upgrade_v1_8.older_than_1_8():
-        upgrade_v1_8.upgrade_1_8()
 
+    if is_new_installation():
+        run_db_init()
+    check_version_upgradeability()
     run_migrations(consts.MIGRATION_TYPE_SCHEMA)
     run_migrations(consts.MIGRATION_TYPE_DATA)
     logger.info(f'Done all upgrades')

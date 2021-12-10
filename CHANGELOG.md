@@ -3,6 +3,7 @@
 ## v1.16.0
  {release_date}
 ### Upgrade requirements
+- Only versions 1.12.0 and newer can be upgraded to this version. For older versions, please upgrade to last 1.15.x first.
 - Unset environment variable [LAYMAN_SETTINGS_MODULE](https://github.com/LayerManager/layman/blob/v1.15.0/doc/env-settings.md), it has no effect anymore.
 ### Migrations and checks
 #### Schema migrations
