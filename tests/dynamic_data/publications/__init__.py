@@ -1,4 +1,4 @@
-from layman import LaymanError, settings
+from layman import LaymanError
 import tests.asserts.final.publication as publication
 import tests.asserts.processing as processing
 from test_tools import process_client
@@ -852,105 +852,6 @@ PUBLICATIONS = {
                 }),
                 Action(publication.internal.thumbnail_equals, {
                     'name': 'small_zip_layer',
-                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
-                }),
-            ],
-        },
-    ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'patch_posted_layer_not_in_gs_wms_workspace'): [
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, dict()),
-                consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
-                ],
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER.info_values),
-                Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
-                }),
-            ],
-        },
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
-                    'file_paths': ['test_tools/data/layers/non_readable_raster.tif'],
-                    'with_chunks': True,
-                }),
-                consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
-                ],
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                Action(publication.rest.async_error_in_info_key, {'info_key': 'file',
-                                                                  'expected': {'http_code': 400,
-                                                                               'code': 2,
-                                                                               'message': 'Wrong parameter value',
-                                                                               'detail': {'parameter': 'file',
-                                                                                          'message': 'Unable to open raster file.',
-                                                                                          'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
-                                                                                          'file': '/layman_data_test/workspaces/dynamic_test_workspace/layers/patch_posted_layer_not_in_gs_wms_workspace/input_file/patch_posted_layer_not_in_gs_wms_workspace.tif',
-                                                                                          },
-                                                                               }, }, ),
-            ],
-        },
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
-                    'file_paths': ['sample/layman.layer/small_layer.geojson'],
-                }),
-                consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
-                ],
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER.info_values),
-                Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
-                }),
-            ],
-        },
-    ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'patch_layer_not_in_gs_wms_workspace'): [
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': ['test_tools/data/layers/non_readable_raster.tif'],
-                    'with_chunks': True,
-                }),
-                consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
-                ],
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                Action(publication.rest.async_error_in_info_key, {'info_key': 'file',
-                                                                  'expected': {'http_code': 400,
-                                                                               'code': 2,
-                                                                               'message': 'Wrong parameter value',
-                                                                               'detail': {'parameter': 'file',
-                                                                                          'message': 'Unable to open raster file.',
-                                                                                          'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
-                                                                                          'file': '/layman_data_test/workspaces/dynamic_test_workspace/layers/patch_layer_not_in_gs_wms_workspace/input_file/patch_layer_not_in_gs_wms_workspace.tif',
-                                                                                          },
-                                                                               }, }, ),
-            ],
-        },
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
-                    'file_paths': ['sample/layman.layer/small_layer.geojson'],
-                }),
-                consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
-                ],
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER.info_values),
-                Action(publication.internal.thumbnail_equals, {
                     'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
                 }),
             ],
