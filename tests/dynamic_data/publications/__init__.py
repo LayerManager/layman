@@ -678,68 +678,6 @@ PUBLICATIONS = {
             ],
         },
     ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'two_zip_files'): [
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': [
-                        'tmp/sm5/vektor/sm5.zip',
-                        'test_tools/data/layers/layer_with_two_main_files.zip',
-                    ],
-                }),
-                consts.KEY_CALL_EXCEPTION: {
-                    consts.KEY_EXCEPTION: LaymanError,
-                    consts.KEY_EXCEPTION_ASSERTS: [
-                        Action(processing.exception.response_exception, {
-                            'expected': {'http_code': 400,
-                                         'code': 2,
-                                         'detail': {'parameter': 'file',
-                                                    'expected': 'At most one file with extensions: .zip',
-                                                    'files': [
-                                                        'sm5.zip',
-                                                        'layer_with_two_main_files.zip',
-                                                    ],
-                                                    }, }, }, ),
-                    ],
-                },
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                Action(publication.internal.does_not_exist, dict())
-            ],
-        },
-    ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_two_zip_files'): [
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': [
-                        'tmp/sm5/vektor/sm5.zip',
-                        'test_tools/data/layers/layer_with_two_main_files.zip',
-                    ],
-                    'compress': True,
-                }),
-                consts.KEY_CALL_EXCEPTION: {
-                    consts.KEY_EXCEPTION: LaymanError,
-                    consts.KEY_EXCEPTION_ASSERTS: [
-                        Action(processing.exception.response_exception, {
-                            'expected': {'http_code': 400,
-                                         'code': 2,
-                                         'detail': {'parameter': 'file',
-                                                    'message': 'Zip file without data file inside.',
-                                                    'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
-                                                    'files': [
-                                                        'temporary_zip_file.zip/sm5.zip',
-                                                        'temporary_zip_file.zip/layer_with_two_main_files.zip',
-                                                    ],
-                                                    }, }, }, ),
-                    ],
-                },
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                Action(publication.internal.does_not_exist, dict())
-            ],
-        },
-    ],
     Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zip_and_main_file'): [
         {
             consts.KEY_ACTION: {
