@@ -439,6 +439,7 @@ def generate(workspace=None):
                             *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                         ]
                     }
+                    patch.append(action_def)
                 else:
                     action_def = {
                         consts.KEY_ACTION: {
@@ -455,8 +456,8 @@ def generate(workspace=None):
                                                                               'expected': exp_exception, }, ),
                         ],
                     }
-                patch.append(action_def)
-                patch.append(VALIDATION_PATCH_ACTION)
+                    patch.append(action_def)
+                    patch.append(VALIDATION_PATCH_ACTION)
                 publ_name = f"{testcase}_patch_{patch_key}_{test_case_postfix}"
                 result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = patch
 
