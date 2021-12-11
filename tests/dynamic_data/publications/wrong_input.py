@@ -435,6 +435,24 @@ def generate(workspace=None):
                         ],
                     }
                 patch.append(action_def)
+                action_def = {
+                    consts.KEY_ACTION: {
+                        consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
+                            'file_paths': ['sample/layman.layer/small_layer.geojson'],
+                        }),
+                        consts.KEY_RESPONSE_ASSERTS: [
+                            Action(processing.response.valid_post, dict()),
+                        ],
+                    },
+                    consts.KEY_FINAL_ASSERTS: [
+                        *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                        Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER.info_values),
+                        Action(publication.internal.thumbnail_equals, {
+                            'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
+                        }),
+                    ],
+                }
+                patch.append(action_def)
                 publ_name = f"{testcase}_patch_{patch_key}_{test_case_postfix}"
                 result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = patch
 
