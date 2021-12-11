@@ -1,4 +1,4 @@
-from layman import LaymanError
+from layman import LaymanError, settings
 import tests.asserts.final.publication as publication
 import tests.asserts.processing as processing
 from test_tools import process_client
@@ -10,28 +10,12 @@ from ... import Action, Publication, dynamic_data as consts
 PUBLICATIONS = {
     Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'basic_sld'): [
         {
-            consts.KEY_ACTION: predefined_actions.POST_TIF_WITH_QML,
-            consts.KEY_FINAL_ASSERTS: [
-                Action(publication.internal.does_not_exist, dict())
-            ],
-        },
-        {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, layers.SMALL_LAYER.definition),
                 consts.KEY_RESPONSE_ASSERTS: [
                     Action(processing.response.valid_post, dict()),
                 ],
             },
-            consts.KEY_FINAL_ASSERTS: [
-                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER.info_values),
-                Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
-                }),
-            ],
-        },
-        {
-            consts.KEY_ACTION: predefined_actions.PATCH_TIF_WITH_QML,
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                 Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER.info_values),
