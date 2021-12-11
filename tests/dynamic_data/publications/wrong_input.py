@@ -1,11 +1,11 @@
 import copy
 
-from layman import LaymanError
+from layman import LaymanError, settings
 from tests.asserts import util as asserts_util
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client
-from . import util
+from . import util, common_layers as layers
 from ... import Action, Publication, dynamic_data as consts
 
 KEY_PUBLICATION_TYPE = 'publ_type'
@@ -159,6 +159,41 @@ TESTCASES = {
                 'sync': False,
                 'detail': {'file': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_chunks_zipped/input_file/non_readable_raster_post_chunks_zipped.zip/non_readable_raster.tif',
                            }
+            },
+        },
+    },
+    'pgw_png_unsupported_crs': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': ['sample/layman.layer/sample_png_pgw_rgba.pgw',
+                           'sample/layman.layer/sample_png_pgw_rgba.png', ],
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 4,
+                          'message': 'Unsupported CRS of data file',
+                          'detail': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
+                          },
+            frozenset([('compress', False), ('with_chunks', True)]): {
+                'sync': False,
+            },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+            },
+        },
+        KEY_PATCHES: {
+            'patch': {
+                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+                KEY_EXPECTED_EXCEPTION: {
+                    frozenset([('compress', False), ('with_chunks', True)]): {
+                        'sync': False,
+                    },
+                    frozenset([('compress', True), ('with_chunks', True)]): {
+                        'sync': False,
+                    },
+                },
             },
         },
     },

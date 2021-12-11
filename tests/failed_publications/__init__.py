@@ -8,19 +8,6 @@ SYNC_ERROR = 'sync_error'
 
 LAYER_DEFINITIONS = [
     {
-        DEFINITION: {'file_paths': ['sample/layman.layer/sample_png_pgw_rgba.pgw',
-                                    'sample/layman.layer/sample_png_pgw_rgba.png', ]},
-        TEST_DATA: {
-            'expected_exc': {'http_code': 400,
-                             'code': 4,
-                             'message': 'Unsupported CRS of data file',
-                             'detail': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
-                             },
-            'error_async_part': 'file',
-            'chunk_error_type': ASYNC_ERROR,
-        }
-    },
-    {
         DEFINITION: {'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
                      'style_file': 'sample/style/ne_10m_admin_0_countries.qml'},
         TEST_DATA: {
