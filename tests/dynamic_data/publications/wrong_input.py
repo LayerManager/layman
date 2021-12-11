@@ -57,7 +57,7 @@ TESTCASES = {
                         'detail': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
                     frozenset([('compress', True), ('with_chunks', True)]): {
                         'sync': False,
-                        'detail': {'path': 'shp_without_dbf_patch_all_files.zip/ne_110m_admin_0_boundary_lines_land.shp'}}
+                        'detail': {'path': 'shp_without_dbf_patch_all_files_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}}
                 },
             },
         },
@@ -216,21 +216,24 @@ def generate(workspace=None):
             result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = [action_def]
 
         for patch_key, patch_params in tc_params.get(KEY_PATCHES, dict()).items():
-            patch = [
-                {
-                    consts.KEY_ACTION: {
-                        consts.KEY_CALL: Action(process_client.publish_workspace_publication,
-                                                patch_params[KEY_PATCH_POST]),
-                        consts.KEY_RESPONSE_ASSERTS: [
-                            Action(processing.response.valid_post, dict()),
-                        ],
-                    },
-                    consts.KEY_FINAL_ASSERTS: [
-                        *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                    ]
-                },
-            ]
             for rest_param_dict in util.dictionary_product(REST_PARAMETRIZATION):
+                test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
+                                              for key, value in rest_param_dict.items()
+                                              if REST_PARAMETRIZATION[key][value]])
+                patch = [
+                    {
+                        consts.KEY_ACTION: {
+                            consts.KEY_CALL: Action(process_client.publish_workspace_publication,
+                                                    patch_params[KEY_PATCH_POST]),
+                            consts.KEY_RESPONSE_ASSERTS: [
+                                Action(processing.response.valid_post, dict()),
+                            ],
+                        },
+                        consts.KEY_FINAL_ASSERTS: [
+                            *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                        ]
+                    },
+                ]
                 rest_param_frozen_set = frozenset(rest_param_dict.items())
                 default_exp_exception = copy.deepcopy(tc_params[KEY_EXPECTED_EXCEPTION][KEY_DEFAULT])
                 exception_diff = patch_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, dict())
@@ -270,6 +273,7 @@ def generate(workspace=None):
                         ],
                     }
                 patch.append(action_def)
-            result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], testcase + '_patch_' + patch_key)] = patch
+                publ_name = f"{testcase}_patch_{patch_key}_{test_case_postfix}"
+                result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = patch
 
     return result
