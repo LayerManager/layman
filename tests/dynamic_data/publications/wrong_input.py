@@ -197,6 +197,53 @@ TESTCASES = {
             },
         },
     },
+    'two_main_files_compressed': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': ['test_tools/data/layers/layer_with_two_main_files.zip'],
+            'compress': False,
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'message': 'Wrong parameter value',
+                          'detail': {
+                              'expected': 'At most one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg',
+                              'files': [
+                                  'layer_with_two_main_files.zip/layer_with_two_main_files/geojson/small_layer.geojson',
+                                  'layer_with_two_main_files.zip/layer_with_two_main_files/raster/sample_tif_rgb.tif'],
+                              'parameter': 'file'},
+                          },
+            frozenset([('compress', False), ('with_chunks', True)]): {
+                'sync': False,
+                'detail': {
+                    'files': [
+                        'two_main_files_compressed_post_chunks.zip/layer_with_two_main_files/geojson/small_layer.geojson',
+                        'two_main_files_compressed_post_chunks.zip/layer_with_two_main_files/raster/sample_tif_rgb.tif'],
+                }
+            },
+        },
+        KEY_PATCHES: {
+            'patch': {
+                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+                KEY_ACTION_PARAMS: {
+                    'compress': False,
+                },
+                KEY_EXPECTED_EXCEPTION: {
+                    frozenset([('compress', False), ('with_chunks', True)]): {
+                        'sync': False,
+                        'detail': {
+                            'files': [
+                                'two_main_files_compressed_patch_patch_chunks.zip/layer_with_two_main_files/geojson/small_layer.geojson',
+                                'two_main_files_compressed_patch_patch_chunks.zip/layer_with_two_main_files/raster/sample_tif_rgb.tif'],
+                        }
+                    },
+                },
+            },
+        },
+    },
 }
 
 
