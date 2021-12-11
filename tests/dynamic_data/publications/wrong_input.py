@@ -244,6 +244,83 @@ TESTCASES = {
             },
         },
     },
+    'two_zip_files': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': [
+                'tmp/sm5/vektor/sm5.zip',
+                'test_tools/data/layers/layer_with_two_main_files.zip',
+            ],
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'detail': {'parameter': 'file',
+                                     'expected': 'At most one file with extensions: .zip',
+                                     'files': [
+                                         'sm5.zip',
+                                         'layer_with_two_main_files.zip',
+                                     ],
+                                     },
+                          },
+            frozenset([('compress', True), ('with_chunks', False)]): {
+                'detail': {
+                    'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
+                    'files': [
+                        'temporary_zip_file.zip/sm5.zip',
+                        'temporary_zip_file.zip/layer_with_two_main_files.zip',
+                    ],
+                    'message': 'Zip file without data file inside.',
+                    'parameter': 'file'
+                }
+            },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+                'detail': {
+                    'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
+                    'files': [
+                        'two_zip_files_post_chunks_zipped.zip/sm5.zip',
+                        'two_zip_files_post_chunks_zipped.zip/layer_with_two_main_files.zip',
+                    ],
+                    'message': 'Zip file without data file inside.',
+                    'parameter': 'file'
+                }
+            },
+        },
+        KEY_PATCHES: {
+            'patch': {
+                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+                KEY_EXPECTED_EXCEPTION: {
+                    frozenset([('compress', True), ('with_chunks', False)]): {
+                        'detail': {
+                            'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
+                            'files': [
+                                'temporary_zip_file.zip/sm5.zip',
+                                'temporary_zip_file.zip/layer_with_two_main_files.zip',
+                            ],
+                            'message': 'Zip file without data file inside.',
+                            'parameter': 'file'
+                        }
+                    },
+                    frozenset([('compress', True), ('with_chunks', True)]): {
+                        'sync': False,
+                        'detail': {
+                            'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
+                            'files': [
+                                'two_zip_files_patch_patch_chunks_zipped.zip/sm5.zip',
+                                'two_zip_files_patch_patch_chunks_zipped.zip/layer_with_two_main_files.zip',
+                            ],
+                            'message': 'Zip file without data file inside.',
+                            'parameter': 'file'
+                        }
+                    },
+
+                },
+            },
+        },
+    },
 }
 
 
