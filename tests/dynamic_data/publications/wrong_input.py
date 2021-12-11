@@ -255,6 +255,9 @@ def generate(workspace=None):
                 test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
                                               for key, value in rest_param_dict.items()
                                               if REST_PARAMETRIZATION[key][value]])
+                if any(k in rest_param_dict and rest_param_dict[k] != v for k, v in
+                       tc_params[KEY_ACTION_PARAMS].items()):
+                    continue
                 patch = [
                     {
                         consts.KEY_ACTION: {
