@@ -1,5 +1,8 @@
 import pytest
 
+import crs as crs_def
+from layman import app
+from test_tools import assert_util
 from . import bbox as bbox_util
 
 
@@ -71,3 +74,17 @@ def test_has_area(bbox, expected_result):
 ])
 def test_ensure_bbox_with_area(bbox, no_area_padding, expected_result):
     assert bbox_util.ensure_bbox_with_area(bbox, no_area_padding) == expected_result
+
+
+@pytest.mark.parametrize('bbox, crs_from, crs_to, expected_bbox', [
+    (
+        crs_def.CRSDefinitions[crs_def.EPSG_4326].world_bbox,
+        crs_def.EPSG_4326,
+        crs_def.EPSG_3857,
+        crs_def.CRSDefinitions[crs_def.EPSG_3857].world_bbox,
+    ),
+])
+def test_transform(bbox, crs_from, crs_to, expected_bbox):
+    with app.app_context():
+        transformed_bbox = bbox_util.transform(bbox, crs_from, crs_to)
+    assert_util.assert_same_bboxes(transformed_bbox, expected_bbox, 0.1)

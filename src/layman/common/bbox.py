@@ -1,4 +1,5 @@
 import logging
+import crs as crs_def
 from db import util as db_util
 
 logger = logging.getLogger(__name__)
@@ -73,8 +74,14 @@ def transform(bbox, crs_from, crs_to):
         return None, None, None, None
     srid_from = db_util.get_srid(crs_from)
     srid_to = db_util.get_srid(crs_to)
-    if srid_from == 4326 and srid_to == 3857:
-        bbox = (bbox[0], max(bbox[1], -89), bbox[2], min(bbox[3], 89))
+    world_bounds = crs_def.CRSDefinitions[crs_to].world_bounds.get(crs_from)
+    if world_bounds:
+        bbox = (
+            max(bbox[0], world_bounds[0]),
+            max(bbox[1], world_bounds[1]),
+            min(bbox[2], world_bounds[2]),
+            min(bbox[3], world_bounds[3]),
+        )
     query = f'''
     with tmp as (select ST_Transform(ST_SetSRID(ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s, %s)), %s), %s) bbox)
     select st_xmin(bbox),
@@ -85,6 +92,13 @@ def transform(bbox, crs_from, crs_to):
     ;'''
     params = tuple(bbox) + (srid_from, srid_to,)
     result = db_util.run_query(query, params)[0]
+    world_bbox = crs_def.CRSDefinitions[crs_to].world_bbox
+    result = (
+        max(result[0], world_bbox[0]),
+        max(result[1], world_bbox[1]),
+        min(result[2], world_bbox[2]),
+        min(result[3], world_bbox[3]),
+    )
     return result
 
 

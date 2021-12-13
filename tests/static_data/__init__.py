@@ -555,7 +555,7 @@ PUBLICATIONS = {
             ]},
         ],
         TEST_DATA: {
-            'bbox': (-20037508.342789244, -30240971.95838617, 20037508.342789248, 18440002.8951142476),
+            'bbox': (-20026376.39, -20048966.1, 20026376.39, 18440002.895114247),
             'file_type': settings.FILE_TYPE_VECTOR,
             'style_type': 'sld',
             'micka_xml': {'filled_template': 'test_tools/data/micka/rest_test_filled_template.xml',
