@@ -38,12 +38,12 @@ def test_geoserver_bbox():
     expected_bbox_1 = test_data.SMALL_LAYER_BBOX
     crs = 'EPSG:3857'
     expected_bboxes = [((1571203, 6268895, 1572589, 6269864), (1571203, 6268895, 1572589, 6269864)),
-                       ((1571203, 6268895, 1571203, 6269864), (1571203 - settings.NO_AREA_BBOX_PADDING, 6268895,
-                                                               1571203 + settings.NO_AREA_BBOX_PADDING, 6269864)),  # line
-                       ((1571203, 6268895, 1571203, 6268895), (1571203 - settings.NO_AREA_BBOX_PADDING,
-                                                               6268895 - settings.NO_AREA_BBOX_PADDING,
-                                                               1571203 + settings.NO_AREA_BBOX_PADDING,
-                                                               6268895 + settings.NO_AREA_BBOX_PADDING)),  # point
+                       ((1571203, 6268895, 1571203, 6269864), (1571203 - crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area, 6268895,
+                                                               1571203 + crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area, 6269864)),  # line
+                       ((1571203, 6268895, 1571203, 6268895), (1571203 - crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area,
+                                                               6268895 - crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area,
+                                                               1571203 + crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area,
+                                                               6268895 + crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area)),  # point
                        ((None, None, None, None), crs_def.CRSDefinitions[crs_def.EPSG_3857].world_bbox),
                        ]
 
