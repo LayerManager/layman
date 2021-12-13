@@ -20,7 +20,7 @@ def test_bbox_crop():
            or st_yMax(p.bbox) > 20048966.10
         ;'''
         with app.app_context():
-            cnt = db_util.run_query(query, settings.LAYMAN_DEFAULT_OUTPUT_BBOX)
+            cnt = db_util.run_query(query)
         assert cnt[0][0] == expected_count, cnt
 
     main_workspace = 'test_bbox_crop_workspace'
@@ -33,10 +33,10 @@ def test_bbox_crop():
     for publication_type, workspace, publication, params in publications:
         process_client.publish_workspace_publication(publication_type, workspace, publication, **params)
 
-    big_bbox = (settings.LAYMAN_DEFAULT_OUTPUT_BBOX[0] - 1,
-                settings.LAYMAN_DEFAULT_OUTPUT_BBOX[1] - 1,
-                settings.LAYMAN_DEFAULT_OUTPUT_BBOX[2] + 1,
-                settings.LAYMAN_DEFAULT_OUTPUT_BBOX[3] + 1,
+    big_bbox = (-20026376.39 - 1,
+                -20048966.10 - 1,
+                20026376.39 + 1,
+                20048966.10 + 1,
                 )
 
     query = f'''update {DB_SCHEMA}.publications set
@@ -59,7 +59,7 @@ def test_bbox_crop():
 
     for publication_type, workspace, publication, _ in publications:
         if publication_type == process_client.LAYER_TYPE:
-            assert_util.assert_all_sources_bbox(workspace, publication, settings.LAYMAN_DEFAULT_OUTPUT_BBOX)
+            assert_util.assert_all_sources_bbox(workspace, publication, (-20026376.39, -20048966.10, 20026376.39, 20048966.10, ))
 
     for publication_type, workspace, publication, _ in publications:
         process_client.delete_workspace_publication(publication_type, workspace, publication)
