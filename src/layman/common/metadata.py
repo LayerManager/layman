@@ -1,5 +1,5 @@
 import json
-from layman import settings
+import crs as crs_def
 from layman.common import bbox as bbox_util
 from layman.util import get_publication_types
 
@@ -13,7 +13,7 @@ def get_syncable_prop_names(publ_type):
 
 
 def extent_equals(ext1, ext2):
-    return bbox_util.are_similar(ext1, ext2, no_area_bbox_padding=settings.NO_AREA_BBOX_PADDING, limit=0.95)
+    return bbox_util.are_similar(ext1, ext2, no_area_bbox_padding=crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area, limit=0.95)
 
 
 PROPERTIES = {
