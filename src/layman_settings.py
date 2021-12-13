@@ -217,14 +217,3 @@ REST_WORKSPACES_PREFIX = 'workspaces'
 RESERVED_WORKSPACE_NAMES = {REST_USERS_PREFIX, REST_WORKSPACES_PREFIX}
 
 # PREFERRED_LANGUAGES = ['cs', 'en']
-
-# If bounding box of layman.layer has no area in at least one dimension,
-# this padding in meters will be added to all dimensions whose coordinates equal
-# for GeoServer feature type definiton and thumbnail rendering.
-# E.g. if bbox is [5, 100, 5, 200] and NO_AREA_BBOX_PADDING = 10,
-# thumbnail will be rendered with bbox [-5, 100, 15, 200].
-NO_AREA_BBOX_PADDING = 10
-NO_AREA_BBOX_PADDING_DICT = {
-    'EPSG:3857': 10,
-    'EPSG:4326': 0.00001
-}
