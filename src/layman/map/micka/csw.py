@@ -8,6 +8,7 @@ from lxml import etree as ET
 from requests.exceptions import HTTPError, ConnectionError
 from flask import current_app
 
+import crs as crs_def
 from layman import common, settings
 from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
 from layman.common.filesystem.uuid import get_publication_uuid_file
@@ -180,8 +181,9 @@ def get_template_path_and_values(workspace, mapname, http_method=None, actor_nam
         'keys': ['title', 'native_bounding_box', 'description'],
     })
     native_bbox = publ_info.get('native_bounding_box')[:4]
+    crs = publ_info.get('native_bounding_box')[4]
     if bbox_util.is_empty(native_bbox):
-        native_bbox = settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+        native_bbox = crs_def.CRSDefinitions[crs].world_bbox
     extent = bbox_util.transform(native_bbox, crs_from=publ_info.get('native_bounding_box')[4], crs_to='EPSG:4326')
     title = publ_info['title']
     abstract = publ_info.get('description')

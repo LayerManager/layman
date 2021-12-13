@@ -1,6 +1,7 @@
 import logging
 import psycopg2.extras
 
+import crs as crs_def
 from db import util as db_util
 from layman import settings, LaymanError
 from layman.authn import is_user_with_name
@@ -434,10 +435,10 @@ def delete_publication(workspace_name, type, name):
 
 def set_bbox(workspace, publication_type, publication, bbox, crs, ):
     cropped_bbox = (
-        max(bbox[0], settings.LAYMAN_DEFAULT_OUTPUT_BBOX[0]),
-        max(bbox[1], settings.LAYMAN_DEFAULT_OUTPUT_BBOX[1]),
-        min(bbox[2], settings.LAYMAN_DEFAULT_OUTPUT_BBOX[2]),
-        min(bbox[3], settings.LAYMAN_DEFAULT_OUTPUT_BBOX[3]),
+        max(bbox[0], crs_def.CRSDefinitions[crs].world_bbox[0]),
+        max(bbox[1], crs_def.CRSDefinitions[crs].world_bbox[1]),
+        min(bbox[2], crs_def.CRSDefinitions[crs].world_bbox[2]),
+        min(bbox[3], crs_def.CRSDefinitions[crs].world_bbox[3]),
     ) if not bbox_util.is_empty(bbox) else bbox
     srid = db_util.get_srid(crs)
     query = f'''update {DB_SCHEMA}.publications set
