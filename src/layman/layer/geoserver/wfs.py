@@ -140,7 +140,7 @@ def get_layer_info(workspace, layername):
 def get_metadata_comparison(workspace, layername):
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', ]})
     file_type = info['file']['file_type']
-    if file_type == settings.FILE_TYPE_RASTER:
+    if file_type in (settings.FILE_TYPE_RASTER, settings.FILE_TYPE_UNKNOWN):
         return dict()
     if file_type != settings.FILE_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown file type: {file_type}")
