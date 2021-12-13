@@ -31,17 +31,17 @@ where st_xMin(p.bbox) < -20026376.39
    or st_xMax(p.bbox) > 20026376.39
    or st_yMax(p.bbox) > 20048966.10
 ;'''
-    publications = db_util.run_query(query, settings.LAYMAN_DEFAULT_OUTPUT_BBOX)
+    publications = db_util.run_query(query)
     for workspace, publ_type, publication, xmin, ymin, xmax, ymax in publications:
         info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['style_type', 'file', 'uuid',
                                                                                                      'native_crs', ], })
 
         original_bbox = (xmin, ymin, xmax, ymax)
         cropped_bbox = (
-            max(original_bbox[0], settings.LAYMAN_DEFAULT_OUTPUT_BBOX[0]),
-            max(original_bbox[1], settings.LAYMAN_DEFAULT_OUTPUT_BBOX[1]),
-            min(original_bbox[2], settings.LAYMAN_DEFAULT_OUTPUT_BBOX[2]),
-            min(original_bbox[3], settings.LAYMAN_DEFAULT_OUTPUT_BBOX[3]),
+            max(original_bbox[0], -20026376.39),
+            max(original_bbox[1], -20048966.10),
+            min(original_bbox[2], 20026376.39),
+            min(original_bbox[3], 20048966.10),
         )
         query = f'''update {DB_SCHEMA}.publications set
         bbox = ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s ,%s))
