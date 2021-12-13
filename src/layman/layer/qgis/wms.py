@@ -1,6 +1,7 @@
 import os
 from owslib.wms import WebMapService
 
+import crs as crs_def
 from layman import patch_mode, settings, util as layman_util
 from layman.common import bbox as bbox_util, empty_method, empty_method_returns_none, empty_method_returns_dict
 from . import util
@@ -64,7 +65,7 @@ def save_qgs_file(workspace, layer):
     full_layer_bbox = info['native_bounding_box']
     layer_bbox = full_layer_bbox[:4]
     crs = full_layer_bbox[4]
-    layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+    layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[crs].world_bbox
     qml = util.get_original_style_xml(workspace, layer)
     qml_geometry = util.get_qml_geometry_from_qml(qml)
     db_types = db.get_geometry_types(workspace, layer)

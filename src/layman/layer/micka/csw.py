@@ -7,6 +7,7 @@ from requests.exceptions import HTTPError, ConnectionError
 from lxml import etree as ET
 from flask import current_app
 
+import crs as crs_def
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util, requests as micka_requests
 from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
@@ -121,7 +122,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
     native_bbox = publ_info.get('native_bounding_box')[:4]
     crs = publ_info.get('native_bounding_box')[4]
     if bbox_util.is_empty(native_bbox):
-        native_bbox = settings.LAYMAN_DEFAULT_OUTPUT_BBOX_DICT[crs]
+        native_bbox = crs_def.CRSDefinitions[crs].world_bbox
     extent = bbox_util.transform(native_bbox, crs_from=crs, crs_to='EPSG:4326')
 
     uuid_file_path = get_publication_uuid_file(LAYER_TYPE, workspace, layername)

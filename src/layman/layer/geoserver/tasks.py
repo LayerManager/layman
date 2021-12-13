@@ -1,5 +1,6 @@
 from celery.utils.log import get_task_logger
 
+import crs as crs_def
 from geoserver import util as gs_util
 from layman.celery import AbortedException
 from layman import celery_app, settings, util as layman_util
@@ -65,7 +66,7 @@ def refresh_wms(
         file_path = info['_file']['normalized_file']['gs_path']
         real_bbox = info['native_bounding_box'][:4]
         bbox = bbox_util.ensure_bbox_with_area(real_bbox, settings.NO_AREA_BBOX_PADDING)\
-            if not bbox_util.is_empty(real_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+            if not bbox_util.is_empty(real_bbox) else crs_def.CRSDefinitions[crs].world_bbox
         gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, file_path)
         gs_util.publish_coverage(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, layername, title, description, bbox, crs, )
     else:

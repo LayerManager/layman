@@ -1,6 +1,7 @@
 import os
 import pathlib
 
+import crs as crs_def
 from geoserver import util as gs_util
 from layman import settings, LaymanError, patch_mode
 from layman.util import url_for, get_publication_info
@@ -66,7 +67,7 @@ def generate_layer_thumbnail(workspace, layername):
     layer_info = get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['wms', 'bounding_box']})
     wms_url = layer_info['_wms']['url']
     raw_bbox = layer_info['bounding_box'] if not bbox_util.is_empty(layer_info['bounding_box']) \
-        else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+        else crs_def.CRSDefinitions[crs_def.EPSG_3857].world_bbox
     bbox = bbox_util.ensure_bbox_with_area(raw_bbox, settings.NO_AREA_BBOX_PADDING)
     tn_bbox = gs_util.get_square_bbox(bbox)
     # Reason: https://github.com/geopython/OWSLib/issues/709

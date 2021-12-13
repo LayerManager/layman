@@ -1,5 +1,6 @@
 import pytest
 
+import crs as crs_def
 from layman import app, settings
 from layman.common.prime_db_schema import publications
 from layman.http import LaymanError
@@ -43,7 +44,7 @@ def test_geoserver_bbox():
                                                                6268895 - settings.NO_AREA_BBOX_PADDING,
                                                                1571203 + settings.NO_AREA_BBOX_PADDING,
                                                                6268895 + settings.NO_AREA_BBOX_PADDING)),  # point
-                       ((None, None, None, None), settings.LAYMAN_DEFAULT_OUTPUT_BBOX),
+                       ((None, None, None, None), crs_def.CRSDefinitions[crs_def.EPSG_3857].world_bbox),
                        ]
 
     process_client.publish_workspace_layer(workspace, layer, style_file='sample/style/small_layer.qml')

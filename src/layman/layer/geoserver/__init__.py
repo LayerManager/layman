@@ -1,6 +1,7 @@
 import logging
 from flask import g
 
+import crs as crs_def
 from geoserver import util as gs_util
 from layman.http import LaymanError
 from layman import settings, util as layman_util
@@ -93,7 +94,8 @@ def get_layer_bbox(workspace, layer):
     db_bbox = full_bbox[:4]
     crs = full_bbox[4]
     # GeoServer is not working good with degradeted bbox
-    result = bbox_util.ensure_bbox_with_area(db_bbox, settings.NO_AREA_BBOX_PADDING_DICT[crs]) if not bbox_util.is_empty(db_bbox) else settings.LAYMAN_DEFAULT_OUTPUT_BBOX
+    result = bbox_util.ensure_bbox_with_area(db_bbox, settings.NO_AREA_BBOX_PADDING_DICT[crs]) \
+        if not bbox_util.is_empty(db_bbox) else crs_def.CRSDefinitions[crs].world_bbox
     return result
 
 
