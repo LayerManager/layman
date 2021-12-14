@@ -36,15 +36,16 @@ def test_geoserver_bbox():
     workspace = 'test_geoserver_bbox_workspace'
     layer = 'test_geoserver_bbox_layer'
     expected_bbox_1 = test_data.SMALL_LAYER_BBOX
-    crs = 'EPSG:3857'
+    crs = crs_def.EPSG_3857
+    no_area_bbox_padding = crs_def.CRSDefinitions[crs].no_area_bbox_padding
     expected_bboxes = [((1571203, 6268895, 1572589, 6269864), (1571203, 6268895, 1572589, 6269864)),
-                       ((1571203, 6268895, 1571203, 6269864), (1571203 - crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area, 6268895,
-                                                               1571203 + crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area, 6269864)),  # line
-                       ((1571203, 6268895, 1571203, 6268895), (1571203 - crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area,
-                                                               6268895 - crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area,
-                                                               1571203 + crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area,
-                                                               6268895 + crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area)),  # point
-                       ((None, None, None, None), crs_def.CRSDefinitions[crs_def.EPSG_3857].world_bbox),
+                       ((1571203, 6268895, 1571203, 6269864), (1571203 - no_area_bbox_padding, 6268895,
+                                                               1571203 + no_area_bbox_padding, 6269864)),  # line
+                       ((1571203, 6268895, 1571203, 6268895), (1571203 - no_area_bbox_padding,
+                                                               6268895 - no_area_bbox_padding,
+                                                               1571203 + no_area_bbox_padding,
+                                                               6268895 + no_area_bbox_padding)),  # point
+                       ((None, None, None, None), crs_def.CRSDefinitions[crs].world_bbox),
                        ]
 
     process_client.publish_workspace_layer(workspace, layer, style_file='sample/style/small_layer.qml')

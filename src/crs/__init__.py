@@ -8,7 +8,7 @@ CRSTypeDef = namedtuple('CRSTypeDef', [
     # for GeoServer feature type definition and thumbnail rendering.
     # E.g. if bbox is [5, 100, 5, 200] and NO_AREA_BBOX_PADDING = 10,
     # thumbnail will be rendered with bbox [-5, 100, 15, 200].
-    'no_padding_area',
+    'no_area_bbox_padding',
     # Maximum coordinates of other CRS, which can be transformed
     'world_bounds',
 ])
@@ -24,7 +24,7 @@ CRSDefinitions = {
             20026376.39,
             20048966.10,
         ),
-        no_padding_area=10,
+        no_area_bbox_padding=10,
         world_bounds={
             EPSG_4326: (
                 -180,
@@ -41,7 +41,7 @@ CRSDefinitions = {
             180,
             90,
         ),
-        no_padding_area=0.00001,
+        no_area_bbox_padding=0.00001,
         world_bounds=dict(),
     )
 }
