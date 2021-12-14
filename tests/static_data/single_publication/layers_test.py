@@ -159,7 +159,7 @@ def test_wms_layer(workspace, publ_type, publication):
         crs = layer_info['native_crs']
         raw_bbox = layer_info['bounding_box'] if not bbox_util.is_empty(layer_info['bounding_box']) \
             else crs_def.CRSDefinitions[crs].world_bbox
-        bbox = bbox_util.ensure_bbox_with_area(raw_bbox, crs_def.CRSDefinitions[crs].no_padding_area)
+        bbox = bbox_util.ensure_bbox_with_area(raw_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding)
         tn_bbox = gs_util.get_square_bbox(bbox)
 
         response = gs_util.get_layer_thumbnail(wms_url, publication, tn_bbox, headers=authn_headers, wms_version=VERSION)

@@ -68,7 +68,7 @@ def generate_layer_thumbnail(workspace, layername):
     wms_url = layer_info['_wms']['url']
     raw_bbox = layer_info['bounding_box'] if not bbox_util.is_empty(layer_info['bounding_box']) \
         else crs_def.CRSDefinitions[crs_def.EPSG_3857].world_bbox
-    bbox = bbox_util.ensure_bbox_with_area(raw_bbox, crs_def.CRSDefinitions[crs_def.EPSG_3857].no_padding_area)
+    bbox = bbox_util.ensure_bbox_with_area(raw_bbox, crs_def.CRSDefinitions[crs_def.EPSG_3857].no_area_bbox_padding)
     tn_bbox = gs_util.get_square_bbox(bbox)
     # Reason: https://github.com/geopython/OWSLib/issues/709
     # tn_img = wms.getmap(
