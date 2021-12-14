@@ -5,7 +5,7 @@ import crs as crs_def
 from layman import patch_mode, settings, util as layman_util
 from layman.common import bbox as bbox_util, empty_method, empty_method_returns_none, empty_method_returns_dict
 from . import util
-from .. import db, qgis, util as layer_util, LAYER_TYPE
+from .. import db, qgis, util as layer_util
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = "1.1.1"
@@ -82,9 +82,8 @@ def save_qgs_file(workspace, layer):
 
 
 def get_style_qml(workspace, layer):
-    crs = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['native_crs']})['native_crs']
     style_template_file = util.get_style_template_path()
-    layer_template_file = util.get_layer_template_path(crs)
+    layer_template_file = util.get_layer_template_path()
     layer_project_file = get_layer_file_path(workspace, layer)
     original_qml = util.get_original_style_path(workspace, layer)
     return util.get_current_style_xml(style_template_file, layer_template_file, layer_project_file, original_qml)

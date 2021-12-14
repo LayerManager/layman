@@ -4,6 +4,8 @@ import os
 import io
 from lxml import etree as ET
 
+import crs as crs_def
+from db import util as db_util
 from layman import settings, LaymanError
 from layman.layer.filesystem import input_style
 from layman.common import db as db_common
@@ -12,13 +14,13 @@ from . import wms
 ELEMENTS_TO_REWRITE = ['legend', 'expressionfields']
 
 
-def get_layer_template_path(crs):
-    file_name = './layer-template_4326.qml' if crs == 'EPSG:4326' else './layer-template.qml'
+def get_layer_template_path():
+    file_name = './layer-template.qml'
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), file_name)
 
 
-def get_project_template_path(crs):
-    file_name = './project-template_4326.qgs' if crs == 'EPSG:4326' else './project-template.qgs'
+def get_project_template_path():
+    file_name = './project-template.qgs'
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), file_name)
 
 
@@ -63,7 +65,7 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, crs, qml_xml, sourc
     qml_geometry = get_qml_geometry_from_qml(qml_xml)
     db_table = layer
 
-    template_path = get_layer_template_path(crs)
+    template_path = get_layer_template_path()
     with open(template_path, 'r') as template_file:
         template_str = template_file.read()
     skeleton_xml_str = template_str.format(
@@ -80,7 +82,9 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, crs, qml_xml, sourc
         wkb_type=wkb_type,
         qml_geometry=qml_geometry,
         extent=extent_to_xml_string(native_bbox),
-        default_action_canvas_value='{00000000-0000-0000-0000-000000000000}'
+        default_action_canvas_value='{00000000-0000-0000-0000-000000000000}',
+        srid=db_util.get_srid(crs),
+        qgis_template_spatialrefsys=crs_def.CRSDefinitions[crs].qgis_template_spatialrefsys,
     )
 
     launder_attribute_names(qml_xml)
@@ -118,7 +122,7 @@ def fill_project_template(workspace, layer, layer_uuid, layer_qml, crs, epsg_cod
     db_table = layer
     creation_iso_datetime = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
 
-    template_path = get_project_template_path(crs)
+    template_path = get_project_template_path()
     with open(template_path, 'r') as template_file:
         template_str = template_file.read()
     return template_str.format(
@@ -136,6 +140,8 @@ def fill_project_template(workspace, layer, layer_uuid, layer_qml, crs, epsg_cod
         wms_crs_list_values=wms_crs_list_values,
         creation_iso_datetime=creation_iso_datetime,
         extent=extent_to_xml_string(extent),
+        srid=db_util.get_srid(crs),
+        qgis_template_spatialrefsys=crs_def.CRSDefinitions[crs].qgis_template_spatialrefsys,
     )
 
 
