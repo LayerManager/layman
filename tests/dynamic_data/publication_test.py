@@ -33,7 +33,7 @@ def test_action_chain(publication, request):
                 util.run_action(publication, Action(assert_response.method, params))
 
         data_cache = dict()
-        for final_assert_idx, assert_call in enumerate(step[consts.KEY_FINAL_ASSERTS]):
+        for final_assert_idx, assert_call in enumerate(step.get(consts.KEY_FINAL_ASSERTS, list())):
             try:
                 util.run_action(publication, assert_call, cache=data_cache)
             except AssertionError as exc:
