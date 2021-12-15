@@ -1,5 +1,5 @@
 import pytest
-from layman import app, util as layman_util, settings
+from layman import app, util as layman_util, settings, celery
 from layman.common.prime_db_schema import publications
 from layman.layer.filesystem import gdal
 from test_tools import process_client, util as test_util, assert_util
@@ -204,6 +204,11 @@ def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
         input_nodata_value = gdal.get_nodata_value(publ_info['_file']['gdal_path'])
         normalized_nodata_value = gdal.get_nodata_value(publ_info['_file']['normalized_file']['path'])
         assert normalized_nodata_value == pytest.approx(input_nodata_value, 0.000000001)
+
+
+def expected_chain_info_state(workspace, publ_type, name, state):
+    chain_info = celery.get_publication_chain_info_dict(workspace, publ_type, name)
+    assert chain_info['state'] == state, f'chain_info={chain_info}'
 
 
 def no_bbox_and_crs(workspace, publ_type, name):

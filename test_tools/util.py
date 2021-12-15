@@ -5,6 +5,7 @@ import requests
 from requests.exceptions import ConnectionError
 from PIL import Image, ImageChops
 
+from layman import app, celery
 from layman.util import url_for as layman_url_for
 
 
@@ -94,3 +95,15 @@ def compress_files(filepaths, *, compress_settings, output_dir):
             inner_path = os.path.join(inner_directory, final_filename) if inner_directory else final_filename
             zipfile.write(file, arcname=inner_path)
     return zip_file
+
+
+def sleep(seconds):
+    time.sleep(seconds)
+
+
+def abort_publication_chain(workspace, publ_type, name):
+    with app.app_context():
+        celery.abort_publication_chain(workspace,
+                                       publ_type,
+                                       name,
+                                       )
