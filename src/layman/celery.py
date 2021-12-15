@@ -8,7 +8,7 @@ from celery import states
 from celery.contrib.abortable import AbortableAsyncResult, ABORTED
 
 from layman.publication_relation.util import update_related_publications_after_change
-from layman import settings, common, util as layman_util
+from layman import settings, common
 from layman.common import redis as redis_util
 
 REDIS_CURRENT_TASK_NAMES = f"{__name__}:CURRENT_TASK_NAMES"
@@ -35,28 +35,20 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
     key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
     hash = task_id
     if rds.hexists(key, hash):
-        finish_publication_chain(task_id, task_state)
         next_task = pop_step_to_run_after_chain(workspace, publication_type, publication_name)
+        update_related_publications_after_change(workspace, publication_type, publication_name)
+        finish_publication_chain(task_id, task_state)
         if next_task:
             module_name, method_name = next_task.split('::')
             module = importlib.import_module(module_name)
             method = getattr(module, method_name)
             method(workspace, publication_type, publication_name)
-        update_related_publications_after_change(workspace, publication_type, publication_name)
     elif task_state == 'FAILURE':
         chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
         if chain_info is not None:
             last_task_id = chain_info['last']
-            finish_publication_chain(last_task_id, task_state)
             clear_steps_to_run_after_chain(workspace, publication_type, publication_name)
-    # Sometimes, when delete request run just after other request for the same publication (for example WFS-T),
-    # the aborted task keep running and finish after end of delete task for the same source. This part make sure,
-    # that in that case we delete it.
-    info = layman_util.get_publication_info(workspace, publication_type, publication_name, context={'keys': ['name']})
-    if not info:
-        current_app.logger.warning(f"POST task={task_name}, workspace={workspace}, publication_type={publication_type},"
-                                   f"publication_name={publication_name} Publication does not exist, so we delete it")
-        layman_util.delete_workspace_publication(workspace, publication_type, publication_name)
+            finish_publication_chain(last_task_id, task_state)
 
 
 def _get_task_hash(task_name, workspace, publication_name):
@@ -104,6 +96,13 @@ def clear_steps_to_run_after_chain(workspace, publication_type, publication_name
     rds.hdel(key, hash)
 
 
+def set_publication_chain_finished(workspace, publication_type, publication_name, state):
+    chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
+    chain_info['finished'] = True
+    chain_info['state'] = state
+    set_publication_chain_info_dict(workspace, publication_type, publication_name, chain_info)
+
+
 def finish_publication_chain(last_task_id_in_chain, state):
     rds = settings.LAYMAN_REDIS
     key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
@@ -113,12 +112,8 @@ def finish_publication_chain(last_task_id_in_chain, state):
         return
     workspace, publication_type, publication_name = _hash_to_publication(publ_hash)
 
-    chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
-    chain_info['finished'] = True
-    chain_info['state'] = state
-    set_publication_chain_info_dict(workspace, publication_type, publication_name, chain_info)
-
     rds.hdel(key, hash)
+    set_publication_chain_finished(workspace, publication_type, publication_name, state)
 
     lock = redis_util.get_publication_lock(workspace, publication_type, publication_name)
     if lock in [common.REQUEST_METHOD_PATCH, common.REQUEST_METHOD_POST, common.PUBLICATION_LOCK_FEATURE_CHANGE, ]:
@@ -204,18 +199,28 @@ def set_publication_chain_info(workspace, publication_type, publication_name, ta
     rds.hset(key, hash, val)
 
 
-def abort_chain(chain_info):
+def wait_for_abort(workspace, publication_type, publication_name):
+    round = 0
+    max_rounds = 20
+    while round <= max_rounds:
+        chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
+        if chain_info['finished']:
+            break
+        time.sleep(0.5)
+
+
+def abort_chain(workspace, publication_type, publication_name):
+    chain_info = get_publication_chain_info(workspace, publication_type, publication_name)
     if chain_info is None or is_chain_ready(chain_info):
         return
 
     abort_task_chain(chain_info['by_order'], chain_info['by_name'])
-    finish_publication_chain(chain_info['last'].task_id, ABORTED)
+    wait_for_abort(workspace, publication_type, publication_name)
+    set_publication_chain_finished(workspace, publication_type, publication_name, ABORTED)
 
 
 def abort_publication_chain(workspace, publication_type, publication_name):
-    chain_info = get_publication_chain_info(workspace, publication_type, publication_name)
-    abort_chain(chain_info)
-    time.sleep(1)
+    abort_chain(workspace, publication_type, publication_name)
     clear_steps_to_run_after_chain(workspace, publication_type, publication_name)
 
 
