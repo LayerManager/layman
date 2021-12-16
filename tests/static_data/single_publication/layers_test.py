@@ -162,7 +162,7 @@ def test_wms_layer(workspace, publ_type, publication):
         bbox = bbox_util.ensure_bbox_with_area(raw_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding)
         tn_bbox = gs_util.get_square_bbox(bbox)
 
-        response = gs_util.get_layer_thumbnail(wms_url, publication, tn_bbox, headers=authn_headers, wms_version=VERSION)
+        response = gs_util.get_layer_thumbnail(wms_url, publication, tn_bbox, crs_def.EPSG_3857, headers=authn_headers, wms_version=VERSION)
         response.raise_for_status()
         assert 'image' in response.headers['content-type'], f'response.headers={response.headers}, response.content={response.content}'
 

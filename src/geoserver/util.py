@@ -9,6 +9,7 @@ from urllib.parse import urljoin
 import requests
 from owslib import wms as owslib_wms, wfs as owslib_wfs
 
+from crs import util as crs_util
 from . import GS_REST_ROLES, GS_REST_USERS, GS_REST_SECURITY_ACL_LAYERS, GS_REST_WORKSPACES, GS_REST_STYLES, GS_AUTH,\
     GS_REST_WMS_SETTINGS, GS_REST_WFS_SETTINGS, GS_REST_USER, GS_REST_SETTINGS, GS_REST, GS_REST_TIMEOUT
 from .error import Error
@@ -989,14 +990,15 @@ def get_square_bbox(bbox):
     return square_bbox
 
 
-def get_layer_thumbnail(wms_url, layername, bbox, headers=None, wms_version='1.3.0'):
+def get_layer_thumbnail(wms_url, layername, bbox, crs, headers=None, wms_version='1.3.0', ):
+    wms_bbox = crs_util.get_wms_bbox(crs, bbox, wms_version)
     response = requests.get(wms_url, params={
         'SERVICE': 'WMS',
         'REQUEST': 'GetMap',
         'VERSION': wms_version,
         'LAYERS': layername,
-        'CRS': 'EPSG:3857',
-        'BBOX': ','.join([str(c) for c in bbox]),
+        'CRS': crs,
+        'BBOX': ','.join([str(c) for c in wms_bbox]),
         'WIDTH': 300,
         'HEIGHT': 300,
         'FORMAT': 'image/png',

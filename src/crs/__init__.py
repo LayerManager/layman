@@ -12,6 +12,8 @@ CRSTypeDef = namedtuple('CRSTypeDef', [
     # Maximum coordinates of other CRS, which can be transformed
     'world_bounds',
     'qgis_template_spatialrefsys',
+    # Boolean value, True if CRS definition in epsg.org DB specify axes in easting-northing order
+    'axes_order_east_north_in_epsg_db',
 ])
 
 EPSG_3857 = 'EPSG:3857'
@@ -43,6 +45,7 @@ CRSDefinitions = {
           <projectionacronym>merc</projectionacronym>
           <ellipsoidacronym>WGS84</ellipsoidacronym>
           <geographicflag>false</geographicflag>''',
+        axes_order_east_north_in_epsg_db=True,
     ),
     EPSG_4326: CRSTypeDef(
         world_bbox=(
@@ -66,5 +69,6 @@ CRSDefinitions = {
             <projectionacronym>longlat</projectionacronym>
             <ellipsoidacronym>EPSG:7030</ellipsoidacronym>
             <geographicflag>true</geographicflag>''',
-    )
+        axes_order_east_north_in_epsg_db=False,
+    ),
 }
