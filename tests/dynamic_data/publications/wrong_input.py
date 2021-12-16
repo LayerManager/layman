@@ -389,6 +389,7 @@ def generate(workspace=None):
                     consts.KEY_FINAL_ASSERTS: [
                         Action(publication.rest.async_error_in_info_key, {'info_key': 'file',
                                                                           'expected': exp_exception, }, ),
+                        Action(publication.internal.no_bbox_and_crs, dict()),
                     ],
                 }
                 action_list = [action_def, VALIDATION_PATCH_ACTION]
@@ -454,6 +455,7 @@ def generate(workspace=None):
                         consts.KEY_FINAL_ASSERTS: [
                             Action(publication.rest.async_error_in_info_key, {'info_key': 'file',
                                                                               'expected': exp_exception, }, ),
+                            Action(publication.internal.no_bbox_and_crs, dict()),
                         ],
                     }
                     patch.append(action_def)
