@@ -73,10 +73,13 @@ def to_tsquery_string(value):
 
 
 def get_srid(crs):
-    auth_name, auth_srid = crs.split(':')
-    auth_srid = int(auth_srid)
-    sql = 'select srid from spatial_ref_sys where auth_name = %s and auth_srid = %s;'
-    srid = run_query(sql, (auth_name, auth_srid, ))[0][0]
+    if crs is None:
+        srid = None
+    else:
+        auth_name, auth_srid = crs.split(':')
+        auth_srid = int(auth_srid)
+        sql = 'select srid from spatial_ref_sys where auth_name = %s and auth_srid = %s;'
+        srid = run_query(sql, (auth_name, auth_srid, ))[0][0]
     return srid
 
 
