@@ -64,11 +64,12 @@ def generate_layer_thumbnail(workspace, layername):
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
-    layer_info = get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['wms', 'bounding_box']})
+    layer_info = get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['wms', 'native_bounding_box', 'native_crs', ]})
     wms_url = layer_info['_wms']['url']
-    raw_bbox = layer_info['bounding_box'] if not bbox_util.is_empty(layer_info['bounding_box']) \
-        else crs_def.CRSDefinitions[crs_def.EPSG_3857].world_bbox
-    bbox = bbox_util.ensure_bbox_with_area(raw_bbox, crs_def.CRSDefinitions[crs_def.EPSG_3857].no_area_bbox_padding)
+    native_bbox = layer_info['native_bounding_box'][:4]
+    native_crs = layer_info['native_crs']
+    raw_bbox = native_bbox if not bbox_util.is_empty(native_bbox) else crs_def.CRSDefinitions[native_crs].world_bbox
+    bbox = bbox_util.ensure_bbox_with_area(raw_bbox, crs_def.CRSDefinitions[native_crs].no_area_bbox_padding)
     tn_bbox = gs_util.get_square_bbox(bbox)
     # Reason: https://github.com/geopython/OWSLib/issues/709
     # tn_img = wms.getmap(
@@ -86,7 +87,7 @@ def generate_layer_thumbnail(workspace, layername):
     # out.close()
 
     from layman.layer.geoserver.wms import VERSION
-    response = gs_util.get_layer_thumbnail(wms_url, layername, tn_bbox, headers=headers, wms_version=VERSION)
+    response = gs_util.get_layer_thumbnail(wms_url, layername, tn_bbox, native_crs, headers=headers, wms_version=VERSION)
     if "png" not in response.headers['content-type'].lower():
         raise LaymanError("Thumbnail rendering failed", data=response.content)
     response.raise_for_status()
