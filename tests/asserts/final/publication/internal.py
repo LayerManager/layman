@@ -1,6 +1,7 @@
 import pytest
-from layman.layer.filesystem import gdal
 from layman import app, util as layman_util, settings
+from layman.common.prime_db_schema import publications
+from layman.layer.filesystem import gdal
 from test_tools import process_client, util as test_util, assert_util
 from ... import util
 
@@ -203,3 +204,13 @@ def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
         input_nodata_value = gdal.get_nodata_value(publ_info['_file']['gdal_path'])
         normalized_nodata_value = gdal.get_nodata_value(publ_info['_file']['normalized_file']['path'])
         assert normalized_nodata_value == pytest.approx(input_nodata_value, 0.000000001)
+
+
+def no_bbox_and_crs(workspace, publ_type, name):
+    with app.app_context():
+        info = publications.get_publication_infos(workspace_name=workspace, pub_type=publ_type, )
+    native_bbox = info[(workspace, publ_type, name)]['native_bounding_box']
+    native_crs = info[(workspace, publ_type, name)]['native_crs']
+
+    assert native_bbox == [None, None, None, None, None]
+    assert native_crs is None
