@@ -16,7 +16,7 @@ from layman.util import call_modules_fn, get_providers_from_source_names, get_in
 from . import get_map_sources, MAP_TYPE, get_map_type_def, get_map_info_keys
 from .filesystem import input_file
 from .micka import csw
-from .micka.csw import map_json_to_operates_on, map_json_to_epsg_codes
+from .micka.csw import map_json_to_operates_on
 
 
 MAPNAME_PATTERN = PUBLICATION_NAME_PATTERN
@@ -258,7 +258,7 @@ def map_file_to_metadata_properties(map_json, operates_on_muuids_filter):
         'abstract': map_json['abstract'],
         'operates_on': map_json_to_operates_on(map_json, operates_on_muuids_filter=operates_on_muuids_filter),
         'extent': list(get_bbox_from_json(map_json)),
-        'reference_system': map_json_to_epsg_codes(map_json),
+        'reference_system': get_crs_from_json(map_json),
     }
     return result
 

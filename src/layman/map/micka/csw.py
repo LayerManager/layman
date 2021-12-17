@@ -161,15 +161,6 @@ def map_json_to_operates_on(map_json, operates_on_muuids_filter=None, editor=Non
     return operates_on
 
 
-def map_json_to_epsg_codes(map_json):
-    epsg_code = None
-    proj_pattern = re.compile(r'^(epsg:\d+)$', re.IGNORECASE)
-    proj_match = proj_pattern.match(map_json['projection'])
-    if proj_match:
-        epsg_code = proj_match.group(1)
-    return [epsg_code] if epsg_code else None
-
-
 def get_template_path_and_values(workspace, mapname, http_method=None, actor_name=None):
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
     uuid_file_path = get_publication_uuid_file(MAP_TYPE, workspace, mapname)
@@ -204,7 +195,7 @@ def get_template_path_and_values(workspace, mapname, http_method=None, actor_nam
         identifier=url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname),
         identifier_label=mapname,
         extent=extent,
-        epsg_codes=map_json_to_epsg_codes(map_json),
+        epsg_codes=[crs],
         md_organisation_name=None,
         organisation_name=None,
         operates_on=operates_on,
