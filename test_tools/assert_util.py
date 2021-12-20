@@ -33,14 +33,14 @@ def assert_same_bboxes(bbox1, bbox2, precision):
         assert abs(bbox2[i] - bbox1[i]) <= precision, (bbox1, bbox2, precision, i)
 
 
-def assert_wfs_bbox(workspace, layer, expected_bbox):
+def assert_wfs_bbox(workspace, layer, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
     wfs_layer = f"{workspace}:{layer}"
     with app.app_context():
         wfs_get_capabilities = wfs.get_wfs_proxy(workspace)
     wfs_bbox_4326 = wfs_get_capabilities.contents[wfs_layer].boundingBoxWGS84
     with app.app_context():
-        wfs_bbox_3857 = bbox_util.transform(wfs_bbox_4326, crs_from='EPSG:4326', crs_to='EPSG:3857', )
-    assert_same_bboxes(expected_bbox, wfs_bbox_3857, 0.00001)
+        wfs_bbox = bbox_util.transform(wfs_bbox_4326, crs_from='EPSG:4326', crs_to=expected_bbox_crs, )
+    assert_same_bboxes(expected_bbox, wfs_bbox, 0.00001)
 
 
 def assert_wms_bbox(workspace, layer, expected_bbox):
