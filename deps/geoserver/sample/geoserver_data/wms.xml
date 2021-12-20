@@ -1,0 +1,6 @@
+<wms>
+  <enabled>true</enabled>
+  <name>WMS</name>
+  <schemaBaseURL>http://schemas.opengis.net</schemaBaseURL>
+  <bboxForEachCRS>true</bboxForEachCRS>
+</wms>
