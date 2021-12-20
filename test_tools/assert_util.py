@@ -58,16 +58,27 @@ def assert_wms_bbox(workspace, layer, expected_bbox, *, expected_bbox_crs='EPSG:
         assert_same_bboxes(expected_bbox_4326, wgs84_bbox, 0.00001)
 
 
-def assert_all_sources_bbox(workspace, layer, expected_bbox):
+def assert_all_sources_bbox(workspace, layer, expected_bbox_3857, *, expected_native_bbox=None, expected_native_crs=None):
     with app.app_context():
-        bbox = tuple(layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
-                                                      context={'key': ['bounding_box']})['bounding_box'])
-    assert_same_bboxes(expected_bbox, bbox, 0)
-    assert_wfs_bbox(workspace, layer, expected_bbox)
-    assert_wms_bbox(workspace, layer, expected_bbox)
+        info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
+                                                context={'key': ['bounding_box', 'native_bounding_box', 'native_crs']})
+    bbox_3857 = tuple(info['bounding_box'])
+    native_bbox = tuple(info['native_bounding_box'][:4])
+    native_crs = info['native_crs']
+
+    assert_same_bboxes(expected_bbox_3857, bbox_3857, 0.00001)
+    if expected_native_bbox is not None:
+        assert_same_bboxes(expected_native_bbox, native_bbox, 0)
+        assert expected_native_crs == native_crs
+
+    assert_wfs_bbox(workspace, layer, expected_bbox_3857)
+    assert_wms_bbox(workspace, layer, expected_bbox_3857)
+    if expected_native_bbox is not None:
+        assert_wfs_bbox(workspace, layer, expected_native_bbox, expected_bbox_crs=expected_native_crs)
+        assert_wms_bbox(workspace, layer, expected_native_bbox, expected_bbox_crs=expected_native_crs)
 
     with app.app_context():
-        expected_bbox_4326 = bbox_util.transform(expected_bbox, crs_from='EPSG:3857', crs_to='EPSG:4326', )
+        expected_bbox_4326 = bbox_util.transform(expected_bbox_3857, crs_from='EPSG:3857', crs_to='EPSG:4326', )
     md_comparison = get_workspace_layer_metadata_comparison(workspace, layer)
     csw_prefix = settings.CSW_PROXY_URL
     csw_src_key = get_source_key_from_metadata_comparison(md_comparison, csw_prefix)
