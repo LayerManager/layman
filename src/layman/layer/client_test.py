@@ -1,4 +1,3 @@
-import time
 import os
 import requests
 import pytest
@@ -8,9 +7,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from layman.layer.filesystem import input_chunk
-from layman import settings, app
+from layman import settings
 from test_tools import process_client
-from test_tools.util import url_for
 
 
 WORKSPACE = 'test_layer_client_test_workspace'
@@ -90,24 +88,13 @@ def test_post_layers_chunk(chrome):
     button = button[0]
     button.click()
 
-    time.sleep(0.5)
-
-    with app.app_context():
-        layer_url = url_for('rest_workspace_layer.get', workspace=WORKSPACE, layername=LAYERNAME)
-    response = requests.get(layer_url)
-    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
-    max_attempts = 20
-    attempts = 1
-    while not (response.status_code == 200 and all(
-            'status' not in response.json()[k] for k in keys_to_check
-    )):
-        # print('waiting')
-        time.sleep(0.5)
-        response = requests.get(layer_url)
-        attempts += 1
-        if attempts > max_attempts:
-            chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-2.5.png')
-            raise Exception('Max attempts reached!')
+    try:
+        process_client.wait_for_publication_status(WORKSPACE,
+                                                   process_client.LAYER_TYPE,
+                                                   LAYERNAME)
+    except Exception as exc:
+        chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-2.5.png')
+        raise exc
     chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-3.png')
 
     entries = chrome.get_log('browser')
@@ -177,24 +164,13 @@ def test_patch_layer_chunk(chrome):
     button = button[0]
     button.click()
 
-    time.sleep(0.5)
-
-    with app.app_context():
-        layer_url = url_for('rest_workspace_layer.get', workspace=WORKSPACE, layername=LAYERNAME)
-    response = requests.get(layer_url)
-    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
-    max_attempts = 20
-    attempts = 1
-    while not (response.status_code == 200 and all(
-            'status' not in response.json()[k] for k in keys_to_check
-    )):
-        # print('waiting')
-        time.sleep(0.5)
-        response = requests.get(layer_url)
-        attempts += 1
-        if attempts > max_attempts:
-            chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.5.png')
-            raise Exception('Max attempts reached!')
+    try:
+        process_client.wait_for_publication_status(WORKSPACE,
+                                                   process_client.LAYER_TYPE,
+                                                   LAYERNAME)
+    except Exception as exc:
+        chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.5.png')
+        raise exc
     chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-4.png')
 
     entries = chrome.get_log('browser')
