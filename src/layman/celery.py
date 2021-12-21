@@ -139,6 +139,15 @@ def is_task_running(task_name, workspace, publication_name=None):
     return result
 
 
+def to_chain_info_with_states(chain_info):
+    return {
+        **chain_info,
+        'last': chain_info['last'].state,
+        'by_name': {k: v.state for k, v in chain_info['by_name']},
+        'by_order': [t.state for t in chain_info['by_order']],
+    }
+
+
 def get_publication_chain_info_dict(workspace, publication_type, publication_name):
     rds = settings.LAYMAN_REDIS
     key = PUBLICATION_CHAIN_INFOS
