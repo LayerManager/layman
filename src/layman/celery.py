@@ -36,8 +36,8 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
     hash = task_id
     if rds.hexists(key, hash):
         next_task = pop_step_to_run_after_chain(workspace, publication_type, publication_name)
-        update_related_publications_after_change(workspace, publication_type, publication_name)
         finish_publication_chain(task_id, task_state)
+        update_related_publications_after_change(workspace, publication_type, publication_name)
         if next_task:
             module_name, method_name = next_task.split('::')
             module = importlib.import_module(module_name)
