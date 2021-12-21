@@ -49,6 +49,7 @@ def recursive_dict_update(base, updater):
 
 
 def run_action(publication, action, *, cache=None):
+    cache = cache or dict()
     publication = Publication(
         action.params.get('workspace', publication.workspace),
         action.params.get('publ_type', publication.type),
@@ -71,7 +72,7 @@ def run_action(publication, action, *, cache=None):
             params[key] = value
 
     for key, param_method in param_def.items():
-        if key in method_params[0] and not key in action.params:
+        if key in method_params[0] and key not in action.params:
             if key in cache:
                 value = cache[key]
             else:
@@ -80,4 +81,8 @@ def run_action(publication, action, *, cache=None):
             params[key] = value
     params.update(action.params)
     params = {key: value for key, value in params.items() if key in method_params.kwonlyargs + method_params.args}
+
+    for key, param in params.items():
+        if isinstance(param, Action):
+            params[key] = run_action(publication, param, cache=cache)
     return action.method(**params)
