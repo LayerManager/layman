@@ -158,6 +158,23 @@ def get_publication_chain_info_dict(workspace, publication_type, publication_nam
 
 
 def get_publication_chain_info(workspace, publication_type, publication_name):
+    chain_info = get_inconsistent_publication_chain_info(workspace, publication_type, publication_name)
+    if chain_info and chain_info['finished'] is False and is_chain_ready(chain_info):
+        # wait for task_postrun to finish all task-related actions and set 'finished' to True
+        attempt = 0
+        max_attempts = 20
+        while chain_info['finished'] is False and attempt < max_attempts:
+            time.sleep(0.1)
+            chain_info = get_inconsistent_publication_chain_info(workspace, publication_type, publication_name)
+            attempt += 1
+            if attempt >= max_attempts:
+                raise Exception(
+                    f"Timeout when waiting for task_postrun to finish in get_publication_chain_info. "
+                    f"Attempt={attempt} Chain info={to_chain_info_with_states(chain_info)}")
+    return chain_info
+
+
+def get_inconsistent_publication_chain_info(workspace, publication_type, publication_name):
     chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
     from layman import celery_app
     if chain_info is not None:
