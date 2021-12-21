@@ -28,9 +28,14 @@ def test_action_chain(publication, request):
 
         if not exception_info:
             response_assert_param = {'response': response}
-            for assert_response in action.get(consts.KEY_RESPONSE_ASSERTS, list()):
+            for response_assert_idx, assert_response in enumerate(action.get(consts.KEY_RESPONSE_ASSERTS, list())):
                 params = dict(**response_assert_param, **assert_response.params)
-                util.run_action(publication, Action(assert_response.method, params))
+                try:
+                    util.run_action(publication, Action(assert_response.method, params))
+                except AssertionError as exc:
+                    print(
+                        f'Response assert error raised: publication={publication}, action_idx={action_idx}, response_assert_idx={response_assert_idx}, assert_response={assert_response}')
+                    raise exc from exc
 
         data_cache = dict()
         for final_assert_idx, assert_call in enumerate(step.get(consts.KEY_FINAL_ASSERTS, list())):
