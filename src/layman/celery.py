@@ -36,6 +36,9 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
     hash = task_id
     if rds.hexists(key, hash):
         next_task = pop_step_to_run_after_chain(workspace, publication_type, publication_name)
+        # 'finish_publication_chain' has to run before next_task's 'method' as 'method' expects the publication to be unlocked and
+        #   'finish_publication_chain' releases the lock.
+        # 'finish_publication_chain' has to run before 'update_related_publications_after_change' as otherwise deadlock arises.
         finish_publication_chain(task_id, task_state)
         update_related_publications_after_change(workspace, publication_type, publication_name)
         if next_task:
