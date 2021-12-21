@@ -71,7 +71,7 @@ def run_action(publication, action, *, cache=None):
             params[key] = value
 
     for key, param_method in param_def.items():
-        if key in method_params[0]:
+        if key in method_params[0] and not key in action.params:
             if key in cache:
                 value = cache[key]
             else:
