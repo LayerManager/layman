@@ -65,6 +65,8 @@ def liferay_mock():
                 'test_owner': None,
                 'test_owner2': None,
                 'test_not_owner': None,
+                'dynamic_test_workspace_geoserver_proxy_user': None,
+                'dynamic_test_workspace_geoserver_proxy_user_2': None,
             },
         },
         'host': '0.0.0.0',

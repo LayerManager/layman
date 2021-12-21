@@ -19,55 +19,6 @@ def setup_user_layer(username, layername, authn_headers):
     ], headers=authn_headers)
 
 
-@pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
-def test_wfs_proxy():
-    username = 'testproxy'
-    layername1 = 'ne_countries'
-    username2 = 'testproxy2'
-
-    authn_headers1 = get_authz_headers(username)
-
-    process_client.reserve_username(username, headers=authn_headers1)
-    process_client.publish_workspace_layer(username,
-                                           layername1,
-                                           headers=authn_headers1)
-
-    data_xml = data_wfs.get_wfs20_insert_points(username, layername1)
-
-    process_client.post_wfst(data_xml, headers=authn_headers1, workspace=username)
-
-    # Testing, that user1 is able to write his own layer through general WFS endpoint
-    process_client.post_wfst(data_xml, headers=authn_headers1)
-
-    # Testing, that user2 is not able to write to layer of user1
-    authn_headers2 = get_authz_headers(username2)
-    process_client.reserve_username(username2, headers=authn_headers2)
-
-    with pytest.raises(GS_Error) as exc:
-        process_client.post_wfst(data_xml, headers=authn_headers2, workspace=username)
-    assert exc.value.data['status_code'] == 400
-
-    # Testing, that user2 is not able to write user1's layer through general WFS endpoint
-    with pytest.raises(GS_Error) as exc:
-        process_client.post_wfst(data_xml, headers=authn_headers2)
-    assert exc.value.data['status_code'] == 400
-
-    # Test anonymous
-    with pytest.raises(GS_Error) as exc:
-        process_client.post_wfst(data_xml, workspace=username)
-    assert exc.value.data['status_code'] == 400
-
-    # Test fraud header
-    headers_fraud = {
-        settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: username,
-    }
-    with pytest.raises(GS_Error) as exc:
-        process_client.post_wfst(data_xml, headers=headers_fraud)
-    assert exc.value.data['status_code'] == 400
-
-    process_client.delete_workspace_layer(username, layername1, headers=authn_headers1)
-
-
 @pytest.mark.timeout(60)
 @pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
 @pytest.mark.parametrize('style_file', [
