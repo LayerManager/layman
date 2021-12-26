@@ -7,6 +7,37 @@ from . import common_layers as layers
 from ... import Action, Publication, dynamic_data as consts
 
 
+def wfst_insert_action(*,
+                       workspace=None,
+                       headers=None,
+                       wrong_input=False,
+                       ):
+    action = {
+        consts.KEY_ACTION: {
+            consts.KEY_CALL: Action(wfs_client.post_wfst, {
+                'operation': wfs_client.WfstOperation.INSERT,
+                'version': wfs_client.WfstVersion.WFS20,
+                'request_workspace': workspace if workspace else None,
+                'request_headers': headers if headers else None,
+            }),
+        },
+    }
+    if wrong_input:
+        action[consts.KEY_ACTION][consts.KEY_CALL_EXCEPTION] = {
+            consts.KEY_EXCEPTION: gs_error,
+            consts.KEY_EXCEPTION_ASSERTS: [
+                Action(processing.exception.response_exception,
+                       {'expected': {'code': -1,
+                                     'message': 'WFS-T error',
+                                     'detail': {
+                                         'status_code': 400,
+                                     },
+                                     }, }, ),
+            ],
+        }
+    return action
+
+
 def generate(workspace):
     username = workspace + '_user'
     username_2 = workspace + '_user_2'
@@ -27,23 +58,8 @@ def generate(workspace):
                     }),
                 ],
             },
-            {
-                consts.KEY_ACTION: {
-                    consts.KEY_CALL: Action(wfs_client.post_wfst, {
-                        'operation': wfs_client.WfstOperation.INSERT,
-                        'version': wfs_client.WfstVersion.WFS20,
-                        'request_workspace': workspace,
-                    }),
-                },
-            },
-            {
-                consts.KEY_ACTION: {
-                    consts.KEY_CALL: Action(wfs_client.post_wfst, {
-                        'operation': wfs_client.WfstOperation.INSERT,
-                        'version': wfs_client.WfstVersion.WFS20,
-                    }),
-                },
-            },
+            wfst_insert_action(workspace=workspace),
+            wfst_insert_action(),
         ],
         Publication(workspace, consts.LAYER_TYPE, 'layer_wfs_proxy_authz'): [
             {
@@ -86,112 +102,22 @@ def generate(workspace):
                     }),
                 ],
             },
-            {
-                consts.KEY_ACTION: {
-                    consts.KEY_CALL: Action(wfs_client.post_wfst, {
-                        'operation': wfs_client.WfstOperation.INSERT,
-                        'version': wfs_client.WfstVersion.WFS20,
-                        'request_workspace': workspace,
-                        'request_headers': Action(process_client.get_authz_headers, {'username': username}),
-                    }),
-                },
-            },
-            {
-                consts.KEY_ACTION: {
-                    consts.KEY_CALL: Action(wfs_client.post_wfst, {
-                        'operation': wfs_client.WfstOperation.INSERT,
-                        'version': wfs_client.WfstVersion.WFS20,
-                        'request_headers': Action(process_client.get_authz_headers, {'username': username}),
-                    }),
-                },
-            },
-            {
-                consts.KEY_ACTION: {
-                    consts.KEY_CALL: Action(wfs_client.post_wfst, {
-                        'operation': wfs_client.WfstOperation.INSERT,
-                        'version': wfs_client.WfstVersion.WFS20,
-                        'request_workspace': workspace,
-                        'request_headers': Action(process_client.get_authz_headers, {'username': username_2}),
-                    }),
-                    consts.KEY_CALL_EXCEPTION: {
-                        consts.KEY_EXCEPTION: gs_error,
-                        consts.KEY_EXCEPTION_ASSERTS: [
-                            Action(processing.exception.response_exception, {'expected': {'code': -1,
-                                                                                          'message': 'WFS-T error',
-                                                                                          'detail': {
-                                                                                              'status_code': 400,
-                                                                                          },
-                                                                                          }, }, ),
-                        ],
-
-                    },
-                },
-            },
-            {
-                consts.KEY_ACTION: {
-                    consts.KEY_CALL: Action(wfs_client.post_wfst, {
-                        'operation': wfs_client.WfstOperation.INSERT,
-                        'version': wfs_client.WfstVersion.WFS20,
-                        'request_headers': Action(process_client.get_authz_headers, {'username': username_2}),
-                    }),
-                    consts.KEY_CALL_EXCEPTION: {
-                        consts.KEY_EXCEPTION: gs_error,
-                        consts.KEY_EXCEPTION_ASSERTS: [
-                            Action(processing.exception.response_exception, {'expected': {'code': -1,
-                                                                                          'message': 'WFS-T error',
-                                                                                          'detail': {
-                                                                                              'status_code': 400,
-                                                                                          },
-                                                                                          }, }, ),
-                        ],
-
-                    },
-                },
-            },
-            {
-                consts.KEY_ACTION: {
-                    consts.KEY_CALL: Action(wfs_client.post_wfst, {
-                        'operation': wfs_client.WfstOperation.INSERT,
-                        'version': wfs_client.WfstVersion.WFS20,
-                        'request_workspace': workspace,
-                    }),
-                    consts.KEY_CALL_EXCEPTION: {
-                        consts.KEY_EXCEPTION: gs_error,
-                        consts.KEY_EXCEPTION_ASSERTS: [
-                            Action(processing.exception.response_exception, {'expected': {'code': -1,
-                                                                                          'message': 'WFS-T error',
-                                                                                          'detail': {
-                                                                                              'status_code': 400,
-                                                                                          },
-                                                                                          }, }, ),
-                        ],
-
-                    },
-                },
-            },
-            {
-                # Test fraud header, that it is deleted by Layman Proxy
-                consts.KEY_ACTION: {
-                    consts.KEY_CALL: Action(wfs_client.post_wfst, {
-                        'operation': wfs_client.WfstOperation.INSERT,
-                        'version': wfs_client.WfstVersion.WFS20,
-                        'request_headers': {
-                            settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: username,
-                        },
-                    }),
-                    consts.KEY_CALL_EXCEPTION: {
-                        consts.KEY_EXCEPTION: gs_error,
-                        consts.KEY_EXCEPTION_ASSERTS: [
-                            Action(processing.exception.response_exception, {'expected': {'code': -1,
-                                                                                          'message': 'WFS-T error',
-                                                                                          'detail': {
-                                                                                              'status_code': 400,
-                                                                                          },
-                                                                                          }, }, ),
-                        ],
-
-                    },
-                },
-            },
+            wfst_insert_action(workspace=workspace,
+                               headers=Action(process_client.get_authz_headers, {'username': username})),
+            wfst_insert_action(headers=Action(process_client.get_authz_headers, {'username': username})),
+            wfst_insert_action(workspace=workspace,
+                               headers=Action(process_client.get_authz_headers, {'username': username_2}),
+                               wrong_input=True,
+                               ),
+            wfst_insert_action(headers=Action(process_client.get_authz_headers, {'username': username_2}),
+                               wrong_input=True,
+                               ),
+            wfst_insert_action(workspace=workspace,
+                               wrong_input=True,
+                               ),
+            # Test fraud header, that it is deleted by Layman Proxy
+            wfst_insert_action(headers={settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: username, },
+                               wrong_input=True,
+                               ),
         ],
     }
