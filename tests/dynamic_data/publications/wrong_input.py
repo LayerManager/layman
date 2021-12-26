@@ -56,7 +56,6 @@ TESTCASES = {
                     frozenset([('compress', True), ('with_chunks', False)]): {
                         'detail': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
                     frozenset([('compress', True), ('with_chunks', True)]): {
-                        'sync': False,
                         'detail': {'path': 'shp_without_dbf_patch_all_files_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}}
                 },
             },
@@ -107,11 +106,6 @@ TESTCASES = {
         KEY_PATCHES: {
             'data_and_style': {
                 KEY_PATCH_POST: dict(),
-                KEY_EXPECTED_EXCEPTION: {
-                    frozenset([('compress', True), ('with_chunks', True)]): {
-                        'sync': False,
-                    },
-                },
             },
             'data_without_style': {
                 KEY_PATCH_POST: {
@@ -120,11 +114,6 @@ TESTCASES = {
                 },
                 KEY_ACTION_PARAMS: {
                     'style_file': None,
-                },
-                KEY_EXPECTED_EXCEPTION: {
-                    frozenset([('compress', True), ('with_chunks', True)]): {
-                        'sync': False,
-                    },
                 },
             },
         },
@@ -186,14 +175,6 @@ TESTCASES = {
         KEY_PATCHES: {
             'patch': {
                 KEY_PATCH_POST: layers.SMALL_LAYER.definition,
-                KEY_EXPECTED_EXCEPTION: {
-                    frozenset([('compress', False), ('with_chunks', True)]): {
-                        'sync': False,
-                    },
-                    frozenset([('compress', True), ('with_chunks', True)]): {
-                        'sync': False,
-                    },
-                },
             },
         },
     },
@@ -233,7 +214,6 @@ TESTCASES = {
                 },
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', False), ('with_chunks', True)]): {
-                        'sync': False,
                         'detail': {
                             'files': [
                                 'two_main_files_compressed_patch_patch_chunks.zip/layer_with_two_main_files/geojson/small_layer.geojson',
@@ -420,7 +400,9 @@ def generate(workspace=None):
                 ]
                 rest_param_frozen_set = frozenset(rest_param_dict.items())
                 default_exp_exception = copy.deepcopy(tc_params[KEY_EXPECTED_EXCEPTION][KEY_DEFAULT])
-                exception_diff = patch_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, dict())
+                exception_diff_post = tc_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, dict())
+                exception_diff_patch = patch_params.get(KEY_EXPECTED_EXCEPTION, dict()).get(rest_param_frozen_set, dict())
+                exception_diff = asserts_util.recursive_dict_update(exception_diff_post, exception_diff_patch)
                 exp_exception = asserts_util.recursive_dict_update(default_exp_exception, exception_diff)
                 is_sync = exp_exception.pop('sync')
                 if is_sync:
