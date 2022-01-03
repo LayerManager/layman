@@ -204,6 +204,39 @@ TESTCASES = {
             },
         },
     },
+    'shp_with_unsupported_epsg': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': [
+                'tmp/data200/trans/jtsk/TRANS/AirfldA.cpg',
+                'tmp/data200/trans/jtsk/TRANS/AirfldA.dbf',
+                'tmp/data200/trans/jtsk/TRANS/AirfldA.prj',
+                'tmp/data200/trans/jtsk/TRANS/AirfldA.sbn',
+                'tmp/data200/trans/jtsk/TRANS/AirfldA.shp',
+                'tmp/data200/trans/jtsk/TRANS/AirfldA.shx',
+            ],
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 4,
+                          'message': 'Unsupported CRS of data file',
+                          'detail': {'found': 'EPSG:5514', 'supported_values': settings.INPUT_SRS_LIST},
+                          },
+            frozenset([('compress', False), ('with_chunks', True)]): {
+                'sync': False,
+            },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+            },
+        },
+        KEY_PATCHES: {
+            'patch': {
+                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+            },
+        },
+    },
     'two_main_files_compressed': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
