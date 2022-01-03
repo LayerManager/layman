@@ -180,16 +180,7 @@ def ensure_security_roles(rule, roles, auth):
     roles_str = ', '.join(roles)
 
     logger.info(f"Ensure_security_roles rule={rule}, roles={roles}, roles_str={roles_str}")
-    response = requests.delete(
-        urljoin(GS_REST_SECURITY_ACL_LAYERS, rule),
-        data=json.dumps(
-            {rule: roles_str}),
-        headers=headers_json,
-        auth=auth,
-        timeout=GS_REST_TIMEOUT,
-    )
-    if response.status_code != 404:
-        response.raise_for_status()
+    delete_security_roles(rule, auth)
 
     response = requests.post(
         GS_REST_SECURITY_ACL_LAYERS,
