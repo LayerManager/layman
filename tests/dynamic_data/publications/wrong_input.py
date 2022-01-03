@@ -263,6 +263,32 @@ TESTCASES = {
             },
         },
     },
+    'tif_with_unsupported_bands': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': ['sample/layman.layer/sample_tif_rg.tif', ],
+            'with_chunks': False,
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'message': 'Wrong parameter value',
+                          'detail': {'parameter': 'file',
+                                     'expected': 'Any of color interpretations [Gray], '
+                                                 '[Gray, Alpha], [Palette], [Red, Green, Blue], '
+                                                 '[Red, Green, Blue, Alpha].',
+                                     'found': ['Red', 'Green']
+                                     },
+                          },
+        },
+        KEY_PATCHES: {
+            'patch': {
+                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+            },
+        },
+    },
     'two_main_files_compressed': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {

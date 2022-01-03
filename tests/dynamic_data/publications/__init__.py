@@ -337,61 +337,6 @@ PUBLICATIONS = {
             ],
         },
     ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'tif_with_unsupported_bands'): [
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': [
-                        'sample/layman.layer/sample_tif_rg.tif',
-                    ],
-                }),
-                consts.KEY_CALL_EXCEPTION: {
-                    consts.KEY_EXCEPTION: LaymanError,
-                    consts.KEY_EXCEPTION_ASSERTS: [
-                        Action(processing.exception.response_exception, {'expected': {'http_code': 400,
-                                                                                      'code': 2,
-                                                                                      'detail': {'parameter': 'file',
-                                                                                                 'expected': 'Any of color interpretations [Gray], '
-                                                                                                             '[Gray, Alpha], [Palette], [Red, Green, Blue], '
-                                                                                                             '[Red, Green, Blue, Alpha].',
-                                                                                                 'found': ['Red', 'Green']
-                                                                                                 }, }, }, ),
-                    ],
-                },
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                Action(publication.internal.does_not_exist, dict())
-            ],
-        },
-    ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_tif_with_unsupported_bands'): [
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': [
-                        'sample/layman.layer/sample_tif_rg.tif',
-                    ],
-                    'compress': True,
-                }),
-                consts.KEY_CALL_EXCEPTION: {
-                    consts.KEY_EXCEPTION: LaymanError,
-                    consts.KEY_EXCEPTION_ASSERTS: [
-                        Action(processing.exception.response_exception, {'expected': {'http_code': 400,
-                                                                                      'code': 2,
-                                                                                      'detail': {'parameter': 'file',
-                                                                                                 'expected': 'Any of color interpretations [Gray], '
-                                                                                                             '[Gray, Alpha], [Palette], [Red, Green, Blue], '
-                                                                                                             '[Red, Green, Blue, Alpha].',
-                                                                                                 'found': ['Red', 'Green']
-                                                                                                 }, }, }, ),
-                    ],
-                },
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                Action(publication.internal.does_not_exist, dict())
-            ],
-        },
-    ],
     Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zip_and_main_file'): [
         {
             consts.KEY_ACTION: {
