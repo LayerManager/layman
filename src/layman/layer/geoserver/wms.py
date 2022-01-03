@@ -1,6 +1,5 @@
 from urllib.parse import urljoin
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qs, parse_qsl
-import requests
 from flask import current_app
 
 from geoserver import util as gs_util
@@ -9,6 +8,7 @@ from layman.cache import mem_redis
 from layman.common import geoserver as gs_common, empty_method_returns_none, empty_method
 from layman.layer.util import is_layer_chain_ready
 from layman.layer import LAYER_TYPE
+import requests_util.retry
 from .util import get_gs_proxy_base_url
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
@@ -94,7 +94,7 @@ def get_wms_proxy(workspace):
     ows_url = get_wms_url(workspace)
 
     def create_string_value():
-        response = requests.get(ows_url, params={
+        response = requests_util.retry.get_session().get(ows_url, params={
             'SERVICE': 'WMS',
             'REQUEST': 'GetCapabilities',
             'VERSION': VERSION,
