@@ -28,74 +28,10 @@ PUBLICATIONS = {
     Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_sld'): [
         {
             consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': [
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.README.html',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.VERSION.txt',
-                    ],
-                    'compress': True,
-                }),
-                consts.KEY_CALL_EXCEPTION: {
-                    consts.KEY_EXCEPTION: LaymanError,
-                    consts.KEY_EXCEPTION_ASSERTS: [
-                        Action(processing.exception.response_exception, {'expected': {'http_code': 400,
-                                                                                      'code': 18,
-                                                                                      'message': 'Missing one or more ShapeFile files.',
-                                                                                      'detail': {'missing_extensions': ['.dbf', '.prj'],
-                                                                                                 'suggestion': 'Missing .prj file can be fixed also by setting "crs" parameter.',
-                                                                                                 'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp',
-                                                                                                 },
-                                                                                      }, }, ),
-                    ],
-                },
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                Action(publication.internal.does_not_exist, dict())
-            ],
-        },
-        {
-            consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, layers.SMALL_LAYER_ZIP.definition),
                 consts.KEY_RESPONSE_ASSERTS: [
                     Action(processing.response.valid_post, dict()),
                 ],
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER_ZIP.info_values),
-                Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': layers.SMALL_LAYER_ZIP.thumbnail,
-                }),
-            ],
-        },
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.patch_workspace_publication, {
-                    'file_paths': [
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.README.html',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
-                        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.VERSION.txt',
-                    ],
-                    'compress': True,
-                }),
-                consts.KEY_CALL_EXCEPTION: {
-                    consts.KEY_EXCEPTION: LaymanError,
-                    consts.KEY_EXCEPTION_ASSERTS: [
-                        Action(processing.exception.response_exception, {'expected': {'http_code': 400,
-                                                                                      'code': 18,
-                                                                                      'message': 'Missing one or more ShapeFile files.',
-                                                                                      'detail': {'missing_extensions': ['.dbf', '.prj'],
-                                                                                                 'suggestion': 'Missing .prj file can be fixed also by setting "crs" parameter.',
-                                                                                                 'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp',
-                                                                                                 },
-                                                                                      }, }, ),
-                    ],
-                },
             },
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
