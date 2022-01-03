@@ -1,10 +1,10 @@
 import os
 
-import requests
 from lxml import etree as ET
 from owslib.util import nspath_eval
 
 from layman import settings, LaymanError
+import requests_util.retry
 from . import NAMESPACES
 
 
@@ -29,10 +29,10 @@ def is_record_does_not_exist_exception(root_el):
 
 def base_insert(xml_str):
     # print(f"Micka insert=\n{xml_str}")
-    response = requests.post(settings.CSW_URL,
-                             auth=settings.CSW_BASIC_AUTHN,
-                             data=xml_str.encode('utf-8'),
-                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,)
+    response = requests_util.retry.get_session().post(settings.CSW_URL,
+                                                      auth=settings.CSW_BASIC_AUTHN,
+                                                      data=xml_str.encode('utf-8'),
+                                                      timeout=settings.DEFAULT_CONNECTION_TIMEOUT, )
     # print(f"Micka insert response=\n{r.text}")
     response.raise_for_status()
     root_el = ET.fromstring(response.content)
@@ -55,11 +55,11 @@ def csw_update(template_values, timeout=None):
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csw-update-template.xml')
     xml_str = fill_template_as_str(template_path, template_values)
     # print(f"CSW update request=\n{xml_str}")
-    response = requests.post(settings.CSW_URL,
-                             auth=settings.CSW_BASIC_AUTHN,
-                             data=xml_str.encode('utf-8'),
-                             timeout=timeout,
-                             )
+    response = requests_util.retry.get_session().post(settings.CSW_URL,
+                                                      auth=settings.CSW_BASIC_AUTHN,
+                                                      data=xml_str.encode('utf-8'),
+                                                      timeout=timeout,
+                                                      )
     # print(f"CSW update response=\n{r.text}")
     response.raise_for_status()
     root_el = ET.fromstring(response.content)
@@ -83,11 +83,11 @@ def csw_delete(muuid):
     }
     xml_str = fill_template_as_str(template_path, template_values)
     # print(f"CSW delete request=\n{xml_str}")
-    response = requests.post(settings.CSW_URL,
-                             auth=settings.CSW_BASIC_AUTHN,
-                             data=xml_str.encode('utf-8'),
-                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
-                             )
+    response = requests_util.retry.get_session().post(settings.CSW_URL,
+                                                      auth=settings.CSW_BASIC_AUTHN,
+                                                      data=xml_str.encode('utf-8'),
+                                                      timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
+                                                      )
     # print(f"CSW delete response=\n{r.text}")
     response.raise_for_status()
     root_el = ET.fromstring(response.content)

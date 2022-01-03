@@ -20,6 +20,7 @@ make timgen-build
 - [#64](https://github.com/LayerManager/layman/issues/64) Layer thumbnails are generated in native CRS of the layer.
 - [#489](https://github.com/LayerManager/layman/issues/489) Error responses from Micka and GeoServer are logged into log and also propagated as part of raised exception, so they can be seen from flower.
 - [#548](https://github.com/LayerManager/layman/pull/548) Suppress GeoServer HTTP error 409 when setting layer access rights if they already have the same value.
+- [#548](https://github.com/LayerManager/layman/pull/548) If Micka returns HTTP error 500 on CSW/SOAP Insert/Update/Delete, retry the request.
 - Remove [LAYMAN_SETTINGS_MODULE](https://github.com/LayerManager/layman/blob/v1.15.0/doc/env-settings.md), import [`src/layman_settings.py`](src/layman_settings.py) directly.
 - [#555](https://github.com/LayerManager/layman/pull/555) Upgrade Selenium from 3 to 4
 - [#555](https://github.com/LayerManager/layman/pull/555) Use Firefox instead of Chrome in Selenium for map thumbnail generation and Layman Test Client tests.
