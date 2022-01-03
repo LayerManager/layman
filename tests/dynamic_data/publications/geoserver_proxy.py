@@ -66,7 +66,7 @@ def generate(workspace):
                 consts.KEY_ACTION: {
                     consts.KEY_CALL: Action(process_client.ensure_reserved_username, {
                         'username': username,
-                        'headers': Action(process_client.get_authz_headers, {'username': username}),
+                        'headers': process_client.get_authz_headers(username=username),
                     }),
                 },
             },
@@ -74,7 +74,7 @@ def generate(workspace):
                 consts.KEY_ACTION: {
                     consts.KEY_CALL: Action(process_client.ensure_reserved_username, {
                         'username': username_2,
-                        'headers': Action(process_client.get_authz_headers, {'username': username_2}),
+                        'headers': process_client.get_authz_headers(username=username_2),
                     }),
                 },
             },
@@ -82,7 +82,7 @@ def generate(workspace):
                 consts.KEY_ACTION: {
                     consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
                         **layers.SMALL_LAYER.definition,
-                        'headers': Action(process_client.get_authz_headers, {'username': username}),
+                        'headers': process_client.get_authz_headers(username=username),
                     }),
                     consts.KEY_RESPONSE_ASSERTS: [
                         Action(processing.response.valid_post, dict()),
@@ -103,13 +103,13 @@ def generate(workspace):
                 ],
             },
             wfst_insert_action(workspace=workspace,
-                               headers=Action(process_client.get_authz_headers, {'username': username})),
-            wfst_insert_action(headers=Action(process_client.get_authz_headers, {'username': username})),
+                               headers=process_client.get_authz_headers(username=username)),
+            wfst_insert_action(headers=process_client.get_authz_headers(username=username)),
             wfst_insert_action(workspace=workspace,
-                               headers=Action(process_client.get_authz_headers, {'username': username_2}),
+                               headers=process_client.get_authz_headers(username=username_2),
                                wrong_input=True,
                                ),
-            wfst_insert_action(headers=Action(process_client.get_authz_headers, {'username': username_2}),
+            wfst_insert_action(headers=process_client.get_authz_headers(username=username_2),
                                wrong_input=True,
                                ),
             wfst_insert_action(workspace=workspace,
