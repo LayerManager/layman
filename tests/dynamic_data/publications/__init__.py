@@ -318,12 +318,6 @@ PUBLICATIONS = {
     ],
     Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_shp_without_prj'): [
         {
-            consts.KEY_ACTION: predefined_actions.POST_ZIP_SHP_WITHOUT_PRJ,
-            consts.KEY_FINAL_ASSERTS: [
-                Action(publication.internal.does_not_exist, dict())
-            ],
-        },
-        {
             consts.KEY_ACTION: predefined_actions.POST_ZIP_SHP_WITHOUT_PRJ_WITH_CRS,
             consts.KEY_FINAL_ASSERTS: [
                 *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
