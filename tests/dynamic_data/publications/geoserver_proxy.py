@@ -21,6 +21,9 @@ def wfst_insert_action(*,
                 'request_headers': headers if headers else None,
             }),
         },
+        consts.KEY_FINAL_ASSERTS: [
+            *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+        ],
     }
     if wrong_input:
         action[consts.KEY_ACTION][consts.KEY_CALL_EXCEPTION] = {
