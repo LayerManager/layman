@@ -97,7 +97,11 @@ def publish_publications_step(publications_set, step_num):
     for workspace, publ_type, publication in publications_set:
         params = data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION][step_num]
         headers = params.get('headers')
-        process_client.wait_for_publication_status(workspace, publ_type, publication, headers=headers, check_response_fn=check_publication_status)
+        try:
+            process_client.wait_for_publication_status(workspace, publ_type, publication, headers=headers, check_response_fn=check_publication_status)
+        except AssertionError as ex:
+            print(f"AssertionError in publication {workspace, publ_type, publication}, step_num={step_num}.")
+            raise ex
     return done_publications
 
 
