@@ -190,7 +190,11 @@ def ensure_security_roles(rule, roles, auth):
         auth=auth,
         timeout=GS_REST_TIMEOUT,
     )
-    response.raise_for_status()
+    if response.status_code == 409:
+        existing_roles = get_security_roles(rule, auth)
+        assert existing_roles == roles
+    else:
+        response.raise_for_status()
 
 
 def ensure_workspace_security_roles(workspace, roles, type, auth):
