@@ -30,7 +30,6 @@ def test_check_user_wms():
     assert exc_info.value.data['workspace_name'] == user
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_geoserver_bbox():
     workspace = 'test_geoserver_bbox_workspace'
