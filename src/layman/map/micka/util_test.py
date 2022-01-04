@@ -32,7 +32,6 @@ def app_context():
         yield ctx
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures('app_context', 'ensure_layman', 'client')
 def test_fill_template():
     xml_path = 'tmp/record-template.xml'
@@ -78,7 +77,7 @@ def test_parse_md_properties():
             'md_organisation_name': None,
             'organisation_name': None,
             'md_date_stamp': '2007-05-25',
-            'reference_system': [3857],
+            'reference_system': ['EPSG:3857'],
             'title': 'World places and boundaries',
             'publication_date': '2007-05-25',
             'identifier': {
