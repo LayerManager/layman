@@ -443,7 +443,6 @@ def test_post_maps_complex(client):
     check_metadata(client, workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_patch_map(client):
     with app.app_context():
@@ -568,7 +567,7 @@ def test_patch_map(client):
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [
-                3857
+                'EPSG:3857'
             ],
             'revision_date': TODAY_DATE,
             'title': "Nov\u00fd n\u00e1zev",
