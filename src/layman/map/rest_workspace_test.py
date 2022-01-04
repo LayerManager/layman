@@ -575,7 +575,6 @@ def test_patch_map(client):
     check_metadata(client, workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_delete_map(client):
     with app.app_context():
