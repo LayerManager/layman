@@ -81,7 +81,7 @@ def check_publication_status(response):
     except json.JSONDecodeError as exc:
         print(f'response={response.text}')
         raise exc
-    assert current_status != 'INCOMPLETE', response.json()
+    assert current_status != 'INCOMPLETE', f"{json.dumps(response.json(), indent=2)}"
     return current_status in {'COMPLETE'}
 
 
