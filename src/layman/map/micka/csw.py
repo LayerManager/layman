@@ -195,7 +195,7 @@ def get_template_path_and_values(workspace, mapname, http_method=None, actor_nam
         identifier=url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname),
         identifier_label=mapname,
         extent=extent,
-        epsg_codes=[crs],
+        crs_list=[crs],
         md_organisation_name=None,
         organisation_name=None,
         operates_on=operates_on,
@@ -221,11 +221,11 @@ def _get_property_values(
         identifier='http://www.env.cz/data/liberec/admin-cleneni',
         identifier_label='Liberec-AdminUnits',
         extent=None,  # west, south, east, north
-        epsg_codes=None,
+        crs_list=None,
         operates_on=None,
         md_language=None,
 ):
-    epsg_codes = epsg_codes or ['3857']
+    crs_list = crs_list or ['EPSG:3857']
     west, south, east, north = extent or [14.62, 50.58, 15.42, 50.82]
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
 
@@ -243,7 +243,7 @@ def _get_property_values(
         'md_file_identifier': get_metadata_uuid(uuid),
         'md_language': md_language,
         'md_date_stamp': md_date_stamp,
-        'reference_system': epsg_codes,
+        'reference_system': crs_list,
         'title': title,
         'publication_date': publication_date,
         'revision_date': revision_date,
@@ -300,7 +300,7 @@ METADATA_PROPERTIES = {
         'xpath_parent': '/gmd:MD_Metadata',
         'xpath_property': './gmd:referenceSystemInfo[gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor[starts-with(@xlink:href, "http://www.opengis.net/def/crs/EPSG/0/")]]',
         'xpath_extract': './gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gmx:Anchor/@xlink:href',
-        'xpath_extract_fn': lambda l: int(l[0].rsplit('/')[-1]) if l else None,
+        'xpath_extract_fn': lambda l: f"EPSG:{l[0].rsplit('/')[-1]}" if l else None,
         'adjust_property_element': common_util.adjust_reference_system_info,
     },
     'title': {
