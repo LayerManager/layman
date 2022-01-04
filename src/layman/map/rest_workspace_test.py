@@ -608,7 +608,6 @@ def test_delete_map(client):
         })
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_map_composed_from_local_layers(client):
     with app.app_context():
@@ -833,7 +832,7 @@ def test_map_composed_from_local_layers(client):
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [
-                3857
+                'EPSG:3857'
             ],
             'revision_date': None,
             'title': "World places and boundaries",
