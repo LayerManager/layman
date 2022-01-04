@@ -187,7 +187,6 @@ def test_post_maps_invalid_json(client):
     })
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_post_maps_simple(client):
     with app.app_context():
@@ -304,7 +303,7 @@ def test_post_maps_simple(client):
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [
-                3857
+                'EPSG:3857'
             ],
             'revision_date': None,
             'title': "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje",

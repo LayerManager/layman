@@ -258,7 +258,7 @@ def map_file_to_metadata_properties(map_json, operates_on_muuids_filter):
         'abstract': map_json['abstract'],
         'operates_on': map_json_to_operates_on(map_json, operates_on_muuids_filter=operates_on_muuids_filter),
         'extent': list(get_bbox_from_json(map_json)),
-        'reference_system': get_crs_from_json(map_json),
+        'reference_system': [get_crs_from_json(map_json)],
     }
     return result
 
