@@ -8,7 +8,6 @@ from . import upgrade_v1_14
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 def test_bbox_crop():
     def assert_out_of_the_box_publications(expected_count):
@@ -26,9 +25,21 @@ def test_bbox_crop():
     main_workspace = 'test_bbox_crop_workspace'
 
     publications = [
-        (process_client.LAYER_TYPE, main_workspace, 'test_bbox_crop_layer', dict(), ),
-        (process_client.LAYER_TYPE, main_workspace, 'test_bbox_crop_qml_layer', {'style_file': 'sample/style/small_layer.qml'}, ),
-        (process_client.MAP_TYPE, main_workspace, 'test_bbox_crop_map', dict(), ),
+        (process_client.LAYER_TYPE, main_workspace, 'test_bbox_crop_layer', {'file_paths': [
+            'sample/layman.layer/small_layer.cpg',
+            'sample/layman.layer/small_layer.dbf',
+            'sample/layman.layer/small_layer.prj',
+            'sample/layman.layer/small_layer.shp',
+            'sample/layman.layer/small_layer.shx',
+        ], },),
+        (process_client.LAYER_TYPE, main_workspace, 'test_bbox_crop_qml_layer', {'file_paths': [
+            'sample/layman.layer/small_layer.cpg',
+            'sample/layman.layer/small_layer.dbf',
+            'sample/layman.layer/small_layer.prj',
+            'sample/layman.layer/small_layer.shp',
+            'sample/layman.layer/small_layer.shx',
+        ], 'style_file': 'sample/style/small_layer.qml'},),
+        (process_client.MAP_TYPE, main_workspace, 'test_bbox_crop_map', dict(),),
     ]
     for publication_type, workspace, publication, params in publications:
         process_client.publish_workspace_publication(publication_type, workspace, publication, **params)
