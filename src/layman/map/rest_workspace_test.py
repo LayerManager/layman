@@ -311,7 +311,6 @@ def test_post_maps_simple(client):
     check_metadata(client, workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures('ensure_layman')
 @pytest.mark.timeout(60)
 def test_post_maps_complex(client):
@@ -436,7 +435,7 @@ def test_post_maps_complex(client):
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': [
-                3857
+                'EPSG:3857'
             ],
             'revision_date': None,
             'title': "Libereck\u00fd kraj: Administrativn\u00ed \u010dlen\u011bn\u00ed",
