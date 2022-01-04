@@ -90,13 +90,17 @@ def generate_map_thumbnail(workspace, mapname, editor):
     chrome_options.add_argument("--no-sandbox")
     desired_capabilities = DesiredCapabilities.CHROME
     desired_capabilities['goog:loggingPrefs'] = {'browser': 'ALL'}
+    current_app.logger.info(f"Before creating webdriver.Chrome")
     chrome = webdriver.Chrome(
         options=chrome_options,
         desired_capabilities=desired_capabilities,
     )
+    current_app.logger.info(f"After creating webdriver.Chrome")
     chrome.set_window_size(500, 500)
+    current_app.logger.info(f"After setting window size")
 
     chrome.get(timgen_url)
+    current_app.logger.info(f"After getting Timgen URL")
     entries = chrome.get_log('browser')
     max_attempts = 40
     attempts = 0
@@ -108,6 +112,7 @@ def generate_map_thumbnail(workspace, mapname, editor):
         time.sleep(0.5)
         attempts += 1
         entries = chrome.get_log('browser')
+    current_app.logger.info(f"After waiting for entries")
     performance_entries = json.loads(chrome.execute_script("return JSON.stringify(window.performance.getEntries())"))
     if attempts >= max_attempts:
         current_app.logger.info(f"max attempts reach")
