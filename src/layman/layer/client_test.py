@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 import pytest
@@ -174,7 +175,9 @@ def test_patch_layer_chunk(chrome):
     chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-4.png')
 
     entries = chrome.get_log('browser')
-    assert len(entries) > 3, entries
+    performance_entries = json.loads(chrome.execute_script("return JSON.stringify(window.performance.getEntries())"))
+    assert len(entries) > 3, f"entries={entries}\n"\
+                             f"Timgen performance entries: {json.dumps(performance_entries, indent=2)}\n"
     for entry in entries:
         print(entry)
         assert entry['level'] == 'INFO' or (
