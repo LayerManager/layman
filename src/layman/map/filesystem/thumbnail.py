@@ -94,6 +94,7 @@ def generate_map_thumbnail(workspace, mapname, editor):
     chrome = webdriver.Chrome(
         options=chrome_options,
         desired_capabilities=desired_capabilities,
+        service_args=["--verbose"],
         service_log_path=f"/code/tmp/artifacts/chrome_log.{workspace}.{mapname}.editor_{editor}.{int(time.time())}",
     )
     current_app.logger.info(f"After creating webdriver.Chrome")
