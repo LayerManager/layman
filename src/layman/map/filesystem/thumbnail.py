@@ -1,4 +1,5 @@
 import base64
+import json
 import os
 import pathlib
 import re
@@ -107,12 +108,17 @@ def generate_map_thumbnail(workspace, mapname, editor):
         time.sleep(0.5)
         attempts += 1
         entries = chrome.get_log('browser')
+    performance_entries = json.loads(chrome.execute_script("return JSON.stringify(window.performance.getEntries())"))
     if attempts >= max_attempts:
         current_app.logger.info(f"max attempts reach")
+        current_app.logger.info(f"Map thumbnail: {workspace, mapname}, editor={editor}\n"
+                                f"Timgen performance entries: {json.dumps(performance_entries, indent=2)}\n")
         raise LaymanError(51, data="Max attempts reached when generating thumbnail")
     for entry in entries:
         if entry.get('level') == 'SEVERE' and entry.get('source') == 'javascript':
             current_app.logger.error(f"timgen error {entry}")
+            current_app.logger.info(f"Map thumbnail: {workspace, mapname}, editor={editor}\n"
+                                    f"Timgen performance entries: {json.dumps(performance_entries, indent=2)}\n")
             raise LaymanError(51, private_data=entry)
         current_app.logger.info(f"browser entry {entry}")
 
