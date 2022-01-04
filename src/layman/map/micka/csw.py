@@ -169,10 +169,10 @@ def get_template_path_and_values(workspace, mapname, http_method=None, actor_nam
     map_json = get_map_json(workspace, mapname)
     operates_on = map_json_to_operates_on(map_json, editor=actor_name)
     publ_info = get_publication_info(workspace, MAP_TYPE, mapname, context={
-        'keys': ['title', 'native_bounding_box', 'description'],
+        'keys': ['title', 'native_bounding_box', 'description', 'native_crs'],
     })
     native_bbox = publ_info.get('native_bounding_box')[:4]
-    crs = publ_info.get('native_bounding_box')[4]
+    crs = publ_info.get('native_crs')
     if bbox_util.is_empty(native_bbox):
         native_bbox = crs_def.CRSDefinitions[crs].world_bbox
     extent = bbox_util.transform(native_bbox, crs_from=publ_info.get('native_bounding_box')[4], crs_to='EPSG:4326')
