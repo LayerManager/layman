@@ -66,7 +66,7 @@ def generate_layer_thumbnail(workspace, layername):
     }
     layer_info = get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['wms', 'native_bounding_box', 'native_crs', ]})
     wms_url = layer_info['_wms']['url']
-    native_bbox = layer_info['native_bounding_box'][:4]
+    native_bbox = layer_info['native_bounding_box']
     native_crs = layer_info['native_crs']
     raw_bbox = native_bbox if not bbox_util.is_empty(native_bbox) else crs_def.CRSDefinitions[native_crs].world_bbox
     bbox = bbox_util.ensure_bbox_with_area(raw_bbox, crs_def.CRSDefinitions[native_crs].no_area_bbox_padding)

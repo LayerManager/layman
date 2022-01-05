@@ -217,5 +217,5 @@ def no_bbox_and_crs(workspace, publ_type, name):
     native_bbox = info[(workspace, publ_type, name)]['native_bounding_box']
     native_crs = info[(workspace, publ_type, name)]['native_crs']
 
-    assert native_bbox == [None, None, None, None, None]
+    assert native_bbox == [None, None, None, None]
     assert native_crs is None

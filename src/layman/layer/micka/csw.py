@@ -115,12 +115,12 @@ def csw_insert(workspace, layername):
 def get_template_path_and_values(workspace, layername, http_method=None):
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
     publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
-        'keys': ['title', 'native_bounding_box', 'description', 'file', ],
+        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'file', ],
     })
     title = publ_info['title']
     abstract = publ_info.get('description')
-    native_bbox = publ_info.get('native_bounding_box')[:4]
-    crs = publ_info.get('native_bounding_box')[4]
+    native_bbox = publ_info.get('native_bounding_box')
+    crs = publ_info.get('native_crs')
     if bbox_util.is_empty(native_bbox):
         native_bbox = crs_def.CRSDefinitions[crs].world_bbox
     extent = bbox_util.transform(native_bbox, crs_from=crs, crs_to='EPSG:4326')

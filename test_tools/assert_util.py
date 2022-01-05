@@ -63,7 +63,7 @@ def assert_all_sources_bbox(workspace, layer, expected_bbox_3857, *, expected_na
         info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
                                                 context={'key': ['bounding_box', 'native_bounding_box', 'native_crs']})
     bbox_3857 = tuple(info['bounding_box'])
-    native_bbox = tuple(info['native_bounding_box'][:4])
+    native_bbox = tuple(info['native_bounding_box'])
     native_crs = info['native_crs']
 
     assert_same_bboxes(expected_bbox_3857, bbox_3857, 0.00001)
