@@ -25,6 +25,11 @@ jobs:
           docker -v
           docker-compose -v
 
+      - name: Usage info
+        run: |
+          df -h
+          free -m
+
       - name: Build
         run: |
           cp .env.test .env
@@ -40,6 +45,11 @@ jobs:
       - name: Run tests
         run: |
           make test-separated
+
+      - name: Usage info
+        run: |
+          df -h
+          free -m
 
       - name: Save logs to files
         if: failure()
