@@ -288,13 +288,13 @@ select *, --ST_NPoints(geometry),
 from t2
 )
 , t3 as (
-SELECT ogc_fid, dump_id, ring_id, geometry, generate_series(1, st_npoints(geometry)-1) as point_idx
+SELECT ogc_fid, dump_id, ring_id, ST_Transform(geometry, 4326) as geometry, generate_series(1, st_npoints(geometry)-1) as point_idx
 FROM t2cumsum
 where cum_sum_points < 50000
 )
 , tdist as (
 SELECT ogc_fid, dump_id, ring_id, ST_PointN(geometry, point_idx), point_idx,
-    st_distance(ST_PointN(geometry, point_idx), ST_PointN(geometry, point_idx+1)) as distance
+    ST_DistanceSphere(ST_PointN(geometry, point_idx), ST_PointN(geometry, point_idx+1)) as distance
 FROM t3
 )
 , tstat as (

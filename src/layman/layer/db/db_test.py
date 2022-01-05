@@ -296,17 +296,17 @@ def test_get_most_frequent_lower_distance(country110m_table, country50m_table, c
     _, layername_200k = data200road_table
     workspace, layername_5k = sm5building_table
     sd_110m = db.guess_scale_denominator(workspace, layername_110m)
-    assert 2500 <= sd_110m <= 10000
-    assert sd_110m == 5000
+    assert 25000000 <= sd_110m <= 500000000
+    assert sd_110m == 100000000
     sd_50m = db.guess_scale_denominator(workspace, layername_50m)
-    assert 2500 <= sd_50m <= 10000
-    assert sd_50m == 5000
+    assert 10000000 <= sd_50m <= 250000000
+    assert sd_50m == 10000000
     sd_10m = db.guess_scale_denominator(workspace, layername_10m)
-    assert 2500 <= sd_10m <= 10000
-    assert sd_10m == 5000
+    assert 2500000 <= sd_10m <= 50000000
+    assert sd_10m == 2500000
     sd_200k = db.guess_scale_denominator(workspace, layername_200k)
     assert 50000 <= sd_200k <= 1000000
-    assert sd_200k == 250000
+    assert sd_200k == 100000
     sd_5k = db.guess_scale_denominator(workspace, layername_5k)
     assert 1000 <= sd_5k <= 25000
     assert sd_5k == 5000

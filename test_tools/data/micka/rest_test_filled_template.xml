@@ -182,7 +182,7 @@
           <gmd:equivalentScale>
             <gmd:MD_RepresentativeFraction>
               <gmd:denominator>
-                <gco:Integer>5000</gco:Integer>
+                <gco:Integer>100000000</gco:Integer>
               </gmd:denominator>
             </gmd:MD_RepresentativeFraction>
           </gmd:equivalentScale>
