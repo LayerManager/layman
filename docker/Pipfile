@@ -23,7 +23,7 @@ requests = "*"
 owslib = "==0.22.0" # https://github.com/geopython/OWSLib/issues/762
 jsonschema = "*"
 flower = "*"
-selenium = "*"
+selenium = ">=4"
 cacheout = "*"
 kombu = "<6.0.0"
 pyproj = "<3.0.0"
