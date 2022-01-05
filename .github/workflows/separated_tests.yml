@@ -25,6 +25,11 @@ jobs:
           docker -v
           docker-compose -v
 
+      - name: Usage info
+        run: |
+          df -h
+          free -m
+
       - name: Build
         run: |
           cp .env.test .env
@@ -37,9 +42,21 @@ jobs:
           mkdir -p tmp
           docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh"
 
+      - name: Usage info
+        if: always()
+        run: |
+          df -h
+          free -m
+
       - name: Run tests
         run: |
           make test-separated
+
+      - name: Usage info
+        if: always()
+        run: |
+          df -h
+          free -m
 
       - name: Save logs to files
         if: failure()
