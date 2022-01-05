@@ -4,7 +4,7 @@ import requests
 import pytest
 
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from layman.layer.filesystem import input_chunk
@@ -23,25 +23,31 @@ def clear_country_chunks():
 
 
 @pytest.fixture(scope="module")
-def chrome():
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    desired_capabilities = DesiredCapabilities.CHROME
+def firefox():
+    print(f"firefox fixture START")
+    firefox_options = Options()
+    firefox_options.headless = True
+    desired_capabilities = DesiredCapabilities.FIREFOX
     desired_capabilities['loggingPrefs'] = {'browser': 'ALL'}
-    chrome = webdriver.Chrome(
-        options=chrome_options,
+    print(f"firefox fixture 1")
+    firefox = webdriver.Firefox(
+        options=firefox_options,
         desired_capabilities=desired_capabilities,
+        service_log_path="/code/tmp/artifacts/gecko_service_log_path.txt",
+        log_path="/code/tmp/artifacts/gecko_log_path.txt",
     )
-    chrome.set_window_size(1000, 2000)
-    yield chrome
-    chrome.close()
-    chrome.quit()
+    print(f"firefox fixture 2")
+    firefox.set_window_size(1000, 2000)
+    print(f"firefox fixture END")
+    yield firefox
+    firefox.close()
+    firefox.quit()
 
 
 @pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
-def test_post_layers_chunk(chrome):
+def test_post_layers_chunk(firefox):
+    print(f"test_post_layers_chunk START")
     relative_file_paths = [
         'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
     ]
@@ -55,36 +61,36 @@ def test_post_layers_chunk(chrome):
     response = requests.get(client_url)
     assert response.status_code == 200
 
-    chrome.get(client_url)
-    chrome.set_window_size(1000, 2000)
-    chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-1.png')
+    firefox.get(client_url)
+    firefox.set_window_size(1000, 2000)
+    firefox.save_screenshot('/code/tmp/artifacts/client-post-layers-1.png')
 
-    button = chrome.find_elements_by_xpath('//button[text()="POST"]')
+    button = firefox.find_elements_by_xpath('//button[text()="POST"]')
     assert len(button) == 1
     button = button[0]
     button.click()
-    chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-1.5.png')
+    firefox.save_screenshot('/code/tmp/artifacts/client-post-layers-1.5.png')
 
-    user_input = chrome.find_elements_by_name('Workspace')
+    user_input = firefox.find_elements_by_name('Workspace')
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
     user_input.send_keys(WORKSPACE)
 
-    layername_input = chrome.find_elements_by_name('name')
+    layername_input = firefox.find_elements_by_name('name')
     assert len(layername_input) == 1
     layername_input = layername_input[0]
     layername_input.clear()
     layername_input.send_keys(LAYERNAME)
 
-    file_input = chrome.find_elements_by_name('file')
+    file_input = firefox.find_elements_by_name('file')
     assert len(file_input) == 1
     file_input = file_input[0]
     # print(" \n ".join(file_paths))
     file_input.send_keys(" \n ".join(file_paths))
-    chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-2.png')
+    firefox.save_screenshot('/code/tmp/artifacts/client-post-layers-2.png')
 
-    button = chrome.find_elements_by_xpath('//button[@type="submit"]')
+    button = firefox.find_elements_by_xpath('//button[@type="submit"]')
     assert len(button) == 1
     button = button[0]
     button.click()
@@ -94,11 +100,11 @@ def test_post_layers_chunk(chrome):
                                                    process_client.LAYER_TYPE,
                                                    LAYERNAME)
     except Exception as exc:
-        chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-2.5.png')
+        firefox.save_screenshot('/code/tmp/artifacts/client-post-layers-2.5.png')
         raise exc
-    chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-3.png')
+    firefox.save_screenshot('/code/tmp/artifacts/client-post-layers-3.png')
 
-    entries = chrome.get_log('browser')
+    entries = firefox.get_log('browser')
     assert len(entries) > 3
     for entry in entries:
         # print(entry)
@@ -113,7 +119,7 @@ def test_post_layers_chunk(chrome):
 
 @pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
-def test_patch_layer_chunk(chrome):
+def test_patch_layer_chunk(firefox):
     relative_file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.cpg',
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.dbf',
@@ -132,35 +138,35 @@ def test_patch_layer_chunk(chrome):
     response = requests.get(client_url)
     assert response.status_code == 200
 
-    chrome.get(client_url)
-    chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-1.png')
+    firefox.get(client_url)
+    firefox.save_screenshot('/code/tmp/artifacts/client-patch-layers-1.png')
 
-    button = chrome.find_elements_by_xpath('//button[text()="PATCH"]')
+    button = firefox.find_elements_by_xpath('//button[text()="PATCH"]')
     assert len(button) == 1
     button = button[0]
     button.click()
-    chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-2.png')
+    firefox.save_screenshot('/code/tmp/artifacts/client-patch-layers-2.png')
 
-    user_input = chrome.find_elements_by_name('Workspace')
+    user_input = firefox.find_elements_by_name('Workspace')
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
     user_input.send_keys(WORKSPACE)
 
-    layername_input = chrome.find_elements_by_name('name')
+    layername_input = firefox.find_elements_by_name('name')
     assert len(layername_input) == 1
     layername_input = layername_input[0]
     layername_input.clear()
     layername_input.send_keys(LAYERNAME)
 
-    file_input = chrome.find_elements_by_name('file')
+    file_input = firefox.find_elements_by_name('file')
     assert len(file_input) == 1
     file_input = file_input[0]
     # print(" \n ".join(file_paths))
     file_input.send_keys(" \n ".join(file_paths))
-    chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.png')
+    firefox.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.png')
 
-    button = chrome.find_elements_by_xpath('//button[@type="submit"]')
+    button = firefox.find_elements_by_xpath('//button[@type="submit"]')
     assert len(button) == 1
     button = button[0]
     button.click()
@@ -170,12 +176,12 @@ def test_patch_layer_chunk(chrome):
                                                    process_client.LAYER_TYPE,
                                                    LAYERNAME)
     except Exception as exc:
-        chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.5.png')
+        firefox.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.5.png')
         raise exc
-    chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-4.png')
+    firefox.save_screenshot('/code/tmp/artifacts/client-patch-layers-4.png')
 
-    entries = chrome.get_log('browser')
-    performance_entries = json.loads(chrome.execute_script("return JSON.stringify(window.performance.getEntries())"))
+    entries = firefox.get_log('browser')
+    performance_entries = json.loads(firefox.execute_script("return JSON.stringify(window.performance.getEntries())"))
     assert len(entries) > 3, f"entries={entries}\n"\
                              f"Timgen performance entries: {json.dumps(performance_entries, indent=2)}\n"
     for entry in entries:
