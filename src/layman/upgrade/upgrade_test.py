@@ -29,6 +29,22 @@ def test_check_version_upgradeability(mig_type, version_to_test):
         upgrade.check_version_upgradeability()
 
 
+@pytest.fixture()
+def preserve_data_version_table():
+    copy_table = f'''create table {DB_SCHEMA}.data_version_backup as table {DB_SCHEMA}.data_version;'''
+    with app.app_context():
+        db_util.run_statement(copy_table)
+    yield
+    copy_table_back = f'''
+    DROP TABLE IF EXISTS {DB_SCHEMA}.data_version;
+    create table {DB_SCHEMA}.data_version as table {DB_SCHEMA}.data_version_backup;
+    DROP TABLE IF EXISTS {DB_SCHEMA}.data_version_backup;
+    '''
+    with app.app_context():
+        db_util.run_statement(copy_table_back)
+
+
+@pytest.mark.usefixtures('preserve_data_version_table')
 @pytest.mark.parametrize('sql_command, expected_value, migration_type', [
     (f'''DROP TABLE IF EXISTS {DB_SCHEMA}.data_version; CREATE TABLE IF NOT EXISTS {DB_SCHEMA}.data_version
         (
