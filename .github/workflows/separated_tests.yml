@@ -63,5 +63,6 @@ jobs:
         with:
           name: test_artifacts
           path: |
+            sudo chown -R $(id -un) layman_data_test
             tmp/artifacts/
             layman_data_test/
