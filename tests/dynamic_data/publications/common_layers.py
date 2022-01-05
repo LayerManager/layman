@@ -7,7 +7,7 @@ SMALL_LAYER = PublicationValues(
         'exp_publication_detail': {
             'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.335616991],
             'native_crs': 'EPSG:4326',
-            'native_bounding_box': [14.114369, 48.964832, 14.126824, 48.970612, 'EPSG:4326'],
+            'native_bounding_box': [14.114369, 48.964832, 14.126824, 48.970612],
         },
         'file_extension': 'geojson',
         'publ_type_detail': ('vector', 'sld'),
@@ -44,7 +44,7 @@ NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = PublicationValues(
         'exp_publication_detail': {
             'bounding_box': [-15695801.072582014, -7341864.739114419, 15699816.562538767, 11122367.192100525],
             'native_crs': 'EPSG:4326',
-            'native_bounding_box': [-140.99778, -54.89681, 141.03385176001382, 70.16419, 'EPSG:4326'],
+            'native_bounding_box': [-140.99778, -54.89681, 141.03385176001382, 70.16419],
         },
         'file_extension': 'shp',
         'publ_type_detail': ('vector', 'sld'),
@@ -80,7 +80,7 @@ SAMPLE_TIF_TFW_RGBA_OPAQUE = PublicationValues(
         'exp_publication_detail': {
             'bounding_box': [1669480.0, 6580973.000000007, 1675351.9999999802, 6586999.0],
             'native_crs': 'EPSG:3857',
-            'native_bounding_box': [1669480.0, 6580973.000000007, 1675351.9999999802, 6586999.0, 'EPSG:3857'],
+            'native_bounding_box': [1669480.0, 6580973.000000007, 1675351.9999999802, 6586999.0],
         },
         'publ_type_detail': ('raster', 'sld'),
     },
@@ -114,7 +114,7 @@ SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE = PublicationValues(
         'exp_publication_detail': {
             'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
             'native_crs': 'EPSG:3857',
-            'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0, 'EPSG:3857'],
+            'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
         },
         'publ_type_detail': ('raster', 'sld'),
     },

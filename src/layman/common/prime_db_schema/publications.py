@@ -194,7 +194,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'type': type,
                                    'style_type': style_type,
                                    'updated_at': updated_at,
-                                   '_native_bounding_box_short': [xmin, ymin, xmax, ymax],
+                                   'native_bounding_box': [xmin, ymin, xmax, ymax],
                                    'native_crs': db_util.get_crs(srid) if srid else None,
                                    'access_rights': {'read': can_read_users.split(','),
                                                      'write': can_write_users.split(',')}
@@ -203,15 +203,14 @@ from {DB_SCHEMA}.workspaces w inner join
              srid, can_read_users, can_write_users, _
              in values}
 
-    infos = {key: {**{in_key: in_value for in_key, in_value in value.items() if in_key not in {'_native_bounding_box_short'}},
-                   'native_bounding_box': value['_native_bounding_box_short'] + [value['native_crs']],
-                   'bounding_box': list(bbox_util.transform(value['_native_bounding_box_short'],
+    infos = {key: {**value,
+                   'bounding_box': list(bbox_util.transform(value['native_bounding_box'],
                                                             value['native_crs'],
                                                             DEFAULT_BBOX_CRS))
-                   if value['_native_bounding_box_short'][0]
+                   if value['native_bounding_box'][0]
                    and value['native_crs']
                    and DEFAULT_BBOX_CRS != value['native_crs']
-                   else value['_native_bounding_box_short'],
+                   else value['native_bounding_box'],
                    }
              for key, value in infos.items()}
 

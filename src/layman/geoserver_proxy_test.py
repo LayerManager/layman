@@ -8,7 +8,7 @@ from layman.layer.filesystem import thumbnail
 from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
 from test_tools import process_client, util as test_util, assert_util
-from test_tools.data import wfs as data_wfs, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX
+from test_tools.data import wfs as data_wfs, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX, SMALL_LAYER_NATIVE_CRS
 from test_tools.process_client import get_authz_headers
 
 
@@ -216,16 +216,16 @@ def test_wfs_bbox(style_file, thumbnail_style_postfix):
 
     process_client.publish_workspace_layer(workspace, layer, style_file=style_file, )
 
-    native_crs = SMALL_LAYER_NATIVE_BBOX[4]
+    native_crs = SMALL_LAYER_NATIVE_CRS
     assert_util.assert_all_sources_bbox(workspace, layer, SMALL_LAYER_BBOX,
-                                        expected_native_bbox=SMALL_LAYER_NATIVE_BBOX[:4],
+                                        expected_native_bbox=SMALL_LAYER_NATIVE_BBOX,
                                         expected_native_crs=native_crs)
 
     expected_bbox = (1571000.0, 6268800.0, 1572590.854206196, 6269876.33561699)
     exp_native_bbox = (14.112533113517683, 48.964264493114904, 14.126824, 48.970612)
     method_bbox_thumbnail_tuples = [
         (data_wfs.get_wfs20_insert_points, expected_bbox, exp_native_bbox, '_bigger'),
-        (data_wfs.get_wfs20_delete_point, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX[:4], ''),
+        (data_wfs.get_wfs20_delete_point, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX, ''),
     ]
 
     for wfs_method, exp_bbox, exp_native_bbox, thumbnail_bbox_postfix in method_bbox_thumbnail_tuples:

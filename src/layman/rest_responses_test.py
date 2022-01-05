@@ -83,7 +83,7 @@ class TestResponsesClass:
         **expected_common_multi,
         'bounding_box': list(test_data.SMALL_MAP_BBOX),
         'native_crs': 'EPSG:3857',
-        'native_bounding_box': list(test_data.SMALL_MAP_BBOX) + ['EPSG:3857'],
+        'native_bounding_box': list(test_data.SMALL_MAP_BBOX),
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}',
     }
 
@@ -124,7 +124,7 @@ class TestResponsesClass:
         **expected_common,
         'bounding_box': list(test_data.SMALL_MAP_BBOX),
         'native_crs': 'EPSG:3857',
-        'native_bounding_box': list(test_data.SMALL_MAP_BBOX) + ['EPSG:3857'],
+        'native_bounding_box': list(test_data.SMALL_MAP_BBOX),
         'file': {'path': f'maps/{publication}/input_file/{publication}.json',
                  'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/file'},
         'metadata': {

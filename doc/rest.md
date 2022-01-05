@@ -65,7 +65,7 @@ JSON array of objects representing available layers with following structure:
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 - **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
 - **native_crs**: Code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326".
-- **native_bounding_box**: List of 4 floats and one string. Bounding box coordinates and it's CRS [minx, miny, maxx, maxy, "EPSG:&lt;code&gt;"] of native CRS.
+- **native_bounding_box**: List of 4 floats and one string. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
 
 Headers:
 - **X-Total-Count**: Total number of layers available from the request, taking into account all filtering parameters except `limit` and `offset`. Example `"247"`.
@@ -272,7 +272,7 @@ JSON object with following structure:
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 - **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
 - **native_crs**: Code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326". Native CRS is CRS of the input data file.
-- **native_bounding_box**: List of 4 floats and one string. Bounding box coordinates and it's CRS [minx, miny, maxx, maxy, "EPSG:&lt;code&gt;"] of native CRS.
+- **native_bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
 
 ### PATCH Workspace Layer
 Update information about existing layer. First, it deletes sources of the layer, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Layers](#post-workspace-layers).
@@ -563,7 +563,7 @@ JSON object with following structure:
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [write access](./security.md#Authorization).
 - **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
 - **native_crs**: Code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326". Native CRS is CRS of the input data file.
-- **native_bounding_box**: List of 4 floats and one string. Bounding box coordinates and it's CRS [minx, miny, maxx, maxy, "EPSG:&lt;code&gt;"] of native CRS.
+- **native_bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
 
 ### PATCH Workspace Map
 Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Maps](#post-workspace-maps), including [asynchronous tasks](async-tasks.md),

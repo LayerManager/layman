@@ -64,7 +64,7 @@ def refresh_wms(
                                               )
     elif file_type == settings.FILE_TYPE_RASTER:
         file_path = info['_file']['normalized_file']['gs_path']
-        real_bbox = info['native_bounding_box'][:4]
+        real_bbox = info['native_bounding_box']
         bbox = bbox_util.ensure_bbox_with_area(real_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding)\
             if not bbox_util.is_empty(real_bbox) else crs_def.CRSDefinitions[crs].world_bbox
         gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, file_path)

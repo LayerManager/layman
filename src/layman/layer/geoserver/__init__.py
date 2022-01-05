@@ -90,9 +90,9 @@ def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspac
 
 
 def get_layer_bbox(workspace, layer):
-    full_bbox = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['native_bounding_box']})['native_bounding_box']
-    db_bbox = full_bbox[:4]
-    crs = full_bbox[4]
+    layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['native_bounding_box', 'native_crs', ]})
+    db_bbox = layer_info['native_bounding_box']
+    crs = layer_info['native_crs']
     # GeoServer is not working good with degradeted bbox
     result = bbox_util.ensure_bbox_with_area(db_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding) \
         if not bbox_util.is_empty(db_bbox) else crs_def.CRSDefinitions[crs].world_bbox

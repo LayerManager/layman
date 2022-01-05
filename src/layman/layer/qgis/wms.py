@@ -62,9 +62,8 @@ def save_qgs_file(workspace, layer):
     info = layer_util.get_layer_info(workspace, layer)
     uuid = info['uuid']
     qgis.ensure_layer_dir(workspace, layer)
-    full_layer_bbox = info['native_bounding_box']
-    layer_bbox = full_layer_bbox[:4]
-    crs = full_layer_bbox[4]
+    layer_bbox = info['native_bounding_box']
+    crs = info['native_crs']
     layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[crs].world_bbox
     qml = util.get_original_style_xml(workspace, layer)
     qml_geometry = util.get_qml_geometry_from_qml(qml)
