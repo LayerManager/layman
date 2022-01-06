@@ -80,8 +80,8 @@ def test_post_layers_chunk(browser):
     file_input = browser.find_elements_by_name('file')
     assert len(file_input) == 1
     file_input = file_input[0]
-    # print(" \n ".join(file_paths))
-    file_input.send_keys(" \n ".join(file_paths))
+    for file_path in file_paths:
+        file_input.send_keys(file_path)
     browser.save_screenshot('/code/tmp/artifacts/client-post-layers-2.png')
 
     button = browser.find_elements_by_xpath('//button[@type="submit"]')
@@ -157,8 +157,8 @@ def test_patch_layer_chunk(browser):
     file_input = browser.find_elements_by_name('file')
     assert len(file_input) == 1
     file_input = file_input[0]
-    # print(" \n ".join(file_paths))
-    file_input.send_keys(" \n ".join(file_paths))
+    for file_path in file_paths:
+        file_input.send_keys(file_path)
     browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.png')
 
     button = browser.find_elements_by_xpath('//button[@type="submit"]')
