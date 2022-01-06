@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 import pytest
@@ -97,15 +98,16 @@ def test_post_layers_chunk(browser):
         raise exc
     browser.save_screenshot('/code/tmp/artifacts/client-post-layers-3.png')
 
-    entries = browser.get_log('browser')
-    assert len(entries) > 3
-    for entry in entries:
-        # print(entry)
-        assert entry['level'] == 'INFO' or (
-            entry['level'] == 'SEVERE' and entry['message'].startswith(f'{client_url}rest/workspaces/{WORKSPACE}/layers/{LAYERNAME}/chunk?')
-            and entry['message'].endswith(
-                'Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
-        )
+    positive_response = browser.find_elements_by_xpath('//div[@class="ui positive message"]')
+    assert positive_response
+
+    resp_msg_div = browser.find_elements_by_css_selector(
+        'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.positive.message > code')
+    assert len(resp_msg_div) == 1
+    resp_msg_div = resp_msg_div[0]
+    resp_json = json.loads(resp_msg_div.text)
+    assert resp_json[0]['name'] == LAYERNAME
+
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(WORKSPACE, LAYERNAME)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
 
@@ -173,15 +175,15 @@ def test_patch_layer_chunk(browser):
         raise exc
     browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-4.png')
 
-    entries = browser.get_log('browser')
-    assert len(entries) > 3, entries
-    for entry in entries:
-        print(entry)
-        assert entry['level'] == 'INFO' or (
-            entry['level'] == 'SEVERE'
-            and entry['message'].startswith(
-                f'{client_url}rest/{settings.REST_WORKSPACES_PREFIX}/{WORKSPACE}/layers/{LAYERNAME}/chunk?'
-            ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
-        )
+    positive_response = browser.find_elements_by_xpath('//div[@class="ui positive message"]')
+    assert positive_response
+
+    resp_msg_div = browser.find_elements_by_css_selector(
+        'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.positive.message > code')
+    assert len(resp_msg_div) == 1
+    resp_msg_div = resp_msg_div[0]
+    resp_json = json.loads(resp_msg_div.text)
+    assert resp_json['name'] == LAYERNAME
+
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(WORKSPACE, LAYERNAME)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
