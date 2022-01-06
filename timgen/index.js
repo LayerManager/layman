@@ -49,7 +49,7 @@ const main = async () => {
   ol_map.once('rendercomplete', (event) => {
     // console.log('rendercomplete');
     const canvas = event.context.canvas;
-    console.log('dataurl', canvas.toDataURL());
+    window['canvas_data_url'] = canvas.toDataURL();
     if(file_name) {
       if (navigator.msSaveBlob) {
         navigator.msSaveBlob(canvas.msToBlob(), file_name);

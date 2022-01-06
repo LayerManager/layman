@@ -106,48 +106,35 @@ def generate_map_thumbnail(workspace, mapname, editor):
 
     max_attempts = 40
     attempts = 0
-    canvas = firefox.execute_script('''return (canvas_data_url);''')
-    while canvas is None:
-        current_app.logger.info(f"waiting for entries, canvas={canvas}")
+    data_url = firefox.execute_script('''return window.canvas_data_url;''')
+    while data_url is None:
+        current_app.logger.info(f"waiting for entries, data_url={data_url}")
         time.sleep(0.5)
         attempts += 1
-        canvas = firefox.execute_script('''return (global.canvas_data_url);''')
-    current_app.logger.info(f"waiting for entries, canvas={canvas}")
+        data_url = firefox.execute_script('''return window.canvas_data_url;''')
 
-    # entries = firefox.get_log('browser')
-    # max_attempts = 40
-    # attempts = 0
-    # while next((e for e in entries
-    #             if (e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message'])
-    #             or (e.get('level') == 'SEVERE' and e.get('source') == 'javascript')
-    #             ), None) is None and attempts < max_attempts:
-    #     current_app.logger.info(f"waiting for entries")
-    #     time.sleep(0.5)
-    #     attempts += 1
-    #     entries = firefox.get_log('browser')
     current_app.logger.info(f"After waiting for entries")
     performance_entries = json.loads(firefox.execute_script("return JSON.stringify(window.performance.getEntries())"))
     if attempts >= max_attempts:
-        current_app.logger.info(f"max attempts reach")
+        current_app.logger.info(f"max attempts reached")
         current_app.logger.info(f"Map thumbnail: {workspace, mapname}, editor={editor}\n"
                                 f"Timgen performance entries: {json.dumps(performance_entries, indent=2)}\n")
         raise LaymanError(51, data="Max attempts reached when generating thumbnail")
-    for entry in entries:
-        if entry.get('level') == 'SEVERE' and entry.get('source') == 'javascript':
-            current_app.logger.error(f"timgen error {entry}")
-            current_app.logger.info(f"Map thumbnail: {workspace, mapname}, editor={editor}\n"
-                                    f"Timgen performance entries: {json.dumps(performance_entries, indent=2)}\n")
-            raise LaymanError(51, private_data=entry)
-        current_app.logger.info(f"browser entry {entry}")
+    # for entry in entries:
+    #     if entry.get('level') == 'SEVERE' and entry.get('source') == 'javascript':
+    #         current_app.logger.error(f"timgen error {entry}")
+    #         current_app.logger.info(f"Map thumbnail: {workspace, mapname}, editor={editor}\n"
+    #                                 f"Timgen performance entries: {json.dumps(performance_entries, indent=2)}\n")
+    #         raise LaymanError(51, private_data=entry)
+    #     current_app.logger.info(f"browser entry {entry}")
 
     # chrome.save_screenshot(f'/code/tmp/{workspace}.{mapname}.png')
     firefox.close()
     firefox.quit()
 
-    entry = next(e for e in entries if e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message'])
-    match = re.match(r'.*\"dataurl\" \"data:image/png;base64,(.+)\"', entry['message'])
+    match = re.match(r'^data:image/png;base64,(.+)$', data_url)
     groups = match.groups()
-    data_url = groups[0]
+    base64_image = groups[0]
     # current_app.logger.info(f"data_url {data_url}")
     # current_app.logger.info(f"len(data_url) {len(data_url)}")
 
@@ -159,4 +146,4 @@ def generate_map_thumbnail(workspace, mapname, editor):
         pass
 
     with open(file_path, 'wb') as file:
-        file.write(base64.b64decode(data_url))
+        file.write(base64.b64decode(base64_image))
