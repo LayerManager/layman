@@ -22,7 +22,7 @@ def clear_country_chunks():
 
 
 @pytest.fixture(scope="module")
-def chrome():
+def browser():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
@@ -40,7 +40,7 @@ def chrome():
 
 @pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
-def test_post_layers_chunk(chrome):
+def test_post_layers_chunk(browser):
     relative_file_paths = [
         'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
     ]
@@ -54,36 +54,36 @@ def test_post_layers_chunk(chrome):
     response = requests.get(client_url)
     assert response.status_code == 200
 
-    chrome.get(client_url)
-    chrome.set_window_size(1000, 2000)
-    chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-1.png')
+    browser.get(client_url)
+    browser.set_window_size(1000, 2000)
+    browser.save_screenshot('/code/tmp/artifacts/client-post-layers-1.png')
 
-    button = chrome.find_elements_by_xpath('//button[text()="POST"]')
+    button = browser.find_elements_by_xpath('//button[text()="POST"]')
     assert len(button) == 1
     button = button[0]
     button.click()
-    chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-1.5.png')
+    browser.save_screenshot('/code/tmp/artifacts/client-post-layers-1.5.png')
 
-    user_input = chrome.find_elements_by_name('Workspace')
+    user_input = browser.find_elements_by_name('Workspace')
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
     user_input.send_keys(WORKSPACE)
 
-    layername_input = chrome.find_elements_by_name('name')
+    layername_input = browser.find_elements_by_name('name')
     assert len(layername_input) == 1
     layername_input = layername_input[0]
     layername_input.clear()
     layername_input.send_keys(LAYERNAME)
 
-    file_input = chrome.find_elements_by_name('file')
+    file_input = browser.find_elements_by_name('file')
     assert len(file_input) == 1
     file_input = file_input[0]
     # print(" \n ".join(file_paths))
     file_input.send_keys(" \n ".join(file_paths))
-    chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-2.png')
+    browser.save_screenshot('/code/tmp/artifacts/client-post-layers-2.png')
 
-    button = chrome.find_elements_by_xpath('//button[@type="submit"]')
+    button = browser.find_elements_by_xpath('//button[@type="submit"]')
     assert len(button) == 1
     button = button[0]
     button.click()
@@ -93,11 +93,11 @@ def test_post_layers_chunk(chrome):
                                                    process_client.LAYER_TYPE,
                                                    LAYERNAME)
     except Exception as exc:
-        chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-2.5.png')
+        browser.save_screenshot('/code/tmp/artifacts/client-post-layers-2.5.png')
         raise exc
-    chrome.save_screenshot('/code/tmp/artifacts/client-post-layers-3.png')
+    browser.save_screenshot('/code/tmp/artifacts/client-post-layers-3.png')
 
-    entries = chrome.get_log('browser')
+    entries = browser.get_log('browser')
     assert len(entries) > 3
     for entry in entries:
         # print(entry)
@@ -112,7 +112,7 @@ def test_post_layers_chunk(chrome):
 
 @pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
-def test_patch_layer_chunk(chrome):
+def test_patch_layer_chunk(browser):
     relative_file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.cpg',
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.dbf',
@@ -131,35 +131,35 @@ def test_patch_layer_chunk(chrome):
     response = requests.get(client_url)
     assert response.status_code == 200
 
-    chrome.get(client_url)
-    chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-1.png')
+    browser.get(client_url)
+    browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-1.png')
 
-    button = chrome.find_elements_by_xpath('//button[text()="PATCH"]')
+    button = browser.find_elements_by_xpath('//button[text()="PATCH"]')
     assert len(button) == 1
     button = button[0]
     button.click()
-    chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-2.png')
+    browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-2.png')
 
-    user_input = chrome.find_elements_by_name('Workspace')
+    user_input = browser.find_elements_by_name('Workspace')
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
     user_input.send_keys(WORKSPACE)
 
-    layername_input = chrome.find_elements_by_name('name')
+    layername_input = browser.find_elements_by_name('name')
     assert len(layername_input) == 1
     layername_input = layername_input[0]
     layername_input.clear()
     layername_input.send_keys(LAYERNAME)
 
-    file_input = chrome.find_elements_by_name('file')
+    file_input = browser.find_elements_by_name('file')
     assert len(file_input) == 1
     file_input = file_input[0]
     # print(" \n ".join(file_paths))
     file_input.send_keys(" \n ".join(file_paths))
-    chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.png')
+    browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.png')
 
-    button = chrome.find_elements_by_xpath('//button[@type="submit"]')
+    button = browser.find_elements_by_xpath('//button[@type="submit"]')
     assert len(button) == 1
     button = button[0]
     button.click()
@@ -169,11 +169,11 @@ def test_patch_layer_chunk(chrome):
                                                    process_client.LAYER_TYPE,
                                                    LAYERNAME)
     except Exception as exc:
-        chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.5.png')
+        browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.5.png')
         raise exc
-    chrome.save_screenshot('/code/tmp/artifacts/client-patch-layers-4.png')
+    browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-4.png')
 
-    entries = chrome.get_log('browser')
+    entries = browser.get_log('browser')
     assert len(entries) > 3, entries
     for entry in entries:
         print(entry)
