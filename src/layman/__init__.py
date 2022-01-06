@@ -1,4 +1,5 @@
 import os
+import pathlib
 import sys
 import time
 from flask import Flask, redirect, jsonify
@@ -60,6 +61,13 @@ logger.info(f"IN_UTIL_PROCESS={IN_UTIL_PROCESS}")
 
 # load UUIDs only once
 LAYMAN_DEPS_ADJUSTED_KEY = f"{__name__}:LAYMAN_DEPS_ADJUSTED"
+
+# ensure home directory, because Firefox needs it to start
+homedir = os.environ.get('HOME')
+if (not homedir) or homedir == '/':
+    homedir = '/tmp/layman_home'
+    pathlib.Path(homedir).mkdir(exist_ok=True, parents=True)
+    os.environ['HOME'] = homedir
 
 from . import error_handlers
 from .common.micka import requests as micka_requests

@@ -6,9 +6,8 @@ import time
 from urllib.parse import urlencode
 from flask import current_app
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.desired_capabilities import \
-    DesiredCapabilities
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from layman import settings, LaymanError
 from layman.authn import is_user_with_name
@@ -84,13 +83,12 @@ def generate_map_thumbnail(workspace, mapname, editor):
     timgen_url = f"{settings.LAYMAN_TIMGEN_URL}?{params}"
     current_app.logger.info(f"Timgen URL: {timgen_url}")
 
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    desired_capabilities = DesiredCapabilities.CHROME
-    desired_capabilities['goog:loggingPrefs'] = {'browser': 'ALL'}
-    browser = webdriver.Chrome(
-        options=chrome_options,
+    firefox_options = Options()
+    firefox_options.headless = True
+    desired_capabilities = DesiredCapabilities.FIREFOX
+    desired_capabilities['loggingPrefs'] = {'browser': 'ALL'}
+    browser = webdriver.Firefox(
+        options=firefox_options,
         desired_capabilities=desired_capabilities,
     )
     browser.set_window_size(500, 500)
