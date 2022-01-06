@@ -89,14 +89,14 @@ def generate_map_thumbnail(workspace, mapname, editor):
     chrome_options.add_argument("--no-sandbox")
     desired_capabilities = DesiredCapabilities.CHROME
     desired_capabilities['goog:loggingPrefs'] = {'browser': 'ALL'}
-    chrome = webdriver.Chrome(
+    browser = webdriver.Chrome(
         options=chrome_options,
         desired_capabilities=desired_capabilities,
     )
-    chrome.set_window_size(500, 500)
+    browser.set_window_size(500, 500)
 
-    chrome.get(timgen_url)
-    entries = chrome.get_log('browser')
+    browser.get(timgen_url)
+    entries = browser.get_log('browser')
     max_attempts = 40
     attempts = 0
     while next((e for e in entries
@@ -106,7 +106,7 @@ def generate_map_thumbnail(workspace, mapname, editor):
         current_app.logger.info(f"waiting for entries")
         time.sleep(0.5)
         attempts += 1
-        entries = chrome.get_log('browser')
+        entries = browser.get_log('browser')
     if attempts >= max_attempts:
         current_app.logger.info(f"max attempts reach")
         raise LaymanError(51, data="Max attempts reached when generating thumbnail")
@@ -116,9 +116,9 @@ def generate_map_thumbnail(workspace, mapname, editor):
             raise LaymanError(51, private_data=entry)
         current_app.logger.info(f"browser entry {entry}")
 
-    # chrome.save_screenshot(f'/code/tmp/{workspace}.{mapname}.png')
-    chrome.close()
-    chrome.quit()
+    # browser.save_screenshot(f'/code/tmp/{workspace}.{mapname}.png')
+    browser.close()
+    browser.quit()
 
     entry = next(e for e in entries if e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message'])
     match = re.match(r'.*\"dataurl\" \"data:image/png;base64,(.+)\"', entry['message'])
