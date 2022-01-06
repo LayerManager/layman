@@ -5,6 +5,10 @@
 ### Upgrade requirements
 - Only versions 1.12.0 and newer can be upgraded to this version. For older versions, please upgrade to last 1.15.x first.
 - Unset environment variable [LAYMAN_SETTINGS_MODULE](https://github.com/LayerManager/layman/blob/v1.15.0/doc/env-settings.md), it has no effect anymore.
+- If you are running Layman with development settings, run  
+```
+make timgen-build
+```
 ### Migrations and checks
 #### Schema migrations
 - [#64](https://github.com/LayerManager/layman/issues/64) Create new column `srid` in `publication` table.
