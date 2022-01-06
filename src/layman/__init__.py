@@ -1,5 +1,4 @@
 import os
-import pathlib
 import sys
 import time
 from flask import Flask, redirect, jsonify
@@ -35,7 +34,7 @@ from .make_celery import make_celery
 
 celery_app = make_celery(app)
 
-from .util import get_workspace_blueprints, get_blueprints
+from .util import get_workspace_blueprints, get_blueprints, ensure_home_dir
 
 for bp in get_workspace_blueprints():
     app.register_blueprint(bp, url_prefix=f'/rest/{settings.REST_WORKSPACES_PREFIX}/<workspace>')
@@ -63,11 +62,7 @@ logger.info(f"IN_UTIL_PROCESS={IN_UTIL_PROCESS}")
 LAYMAN_DEPS_ADJUSTED_KEY = f"{__name__}:LAYMAN_DEPS_ADJUSTED"
 
 # ensure home directory, because Firefox needs it to start
-homedir = os.environ.get('HOME')
-if (not homedir) or homedir == '/':
-    homedir = '/tmp/layman_home'
-    pathlib.Path(homedir).mkdir(exist_ok=True, parents=True)
-    os.environ['HOME'] = homedir
+ensure_home_dir()
 
 from . import error_handlers
 from .common.micka import requests as micka_requests
