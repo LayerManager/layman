@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import pathlib
 from flask import Flask, redirect, jsonify
 from flask.logging import create_logger
 
@@ -60,6 +61,10 @@ logger.info(f"IN_UTIL_PROCESS={IN_UTIL_PROCESS}")
 
 # load UUIDs only once
 LAYMAN_DEPS_ADJUSTED_KEY = f"{__name__}:LAYMAN_DEPS_ADJUSTED"
+
+homedir = os.path.join(settings.LAYMAN_DATA_DIR, 'home')
+pathlib.Path(homedir).mkdir(exist_ok=True, parents=True)
+os.environ["HOME"] = homedir
 
 from . import error_handlers
 from .common.micka import requests as micka_requests

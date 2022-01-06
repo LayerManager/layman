@@ -24,21 +24,17 @@ def clear_country_chunks():
 
 @pytest.fixture(scope="module")
 def firefox():
-    print(f"firefox fixture START")
     firefox_options = Options()
     firefox_options.headless = True
     desired_capabilities = DesiredCapabilities.FIREFOX
     desired_capabilities['loggingPrefs'] = {'browser': 'ALL'}
-    print(f"firefox fixture 1")
     firefox = webdriver.Firefox(
         options=firefox_options,
         desired_capabilities=desired_capabilities,
         service_log_path="/code/tmp/artifacts/gecko_service_log_path.txt",
         log_path="/code/tmp/artifacts/gecko_log_path.txt",
     )
-    print(f"firefox fixture 2")
     firefox.set_window_size(1000, 2000)
-    print(f"firefox fixture END")
     yield firefox
     firefox.close()
     firefox.quit()
@@ -47,7 +43,6 @@ def firefox():
 @pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
 def test_post_layers_chunk(firefox):
-    print(f"test_post_layers_chunk START")
     relative_file_paths = [
         'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
     ]
@@ -62,6 +57,7 @@ def test_post_layers_chunk(firefox):
     assert response.status_code == 200
 
     firefox.get(client_url)
+    # entries = firefox.get_log('browser')
     firefox.set_window_size(1000, 2000)
     firefox.save_screenshot('/code/tmp/artifacts/client-post-layers-1.png')
 
@@ -86,8 +82,8 @@ def test_post_layers_chunk(firefox):
     file_input = firefox.find_elements_by_name('file')
     assert len(file_input) == 1
     file_input = file_input[0]
-    # print(" \n ".join(file_paths))
-    file_input.send_keys(" \n ".join(file_paths))
+    for file_path in file_paths:
+        file_input.send_keys(file_path)
     firefox.save_screenshot('/code/tmp/artifacts/client-post-layers-2.png')
 
     button = firefox.find_elements_by_xpath('//button[@type="submit"]')
@@ -104,15 +100,16 @@ def test_post_layers_chunk(firefox):
         raise exc
     firefox.save_screenshot('/code/tmp/artifacts/client-post-layers-3.png')
 
-    entries = firefox.get_log('browser')
-    assert len(entries) > 3
-    for entry in entries:
-        # print(entry)
-        assert entry['level'] == 'INFO' or (
-            entry['level'] == 'SEVERE' and entry['message'].startswith(f'{client_url}rest/workspaces/{WORKSPACE}/layers/{LAYERNAME}/chunk?')
-            and entry['message'].endswith(
-                'Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
-        )
+    positive_response = firefox.find_elements_by_xpath('//div[@class="ui positive message"]')
+    assert positive_response
+
+    resp_msg_div = firefox.find_elements_by_css_selector(
+        'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.positive.message > code')
+    assert len(resp_msg_div) == 1
+    resp_msg_div = resp_msg_div[0]
+    resp_json = json.loads(resp_msg_div.text)
+    assert resp_json[0]['name'] == 'country_chunks'
+
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(WORKSPACE, LAYERNAME)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
 
@@ -162,8 +159,8 @@ def test_patch_layer_chunk(firefox):
     file_input = firefox.find_elements_by_name('file')
     assert len(file_input) == 1
     file_input = file_input[0]
-    # print(" \n ".join(file_paths))
-    file_input.send_keys(" \n ".join(file_paths))
+    for file_path in file_paths:
+        file_input.send_keys(file_path)
     firefox.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.png')
 
     button = firefox.find_elements_by_xpath('//button[@type="submit"]')
@@ -180,17 +177,15 @@ def test_patch_layer_chunk(firefox):
         raise exc
     firefox.save_screenshot('/code/tmp/artifacts/client-patch-layers-4.png')
 
-    entries = firefox.get_log('browser')
-    performance_entries = json.loads(firefox.execute_script("return JSON.stringify(window.performance.getEntries())"))
-    assert len(entries) > 3, f"entries={entries}\n"\
-                             f"Timgen performance entries: {json.dumps(performance_entries, indent=2)}\n"
-    for entry in entries:
-        print(entry)
-        assert entry['level'] == 'INFO' or (
-            entry['level'] == 'SEVERE'
-            and entry['message'].startswith(
-                f'{client_url}rest/{settings.REST_WORKSPACES_PREFIX}/{WORKSPACE}/layers/{LAYERNAME}/chunk?'
-            ) and entry['message'].endswith('Failed to load resource: the server responded with a status of 404 (NOT FOUND)')
-        )
+    positive_response = firefox.find_elements_by_xpath('//div[@class="ui positive message"]')
+    assert positive_response
+
+    resp_msg_div = firefox.find_elements_by_css_selector(
+        'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.positive.message > code')
+    assert len(resp_msg_div) == 1
+    resp_msg_div = resp_msg_div[0]
+    resp_json = json.loads(resp_msg_div.text)
+    assert resp_json['name'] == 'country_chunks'
+
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(WORKSPACE, LAYERNAME)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
