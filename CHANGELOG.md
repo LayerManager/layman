@@ -21,6 +21,7 @@ make timgen-build
 - [#489](https://github.com/LayerManager/layman/issues/489) Error responses from Micka and GeoServer are logged into log and also propagated as part of raised exception, so they can be seen from flower.
 - Remove [LAYMAN_SETTINGS_MODULE](https://github.com/LayerManager/layman/blob/v1.15.0/doc/env-settings.md), import [`src/layman_settings.py`](src/layman_settings.py) directly.
 - [#555](https://github.com/LayerManager/layman/pull/555) Upgrade Selenium from 3 to 4
+- [#555](https://github.com/LayerManager/layman/pull/555) Use Firefox instead of Chrome in Selenium for map thumbnail generation and Layman Test Client tests.
 
 ## v1.15.1
  2021-12-06

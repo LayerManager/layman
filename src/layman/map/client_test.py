@@ -4,7 +4,7 @@ import sys
 import requests
 import pytest
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 del sys.modules['layman']
@@ -31,19 +31,18 @@ def client():
 
 @pytest.fixture(scope="module")
 def browser():
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    desired_capabilities = DesiredCapabilities.CHROME
+    firefox_options = Options()
+    firefox_options.headless = True
+    desired_capabilities = DesiredCapabilities.FIREFOX
     desired_capabilities['loggingPrefs'] = {'browser': 'ALL'}
-    chrome = webdriver.Chrome(
-        options=chrome_options,
+    firefox = webdriver.Firefox(
+        options=firefox_options,
         desired_capabilities=desired_capabilities,
     )
-    chrome.set_window_size(1000, 2000)
-    yield chrome
-    chrome.close()
-    chrome.quit()
+    firefox.set_window_size(1000, 2000)
+    yield firefox
+    firefox.close()
+    firefox.quit()
 
 
 @pytest.mark.test_client
