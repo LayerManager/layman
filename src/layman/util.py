@@ -2,6 +2,8 @@ from functools import wraps
 import importlib
 import copy
 import inspect
+import os
+import pathlib
 import re
 import unicodedata
 import urllib.parse
@@ -509,3 +511,11 @@ def get_info_with_statuses(info, chain_info, task_to_layer_info_keys, item_keys)
                 if 'error' in source_state or 'error' not in filled_info[layerinfo_key]:
                     filled_info[layerinfo_key].update(source_state)
     return filled_info
+
+
+def ensure_home_dir():
+    homedir = os.environ.get('HOME')
+    if (not homedir) or homedir == '/':
+        homedir = '/tmp/layman_home'
+        pathlib.Path(homedir).mkdir(exist_ok=True, parents=True)
+        os.environ['HOME'] = homedir
