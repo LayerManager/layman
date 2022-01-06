@@ -93,14 +93,4 @@ def test_post_no_file(browser):
     resp_json = json.loads(resp_msg_div.text)
     assert resp_json['code'] == 1
 
-    entries = browser.get_log('browser')
-    assert len(entries) == 1
-
-    severe_entries = [e for e in entries if e['level'] == 'SEVERE']
-    assert len(severe_entries) == 1
-    for entry in severe_entries:
-        assert entry['message'].startswith(f'{client_url}rest/{settings.REST_WORKSPACES_PREFIX}/{workspace}/maps?'
-                                           ) and entry['message'].endswith(
-            'Failed to load resource: the server responded with a status of 400 (BAD REQUEST)')
-
     check_redis_consistency(expected_publ_num_by_type={f'{MAP_TYPE}': 0})
