@@ -6,10 +6,10 @@ import re
 import time
 from urllib.parse import urlencode
 from flask import current_app
+
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.desired_capabilities import \
-    DesiredCapabilities
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from layman import settings, LaymanError
 from layman.authn import is_user_with_name
@@ -85,30 +85,48 @@ def generate_map_thumbnail(workspace, mapname, editor):
     timgen_url = f"{settings.LAYMAN_TIMGEN_URL}?{params}"
     current_app.logger.info(f"Timgen URL: {timgen_url}")
 
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    desired_capabilities = DesiredCapabilities.CHROME
-    desired_capabilities['goog:loggingPrefs'] = {'browser': 'ALL'}
-    chrome = webdriver.Chrome(
-        options=chrome_options,
+    firefox_options = Options()
+    firefox_options.headless = True
+    desired_capabilities = DesiredCapabilities.FIREFOX
+    desired_capabilities['loggingPrefs'] = {'browser': 'ALL'}
+    firefox = webdriver.Firefox(
+        options=firefox_options,
         desired_capabilities=desired_capabilities,
+        service_log_path="/code/tmp/artifacts/gecko_service_log_path.txt",
+        log_path="/code/tmp/artifacts/gecko_log_path.txt",
     )
-    chrome.set_window_size(500, 500)
 
-    chrome.get(timgen_url)
-    entries = chrome.get_log('browser')
+    current_app.logger.info(f"After creating webdriver.Chrome")
+    firefox.set_window_size(500, 500)
+    current_app.logger.info(f"After setting window size")
+
+    firefox.get(timgen_url)
+    current_app.logger.info(f"After getting Timgen URL")
+    firefox.save_screenshot('/code/tmp/artifacts/generate-thumbnail-1.png')
+
     max_attempts = 40
     attempts = 0
-    while next((e for e in entries
-                if (e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message'])
-                or (e.get('level') == 'SEVERE' and e.get('source') == 'javascript')
-                ), None) is None and attempts < max_attempts:
-        current_app.logger.info(f"waiting for entries")
+    canvas = firefox.execute_script('''return (canvas_data_url);''')
+    while canvas is None:
+        current_app.logger.info(f"waiting for entries, canvas={canvas}")
         time.sleep(0.5)
         attempts += 1
-        entries = chrome.get_log('browser')
-    performance_entries = json.loads(chrome.execute_script("return JSON.stringify(window.performance.getEntries())"))
+        canvas = firefox.execute_script('''return (global.canvas_data_url);''')
+    current_app.logger.info(f"waiting for entries, canvas={canvas}")
+
+    # entries = firefox.get_log('browser')
+    # max_attempts = 40
+    # attempts = 0
+    # while next((e for e in entries
+    #             if (e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message'])
+    #             or (e.get('level') == 'SEVERE' and e.get('source') == 'javascript')
+    #             ), None) is None and attempts < max_attempts:
+    #     current_app.logger.info(f"waiting for entries")
+    #     time.sleep(0.5)
+    #     attempts += 1
+    #     entries = firefox.get_log('browser')
+    current_app.logger.info(f"After waiting for entries")
+    performance_entries = json.loads(firefox.execute_script("return JSON.stringify(window.performance.getEntries())"))
     if attempts >= max_attempts:
         current_app.logger.info(f"max attempts reach")
         current_app.logger.info(f"Map thumbnail: {workspace, mapname}, editor={editor}\n"
@@ -123,8 +141,8 @@ def generate_map_thumbnail(workspace, mapname, editor):
         current_app.logger.info(f"browser entry {entry}")
 
     # chrome.save_screenshot(f'/code/tmp/{workspace}.{mapname}.png')
-    chrome.close()
-    chrome.quit()
+    firefox.close()
+    firefox.quit()
 
     entry = next(e for e in entries if e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message'])
     match = re.match(r'.*\"dataurl\" \"data:image/png;base64,(.+)\"', entry['message'])
