@@ -96,34 +96,27 @@ def generate_map_thumbnail(workspace, mapname, editor):
     browser.set_window_size(500, 500)
 
     browser.get(timgen_url)
-    entries = browser.get_log('browser')
+
     max_attempts = 40
     attempts = 0
-    while next((e for e in entries
-                if (e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message'])
-                or (e.get('level') == 'SEVERE' and e.get('source') == 'javascript')
-                ), None) is None and attempts < max_attempts:
-        current_app.logger.info(f"waiting for entries")
+    data_url = browser.execute_script('''return window.canvas_data_url;''')
+    while data_url is None:
+        current_app.logger.info(f"waiting for entries, data_url={data_url}")
         time.sleep(0.5)
         attempts += 1
-        entries = browser.get_log('browser')
+        data_url = browser.execute_script('''return window.canvas_data_url;''')
+
     if attempts >= max_attempts:
         current_app.logger.info(f"max attempts reach")
         raise LaymanError(51, data="Max attempts reached when generating thumbnail")
-    for entry in entries:
-        if entry.get('level') == 'SEVERE' and entry.get('source') == 'javascript':
-            current_app.logger.error(f"timgen error {entry}")
-            raise LaymanError(51, private_data=entry)
-        current_app.logger.info(f"browser entry {entry}")
 
     # browser.save_screenshot(f'/code/tmp/{workspace}.{mapname}.png')
     browser.close()
     browser.quit()
 
-    entry = next(e for e in entries if e['level'] == 'INFO' and '"dataurl" "data:image/png;base64,' in e['message'])
-    match = re.match(r'.*\"dataurl\" \"data:image/png;base64,(.+)\"', entry['message'])
+    match = re.match(r'^data:image/png;base64,(.+)$', data_url)
     groups = match.groups()
-    data_url = groups[0]
+    base64_image = groups[0]
     # current_app.logger.info(f"data_url {data_url}")
     # current_app.logger.info(f"len(data_url) {len(data_url)}")
 
@@ -135,4 +128,4 @@ def generate_map_thumbnail(workspace, mapname, editor):
         pass
 
     with open(file_path, 'wb') as file:
-        file.write(base64.b64decode(data_url))
+        file.write(base64.b64decode(base64_image))
