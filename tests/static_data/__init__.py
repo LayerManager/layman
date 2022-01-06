@@ -830,9 +830,10 @@ PUBLICATIONS = {
     },
 }
 
-PUBLICATIONS = {(ws, pt, pn): value for (ws, pt, pn), value in PUBLICATIONS.items()
-                if (ws, pt, pn) in {(COMMON_WORKSPACE, MAP_TYPE, 'post_internal_layer'),
-                                    }}
+# PUBLICATIONS = {(ws, pt, pn): value for (ws, pt, pn), value in PUBLICATIONS.items()
+#                 if (ws, pt, pn) in {(COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'),
+#                                     (COMMON_WORKSPACE, MAP_TYPE, 'post_internal_layer'),
+#                                     }}
 
 LIST_ALL_PUBLICATIONS = list(PUBLICATIONS.keys())
 LIST_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication) in PUBLICATIONS
@@ -851,18 +852,18 @@ LIST_INTERNAL_MAPS = [(workspace, publ_type, publication) for (workspace, publ_t
 
 WORKSPACES = {workspace for workspace, _, _ in PUBLICATIONS}
 
-# assert len(WORKSPACES) > 0, WORKSPACES
-# assert len(USERS) > 0, USERS
-# assert len(HEADERS) > 0, HEADERS
-#
-# assert len(LIST_ALL_PUBLICATIONS) > 0, LIST_ALL_PUBLICATIONS
-# assert len(LIST_LAYERS) > 0, LIST_LAYERS
-# assert len(LIST_RASTER_LAYERS) > 0, LIST_RASTER_LAYERS
-# assert len(LIST_VECTOR_LAYERS) > 0, LIST_VECTOR_LAYERS
-# assert len(LIST_SLD_LAYERS) > 0, LIST_SLD_LAYERS
-# assert len(LIST_QML_LAYERS) > 0, LIST_QML_LAYERS
-# assert len(LIST_INTERNAL_MAPS) > 0, LIST_INTERNAL_MAPS
-# assert any('normalized_overviews' in v[TEST_DATA] for v in PUBLICATIONS.values())
+assert len(WORKSPACES) > 0, WORKSPACES
+assert len(USERS) > 0, USERS
+assert len(HEADERS) > 0, HEADERS
+
+assert len(LIST_ALL_PUBLICATIONS) > 0, LIST_ALL_PUBLICATIONS
+assert len(LIST_LAYERS) > 0, LIST_LAYERS
+assert len(LIST_RASTER_LAYERS) > 0, LIST_RASTER_LAYERS
+assert len(LIST_VECTOR_LAYERS) > 0, LIST_VECTOR_LAYERS
+assert len(LIST_SLD_LAYERS) > 0, LIST_SLD_LAYERS
+assert len(LIST_QML_LAYERS) > 0, LIST_QML_LAYERS
+assert len(LIST_INTERNAL_MAPS) > 0, LIST_INTERNAL_MAPS
+assert any('normalized_overviews' in v[TEST_DATA] for v in PUBLICATIONS.values())
 
 
 def assert_same_name_publications(publications):
@@ -879,7 +880,7 @@ def assert_same_name_publications(publications):
     assert len(same_name_same_type) > 0
 
 
-# assert_same_name_publications(PUBLICATIONS)
+assert_same_name_publications(PUBLICATIONS)
 
-# assert all(set(test_data.get('users_can_read', set())).issubset(USERS) for test_data in PUBLICATIONS.values())
-# assert all(set(test_data.get('users_can_write', set())).issubset(USERS) for test_data in PUBLICATIONS.values())
+assert all(set(test_data.get('users_can_read', set())).issubset(USERS) for test_data in PUBLICATIONS.values())
+assert all(set(test_data.get('users_can_write', set())).issubset(USERS) for test_data in PUBLICATIONS.values())
