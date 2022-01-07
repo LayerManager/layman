@@ -60,7 +60,7 @@ def generate(workspace=None):
                     *tc_params[consts.KEY_FINAL_ASSERTS],
                 ]
             }
-            publ_name = f"{testcase}_post_{test_case_postfix}"
+            publ_name = "_".join([part for part in [testcase, 'post', test_case_postfix] if part])
             result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = [action_def]
 
         patch = [
