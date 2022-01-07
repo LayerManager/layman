@@ -132,7 +132,7 @@ def check_raster_main_file(main_filepath, *, check_crs=True):
 def spatial_ref_crs_to_crs_id(spatial_ref):
     crs_auth_name = spatial_ref.GetAuthorityName(None)
     crs_code = spatial_ref.GetAuthorityCode(None)
-    return crs_auth_name + ":" + crs_code
+    return f"{crs_auth_name}:{crs_code}" if (crs_auth_name and crs_code) else None
 
 
 def get_raster_crs(main_filepath):
