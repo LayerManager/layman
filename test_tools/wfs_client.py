@@ -24,9 +24,13 @@ def post_wfst(workspace, publ_type, name,
               request_headers=None,
               request_url=None,
               request_workspace=None,
+              wait_for_update=True,
               ):
     assert publ_type == process_client.LAYER_TYPE
 
     data_xml = WfstOperationDef[(operation, version)](workspace, name)
 
     process_client.post_wfst(data_xml, headers=request_headers, url=request_url, workspace=request_workspace)
+
+    if wait_for_update:
+        process_client.wait_for_publication_status(workspace, publ_type, name, headers=request_headers)
