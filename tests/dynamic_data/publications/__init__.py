@@ -1,8 +1,7 @@
-from layman import LaymanError
 import tests.asserts.final.publication as publication
 import tests.asserts.processing as processing
 from test_tools import process_client
-from . import wrong_input, file_input, celery, common_layers as layers, geoserver_proxy
+from . import wrong_input, file_input, celery, common_layers as layers, geoserver_proxy, crs
 from .. import predefined_actions
 from ... import Action, Publication, dynamic_data as consts
 
@@ -514,6 +513,7 @@ PUBLICATIONS = {
     **file_input.generate(consts.COMMON_WORKSPACE + '_generated_file_input'),
     **celery.generate(consts.COMMON_WORKSPACE + '_celery'),
     **geoserver_proxy.generate(consts.COMMON_WORKSPACE + '_geoserver_proxy'),
+    **crs.generate(consts.COMMON_WORKSPACE + '_crs'),
 }
 
 # pylint: disable=unnecessary-comprehension
