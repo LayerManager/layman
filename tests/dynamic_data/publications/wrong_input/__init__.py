@@ -452,6 +452,27 @@ TESTCASES = {
             },
         },
     },
+    'epsg_4326_en': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': [
+                f'{os.path.dirname(os.path.abspath(__file__))}/small_layer_4326_en.shp',
+                f'{os.path.dirname(os.path.abspath(__file__))}/small_layer_4326_en.dbf',
+                f'{os.path.dirname(os.path.abspath(__file__))}/small_layer_4326_en.prj',
+                f'{os.path.dirname(os.path.abspath(__file__))}/small_layer_4326_en.shx',
+            ],
+            'compress': False,
+            'with_chunks': False,
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 4,
+                          'detail': {'found': None, 'supported_values': ['EPSG:3857', 'EPSG:4326']},
+                          },
+        },
+    },
 }
 
 VALIDATION_PATCH_ACTION = {
