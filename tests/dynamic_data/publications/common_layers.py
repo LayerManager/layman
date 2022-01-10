@@ -1,5 +1,7 @@
+import tests.asserts.final.publication as publication
+import tests.asserts.processing as processing
 from test_tools import process_client
-from ... import PublicationValues
+from ... import PublicationValues, dynamic_data as consts, Action
 
 SMALL_LAYER = PublicationValues(
     definition=dict(),
@@ -134,3 +136,16 @@ SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE_ZIP = PublicationValues(
     },
     thumbnail=SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.thumbnail,
 )
+
+DEFAULT_POST = {
+    consts.KEY_ACTION: {
+        consts.KEY_CALL: Action(process_client.publish_workspace_publication,
+                                dict()),
+        consts.KEY_RESPONSE_ASSERTS: [
+            Action(processing.response.valid_post, dict()),
+        ],
+    },
+    consts.KEY_FINAL_ASSERTS: [
+        *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+    ]
+}
