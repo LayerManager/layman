@@ -1,12 +1,13 @@
 import copy
+import os
 
 from layman import LaymanError, settings
 from tests.asserts import util as asserts_util
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client
-from . import util, common_layers as layers
-from ... import Action, Publication, dynamic_data as consts
+from .. import util, common_layers as layers
+from .... import Action, Publication, dynamic_data as consts
 
 KEY_PUBLICATION_TYPE = 'publ_type'
 KEY_ACTION_PARAMS = 'action_params'
@@ -160,7 +161,7 @@ TESTCASES = {
     'non_readable_raster': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
-            'file_paths': ['test_tools/data/layers/non_readable_raster.tif'],
+            'file_paths': [f'{os.path.dirname(os.path.abspath(__file__))}/non_readable_raster.tif'],
         },
         consts.KEY_EXCEPTION: LaymanError,
         KEY_EXPECTED_EXCEPTION: {
@@ -331,7 +332,7 @@ TESTCASES = {
     'two_main_files_compressed': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
-            'file_paths': ['test_tools/data/layers/layer_with_two_main_files.zip'],
+            'file_paths': [f'{os.path.dirname(os.path.abspath(__file__))}/layer_with_two_main_files.zip'],
             'compress': False,
         },
         consts.KEY_EXCEPTION: LaymanError,
@@ -379,7 +380,7 @@ TESTCASES = {
         KEY_ACTION_PARAMS: {
             'file_paths': [
                 'tmp/sm5/vektor/sm5.zip',
-                'test_tools/data/layers/layer_with_two_main_files.zip',
+                f'{os.path.dirname(os.path.abspath(__file__))}/layer_with_two_main_files.zip',
             ],
         },
         consts.KEY_EXCEPTION: LaymanError,
