@@ -250,12 +250,12 @@ TESTCASES = {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': [
-                'tmp/data200/trans/jtsk/TRANS/AirfldA.cpg',
-                'tmp/data200/trans/jtsk/TRANS/AirfldA.dbf',
-                'tmp/data200/trans/jtsk/TRANS/AirfldA.prj',
-                'tmp/data200/trans/jtsk/TRANS/AirfldA.sbn',
-                'tmp/data200/trans/jtsk/TRANS/AirfldA.shp',
-                'tmp/data200/trans/jtsk/TRANS/AirfldA.shx',
+                f'{DIRECTORY}/sample_point_cz_2154.cpg',
+                f'{DIRECTORY}/sample_point_cz_2154.dbf',
+                f'{DIRECTORY}/sample_point_cz_2154.prj',
+                f'{DIRECTORY}/sample_point_cz_2154.qmd',
+                f'{DIRECTORY}/sample_point_cz_2154.shp',
+                f'{DIRECTORY}/sample_point_cz_2154.shx',
             ],
         },
         consts.KEY_EXCEPTION: LaymanError,
@@ -264,7 +264,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 4,
                           'message': 'Unsupported CRS of data file',
-                          'detail': {'found': 'EPSG:5514', 'supported_values': settings.INPUT_SRS_LIST},
+                          'detail': {'found': 'EPSG:2154', 'supported_values': settings.INPUT_SRS_LIST},
                           },
             frozenset([('compress', False), ('with_chunks', True)]): {
                 'sync': False,
@@ -282,7 +282,7 @@ TESTCASES = {
     'tif_with_unsupported_epsg': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
-            'file_paths': ['sample/layman.layer/sample_tif_rgb_5514.tif', ],
+            'file_paths': [f'{DIRECTORY}/sample_tif_rgb_2154.tif', ],
         },
         consts.KEY_EXCEPTION: LaymanError,
         KEY_EXPECTED_EXCEPTION: {
@@ -290,7 +290,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 4,
                           'message': 'Unsupported CRS of data file',
-                          'detail': {'found': 'EPSG:5514', 'supported_values': settings.INPUT_SRS_LIST},
+                          'detail': {'found': 'EPSG:2154', 'supported_values': settings.INPUT_SRS_LIST},
                           },
             frozenset([('compress', False), ('with_chunks', True)]): {
                 'sync': False,
@@ -471,7 +471,7 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 4,
-                          'detail': {'found': None, 'supported_values': ['EPSG:3857', 'EPSG:4326']},
+                          'detail': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
                           },
         },
     },
