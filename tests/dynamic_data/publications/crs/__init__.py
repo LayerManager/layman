@@ -12,6 +12,8 @@ KEY_FILE_NAME = 'file_suffix'
 KEY_INFO_VALUES = 'info_values'
 KEY_THUMBNAIL = 'thumbnail'
 
+DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+
 REST_PARAMETRIZATION = {
     'with_chunks': {False: 'sync', True: 'chunks'},
     'compress': {False: '', True: 'zipped'},
@@ -39,7 +41,7 @@ def generate(workspace=None):
     result = dict()
     for testcase, tc_params in TESTCASES.items():
         file_name = tc_params.get(KEY_FILE_NAME)
-        file_paths = {'file_paths': [f'{os.path.dirname(os.path.abspath(__file__))}/{file_name}.{ext}' for ext in ['shp', 'dbf', 'prj', 'shx']]} if file_name else dict()
+        file_paths = {'file_paths': [f'{DIRECTORY}/{file_name}.{ext}' for ext in ['shp', 'dbf', 'prj', 'shx']]} if file_name else dict()
         action_params = {**file_paths,
                          **tc_params.get(KEY_ACTION_PARAMS, dict()),
                          }
