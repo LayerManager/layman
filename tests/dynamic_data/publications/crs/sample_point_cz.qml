@@ -1,0 +1,1 @@
+../../../../sample/layman.layer/sample_point_cz.qml

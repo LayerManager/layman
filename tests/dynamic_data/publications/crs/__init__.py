@@ -32,6 +32,23 @@ TESTCASES = {
                           'file_extension': 'shp', },
         KEY_THUMBNAIL: layers.SMALL_LAYER.thumbnail,
     },
+    'epsg_5514': {
+        KEY_FILE_NAME: 'sample_point_cz_5514_5239',
+        KEY_ACTION_PARAMS: {
+            'style_file': f'{DIRECTORY}/sample_point_cz.sld',
+        },
+        KEY_INFO_VALUES: {
+            'exp_publication_detail': {
+                # From epsg.io: [1848688.08,         6308687.70,        1848707.00,         6308708.80]
+                'bounding_box': [1848686.0507945428, 6308687.699346839, 1848709.0337724225, 6308708.801626363],
+                'native_crs': 'EPSG:5514',
+                'native_bounding_box': [-598214.7290553625207394, -1160319.8064114262815565, -598200.9321668159682304, -1160307.4425631782505661],
+            },
+            'file_extension': 'shp',
+            'publ_type_detail': ('vector', 'sld'),
+        },
+        KEY_THUMBNAIL: f'{DIRECTORY}/sample_point_cz_5514_5239_thumbnail.png',
+    },
 }
 
 
