@@ -14,10 +14,13 @@ CRSTypeDef = namedtuple('CRSTypeDef', [
     'qgis_template_spatialrefsys',
     # Boolean value, True if CRS definition in epsg.org DB specify axes in easting-northing order
     'axes_order_east_north_in_epsg_db',
+    # Definition used for PostGIS spatial_ref_sys table
+    'proj4text',
 ])
 
 EPSG_3857 = 'EPSG:3857'
 EPSG_4326 = 'EPSG:4326'
+EPSG_5514 = 'EPSG:5514'
 
 CRSDefinitions = {
     EPSG_3857: CRSTypeDef(
@@ -46,6 +49,7 @@ CRSDefinitions = {
           <ellipsoidacronym>WGS84</ellipsoidacronym>
           <geographicflag>false</geographicflag>''',
         axes_order_east_north_in_epsg_db=True,
+        proj4text=None,
     ),
     EPSG_4326: CRSTypeDef(
         world_bbox=(
@@ -70,5 +74,6 @@ CRSDefinitions = {
             <ellipsoidacronym>EPSG:7030</ellipsoidacronym>
             <geographicflag>true</geographicflag>''',
         axes_order_east_north_in_epsg_db=False,
+        proj4text=None,
     ),
 }
