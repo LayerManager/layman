@@ -16,6 +16,8 @@ KEY_DEFAULT = 'default'
 KEY_PATCHES = 'patches'
 KEY_PATCH_POST = 'post_params'
 
+DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+
 REST_PARAMETRIZATION = {
     'with_chunks': {False: 'sync', True: 'chunks'},
     'compress': {False: '', True: 'zipped'},
@@ -161,7 +163,7 @@ TESTCASES = {
     'non_readable_raster': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
-            'file_paths': [f'{os.path.dirname(os.path.abspath(__file__))}/non_readable_raster.tif'],
+            'file_paths': [f'{DIRECTORY}/non_readable_raster.tif'],
         },
         consts.KEY_EXCEPTION: LaymanError,
         KEY_EXPECTED_EXCEPTION: {
@@ -332,7 +334,7 @@ TESTCASES = {
     'two_main_files_compressed': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
-            'file_paths': [f'{os.path.dirname(os.path.abspath(__file__))}/layer_with_two_main_files.zip'],
+            'file_paths': [f'{DIRECTORY}/layer_with_two_main_files.zip'],
             'compress': False,
         },
         consts.KEY_EXCEPTION: LaymanError,
@@ -380,7 +382,7 @@ TESTCASES = {
         KEY_ACTION_PARAMS: {
             'file_paths': [
                 'tmp/sm5/vektor/sm5.zip',
-                f'{os.path.dirname(os.path.abspath(__file__))}/layer_with_two_main_files.zip',
+                f'{DIRECTORY}/layer_with_two_main_files.zip',
             ],
         },
         consts.KEY_EXCEPTION: LaymanError,
@@ -456,10 +458,10 @@ TESTCASES = {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': [
-                f'{os.path.dirname(os.path.abspath(__file__))}/small_layer_4326_en.shp',
-                f'{os.path.dirname(os.path.abspath(__file__))}/small_layer_4326_en.dbf',
-                f'{os.path.dirname(os.path.abspath(__file__))}/small_layer_4326_en.prj',
-                f'{os.path.dirname(os.path.abspath(__file__))}/small_layer_4326_en.shx',
+                f'{DIRECTORY}/small_layer_4326_en.shp',
+                f'{DIRECTORY}/small_layer_4326_en.dbf',
+                f'{DIRECTORY}/small_layer_4326_en.prj',
+                f'{DIRECTORY}/small_layer_4326_en.shx',
             ],
             'compress': False,
             'with_chunks': False,
