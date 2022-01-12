@@ -17,6 +17,7 @@ make timgen-build
 - [#64](https://github.com/LayerManager/layman/issues/64) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-maps), [GET Workspace Map](doc/rest.md#get-workspace-map), [PATCH Workspace Map](doc/rest.md#patch-workspace-map) contains new attribute
    - `native_crs` with code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326"
    - `native_bounding_box` with coordinates in native CRS  [minx, miny, maxx, maxy]
+- [#64](https://github.com/LayerManager/layman/issues/64) Layman supports import of vector layers in "EPSG:5514" with SLD style.
 - [#64](https://github.com/LayerManager/layman/issues/64) Layer thumbnails are generated in native CRS of the layer.
 - [#489](https://github.com/LayerManager/layman/issues/489) Error responses from Micka and GeoServer are logged into log and also propagated as part of raised exception, so they can be seen from flower.
 - [#548](https://github.com/LayerManager/layman/pull/548) Suppress GeoServer HTTP error 409 when setting layer access rights if they already have the same value.
