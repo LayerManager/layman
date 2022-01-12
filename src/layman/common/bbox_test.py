@@ -83,6 +83,13 @@ def test_ensure_bbox_with_area(bbox, no_area_padding, expected_result):
         crs_def.EPSG_3857,
         crs_def.CRSDefinitions[crs_def.EPSG_3857].world_bbox,
     ),
+    (
+        [-598214.7290553625207394, -1160319.8064114262815565, -598200.9321668159682304, -1160307.4425631782505661],
+        crs_def.EPSG_5514,
+        crs_def.EPSG_3857,
+        # 1848688.08,        6308687.70,        1848707.00,         6308708.80],  from epsg.io
+        [1848686.0507945428, 6308687.699346839, 1848709.0337724225, 6308708.801626363],
+    ),
 ])
 def test_transform(bbox, crs_from, crs_to, expected_bbox):
     with app.app_context():
