@@ -33,7 +33,7 @@ In response of [POST Workspace Maps](rest.md#post-workspace-maps) you will obtai
  ## Maps composed from vector files
 In case of maps composed from vector files, it is recommended first to publish each file as one WMS layer at Layman. Having each vector file as one WMS layer at Layman, you can then save map composition of WMS layers in the same way as in [previous example](#maps-composed-from-wms-layers).
 
-Remember that Layman supports only `EPSG:4326` and `EPSG:3857` projections by default for publishing layers. Therefore compositions that use WMS layers provided by Layman must use one of supported projections, otherwise these layers can not be displayed.
+Remember that Layman supports only `EPSG:4326`, `EPSG:3857` and `EPSG:5514` projections by default for publishing layers. Therefore compositions that use WMS layers provided by Layman must use one of supported projections, otherwise these layers can not be displayed.
 
 In QGIS, you need to implement following steps.
 
