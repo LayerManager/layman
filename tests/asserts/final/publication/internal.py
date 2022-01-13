@@ -173,6 +173,11 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            'style_type': style_type,
                                            'style': {'type': style_type},
                                        })
+            if style_type == 'qml':
+                util.recursive_dict_update(expected_detail,
+                                           {
+                                               '_wms': {'qgis_capabilities_url': f'{settings.LAYMAN_QGIS_URL}?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.1.1&map={settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.qgis'},
+                                           })
 
     expected_detail = util.recursive_dict_update(expected_detail, exp_publication_detail)
     with app.app_context():
