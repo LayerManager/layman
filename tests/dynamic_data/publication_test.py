@@ -11,6 +11,7 @@ def publication_id(publication):
     return f'{publication.workspace}-{publication.type}-{publication.name}'
 
 
+@pytest.mark.timeout(60)
 @pytest.mark.parametrize('publication', data.PUBLICATIONS, ids=publication_id)
 @pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
 def test_action_chain(publication, request):
