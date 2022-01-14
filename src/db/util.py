@@ -87,3 +87,10 @@ def get_crs(srid):
     sql = 'select auth_name, auth_srid from spatial_ref_sys where srid = %s;'
     auth_name, auth_srid = run_query(sql, (srid, ))[0]
     return f'{auth_name}:{auth_srid}'
+
+
+def ensure_srid_definition(srid, proj4text):
+    sql = f'''INSERT into spatial_ref_sys (srid, auth_name, auth_srid, proj4text, srtext) values ( %s, null, null, %s, null)
+ON CONFLICT (srid) DO UPDATE SET proj4text = %s;'''
+    params = (srid, proj4text, proj4text)
+    run_statement(sql, params)
