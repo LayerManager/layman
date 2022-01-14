@@ -82,21 +82,19 @@ def transform(bbox, crs_from, crs_to):
             min(bbox[2], world_bounds[2]),
             min(bbox[3], world_bounds[3]),
         )
-    if crs_def.CRSDefinitions[crs_from].proj4text:
-        bbox_trans = 'ST_Transform(ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s, %s)), %s, %s)'
-        params = tuple(bbox) + (crs_def.CRSDefinitions[crs_from].proj4text, srid_to,)
-    else:
-        bbox_trans = 'ST_Transform(ST_SetSRID(ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s, %s)), %s), %s)'
-        params = tuple(bbox) + (srid_from, srid_to,)
 
     query = f'''
-    with tmp as (select {bbox_trans} bbox)
+    with tmp as (select ST_Transform(ST_SetSRID(ST_MakeBox2D(ST_Point(%s, %s),
+                                                             ST_Point(%s, %s)),
+                                                %s),
+                                     %s) bbox)
     select st_xmin(bbox),
            st_ymin(bbox),
            st_xmax(bbox),
            st_ymax(bbox)
     from tmp
     ;'''
+    params = tuple(bbox) + (srid_from, srid_to,)
     result = db_util.run_query(query, params)[0]
     world_bbox = crs_def.CRSDefinitions[crs_to].world_bbox
     result = (
