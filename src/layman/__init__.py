@@ -117,6 +117,13 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                         from .layer.qgis import output_srs
                         output_srs.ensure_output_srs_for_all()
 
+                        logger.info(f'Ensure PostGIS CRS definitions')
+                        from crs import CRSDefinitions
+                        from db import util as db_util
+                        for crs_code, crs_def in CRSDefinitions.items():
+                            if crs_def.srid:
+                                db_util.ensure_srid_definition(crs_def.srid, crs_def.proj4text)
+
                 pipe.multi()
                 pipe.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
                 pipe.execute()
