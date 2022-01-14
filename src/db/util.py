@@ -3,6 +3,7 @@ import re
 import psycopg2
 from flask import g
 
+import crs as crs_def
 from . import PG_CONN
 from .error import Error
 
@@ -76,17 +77,26 @@ def get_srid(crs):
     if crs is None:
         srid = None
     else:
-        auth_name, auth_srid = crs.split(':')
-        auth_srid = int(auth_srid)
-        sql = 'select srid from spatial_ref_sys where auth_name = %s and auth_srid = %s;'
-        srid = run_query(sql, (auth_name, auth_srid, ))[0][0]
+        srid = crs_def.CRSDefinitions[crs].srid
+        if not srid:
+            auth_name, auth_srid = crs.split(':')
+            auth_srid = int(auth_srid)
+            sql = 'select srid from spatial_ref_sys where auth_name = %s and auth_srid = %s;'
+            srid = run_query(sql, (auth_name, auth_srid, ))[0][0]
     return srid
 
 
 def get_crs(srid):
-    sql = 'select auth_name, auth_srid from spatial_ref_sys where srid = %s;'
-    auth_name, auth_srid = run_query(sql, (srid, ))[0]
-    return f'{auth_name}:{auth_srid}'
+    crs = next((
+        crs_code for crs_code, crs_item_def in crs_def.CRSDefinitions.items()
+        if crs_item_def.srid == srid
+    ), None)
+    if not crs:
+        sql = 'select auth_name, auth_srid from spatial_ref_sys where srid = %s;'
+        auth_name, auth_srid = run_query(sql, (srid, ))[0]
+        if auth_name or auth_srid:
+            crs = f'{auth_name}:{auth_srid}'
+    return crs
 
 
 def ensure_srid_definition(srid, proj4text):
