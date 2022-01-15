@@ -1,5 +1,6 @@
 from celery.utils.log import get_task_logger
 
+import crs as crs_def
 from layman.celery import AbortedException
 from layman.common import empty_method_returns_true
 from layman import celery_app, util as layman_util, settings
@@ -60,3 +61,7 @@ def refresh_table(
             else:
                 err_code = 11
             raise LaymanError(err_code, private_data=pg_error)
+
+    crs = db.get_crs(workspace, layername)
+    if crs_def.CRSDefinitions[crs].srid:
+        table.set_layer_srid(workspace, layername, crs_def.CRSDefinitions[crs].srid)
