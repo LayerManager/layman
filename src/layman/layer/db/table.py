@@ -50,3 +50,9 @@ def delete_layer(workspace, layername, conn_cur=None):
         conn.commit()
     except BaseException as exc:
         raise LaymanError(7)from exc
+
+
+def set_layer_srid(workspace, layername, srid, *, conn_cur=None):
+    query = '''SELECT UpdateGeometrySRID(%s, %s, 'wkb_geometry', %s);'''
+    params = (workspace, layername, srid)
+    db_util.run_query(query, params, conn_cur=conn_cur)
