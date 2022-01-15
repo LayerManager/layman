@@ -2,6 +2,7 @@ import tests.asserts.final.publication as publication
 import tests.asserts.processing as processing
 from test_tools import process_client
 from . import wrong_input, file_input, celery, common_layers as layers, geoserver_proxy, crs
+from .crs import sample_point_cz
 from .. import predefined_actions
 from ... import Action, Publication, dynamic_data as consts
 
@@ -514,6 +515,7 @@ PUBLICATIONS = {
     **celery.generate(consts.COMMON_WORKSPACE + '_celery'),
     **geoserver_proxy.generate(consts.COMMON_WORKSPACE + '_geoserver_proxy'),
     **crs.generate(consts.COMMON_WORKSPACE + '_crs'),
+    **sample_point_cz.generate(consts.COMMON_WORKSPACE + '_crs_sample_point_cz'),
 }
 
 # pylint: disable=unnecessary-comprehension
