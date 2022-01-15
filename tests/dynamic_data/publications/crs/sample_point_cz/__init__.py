@@ -8,10 +8,7 @@ from test_tools import process_client
 from ... import util, common_layers as layers
 from ..... import Action, Publication, dynamic_data as consts
 
-KEY_ACTION_PARAMS = 'action_params'
-KEY_FILE_NAME = 'file_suffix'
 KEY_INFO_VALUES = 'info_values'
-KEY_THUMBNAIL = 'thumbnail'
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -31,6 +28,17 @@ SOURCE_EPSG_CODES = {
     },
 }
 
+# expected coordinates manually copied from QGIS 3.16.2 in given EPSG
+# point_id 1: northernmost vertex of fountain at Moravske namesti, Brno
+EXP_POINT_COORDINATES = [
+    (1, 3857, (1848649.486, 6308703.297), 0.2),
+    # ~5 meters! By default, GeoServer limits WFS output to 4 decimal places, about 10 m accuracy
+    (1, 4326, (16.60669976, 49.19904767), 0.00005),
+    (1, 32633, (617046.8503, 5450825.7990), 0.1),
+    (1, 32634, (179991.0748, 5458879.0878), 0.1),
+    (1, 5514, (-598208.8093, -1160307.4484), 0.1),
+]
+
 
 def generate(workspace=None):
     workspace = workspace or consts.COMMON_WORKSPACE
@@ -44,6 +52,13 @@ def generate(workspace=None):
         'file_extension': 'shp',
         'publ_type_detail': ('vector', 'sld'),
     }
+
+    feature_spacial_precision_assert = [Action(publication.geoserver.feature_spatial_precision, {
+        'feature_id': feature_id,
+        'epsg_code': epsg_code,
+        'exp_coordinates': exp_coordinates,
+        'precision': precision,
+    }) for feature_id, epsg_code, exp_coordinates, precision in EXP_POINT_COORDINATES]
 
     for epsg_code, tc_params in SOURCE_EPSG_CODES.items():
         action_params = {
@@ -90,7 +105,7 @@ def generate(workspace=None):
                     *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                     Action(publication.internal.correct_values_in_detail, copy.deepcopy(post_info_values)),
                     Action(publication.internal.thumbnail_equals, {'exp_thumbnail': exp_thumbnail, }),
-                    *tc_params.get(consts.KEY_FINAL_ASSERTS, list()),
+                    *feature_spacial_precision_assert,
                 ]
             }
             result[Publication(workspace, process_client.LAYER_TYPE, publ_name)] = [action_def]
@@ -121,7 +136,7 @@ def generate(workspace=None):
                     *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                     Action(publication.internal.correct_values_in_detail, copy.deepcopy(patch_info_values)),
                     Action(publication.internal.thumbnail_equals, {'exp_thumbnail': exp_thumbnail, }),
-                    *tc_params.get(consts.KEY_FINAL_ASSERTS, list()),
+                    *feature_spacial_precision_assert,
                 ]
             }
             result[Publication(workspace, process_client.LAYER_TYPE, publ_name)] = [layers.DEFAULT_POST, patch_action]
