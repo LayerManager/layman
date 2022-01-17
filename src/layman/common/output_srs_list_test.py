@@ -111,31 +111,6 @@ def assert_qgis_output_srs_list(workspace, layer, expected_srs_list):
         assert qgis_util.get_layer_wms_crs_list_values(workspace, layer) == set(expected_srs_list)
 
 
-# expected coordinates manually copied from QGIS 3.16.2 in given EPSG
-# point_id 1: northernmost vertex of fountain at Moravske namesti, Brno
-@pytest.mark.parametrize('point_id, epsg_code, exp_coordinates, precision', [
-    (1, 3857, (1848649.486, 6308703.297), 0.2),
-    # ~5 meters! By default, GeoServer limits WFS output to 4 decimal places, about 10 m accuracy
-    (1, 4326, (16.60669976, 49.19904767), 0.00005),
-    (1, 32633, (617046.8503, 5450825.7990), 0.1),
-    (1, 32634, (179991.0748, 5458879.0878), 0.1),
-    (1, 5514, (-598208.8093, -1160307.4484), 0.1),
-])
-def test_spatial_precision(ensure_layer, point_id, epsg_code, exp_coordinates, precision, ):
-    process.ensure_layman_function({
-        'LAYMAN_OUTPUT_SRS_LIST': ','.join([str(code) for code in OUTPUT_SRS_LIST])
-    })
-    workspace = 'test_coordinate_precision_workspace'
-    layername = 'test_coordinate_precision_layer'
-
-    ensure_layer(workspace, layername, file_paths=['sample/layman.layer/sample_point_cz.geojson'], )
-
-    feature_collection = geoserver_client.get_features(workspace, layername, epsg_code=epsg_code)
-    feature = next(f for f in feature_collection['features'] if f['properties']['point_id'] == point_id)
-    for idx, coordinate in enumerate(feature['geometry']['coordinates']):
-        assert abs(coordinate - exp_coordinates[idx]) <= precision, f"EPSG:{epsg_code}: expected coordinates={exp_coordinates}, found coordinates={feature['geometry']['coordinates']}"
-
-
 @pytest.mark.parametrize('epsg_code, extent, img_size, style_type, wms_version, diff_line_width, suffix', [
     (3857, (1848629.922, 6308682.319, 1848674.659, 6308704.687), (601, 301), 'sld', '1.3.0', 2, ''),
     (3857, (1848629.922, 6308682.319, 1848674.659, 6308704.687), (601, 301), 'qml', '1.3.0', 2, ''),
