@@ -39,6 +39,23 @@ EXP_POINT_COORDINATES = [
     (1, 5514, (-598208.8093, -1160307.4484), 0.1),
 ]
 
+EXP_WMS_PICTURES = [
+    (3857, (1848629.922, 6308682.319, 1848674.659, 6308704.687), (601, 301), 'sld', '1.3.0', 2, ''),
+    (3857, (1848629.922, 6308682.319, 1848674.659, 6308704.687), (601, 301), 'qml', '1.3.0', 2, ''),
+    (4326, (49.198905759, 16.606580653, 49.199074214, 16.606874005), (560, 321), 'sld', '1.3.0', 2, ''),
+    (4326, (49.198905759, 16.606580653, 49.199074214, 16.606874005), (560, 321), 'qml', '1.3.0', 2, ''),
+    (4326, (16.606580653, 49.198905759, 16.606874005, 49.199074214), (560, 321), 'sld', '1.1.1', 2, ''),
+    (4326, (16.606580653, 49.198905759, 16.606874005, 49.199074214), (560, 321), 'qml', '1.1.1', 2, ''),
+    (5514, (-598222.071, -1160322.246, -598192.491, -1160305.260), (559, 321), 'sld', '1.3.0', 2, ''),
+    # (5514, (-598222.071, -1160322.246, -598192.491, -1160305.260), (559, 321), 'qml', '1.3.0', 2, ''),
+    (5514, (-598236.981, -1160331.352, -598182.368, -1160295.230), (381, 252), 'sld', '1.3.0', 2, '_low'),
+    (5514, (-598236.981, -1160331.352, -598182.368, -1160295.230), (381, 252), 'qml', '1.3.0', 4, '_low'),
+    (32633, (617036.812, 5450809.904, 617060.659, 5450828.394), (414, 321), 'sld', '1.3.0', 2, ''),
+    (32633, (617036.812, 5450809.904, 617060.659, 5450828.394), (414, 321), 'qml', '1.3.0', 2, ''),
+    (32634, (179980.621, 5458862.472, 180005.430, 5458881.708), (415, 321), 'sld', '1.3.0', 2, ''),
+    (32634, (179980.621, 5458862.472, 180005.430, 5458881.708), (415, 321), 'qml', '1.3.0', 2, ''),
+]
+
 
 def generate(workspace=None):
     workspace = workspace or consts.COMMON_WORKSPACE
@@ -76,6 +93,20 @@ def generate(workspace=None):
         exp_thumbnail = f'{DIRECTORY}/sample_point_cz_{epsg_code}_thumbnail.png'
 
         for rest_param_dict in rest_param_dicts:
+            wms_spacial_precision_assert = [Action(publication.geoserver.wms_spatial_precision, {
+                'epsg_code': epsg_code,
+                'extent': extent,
+                'img_size': img_size,
+                'wms_version': wms_version,
+                'diff_line_width': diff_line_width,
+                'obtained_file_path': f'tmp/artifacts/test_spatial_precision_wms/sample_point_cz_{style_type}_{epsg_code}{suffix}.png',
+                'expected_file_path': f'{DIRECTORY}/sample_point_cz_{epsg_code}{suffix}.png',
+            })
+                for epsg_code, extent, img_size, style_type, wms_version, diff_line_width, suffix in
+                EXP_WMS_PICTURES
+                if style_type == rest_param_dict.get('style_file')
+            ]
+
             for action_code, action_method, action_predecessor in [
                 ('post', process_client.publish_workspace_publication, []),
                 ('patch', process_client.patch_workspace_publication, [layers.DEFAULT_POST])
@@ -109,6 +140,7 @@ def generate(workspace=None):
                         Action(publication.internal.correct_values_in_detail, copy.deepcopy(post_info_values)),
                         Action(publication.internal.thumbnail_equals, {'exp_thumbnail': exp_thumbnail, }),
                         *feature_spacial_precision_assert,
+                        *wms_spacial_precision_assert,
                     ]
                 }
                 actions_list = copy.deepcopy(action_predecessor)
