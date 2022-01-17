@@ -99,7 +99,7 @@ CRSDefinitions = {
   <ellipsoidacronym>EPSG:7004</ellipsoidacronym>
   <geographicflag>false</geographicflag>''',
         axes_order_east_north_in_epsg_db=True,
-        proj4text='+proj=krovak +lat_0=49.5 +lon_0=24.83333333333333 +alpha=30.28813972222222 +k=0.9999 +x_0=0 +y_0=0 +ellps=bessel +towgs84=572.213,85.334,461.94,-4.9732,-1.529,-5.2484,3.5378 +units=m +no_defs ',
+        proj4text='+proj=krovak +lat_0=49.5 +lon_0=24.83333333333333 +alpha=30.28813972222222 +k=0.9999 +x_0=0 +y_0=0 +ellps=bessel +towgs84=570.8,85.7,462.8,4.998,1.587,5.261,3.56 +units=m +no_defs ',
         srid=900914,
     ),
 }
