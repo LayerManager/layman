@@ -4,6 +4,7 @@ import copy
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client
+from . import vectors
 from .. import util, common_layers as layers
 from .... import Action, Publication, dynamic_data as consts
 
@@ -70,7 +71,7 @@ TESTCASES = {
 }
 
 
-def generate(workspace=None):
+def generate_local(workspace=None):
     workspace = workspace or consts.COMMON_WORKSPACE
 
     result = dict()
@@ -148,3 +149,10 @@ def generate(workspace=None):
             }
             result[Publication(workspace, process_client.LAYER_TYPE, publ_name)] = [layers.DEFAULT_POST, patch_action]
     return result
+
+
+def generate(workspace=None):
+    return {
+        **generate_local(workspace),
+        **vectors.generate(workspace + '_vectors')
+    }
