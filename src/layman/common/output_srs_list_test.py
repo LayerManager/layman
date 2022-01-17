@@ -1,7 +1,6 @@
 import math
 import pytest
 
-from db import util as db_util
 from layman import settings, app
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
 from test_tools import process, process_client, geoserver_client, assert_util
@@ -53,7 +52,7 @@ def test_custom_srs_list(ensure_layer):
     ensure_layer(workspace, layer_qgis1, style_file=source_style_file_path)
 
     with app.app_context():
-        init_output_epsg_codes_set = {db_util.get_srid(crs) for crs in settings.LAYMAN_OUTPUT_SRS_LIST}
+        init_output_epsg_codes_set = {crs.replace(':', '::') for crs in settings.LAYMAN_OUTPUT_SRS_LIST}
         assert_gs_wms_output_srs_list(workspace, layer_sld1, settings.LAYMAN_OUTPUT_SRS_LIST)
         assert_wfs_output_srs_list(workspace, layer_sld1, init_output_epsg_codes_set)
         assert not qgis_wms.get_layer_info(workspace, layer_sld1)
@@ -68,14 +67,15 @@ def test_custom_srs_list(ensure_layer):
     })
     ensure_layer(workspace, layer_sld2)
     ensure_layer(workspace, layer_qgis2, style_file=source_style_file_path)
+    output_epsg_codes_set = {crs.replace(':', '::') for crs in output_crs_list}
     with app.app_context():
         for layer in [layer_sld1, layer_sld2, ]:
             assert_gs_wms_output_srs_list(workspace, layer, output_crs_list)
-            assert_wfs_output_srs_list(workspace, layer, OUTPUT_SRS_LIST)
+            assert_wfs_output_srs_list(workspace, layer, output_epsg_codes_set)
             assert not qgis_wms.get_layer_info(workspace, layer)
         for layer in [layer_qgis1, layer_qgis2, ]:
             assert_gs_wms_output_srs_list(workspace, layer, output_crs_list)
-            assert_wfs_output_srs_list(workspace, layer, OUTPUT_SRS_LIST)
+            assert_wfs_output_srs_list(workspace, layer, output_epsg_codes_set)
             assert_qgis_output_srs_list(workspace, layer, output_crs_list)
             assert_qgis_wms_output_srs_list(workspace, layer, output_crs_list)
 
@@ -103,7 +103,7 @@ def assert_wfs_output_srs_list(workspace, layername, expected_output_epsg_codes)
     wfs_layer = wfs.contents[full_layername]
     crs_names = [str(crs) for crs in wfs_layer.crsOptions]
     for expected_output_srs in expected_output_epsg_codes:
-        assert f"urn:ogc:def:crs:EPSG::{expected_output_srs}" in crs_names
+        assert f"urn:ogc:def:crs:{expected_output_srs}" in crs_names
 
 
 def assert_qgis_output_srs_list(workspace, layer, expected_srs_list):
