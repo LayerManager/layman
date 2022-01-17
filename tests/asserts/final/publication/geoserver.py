@@ -1,7 +1,7 @@
 import requests
 
 from layman import app, settings, util as layman_util
-from test_tools import util as test_util
+from test_tools import util as test_util, geoserver_client, process_client
 
 
 def workspace_wms_1_3_0_capabilities_available(workspace):
@@ -30,3 +30,12 @@ def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, n
             'version': '2.0.0',
         })
         assert r_wfs.status_code == 200
+
+
+def feature_spatial_precision(workspace, publ_type, name, *, feature_id, epsg_code, exp_coordinates, precision):
+    assert publ_type == process_client.LAYER_TYPE
+
+    feature_collection = geoserver_client.get_features(workspace, name, epsg_code=epsg_code)
+    feature = next(f for f in feature_collection['features'] if f['properties']['point_id'] == feature_id)
+    for idx, coordinate in enumerate(feature['geometry']['coordinates']):
+        assert abs(coordinate - exp_coordinates[idx]) <= precision, f"EPSG:{epsg_code}: expected coordinates={exp_coordinates}, found coordinates={feature['geometry']['coordinates']}"
