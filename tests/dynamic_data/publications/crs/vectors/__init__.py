@@ -58,6 +58,14 @@ SOURCE_EPSG_CODES = {
             }
         },
     },
+    3034: {
+        KEY_INFO_VALUES: {
+            'exp_publication_detail': {
+                'native_bounding_box': [4464506.1421598251909018, 2519866.8009202978573740, 4464518.7942008553072810, 2519878.8700591023080051],
+                'bounding_box': [1848640.5623333207, 6308683.148403931, 1848662.1915096296, 6308704.001720284]
+            }
+        },
+    },
 }
 
 # expected coordinates manually copied from QGIS 3.16.2 in given EPSG
