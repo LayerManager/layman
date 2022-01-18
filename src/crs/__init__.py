@@ -25,6 +25,7 @@ EPSG_4326 = 'EPSG:4326'
 EPSG_5514 = 'EPSG:5514'
 EPSG_32633 = 'EPSG:32633'
 EPSG_32634 = 'EPSG:32634'
+EPSG_3034 = 'EPSG:3034'
 
 CRSDefinitions = {
     EPSG_3857: CRSTypeDef(
@@ -147,5 +148,27 @@ CRSDefinitions = {
         axes_order_east_north_in_epsg_db=True,
         proj4text=None,
         srid=None,
+    ),
+    EPSG_3034: CRSTypeDef(
+        world_bbox=(
+            1584884.54,
+            1150546.94,
+            8442721.99,
+            6678398.53,
+        ),
+        no_area_bbox_padding=1,
+        world_bounds=dict(),
+        qgis_template_spatialrefsys='''<wkt>PROJCRS["ETRS89-extended / LCC Europe",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["Europe Conformal 2001",METHOD["Lambert Conic Conformal (2SP)",ID["EPSG",9802]],PARAMETER["Latitude of false origin",52,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8821]],PARAMETER["Longitude of false origin",10,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8822]],PARAMETER["Latitude of 1st standard parallel",35,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8823]],PARAMETER["Latitude of 2nd standard parallel",65,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8824]],PARAMETER["Easting at false origin",4000000,LENGTHUNIT["metre",1],ID["EPSG",8826]],PARAMETER["Northing at false origin",2800000,LENGTHUNIT["metre",1],ID["EPSG",8827]]],CS[Cartesian,2],AXIS["northing (N)",north,ORDER[1],LENGTHUNIT["metre",1]],AXIS["easting (E)",east,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - LCC &amp; LAEA"],BBOX[24.6,-35.58,84.17,44.83]],ID["EPSG",3034]]</wkt>
+      <proj4>+proj=lcc +lat_0=52 +lon_0=10 +lat_1=35 +lat_2=65 +x_0=4000000 +y_0=2800000 +ellps=GRS80 +units=m +no_defs</proj4>
+      <srsid>999</srsid>
+      <srid>3034</srid>
+      <authid>EPSG:3034</authid>
+      <description>ETRS89-extended / LCC Europe</description>
+      <projectionacronym>lcc</projectionacronym>
+      <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
+      <geographicflag>false</geographicflag>''',
+        axes_order_east_north_in_epsg_db=False,
+        proj4text='+proj=lcc +lat_1=35 +lat_2=65 +lat_0=52 +lon_0=10 +x_0=4000000 +y_0=2800000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ',
+        srid=90015,
     ),
 }
