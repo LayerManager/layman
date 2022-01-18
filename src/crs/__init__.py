@@ -24,6 +24,7 @@ EPSG_3857 = 'EPSG:3857'
 EPSG_4326 = 'EPSG:4326'
 EPSG_5514 = 'EPSG:5514'
 EPSG_32633 = 'EPSG:32633'
+EPSG_32634 = 'EPSG:32634'
 
 CRSDefinitions = {
     EPSG_3857: CRSTypeDef(
@@ -118,6 +119,28 @@ CRSDefinitions = {
       <srid>32633</srid>
       <authid>EPSG:32633</authid>
       <description>WGS 84 / UTM zone 33N</description>
+      <projectionacronym>utm</projectionacronym>
+      <ellipsoidacronym>EPSG:7030</ellipsoidacronym>
+      <geographicflag>false</geographicflag>''',
+        axes_order_east_north_in_epsg_db=True,
+        proj4text=None,
+        srid=None,
+    ),
+    EPSG_32634: CRSTypeDef(
+        world_bbox=(
+            6021.44,
+            0.00,
+            1004994.66,
+            9329005.18,
+        ),
+        no_area_bbox_padding=1,
+        world_bounds=dict(),
+        qgis_template_spatialrefsys='''<wkt>PROJCRS["WGS 84 / UTM zone 34N",BASEGEOGCRS["WGS 84",DATUM["World Geodetic System 1984",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["UTM zone 34N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",21,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["World - N hemisphere - 18°E to 24°E - by country"],BBOX[0,18,84,24]],ID["EPSG",32634]]</wkt>
+      <proj4>+proj=utm +zone=34 +datum=WGS84 +units=m +no_defs</proj4>
+      <srsid>3118</srsid>
+      <srid>32634</srid>
+      <authid>EPSG:32634</authid>
+      <description>WGS 84 / UTM zone 34N</description>
       <projectionacronym>utm</projectionacronym>
       <ellipsoidacronym>EPSG:7030</ellipsoidacronym>
       <geographicflag>false</geographicflag>''',
