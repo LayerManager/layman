@@ -26,6 +26,7 @@ EPSG_5514 = 'EPSG:5514'
 EPSG_32633 = 'EPSG:32633'
 EPSG_32634 = 'EPSG:32634'
 EPSG_3034 = 'EPSG:3034'
+EPSG_3035 = 'EPSG:3035'
 
 CRSDefinitions = {
     EPSG_3857: CRSTypeDef(
@@ -170,5 +171,27 @@ CRSDefinitions = {
         axes_order_east_north_in_epsg_db=False,
         proj4text='+proj=lcc +lat_1=35 +lat_2=65 +lat_0=52 +lon_0=10 +x_0=4000000 +y_0=2800000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ',
         srid=90015,
+    ),
+    EPSG_3035: CRSTypeDef(
+        world_bbox=(
+            1584884.54,
+            1507846.05,
+            8442721.99,
+            6829874.45,
+        ),
+        no_area_bbox_padding=1,
+        world_bounds=dict(),
+        qgis_template_spatialrefsys='''<wkt>PROJCRS["ETRS89-extended / LAEA Europe",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["Europe Equal Area 2001",METHOD["Lambert Azimuthal Equal Area",ID["EPSG",9820]],PARAMETER["Latitude of natural origin",52,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",10,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",4321000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",3210000,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["northing (Y)",north,ORDER[1],LENGTHUNIT["metre",1]],AXIS["easting (X)",east,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - LCC &amp; LAEA"],BBOX[24.6,-35.58,84.17,44.83]],ID["EPSG",3035]]</wkt>
+      <proj4>+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs</proj4>
+      <srsid>1000</srsid>
+      <srid>3035</srid>
+      <authid>EPSG:3035</authid>
+      <description>ETRS89-extended / LAEA Europe</description>
+      <projectionacronym>laea</projectionacronym>
+      <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
+      <geographicflag>false</geographicflag>''',
+        axes_order_east_north_in_epsg_db=False,
+        proj4text='+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ',
+        srid=90016,
     ),
 }
