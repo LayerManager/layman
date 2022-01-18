@@ -23,6 +23,7 @@ CRSTypeDef = namedtuple('CRSTypeDef', [
 EPSG_3857 = 'EPSG:3857'
 EPSG_4326 = 'EPSG:4326'
 EPSG_5514 = 'EPSG:5514'
+EPSG_32633 = 'EPSG:32633'
 
 CRSDefinitions = {
     EPSG_3857: CRSTypeDef(
@@ -88,6 +89,26 @@ CRSDefinitions = {
   <projectionacronym>krovak</projectionacronym>
   <ellipsoidacronym>EPSG:7004</ellipsoidacronym>
   <geographicflag>false</geographicflag>''',
+        axes_order_east_north_in_epsg_db=True,
+        proj4text=None,
+        srid=None,
+    ),
+    EPSG_32633: CRSTypeDef(
+        world_bbox=(
+            166021.44,
+            0.00,
+            1004994.66,
+            9329005.18,
+        ),
+        no_area_bbox_padding=1,
+        world_bounds=dict(),
+        qgis_template_spatialrefsys='''<srsid>3117</srsid>
+      <srid>32633</srid>
+      <authid>EPSG:32633</authid>
+      <description>WGS 84 / UTM zone 33N</description>
+      <projectionacronym>utm</projectionacronym>
+      <ellipsoidacronym>EPSG:7030</ellipsoidacronym>
+      <geographicflag>false</geographicflag>''',
         axes_order_east_north_in_epsg_db=True,
         proj4text=None,
         srid=None,
