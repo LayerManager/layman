@@ -12,6 +12,13 @@ DEFAULT_CONNECTION_TIMEOUT = int(os.environ['DEFAULT_CONNECTION_TIMEOUT'])
 EPSG_ENCODING = 'iso-8859-1'
 
 EPSG_PROPERTIES_DEFAULT = {
+    3034: '3034=PROJCS["ETRS89 / LCC Europe",GEOGCS["ETRS89",DATUM["European_Terrestrial_Reference_System_1989",'
+          'SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6258"]],'
+          'PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],'
+          'AUTHORITY["EPSG","4258"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["standard_parallel_1",35],'
+          'PARAMETER["standard_parallel_2",65],PARAMETER["latitude_of_origin",52],PARAMETER["central_meridian",10],'
+          'PARAMETER["false_easting",4000000],PARAMETER["false_northing",2800000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],'
+          'AUTHORITY["EPSG","3034"]]',
     3059: '3059=PROJCS["LKS92 / Latvia TM",GEOGCS["LKS92",DATUM["Latvia_1992",SPHEROID["GRS 1980",6378137,298.257222101,'
           'AUTHORITY["EPSG","7019"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6661"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],'
           'UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4661"]],PROJECTION["Transverse_Mercator"],'

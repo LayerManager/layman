@@ -25,6 +25,7 @@ EPSG_4326 = 'EPSG:4326'
 EPSG_5514 = 'EPSG:5514'
 EPSG_32633 = 'EPSG:32633'
 EPSG_32634 = 'EPSG:32634'
+EPSG_3034 = 'EPSG:3034'
 
 CRSDefinitions = {
     EPSG_3857: CRSTypeDef(
@@ -133,5 +134,25 @@ CRSDefinitions = {
         axes_order_east_north_in_epsg_db=True,
         proj4text=None,
         srid=None,
+    ),
+    EPSG_3034: CRSTypeDef(
+        world_bbox=(
+            1584884.54,
+            1150546.94,
+            8442721.99,
+            6678398.53,
+        ),
+        no_area_bbox_padding=1,
+        world_bounds=dict(),
+        qgis_template_spatialrefsys='''<srsid>999</srsid>
+      <srid>900915</srid>
+      <authid>EPSG:3034</authid>
+      <description>ETRS89-extended / LCC Europe</description>
+      <projectionacronym>lcc</projectionacronym>
+      <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
+      <geographicflag>false</geographicflag>''',
+        axes_order_east_north_in_epsg_db=False,
+        proj4text='+proj=lcc +lat_1=35 +lat_2=65 +lat_0=52 +lon_0=10 +x_0=4000000 +y_0=2800000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ',
+        srid=900915,
     ),
 }
