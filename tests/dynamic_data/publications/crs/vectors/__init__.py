@@ -111,8 +111,9 @@ def generate(workspace=None):
             })
                 for epsg_code, extent, img_size, style_type, wms_version, diff_line_width, suffix in
                 EXP_WMS_PICTURES
-                if style_type == rest_param_dict.get('style_file')
+                if style_type == REST_PARAMETRIZATION['style_file'][rest_param_dict['style_file']]
             ]
+            assert len(wms_spacial_precision_assert) > 0
 
             for action_code, action_method, action_predecessor in [
                 ('post', process_client.publish_workspace_publication, []),
