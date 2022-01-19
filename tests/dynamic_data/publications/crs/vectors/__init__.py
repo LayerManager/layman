@@ -55,30 +55,27 @@ EXP_POINT_COORDINATES = [
 ]
 
 EXP_WMS_PICTURES = [
-    # TODO Based on published and requested CRS, decide if to use _low or not.
-    # Generally I want to use _low for if publishes CRS is 5514 or requested CRS is 5514, but not both.
-    # Now _low is overused.
-
     (3857, (1848629.922, 6308682.319, 1848674.659, 6308704.687), (601, 301), 'sld', '1.3.0', 2, ''),
-    # (3857, (1848629.922, 6308682.319, 1848674.659, 6308704.687), (601, 301), 'qml', '1.3.0', 2, ''),
+    (3857, (1848629.922, 6308682.319, 1848674.659, 6308704.687), (601, 301), 'qml', '1.3.0', 2, ''),
     (3857, (1848621.712, 6308661.197, 1848698.933, 6308712.273), (381, 252), 'qml', '1.3.0', 4, '_low'),
     (4326, (49.198905759, 16.606580653, 49.199074214, 16.606874005), (560, 321), 'sld', '1.3.0', 2, ''),
-    # (4326, (49.198905759, 16.606580653, 49.199074214, 16.606874005), (560, 321), 'qml', '1.3.0', 2, ''),
+    (4326, (49.198905759, 16.606580653, 49.199074214, 16.606874005), (560, 321), 'qml', '1.3.0', 2, ''),
     (4326, (49.198772323, 16.60647156231, 49.199170804, 16.607074027), (381, 252), 'qml', '1.3.0', 4.3, '_low'),
     (4326, (16.606580653, 49.198905759, 16.606874005, 49.199074214), (560, 321), 'sld', '1.1.1', 2, ''),
-    # (4326, (16.606580653, 49.198905759, 16.606874005, 49.199074214), (560, 321), 'qml', '1.1.1', 2, ''),
+    (4326, (16.606580653, 49.198905759, 16.606874005, 49.199074214), (560, 321), 'qml', '1.1.1', 2, ''),
     (4326, (16.60647156231, 49.198772323, 16.607074027, 49.199170804), (381, 252), 'qml', '1.1.1', 4.3, '_low'),
     (5514, (-598222.071, -1160322.246, -598192.491, -1160305.260), (559, 321), 'sld', '1.3.0', 2, ''),
-    # (5514, (-598222.071, -1160322.246, -598192.491, -1160305.260), (559, 321), 'qml', '1.3.0', 2, ''),
+    (5514, (-598222.071, -1160322.246, -598192.491, -1160305.260), (559, 321), 'qml', '1.3.0', 2, ''),
     (5514, (-598236.981, -1160331.352, -598182.368, -1160295.230), (381, 252), 'sld', '1.3.0', 2, '_low'),
     (5514, (-598236.981, -1160331.352, -598182.368, -1160295.230), (381, 252), 'qml', '1.3.0', 4, '_low'),
-
-    # TODO _low is not yet generated, because 32633 is not in GetCapabilities, so QGIS does not recognize it
     (32633, (617036.812, 5450809.904, 617060.659, 5450828.394), (414, 321), 'sld', '1.3.0', 2, ''),
-    # (32633, (617036.812, 5450809.904, 617060.659, 5450828.394), (414, 321), 'qml', '1.3.0', 2, ''),
-    # TODO _low is not yet generated, because 32634 is not in GetCapabilities, so QGIS does not recognize it
+    (32633, (617036.812, 5450809.904, 617060.659, 5450828.394), (414, 321), 'qml', '1.3.0', 2, ''),
+    (32633, (617019.512, 5450805.336, 617071.525, 5450843.199), (397, 289), 'sld', '1.3.0', 2, '_low'),
+    (32633, (617019.512, 5450805.336, 617071.525, 5450843.199), (397, 289), 'qml', '1.3.0', 4, '_low'),
     (32634, (179980.621, 5458862.472, 180005.430, 5458881.708), (415, 321), 'sld', '1.3.0', 2, ''),
-    # (32634, (179980.621, 5458862.472, 180005.430, 5458881.708), (415, 321), 'qml', '1.3.0', 2.6, ''),
+    (32634, (179980.621, 5458862.472, 180005.430, 5458881.708), (415, 321), 'qml', '1.3.0', 2.6, ''),
+    (32634, (179969.973, 5458859.204, 180018.657, 5458894.643), (397, 289), 'sld', '1.3.0', 2, '_low'),
+    (32634, (179969.973, 5458859.204, 180018.657, 5458894.643), (397, 289), 'qml', '1.3.0', 4, '_low'),
 ]
 
 
@@ -119,19 +116,21 @@ def generate(workspace=None):
 
         for rest_param_dict in rest_param_dicts:
             wms_spacial_precision_assert = [Action(publication.geoserver.wms_spatial_precision, {
-                'epsg_code': epsg_code,
+                'epsg_code': wms_epsg_code,
                 'extent': extent,
                 'img_size': img_size,
                 'wms_version': wms_version,
                 'diff_line_width': diff_line_width,
-                'obtained_file_path': f'tmp/artifacts/test_spatial_precision_wms/sample_point_cz_{style_type}_{epsg_code}{suffix}.png',
-                'expected_file_path': f'{DIRECTORY}/sample_point_cz_{epsg_code}{suffix}.png',
+                'obtained_file_path': f'tmp/artifacts/test_spatial_precision_wms/sample_point_cz_{style_type}_{wms_epsg_code}{suffix}.png',
+                'expected_file_path': f'{DIRECTORY}/sample_point_cz_{wms_epsg_code}{suffix}.png',
             })
-                for epsg_code, extent, img_size, style_type, wms_version, diff_line_width, suffix in
+                for wms_epsg_code, extent, img_size, style_type, wms_version, diff_line_width, suffix in
                 EXP_WMS_PICTURES
                 if style_type == REST_PARAMETRIZATION['style_file'][rest_param_dict['style_file']]
+                # If one and only one of the CRSs is 5514, use low resolution
+                and ((wms_epsg_code == 5514) != (epsg_code == 5514)) == (suffix == '_low')
             ]
-            assert len(wms_spacial_precision_assert) > 0
+            assert len(wms_spacial_precision_assert) > 0, epsg_code
 
             for action_code, action_method, action_predecessor in [
                 ('post', process_client.publish_workspace_publication, []),
