@@ -60,8 +60,14 @@ EXP_WMS_PICTURES = [
     (32633, (617036.812, 5450809.904, 617060.659, 5450828.394), (414, 321), 'sld', '1.3.0', 2, ''),
     (32633, (617036.812, 5450809.904, 617060.659, 5450828.394), (414, 321), 'qml', '1.3.0', 2, ''),
     (32634, (179980.621, 5458862.472, 180005.430, 5458881.708), (415, 321), 'sld', '1.3.0', 2, ''),
-    (32634, (179980.621, 5458862.472, 180005.430, 5458881.708), (415, 321), 'qml', '1.3.0', 2, ''),
+    (32634, (179980.621, 5458862.472, 180005.430, 5458881.708), (415, 321), 'qml', '1.3.0', 2.6, ''),
 ]
+
+
+def use_low_resolution(wms_epsg_code, epsg_code, style_type):
+    if style_type == 'sld':
+        return False
+    return (wms_epsg_code == 5514) != (epsg_code == 5514)
 
 
 def generate(workspace=None):
@@ -101,18 +107,23 @@ def generate(workspace=None):
 
         for rest_param_dict in rest_param_dicts:
             wms_spacial_precision_assert = [Action(publication.geoserver.wms_spatial_precision, {
-                'epsg_code': epsg_code,
+                'epsg_code': wms_epsg_code,
                 'extent': extent,
                 'img_size': img_size,
                 'wms_version': wms_version,
                 'diff_line_width': diff_line_width,
-                'obtained_file_path': f'tmp/artifacts/test_spatial_precision_wms/sample_point_cz_{style_type}_{epsg_code}{suffix}.png',
-                'expected_file_path': f'{DIRECTORY}/sample_point_cz_{epsg_code}{suffix}.png',
+                'obtained_file_path': f'tmp/artifacts/test_spatial_precision_wms/sample_point_cz_{style_type}_{wms_epsg_code}{suffix}.png',
+                'expected_file_path': f'{DIRECTORY}/sample_point_cz_{wms_epsg_code}{suffix}.png',
             })
-                for epsg_code, extent, img_size, style_type, wms_version, diff_line_width, suffix in
+                for wms_epsg_code, extent, img_size, style_type, wms_version, diff_line_width, suffix in
                 EXP_WMS_PICTURES
-                if style_type == rest_param_dict.get('style_file')
+                if style_type == REST_PARAMETRIZATION['style_file'][rest_param_dict['style_file']]
+                # If one and only one of the CRSs is 5514, use low resolution for QML style
+                and (use_low_resolution(wms_epsg_code, epsg_code, style_type) == (suffix == '_low'))
             ]
+            assert len(wms_spacial_precision_assert) == 6, f'epsg_code={epsg_code}, \n' \
+                                                           f'len(wms_spacial_precision_assert)={len(wms_spacial_precision_assert)}, \n' \
+                                                           f'wms_spacial_precision_assert={wms_spacial_precision_assert}'
 
             for action_code, action_method, action_predecessor in [
                 ('post', process_client.publish_workspace_publication, []),
