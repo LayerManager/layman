@@ -68,7 +68,7 @@ def generate_local(workspace=None):
                     continue
 
                 post_info_values = copy.deepcopy(info_values)
-                if rest_param_dict['compress']:
+                if rest_param_dict.get('compress', False):
                     post_info_values['gdal_prefix'] = '/vsizip/'
                     post_info_values['file_extension'] = f'zip/{file_name}.shp'
 
