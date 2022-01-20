@@ -200,6 +200,9 @@ def generate(workspace=None):
                         Action(publication.geoserver.wfs_bbox, {'exp_bbox': bboxes[crs_def.EPSG_4326]['bbox'],
                                                                 'precision': bboxes[crs_def.EPSG_4326]['precision'],
                                                                 }),
+                        Action(publication.geoserver.wms_geographic_bbox, {'exp_bbox': bboxes[crs_def.EPSG_4326]['bbox'],
+                                                                           'precision': bboxes[crs_def.EPSG_4326]['precision'],
+                                                                           }),
                     ]
                 }
                 actions_list = copy.deepcopy(action_predecessor)
