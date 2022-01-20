@@ -3,7 +3,7 @@ import requests
 
 from layman import app, settings, util as layman_util
 from layman.common import bbox as bbox_util
-from layman.layer.geoserver import wfs
+from layman.layer.geoserver import wfs, wms
 from test_tools import util as test_util, geoserver_client, process_client, assert_util
 
 
@@ -70,5 +70,16 @@ def wfs_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.00001):
     with app.app_context():
         wfs_get_capabilities = wfs.get_wfs_proxy(workspace)
     bbox = wfs_get_capabilities.contents[wfs_layer].boundingBoxWGS84
+    assert_util.assert_same_bboxes(exp_bbox, bbox, precision)
+    assert bbox_util.contains_bbox(bbox, exp_bbox, precision=precision / 10000)
+
+
+def wms_geographic_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.00001):
+    assert publ_type == process_client.LAYER_TYPE
+
+    with app.app_context():
+        wms_get_capabilities = wms.get_wms_proxy(workspace)
+    wms_layer = wms_get_capabilities.contents[name]
+    bbox = wms_layer.boundingBoxWGS84
     assert_util.assert_same_bboxes(exp_bbox, bbox, precision)
     assert bbox_util.contains_bbox(bbox, exp_bbox, precision=precision / 10000)
