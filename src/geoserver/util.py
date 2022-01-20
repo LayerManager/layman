@@ -222,7 +222,7 @@ def delete_feature_type(geoserver_workspace, feature_type_name, auth):
         response.raise_for_status()
 
 
-def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, description=None, bbox=None, crs=None, auth):
+def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, description=None, bbox=None, crs=None, auth, lat_lon_bbox=None):
     assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
     ftype = dict()
 
@@ -241,6 +241,8 @@ def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, de
         ftype['abstract'] = description
     if bbox:
         ftype['nativeBoundingBox'] = bbox_to_native_bbox(bbox, crs)
+    if lat_lon_bbox:
+        ftype['latLonBoundingBox'] = bbox_to_native_bbox(lat_lon_bbox, 'CRS:84')
 
     ftype = {k: v for k, v in ftype.items() if v is not None}
     body = {
@@ -257,7 +259,7 @@ def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, de
     response.raise_for_status()
 
 
-def post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, auth):
+def post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, auth, *, lat_lon_bbox):
     keywords = [
         "features",
         layername,
@@ -279,6 +281,7 @@ def post_feature_type(geoserver_workspace, layername, description, title, bbox, 
             "name": geoserver_workspace + ":postgresql",
         },
         'nativeBoundingBox': bbox_to_native_bbox(bbox, crs),
+        'latLonBoundingBox': bbox_to_native_bbox(lat_lon_bbox, 'CRS:84'),
     }
     response = requests.post(urljoin(GS_REST_WORKSPACES,
                                      geoserver_workspace + '/datastores/postgresql/featuretypes/'),
@@ -652,12 +655,14 @@ def delete_wms_layer(geoserver_workspace, layer, auth):
         response.raise_for_status()
 
 
-def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox=None, title=None, description=None, crs=None):
+def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox=None, title=None, description=None, crs=None, lat_lon_bbox=None):
     wms_layer = get_wms_layer(geoserver_workspace, layer, auth=auth)
     assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
     if bbox:
         wms_layer['nativeBoundingBox'] = bbox_to_native_bbox(bbox, crs)
         wms_layer['nativeCRS'] = crs
+    if lat_lon_bbox:
+        wms_layer['latLonBoundingBox'] = bbox_to_native_bbox(lat_lon_bbox, 'CRS:84')
         # automatically recalculates also 'latLonBoundingBox'
     if title is not None:
         wms_layer['title'] = title
@@ -685,7 +690,7 @@ def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox=None, title=None, 
     response.raise_for_status()
 
 
-def post_wms_layer(geoserver_workspace, layer, store_name, title, description, bbox, crs, auth):
+def post_wms_layer(geoserver_workspace, layer, store_name, title, description, bbox, crs, auth, *, lat_lon_bbox):
     keywords = [
         "features",
         layer,
@@ -709,6 +714,7 @@ def post_wms_layer(geoserver_workspace, layer, store_name, title, description, b
             "name": geoserver_workspace + f":{store_name}",
         },
         'nativeBoundingBox': bbox_to_native_bbox(bbox, crs),
+        'latLonBoundingBox': bbox_to_native_bbox(lat_lon_bbox, 'CRS:84'),
     }
     response = requests.post(urljoin(GS_REST_WORKSPACES,
                                      geoserver_workspace + '/wmslayers/'),
