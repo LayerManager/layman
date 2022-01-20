@@ -1,6 +1,7 @@
 import os
 import copy
 
+import crs as crs_def
 from tests.asserts import util as asserts_util
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
@@ -76,6 +77,13 @@ EXP_WMS_PICTURES = [
     (32634, (179969.973, 5458859.204, 180018.657, 5458894.643), (397, 289), 'qml', '1.3.0', 4.2, '_low'),
 ]
 
+EXP_BBOXES = {
+    crs_def.EPSG_3857: {
+        'bbox': [1848641.3277258177, 6308684.223766193, 1848661.9177672109, 6308703.364768417],
+        'precision': 2,
+    }
+}
+
 
 def use_low_resolution(wms_epsg_code, epsg_code, style_type):
     if style_type == 'sld':
@@ -89,7 +97,7 @@ def generate(workspace=None):
     result = dict()
     def_publ_info_values = {
         'exp_publication_detail': {
-            'bounding_box': [1848641.3277258177, 6308684.223766193, 1848661.9177672109, 6308703.364768417],
+            'bounding_box': EXP_BBOXES[crs_def.EPSG_3857]['bbox'],
         },
         'file_extension': 'shp',
         'publ_type_detail': ('vector', 'sld'),
@@ -172,6 +180,9 @@ def generate(workspace=None):
                         Action(publication.internal.thumbnail_equals, {'exp_thumbnail': exp_thumbnail, }),
                         *feature_spacial_precision_assert,
                         *wms_spacial_precision_assert,
+                        Action(publication.internal.detail_3857bbox_value, {'exp_bbox': EXP_BBOXES[crs_def.EPSG_3857]['bbox'],
+                                                                            'precision': EXP_BBOXES[crs_def.EPSG_3857]['precision'],
+                                                                            }),
                     ]
                 }
                 actions_list = copy.deepcopy(action_predecessor)
