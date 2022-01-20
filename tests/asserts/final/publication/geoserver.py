@@ -83,3 +83,14 @@ def wms_geographic_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.000
     bbox = wms_layer.boundingBoxWGS84
     assert_util.assert_same_bboxes(exp_bbox, bbox, precision)
     assert bbox_util.contains_bbox(bbox, exp_bbox, precision=precision / 10000)
+
+
+def wms_bbox(workspace, publ_type, name, *, exp_bbox, crs, precision=0.00001):
+    assert publ_type == process_client.LAYER_TYPE
+
+    with app.app_context():
+        wms_get_capabilities = wms.get_wms_proxy(workspace)
+    wms_layer = wms_get_capabilities.contents[name]
+    bbox = next(bbox[:4] for bbox in wms_layer.crs_list if bbox[4] == crs)
+    assert_util.assert_same_bboxes(exp_bbox, bbox, precision)
+    assert bbox_util.contains_bbox(bbox, exp_bbox, precision=precision / 10000)

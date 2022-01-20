@@ -42,10 +42,9 @@ SOURCE_EPSG_CODES = {
             }
         },
         'bboxes': {
-            crs_def.EPSG_4326: {
+            'CRS:84': {
                 # This bounding box is wrong by about 0.003
                 'bbox': [16.60398290111868, 49.19974461330045, 16.604189374445127, 49.19986848926369],
-                'precision': 0.00001,
             },
         }
     },
@@ -91,7 +90,11 @@ EXP_BBOXES = {
     },
     crs_def.EPSG_4326: {
         'bbox': [16.6066275955110711, 49.1989353676069285, 16.6068125589999127, 49.1990477233154735],
-        'precision': 0.000001,
+        'precision': 0.00002,  # This is about 2 meters
+    },
+    crs_def.EPSG_5514: {
+        'bbox': [-598214.7290553625207394, -1160319.8064114262815565, -598200.9321668159682304, -1160307.4425631782505661],
+        'precision': 2,
     },
 }
 
@@ -128,7 +131,16 @@ def generate(workspace=None):
         }
 
         bboxes = copy.deepcopy(EXP_BBOXES)
+        bboxes['CRS:84'] = copy.deepcopy(bboxes[crs_def.EPSG_4326])
         asserts_util.recursive_dict_update(bboxes, tc_params.get('bboxes', dict()))
+
+        wms_bbox_actions = [
+            Action(publication.geoserver.wms_bbox, {'exp_bbox': bbox['bbox'],
+                                                    'crs': crs,
+                                                    'precision': bbox['precision'],
+                                                    })
+            for crs, bbox in bboxes.items()
+        ]
 
         parametrization = {key: values for key, values in REST_PARAMETRIZATION.items()
                            if key not in action_params}
@@ -197,12 +209,13 @@ def generate(workspace=None):
                         Action(publication.internal.detail_3857bbox_value, {'exp_bbox': bboxes[crs_def.EPSG_3857]['bbox'],
                                                                             'precision': bboxes[crs_def.EPSG_3857]['precision'],
                                                                             }),
-                        Action(publication.geoserver.wfs_bbox, {'exp_bbox': bboxes[crs_def.EPSG_4326]['bbox'],
-                                                                'precision': bboxes[crs_def.EPSG_4326]['precision'],
+                        Action(publication.geoserver.wfs_bbox, {'exp_bbox': bboxes['CRS:84']['bbox'],
+                                                                'precision': bboxes['CRS:84']['precision'],
                                                                 }),
-                        Action(publication.geoserver.wms_geographic_bbox, {'exp_bbox': bboxes[crs_def.EPSG_4326]['bbox'],
-                                                                           'precision': bboxes[crs_def.EPSG_4326]['precision'],
+                        Action(publication.geoserver.wms_geographic_bbox, {'exp_bbox': bboxes['CRS:84']['bbox'],
+                                                                           'precision': bboxes['CRS:84']['precision'],
                                                                            }),
+                        *wms_bbox_actions,
                     ]
                 }
                 actions_list = copy.deepcopy(action_predecessor)
