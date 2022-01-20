@@ -15,9 +15,10 @@ def is_valid(coords):
         and (is_empty(coords) or (coords[0] <= coords[2] and coords[1] <= coords[3]))
 
 
-def contains_bbox(bbox1, bbox2):
+def contains_bbox(bbox1, bbox2, *, precision=0):
     return not is_empty(bbox1) and not is_empty(bbox2) \
-        and bbox1[0] <= bbox2[0] and bbox2[2] <= bbox1[2] and bbox1[1] <= bbox2[1] and bbox2[3] <= bbox1[3]
+        and all(bbox1[i] <= bbox2[i] + precision for i in [0, 1]) \
+        and all(bbox2[i] <= bbox1[i] + precision for i in [2, 3])
 
 
 def intersects(bbox1, bbox2):

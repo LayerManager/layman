@@ -2,6 +2,8 @@ import math
 import requests
 
 from layman import app, settings, util as layman_util
+from layman.common import bbox as bbox_util
+from layman.layer.geoserver import wfs
 from test_tools import util as test_util, geoserver_client, process_client, assert_util
 
 
@@ -59,3 +61,14 @@ def wms_spatial_precision(workspace, publ_type, name, *, epsg_code, extent, img_
     pixel_diff_limit = circle_perimeter * num_circles * diff_line_width
 
     assert_util.assert_same_images(url, obtained_file_path, expected_file_path, pixel_diff_limit)
+
+
+def wfs_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.00001):
+    assert publ_type == process_client.LAYER_TYPE
+
+    wfs_layer = f"{workspace}:{name}"
+    with app.app_context():
+        wfs_get_capabilities = wfs.get_wfs_proxy(workspace)
+    bbox = wfs_get_capabilities.contents[wfs_layer].boundingBoxWGS84
+    assert_util.assert_same_bboxes(exp_bbox, bbox, precision)
+    assert bbox_util.contains_bbox(bbox, exp_bbox, precision=precision / 10000)
