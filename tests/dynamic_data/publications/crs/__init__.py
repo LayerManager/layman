@@ -15,6 +15,33 @@ KEY_THUMBNAIL = 'thumbnail'
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
+LA_FINAL_ASSERTS = [
+    Action(publication.internal.detail_3857bbox_value,
+           {'exp_bbox': [2683694.415110543, 7750959.738378579, 2683726.18235363, 7750991.711694677],
+            'precision': 1,
+            }),
+    Action(publication.geoserver.wfs_bbox,
+           {'exp_bbox': [24.1080371100000015, 56.9551622299999991, 24.1083224800000018, 56.9553188499999976],
+            'precision': 0.000001,
+            }),
+    Action(publication.geoserver.wms_geographic_bbox,
+           {'exp_bbox': [24.1080371100000015, 56.9551622299999991, 24.1083224800000018, 56.9553188499999976],
+            'precision': 0.000001,
+            }),
+    Action(publication.geoserver.feature_spatial_precision, {
+        'feature_id': 1,
+        'epsg_code': 4326,
+        'exp_coordinates': (24.10803711, 56.95521220),
+        'precision': 0.00004,
+    }),
+    Action(publication.geoserver.feature_spatial_precision, {
+        'feature_id': 1,
+        'epsg_code': 3059,
+        'exp_coordinates': (506570.91, 312405.56),
+        'precision': 1,
+    }),
+]
+
 REST_PARAMETRIZATION = {
     'with_chunks': {False: 'sync', True: 'chunks'},
     'compress': {False: '', True: 'zipped'},
@@ -32,6 +59,66 @@ TESTCASES = {
         KEY_INFO_VALUES: {**layers.SMALL_LAYER.info_values,
                           'file_extension': 'shp', },
         KEY_THUMBNAIL: layers.SMALL_LAYER.thumbnail,
+    },
+    'la_4326': {
+        KEY_FILE_NAME: 'sample_point_la_4326',
+        KEY_ACTION_PARAMS: {
+            'style_file': f'{DIRECTORY}/vectors/sample_point_cz.sld',
+        },
+        KEY_INFO_VALUES: {'exp_publication_detail': {
+            'bounding_box': [2683694.415110543, 7750959.738378579, 2683726.18235363, 7750991.711694677],
+            'native_crs': 'EPSG:4326',
+            'native_bounding_box': [24.1080371100000015, 56.9551622299999991, 24.1083224800000018, 56.9553188499999976],
+        },
+            'file_extension': 'shp',
+            'publ_type_detail': ('vector', 'sld'), },
+        KEY_THUMBNAIL: f'{DIRECTORY}/sample_point_la_4326_thumbnail.png',
+        consts.KEY_FINAL_ASSERTS: LA_FINAL_ASSERTS,
+    },
+    'la_4326_qml': {
+        KEY_FILE_NAME: 'sample_point_la_4326',
+        KEY_ACTION_PARAMS: {
+            'style_file': f'{DIRECTORY}/vectors/sample_point_cz.qml',
+        },
+        KEY_INFO_VALUES: {'exp_publication_detail': {
+            'bounding_box': [2683694.415110543, 7750959.738378579, 2683726.18235363, 7750991.711694677],
+            'native_crs': 'EPSG:4326',
+            'native_bounding_box': [24.1080371100000015, 56.9551622299999991, 24.1083224800000018, 56.9553188499999976],
+        },
+            'file_extension': 'shp',
+            'publ_type_detail': ('vector', 'qml'), },
+        KEY_THUMBNAIL: f'{DIRECTORY}/sample_point_la_4326_thumbnail.png',
+        consts.KEY_FINAL_ASSERTS: LA_FINAL_ASSERTS,
+    },
+    'la_3059': {
+        KEY_FILE_NAME: 'sample_point_la_3059',
+        KEY_ACTION_PARAMS: {
+            'style_file': f'{DIRECTORY}/vectors/sample_point_cz.sld',
+        },
+        KEY_INFO_VALUES: {'exp_publication_detail': {
+            'bounding_box': [2683694.3990728464, 7750959.722238572, 2683726.1999545163, 7750991.729864702],
+            'native_crs': 'EPSG:3059',
+            'native_bounding_box': [506570.9055767511, 312400.0189709142, 506588.25283597945, 312417.4443366183],
+        },
+            'file_extension': 'shp',
+            'publ_type_detail': ('vector', 'sld'), },
+        KEY_THUMBNAIL: f'{DIRECTORY}/sample_point_la_3059_thumbnail.png',
+        consts.KEY_FINAL_ASSERTS: LA_FINAL_ASSERTS,
+    },
+    'la_3059_qml': {
+        KEY_FILE_NAME: 'sample_point_la_3059',
+        KEY_ACTION_PARAMS: {
+            'style_file': f'{DIRECTORY}/vectors/sample_point_cz.qml',
+        },
+        KEY_INFO_VALUES: {'exp_publication_detail': {
+            'bounding_box': [2683694.3990728464, 7750959.722238572, 2683726.1999545163, 7750991.729864702],
+            'native_crs': 'EPSG:3059',
+            'native_bounding_box': [506570.9055767511, 312400.0189709142, 506588.25283597945, 312417.4443366183],
+        },
+            'file_extension': 'shp',
+            'publ_type_detail': ('vector', 'qml'), },
+        KEY_THUMBNAIL: f'{DIRECTORY}/sample_point_la_3059_qml_thumbnail.png',
+        consts.KEY_FINAL_ASSERTS: LA_FINAL_ASSERTS,
     },
 }
 
