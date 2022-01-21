@@ -27,6 +27,7 @@ EPSG_32633 = 'EPSG:32633'
 EPSG_32634 = 'EPSG:32634'
 EPSG_3034 = 'EPSG:3034'
 EPSG_3035 = 'EPSG:3035'
+EPSG_3059 = 'EPSG:3059'
 
 CRSDefinitions = {
     EPSG_3857: CRSTypeDef(
@@ -175,5 +176,25 @@ CRSDefinitions = {
         axes_order_east_north_in_epsg_db=False,
         proj4text='+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ',
         srid=900916,
+    ),
+    EPSG_3059: CRSTypeDef(
+        world_bbox=(
+            189423.14,
+            180420.28,
+            749893.19,
+            446584.80,
+        ),
+        no_area_bbox_padding=1,
+        world_bounds=dict(),
+        qgis_template_spatialrefsys='''<srsid>1022</srsid>
+      <srid>900917</srid>
+      <authid>EPSG:3059</authid>
+      <description>LKS92 / Latvia TM</description>
+      <projectionacronym>tmerc</projectionacronym>
+      <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
+      <geographicflag>false</geographicflag>''',
+        axes_order_east_north_in_epsg_db=False,
+        proj4text='+proj=tmerc +lat_0=0 +lon_0=24 +k=0.9996 +x_0=500000 +y_0=-6000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs',
+        srid=900917,
     ),
 }

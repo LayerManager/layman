@@ -14,7 +14,7 @@ assert all(isinstance(epsg_code, int) for epsg_code in OUTPUT_SRS_LIST)
 
 def test_default_srs_list():
     assert set(settings.LAYMAN_OUTPUT_SRS_LIST) == {'EPSG:3857', 'EPSG:4326', 'EPSG:5514', 'EPSG:32633', 'EPSG:32634', 'EPSG:3034',
-                                                    'EPSG:3035', }
+                                                    'EPSG:3035', 'EPSG:3059', }
 
 
 @pytest.fixture(scope="module")
