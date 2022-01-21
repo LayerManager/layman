@@ -34,6 +34,8 @@ logger = logging.getLogger(__name__)
 
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
 
+EXP_REFERENCE_SYSTEMS = [3034, 3035, 3059, 3857, 4326, 5514, 32633, 32634, ]
+
 METADATA_PROPERTIES = {
     'abstract',
     'extent',
@@ -334,7 +336,7 @@ def test_post_layers_simple(client):
             'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
-            'reference_system': [3857, 4326, 5514],
+            'reference_system': EXP_REFERENCE_SYSTEMS,
             'revision_date': None,
             'spatial_resolution': {
                 'scale_denominator': 100000000,
@@ -587,7 +589,7 @@ def test_post_layers_complex(client):
             'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
-            'reference_system': [3857, 4326, 5514],
+            'reference_system': EXP_REFERENCE_SYSTEMS,
             'revision_date': None,
             'spatial_resolution': {
                 'scale_denominator': 100000000,
@@ -744,7 +746,7 @@ def test_patch_layer_title(client):
             'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
-            'reference_system': [3857, 4326, 5514],
+            'reference_system': EXP_REFERENCE_SYSTEMS,
             'revision_date': TODAY_DATE,
             'spatial_resolution': {
                 'scale_denominator': 100000000,
@@ -811,7 +813,7 @@ def test_patch_layer_style(client):
             'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
-            'reference_system': [3857, 4326, 5514],
+            'reference_system': EXP_REFERENCE_SYSTEMS,
             'revision_date': TODAY_DATE,
             'spatial_resolution': {
                 'scale_denominator': 100000000,
@@ -958,7 +960,7 @@ def test_patch_layer_data(client):
             'layer_endpoint': url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
-            'reference_system': [3857, 4326, 5514],
+            'reference_system': EXP_REFERENCE_SYSTEMS,
             'revision_date': TODAY_DATE,
             'spatial_resolution': None,  # it's point data now and we can't guess scale from point data
             'title': 'populated places',
