@@ -32,6 +32,9 @@ MIGRATIONS = {
         ((1, 14, 0), [
             upgrade_v1_14.crop_bbox,
         ]),
+        ((1, 16, 0), [
+            upgrade_v1_16.adjust_db_publication_srid_data,
+        ]),
     ],
 }
 
