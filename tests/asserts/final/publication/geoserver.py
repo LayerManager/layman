@@ -53,9 +53,15 @@ def wms_spatial_precision(workspace, publ_type, name, *, epsg_code, extent, img_
         '1.3.0': 'CRS',
     }[wms_version]
 
+    with app.app_context():
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['native_crs', 'style_type']})
+        native_crs = publ_info['native_crs']
+        style_type = publ_info['style_type']
+    buffer_parameter = '' if native_crs != 'EPSG:5514' or epsg_code != 3857 or style_type != 'sld' else '&BUFFER=100000'
+
     url_part = f'/{workspace}_wms/wms?SERVICE=WMS&VERSION={wms_version}&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS={workspace}_wms%3A{name}&FORMAT_OPTIONS=antialias%3Afull&{crs_name}=EPSG%3A{epsg_code}&WIDTH={img_size[0]}&HEIGHT={img_size[1]}&BBOX={"%2C".join((str(c) for c in extent))}'
-    geoserver_url = f'{settings.LAYMAN_GS_URL}{url_part}&BUFFER=100000'
-    layman_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver{url_part}&BUFFER=100000'
+    geoserver_url = f'{settings.LAYMAN_GS_URL}{url_part}{buffer_parameter}'
+    layman_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver{url_part}{buffer_parameter}'
 
     circle_diameter = 30
     circle_perimeter = circle_diameter * math.pi
