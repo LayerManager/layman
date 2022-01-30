@@ -237,6 +237,12 @@ def get_geoserver_workspace(workspace):
     return workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
 
 
+def get_layman_workspace(geoserver_workspace):
+    workspace = geoserver_workspace[:-len(settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX)] if geoserver_workspace.endswith(
+        settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX) else geoserver_workspace
+    return workspace
+
+
 def get_qgis_store_name(layer):
     return f'{DEFAULT_WMS_QGIS_STORE_PREFIX}_{layer}'
 

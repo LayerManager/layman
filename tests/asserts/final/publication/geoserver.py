@@ -61,7 +61,7 @@ def wms_spatial_precision(workspace, publ_type, name, *, epsg_code, extent, img_
 
     url_part = f'/{workspace}_wms/wms?SERVICE=WMS&VERSION={wms_version}&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS={workspace}_wms%3A{name}&FORMAT_OPTIONS=antialias%3Afull&{crs_name}=EPSG%3A{epsg_code}&WIDTH={img_size[0]}&HEIGHT={img_size[1]}&BBOX={"%2C".join((str(c) for c in extent))}'
     geoserver_url = f'{settings.LAYMAN_GS_URL}{url_part}{buffer_parameter}'
-    layman_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver{url_part}{buffer_parameter}'
+    layman_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver{url_part}'
 
     circle_diameter = 30
     circle_perimeter = circle_diameter * math.pi

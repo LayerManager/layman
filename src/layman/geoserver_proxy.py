@@ -1,15 +1,19 @@
 import re
 import traceback
 
+from urllib import parse
 import requests
+from requests.structures import CaseInsensitiveDict
 from lxml import etree as ET
 
 from flask import Blueprint, g, current_app as app, request, Response
 
+import crs as crs_def
 from geoserver.util import reset as gs_reset
 from layman import authn, authz, settings, util as layman_util
 from layman.authn import authenticate, is_user_with_name
 from layman.layer import db, LAYER_TYPE
+from layman.layer.geoserver import wms as gs_wms
 from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import LAYERNAME_PATTERN, ATTRNAME_PATTERN, patch_after_feature_change
 from layman.util import WORKSPACE_NAME_ONLY_PATTERN
@@ -170,13 +174,16 @@ def extract_attributes_from_wfs_t_insert_replace(action):
 def proxy(subpath):
     app.logger.info(f"{request.method} GeoServer proxy, actor={g.user}, subpath={subpath}, url={request.url}, request.query_string={request.query_string.decode('UTF-8')}")
 
-    url = settings.LAYMAN_GS_URL + subpath + '?' + request.query_string.decode('UTF-8')
+    # adjust authentication headers
+    url = settings.LAYMAN_GS_URL + subpath
+    query_params_string = request.query_string.decode('UTF-8')
     headers_req = {key.lower(): value for (key, value) in request.headers if key.lower() not in ['host', settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE.lower()]}
     data = request.get_data()
     authn_username = authn.get_authn_username()
     if is_user_with_name(authn_username):
         headers_req[settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE] = authn_username
 
+    # ensure layer attributes in case of WFS-T
     app.logger.info(f"{request.method} GeoServer proxy, headers_req={headers_req}, url={url}")
     wfs_t_layers = set()
     if data is not None and len(data) > 0:
@@ -186,6 +193,38 @@ def proxy(subpath):
                 ensure_wfs_t_attributes(wfs_t_attribs)
         except BaseException as err:
             app.logger.warning(f"WFS Proxy: error={err}, trace={traceback.format_exc()}")
+
+    query_params = CaseInsensitiveDict(request.args.to_dict())
+
+    # add buffer if incoming request is WMS GetMap in EPSG:3857 and one of SLD layers has native CRS EPSG:5514
+    # otherwise features are missing in the response in this specific case, we are not sure about the reason
+    if query_params.get('service') == 'WMS' and query_params.get('request') == 'GetMap' \
+            and (query_params.get('crs') or query_params.get('srs')) == crs_def.EPSG_3857:
+        layers = [layer.split(':') for layer in query_params.get('layers').split(',')]
+        use_buffer = False
+        for geoserver_workspace, layer in layers:
+            workspace = gs_wms.get_layman_workspace(geoserver_workspace)
+            publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, {'keys': ['native_crs',
+                                                                                                 'style_type']})
+            if publ_info and publ_info.get('native_crs') == crs_def.EPSG_5514 and publ_info.get('style_type') == 'sld':
+                use_buffer = True
+                break
+        if use_buffer:
+            try:
+                width = float(query_params.get('width'))
+                minx, _, maxx, _ = [float(c) for c in query_params.get('bbox').split(',')]
+                resolution = (maxx - minx) / width
+                buffer_in_meters = 400  # hopefully it's enough for any case
+                buffer_in_pixels = round(buffer_in_meters / resolution)
+                buffer_request = int(query_params.get('buffer', 0))
+                if buffer_in_pixels > buffer_request:
+                    query_params['buffer'] = buffer_in_pixels
+                    query_params_string = parse.urlencode(query_params)
+            except ValueError:
+                pass
+
+    url += '?' + query_params_string
+
     response = requests.request(method=request.method,
                                 url=url,
                                 data=data,
