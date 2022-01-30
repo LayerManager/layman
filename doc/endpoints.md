@@ -1,9 +1,12 @@
 # Endpoints
 
 ## Web Map Service
-[Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms) endpoint is implemented using combination of Layman's authentication proxy and [GeoServer](https://docs.geoserver.org/2.13.0/user/services/wms/reference.html).
+[Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms) endpoint is implemented using combination of Layman's authentication proxy, Layman's WMS proxy, and [GeoServer](https://docs.geoserver.org/2.13.0/user/services/wms/reference.html).
 
 The authentication proxy understands same [authentication credentials](security.md#authentication) as Layman REST API (e.g. OAuth2 credentials) and passes the request to GeoServer with credentials understandable by GeoServer.
+
+The WMS proxy parses request and adapts it in case of WMS GetMap requests:
+- If incoming request is in EPSG:3857 and one of requested SLD layers has native CRS EPSG:5514, it adds [`buffer`](https://docs.geoserver.org/latest/en/user/services/wms/vendor.html#buffer) parameter with value equal to 400 meters if `buffer` is not yet set. It fixes missing features in GeoServer response.
 
 WMS respects [publication access rights](security.md#publication-access-rights). If user asks for layer he has not read access to by GetMap or GetFeatureInfo request, GeoServer returns standard ServiceExceptionReport (code LayerNotDefined).
 
