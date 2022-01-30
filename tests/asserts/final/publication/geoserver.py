@@ -53,14 +53,17 @@ def wms_spatial_precision(workspace, publ_type, name, *, epsg_code, extent, img_
         '1.3.0': 'CRS',
     }[wms_version]
 
-    url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?SERVICE=WMS&VERSION={wms_version}&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS={workspace}_wms%3A{name}&FORMAT_OPTIONS=antialias%3Afull&{crs_name}=EPSG%3A{epsg_code}&WIDTH={img_size[0]}&HEIGHT={img_size[1]}&BBOX={"%2C".join((str(c) for c in extent))}&BUFFER=100000'
+    url_part = f'/{workspace}_wms/wms?SERVICE=WMS&VERSION={wms_version}&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS={workspace}_wms%3A{name}&FORMAT_OPTIONS=antialias%3Afull&{crs_name}=EPSG%3A{epsg_code}&WIDTH={img_size[0]}&HEIGHT={img_size[1]}&BBOX={"%2C".join((str(c) for c in extent))}'
+    geoserver_url = f'{settings.LAYMAN_GS_URL}{url_part}&BUFFER=100000'
+    layman_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver{url_part}&BUFFER=100000'
 
     circle_diameter = 30
     circle_perimeter = circle_diameter * math.pi
     num_circles = 5
     pixel_diff_limit = circle_perimeter * num_circles * diff_line_width
 
-    assert_util.assert_same_images(url, obtained_file_path, expected_file_path, pixel_diff_limit)
+    assert_util.assert_same_images(layman_url, obtained_file_path, expected_file_path, pixel_diff_limit)
+    assert_util.assert_same_images(geoserver_url, obtained_file_path, expected_file_path, pixel_diff_limit)
 
 
 def wfs_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.00001):
