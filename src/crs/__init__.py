@@ -22,6 +22,7 @@ CRSTypeDef = namedtuple('CRSTypeDef', [
 
 EPSG_3857 = 'EPSG:3857'
 EPSG_4326 = 'EPSG:4326'
+CRS_84 = 'CRS:84'
 EPSG_5514 = 'EPSG:5514'
 EPSG_32633 = 'EPSG:32633'
 EPSG_32634 = 'EPSG:32634'
@@ -197,4 +198,9 @@ CRSDefinitions = {
         proj4text='+proj=tmerc +lat_0=0 +lon_0=24 +k=0.9996 +x_0=500000 +y_0=-6000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs',
         srid=900917,
     ),
+}
+
+
+CRS_URN = {
+    CRS_84: 'urn:ogc:def:crs:OGC:1.3:CRS84',
 }
