@@ -83,10 +83,16 @@ EXP_POINT_COORDINATES = [
     (1, crs_def.EPSG_3857, (1848649.486, 6308703.297), 0.2),
     # ~5 meters! By default, GeoServer limits WFS output to 4 decimal places, about 10 m accuracy
     (1, crs_def.EPSG_4326, (16.60669976, 49.19904767), 0.00005),
+    (1, crs_def.CRS_84, (16.60669976, 49.19904767), 0.00005),
     (1, crs_def.EPSG_32633, (617046.8503, 5450825.7990), 0.1),
     (1, crs_def.EPSG_32634, (179991.0748, 5458879.0878), 0.1),
     (1, crs_def.EPSG_5514, (-598208.8093, -1160307.4484), 0.1),
 ]
+
+EXP_POINT_COORDINATES_FIXES = {
+    # Should be the same as for EPSG:4326, but for (so far) unknown reasons, wrong by about 300 m for data in EPSG:5514
+    (crs_def.EPSG_5514, crs_def.CRS_84, 1): (16.6041, 49.1999)
+}
 
 EXP_WMS_PICTURES = [
     (crs_def.EPSG_3857, (1848629.922, 6308682.319, 1848674.659, 6308704.687), (601, 301), 'sld', '1.3.0', 2, ''),
@@ -144,13 +150,6 @@ def generate(workspace=None):
         'publ_type_detail': ('vector', 'sld'),
     }
 
-    feature_spacial_precision_assert = [Action(publication.geoserver.feature_spatial_precision, {
-        'feature_id': feature_id,
-        'crs': crs,
-        'exp_coordinates': exp_coordinates,
-        'precision': precision,
-    }) for feature_id, crs, exp_coordinates, precision in EXP_POINT_COORDINATES]
-
     wms_picture_expected_number = len({(exp_wms_picture[0], exp_wms_picture[4], ) for exp_wms_picture in EXP_WMS_PICTURES})
 
     for crs, tc_params in SOURCE_EPSG_CODES.items():
@@ -159,6 +158,13 @@ def generate(workspace=None):
             'file_paths': [f'{DIRECTORY}/sample_point_cz_{crs_code}.{ext}' for ext in ['shp', 'dbf', 'prj', 'shx', 'cpg', ]
                            if os.path.exists(f'{DIRECTORY}/sample_point_cz_{crs_code}.{ext}')]
         }
+
+        feature_spacial_precision_assert = [Action(publication.geoserver.feature_spatial_precision, {
+            'feature_id': feature_id,
+            'crs': wfs_crs,
+            'exp_coordinates': EXP_POINT_COORDINATES_FIXES.get((crs, wfs_crs, feature_id), exp_coordinates),
+            'precision': precision,
+        }) for feature_id, wfs_crs, exp_coordinates, precision in EXP_POINT_COORDINATES]
 
         bboxes = copy.deepcopy(EXP_BBOXES)
         bboxes['CRS:84'] = copy.deepcopy(bboxes[crs_def.EPSG_4326])
