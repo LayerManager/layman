@@ -80,12 +80,12 @@ SOURCE_EPSG_CODES = {
 # expected coordinates manually copied from QGIS 3.16.2 in given EPSG
 # point_id 1: northernmost vertex of fountain at Moravske namesti, Brno
 EXP_POINT_COORDINATES = [
-    (1, 3857, (1848649.486, 6308703.297), 0.2),
+    (1, crs_def.EPSG_3857, (1848649.486, 6308703.297), 0.2),
     # ~5 meters! By default, GeoServer limits WFS output to 4 decimal places, about 10 m accuracy
-    (1, 4326, (16.60669976, 49.19904767), 0.00005),
-    (1, 32633, (617046.8503, 5450825.7990), 0.1),
-    (1, 32634, (179991.0748, 5458879.0878), 0.1),
-    (1, 5514, (-598208.8093, -1160307.4484), 0.1),
+    (1, crs_def.EPSG_4326, (16.60669976, 49.19904767), 0.00005),
+    (1, crs_def.EPSG_32633, (617046.8503, 5450825.7990), 0.1),
+    (1, crs_def.EPSG_32634, (179991.0748, 5458879.0878), 0.1),
+    (1, crs_def.EPSG_5514, (-598208.8093, -1160307.4484), 0.1),
 ]
 
 EXP_WMS_PICTURES = [
@@ -146,10 +146,10 @@ def generate(workspace=None):
 
     feature_spacial_precision_assert = [Action(publication.geoserver.feature_spatial_precision, {
         'feature_id': feature_id,
-        'epsg_code': epsg_code,
+        'crs': crs,
         'exp_coordinates': exp_coordinates,
         'precision': precision,
-    }) for feature_id, epsg_code, exp_coordinates, precision in EXP_POINT_COORDINATES]
+    }) for feature_id, crs, exp_coordinates, precision in EXP_POINT_COORDINATES]
 
     for crs, tc_params in SOURCE_EPSG_CODES.items():
         _, crs_code = crs.split(':')

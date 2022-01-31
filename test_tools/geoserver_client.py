@@ -1,4 +1,6 @@
 import requests
+
+import crs as crs_def
 from layman import app
 from layman.layer.geoserver.util import wfs_direct, wms_direct
 from layman.layer.geoserver import wfs
@@ -29,9 +31,10 @@ def get_wms_capabilities(workspace=None, service_endpoint='ows', headers=None):
     return wms_direct(wms_url, headers=headers)
 
 
-def get_features(workspace, feature_type, epsg_code=3857):
+def get_features(workspace, feature_type, crs=crs_def.EPSG_3857):
     wfs_url = get_wfs_url(workspace)
-    epsg_name = f"urn:ogc:def:crs:EPSG::{epsg_code}"
+    crs_authority, crs_code = crs.split(':')
+    epsg_name = f"urn:ogc:def:crs:{crs_authority}::{crs_code}"
     response = requests.get(wfs_url, params={
         'service': 'WFS',
         'request': 'GetFeature',
