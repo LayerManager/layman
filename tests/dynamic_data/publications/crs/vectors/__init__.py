@@ -20,21 +20,21 @@ REST_PARAMETRIZATION = {
 }
 
 SOURCE_EPSG_CODES = {
-    4326: {
+    crs_def.EPSG_4326: {
         KEY_INFO_VALUES: {
             'exp_publication_detail': {
                 'native_bounding_box': [16.6066275955110711, 49.1989353676069285, 16.6068125589999127, 49.1990477233154735],
             }
         },
     },
-    3857: {
+    crs_def.EPSG_3857: {
         KEY_INFO_VALUES: {
             'exp_publication_detail': {
                 'native_bounding_box': [1848641.3277258177, 6308684.223766193, 1848661.9177672109, 6308703.364768417],
             }
         },
     },
-    5514: {
+    crs_def.EPSG_5514: {
         KEY_INFO_VALUES: {
             'exp_publication_detail': {
                 'native_bounding_box': [-598214.7290553625207394, -1160319.8064114262815565, -598200.9321668159682304, -1160307.4425631782505661],
@@ -42,7 +42,7 @@ SOURCE_EPSG_CODES = {
             }
         },
     },
-    32633: {
+    crs_def.EPSG_32633: {
         KEY_INFO_VALUES: {
             'exp_publication_detail': {
                 'native_bounding_box': [617041.7249990371, 5450813.311883376, 617055.1207238155, 5450825.813110342],
@@ -50,7 +50,7 @@ SOURCE_EPSG_CODES = {
             }
         },
     },
-    32634: {
+    crs_def.EPSG_32634: {
         KEY_INFO_VALUES: {
             'exp_publication_detail': {
                 'native_bounding_box': [179985.4523066559922881, 5458866.6349301775917411, 179999.1353933966602199, 5458879.0886732628569007],
@@ -58,7 +58,7 @@ SOURCE_EPSG_CODES = {
             }
         },
     },
-    3034: {
+    crs_def.EPSG_3034: {
         KEY_INFO_VALUES: {
             'exp_publication_detail': {
                 'native_bounding_box': [4464506.1421598251909018, 2519866.8009202978573740, 4464518.7942008553072810, 2519878.8700591023080051],
@@ -66,7 +66,7 @@ SOURCE_EPSG_CODES = {
             }
         },
     },
-    3035: {
+    crs_def.EPSG_3035: {
         KEY_INFO_VALUES: {
             'exp_publication_detail': {
                 'native_bounding_box': [4801864.984034311, 2920036.6864006906, 4801878.080408361,
@@ -126,10 +126,10 @@ EXP_BBOXES = {
 }
 
 
-def use_low_resolution(wms_epsg_code, epsg_code, style_type):
+def use_low_resolution(wms_epsg_code, crs, style_type):
     if style_type == 'sld':
         return False
-    return (wms_epsg_code == 5514) != (epsg_code == 5514)
+    return (wms_epsg_code == 5514) != (crs == crs_def.EPSG_5514)
 
 
 def generate(workspace=None):
@@ -151,10 +151,11 @@ def generate(workspace=None):
         'precision': precision,
     }) for feature_id, epsg_code, exp_coordinates, precision in EXP_POINT_COORDINATES]
 
-    for epsg_code, tc_params in SOURCE_EPSG_CODES.items():
+    for crs, tc_params in SOURCE_EPSG_CODES.items():
+        _, crs_code = crs.split(':')
         action_params = {
-            'file_paths': [f'{DIRECTORY}/sample_point_cz_{epsg_code}.{ext}' for ext in ['shp', 'dbf', 'prj', 'shx', 'cpg', ]
-                           if os.path.exists(f'{DIRECTORY}/sample_point_cz_{epsg_code}.{ext}')]
+            'file_paths': [f'{DIRECTORY}/sample_point_cz_{crs_code}.{ext}' for ext in ['shp', 'dbf', 'prj', 'shx', 'cpg', ]
+                           if os.path.exists(f'{DIRECTORY}/sample_point_cz_{crs_code}.{ext}')]
         }
 
         bboxes = copy.deepcopy(EXP_BBOXES)
@@ -174,10 +175,10 @@ def generate(workspace=None):
         rest_param_dicts = util.dictionary_product(parametrization)
 
         def_info_values = copy.deepcopy(def_publ_info_values)
-        def_info_values['exp_publication_detail']['native_crs'] = f'EPSG:{epsg_code}'
+        def_info_values['exp_publication_detail']['native_crs'] = crs
         asserts_util.recursive_dict_update(def_info_values, tc_params.get(KEY_INFO_VALUES, dict()))
 
-        exp_thumbnail = f'{DIRECTORY}/sample_point_cz_{epsg_code}_thumbnail.png'
+        exp_thumbnail = f'{DIRECTORY}/sample_point_cz_{crs_code}_thumbnail.png'
 
         for rest_param_dict in rest_param_dicts:
             wms_spacial_precision_assert = [Action(publication.geoserver.wms_spatial_precision, {
@@ -193,9 +194,9 @@ def generate(workspace=None):
                 EXP_WMS_PICTURES
                 if style_type == REST_PARAMETRIZATION['style_file'][rest_param_dict['style_file']]
                 # If one and only one of the CRSs is 5514, use low resolution for QML style
-                and (use_low_resolution(wms_epsg_code, epsg_code, style_type) == (suffix == '_low'))
+                and (use_low_resolution(wms_epsg_code, crs, style_type) == (suffix == '_low'))
             ]
-            assert len(wms_spacial_precision_assert) == 6, f'epsg_code={epsg_code}, \n' \
+            assert len(wms_spacial_precision_assert) == 6, f'crs={crs}, \n' \
                                                            f'len(wms_spacial_precision_assert)={len(wms_spacial_precision_assert)}, \n' \
                                                            f'wms_spacial_precision_assert={wms_spacial_precision_assert}'
 
@@ -206,15 +207,15 @@ def generate(workspace=None):
                 test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
                                               for key, value in rest_param_dict.items()
                                               if REST_PARAMETRIZATION[key][value]])
-                publ_name = "_".join([part for part in ['points', f'{epsg_code}', action_code, test_case_postfix] if part])
+                publ_name = "_".join([part for part in ['points', f'{crs_code}', action_code, test_case_postfix] if part])
                 if any(k in rest_param_dict and rest_param_dict[k] != v for k, v in action_params.items()):
                     continue
 
                 post_info_values = copy.deepcopy(def_info_values)
-                post_info_values['exp_publication_detail']['native_crs'] = f'EPSG:{epsg_code}'
+                post_info_values['exp_publication_detail']['native_crs'] = crs
                 if rest_param_dict.get('compress'):
                     post_info_values['gdal_prefix'] = '/vsizip/'
-                    post_info_values['file_extension'] = f'zip/sample_point_cz_{epsg_code}.shp'
+                    post_info_values['file_extension'] = f'zip/sample_point_cz_{crs_code}.shp'
                 if rest_param_dict.get('style_file'):
                     post_info_values['publ_type_detail'] = ('vector', REST_PARAMETRIZATION['style_file'][rest_param_dict['style_file']])
 
