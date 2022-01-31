@@ -1,6 +1,7 @@
 import math
 import requests
 
+import crs as crs_def
 from layman import app, settings, util as layman_util
 from layman.common import bbox as bbox_util
 from layman.layer.geoserver import wfs, wms
@@ -44,7 +45,7 @@ def feature_spatial_precision(workspace, publ_type, name, *, feature_id, crs, ex
         assert abs(coordinate - exp_coordinates[idx]) <= precision, f"{crs}: expected coordinates={exp_coordinates}, found coordinates={feature['geometry']['coordinates']}"
 
 
-def wms_spatial_precision(workspace, publ_type, name, *, epsg_code, extent, img_size, wms_version, diff_line_width, obtained_file_path,
+def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, wms_version, diff_line_width, obtained_file_path,
                           expected_file_path, ):
     assert publ_type == process_client.LAYER_TYPE
 
@@ -57,9 +58,9 @@ def wms_spatial_precision(workspace, publ_type, name, *, epsg_code, extent, img_
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['native_crs', 'style_type']})
         native_crs = publ_info['native_crs']
         style_type = publ_info['style_type']
-    buffer_parameter = '' if native_crs != 'EPSG:5514' or epsg_code != 3857 or style_type != 'sld' else '&BUFFER=100000'
+    buffer_parameter = '' if native_crs != crs_def.EPSG_5514 or crs != crs_def.EPSG_3857 or style_type != 'sld' else '&BUFFER=100000'
 
-    url_part = f'/{workspace}_wms/wms?SERVICE=WMS&VERSION={wms_version}&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS={workspace}_wms%3A{name}&FORMAT_OPTIONS=antialias%3Afull&{crs_name}=EPSG%3A{epsg_code}&WIDTH={img_size[0]}&HEIGHT={img_size[1]}&BBOX={"%2C".join((str(c) for c in extent))}'
+    url_part = f'/{workspace}_wms/wms?SERVICE=WMS&VERSION={wms_version}&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS={workspace}_wms%3A{name}&FORMAT_OPTIONS=antialias%3Afull&{crs_name}={crs}&WIDTH={img_size[0]}&HEIGHT={img_size[1]}&BBOX={"%2C".join((str(c) for c in extent))}'
     geoserver_url = f'{settings.LAYMAN_GS_URL}{url_part}{buffer_parameter}'
     layman_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver{url_part}'
 
