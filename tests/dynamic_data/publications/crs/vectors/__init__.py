@@ -151,6 +151,8 @@ def generate(workspace=None):
         'precision': precision,
     }) for feature_id, crs, exp_coordinates, precision in EXP_POINT_COORDINATES]
 
+    wms_picture_expected_number = len({(exp_wms_picture[0], exp_wms_picture[4], ) for exp_wms_picture in EXP_WMS_PICTURES})
+
     for crs, tc_params in SOURCE_EPSG_CODES.items():
         _, crs_code = crs.split(':')
         action_params = {
@@ -196,9 +198,11 @@ def generate(workspace=None):
                 # If one and only one of the CRSs is 5514, use low resolution for QML style
                 and (use_low_resolution(wms_crs, crs, style_type) == (suffix == '_low'))
             ]
-            assert len(wms_spacial_precision_assert) == 6, f'crs={crs}, \n' \
-                                                           f'len(wms_spacial_precision_assert)={len(wms_spacial_precision_assert)}, \n' \
-                                                           f'wms_spacial_precision_assert={wms_spacial_precision_assert}'
+            assert len(wms_spacial_precision_assert) == wms_picture_expected_number, \
+                f'crs={crs}, \n' \
+                f'wms_picture_expected_number={wms_picture_expected_number}, \n' \
+                f'len(wms_spacial_precision_assert)={len(wms_spacial_precision_assert)}, \n' \
+                f'wms_spacial_precision_assert={wms_spacial_precision_assert}'
 
             for action_code, action_method, action_predecessor in [
                 ('post', process_client.publish_workspace_publication, []),
