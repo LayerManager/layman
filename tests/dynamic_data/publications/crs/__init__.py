@@ -1,6 +1,7 @@
 import os
 import copy
 
+import crs as crs_def
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client
@@ -30,13 +31,13 @@ LA_FINAL_ASSERTS = [
             }),
     Action(publication.geoserver.feature_spatial_precision, {
         'feature_id': 1,
-        'epsg_code': 4326,
+        'crs': crs_def.EPSG_4326,
         'exp_coordinates': (24.10803711, 56.95521220),
         'precision': 0.00004,
     }),
     Action(publication.geoserver.feature_spatial_precision, {
         'feature_id': 1,
-        'epsg_code': 3059,
+        'crs': crs_def.EPSG_3059,
         'exp_coordinates': (506570.91, 312405.56),
         'precision': 1,
     }),

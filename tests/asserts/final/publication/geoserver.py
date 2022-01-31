@@ -35,13 +35,13 @@ def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, n
         assert r_wfs.status_code == 200
 
 
-def feature_spatial_precision(workspace, publ_type, name, *, feature_id, epsg_code, exp_coordinates, precision):
+def feature_spatial_precision(workspace, publ_type, name, *, feature_id, crs, exp_coordinates, precision):
     assert publ_type == process_client.LAYER_TYPE
 
-    feature_collection = geoserver_client.get_features(workspace, name, epsg_code=epsg_code)
+    feature_collection = geoserver_client.get_features(workspace, name, crs=crs)
     feature = next(f for f in feature_collection['features'] if f['properties']['point_id'] == feature_id)
     for idx, coordinate in enumerate(feature['geometry']['coordinates']):
-        assert abs(coordinate - exp_coordinates[idx]) <= precision, f"EPSG:{epsg_code}: expected coordinates={exp_coordinates}, found coordinates={feature['geometry']['coordinates']}"
+        assert abs(coordinate - exp_coordinates[idx]) <= precision, f"{crs}: expected coordinates={exp_coordinates}, found coordinates={feature['geometry']['coordinates']}"
 
 
 def wms_spatial_precision(workspace, publ_type, name, *, epsg_code, extent, img_size, wms_version, diff_line_width, obtained_file_path,
