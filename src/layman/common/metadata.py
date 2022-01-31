@@ -12,7 +12,7 @@ def get_syncable_prop_names(publ_type):
     return prop_names
 
 
-def extent_equals(ext1, ext2):
+def extent_4326_equals(ext1, ext2):
     return bbox_util.are_similar(ext1, ext2, no_area_bbox_padding=crs_def.CRSDefinitions[crs_def.EPSG_4326].no_area_bbox_padding, limit=0.95)
 
 
@@ -65,7 +65,7 @@ PROPERTIES = {
     },
     'extent': {
         'upper_mp': '1',
-        'equals_fn': extent_equals,
+        'equals_fn': extent_4326_equals,
     },
     'wms_url': {
         'upper_mp': '1',
