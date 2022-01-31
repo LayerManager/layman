@@ -170,6 +170,12 @@ def extract_attributes_from_wfs_t_insert_replace(action):
     return attribs
 
 
+def extract_workspace_from_url(url):
+    parts = url.split('/')
+    workspace = parts[0] if len(parts) == 2 else None
+    return workspace
+
+
 @bp.route('/<path:subpath>', methods=['POST', 'GET'])
 def proxy(subpath):
     app.logger.info(f"{request.method} GeoServer proxy, actor={g.user}, subpath={subpath}, url={request.url}, request.query_string={request.query_string.decode('UTF-8')}")
@@ -201,6 +207,8 @@ def proxy(subpath):
     if query_params.get('service') == 'WMS' and query_params.get('request') == 'GetMap' \
             and (query_params.get('crs') or query_params.get('srs')) == crs_def.EPSG_3857:
         layers = [layer.split(':') for layer in query_params.get('layers').split(',')]
+        url_workspace = extract_workspace_from_url(subpath)
+        layers = [layer if len(layer) == 2 else [url_workspace] + layer for layer in layers]
         use_buffer = False
         for geoserver_workspace, layer in layers:
             workspace = gs_wms.get_layman_workspace(geoserver_workspace)
