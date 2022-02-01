@@ -1,4 +1,6 @@
+import copy
 import math
+from urllib import parse
 import requests
 
 import crs as crs_def
@@ -58,11 +60,33 @@ def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, 
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['native_crs', 'style_type']})
         native_crs = publ_info['native_crs']
         style_type = publ_info['style_type']
-    buffer_parameter = '' if native_crs != crs_def.EPSG_5514 or crs != crs_def.EPSG_3857 or style_type != 'sld' else '&BUFFER=100000'
 
-    url_part = f'/{workspace}_wms/wms?SERVICE=WMS&VERSION={wms_version}&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=true&STYLES&LAYERS={workspace}_wms%3A{name}&FORMAT_OPTIONS=antialias%3Afull&{crs_name}={crs}&WIDTH={img_size[0]}&HEIGHT={img_size[1]}&BBOX={"%2C".join((str(c) for c in extent))}'
-    geoserver_url = f'{settings.LAYMAN_GS_URL}{url_part}{buffer_parameter}'
-    layman_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver{url_part}'
+    query_params = {
+        'SERVICE': 'WMS',
+        'VERSION': wms_version,
+        'REQUEST': 'GetMap',
+        'FORMAT': 'image/png',
+        'TRANSPARENT': 'true',
+        # 'STYLES': None,
+        'LAYERS': f'{workspace}_wms:{name}',
+        'FORMAT_OPTIONS': 'antialias:full',
+        crs_name: crs,
+        'WIDTH': img_size[0],
+        'HEIGHT': img_size[1],
+        'BBOX': ",".join((str(c) for c in extent)),
+    }
+
+    gs_query_params = copy.deepcopy(query_params)
+    if native_crs == crs_def.EPSG_5514 and crs == crs_def.EPSG_3857 and style_type == 'sld':
+        gs_query_params['BUFFER'] = 100000
+    if native_crs == crs_def.EPSG_5514 and crs == crs_def.CRS_84 and style_type == 'sld':
+        gs_query_params[crs_name] = crs_def.EPSG_4326
+        if wms_version == '1.3.0':
+            bbox = [extent[1], extent[0], extent[3], extent[2]]
+            gs_query_params['BBOX'] = ",".join((str(c) for c in bbox))
+
+    geoserver_url = f'{settings.LAYMAN_GS_URL}/{workspace}_wms/wms?{parse.urlencode(gs_query_params)}'
+    layman_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?{parse.urlencode(query_params)}'
 
     circle_diameter = 30
     circle_perimeter = circle_diameter * math.pi
