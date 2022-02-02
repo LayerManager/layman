@@ -86,15 +86,20 @@ def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, 
             gs_query_params['BBOX'] = ",".join((str(c) for c in bbox))
 
     geoserver_url = f'{settings.LAYMAN_GS_URL}/{workspace}_wms/wms?{parse.urlencode(gs_query_params)}'
-    layman_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?{parse.urlencode(query_params)}'
+    layman_without_workspace_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver/wms?{parse.urlencode(query_params)}'
+    query_params['LAYERS'] = name
+    layman_with_workspace_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?{parse.urlencode(query_params)}'
 
     circle_diameter = 30
     circle_perimeter = circle_diameter * math.pi
     num_circles = 5
     pixel_diff_limit = circle_perimeter * num_circles * diff_line_width
 
-    assert_util.assert_same_images(layman_url, obtained_file_path, expected_file_path, pixel_diff_limit)
-    assert_util.assert_same_images(geoserver_url, obtained_file_path, expected_file_path, pixel_diff_limit)
+    for url in [geoserver_url,
+                layman_with_workspace_url,
+                layman_without_workspace_url,
+                ]:
+        assert_util.assert_same_images(url, obtained_file_path, expected_file_path, pixel_diff_limit)
 
 
 def wfs_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.00001):
