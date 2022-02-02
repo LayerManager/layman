@@ -19,7 +19,8 @@ make timgen-build
    - `native_bounding_box` with coordinates in native CRS  [minx, miny, maxx, maxy]
 - [#64](https://github.com/LayerManager/layman/issues/64) Layman supports import of vector layers in "EPSG:3034", "EPSG:3035", "EPSG:5514", "EPSG:32633", "EPSG:32634" and "EPSG:3059".
 - [#64](https://github.com/LayerManager/layman/issues/64) Layer thumbnails are generated in native CRS of the layer.
-- [#64](https://github.com/LayerManager/layman/issues/64) WMS proxy was added to [WMS endpoint](doc/endpoints.md#web-map-service). In case of some special WMS GetMap requests, it adds `buffer` parameter to the request to fix some GeoServer issues or change request CRS. 
+- [#64](https://github.com/LayerManager/layman/issues/64) WMS proxy was added to [WMS endpoint](doc/endpoints.md#web-map-service). In case of some special WMS GetMap requests, it adds `buffer` parameter to the request to fix some GeoServer issues or change request CRS.
+- [#64](https://github.com/LayerManager/layman/issues/64) For layers in `EPSG:5514` and WFS requests in `CRS:84`, the features may have wrong coordinates by hundreds of meters. For requests in `EPSG:4326`, coordinates are correct.
 - [#489](https://github.com/LayerManager/layman/issues/489) Error responses from Micka and GeoServer are logged into log and also propagated as part of raised exception, so they can be seen from flower.
 - [#548](https://github.com/LayerManager/layman/pull/548) Suppress GeoServer HTTP error 409 when setting layer access rights if they already have the same value.
 - [#548](https://github.com/LayerManager/layman/pull/548) If Micka returns HTTP error 500 on CSW/SOAP Insert/Update/Delete, retry the request.

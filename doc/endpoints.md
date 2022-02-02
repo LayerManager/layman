@@ -24,5 +24,8 @@ The WFS proxy parses request and adapts it in few ways in case of WFS-T 1.0, 1.1
 
 WFS respects [publication access rights](security.md#publication-access-rights). If user asks for type (layer) he has not read access to by DescribeFeatureType or GetFeature request, GeoServer returns standard ExceptionReport (code InvalidParameterValue, locator typeName or typeNames). To perform WFS-T requests, write access is needed.
 
+### Known issues
+For layers in `EPSG:5514` and WFS requests in `CRS:84`, the features may have wrong coordinates by hundreds of meters. For requests in `EPSG:4326`, coordinates are correct.
+
 ## Catalogue Service
 [Catalogue Service (CSW)](https://www.opengeospatial.org/standards/cat) is implemented using [Micka](https://github.com/hsrs-cz/Micka).
