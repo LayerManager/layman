@@ -38,6 +38,9 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
     full_text_like = '%' + full_text_filter + '%' if full_text_filter else None
     ordering_full_text_tsquery = db_util.to_tsquery_string(ordering_full_text) if ordering_full_text else None
 
+    ordering_bbox_srid = db_util.get_srid(crs_def.EPSG_3857)
+    filtering_bbox_srid = db_util.get_srid(crs_def.EPSG_3857)
+
     where_params_def = [
         (workspace_name, 'w.name = %s', (workspace_name,)),
         (pub_type, 'p.type = %s', (pub_type,)),
@@ -64,7 +67,8 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
                                     and w2.name = %s))""", (writer, writer,)),
         (full_text_filter, '(_prime_schema.my_unaccent(p.title) @@ to_tsquery(unaccent(%s))'
                            'or lower(unaccent(p.title)) like lower(unaccent(%s)))', (full_text_tsquery, full_text_like,)),
-        (bbox_filter, 'p.bbox && ST_MakeBox2D(ST_MakePoint(%s, %s), ST_MakePoint(%s, %s))', bbox_filter),
+        (bbox_filter, 'ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s) && ST_MakeBox2D(ST_MakePoint(%s, %s), ST_MakePoint(%s, %s))',
+         (filtering_bbox_srid, ) + bbox_filter if bbox_filter else None, ),
     ]
 
     order_by_definition = {
@@ -76,24 +80,24 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
             -- A∩B / (A + B)
             CASE
                 -- if there is any intersection
-                WHEN p.bbox && ST_MakeBox2D(ST_MakePoint(%s, %s),
-                                            ST_MakePoint(%s, %s))
+                WHEN ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s) && ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),
+                                                                                             ST_MakePoint(%s, %s)), %s)
                     THEN
                         -- in cases, when area of intersection is 0, we want it rank higher than no intersection
-                        GREATEST(st_area(st_intersection(p.bbox, ST_MakeBox2D(ST_MakePoint(%s, %s),
-                                                                              ST_MakePoint(%s, %s)))),
-                                 1)
+                        GREATEST(st_area(st_intersection(ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s), ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),
+                                                                                                                               ST_MakePoint(%s, %s)), %s))),
+                                 0.00001)
                         -- we have to solve division by 0
-                        / (GREATEST(st_area(p.bbox), 1) +
-                           GREATEST(st_area(ST_MakeBox2D(ST_MakePoint(%s, %s),
-                                                         ST_MakePoint(%s, %s))),
-                                    1)
+                        / (GREATEST(st_area(ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s)), 0.00001) +
+                           GREATEST(st_area(ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),
+                                                                    ST_MakePoint(%s, %s)), %s)),
+                                    0.00001)
                            )
                 -- if there is no intersection, result is 0 in all cases
                 ELSE
                     0
             END DESC
-            """, ordering_bbox + ordering_bbox + ordering_bbox if ordering_bbox else tuple()),
+            """, (ordering_bbox_srid, ) + ordering_bbox + (ordering_bbox_srid, ) + (ordering_bbox_srid, ) + ordering_bbox + (ordering_bbox_srid, ) + (ordering_bbox_srid, ) + ordering_bbox + (ordering_bbox_srid, ) if ordering_bbox else tuple()),
     }
 
     assert all(ordering_item in order_by_definition.keys() for ordering_item in order_by_list)
