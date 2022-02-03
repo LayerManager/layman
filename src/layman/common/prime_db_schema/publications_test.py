@@ -400,19 +400,18 @@ class TestSelectPublicationsComplex:
             'total_count': 3,
             'content_range': (1, 3),
         }),
-        ({'bbox_filter': (1843001, 6323001, 1844999, 6324999),
-          'bbox_filter_crs': crs_def.EPSG_3857,
+        ({'bbox_filter': (-600665, -1150641, -599439, -1149488),  # EPSG:3857 (1843001, 6323001, 1844999, 6324999)
+          'bbox_filter_crs': crs_def.EPSG_5514,
           }, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
-                      (workspace1, MAP_TYPE, map_1o_2_2x3_6),
                       (workspace2, MAP_TYPE, map_2e_3_3x5_5),
                       (workspace2, MAP_TYPE, map_2o_2_2x4_4),
                       ],
-            'total_count': 4,
-            'content_range': (1, 4),
+            'total_count': 3,
+            'content_range': (1, 3),
         }),
-        ({'bbox_filter': (1843001, 6323001, 1843001, 6323001),
-          'bbox_filter_crs': crs_def.EPSG_3857,
+        ({'bbox_filter': (176844.09626803786, 5468335.761457844, 176844.09626803786, 5468335.7614578441),  # EPSG:3857 (1843001, 6323001, 1843001, 6323001)
+          'bbox_filter_crs': crs_def.EPSG_32634,
           }, {
             'items': [(workspace1, MAP_TYPE, map_1o_2_2x3_6),
                       (workspace2, MAP_TYPE, map_2e_3_3x5_5),
