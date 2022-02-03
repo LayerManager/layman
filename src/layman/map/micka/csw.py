@@ -175,7 +175,7 @@ def get_template_path_and_values(workspace, mapname, http_method=None, actor_nam
     crs = publ_info.get('native_crs')
     if bbox_util.is_empty(native_bbox):
         native_bbox = crs_def.CRSDefinitions[crs].world_bbox
-    extent = bbox_util.transform(native_bbox, crs_from=publ_info.get('native_crs'), crs_to='EPSG:4326')
+    extent = bbox_util.transform(native_bbox, crs_from=publ_info.get('native_crs'), crs_to=crs_def.EPSG_4326)
     title = publ_info['title']
     abstract = publ_info.get('description')
     md_language = next(iter(common_language.get_languages_iso639_2(' '.join([
