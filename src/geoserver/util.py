@@ -505,7 +505,8 @@ def delete_db_store(geoserver_workspace, auth):
         response.raise_for_status()
 
 
-def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, description=None, bbox=None, crs=None, auth):
+def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, description=None, bbox=None, crs=None,
+                   auth, lat_lon_bbox=None):
     assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
     coverage = dict()
 
@@ -524,6 +525,8 @@ def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, de
         coverage['abstract'] = description
     if bbox:
         coverage['nativeBoundingBox'] = bbox_to_dict(bbox, crs)
+    if lat_lon_bbox:
+        coverage['latLonBoundingBox'] = bbox_to_dict(lat_lon_bbox, 'CRS:84')
 
     coverage = {k: v for k, v in coverage.items() if v is not None}
     body = {
@@ -575,7 +578,7 @@ def delete_coverage_store(geoserver_workspace, auth, name):
         response.raise_for_status()
 
 
-def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, description, bbox, crs):
+def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, description, bbox, crs, *, lat_lon_bbox):
     keywords = [
         "features",
         layer,
@@ -591,11 +594,13 @@ def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, de
             },
             "name": layer,
             'nativeBoundingBox': native_bbox,
+            "latLonBoundingBox": bbox_to_dict(lat_lon_bbox, 'CRS:84'),
             "nativeFormat": "GeoTIFF",
             "srs": crs,
             "store": {
                 "@class": "coverageStore",
-                "href": urljoin(GS_REST_WORKSPACES, geoserver_workspace, f'/coveragestores/coverages/{coverage_store}.json'),
+                "href": urljoin(GS_REST_WORKSPACES, geoserver_workspace,
+                                f'/coveragestores/coverages/{coverage_store}.json'),
                 "name": f"{geoserver_workspace}:{coverage_store}"
             },
             "title": title
