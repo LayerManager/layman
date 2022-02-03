@@ -57,9 +57,11 @@ def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, 
     }[wms_version]
 
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['native_crs', 'style_type']})
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['native_crs', 'style_type',
+                                                                                           'file']})
         native_crs = publ_info['native_crs']
         style_type = publ_info['style_type']
+        file_type = publ_info['file']['file_type']
 
     query_params = {
         'SERVICE': 'WMS',
@@ -77,7 +79,8 @@ def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, 
     }
 
     gs_query_params = copy.deepcopy(query_params)
-    if native_crs == crs_def.EPSG_5514 and crs == crs_def.EPSG_3857 and style_type == 'sld':
+    if native_crs == crs_def.EPSG_5514 and crs == crs_def.EPSG_3857 and style_type == 'sld' \
+            and file_type == settings.FILE_TYPE_VECTOR:
         gs_query_params['BUFFER'] = 100000
     if native_crs == crs_def.EPSG_5514 and crs == crs_def.CRS_84 and style_type == 'sld':
         gs_query_params[crs_name] = crs_def.EPSG_4326

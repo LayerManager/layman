@@ -6,7 +6,7 @@
 The authentication proxy understands same [authentication credentials](security.md#authentication) as Layman REST API (e.g. OAuth2 credentials) and passes the request to GeoServer with credentials understandable by GeoServer.
 
 The WMS proxy parses request and adapts it in case of WMS GetMap requests:
-- If incoming request is in EPSG:3857 and one of requested SLD layers has native CRS EPSG:5514, it adds [`buffer`](https://docs.geoserver.org/latest/en/user/services/wms/vendor.html#buffer) parameter with value equal to 400 meters if `buffer` is not yet set. It fixes missing features in GeoServer response.
+- If incoming request is in EPSG:3857 and one of requested vector SLD layers has native CRS EPSG:5514, it adds [`buffer`](https://docs.geoserver.org/latest/en/user/services/wms/vendor.html#buffer) parameter with value equal to 400 meters if `buffer` is not yet set. It fixes missing features in GeoServer response.
 - If incoming request is in CRS:84 and  one of requested SLD layers has native CRS EPSG:5514, it changes CRS of the request to EPSG:4326. It fixes wrong transformation of features in GeoServer.
 
 WMS respects [publication access rights](security.md#publication-access-rights). If user asks for layer he has not read access to by GetMap or GetFeatureInfo request, GeoServer returns standard ServiceExceptionReport (code LayerNotDefined).
