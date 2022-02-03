@@ -1,6 +1,7 @@
 import uuid
 import pytest
 
+import crs as crs_def
 from layman import settings, app as app, LaymanError
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
@@ -389,7 +390,9 @@ class TestSelectPublicationsComplex:
             'content_range': (1, 7),
         }),
         ({'order_by_list': ['bbox'], 'ordering_bbox': (1844001, 6324001, 1844001, 6324001),
-          'bbox_filter': (1844001, 6324001, 1844001, 6324001), }, {
+          'bbox_filter': (1844001, 6324001, 1844001, 6324001),
+          'bbox_filter_crs': crs_def.EPSG_3857,
+          }, {
             'items': [(workspace2, MAP_TYPE, map_2e_3_3x5_5),
                       (workspace2, MAP_TYPE, map_2o_2_2x4_4),
                       (workspace1, MAP_TYPE, map_1e_2_4x6_6),
@@ -397,7 +400,9 @@ class TestSelectPublicationsComplex:
             'total_count': 3,
             'content_range': (1, 3),
         }),
-        ({'bbox_filter': (1843001, 6323001, 1844999, 6324999), }, {
+        ({'bbox_filter': (1843001, 6323001, 1844999, 6324999),
+          'bbox_filter_crs': crs_def.EPSG_3857,
+          }, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
                       (workspace1, MAP_TYPE, map_1o_2_2x3_6),
                       (workspace2, MAP_TYPE, map_2e_3_3x5_5),
@@ -406,7 +411,9 @@ class TestSelectPublicationsComplex:
             'total_count': 4,
             'content_range': (1, 4),
         }),
-        ({'bbox_filter': (1843001, 6323001, 1843001, 6323001), }, {
+        ({'bbox_filter': (1843001, 6323001, 1843001, 6323001),
+          'bbox_filter_crs': crs_def.EPSG_3857,
+          }, {
             'items': [(workspace1, MAP_TYPE, map_1o_2_2x3_6),
                       (workspace2, MAP_TYPE, map_2e_3_3x5_5),
                       (workspace2, MAP_TYPE, map_2o_2_2x4_4),

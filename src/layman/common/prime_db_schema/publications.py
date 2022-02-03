@@ -28,6 +28,7 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
                                         limit=None, offset=None,
                                         full_text_filter=None,
                                         bbox_filter=None,
+                                        bbox_filter_crs=None,
                                         order_by_list=None,
                                         ordering_full_text=None,
                                         ordering_bbox=None,
@@ -39,7 +40,7 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
     ordering_full_text_tsquery = db_util.to_tsquery_string(ordering_full_text) if ordering_full_text else None
 
     ordering_bbox_srid = db_util.get_srid(crs_def.EPSG_3857)
-    filtering_bbox_srid = db_util.get_srid(crs_def.EPSG_3857)
+    filtering_bbox_srid = db_util.get_srid(bbox_filter_crs)
 
     where_params_def = [
         (workspace_name, 'w.name = %s', (workspace_name,)),
