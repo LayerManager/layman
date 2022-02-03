@@ -116,6 +116,21 @@ def get_bbox_from_param(request_args, param_name):
     return bbox
 
 
+def get_crs_from_param(request_args, param_name):
+    crs = None
+    if request_args.get(param_name):
+        match = re.match(consts.CRS_PATTERN, request_args[param_name])
+        if not match:
+            raise LaymanError(2, {'parameter': param_name, 'expected': {
+                'text': 'One CRS name: AUTHORITY:CODE',
+                'regular_expression': consts.CRS_PATTERN,
+            }})
+        crs = match.groups()[0]
+        if crs not in settings.LAYMAN_OUTPUT_SRS_LIST:
+            raise LaymanError(2, {'parameter': param_name, 'expected': settings.LAYMAN_OUTPUT_SRS_LIST, 'value': crs})
+    return crs
+
+
 def get_integer_from_param(request_args, param_name, negative=True, zero=True, positive=True):
     result = None
     assert negative or zero or positive
@@ -154,8 +169,9 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
         full_text_filter = request_args[consts.FILTER_FULL_TEXT].strip() or None
 
     bbox_filter = get_bbox_from_param(request_args, consts.FILTER_BBOX)
+    bbox_filter_crs = get_crs_from_param(request_args, consts.FILTER_BBOX_CRS)
 
-    bbox_filter_crs = crs_def.EPSG_3857 if bbox_filter else None
+    bbox_filter_crs = bbox_filter_crs or (crs_def.EPSG_3857 if bbox_filter else None)
 
     #########################################################
     # Ordering

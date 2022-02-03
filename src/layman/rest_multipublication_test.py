@@ -340,6 +340,7 @@ class TestGetPublications:
         (
             authn_headers_user2, {'full_text_filter': 'prilis yellow',
                                   'bbox_filter': ','.join(str(c) for c in (2000, 2000, 6000, 6000)),
+                                  'bbox_filter_crs': crs_def.EPSG_3857,
                                   'offset': 1,
                                   'limit': 1,
                                   }, [
@@ -352,6 +353,19 @@ class TestGetPublications:
             authn_headers_user2, {'order_by': 'title',
                                   'full_text_filter': 'prilis',
                                   'bbox_filter': ','.join(str(c) for c in (2000, 2000, 6000, 6000)),
+                                  'offset': 1,
+                                  'limit': 1,
+                                  }, [
+                # (workspace1, publication_1e_2_4x6_6),
+                (workspace2, publication_2o_2_2x4_4),
+                # (workspace2, publication_2e_3_3x5_5),
+            ], {'X-Total-Count': '3',
+                'Content-Range': 'items 2-2/3'},),
+        (
+            authn_headers_user2, {'order_by': 'title',
+                                  'full_text_filter': 'prilis',
+                                  'bbox_filter': ','.join(str(c) for c in (0.0179663, 0.0179663, 0.0538989, 0.0538989)),  # EPSG:3857 (2000, 2000, 6000, 6000)
+                                  'bbox_filter_crs': crs_def.EPSG_4326,
                                   'offset': 1,
                                   'limit': 1,
                                   }, [
@@ -569,6 +583,21 @@ class TestGetPublications:
         (workspace2, authn_headers_user2, {'order_by': 'title',
                                            'full_text_filter': 'prilis',
                                            'bbox_filter': ','.join(str(c) for c in (2000, 2000, 6000, 6000)),
+                                           'bbox_filter_crs': crs_def.EPSG_3857,
+                                           'offset': 1,
+                                           'limit': 1,
+                                           }, [
+            # (workspace2, publication_2o_2_2x4_4),
+            (workspace2, publication_2e_3_3x5_5),
+        ], {'X-Total-Count': '2',
+            'Content-Range': 'items 2-2/2',
+            },
+        ),
+        (workspace2, authn_headers_user2, {'order_by': 'title',
+                                           'full_text_filter': 'prilis',
+                                           'bbox_filter': ','.join(str(c) for c in (0.0179663, 0.0179663, 0.0538989, 0.0538989)),
+                                           # EPSG:3857 (2000, 2000, 6000, 6000)
+                                           'bbox_filter_crs': crs_def.EPSG_4326,
                                            'offset': 1,
                                            'limit': 1,
                                            }, [
@@ -606,6 +635,9 @@ class TestGetPublications:
     ({'bbox_filter': '1,2,3,4,5'}, (2, 400), {'parameter': 'bbox_filter'}),
     ({'bbox_filter': '1,2,c,4'}, (2, 400), {'parameter': 'bbox_filter'}),
     ({'bbox_filter': '1,4,2,3'}, (2, 400), {'parameter': 'bbox_filter'}),
+    ({'bbox_filter_crs': '3'}, (2, 400), {'parameter': 'bbox_filter_crs'}),
+    ({'bbox_filter_crs': 'EPSG:3030'}, (2, 400), {'parameter': 'bbox_filter_crs'}),
+    ({'bbox_filter_crs': 'CRS:84'}, (2, 400), {'parameter': 'bbox_filter_crs'}),
     ({'ordering_bbox': '1,2,3,4,5'}, (2, 400), {'parameter': 'ordering_bbox'}),
     ({'ordering_bbox': '1,2,c,4'}, (2, 400), {'parameter': 'ordering_bbox'}),
     ({'ordering_bbox': '1,4,2,3'}, (2, 400), {'parameter': 'ordering_bbox'}),
