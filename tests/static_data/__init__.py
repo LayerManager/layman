@@ -284,7 +284,7 @@ PUBLICATIONS = {
             {'file_paths': ['sample/layman.layer/sample_tif_rgba_4326.tif', ]},
         ],
         TEST_DATA: {
-            'bbox': (1679391.075, 6562360.437, 1679416.269, 6562381.831),
+            'bbox': (1679391.075, 6562360.443, 1679416.256, 6562381.831),
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Red', 'Green', 'Blue', 'Alpha'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_rgba_4326.png',
@@ -343,7 +343,7 @@ PUBLICATIONS = {
             {'file_paths': ['sample/layman.layer/sample_tif_colortable_nodata_opaque_4326.tif']},
         ],
         TEST_DATA: {
-            'bbox': (868376.00, 522145.76, 940600.68, 593255.00),
+            'bbox': (868375.99, 522100.63, 940557.77, 593254.99),
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Palette'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque_4326.png',
@@ -383,7 +383,7 @@ PUBLICATIONS = {
             {'file_paths': ['sample/layman.layer/sample_tif_grayscale_alpha_nodata_4326.tif']},
         ],
         TEST_DATA: {
-            'bbox': (1823049.06, 6309995.31, 1826920.44, 6312703.75),
+            'bbox': (1823049.05, 6310001.12, 1826924.71, 6312703.74),
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Gray', 'Alpha'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_alpha_nodata_4326.png',
