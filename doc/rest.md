@@ -39,6 +39,7 @@ Query parameters:
   - Any word from input string appears in title. Search is case-insensitive, unaccent and does lemmatization for English.
   - Input string appears as substring of title. Search is case-insensitive and unaccent.
 - *bbox_filter*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. Only layers whose bounding box intersects with given bounding box will be returned.
+- *bbox_filter_crs*: String. CRS of *bbox_filter*, default value is `EPSG:3857`, has to be one of [LAYMAN_OUTPUT_SRS_LIST](env-settings.md#LAYMAN_OUTPUT_SRS_LIST).
 - *order_by*: String. Can be one of these values:
   - `full_text` Layers will be ordered by results of full-text search. Can be used only in combination with *full_text_filter*.
   - `title` Layers will be ordered lexicographically by title value.

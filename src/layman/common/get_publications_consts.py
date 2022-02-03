@@ -1,8 +1,10 @@
 BBOX_PATTERN = r"^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$"
 INTEGER_PATTERN = f"^([-+]?[0-9]+)$"
+CRS_PATTERN = r"^(\w+:\d+)$"
 
 FILTER_FULL_TEXT = 'full_text_filter'
 FILTER_BBOX = 'bbox_filter'
+FILTER_BBOX_CRS = 'bbox_filter_crs'
 
 ORDER_BY_PARAM = 'order_by'
 ORDER_BY_FULL_TEXT = 'full_text'
