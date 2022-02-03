@@ -1,6 +1,8 @@
 import pytest
 
+import crs as crs_def
 from layman import app, util as layman_util, settings
+from layman.common import bbox as bbox_util
 from layman.layer.filesystem import gdal
 from test_tools import assert_util, process_client
 from .. import util
@@ -118,8 +120,10 @@ def test_info(workspace, publ_type, publication):
 
         file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
         if file_type == settings.FILE_TYPE_RASTER:
-            bbox = gdal.get_bbox(workspace, publication)
-            assert_util.assert_same_bboxes(bbox, exp_bbox, 0.01)
+            native_bbox = gdal.get_bbox(workspace, publication)
+            with app.app_context():
+                bbox_3857 = bbox_util.transform(native_bbox, info['native_crs'], crs_def.EPSG_3857)
+            assert_util.assert_same_bboxes(bbox_3857, exp_bbox, 0.01)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
