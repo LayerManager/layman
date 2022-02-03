@@ -1,3 +1,4 @@
+import crs as crs_def
 from geoserver import util as gs_util
 from layman import celery_app, settings, util as layman_util
 from layman.common import bbox as bbox_util
@@ -28,7 +29,7 @@ def patch_after_feature_change(
         info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['style_type', 'native_crs', ], })
         style_type = info['style_type']
         crs = info['native_crs']
-        lat_lon_bbox = bbox_util.transform(bbox, crs, 'EPSG:4326')
+        lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
         if style_type == 'sld':
             gs_util.patch_feature_type(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs, lat_lon_bbox=lat_lon_bbox)
         elif style_type == 'qml':

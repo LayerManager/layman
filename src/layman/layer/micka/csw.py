@@ -124,7 +124,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
     crs = publ_info.get('native_crs')
     if bbox_util.is_empty(native_bbox):
         native_bbox = crs_def.CRSDefinitions[crs].world_bbox
-    extent = bbox_util.transform(native_bbox, crs_from=crs, crs_to='EPSG:4326')
+    extent = bbox_util.transform(native_bbox, crs_from=crs, crs_to=crs_def.EPSG_4326)
 
     uuid_file_path = get_publication_uuid_file(LAYER_TYPE, workspace, layername)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
