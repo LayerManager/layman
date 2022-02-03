@@ -227,10 +227,11 @@ def no_bbox_and_crs(workspace, publ_type, name):
     assert native_crs is None
 
 
-def detail_3857bbox_value(workspace, publ_type, name, *, exp_bbox, precision=0.1):
+def detail_3857bbox_value(workspace, publ_type, name, *, exp_bbox, precision=0.1, contains=True):
     with app.app_context():
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['bounding_box']})
     bounding_box = publ_info['bounding_box']
 
     assert_util.assert_same_bboxes(exp_bbox, bounding_box, precision)
-    assert bbox_util.contains_bbox(bounding_box, exp_bbox)
+    if contains:
+        assert bbox_util.contains_bbox(bounding_box, exp_bbox)
