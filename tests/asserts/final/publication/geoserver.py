@@ -113,7 +113,7 @@ def wfs_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.00001):
     assert bbox_util.contains_bbox(bbox, exp_bbox, precision=precision / 10000)
 
 
-def wms_geographic_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.00001):
+def wms_geographic_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.00001, contains=True):
     assert publ_type == process_client.LAYER_TYPE
 
     with app.app_context():
@@ -121,10 +121,11 @@ def wms_geographic_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.000
     wms_layer = wms_get_capabilities.contents[name]
     bbox = wms_layer.boundingBoxWGS84
     assert_util.assert_same_bboxes(exp_bbox, bbox, precision)
-    assert bbox_util.contains_bbox(bbox, exp_bbox, precision=precision / 10000)
+    if contains:
+        assert bbox_util.contains_bbox(bbox, exp_bbox, precision=precision / 10000)
 
 
-def wms_bbox(workspace, publ_type, name, *, exp_bbox, crs, precision=0.00001):
+def wms_bbox(workspace, publ_type, name, *, exp_bbox, crs, precision=0.00001, contains=True):
     assert publ_type == process_client.LAYER_TYPE
 
     with app.app_context():
@@ -132,4 +133,5 @@ def wms_bbox(workspace, publ_type, name, *, exp_bbox, crs, precision=0.00001):
     wms_layer = wms_get_capabilities.contents[name]
     bbox = next(bbox[:4] for bbox in wms_layer.crs_list if bbox[4] == crs)
     assert_util.assert_same_bboxes(exp_bbox, bbox, precision)
-    assert bbox_util.contains_bbox(bbox, exp_bbox, precision=precision / 10000)
+    if contains:
+        assert bbox_util.contains_bbox(bbox, exp_bbox, precision=precision / 10000)
