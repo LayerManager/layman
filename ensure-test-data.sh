@@ -54,7 +54,7 @@ data200transRoad=tmp/data200/trans/RoadL.shp
 if ! [ -f $data200transRoad ]; then
   curl -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36" -L -o $data200trans "https://geoportal.cuzk.cz/ZAKAZKY/Data200/TRANS.zip"
   unzip -q $data200trans -d $data200transJtsk
-  for f in tmp/data200/trans/jtsk/TRANS/RoadL.shp
+  for f in tmp/data200/trans/jtsk/RoadL.shp
   do
    echo "Processing $f"
     ogr2ogr -t_srs EPSG:3857 -lco ENCODING=UTF-8 tmp/data200/trans/$(basename $f) $f
