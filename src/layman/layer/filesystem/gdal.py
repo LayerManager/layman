@@ -235,30 +235,19 @@ def normalize_raster_file_async(input_path, crs_id, output_file):
             bash_args.extend([
                 '-co', 'ALPHA=YES',
             ])
-    # if output EPSG is the same as input EPSG, set pixel size (-tr) explicitly to the value of input
-    input_crs_equals_output_crs = crs_id == "EPSG:3857" or \
-        (crs_id is None and input_file.get_raster_crs_id(input_path) == "EPSG:3857")
-    if input_crs_equals_output_crs:
-        pixel_size = get_pixel_size(input_path)
-        tr_list = [str(ps) for ps in pixel_size]
-        tr_list.insert(0, '-tr')
-        bash_args.extend(tr_list)
+    pixel_size = get_pixel_size(input_path)
+    tr_list = [str(ps) for ps in pixel_size]
+    tr_list.insert(0, '-tr')
+    bash_args.extend(tr_list)
     if crs_id is not None:
         bash_args.extend([
             '-s_srs', f'{crs_id}',
         ])
-    # resampling method
-    if input_crs_equals_output_crs:
-        resampling_method = 'nearest'
-    elif color_interp == ['Palette']:
-        resampling_method = 'mode'
-    else:
-        resampling_method = 'bilinear'
+    resampling_method = 'nearest'
     bash_args.extend([
         '-r', resampling_method,
     ])
     bash_args.extend([
-        '-t_srs', 'EPSG:3857',
         input_path,
         output_file,
     ])
