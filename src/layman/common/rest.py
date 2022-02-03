@@ -1,6 +1,7 @@
 import re
 from flask import jsonify, make_response
 
+import crs as crs_def
 from layman import settings, util as layman_util, LaymanError
 from layman.authn import is_user_with_name
 from layman.common import bbox as bbox_util
@@ -154,6 +155,8 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
 
     bbox_filter = get_bbox_from_param(request_args, consts.FILTER_BBOX)
 
+    bbox_filter_crs = crs_def.EPSG_3857 if bbox_filter else None
+
     #########################################################
     # Ordering
     ordering_bbox = get_bbox_from_param(request_args, consts.ORDERING_BBOX)
@@ -206,6 +209,7 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
                                                                               limit=limit, offset=offset,
                                                                               full_text_filter=full_text_filter,
                                                                               bbox_filter=bbox_filter,
+                                                                              bbox_filter_crs=bbox_filter_crs,
                                                                               order_by_list=order_by_list,
                                                                               ordering_full_text=ordering_full_text,
                                                                               ordering_bbox=ordering_bbox,
