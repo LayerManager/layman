@@ -1,3 +1,4 @@
+import crs as crs_def
 from layman import util as layman_util, app
 from layman.common import bbox
 from layman.layer.geoserver import util as layer_gs_util
@@ -13,7 +14,7 @@ def get_map_with_internal_layers_json(layers, *, extent_3857=None):
                        max([maxx for _, _, maxx, _ in extents]), min([maxy for _, _, _, maxy in extents]), )
 
     with app.app_context():
-        extent_4326 = bbox.transform(extent_3857, crs_from='EPSG:3857', crs_to='EPSG:4326', )
+        extent_4326 = bbox.transform(extent_3857, crs_from=crs_def.EPSG_3857, crs_to=crs_def.EPSG_4326, )
     map_json = f'''
 {{
     "abstract": "Map generated for internal layers",

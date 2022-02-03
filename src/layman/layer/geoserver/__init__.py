@@ -109,7 +109,7 @@ def get_layer_native_bbox(workspace, layer):
 def publish_layer_from_db(workspace, layername, description, title, *, crs, geoserver_workspace=None):
     geoserver_workspace = geoserver_workspace or workspace
     bbox = get_layer_bbox(workspace, layername)
-    lat_lon_bbox = bbox_util.transform(bbox, crs, 'EPSG:4326')
+    lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
     gs_util.post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox)
 
 
@@ -124,7 +124,7 @@ def publish_layer_from_qgis(workspace, layer, description, title, *, geoserver_w
                              store_name,
                              layer_capabilities_url)
     bbox = get_layer_bbox(workspace, layer)
-    lat_lon_bbox = bbox_util.transform(bbox, crs, 'EPSG:4326')
+    lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
     gs_util.post_wms_layer(geoserver_workspace, layer, store_name, title, description, bbox, crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox)
 
 
