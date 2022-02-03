@@ -47,7 +47,7 @@ Query parameters:
   - `bbox` Layers will be ordered by similarity of bounding box with bounding box passed in *ordering_bbox* or *bbox_filter*. Can be used only in combination with  *ordering_bbox* or *bbox_filter*.
   
   If *full_text_filter* is set, default value is `full_text`; if *bbox_filter* is set, default value is `bbox`; otherwise default value is empty string, i.e. no ordering is guaranteed.
-- *ordering_bbox*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. The bounding box will be used for ordering. Can be used only if *order_by* is set to `bbox` (by default or explicitly).
+- *ordering_bbox*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. The bounding box will be used for ordering. Can be used only if *order_by* is set to `bbox` (by default or explicitly). If *order_by* is set to `bbox`, default value of *ordering_bbox* is the value of *bbox_filter*.
 - *limit*: Non-negative Integer. No more layers than this number will be returned. But possibly less, if the query itself yields fewer layers.
 - *offset*: Non-negative Integer. Says to skip that many layers before beginning to return layers.
 
