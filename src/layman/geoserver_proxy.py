@@ -176,18 +176,6 @@ def extract_workspace_from_url(url):
     return workspace
 
 
-def contains_vector_layer(layers):
-    result = False
-    for geoserver_workspace, layer in layers:
-        workspace = gs_wms.get_layman_workspace(geoserver_workspace)
-        publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, {'keys': ['file']})
-        file_type = publ_info.get('file', {}).get('file_type')
-        if file_type == settings.FILE_TYPE_VECTOR:
-            result = True
-            break
-    return result
-
-
 @bp.route('/<path:subpath>', methods=['POST', 'GET'])
 def proxy(subpath):
     app.logger.info(f"{request.method} GeoServer proxy, actor={g.user}, subpath={subpath}, url={request.url}, request.query_string={request.query_string.decode('UTF-8')}")
@@ -214,10 +202,10 @@ def proxy(subpath):
 
     query_params = CaseInsensitiveDict(request.args.to_dict())
 
-    # add buffer if incoming request is WMS GetMap in EPSG:3857 and one of SLD layers has native CRS EPSG:5514
-    # otherwise features are missing in the response in this specific case, we are not sure about the reason
+    # change CRS:84 to EPSG:4326 if one of SLD layers has native CRS EPSG:5514
+    # otherwise layers are shifted by hundreds of meters, we are not sure about the reason
     if query_params.get('service') == 'WMS' and query_params.get('request') == 'GetMap'\
-       and (query_params.get('crs') or query_params.get('srs')) in {crs_def.EPSG_3857, crs_def.CRS_84}:
+       and (query_params.get('crs') or query_params.get('srs')) == crs_def.CRS_84:
         layers = [layer.split(':') for layer in query_params.get('layers').split(',')]
         url_workspace = extract_workspace_from_url(subpath)
         layers = [layer if len(layer) == 2 else [url_workspace] + layer for layer in layers]
@@ -231,31 +219,16 @@ def proxy(subpath):
                 break
 
         if fix_params:
-            if (query_params.get('crs') or query_params.get('srs')) == crs_def.EPSG_3857 \
-                    and contains_vector_layer(layers):
-                try:
-                    width = float(query_params.get('width'))
-                    minx, _, maxx, _ = [float(c) for c in query_params.get('bbox').split(',')]
-                    resolution = (maxx - minx) / width
-                    buffer_in_meters = 400  # hopefully it's enough for any case
-                    buffer_in_pixels = round(buffer_in_meters / resolution)
-                    buffer_request = int(query_params.get('buffer', 0))
-                    if buffer_in_pixels > buffer_request:
-                        query_params['buffer'] = buffer_in_pixels
-                        query_params_string = parse.urlencode(query_params)
-                except ValueError:
-                    pass
-            elif (query_params.get('crs') or query_params.get('srs')) == crs_def.CRS_84:
-                if query_params.get('crs') == crs_def.CRS_84:
-                    param_key = 'crs'
-                    bbox = query_params['bbox'].split(',')
-                    bbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
-                    query_params['bbox'] = ",".join(bbox)
-                else:
-                    param_key = 'srs'
+            if query_params.get('crs') == crs_def.CRS_84:
+                param_key = 'crs'
+                bbox = query_params['bbox'].split(',')
+                bbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
+                query_params['bbox'] = ",".join(bbox)
+            else:
+                param_key = 'srs'
 
-                query_params[param_key] = crs_def.EPSG_4326
-                query_params_string = parse.urlencode(query_params)
+            query_params[param_key] = crs_def.EPSG_4326
+            query_params_string = parse.urlencode(query_params)
 
     url += '?' + query_params_string
 
