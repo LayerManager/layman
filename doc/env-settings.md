@@ -38,7 +38,7 @@ List of [EPSG codes](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Datas
    - Sample SRS list for Czech Republic: `4326,3857,5514,102067,32633,32634`
    - Sample SRS list for Latvia: `4326,3857,3059`
 
-During startup, Layman passes definitions of each EPSG to GeoServer, either from its internal sources, or from [epsg.io](https://epsg.io/). If download from epsg.io fails, warning `Not able to download EPSG definition from epsg.io` appears in log. In such case, you can [set EPSG definition manually](https://docs.geoserver.org/2.13.0/user/configuration/crshandling/customcrs.html) and restart GeoServer.
+During startup, Layman passes definitions of each EPSG to GeoServer, either from its internal sources, or from [epsg.io](https://epsg.io/). If download from epsg.io fails, warning `Not able to download EPSG definition from epsg.io` appears in log. In such case, you can [set EPSG definition manually](https://docs.geoserver.org/2.15.2/en/user/configuration/crshandling/customcrs.html) and restart GeoServer.
 
 If you want to be sure that GeoServer understands each of your SRS that you passed into LAYMAN_OUTPUT_SRS_LIST, visit GeoServer's admin GUI, page Services > WMS or WFS, and click on Submit. If you see no error message, everything is OK.
 

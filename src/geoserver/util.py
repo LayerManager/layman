@@ -37,6 +37,10 @@ headers_json = {
     'Content-type': 'application/json',
 }
 
+headers_xml = {
+    'Content-type': 'text/xml',
+}
+
 headers_sld = {
     'Accept': 'application/vnd.ogc.sld+xml',
     'Content-type': 'application/xml',
@@ -62,7 +66,7 @@ def get_roles(auth):
                             timeout=GS_REST_TIMEOUT,
                             )
     response.raise_for_status()
-    return response.json()['roleNames']
+    return response.json()['roles']
 
 
 def ensure_role(role, auth):
@@ -345,16 +349,8 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
         sld_file = io.BytesIO(response.content)
     response = requests.post(
         get_workspace_style_url(geoserver_workspace),
-        data=json.dumps(
-            {
-                "style": {
-                    "name": layername,
-                    "format": "sld",
-                    "filename": layername + ".sld"
-                }
-            }
-        ),
-        headers=headers_json,
+        data=f"<style><name>{layername}</name><filename>{layername}.sld</filename></style>",
+        headers=headers_xml,
         auth=GS_AUTH,
         timeout=GS_REST_TIMEOUT,
     )
@@ -818,7 +814,7 @@ def get_user_roles(user, auth):
                             timeout=GS_REST_TIMEOUT,
                             )
     response.raise_for_status()
-    return response.json()['roleNames']
+    return response.json()['roles']
 
 
 def ensure_user_role(user, role, auth):
