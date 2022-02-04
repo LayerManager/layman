@@ -1,7 +1,7 @@
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
-from test_tools import process_client
-from . import util, common_layers as layers
+from test_tools import process_client, util
+from . import common_layers as layers
 from ... import Action, Publication, dynamic_data as consts
 
 KEY_PUBLICATION_TYPE = 'publ_type'
