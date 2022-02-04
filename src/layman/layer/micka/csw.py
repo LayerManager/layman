@@ -11,6 +11,7 @@ import crs as crs_def
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util, requests as micka_requests
 from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
+from layman.layer.prime_db_schema import table as prime_db_table
 from layman.layer.filesystem import gdal
 from layman.layer.filesystem.uuid import get_layer_uuid
 from layman.layer import db
@@ -149,11 +150,13 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         wfs_url = wfs.get_wfs_url(workspace, external_url=True)
     elif file_type == settings.FILE_TYPE_RASTER:
         languages = []
-        distance_value = gdal.get_normalized_ground_sample_distance(workspace, layername)
+        bbox_sphere_size = prime_db_table.get_bbox_sphere_size(workspace, layername)
+        distance_value = gdal.get_normalized_ground_sample_distance_in_m(workspace, layername,
+                                                                         bbox_size=bbox_sphere_size)
         spatial_resolution = {
             'ground_sample_distance': {
                 'value': distance_value,
-                'uom': 'm',  # EPSG:3857
+                'uom': 'm',
             }
         }
         wfs_url = None
