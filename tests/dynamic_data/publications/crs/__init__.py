@@ -13,6 +13,7 @@ KEY_ACTION_PARAMS = 'action_params'
 KEY_FILE_NAME = 'file_suffix'
 KEY_INFO_VALUES = 'info_values'
 KEY_THUMBNAIL = 'thumbnail'
+KEY_ONLY_FIRST_PARAMETRIZATION = 'only_first_parametrization'
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -136,46 +137,44 @@ def generate_local(workspace=None):
                          **tc_params.get(KEY_ACTION_PARAMS, dict()),
                          }
 
-        parametrization = {key: values for key, values in REST_PARAMETRIZATION.items()
-                           if key not in action_params}
-        rest_param_dicts = util.dictionary_product(parametrization)
+        action_parametrization = util.get_test_case_parametrization(param_parametrization=REST_PARAMETRIZATION,
+                                                                    only_first_parametrization=tc_params.get(
+                                                                        KEY_ONLY_FIRST_PARAMETRIZATION,
+                                                                        True),
+                                                                    default_params=action_params,
+                                                                    action_parametrization=layers.DEFAULT_ACTIONS,
+                                                                    )
 
         info_values = tc_params[KEY_INFO_VALUES]
         exp_thumbnail = tc_params[KEY_THUMBNAIL]
 
-        for rest_param_dict in rest_param_dicts:
-            for action_code, action_method, action_predecessor in layers.DEFAULT_ACTIONS:
-                test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
-                                              for key, value in rest_param_dict.items()
-                                              if REST_PARAMETRIZATION[key][value]])
-                publ_name = "_".join([part for part in [testcase, action_code, test_case_postfix] if part])
-                if any(k in rest_param_dict and rest_param_dict[k] != v for k, v in action_params.items()):
-                    continue
+        for test_case_postfix, action_method, action_predecessor, rest_param_dict in action_parametrization:
+            publ_name = "_".join([part for part in [testcase, test_case_postfix] if part])
 
-                post_info_values = copy.deepcopy(info_values)
-                if rest_param_dict.get('compress', False):
-                    post_info_values['gdal_prefix'] = '/vsizip/'
-                    post_info_values['file_extension'] = f'zip/{file_name}.shp'
+            post_info_values = copy.deepcopy(info_values)
+            if rest_param_dict.get('compress', False):
+                post_info_values['gdal_prefix'] = '/vsizip/'
+                post_info_values['file_extension'] = f'zip/{file_name}.shp'
 
-                action_def = {
-                    consts.KEY_ACTION: {
-                        consts.KEY_CALL: Action(action_method,
-                                                {**action_params,
-                                                 **rest_param_dict}),
-                        consts.KEY_RESPONSE_ASSERTS: [
-                            Action(processing.response.valid_post, dict()),
-                        ],
-                    },
-                    consts.KEY_FINAL_ASSERTS: [
-                        *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                        Action(publication.internal.correct_values_in_detail, copy.deepcopy(post_info_values)),
-                        Action(publication.internal.thumbnail_equals, {'exp_thumbnail': exp_thumbnail, }),
-                        *tc_params.get(consts.KEY_FINAL_ASSERTS, list()),
-                    ]
-                }
-                actions_list = copy.deepcopy(action_predecessor)
-                actions_list.append(action_def)
-                result[Publication(workspace, process_client.LAYER_TYPE, publ_name)] = actions_list
+            action_def = {
+                consts.KEY_ACTION: {
+                    consts.KEY_CALL: Action(action_method,
+                                            {**action_params,
+                                             **rest_param_dict}),
+                    consts.KEY_RESPONSE_ASSERTS: [
+                        Action(processing.response.valid_post, dict()),
+                    ],
+                },
+                consts.KEY_FINAL_ASSERTS: [
+                    *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                    Action(publication.internal.correct_values_in_detail, copy.deepcopy(post_info_values)),
+                    Action(publication.internal.thumbnail_equals, {'exp_thumbnail': exp_thumbnail, }),
+                    *tc_params.get(consts.KEY_FINAL_ASSERTS, list()),
+                ]
+            }
+            actions_list = copy.deepcopy(action_predecessor)
+            actions_list.append(action_def)
+            result[Publication(workspace, process_client.LAYER_TYPE, publ_name)] = actions_list
 
     return result
 
