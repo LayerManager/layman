@@ -149,3 +149,8 @@ DEFAULT_POST = {
         *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
     ]
 }
+
+DEFAULT_ACTIONS = [
+    ('post', process_client.publish_workspace_publication, []),
+    ('patch', process_client.patch_workspace_publication, [DEFAULT_POST])
+]
