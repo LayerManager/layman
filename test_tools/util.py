@@ -1,3 +1,4 @@
+import copy
 import itertools
 import time
 from zipfile import ZipFile
@@ -116,3 +117,32 @@ def dictionary_product(source):
     values = itertools.product(*all_values)
     param_dict = [{names[idx]: value for idx, value in enumerate(vals)} for vals in values]
     return param_dict
+
+
+def get_test_case_parametrization(*, param_parametrization, only_first_parametrization, default_params, action_parametrization):
+    result = list()
+
+    parametrization = copy.deepcopy(param_parametrization)
+    if default_params:
+        for param_name, param_value in default_params.items():
+            if param_name in parametrization:
+                parametrization[param_name] = {default_params[param_name]: parametrization[param_name][param_value]}
+
+    if only_first_parametrization:
+        action_code, action_method, action_predecessor = action_parametrization[0]
+        action_params = {param_name: next(iter(param_values.keys())) for param_name, param_values in parametrization.items()}
+        postfix = '_'.join([action_code] + [parametrization[key][value]
+                                            for key, value in action_params.items()
+                                            if parametrization[key][value]])
+
+        result = [(postfix, action_method, action_predecessor, action_params), ]
+    else:
+        for action_code, action_method, action_predecessor in action_parametrization:
+            rest_param_dicts = dictionary_product(parametrization)
+            for rest_param_dict in rest_param_dicts:
+                postfix = '_'.join([action_code] + [parametrization[key][value]
+                                                    for key, value in rest_param_dict.items()
+                                                    if parametrization[key][value]])
+                result.append((postfix, action_method, action_predecessor, rest_param_dict))
+
+    return result
