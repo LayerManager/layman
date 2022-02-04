@@ -1,7 +1,7 @@
 import pytest
 from layman import app, settings, LaymanError
 from . import get_publications_consts
-from .rest import parse_request_path, get_integer_from_param
+from .rest import parse_request_path, get_integer_from_param, get_bbox_from_param
 
 
 @pytest.mark.parametrize('request_path', [
@@ -69,6 +69,31 @@ def test_get_integer_from_param(request_args, param_name, expected_value):
 def test_get_integer_from_param_fail(request_args, param_name, other_params, expected_expected):
     with pytest.raises(LaymanError) as exc_info:
         get_integer_from_param(request_args, param_name, **other_params)
+    assert exc_info.value.code == 2
+    assert exc_info.value.http_code == 400
+    assert exc_info.value.data['expected'] == expected_expected
+
+
+@pytest.mark.parametrize('request_args, param_name, expected_value', [
+    (dict(), 'bbox', None),
+    ({'bbox': '8,8,8,8'}, 'bbox', (8, 8, 8, 8)),
+    ({'bbox': '-4.5,-3.4,-2.3,-1.2'}, 'bbox', (-4.5, -3.4, -2.3, -1.2)),
+])
+def test_get_bbox_from_param(request_args, param_name, expected_value):
+    result = get_bbox_from_param(request_args, param_name)
+    assert result == expected_value
+
+
+@pytest.mark.parametrize('request_args, param_name, expected_expected', [
+    ({'bbox': '100'}, 'bbox', {'text': 'Four comma-separated coordinates: minx,miny,maxx,maxy',
+                               'regular_expression': get_publications_consts.BBOX_PATTERN}),
+    ({'bbox': '8, 8, 8, 8'}, 'bbox', {'text': 'Four comma-separated coordinates: minx,miny,maxx,maxy',
+                                      'regular_expression': get_publications_consts.BBOX_PATTERN}),
+    ({'bbox': '4.5,3.4,2.3,1.2'}, 'bbox', 'minx <= maxx and miny <= maxy'),
+])
+def test_get_bbox_from_param_fail(request_args, param_name, expected_expected):
+    with pytest.raises(LaymanError) as exc_info:
+        get_bbox_from_param(request_args, param_name)
     assert exc_info.value.code == 2
     assert exc_info.value.http_code == 400
     assert exc_info.value.data['expected'] == expected_expected
