@@ -7,6 +7,7 @@
 - Unset environment variable [LAYMAN_SETTINGS_MODULE](https://github.com/LayerManager/layman/blob/v1.15.0/doc/env-settings.md), it has no effect anymore.
 - If you are running Layman with development settings, run  
 ```
+make geoserver-build
 make timgen-build
 ```
 ### Migrations and checks
@@ -14,6 +15,7 @@ make timgen-build
 - [#64](https://github.com/LayerManager/layman/issues/64) Create new column `srid` in `publication` table.
 #### Data migrations
 ### Changes
+- [#64](https://github.com/LayerManager/layman/issues/64) Upgrade GeoServer to 2.15.2, because 2.13.0 had serious problem with transformations of EPSG:5514.
 - [#64](https://github.com/LayerManager/layman/issues/64) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-maps), [GET Workspace Map](doc/rest.md#get-workspace-map), [PATCH Workspace Map](doc/rest.md#patch-workspace-map) contains new attribute
    - `native_crs` with code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326"
    - `native_bounding_box` with coordinates in native CRS  [minx, miny, maxx, maxy]
@@ -305,7 +307,7 @@ make timgen-build
    - Sample SRS list for Czech Republic: `4326,3857,5514,102067,32633,32634`
    - Sample SRS list for Latvia: `4326,3857,3059`
 
-  During startup, Layman passes definitions of each EPSG to GeoServer, either from its internal sources, or from [epsg.io](https://epsg.io/). If download from epsg.io fails, warning `Not able to download EPSG definition from epsg.io` appears in log. In such case, you can [set EPSG definition manually](https://docs.geoserver.org/2.13.0/user/configuration/crshandling/customcrs.html) and restart GeoServer.
+  During startup, Layman passes definitions of each EPSG to GeoServer, either from its internal sources, or from [epsg.io](https://epsg.io/). If download from epsg.io fails, warning `Not able to download EPSG definition from epsg.io` appears in log. In such case, you can [set EPSG definition manually](https://docs.geoserver.org/2.15.x/en/user/configuration/crshandling/customcrs.html) and restart GeoServer.
 
   If you want to be sure that GeoServer understands each of your SRS that you passed into LAYMAN_OUTPUT_SRS_LIST, visit GeoServer's admin GUI, page Services > WMS or WFS, and click on Submit. If you see no error message, everything is OK.
   

@@ -76,7 +76,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
                                 auth=auth
                                 )
         response.raise_for_status()
-        roles = response.json()['roleNames']
+        roles = response.json()['roles']
 
         if settings.LAYMAN_GS_ROLE in roles:
             response = requests.delete(

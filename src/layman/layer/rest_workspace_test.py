@@ -657,7 +657,7 @@ def test_uppercase_attr(client):
         sld_file = io.BytesIO(response.content)
         tree = ET.parse(sld_file)
         root = tree.getroot()
-        assert root.attrib['version'] == '1.0.0'
+        assert root.attrib['version'] == '1.1.0'
 
         feature_type = get_feature_type(workspace, 'postgresql', layername)
         attributes = feature_type['attributes']['attribute']
@@ -871,11 +871,8 @@ def test_post_layers_sld_1_1_0(client):
     sld_file = io.BytesIO(response.content)
     tree = ET.parse(sld_file)
     root = tree.getroot()
-    # for some reason, GeoServer REST API in 2.13.0 transforms SLD 1.1.0 to 1.0.0
-    # web interface is not doing this
-    # assert root.attrib['version'] == '1.1.0'
-    assert root.attrib['version'] == '1.0.0'
-    assert root[0][1][1][1][1][0][0].text == '#e31a1c'
+    assert root.attrib['version'] == '1.1.0'
+    assert root[0][1][1][0][1][0][0].text == '#e31a1c'
     # assert wms[layername].styles[
     #     username+':'+layername]['title'] == 'test_layer2'
 
