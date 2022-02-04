@@ -453,3 +453,36 @@ def set_bbox(workspace, publication_type, publication, bbox, crs, ):
       and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
     params = cropped_bbox + (srid, publication_type, publication, workspace,)
     db_util.run_statement(query, params)
+
+
+def get_bbox_sphere_size(workspace, publication_type, publication):
+    query = f"""
+    select
+        ST_DistanceSphere(
+            st_transform(st_setsrid(ST_MakePoint(
+                ST_XMin(bbox),
+                (ST_YMax(bbox) + ST_YMin(bbox)) / 2
+            ), srid), 4326),
+            st_transform(st_setsrid(ST_MakePoint(
+                ST_XMax(bbox),
+                (ST_YMax(bbox) + ST_YMin(bbox)) / 2
+            ), srid), 4326)
+        ) as x_size,
+        ST_DistanceSphere(
+            st_transform(st_setsrid(ST_MakePoint(
+                    ST_YMin(bbox),
+                    (ST_XMax(bbox) + ST_XMin(bbox)) / 2
+            ), srid), 4326),
+            st_transform(st_setsrid(ST_MakePoint(
+                ST_YMax(bbox),
+                (ST_XMax(bbox) + ST_XMin(bbox)) / 2
+            ), srid), 4326)
+        ) as y_size
+    from {DB_SCHEMA}.publications
+    where type = %s
+      and name = %s
+      and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s)
+        """
+
+    [x_size, y_size] = db_util.run_query(query, (publication_type, publication, workspace))[0]
+    return [x_size, y_size]

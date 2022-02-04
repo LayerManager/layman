@@ -340,9 +340,9 @@ def get_crs(workspace, layer):
     return crs
 
 
-def get_normalized_ground_sample_distance(workspace, layer):
+def get_normalized_ground_sample_distance_in_m(workspace, layer, *, bbox_size):
     filepath = get_normalized_raster_layer_main_filepath(workspace, layer)
-    pixel_size = get_pixel_size(filepath)
-    abs_pixel_size = [abs(size) for size in pixel_size]
-    distance_value = sum(abs_pixel_size) / len(abs_pixel_size)
+    raster_size = get_raster_size(filepath)
+    pixel_size = [bbox_size / raster_size[idx] for (idx, bbox_size) in enumerate(bbox_size)]
+    distance_value = sum(pixel_size) / len(pixel_size)
     return distance_value

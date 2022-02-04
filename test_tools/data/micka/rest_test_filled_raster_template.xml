@@ -235,7 +235,7 @@
       <gmd:spatialResolution>
         <gmd:MD_Resolution>
           <gmd:distance>
-            <gco:Distance uom="m">0.043745341126665845</gco:Distance>
+            <gco:Distance uom="m">0.030247838093669925</gco:Distance>
           </gmd:distance>
         </gmd:MD_Resolution>
       </gmd:spatialResolution>

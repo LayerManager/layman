@@ -77,3 +77,7 @@ def post_layer(workspace,
                'style_type': style_type.code if style_type else None,
                }
     pubs_util.insert_publication(workspace, db_info)
+
+
+def get_bbox_sphere_size(workspace, layername):
+    return pubs_util.get_bbox_sphere_size(workspace, LAYER_TYPE, layername)
