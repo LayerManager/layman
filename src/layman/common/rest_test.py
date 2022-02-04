@@ -1,7 +1,7 @@
 import pytest
 from layman import app, settings, LaymanError
 from . import get_publications_consts
-from .rest import parse_request_path, get_integer_from_param, get_bbox_from_param
+from .rest import parse_request_path, get_integer_from_param, get_bbox_from_param, get_crs_from_param
 
 
 @pytest.mark.parametrize('request_path', [
@@ -94,6 +94,30 @@ def test_get_bbox_from_param(request_args, param_name, expected_value):
 def test_get_bbox_from_param_fail(request_args, param_name, expected_expected):
     with pytest.raises(LaymanError) as exc_info:
         get_bbox_from_param(request_args, param_name)
+    assert exc_info.value.code == 2
+    assert exc_info.value.http_code == 400
+    assert exc_info.value.data['expected'] == expected_expected
+
+
+@pytest.mark.parametrize('request_args, param_name, expected_value', [
+    (dict(), 'crs', None),
+    ({'crs': 'EPSG:3857'}, 'crs', 'EPSG:3857'),
+    ({'crs': 'EPSG:5514'}, 'crs', 'EPSG:5514'),
+])
+def test_get_crs_from_param(request_args, param_name, expected_value):
+    result = get_crs_from_param(request_args, param_name)
+    assert result == expected_value
+
+
+@pytest.mark.parametrize('request_args, param_name, expected_expected', [
+    ({'crs': 'CRS:84'}, 'crs', settings.LAYMAN_OUTPUT_SRS_LIST),
+    ({'crs': 'epsg:3857'}, 'crs', settings.LAYMAN_OUTPUT_SRS_LIST),
+    ({'crs': '3857'}, 'crs', {'text': 'One CRS name: AUTHORITY:CODE',
+                                      'regular_expression': get_publications_consts.CRS_PATTERN}),
+])
+def test_get_crs_from_param_fail(request_args, param_name, expected_expected):
+    with pytest.raises(LaymanError) as exc_info:
+        get_crs_from_param(request_args, param_name)
     assert exc_info.value.code == 2
     assert exc_info.value.http_code == 400
     assert exc_info.value.data['expected'] == expected_expected
