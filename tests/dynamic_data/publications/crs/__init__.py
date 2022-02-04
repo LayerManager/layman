@@ -144,10 +144,7 @@ def generate_local(workspace=None):
         exp_thumbnail = tc_params[KEY_THUMBNAIL]
 
         for rest_param_dict in rest_param_dicts:
-            for action_code, action_method, action_predecessor in [
-                ('post', process_client.publish_workspace_publication, []),
-                ('patch', process_client.patch_workspace_publication, [layers.DEFAULT_POST])
-            ]:
+            for action_code, action_method, action_predecessor in layers.DEFAULT_ACTIONS:
                 test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
                                               for key, value in rest_param_dict.items()
                                               if REST_PARAMETRIZATION[key][value]])
