@@ -10,6 +10,7 @@ from ... import common_layers as layers
 from ..... import Action, Publication, dynamic_data as consts
 
 KEY_INFO_VALUES = 'info_values'
+KEY_ONLY_FIRST_PARAMETRIZATION = 'only_first_parametrization'
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -26,6 +27,11 @@ SOURCE_EPSG_CODES = {
                 'native_bounding_box': [16.6066275955110711, 49.1989353676069285, 16.6068125589999127, 49.1990477233154735],
             }
         },
+        consts.KEY_ACTION: {
+            'with_chunks': False,
+            'compress': False,
+        },
+        KEY_ONLY_FIRST_PARAMETRIZATION: False,
     },
     crs_def.EPSG_3857: {
         KEY_INFO_VALUES: {
@@ -33,6 +39,11 @@ SOURCE_EPSG_CODES = {
                 'native_bounding_box': [1848641.3277258177, 6308684.223766193, 1848661.9177672109, 6308703.364768417],
             }
         },
+        consts.KEY_ACTION: {
+            'with_chunks': False,
+            'compress': False,
+        },
+        KEY_ONLY_FIRST_PARAMETRIZATION: False,
     },
     crs_def.EPSG_5514: {
         KEY_INFO_VALUES: {
@@ -41,6 +52,7 @@ SOURCE_EPSG_CODES = {
                 'bounding_box': [1848640.4769060146, 6308683.577507495, 1848663.461145939, 6308704.681240051],
             }
         },
+        KEY_ONLY_FIRST_PARAMETRIZATION: False,
     },
     crs_def.EPSG_32633: {
         KEY_INFO_VALUES: {
@@ -184,9 +196,12 @@ def generate(workspace=None):
             for crs, bbox in bboxes.items()
         ]
 
-        parametrization = {key: values for key, values in REST_PARAMETRIZATION.items()
-                           if key not in action_params}
-        rest_param_dicts = util.dictionary_product(parametrization)
+        action_parametrization = util.get_test_case_parametrization(param_parametrization=REST_PARAMETRIZATION,
+                                                                    only_first_parametrization=tc_params.get(
+                                                                        KEY_ONLY_FIRST_PARAMETRIZATION, True),
+                                                                    default_params=tc_params.get(consts.KEY_ACTION),
+                                                                    action_parametrization=layers.DEFAULT_ACTIONS,
+                                                                    )
 
         def_info_values = copy.deepcopy(def_publ_info_values)
         def_info_values['exp_publication_detail']['native_crs'] = crs
@@ -194,7 +209,7 @@ def generate(workspace=None):
 
         exp_thumbnail = f'{DIRECTORY}/sample_point_cz_{crs_code}_thumbnail.png'
 
-        for rest_param_dict in rest_param_dicts:
+        for test_case_postfix, action_method, action_predecessor, rest_param_dict in action_parametrization:
             wms_spacial_precision_assert = [Action(publication.geoserver.wms_spatial_precision, {
                 'crs': wms_crs,
                 'extent': extent,
@@ -216,50 +231,44 @@ def generate(workspace=None):
                 f'len(wms_spacial_precision_assert)={len(wms_spacial_precision_assert)}, \n' \
                 f'wms_spacial_precision_assert={wms_spacial_precision_assert}'
 
-            for action_code, action_method, action_predecessor in layers.DEFAULT_ACTIONS:
-                test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
-                                              for key, value in rest_param_dict.items()
-                                              if REST_PARAMETRIZATION[key][value]])
-                publ_name = "_".join([part for part in ['points', f'{crs_code}', action_code, test_case_postfix] if part])
-                if any(k in rest_param_dict and rest_param_dict[k] != v for k, v in action_params.items()):
-                    continue
+            publ_name = "_".join([part for part in ['points', f'{crs_code}', test_case_postfix] if part])
 
-                post_info_values = copy.deepcopy(def_info_values)
-                post_info_values['exp_publication_detail']['native_crs'] = crs
-                if rest_param_dict.get('compress'):
-                    post_info_values['gdal_prefix'] = '/vsizip/'
-                    post_info_values['file_extension'] = f'zip/sample_point_cz_{crs_code}.shp'
-                if rest_param_dict.get('style_file'):
-                    post_info_values['publ_type_detail'] = ('vector', REST_PARAMETRIZATION['style_file'][rest_param_dict['style_file']])
+            post_info_values = copy.deepcopy(def_info_values)
+            post_info_values['exp_publication_detail']['native_crs'] = crs
+            if rest_param_dict.get('compress'):
+                post_info_values['gdal_prefix'] = '/vsizip/'
+                post_info_values['file_extension'] = f'zip/sample_point_cz_{crs_code}.shp'
+            if rest_param_dict.get('style_file'):
+                post_info_values['publ_type_detail'] = ('vector', REST_PARAMETRIZATION['style_file'][rest_param_dict['style_file']])
 
-                action_def = {
-                    consts.KEY_ACTION: {
-                        consts.KEY_CALL: Action(action_method,
-                                                {**action_params,
-                                                 **rest_param_dict}),
-                        consts.KEY_RESPONSE_ASSERTS: [
-                            Action(processing.response.valid_post, dict()),
-                        ],
-                    },
-                    consts.KEY_FINAL_ASSERTS: [
-                        *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                        Action(publication.internal.correct_values_in_detail, copy.deepcopy(post_info_values)),
-                        Action(publication.internal.thumbnail_equals, {'exp_thumbnail': exp_thumbnail, }),
-                        *feature_spacial_precision_assert,
-                        *wms_spacial_precision_assert,
-                        Action(publication.internal.detail_3857bbox_value, {'exp_bbox': bboxes[crs_def.EPSG_3857]['bbox'],
-                                                                            'precision': bboxes[crs_def.EPSG_3857]['precision'],
-                                                                            }),
-                        Action(publication.geoserver.wfs_bbox, {'exp_bbox': bboxes['CRS:84']['bbox'],
-                                                                'precision': bboxes['CRS:84']['precision'],
-                                                                }),
-                        Action(publication.geoserver.wms_geographic_bbox, {'exp_bbox': bboxes['CRS:84']['bbox'],
-                                                                           'precision': bboxes['CRS:84']['precision'],
-                                                                           }),
-                        *wms_bbox_actions,
-                    ]
-                }
-                actions_list = copy.deepcopy(action_predecessor)
-                actions_list.append(action_def)
-                result[Publication(workspace, process_client.LAYER_TYPE, publ_name)] = actions_list
+            action_def = {
+                consts.KEY_ACTION: {
+                    consts.KEY_CALL: Action(action_method,
+                                            {**action_params,
+                                             **rest_param_dict}),
+                    consts.KEY_RESPONSE_ASSERTS: [
+                        Action(processing.response.valid_post, dict()),
+                    ],
+                },
+                consts.KEY_FINAL_ASSERTS: [
+                    *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                    Action(publication.internal.correct_values_in_detail, copy.deepcopy(post_info_values)),
+                    Action(publication.internal.thumbnail_equals, {'exp_thumbnail': exp_thumbnail, }),
+                    *feature_spacial_precision_assert,
+                    *wms_spacial_precision_assert,
+                    Action(publication.internal.detail_3857bbox_value, {'exp_bbox': bboxes[crs_def.EPSG_3857]['bbox'],
+                                                                        'precision': bboxes[crs_def.EPSG_3857]['precision'],
+                                                                        }),
+                    Action(publication.geoserver.wfs_bbox, {'exp_bbox': bboxes['CRS:84']['bbox'],
+                                                            'precision': bboxes['CRS:84']['precision'],
+                                                            }),
+                    Action(publication.geoserver.wms_geographic_bbox, {'exp_bbox': bboxes['CRS:84']['bbox'],
+                                                                       'precision': bboxes['CRS:84']['precision'],
+                                                                       }),
+                    *wms_bbox_actions,
+                ]
+            }
+            actions_list = copy.deepcopy(action_predecessor)
+            actions_list.append(action_def)
+            result[Publication(workspace, process_client.LAYER_TYPE, publ_name)] = actions_list
     return result
