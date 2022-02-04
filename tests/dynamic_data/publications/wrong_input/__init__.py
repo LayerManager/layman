@@ -15,6 +15,7 @@ KEY_EXPECTED_EXCEPTION = 'expected_exception'
 KEY_DEFAULT = 'default'
 KEY_PATCHES = 'patches'
 KEY_PATCH_POST = 'post_params'
+KEY_ONLY_FIRST_PARAMETRIZATION = 'only_first_parametrization'
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -502,12 +503,13 @@ def generate(workspace=None):
 
     result = dict()
     for testcase, tc_params in TESTCASES.items():
-        for rest_param_dict in util.dictionary_product(REST_PARAMETRIZATION):
-            test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
-                                          for key, value in rest_param_dict.items()
-                                          if REST_PARAMETRIZATION[key][value]])
-            if any(k in rest_param_dict and rest_param_dict[k] != v for k, v in tc_params[KEY_ACTION_PARAMS].items()):
-                continue
+        action_parametrization = util.get_test_case_parametrization(param_parametrization=REST_PARAMETRIZATION,
+                                                                    only_first_parametrization=tc_params.get(
+                                                                        KEY_ONLY_FIRST_PARAMETRIZATION, True),
+                                                                    default_params=tc_params[KEY_ACTION_PARAMS],
+                                                                    action_parametrization=[('', None, []), ],
+                                                                    )
+        for test_case_postfix, _, _, rest_param_dict in action_parametrization:
             rest_param_frozen_set = frozenset(rest_param_dict.items())
             default_exp_exception = copy.deepcopy(tc_params[KEY_EXPECTED_EXCEPTION][KEY_DEFAULT])
             exception_diff = tc_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, dict())
@@ -547,17 +549,18 @@ def generate(workspace=None):
                     ],
                 }
                 action_list = [action_def, VALIDATION_PATCH_ACTION]
-            publ_name = f"{testcase}_post_{test_case_postfix}"
+            publ_name = f"{testcase}_post{test_case_postfix}"
             result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = action_list
 
         for patch_key, patch_params in tc_params.get(KEY_PATCHES, dict()).items():
-            for rest_param_dict in util.dictionary_product(REST_PARAMETRIZATION):
-                test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
-                                              for key, value in rest_param_dict.items()
-                                              if REST_PARAMETRIZATION[key][value]])
-                if any(k in rest_param_dict and rest_param_dict[k] != v for k, v in
-                       tc_params[KEY_ACTION_PARAMS].items()):
-                    continue
+            action_parametrization = util.get_test_case_parametrization(param_parametrization=REST_PARAMETRIZATION,
+                                                                        only_first_parametrization=tc_params.get(
+                                                                            KEY_ONLY_FIRST_PARAMETRIZATION, True),
+                                                                        default_params={**tc_params[KEY_ACTION_PARAMS],
+                                                                                        **patch_params.get(KEY_ACTION_PARAMS, dict())},
+                                                                        action_parametrization=[('', None, []), ],
+                                                                        )
+            for test_case_postfix, _, _, rest_param_dict in action_parametrization:
                 patch = [
                     {
                         consts.KEY_ACTION: {
@@ -616,7 +619,7 @@ def generate(workspace=None):
                     }
                     patch.append(action_def)
                     patch.append(VALIDATION_PATCH_ACTION)
-                publ_name = f"{testcase}_patch_{patch_key}_{test_case_postfix}"
+                publ_name = f"{testcase}_patch_{patch_key}{test_case_postfix}"
                 result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = patch
 
     return result
