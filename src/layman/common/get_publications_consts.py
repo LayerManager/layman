@@ -12,6 +12,7 @@ ORDER_BY_TITLE = 'title'
 ORDER_BY_LAST_CHANGE = 'last_change'
 ORDER_BY_BBOX = 'bbox'
 ORDERING_BBOX = 'ordering_bbox'
+ORDERING_BBOX_CRS = 'ordering_bbox_crs'
 
 LIMIT = 'limit'
 OFFSET = 'offset'
