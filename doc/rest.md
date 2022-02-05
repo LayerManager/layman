@@ -38,7 +38,7 @@ Query parameters:
 - *full_text_filter*: String. Only layers satisfying any of following conditions are returned:
   - Any word from input string appears in title. Search is case-insensitive, unaccent and does lemmatization for English.
   - Input string appears as substring of title. Search is case-insensitive and unaccent.
-- *bbox_filter*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. Only layers whose bounding box intersects with given bounding box will be returned.
+- *bbox_filter*: String. Bounding box defined by four comma-separated coordinates `minx,miny,maxx,maxy`. Only layers whose bounding box intersects with given bounding box will be returned.
 - *bbox_filter_crs*: String. CRS of *bbox_filter*, default value is `EPSG:3857`, has to be one of [LAYMAN_OUTPUT_SRS_LIST](env-settings.md#LAYMAN_OUTPUT_SRS_LIST).
 - *order_by*: String. Can be one of these values:
   - `full_text` Layers will be ordered by results of full-text search. Can be used only in combination with *full_text_filter*.
@@ -47,7 +47,8 @@ Query parameters:
   - `bbox` Layers will be ordered by similarity of bounding box with bounding box passed in *ordering_bbox* or *bbox_filter*. Can be used only in combination with  *ordering_bbox* or *bbox_filter*.
   
   If *full_text_filter* is set, default value is `full_text`; if *bbox_filter* is set, default value is `bbox`; otherwise default value is empty string, i.e. no ordering is guaranteed.
-- *ordering_bbox*: String. Bounding box in EPSG:3857 defined by four comma-separated coordinates `minx,miny,maxx,maxy`. The bounding box will be used for ordering. Can be used only if *order_by* is set to `bbox` (by default or explicitly). If *order_by* is set to `bbox`, default value of *ordering_bbox* is the value of *bbox_filter*.
+- *ordering_bbox*: String. Bounding box defined by four comma-separated coordinates `minx,miny,maxx,maxy`. The bounding box will be used for ordering. Can be used only if *order_by* is set to `bbox` (by default or explicitly). If *order_by* is set to `bbox`, default value of *ordering_bbox* is the value of *bbox_filter*.
+- *ordering_bbox_crs*: String. CRS of *ordering_bbox*, default value is *bbox_filter_crs* if defined otherwise `EPSG:3857`, has to be one of [LAYMAN_OUTPUT_SRS_LIST](env-settings.md#LAYMAN_OUTPUT_SRS_LIST).
 - *limit*: Non-negative Integer. No more layers than this number will be returned. But possibly less, if the query itself yields fewer layers.
 - *offset*: Non-negative Integer. Says to skip that many layers before beginning to return layers.
 

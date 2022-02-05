@@ -176,7 +176,9 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
     #########################################################
     # Ordering
     ordering_bbox = get_bbox_from_param(request_args, consts.ORDERING_BBOX)
-    ordering_bbox_crs = crs_def.EPSG_3857 if ordering_bbox else None
+    ordering_bbox_crs = get_crs_from_param(request_args, consts.ORDERING_BBOX_CRS)
+
+    ordering_bbox_crs = ordering_bbox_crs or ((bbox_filter_crs or crs_def.EPSG_3857) if ordering_bbox else None)
 
     explicit_order_by_value = request_args.get(consts.ORDER_BY_PARAM)
     if explicit_order_by_value:
@@ -212,6 +214,14 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
     if ordering_bbox and order_by_value != consts.ORDER_BY_BBOX:
         raise LaymanError(48, f'Parameter "{consts.ORDERING_BBOX}" can be set only if '
                               f'parameter "{consts.ORDER_BY_PARAM}" is set to {consts.ORDER_BY_BBOX}.')
+
+    if bbox_filter_crs and not bbox_filter:
+        raise LaymanError(48, f'Parameter "{consts.FILTER_BBOX_CRS}" can be set only if '
+                              f'parameter "{consts.FILTER_BBOX}" is set.')
+
+    if ordering_bbox_crs and not ordering_bbox:
+        raise LaymanError(48, f'Parameter "{consts.ORDERING_BBOX_CRS}" can be set only if '
+                              f'parameter "{consts.ORDERING_BBOX}" is set.')
 
     #########################################################
     # Pagination
