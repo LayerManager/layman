@@ -32,6 +32,7 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
                                         order_by_list=None,
                                         ordering_full_text=None,
                                         ordering_bbox=None,
+                                        ordering_bbox_crs=None,
                                         ):
     order_by_list = order_by_list or []
 
@@ -39,7 +40,7 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
     full_text_like = '%' + full_text_filter + '%' if full_text_filter else None
     ordering_full_text_tsquery = db_util.to_tsquery_string(ordering_full_text) if ordering_full_text else None
 
-    ordering_bbox_srid = db_util.get_srid(crs_def.EPSG_3857)
+    ordering_bbox_srid = db_util.get_srid(ordering_bbox_crs)
     filtering_bbox_srid = db_util.get_srid(bbox_filter_crs)
 
     where_params_def = [

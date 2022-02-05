@@ -176,6 +176,7 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
     #########################################################
     # Ordering
     ordering_bbox = get_bbox_from_param(request_args, consts.ORDERING_BBOX)
+    ordering_bbox_crs = crs_def.EPSG_3857 if ordering_bbox else None
 
     explicit_order_by_value = request_args.get(consts.ORDER_BY_PARAM)
     if explicit_order_by_value:
@@ -192,6 +193,7 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
 
     if order_by_value == consts.ORDER_BY_BBOX and not ordering_bbox:
         ordering_bbox = bbox_filter
+        ordering_bbox_crs = bbox_filter_crs
 
     ordering_full_text = full_text_filter if order_by_value == consts.ORDER_BY_FULL_TEXT else None
 
@@ -229,6 +231,7 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
                                                                               order_by_list=order_by_list,
                                                                               ordering_full_text=ordering_full_text,
                                                                               ordering_bbox=ordering_bbox,
+                                                                              ordering_bbox_crs=ordering_bbox_crs
                                                                               )
 
     infos = [
