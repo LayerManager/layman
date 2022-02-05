@@ -11,6 +11,7 @@ from ..... import Action, Publication, dynamic_data as consts
 
 KEY_INFO_VALUES = 'info_values'
 KEY_ONLY_FIRST_PARAMETRIZATION = 'only_first_parametrization'
+KEY_ACTION_PARAMETRIZATION = 'action_parametrization'
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -32,6 +33,7 @@ SOURCE_EPSG_CODES = {
             'compress': False,
         },
         KEY_ONLY_FIRST_PARAMETRIZATION: False,
+        KEY_ACTION_PARAMETRIZATION: layers.DEFAULT_ACTIONS[:1],
     },
     crs_def.EPSG_3857: {
         KEY_INFO_VALUES: {
@@ -44,6 +46,7 @@ SOURCE_EPSG_CODES = {
             'compress': False,
         },
         KEY_ONLY_FIRST_PARAMETRIZATION: False,
+        KEY_ACTION_PARAMETRIZATION: layers.DEFAULT_ACTIONS[:1],
     },
     crs_def.EPSG_5514: {
         KEY_INFO_VALUES: {
@@ -200,7 +203,8 @@ def generate(workspace=None):
                                                                     only_first_parametrization=tc_params.get(
                                                                         KEY_ONLY_FIRST_PARAMETRIZATION, True),
                                                                     default_params=tc_params.get(consts.KEY_ACTION),
-                                                                    action_parametrization=layers.DEFAULT_ACTIONS,
+                                                                    action_parametrization=tc_params.get(
+                                                                        KEY_ACTION_PARAMETRIZATION, layers.DEFAULT_ACTIONS),
                                                                     )
 
         def_info_values = copy.deepcopy(def_publ_info_values)
