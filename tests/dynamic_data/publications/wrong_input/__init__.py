@@ -476,6 +476,46 @@ TESTCASES = {
                           },
         },
     },
+    'map_schema_1_0_0': {
+        KEY_PUBLICATION_TYPE: process_client.MAP_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': [
+                f'{DIRECTORY}/map_schema_1_1_0.json',
+            ],
+            'compress': False,
+            'with_chunks': False,
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'detail': {'expected': 'JSON file according schema `https://github.com/hslayers/map-compositions`, version 2',
+                                     'parameter': 'file',
+                                     'reason': 'Missing key `describedBy`'},
+                          },
+        },
+    },
+    'map_schema_3_0_0': {
+        KEY_PUBLICATION_TYPE: process_client.MAP_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': [
+                f'{DIRECTORY}/map_schema_3_0_0.json',
+            ],
+            'compress': False,
+            'with_chunks': False,
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'detail': {'expected': '2.x.x',
+                                     'parameter': 'file',
+                                     'reason': 'Invalid schema version'},
+                          },
+        },
+    },
 }
 
 VALIDATION_PATCH_ACTION = {

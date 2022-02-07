@@ -10,7 +10,7 @@ Two types of QGIS maps are considered:
 ## Maps composed from WMS layers
 In QGIS, you need to implement following steps.
 
-First, compose JSON valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema). For Layman, especially `name`, `title`, `abstract`, and `layers` attributes are important. Each layer must have `className` attribute equal to `HSLayers.Layer.WMS`.
+First, compose JSON valid against [map-composition schema](https://github.com/hslayers/map-compositions). For Layman, especially `describedBy`, `name`, `title`, `abstract`, `layers`, `projection`, and `extent attributes are important. Each layer must have `className` attribute equal to `HSLayers.Layer.WMS`.
 
 Then save the file to Layman using [POST Workspace Maps](rest.md#post-workspace-maps) endpoint. Well-known [requests](https://requests.readthedocs.io/en/master/) module can be used for sending HTTP requests. See especially
 - [More complicated POST requests](https://requests.readthedocs.io/en/master/user/quickstart/#more-complicated-post-requests)
