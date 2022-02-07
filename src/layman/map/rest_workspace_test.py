@@ -176,7 +176,7 @@ def test_post_maps_invalid_json(client):
         # print('resp_json', resp_json)
         assert resp_json['code'] == 2
         assert resp_json['detail']['parameter'] == 'file'
-        assert resp_json['detail']['reason'] == 'JSON not valid against schema layman/map/schema.draft-07.json'
+        assert resp_json['detail']['reason'] == 'JSON not valid against schema https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json'
         assert len(resp_json['detail']['validation-errors']) == 2
     finally:
         for file_path in files:

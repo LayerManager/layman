@@ -3,6 +3,7 @@ import json
 import os
 import re
 import subprocess
+import requests
 from jsonschema import validate, Draft7Validator
 from flask import current_app, request, g
 
@@ -20,7 +21,9 @@ from .micka.csw import map_json_to_operates_on
 
 
 MAPNAME_PATTERN = PUBLICATION_NAME_PATTERN
-
+SCHEMA_URL_PATTERN = r'^https://raw.githubusercontent.com/hslayers/map-compositions/(([0-9]{1,}.[0-9]{1,}.[0-9]{1,})|([a-zA-Z]*?))/schema.json$'
+_SCHEMA_CACHE_PATH = 'tmp'
+_ACCEPTED_SCHEMA_MAJOR_VERSION = '2'
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
@@ -166,37 +169,79 @@ def get_complete_map_info(workspace=None, mapname=None, cached=False):
     return complete_info
 
 
+def get_composition_schema(url):
+    match = re.compile(SCHEMA_URL_PATTERN).match(url)
+    if not match:
+        raise LaymanError(2, {
+            'parameter': 'file',
+            'reason': 'Invalid schema url',
+            'regular_expression': SCHEMA_URL_PATTERN,
+        })
+    version = url.split('/')[-2]
+    if version.split('.')[0] != _ACCEPTED_SCHEMA_MAJOR_VERSION:
+        raise LaymanError(2, {
+            'parameter': 'file',
+            'reason': 'Invalid schema version',
+            'expected': _ACCEPTED_SCHEMA_MAJOR_VERSION + '.x.x',
+        })
+
+    schema_file_name = os.path.join(*url.split('/')[-1:])
+    schema_path = os.path.join(*url.split('/')[-3:-1])
+    local_path = os.path.join(_SCHEMA_CACHE_PATH, schema_path)
+    local_full_path = os.path.join(local_path, schema_file_name)
+    if os.path.exists(local_full_path):
+        with open(local_full_path) as schema_file:
+            schema_json = json.load(schema_file)
+    else:
+        res = requests.get(url,
+                           timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+        res.raise_for_status()
+        schema_txt = res.text
+        schema_json = json.loads(schema_txt)
+
+        os.makedirs(local_path, exist_ok=True)
+        out_file = open(local_full_path, "w")
+        json.dump(schema_json, out_file, indent=4)
+        out_file.close()
+    return schema_json
+
+
 def check_file(file):
     try:
         file_json = json.load(file)
-        schema_path = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            'schema.draft-07.json'
-        )
-        with open(schema_path) as schema_file:
-            schema_json = json.load(schema_file)
-            validator = Draft7Validator(schema_json)
-            if not validator.is_valid(file_json):
-                errors = [
-                    {
-                        'message': e.message,
-                        'absolute_path': list(e.absolute_path),
-                    }
-                    for e in validator.iter_errors(file_json)
-                ]
-                raise LaymanError(2, {
-                    'parameter': 'file',
-                    'reason': 'JSON not valid against schema layman/map/schema.draft-07.json',
-                    'validation-errors': errors,
-                })
-            validate(instance=file_json, schema=schema_json)
-            return file_json
-
     except ValueError as exc:
         raise LaymanError(2, {
             'parameter': 'file',
             'reason': 'Invalid JSON syntax'
         }) from exc
+
+    try:
+        schema_url = file_json['describedBy']
+    except KeyError as exc:
+        raise LaymanError(2, {
+            'parameter': 'file',
+            'reason': 'Missing key `describedBy`',
+            'expected': 'JSON file according schema `https://github.com/hslayers/map-compositions`, version ' + _ACCEPTED_SCHEMA_MAJOR_VERSION,
+        }) from exc
+
+    schema_json = get_composition_schema(schema_url)
+
+    validator = Draft7Validator(schema_json)
+    if not validator.is_valid(file_json):
+        errors = [
+            {
+                'message': e.message,
+                'absolute_path': list(e.absolute_path),
+            }
+            for e in validator.iter_errors(file_json)
+        ]
+        raise LaymanError(2, {
+            'parameter': 'file',
+            'reason': f'JSON not valid against schema {schema_url}',
+            'validation-errors': errors,
+        })
+    validate(instance=file_json, schema=schema_json)
+    return file_json
 
 
 def get_map_chain(workspace, mapname):

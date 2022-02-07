@@ -25,6 +25,7 @@ make timgen-build
 - [#64](https://github.com/LayerManager/layman/issues/64) Layer thumbnails are generated in native CRS of the layer.
 - [#64](https://github.com/LayerManager/layman/issues/64) WMS proxy was added to [WMS endpoint](doc/endpoints.md#web-map-service). In case of some special WMS GetMap requests, it changes requested CRS to fix some GeoServer issues.
 - [#64](https://github.com/LayerManager/layman/issues/64) For layers in `EPSG:5514` and WFS requests in `CRS:84`, the features may have wrong coordinates by hundreds of meters. For requests in `EPSG:4326`, coordinates are correct.
+- [#64](https://github.com/LayerManager/layman/issues/64) Map compositions are validated against [map-composition-schema](https://github.com/hslayers/map-compositions) defined in `describedBy` key of map composition data JSON. Layman now supports only map compositions in version 2.
 - [#489](https://github.com/LayerManager/layman/issues/489) Error responses from Micka and GeoServer are logged into log and also propagated as part of raised exception, so they can be seen from flower.
 - [#548](https://github.com/LayerManager/layman/pull/548) Suppress GeoServer HTTP error 409 when setting layer access rights if they already have the same value.
 - [#548](https://github.com/LayerManager/layman/pull/548) If Micka returns HTTP error 500 on CSW/SOAP Insert/Update/Delete, retry the request.
@@ -131,7 +132,7 @@ make timgen-build
   - `ground_sample_distance` used for raster data
 - [#367](https://github.com/LayerManager/layman/issues/367) When publishing or patching layer or map, it's bounding box is limited to extent of EPSG:3857 projection in all sources except filesystem and DB table. Only bounding box is affected, not data itself.
 - [#347](https://github.com/LayerManager/layman/issues/347) When ordering publications by title, only letters, numbers, and spaces are considered.
-- [#382](https://github.com/LayerManager/layman/pull/382) [Map composition schema](https://github.com/LayerManager/layman/blob/master/src/layman/map/schema.draft-07.json) allows new properties `hs.format.externalWFS` and `workspace`. It was already introduced in v1.13.1.
+- [#382](https://github.com/LayerManager/layman/pull/382) [Map composition schema](https://raw.githubusercontent.com/LayerManager/layman/v1.15.1/src/layman/map/schema.draft-07.json) allows new properties `hs.format.externalWFS` and `workspace`. It was already introduced in v1.13.1.
 - [#385](https://github.com/LayerManager/layman/pull/385) The `style` property can be specified using a string in SLD format, URL to SLD file or JSON object. It was already introduced in v1.13.1.
 - Errors `19`: 'Layer is already in process.' and `29`: 'Map is already in process.' are merged into `49`: 'Publication is already in process.'.
 - Fix: In case of synchronous error during [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) layer data on the server remains always untouched. Previously, layer data on the server could be lost.
@@ -165,7 +166,7 @@ make timgen-build
 ## v1.13.1
  2021-06-07
 ### Changes
-- [Map composition schema](https://github.com/LayerManager/layman/blob/master/src/layman/map/schema.draft-07.json) allows new properties `hs.format.externalWFS` and `workspace` ([#382](https://github.com/LayerManager/layman/pull/382)). The `style` property can be specified using a string in SLD format, URL to SLD file or JSON object ([#385](https://github.com/LayerManager/layman/pull/385)).
+- [Map composition schema](https://raw.githubusercontent.com/LayerManager/layman/v1.15.1/src/layman/map/schema.draft-07.json) allows new properties `hs.format.externalWFS` and `workspace` ([#382](https://github.com/LayerManager/layman/pull/382)). The `style` property can be specified using a string in SLD format, URL to SLD file or JSON object ([#385](https://github.com/LayerManager/layman/pull/385)).
 
 ## v1.13.0
  2021-05-26

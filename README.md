@@ -9,7 +9,7 @@ Publishing geospatial data online through [REST API](doc/rest.md).
 - Accepts **vector** layer data in [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON) and [ShapeFile](https://en.wikipedia.org/wiki/Shapefile) formats
 - Accepts **raster** layer data in [GeoTIFF](https://gdal.org/drivers/raster/gtiff.html), [JPEG2000](https://gdal.org/drivers/raster/jp2openjpeg.html), [PNG](https://gdal.org/drivers/raster/png.html), and [JPEG](https://gdal.org/drivers/raster/jpeg.html) formats
 - Accepts layer **style** in [Styled Layer Descriptor](https://www.opengeospatial.org/standards/sld), [Symbology Encoding](https://www.opengeospatial.org/standards/se), and [QGIS Style File Format](https://docs.qgis.org/3.16/en/docs/user_manual/appendices/qgis_file_formats.html#qml-the-qgis-style-file-format) (for vector data only) formats
-- Accepts **map** definition in [HSLayers Map Composition](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema) format
+- Accepts **map** definition in [HSLayers Map Composition](https://github.com/hslayers/map-compositions) format
 - Even large files can be easily uploaded from browser thanks to asynchronous chunk upload
 - [OAuth2 authentication](doc/security.md#authentication)
 - [Authorization](doc/security.md#authorization) enables to set read and write access to each layer and map for specific users
