@@ -1,16 +1,24 @@
 {
-  "abstract": "Na map\u011b jsou zobrazen\u00e9 t\u0159\u00eddy ochrany p\u016fdy v Libereck\u00e9m kraji", 
+  "describedBy": "https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json",
+  "schema_version": "2.0.0",
+  "abstract": "Na map\u011b jsou zobrazen\u00e9 t\u0159\u00eddy ochrany p\u016fdy v Libereck\u00e9m kraji",
   "center": [
-    1672068, 
-    6568819
+    15.02,
+    50.70
   ], 
   "current_base_layer": null, 
   "extent": [
-    "14.62", 
-    "50.58", 
-    "15.42", 
-    "50.82"
-  ], 
+    14.62,
+    50.58,
+    15.42,
+    50.82
+  ],
+  "nativeExtent": [
+    14.62,
+    50.58,
+    15.42,
+    50.82
+  ],
   "groups": {
     "guest": "w"
   }, 
@@ -108,7 +116,7 @@
     }
   ], 
   "name": "tridy_ochrany_pudy", 
-  "projection": "epsg:3857", 
+  "projection": "EPSG:4326",
   "scale": 1, 
   "title": "T\u0159\u00eddy ochrany p\u016fdy", 
   "units": "m", 

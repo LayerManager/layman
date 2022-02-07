@@ -17,15 +17,23 @@ def get_map_with_internal_layers_json(layers, *, extent_3857=None):
         extent_4326 = bbox.transform(extent_3857, crs_from=crs_def.EPSG_3857, crs_to=crs_def.EPSG_4326, )
     map_json = f'''
 {{
+    "describedBy": "https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json",
+    "schema_version": "2.0.0",
     "abstract": "Map generated for internal layers",
     "title": "Map of internal layers",
     "extent": [
-        "{extent_4326[0]}",
-        "{extent_4326[1]}",
-        "{extent_4326[2]}",
-        "{extent_4326[3]}"
+        {extent_4326[0]},
+        {extent_4326[1]},
+        {extent_4326[2]},
+        {extent_4326[3]}
     ],
-    "projection": "epsg:3857",
+    "nativeExtent": [
+        {extent_3857[0]},
+        {extent_3857[1]},
+        {extent_3857[2]},
+        {extent_3857[3]}
+    ],
+    "projection": "EPSG:3857",
     "layers": [
         {{
             "metadata": {{}},

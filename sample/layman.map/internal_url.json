@@ -1,11 +1,19 @@
 {
+  "describedBy": "https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json",
+  "schema_version": "2.0.0",
   "abstract": "World places and boundaries abstract",
   "title": "World places and boundaries",
   "extent": [
-    "-35.0",
-    "-48.5",
-    "179",
-    "81.5"
+    -35.0,
+    -48.5,
+    179,
+    81.5
+  ],
+  "nativeExtent": [
+    1627490.9553976597,
+    6547334.172794042,
+    1716546.5480322787,
+    6589515.35758913
   ],
   "projection": "epsg:3857",
   "layers": [

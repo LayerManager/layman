@@ -1,10 +1,18 @@
 {
+  "describedBy": "https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json",
+  "schema_version": "2.0.0",
   "abstract": "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce.",
   "extent": [
-    "14.62",
-    "50.58",
-    "15.42",
-    "50.82"
+    14.62,
+    50.58,
+    15.42,
+    50.82
+  ],
+  "nativeExtent": [
+    14.62,
+    50.58,
+    15.42,
+    50.82
   ],
   "user": {
     "name": "Test User"
@@ -13,10 +21,10 @@
     "guest": "r"
   },
   "scale": 1,
-  "projection": "epsg:3857",
+  "projection": "EPSG:4326",
   "center": [
-    1672068,
-    6568819
+    15.02,
+    50.70
   ],
   "units": "m",
   "layers": [

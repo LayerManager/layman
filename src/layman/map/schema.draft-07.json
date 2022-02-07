@@ -1,17 +1,31 @@
 {
   "definitions": {},
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/hslayers/hslayers-ng/develop/components/compositions/schema.js",
+  "$id": "https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json",
   "type": "object",
   "title": "Schema of map compositions supported in Hslayers-ng",
   "required": [
+    "describedBy",
+    "schema_version",
     "abstract",
     "title",
     "extent",
+    "nativeExtent",
     "projection",
     "layers"
   ],
   "properties": {
+    "describedBy": {
+      "description": "The URL reference to the schema.",
+      "type": "string",
+      "pattern": "https://raw.githubusercontent.com/hslayers/map-compositions/(([0-9]{1,}.[0-9]{1,}.[0-9]{1,})|([a-zA-Z]*?))/schema.json"
+    },
+    "schema_version": {
+      "description": "The version number of the schema in model.revision.addition format.",
+      "type": "string",
+      "pattern": "^[0-9]{1,}.[0-9]{1,}.[0-9]{1,}$",
+      "example": "1.2.0"
+    },
     "abstract": {
       "$id": "#/properties/abstract",
       "type": "string",
@@ -45,17 +59,35 @@
     "extent": {
       "$id": "#/properties/extent",
       "type": "array",
-      "title": "Composition extent in EPSG:4326",
+      "title": "Composition extent in EPSG:4326 as list of four values: [min longitude, min latitude, max longitude, max latitude].",
       "items": {
         "$id": "#/properties/extent/items",
-        "type": "string",
+        "type": "number",
         "title": "The Items Schema",
         "default": "",
         "examples": [
-          "14.62",
-          "50.58",
-          "15.42",
-          "50.82"
+          14.62,
+          50.58,
+          15.42,
+          50.82
+        ],
+        "pattern": "^(.*)$"
+      }
+    },
+    "nativeExtent": {
+      "$id": "#/properties/extent",
+      "type": "array",
+      "title": "Map extent in the native (original) coordinate system of the composition",
+      "items": {
+        "$id": "#/properties/extent/items",
+        "type": "number",
+        "title": "The Items Schema",
+        "default": "",
+        "examples": [
+          1672068,
+          6568819,
+          1672168,
+          6568919
         ],
         "pattern": "^(.*)$"
       }
@@ -137,8 +169,7 @@
     "center": {
       "$id": "#/properties/center",
       "type": "array",
-      "title": "Center of composition",
-      "description": "Currently not supported in HsLayers",
+      "title": "Map center in the native (original) coordinate system of the composition",
       "items": {
         "$id": "#/properties/center/items",
         "type": "number",
@@ -297,7 +328,7 @@
               "title": "The Items Schema",
               "default": "",
               "examples": [
-                ["https%3A%2F%2Fgeoportal.kraj-lbc.cz%2Fcgi-bin%2Fmapserv%3Fmap%3D%2Fdata%2Fgis%2FMapServer%2Fprojects%2Fwms%2Fatlas%2Fpuda.map%26version%3D1.3.0%26service%3DWMS%26request%3DGetLegendGraphic%26sld_version%3D1.1.0%26layer%3Dtridyochrany%26format%3Dimage%2Fpng%26STYLE%3Ddefault"]
+                [ "https%3A%2F%2Fgeoportal.kraj-lbc.cz%2Fcgi-bin%2Fmapserv%3Fmap%3D%2Fdata%2Fgis%2FMapServer%2Fprojects%2Fwms%2Fatlas%2Fpuda.map%26version%3D1.3.0%26service%3DWMS%26request%3DGetLegendGraphic%26sld_version%3D1.1.0%26layer%3Dtridyochrany%26format%3Dimage%2Fpng%26STYLE%3Ddefault" ]
               ],
               "pattern": "^(.*)$"
             }
@@ -334,7 +365,7 @@
               "OnlineResource": {
                 "$id": "#/properties/layers/items/properties/attribution/properties/OnlineResource",
                 "type": "string",
-                "title": "Url of layer attribution",
+                "title": "URL of layer attribution",
                 "examples": [
                   "https://www.openstreetmap.org/copyright"
                 ]
@@ -382,7 +413,7 @@
           "url": {
             "$id": "#/properties/layers/items/properties/url",
             "type": "string",
-            "title": "Url of WMS service",
+            "title": "URL of WMS service",
             "description": "WMS service URL. Vector layers which are loaded from file, see #/properties/layers/items/properties/protocol/properties/url property",
             "default": "",
             "examples": [
@@ -397,7 +428,7 @@
             "description": "Urls array of ArcGISRest service.",
             "default": "",
             "examples": [
-              ["https://example.com/arcgis/rest/services/map_pub/MapServer"]
+              [ "https://example.com/arcgis/rest/services/map_pub/MapServer" ]
             ]
           },
           "params": {
@@ -422,16 +453,6 @@
                 "default": "",
                 "examples": [
                   "image/png"
-                ],
-                "pattern": "^(.*)$"
-              },
-              "FROMCRS": {
-                "$id": "#/properties/layers/items/properties/params/properties/FROMCRS",
-                "type": "string",
-                "title": "CRS used if serverside reprojection is needed",
-                "default": "",
-                "examples": [
-                  "EPSG:3857"
                 ],
                 "pattern": "^(.*)$"
               },
@@ -531,12 +552,12 @@
               }
             ]
           },
-          "workspace":{
+          "workspace": {
             "$id": "#/properties/layers/items/properties/workspace",
             "type": "string",
             "title": "Workspace name",
             "description": "Layman workspace name",
-            "examples": ["workspacename"]
+            "examples": [ "workspacename" ]
           }
         }
       }
