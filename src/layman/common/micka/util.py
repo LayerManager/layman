@@ -560,7 +560,7 @@ def adjust_spatial_resolution(prop_el, prop_value):
                   {distance_el_str}
                 </gmd:MD_Resolution>
             """, parser=parser)
-    if child_el:
+    if child_el is not None:
         prop_el.append(child_el)
     else:
         _add_unknown_reason(prop_el)
