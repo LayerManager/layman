@@ -32,11 +32,16 @@ Public URL of [Layman Test Client](https://github.com/LayerManager/layman-test-c
 ### LAYMAN_TIMGEN_URL
 Internal URL of thumnbail image generator (Timgen) used for generating map thumbnails.
 
-### LAYMAN_OUTPUT_SRS_LIST
-List of [EPSG codes](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) that will be supported as output spatial reference systems in both WMS and WFS. Value consists of integer codes separated by comma (`,`). If the list does not contain codes [4326](https://epsg.io/4326) and [3857](https://epsg.io/3857), they are appended by Layman automatically.
+### LAYMAN_INPUT_SRS_LIST
+List of [EPSG codes](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) that are accepted as native for layers and map compositions. Value consists of integer codes separated by comma (`,`). If the list does not contain codes [4326](https://epsg.io/4326) and [3857](https://epsg.io/3857), they are appended by Layman automatically.
+Only subset of these codes is allowed: `3857,4326,5514,32633,32634,3034,3035,3059`
    - Sample SRS list for World: `4326,3857`
-   - Sample SRS list for Czech Republic: `4326,3857,5514,102067,32633,32634`
+   - Sample SRS list for Europe: `4326,3857,3034,3035`
+   - Sample SRS list for Czech Republic: `4326,3857,5514,32633,32634`
    - Sample SRS list for Latvia: `4326,3857,3059`
+
+### LAYMAN_OUTPUT_SRS_LIST
+List of [EPSG codes](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) that will be supported as output spatial reference systems in both WMS and WFS. Value consists of integer codes separated by comma (`,`). If the list does not contain codes from [LAYMAN_INPUT_SRS_LIST](#LAYMAN_INPUT_SRS_LIST), they are appended by Layman automatically. For examples of SRS list, see [LAYMAN_INPUT_SRS_LIST](#LAYMAN_INPUT_SRS_LIST).
 
 During startup, Layman passes definitions of each EPSG to GeoServer, either from its internal sources, or from [epsg.io](https://epsg.io/). If download from epsg.io fails, warning `Not able to download EPSG definition from epsg.io` appears in log. In such case, you can [set EPSG definition manually](https://docs.geoserver.org/2.15.2/en/user/configuration/crshandling/customcrs.html) and restart GeoServer.
 
