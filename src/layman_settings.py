@@ -28,7 +28,7 @@ COMPRESSED_FILE_EXTENSIONS = {
     '.zip': '/vsizip/',
 }
 
-INPUT_SRS_LIST = [
+ALLOWED_INPUT_SRS_LIST = [
     'EPSG:3857',
     'EPSG:4326',
     'EPSG:5514',
@@ -38,6 +38,18 @@ INPUT_SRS_LIST = [
     'EPSG:3035',
     'EPSG:3059',
 ]
+
+INPUT_SRS_LIST = [
+    f'EPSG:{int(code)}' for code in os.environ['LAYMAN_INPUT_SRS_LIST'].split(',')
+    if len(code) > 0
+]
+for input_srs in INPUT_SRS_LIST:
+    assert input_srs in ALLOWED_INPUT_SRS_LIST, f'Input CRS {input_srs} is not allowed.'
+for mandatory_srs in ['EPSG:3857',
+                      'EPSG:4326',
+                      ]:
+    if mandatory_srs not in INPUT_SRS_LIST:
+        INPUT_SRS_LIST.append(mandatory_srs)
 
 DEFAULT_CONNECTION_TIMEOUT = int(os.environ['DEFAULT_CONNECTION_TIMEOUT'])
 

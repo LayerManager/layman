@@ -150,7 +150,7 @@ Body parameters:
    - by default it is layer name
 - *description*
    - by default it is empty string
-- *crs*, string `EPSG:3857`, `EPSG:4326`, `EPSG:3034`, `EPSG:3035`, `EPSG:5514`, `EPSG:32633` `EPSG:32634` or `EPSG:3059`
+- *crs*, string, e.g. `EPSG:3857`, supported EPSG codes are defined by [LAYMAN_INPUT_SRS_LIST](./env-settings.md#LAYMAN_INPUT_SRS_LIST)
    - CRS of the file
    - by default it is read/guessed from input file
 - *style*, style file
@@ -301,7 +301,7 @@ Body parameters:
    - if QML style is used (either directly within this request, or indirectly from previous state on server), it must list all attributes contained in given data file
 - *title*
 - *description*
-- *crs*, string `EPSG:3857`, `EPSG:4326`, `EPSG:3034`, `EPSG:3035`, `EPSG:5514`, `EPSG:32633`, `EPSG:32634` or `EPSG:3059`
+- *crs*, string, e.g. `EPSG:3857`, supported EPSG codes are defined by [LAYMAN_INPUT_SRS_LIST](./env-settings.md#LAYMAN_INPUT_SRS_LIST)
    - Taken into account only if `file` is provided.
 - *style*, style file
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
