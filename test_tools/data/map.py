@@ -6,24 +6,26 @@ from layman.layer.geoserver import util as layer_gs_util
 from .. import process_client
 
 
-def get_map_with_internal_layers_json(layers, *, extent_3857=None):
-    if not extent_3857:
+def get_map_with_internal_layers_json(layers, *, native_extent=None, native_crs=None):
+    if not native_extent:
         with app.app_context():
             extents = [layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['wms', 'bounding_box']})['bounding_box']
                        for workspace, layer in layers]
-        extent_3857 = (min([minx for minx, _, _, _ in extents]), min([miny for _, miny, _, _ in extents]),
-                       max([maxx for _, _, maxx, _ in extents]), max([maxy for _, _, _, maxy in extents]), )
+        native_extent = (min([minx for minx, _, _, _ in extents]), min([miny for _, miny, _, _ in extents]),
+                         max([maxx for _, _, maxx, _ in extents]), max([maxy for _, _, _, maxy in extents]),)
+        native_crs = crs_def.EPSG_3857
+    assert native_crs
 
     with app.app_context():
-        extent_4326 = bbox.transform(extent_3857, crs_from=crs_def.EPSG_3857, crs_to=crs_def.EPSG_4326, )
+        extent_4326 = bbox.transform(native_extent, crs_from=native_crs, crs_to=crs_def.EPSG_4326, )
     map_json = {
         "describedBy": "https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json",
         "schema_version": "2.0.0",
         "abstract": "Map generated for internal layers",
         "title": "Map of internal layers",
         "extent": extent_4326,
-        "nativeExtent": extent_3857,
-        "projection": "EPSG:3857",
+        "nativeExtent": native_extent,
+        "projection": native_crs,
         "layers": [
             {
                 "metadata": {},
@@ -69,9 +71,9 @@ def get_map_with_internal_layers_json(layers, *, extent_3857=None):
     return map_json
 
 
-def create_map_with_internal_layers_file(layers, *, extent_3857=None):
+def create_map_with_internal_layers_file(layers, *, native_extent=None, native_crs=None):
     file_path = f'tmp/map_with_internal_layers.json'
-    map_json = get_map_with_internal_layers_json(layers, extent_3857=extent_3857)
+    map_json = get_map_with_internal_layers_json(layers, native_extent=native_extent, native_crs=native_crs)
     with open(file_path, 'w') as out:
         out.write(json.dumps(map_json, indent=2))
     return file_path
