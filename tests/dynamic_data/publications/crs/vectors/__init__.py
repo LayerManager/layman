@@ -102,11 +102,20 @@ EXP_POINT_COORDINATES = [
     (1, crs_def.EPSG_32633, (617046.8503, 5450825.7990), 0.1),
     (1, crs_def.EPSG_32634, (179991.0748, 5458879.0878), 0.1),
     (1, crs_def.EPSG_5514, (-598208.8093, -1160307.4484), 0.1),
+    (1, crs_def.EPSG_3034, (4464510.640810357, 2519878.8700591023), 0.1),
+    (1, crs_def.EPSG_3035, (4801869.646727926, 2920049.1861927817), 0.1),
 ]
 
-EXP_POINT_COORDINATES_FIXES = {
+EXP_POINT_COORDINATES_GS_FIXES = {
     # Should be the same as for EPSG:4326, but for (so far) unknown reasons, wrong by about 300 m for data in EPSG:5514
     (crs_def.EPSG_5514, crs_def.CRS_84, 1): (16.6041, 49.1999)
+}
+
+EXP_POINT_COORDINATES_DB_FIXES = {
+    (crs_def.EPSG_5514, crs_def.EPSG_3034, 1): (4464511.541476852, 2519881.9274773938),
+    (crs_def.EPSG_5514, crs_def.EPSG_3035, 1): (4801870.58233825, 2920052.353109576),
+    (crs_def.EPSG_3034, crs_def.EPSG_5514, 1): (-598210.3483076858, -1160310.3629643407),
+    (crs_def.EPSG_3035, crs_def.EPSG_5514, 1): (-598210.3483076858, -1160310.3629643407),
 }
 
 EXP_WMS_PICTURES = [
@@ -183,9 +192,21 @@ def generate(workspace=None):
         feature_spacial_precision_assert = [Action(publication.geoserver.feature_spatial_precision, {
             'feature_id': feature_id,
             'crs': wfs_crs,
-            'exp_coordinates': EXP_POINT_COORDINATES_FIXES.get((crs, wfs_crs, feature_id), exp_coordinates),
+            'exp_coordinates': EXP_POINT_COORDINATES_GS_FIXES.get((crs, wfs_crs, feature_id), exp_coordinates),
             'precision': precision,
         }) for feature_id, wfs_crs, exp_coordinates, precision in EXP_POINT_COORDINATES]
+
+        db_spacial_precision_assert = [Action(
+            publication.internal.point_coordinates,
+            {
+                'point_id': feature_id,
+                'crs': to_crs,
+                'exp_coordinates': EXP_POINT_COORDINATES_DB_FIXES.get((crs, to_crs, feature_id),
+                                                                      exp_coordinates),
+                'precision': precision,
+            }
+        ) for feature_id, to_crs, exp_coordinates, precision in EXP_POINT_COORDINATES
+            if to_crs != crs_def.CRS_84]
 
         bboxes = copy.deepcopy(EXP_BBOXES)
         bboxes['CRS:84'] = copy.deepcopy(bboxes[crs_def.EPSG_4326])
@@ -270,6 +291,7 @@ def generate(workspace=None):
                                                                        'precision': bboxes['CRS:84']['precision'],
                                                                        }),
                     *wms_bbox_actions,
+                    *db_spacial_precision_assert,
                 ]
             }
             actions_list = copy.deepcopy(action_predecessor)
