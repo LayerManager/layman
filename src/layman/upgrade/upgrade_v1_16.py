@@ -3,6 +3,7 @@ import logging
 from crs import EPSG_3857
 from db import util as db_util
 from layman import settings
+from layman.layer import LAYER_TYPE
 
 logger = logging.getLogger(__name__)
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -15,7 +16,7 @@ def adjust_db_for_srid():
     db_util.run_statement(statement)
 
 
-def adjust_db_publication_srid_data():
+def adjust_db_publication_layer_srid_data():
     crs = EPSG_3857
     srid = db_util.get_srid(crs)
 
@@ -23,9 +24,12 @@ def adjust_db_publication_srid_data():
     update {DB_SCHEMA}.publications set
       srid = %s
     where srid is null
+      and type = %s
     ;'''
-    db_util.run_statement(statement, (srid, ))
+    db_util.run_statement(statement, (srid, LAYER_TYPE))
 
+
+def adjust_db_publication_srid_constraint():
     statement = f'alter table {DB_SCHEMA}.publications add constraint bbox_with_crs_check CHECK ' \
                 f'(bbox is null or srid is not null);'
     db_util.run_statement(statement)
