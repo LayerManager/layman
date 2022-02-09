@@ -1,7 +1,7 @@
 from contextlib import nullcontext as does_not_raise
 import pytest
 
-from test_tools import process_client
+from test_tools import cleanup
 from . import publications as data
 from ..asserts import util
 from .. import Action, dynamic_data as consts
@@ -47,7 +47,4 @@ def test_action_chain(publication, request):
                     f'Final assert error raised: publication={publication}, action_idx={action_idx}, final_assert_idx={final_assert_idx}, assert_call={assert_call}')
                 raise exc from exc
 
-    if not request.config.option.nocleanup:
-        if util.get_publication_exists(publication):
-            headers = util.get_publication_header(publication)
-            process_client.delete_workspace_publication(publication.type, publication.workspace, publication.name, headers=headers)
+    cleanup.cleanup_publications(request, [publication])
