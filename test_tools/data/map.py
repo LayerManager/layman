@@ -11,7 +11,7 @@ def get_map_with_internal_layers_json(layers, *, extent_3857=None):
             extents = [layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['wms', 'bounding_box']})['bounding_box']
                        for workspace, layer in layers]
         extent_3857 = (min([minx for minx, _, _, _ in extents]), min([miny for _, miny, _, _ in extents]),
-                       max([maxx for _, _, maxx, _ in extents]), min([maxy for _, _, _, maxy in extents]), )
+                       max([maxx for _, _, maxx, _ in extents]), max([maxy for _, _, _, maxy in extents]), )
 
     with app.app_context():
         extent_4326 = bbox.transform(extent_3857, crs_from=crs_def.EPSG_3857, crs_to=crs_def.EPSG_4326, )
