@@ -9,7 +9,7 @@ from .. import process_client
 def get_map_with_internal_layers_json(layers, *, native_extent=None, native_crs=None):
     if not native_extent:
         with app.app_context():
-            extents = [layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['wms', 'bounding_box']})['bounding_box']
+            extents = [layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['bounding_box']})['bounding_box']
                        for workspace, layer in layers]
         native_extent = (min([minx for minx, _, _, _ in extents]), min([miny for _, miny, _, _ in extents]),
                          max([maxx for _, _, maxx, _ in extents]), max([maxy for _, _, _, maxy in extents]),)
