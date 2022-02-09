@@ -102,7 +102,7 @@ def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, ):
     assert diffs < 500
 
 
-def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_detail, publ_type_detail, full_comparison=True,
+def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_detail, publ_type_detail=None, full_comparison=True,
                              file_extension=None, gdal_prefix='', ):
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
     expected_detail = {
@@ -118,6 +118,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
             'csw_url': 'http://localhost:3080/csw',
         },
         '_thumbnail': {'path': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/thumbnail/{name}.png'},
+        'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
     }
     if publ_type == process_client.LAYER_TYPE:
         util.recursive_dict_update(expected_detail,
@@ -130,7 +131,6 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        '_wms': {
                                            'url': f'{settings.LAYMAN_GS_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows',
                                            'workspace': f'{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'},
-                                       'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
                                        'description': None,
                                    })
 
@@ -181,6 +181,18 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            {
                                                '_wms': {'qgis_capabilities_url': f'{settings.LAYMAN_QGIS_URL}?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.1.1&map={settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.qgis'},
                                            })
+
+    if publ_type == process_client.MAP_TYPE:
+        util.recursive_dict_update(expected_detail,
+                                   {
+                                       '_file': {
+                                           'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/file',
+                                       },
+                                       'file': {
+                                           'path': f'{publ_type_dir}/{name}/input_file/{name}.json',
+                                           'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/file'},
+                                       'style_type': None,
+                                   })
 
     expected_detail = util.recursive_dict_update(expected_detail, exp_publication_detail)
     with app.app_context():
