@@ -13,6 +13,8 @@ make timgen-build
 ### Migrations and checks
 #### Schema migrations
 - [#64](https://github.com/LayerManager/layman/issues/64) Create new column `srid` in `publication` table.
+- [#64](https://github.com/LayerManager/layman/issues/64) Native CRS of previously uploaded layers is set to `EPSG:3857`.
+- [#64](https://github.com/LayerManager/layman/issues/64) Native CRS of previously uploaded maps is set according their composition file (either `EPSG:3857` or `EPSG:4326`) and their composition file is upgraded to [version 2.0.0](https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json).
 #### Data migrations
 ### Changes
 - [#64](https://github.com/LayerManager/layman/issues/64) Upgrade GeoServer to 2.15.2, because 2.13.0 had serious problem with transformations of EPSG:5514.

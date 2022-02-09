@@ -34,6 +34,7 @@ MIGRATIONS = {
         ]),
         ((1, 16, 0), [
             upgrade_v1_16.adjust_db_publication_layer_srid_data,
+            upgrade_v1_16.adjust_maps,
             upgrade_v1_16.adjust_db_publication_srid_constraint,
         ]),
     ],
