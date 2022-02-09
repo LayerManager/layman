@@ -1,7 +1,9 @@
 import pytest
+from db import util as db_util
 from layman import app, util as layman_util, settings, celery
 from layman.common import bbox as bbox_util
 from layman.common.prime_db_schema import publications
+from layman.layer import LAYER_TYPE
 from layman.layer.filesystem import gdal
 from test_tools import process_client, util as test_util, assert_util
 from ... import util
@@ -235,3 +237,23 @@ def detail_3857bbox_value(workspace, publ_type, name, *, exp_bbox, precision=0.1
     assert_util.assert_same_bboxes(exp_bbox, bounding_box, precision)
     if contains:
         assert bbox_util.contains_bbox(bounding_box, exp_bbox)
+
+
+def point_coordinates(workspace, publ_type, name, *, point_id, crs, exp_coordinates, precision, ):
+    assert publ_type == LAYER_TYPE
+
+    query = f'''with transformed as (select st_transform(wkb_geometry, %s) point
+from {workspace}.{name}
+where point_id = %s)
+select st_x(point),
+       st_y(point)
+from transformed
+;'''
+    with app.app_context():
+        to_srid = db_util.get_srid(crs)
+        coordinates = db_util.run_query(query, (to_srid, point_id))
+    assert len(coordinates) == 1, coordinates
+    coordinates = coordinates[0]
+
+    for i in range(0, 1):
+        assert abs(exp_coordinates[i] - coordinates[i]) <= precision, f'exp_coordinates={exp_coordinates}, coordinates={coordinates}'
