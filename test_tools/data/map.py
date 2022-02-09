@@ -1,4 +1,6 @@
 import json
+import os
+from pathlib import Path
 import crs as crs_def
 from layman import util as layman_util, app
 from layman.common import bbox
@@ -72,9 +74,9 @@ def get_map_with_internal_layers_json(layers, *, native_extent=None, native_crs=
     return map_json
 
 
-def create_map_with_internal_layers_file(layers, *, native_extent=None, native_crs=None):
-    file_path = f'tmp/map_with_internal_layers.json'
+def create_map_with_internal_layers_file(layers, *, file_path, native_extent=None, native_crs=None):
     map_json = get_map_with_internal_layers_json(layers, native_extent=native_extent, native_crs=native_crs)
+    file_dir = os.path.dirname(file_path)
+    Path(file_dir).mkdir(parents=True, exist_ok=True)
     with open(file_path, 'w') as out:
         out.write(json.dumps(map_json, indent=2))
-    return file_path

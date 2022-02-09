@@ -23,9 +23,10 @@ def test_map_refresh_after_layer_change():
 
     process_client.publish_workspace_layer(workspace, layer)
 
-    map_file = map_data.create_map_with_internal_layers_file([(workspace, layer)], native_extent=bbox,
-                                                             native_crs='EPSG:3857')
-    process_client.publish_workspace_map(workspace, map, file_paths=[map_file])
+    file_path = f'tmp/map_with_internal_layers.json'
+    map_data.create_map_with_internal_layers_file([(workspace, layer)], file_path=file_path, native_extent=bbox,
+                                                  native_crs='EPSG:3857')
+    process_client.publish_workspace_map(workspace, map, file_paths=[file_path])
 
     assert_map_thumbnail(workspace, map, f'/code/test_tools/data/thumbnail/map_with_internal_layer_basic.png')
 
