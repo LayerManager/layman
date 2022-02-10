@@ -166,15 +166,23 @@ def patch_workspace_publication(publication_type,
                                 compress=False,
                                 compress_settings=None,
                                 with_chunks=False,
+                                crs=None,
+                                map_layers=None,
+                                native_extent=None,
                                 ):
     headers = headers or {}
-    file_paths = file_paths or []
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
-    if style_file:
-        assert publication_type == LAYER_TYPE
 
-    # Only Layer files can be uploaded by chunks
-    assert not with_chunks or publication_type == LAYER_TYPE
+    # map layers must not be set together with file_paths
+    assert not map_layers or not file_paths
+
+    file_paths = [] if file_paths is None and not map_layers else file_paths
+
+    if style_file or with_chunks or compress or compress_settings:
+        assert publication_type == LAYER_TYPE
+    if map_layers or native_extent:
+        assert publication_type == MAP_TYPE
+
     # Compress settings can be used only with compress option
     assert not compress_settings or compress
 
@@ -188,6 +196,13 @@ def patch_workspace_publication(publication_type,
         temp_dir = tempfile.mkdtemp(prefix="layman_zip_")
         zip_file = util.compress_files(file_paths, compress_settings=compress_settings, output_dir=temp_dir)
         file_paths = [zip_file]
+
+    if map_layers:
+        temp_dir = tempfile.mkdtemp(prefix="layman_map_")
+        file_path = os.path.join(temp_dir, name)
+        map_data.create_map_with_internal_layers_file(map_layers, file_path=file_path, native_extent=native_extent,
+                                                      native_crs=crs)
+        file_paths = [file_path]
 
     for file_path in file_paths:
         assert os.path.isfile(file_path), file_path
