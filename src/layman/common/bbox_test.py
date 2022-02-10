@@ -78,10 +78,10 @@ def test_ensure_bbox_with_area(bbox, no_area_padding, expected_result):
 
 @pytest.mark.parametrize('bbox, crs_from, crs_to, expected_bbox', [
     (
-        crs_def.CRSDefinitions[crs_def.EPSG_4326].world_bbox,
+        crs_def.CRSDefinitions[crs_def.EPSG_4326].default_bbox,
         crs_def.EPSG_4326,
         crs_def.EPSG_3857,
-        crs_def.CRSDefinitions[crs_def.EPSG_3857].world_bbox,
+        crs_def.CRSDefinitions[crs_def.EPSG_3857].default_bbox,
     ),
     (
         [-598214.7290553625207394, -1160319.8064114262815565, -598200.9321668159682304, -1160307.4425631782505661],

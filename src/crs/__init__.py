@@ -2,7 +2,9 @@ from collections import namedtuple
 
 CRSTypeDef = namedtuple('CRSTypeDef', [
     # Bounding box used if data file is empty (in EPSG:3857)
-    'world_bbox',
+    'default_bbox',
+    # Maximum bounding box used to crop calculated bbox
+    'max_bbox',
     # If bounding box of layman.layer has no area in at least one dimension,
     # this padding in meters will be added to all dimensions whose coordinates equal
     # for GeoServer feature type definition and thumbnail rendering.
@@ -32,7 +34,13 @@ EPSG_3059 = 'EPSG:3059'
 
 CRSDefinitions = {
     EPSG_3857: CRSTypeDef(
-        world_bbox=(
+        default_bbox=(
+            -20026376.39,
+            -20048966.10,
+            20026376.39,
+            20048966.10,
+        ),
+        max_bbox=(
             -20026376.39,
             -20048966.10,
             20026376.39,
@@ -59,7 +67,13 @@ CRSDefinitions = {
         srid=None,
     ),
     EPSG_4326: CRSTypeDef(
-        world_bbox=(
+        default_bbox=(
+            -180,
+            -90,
+            180,
+            90,
+        ),
+        max_bbox=(
             -180,
             -90,
             180,
@@ -79,12 +93,13 @@ CRSDefinitions = {
         srid=None,
     ),
     EPSG_5514: CRSTypeDef(
-        world_bbox=(
+        default_bbox=(
             -951499.37,
             -1276279.09,
             -159365.31,
             -983013.08,
         ),
+        max_bbox=None,
         no_area_bbox_padding=10,
         world_bounds=dict(),
         qgis_template_spatialrefsys='''<srsid>26812</srsid>
@@ -99,12 +114,13 @@ CRSDefinitions = {
         srid=None,
     ),
     EPSG_32633: CRSTypeDef(
-        world_bbox=(
+        default_bbox=(
             166021.44,
             0.00,
             1004994.66,
             9329005.18,
         ),
+        max_bbox=None,
         no_area_bbox_padding=1,
         world_bounds=dict(),
         qgis_template_spatialrefsys='''<srsid>3117</srsid>
@@ -119,12 +135,13 @@ CRSDefinitions = {
         srid=None,
     ),
     EPSG_32634: CRSTypeDef(
-        world_bbox=(
-            6021.44,
+        default_bbox=(
+            166021.44,
             0.00,
-            1004994.66,
+            534994.66,
             9329005.18,
         ),
+        max_bbox=None,
         no_area_bbox_padding=1,
         world_bounds=dict(),
         qgis_template_spatialrefsys='''<srsid>3118</srsid>
@@ -139,12 +156,13 @@ CRSDefinitions = {
         srid=None,
     ),
     EPSG_3034: CRSTypeDef(
-        world_bbox=(
+        default_bbox=(
             1584884.54,
             1150546.94,
             8442721.99,
             6678398.53,
         ),
+        max_bbox=None,
         no_area_bbox_padding=1,
         world_bounds=dict(),
         qgis_template_spatialrefsys='''<srsid>999</srsid>
@@ -159,12 +177,13 @@ CRSDefinitions = {
         srid=900915,
     ),
     EPSG_3035: CRSTypeDef(
-        world_bbox=(
-            1584884.54,
+        default_bbox=(
+            1896628.62,
             1507846.05,
-            8442721.99,
+            4662111.45,
             6829874.45,
         ),
+        max_bbox=None,
         no_area_bbox_padding=1,
         world_bounds=dict(),
         qgis_template_spatialrefsys='''<srsid>1000</srsid>
@@ -179,12 +198,13 @@ CRSDefinitions = {
         srid=900916,
     ),
     EPSG_3059: CRSTypeDef(
-        world_bbox=(
+        default_bbox=(
             189423.14,
             180420.28,
             749893.19,
             446584.80,
         ),
+        max_bbox=None,
         no_area_bbox_padding=1,
         world_bounds=dict(),
         qgis_template_spatialrefsys='''<srsid>1022</srsid>

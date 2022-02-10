@@ -66,7 +66,7 @@ def refresh_wms(
         file_path = info['_file']['normalized_file']['gs_path']
         real_bbox = info['native_bounding_box']
         bbox = bbox_util.ensure_bbox_with_area(real_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding)\
-            if not bbox_util.is_empty(real_bbox) else crs_def.CRSDefinitions[crs].world_bbox
+            if not bbox_util.is_empty(real_bbox) else crs_def.CRSDefinitions[crs].default_bbox
         lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
         gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, file_path)
         gs_util.publish_coverage(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, layername, title,

@@ -95,7 +95,7 @@ def get_layer_bbox(workspace, layer):
     crs = layer_info['native_crs']
     # GeoServer is not working good with degradeted bbox
     result = bbox_util.ensure_bbox_with_area(db_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding) \
-        if not bbox_util.is_empty(db_bbox) else crs_def.CRSDefinitions[crs].world_bbox
+        if not bbox_util.is_empty(db_bbox) else crs_def.CRSDefinitions[crs].default_bbox
     return result
 
 

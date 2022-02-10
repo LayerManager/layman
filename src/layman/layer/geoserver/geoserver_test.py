@@ -44,7 +44,7 @@ def test_geoserver_bbox():
                                                                6268895 - no_area_bbox_padding,
                                                                1571203 + no_area_bbox_padding,
                                                                6268895 + no_area_bbox_padding)),  # point
-                       ((None, None, None, None), crs_def.CRSDefinitions[crs].world_bbox),
+                       ((None, None, None, None), crs_def.CRSDefinitions[crs].max_bbox),
                        ]
 
     process_client.publish_workspace_layer(workspace, layer, style_file='sample/style/small_layer.qml')
