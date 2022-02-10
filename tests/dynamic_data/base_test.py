@@ -4,9 +4,6 @@ from test_tools import process_client, cleanup
 from .. import Publication
 
 
-KEY_DEFINITION = 'definition'
-
-
 def pytest_generate_tests(metafunc):
     # used for parametrizing subclasses of TestSingleRestPublication, called once per each test function
     # https://docs.pytest.org/en/6.2.x/parametrize.html#pytest-generate-tests
