@@ -64,7 +64,7 @@ def save_qgs_file(workspace, layer):
     qgis.ensure_layer_dir(workspace, layer)
     layer_bbox = info['native_bounding_box']
     crs = info['native_crs']
-    layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[crs].world_bbox
+    layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[crs].default_bbox
     qml = util.get_original_style_xml(workspace, layer)
     qml_geometry = util.get_qml_geometry_from_qml(qml)
     db_types = db.get_geometry_types(workspace, layer)

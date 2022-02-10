@@ -97,13 +97,13 @@ def transform(bbox, crs_from, crs_to):
     ;'''
     params = tuple(bbox) + (srid_from, srid_to,)
     result = db_util.run_query(query, params)[0]
-    world_bbox = crs_def.CRSDefinitions[crs_to].world_bbox
+    max_bbox = crs_def.CRSDefinitions[crs_to].max_bbox
     result = (
-        max(result[0], world_bbox[0]),
-        max(result[1], world_bbox[1]),
-        min(result[2], world_bbox[2]),
-        min(result[3], world_bbox[3]),
-    )
+        max(result[0], max_bbox[0]),
+        max(result[1], max_bbox[1]),
+        min(result[2], max_bbox[2]),
+        min(result[3], max_bbox[3]),
+    ) if max_bbox else result
     return result
 
 

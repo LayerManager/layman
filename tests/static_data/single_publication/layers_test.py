@@ -158,7 +158,7 @@ def test_wms_layer(workspace, publ_type, publication):
         layer_info = process_client.get_workspace_layer(workspace, publication, headers=authn_headers)
         crs = layer_info['native_crs']
         raw_bbox = layer_info['bounding_box'] if not bbox_util.is_empty(layer_info['bounding_box']) \
-            else crs_def.CRSDefinitions[crs].world_bbox
+            else crs_def.CRSDefinitions[crs].default_bbox
         bbox = bbox_util.ensure_bbox_with_area(raw_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding)
         tn_bbox = gs_util.get_square_bbox(bbox)
 
@@ -198,7 +198,7 @@ def test_fill_project_template(workspace, publ_type, publication):
     with app.app_context():
         layer_bbox = layer_db.get_bbox(workspace, publication)
         layer_crs = layer_db.get_crs(workspace, publication)
-    layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[layer_crs].world_bbox
+    layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[layer_crs].default_bbox
     with app.app_context():
         qml_path = qgis_util.get_original_style_path(workspace, publication)
     parser = ET.XMLParser(remove_blank_text=True)
