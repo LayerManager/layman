@@ -8,7 +8,6 @@ from ..... import Publication
 LAYER_FOR_MAPS = "layer_for_map_crs"
 
 KEY_INFO_VALUES = 'info_values'
-KEY_DEFINITION = base_test.KEY_DEFINITION
 
 TEST_CASES = {
     crs_def.EPSG_4326: {
@@ -28,9 +27,6 @@ TEST_CASES = {
         },
     },
     crs_def.EPSG_5514: {
-        KEY_DEFINITION: {
-            'native_extent': [-782190.2850904732, -1163856.3670231388, -780984.9048069374, -1162816.2134994941],
-        },
         KEY_INFO_VALUES: {
             'exp_publication_detail': {
                 'native_bounding_box': [-782334.8391616135, -1164023.7276125506, -780840.5943329989, -1162648.8238845991],
@@ -64,7 +60,6 @@ class TestMap(base_test.TestSingleRestPublication):
             'native_extent': params[KEY_INFO_VALUES]['exp_publication_detail']['native_bounding_box'],
             'crs': map_crs,
             'title': publication.name,
-            **params.get(KEY_DEFINITION, {}),
         }
         rest_method(map, params=map_params)
 
