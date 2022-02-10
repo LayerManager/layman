@@ -18,7 +18,7 @@ make timgen-build
 - [#64](https://github.com/LayerManager/layman/issues/64) Native CRS of previously uploaded maps is set according their composition file (either `EPSG:3857` or `EPSG:4326`) and their composition file is upgraded to [version 2.0.0](https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json).
 #### Data migrations
 ### Changes
-- [#64](https://github.com/LayerManager/layman/issues/64) Upgrade GeoServer to 2.15.2, because 2.13.0 had serious problem with transformations of EPSG:5514.
+- [#64](https://github.com/LayerManager/layman/issues/64) Upgrade GeoServer to 2.15.5, because 2.13.0 had serious problem with transformations of EPSG:5514.
 - [#64](https://github.com/LayerManager/layman/issues/64) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-maps), [GET Workspace Map](doc/rest.md#get-workspace-map), [PATCH Workspace Map](doc/rest.md#patch-workspace-map) contains new attribute
    - `native_crs` with code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326"
    - `native_bounding_box` with coordinates in native CRS  [minx, miny, maxx, maxy]

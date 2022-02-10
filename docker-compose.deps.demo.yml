@@ -38,7 +38,7 @@ services:
         - ./deps/geoserver/tmp:/geoserver_tmp
       restart: on-failure
       environment:
-        - GS_VERSION=2.15.2
+        - GS_VERSION=2.15.5
       env_file:
         - .env
         - deps/geoserver/docker/.env

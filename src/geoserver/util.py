@@ -66,7 +66,7 @@ def get_roles(auth):
                             timeout=GS_REST_TIMEOUT,
                             )
     response.raise_for_status()
-    return response.json()['roles']
+    return response.json()['roleNames']
 
 
 def ensure_role(role, auth):
@@ -814,7 +814,7 @@ def get_user_roles(user, auth):
                             timeout=GS_REST_TIMEOUT,
                             )
     response.raise_for_status()
-    return response.json()['roles']
+    return response.json()['roleNames']
 
 
 def ensure_user_role(user, role, auth):
