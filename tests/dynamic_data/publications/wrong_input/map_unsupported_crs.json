@@ -1,0 +1,37 @@
+{
+  "describedBy": "https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json",
+  "schema_version": "2.0.0",
+  "abstract": "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce.",
+  "title": "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje",
+  "extent": [
+    0.0179664,
+    0.0179664,
+    0.0269495,
+    0.0538990
+  ],
+  "nativeExtent": [
+    2000,
+    2000,
+    3000,
+    6000
+  ],
+  "user": {
+    "email": "test@user.cz",
+    "name": "Test User"
+  },
+  "groups": {
+    "guest": "r"
+  },
+  "scale": 1,
+  "projection": "EPSG:3030",
+  "center": [
+    1672068,
+    6568819
+  ],
+  "units": "m",
+  "layers": [
+ ],
+  "current_base_layer": {
+    "title": "Topografick\u00e1 podkladov\u00e1 mapa (\u0161edo\u0161k\u00e1l\u00e1)"
+  }
+}

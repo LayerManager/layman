@@ -516,6 +516,25 @@ TESTCASES = {
                           },
         },
     },
+    'map_unsupported_crs': {
+        KEY_PUBLICATION_TYPE: process_client.MAP_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': [
+                f'{DIRECTORY}/map_unsupported_crs.json',
+            ],
+            'compress': False,
+            'with_chunks': False,
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 4,
+                          'detail': {'found': 'EPSG:3030',
+                                     'supported_values': settings.INPUT_SRS_LIST},
+                          },
+        },
+    },
 }
 
 VALIDATION_PATCH_ACTION = {
