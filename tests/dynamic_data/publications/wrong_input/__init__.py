@@ -117,7 +117,7 @@ TESTCASES = {
                           'code': 2,
                           'detail': {'parameter': 'file',
                                      'message': 'Zip file without data file inside.',
-                                     'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
+                                     'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                                      'files': [
                                          'temporary_zip_file.zip',
                                      ],
@@ -174,7 +174,7 @@ TESTCASES = {
                           'message': 'Wrong parameter value',
                           'detail': {'parameter': 'file',
                                      'message': 'Unable to open raster file.',
-                                     'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
+                                     'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                                      'file': '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_sync/input_file/non_readable_raster_post_sync.tif',
                                      },
                           },
@@ -345,7 +345,7 @@ TESTCASES = {
                           'code': 2,
                           'message': 'Wrong parameter value',
                           'detail': {
-                              'expected': 'At most one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg',
+                              'expected': 'At most one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg',
                               'files': [
                                   'layer_with_two_main_files.zip/layer_with_two_main_files/geojson/small_layer.geojson',
                                   'layer_with_two_main_files.zip/layer_with_two_main_files/raster/sample_tif_rgb.tif'],
@@ -401,7 +401,7 @@ TESTCASES = {
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
                 'detail': {
-                    'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
+                    'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                     'files': [
                         'temporary_zip_file.zip/sm5.zip',
                         'temporary_zip_file.zip/layer_with_two_main_files.zip',
@@ -413,7 +413,7 @@ TESTCASES = {
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
                 'detail': {
-                    'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
+                    'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                     'files': [
                         'two_zip_files_post_chunks_zipped.zip/sm5.zip',
                         'two_zip_files_post_chunks_zipped.zip/layer_with_two_main_files.zip',
@@ -429,7 +429,7 @@ TESTCASES = {
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', True), ('with_chunks', False)]): {
                         'detail': {
-                            'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
+                            'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                             'files': [
                                 'temporary_zip_file.zip/sm5.zip',
                                 'temporary_zip_file.zip/layer_with_two_main_files.zip',
@@ -441,7 +441,7 @@ TESTCASES = {
                     frozenset([('compress', True), ('with_chunks', True)]): {
                         'sync': False,
                         'detail': {
-                            'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.',
+                            'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                             'files': [
                                 'two_zip_files_patch_patch_chunks_zipped.zip/sm5.zip',
                                 'two_zip_files_patch_patch_chunks_zipped.zip/layer_with_two_main_files.zip',

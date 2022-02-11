@@ -125,7 +125,7 @@ Body parameters:
       - GeoTIFF (.tif or .tiff, with or without .tfw, .tifw, .tiffw or .wld)
       - JPEG 2000 (.jp2, with or without .j2w, jp2w or .wld)
       - PNG (.png, with .png.aux.xml, .pgw, .pngw or .wld)
-      - JPEG (.jpg, with .jpg.aux.xml, .jgw, .jpgw or .wld)
+      - JPEG (.jpg, .jpeg, with .jpg.aux.xml, .jgw, .jpgw, .jpegw or .wld)
       - any of above types in single ZIP file (.zip)
       - file names, i.e. array of strings
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
