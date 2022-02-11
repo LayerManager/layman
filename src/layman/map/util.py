@@ -241,6 +241,12 @@ def check_file(file):
             'validation-errors': errors,
         })
     validate(instance=file_json, schema=schema_json)
+
+    map_crs = get_crs_from_json(file_json)
+    if map_crs not in settings.INPUT_SRS_LIST:
+        raise LaymanError(4, {'found': map_crs,
+                              'supported_values': settings.INPUT_SRS_LIST})
+
     return file_json
 
 
