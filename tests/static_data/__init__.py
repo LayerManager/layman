@@ -174,7 +174,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'thumbnail': 'sample/style/test_sld_style_applied_in_thumbnail_layer.png',
             'get_map': ('SRS=EPSG:3857&WIDTH=768&HEIGHT=752&BBOX=-30022616.05686392,-30569903.32873383,30022616.05686392,28224386.44929134',
-                        'test_tools/data/thumbnail/countries_wms_blue_map.png',
+                        'test_tools/data/thumbnail/countries_wms_blue.png',
                         2000,
                         ),
             'file_type': settings.FILE_TYPE_VECTOR,
@@ -520,7 +520,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'thumbnail': 'sample/style/test_sld_style_applied_in_thumbnail_layer.png',
             'get_map': ('SRS=EPSG:3857&WIDTH=768&HEIGHT=752&BBOX=-30022616.05686392,-30569903.32873383,30022616.05686392,28224386.44929134',
-                        'test_tools/data/thumbnail/countries_wms_blue_map.png',
+                        'test_tools/data/thumbnail/countries_wms_blue.png',
                         2000,
                         ),
             'file_type': settings.FILE_TYPE_VECTOR,
