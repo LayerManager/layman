@@ -341,7 +341,7 @@ JSON object representing deleted layer:
 ### URL
 `/rest/workspaces/<workspace_name>/layers/<layername>/thumbnail`
 ### GET Workspace Layer Thumbnail
-Get thumbnail of the layer in PNG format, 300x300 px, transparent background.
+Get thumbnail of the layer in PNG format, 300x300 px, transparent background, in native CRS.
 
 #### Request
 No action parameters.
@@ -641,7 +641,7 @@ JSON file describing the map valid against [map-composition schema](https://gith
 ### URL
 `/rest/workspaces/<workspace_name>/maps/<mapname>/thumbnail`
 ### GET Workspace Map Thumbnail
-Get thumbnail of the map in PNG format, 300x300 px, transparent background.
+Get thumbnail of the map in PNG format, 300x300 px, transparent background, in EPSG:3857.
 
 #### Request
 No action parameters.
