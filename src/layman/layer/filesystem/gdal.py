@@ -46,7 +46,7 @@ def open_raster_file(filepath, mode=gdal.GA_ReadOnly):
         raise LaymanError(2, {
             'parameter': 'file',
             'message': f"Unable to open raster file.",
-            'expected': f"At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg; or one of them in single .zip file.",
+            'expected': f"At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.",
             'file': filepath,
         })
     return dataset

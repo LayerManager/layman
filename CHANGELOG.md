@@ -29,6 +29,7 @@ make timgen-build
 - [#64](https://github.com/LayerManager/layman/issues/64) Layer thumbnails are generated in native CRS of the layer.
 - [#64](https://github.com/LayerManager/layman/issues/64) WMS proxy was added to [WMS endpoint](doc/endpoints.md#web-map-service). In case of some special WMS GetMap requests, it changes requested CRS to fix some GeoServer issues.
 - [#64](https://github.com/LayerManager/layman/issues/64) For layers in `EPSG:5514` and WFS requests in `CRS:84`, the features may have wrong coordinates by hundreds of meters. For requests in `EPSG:4326`, coordinates are correct.
+- [#572](https://github.com/LayerManager/layman/issues/572) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) accept also raster files with `.jpeg` extension .
 - [#64](https://github.com/LayerManager/layman/issues/64) Map compositions are validated against [map-composition-schema](https://github.com/hslayers/map-compositions) defined in `describedBy` key of map composition data JSON. Layman now supports only map compositions in version 2.
 - [#489](https://github.com/LayerManager/layman/issues/489) Error responses from Micka and GeoServer are logged into log and also propagated as part of raised exception, so they can be seen from flower.
 - [#548](https://github.com/LayerManager/layman/pull/548) Suppress GeoServer HTTP error 409 when setting layer access rights if they already have the same value.

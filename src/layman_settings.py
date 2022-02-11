@@ -21,6 +21,7 @@ MAIN_FILE_EXTENSIONS = {
     '.jp2': FILE_TYPE_RASTER,
     '.png': FILE_TYPE_RASTER,
     '.jpg': FILE_TYPE_RASTER,
+    '.jpeg': FILE_TYPE_RASTER,
 }
 
 # Files are opened with dedicated tools for each format, so adding new extension is not sufficient for new compress format to start working
