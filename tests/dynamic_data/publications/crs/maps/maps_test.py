@@ -1,9 +1,11 @@
+import os
 import crs as crs_def
 from test_tools import process_client
 import tests.asserts.final.publication as asserts_publ
 from tests.dynamic_data import base_test
 from ..... import Publication
 
+DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 LAYER_FOR_MAPS = "layer_for_map_crs"
 
@@ -71,3 +73,5 @@ class TestMap(base_test.TestSingleRestPublication):
         asserts_publ.internal.correct_values_in_detail(map.workspace, map.type, map.name,
                                                        exp_publication_detail=exp_publication_detail,
                                                        )
+        exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{map_crs.replace(':', '_').lower()}.png")
+        asserts_publ.internal.thumbnail_equals(map.workspace, map.type, map.name, exp_thumbnail, )
