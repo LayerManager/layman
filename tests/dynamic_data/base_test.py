@@ -24,8 +24,9 @@ def pytest_generate_tests(metafunc):
                 (publication, method_name),
             ])
             ids.append(publ_name)
+    publ_type_name = cls.publication_type.split('.')[-1]
     metafunc.parametrize(
-        argnames='publication, key, params, rest_method, post_before_patch',
+        argnames=f'{publ_type_name}, key, params, rest_method, post_before_patch',
         argvalues=argvalues,
         ids=ids,
         indirect=['post_before_patch'],

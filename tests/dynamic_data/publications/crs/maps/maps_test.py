@@ -50,23 +50,22 @@ class TestMap(base_test.TestSingleRestPublication):
     def before_class(self):
         self.post_publication(Publication(self.workspace, process_client.LAYER_TYPE, LAYER_FOR_MAPS), scope='class')
 
-    def test_input_crs(self, publication, key, params, rest_method):
+    def test_input_crs(self, map, key, params, rest_method):
         """Parametrized using pytest_generate_tests"""
-        map = publication
         map_crs = key
         layer_name = LAYER_FOR_MAPS
         map_params = {
             'map_layers': [(self.workspace, layer_name)],
             'native_extent': params[KEY_INFO_VALUES]['exp_publication_detail']['native_bounding_box'],
             'crs': map_crs,
-            'title': publication.name,
+            'title': map.name,
         }
         rest_method(map, params=map_params)
 
         exp_publication_detail = {
             'description': 'Map generated for internal layers',
             'native_crs': map_crs,
-            'title': publication.name,
+            'title': map.name,
             **params.get(KEY_INFO_VALUES, {}).get('exp_publication_detail', {})
         }
         asserts_publ.internal.correct_values_in_detail(map.workspace, map.type, map.name,
