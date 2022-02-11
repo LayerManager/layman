@@ -25,7 +25,7 @@ def test_get_style_type_from_xml_file(file_path,
 
 @pytest.mark.parametrize('file_path, expected_error, expected_code', [
     ('sample/style/no_style.xml', LaymanError, 46),
-    ('sample/style/countries_wms_blue.png', lxml.etree.XMLSyntaxError, 4),
+    ('test_tools/data/thumbnail/countries_wms_blue.png', lxml.etree.XMLSyntaxError, 4),
 ])
 def test_get_style_type_from_xml_file_errors(file_path,
                                              expected_error,
