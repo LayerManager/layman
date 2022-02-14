@@ -78,10 +78,10 @@ def transform(bbox, crs_from, crs_to):
     world_bounds = crs_def.CRSDefinitions[crs_to].world_bounds.get(crs_from)
     if world_bounds:
         bbox = (
-            max(bbox[0], world_bounds[0]),
-            max(bbox[1], world_bounds[1]),
-            min(bbox[2], world_bounds[2]),
-            min(bbox[3], world_bounds[3]),
+            min(max(bbox[0], world_bounds[0]), world_bounds[2]),
+            min(max(bbox[1], world_bounds[1]), world_bounds[3]),
+            max(min(bbox[2], world_bounds[2]), world_bounds[0]),
+            max(min(bbox[3], world_bounds[3]), world_bounds[1]),
         )
 
     query = f'''
@@ -99,10 +99,10 @@ def transform(bbox, crs_from, crs_to):
     result = db_util.run_query(query, params)[0]
     max_bbox = crs_def.CRSDefinitions[crs_to].max_bbox
     result = (
-        max(result[0], max_bbox[0]),
-        max(result[1], max_bbox[1]),
-        min(result[2], max_bbox[2]),
-        min(result[3], max_bbox[3]),
+        min(max(result[0], max_bbox[0]), max_bbox[2]),
+        min(max(result[1], max_bbox[1]), max_bbox[3]),
+        max(min(result[2], max_bbox[2]), max_bbox[0]),
+        max(min(result[3], max_bbox[3]), max_bbox[1]),
     ) if max_bbox else result
     return result
 
