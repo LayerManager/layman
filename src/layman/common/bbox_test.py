@@ -84,6 +84,18 @@ def test_ensure_bbox_with_area(bbox, no_area_padding, expected_result):
         crs_def.CRSDefinitions[crs_def.EPSG_3857].default_bbox,
     ),
     (
+        [180, 90, 180, 90],
+        crs_def.EPSG_4326,
+        crs_def.EPSG_3857,
+        [20026376.39, 20048966.1, 20026376.39, 20048966.1],
+    ),
+    (
+        [-180, -90, -180, -90],
+        crs_def.EPSG_4326,
+        crs_def.EPSG_3857,
+        [-20026376.39, -20048966.1, -20026376.39, -20048966.1],
+    ),
+    (
         [-598214.7290553625207394, -1160319.8064114262815565, -598200.9321668159682304, -1160307.4425631782505661],
         crs_def.EPSG_5514,
         crs_def.EPSG_3857,

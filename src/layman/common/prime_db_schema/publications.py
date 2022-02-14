@@ -441,10 +441,10 @@ def delete_publication(workspace_name, type, name):
 def set_bbox(workspace, publication_type, publication, bbox, crs, ):
     max_bbox = crs_def.CRSDefinitions[crs].max_bbox if crs else None
     cropped_bbox = (
-        max(bbox[0], max_bbox[0]),
-        max(bbox[1], max_bbox[1]),
-        min(bbox[2], max_bbox[2]),
-        min(bbox[3], max_bbox[3]),
+        min(max(bbox[0], max_bbox[0]), max_bbox[2]),
+        min(max(bbox[1], max_bbox[1]), max_bbox[3]),
+        max(min(bbox[2], max_bbox[2]), max_bbox[0]),
+        max(min(bbox[3], max_bbox[3]), max_bbox[1]),
     ) if not bbox_util.is_empty(bbox) and max_bbox else bbox
     srid = db_util.get_srid(crs)
     query = f'''update {DB_SCHEMA}.publications set
