@@ -4,6 +4,24 @@
  {release_date}
 ### Upgrade requirements
 - Only versions 1.12.0 and newer can be upgraded to this version. For older versions, please upgrade to last 1.15.x first.
+- Due to GeoServer upgrade, it's possible that `make upgrade-demo` fails with following error:
+```shell
+Waiting for GeoServer REST API, user=layman, url=http://geoserver:8080/geoserver/rest/workspaces/
+Traceback (most recent call last):
+  File "src/wait_for_deps.py", line 158, in <module>
+    main()
+  File "src/wait_for_deps.py", line 88, in main
+    response.raise_for_status()
+  File "/usr/local/lib/python3.8/dist-packages/requests/models.py", line 960, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 401 Client Error:  for url: http://geoserver:8080/geoserver/rest/workspaces/
+```
+If you encounter such error, you can use script `upgrade_v1_16_fix_gs.sh` for fixing this issue. Be aware, that you will lose some security GeoServer settings, like Layman user and admin password, so you need to set them again after. The script needs to be run from Layman`s root directory:
+```shell
+make stop-demo
+sh src/layman/upgrade/upgrade_v1_16_fix_gs.sh
+```
+After the script finishes, either set [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) or create [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) in GeoServer GUI.
 - Set new environment variable [LAYMAN_INPUT_SRS_LIST](doc/env-settings.md#LAYMAN_INPUT_SRS_LIST)
 - Unset environment variable [LAYMAN_SETTINGS_MODULE](https://github.com/LayerManager/layman/blob/v1.15.0/doc/env-settings.md), it has no effect anymore.
 - If you are running Layman with development settings, run  
