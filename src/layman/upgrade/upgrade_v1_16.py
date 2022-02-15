@@ -89,3 +89,11 @@ def adjust_db_publication_srid_constraint():
     statement = f'alter table {DB_SCHEMA}.publications add constraint bbox_with_crs_check CHECK ' \
                 f'(bbox is null or srid is not null);'
     db_util.run_statement(statement)
+
+
+def ensure_gs_users():
+    from layman.layer import geoserver
+    from .. import util as layman_util
+
+    for username in layman_util.get_usernames():
+        geoserver.ensure_whole_user(username)
