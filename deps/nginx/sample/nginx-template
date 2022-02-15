@@ -54,9 +54,11 @@ server {
 
     location /qgis {
         allow  127.0.0.1;
-        # docker containers 172.18.0.x, 172.19.0.x
+        # docker containers 172.18.0.x, 172.19.0.x, 172.20.0.x, 172.21.0.x
         allow  172.18.0.0/24;
         allow  172.19.0.0/24;
+        allow  172.20.0.0/24;
+        allow  172.21.0.0/24;
         deny   all;
         proxy_buffers 16 16k;
         proxy_buffer_size 16k;
