@@ -23,11 +23,13 @@ sh src/layman/upgrade/upgrade_v1_16_fix_gs.sh
 ```
 After the script finishes, either set [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD) or create [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) in GeoServer GUI.
 - Set new environment variable [LAYMAN_INPUT_SRS_LIST](doc/env-settings.md#LAYMAN_INPUT_SRS_LIST)
+- Change [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION) to `v1.10.0`
 - Unset environment variable [LAYMAN_SETTINGS_MODULE](https://github.com/LayerManager/layman/blob/v1.15.0/doc/env-settings.md), it has no effect anymore.
 - If you are running Layman with development settings, run  
 ```
 make geoserver-build
 make timgen-build
+make client-build
 ```
 ### Migrations and checks
 #### Schema migrations
