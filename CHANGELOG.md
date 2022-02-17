@@ -1,7 +1,7 @@
 # Changelog
 
 ## v1.16.0
- {release_date}
+ 2022-02-18
 ### Upgrade requirements
 - Only versions 1.12.0 and newer can be upgraded to this version. For older versions, please upgrade to last 1.15.x first.
 - Due to GeoServer upgrade, it's possible that `make upgrade-demo` fails with following error:
