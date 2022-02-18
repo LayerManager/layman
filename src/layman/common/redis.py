@@ -24,13 +24,17 @@ def create_lock_decorator(publication_type, publication_name_key, is_chain_ready
                 result = func(*args, **kwargs)
                 if is_chain_ready_fn(workspace, publication_name):
                     unlock_publication(workspace, publication_type, publication_name)
+                    celery_util.run_next_chain(workspace, publication_type, publication_name)
             except Exception as exception:
                 try:
                     if is_chain_ready_fn(workspace, publication_name):
                         unlock_publication(workspace, publication_type, publication_name)
+                        celery_util.run_next_chain(workspace, publication_type, publication_name)
                 finally:
                     unlock_publication(workspace, publication_type, publication_name)
+                    celery_util.run_next_chain(workspace, publication_type, publication_name)
                 raise exception
+
             return result
 
         return decorated_function
