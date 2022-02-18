@@ -27,10 +27,9 @@ def test_patch_after_feature_change_concurrency(publication_type):
     process_client.patch_workspace_publication(publication_type, workspace, publication, title='New title',
                                                check_response_fn=empty_method_returns_true)
     queue = celery.get_run_after_chain_queue(workspace, publication_type, publication)
-    assert len(queue) == 1, queue
-    assert queue == ['layman.util::patch_after_feature_change', ]
+    assert len(queue) == 0, queue
     lock = redis.get_publication_lock(workspace, publication_type, publication)
-    assert lock == common_const.PUBLICATION_LOCK_PATCH or not lock
+    assert lock == common_const.PUBLICATION_LOCK_FEATURE_CHANGE
 
     process_client.patch_after_feature_change(workspace, publication_type, publication)
     queue = celery.get_run_after_chain_queue(workspace, publication_type, publication)
