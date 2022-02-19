@@ -99,8 +99,8 @@ def generate_map_thumbnail(workspace, mapname, editor):
     max_attempts = 40
     attempts = 0
     data_url = browser.execute_script('''return window.canvas_data_url;''')
-    while data_url is None:
-        current_app.logger.info(f"waiting for entries, data_url={data_url}")
+    while data_url is None and attempts < max_attempts:
+        current_app.logger.info(f"waiting for entries, data_url={data_url}, attempts={attempts}")
         time.sleep(0.5)
         attempts += 1
         data_url = browser.execute_script('''return window.canvas_data_url;''')
