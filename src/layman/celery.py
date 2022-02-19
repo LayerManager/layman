@@ -35,17 +35,12 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
     key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
     hash = task_id
     if rds.hexists(key, hash):
-        next_task = pop_step_to_run_after_chain(workspace, publication_type, publication_name)
         # 'finish_publication_chain' has to run before next_task's 'method' as 'method' expects the publication to be unlocked and
         #   'finish_publication_chain' releases the lock.
         # 'finish_publication_chain' has to run before 'update_related_publications_after_change' as otherwise deadlock arises.
         finish_publication_chain(task_id, task_state)
         update_related_publications_after_change(workspace, publication_type, publication_name)
-        if next_task:
-            module_name, method_name = next_task.split('::')
-            module = importlib.import_module(module_name)
-            method = getattr(module, method_name)
-            method(workspace, publication_type, publication_name)
+        run_next_chain(workspace, publication_type, publication_name)
     elif task_state == 'FAILURE':
         chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
         if chain_info is not None:
@@ -320,6 +315,15 @@ def delete_publication(workspace, publication_type, publication_name):
 
     key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
     rds.hdel(key, task_id)
+
+
+def run_next_chain(workspace, publ_type, publication):
+    next_task = pop_step_to_run_after_chain(workspace, publ_type, publication)
+    if next_task:
+        module_name, method_name = next_task.split('::')
+        module = importlib.import_module(module_name)
+        method = getattr(module, method_name)
+        method(workspace, publ_type, publication)
 
 
 class AbortedException(Exception):
