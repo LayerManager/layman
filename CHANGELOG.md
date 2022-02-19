@@ -3,7 +3,7 @@
 ## v1.16.1
  {release_date}
 ### Changes
-
+- Fix infinity loop when generating map thumbnail. One of consequences was that such infinity loops consumed all celery workers and it was not possible to complete POST/PATCH map or layer.
 
 ## v1.16.0
  2022-02-18
