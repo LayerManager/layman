@@ -6,6 +6,7 @@
 - Fix infinity loop when generating map thumbnail. One of consequences was that such infinity loops consumed all celery workers and it was not possible to complete POST/PATCH map or layer.
 - Fix empty map thumbnail. In some cases, map thumbnail was generated as if anonymous user asks for the map. Now the thumbnail is generated as if user with writing rights asks for the map.
 - New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](doc/env-settings.md#oauth2_liferay_introspection_sub_key).
+- [#599](https://github.com/LayerManager/layman/issues/599) Layman supports uploading data files with upper or mixed case extensions.
 
 ## v1.16.0
  2022-02-18

@@ -36,7 +36,7 @@ def delete_layer(workspace, layername):
 
 
 def get_compressed_main_file_extension(filepath):
-    file_ext = os.path.splitext(filepath)[1]
+    file_ext = os.path.splitext(filepath)[1].lower()
     return file_ext if file_ext in settings.COMPRESSED_FILE_EXTENSIONS else None
 
 
@@ -80,7 +80,7 @@ get_publication_uuid = uuid.get_publication_uuid
 
 
 def get_main_file_name(filenames):
-    return next((fn for fn in filenames if os.path.splitext(fn)[1]
+    return next((fn for fn in filenames if os.path.splitext(fn)[1].lower()
                  in util.get_all_allowed_main_extensions()), None)
 
 
@@ -96,7 +96,7 @@ def get_gdal_format_file_path(filepath):
 
 def get_file_type(main_filepath):
     if main_filepath:
-        ext = os.path.splitext(main_filepath)[1]
+        ext = os.path.splitext(main_filepath)[1].lower()
         file_type = settings.MAIN_FILE_EXTENSIONS.get(ext, settings.FILE_TYPE_UNKNOWN)
     else:
         file_type = settings.FILE_TYPE_UNKNOWN
@@ -271,7 +271,7 @@ def get_file_name_mappings(file_names, main_file_name, layer_name, output_dir):
     filepath_mapping = {}
     for file_name in file_names:
         if file_name.startswith(main_file_name + '.'):
-            new_fn = layer_name + file_name[len(main_file_name):]
+            new_fn = layer_name + file_name[len(main_file_name):].lower()
             filepath_mapping[file_name] = os.path.join(output_dir, new_fn)
             filename_mapping[file_name] = new_fn
         else:
