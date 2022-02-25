@@ -150,6 +150,22 @@ DEFAULT_POST = {
     ]
 }
 
+DEFAULT_POST_DICT = {
+    process_client.LAYER_TYPE: DEFAULT_POST,
+    process_client.MAP_TYPE: {
+        consts.KEY_ACTION: {
+            consts.KEY_CALL: Action(process_client.publish_workspace_publication,
+                                    dict()),
+            consts.KEY_RESPONSE_ASSERTS: [
+                Action(processing.response.valid_post, dict()),
+            ],
+        },
+        consts.KEY_FINAL_ASSERTS: [
+            *publication.IS_MAP_COMPLETE_AND_CONSISTENT,
+        ]
+    },
+}
+
 DEFAULT_ACTIONS = [
     ('post', process_client.publish_workspace_publication, []),
     ('patch', process_client.patch_workspace_publication, [DEFAULT_POST])

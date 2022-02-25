@@ -39,7 +39,8 @@ def generate(workspace=None):
     for testcase, tc_params in TESTCASES.items():
         parametrization = {key: values for key, values in REST_PARAMETRIZATION.items()
                            if key not in tc_params.get(KEY_ACTION_PARAMS, list())}
-        rest_param_dicts = util.dictionary_product(parametrization)
+        rest_param_dicts = util.dictionary_product(parametrization) if tc_params[KEY_PUBLICATION_TYPE] == process_client.LAYER_TYPE\
+            else [dict()]
         for rest_param_dict in rest_param_dicts:
             test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
                                           for key, value in rest_param_dict.items()
@@ -56,7 +57,7 @@ def generate(workspace=None):
                     ],
                 },
                 consts.KEY_FINAL_ASSERTS: [
-                    *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                    *publication.IS_PUBLICATION_COMPLETE_AND_CONSISTENT[tc_params[KEY_PUBLICATION_TYPE]],
                     *tc_params[consts.KEY_FINAL_ASSERTS],
                 ]
             }
@@ -77,10 +78,11 @@ def generate(workspace=None):
                     ],
                 },
                 consts.KEY_FINAL_ASSERTS: [
-                    *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+                    *publication.IS_PUBLICATION_COMPLETE_AND_CONSISTENT[tc_params[KEY_PUBLICATION_TYPE]],
                     *tc_params[consts.KEY_FINAL_ASSERTS],
                 ]
             }
-            publ_name = f"{testcase}_patch_{test_case_postfix}"
-            result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = [layers.DEFAULT_POST, patch_action]
+            publ_name = "_".join([part for part in [testcase, 'patch', test_case_postfix] if part])
+            result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = [
+                layers.DEFAULT_POST_DICT[tc_params[KEY_PUBLICATION_TYPE]], patch_action]
     return result
