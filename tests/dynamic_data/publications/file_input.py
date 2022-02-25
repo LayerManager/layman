@@ -29,6 +29,35 @@ TESTCASES = {
             }),
         ],
     },
+    'capslock_extension_zip': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': [
+                'sample/layman.layer/smaLL_Layer.ZIP',
+            ],
+            'compress': False,
+        },
+        consts.KEY_FINAL_ASSERTS: [
+            Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER_ZIP.info_values),
+            Action(publication.internal.thumbnail_equals, {
+                'exp_thumbnail': layers.SMALL_LAYER_ZIP.thumbnail,
+            }),
+        ],
+    },
+    'capslock_extension_geojson': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': [
+                'sample/layman.layer/SMAll_layER.GeOjSoN',
+            ],
+        },
+        consts.KEY_FINAL_ASSERTS: [
+            *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+            Action(publication.internal.thumbnail_equals, {
+                'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
+            }),
+        ],
+    },
 }
 
 
