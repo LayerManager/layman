@@ -87,7 +87,7 @@ def authenticate():
             try:
                 r_json = response.json()
                 # current_app.logger.info(f"r_json={r_json}")
-                if r_json['active'] is True and r_json['token_type'] == 'Bearer':
+                if r_json['active'] is True and r_json.get('token_type', 'Bearer') == 'Bearer':
                     valid_resp = r_json
                     break
             except ValueError:
@@ -102,7 +102,7 @@ def authenticate():
                               f'Introspection endpoint claims that access token is not active or it\'s not Bearer token.',
                               sub_code=9)
 
-        sub = valid_resp['sub']
+        sub = valid_resp[provider_module.INTROSPECTION_SUB_KEY]
 
         exp = valid_resp['exp']
         exp_in = math.ceil(exp - time.time())
