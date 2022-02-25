@@ -1,7 +1,7 @@
 # Changelog
 
 ## v1.16.1
- {release_date}
+ 2022-02-25
 ### Changes
 - Fix infinity loop when generating map thumbnail. One of consequences was that such infinity loops consumed all celery workers and it was not possible to complete POST/PATCH map or layer.
 - Fix empty map thumbnail. In some cases, map thumbnail was generated as if anonymous user asks for the map. Now the thumbnail is generated as if user with writing rights asks for the map.
