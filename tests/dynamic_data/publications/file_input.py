@@ -58,6 +58,16 @@ TESTCASES = {
             }),
         ],
     },
+    'capslock_extension_json': {
+        KEY_PUBLICATION_TYPE: process_client.MAP_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': [
+                'sample/layman.map/smaLL_Map.jSOn',
+            ],
+        },
+        consts.KEY_FINAL_ASSERTS: [
+        ],
+    },
 }
 
 
