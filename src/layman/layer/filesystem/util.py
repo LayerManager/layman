@@ -54,17 +54,17 @@ class InputFiles:
 
     @property
     def raw_paths_to_archives(self):
-        return [fp for fp in self.raw_paths if os.path.splitext(fp)[1] in settings.COMPRESSED_FILE_EXTENSIONS]
+        return [fp for fp in self.raw_paths if os.path.splitext(fp)[1].lower() in settings.COMPRESSED_FILE_EXTENSIONS]
 
     @property
     def archive_streams(self):
         return [fs for fs in self.sent_streams
-                if os.path.splitext(fs.filename)[1] in settings.COMPRESSED_FILE_EXTENSIONS]
+                if os.path.splitext(fs.filename)[1].lower() in settings.COMPRESSED_FILE_EXTENSIONS]
 
     @property
     def saved_paths_to_archives(self):
         return [fp for fp in self.saved_paths
-                if os.path.splitext(fp)[1] in settings.COMPRESSED_FILE_EXTENSIONS]
+                if os.path.splitext(fp)[1].lower() in settings.COMPRESSED_FILE_EXTENSIONS]
 
     @property
     def is_one_archive(self):
@@ -91,12 +91,12 @@ class InputFiles:
     @property
     def raw_main_file_paths(self):
         return [fn for fn in self.raw_paths
-                if os.path.splitext(fn)[1] in get_all_allowed_main_extensions()]
+                if os.path.splitext(fn)[1].lower() in get_all_allowed_main_extensions()]
 
     @property
     def raw_or_archived_main_file_paths(self):
         return [fn for fn in self.raw_or_archived_paths
-                if os.path.splitext(fn)[1] in get_all_allowed_main_extensions()]
+                if os.path.splitext(fn)[1].lower() in get_all_allowed_main_extensions()]
 
     @property
     def raw_or_archived_main_file_path(self):
@@ -107,7 +107,7 @@ class InputFiles:
 
     @property
     def archive_type(self):
-        return os.path.splitext(self.saved_paths_to_archives[0])[1] if self.is_one_archive else None
+        return os.path.splitext(self.saved_paths_to_archives[0])[1].lower() if self.is_one_archive else None
 
     @property
     def main_file_path_for_gdal(self):
