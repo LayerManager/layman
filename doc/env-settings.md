@@ -84,6 +84,9 @@ URL of LTC OAuth2 callback endpoint to be called after Liferay authorization. Us
 ### OAUTH2_LIFERAY_INTROSPECTION_URL
 URL of Liferay OAuth2 Introspection endpoint.
 
+### OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY
+Name of the key in OAuth2 introspection response whose value is OAuth2 subject (also known as "sub"). If not set or set to empty string, `sub` is used, that is suitable for Liferay. Value `username` is suitable for Wagtail.
+
 ### OAUTH2_LIFERAY_USER_PROFILE_URL
 URL of Liferay User Profile endpoint.
 
