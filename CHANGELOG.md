@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.16.2
+ {release_date}
+### Upgrade requirements
+### Changes
+
 ## v1.16.1
  2022-02-25
 ### Changes
