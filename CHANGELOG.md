@@ -3,7 +3,21 @@
 ## v1.16.2
  {release_date}
 ### Upgrade requirements
+- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
+  ```
+  LAYMAN_CLIENT_VERSION=v1.11.0
+  ```
+- If you are using Liferay as OAuth2 provider, set new environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_liferay_scope):
+  ```
+  OAUTH2_LIFERAY_SCOPE=liferay-json-web-services.everything.read.userprofile
+  ```
+  If you are using Wagtail, do not set this variable at all (not even to empty string).
+- If you are running Layman with development settings, run  
+  ```
+  make client-build
+  ```
 ### Changes
+- New environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_liferay_scope).
 
 ## v1.16.1
  2022-02-25

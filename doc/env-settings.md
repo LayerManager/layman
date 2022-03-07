@@ -90,6 +90,9 @@ Name of the key in OAuth2 introspection response whose value is OAuth2 subject (
 ### OAUTH2_LIFERAY_USER_PROFILE_URL
 URL of Liferay User Profile endpoint.
 
+### OAUTH2_LIFERAY_SCOPE
+Comma-separated list of requested OAuth2 scopes. Value `liferay-json-web-services.everything.read.userprofile` is suitable for Liferay. Do not set this variable at all (not even to empty string) if you don't want to request scope; this is suitable option for Wagtail.
+
 ### GRANT_CREATE_PUBLIC_WORKSPACE
 List of [users](models.md#user) and [roles](models.md#role) giving them permission to create new [public workspace](models.md#public-workspace). It must be subset of (or equal to) GRANT_PUBLISH_IN_PUBLIC_WORKSPACE.
 
