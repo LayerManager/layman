@@ -7,8 +7,28 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- New environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_liferay_scope). Introduced in v1.16.2.
 - New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](doc/env-settings.md#oauth2_liferay_introspection_sub_key). Introduced in v1.16.1.
 - [#599](https://github.com/LayerManager/layman/issues/599) Layman supports uploading data files with upper or mixed case extensions. Introduced in v1.16.1.
+
+## v1.16.2
+ 2022-03-07
+### Upgrade requirements
+- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
+  ```
+  LAYMAN_CLIENT_VERSION=v1.11.0
+  ```
+- If you are using Liferay as OAuth2 provider, set new environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_liferay_scope):
+  ```
+  OAUTH2_LIFERAY_SCOPE=liferay-json-web-services.everything.read.userprofile
+  ```
+  If you are using Wagtail, do not set this variable at all (not even to empty string).
+- If you are running Layman with development settings, run  
+  ```
+  make client-build
+  ```
+### Changes
+- New environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_liferay_scope).
 
 ## v1.16.1
  2022-02-25
