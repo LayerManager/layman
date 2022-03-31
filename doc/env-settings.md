@@ -18,7 +18,7 @@ String with public domain and optionally port, e.g. `<domain>` or `<domain>:<por
 Set to `true` if you do not want to flush & load redis database on Layman's startup.
 
 ### LAYMAN_CELERY_QUEUE
-Name of Celery [queue](https://docs.celeryproject.org/en/latest/userguide/routing.html) where Layman's Celery tasks will be sent.
+Name of Celery [queue](https://docs.celeryq.dev/en/latest/userguide/routing.html) where Layman's Celery tasks will be sent.
 
 ### LAYMAN_CLIENT_VERSION
 Git commit hash or tag of [Layman Test Client](https://github.com/LayerManager/layman-test-client). Referenced version will be used as default client for this Layman instance.

@@ -15,7 +15,7 @@ def make_celery(app):
         include=get_task_modules(),
     )
     celery_app.conf.update(
-        # http://docs.celeryproject.org/en/latest/getting-started/brokers/redis.html
+        # https://docs.celeryq.dev/en/stable/getting-started/backends-and-brokers/redis.html
         broker_transport_options={
             'visibility_timeout': 3600,  # 1 hour
             'fanout_prefix': True,
