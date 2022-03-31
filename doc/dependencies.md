@@ -53,7 +53,7 @@
 | [pytest](https://pytest.org/) | MIT License | Pipfile | test | bin | |
 | [flake8](https://flake8.pycqa.org/) | MIT | Pipfile | test | bin | code style checker |
 | [pycodestyle](https://pycodestyle.pycqa.org/) | MIT | Pipfile | test | bin | code style checker |
-| [pylint](https://www.pylint.org/) | GNU GPL v2 | Pipfile | test | bin | code style checker |
+| [pylint](https://github.com/PyCQA/pylint) | GNU GPL v2 | Pipfile | test | bin | code style checker |
 | [autopep8](https://github.com/hhatto/autopep8) | MIT | Pipfile | test | bin | to automatically fix code style |
 | [pytest-rerunfailures](https://github.com/pytest-dev/pytest-rerunfailures) | MPL | Pipfile | test | bin | to automatically rerun flaky tests |
 | [pytest-timeout](https://pypi.org/project/pytest-timeout/) | MIT | Pipfile | test | bin | to automatically stop tests after given timeout |
