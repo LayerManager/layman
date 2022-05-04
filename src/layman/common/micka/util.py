@@ -231,17 +231,23 @@ def csw_insert(template_values):
 
 
 def soap_insert(template_values):
-    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'soap-insert-template.xml')
-    xml_str = fill_template_as_str(template_path, template_values)
-    root_el, response = base_insert(xml_str)
-    assert root_el.tag == nspath_eval('soap:Envelope', NAMESPACES), response.content
-    assert root_el.find(nspath_eval('soap:Body/csw:TransactionResponse/csw:TransactionSummary/csw:totalInserted',
-                                    NAMESPACES)).text == "1", response.content
+    response = None
+    try:
+        template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'soap-insert-template.xml')
+        xml_str = fill_template_as_str(template_path, template_values)
+        root_el, response = base_insert(xml_str)
+        assert root_el.tag == nspath_eval('soap:Envelope', NAMESPACES), response.content
+        assert root_el.find(nspath_eval('soap:Body/csw:TransactionResponse/csw:TransactionSummary/csw:totalInserted',
+                                        NAMESPACES)).text == "1", response.content
 
-    muuid_els = root_el.findall(
-        nspath_eval('soap:Body/csw:TransactionResponse/csw:InsertResult/csw:BriefRecord/dc:identifier', NAMESPACES))
-    assert len(muuid_els) == 1, response.content
-    muuid = muuid_els[0].text
+        muuid_els = root_el.findall(
+            nspath_eval('soap:Body/csw:TransactionResponse/csw:InsertResult/csw:BriefRecord/dc:identifier', NAMESPACES))
+        assert len(muuid_els) == 1, response.content
+        muuid = muuid_els[0].text
+    except BaseException as exc:
+        if response:
+            logger.warning(f'response={response}')
+        raise exc
     return muuid
 
 
