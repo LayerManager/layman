@@ -4,6 +4,7 @@
  {release_date}
 ### Upgrade requirements
 ### Changes
+- Stop Firefox instances if map thumbnail generation times out. Previously Firefox processes keeps running and were never stopped.
 
 ## v1.16.2
  2022-03-07
