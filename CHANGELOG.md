@@ -12,10 +12,10 @@
 - [#599](https://github.com/LayerManager/layman/issues/599) Layman supports uploading data files with upper or mixed case extensions. Introduced in v1.16.1.
 
 ## v1.16.3
- {release_date}
-### Upgrade requirements
+ 2022-06-20
 ### Changes
 - Stop Firefox instances if map thumbnail generation times out. Previously Firefox processes keeps running and were never stopped.
+- Add logging for Micka response in case of exception.
 
 ## v1.16.2
  2022-03-07
