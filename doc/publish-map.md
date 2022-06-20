@@ -12,10 +12,10 @@ In QGIS, you need to implement following steps.
 
 First, compose JSON valid against [map-composition schema](https://github.com/hslayers/map-compositions). For Layman, especially `describedBy`, `name`, `title`, `abstract`, `layers`, `projection`, and `extent attributes are important. Each layer must have `className` attribute equal to `HSLayers.Layer.WMS`.
 
-Then save the file to Layman using [POST Workspace Maps](rest.md#post-workspace-maps) endpoint. Well-known [requests](https://requests.readthedocs.io/en/master/) module can be used for sending HTTP requests. See especially
-- [More complicated POST requests](https://requests.readthedocs.io/en/master/user/quickstart/#more-complicated-post-requests)
-- [POST a Multipart-Encoded File](https://requests.readthedocs.io/en/master/user/quickstart/#post-a-multipart-encoded-file)
-- [POST Multiple Multipart-Encoded Files](https://requests.readthedocs.io/en/master/user/advanced/#post-multiple-multipart-encoded-files)
+Then save the file to Layman using [POST Workspace Maps](rest.md#post-workspace-maps) endpoint. Well-known [requests](https://requests.readthedocs.io/en/latest/) module can be used for sending HTTP requests. See especially
+- [More complicated POST requests](https://requests.readthedocs.io/en/latest/user/quickstart/#more-complicated-post-requests)
+- [POST a Multipart-Encoded File](https://requests.readthedocs.io/en/latest/user/quickstart/#post-a-multipart-encoded-file)
+- [POST Multiple Multipart-Encoded Files](https://requests.readthedocs.io/en/latest/user/advanced/#post-multiple-multipart-encoded-files)
 
 In response of [POST Workspace Maps](rest.md#post-workspace-maps) you will obtain
  - `name` of the map unique within all maps in used [workspace](models.md#workspace)
