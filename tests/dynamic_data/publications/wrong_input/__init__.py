@@ -535,6 +535,24 @@ TESTCASES = {
                           },
         },
     },
+    'layer_unsupported_overview_resampling': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
+            'overview_resampling': 'no_overview_resampling',
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'detail': {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/programs/gdaladdo.html',
+                                     'parameter': 'overview_resampling',
+                                     'detail': {'found': 'no_overview_resampling',
+                                                'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, },
+                          },
+        },
+    },
 }
 
 VALIDATION_PATCH_ACTION = {
