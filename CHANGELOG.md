@@ -1,10 +1,10 @@
 # Changelog
 
 ## v1.16.3
- {release_date}
-### Upgrade requirements
+ 2022-06-20
 ### Changes
 - Stop Firefox instances if map thumbnail generation times out. Previously Firefox processes keeps running and were never stopped.
+- Add logging for Micka response in case of exception.
 
 ## v1.16.2
  2022-03-07
