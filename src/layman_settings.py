@@ -52,6 +52,19 @@ for mandatory_srs in ['EPSG:3857',
     if mandatory_srs not in INPUT_SRS_LIST:
         INPUT_SRS_LIST.append(mandatory_srs)
 
+OVERVIEW_RESAMPLING_METHOD_LIST = [
+    'nearest',
+    'average',
+    'rms',
+    'bilinear',
+    'gauss',
+    'cubic',
+    'cubicspline',
+    'lanczos',
+    'average_magphase',
+    'mode',
+]
+
 DEFAULT_CONNECTION_TIMEOUT = int(os.environ['DEFAULT_CONNECTION_TIMEOUT'])
 
 LAYMAN_PG_HOST = os.environ['LAYMAN_PG_HOST']
