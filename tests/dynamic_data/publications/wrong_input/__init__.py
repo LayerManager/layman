@@ -558,6 +558,37 @@ TESTCASES = {
             },
         },
     },
+    'layer_vector_overview_resampling': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'overview_resampling': 'nearest',
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_ONLY_FIRST_PARAMETRIZATION: False,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 48,
+                          'message': 'Wrong combination of parameters',
+                          'detail': 'Vector layers do not support overview resampling.',
+                          },
+            frozenset([('compress', False), ('with_chunks', True)]): {
+                'sync': False,
+            },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+            },
+        },
+        KEY_PATCHES: {
+            'full': {
+                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+                KEY_ACTION_PARAMS: {
+                    'file_paths': ['sample/layman.layer/small_layer.geojson'],
+                    'overview_resampling': 'nearest',
+                },
+            },
+        },
+    },
 }
 
 VALIDATION_PATCH_ACTION = {

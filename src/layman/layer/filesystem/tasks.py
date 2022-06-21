@@ -23,7 +23,7 @@ refresh_gdal_needed = empty_method_returns_true
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_input_chunk(self, workspace, layername, check_crs=True):
+def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_resampling=''):
     if self.is_aborted():
         raise AbortedException
     last_change = time.time()
@@ -58,7 +58,7 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True):
     input_file.check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=True)
 
     main_filepath = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['_file']['gdal_path']
-    input_file.check_main_file(main_filepath, check_crs=check_crs)
+    input_file.check_main_file(main_filepath, check_crs=check_crs, overview_resampling=overview_resampling)
 
     file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
     style_type_for_check = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type']})['style_type']
