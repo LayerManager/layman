@@ -169,6 +169,7 @@ def patch_workspace_publication(publication_type,
                                 crs=None,
                                 map_layers=None,
                                 native_extent=None,
+                                overview_resampling=None,
                                 ):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
@@ -178,7 +179,7 @@ def patch_workspace_publication(publication_type,
 
     file_paths = [] if file_paths is None and not map_layers else file_paths
 
-    if style_file or with_chunks or compress or compress_settings:
+    if style_file or with_chunks or compress or compress_settings or overview_resampling:
         assert publication_type == LAYER_TYPE
     if map_layers or native_extent:
         assert publication_type == MAP_TYPE
@@ -223,6 +224,8 @@ def patch_workspace_publication(publication_type,
             data['title'] = title
         if style_file:
             files.append(('style', (os.path.basename(style_file), open(style_file, 'rb'))))
+        if overview_resampling:
+            data['overview_resampling'] = overview_resampling
 
         response = requests.patch(r_url,
                                   files=files,

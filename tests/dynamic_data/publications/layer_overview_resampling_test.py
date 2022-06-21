@@ -14,12 +14,6 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     test_cases = {resampling_method: {} for resampling_method in settings.OVERVIEW_RESAMPLING_METHOD_LIST}
 
-    rest_parametrization = {
-        'method': {
-            'post_publication': 'post',
-        },
-    }
-
     # pylint: disable=unused-argument
     @staticmethod
     def test_overview_resampling(layer, key, params, rest_method):

@@ -318,6 +318,9 @@ Body parameters:
 - ~~sld~~, SLD file
    - **deprecated parameter**
    - alias for *style* parameter
+- *overview_resampling*, string
+   - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
+
 #### Response
 Content-Type: `application/json`
 

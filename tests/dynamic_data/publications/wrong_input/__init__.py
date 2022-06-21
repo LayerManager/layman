@@ -552,6 +552,11 @@ TESTCASES = {
                                                 'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, },
                           },
         },
+        KEY_PATCHES: {
+            'full': {
+                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+            },
+        },
     },
 }
 
