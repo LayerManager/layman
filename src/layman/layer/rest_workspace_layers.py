@@ -119,6 +119,7 @@ def post(workspace):
         'actor_name': actor_name,
         'style_type': style_type,
         'store_in_geoserver': style_type.store_in_geoserver,
+        'overview_resampling': overview_resampling,
     }
 
     rest_common.setup_post_access_rights(request.form, task_options, actor_name)
@@ -157,7 +158,7 @@ def post(workspace):
             })
         else:
             try:
-                input_file.save_layer_files(workspace, layername, input_files, check_crs)
+                input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling)
             except BaseException as exc:
                 uuid.delete_layer(workspace, layername)
                 input_file.delete_layer(workspace, layername)

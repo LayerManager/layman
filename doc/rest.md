@@ -171,6 +171,7 @@ Body parameters:
    - alias for *style* parameter
 - *overview_resampling*, string
    - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
+   - supported only for raster layers
 
 #### Response
 Content-Type: `application/json`
@@ -320,6 +321,7 @@ Body parameters:
    - alias for *style* parameter
 - *overview_resampling*, string
    - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
+   - supported only for raster layers
 
 #### Response
 Content-Type: `application/json`

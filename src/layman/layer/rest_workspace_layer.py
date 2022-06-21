@@ -99,6 +99,15 @@ def patch(workspace, layername):
     if len(input_files.raw_paths) > 0:
         delete_from = 'layman.layer.filesystem.input_file'
 
+    # Overview resampling
+    overview_resampling = request.form.get('overview_resampling', '')
+    if overview_resampling and overview_resampling not in settings.OVERVIEW_RESAMPLING_METHOD_LIST:
+        raise LaymanError(2, {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/programs/gdaladdo.html',
+                              'parameter': 'overview_resampling',
+                              'detail': {'found': 'no_overview_resampling',
+                                         'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, })
+    kwargs['overview_resampling'] = overview_resampling
+
     # FILE NAMES
     use_chunk_upload = bool(input_files.sent_paths)
     if delete_from == 'layman.layer.filesystem.input_file':
@@ -108,7 +117,7 @@ def patch(workspace, layername):
         # file checks
         if not use_chunk_upload:
             temp_dir = tempfile.mkdtemp(prefix="layman_")
-            input_file.save_layer_files(workspace, layername, input_files, check_crs, output_dir=temp_dir)
+            input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, output_dir=temp_dir)
 
     if input_files.raw_paths:
         file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
@@ -120,14 +129,6 @@ def patch(workspace, layername):
         style_type_for_check = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type']})['style_type']
     if file_type == settings.FILE_TYPE_RASTER and style_type_for_check == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
-
-    # Overview resampling
-    overview_resampling = request.form.get('overview_resampling', '')
-    if overview_resampling and overview_resampling not in settings.OVERVIEW_RESAMPLING_METHOD_LIST:
-        raise LaymanError(2, {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/programs/gdaladdo.html',
-                              'parameter': 'overview_resampling',
-                              'detail': {'found': 'no_overview_resampling',
-                                         'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, })
 
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh

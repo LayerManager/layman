@@ -103,9 +103,11 @@ def get_file_type(main_filepath):
     return file_type
 
 
-def check_main_file(main_filepath, *, check_crs=True):
+def check_main_file(main_filepath, *, check_crs=True, overview_resampling=''):
     file_type = get_file_type(main_filepath)
     if file_type == settings.FILE_TYPE_VECTOR:
+        if overview_resampling:
+            raise LaymanError(48, f'Vector layers do not support overview resampling.')
         check_vector_main_file(main_filepath, check_crs=check_crs)
     elif file_type == settings.FILE_TYPE_RASTER:
         check_raster_main_file(main_filepath, check_crs=check_crs)
@@ -240,7 +242,7 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
             raise LaymanError(3, conflict_paths)
 
 
-def save_layer_files(workspace, layername, input_files, check_crs, *, output_dir=None):
+def save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, *, output_dir=None, ):
     if input_files.is_one_archive:
         main_filename = input_files.raw_paths_to_archives[0]
     else:
@@ -253,7 +255,7 @@ def save_layer_files(workspace, layername, input_files, check_crs, *, output_dir
     common.save_files(input_files.sent_streams, filepath_mapping)
 
     main_filepath = get_gdal_format_file_path(filepath_mapping[main_filename])
-    check_main_file(main_filepath, check_crs=check_crs)
+    check_main_file(main_filepath, check_crs=check_crs, overview_resampling=overview_resampling)
 
 
 def get_unsafe_layername(input_files):
