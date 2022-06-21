@@ -121,6 +121,14 @@ def patch(workspace, layername):
     if file_type == settings.FILE_TYPE_RASTER and style_type_for_check == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
 
+    # Overview resampling
+    overview_resampling = request.form.get('overview_resampling', '')
+    if overview_resampling and overview_resampling not in settings.OVERVIEW_RESAMPLING_METHOD_LIST:
+        raise LaymanError(2, {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/programs/gdaladdo.html',
+                              'parameter': 'overview_resampling',
+                              'detail': {'found': 'no_overview_resampling',
+                                         'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, })
+
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
 

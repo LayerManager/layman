@@ -7,7 +7,7 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
-- [#551](https://github.com/LayerManager/layman/issues/551) Endpoint [POST Workspace Layers](doc/rest.md#post-workspace-layers) supports new body parameter *overview_resampling*.
+- [#551](https://github.com/LayerManager/layman/issues/551) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new body parameter *overview_resampling*.
 - New environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_liferay_scope). Introduced in v1.16.2.
 - New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](doc/env-settings.md#oauth2_liferay_introspection_sub_key). Introduced in v1.16.1.
 - [#599](https://github.com/LayerManager/layman/issues/599) Layman supports uploading data files with upper or mixed case extensions. Introduced in v1.16.1.
