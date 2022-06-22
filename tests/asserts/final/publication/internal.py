@@ -94,12 +94,13 @@ def mandatory_keys_in_all_sources_of_actor(workspace, publ_type, name, actor, ):
     assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
 
 
-def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, ):
+def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, *, max_diffs=None):
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['thumbnail']})
 
     diffs = test_util.compare_images(exp_thumbnail, pub_info['_thumbnail']['path'])
-    assert diffs < 500
+    max_diffs = max_diffs or 500
+    assert diffs < max_diffs
 
 
 def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_detail, publ_type_detail=None, full_comparison=True,
