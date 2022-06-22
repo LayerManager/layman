@@ -1,7 +1,10 @@
+import os
 from layman import settings
 from test_tools import process_client
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
+
+DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 pytest_generate_tests = base_test.pytest_generate_tests
 
@@ -20,7 +23,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         """Parametrized using pytest_generate_tests"""
         overview_resampling_method = key
         layer_params = {
-            'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
+            'file_paths': [os.path.join(DIRECTORY, 'raster_for_resampling.tif')],
             'overview_resampling': overview_resampling_method,
         }
         rest_method(layer, params=layer_params)
