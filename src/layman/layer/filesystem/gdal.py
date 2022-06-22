@@ -269,17 +269,20 @@ def compress_raster_file_async(workspace, layer, *, file_to_compress):
     return process
 
 
-def add_overview_async(workspace, layer):
+def add_overview_async(workspace, layer, *, overview_resampling=None):
     normalized_path = get_normalized_raster_layer_main_filepath(workspace, layer)
     color_interp = get_color_interpretations(normalized_path)
     bash_args = [
         'gdaladdo',
     ]
     # resampling
-    if color_interp == ['Palette']:
-        resampling_method = 'mode'
+    if overview_resampling:
+        resampling_method = overview_resampling
     else:
-        resampling_method = 'average'
+        if color_interp == ['Palette']:
+            resampling_method = 'mode'
+        else:
+            resampling_method = 'average'
     bash_args.extend([
         '-r', resampling_method,
     ])

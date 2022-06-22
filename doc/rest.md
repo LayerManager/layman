@@ -170,8 +170,10 @@ Body parameters:
    - **deprecated parameter**
    - alias for *style* parameter
 - *overview_resampling*, string
-   - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
    - supported only for raster layers
+   - method used by [`gdaladdo`](https://gdal.org/programs/gdaladdo.html#cmdoption-gdaladdo-r) for overview resampling when normalizing raster layer
+   - by default Layman will guess overview resampling method from input file metadata
+   - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
 
 #### Response
 Content-Type: `application/json`
@@ -320,8 +322,10 @@ Body parameters:
    - **deprecated parameter**
    - alias for *style* parameter
 - *overview_resampling*, string
-   - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
    - supported only for raster layers
+   - method used by [`gdaladdo`](https://gdal.org/programs/gdaladdo.html#cmdoption-gdaladdo-r) for overview resampling when normalizing raster layer
+   - by default Layman will guess overview resampling method from input file metadata
+   - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
 
 #### Response
 Content-Type: `application/json`

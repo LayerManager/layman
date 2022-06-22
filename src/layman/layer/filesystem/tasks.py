@@ -71,7 +71,7 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_gdal(self, workspace, layername, crs_id=None):
+def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=None):
     def finish_gdal_process(process):
         if self.is_aborted():
             logger.info(f'terminating GDAL process workspace.layer={workspace}.{layername}')
@@ -119,7 +119,7 @@ def refresh_gdal(self, workspace, layername, crs_id=None):
         pass
     finish_gdal_process(process)
 
-    process = gdal.add_overview_async(workspace, layername)
+    process = gdal.add_overview_async(workspace, layername, overview_resampling=overview_resampling)
     while process.poll() is None and not self.is_aborted():
         pass
     finish_gdal_process(process)
