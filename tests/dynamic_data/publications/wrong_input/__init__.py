@@ -7,7 +7,7 @@ import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client, util
 from .. import common_layers as layers
-from .... import Action, Publication, dynamic_data as consts
+from .... import Action, Publication, dynamic_data as consts, TestTypes, TestKeys
 
 KEY_PUBLICATION_TYPE = 'publ_type'
 KEY_ACTION_PARAMS = 'action_params'
@@ -613,12 +613,15 @@ VALIDATION_PATCH_ACTION = {
 
 def generate(workspace=None):
     workspace = workspace or consts.COMMON_WORKSPACE
+    test_type_str = os.getenv(TestKeys.TYPE.value, TestTypes.MANDATORY.value)
+    test_type = TestTypes(test_type_str)
+    default_only_first_parametrization = test_type != TestTypes.OPTIONAL
 
     result = dict()
     for testcase, tc_params in TESTCASES.items():
         action_parametrization = util.get_test_case_parametrization(param_parametrization=REST_PARAMETRIZATION,
                                                                     only_first_parametrization=tc_params.get(
-                                                                        KEY_ONLY_FIRST_PARAMETRIZATION, True),
+                                                                        KEY_ONLY_FIRST_PARAMETRIZATION, default_only_first_parametrization),
                                                                     default_params=tc_params[KEY_ACTION_PARAMS],
                                                                     action_parametrization=[('', None, []), ],
                                                                     )

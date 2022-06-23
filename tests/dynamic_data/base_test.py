@@ -1,17 +1,23 @@
 import copy
+import os
 import pytest
 from test_tools import process_client, cleanup
-from .. import Publication
+from .. import Publication, TestTypes, TestKeys
 
 
 def pytest_generate_tests(metafunc):
     # used for parametrizing subclasses of TestSingleRestPublication, called once per each test function
     # https://docs.pytest.org/en/6.2.x/parametrize.html#pytest-generate-tests
+    test_type_str = os.getenv(TestKeys.TYPE.value, TestTypes.MANDATORY.value)
+    test_type = TestTypes(test_type_str)
     cls = metafunc.cls
     rest_methods = cls.rest_parametrization['method']
     argvalues = []
     ids = []
-    for key, params in cls.test_cases.items():
+
+    test_cases_for_type = {key: params for key, params in cls.test_cases.items() if
+                           test_type == TestTypes.OPTIONAL or params.get(TestKeys.TYPE, cls.default_test_type) == TestTypes.MANDATORY}
+    for key, params in test_cases_for_type.items():
         for method_function_name, method_name in rest_methods.items():
             publ_name = cls.key_to_publication_base_name(key) + f"_{method_name}"
             publication = Publication(cls.workspace, cls.publication_type, publ_name)
@@ -52,6 +58,8 @@ class TestSingleRestPublication:
             'patch_publication': 'patch',
         },
     }
+
+    default_test_type = TestTypes.OPTIONAL
 
     @classmethod
     def key_to_publication_base_name(cls, key):

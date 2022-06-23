@@ -16,6 +16,11 @@ make test-separated
 Additional parameters for pytest command line
 - `--nocleanup`: Do not delete publications after tests
 
+Additional environment setting for pytest command line
+- `TEST_TYPE`: Specify level of tests to run 
+  - Accepted values: `optional`/`mandatory`
+  - Default value is `mandatory`
+
 ## Rules
 - Every direct subfolder of `tests`, e.g. `static_data` or `failed_publications`, relies on that tests from other folders will not use their workspaces.
 - Each test in `tests` and `src` takes into account that other workspaces may be created in parallel. Also, in such other workspaces, publications can be created and deleted in parallel.
