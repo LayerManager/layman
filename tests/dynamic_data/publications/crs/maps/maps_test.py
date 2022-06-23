@@ -1,7 +1,8 @@
 import os
 import crs as crs_def
+import tests
 from test_tools import process_client
-import tests.asserts.final.publication as asserts_publ
+from tests.asserts.final import publication as asserts_publ
 from tests.dynamic_data import base_test
 from ..... import Publication
 
@@ -48,6 +49,8 @@ class TestMap(base_test.TestSingleRestPublication):
     publication_type = process_client.MAP_TYPE
 
     test_cases = TEST_CASES
+
+    default_test_type = tests.TestTypes.MANDATORY
 
     def before_class(self):
         self.post_publication(Publication(self.workspace, process_client.LAYER_TYPE, LAYER_FOR_MAPS), scope='class')
