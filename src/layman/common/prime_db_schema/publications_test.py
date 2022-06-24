@@ -528,6 +528,19 @@ class TestSelectPublicationsComplex:
         assert expected_result['content_range'] == infos['content_range']
 
 
+def test_world_bbox_filter():
+    workspace = 'test_world_bbox_filter_workspace'
+    layer = 'test_world_bbox_filter_layer'
+
+    prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layer)
+    with app.app_context():
+        publications.set_bbox(workspace, LAYER_TYPE, layer, crs_def.CRSDefinitions[crs_def.EPSG_4326].max_bbox, crs_def.EPSG_4326)
+        publications.get_publication_infos_with_metainfo(bbox_filter=(-100, -100, 100, 100),
+                                                         bbox_filter_crs=crs_def.EPSG_3857)
+
+    prime_db_schema_client.clear_workspaces(workspace)
+
+
 def test_only_valid_names():
     workspace_name = 'test_only_valid_names_workspace'
     username = 'test_only_valid_names_user'

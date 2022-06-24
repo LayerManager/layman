@@ -7,6 +7,7 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [#606](https://github.com/LayerManager/layman/issues/606) Fix filtering publications by bounding box in case of publication with whole world bounding box in database.
 - [#551](https://github.com/LayerManager/layman/issues/551) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new body parameter *overview_resampling*.
 - [#576](https://github.com/LayerManager/layman/issues/576) Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Workspace Layers](doc/rest.md#get-workspace-layers) returns new `file_type` key, currently always with `null` value.
 - New environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_liferay_scope). Introduced in v1.16.2.
