@@ -43,6 +43,23 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
     ordering_bbox_srid = db_util.get_srid(ordering_bbox_crs)
     filtering_bbox_srid = db_util.get_srid(bbox_filter_crs)
 
+    if bbox_filter_crs and bbox_filter_crs in crs_def.CRSDefinitions and crs_def.CRSDefinitions[bbox_filter_crs].world_bounds:
+        bbox_filter_where_part = 'ST_TRANSFORM(ST_SetSRID( case '
+        for world_bound_crs, world_bound_bbox in crs_def.CRSDefinitions[bbox_filter_crs].world_bounds.items():
+            world_bound_srid = db_util.get_srid(world_bound_crs)
+            bbox_filter_where_part += f'''
+              when p.srid = {world_bound_srid} then ST_MakeBox2D(
+        ST_MakePoint(least(greatest(ST_XMIN(p.bbox), {world_bound_bbox[0]}), {world_bound_bbox[2]}),
+                            least(greatest(ST_YMIN(p.bbox), {world_bound_bbox[1]}), {world_bound_bbox[3]})
+            ),
+        ST_MakePoint(greatest(least(ST_XMAX(p.bbox), {world_bound_bbox[2]}), {world_bound_bbox[0]}),
+                            greatest(least(ST_YMAX(p.bbox), {world_bound_bbox[3]}), {world_bound_bbox[1]})
+            ))
+'''
+        bbox_filter_where_part += f'else p.bbox end, p.srid), %s) && ST_MakeBox2D(ST_MakePoint(%s, %s), ST_MakePoint(%s, %s))'
+    else:
+        bbox_filter_where_part = 'ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s) && ST_MakeBox2D(ST_MakePoint(%s, %s), ST_MakePoint(%s, %s))'
+
     where_params_def = [
         (workspace_name, 'w.name = %s', (workspace_name,)),
         (pub_type, 'p.type = %s', (pub_type,)),
@@ -69,8 +86,7 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
                                     and w2.name = %s))""", (writer, writer,)),
         (full_text_filter, '(_prime_schema.my_unaccent(p.title) @@ to_tsquery(unaccent(%s))'
                            'or lower(unaccent(p.title)) like lower(unaccent(%s)))', (full_text_tsquery, full_text_like,)),
-        (bbox_filter, 'ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s) && ST_MakeBox2D(ST_MakePoint(%s, %s), ST_MakePoint(%s, %s))',
-         (filtering_bbox_srid, ) + bbox_filter if bbox_filter else None, ),
+        (bbox_filter, bbox_filter_where_part, (filtering_bbox_srid, ) + bbox_filter if bbox_filter else None, ),
     ]
 
     order_by_definition = {
