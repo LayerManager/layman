@@ -11,7 +11,7 @@ CRSTypeDef = namedtuple('CRSTypeDef', [
     # E.g. if bbox is [5, 100, 5, 200] and NO_AREA_BBOX_PADDING = 10,
     # thumbnail will be rendered with bbox [-5, 100, 15, 200].
     'no_area_bbox_padding',
-    # Maximum coordinates of other CRS, which can be transformed
+    # Maximum coordinates of other CRS, which can be transformed by DB
     'world_bounds',
     'qgis_template_spatialrefsys',
     # Boolean value, True if CRS definition in epsg.org DB specify axes in easting-northing order
@@ -50,9 +50,9 @@ CRSDefinitions = {
         world_bounds={
             EPSG_4326: (
                 -180,
-                -85.06,
+                -89.99999,
                 180,
-                85.06,
+                89.99999,
             )
         },
         qgis_template_spatialrefsys='''<srsid>3857</srsid>
@@ -164,7 +164,14 @@ CRSDefinitions = {
         ),
         max_bbox=None,
         no_area_bbox_padding=1,
-        world_bounds=dict(),
+        world_bounds={
+            EPSG_4326: (
+                -180,
+                -89.99999,
+                180,
+                89.99999,
+            )
+        },
         qgis_template_spatialrefsys='''<srsid>999</srsid>
       <srid>900915</srid>
       <authid>EPSG:3034</authid>
