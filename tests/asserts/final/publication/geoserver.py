@@ -47,9 +47,11 @@ def feature_spatial_precision(workspace, publ_type, name, *, feature_id, crs, ex
         assert abs(coordinate - exp_coordinates[idx]) <= precision, f"{crs}: expected coordinates={exp_coordinates}, found coordinates={feature['geometry']['coordinates']}"
 
 
-def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, wms_version, diff_line_width, obtained_file_path,
-                          expected_file_path, ):
+def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, wms_version, obtained_file_path,
+                          expected_file_path, diff_line_width=None, pixel_diff_limit=None):
     assert publ_type == process_client.LAYER_TYPE
+    assert diff_line_width is None or pixel_diff_limit is None, f'diff_line_width={diff_line_width}, pixel_diff_limit={pixel_diff_limit}'
+    assert diff_line_width is not None or pixel_diff_limit is not None, f'diff_line_width={diff_line_width}, pixel_diff_limit={pixel_diff_limit}'
 
     crs_name = {
         '1.1.1': 'SRS',
@@ -89,10 +91,11 @@ def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, 
     query_params['LAYERS'] = name
     layman_with_workspace_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?{parse.urlencode(query_params)}'
 
-    circle_diameter = 30
-    circle_perimeter = circle_diameter * math.pi
-    num_circles = 5
-    pixel_diff_limit = circle_perimeter * num_circles * diff_line_width
+    if diff_line_width is not None:
+        circle_diameter = 30
+        circle_perimeter = circle_diameter * math.pi
+        num_circles = 5
+        pixel_diff_limit = circle_perimeter * num_circles * diff_line_width
 
     for url in [geoserver_url,
                 layman_with_workspace_url,
