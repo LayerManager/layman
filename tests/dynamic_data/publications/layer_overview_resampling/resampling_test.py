@@ -1,4 +1,5 @@
 import os
+import crs as crs_def
 from layman import settings
 from test_tools import process_client
 from tests.asserts.final import publication as asserts_publ
@@ -33,3 +34,11 @@ class TestLayer(base_test.TestSingleRestPublication):
         assert_util.is_publication_valid_and_complete(layer)
         exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{overview_resampling_method}.png")
         asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
+        exp_wms = os.path.join(DIRECTORY, f"wms_{overview_resampling_method}.png")
+        asserts_publ.geoserver.wms_spatial_precision(layer.workspace, layer.type, layer.name, crs=crs_def.EPSG_3857,
+                                                     extent=[1813457.889, 6537015.8795, 1823298.532, 6545906.3456],
+                                                     img_size=(656, 594),
+                                                     wms_version='1.3.0',
+                                                     pixel_diff_limit=20,
+                                                     obtained_file_path=f'tmp/artifacts/test_overview_resampling/downloaded_wms_{overview_resampling_method}.png',
+                                                     expected_file_path=exp_wms, )
