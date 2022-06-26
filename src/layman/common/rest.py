@@ -259,6 +259,12 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
         }
         for (workspace, _, name), info in publication_infos_whole['items'].items()
     ]
+
+    multi_info_keys_to_remove = layman_util.get_multi_info_keys_to_remove(publication_type)
+    for info in infos:
+        for info_key_to_remove in multi_info_keys_to_remove:
+            info.pop(info_key_to_remove, None)
+
     response = make_response(jsonify(infos), 200)
     response.headers['X-Total-Count'] = publication_infos_whole['total_count']
     response.headers['Content-Range'] = f'items {publication_infos_whole["content_range"][0]}-' \
