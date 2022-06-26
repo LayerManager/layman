@@ -38,6 +38,7 @@ def test_infos(workspace, publ_type, publication):
     asserts_internal_rest.same_title_in_source_and_rest_multi(workspace, publ_type, publication, headers)
     asserts_rest.is_in_rest_multi(workspace, publ_type, publication, headers)
     asserts_rest.correct_url_in_rest_multi(workspace, publ_type, publication, headers)
+    asserts_rest.correct_file_type_in_rest_multi(workspace, publ_type, publication, headers)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
