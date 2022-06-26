@@ -1,5 +1,6 @@
 from celery import states
 from layman import app
+from layman.layer import LAYER_TYPE
 from test_tools import process_client, util as test_util
 
 
@@ -20,6 +21,17 @@ def correct_url_in_rest_multi(workspace, publ_type, name, headers):
         expected_url = test_util.url_for(get_workspace_publication_url, workspace=workspace, **{param_name: name},
                                          internal=False)
         assert info['url'] == expected_url, f'publication_infos={publication_infos}, expected_url={expected_url}'
+
+
+def correct_file_type_in_rest_multi(workspace, publ_type, name, headers):
+    infos = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
+    publication_infos = [info for info in infos if info['name'] == name]
+    info = next(iter(publication_infos))
+    if publ_type == LAYER_TYPE:
+        assert 'file_type' in info
+        assert info['file_type'] is None
+    else:
+        assert 'file_type' not in info
 
 
 def is_complete_in_rest(rest_publication_detail):

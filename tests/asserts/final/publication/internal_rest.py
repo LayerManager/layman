@@ -20,7 +20,7 @@ def same_values_in_internal_and_rest(workspace, publ_type, name, rest_publicatio
     publ_info = copy.deepcopy(publ_info)
 
     # adjust publ_info, see layman.common.util::clear_publication_info
-    publ_info = {key: value for key, value in publ_info.items() if not (key.startswith('_') or key in ['id', 'type', 'style_type'])}
+    publ_info = {key: value for key, value in publ_info.items() if not (key.startswith('_') or key in ['id', 'type', 'style_type', 'file_type'])}
     publ_info['updated_at'] = publ_info['updated_at'].isoformat()
 
     # adjust rest_publication_detail, see get_complete_(layer|map)_info

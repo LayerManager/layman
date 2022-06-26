@@ -256,6 +256,7 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
             'bounding_box': info['bounding_box'],
             'native_crs': info['native_crs'],
             'native_bounding_box': info['native_bounding_box'],
+            'file_type': info['file_type'],
         }
         for (workspace, _, name), info in publication_infos_whole['items'].items()
     ]

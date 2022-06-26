@@ -51,6 +51,10 @@ def test_publication_basic():
             assert pubs[(username, publication_type, publication_name)].get('title') == publication_title
             assert pubs[(username, publication_type, publication_name)].get('uuid') == str(uuid_str)
 
+            publ_info = pubs[(username, publication_type, publication_name)]
+            assert 'file_type' in publ_info
+            assert publ_info['file_type'] is None
+
             db_info = {"name": publication_name,
                        "title": publication_title2,
                        "actor_name": username,

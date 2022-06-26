@@ -68,6 +68,7 @@ JSON array of objects representing available layers with following structure:
 - **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
 - **native_crs**: Code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326".
 - **native_bounding_box**: List of 4 floats and one string. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
+- **file_type**: File type of the layer, currently always `null`.
 
 Headers:
 - **X-Total-Count**: Total number of layers available from the request, taking into account all filtering parameters except `limit` and `offset`. Example `"247"`.
@@ -446,7 +447,7 @@ JSON object with one attribute:
 ### GET Maps
 Get list of published maps (map compositions).
 
-Have the same request parameters and response structure and headers as [GET Layers](#get-layers).
+Have the same request parameters and response structure and headers as [GET Layers](#get-layers), except `file_type` key is not available in response.
 
 ## Workspace Maps
 ### URL
@@ -455,7 +456,7 @@ Have the same request parameters and response structure and headers as [GET Laye
 ### GET Workspace Maps
 Get list of published maps (map compositions).
 
-Have the same request parameters and response structure and headers as [GET Layers](#get-layers).
+Have the same request parameters and response structure and headers as [GET Maps](#get-maps).
 
 ### POST Workspace Maps
 Publish new map composition. Accepts JSON valid against [map-composition schema](https://github.com/hslayers/map-compositions) version 2 used by [Hslayers-ng](https://github.com/hslayers/hslayers-ng). Exact version of schema is defined by `describedBy` key of JSON data file.

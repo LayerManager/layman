@@ -15,6 +15,6 @@ def merge_infos(infos):
 
 
 def clear_publication_info(info):
-    clear_info = {key: value for key, value in info.items() if not (key.startswith('_') or key in ['id', 'type', 'style_type'])}
+    clear_info = {key: value for key, value in info.items() if not (key.startswith('_') or key in ['id', 'type', 'style_type', 'file_type'])}
     clear_info['updated_at'] = clear_info['updated_at'].isoformat()
     return clear_info
