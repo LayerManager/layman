@@ -192,12 +192,12 @@ from {DB_SCHEMA}.workspaces w inner join
     # print(f'get_publication_infos:\n\nselect={select}\n\nsql_params={sql_params}\n\n&&&&&&&&&&&&&&&&&')
 
     infos = {(workspace_name,
-              type,
+              publication_type,
               publication_name,): {'id': id_publication,
                                    'name': publication_name,
                                    'title': title,
                                    'uuid': uuid,
-                                   'type': type,
+                                   'type': publication_type,
                                    'style_type': style_type,
                                    'updated_at': updated_at,
                                    'native_bounding_box': [xmin, ymin, xmax, ymax],
@@ -205,7 +205,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'access_rights': {'read': can_read_users.split(','),
                                                      'write': can_write_users.split(',')}
                                    }
-             for id_publication, workspace_name, type, publication_name, title, uuid, style_type, updated_at, xmin, ymin, xmax, ymax,
+             for id_publication, workspace_name, publication_type, publication_name, title, uuid, style_type, updated_at, xmin, ymin, xmax, ymax,
              srid, can_read_users, can_write_users, _
              in values}
 
