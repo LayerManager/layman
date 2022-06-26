@@ -299,6 +299,10 @@ def get_internal_sources(publ_type):
     return get_modules_from_names(get_publication_types()[publ_type]['internal_sources'])
 
 
+def get_multi_info_keys_to_remove(publ_type):
+    return get_publication_types()[publ_type]['multi_info_keys_to_remove']
+
+
 def merge_infos(target_info, partial_info, *, comment=None):
     for key, value in partial_info.items():
         if isinstance(value, dict) and isinstance(target_info.get(key), dict):

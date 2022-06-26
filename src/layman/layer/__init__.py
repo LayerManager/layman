@@ -103,6 +103,7 @@ PUBLICATION_TYPES = {
                                                    'wms', 'thumbnail', 'file', 'metadata', 'style', 'sld', 'access_rights',
                                                    'bounding_box', 'native_crs', 'native_bounding_box', },
                       },
+        'multi_info_keys_to_remove': [],
     }
 }
 
