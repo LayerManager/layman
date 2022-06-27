@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '12'
-      - run: npm install --global remark-cli remark-validate-links remark-lint-no-dead-urls
+      - run: npm install --global remark-cli@10.0.1 remark-validate-links remark-lint-no-dead-urls
       - run: make remark
 
   Flake_8_syntax_errors:
