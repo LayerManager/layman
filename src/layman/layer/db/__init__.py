@@ -420,9 +420,11 @@ def create_string_attributes(attribute_tuples, conn_cur=None):
 def get_missing_attributes(attribute_tuples, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
+    table_name = {(workspace, layer): get_table_name(workspace, layer) for workspace, layer, _ in attribute_tuples}
+
     # Find all foursomes which do not already exist
     query = f"""select attribs.*
-from (""" + "\n union all\n".join([f"select '{workspace}' workspace, '{layername}' layername, '{layername}' table_name, '{attrname}' attrname" for workspace, layername, attrname in attribute_tuples]) + """) attribs left join
+from (""" + "\n union all\n".join([f"select '{workspace}' workspace, '{layername}' layername, '{table_name[(workspace, layername)]}' table_name, '{attrname}' attrname" for workspace, layername, attrname in attribute_tuples]) + """) attribs left join
     information_schema.columns c on c.table_schema = attribs.workspace
                                 and c.table_name = attribs.table_name
                                 and c.column_name = attribs.attrname
