@@ -16,10 +16,10 @@
   - either by [workspace](#workspace) name and layername
       - [REST API](rest.md): `/rest/workspaces/<workspace_name>/layers/<layername>` 
       - [filesystem](data-storage.md#filesystem): `/path/to/LAYMAN_DATA_DIR/workspaces/<workspace_name>/layers/<layername>` 
-      - [PostgreSQL](data-storage.md#postgresql): `db=LAYMAN_PG_DBNAME, schema=<workspace_name>, table=<layername>` 
       - [GeoServer WFS](data-storage.md#geoserver): `/geoserver/<workspace_name>/ows, layer=<layername>`
       - [GeoServer WMS](data-storage.md#geoserver): `/geoserver/<workspace_name>_wms/ows, layer=<layername>, style=<layername>`
   - or by UUID:
+      - [PostgreSQL](data-storage.md#postgresql): `db=LAYMAN_PG_DBNAME, schema=<workspace_name>, table=layer_<UUID>` 
       - Micka: `/record/basic/m-<uuid>`
 - Simple rules
   - one DB table per input file

@@ -10,7 +10,10 @@ from layman import app as layman
 from layman.layer.filesystem.input_file import ensure_layer_input_file_dir
 from layman.layer.filesystem.util import get_layer_dir
 from layman.common import bbox as bbox_util
+from layman.common.prime_db_schema import publications
 from layman.layer import db
+from test_tools import prime_db_schema_client
+from test_tools.process_client import LAYER_TYPE
 from . import table as table_util
 
 
@@ -20,11 +23,13 @@ WORKSPACE = 'db_testuser'
 def post_layer(workspace, layer, file_path):
     with layman.app_context():
         db.ensure_workspace(workspace)
+        prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layer)
         ensure_layer_input_file_dir(workspace, layer)
         db.import_layer_vector_file(workspace, layer, file_path, None)
     yield workspace, layer
     with layman.app_context():
         table_util.delete_layer(workspace, layer)
+        publications.delete_publication(workspace, LAYER_TYPE, layer)
 
 
 @pytest.fixture()
@@ -131,7 +136,9 @@ def test_abort_import_layer_vector_file():
     )
 
     def abort_layer_import():
-        table_name = db.get_table_name(workspace, layername)
+        prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layername)
+        with layman.app_context():
+            table_name = db.get_table_name(workspace, layername)
         process = db.import_layer_vector_file_async(workspace, table_name, main_filepath,
                                                     crs_id)
         time1 = time.time()
@@ -147,6 +154,7 @@ def test_abort_import_layer_vector_file():
     return_code = abort_layer_import()
     assert return_code != 0
     with layman.app_context():
+        publications.delete_publication(workspace, LAYER_TYPE, layername)
         layerdir = get_layer_dir(workspace, layername)
     shutil.rmtree(layerdir)
 

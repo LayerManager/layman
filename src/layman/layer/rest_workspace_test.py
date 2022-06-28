@@ -204,28 +204,6 @@ def test_workspace_schema_conflict(client):
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
-def test_layername_db_object_conflict(client):
-    file_paths = [
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
-    ]
-    for file_path in file_paths:
-        assert os.path.isfile(file_path)
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        response = client.post(url_for('rest_workspace_layers.post', workspace='testuser1'), data={
-            'file': files,
-            'name': 'spatial_ref_sys',
-        })
-        assert response.status_code == 409
-        resp_json = response.get_json()
-        assert resp_json['code'] == 9
-    finally:
-        for file_path in files:
-            file_path[0].close()
-
-
-@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_get_layers_testuser1_v1(client):
     workspace = 'test_get_layers_testuser1_v1_user'
     layername = 'layer1'
