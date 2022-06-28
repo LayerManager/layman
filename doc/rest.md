@@ -253,7 +253,7 @@ JSON object with following structure:
 - **file**
   - *path*: String. Path to input data file. Path is relative to workspace directory.  
   If data file was sent in ZIP archive to the server, path includes also path to the main file inside ZIP file. E.g. `layers/zipped_shapefile/input_file/zipped_shapefile.zip/layer_main_file.shp`
-  - *file_type*: String. Either `vector` or `raster` depends on source file type.
+  - *file_type*: String. Either `vector`, `raster`, or `unknown` depending on source file type. Value `unknown` is used if input files are zipped and still being uploaded.
   - *status*: Status information about saving and availability of files. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *db_table*, available only for vector layers
