@@ -65,4 +65,4 @@ def refresh_table(
 
     crs = db.get_crs(workspace, table_name)
     if crs_def.CRSDefinitions[crs].srid:
-        table.set_layer_srid(workspace, layername, crs_def.CRSDefinitions[crs].srid)
+        table.set_layer_srid(workspace, table_name, crs_def.CRSDefinitions[crs].srid)
