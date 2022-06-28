@@ -70,7 +70,7 @@ def save_qgs_file(workspace, layer):
     qml_geometry = util.get_qml_geometry_from_qml(qml)
     db_types = db.get_geometry_types(workspace, table_name)
     db_cols = [
-        col for col in db.get_all_column_infos(workspace, layer)
+        col for col in db.get_all_column_infos(workspace, table_name)
         if col.name not in ['wkb_geometry', 'ogc_fid']
     ]
     source_type = util.get_source_type(db_types, qml_geometry)

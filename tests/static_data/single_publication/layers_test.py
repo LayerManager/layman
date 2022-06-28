@@ -210,7 +210,7 @@ def test_fill_project_template(workspace, publ_type, publication):
     with app.app_context():
         db_types = layer_db.get_geometry_types(workspace, table_name)
         db_cols = [
-            col for col in layer_db.get_all_column_infos(workspace, publication)
+            col for col in layer_db.get_all_column_infos(workspace, table_name)
             if col.name not in ['wkb_geometry', 'ogc_fid']
         ]
     qml_geometry = qgis_util.get_qml_geometry_from_qml(qml_xml)
@@ -309,5 +309,6 @@ def test_layer_attributes_in_db(workspace, publ_type, publication):
     expected_names.update(generated_names)
 
     with app.app_context():
-        attr_names = {col.name for col in layer_db.get_all_column_infos(workspace, publication)}
+        table_name = layer_db.get_table_name(workspace, publication)
+        attr_names = {col.name for col in layer_db.get_all_column_infos(workspace, table_name)}
     assert attr_names == expected_names
