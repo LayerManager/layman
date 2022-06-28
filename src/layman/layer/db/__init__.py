@@ -398,32 +398,6 @@ def guess_scale_denominator(workspace, layername):
     return scale_denominator
 
 
-def get_most_frequent_lower_distance2(workspace, layername, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
-
-    query = get_most_frequent_lower_distance_query(workspace, layername, [
-        'st_area', 'Box2D'
-    ])
-
-    # print(f"\nget_most_frequent_lower_distance v2\nusername={username}, layername={layername}")
-    # print(query)
-
-    try:
-        cur.execute(query)
-    except BaseException as exc:
-        logger.error(f'get_most_frequent_lower_distance2 ERROR')
-        raise LaymanError(7) from exc
-    rows = cur.fetchall()
-    # for row in rows:
-    #     print(f"row={row}")
-    result = None
-    if len(rows) > 0:
-        distance, freq, num_distances = rows[0]
-        if freq / num_distances > 0.03:
-            result = distance
-    return result
-
-
 def create_string_attributes(attribute_tuples, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
     query = "\n".join([f"""ALTER TABLE {workspace}.{table} ADD COLUMN {attrname} VARCHAR(1024);""" for workspace, layer, table, attrname in attribute_tuples]) + "\n COMMIT;"
