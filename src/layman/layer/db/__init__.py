@@ -473,12 +473,12 @@ def get_crs(workspace, layername, conn_cur=None):
     return crs
 
 
-def get_geometry_types(workspace, layername, conn_cur=None):
+def get_geometry_types(workspace, table_name, conn_cur=None):
     conn, cur = conn_cur or db_util.get_connection_cursor()
     try:
         sql = f"""
 select distinct ST_GeometryType(wkb_geometry) as geometry_type_name
-from {workspace}.{layername}
+from {workspace}.{table_name}
 """
         cur.execute(sql)
     except BaseException as exc:
