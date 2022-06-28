@@ -11,10 +11,20 @@ from layman.layer.filesystem.input_file import ensure_layer_input_file_dir
 from layman.layer.filesystem.util import get_layer_dir
 from layman.common import bbox as bbox_util
 from layman.layer import db
-from .table import delete_layer
+from . import table as table_util
 
 
 WORKSPACE = 'db_testuser'
+
+
+def post_layer(workspace, layer, file_path):
+    with layman.app_context():
+        db.ensure_workspace(workspace)
+        ensure_layer_input_file_dir(workspace, layer)
+        db.import_layer_vector_file(workspace, layer, file_path, None)
+    yield workspace, layer
+    with layman.app_context():
+        table_util.delete_layer(workspace, layer)
 
 
 @pytest.fixture()
@@ -22,13 +32,7 @@ def boundary_table():
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp'
     workspace = WORKSPACE
     layername = 'hranice'
-    with layman.app_context():
-        db.ensure_workspace(workspace)
-        ensure_layer_input_file_dir(workspace, layername)
-    db.import_layer_vector_file(workspace, layername, file_path, None)
-    yield workspace, layername
-    with layman.app_context():
-        delete_layer(workspace, layername)
+    yield from post_layer(workspace, layername, file_path)
 
 
 @pytest.fixture()
@@ -36,13 +40,7 @@ def road_table():
     file_path = 'sample/data/upper_attr.geojson'
     workspace = WORKSPACE
     layername = 'silnice'
-    with layman.app_context():
-        db.ensure_workspace(workspace)
-        ensure_layer_input_file_dir(workspace, layername)
-    db.import_layer_vector_file(workspace, layername, file_path, None)
-    yield workspace, layername
-    with layman.app_context():
-        delete_layer(workspace, layername)
+    yield from post_layer(workspace, layername, file_path)
 
 
 @pytest.fixture()
@@ -50,13 +48,7 @@ def country_table():
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp'
     workspace = WORKSPACE
     layername = 'staty'
-    with layman.app_context():
-        db.ensure_workspace(workspace)
-        ensure_layer_input_file_dir(workspace, layername)
-    db.import_layer_vector_file(workspace, layername, file_path, None)
-    yield workspace, layername
-    with layman.app_context():
-        delete_layer(workspace, layername)
+    yield from post_layer(workspace, layername, file_path)
 
 
 @pytest.fixture()
@@ -64,13 +56,7 @@ def country110m_table():
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
     workspace = WORKSPACE
     layername = 'staty110m'
-    with layman.app_context():
-        db.ensure_workspace(workspace)
-        ensure_layer_input_file_dir(workspace, layername)
-    db.import_layer_vector_file(workspace, layername, file_path, None)
-    yield workspace, layername
-    with layman.app_context():
-        delete_layer(workspace, layername)
+    yield from post_layer(workspace, layername, file_path)
 
 
 @pytest.fixture()
@@ -78,13 +64,7 @@ def country50m_table():
     file_path = 'tmp/naturalearth/50m/cultural/ne_50m_admin_0_countries.geojson'
     workspace = WORKSPACE
     layername = 'staty50m'
-    with layman.app_context():
-        db.ensure_workspace(workspace)
-        ensure_layer_input_file_dir(workspace, layername)
-    db.import_layer_vector_file(workspace, layername, file_path, None)
-    yield workspace, layername
-    with layman.app_context():
-        delete_layer(workspace, layername)
+    yield from post_layer(workspace, layername, file_path)
 
 
 @pytest.fixture()
@@ -92,13 +72,7 @@ def country10m_table():
     file_path = 'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson'
     workspace = WORKSPACE
     layername = 'staty10m'
-    with layman.app_context():
-        db.ensure_workspace(workspace)
-        ensure_layer_input_file_dir(workspace, layername)
-    db.import_layer_vector_file(workspace, layername, file_path, None)
-    yield workspace, layername
-    with layman.app_context():
-        delete_layer(workspace, layername)
+    yield from post_layer(workspace, layername, file_path)
 
 
 @pytest.fixture()
@@ -106,13 +80,7 @@ def data200road_table():
     file_path = 'tmp/data200/trans/RoadL.shp'
     workspace = WORKSPACE
     layername = 'data200_road'
-    with layman.app_context():
-        db.ensure_workspace(workspace)
-        ensure_layer_input_file_dir(workspace, layername)
-    db.import_layer_vector_file(workspace, layername, file_path, None)
-    yield workspace, layername
-    with layman.app_context():
-        delete_layer(workspace, layername)
+    yield from post_layer(workspace, layername, file_path)
 
 
 @pytest.fixture()
@@ -120,13 +88,7 @@ def sm5building_table():
     file_path = 'tmp/sm5/vektor/Budova.shp'
     workspace = WORKSPACE
     layername = 'sm5_building'
-    with layman.app_context():
-        db.ensure_workspace(workspace)
-        ensure_layer_input_file_dir(workspace, layername)
-    db.import_layer_vector_file(workspace, layername, file_path, None)
-    yield workspace, layername
-    with layman.app_context():
-        delete_layer(workspace, layername)
+    yield from post_layer(workspace, layername, file_path)
 
 
 @pytest.fixture()
@@ -134,13 +96,7 @@ def populated_places_table():
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson'
     workspace = WORKSPACE
     layername = 'ne_110m_populated_places'
-    with layman.app_context():
-        db.ensure_workspace(workspace)
-        ensure_layer_input_file_dir(workspace, layername)
-    db.import_layer_vector_file(workspace, layername, file_path, None)
-    yield workspace, layername
-    with layman.app_context():
-        delete_layer(workspace, layername)
+    yield from post_layer(workspace, layername, file_path)
 
 
 @pytest.fixture()
@@ -148,14 +104,7 @@ def empty_table():
     file_path = 'sample/layman.layer/empty.shp'
     workspace = WORKSPACE
     layername = 'empty'
-    with layman.app_context():
-        db.ensure_workspace(workspace)
-        ensure_layer_input_file_dir(workspace, layername)
-    with layman.app_context():
-        db.import_layer_vector_file(workspace, layername, file_path, None)
-    yield workspace, layername
-    with layman.app_context():
-        delete_layer(workspace, layername)
+    yield from post_layer(workspace, layername, file_path)
 
 
 @pytest.fixture()
@@ -163,12 +112,7 @@ def single_point_table():
     file_path = 'sample/layman.layer/single_point.shp'
     workspace = WORKSPACE
     layername = 'single_point'
-    with layman.app_context():
-        ensure_layer_input_file_dir(workspace, layername)
-        db.import_layer_vector_file(workspace, layername, file_path, None)
-    yield workspace, layername
-    with layman.app_context():
-        delete_layer(workspace, layername)
+    yield from post_layer(workspace, layername, file_path)
 
 
 def test_abort_import_layer_vector_file():
