@@ -23,13 +23,12 @@ def correct_url_in_rest_multi(workspace, publ_type, name, headers):
         assert info['url'] == expected_url, f'publication_infos={publication_infos}, expected_url={expected_url}'
 
 
-def correct_file_type_in_rest_multi(workspace, publ_type, name, headers):
+def correct_file_type_in_rest_multi(workspace, publ_type, name, headers, exp_file_type):
     infos = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
     publication_infos = [info for info in infos if info['name'] == name]
     info = next(iter(publication_infos))
     if publ_type == LAYER_TYPE:
-        assert 'file_type' in info
-        assert info['file_type'] is None
+        assert info['file_type'] == exp_file_type
     else:
         assert 'file_type' not in info
 

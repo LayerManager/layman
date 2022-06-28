@@ -129,6 +129,7 @@ def patch(workspace, layername):
         style_type_for_check = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type']})['style_type']
     if file_type == settings.FILE_TYPE_RASTER and style_type_for_check == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
+    kwargs['file_type'] = file_type
 
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh

@@ -34,11 +34,14 @@ def test_get_publication_info_items(workspace, publ_type, publication):
 def test_infos(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
-    headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
+    publ_def = data.PUBLICATIONS[(workspace, publ_type, publication)]
+    headers = data.HEADERS.get(publ_def[data.TEST_DATA].get('users_can_write', [None])[0])
     asserts_internal_rest.same_title_in_source_and_rest_multi(workspace, publ_type, publication, headers)
     asserts_rest.is_in_rest_multi(workspace, publ_type, publication, headers)
     asserts_rest.correct_url_in_rest_multi(workspace, publ_type, publication, headers)
-    asserts_rest.correct_file_type_in_rest_multi(workspace, publ_type, publication, headers)
+    if 'file_type' in publ_def[data.TEST_DATA]:
+        exp_file_type = publ_def[data.TEST_DATA]['file_type']
+        asserts_rest.correct_file_type_in_rest_multi(workspace, publ_type, publication, headers, exp_file_type)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)

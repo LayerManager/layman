@@ -11,7 +11,7 @@
 ### Changes
 - [#606](https://github.com/LayerManager/layman/issues/606) Fix filtering publications by bounding box in case of publication with whole world bounding box in database.
 - [#551](https://github.com/LayerManager/layman/issues/551) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new body parameter *overview_resampling*.
-- [#576](https://github.com/LayerManager/layman/issues/576) Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Workspace Layers](doc/rest.md#get-workspace-layers) returns new `file_type` key, currently always with `null` value.
+- [#576](https://github.com/LayerManager/layman/issues/576) Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Workspace Layers](doc/rest.md#get-workspace-layers) returns new `file_type` key with the same value as `file.file_type` in [GET Workspace Layer](doc/rest.md#get-workspace-layer) response (i.e. `vector`, `raster`, or `unknown`).
 - New environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_liferay_scope). Introduced in v1.16.2.
 - New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](doc/env-settings.md#oauth2_liferay_introspection_sub_key). Introduced in v1.16.1.
 - [#599](https://github.com/LayerManager/layman/issues/599) Layman supports uploading data files with upper or mixed case extensions. Introduced in v1.16.1.

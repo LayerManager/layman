@@ -6,7 +6,7 @@ import pytest
 
 del sys.modules['layman']
 
-from layman import app as layman
+from layman import app as layman, settings
 from layman.layer.filesystem.input_file import ensure_layer_input_file_dir
 from layman.layer.filesystem.util import get_layer_dir
 from layman.common import bbox as bbox_util
@@ -23,7 +23,8 @@ WORKSPACE = 'db_testuser'
 def post_layer(workspace, layer, file_path):
     with layman.app_context():
         db.ensure_workspace(workspace)
-        prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layer)
+        prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layer,
+                                                          file_type=settings.FILE_TYPE_VECTOR)
         ensure_layer_input_file_dir(workspace, layer)
         db.import_layer_vector_file(workspace, layer, file_path, None)
     yield workspace, layer
@@ -136,7 +137,8 @@ def test_abort_import_layer_vector_file():
     )
 
     def abort_layer_import():
-        prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layername)
+        prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layername,
+                                                          file_type=settings.FILE_TYPE_VECTOR)
         with layman.app_context():
             table_name = db.get_table_name(workspace, layername)
         process = db.import_layer_vector_file_async(workspace, table_name, main_filepath,
