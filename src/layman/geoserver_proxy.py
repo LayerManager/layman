@@ -69,7 +69,7 @@ def ensure_wfs_t_attributes(attribs):
     editable_attribs = set(attr for attr in attribs if authz.can_i_edit(LAYER_TYPE, attr[0], attr[1]))
     created_attributes = db.ensure_attributes(editable_attribs)
     if created_attributes:
-        changed_layers = {(workspace, layer) for workspace, layer, _ in created_attributes}
+        changed_layers = {(workspace, layer) for workspace, layer, _, _ in created_attributes}
         qgis_changed_layers = {(workspace, layer) for workspace, layer in changed_layers
                                if layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['style_type'], })['style_type'] == 'qml'}
         for workspace, layer in qgis_changed_layers:
