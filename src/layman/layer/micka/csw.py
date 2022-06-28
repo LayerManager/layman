@@ -136,12 +136,12 @@ def get_template_path_and_values(workspace, layername, http_method=None):
 
     file_type = publ_info.get('file', dict()).get('file_type')
     if file_type == settings.FILE_TYPE_VECTOR:
+        table_name = publ_info['db_table']['name']
         try:
-            languages = db.get_text_languages(workspace, layername)
+            languages = db.get_text_languages(workspace, table_name)
         except LaymanError:
             languages = []
         try:
-            table_name = publ_info['db_table']['name']
             scale_denominator = db.guess_scale_denominator(workspace, table_name)
         except LaymanError:
             scale_denominator = None

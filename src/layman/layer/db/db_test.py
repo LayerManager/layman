@@ -164,7 +164,7 @@ def test_data_language(boundary_table):
     assert len(text_data) == 1
     assert text_data[0].startswith(' '.join(['International boundary (verify)'] * 100))
     with layman.app_context():
-        langs = db.get_text_languages(workspace, layername)
+        langs = db.get_text_languages(workspace, table_name)
     assert langs == ['eng']
 
 
@@ -198,7 +198,7 @@ def test_data_language_roads(road_table):
         'vym_tahy_p'
     ])
     with layman.app_context():
-        langs = db.get_text_languages(workspace, layername)
+        langs = db.get_text_languages(workspace, table_name)
     assert langs == ['cze']
 
 
@@ -210,7 +210,7 @@ def test_populated_places_table(populated_places_table):
         col_names = db.get_text_column_names(workspace, table_name)
     assert len(col_names) == 31
     with layman.app_context():
-        langs = db.get_text_languages(workspace, layername)
+        langs = db.get_text_languages(workspace, table_name)
     assert set(langs) == set(['chi', 'eng', 'rus'])
 
 
@@ -222,7 +222,7 @@ def test_data_language_countries(country_table):
         col_names = db.get_text_column_names(workspace, table_name)
     assert len(col_names) == 63
     with layman.app_context():
-        langs = db.get_text_languages(workspace, layername)
+        langs = db.get_text_languages(workspace, table_name)
     assert set(langs) == set([
         'ara',
         'ben',
@@ -249,7 +249,8 @@ def test_data_language_countries2(country110m_table):
     # print(col_names)
     # assert len(col_names) == 63
     with layman.app_context():
-        langs = db.get_text_languages(workspace, layername)
+        table_name = db.get_table_name(workspace, layername)
+        langs = db.get_text_languages(workspace, table_name)
     assert set(langs) == set(['eng'])
 
 
