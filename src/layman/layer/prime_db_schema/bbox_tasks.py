@@ -22,11 +22,12 @@ def patch_after_feature_change(
     if self.is_aborted():
         raise AbortedException
 
-    info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file', 'native_crs', ]})
+    info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file', 'native_crs', 'db_table']})
     file_type = info['file']['file_type']
     crs = info['native_crs']
+    db_table = info['db_table']['name']
     assert file_type == settings.FILE_TYPE_VECTOR
-    bbox = db_get_bbox(username, layername)
+    bbox = db_get_bbox(username, db_table)
 
     if self.is_aborted():
         raise AbortedException

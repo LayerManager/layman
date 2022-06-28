@@ -449,10 +449,10 @@ def ensure_attributes(attribute_tuples):
     return missing_attributes
 
 
-def get_bbox(workspace, layername, conn_cur=None):
+def get_bbox(workspace, table_name, conn_cur=None):
     query = f'''
     with tmp as (select ST_Extent(l.wkb_geometry) as bbox
-                 from {workspace}.{layername} l
+                 from {workspace}.{table_name} l
     )
     select st_xmin(bbox),
            st_ymin(bbox),

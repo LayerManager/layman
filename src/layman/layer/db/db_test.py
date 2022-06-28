@@ -280,12 +280,14 @@ def test_get_most_frequent_lower_distance(country110m_table, country50m_table, c
 def test_empty_table_bbox(empty_table):
     workspace, layername = empty_table
     with layman.app_context():
-        bbox = db.get_bbox(workspace, layername)
+        db_table = db.get_table_name(workspace, layername)
+        bbox = db.get_bbox(workspace, db_table)
     assert bbox_util.is_empty(bbox), bbox
 
 
 def test_single_point_table_bbox(single_point_table):
     workspace, layername = single_point_table
     with layman.app_context():
-        bbox = db.get_bbox(workspace, layername)
+        db_table = db.get_table_name(workspace, layername)
+        bbox = db.get_bbox(workspace, db_table)
     assert bbox[0] == bbox[2] and bbox[1] == bbox[3], bbox
