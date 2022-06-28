@@ -85,7 +85,9 @@ def delete_whole_user(username):
 
 
 def import_layer_vector_file(workspace, layername, main_filepath, crs_id):
-    process = import_layer_vector_file_async(workspace, layername, main_filepath,
+    table_name = get_table_name(workspace, layername)
+    assert table_name, f'workspace={workspace}, layername={layername}, table_name={table_name}'
+    process = import_layer_vector_file_async(workspace, table_name, main_filepath,
                                              crs_id)
     while process.poll() is None:
         pass
@@ -95,14 +97,15 @@ def import_layer_vector_file(workspace, layername, main_filepath, crs_id):
         raise LaymanError(11, private_data=pg_error)
 
 
-def import_layer_vector_file_async(workspace, layername, main_filepath,
+def import_layer_vector_file_async(workspace, table_name, main_filepath,
                                    crs_id):
     # import file to database table
     import subprocess
+    assert table_name, f'workspace={workspace}, table_name={table_name}, main_filepath={main_filepath}'
     pg_conn = ' '.join([f"{k}='{v}'" for k, v in PG_CONN.items()])
     bash_args = [
         'ogr2ogr',
-        '-nln', layername,
+        '-nln', table_name,
         '-nlt', 'GEOMETRY',
         '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
         '-lco', f'SCHEMA={workspace}',
