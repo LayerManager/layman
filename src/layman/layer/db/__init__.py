@@ -426,7 +426,7 @@ def get_most_frequent_lower_distance2(workspace, layername, conn_cur=None):
 
 def create_string_attributes(attribute_tuples, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
-    query = "\n".join([f"""ALTER TABLE {workspace}.{layername} ADD COLUMN {attrname} VARCHAR(1024);""" for workspace, layername, attrname in attribute_tuples]) + "\n COMMIT;"
+    query = "\n".join([f"""ALTER TABLE {workspace}.{table} ADD COLUMN {attrname} VARCHAR(1024);""" for workspace, layer, table, attrname in attribute_tuples]) + "\n COMMIT;"
     try:
         cur.execute(query)
     except BaseException as exc:
@@ -437,11 +437,11 @@ def create_string_attributes(attribute_tuples, conn_cur=None):
 def get_missing_attributes(attribute_tuples, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
-    # Find all triples which do not already exist
+    # Find all foursomes which do not already exist
     query = f"""select attribs.*
-from (""" + "\n union all\n".join([f"select '{workspace}' workspace, '{layername}' layername, '{attrname}' attrname" for workspace, layername, attrname in attribute_tuples]) + """) attribs left join
+from (""" + "\n union all\n".join([f"select '{workspace}' workspace, '{layername}' layername, '{layername}' table_name, '{attrname}' attrname" for workspace, layername, attrname in attribute_tuples]) + """) attribs left join
     information_schema.columns c on c.table_schema = attribs.workspace
-                                and c.table_name = attribs.layername
+                                and c.table_name = attribs.table_name
                                 and c.column_name = attribs.attrname
 where c.column_name is null"""
 
@@ -457,7 +457,8 @@ where c.column_name is null"""
     for row in rows:
         missing_attributes.add((row[0],
                                 row[1],
-                                row[2]))
+                                row[2],
+                                row[3]))
     return missing_attributes
 
 
