@@ -58,12 +58,11 @@ def get_layer_original_style_stream(workspace, layer):
     return result
 
 
-def fill_layer_template(workspace, layer, uuid, native_bbox, crs, qml_xml, source_type, attrs_to_ensure):
+def fill_layer_template(workspace, layer, uuid, native_bbox, crs, qml_xml, source_type, attrs_to_ensure, table_name):
     db_schema = workspace
     layer_name = layer
     wkb_type = source_type
     qml_geometry = get_qml_geometry_from_qml(qml_xml)
-    db_table = layer
 
     template_path = get_layer_template_path()
     with open(template_path, 'r') as template_file:
@@ -76,7 +75,7 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, crs, qml_xml, sourc
         db_password=settings.LAYMAN_PG_PASSWORD,
         source_type=source_type,
         db_schema=db_schema,
-        db_table=db_table,
+        db_table=table_name,
         layer_name=layer_name,
         layer_uuid=uuid,
         wkb_type=wkb_type,
@@ -115,11 +114,10 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, crs, qml_xml, sourc
     return full_xml_str
 
 
-def fill_project_template(workspace, layer, layer_uuid, layer_qml, crs, epsg_codes, extent, source_type):
+def fill_project_template(workspace, layer, layer_uuid, layer_qml, crs, epsg_codes, extent, source_type, table_name):
     wms_crs_list_values = "\n".join((f"<value>{code}</value>" for code in epsg_codes))
     db_schema = workspace
     layer_name = layer
-    db_table = layer
     creation_iso_datetime = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
 
     template_path = get_project_template_path()
@@ -133,7 +131,7 @@ def fill_project_template(workspace, layer, layer_uuid, layer_qml, crs, epsg_cod
         db_password=settings.LAYMAN_PG_PASSWORD,
         source_type=source_type,
         db_schema=db_schema,
-        db_table=db_table,
+        db_table=table_name,
         layer_name=layer_name,
         layer_uuid=layer_uuid,
         layer_qml=layer_qml,

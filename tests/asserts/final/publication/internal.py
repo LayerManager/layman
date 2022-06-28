@@ -256,8 +256,12 @@ def detail_3857bbox_value(workspace, publ_type, name, *, exp_bbox, precision=0.1
 def point_coordinates(workspace, publ_type, name, *, point_id, crs, exp_coordinates, precision, ):
     assert publ_type == LAYER_TYPE
 
+    with app.app_context():
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['db_table']})
+    db_table = publ_info['db_table']['name']
+
     query = f'''with transformed as (select st_transform(wkb_geometry, %s) point
-from {workspace}.{name}
+from {workspace}.{db_table}
 where point_id = %s)
 select st_x(point),
        st_y(point)
