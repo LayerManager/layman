@@ -188,13 +188,13 @@ AND table_name = '{layername}'
     return [ColumnInfo(name=r[0], data_type=r[1]) for r in rows]
 
 
-def get_number_of_features(workspace, layername, conn_cur=None):
+def get_number_of_features(workspace, table_name, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
     try:
         cur.execute(f"""
 select count(*)
-from {workspace}.{layername}
+from {workspace}.{table_name}
 """)
     except BaseException as exc:
         logger.error(f'get_number_of_features ERROR')
@@ -205,10 +205,11 @@ from {workspace}.{layername}
 
 def get_text_data(workspace, layername, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
+    table_name = get_table_name(workspace, layername)
     col_names = get_text_column_names(workspace, layername, conn_cur=conn_cur)
     if len(col_names) == 0:
         return [], 0
-    num_features = get_number_of_features(workspace, layername, conn_cur=conn_cur)
+    num_features = get_number_of_features(workspace, table_name, conn_cur=conn_cur)
     if num_features == 0:
         return [], 0
     limit = max(100, num_features // 10)
