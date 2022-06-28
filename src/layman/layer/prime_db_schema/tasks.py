@@ -30,7 +30,7 @@ def refresh_bbox(
     file_type = publ_info['file']['file_type']
     if file_type == settings.FILE_TYPE_VECTOR:
         table_name = publ_info['db_table']['name']
-        bbox = db_get_bbox(username, layername)
+        bbox = db_get_bbox(username, table_name)
         crs = db_get_crs(username, table_name)
     elif file_type == settings.FILE_TYPE_RASTER:
         bbox = gdal_get_bbox(username, layername)
