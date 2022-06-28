@@ -248,6 +248,11 @@ def test_data_language_countries2(country110m_table):
     assert set(langs) == set(['eng'])
 
 
+def guess_scale_denominator(workspace, layer):
+    table_name = db.get_table_name(workspace, layer)
+    return db.guess_scale_denominator(workspace, table_name)
+
+
 def test_get_most_frequent_lower_distance(country110m_table, country50m_table, country10m_table,
                                           data200road_table, sm5building_table):
     _, layername_110m = country110m_table
@@ -256,23 +261,23 @@ def test_get_most_frequent_lower_distance(country110m_table, country50m_table, c
     _, layername_200k = data200road_table
     workspace, layername_5k = sm5building_table
     with layman.app_context():
-        sd_110m = db.guess_scale_denominator(workspace, layername_110m)
+        sd_110m = guess_scale_denominator(workspace, layername_110m)
     assert 25000000 <= sd_110m <= 500000000
     assert sd_110m == 100000000
     with layman.app_context():
-        sd_50m = db.guess_scale_denominator(workspace, layername_50m)
+        sd_50m = guess_scale_denominator(workspace, layername_50m)
     assert 10000000 <= sd_50m <= 250000000
     assert sd_50m == 10000000
     with layman.app_context():
-        sd_10m = db.guess_scale_denominator(workspace, layername_10m)
+        sd_10m = guess_scale_denominator(workspace, layername_10m)
     assert 2500000 <= sd_10m <= 50000000
     assert sd_10m == 2500000
     with layman.app_context():
-        sd_200k = db.guess_scale_denominator(workspace, layername_200k)
+        sd_200k = guess_scale_denominator(workspace, layername_200k)
     assert 50000 <= sd_200k <= 1000000
     assert sd_200k == 100000
     with layman.app_context():
-        sd_5k = db.guess_scale_denominator(workspace, layername_5k)
+        sd_5k = guess_scale_denominator(workspace, layername_5k)
     assert 1000 <= sd_5k <= 25000
     assert sd_5k == 5000
 
