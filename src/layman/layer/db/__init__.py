@@ -7,12 +7,23 @@ from db import util as db_util, PG_CONN
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
+from layman.util import get_publication_info
+from .. import LAYER_TYPE
 
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 logger = logging.getLogger(__name__)
 
 
 ColumnInfo = namedtuple('ColumnInfo', 'name data_type')
+
+
+def get_table_name(workspace, layer):
+    layer_info = get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['uuid', ]})
+    table_name = None
+    if layer_info:
+        uuid = layer_info['uuid'].replace('-', '_')
+        table_name = f'layer_{uuid}'
+    return table_name
 
 
 def get_workspaces(conn_cur=None):
@@ -94,10 +105,12 @@ def import_layer_vector_file_async(workspace, layername, main_filepath,
                                    crs_id):
     # import file to database table
     import subprocess
+    table_name = get_table_name(workspace, layername)
+    assert table_name, f'workspace={workspace}, layername={layername}, table_name={table_name}'
     pg_conn = ' '.join([f"{k}='{v}'" for k, v in PG_CONN.items()])
     bash_args = [
         'ogr2ogr',
-        '-nln', layername,
+        '-nln', table_name,
         '-nlt', 'GEOMETRY',
         '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
         '-lco', f'SCHEMA={workspace}',
@@ -126,6 +139,7 @@ def import_layer_vector_file_async(workspace, layername, main_filepath,
 
 
 def check_new_layername(workspace, layername, conn_cur=None):
+    table_name = get_table_name(workspace, layername)
     if conn_cur is None:
         conn_cur = db_util.get_connection_cursor()
     _, cur = conn_cur
@@ -135,7 +149,7 @@ def check_new_layername(workspace, layername, conn_cur=None):
         cur.execute(f"""SELECT n.nspname AS schemaname, c.relname, c.relkind
     FROM   pg_class c
     JOIN   pg_namespace n ON n.oid = c.relnamespace
-    WHERE  n.nspname IN ('{workspace}', '{settings.PG_POSTGIS_SCHEMA}') AND c.relname='{layername}'""")
+    WHERE  n.nspname IN ('{workspace}', '{settings.PG_POSTGIS_SCHEMA}') AND c.relname='{table_name}'""")
     except BaseException as exc:
         logger.error(f'check_new_layername ERROR')
         raise LaymanError(7) from exc
@@ -145,6 +159,7 @@ def check_new_layername(workspace, layername, conn_cur=None):
 
 
 def get_text_column_names(workspace, layername, conn_cur=None):
+    table_name = get_table_name(workspace, layername)
     _, cur = conn_cur or db_util.get_connection_cursor()
 
     try:
@@ -152,7 +167,7 @@ def get_text_column_names(workspace, layername, conn_cur=None):
 SELECT QUOTE_IDENT(column_name) AS column_name
 FROM information_schema.columns
 WHERE table_schema = '{workspace}'
-AND table_name = '{layername}'
+AND table_name = '{table_name}'
 AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 """)
     except BaseException as exc:
@@ -167,6 +182,7 @@ def get_all_column_names(workspace, layername, conn_cur=None):
 
 
 def get_all_column_infos(workspace, layername, conn_cur=None):
+    table_name = get_table_name(workspace, layername)
     _, cur = conn_cur or db_util.get_connection_cursor()
 
     try:
@@ -174,7 +190,7 @@ def get_all_column_infos(workspace, layername, conn_cur=None):
 SELECT column_name AS column_name, data_type
 FROM information_schema.columns
 WHERE table_schema = '{workspace}'
-AND table_name = '{layername}'
+AND table_name = '{table_name}'
 """)
     except BaseException as exc:
         logger.error(f'get_all_column_names ERROR')
@@ -184,12 +200,13 @@ AND table_name = '{layername}'
 
 
 def get_number_of_features(workspace, layername, conn_cur=None):
+    table_name = get_table_name(workspace, layername)
     _, cur = conn_cur or db_util.get_connection_cursor()
 
     try:
         cur.execute(f"""
 select count(*)
-from {workspace}.{layername}
+from {workspace}.{table_name}
 """)
     except BaseException as exc:
         logger.error(f'get_number_of_features ERROR')
@@ -199,6 +216,7 @@ from {workspace}.{layername}
 
 
 def get_text_data(workspace, layername, conn_cur=None):
+    table_name = get_table_name(workspace, layername)
     _, cur = conn_cur or db_util.get_connection_cursor()
     col_names = get_text_column_names(workspace, layername, conn_cur=conn_cur)
     if len(col_names) == 0:
@@ -210,7 +228,7 @@ def get_text_data(workspace, layername, conn_cur=None):
     try:
         cur.execute(f"""
 select {', '.join(col_names)}
-from {workspace}.{layername}
+from {workspace}.{table_name}
 order by ogc_fid
 limit {limit}
 """)
@@ -248,6 +266,7 @@ def get_text_languages(workspace, layername):
 
 
 def get_most_frequent_lower_distance_query(workspace, layername, order_by_methods):
+    table_name = get_table_name(workspace, layername)
     query = f"""
 with t1 as (
 select
@@ -256,7 +275,7 @@ select
 from (
   SELECT
     ogc_fid, (st_dump(wkb_geometry)).geom as geometry
-  FROM {{workspace}}.{{layername}}
+  FROM {{workspace}}.{{table_name}}
 ) sub_view
 order by {{order_by_prefix}}geometry{{order_by_suffix}}, ogc_fid, dump_id
 limit 5000
@@ -333,7 +352,7 @@ limit 1
     order_by_suffix = ')' * len(order_by_methods)
 
     query = query.format(workspace=workspace,
-                         layername=layername,
+                         table_name=table_name,
                          order_by_prefix=order_by_prefix,
                          order_by_suffix=order_by_suffix,
                          )
@@ -471,9 +490,10 @@ def ensure_attributes(attribute_tuples):
 
 
 def get_bbox(workspace, layername, conn_cur=None):
+    table_name = get_table_name(workspace, layername)
     query = f'''
     with tmp as (select ST_Extent(l.wkb_geometry) as bbox
-                 from {workspace}.{layername} l
+                 from {workspace}.{table_name} l
     )
     select st_xmin(bbox),
            st_ymin(bbox),
@@ -486,8 +506,9 @@ def get_bbox(workspace, layername, conn_cur=None):
 
 
 def get_crs(workspace, layername, conn_cur=None):
+    table_name = get_table_name(workspace, layername)
     query = f'''
-    select Find_SRID('{workspace}', '{layername}', 'wkb_geometry');
+    select Find_SRID('{workspace}', '{table_name}', 'wkb_geometry');
     '''
     srid = db_util.run_query(query, conn_cur=conn_cur)[0][0]
     crs = db_util.get_crs(srid)
@@ -495,11 +516,12 @@ def get_crs(workspace, layername, conn_cur=None):
 
 
 def get_geometry_types(workspace, layername, conn_cur=None):
+    table_name = get_table_name(workspace, layername)
     conn, cur = conn_cur or db_util.get_connection_cursor()
     try:
         sql = f"""
 select distinct ST_GeometryType(wkb_geometry) as geometry_type_name
-from {workspace}.{layername}
+from {workspace}.{table_name}
 """
         cur.execute(sql)
     except BaseException as exc:
