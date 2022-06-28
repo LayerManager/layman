@@ -50,7 +50,8 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
     workspace = 'test_geometry_types_workspace'
     process_client.publish_workspace_layer(workspace, layer, file_paths=[f'/code/sample/data/geometry-types/{layer}.geojson'], )
     with app.app_context():
-        db_types = db.get_geometry_types(workspace, layer)
+        table_name = db.get_table_name(workspace, layer)
+        db_types = db.get_geometry_types(workspace, table_name)
     assert set(db_types) == exp_db_types
 
     qgis_geometries = ['Point', 'Line', 'Polygon', 'Unknown geometry']
