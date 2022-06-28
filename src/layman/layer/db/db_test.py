@@ -159,7 +159,7 @@ def test_data_language(boundary_table):
         col_names = db.get_text_column_names(workspace, table_name)
     assert set(col_names) == set(['featurecla', 'name', 'name_alt'])
     with layman.app_context():
-        text_data, _ = db.get_text_data(workspace, layername)
+        text_data, _ = db.get_text_data(workspace, table_name)
     # print(f"num_rows={num_rows}")
     assert len(text_data) == 1
     assert text_data[0].startswith(' '.join(['International boundary (verify)'] * 100))

@@ -207,9 +207,8 @@ from {workspace}.{table_name}
     return rows[0][0]
 
 
-def get_text_data(workspace, layername, conn_cur=None):
+def get_text_data(workspace, table_name, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
-    table_name = get_table_name(workspace, layername)
     col_names = get_text_column_names(workspace, table_name, conn_cur=conn_cur)
     if len(col_names) == 0:
         return [], 0
@@ -220,7 +219,7 @@ def get_text_data(workspace, layername, conn_cur=None):
     try:
         cur.execute(f"""
 select {', '.join(col_names)}
-from {workspace}.{layername}
+from {workspace}.{table_name}
 order by ogc_fid
 limit {limit}
 """)
@@ -243,7 +242,8 @@ limit {limit}
 
 
 def get_text_languages(workspace, layername):
-    texts, num_rows = get_text_data(workspace, layername)
+    table_name = get_table_name(workspace, layername)
+    texts, num_rows = get_text_data(workspace, table_name)
     all_langs = set()
     for text in texts:
         # skip short texts
