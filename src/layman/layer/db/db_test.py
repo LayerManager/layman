@@ -131,7 +131,8 @@ def test_abort_import_layer_vector_file():
     )
 
     def abort_layer_import():
-        process = db.import_layer_vector_file_async(workspace, layername, main_filepath,
+        table_name = db.get_table_name(workspace, layername)
+        process = db.import_layer_vector_file_async(workspace, table_name, main_filepath,
                                                     crs_id)
         time1 = time.time()
         while process.poll() is None:

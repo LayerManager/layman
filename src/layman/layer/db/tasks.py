@@ -41,7 +41,7 @@ def refresh_table(
 
     main_filepath = publ_info['_file']['gdal_path']
     table_name = db.get_table_name(workspace, layername)
-    process = db.import_layer_vector_file_async(workspace, layername, main_filepath, crs_id)
+    process = db.import_layer_vector_file_async(workspace, table_name, main_filepath, crs_id)
     while process.poll() is None and not self.is_aborted():
         pass
     if self.is_aborted():
