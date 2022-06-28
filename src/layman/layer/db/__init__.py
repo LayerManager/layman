@@ -4,20 +4,28 @@ import os
 import logging
 
 from db import util as db_util, PG_CONN
+from layman.common import empty_method
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
+from layman.util import get_publication_info
+from .. import LAYER_TYPE
 
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 logger = logging.getLogger(__name__)
 
+check_new_layername = empty_method
 
 ColumnInfo = namedtuple('ColumnInfo', 'name data_type')
 
 
 def get_table_name(workspace, layer):
-    # pylint: disable=unused-argument
-    return layer
+    layer_info = get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['uuid', ]})
+    table_name = None
+    if layer_info:
+        uuid = layer_info['uuid'].replace('-', '_')
+        table_name = f'layer_{uuid}'
+    return table_name
 
 
 def get_workspaces(conn_cur=None):
@@ -131,25 +139,6 @@ def import_layer_vector_file_async(workspace, table_name, main_filepath,
     process = subprocess.Popen(bash_args, stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
     return process
-
-
-def check_new_layername(workspace, layername, conn_cur=None):
-    if conn_cur is None:
-        conn_cur = db_util.get_connection_cursor()
-    _, cur = conn_cur
-
-    # DB table name conflicts
-    try:
-        cur.execute(f"""SELECT n.nspname AS schemaname, c.relname, c.relkind
-    FROM   pg_class c
-    JOIN   pg_namespace n ON n.oid = c.relnamespace
-    WHERE  n.nspname IN ('{workspace}', '{settings.PG_POSTGIS_SCHEMA}') AND c.relname='{layername}'""")
-    except BaseException as exc:
-        logger.error(f'check_new_layername ERROR')
-        raise LaymanError(7) from exc
-    rows = cur.fetchall()
-    if len(rows) > 0:
-        raise LaymanError(9, {'db_object_name': layername})
 
 
 def get_text_column_names(workspace, table_name, conn_cur=None):

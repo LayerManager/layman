@@ -105,6 +105,8 @@ def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, *, max_diffs=Non
 
 def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_detail, publ_type_detail=None, full_comparison=True,
                              file_extension=None, gdal_prefix='', ):
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, name)
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
     expected_detail = {
         'name': name,
@@ -150,11 +152,13 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
 
         file_type = publ_type_detail[0]
         if file_type == settings.FILE_TYPE_VECTOR:
+            uuid = pub_info["uuid"]
+            db_table = f'layer_{uuid.replace("-","_")}'
             util.recursive_dict_update(expected_detail,
                                        {
                                            'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
                                            'file': {'file_type': 'vector'},
-                                           'db_table': {'name': f'{name}'},
+                                           'db_table': {'name': db_table},
                                        })
         elif file_type == settings.FILE_TYPE_RASTER:
             if file_extension:
@@ -197,8 +201,6 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                    })
 
     expected_detail = util.recursive_dict_update(expected_detail, exp_publication_detail)
-    with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, name)
 
     if full_comparison:
         for key in {'id', 'uuid', 'updated_at', }:
