@@ -171,10 +171,11 @@ AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 
 
 def get_all_column_names(workspace, layername, conn_cur=None):
-    return [col.name for col in get_all_column_infos(workspace, layername, conn_cur)]
+    table_name = get_table_name(workspace, layername)
+    return [col.name for col in get_all_column_infos(workspace, table_name, conn_cur)]
 
 
-def get_all_column_infos(workspace, layername, conn_cur=None):
+def get_all_column_infos(workspace, table_name, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
     try:
@@ -182,7 +183,7 @@ def get_all_column_infos(workspace, layername, conn_cur=None):
 SELECT column_name AS column_name, data_type
 FROM information_schema.columns
 WHERE table_schema = '{workspace}'
-AND table_name = '{layername}'
+AND table_name = '{table_name}'
 """)
     except BaseException as exc:
         logger.error(f'get_all_column_names ERROR')
