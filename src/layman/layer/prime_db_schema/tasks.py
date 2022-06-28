@@ -26,11 +26,12 @@ def refresh_bbox(
     if self.is_aborted():
         raise AbortedException
 
-    publ_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})
+    publ_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file', 'db_table']})
     file_type = publ_info['file']['file_type']
     if file_type == settings.FILE_TYPE_VECTOR:
+        table_name = publ_info['db_table']['name']
         bbox = db_get_bbox(username, layername)
-        crs = db_get_crs(username, layername)
+        crs = db_get_crs(username, table_name)
     elif file_type == settings.FILE_TYPE_RASTER:
         bbox = gdal_get_bbox(username, layername)
         crs = gdal_get_crs(username, layername)

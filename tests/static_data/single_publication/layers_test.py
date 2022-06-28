@@ -198,7 +198,7 @@ def test_fill_project_template(workspace, publ_type, publication):
 
     with app.app_context():
         layer_bbox = layer_db.get_bbox(workspace, publication)
-        layer_crs = layer_db.get_crs(workspace, publication)
+        layer_crs = layer_db.get_crs(workspace, table_name)
     layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[layer_crs].default_bbox
     with app.app_context():
         qml_path = qgis_util.get_original_style_path(workspace, publication)
