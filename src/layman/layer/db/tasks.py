@@ -40,6 +40,7 @@ def refresh_table(
         raise AbortedException
 
     main_filepath = publ_info['_file']['gdal_path']
+    table_name = db.get_table_name(workspace, layername)
     process = db.import_layer_vector_file_async(workspace, layername, main_filepath, crs_id)
     while process.poll() is None and not self.is_aborted():
         pass
@@ -62,6 +63,6 @@ def refresh_table(
                 err_code = 11
             raise LaymanError(err_code, private_data=pg_error)
 
-    crs = db.get_crs(workspace, layername)
+    crs = db.get_crs(workspace, table_name)
     if crs_def.CRSDefinitions[crs].srid:
         table.set_layer_srid(workspace, layername, crs_def.CRSDefinitions[crs].srid)

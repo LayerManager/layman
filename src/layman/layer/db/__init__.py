@@ -464,9 +464,9 @@ def get_bbox(workspace, layername, conn_cur=None):
     return result
 
 
-def get_crs(workspace, layername, conn_cur=None):
+def get_crs(workspace, table_name, conn_cur=None):
     query = f'''
-    select Find_SRID('{workspace}', '{layername}', 'wkb_geometry');
+    select Find_SRID('{workspace}', '{table_name}', 'wkb_geometry');
     '''
     srid = db_util.run_query(query, conn_cur=conn_cur)[0][0]
     crs = db_util.get_crs(srid)
