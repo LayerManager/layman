@@ -252,7 +252,7 @@ def get_text_languages(workspace, layername):
     return sorted(list(all_langs))
 
 
-def get_most_frequent_lower_distance_query(workspace, layername, order_by_methods):
+def get_most_frequent_lower_distance_query(workspace, table_name, order_by_methods):
     query = f"""
 with t1 as (
 select
@@ -261,7 +261,7 @@ select
 from (
   SELECT
     ogc_fid, (st_dump(wkb_geometry)).geom as geometry
-  FROM {{workspace}}.{{layername}}
+  FROM {{workspace}}.{{table_name}}
 ) sub_view
 order by {{order_by_prefix}}geometry{{order_by_suffix}}, ogc_fid, dump_id
 limit 5000
@@ -338,17 +338,17 @@ limit 1
     order_by_suffix = ')' * len(order_by_methods)
 
     query = query.format(workspace=workspace,
-                         layername=layername,
+                         table_name=table_name,
                          order_by_prefix=order_by_prefix,
                          order_by_suffix=order_by_suffix,
                          )
     return query
 
 
-def get_most_frequent_lower_distance(workspace, layername, conn_cur=None):
+def get_most_frequent_lower_distance(workspace, table_name, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
-    query = get_most_frequent_lower_distance_query(workspace, layername, [
+    query = get_most_frequent_lower_distance_query(workspace, table_name, [
         'ST_NPoints'
     ])
 
@@ -389,8 +389,8 @@ SCALE_DENOMINATORS = [
 ]
 
 
-def guess_scale_denominator(workspace, layername):
-    distance = get_most_frequent_lower_distance(workspace, layername)
+def guess_scale_denominator(workspace, table_name):
+    distance = get_most_frequent_lower_distance(workspace, table_name)
     log_sd_list = [math.log10(sd) for sd in SCALE_DENOMINATORS]
     if distance is not None:
         coef = 2000 if distance > 100 else 1000
