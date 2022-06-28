@@ -15,6 +15,11 @@ logger = logging.getLogger(__name__)
 ColumnInfo = namedtuple('ColumnInfo', 'name data_type')
 
 
+def get_table_name(workspace, layer):
+    # pylint: disable=unused-argument
+    return layer
+
+
 def get_workspaces(conn_cur=None):
     if conn_cur is None:
         conn_cur = db_util.get_connection_cursor()
