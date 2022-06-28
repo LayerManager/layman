@@ -7,7 +7,7 @@ ERROR_LIST = {
     6: (500, 'Cannot connect to database'),
     7: (500, 'Database query error'),
     # 8: (409, 'Reserved DB schema name'),
-    9: (409, 'DB object already exists'),
+    # 9: (409, 'DB object already exists'),
     # 10: (409, 'DB schema owned by another than layman user'),
     11: (500, 'Error during import data into DB'),
     # 12: (409, 'GeoServer workspace not assigned to LAYMAN_GS_ROLE'),
