@@ -30,7 +30,7 @@ def refresh_wms(
         title=None,
         access_rights=None,
 ):
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'native_bounding_box', 'native_crs', ]})
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'native_bounding_box', 'native_crs', 'db_table']})
     file_type = info['file']['file_type']
     crs = info['native_crs']
 
@@ -47,11 +47,13 @@ def refresh_wms(
         if store_in_geoserver:
             gs_util.delete_wms_layer(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
             gs_util.delete_wms_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, wms.get_qgis_store_name(layername))
+            table_name = info['db_table']['name']
             geoserver.publish_layer_from_db(workspace,
                                             layername,
                                             description,
                                             title,
                                             crs=crs,
+                                            table_name=table_name,
                                             geoserver_workspace=geoserver_workspace,
                                             )
         else:
@@ -96,7 +98,7 @@ def refresh_wfs(
         title=None,
         access_rights=None,
 ):
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'native_crs', ]})
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'native_crs', 'db_table', ]})
     file_type = info['file']['file_type']
     if file_type == settings.FILE_TYPE_RASTER:
         return
@@ -110,7 +112,8 @@ def refresh_wfs(
     if self.is_aborted():
         raise AbortedException
     crs = info['native_crs']
-    geoserver.publish_layer_from_db(workspace, layername, description, title, crs=crs)
+    table_name = info['db_table']['name']
+    geoserver.publish_layer_from_db(workspace, layername, description, title, crs=crs, table_name=table_name, )
     geoserver.set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, workspace)
     wfs.clear_cache(workspace)
 

@@ -214,14 +214,15 @@ def test_fill_project_template(workspace, publ_type, publication):
         ]
     qml_geometry = qgis_util.get_qml_geometry_from_qml(qml_xml)
     source_type = qgis_util.get_source_type(db_types, qml_geometry)
+    table_name = layer_info['db_table']['name']
     with app.app_context():
-        layer_qml_str = qgis_util.fill_layer_template(workspace, publication, layer_uuid, layer_bbox, layer_crs, qml_xml, source_type, db_cols)
+        layer_qml_str = qgis_util.fill_layer_template(workspace, publication, layer_uuid, layer_bbox, layer_crs, qml_xml, source_type, db_cols, table_name)
     layer_qml = ET.fromstring(layer_qml_str.encode('utf-8'), parser=parser)
     if exp_min_scale is not None:
         assert layer_qml.attrib['minScale'] == exp_min_scale
     with app.app_context():
         qgs_str = qgis_util.fill_project_template(workspace, publication, layer_uuid, layer_qml_str, layer_crs, settings.LAYMAN_OUTPUT_SRS_LIST,
-                                                  layer_bbox, source_type)
+                                                  layer_bbox, source_type, table_name)
     with open(qgs_path, "w") as qgs_file:
         print(qgs_str, file=qgs_file)
 

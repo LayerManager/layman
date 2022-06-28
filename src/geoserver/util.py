@@ -263,7 +263,7 @@ def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, de
     response.raise_for_status()
 
 
-def post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, auth, *, lat_lon_bbox):
+def post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, auth, *, lat_lon_bbox, table_name):
     keywords = [
         "features",
         layername,
@@ -272,6 +272,7 @@ def post_feature_type(geoserver_workspace, layername, description, title, bbox, 
     keywords = list(set(keywords))
     feature_type_def = {
         "name": layername,
+        'nativeName': table_name,
         "title": title,
         "abstract": description,
         "keywords": {
