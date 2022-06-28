@@ -1,7 +1,7 @@
 import logging
 
 from db import util as db_util
-from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_13, upgrade_v1_14, upgrade_v1_16
+from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_13, upgrade_v1_14, upgrade_v1_16, upgrade_v1_17
 from layman import settings
 from . import consts
 
@@ -27,6 +27,9 @@ MIGRATIONS = {
         ((1, 16, 0), [
             upgrade_v1_16.adjust_db_for_srid,
         ]),
+        ((1, 17, 0), [
+            upgrade_v1_17.adjust_db_for_file_type,
+        ]),
     ],
     consts.MIGRATION_TYPE_DATA: [
         ((1, 14, 0), [
@@ -37,6 +40,10 @@ MIGRATIONS = {
             upgrade_v1_16.adjust_maps,
             upgrade_v1_16.adjust_db_publication_srid_constraint,
             upgrade_v1_16.ensure_gs_users,
+        ]),
+        ((1, 17, 0), [
+            upgrade_v1_17.adjust_publications_file_type,
+            upgrade_v1_17.adjust_db_publication_file_type_constraint,
         ]),
     ],
 }

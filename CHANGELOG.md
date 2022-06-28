@@ -5,7 +5,9 @@
 ### Upgrade requirements
 ### Migrations and checks
 #### Schema migrations
+- [#576](https://github.com/LayerManager/layman/issues/576) Create new column `file_type` in `publication` table.
 #### Data migrations
+- [#576](https://github.com/LayerManager/layman/issues/576) Fill column `file_type` in `publications` table in prime DB schema for all publications. Value of each map will be `NULL`. Value of each layer will be same as value of `file.file_type` in [GET Workspace Layer](doc/rest.md#get-workspace-layer) response (i.e. `vector`, `raster`, or `unknown`).
 ### Changes
 - [#606](https://github.com/LayerManager/layman/issues/606) Fix filtering publications by bounding box in case of publication with whole world bounding box in database.
 - [#551](https://github.com/LayerManager/layman/issues/551) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new body parameter *overview_resampling*.

@@ -9,6 +9,7 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
 @pytest.mark.usefixtures('ensure_layman')
+@pytest.mark.skip(reason="Waiting for decision about upgrading to v1.17 only from v1.14+")
 def test_bbox_crop():
     def assert_out_of_the_box_publications(expected_count):
         query = f'''select count(*)
