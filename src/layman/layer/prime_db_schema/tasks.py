@@ -6,7 +6,7 @@ from layman import celery_app, util as layman_util, settings
 from .. import LAYER_TYPE
 from ..db import get_bbox as db_get_bbox, get_crs as db_get_crs
 from ..filesystem.gdal import get_bbox as gdal_get_bbox, get_crs as gdal_get_crs
-from ...common.prime_db_schema.publications import set_bbox
+from ...common.prime_db_schema.publications import set_bbox, set_file_type
 
 logger = get_task_logger(__name__)
 
@@ -41,6 +41,7 @@ def refresh_bbox(
     if self.is_aborted():
         raise AbortedException
 
+    set_file_type(username, LAYER_TYPE, layername, file_type, )
     set_bbox(username, LAYER_TYPE, layername, bbox, crs, )
 
     if self.is_aborted():

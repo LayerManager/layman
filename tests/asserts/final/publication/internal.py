@@ -122,7 +122,6 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
         },
         '_thumbnail': {'path': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/thumbnail/{name}.png'},
         'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
-        'file_type': None,
     }
     if publ_type == process_client.LAYER_TYPE:
         util.recursive_dict_update(expected_detail,
@@ -154,6 +153,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
         if file_type == settings.FILE_TYPE_VECTOR:
             uuid = pub_info["uuid"]
             db_table = f'layer_{uuid.replace("-","_")}'
+            expected_detail['file_type'] = 'vector'
             util.recursive_dict_update(expected_detail,
                                        {
                                            'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
@@ -161,6 +161,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            'db_table': {'name': db_table},
                                        })
         elif file_type == settings.FILE_TYPE_RASTER:
+            expected_detail['file_type'] = 'raster'
             if file_extension:
                 util.recursive_dict_update(expected_detail,
                                            {
@@ -189,6 +190,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            })
 
     if publ_type == process_client.MAP_TYPE:
+        expected_detail['file_type'] = None
         util.recursive_dict_update(expected_detail,
                                    {
                                        '_file': {

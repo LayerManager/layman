@@ -66,6 +66,7 @@ def post_layer(workspace,
                title,
                uuid,
                actor_name,
+               file_type,
                style_type=None,
                ):
     db_info = {"name": layername,
@@ -74,6 +75,7 @@ def post_layer(workspace,
                "uuid": uuid,
                "access_rights": access_rights,
                "actor_name": actor_name,
+               "file_type": file_type,
                'style_type': style_type.code if style_type else None,
                }
     pubs_util.insert_publication(workspace, db_info)

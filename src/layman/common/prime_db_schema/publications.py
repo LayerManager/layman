@@ -129,6 +129,7 @@ select p.id as id_publication,
        p.name,
        p.title,
        p.uuid::text,
+       p.file_type,
        p.style_type,
        p.updated_at,
        ST_XMIN(p.bbox) as xmin,
@@ -214,7 +215,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'title': title,
                                    'uuid': uuid,
                                    'type': publication_type,
-                                   'file_type': None,
+                                   'file_type': file_type,
                                    'style_type': style_type,
                                    'updated_at': updated_at,
                                    'native_bounding_box': [xmin, ymin, xmax, ymax],
@@ -222,7 +223,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'access_rights': {'read': can_read_users.split(','),
                                                      'write': can_write_users.split(',')}
                                    }
-             for id_publication, workspace_name, publication_type, publication_name, title, uuid, style_type, updated_at, xmin, ymin, xmax, ymax,
+             for id_publication, workspace_name, publication_type, publication_name, title, uuid, file_type, style_type, updated_at, xmin, ymin, xmax, ymax,
              srid, can_read_users, can_write_users, _
              in values}
 
@@ -351,8 +352,8 @@ def insert_publication(workspace_name, info):
     check_publication_info(workspace_name, info)
 
     insert_publications_sql = f'''insert into {DB_SCHEMA}.publications as p
-        (id_workspace, name, title, type, uuid, style_type, everyone_can_read, everyone_can_write, updated_at) values
-        (%s, %s, %s, %s, %s, %s, %s, %s,  current_timestamp)
+        (id_workspace, name, title, type, uuid, style_type, file_type, everyone_can_read, everyone_can_write, updated_at) values
+        (%s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp)
 returning id
 ;'''
 
@@ -362,6 +363,7 @@ returning id
             info.get("publ_type_name"),
             info.get("uuid"),
             info.get('style_type'),
+            info.get('file_type'),
             ROLE_EVERYONE in info['access_rights']['read'],
             ROLE_EVERYONE in info['access_rights']['write'],
             )
@@ -471,6 +473,16 @@ def set_bbox(workspace, publication_type, publication, bbox, crs, ):
       and name = %s
       and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
     params = cropped_bbox + (srid, publication_type, publication, workspace,)
+    db_util.run_statement(query, params)
+
+
+def set_file_type(workspace, publication_type, publication, file_type, ):
+    query = f'''update {DB_SCHEMA}.publications set
+    file_type = %s
+    where type = %s
+      and name = %s
+      and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
+    params = (file_type, publication_type, publication, workspace,)
     db_util.run_statement(query, params)
 
 

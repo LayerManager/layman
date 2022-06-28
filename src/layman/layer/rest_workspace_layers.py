@@ -120,6 +120,7 @@ def post(workspace):
         'style_type': style_type,
         'store_in_geoserver': style_type.store_in_geoserver,
         'overview_resampling': overview_resampling,
+        'file_type': file_type,
     }
 
     rest_common.setup_post_access_rights(request.form, task_options, actor_name)

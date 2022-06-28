@@ -78,7 +78,7 @@ class TestResponsesClass:
         'native_crs': 'EPSG:4326',
         'native_bounding_box': list(test_data.SMALL_LAYER_NATIVE_BBOX),
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
-        'file_type': None,
+        'file_type': settings.FILE_TYPE_VECTOR,
     }
     expected_maps = {
         **expected_common_multi,

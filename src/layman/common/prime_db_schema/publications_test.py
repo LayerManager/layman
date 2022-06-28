@@ -40,6 +40,7 @@ def test_publication_basic():
                        "publ_type_name": publication_type,
                        "uuid": uuid_orig,
                        "actor_name": username,
+                       'file_type': 'vector' if publication_type == LAYER_TYPE else None,
                        'style_type': style_type,
                        "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
                                          "write": {settings.RIGHTS_EVERYONE_ROLE, },
@@ -53,7 +54,7 @@ def test_publication_basic():
 
             publ_info = pubs[(username, publication_type, publication_name)]
             assert 'file_type' in publ_info
-            assert publ_info['file_type'] is None
+            assert publ_info['file_type'] == ('vector' if publication_type == LAYER_TYPE else None)
 
             db_info = {"name": publication_name,
                        "title": publication_title2,
@@ -536,7 +537,8 @@ class TestWorldBboxFilter:
     def provide_data(self):
         for crs, values in crs_def.CRSDefinitions.items():
             layer = self.layer_prefix + '_' + crs.split(':')[1]
-            prime_db_schema_client.post_workspace_publication(LAYER_TYPE, self.workspace, layer)
+            prime_db_schema_client.post_workspace_publication(LAYER_TYPE, self.workspace, layer,
+                                                              file_type=settings.FILE_TYPE_VECTOR)
             bbox = values.max_bbox or values.default_bbox
             with app.app_context():
                 publications.set_bbox(self.workspace, LAYER_TYPE, layer, bbox, crs)
