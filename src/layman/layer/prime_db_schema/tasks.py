@@ -26,7 +26,8 @@ def refresh_bbox(
     if self.is_aborted():
         raise AbortedException
 
-    file_type = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
+    publ_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})
+    file_type = publ_info['file']['file_type']
     if file_type == settings.FILE_TYPE_VECTOR:
         bbox = db_get_bbox(username, layername)
         crs = db_get_crs(username, layername)
