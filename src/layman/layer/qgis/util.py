@@ -6,10 +6,11 @@ from lxml import etree as ET
 
 import crs as crs_def
 from db import util as db_util
-from layman import settings, LaymanError
+from layman import settings, LaymanError, util as layman_util
 from layman.layer.filesystem import input_style
 from layman.common import db as db_common
 from . import wms
+from .. import LAYER_TYPE
 
 ELEMENTS_TO_REWRITE = ['legend', 'expressionfields']
 
@@ -63,7 +64,8 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, crs, qml_xml, sourc
     layer_name = layer
     wkb_type = source_type
     qml_geometry = get_qml_geometry_from_qml(qml_xml)
-    db_table = layer
+    layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['db_table', ]})
+    db_table = layer_info['db_table']['name']
 
     template_path = get_layer_template_path()
     with open(template_path, 'r') as template_file:
@@ -119,7 +121,8 @@ def fill_project_template(workspace, layer, layer_uuid, layer_qml, crs, epsg_cod
     wms_crs_list_values = "\n".join((f"<value>{code}</value>" for code in epsg_codes))
     db_schema = workspace
     layer_name = layer
-    db_table = layer
+    layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['db_table', ]})
+    db_table = layer_info['db_table']['name']
     creation_iso_datetime = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
 
     template_path = get_project_template_path()
