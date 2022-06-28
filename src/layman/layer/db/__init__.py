@@ -241,8 +241,7 @@ limit {limit}
     return col_texts, limit
 
 
-def get_text_languages(workspace, layername):
-    table_name = get_table_name(workspace, layername)
+def get_text_languages(workspace, table_name):
     texts, num_rows = get_text_data(workspace, table_name)
     all_langs = set()
     for text in texts:
