@@ -154,7 +154,8 @@ def test_data_language(boundary_table):
     workspace, layername = boundary_table
     # print(f"username={username}, layername={layername}")
     with layman.app_context():
-        col_names = db.get_text_column_names(workspace, layername)
+        table_name = db.get_table_name(workspace, layername)
+        col_names = db.get_text_column_names(workspace, table_name)
     assert set(col_names) == set(['featurecla', 'name', 'name_alt'])
     with layman.app_context():
         text_data, _ = db.get_text_data(workspace, layername)
@@ -170,7 +171,8 @@ def test_data_language_roads(road_table):
     workspace, layername = road_table
     # print(f"username={username}, layername={layername}")
     with layman.app_context():
-        col_names = db.get_text_column_names(workspace, layername)
+        table_name = db.get_table_name(workspace, layername)
+        col_names = db.get_text_column_names(workspace, table_name)
     assert set(col_names) == set([
         'cislouseku',
         'dpr_smer_p',
@@ -203,7 +205,8 @@ def test_populated_places_table(populated_places_table):
     workspace, layername = populated_places_table
     print(f"workspace={workspace}, layername={layername}")
     with layman.app_context():
-        col_names = db.get_text_column_names(workspace, layername)
+        table_name = db.get_table_name(workspace, layername)
+        col_names = db.get_text_column_names(workspace, table_name)
     assert len(col_names) == 31
     with layman.app_context():
         langs = db.get_text_languages(workspace, layername)
@@ -214,7 +217,8 @@ def test_data_language_countries(country_table):
     workspace, layername = country_table
     # print(f"username={username}, layername={layername}")
     with layman.app_context():
-        col_names = db.get_text_column_names(workspace, layername)
+        table_name = db.get_table_name(workspace, layername)
+        col_names = db.get_text_column_names(workspace, table_name)
     assert len(col_names) == 63
     with layman.app_context():
         langs = db.get_text_languages(workspace, layername)

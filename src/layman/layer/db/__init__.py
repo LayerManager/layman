@@ -149,7 +149,7 @@ def check_new_layername(workspace, layername, conn_cur=None):
         raise LaymanError(9, {'db_object_name': layername})
 
 
-def get_text_column_names(workspace, layername, conn_cur=None):
+def get_text_column_names(workspace, table_name, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
     try:
@@ -157,7 +157,7 @@ def get_text_column_names(workspace, layername, conn_cur=None):
 SELECT QUOTE_IDENT(column_name) AS column_name
 FROM information_schema.columns
 WHERE table_schema = '{workspace}'
-AND table_name = '{layername}'
+AND table_name = '{table_name}'
 AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 """)
     except BaseException as exc:
@@ -206,7 +206,7 @@ from {workspace}.{table_name}
 def get_text_data(workspace, layername, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
     table_name = get_table_name(workspace, layername)
-    col_names = get_text_column_names(workspace, layername, conn_cur=conn_cur)
+    col_names = get_text_column_names(workspace, table_name, conn_cur=conn_cur)
     if len(col_names) == 0:
         return [], 0
     num_features = get_number_of_features(workspace, table_name, conn_cur=conn_cur)
