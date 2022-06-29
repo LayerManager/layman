@@ -105,18 +105,18 @@ def import_layer_vector_file(workspace, layername, main_filepath, crs_id):
         raise LaymanError(11, private_data=pg_error)
 
 
-def import_layer_vector_file_async(workspace, table_name, main_filepath,
+def import_layer_vector_file_async(schema, table_name, main_filepath,
                                    crs_id):
     # import file to database table
     import subprocess
-    assert table_name, f'workspace={workspace}, table_name={table_name}, main_filepath={main_filepath}'
+    assert table_name, f'schema={schema}, table_name={table_name}, main_filepath={main_filepath}'
     pg_conn = ' '.join([f"{k}='{v}'" for k, v in PG_CONN.items()])
     bash_args = [
         'ogr2ogr',
         '-nln', table_name,
         '-nlt', 'GEOMETRY',
         '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
-        '-lco', f'SCHEMA={workspace}',
+        '-lco', f'SCHEMA={schema}',
         # '-clipsrc', '-180', '-85.06', '180', '85.06',
         '-f', 'PostgreSQL',
         '-unsetFid',
@@ -141,14 +141,14 @@ def import_layer_vector_file_async(workspace, table_name, main_filepath,
     return process
 
 
-def get_text_column_names(workspace, table_name, conn_cur=None):
+def get_text_column_names(schema, table_name, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
     try:
         cur.execute(f"""
 SELECT QUOTE_IDENT(column_name) AS column_name
 FROM information_schema.columns
-WHERE table_schema = '{workspace}'
+WHERE table_schema = '{schema}'
 AND table_name = '{table_name}'
 AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 """)
@@ -164,14 +164,14 @@ def get_all_column_names(workspace, layername, conn_cur=None):
     return [col.name for col in get_all_column_infos(workspace, table_name, conn_cur)]
 
 
-def get_all_column_infos(workspace, table_name, conn_cur=None):
+def get_all_column_infos(schema, table_name, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
     try:
         cur.execute(f"""
 SELECT column_name AS column_name, data_type
 FROM information_schema.columns
-WHERE table_schema = '{workspace}'
+WHERE table_schema = '{schema}'
 AND table_name = '{table_name}'
 """)
     except BaseException as exc:
@@ -181,13 +181,13 @@ AND table_name = '{table_name}'
     return [ColumnInfo(name=r[0], data_type=r[1]) for r in rows]
 
 
-def get_number_of_features(workspace, table_name, conn_cur=None):
+def get_number_of_features(schema, table_name, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
     try:
         cur.execute(f"""
 select count(*)
-from {workspace}.{table_name}
+from {schema}.{table_name}
 """)
     except BaseException as exc:
         logger.error(f'get_number_of_features ERROR')
@@ -196,19 +196,19 @@ from {workspace}.{table_name}
     return rows[0][0]
 
 
-def get_text_data(workspace, table_name, conn_cur=None):
+def get_text_data(schema, table_name, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
-    col_names = get_text_column_names(workspace, table_name, conn_cur=conn_cur)
+    col_names = get_text_column_names(schema, table_name, conn_cur=conn_cur)
     if len(col_names) == 0:
         return [], 0
-    num_features = get_number_of_features(workspace, table_name, conn_cur=conn_cur)
+    num_features = get_number_of_features(schema, table_name, conn_cur=conn_cur)
     if num_features == 0:
         return [], 0
     limit = max(100, num_features // 10)
     try:
         cur.execute(f"""
 select {', '.join(col_names)}
-from {workspace}.{table_name}
+from {schema}.{table_name}
 order by ogc_fid
 limit {limit}
 """)
@@ -230,8 +230,8 @@ limit {limit}
     return col_texts, limit
 
 
-def get_text_languages(workspace, table_name):
-    texts, num_rows = get_text_data(workspace, table_name)
+def get_text_languages(schema, table_name):
+    texts, num_rows = get_text_data(schema, table_name)
     all_langs = set()
     for text in texts:
         # skip short texts
@@ -245,7 +245,7 @@ def get_text_languages(workspace, table_name):
     return sorted(list(all_langs))
 
 
-def get_most_frequent_lower_distance_query(workspace, table_name, order_by_methods):
+def get_most_frequent_lower_distance_query(schema, table_name, order_by_methods):
     query = f"""
 with t1 as (
 select
@@ -254,7 +254,7 @@ select
 from (
   SELECT
     ogc_fid, (st_dump(wkb_geometry)).geom as geometry
-  FROM {{workspace}}.{{table_name}}
+  FROM {{schema}}.{{table_name}}
 ) sub_view
 order by {{order_by_prefix}}geometry{{order_by_suffix}}, ogc_fid, dump_id
 limit 5000
@@ -330,7 +330,7 @@ limit 1
     order_by_prefix = ''.join([f"{method}(" for method in order_by_methods])
     order_by_suffix = ')' * len(order_by_methods)
 
-    query = query.format(workspace=workspace,
+    query = query.format(schema=schema,
                          table_name=table_name,
                          order_by_prefix=order_by_prefix,
                          order_by_suffix=order_by_suffix,
@@ -338,10 +338,10 @@ limit 1
     return query
 
 
-def get_most_frequent_lower_distance(workspace, table_name, conn_cur=None):
+def get_most_frequent_lower_distance(schema, table_name, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
-    query = get_most_frequent_lower_distance_query(workspace, table_name, [
+    query = get_most_frequent_lower_distance_query(schema, table_name, [
         'ST_NPoints'
     ])
 
@@ -382,8 +382,8 @@ SCALE_DENOMINATORS = [
 ]
 
 
-def guess_scale_denominator(workspace, table_name):
-    distance = get_most_frequent_lower_distance(workspace, table_name)
+def guess_scale_denominator(schema, table_name):
+    distance = get_most_frequent_lower_distance(schema, table_name)
     log_sd_list = [math.log10(sd) for sd in SCALE_DENOMINATORS]
     if distance is not None:
         coef = 2000 if distance > 100 else 1000
@@ -398,7 +398,7 @@ def guess_scale_denominator(workspace, table_name):
 
 def create_string_attributes(attribute_tuples, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
-    query = "\n".join([f"""ALTER TABLE {workspace}.{table} ADD COLUMN {attrname} VARCHAR(1024);""" for workspace, layer, table, attrname in attribute_tuples]) + "\n COMMIT;"
+    query = "\n".join([f"""ALTER TABLE {schema}.{table} ADD COLUMN {attrname} VARCHAR(1024);""" for schema, _, table, attrname in attribute_tuples]) + "\n COMMIT;"
     try:
         cur.execute(query)
     except BaseException as exc:
@@ -444,10 +444,10 @@ def ensure_attributes(attribute_tuples):
     return missing_attributes
 
 
-def get_bbox(workspace, table_name, conn_cur=None):
+def get_bbox(schema, table_name, conn_cur=None):
     query = f'''
     with tmp as (select ST_Extent(l.wkb_geometry) as bbox
-                 from {workspace}.{table_name} l
+                 from {schema}.{table_name} l
     )
     select st_xmin(bbox),
            st_ymin(bbox),
@@ -459,21 +459,21 @@ def get_bbox(workspace, table_name, conn_cur=None):
     return result
 
 
-def get_crs(workspace, table_name, conn_cur=None):
+def get_crs(schema, table_name, conn_cur=None):
     query = f'''
-    select Find_SRID('{workspace}', '{table_name}', 'wkb_geometry');
+    select Find_SRID('{schema}', '{table_name}', 'wkb_geometry');
     '''
     srid = db_util.run_query(query, conn_cur=conn_cur)[0][0]
     crs = db_util.get_crs(srid)
     return crs
 
 
-def get_geometry_types(workspace, table_name, conn_cur=None):
+def get_geometry_types(schema, table_name, conn_cur=None):
     conn, cur = conn_cur or db_util.get_connection_cursor()
     try:
         sql = f"""
 select distinct ST_GeometryType(wkb_geometry) as geometry_type_name
-from {workspace}.{table_name}
+from {schema}.{table_name}
 """
         cur.execute(sql)
     except BaseException as exc:
