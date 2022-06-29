@@ -67,12 +67,6 @@ def get_providers():
     return current_app.config[key]
 
 
-def check_new_layername(workspace, layername):
-    check_layername(layername)
-    providers = get_providers()
-    call_modules_fn(providers, 'check_new_layername', [workspace, layername])
-
-
 def fill_in_partial_info_statuses(info, chain_info):
     file_type = info.get('file', dict()).get('file_type')
     item_keys = get_layer_info_keys(file_type) if file_type else settings.FILE_TYPE_UNKNOWN

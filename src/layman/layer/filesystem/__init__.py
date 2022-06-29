@@ -3,7 +3,6 @@ from layman.common.filesystem import util as common_util
 from . import util, gdal
 
 check_workspace_name = empty_method
-check_new_layername = empty_method
 
 get_usernames = common_util.get_usernames
 get_workspaces = common_util.get_workspaces

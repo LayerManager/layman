@@ -57,9 +57,7 @@ def test_publication_interface_methods():
         {
             'publication_type': 'layman.layer',
             'modules_getter': provider_modules_getter,
-            'methods': publication_provider_methods.union({
-                'check_new_layername',
-            }),
+            'methods': publication_provider_methods,
         },
         {
             'publication_type': 'layman.map',

@@ -65,7 +65,6 @@ def post(workspace):
     info = util.get_layer_info(workspace, layername)
     if info:
         raise LaymanError(17, {'layername': layername})
-    util.check_new_layername(workspace, layername)
 
     # CRS
     crs_id = None

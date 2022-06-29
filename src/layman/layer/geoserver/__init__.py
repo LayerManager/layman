@@ -12,8 +12,6 @@ from . import wms
 logger = logging.getLogger(__name__)
 FLASK_RULES_KEY = f"{__name__}:RULES"
 
-check_new_layername = empty_method
-
 
 def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
     gs_util.ensure_user(username, None, auth)
