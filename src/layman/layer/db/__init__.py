@@ -14,8 +14,6 @@ from .. import LAYER_TYPE
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 logger = logging.getLogger(__name__)
 
-check_new_layername = empty_method
-
 ColumnInfo = namedtuple('ColumnInfo', 'name data_type')
 
 

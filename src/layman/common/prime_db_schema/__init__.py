@@ -1,7 +1,4 @@
-from layman.common import empty_method
 from layman.common.prime_db_schema import users as users_util, workspaces as workspaces_util
-
-check_new_layername = empty_method
 
 get_usernames = users_util.get_usernames
 get_workspaces = workspaces_util.get_workspace_names
