@@ -109,7 +109,7 @@ def test_get_maps_empty(client):
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_wrong_value_of_mapname(client):
     workspace = 'testuser1'
-    mapnames = [' ', '2a', 'ě', ';', '?', 'ABC']
+    mapnames = [' ', 'ě', ';', '?', 'ABC']
     for mapname in mapnames:
         response = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname))
         resp_json = response.get_json()

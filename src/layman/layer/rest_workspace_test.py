@@ -155,7 +155,7 @@ def test_wrong_value_of_layername(client):
     # publish and delete layer to ensure that username exists
     flask_client.publish_layer(workspace, layername, client)
     flask_client.delete_layer(workspace, layername, client)
-    layernames = [' ', '2a', 'ě', ';', '?', 'ABC']
+    layernames = [' ', 'ě', ';', '?', 'ABC']
     for layername in layernames:
         with app.app_context():
             response = client.get(url_for('rest_workspace_layer.get', workspace=workspace, layername=layername))

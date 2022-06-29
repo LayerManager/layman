@@ -65,7 +65,7 @@ def to_safe_name(unsafe_name, type_name):
     value = slugify(unsafe_name)
     if len(value) == 0:
         value = type_name
-    elif re.match(r'^[^a-z].*', value):
+    elif re.match(r'^[^0-9a-z].*', value):
         value = f'{type_name}_{value}'
     return value
 

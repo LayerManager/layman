@@ -16,6 +16,7 @@
 - New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](doc/env-settings.md#oauth2_liferay_introspection_sub_key). Introduced in v1.16.1.
 - [#599](https://github.com/LayerManager/layman/issues/599) Layman supports uploading data files with upper or mixed case extensions. Introduced in v1.16.1.
 - [#541](https://github.com/LayerManager/layman/issues/541) Vector layers are stored in DB table with name in form `layer_<UUID>`, e.g. `layer_96b918c6_d88c_42d8_b999_f3992b826958`, previously the name of the table was the same as name of the layer.
+- [#541](https://github.com/LayerManager/layman/issues/541) Layer name and map name can start with numbers.
 
 ## v1.16.3
  2022-06-20
