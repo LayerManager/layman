@@ -2,17 +2,21 @@ import copy
 import os
 import pytest
 
-import tests
 from test_tools import process_client, cleanup
+from tests.asserts.final import publication as publ_asserts
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
-from ... import Publication, TestTypes, TestKeys
-
+from tests.dynamic_data.publications import common_layers
+from ... import Publication, TestTypes, TestKeys, PublicationValues
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 TEST_CASES = {
     'starts_with_number': {'name': '0125_name'},
+}
+
+TEST_CASE_PARAMETRIZATION = {
+    'vector_sld_layer': common_layers.LAYER_VECTOR_SLD,
 }
 
 
@@ -30,20 +34,33 @@ def pytest_generate_tests(metafunc):
                            test_type == TestTypes.OPTIONAL or params.get(TestKeys.TYPE, cls.default_test_type) == TestTypes.MANDATORY}
     for key, params in test_cases_for_type.items():
         for method_function_name, method_name in rest_methods.items():
-            publ_name = cls.key_to_publication_base_name(key) + f"_{method_name}"
-            publication = Publication(cls.workspace, cls.publication_type, publ_name)
-            rest_method = getattr(cls, method_function_name)
-            argvalues.append([
-                publication,
-                key,
-                copy.deepcopy(params),
-                rest_method,
-                (publication, method_name),
-            ])
-            ids.append(publ_name)
+            for parametrization_key, publication_definition in TEST_CASE_PARAMETRIZATION.items():
+                publ_name = params['name']
+                publication = Publication(cls.workspace, cls.publication_type, publ_name)
+                rest_method = getattr(cls, method_function_name)
+                testcase_id = f'{publ_name}:{parametrization_key}_{method_name}'
+
+                post_definition = copy.deepcopy(params)
+                post_definition.update(publication_definition.definition)
+                post_definition.pop('name', None)
+
+                test_case_definition = PublicationValues(
+                    definition=post_definition,
+                    info_values=publication_definition.info_values,
+                    thumbnail=publication_definition.thumbnail,
+                )
+
+                argvalues.append([
+                    publication,
+                    key,
+                    test_case_definition,
+                    rest_method,
+                    (publication, method_name),
+                ])
+                ids.append(testcase_id)
     publ_type_name = cls.publication_type.split('.')[-1]
     metafunc.parametrize(
-        argnames=f'{publ_type_name}, key, params, rest_method, post_before_patch',
+        argnames=f'{publ_type_name}, key, publication_definition, rest_method, post_before_patch',
         argvalues=argvalues,
         ids=ids,
         indirect=['post_before_patch'],
@@ -54,7 +71,7 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     workspace = 'dynamic_test_publication_name'
     test_cases = TEST_CASES
-    default_test_type = tests.TestTypes.MANDATORY
+    default_test_type = TestTypes.MANDATORY
     publication_type = process_client.LAYER_TYPE
 
     rest_parametrization = {
@@ -77,7 +94,11 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     # pylint: disable=unused-argument
     @staticmethod
-    def test_publication_name(layer, key, params, rest_method):
+    def test_publication_name(layer, key, publication_definition, rest_method):
         """Parametrized using pytest_generate_tests"""
-        rest_method(layer, params=params)
+        rest_method(layer, params=publication_definition.definition)
         assert_util.is_publication_valid_and_complete(layer)
+        publ_asserts.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
+                                                       **publication_definition.info_values)
+        publ_asserts.internal.thumbnail_equals(layer.workspace, layer.type, layer.name,
+                                               exp_thumbnail=publication_definition.thumbnail)
