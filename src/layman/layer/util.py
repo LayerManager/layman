@@ -8,10 +8,11 @@ from layman.util import call_modules_fn, get_providers_from_source_names, get_in
     to_safe_name, url_for
 from layman import celery as celery_util, common
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
-from layman.common.util import PUBLICATION_NAME_PATTERN, clear_publication_info
+from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_keys
 
 LAYERNAME_PATTERN = PUBLICATION_NAME_PATTERN
+LAYERNAME_MAX_LENGTH = PUBLICATION_MAX_LENGTH
 ATTRNAME_PATTERN = PUBLICATION_NAME_PATTERN
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
@@ -51,6 +52,9 @@ def info_decorator(func):
 def check_layername(layername):
     if not re.match(LAYERNAME_PATTERN, layername):
         raise LaymanError(2, {'parameter': 'layername', 'expected': LAYERNAME_PATTERN})
+    if len(layername) > LAYERNAME_MAX_LENGTH:
+        raise LaymanError(2, {'parameter': 'layername',
+                              'detail': f'Layer name too long ({len(layername)}), maximum allowed length is {LAYERNAME_MAX_LENGTH}.'})
 
 
 def get_sources():
