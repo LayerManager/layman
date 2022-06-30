@@ -1,8 +1,9 @@
 import copy
 import os
+import pytest
 
 import tests
-from test_tools import process_client
+from test_tools import process_client, cleanup
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
 from ... import Publication, TestTypes, TestKeys
@@ -61,6 +62,18 @@ class TestPublication(base_test.TestSingleRestPublication):
             'post_publication': 'post',
         },
     }
+
+    @pytest.fixture(scope='class', autouse=True)
+    def class_cleanup(self, request):
+        yield
+        cleanup.cleanup_publications(request, self.publications_to_cleanup_on_class_end, force=True)
+        self.publications_to_cleanup_on_class_end.clear()
+
+    @pytest.fixture(scope='function', autouse=True)
+    def function_cleanup(self, request):
+        yield
+        cleanup.cleanup_publications(request, self.publications_to_cleanup_on_function_end, force=True)
+        self.publications_to_cleanup_on_function_end.clear()
 
     # pylint: disable=unused-argument
     @staticmethod
