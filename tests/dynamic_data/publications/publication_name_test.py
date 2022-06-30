@@ -6,7 +6,7 @@ from test_tools import process_client, cleanup
 from tests.asserts.final import publication as publ_asserts
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
-from tests.dynamic_data.publications import common_layers
+from tests.dynamic_data.publications import common_publications
 from ... import Publication, TestTypes, TestKeys, PublicationValues
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -17,9 +17,9 @@ TEST_CASES = {
 }
 
 TEST_CASE_PARAMETRIZATION = {
-    'vector_sld_layer': common_layers.LAYER_VECTOR_SLD,
-    'vector_qml_layer': common_layers.LAYER_VECTOR_QML,
-    'raster_layer': common_layers.LAYER_RASTER,
+    'vector_sld_layer': common_publications.LAYER_VECTOR_SLD,
+    'vector_qml_layer': common_publications.LAYER_VECTOR_QML,
+    'raster_layer': common_publications.LAYER_RASTER,
 }
 
 

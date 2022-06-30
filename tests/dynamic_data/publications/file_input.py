@@ -1,7 +1,7 @@
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client, util
-from . import common_layers as layers
+from . import common_publications as publications
 from ... import Action, Publication, dynamic_data as consts
 
 KEY_PUBLICATION_TYPE = 'publ_type'
@@ -23,9 +23,9 @@ TESTCASES = {
             'compress': False,
         },
         consts.KEY_FINAL_ASSERTS: [
-            Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER_ZIP.info_values),
+            Action(publication.internal.correct_values_in_detail, publications.SMALL_LAYER_ZIP.info_values),
             Action(publication.internal.thumbnail_equals, {
-                'exp_thumbnail': layers.SMALL_LAYER_ZIP.thumbnail,
+                'exp_thumbnail': publications.SMALL_LAYER_ZIP.thumbnail,
             }),
         ],
     },
@@ -38,9 +38,9 @@ TESTCASES = {
             'compress': False,
         },
         consts.KEY_FINAL_ASSERTS: [
-            Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER_ZIP.info_values),
+            Action(publication.internal.correct_values_in_detail, publications.SMALL_LAYER_ZIP.info_values),
             Action(publication.internal.thumbnail_equals, {
-                'exp_thumbnail': layers.SMALL_LAYER_ZIP.thumbnail,
+                'exp_thumbnail': publications.SMALL_LAYER_ZIP.thumbnail,
             }),
         ],
     },
@@ -54,7 +54,7 @@ TESTCASES = {
         consts.KEY_FINAL_ASSERTS: [
             *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
             Action(publication.internal.thumbnail_equals, {
-                'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
+                'exp_thumbnail': publications.SMALL_LAYER.thumbnail,
             }),
         ],
     },
@@ -123,5 +123,5 @@ def generate(workspace=None):
             }
             publ_name = "_".join([part for part in [testcase, 'patch', test_case_postfix] if part])
             result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = [
-                layers.DEFAULT_POST_DICT[tc_params[KEY_PUBLICATION_TYPE]], patch_action]
+                publications.DEFAULT_POST_DICT[tc_params[KEY_PUBLICATION_TYPE]], patch_action]
     return result

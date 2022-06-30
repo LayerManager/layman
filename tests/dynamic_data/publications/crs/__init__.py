@@ -6,7 +6,7 @@ import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client, util
 from . import vectors, rasters
-from .. import common_layers as layers
+from .. import common_publications as publications
 from .... import Action, Publication, dynamic_data as consts
 
 KEY_ACTION_PARAMS = 'action_params'
@@ -52,15 +52,15 @@ REST_PARAMETRIZATION = {
 TESTCASES = {
     'epsg_4326_shp': {
         KEY_FILE_NAME: 'small_layer_4326',
-        KEY_INFO_VALUES: {**layers.SMALL_LAYER.info_values,
+        KEY_INFO_VALUES: {**publications.SMALL_LAYER.info_values,
                           'file_extension': 'shp', },
-        KEY_THUMBNAIL: layers.SMALL_LAYER.thumbnail,
+        KEY_THUMBNAIL: publications.SMALL_LAYER.thumbnail,
     },
     'epsg_4326_ne': {
         KEY_FILE_NAME: 'small_layer_4326_ne',
-        KEY_INFO_VALUES: {**layers.SMALL_LAYER.info_values,
+        KEY_INFO_VALUES: {**publications.SMALL_LAYER.info_values,
                           'file_extension': 'shp', },
-        KEY_THUMBNAIL: layers.SMALL_LAYER.thumbnail,
+        KEY_THUMBNAIL: publications.SMALL_LAYER.thumbnail,
     },
     'la_4326': {
         KEY_FILE_NAME: 'sample_point_la_4326',
@@ -142,7 +142,7 @@ def generate_local(workspace=None):
                                                                         KEY_ONLY_FIRST_PARAMETRIZATION,
                                                                         True),
                                                                     default_params=action_params,
-                                                                    action_parametrization=layers.DEFAULT_ACTIONS,
+                                                                    action_parametrization=publications.DEFAULT_ACTIONS,
                                                                     )
 
         info_values = tc_params[KEY_INFO_VALUES]

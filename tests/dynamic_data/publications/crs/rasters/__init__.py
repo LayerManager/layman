@@ -5,7 +5,7 @@ from test_tools import process_client, util
 from tests.asserts import util as asserts_util
 import tests.asserts.final.publication as publication
 import tests.asserts.processing as processing
-from ... import common_layers as layers
+from ... import common_publications as publications
 from ..... import Action, Publication, dynamic_data as consts
 
 
@@ -145,7 +145,7 @@ def generate(workspace=None):
                                                                     only_first_parametrization=tc_params.get(
                                                                         KEY_ONLY_FIRST_PARAMETRIZATION, True),
                                                                     default_params=tc_params.get(consts.KEY_ACTION),
-                                                                    action_parametrization=layers.DEFAULT_ACTIONS,
+                                                                    action_parametrization=publications.DEFAULT_ACTIONS,
                                                                     )
 
         def_info_values = copy.deepcopy(def_publ_info_values)
