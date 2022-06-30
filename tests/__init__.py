@@ -7,7 +7,7 @@ pytest.register_assert_rewrite('tests.asserts', 'tests.static_data.data')
 
 Action = namedtuple('ActionTypeDef', ['method', 'params', ])
 Publication = namedtuple('PublicationTypeDef', ['workspace', 'type', 'name'])
-PublicationValues = namedtuple('PublicationValuesDef', ['definition', 'info_values', 'thumbnail'])
+PublicationValues = namedtuple('PublicationValuesDef', ['type', 'definition', 'info_values', 'thumbnail'])
 
 
 class TestTypes(Enum):

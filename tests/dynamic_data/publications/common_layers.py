@@ -4,6 +4,7 @@ from test_tools import process_client
 from ... import PublicationValues, dynamic_data as consts, Action
 
 SMALL_LAYER = PublicationValues(
+    type=process_client.LAYER_TYPE,
     definition=dict(),
     info_values={
         'exp_publication_detail': {
@@ -18,6 +19,7 @@ SMALL_LAYER = PublicationValues(
 )
 
 SMALL_LAYER_ZIP = PublicationValues(
+    type=process_client.LAYER_TYPE,
     definition={
         'file_paths': ['sample/layman.layer/small_layer.geojson'],
         'compress': True,
@@ -31,6 +33,7 @@ SMALL_LAYER_ZIP = PublicationValues(
 )
 
 SMALL_LAYER_QML = PublicationValues(
+    type=process_client.LAYER_TYPE,
     definition={
         'style_file': 'sample/style/small_layer.qml'
     },
@@ -42,6 +45,7 @@ SMALL_LAYER_QML = PublicationValues(
 )
 
 NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = PublicationValues(
+    type=process_client.LAYER_TYPE,
     definition={
         'file_paths': [
             'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
@@ -66,6 +70,7 @@ NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = PublicationValues(
 )
 
 NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_ZIP = PublicationValues(
+    type=process_client.LAYER_TYPE,
     definition={
         **NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.definition,
         'compress': True,
@@ -83,6 +88,7 @@ NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_ZIP = PublicationValues(
 )
 
 SAMPLE_TIF_TFW_RGBA_OPAQUE = PublicationValues(
+    type=process_client.LAYER_TYPE,
     definition={
         'file_paths': [
             'sample/layman.layer/sample_tif_tfw_rgba_opaque.tfw',
@@ -102,6 +108,7 @@ SAMPLE_TIF_TFW_RGBA_OPAQUE = PublicationValues(
 )
 
 SAMPLE_TIF_TFW_RGBA_OPAQUE_ZIP = PublicationValues(
+    type=process_client.LAYER_TYPE,
     definition={
         **SAMPLE_TIF_TFW_RGBA_OPAQUE.definition,
         'compress': True,
@@ -118,6 +125,7 @@ SAMPLE_TIF_TFW_RGBA_OPAQUE_ZIP = PublicationValues(
 )
 
 SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE = PublicationValues(
+    type=process_client.LAYER_TYPE,
     definition={
         'file_paths': [
             'sample/layman.layer/sample_tif_colortable_nodata_opaque.tif',
@@ -136,6 +144,7 @@ SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE = PublicationValues(
 )
 
 SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE_ZIP = PublicationValues(
+    type=process_client.LAYER_TYPE,
     definition={
         **SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.definition,
         'compress': True,

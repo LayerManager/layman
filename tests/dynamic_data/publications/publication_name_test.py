@@ -48,6 +48,7 @@ def pytest_generate_tests(metafunc):
                 post_definition.pop('name', None)
 
                 test_case_definition = PublicationValues(
+                    type=publication_definition.type,
                     definition=post_definition,
                     info_values=publication_definition.info_values,
                     thumbnail=publication_definition.thumbnail,
