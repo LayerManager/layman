@@ -13,10 +13,13 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 TEST_CASES = {
     'starts_with_number': {'name': '0125_name'},
+    'only_numbers': {'name': '0125'},
 }
 
 TEST_CASE_PARAMETRIZATION = {
     'vector_sld_layer': common_layers.LAYER_VECTOR_SLD,
+    'vector_qml_layer': common_layers.LAYER_VECTOR_QML,
+    'raster_layer': common_layers.LAYER_RASTER,
 }
 
 
