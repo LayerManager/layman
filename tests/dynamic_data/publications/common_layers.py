@@ -30,6 +30,17 @@ SMALL_LAYER_ZIP = PublicationValues(
     thumbnail=SMALL_LAYER.thumbnail,
 )
 
+SMALL_LAYER_QML = PublicationValues(
+    definition={
+        'style_file': 'sample/style/small_layer.qml'
+    },
+    info_values={
+        **SMALL_LAYER.info_values,
+        'publ_type_detail': ('vector', 'qml'),
+    },
+    thumbnail='sample/style/small_layer_qml.png',
+)
+
 NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = PublicationValues(
     definition={
         'file_paths': [
@@ -84,6 +95,7 @@ SAMPLE_TIF_TFW_RGBA_OPAQUE = PublicationValues(
             'native_crs': 'EPSG:3857',
             'native_bounding_box': [1669480.0, 6580973.000000007, 1675351.9999999802, 6586999.0],
         },
+        'file_extension': 'tif',
         'publ_type_detail': ('raster', 'sld'),
     },
     thumbnail='test_tools/data/thumbnail/raster_layer_tiff.png',
@@ -170,3 +182,7 @@ DEFAULT_ACTIONS = [
     ('post', process_client.publish_workspace_publication, []),
     ('patch', process_client.patch_workspace_publication, [DEFAULT_POST])
 ]
+
+LAYER_VECTOR_SLD = SMALL_LAYER
+LAYER_VECTOR_QML = SMALL_LAYER_QML
+LAYER_RASTER = SAMPLE_TIF_TFW_RGBA_OPAQUE
