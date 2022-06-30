@@ -11,7 +11,7 @@ from layman import LaymanError, util as layman_util, celery as celery_util, sett
 from layman.authn.filesystem import get_authn_info
 from layman.common.micka import util as micka_util
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
-from layman.common.util import PUBLICATION_NAME_PATTERN, clear_publication_info
+from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for
 from . import get_map_sources, MAP_TYPE, get_map_type_def, get_map_info_keys
@@ -21,6 +21,7 @@ from .micka.csw import map_json_to_operates_on
 
 
 MAPNAME_PATTERN = PUBLICATION_NAME_PATTERN
+MAPNAME_MAX_LENGTH = PUBLICATION_MAX_LENGTH
 SCHEMA_URL_PATTERN = r'^https://raw.githubusercontent.com/hslayers/map-compositions/(([0-9]{1,}.[0-9]{1,}.[0-9]{1,})|([a-zA-Z]*?))/schema.json$'
 _SCHEMA_CACHE_PATH = 'tmp'
 _ACCEPTED_SCHEMA_MAJOR_VERSION = '2'
@@ -63,6 +64,9 @@ def check_mapname(mapname):
     if not re.match(MAPNAME_PATTERN, mapname):
         raise LaymanError(2, {'parameter': 'mapname',
                               'expected': MAPNAME_PATTERN})
+    if len(mapname) > MAPNAME_MAX_LENGTH:
+        raise LaymanError(2, {'parameter': 'mapname',
+                              'detail': f'Map name too long ({len(mapname)}), maximum allowed length is {MAPNAME_MAX_LENGTH}.'})
 
 
 def get_sources():

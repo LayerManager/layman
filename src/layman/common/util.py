@@ -3,6 +3,7 @@ from collections import defaultdict
 
 PUBLICATION_NAME_ONLY_PATTERN = r"[a-z0-9]*(?:_[a-z0-9]+)*"
 PUBLICATION_NAME_PATTERN = r"^" + PUBLICATION_NAME_ONLY_PATTERN + r"$"
+PUBLICATION_MAX_LENGTH = 210  # File-system limitation
 
 
 def merge_infos(infos):

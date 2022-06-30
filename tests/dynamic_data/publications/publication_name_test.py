@@ -14,6 +14,7 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 TEST_CASES = {
     'starts_with_number': {'name': '0125_name'},
     'only_numbers': {'name': '0125'},
+    '210_chars': {'name': 'a' * 210},
 }
 
 TEST_CASE_PARAMETRIZATION = {

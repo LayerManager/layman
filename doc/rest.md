@@ -145,6 +145,7 @@ Body parameters:
    - computer-friendly identifier of the layer
    - must be unique among all layers of one workspace
    - by default, it is file name without extension
+   - maximal length is 210 characters
    - will be automatically adjusted using `to_safe_layer_name` function
 - *title*, string `.+`
    - human readable name of the layer
@@ -488,6 +489,7 @@ Body parameters:
       - `name` attribute of JSON root object
       - `title` attribute of JSON root object
       - file name without extension
+   - maximal length is 210 characters
    - will be automatically adjusted using `to_safe_map_name` function
 - *title*, string `.+`
    - human readable name of the map
