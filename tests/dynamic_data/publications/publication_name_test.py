@@ -2,7 +2,7 @@ import copy
 import os
 import pytest
 
-from test_tools import process_client, cleanup
+from test_tools import cleanup
 from tests.asserts.final import publication as publ_asserts
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
@@ -20,6 +20,7 @@ TEST_CASE_PARAMETRIZATION = {
     'vector_sld_layer': common_publications.LAYER_VECTOR_SLD,
     'vector_qml_layer': common_publications.LAYER_VECTOR_QML,
     'raster_layer': common_publications.LAYER_RASTER,
+    'map': common_publications.MAP_EMPTY,
 }
 
 
@@ -39,7 +40,7 @@ def pytest_generate_tests(metafunc):
         for method_function_name, method_name in rest_methods.items():
             for parametrization_key, publication_definition in TEST_CASE_PARAMETRIZATION.items():
                 publ_name = params['name']
-                publication = Publication(cls.workspace, cls.publication_type, publ_name)
+                publication = Publication(cls.workspace, publication_definition.type, publ_name)
                 rest_method = getattr(cls, method_function_name)
                 testcase_id = f'{publ_name}:{parametrization_key}_{method_name}'
 
@@ -62,7 +63,7 @@ def pytest_generate_tests(metafunc):
                     (publication, method_name),
                 ])
                 ids.append(testcase_id)
-    publ_type_name = cls.publication_type.split('.')[-1]
+    publ_type_name = cls.publication_type.split('.')[-1] if cls.publication_type else 'publication'
     metafunc.parametrize(
         argnames=f'{publ_type_name}, key, publication_definition, rest_method, post_before_patch',
         argvalues=argvalues,
@@ -76,7 +77,7 @@ class TestPublication(base_test.TestSingleRestPublication):
     workspace = 'dynamic_test_publication_name'
     test_cases = TEST_CASES
     default_test_type = TestTypes.MANDATORY
-    publication_type = process_client.LAYER_TYPE
+    publication_type = None
 
     rest_parametrization = {
         'method': {
@@ -98,11 +99,12 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     # pylint: disable=unused-argument
     @staticmethod
-    def test_publication_name(layer, key, publication_definition, rest_method):
+    def test_publication_name(publication, key, publication_definition, rest_method):
         """Parametrized using pytest_generate_tests"""
-        rest_method(layer, params=publication_definition.definition)
-        assert_util.is_publication_valid_and_complete(layer)
-        publ_asserts.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
+        rest_method(publication, params=publication_definition.definition)
+        assert_util.is_publication_valid_and_complete(publication)
+        publ_asserts.internal.correct_values_in_detail(publication.workspace, publication.type, publication.name,
                                                        **publication_definition.info_values)
-        publ_asserts.internal.thumbnail_equals(layer.workspace, layer.type, layer.name,
-                                               exp_thumbnail=publication_definition.thumbnail)
+        if publication_definition.thumbnail:
+            publ_asserts.internal.thumbnail_equals(publication.workspace, publication.type, publication.name,
+                                                   exp_thumbnail=publication_definition.thumbnail)
