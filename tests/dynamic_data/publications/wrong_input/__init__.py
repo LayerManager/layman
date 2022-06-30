@@ -6,7 +6,7 @@ from tests.asserts import util as asserts_util
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client, util
-from .. import common_layers as layers
+from .. import common_publications as publications
 from .... import Action, Publication, dynamic_data as consts, TestTypes, TestKeys
 
 KEY_PUBLICATION_TYPE = 'publ_type'
@@ -217,7 +217,7 @@ TESTCASES = {
         },
         KEY_PATCHES: {
             'patch': {
-                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
             },
         },
     },
@@ -243,7 +243,7 @@ TESTCASES = {
         },
         KEY_PATCHES: {
             'patch': {
-                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
             },
         },
     },
@@ -276,7 +276,7 @@ TESTCASES = {
         },
         KEY_PATCHES: {
             'patch': {
-                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
             },
         },
     },
@@ -302,7 +302,7 @@ TESTCASES = {
         },
         KEY_PATCHES: {
             'patch': {
-                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
             },
         },
     },
@@ -328,7 +328,7 @@ TESTCASES = {
         },
         KEY_PATCHES: {
             'patch': {
-                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
             },
         },
     },
@@ -362,7 +362,7 @@ TESTCASES = {
         },
         KEY_PATCHES: {
             'patch': {
-                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
                 KEY_ACTION_PARAMS: {
                     'compress': False,
                 },
@@ -425,7 +425,7 @@ TESTCASES = {
         },
         KEY_PATCHES: {
             'patch': {
-                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', True), ('with_chunks', False)]): {
                         'detail': {
@@ -554,7 +554,7 @@ TESTCASES = {
         },
         KEY_PATCHES: {
             'full': {
-                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
             },
         },
     },
@@ -581,7 +581,7 @@ TESTCASES = {
         },
         KEY_PATCHES: {
             'full': {
-                KEY_PATCH_POST: layers.SMALL_LAYER.definition,
+                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
                 KEY_ACTION_PARAMS: {
                     'file_paths': ['sample/layman.layer/small_layer.geojson'],
                     'overview_resampling': 'nearest',
@@ -603,9 +603,9 @@ VALIDATION_PATCH_ACTION = {
     },
     consts.KEY_FINAL_ASSERTS: [
         *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-        Action(publication.internal.correct_values_in_detail, layers.SMALL_LAYER.info_values),
+        Action(publication.internal.correct_values_in_detail, publications.SMALL_LAYER.info_values),
         Action(publication.internal.thumbnail_equals, {
-            'exp_thumbnail': layers.SMALL_LAYER.thumbnail,
+            'exp_thumbnail': publications.SMALL_LAYER.thumbnail,
         }),
     ],
 }

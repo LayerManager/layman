@@ -6,7 +6,7 @@ from tests.asserts import util as asserts_util
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client, util
-from ... import common_layers as layers
+from ... import common_publications as publications
 from ..... import Action, Publication, dynamic_data as consts
 
 KEY_INFO_VALUES = 'info_values'
@@ -33,7 +33,7 @@ SOURCE_EPSG_CODES = {
             'compress': False,
         },
         KEY_ONLY_FIRST_PARAMETRIZATION: False,
-        KEY_ACTION_PARAMETRIZATION: layers.DEFAULT_ACTIONS[:1],
+        KEY_ACTION_PARAMETRIZATION: publications.DEFAULT_ACTIONS[:1],
     },
     crs_def.EPSG_3857: {
         KEY_INFO_VALUES: {
@@ -46,7 +46,7 @@ SOURCE_EPSG_CODES = {
             'compress': False,
         },
         KEY_ONLY_FIRST_PARAMETRIZATION: False,
-        KEY_ACTION_PARAMETRIZATION: layers.DEFAULT_ACTIONS[:1],
+        KEY_ACTION_PARAMETRIZATION: publications.DEFAULT_ACTIONS[:1],
     },
     crs_def.EPSG_5514: {
         KEY_INFO_VALUES: {
@@ -225,7 +225,7 @@ def generate(workspace=None):
                                                                         KEY_ONLY_FIRST_PARAMETRIZATION, True),
                                                                     default_params=tc_params.get(consts.KEY_ACTION),
                                                                     action_parametrization=tc_params.get(
-                                                                        KEY_ACTION_PARAMETRIZATION, layers.DEFAULT_ACTIONS),
+                                                                        KEY_ACTION_PARAMETRIZATION, publications.DEFAULT_ACTIONS),
                                                                     )
 
         def_info_values = copy.deepcopy(def_publ_info_values)
