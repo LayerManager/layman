@@ -158,6 +158,20 @@ SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE_ZIP = PublicationValues(
     thumbnail=SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.thumbnail,
 )
 
+EMPTY_MAP = PublicationValues(
+    type=process_client.MAP_TYPE,
+    definition=dict(),
+    info_values={
+        'exp_publication_detail': {
+            'bounding_box': [1627490.9553976597, 6547334.172794042, 1716546.5480322787, 6589515.35758913],
+            'native_crs': 'EPSG:3857',
+            'native_bounding_box': [1627490.9553976597, 6547334.172794042, 1716546.5480322787, 6589515.35758913],
+            'description': 'Na tematické mapě při přiblížení jsou postupně zobrazované administrativní celky Libereckého kraje : okresy, OPÚ, ORP a obce.'
+        },
+    },
+    thumbnail=None,
+)
+
 DEFAULT_POST = {
     consts.KEY_ACTION: {
         consts.KEY_CALL: Action(process_client.publish_workspace_publication,
@@ -195,3 +209,4 @@ DEFAULT_ACTIONS = [
 LAYER_VECTOR_SLD = SMALL_LAYER
 LAYER_VECTOR_QML = SMALL_LAYER_QML
 LAYER_RASTER = SAMPLE_TIF_TFW_RGBA_OPAQUE
+MAP_EMPTY = EMPTY_MAP
