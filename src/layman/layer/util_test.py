@@ -1,16 +1,20 @@
 import datetime
 import psycopg2
 from psycopg2 import tz
+import pytest
 
 from layman import settings
 from .util import to_safe_layer_name, fill_in_partial_info_statuses
 
 
-def test_to_safe_layer_name():
-    assert to_safe_layer_name('') == 'layer'
-    assert to_safe_layer_name(' ?:"+  @') == 'layer'
-    assert to_safe_layer_name('01 Stanice vodních toků 26.4.2017 (voda)') == '01_stanice_vodnich_toku_26_4_2017_voda'
-    assert to_safe_layer_name('řecko') == 'recko'
+@pytest.mark.parametrize('unsafe_name, exp_output', [
+    ('', 'layer'),
+    (' ?:"+  @', 'layer'),
+    ('01 Stanice vodních toků 26.4.2017 (voda)', '01_stanice_vodnich_toku_26_4_2017_voda'),
+    ('řĚčKó', 'recko'),
+])
+def test_to_safe_layer_name(unsafe_name, exp_output):
+    assert to_safe_layer_name(unsafe_name) == exp_output
 
 
 def test_fill_in_partial_info_statuses():
