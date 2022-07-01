@@ -114,8 +114,8 @@ class TestGetPublications:
         prime_db_schema_client.ensure_workspace(self.workspace1)
 
         for publ_type in process_client.PUBLICATION_TYPES:
+            file_type = 'vector' if publ_type == process_client.LAYER_TYPE else None
             for workspace, publ_name, publ_params in self.publications:
-                file_type = 'vector' if publ_type == process_client.LAYER_TYPE else None
                 prime_db_schema_client.post_workspace_publication(publ_type, workspace, publ_name, **publ_params,
                                                                   file_type=file_type)
         yield
