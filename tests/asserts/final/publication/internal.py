@@ -150,10 +150,10 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        })
 
         file_type = publ_type_detail[0]
+        expected_detail['file_type'] = file_type
         if file_type == settings.FILE_TYPE_VECTOR:
             uuid = pub_info["uuid"]
             db_table = f'layer_{uuid.replace("-","_")}'
-            expected_detail['file_type'] = 'vector'
             util.recursive_dict_update(expected_detail,
                                        {
                                            'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
@@ -161,7 +161,6 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            'db_table': {'name': db_table},
                                        })
         elif file_type == settings.FILE_TYPE_RASTER:
-            expected_detail['file_type'] = 'raster'
             if file_extension:
                 util.recursive_dict_update(expected_detail,
                                            {
