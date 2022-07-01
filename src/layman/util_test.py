@@ -4,22 +4,24 @@ import pytest
 from . import app, settings, LaymanError, util
 
 
-def test_slugify():
-    assert util.slugify('Brno-město') == 'brno_mesto'
-    assert util.slugify('Brno__město') == 'brno_mesto'
-    assert util.slugify(' ') == ''
-    assert util.slugify(' ?:"+  @') == ''
-    assert util.slugify('01 Stanice vodních toků 26.4.2017 (voda)') == \
-        '01_stanice_vodnich_toku_26_4_2017_voda'
+@pytest.mark.parametrize('unsafe_input, exp_output', [
+    ('Brno-město', 'brno_mesto'),
+    ('Brno__město', 'brno_mesto'),
+    (' ', ''),
+    (' ?:"+  @', ''),
+    ('01 Stanice vodních toků 26.4.2017 (voda)', '01_stanice_vodnich_toku_26_4_2017_voda'),
+])
+def test_slugify(unsafe_input, exp_output):
+    assert util.slugify(unsafe_input) == exp_output
 
 
-def test_check_reserved_workspace_names():
+@pytest.mark.parametrize('workspace', settings.RESERVED_WORKSPACE_NAMES)
+def test_check_reserved_workspace_names(workspace):
     with app.app_context():
-        for workspace in settings.RESERVED_WORKSPACE_NAMES:
-            with pytest.raises(LaymanError) as exc_info:
-                util.check_reserved_workspace_names(workspace)
-            assert exc_info.value.code == 35
-            assert exc_info.value.data['reserved_by'] == 'RESERVED_WORKSPACE_NAMES'
+        with pytest.raises(LaymanError) as exc_info:
+            util.check_reserved_workspace_names(workspace)
+        assert exc_info.value.code == 35
+        assert exc_info.value.data['reserved_by'] == 'RESERVED_WORKSPACE_NAMES'
 
 
 def assert_module_methods(module, methods):
