@@ -1,8 +1,13 @@
+from collections import namedtuple
 import copy
 import os
+from typing import final
 import pytest
 from test_tools import process_client, cleanup
 from .. import Publication, TestTypes, TestKeys
+
+RestMethodType = namedtuple('RestMethodTypeDef', ['function_name', 'name'])
+TestCaseType = namedtuple('TestCaseTypeDef', ['id', 'publication', 'key', 'method', 'params', 'type'])
 
 
 def pytest_generate_tests(metafunc):
@@ -11,25 +16,22 @@ def pytest_generate_tests(metafunc):
     test_type_str = os.getenv(TestKeys.TYPE.value, TestTypes.MANDATORY.value)
     test_type = TestTypes(test_type_str)
     cls = metafunc.cls
-    rest_methods = cls.rest_parametrization['method']
     argvalues = []
     ids = []
 
-    test_cases_for_type = {key: params for key, params in cls.test_cases.items() if
-                           test_type == TestTypes.OPTIONAL or params.get(TestKeys.TYPE, cls.default_test_type) == TestTypes.MANDATORY}
-    for key, params in test_cases_for_type.items():
-        for method_function_name, method_name in rest_methods.items():
-            publ_name = cls.key_to_publication_base_name(key) + f"_{method_name}"
-            publication = Publication(cls.workspace, cls.publication_type, publ_name)
-            rest_method = getattr(cls, method_function_name)
-            argvalues.append([
-                publication,
-                key,
-                copy.deepcopy(params),
-                rest_method,
-                (publication, method_name),
-            ])
-            ids.append(publ_name)
+    test_cases = cls.parametrize_test_cases()
+    test_cases_for_type = [test_case for test_case in test_cases if
+                           test_type == TestTypes.OPTIONAL or test_case.type == TestTypes.MANDATORY]
+    for test_case in test_cases_for_type:
+        rest_method = getattr(cls, test_case.method.function_name)
+        argvalues.append([
+            test_case.publication,
+            test_case.key,
+            copy.deepcopy(test_case.params),
+            rest_method,
+            (test_case.publication, test_case.method.name),
+        ])
+        ids.append(test_case.id)
     publ_type_name = cls.publication_type.split('.')[-1] if cls.publication_type else 'publication'
     metafunc.parametrize(
         argnames=f'{publ_type_name}, key, params, rest_method, post_before_patch',
@@ -50,20 +52,33 @@ class TestSingleRestPublication:
 
     publication_type = None
 
-    test_cases = dict()
+    test_cases = []
 
     rest_parametrization = {
         'method': {
-            'post_publication': 'post',
-            'patch_publication': 'patch',
+            RestMethodType('post_publication', 'post'),
+            RestMethodType('patch_publication', 'patch'),
         },
     }
 
     default_test_type = TestTypes.OPTIONAL
 
     @classmethod
-    def key_to_publication_base_name(cls, key):
-        return f"{cls.publication_type.split('.')[1]}_{key.replace(':', '_').lower()}"
+    @final
+    def parametrize_test_cases(cls) -> [TestCaseType]:
+        test_cases = []
+        for input_test_case in cls.test_cases:
+            for rest_method in cls.rest_parametrization['method']:
+                name = f"{cls.publication_type.split('.')[1]}_{input_test_case.key.replace(':', '_').lower()}_{rest_method.name}"
+                test_case = TestCaseType(id=name,
+                                         publication=Publication(cls.workspace, cls.publication_type, name),
+                                         key=input_test_case.key,
+                                         method=rest_method,
+                                         params=copy.deepcopy(input_test_case.params),
+                                         type=input_test_case.type or input_test_case.params.get(TestKeys.TYPE, cls.default_test_type)
+                                         )
+                test_cases.append(test_case)
+        return test_cases
 
     @classmethod
     def post_publication(cls, publication, params=None, scope='function'):

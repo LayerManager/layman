@@ -48,7 +48,13 @@ class TestMap(base_test.TestSingleRestPublication):
 
     publication_type = process_client.MAP_TYPE
 
-    test_cases = TEST_CASES
+    test_cases = [base_test.TestCaseType(id=None,
+                                         publication=None,
+                                         key=key,
+                                         method=None,
+                                         params=params,
+                                         type=None,
+                                         ) for key, params in TEST_CASES.items()]
 
     default_test_type = tests.TestTypes.MANDATORY
 
