@@ -7,6 +7,7 @@
 ### Migrations and checks
 #### Schema migrations
 - [#576](https://github.com/LayerManager/layman/issues/576) Create new column `file_type` in `publication` table.
+- [#541](https://github.com/LayerManager/layman/issues/541) Rename vector data DB tables to `layer_<uuid>` format.
 #### Data migrations
 - [#576](https://github.com/LayerManager/layman/issues/576) Fill column `file_type` in `publications` table in prime DB schema for all publications. Value of each map will be `NULL`. Value of each layer will be same as value of `file.file_type` in [GET Workspace Layer](doc/rest.md#get-workspace-layer) response (i.e. `vector`, `raster`, or `unknown`).
 ### Changes
