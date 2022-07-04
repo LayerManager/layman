@@ -45,10 +45,9 @@ def parametrize_test(workspace, input_test_cases, publication_types):
                 thumbnail=publication_definition.thumbnail,
             )
 
-            test_case = base_test.TestCaseType(id=test_case_id,
+            test_case = base_test.TestCaseType(pytest_id=test_case_id,
                                                publication=Publication(workspace, publication_definition.type, name),
                                                key=key,
-                                               method=None,
                                                params=test_case_definition,
                                                type=params.get(TestKeys.TYPE, TestTypes.MANDATORY)
                                                )

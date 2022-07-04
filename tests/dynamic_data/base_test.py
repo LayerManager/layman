@@ -1,5 +1,6 @@
 from collections import namedtuple
 import copy
+from dataclasses import dataclass, field
 import os
 from typing import final
 import pytest
@@ -7,7 +8,16 @@ from test_tools import process_client, cleanup
 from .. import Publication, TestTypes, TestKeys
 
 RestMethodType = namedtuple('RestMethodTypeDef', ['function_name', 'name'])
-TestCaseType = namedtuple('TestCaseTypeDef', ['id', 'publication', 'key', 'method', 'params', 'type'])
+
+
+@dataclass(frozen=True)
+class TestCaseType:
+    pytest_id: str = None
+    publication: Publication = None
+    key: str = None
+    method: RestMethodType = None
+    params: dict = field(default_factory=dict)
+    type: TestTypes = TestTypes.OPTIONAL
 
 
 def pytest_generate_tests(metafunc):
@@ -31,7 +41,7 @@ def pytest_generate_tests(metafunc):
             rest_method,
             (test_case.publication, test_case.method.name),
         ])
-        ids.append(test_case.id)
+        ids.append(test_case.pytest_id)
     publ_type_name = cls.publication_type.split('.')[-1] if cls.publication_type else 'publication'
     metafunc.parametrize(
         argnames=f'{publ_type_name}, key, params, rest_method, post_before_patch',
@@ -78,7 +88,7 @@ class TestSingleRestPublication:
                 if input_test_case.publication:
                     name = input_test_case.publication.name or name
 
-                test_case = TestCaseType(id=input_test_case.id or name,
+                test_case = TestCaseType(pytest_id=input_test_case.pytest_id or name,
                                          publication=Publication(workspace, publication_type, name),
                                          key=input_test_case.key,
                                          method=rest_method,
