@@ -69,13 +69,23 @@ class TestSingleRestPublication:
         test_cases = []
         for input_test_case in cls.test_cases:
             for rest_method in cls.rest_parametrization['method']:
-                name = f"{cls.publication_type.split('.')[1]}_{input_test_case.key.replace(':', '_').lower()}_{rest_method.name}"
-                test_case = TestCaseType(id=name,
-                                         publication=Publication(cls.workspace, cls.publication_type, name),
+                workspace = cls.workspace
+                publication_type = cls.publication_type
+
+                if input_test_case.publication:
+                    workspace = input_test_case.publication.workspace or workspace
+                    publication_type = input_test_case.publication.type or publication_type
+                name = f"{publication_type.split('.')[1]}_{input_test_case.key.replace(':', '_').lower()}_{rest_method.name}"
+
+                if input_test_case.publication:
+                    name = input_test_case.publication.name or name
+
+                test_case = TestCaseType(id=input_test_case.id or name,
+                                         publication=Publication(workspace, publication_type, name),
                                          key=input_test_case.key,
                                          method=rest_method,
                                          params=copy.deepcopy(input_test_case.params),
-                                         type=input_test_case.type or input_test_case.params.get(TestKeys.TYPE, cls.default_test_type)
+                                         type=input_test_case.type or cls.default_test_type,
                                          )
                 test_cases.append(test_case)
         return test_cases

@@ -17,7 +17,9 @@ TEST_CASES = {
     '210_chars': {'name': 'a' * 210},
 }
 
-TEST_CASE_PARAMETRIZATION = {
+pytest_generate_tests = base_test.pytest_generate_tests
+
+PUBLICATION_TYPES = {
     'vector_sld_layer': common_publications.LAYER_VECTOR_SLD,
     'vector_qml_layer': common_publications.LAYER_VECTOR_QML,
     'raster_layer': common_publications.LAYER_RASTER,
@@ -25,64 +27,45 @@ TEST_CASE_PARAMETRIZATION = {
 }
 
 
-def pytest_generate_tests(metafunc):
-    # used for parametrizing subclasses of TestSingleRestPublication, called once per each test function
-    # https://docs.pytest.org/en/6.2.x/parametrize.html#pytest-generate-tests
-    test_type_str = os.getenv(TestKeys.TYPE.value, TestTypes.MANDATORY.value)
-    test_type = TestTypes(test_type_str)
-    cls = metafunc.cls
-    rest_methods = cls.rest_parametrization['method']
-    argvalues = []
-    ids = []
+def parametrize_test(workspace, input_test_cases, publication_types):
+    test_cases = []
+    for key, params in input_test_cases.items():
+        for parametrization_key, publication_definition in publication_types.items():
+            name = params['name']
+            test_case_id = f'{name}:{parametrization_key}_post'
 
-    test_cases_for_type = {key: params for key, params in cls.test_cases.items() if
-                           test_type == TestTypes.OPTIONAL or params.get(TestKeys.TYPE, cls.default_test_type) == TestTypes.MANDATORY}
-    for key, params in test_cases_for_type.items():
-        for method_function_name, method_name in rest_methods.items():
-            for parametrization_key, publication_definition in TEST_CASE_PARAMETRIZATION.items():
-                publ_name = params['name']
-                publication = Publication(cls.workspace, publication_definition.type, publ_name)
-                rest_method = getattr(cls, method_function_name)
-                testcase_id = f'{publ_name}:{parametrization_key}_{method_name}'
+            post_definition = copy.deepcopy(params)
+            post_definition.update(publication_definition.definition)
+            post_definition.pop('name', None)
 
-                post_definition = copy.deepcopy(params)
-                post_definition.update(publication_definition.definition)
-                post_definition.pop('name', None)
+            test_case_definition = PublicationValues(
+                type=publication_definition.type,
+                definition=post_definition,
+                info_values=publication_definition.info_values,
+                thumbnail=publication_definition.thumbnail,
+            )
 
-                test_case_definition = PublicationValues(
-                    type=publication_definition.type,
-                    definition=post_definition,
-                    info_values=publication_definition.info_values,
-                    thumbnail=publication_definition.thumbnail,
-                )
-
-                argvalues.append([
-                    publication,
-                    key,
-                    test_case_definition,
-                    rest_method,
-                    (publication, method_name),
-                ])
-                ids.append(testcase_id)
-    publ_type_name = cls.publication_type.split('.')[-1] if cls.publication_type else 'publication'
-    metafunc.parametrize(
-        argnames=f'{publ_type_name}, key, publication_definition, rest_method, post_before_patch',
-        argvalues=argvalues,
-        ids=ids,
-        indirect=['post_before_patch'],
-    )
+            test_case = base_test.TestCaseType(id=test_case_id,
+                                               publication=Publication(workspace, publication_definition.type, name),
+                                               key=key,
+                                               method=None,
+                                               params=test_case_definition,
+                                               type=params.get(TestKeys.TYPE, TestTypes.MANDATORY)
+                                               )
+            test_cases.append(test_case)
+    return test_cases
 
 
 class TestPublication(base_test.TestSingleRestPublication):
 
     workspace = 'dynamic_test_publication_name'
-    test_cases = TEST_CASES
+    test_cases = parametrize_test('dynamic_test_publication_name', TEST_CASES, PUBLICATION_TYPES)
     default_test_type = TestTypes.MANDATORY
     publication_type = None
 
     rest_parametrization = {
         'method': {
-            'post_publication': 'post',
+            base_test.RestMethodType('post_publication', 'post'),
         },
     }
 
@@ -100,12 +83,12 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     # pylint: disable=unused-argument
     @staticmethod
-    def test_publication_name(publication, key, publication_definition, rest_method):
+    def test_publication_name(publication, key, params, rest_method):
         """Parametrized using pytest_generate_tests"""
-        rest_method(publication, params=publication_definition.definition)
+        rest_method(publication, params=params.definition)
         assert_util.is_publication_valid_and_complete(publication)
         publ_asserts.internal.correct_values_in_detail(publication.workspace, publication.type, publication.name,
-                                                       **publication_definition.info_values)
-        if publication_definition.thumbnail:
+                                                       **params.info_values)
+        if params.thumbnail:
             publ_asserts.internal.thumbnail_equals(publication.workspace, publication.type, publication.name,
-                                                   exp_thumbnail=publication_definition.thumbnail)
+                                                   exp_thumbnail=params.thumbnail)
