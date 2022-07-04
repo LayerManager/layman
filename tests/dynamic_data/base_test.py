@@ -61,8 +61,6 @@ class TestSingleRestPublication:
         ],
     }
 
-    default_test_type = TestTypes.OPTIONAL
-
     @classmethod
     @final
     def parametrize_test_cases(cls) -> [TestCaseType]:
@@ -85,7 +83,7 @@ class TestSingleRestPublication:
                                          key=input_test_case.key,
                                          method=rest_method,
                                          params=copy.deepcopy(input_test_case.params),
-                                         type=input_test_case.type or cls.default_test_type,
+                                         type=input_test_case.type or TestTypes.OPTIONAL,
                                          )
                 test_cases.append(test_case)
         return test_cases
