@@ -60,7 +60,6 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     workspace = 'dynamic_test_publication_name'
     test_cases = parametrize_test('dynamic_test_publication_name', TEST_CASES, PUBLICATION_TYPES)
-    default_test_type = TestTypes.MANDATORY
     publication_type = None
 
     rest_parametrization = {

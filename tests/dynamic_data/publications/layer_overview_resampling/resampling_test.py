@@ -24,7 +24,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          key=resampling_method,
                                          method=None,
                                          params=dict(),
-                                         type=TestTypes.MANDATORY if resampling_method == 'nearest' else None,
+                                         type=TestTypes.MANDATORY if resampling_method == 'nearest' else TestTypes.OPTIONAL,
                                          ) for
                   resampling_method in
                   settings.OVERVIEW_RESAMPLING_METHOD_LIST]

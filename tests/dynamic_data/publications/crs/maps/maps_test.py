@@ -53,10 +53,8 @@ class TestMap(base_test.TestSingleRestPublication):
                                          key=key,
                                          method=None,
                                          params=params,
-                                         type=None,
+                                         type=tests.TestTypes.MANDATORY,
                                          ) for key, params in TEST_CASES.items()]
-
-    default_test_type = tests.TestTypes.MANDATORY
 
     def before_class(self):
         self.post_publication(Publication(self.workspace, process_client.LAYER_TYPE, LAYER_FOR_MAPS), scope='class')
