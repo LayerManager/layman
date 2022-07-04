@@ -19,11 +19,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     publication_type = process_client.LAYER_TYPE
 
-    test_cases = [base_test.TestCaseType(id=None,
-                                         publication=None,
-                                         key=resampling_method,
-                                         method=None,
-                                         params=dict(),
+    test_cases = [base_test.TestCaseType(key=resampling_method,
                                          type=TestTypes.MANDATORY if resampling_method == 'nearest' else TestTypes.OPTIONAL,
                                          ) for
                   resampling_method in
