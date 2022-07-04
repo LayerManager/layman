@@ -64,9 +64,9 @@ class TestPublication(base_test.TestSingleRestPublication):
     publication_type = None
 
     rest_parametrization = {
-        'method': {
+        'method': [
             base_test.RestMethodType('post_publication', 'post'),
-        },
+        ],
     }
 
     @pytest.fixture(scope='class', autouse=True)

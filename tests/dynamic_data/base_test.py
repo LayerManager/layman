@@ -55,10 +55,10 @@ class TestSingleRestPublication:
     test_cases = []
 
     rest_parametrization = {
-        'method': {
+        'method': [
             RestMethodType('post_publication', 'post'),
             RestMethodType('patch_publication', 'patch'),
-        },
+        ],
     }
 
     default_test_type = TestTypes.OPTIONAL
