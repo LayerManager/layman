@@ -44,6 +44,7 @@ MIGRATIONS = {
         ((1, 17, 0), [
             upgrade_v1_17.adjust_publications_file_type,
             upgrade_v1_17.adjust_db_publication_file_type_constraint,
+            upgrade_v1_17.rename_table_names,
         ]),
     ],
 }
