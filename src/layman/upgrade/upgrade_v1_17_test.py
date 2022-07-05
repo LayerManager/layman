@@ -70,9 +70,9 @@ def test_file_type():
     layer_infos = process_client.get_workspace_layers(main_workspace)
     assert len(layer_infos) == 2
     vector_layer_info = next(info for info in layer_infos if info['name'] == vector_layer_def[2])
-    assert vector_layer_info['file_type'] == 'vector'
+    assert vector_layer_info['file']['file_type'] == 'vector'
     raster_layer_info = next(info for info in layer_infos if info['name'] == raster_layer_def[2])
-    assert raster_layer_info['file_type'] == 'raster'
+    assert raster_layer_info['file']['file_type'] == 'raster'
 
     map_infos = process_client.get_workspace_maps(main_workspace)
     assert len(map_infos) == 1
