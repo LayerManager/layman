@@ -28,9 +28,9 @@ def correct_file_type_in_rest_multi(workspace, publ_type, name, headers, exp_fil
     publication_infos = [info for info in infos if info['name'] == name]
     info = next(iter(publication_infos))
     if publ_type == LAYER_TYPE:
-        assert info['file_type'] == exp_file_type
+        assert info['file']['file_type'] == exp_file_type
     else:
-        assert 'file_type' not in info
+        assert 'file' not in info
 
 
 def is_complete_in_rest(rest_publication_detail):
