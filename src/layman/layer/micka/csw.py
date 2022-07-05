@@ -116,7 +116,7 @@ def csw_insert(workspace, layername):
 def get_template_path_and_values(workspace, layername, http_method=None):
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
     publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
-        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'file', 'db_table'],
+        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'file_type', 'db_table'],
     })
     title = publ_info['title']
     abstract = publ_info.get('description')
@@ -134,7 +134,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         abstract or ''
     ]))), None)
 
-    file_type = publ_info.get('file', dict()).get('file_type')
+    file_type = publ_info.get('file_type')
     if file_type == settings.FILE_TYPE_VECTOR:
         table_name = publ_info['db_table']['name']
         try:
