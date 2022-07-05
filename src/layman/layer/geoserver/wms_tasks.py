@@ -22,7 +22,7 @@ def patch_after_feature_change(
     if self.is_aborted():
         raise AbortedException
 
-    file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['file']})['file']['file_type']
+    file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['file_type']})['file_type']
     if file_type == settings.FILE_TYPE_VECTOR:
         bbox = geoserver.get_layer_bbox(workspace, layer)
         geoserver_workspace = wms.get_geoserver_workspace(workspace)
