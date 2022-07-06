@@ -10,7 +10,7 @@ logger = get_task_logger(__name__)
 
 
 @celery_app.task(
-    name='layman.layer.prime_db_schema.bbox.patch_after_feature_change',
+    name='layman.layer.prime_db_schema.file_data.patch_after_feature_change',
     bind=True,
     base=celery_app.AbortableTask
 )
