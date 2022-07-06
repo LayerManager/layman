@@ -3,6 +3,7 @@
 ## v1.17.0
  {release-date}
 ### Upgrade requirements
+- Only versions 1.14.0 and newer can be upgraded to this version. For older versions, please upgrade to last 1.16.x first.
 ### Migrations and checks
 #### Schema migrations
 - [#576](https://github.com/LayerManager/layman/issues/576) Create new column `file_type` in `publication` table.

@@ -1,7 +1,7 @@
 import logging
 
 from db import util as db_util
-from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_13, upgrade_v1_14, upgrade_v1_16, upgrade_v1_17
+from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_16, upgrade_v1_17
 from layman import settings
 from . import consts
 
@@ -13,17 +13,14 @@ logger = logging.getLogger(__name__)
 MIGRATION_TYPES = [consts.MIGRATION_TYPE_SCHEMA, consts.MIGRATION_TYPE_DATA]
 
 MIN_UPGRADEABLE_VERSION = {
-    consts.MIGRATION_TYPE_DATA: (1, 12, 0, 3),
-    consts.MIGRATION_TYPE_SCHEMA: (1, 12, 0, 2),
-    consts.MORE_INFO_VERSION: '1.16.0',
+    consts.MIGRATION_TYPE_DATA: (1, 14, 0, 0),
+    consts.MIGRATION_TYPE_SCHEMA: (1, 13, 0, 0),
+    consts.MORE_INFO_VERSION: '1.17.0',
 }
 
 
 MIGRATIONS = {
     consts.MIGRATION_TYPE_SCHEMA: [
-        ((1, 13, 0), [
-            upgrade_v1_13.rename_users_directory,
-        ]),
         ((1, 16, 0), [
             upgrade_v1_16.adjust_db_for_srid,
         ]),
@@ -32,9 +29,6 @@ MIGRATIONS = {
         ]),
     ],
     consts.MIGRATION_TYPE_DATA: [
-        ((1, 14, 0), [
-            upgrade_v1_14.crop_bbox,
-        ]),
         ((1, 16, 0), [
             upgrade_v1_16.adjust_db_publication_layer_srid_data,
             upgrade_v1_16.adjust_maps,
