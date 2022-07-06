@@ -62,7 +62,7 @@ def test_fill_in_partial_info_statuses():
     task_info_micka_soap = CeleryResult()
 
     chain_info = {'by_name': {'layman.layer.db.table.refresh': task_info_db_table,
-                              'layman.layer.prime_db_schema.bbox.refresh': task_info_prime_bbox,
+                              'layman.layer.prime_db_schema.file_data.refresh': task_info_prime_bbox,
                               'layman.layer.qgis.wms.refresh': task_info_qgis_wms,
                               'layman.layer.geoserver.wfs.refresh': task_info_gs_wfs,
                               'layman.layer.geoserver.wms.refresh': task_info_gs_wms,
