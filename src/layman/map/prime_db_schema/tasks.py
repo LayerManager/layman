@@ -9,15 +9,15 @@ from ...common.prime_db_schema.publications import set_bbox
 logger = get_task_logger(__name__)
 
 JSON_EXTENT_CRS = 'EPSG:4326'
-refresh_bbox_needed = empty_method_returns_true
+refresh_file_data_needed = empty_method_returns_true
 
 
 @celery_app.task(
-    name='layman.map.prime_db_schema.bbox.refresh',
+    name='layman.map.prime_db_schema.file_data.refresh',
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_bbox(
+def refresh_file_data(
         self,
         workspace,
         mapname,
