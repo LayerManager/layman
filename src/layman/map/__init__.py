@@ -50,7 +50,7 @@ PUBLICATION_TYPES = {
             ('layman.map.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'title', 'uuid',
                                                                                    'bounding_box', ]),),
             ('layman.map.filesystem.input_file', InternalSourceTypeDef(info_items=['description', 'file']),),
-            ('layman.map.prime_db_schema.bbox', InternalSourceTypeDef(info_items=[]),),
+            ('layman.map.prime_db_schema.file_data', InternalSourceTypeDef(info_items=[]),),
             ('layman.map.filesystem.thumbnail', InternalSourceTypeDef(info_items=['thumbnail', ]),),
             ('layman.map.micka.soap', InternalSourceTypeDef(info_items=['metadata', ]),),
         ]),
