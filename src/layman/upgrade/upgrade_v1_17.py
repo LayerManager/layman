@@ -8,7 +8,7 @@ import geoserver
 from geoserver import util as gs_util
 from layman import settings, util as layman_util
 from layman.layer import LAYER_TYPE
-from layman.layer.geoserver import wms as gs_wms
+from layman.layer.geoserver import wms as gs_wms, wfs as gs_wfs
 from layman.layer.qgis import wms as qgis_wms
 from layman.map import MAP_TYPE
 
@@ -82,10 +82,29 @@ def rename_table_names():
         table_name = f'layer_{uuid.replace("-", "_")}'
 
         if file_type == settings.FILE_TYPE_VECTOR:
+            query = f"""
+            SELECT count(*)
+            FROM information_schema.tables
+            WHERE table_schema = %s
+            AND table_name = %s
+            """
+            result = db_util.run_query(query, (workspace, publication))
+
+            if result[0][0] == 0:
+                logger.info(f'      Table {workspace}.{publication} does not exists in DB')
+                continue
+
             query = f'''
             ALTER TABLE {workspace}.{publication} RENAME TO {table_name};
             '''
             db_util.run_statement(query,)
+
+            # WFS workspace GS
+            wfs_info = gs_wfs.get_layer_info(workspace, publication)
+
+            if 'wfs' not in wfs_info:
+                logger.info(f'      Layer {workspace}.{publication} does not exists on GeoServer')
+                continue
 
             # WFS workspace GS
             ftype = {'nativeName': table_name}
@@ -105,6 +124,13 @@ def rename_table_names():
             # WMS workspace
             if style_type == 'sld':
                 wms_workspace = gs_wms.get_geoserver_workspace(workspace)
+
+                wfs_info = gs_wfs.get_layer_info(wms_workspace, publication)
+
+                if 'wfs' not in wfs_info:
+                    logger.info(f'      Layer {wms_workspace}.{publication} does not exists on GeoServer')
+                    continue
+
                 response = requests.put(
                     urljoin(geoserver.GS_REST_WORKSPACES,
                             wms_workspace + '/datastores/postgresql/featuretypes/' + publication),
