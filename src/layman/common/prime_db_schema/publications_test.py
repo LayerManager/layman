@@ -553,6 +553,15 @@ class TestWorldBboxFilter:
             publications.get_publication_infos_with_metainfo(bbox_filter=(-100, -100, 100, 100),
                                                              bbox_filter_crs=crs)
 
+    @staticmethod
+    @pytest.mark.parametrize('crs', crs_def.CRSDefinitions.keys())
+    @pytest.mark.usefixtures('provide_data')
+    def test_world_bbox_ordering(crs):
+        with app.app_context():
+            publications.get_publication_infos_with_metainfo(ordering_bbox=(-100, -100, 100, 100),
+                                                             ordering_bbox_crs=crs,
+                                                             order_by_list=['bbox', ])
+
 
 def test_only_valid_names():
     workspace_name = 'test_only_valid_names_workspace'

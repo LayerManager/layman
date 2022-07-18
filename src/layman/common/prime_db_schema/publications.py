@@ -98,15 +98,15 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
             -- A∩B / (A + B)
             CASE
                 -- if there is any intersection
-                WHEN ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s) && ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),
-                                                                                             ST_MakePoint(%s, %s)), %s)
+                WHEN bbox_for_ordering && ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),
+                                                                  ST_MakePoint(%s, %s)), %s)
                     THEN
                         -- in cases, when area of intersection is 0, we want it rank higher than no intersection
-                        GREATEST(st_area(st_intersection(ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s), ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),
-                                                                                                                               ST_MakePoint(%s, %s)), %s))),
+                        GREATEST(st_area(st_intersection(bbox_for_ordering, ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),
+                                                                                                    ST_MakePoint(%s, %s)), %s))),
                                  0.00001)
                         -- we have to solve division by 0
-                        / (GREATEST(st_area(ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s)), 0.00001) +
+                        / (GREATEST(st_area(bbox_for_ordering), 0.00001) +
                            GREATEST(st_area(ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),
                                                                     ST_MakePoint(%s, %s)), %s)),
                                     0.00001)
@@ -115,14 +115,39 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
                 ELSE
                     0
             END DESC
-            """, (ordering_bbox_srid, ) + ordering_bbox + (ordering_bbox_srid, ) + (ordering_bbox_srid, ) + ordering_bbox + (ordering_bbox_srid, ) + (ordering_bbox_srid, ) + ordering_bbox + (ordering_bbox_srid, ) if ordering_bbox else tuple()),
+            """, ordering_bbox + (ordering_bbox_srid, ) + ordering_bbox + (ordering_bbox_srid, ) + ordering_bbox + (ordering_bbox_srid, ) if ordering_bbox else tuple()),
     }
 
     assert all(ordering_item in order_by_definition.keys() for ordering_item in order_by_list)
 
+    with_clause_params = tuple()
+    if ordering_bbox_crs:
+        if ordering_bbox_crs in crs_def.CRSDefinitions and crs_def.CRSDefinitions[ordering_bbox_crs].world_bounds:
+            bbox_for_ordering = f"""ST_TRANSFORM(ST_SetSRID( case """
+            for world_bound_crs, world_bound_bbox in crs_def.CRSDefinitions[ordering_bbox_crs].world_bounds.items():
+                world_bound_srid = db_util.get_srid(world_bound_crs)
+                bbox_for_ordering += f'''
+                          when p.srid = {world_bound_srid} then ST_MakeBox2D(
+                    ST_MakePoint(least(greatest(ST_XMIN(p.bbox), {world_bound_bbox[0]}), {world_bound_bbox[2]}),
+                                        least(greatest(ST_YMIN(p.bbox), {world_bound_bbox[1]}), {world_bound_bbox[3]})
+                        ),
+                    ST_MakePoint(greatest(least(ST_XMAX(p.bbox), {world_bound_bbox[2]}), {world_bound_bbox[0]}),
+                                        greatest(least(ST_YMAX(p.bbox), {world_bound_bbox[3]}), {world_bound_bbox[1]})
+                        ))
+            '''
+            bbox_for_ordering += f'else p.bbox end, p.srid), %s)'
+        else:
+            bbox_for_ordering = f"""ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s)"""
+        with_clause_params = (ordering_bbox_srid, )
+    else:
+        bbox_for_ordering = '0'
+
     #########################################################
     # SELECT clause
     select_clause = f"""
+with publs as (
+select *, {bbox_for_ordering} as bbox_for_ordering from {DB_SCHEMA}.publications p
+) 
 select p.id as id_publication,
        w.name as workspace_name,
        p.type,
@@ -157,7 +182,7 @@ select p.id as id_publication,
           and r.type = 'write') can_write_users,
        count(*) OVER() AS full_count
 from {DB_SCHEMA}.workspaces w inner join
-     {DB_SCHEMA}.publications p on p.id_workspace = w.id left join
+     publs p on p.id_workspace = w.id left join
      {DB_SCHEMA}.users u on u.id_workspace = w.id
 """
     select_params = (ROLE_EVERYONE, ROLE_EVERYONE, )
@@ -202,7 +227,7 @@ from {DB_SCHEMA}.workspaces w inner join
 
     #########################################################
     # Put it together
-    sql_params = select_params + where_params + order_by_params + pagination_params
+    sql_params = with_clause_params + select_params + where_params + order_by_params + pagination_params
     select = select_clause + where_clause + order_by_clause + pagination_clause
     values = db_util.run_query(select, sql_params)
 
