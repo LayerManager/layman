@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import logging
 import psycopg2.extras
 
@@ -14,6 +15,13 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 ROLE_EVERYONE = settings.RIGHTS_EVERYONE_ROLE
 DEFAULT_BBOX_CRS = 'EPSG:3857'
 psycopg2.extras.register_uuid()
+
+
+@dataclass
+class CalculatedColumnType:
+    alias: str
+    definition: str
+    params: tuple = tuple()
 
 
 def get_publication_infos(workspace_name=None, pub_type=None, style_type=None,
@@ -98,13 +106,13 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
             -- A∩B / (A + B)
             CASE
                 -- if there is any intersection
-                WHEN bbox_for_ordering && consts.ordering_bbox
+                WHEN p.bbox_for_ordering && consts.ordering_bbox
                     THEN
                         -- in cases, when area of intersection is 0, we want it rank higher than no intersection
-                        GREATEST(st_area(st_intersection(bbox_for_ordering, consts.ordering_bbox)),
+                        GREATEST(st_area(st_intersection(p.bbox_for_ordering, consts.ordering_bbox)),
                                  0.00001)
                         -- we have to solve division by 0
-                        / (GREATEST(st_area(bbox_for_ordering), 0.00001) +
+                        / (GREATEST(st_area(p.bbox_for_ordering), 0.00001) +
                            GREATEST(st_area(consts.ordering_bbox), 0.00001)
                            )
                 -- if there is no intersection, result is 0 in all cases
@@ -116,13 +124,15 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
 
     assert all(ordering_item in order_by_definition.keys() for ordering_item in order_by_list)
 
-    with_clause_params = tuple()
+    calculated_columns = []
+    ordering_bbox_clause = ''
+    with_consts_params = tuple()
     if ordering_bbox_crs:
         if ordering_bbox_crs in crs_def.CRSDefinitions and crs_def.CRSDefinitions[ordering_bbox_crs].world_bounds:
-            bbox_for_ordering = f"""ST_TRANSFORM(ST_SetSRID( case """
+            bbox_for_ordering_def = f"""ST_TRANSFORM(ST_SetSRID(case """
             for world_bound_crs, world_bound_bbox in crs_def.CRSDefinitions[ordering_bbox_crs].world_bounds.items():
                 world_bound_srid = db_util.get_srid(world_bound_crs)
-                bbox_for_ordering += f'''
+                bbox_for_ordering_def += f'''
                           when p.srid = {world_bound_srid} then ST_MakeBox2D(
                     ST_MakePoint(least(greatest(ST_XMIN(p.bbox), {world_bound_bbox[0]}), {world_bound_bbox[2]}),
                                         least(greatest(ST_YMIN(p.bbox), {world_bound_bbox[1]}), {world_bound_bbox[3]})
@@ -131,24 +141,27 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
                                         greatest(least(ST_YMAX(p.bbox), {world_bound_bbox[3]}), {world_bound_bbox[1]})
                         ))
             '''
-            bbox_for_ordering += f'else p.bbox end, p.srid), %s)'
+            bbox_for_ordering_def += f'else p.bbox end, p.srid), %s)'
         else:
-            bbox_for_ordering = f"""ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s)"""
+            bbox_for_ordering_def = f"""ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s)"""
 
-        ordering_bbox_clause = f"""ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),ST_MakePoint(%s, %s)), %s)"""
-        with_clause_params = (ordering_bbox_srid, ) + ordering_bbox + (ordering_bbox_srid, )
-    else:
-        bbox_for_ordering = '0'
-        ordering_bbox_clause = '0'
+        ordering_bbox_clause = f"""ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),ST_MakePoint(%s, %s)), %s) ordering_bbox"""
+        calculated_columns.append(CalculatedColumnType(alias="bbox_for_ordering",
+                                                       definition=bbox_for_ordering_def,
+                                                       params=(ordering_bbox_srid, )))
+        with_consts_params = ordering_bbox + (ordering_bbox_srid, )
+
+    calculated_columns_str = ', '.join([f"{calculated_column.definition} as {calculated_column.alias}" for calculated_column in calculated_columns])
+    calculated_columns_str = f", {calculated_columns_str}" if calculated_columns_str else ""
 
     #########################################################
     # SELECT clause
     select_clause = f"""
 with publs as (
-select *, {bbox_for_ordering} as bbox_for_ordering from {DB_SCHEMA}.publications p
-) ,
+select * {calculated_columns_str} from {DB_SCHEMA}.publications p
+),
 consts as (
-    select {ordering_bbox_clause} ordering_bbox
+    select {ordering_bbox_clause}
 )
 select p.id as id_publication,
        w.name as workspace_name,
@@ -230,7 +243,8 @@ from {DB_SCHEMA}.workspaces w inner join
 
     #########################################################
     # Put it together
-    sql_params = with_clause_params + select_params + where_params + order_by_params + pagination_params
+    with_publications_params = tuple(param for column in calculated_columns for param in column.params)
+    sql_params = with_publications_params + with_consts_params + select_params + where_params + order_by_params + pagination_params
     select = select_clause + where_clause + order_by_clause + pagination_clause
     values = db_util.run_query(select, sql_params)
 
