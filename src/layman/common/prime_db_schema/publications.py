@@ -98,24 +98,20 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
             -- A∩B / (A + B)
             CASE
                 -- if there is any intersection
-                WHEN bbox_for_ordering && ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),
-                                                                  ST_MakePoint(%s, %s)), %s)
+                WHEN bbox_for_ordering && consts.ordering_bbox
                     THEN
                         -- in cases, when area of intersection is 0, we want it rank higher than no intersection
-                        GREATEST(st_area(st_intersection(bbox_for_ordering, ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),
-                                                                                                    ST_MakePoint(%s, %s)), %s))),
+                        GREATEST(st_area(st_intersection(bbox_for_ordering, consts.ordering_bbox)),
                                  0.00001)
                         -- we have to solve division by 0
                         / (GREATEST(st_area(bbox_for_ordering), 0.00001) +
-                           GREATEST(st_area(ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),
-                                                                    ST_MakePoint(%s, %s)), %s)),
-                                    0.00001)
+                           GREATEST(st_area(consts.ordering_bbox), 0.00001)
                            )
                 -- if there is no intersection, result is 0 in all cases
                 ELSE
                     0
             END DESC
-            """, ordering_bbox + (ordering_bbox_srid, ) + ordering_bbox + (ordering_bbox_srid, ) + ordering_bbox + (ordering_bbox_srid, ) if ordering_bbox else tuple()),
+            """, tuple()),
     }
 
     assert all(ordering_item in order_by_definition.keys() for ordering_item in order_by_list)
@@ -138,16 +134,22 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
             bbox_for_ordering += f'else p.bbox end, p.srid), %s)'
         else:
             bbox_for_ordering = f"""ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s)"""
-        with_clause_params = (ordering_bbox_srid, )
+
+        ordering_bbox_clause = f"""ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),ST_MakePoint(%s, %s)), %s)"""
+        with_clause_params = (ordering_bbox_srid, ) + ordering_bbox + (ordering_bbox_srid, )
     else:
         bbox_for_ordering = '0'
+        ordering_bbox_clause = '0'
 
     #########################################################
     # SELECT clause
     select_clause = f"""
 with publs as (
 select *, {bbox_for_ordering} as bbox_for_ordering from {DB_SCHEMA}.publications p
-) 
+) ,
+consts as (
+    select {ordering_bbox_clause} ordering_bbox
+)
 select p.id as id_publication,
        w.name as workspace_name,
        p.type,
@@ -183,7 +185,8 @@ select p.id as id_publication,
        count(*) OVER() AS full_count
 from {DB_SCHEMA}.workspaces w inner join
      publs p on p.id_workspace = w.id left join
-     {DB_SCHEMA}.users u on u.id_workspace = w.id
+     {DB_SCHEMA}.users u on u.id_workspace = w.id,
+     consts
 """
     select_params = (ROLE_EVERYONE, ROLE_EVERYONE, )
 
