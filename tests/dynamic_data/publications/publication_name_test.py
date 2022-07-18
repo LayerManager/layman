@@ -1,4 +1,3 @@
-import copy
 import os
 import pytest
 
@@ -12,7 +11,8 @@ from ... import Publication, TestTypes, TestKeys, PublicationValues
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 TEST_CASES = {
-    'starts_with_number': {'name': '0125_name'},
+    'starts_with_number': {'name': '0125_name',
+                           TestKeys.TYPE: TestTypes.OPTIONAL},
     'only_numbers': {'name': '0125'},
     '210_chars': {'name': 'a' * 210},
 }
@@ -34,9 +34,8 @@ def parametrize_test(workspace, input_test_cases, publication_types):
             name = params['name']
             test_case_id = f'{name}:{parametrization_key}_post'
 
-            post_definition = copy.deepcopy(params)
+            post_definition = dict()
             post_definition.update(publication_definition.definition)
-            post_definition.pop('name', None)
 
             test_case_definition = PublicationValues(
                 type=publication_definition.type,
