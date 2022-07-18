@@ -564,7 +564,6 @@ TESTCASES = {
             'overview_resampling': 'nearest',
         },
         consts.KEY_EXCEPTION: LaymanError,
-        KEY_ONLY_FIRST_PARAMETRIZATION: False,
         KEY_EXPECTED_EXCEPTION: {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
