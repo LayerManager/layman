@@ -51,22 +51,8 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
     ordering_bbox_srid = db_util.get_srid(ordering_bbox_crs)
     filtering_bbox_srid = db_util.get_srid(bbox_filter_crs)
 
-    if bbox_filter_crs and bbox_filter_crs in crs_def.CRSDefinitions and crs_def.CRSDefinitions[bbox_filter_crs].world_bounds:
-        bbox_filter_where_part = 'ST_TRANSFORM(ST_SetSRID( case '
-        for world_bound_crs, world_bound_bbox in crs_def.CRSDefinitions[bbox_filter_crs].world_bounds.items():
-            world_bound_srid = db_util.get_srid(world_bound_crs)
-            bbox_filter_where_part += f'''
-              when p.srid = {world_bound_srid} then ST_MakeBox2D(
-        ST_MakePoint(least(greatest(ST_XMIN(p.bbox), {world_bound_bbox[0]}), {world_bound_bbox[2]}),
-                            least(greatest(ST_YMIN(p.bbox), {world_bound_bbox[1]}), {world_bound_bbox[3]})
-            ),
-        ST_MakePoint(greatest(least(ST_XMAX(p.bbox), {world_bound_bbox[2]}), {world_bound_bbox[0]}),
-                            greatest(least(ST_YMAX(p.bbox), {world_bound_bbox[3]}), {world_bound_bbox[1]})
-            ))
-'''
-        bbox_filter_where_part += f'else p.bbox end, p.srid), %s) && ST_MakeBox2D(ST_MakePoint(%s, %s), ST_MakePoint(%s, %s))'
-    else:
-        bbox_filter_where_part = 'ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s) && ST_MakeBox2D(ST_MakePoint(%s, %s), ST_MakePoint(%s, %s))'
+    bbox_filter_where_part = secure_bbox_transform(bbox_filter_crs)
+    bbox_filter_where_part += ' && ST_MakeBox2D(ST_MakePoint(%s, %s), ST_MakePoint(%s, %s))'
 
     where_params_def = [
         (workspace_name, 'w.name = %s', (workspace_name,)),
@@ -128,23 +114,7 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
     ordering_bbox_clause = ''
     with_consts_params = tuple()
     if ordering_bbox_crs:
-        if ordering_bbox_crs in crs_def.CRSDefinitions and crs_def.CRSDefinitions[ordering_bbox_crs].world_bounds:
-            bbox_for_ordering_def = f"""ST_TRANSFORM(ST_SetSRID(case """
-            for world_bound_crs, world_bound_bbox in crs_def.CRSDefinitions[ordering_bbox_crs].world_bounds.items():
-                world_bound_srid = db_util.get_srid(world_bound_crs)
-                bbox_for_ordering_def += f'''
-                          when p.srid = {world_bound_srid} then ST_MakeBox2D(
-                    ST_MakePoint(least(greatest(ST_XMIN(p.bbox), {world_bound_bbox[0]}), {world_bound_bbox[2]}),
-                                        least(greatest(ST_YMIN(p.bbox), {world_bound_bbox[1]}), {world_bound_bbox[3]})
-                        ),
-                    ST_MakePoint(greatest(least(ST_XMAX(p.bbox), {world_bound_bbox[2]}), {world_bound_bbox[0]}),
-                                        greatest(least(ST_YMAX(p.bbox), {world_bound_bbox[3]}), {world_bound_bbox[1]})
-                        ))
-            '''
-            bbox_for_ordering_def += f'else p.bbox end, p.srid), %s)'
-        else:
-            bbox_for_ordering_def = f"""ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s)"""
-
+        bbox_for_ordering_def = secure_bbox_transform(ordering_bbox_crs)
         ordering_bbox_clause = f"""ST_SetSRID(ST_MakeBox2D(ST_MakePoint(%s, %s),ST_MakePoint(%s, %s)), %s) ordering_bbox"""
         calculated_columns.append(CalculatedColumnType(alias="bbox_for_ordering",
                                                        definition=bbox_for_ordering_def,
@@ -305,6 +275,26 @@ from {DB_SCHEMA}.workspaces w inner join
               'content_range': content_range,
               }
     return result
+
+
+def secure_bbox_transform(bbox_crs):
+    if bbox_crs and bbox_crs in crs_def.CRSDefinitions and crs_def.CRSDefinitions[bbox_crs].world_bounds:
+        bbox_sql = f"""ST_TRANSFORM(ST_SetSRID(case """
+        for world_bound_crs, world_bound_bbox in crs_def.CRSDefinitions[bbox_crs].world_bounds.items():
+            world_bound_srid = db_util.get_srid(world_bound_crs)
+            bbox_sql += f'''
+                              when p.srid = {world_bound_srid} then ST_MakeBox2D(
+                        ST_MakePoint(least(greatest(ST_XMIN(p.bbox), {world_bound_bbox[0]}), {world_bound_bbox[2]}),
+                                            least(greatest(ST_YMIN(p.bbox), {world_bound_bbox[1]}), {world_bound_bbox[3]})
+                            ),
+                        ST_MakePoint(greatest(least(ST_XMAX(p.bbox), {world_bound_bbox[2]}), {world_bound_bbox[0]}),
+                                            greatest(least(ST_YMAX(p.bbox), {world_bound_bbox[3]}), {world_bound_bbox[1]})
+                            ))
+                '''
+        bbox_sql += f'else p.bbox end, p.srid), %s)'
+    else:
+        bbox_sql = 'ST_TRANSFORM(ST_SetSRID(p.bbox, p.srid), %s)'
+    return bbox_sql
 
 
 def only_valid_names(users_list):
