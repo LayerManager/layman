@@ -170,12 +170,16 @@ def patch_workspace_publication(publication_type,
                                 map_layers=None,
                                 native_extent=None,
                                 overview_resampling=None,
+                                do_not_upload_chunks=False,
                                 ):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     # map layers must not be set together with file_paths
     assert not map_layers or not file_paths
+
+    assert not (not with_chunks and do_not_upload_chunks)
+    assert not (check_response_fn and do_not_upload_chunks)  # because check_response_fn is not called when do_not_upload_chunks
 
     file_paths = [] if file_paths is None and not map_layers else file_paths
 
@@ -236,13 +240,14 @@ def patch_workspace_publication(publication_type,
         for file_path in files:
             file_path[1][1].close()
 
-    if with_chunks:
+    if with_chunks and not do_not_upload_chunks:
         upload_file_chunks(publication_type,
                            workspace,
                            name,
                            file_paths, )
 
-    wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn, headers=headers)
+    if not do_not_upload_chunks:
+        wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn, headers=headers)
     wfs.clear_cache(workspace)
     wms.clear_cache(workspace)
     if temp_dir:
@@ -303,6 +308,7 @@ def publish_workspace_publication(publication_type,
                                   map_layers=None,
                                   native_extent=None,
                                   overview_resampling=None,
+                                  do_not_upload_chunks=False,
                                   ):
     title = title or name
     headers = headers or {}
@@ -310,6 +316,9 @@ def publish_workspace_publication(publication_type,
 
     # map layers must not be set together with file_paths
     assert not map_layers or not file_paths
+
+    assert not (not with_chunks and do_not_upload_chunks)
+    assert not (check_response_fn and do_not_upload_chunks)  # because check_response_fn is not called when do_not_upload_chunks
 
     file_paths = [publication_type_def.source_path] if file_paths is None and not map_layers else file_paths
 
@@ -372,14 +381,14 @@ def publish_workspace_publication(publication_type,
         for file_path in files:
             file_path[1][1].close()
 
-    if with_chunks:
-        if with_chunks:
-            upload_file_chunks(publication_type,
-                               workspace,
-                               name,
-                               file_paths, )
+    if with_chunks and not do_not_upload_chunks:
+        upload_file_chunks(publication_type,
+                           workspace,
+                           name,
+                           file_paths, )
 
-    wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn, headers=headers)
+    if not do_not_upload_chunks:
+        wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn, headers=headers)
     if temp_dir:
         shutil.rmtree(temp_dir)
     return response.json()[0]
