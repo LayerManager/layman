@@ -231,6 +231,7 @@ def wait_for_abort(workspace, publication_type, publication_name):
         if chain_info['finished']:
             break
         time.sleep(0.5)
+        round += 1
 
 
 def abort_chain(workspace, publication_type, publication_name):
