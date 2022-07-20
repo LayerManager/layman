@@ -259,7 +259,7 @@ def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_cal
     results = dict()
     for func in functions:
         fullargspec = inspect.getfullargspec(func)
-        fn_arg_names = fullargspec[0]
+        fn_arg_names = fullargspec[0] + fullargspec[4]  # args + kwonlyargs
         final_kwargs = {
             k: v for k, v in kwargs.items()
             if k in fn_arg_names
