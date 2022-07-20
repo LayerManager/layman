@@ -106,6 +106,8 @@ def patch(workspace, layername):
                               'parameter': 'overview_resampling',
                               'detail': {'found': 'no_overview_resampling',
                                          'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, })
+    if len(input_files.raw_paths) == 0 and overview_resampling:
+        raise LaymanError(48, f'Parameter overview_resampling requires parameter file to be set.')
     kwargs['overview_resampling'] = overview_resampling
 
     # FILE NAMES

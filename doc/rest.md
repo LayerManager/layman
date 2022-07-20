@@ -329,6 +329,7 @@ Body parameters:
    - method used by [`gdaladdo`](https://gdal.org/programs/gdaladdo.html#cmdoption-gdaladdo-r) for overview resampling when normalizing raster layer
    - by default Layman will guess overview resampling method from input file metadata
    - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
+   - can be used only together with `file` parameter, otherwise error is raised
 
 #### Response
 Content-Type: `application/json`
