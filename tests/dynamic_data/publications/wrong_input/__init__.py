@@ -15,6 +15,7 @@ KEY_EXPECTED_EXCEPTION = 'expected_exception'
 KEY_DEFAULT = 'default'
 KEY_PATCHES = 'patches'
 KEY_PATCH_POST = 'post_params'
+KEY_SKIP_POST = 'skip_post'
 KEY_ONLY_FIRST_PARAMETRIZATION = 'only_first_parametrization'
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -650,54 +651,56 @@ def generate(workspace=None):
 
     result = dict()
     for testcase, tc_params in TESTCASES.items():
-        action_parametrization = util.get_test_case_parametrization(param_parametrization=REST_PARAMETRIZATION,
-                                                                    only_first_parametrization=tc_params.get(
-                                                                        KEY_ONLY_FIRST_PARAMETRIZATION, default_only_first_parametrization),
-                                                                    default_params=tc_params[KEY_ACTION_PARAMS],
-                                                                    action_parametrization=[('', None, []), ],
-                                                                    )
-        for test_case_postfix, _, _, rest_param_dict in action_parametrization:
-            rest_param_frozen_set = frozenset(rest_param_dict.items())
-            default_exp_exception = copy.deepcopy(tc_params[KEY_EXPECTED_EXCEPTION][KEY_DEFAULT])
-            exception_diff = tc_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, dict())
-            exp_exception = asserts_util.recursive_dict_update(default_exp_exception, exception_diff)
-            is_sync = exp_exception.pop('sync')
-            if is_sync:
-                action_def = {
-                    consts.KEY_ACTION: {
-                        consts.KEY_CALL: Action(process_client.publish_workspace_publication,
-                                                {**tc_params[KEY_ACTION_PARAMS],
-                                                 **rest_param_dict}),
-                        consts.KEY_CALL_EXCEPTION: {
-                            consts.KEY_EXCEPTION: LaymanError,
-                            consts.KEY_EXCEPTION_ASSERTS: [
-                                Action(processing.exception.response_exception, {'expected': exp_exception}, ),
-                            ],
-                        }, },
-                    consts.KEY_FINAL_ASSERTS: [
-                        Action(publication.internal.does_not_exist, dict())
-                    ],
-                }
-                action_list = [action_def]
-            else:
-                action_def = {
-                    consts.KEY_ACTION: {
-                        consts.KEY_CALL: Action(process_client.publish_workspace_publication,
-                                                {**tc_params[KEY_ACTION_PARAMS],
-                                                 **rest_param_dict}),
-                        consts.KEY_RESPONSE_ASSERTS: [
-                            Action(processing.response.valid_post, dict()),
+
+        if not tc_params.get(KEY_SKIP_POST, False):
+            action_parametrization = util.get_test_case_parametrization(param_parametrization=REST_PARAMETRIZATION,
+                                                                        only_first_parametrization=tc_params.get(
+                                                                            KEY_ONLY_FIRST_PARAMETRIZATION, default_only_first_parametrization),
+                                                                        default_params=tc_params[KEY_ACTION_PARAMS],
+                                                                        action_parametrization=[('', None, []), ],
+                                                                        )
+            for test_case_postfix, _, _, rest_param_dict in action_parametrization:
+                rest_param_frozen_set = frozenset(rest_param_dict.items())
+                default_exp_exception = copy.deepcopy(tc_params[KEY_EXPECTED_EXCEPTION][KEY_DEFAULT])
+                exception_diff = tc_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, dict())
+                exp_exception = asserts_util.recursive_dict_update(default_exp_exception, exception_diff)
+                is_sync = exp_exception.pop('sync')
+                if is_sync:
+                    action_def = {
+                        consts.KEY_ACTION: {
+                            consts.KEY_CALL: Action(process_client.publish_workspace_publication,
+                                                    {**tc_params[KEY_ACTION_PARAMS],
+                                                     **rest_param_dict}),
+                            consts.KEY_CALL_EXCEPTION: {
+                                consts.KEY_EXCEPTION: LaymanError,
+                                consts.KEY_EXCEPTION_ASSERTS: [
+                                    Action(processing.exception.response_exception, {'expected': exp_exception}, ),
+                                ],
+                            }, },
+                        consts.KEY_FINAL_ASSERTS: [
+                            Action(publication.internal.does_not_exist, dict())
                         ],
-                    },
-                    consts.KEY_FINAL_ASSERTS: [
-                        Action(publication.rest.async_error_in_info_key, {'info_key': 'file',
-                                                                          'expected': exp_exception, }, ),
-                        Action(publication.internal.no_bbox_and_crs, dict()),
-                    ],
-                }
-                action_list = [action_def, VALIDATION_PATCH_ACTION]
-            publ_name = f"{testcase}_post{test_case_postfix}"
-            result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = action_list
+                    }
+                    action_list = [action_def]
+                else:
+                    action_def = {
+                        consts.KEY_ACTION: {
+                            consts.KEY_CALL: Action(process_client.publish_workspace_publication,
+                                                    {**tc_params[KEY_ACTION_PARAMS],
+                                                     **rest_param_dict}),
+                            consts.KEY_RESPONSE_ASSERTS: [
+                                Action(processing.response.valid_post, dict()),
+                            ],
+                        },
+                        consts.KEY_FINAL_ASSERTS: [
+                            Action(publication.rest.async_error_in_info_key, {'info_key': 'file',
+                                                                              'expected': exp_exception, }, ),
+                            Action(publication.internal.no_bbox_and_crs, dict()),
+                        ],
+                    }
+                    action_list = [action_def, VALIDATION_PATCH_ACTION]
+                publ_name = f"{testcase}_post{test_case_postfix}"
+                result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = action_list
 
         for patch_key, patch_params in tc_params.get(KEY_PATCHES, dict()).items():
             action_parametrization = util.get_test_case_parametrization(param_parametrization=REST_PARAMETRIZATION,
