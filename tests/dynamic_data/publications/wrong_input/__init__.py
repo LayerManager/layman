@@ -702,7 +702,7 @@ def generate(workspace=None):
         for patch_key, patch_params in tc_params.get(KEY_PATCHES, dict()).items():
             action_parametrization = util.get_test_case_parametrization(param_parametrization=REST_PARAMETRIZATION,
                                                                         only_first_parametrization=tc_params.get(
-                                                                            KEY_ONLY_FIRST_PARAMETRIZATION, True),
+                                                                            KEY_ONLY_FIRST_PARAMETRIZATION, default_only_first_parametrization),
                                                                         default_params={**tc_params[KEY_ACTION_PARAMS],
                                                                                         **patch_params.get(KEY_ACTION_PARAMS, dict())},
                                                                         action_parametrization=[('', None, []), ],
