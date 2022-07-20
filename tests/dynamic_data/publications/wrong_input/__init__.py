@@ -589,6 +589,32 @@ TESTCASES = {
             },
         },
     },
+    'layer_overview_resampling_no_input_file': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_SKIP_POST: True,
+        KEY_ACTION_PARAMS: {},
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 48,
+                          'message': 'Wrong combination of parameters',
+                          'detail': 'Parameter overview_resampling requires parameter file to be set.',
+                          },
+        },
+        KEY_PATCHES: {
+            'full': {
+                KEY_PATCH_POST: {
+                    'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
+                    'overview_resampling': 'nearest',
+                },
+                KEY_ACTION_PARAMS: {
+                    'file_paths': [],
+                    'overview_resampling': 'mode',
+                },
+            },
+        },
+    },
     'layer_name_211': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
