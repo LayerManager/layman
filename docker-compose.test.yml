@@ -20,6 +20,7 @@ services:
         - ./tmp:/code/tmp
         - ./test.sh:/code/test.sh
         - ./test_separated.sh:/code/test_separated.sh
+        - ./test_static.sh:/code/test_static.sh
         - ./pytest.ini:/code/pytest.ini
         - ./.pylintrc:/code/.pylintrc
         - ./version.txt:/code/version.txt

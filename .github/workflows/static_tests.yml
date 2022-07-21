@@ -1,0 +1,85 @@
+name: StaticIntegrationTests
+
+on:
+  push:
+    branches:
+      - master
+      - '[1-9].*.x'
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+  workflow_dispatch:
+
+jobs:
+  StaticIntegrationTests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: View versions
+        run: |
+          docker -v
+          docker-compose -v
+
+      - name: Usage info
+        run: |
+          df -h
+          free -m
+
+      - name: Build
+        run: |
+          cp .env.test .env
+          docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_dev
+          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql nginx-qgis
+          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel qgis geoserver micka timgen layman_client_test
+
+      - name: Download test data
+        run: |
+          mkdir -p tmp
+          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh"
+
+      - name: Usage info
+        if: always()
+        run: |
+          df -h
+          free -m
+
+      - name: Run tests
+        run: |
+          make test-static
+
+      - name: Usage info
+        if: always()
+        run: |
+          df -h
+          free -m
+
+      - name: Save logs to files
+        if: failure()
+        run: |
+          mkdir logs
+          docker logs layman_celery_worker_test_1 &> logs/log_celery_worker.txt
+          docker logs timgen &> logs/log_timgen.txt
+          docker logs micka &> logs/log_micka.txt
+          docker logs layman_geoserver_1 &> logs/log_geoserver.txt
+
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test_logs
+          path: logs
+
+      - name: Upload artifacts
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test_artifacts
+          path: |
+            sudo chown -R $(id -un) layman_data_test
+            tmp/artifacts/
+            layman_data_test/
