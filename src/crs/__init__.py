@@ -49,10 +49,10 @@ CRSDefinitions = {
         no_area_bbox_padding=10,
         world_bounds={
             EPSG_4326: (
-                -180,
-                -89.99999,
-                180,
-                89.99999,
+                -179.9,
+                -85.06,
+                179.9,
+                85.06,
             )
         },
         qgis_template_spatialrefsys='''<srsid>3857</srsid>
