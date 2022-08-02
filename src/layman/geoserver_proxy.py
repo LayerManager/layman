@@ -71,7 +71,7 @@ def ensure_wfs_t_attributes(attribs):
     if created_attributes:
         changed_layers = {(workspace, layer) for workspace, layer, _, _ in created_attributes}
         qgis_changed_layers = {(workspace, layer) for workspace, layer in changed_layers
-                               if layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['style_type'], })['style_type'] == 'qml'}
+                               if layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['style_type'], })['_style_type'] == 'qml'}
         for workspace, layer in qgis_changed_layers:
             qgis_wms.save_qgs_file(workspace, layer)
         gs_reset(settings.LAYMAN_GS_AUTH)
@@ -214,7 +214,7 @@ def proxy(subpath):
             workspace = gs_wms.get_layman_workspace(geoserver_workspace)
             publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, {'keys': ['native_crs',
                                                                                                  'style_type']})
-            if publ_info and publ_info.get('native_crs') == crs_def.EPSG_5514 and publ_info.get('style_type') == 'sld':
+            if publ_info and publ_info.get('native_crs') == crs_def.EPSG_5514 and publ_info.get('_style_type') == 'sld':
                 fix_params = True
                 break
 

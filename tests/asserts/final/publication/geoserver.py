@@ -62,7 +62,7 @@ def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, 
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['native_crs', 'style_type',
                                                                                            'file']})
         native_crs = publ_info['native_crs']
-        style_type = publ_info['style_type']
+        style_type = publ_info['_style_type']
 
     query_params = {
         'SERVICE': 'WMS',
