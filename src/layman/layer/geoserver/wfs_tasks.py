@@ -21,7 +21,7 @@ def patch_after_feature_change(
         raise AbortedException
 
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['file_type', 'native_crs']})
-    file_type = info['file_type']
+    file_type = info['_file_type']
     if file_type == settings.FILE_TYPE_RASTER:
         return
     if file_type != settings.FILE_TYPE_VECTOR:

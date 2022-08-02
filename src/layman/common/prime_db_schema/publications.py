@@ -227,7 +227,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'title': title,
                                    'uuid': uuid,
                                    'type': publication_type,
-                                   'file_type': file_type,
+                                   '_file_type': file_type,
                                    'style_type': style_type,
                                    'updated_at': updated_at,
                                    'native_bounding_box': [xmin, ymin, xmax, ymax],
