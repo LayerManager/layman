@@ -16,7 +16,7 @@ def source_has_its_key_or_it_is_empty(workspace, publ_type, name):
             for key in source_def.info_items:
                 context = {'keys': [key]}
                 info = layman_util.get_publication_info(workspace, publ_type, name, context)
-                assert key in info or not info, info
+                assert key in info or f'_{key}' in info or not info, info
 
 
 def same_value_of_key_in_all_sources(workspace, publ_type, name):
@@ -136,7 +136,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        })
 
         file_type = publ_type_detail[0]
-        expected_detail['file_type'] = file_type
+        expected_detail['_file_type'] = file_type
         if file_type == settings.FILE_TYPE_VECTOR:
             uuid = pub_info["uuid"]
             db_table = f'layer_{uuid.replace("-","_")}'
@@ -175,7 +175,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            })
 
     if publ_type == process_client.MAP_TYPE:
-        expected_detail['file_type'] = None
+        expected_detail['_file_type'] = None
         util.recursive_dict_update(expected_detail,
                                    {
                                        '_file': {

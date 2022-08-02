@@ -31,7 +31,7 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
         rest_method(layer, params=params)
 
         exp_publication_detail = {
-            'file_type': 'unknown',
+            '_file_type': 'unknown',
             'style_type': 'sld',
             'native_bounding_box': [
                 None,
