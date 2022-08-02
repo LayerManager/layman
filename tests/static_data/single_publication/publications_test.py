@@ -26,7 +26,6 @@ def test_thumbnail(workspace, publ_type, publication):
 def test_get_publication_info_items(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     asserts_internal.source_has_its_key_or_it_is_empty(workspace, publ_type, publication)
-    asserts_internal.source_internal_keys_are_subset_of_source_sibling_keys(workspace, publ_type, publication)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)

@@ -393,7 +393,6 @@ PUBLICATIONS = {
             },
             consts.KEY_FINAL_ASSERTS: [
                 Action(publication.internal.source_has_its_key_or_it_is_empty, {'name': 'small_layer'}),
-                Action(publication.internal.source_internal_keys_are_subset_of_source_sibling_keys, {'name': 'small_layer'}),
                 Action(publication.internal_rest.same_title_in_source_and_rest_multi, {'name': 'small_layer'}),
                 Action(publication.internal_rest.same_values_in_internal_and_rest, {'name': 'small_layer'}),
                 Action(publication.rest.is_in_rest_multi, {'name': 'small_layer'}),
@@ -435,7 +434,6 @@ PUBLICATIONS = {
             },
             consts.KEY_FINAL_ASSERTS: [
                 Action(publication.internal.source_has_its_key_or_it_is_empty, {'name': 'small_layer_with_id'}),
-                Action(publication.internal.source_internal_keys_are_subset_of_source_sibling_keys, {'name': 'small_layer_with_id'}),
                 Action(publication.internal_rest.same_title_in_source_and_rest_multi, {'name': 'small_layer_with_id'}),
                 Action(publication.internal_rest.same_values_in_internal_and_rest, {'name': 'small_layer_with_id'}),
                 Action(publication.rest.is_in_rest_multi, {'name': 'small_layer_with_id'}),
@@ -480,7 +478,6 @@ PUBLICATIONS = {
             },
             consts.KEY_FINAL_ASSERTS: [
                 Action(publication.internal.source_has_its_key_or_it_is_empty, {'name': 'small_zip_layer'}),
-                Action(publication.internal.source_internal_keys_are_subset_of_source_sibling_keys, {'name': 'small_zip_layer'}),
                 Action(publication.internal_rest.same_title_in_source_and_rest_multi, {'name': 'small_zip_layer'}),
                 Action(publication.internal_rest.same_values_in_internal_and_rest, {'name': 'small_zip_layer'}),
                 Action(publication.rest.is_in_rest_multi, {'name': 'small_zip_layer'}),

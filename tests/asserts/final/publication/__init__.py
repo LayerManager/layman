@@ -5,7 +5,6 @@ from . import geoserver, internal, internal_rest, rest
 
 IS_LAYER_COMPLETE_AND_CONSISTENT = [
     Action(internal.source_has_its_key_or_it_is_empty, dict()),
-    Action(internal.source_internal_keys_are_subset_of_source_sibling_keys, dict()),
     Action(internal_rest.same_title_in_source_and_rest_multi, dict()),
     Action(internal_rest.same_values_in_internal_and_rest, dict()),
     Action(rest.is_in_rest_multi, dict()),
@@ -26,7 +25,6 @@ IS_LAYER_COMPLETE_AND_CONSISTENT = [
 
 IS_MAP_COMPLETE_AND_CONSISTENT = [
     Action(internal.source_has_its_key_or_it_is_empty, dict()),
-    Action(internal.source_internal_keys_are_subset_of_source_sibling_keys, dict()),
     Action(internal_rest.same_title_in_source_and_rest_multi, dict()),
     Action(internal_rest.same_values_in_internal_and_rest, dict()),
     Action(rest.is_in_rest_multi, dict()),
