@@ -165,7 +165,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
         if style_type:
             util.recursive_dict_update(expected_detail,
                                        {
-                                           'style_type': style_type,
+                                           '_style_type': style_type,
                                            'style': {'type': style_type},
                                        })
             if style_type == 'qml':
@@ -184,7 +184,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        'file': {
                                            'path': f'{publ_type_dir}/{name}/input_file/{name}.json',
                                            'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/file'},
-                                       'style_type': None,
+                                       '_style_type': None,
                                    })
 
     expected_detail = util.recursive_dict_update(expected_detail, exp_publication_detail)

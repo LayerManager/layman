@@ -31,7 +31,7 @@ def after_request(response):
 def get(workspace, layername):
     app.logger.info(f"GET Style, actor={g.user}, workspace={workspace}, layername={layername}")
 
-    style_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type'], })['style_type']
+    style_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type'], })['_style_type']
     result = None
     if style_type == 'sld':
         response = sld.get_style_response(workspace,

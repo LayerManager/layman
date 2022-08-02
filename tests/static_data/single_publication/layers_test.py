@@ -54,7 +54,7 @@ def test_info(workspace, publ_type, publication):
     if 'wfs' in info:
         assert info['wfs'].get('url') == wfs_url, f'r_json={info}, wfs_url={wfs_url}'
 
-    assert info_internal['style_type'] == style, f'info_internal={info_internal}'
+    assert info_internal['_style_type'] == style, f'info_internal={info_internal}'
     assert info['style']['type'] == style, info.get('style')
     external_style_url = info['style']['url']
     assert external_style_url == expected_style_url, (info, external_style_url)

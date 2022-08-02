@@ -128,7 +128,7 @@ def patch(workspace, layername):
     if style_type:
         style_type_for_check = style_type.code
     else:
-        style_type_for_check = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type']})['style_type']
+        style_type_for_check = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type']})['_style_type']
     if file_type == settings.FILE_TYPE_RASTER and style_type_for_check == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
     kwargs['file_type'] = file_type
