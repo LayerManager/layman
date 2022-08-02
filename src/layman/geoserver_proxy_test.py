@@ -47,7 +47,7 @@ def test_missing_attribute(style_file, ):
                                            )
 
     with app.app_context():
-        style_type = layman_util.get_publication_info(username, process_client.LAYER_TYPE, layername, context={'keys': ['style_type'], })['style_type']
+        style_type = layman_util.get_publication_info(username, process_client.LAYER_TYPE, layername, context={'keys': ['style_type'], })['_style_type']
 
     def wfs_post(workspace, attr_names_list, data_xml):
         with app.app_context():

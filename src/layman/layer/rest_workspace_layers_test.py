@@ -69,14 +69,14 @@ def test_style_correctly_saved(source_style_file_path,
     assert_style_file(workspace, layer, expected_style_file)
     with app.app_context():
         info = layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['style_type', 'style'], })
-    assert info['style_type'] == expected_style_type
+    assert info['_style_type'] == expected_style_type
 
     process_client.delete_workspace_layer(workspace, layer)
     process_client.publish_workspace_layer(workspace, layer)
 
     with app.app_context():
         info = layer_util.get_layer_info(workspace, layer)
-    assert info['style_type'] == 'sld'
+    assert info['_style_type'] == 'sld'
     assert info['style']['type'] == 'sld', info.get('style')
     assert info['style']['url'], info.get('style')
 
@@ -88,7 +88,7 @@ def test_style_correctly_saved(source_style_file_path,
     assert_style_file(workspace, layer, expected_style_file)
     with app.app_context():
         info = layer_util.get_layer_info(workspace, layer)
-    assert info['style_type'] == expected_style_type
+    assert info['_style_type'] == expected_style_type
 
     process_client.delete_workspace_layer(workspace, layer)
 

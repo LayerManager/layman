@@ -32,7 +32,7 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
 
         exp_publication_detail = {
             '_file_type': 'unknown',
-            'style_type': 'sld',
+            '_style_type': 'sld',
             'native_bounding_box': [
                 None,
                 None,

@@ -228,7 +228,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'uuid': uuid,
                                    'type': publication_type,
                                    '_file_type': file_type,
-                                   'style_type': style_type,
+                                   '_style_type': style_type,
                                    'updated_at': updated_at,
                                    'native_bounding_box': [xmin, ymin, xmax, ymax],
                                    'native_crs': db_util.get_crs(srid) if srid else None,

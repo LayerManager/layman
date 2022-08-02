@@ -78,7 +78,7 @@ def rename_table_names():
                                                      context={'keys': ['file', 'uuid', 'style_type', ]})
         file_type = publ_info['file']['file_type']
         uuid = publ_info['uuid']
-        style_type = publ_info['style_type']
+        style_type = publ_info['_style_type']
         table_name = f'layer_{uuid.replace("-", "_")}'
 
         if file_type == settings.FILE_TYPE_VECTOR:
