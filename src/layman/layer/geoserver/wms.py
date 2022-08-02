@@ -32,7 +32,7 @@ def patch_layer(workspace, layername, title, description, access_rights=None):
         return
     geoserver_workspace = get_geoserver_workspace(workspace)
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type', 'file_type', ], })
-    file_type = info['file_type']
+    file_type = info['_file_type']
     if file_type == settings.FILE_TYPE_VECTOR:
         if info['style_type'] == 'sld':
             gs_util.patch_feature_type(geoserver_workspace, layername, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)

@@ -134,7 +134,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         abstract or ''
     ]))), None)
 
-    file_type = publ_info.get('file_type')
+    file_type = publ_info.get('_file_type')
     if file_type == settings.FILE_TYPE_VECTOR:
         table_name = publ_info['db_table']['name']
         try:
