@@ -7,7 +7,8 @@
       "skipLocalhost": true,
       "skipUrlPatterns": [
         "https://help.liferay.com",
-        "https://github.com/LayerManager/layman/issues/"
+        "https://github.com/LayerManager/layman/issues/",
+        "https://docs.geoserver.org/2.15"
       ]
     }
   }
