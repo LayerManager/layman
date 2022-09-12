@@ -4,6 +4,7 @@ from layman import app, util as layman_util, settings, celery
 from layman.common import bbox as bbox_util
 from layman.common.prime_db_schema import publications
 from layman.layer import LAYER_TYPE
+from layman.map import MAP_TYPE
 from layman.layer.filesystem import gdal
 from test_tools import process_client, util as test_util, assert_util
 from ... import util
@@ -22,7 +23,7 @@ def source_has_its_key_or_it_is_empty(workspace, publ_type, name):
 def source_internal_keys_are_subset_of_source_sibling_keys(workspace, publ_type, name):
     with app.app_context():
         internal_sources = layman_util.get_publication_types()[publ_type]['internal_sources']
-        for source_def in internal_sources.values():
+        for source_name, source_def in internal_sources.items():
             for key in source_def.info_items:
                 context = {'keys': [key]}
                 info = layman_util.get_publication_info(workspace, publ_type, name, context)
@@ -31,6 +32,9 @@ def source_internal_keys_are_subset_of_source_sibling_keys(workspace, publ_type,
                                        for sibling_key in item_list.info_items
                                        if key in item_list.info_items)
                 internal_keys = [key[1:] for key in info if key.startswith('_')]
+                if publ_type == MAP_TYPE and source_name == 'layman.map.prime_db_schema.table':
+                    internal_keys.remove('style_type')
+                    internal_keys.remove('file_type')
                 assert set(internal_keys) <= all_sibling_keys, \
                     f'internal_keys={set(internal_keys)}, all_sibling_keys={all_sibling_keys}, key={key}, info={info}'
 
