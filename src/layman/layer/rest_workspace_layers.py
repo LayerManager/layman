@@ -112,6 +112,14 @@ def post(workspace):
 
     # Timeseries regex
     time_regex = request.form.get('time_regex', None)
+    if time_regex:
+        try:
+            import re
+            re.compile(time_regex)
+        except re.error as exp:
+            raise LaymanError(2, {'parameter': 'time_regex',
+                                  'expected': 'Regular expression',
+                                  }) from exp
 
     task_options = {
         'crs_id': crs_id,
