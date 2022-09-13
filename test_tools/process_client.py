@@ -309,6 +309,7 @@ def publish_workspace_publication(publication_type,
                                   native_extent=None,
                                   overview_resampling=None,
                                   do_not_upload_chunks=False,
+                                  time_regex=None,
                                   ):
     title = title or name
     headers = headers or {}
@@ -329,6 +330,8 @@ def publish_workspace_publication(publication_type,
 
     # Compress settings can be used only with compress option
     assert not compress_settings or compress
+
+    assert not (time_regex and publication_type == MAP_TYPE)
 
     with app.app_context():
         r_url = url_for(publication_type_def.post_workspace_publication_url, workspace=workspace)
@@ -369,6 +372,8 @@ def publish_workspace_publication(publication_type,
             data['crs'] = crs
         if overview_resampling:
             data['overview_resampling'] = overview_resampling
+        if time_regex:
+            data['time_regex'] = time_regex
         response = requests.post(r_url,
                                  files=files,
                                  data=data,

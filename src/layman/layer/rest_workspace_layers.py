@@ -110,6 +110,9 @@ def post(workspace):
 
     actor_name = authn.get_authn_username()
 
+    # Timeseries regex
+    time_regex = request.form.get('time_regex', None)
+
     task_options = {
         'crs_id': crs_id,
         'description': description,
@@ -120,6 +123,7 @@ def post(workspace):
         'store_in_geoserver': style_type.store_in_geoserver,
         'overview_resampling': overview_resampling,
         'file_type': file_type,
+        'time_regex': time_regex,
     }
 
     rest_common.setup_post_access_rights(request.form, task_options, actor_name)
