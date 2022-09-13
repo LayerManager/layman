@@ -100,6 +100,20 @@ def mandatory_keys_in_all_sources_of_actor(workspace, publ_type, name, actor, ):
     assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
 
 
+def all_keys_assigned_to_source(workspace, publ_type, name):
+    with app.app_context():
+        info = layman_util.get_publication_info(workspace, publ_type, name)
+        internal_sources = layman_util.get_publication_types()[publ_type]['internal_sources']
+    source_keys = set()
+    for source_def in internal_sources.values():
+        source_keys = source_keys.union(set(source_def.info_items))
+    info_keys = {key[1:] if key.startswith('_') else key for key in info}
+    if publ_type == MAP_TYPE:
+        info_keys.remove('style_type')
+        info_keys.remove('file_type')
+    assert info_keys.issubset(source_keys), f'missing={info_keys.difference(source_keys)} ,info_keys={info_keys}, source_keys={source_keys}'
+
+
 def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, *, max_diffs=None):
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['thumbnail']})
