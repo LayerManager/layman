@@ -333,6 +333,9 @@ Body parameters:
    - by default Layman will guess overview resampling method from input file metadata
    - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
    - can be used only together with `file` parameter, otherwise error is raised
+- *time_regex*, string, e.g. `[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)`
+  - used for timeseries raster files
+  - specifies the pattern used for extracting the time information from the file name
 
 #### Response
 Content-Type: `application/json`

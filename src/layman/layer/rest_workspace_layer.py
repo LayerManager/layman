@@ -133,6 +133,19 @@ def patch(workspace, layername):
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
     kwargs['file_type'] = file_type
 
+    # Timeseries regex
+    time_regex = request.form.get('time_regex', None)
+    if time_regex:
+        try:
+            import re
+            re.compile(time_regex)
+        except re.error as exp:
+            raise LaymanError(2, {'parameter': 'time_regex',
+                                  'expected': 'Regular expression',
+                                  }) from exp
+
+    kwargs['time_regex'] = time_regex
+
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
 

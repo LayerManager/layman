@@ -7,7 +7,7 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
-- [#635](https://github.com/LayerManager/layman/issues/635) Endpoint [POST Workspace Layers](doc/rest.md#post-workspace-layers) supports new body parameter *time_regex*.
+- [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new body parameter *time_regex*.
 
 ## v1.17.0
  2022-07-21
