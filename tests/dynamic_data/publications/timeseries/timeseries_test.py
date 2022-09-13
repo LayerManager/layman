@@ -25,12 +25,6 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          params={'time_regex': time_regex},
                                          ) for name, time_regex in LAYERS.items()]
 
-    rest_parametrization = {
-        'method': [
-            base_test.RestMethodType('post_publication', 'post'),
-        ],
-    }
-
     # pylint: disable=unused-argument
     @staticmethod
     def test_overview_resampling(layer, key, params, rest_method):

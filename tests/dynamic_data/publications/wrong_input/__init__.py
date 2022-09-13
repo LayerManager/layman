@@ -662,6 +662,11 @@ TESTCASES = {
                                      },
                           },
         },
+        KEY_PATCHES: {
+            'full': {
+                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
+            },
+        },
     },
 }
 
