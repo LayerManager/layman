@@ -2,8 +2,9 @@ from collections import namedtuple
 import copy
 from dataclasses import dataclass, field
 import os
-from typing import final
+from typing import final, List
 import pytest
+import _pytest.mark.structures
 from test_tools import process_client, cleanup
 from .. import Publication, TestTypes, TestKeys
 
@@ -18,6 +19,7 @@ class TestCaseType:
     method: RestMethodType = None
     params: dict = field(default_factory=dict)
     type: TestTypes = TestTypes.OPTIONAL
+    marks: List[_pytest.mark.structures.Mark] = field(default_factory=list)
 
 
 def pytest_generate_tests(metafunc):
@@ -34,13 +36,14 @@ def pytest_generate_tests(metafunc):
                            test_type == TestTypes.OPTIONAL or test_case.type == TestTypes.MANDATORY]
     for test_case in test_cases_for_type:
         rest_method = getattr(cls, test_case.method.function_name)
-        argvalues.append([
+        argvalues.append(pytest.param(
             test_case.publication,
             test_case.key,
             copy.deepcopy(test_case.params),
             rest_method,
             (test_case.publication, test_case.method.name),
-        ])
+            marks=test_case.marks,
+        ))
         ids.append(test_case.pytest_id)
     publ_type_name = cls.publication_type.split('.')[-1] if cls.publication_type else 'publication'
     metafunc.parametrize(
@@ -94,6 +97,7 @@ class TestSingleRestPublication:
                                          method=rest_method,
                                          params=copy.deepcopy(input_test_case.params),
                                          type=input_test_case.type or TestTypes.OPTIONAL,
+                                         marks=input_test_case.marks,
                                          )
                 test_cases.append(test_case)
         return test_cases
