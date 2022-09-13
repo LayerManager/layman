@@ -647,6 +647,22 @@ TESTCASES = {
                           },
         },
     },
+    'wrong_time_regex': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'time_regex': '[',
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'detail': {'parameter': 'time_regex',
+                                     'expected': 'Regular expression',
+                                     },
+                          },
+        },
+    },
 }
 
 VALIDATION_PATCH_ACTION = {
