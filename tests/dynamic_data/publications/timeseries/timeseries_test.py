@@ -1,7 +1,7 @@
 import os
 
 from test_tools import process_client
-from tests import TestTypes
+from tests import TestTypes, Publication
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
 
@@ -22,14 +22,16 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     test_cases = [base_test.TestCaseType(key=name,
                                          type=TestTypes.MANDATORY,
-                                         params={'time_regex': time_regex},
+                                         params={'file_paths': ['sample/layman.layer/sample_tif_colortable_nodata.tif'],
+                                                 'time_regex': time_regex},
                                          ) for name, time_regex in LAYERS.items()]
 
     # pylint: disable=unused-argument
     @staticmethod
-    def test_overview_resampling(layer, key, params, rest_method):
+    def test_timeseries_layer(layer: Publication, key, params, rest_method):
         """Parametrized using pytest_generate_tests"""
         layer_params = {
+            **params,
             'time_regex': params['time_regex']
         }
         rest_method(layer, params=layer_params)

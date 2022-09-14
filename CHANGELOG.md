@@ -5,7 +5,9 @@
 ### Upgrade requirements
 ### Migrations and checks
 #### Schema migrations
+- [#635](https://github.com/LayerManager/layman/issues/635) Create new column `image_mosaic` in `publication` table.
 #### Data migrations
+- [#635](https://github.com/LayerManager/layman/issues/635) Fill column `image_mosaic` in `publications` table in prime DB schema for all publications. Value of each publication is set to `false`.
 ### Changes
 - [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new body parameter *time_regex*.
 

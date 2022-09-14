@@ -134,7 +134,7 @@ def patch(workspace, layername):
     kwargs['file_type'] = file_type
 
     # Timeseries regex
-    time_regex = request.form.get('time_regex', None)
+    time_regex = request.form.get('time_regex') or None
     if time_regex:
         try:
             import re
@@ -145,6 +145,7 @@ def patch(workspace, layername):
                                   }) from exp
 
     kwargs['time_regex'] = time_regex
+    kwargs['image_mosaic'] = time_regex is not None if delete_from == 'layman.layer.filesystem.input_file' else None
 
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
