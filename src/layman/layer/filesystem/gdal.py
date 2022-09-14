@@ -24,9 +24,13 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
                 }
             }
         }
+        norm_file_dict = result['_file']['normalized_file']
         if '_file.normalized_file.stats' in extra_keys:
             stats = get_statistics(gdal_path)
-            result['_file']['normalized_file']['stats'] = stats
+            norm_file_dict['stats'] = stats
+        if '_file.normalized_file.mask_flags' in extra_keys:
+            mask_flags = get_mask_flags(gdal_path)
+            norm_file_dict['mask_flags'] = mask_flags
     return result
 
 
