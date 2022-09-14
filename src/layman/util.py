@@ -341,7 +341,9 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
         LAYER_TYPE: 'get_layer_info',
         MAP_TYPE: 'get_map_info',
     }[publ_type]
-    partial_infos = call_modules_fn(sources, info_method, [workspace, publ_name])
+    partial_infos = call_modules_fn(sources, info_method, [workspace, publ_name], kwargs={
+        'extra_keys': context.get('extra_keys', []),
+    })
 
     result = {}
     for source, partial_info in partial_infos.items():
