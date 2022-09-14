@@ -131,6 +131,7 @@ def refresh_sld(self, workspace, layername, store_in_geoserver):
     if self.is_aborted():
         raise AbortedException
     if store_in_geoserver:
+        sld.ensure_custom_sld_file_if_needed(workspace, layername)
         sld.create_layer_style(workspace, layername)
 
     if self.is_aborted():
