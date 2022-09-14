@@ -28,4 +28,7 @@ def same_values_in_internal_and_rest(workspace, publ_type, name, rest_publicatio
     for key in {'layman_metadata', 'sld', 'url'}:
         rest_publication_detail.pop(key, None)
 
+    if 'image_mosaic' not in rest_publication_detail:
+        publ_info.pop('image_mosaic')
+
     assert publ_info == rest_publication_detail

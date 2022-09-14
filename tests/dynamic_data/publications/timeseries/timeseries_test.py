@@ -1,5 +1,6 @@
 import os
 
+from layman import util as layman_util, app
 from test_tools import process_client
 from tests import TestTypes, Publication
 from tests.asserts.final.publication import util as assert_util
@@ -37,3 +38,9 @@ class TestLayer(base_test.TestSingleRestPublication):
         rest_method(layer, params=layer_params)
 
         assert_util.is_publication_valid_and_complete(layer)
+
+        with app.app_context():
+            internal_info = layman_util.get_publication_info(layer.workspace, layer.type, layer.name, context={'keys': ['image_mosaic'], })
+            rest_info = process_client.get_workspace_layer(layer.workspace, layer.name)
+        assert internal_info['image_mosaic'] is True, f'internal_info={internal_info}'
+        assert rest_info['image_mosaic'] is True, f'rest_info={rest_info}'

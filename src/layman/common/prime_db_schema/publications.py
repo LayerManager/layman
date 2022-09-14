@@ -141,6 +141,7 @@ select p.id as id_publication,
        p.uuid::text,
        p.file_type,
        p.style_type,
+       p.image_mosaic,
        p.updated_at,
        ST_XMIN(p.bbox) as xmin,
        ST_YMIN(p.bbox) as ymin,
@@ -229,13 +230,14 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'type': publication_type,
                                    '_file_type': file_type,
                                    '_style_type': style_type,
+                                   'image_mosaic': image_mosaic,
                                    'updated_at': updated_at,
                                    'native_bounding_box': [xmin, ymin, xmax, ymax],
                                    'native_crs': db_util.get_crs(srid) if srid else None,
                                    'access_rights': {'read': can_read_users.split(','),
                                                      'write': can_write_users.split(',')}
                                    }
-             for id_publication, workspace_name, publication_type, publication_name, title, uuid, file_type, style_type, updated_at, xmin, ymin, xmax, ymax,
+             for id_publication, workspace_name, publication_type, publication_name, title, uuid, file_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
              srid, can_read_users, can_write_users, _
              in values}
 

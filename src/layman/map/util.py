@@ -144,6 +144,7 @@ def delete_map(workspace, mapname, kwargs=None):
 
 def clear_publication_info(layer_info):
     clear_info = common_clear_publication_info(layer_info)
+    clear_info.pop('image_mosaic')
     return clear_info
 
 

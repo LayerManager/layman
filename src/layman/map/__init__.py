@@ -49,7 +49,7 @@ PUBLICATION_TYPES = {
             ('layman.map.filesystem.uuid', InternalSourceTypeDef(info_items=[]),),
             ('layman.map.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'title', 'uuid',
                                                                                    'bounding_box', 'native_crs', 'native_bounding_box',
-                                                                                   'updated_at', 'type', 'id', ]),),
+                                                                                   'updated_at', 'type', 'id', 'image_mosaic']),),
             ('layman.map.filesystem.input_file', InternalSourceTypeDef(info_items=['description', 'file']),),
             ('layman.map.prime_db_schema.file_data', InternalSourceTypeDef(info_items=[]),),
             ('layman.map.filesystem.thumbnail', InternalSourceTypeDef(info_items=['thumbnail', ]),),
