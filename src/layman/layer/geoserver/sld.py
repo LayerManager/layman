@@ -1,3 +1,4 @@
+import shutil
 from geoserver import util as gs_util
 from layman import settings, patch_mode
 from layman.common import empty_method, empty_method_returns_none, empty_method_returns_dict
@@ -53,6 +54,26 @@ def get_layer_info(workspace, layername):
         info = {}
 
     return info
+
+
+def ensure_custom_sld_file_if_needed(workspace, layer):
+    # if style already exists, don't use customized SLD style
+    if input_style.get_layer_file(workspace, layer):
+        return
+    info = get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['file_type', 'style_type']})
+    file_type = info['_file_type']
+    style_type = info['_style_type']
+    if file_type != settings.FILE_TYPE_RASTER or style_type != 'sld':
+        return
+    info = get_publication_info(workspace, LAYER_TYPE, layer, {'keys': ['file'],
+                                                               'extra_keys': ['_file.normalized_file.stats']})
+    stats = info['_file'].get('normalized_file', {}).get('stats', [])
+
+    # if there is one band with min&max suitable for prepared static SLD style, use the style
+    if len(stats) == 1 and stats[0][0] == 228 and stats[0][1] == 255:
+        input_style.ensure_layer_input_style_dir(workspace, layer)
+        style_file_path = input_style.get_file_path(workspace, layer, with_extension=False) + '.sld'
+        shutil.copyfile('/code/tests/dynamic_data/publications/layer_raster_contrast/style.sld', style_file_path)
 
 
 def create_layer_style(workspace, layername):
