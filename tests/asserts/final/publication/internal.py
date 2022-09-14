@@ -221,6 +221,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        '_style_type': None,
                                    })
 
+    expected_detail['image_mosaic'] = False
     expected_detail = util.recursive_dict_update(expected_detail, exp_publication_detail)
 
     if keys_to_remove:
