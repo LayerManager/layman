@@ -9,11 +9,13 @@ from . import input_file, util
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
-def get_layer_info(workspace, layer):
+def get_layer_info(workspace, layer, *, extra_keys=None):
+    extra_keys = extra_keys or []
     gdal_path = get_normalized_raster_layer_main_filepath(workspace, layer)
     gdal_gs_path = get_normalized_raster_layer_main_filepath(workspace, layer, geoserver=True)
+    result = {}
     if os.path.exists(gdal_path):
-        return {
+        result = {
             'name': layer,
             '_file': {
                 'normalized_file': {
@@ -22,7 +24,10 @@ def get_layer_info(workspace, layer):
                 }
             }
         }
-    return {}
+        if '_file.normalized_file.stats' in extra_keys:
+            stats = get_statistics(gdal_path)
+            result['_file']['normalized_file']['stats'] = stats
+    return result
 
 
 get_publication_uuid = input_file.get_publication_uuid
