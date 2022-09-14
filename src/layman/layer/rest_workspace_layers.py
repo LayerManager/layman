@@ -111,7 +111,7 @@ def post(workspace):
     actor_name = authn.get_authn_username()
 
     # Timeseries regex
-    time_regex = request.form.get('time_regex', None)
+    time_regex = request.form.get('time_regex') or None
     if time_regex:
         try:
             import re
@@ -132,6 +132,7 @@ def post(workspace):
         'overview_resampling': overview_resampling,
         'file_type': file_type,
         'time_regex': time_regex,
+        'image_mosaic': time_regex is not None,
     }
 
     rest_common.setup_post_access_rights(request.form, task_options, actor_name)

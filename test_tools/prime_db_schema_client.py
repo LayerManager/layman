@@ -47,6 +47,7 @@ def post_workspace_publication(publication_type, workspace, name, *, actor=None,
             'file_type': file_type,
             'style_type': style_type,
             'access_rights': access_rights,
+            'image_mosaic': False
         })
         if bbox:
             publications.set_bbox(workspace, publication_type, name, bbox, crs)

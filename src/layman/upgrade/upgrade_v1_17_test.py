@@ -118,6 +118,7 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
                                          actor_name=None,
                                          file_type=settings.FILE_TYPE_VECTOR,
                                          style_type=style_type_def,
+                                         image_mosaic=False,
                                          )
         uuid_common.assign_publication_uuid(LAYER_TYPE, workspace, layer, uuid_str=uuid_str)
 

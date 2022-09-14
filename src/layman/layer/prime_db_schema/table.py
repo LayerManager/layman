@@ -28,11 +28,13 @@ def patch_layer(workspace,
                 style_type=None,
                 title=None,
                 access_rights=None,
+                image_mosaic=None,
                 ):
     db_info = {"name": layername,
                "title": title,
                "publ_type_name": LAYER_TYPE,
                "actor_name": actor_name,
+               'image_mosaic': image_mosaic,
                }
     if style_type:
         db_info['style_type'] = style_type.code
@@ -67,6 +69,7 @@ def post_layer(workspace,
                uuid,
                actor_name,
                file_type,
+               image_mosaic,
                style_type=None,
                ):
     db_info = {"name": layername,
@@ -77,6 +80,7 @@ def post_layer(workspace,
                "actor_name": actor_name,
                "file_type": file_type,
                'style_type': style_type.code if style_type else None,
+               'image_mosaic': image_mosaic,
                }
     pubs_util.insert_publication(workspace, db_info)
 

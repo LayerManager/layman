@@ -64,6 +64,7 @@ def post_map(workspace,
                "uuid": uuid,
                "access_rights": access_rights,
                "actor_name": actor_name,
+               'image_mosaic': False,
                }
     pubs_util.insert_publication(workspace, db_info)
 

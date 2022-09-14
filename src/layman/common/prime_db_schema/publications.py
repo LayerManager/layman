@@ -384,8 +384,8 @@ def insert_publication(workspace_name, info):
     check_publication_info(workspace_name, info)
 
     insert_publications_sql = f'''insert into {DB_SCHEMA}.publications as p
-        (id_workspace, name, title, type, uuid, style_type, file_type, everyone_can_read, everyone_can_write, updated_at) values
-        (%s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp)
+        (id_workspace, name, title, type, uuid, style_type, file_type, everyone_can_read, everyone_can_write, updated_at, image_mosaic) values
+        (%s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp, %s)
 returning id
 ;'''
 
@@ -398,6 +398,7 @@ returning id
             info.get('file_type'),
             ROLE_EVERYONE in info['access_rights']['read'],
             ROLE_EVERYONE in info['access_rights']['write'],
+            info.get("image_mosaic"),
             )
     pub_id = db_util.run_query(insert_publications_sql, data)[0][0]
 
@@ -448,7 +449,8 @@ def update_publication(workspace_name, info):
     style_type = coalesce(%s, style_type),
     everyone_can_read = coalesce(%s, everyone_can_read),
     everyone_can_write = coalesce(%s, everyone_can_write),
-    updated_at =  current_timestamp
+    updated_at =  current_timestamp,
+    image_mosaic = coalesce(%s, image_mosaic)
 where id_workspace = %s
   and name = %s
   and type = %s
@@ -459,6 +461,7 @@ returning id
             info.get('style_type'),
             access_rights_changes['read']['EVERYONE'],
             access_rights_changes['write']['EVERYONE'],
+            info.get("image_mosaic"),
             id_workspace,
             info.get("name"),
             info.get("publ_type_name"),

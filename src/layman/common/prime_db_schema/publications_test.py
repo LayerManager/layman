@@ -45,6 +45,7 @@ def test_publication_basic():
                        "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
                                          "write": {settings.RIGHTS_EVERYONE_ROLE, },
                                          },
+                       'image_mosaic': False,
                        }
             publications.insert_publication(username, db_info)
             pubs = publications.get_publication_infos(username, publication_type)
@@ -812,6 +813,7 @@ def test_insert_rights():
         publication_info.update({"access_rights": access_rights})
         if users.get_user_infos(username):
             publication_info.update({"actor_name": username})
+        publication_info['image_mosaic'] = False
         publications.insert_publication(username, publication_info)
         assert_access_rights(username,
                              publication_info_original["name"],
@@ -940,6 +942,7 @@ def test_update_rights():
                                "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
                                                  "write": {settings.RIGHTS_EVERYONE_ROLE, },
                                                  },
+                               "image_mosaic": False,
                                }
 
     with app.app_context():

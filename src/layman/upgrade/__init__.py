@@ -1,7 +1,7 @@
 import logging
 
 from db import util as db_util
-from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_16, upgrade_v1_17
+from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_16, upgrade_v1_17, upgrade_v1_18
 from layman import settings
 from . import consts
 
@@ -27,6 +27,9 @@ MIGRATIONS = {
         ((1, 17, 0), [
             upgrade_v1_17.adjust_db_for_file_type,
         ]),
+        ((1, 18, 0), [
+            upgrade_v1_18.adjust_db_for_image_mosaic,
+        ])
     ],
     consts.MIGRATION_TYPE_DATA: [
         ((1, 16, 0), [
