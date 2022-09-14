@@ -12,8 +12,8 @@
                 <sld:SourceChannelName>1</sld:SourceChannelName>
                 <sld:ContrastEnhancement>
                   <sld:Normalize>
-                    <sld:VendorOption name="minValue">228</sld:VendorOption>
-                    <sld:VendorOption name="maxValue">255</sld:VendorOption>
+                    <sld:VendorOption name="minValue">{min_value}</sld:VendorOption>
+                    <sld:VendorOption name="maxValue">{max_value}</sld:VendorOption>
                     <sld:VendorOption name="algorithm">StretchToMinimumMaximum</sld:VendorOption>
                   </sld:Normalize>
                 </sld:ContrastEnhancement>

@@ -1,4 +1,5 @@
-import shutil
+import os
+from osgeo import gdalconst
 from geoserver import util as gs_util
 from layman import settings, patch_mode
 from layman.common import empty_method, empty_method_returns_none, empty_method_returns_dict
@@ -9,6 +10,7 @@ from .. import LAYER_TYPE
 from ...util import url_for, get_publication_info
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
+DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 get_metadata_comparison = empty_method_returns_dict
 pre_publication_action_check = empty_method
@@ -66,14 +68,27 @@ def ensure_custom_sld_file_if_needed(workspace, layer):
     if file_type != settings.FILE_TYPE_RASTER or style_type != 'sld':
         return
     info = get_publication_info(workspace, LAYER_TYPE, layer, {'keys': ['file'],
-                                                               'extra_keys': ['_file.normalized_file.stats']})
-    stats = info['_file'].get('normalized_file', {}).get('stats', [])
+                                                               'extra_keys': [
+                                                                   '_file.normalized_file.stats',
+                                                                   '_file.normalized_file.mask_flags',
+                                                               ]})
+    norm_file_dict = info['_file']['normalized_file']
+    stats = norm_file_dict['stats']
+    mask_flags = norm_file_dict['mask_flags']
 
-    # if there is one band with min&max suitable for prepared static SLD style, use the style
-    if len(stats) == 1 and stats[0][0] == 228 and stats[0][1] == 255:
+    # if there is one band without mask flags
+    if mask_flags == [{gdalconst.GMF_ALL_VALID}]:
         input_style.ensure_layer_input_style_dir(workspace, layer)
         style_file_path = input_style.get_file_path(workspace, layer, with_extension=False) + '.sld'
-        shutil.copyfile('/code/tests/dynamic_data/publications/layer_raster_contrast/style.sld', style_file_path)
+        create_customized_grayscale_sld(file_path=style_file_path, min_value=stats[0][0], max_value=stats[0][1])
+
+
+def create_customized_grayscale_sld(*, file_path, min_value, max_value):
+    with open(os.path.join(DIRECTORY, 'sld_customized_raster_template.sld'), 'r') as template_file:
+        template_str = template_file.read()
+    xml_str = template_str.format(min_value=min_value, max_value=max_value)
+    with open(file_path, 'w') as file:
+        file.write(xml_str)
 
 
 def create_layer_style(workspace, layername):
