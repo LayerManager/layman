@@ -13,6 +13,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 TEST_CASES = {
     'tif_byte': {},
+    'tif_float': {},
     'tif_byte_nodata': {'xfail': True},
 }
 
