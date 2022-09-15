@@ -159,7 +159,7 @@ Body parameters:
    - by default it is read/guessed from input file
 - *style*, style file
    - by default either default SLD style of GeoServer, or customized SLD created by Layman is used
-     - default customized SLD file is created only for one-band grayscale raster input files without nodata; [ContrastEnhancement with StretchToMinimumMaximum algorithm](https://docs.geoserver.org/latest/en/user/styling/sld/reference/rastersymbolizer.html#contrastenhancement) is used
+     - default customized SLD file is created only for one-band grayscale raster input files without nodata; [ColorMap with type `ramp`](https://docs.geoserver.org/stable/en/user/styling/sld/reference/rastersymbolizer.html#colormap) is used
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
      - QML style for raster data file is not supported
      - It's possible to encode also external images in QML styles and use them in the style. To do so, each image needs to be encoded in Base64 encoding inside QML file. You can achieve it by selecting "Embed File" option in QGIS Layer Symbology window, see e.g. QGIS issues [2815](https://github.com/qgis/QGIS-Documentation/issues/2815) or [4563](https://github.com/qgis/QGIS-Documentation/pull/4563).
