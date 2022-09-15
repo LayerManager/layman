@@ -67,12 +67,13 @@ def ensure_custom_sld_file_if_needed(workspace, layer):
     style_type = info['_style_type']
     if file_type != settings.FILE_TYPE_RASTER or style_type != 'sld':
         return
-    info = get_publication_info(workspace, LAYER_TYPE, layer, {'keys': ['file'],
-                                                               'extra_keys': [
-                                                                   '_file.normalized_file.stats',
-                                                                   '_file.normalized_file.mask_flags',
-                                                                   '_file.normalized_file.color_interpretations',
-                                                               ]})
+    info = get_publication_info(workspace, LAYER_TYPE, layer, {
+        'keys': ['file'],
+        'extra_keys': [
+            '_file.normalized_file.stats',
+            '_file.normalized_file.mask_flags',
+            '_file.normalized_file.color_interpretations',
+        ]})
     norm_file_dict = info['_file']['normalized_file']
     stats = norm_file_dict['stats']
     mask_flags = norm_file_dict['mask_flags']
