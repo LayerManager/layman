@@ -11,7 +11,7 @@ from layman import LaymanError, util as layman_util, celery as celery_util, sett
 from layman.authn.filesystem import get_authn_info
 from layman.common.micka import util as micka_util
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
-from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info
+from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info as common_clear_publication_info
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for
 from . import get_map_sources, MAP_TYPE, get_map_type_def, get_map_info_keys
@@ -140,6 +140,11 @@ def delete_map(workspace, mapname, kwargs=None):
     sources = get_sources()
     call_modules_fn(sources[::-1], 'delete_map', [workspace, mapname], kwargs=kwargs)
     celery_util.delete_publication(workspace, MAP_TYPE, mapname)
+
+
+def clear_publication_info(layer_info):
+    clear_info = common_clear_publication_info(layer_info)
+    return clear_info
 
 
 def get_complete_map_info(workspace=None, mapname=None, cached=False):

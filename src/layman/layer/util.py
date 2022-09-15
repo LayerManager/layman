@@ -8,7 +8,7 @@ from layman.util import call_modules_fn, get_providers_from_source_names, get_in
     to_safe_name, url_for
 from layman import celery as celery_util, common
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
-from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info
+from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info as common_clear_publication_info
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_keys
 
 LAYERNAME_PATTERN = PUBLICATION_NAME_PATTERN
@@ -85,6 +85,11 @@ def get_layer_info(workspace, layername, context=None):
 
     filled_partial_info = fill_in_partial_info_statuses(partial_info, chain_info)
     return filled_partial_info
+
+
+def clear_publication_info(layer_info):
+    clear_info = common_clear_publication_info(layer_info)
+    return clear_info
 
 
 def get_complete_layer_info(workspace=None, layername=None, cached=False):
