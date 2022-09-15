@@ -10,18 +10,11 @@
             <sld:ChannelSelection>
               <sld:GrayChannel>
                 <sld:SourceChannelName>1</sld:SourceChannelName>
-                <sld:ContrastEnhancement>
-                  <sld:Normalize>
-                    <sld:VendorOption name="minValue">{min_value}</sld:VendorOption>
-                    <sld:VendorOption name="maxValue">{max_value}</sld:VendorOption>
-                    <sld:VendorOption name="algorithm">StretchToMinimumMaximum</sld:VendorOption>
-                  </sld:Normalize>
-                </sld:ContrastEnhancement>
               </sld:GrayChannel>
             </sld:ChannelSelection>
             <sld:ColorMap>
-              <sld:ColorMapEntry color="#000000" quantity="0"/>
-              <sld:ColorMapEntry color="#ffffff" quantity="255"/>
+              <sld:ColorMapEntry color="#000000" quantity="{min_value}"/>
+              <sld:ColorMapEntry color="#ffffff" quantity="{max_value}"/>
             </sld:ColorMap>
             <sld:ContrastEnhancement/>
           </sld:RasterSymbolizer>
