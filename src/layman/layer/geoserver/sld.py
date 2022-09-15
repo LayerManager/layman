@@ -71,13 +71,15 @@ def ensure_custom_sld_file_if_needed(workspace, layer):
                                                                'extra_keys': [
                                                                    '_file.normalized_file.stats',
                                                                    '_file.normalized_file.mask_flags',
+                                                                   '_file.normalized_file.color_interpretations',
                                                                ]})
     norm_file_dict = info['_file']['normalized_file']
     stats = norm_file_dict['stats']
     mask_flags = norm_file_dict['mask_flags']
+    color_interpretations = norm_file_dict['color_interpretations']
 
-    # if there is one band without mask flags
-    if mask_flags == [{gdalconst.GMF_ALL_VALID}]:
+    # if there is one grayscale band without mask flags
+    if color_interpretations == ['Gray'] and mask_flags == [{gdalconst.GMF_ALL_VALID}]:
         input_style.ensure_layer_input_style_dir(workspace, layer)
         style_file_path = input_style.get_file_path(workspace, layer, with_extension=False) + '.sld'
         create_customized_grayscale_sld(file_path=style_file_path, min_value=stats[0][0], max_value=stats[0][1])

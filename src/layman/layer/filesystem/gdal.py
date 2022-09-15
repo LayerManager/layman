@@ -31,6 +31,9 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
         if '_file.normalized_file.mask_flags' in extra_keys:
             mask_flags = get_mask_flags(gdal_path)
             norm_file_dict['mask_flags'] = mask_flags
+        if '_file.normalized_file.color_interpretations' in extra_keys:
+            color_interpretations = get_color_interpretations(gdal_path)
+            norm_file_dict['color_interpretations'] = color_interpretations
     return result
 
 
