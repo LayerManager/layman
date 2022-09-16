@@ -43,6 +43,9 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
         if '_file.normalized_file.color_interpretations' in extra_keys:
             color_interpretations = get_color_interpretations(gdal_paths[0])
             norm_file_dict['color_interpretations'] = color_interpretations
+        if '_file.normalized_file.nodata_value' in extra_keys:
+            nodata_value = to_nodata_value(get_nodata_values(gdal_paths[0]))
+            norm_file_dict['nodata_value'] = nodata_value
     return result
 
 

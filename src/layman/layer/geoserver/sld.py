@@ -71,6 +71,7 @@ def ensure_custom_sld_file_if_needed(workspace, layer):
         'keys': ['file'],
         'extra_keys': [
             '_file.normalized_file.stats',
+            '_file.normalized_file.nodata_value',
             '_file.mask_flags',
             '_file.color_interpretations',
         ]})
@@ -79,18 +80,23 @@ def ensure_custom_sld_file_if_needed(workspace, layer):
     input_mask_flags = file_dict['mask_flags']
     norm_file_dict = file_dict['normalized_file']
     norm_stats = norm_file_dict['stats']
+    norm_nodata_value = norm_file_dict['nodata_value']
 
     # if there is one grayscale band without mask flags
-    if input_color_interpretations == ['Gray'] and input_mask_flags == [{gdalconst.GMF_ALL_VALID}]:
+    if input_color_interpretations == ['Gray'] and input_mask_flags[0].issubset({gdalconst.GMF_ALL_VALID, gdalconst.GMF_NODATA}):
         input_style.ensure_layer_input_style_dir(workspace, layer)
         style_file_path = input_style.get_file_path(workspace, layer, with_extension=False) + '.sld'
-        create_customized_grayscale_sld(file_path=style_file_path, min_value=norm_stats[0][0], max_value=norm_stats[0][1])
+        create_customized_grayscale_sld(file_path=style_file_path, min_value=norm_stats[0][0],
+                                        max_value=norm_stats[0][1], nodata_value=norm_nodata_value)
 
 
-def create_customized_grayscale_sld(*, file_path, min_value, max_value):
+def create_customized_grayscale_sld(*, file_path, min_value, max_value, nodata_value):
+    nodata_high_entry = ''
+    if nodata_value is not None and nodata_value > max_value:
+        nodata_high_entry = f'<sld:ColorMapEntry color="#ffffff" quantity="{nodata_value}" opacity="0" />'
     with open(os.path.join(DIRECTORY, 'sld_customized_raster_template.sld'), 'r') as template_file:
         template_str = template_file.read()
-    xml_str = template_str.format(min_value=min_value, max_value=max_value)
+    xml_str = template_str.format(min_value=min_value, max_value=max_value, nodata_high_entry=nodata_high_entry)
     with open(file_path, 'w') as file:
         file.write(xml_str)
 
