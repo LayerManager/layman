@@ -10,8 +10,15 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 pytest_generate_tests = base_test.pytest_generate_tests
 
+DEFAULT_TIME_REGEXP = r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)'
+
 LAYERS = {
-    'default': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+    'default': {
+        'params': {
+            'time_regex': DEFAULT_TIME_REGEXP,
+            'file_paths': ['sample/layman.layer/sample_tif_colortable_nodata.tif'],
+        }
+    },
 }
 
 
@@ -23,9 +30,8 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     test_cases = [base_test.TestCaseType(key=name,
                                          type=TestTypes.MANDATORY,
-                                         params={'file_paths': ['sample/layman.layer/sample_tif_colortable_nodata.tif'],
-                                                 'time_regex': time_regex},
-                                         ) for name, time_regex in LAYERS.items()]
+                                         params=test_case_params.get('params', {}),
+                                         ) for name, test_case_params in LAYERS.items()]
 
     # pylint: disable=unused-argument
     @staticmethod
@@ -33,7 +39,6 @@ class TestLayer(base_test.TestSingleRestPublication):
         """Parametrized using pytest_generate_tests"""
         layer_params = {
             **params,
-            'time_regex': params['time_regex']
         }
         rest_method(layer, params=layer_params)
 
