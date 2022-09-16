@@ -1,9 +1,8 @@
 import os
 
-from layman import util as layman_util, app
 from test_tools import process_client
 from tests import TestTypes, Publication
-from tests.asserts.final.publication import util as assert_util
+from tests.asserts.final.publication import util as assert_util, internal as assert_internal
 from tests.dynamic_data import base_test
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -17,7 +16,17 @@ LAYERS = {
         'params': {
             'time_regex': DEFAULT_TIME_REGEXP,
             'file_paths': ['sample/layman.layer/sample_tif_colortable_nodata.tif'],
-        }
+        },
+        'detail_values': {
+            'exp_publication_detail': {
+                'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
+                'native_crs': 'EPSG:3857',
+                'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
+                'image_mosaic': True,
+            },
+            'file_extension': 'tif',
+            'publ_type_detail': ('raster', 'sld'),
+        },
     },
 }
 
@@ -28,24 +37,25 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     publication_type = process_client.LAYER_TYPE
 
+    rest_parametrization = {
+        'method': [
+            base_test.RestMethodType('post_publication', 'post'),
+        ],
+    }
+
     test_cases = [base_test.TestCaseType(key=name,
                                          type=TestTypes.MANDATORY,
-                                         params=test_case_params.get('params', {}),
+                                         params=test_case_params,
                                          ) for name, test_case_params in LAYERS.items()]
 
     # pylint: disable=unused-argument
     @staticmethod
     def test_timeseries_layer(layer: Publication, key, params, rest_method):
         """Parametrized using pytest_generate_tests"""
-        layer_params = {
-            **params,
-        }
-        rest_method(layer, params=layer_params)
+        rest_method(layer, params=params.get('params', {}))
 
         assert_util.is_publication_valid_and_complete(layer)
 
-        with app.app_context():
-            internal_info = layman_util.get_publication_info(layer.workspace, layer.type, layer.name, context={'keys': ['image_mosaic'], })
-            rest_info = process_client.get_workspace_layer(layer.workspace, layer.name)
-        assert internal_info['image_mosaic'] is True, f'internal_info={internal_info}'
-        assert rest_info['image_mosaic'] is True, f'rest_info={rest_info}'
+        assert_internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
+                                                 **params.get('detail_values', {}),
+                                                 )
