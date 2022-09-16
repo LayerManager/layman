@@ -45,7 +45,6 @@ LAYERS = {
             'file_extension': 'zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
             'gdal_prefix': '/vsizip/',
         },
-        'xfail': True,
     }
 }
 

@@ -169,9 +169,9 @@ def check_raster_layer_crs(main_filepath):
     check_spatial_ref_crs(crs)
 
 
-def check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=False):
+def check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=False, enable_more_main_files=False):
     main_files = input_files.raw_or_archived_main_file_paths
-    if len(main_files) > 1:
+    if len(main_files) > 1 and not enable_more_main_files:
         raise LaymanError(2, {'parameter': 'file',
                               'expected': 'At most one file with any of extensions: '
                                           + ', '.join(util.get_all_allowed_main_extensions()),

@@ -74,10 +74,21 @@ def post(workspace):
             raise LaymanError(2, {'parameter': 'crs', 'supported_values': settings.INPUT_SRS_LIST})
     check_crs = crs_id is None
 
+    # Timeseries regex
+    time_regex = request.form.get('time_regex') or None
+    if time_regex:
+        try:
+            import re
+            re.compile(time_regex)
+        except re.error as exp:
+            raise LaymanError(2, {'parameter': 'time_regex',
+                                  'expected': 'Regular expression',
+                                  }) from exp
+
     # FILE NAMES
     use_chunk_upload = not input_files.sent_streams
     if not (use_chunk_upload and input_files.is_one_archive):
-        input_file.check_filenames(workspace, layername, input_files, check_crs)
+        input_file.check_filenames(workspace, layername, input_files, check_crs, enable_more_main_files=time_regex is not None)
     file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
 
     # TITLE
@@ -109,17 +120,6 @@ def post(workspace):
                                          'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, })
 
     actor_name = authn.get_authn_username()
-
-    # Timeseries regex
-    time_regex = request.form.get('time_regex') or None
-    if time_regex:
-        try:
-            import re
-            re.compile(time_regex)
-        except re.error as exp:
-            raise LaymanError(2, {'parameter': 'time_regex',
-                                  'expected': 'Regular expression',
-                                  }) from exp
 
     task_options = {
         'crs_id': crs_id,

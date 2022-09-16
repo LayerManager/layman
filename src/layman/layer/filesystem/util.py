@@ -101,7 +101,7 @@ class InputFiles:
     @property
     def raw_or_archived_main_file_path(self):
         paths = self.raw_or_archived_main_file_paths
-        if len(paths) == 1:
+        if len(paths) >= 1:
             return paths[0]
         return None
 
