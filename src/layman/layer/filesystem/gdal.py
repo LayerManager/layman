@@ -27,7 +27,13 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
                 }
             }
         }
-        norm_file_dict = result['_file']['normalized_file']
+        file_dict = result['_file']
+        input_file_gdal_path = input_file.get_layer_info(workspace, layer)['_file']['gdal_paths'][0]
+        if '_file.color_interpretations' in extra_keys:
+            file_dict['color_interpretations'] = get_color_interpretations(input_file_gdal_path)
+        if '_file.mask_flags' in extra_keys:
+            file_dict['mask_flags'] = get_mask_flags(input_file_gdal_path)
+        norm_file_dict = file_dict['normalized_file']
         if '_file.normalized_file.stats' in extra_keys:
             stats = get_statistics(gdal_paths[0])
             norm_file_dict['stats'] = stats
