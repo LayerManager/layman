@@ -142,6 +142,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
         },
         '_thumbnail': {'path': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/thumbnail/{name}.png'},
         'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
+        'image_mosaic': False,
     }
     if publ_type == process_client.LAYER_TYPE:
         util.recursive_dict_update(expected_detail,
@@ -221,7 +222,6 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        '_style_type': None,
                                    })
 
-    expected_detail['image_mosaic'] = False
     expected_detail = util.recursive_dict_update(expected_detail, exp_publication_detail)
 
     if keys_to_remove:
