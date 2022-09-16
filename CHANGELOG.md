@@ -11,7 +11,7 @@
 ### Changes
 - [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new body parameter *time_regex*.
 - [#635](https://github.com/LayerManager/layman/issues/635) Endpoint [POST Workspace Layers](doc/rest.md#post-workspace-layers) support more main raster files in combination with *time_regex* parameter.
-- [#446](https://github.com/LayerManager/layman/issues/446) If endpoint [POST Workspace Layers](doc/rest.md#post-workspace-layers) receives one-band grayscale input raster file without nodata value and if no input style was sent with the raster file, then Layman will automatically create and use customized SLD style with stable contrast.
+- [#446](https://github.com/LayerManager/layman/issues/446) If endpoint [POST Workspace Layers](doc/rest.md#post-workspace-layers) receives one-band grayscale input raster file and if no input style was sent with the raster file, then Layman will automatically create and use customized SLD style with stable contrast.
 - [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) returns new key `image_mosaic` for raster layers.
 - [#635](https://github.com/LayerManager/layman/issues/635) Stored data files are not renamed to `<layer_name>.ext` format for image_mosaic layers. This applies both to files stored in Layman and normalized raster files stored in GeoServer. 
 
