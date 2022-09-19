@@ -85,6 +85,8 @@ def post(workspace):
                                   'expected': 'Regular expression',
                                   }) from exp
 
+    normalize_filenames = time_regex is None
+
     # FILE NAMES
     use_chunk_upload = not input_files.sent_streams
     if not (use_chunk_upload and input_files.is_one_archive):
@@ -136,6 +138,7 @@ def post(workspace):
         'file_type': file_type,
         'time_regex': time_regex,
         'image_mosaic': time_regex is not None,
+        'normalize_filenames': normalize_filenames,
     }
 
     rest_common.setup_post_access_rights(request.form, task_options, actor_name)
@@ -174,7 +177,7 @@ def post(workspace):
             })
         else:
             try:
-                input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling)
+                input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, normalize_filenames=normalize_filenames)
             except BaseException as exc:
                 uuid.delete_layer(workspace, layername)
                 input_file.delete_layer(workspace, layername)
