@@ -111,6 +111,9 @@ def post(workspace):
     if file_type == settings.FILE_TYPE_RASTER and style_type.code == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
 
+    if file_type == settings.FILE_TYPE_VECTOR and time_regex is not None:
+        raise LaymanError(48, f'Vector layers are not allowed to be combined with `time_regex` parameter.')
+
     # Overview resampling
     overview_resampling = request.form.get('overview_resampling', '')
     if overview_resampling and overview_resampling not in settings.OVERVIEW_RESAMPLING_METHOD_LIST:
