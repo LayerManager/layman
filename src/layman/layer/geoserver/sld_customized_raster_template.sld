@@ -13,6 +13,7 @@
               </sld:GrayChannel>
             </sld:ChannelSelection>
             <sld:ColorMap>
+              {nodata_low_entry}
               <sld:ColorMapEntry color="#000000" quantity="{min_value}"/>
               <sld:ColorMapEntry color="#ffffff" quantity="{max_value}"/>
               {nodata_high_entry}
