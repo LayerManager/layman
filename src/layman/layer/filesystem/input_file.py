@@ -42,7 +42,7 @@ def get_compressed_main_file_extension(filepath):
 
 def get_layer_input_files(workspace, layername):
     input_file_dir = get_layer_input_file_dir(workspace, layername)
-    pattern = os.path.join(input_file_dir, layername + '.*')
+    pattern = os.path.join(input_file_dir, '*.*')
     filepaths = glob.glob(pattern)
     return util.InputFiles(saved_paths=filepaths)
 
@@ -242,14 +242,14 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
             raise LaymanError(3, conflict_paths)
 
 
-def save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, *, output_dir=None, ):
+def save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, *, output_dir=None, normalize_filenames=True):
     if input_files.is_one_archive:
         main_filename = input_files.raw_paths_to_archives[0]
     else:
         main_filename = input_files.raw_or_archived_main_file_path
     output_dir = output_dir or ensure_layer_input_file_dir(workspace, layername)
     _, filepath_mapping = get_file_name_mappings(
-        input_files.raw_paths, main_filename, layername, output_dir
+        input_files.raw_paths, main_filename, layername, output_dir, normalize_filenames=normalize_filenames
     )
 
     common.save_files(input_files.sent_streams, filepath_mapping)
@@ -267,16 +267,20 @@ def get_unsafe_layername(input_files):
     return unsafe_layername
 
 
-def get_file_name_mappings(file_names, main_file_name, layer_name, output_dir):
+def get_file_name_mappings(file_names, main_file_name, layer_name, output_dir, *, normalize_filenames=True):
     main_file_name = os.path.splitext(main_file_name)[0]
     filename_mapping = {}
     filepath_mapping = {}
-    for file_name in file_names:
-        if file_name.startswith(main_file_name + '.'):
-            new_fn = layer_name + file_name[len(main_file_name):].lower()
-            filepath_mapping[file_name] = os.path.join(output_dir, new_fn)
-            filename_mapping[file_name] = new_fn
-        else:
-            filename_mapping[file_name] = None
-            filepath_mapping[file_name] = None
+    if normalize_filenames:
+        for file_name in file_names:
+            if file_name.startswith(main_file_name + '.'):
+                new_fn = layer_name + file_name[len(main_file_name):].lower()
+                filepath_mapping[file_name] = os.path.join(output_dir, new_fn)
+                filename_mapping[file_name] = new_fn
+            else:
+                filename_mapping[file_name] = None
+                filepath_mapping[file_name] = None
+    else:
+        filename_mapping = {file_name: file_name for file_name in file_names}
+        filepath_mapping = {file_name: os.path.join(output_dir, file_name) for file_name in file_names}
     return (filename_mapping, filepath_mapping)
