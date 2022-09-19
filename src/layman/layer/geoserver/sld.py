@@ -93,10 +93,14 @@ def ensure_custom_sld_file_if_needed(workspace, layer):
 def create_customized_grayscale_sld(*, file_path, min_value, max_value, nodata_value):
     nodata_high_entry = ''
     nodata_low_entry = ''
+    # It seems GS changes NoData values to 0 during rendering,
+    # and then it treats both NoData cells and 0 cells in the same way.
     if nodata_value is not None:
         # if nodata_value > max_value, setting nodata_high_entry seems not necessary
         if nodata_value < min_value:
             nodata_low_entry = f'<sld:ColorMapEntry color="#000000" quantity="{nodata_value}" opacity="0" />'
+        if min_value < nodata_value < max_value:
+            nodata_low_entry = f'<sld:ColorMapEntry color="#000000" quantity="0" opacity="0" />'
     with open(os.path.join(DIRECTORY, 'sld_customized_raster_template.sld'), 'r') as template_file:
         template_str = template_file.read()
     xml_str = template_str.format(min_value=min_value, max_value=max_value, nodata_high_entry=nodata_high_entry,
