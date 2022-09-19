@@ -15,6 +15,7 @@ TEST_CASES = {
     'tif_byte': {},
     'tif_float': {},
     'tif_byte_nodata_high': {},  # nodata > max value
+    'tif_byte_nodata_low': {},  # nodata < min value
 }
 
 

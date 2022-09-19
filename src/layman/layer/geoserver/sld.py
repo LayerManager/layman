@@ -92,11 +92,16 @@ def ensure_custom_sld_file_if_needed(workspace, layer):
 
 def create_customized_grayscale_sld(*, file_path, min_value, max_value, nodata_value):
     nodata_high_entry = ''
-    if nodata_value is not None and nodata_value > max_value:
-        nodata_high_entry = f'<sld:ColorMapEntry color="#ffffff" quantity="{nodata_value}" opacity="0" />'
+    nodata_low_entry = ''
+    if nodata_value is not None:
+        if nodata_value > max_value:
+            nodata_high_entry = f'<sld:ColorMapEntry color="#ffffff" quantity="{nodata_value}" opacity="0" />'
+        elif nodata_value < min_value:
+            nodata_low_entry = f'<sld:ColorMapEntry color="#000000" quantity="{nodata_value}" opacity="0" />'
     with open(os.path.join(DIRECTORY, 'sld_customized_raster_template.sld'), 'r') as template_file:
         template_str = template_file.read()
-    xml_str = template_str.format(min_value=min_value, max_value=max_value, nodata_high_entry=nodata_high_entry)
+    xml_str = template_str.format(min_value=min_value, max_value=max_value, nodata_high_entry=nodata_high_entry,
+                                  nodata_low_entry=nodata_low_entry)
     with open(file_path, 'w') as file:
         file.write(xml_str)
 
