@@ -170,7 +170,7 @@ def post(workspace):
         input_style.save_layer_file(workspace, layername, style_file, style_type)
         if use_chunk_upload:
             files_to_upload = input_chunk.save_layer_files_str(
-                workspace, layername, input_files, check_crs)
+                workspace, layername, input_files, check_crs, normalize_filenames=normalize_filenames)
             layer_result.update({
                 'files_to_upload': files_to_upload,
             })
