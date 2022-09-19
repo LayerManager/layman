@@ -86,11 +86,12 @@ def post(workspace):
                                   }) from exp
 
     normalize_filenames = time_regex is None
+    enable_more_main_files = time_regex is not None
 
     # FILE NAMES
     use_chunk_upload = not input_files.sent_streams
     if not (use_chunk_upload and input_files.is_one_archive):
-        input_file.check_filenames(workspace, layername, input_files, check_crs, enable_more_main_files=time_regex is not None)
+        input_file.check_filenames(workspace, layername, input_files, check_crs, enable_more_main_files=enable_more_main_files)
     file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
 
     # TITLE
@@ -139,6 +140,7 @@ def post(workspace):
         'time_regex': time_regex,
         'image_mosaic': time_regex is not None,
         'normalize_filenames': normalize_filenames,
+        'enable_more_main_files': enable_more_main_files,
     }
 
     rest_common.setup_post_access_rights(request.form, task_options, actor_name)
