@@ -87,6 +87,31 @@ LAYERS = {
             'file_extension': 'tif',
         },
     },
+    'more_files_zip_chunk': {
+        'params': {
+            'time_regex': r'[0-9]{8}',
+            'file_paths': [os.path.join(DIRECTORY, 'timeseries_tif.zip')],
+            'with_chunks': True,
+        },
+        'detail_values': {
+            'exp_publication_detail': {
+                'bounding_box': [1737105.4141226907, 6491458.724017749, 1765157.537707582, 6509901.824098258],
+                'native_crs': 'EPSG:32633',
+                'native_bounding_box': [543100.0, 5567910.0, 560930.0, 5579500.0],
+                'image_mosaic': True,
+                '_file': {
+                    'gdal_path': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                    'path': '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                },
+                'file': {
+                    'path': 'layers/layer_more_files_zip_chunk_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                },
+            },
+            'publ_type_detail': ('raster', 'sld'),
+            'file_extension': 'zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+            'gdal_prefix': '/vsizip/',
+        },
+    },
 }
 
 
