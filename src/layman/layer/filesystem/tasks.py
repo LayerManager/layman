@@ -106,7 +106,8 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
         pass
     finish_gdal_process(process)
 
-    process = gdal.compress_raster_file_async(workspace, layername, file_to_compress=tmp_vrt_file)
+    normalize_file_path = os.path.join(gdal.get_normalized_raster_layer_dir(workspace, layername, ), f"{layername}.tif")
+    process = gdal.compress_raster_file_async(output_file=normalize_file_path, file_to_compress=tmp_vrt_file, )
     while process.poll() is None and not self.is_aborted():
         pass
     if vrt_file_path:
@@ -120,7 +121,7 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
         pass
     finish_gdal_process(process)
 
-    process = gdal.add_overview_async(workspace, layername, overview_resampling=overview_resampling)
+    process = gdal.add_overview_async(filepath=normalize_file_path, overview_resampling=overview_resampling, )
     while process.poll() is None and not self.is_aborted():
         pass
     finish_gdal_process(process)
