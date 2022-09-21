@@ -91,20 +91,30 @@ def ensure_custom_sld_file_if_needed(workspace, layer):
 
 
 def create_customized_grayscale_sld(*, file_path, min_value, max_value, nodata_value):
-    nodata_high_entry = ''
+    nodata_high_entry = f"<!-- min_value={min_value}, max_value={max_value}, nodata_value={nodata_value} -->"
+    nodata_middle_entry = ''
     nodata_low_entry = ''
+    min_difference = 0.00001
     # It seems GS changes NoData values to 0 during rendering,
     # and then it treats both NoData cells and 0 cells in the same way.
     if nodata_value is not None:
         # if nodata_value > max_value, setting nodata_high_entry seems not necessary
-        if nodata_value < min_value:
+        if min_value <= 0 <= max_value:
+            zero_ratio = (0 - min_value) / (max_value - min_value)
+            zero_color = f"{round(zero_ratio * 256):02X}" * 3
+            nodata_middle_entry = f'''
+            <sld:ColorMapEntry color="#{zero_color}" quantity="-{min_difference}" />
+            <sld:ColorMapEntry color="#{zero_color}" quantity="0" opacity="0" />
+            <sld:ColorMapEntry color="#{zero_color}" quantity="{min_difference}" />
+            '''
+        elif nodata_value < min_value:
             nodata_low_entry = f'<sld:ColorMapEntry color="#ffffff" quantity="{nodata_value}" opacity="0" />'
-        if min_value < nodata_value < max_value:
+        elif (min_value > 0 or max_value < 0) and min_value < nodata_value < max_value:
             nodata_low_entry = f'<sld:ColorMapEntry color="#ffffff" quantity="0" opacity="0" />'
     with open(os.path.join(DIRECTORY, 'sld_customized_raster_template.sld'), 'r') as template_file:
         template_str = template_file.read()
     xml_str = template_str.format(min_value=min_value, max_value=max_value, nodata_high_entry=nodata_high_entry,
-                                  nodata_low_entry=nodata_low_entry)
+                                  nodata_low_entry=nodata_low_entry, nodata_middle_entry=nodata_middle_entry)
     with open(file_path, 'w') as file:
         file.write(xml_str)
 

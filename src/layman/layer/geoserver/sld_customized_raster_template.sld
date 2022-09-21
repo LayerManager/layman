@@ -15,6 +15,7 @@
             <sld:ColorMap>
               {nodata_low_entry}
               <sld:ColorMapEntry color="#000000" quantity="{min_value}"/>
+              {nodata_middle_entry}
               <sld:ColorMapEntry color="#ffffff" quantity="{max_value}"/>
               {nodata_high_entry}
             </sld:ColorMap>
