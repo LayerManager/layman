@@ -106,6 +106,8 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
         while process.poll() is None and not self.is_aborted():
             pass
         finish_gdal_process(process)
+        nodata_value = gdal.get_nodata_value(vrt_file_path or input_path)
+        gdal.correct_nodata_value_in_vrt(tmp_vrt_file, nodata_value=nodata_value)
 
         source_file = f'{layername}.tif' if normalize_filenames else input_path
         normalize_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, layername, source_file=source_file, )

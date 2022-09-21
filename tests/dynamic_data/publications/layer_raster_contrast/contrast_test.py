@@ -77,7 +77,6 @@ TEST_CASES = {
             'max': 0.8629,
             'tolerance': 0.0001,
         },
-        'xfail': True,
     },
 }
 

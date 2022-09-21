@@ -2,6 +2,7 @@ import glob
 import os
 import shutil
 import subprocess
+from lxml import etree as ET
 from osgeo import gdal, gdalconst, osr
 from layman import patch_mode, settings, LaymanError
 from layman.common import empty_method, empty_method_returns_dict
@@ -226,6 +227,20 @@ def create_vrt_file_if_needed(filepath):
     else:
         vrt_file_path = None
     return vrt_file_path
+
+
+def correct_nodata_value_in_vrt(input_path, *, nodata_value):
+    xml_tree = ET.parse(input_path)
+    for band_mapping in xml_tree.xpath(f"//BandList/BandMapping"):
+        src_els = band_mapping.xpath(f"./SrcNoDataReal")
+        dst_els = band_mapping.xpath(f"./DstNoDataReal")
+        assert len(src_els) == len(dst_els) and len(src_els) <= 1
+        if len(src_els) > 0:
+            src_el = src_els[0]
+            dst_el = dst_els[0]
+            src_el.text = f"{nodata_value}"
+            dst_el.text = f"{nodata_value}"
+    xml_tree.write(input_path, pretty_print=True, xml_declaration=True, encoding="utf-8")
 
 
 def normalize_raster_file_async(input_path, crs_id, output_file):
