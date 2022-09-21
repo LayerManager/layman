@@ -57,8 +57,9 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
     input_files = input_file.get_layer_input_files(workspace, layername)
     input_file.check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=True, enable_more_main_files=enable_more_main_files)
 
-    main_filepath = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['_file']['gdal_path']
-    input_file.check_main_file(main_filepath, check_crs=check_crs, overview_resampling=overview_resampling)
+    main_filepaths = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['_file']['gdal_paths']
+    for main_filepath in main_filepaths:
+        input_file.check_main_file(main_filepath, check_crs=check_crs, overview_resampling=overview_resampling)
 
     file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
     style_type_for_check = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type']})['_style_type']
@@ -97,7 +98,7 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
     if self.is_aborted():
         raise AbortedException
 
-    input_path = layer_info['_file']['gdal_path']
+    input_path = layer_info['_file']['gdal_paths'][0]
     vrt_file_path = gdal.create_vrt_file_if_needed(input_path)
     tmp_vrt_file = tempfile.mkstemp(suffix='.vrt')[1]
     process = gdal.normalize_raster_file_async(vrt_file_path or input_path, crs_id, output_file=tmp_vrt_file)

@@ -62,7 +62,7 @@ def get_layer_info(workspace, layername):
             },
             '_file': {
                 'path': main_file_path,
-                'gdal_path': input_files.main_file_path_for_gdal,
+                'gdal_paths': input_files.main_file_paths_for_gdal,
             },
         }
     elif os.path.exists(util.get_layer_dir(workspace, layername)):
