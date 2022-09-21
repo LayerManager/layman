@@ -43,7 +43,7 @@ def get_compressed_main_file_extension(filepath):
 def get_layer_input_files(workspace, layername):
     input_file_dir = get_layer_input_file_dir(workspace, layername)
     pattern = os.path.join(input_file_dir, '*.*')
-    filepaths = glob.glob(pattern)
+    filepaths = sorted(glob.glob(pattern))
     return util.InputFiles(saved_paths=filepaths)
 
 
