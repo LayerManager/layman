@@ -268,8 +268,8 @@ def normalize_raster_file_async(input_path, crs_id, output_file):
     return process
 
 
-def compress_raster_file_async(workspace, layer, *, file_to_compress):
-    result_path = get_normalized_raster_layer_main_filepath(workspace, layer)
+def compress_raster_file_async(*, output_file, file_to_compress, ):
+    result_path = output_file
     bash_args = [
         'gdal_translate',
         '-co', 'compress=lzw',
@@ -281,8 +281,8 @@ def compress_raster_file_async(workspace, layer, *, file_to_compress):
     return process
 
 
-def add_overview_async(workspace, layer, *, overview_resampling=None):
-    normalized_path = get_normalized_raster_layer_main_filepath(workspace, layer)
+def add_overview_async(*, filepath, overview_resampling,):
+    normalized_path = filepath
     color_interp = get_color_interpretations(normalized_path)
     bash_args = [
         'gdaladdo',
