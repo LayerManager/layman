@@ -21,7 +21,7 @@ def test_raster_files(workspace, publ_type, publication):
     for ext in publ_test_data['file_extensions']:
         file_path = os.path.join(directory_path, publication + ext)
         assert os.path.exists(file_path), file_path
-    norm_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, publication)
+    norm_file_path = gdal.get_normalized_raster_layer_main_filepaths(workspace, publication)[0]
     assert os.path.exists(norm_file_path), norm_file_path
     normalized_color_interp = publ_test_data['normalized_color_interp']
     assert normalized_color_interp == gdal.get_color_interpretations(norm_file_path)

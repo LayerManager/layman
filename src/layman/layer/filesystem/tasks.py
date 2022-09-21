@@ -72,7 +72,7 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=None):
+def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=None, normalize_filenames=True):
     def finish_gdal_process(process):
         if self.is_aborted():
             logger.info(f'terminating GDAL process workspace.layer={workspace}.{layername}')
@@ -106,7 +106,8 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
         pass
     finish_gdal_process(process)
 
-    normalize_file_path = os.path.join(gdal.get_normalized_raster_layer_dir(workspace, layername, ), f"{layername}.tif")
+    source_file = f'{layername}.tif' if normalize_filenames else input_path
+    normalize_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, layername, source_file=source_file, )
     process = gdal.compress_raster_file_async(output_file=normalize_file_path, file_to_compress=tmp_vrt_file, )
     while process.poll() is None and not self.is_aborted():
         pass

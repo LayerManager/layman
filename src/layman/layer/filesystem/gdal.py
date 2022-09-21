@@ -1,3 +1,4 @@
+import glob
 import os
 import shutil
 import subprocess
@@ -11,29 +12,32 @@ PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 def get_layer_info(workspace, layer, *, extra_keys=None):
     extra_keys = extra_keys or []
-    gdal_path = get_normalized_raster_layer_main_filepath(workspace, layer)
-    gdal_gs_path = get_normalized_raster_layer_main_filepath(workspace, layer, geoserver=True)
+    gdal_paths = get_normalized_raster_layer_main_filepaths(workspace, layer)
+    gs_directory = get_normalized_raster_layer_dir(workspace, layer, geoserver=True)
     result = {}
-    if os.path.exists(gdal_path):
-        result = {
-            'name': layer,
-            '_file': {
-                'normalized_file': {
-                    'path': gdal_path,
-                    'gs_path': gdal_gs_path,
+    if len(gdal_paths) > 0:
+        gdal_path = gdal_paths[0]
+        gdal_gs_path = os.path.join(gs_directory, os.path.basename(gdal_path))
+        if os.path.exists(gdal_path):
+            result = {
+                'name': layer,
+                '_file': {
+                    'normalized_file': {
+                        'path': gdal_path,
+                        'gs_path': gdal_gs_path,
+                    }
                 }
             }
-        }
-        norm_file_dict = result['_file']['normalized_file']
-        if '_file.normalized_file.stats' in extra_keys:
-            stats = get_statistics(gdal_path)
-            norm_file_dict['stats'] = stats
-        if '_file.normalized_file.mask_flags' in extra_keys:
-            mask_flags = get_mask_flags(gdal_path)
-            norm_file_dict['mask_flags'] = mask_flags
-        if '_file.normalized_file.color_interpretations' in extra_keys:
-            color_interpretations = get_color_interpretations(gdal_path)
-            norm_file_dict['color_interpretations'] = color_interpretations
+            norm_file_dict = result['_file']['normalized_file']
+            if '_file.normalized_file.stats' in extra_keys:
+                stats = get_statistics(gdal_path)
+                norm_file_dict['stats'] = stats
+            if '_file.normalized_file.mask_flags' in extra_keys:
+                mask_flags = get_mask_flags(gdal_path)
+                norm_file_dict['mask_flags'] = mask_flags
+            if '_file.normalized_file.color_interpretations' in extra_keys:
+                color_interpretations = get_color_interpretations(gdal_path)
+                norm_file_dict['color_interpretations'] = color_interpretations
     return result
 
 
@@ -317,8 +321,18 @@ def get_normalized_raster_layer_dir(workspace, layer, *, geoserver=False):
     return os.path.join(get_normalized_raster_workspace_dir(workspace, geoserver=geoserver), 'layers', layer)
 
 
-def get_normalized_raster_layer_main_filepath(workspace, layer, *, geoserver=False):
-    return os.path.join(get_normalized_raster_layer_dir(workspace, layer, geoserver=geoserver), f"{layer}.tif")
+def get_normalized_raster_layer_main_filepaths(workspace, layer, *, geoserver=False):
+    dir_path = get_normalized_raster_layer_dir(workspace, layer, geoserver=geoserver)
+    pattern = os.path.join(dir_path, '*.tif')
+    filepaths = sorted(glob.glob(pattern))
+    return filepaths
+
+
+def get_normalized_raster_layer_main_filepath(workspace, layer, *, source_file):
+    dir_path = get_normalized_raster_layer_dir(workspace, layer, )
+    basename = os.path.basename(source_file)
+    file_name = os.path.splitext(basename)
+    return os.path.join(dir_path, file_name[0] + '.tif')
 
 
 def ensure_normalized_raster_layer_dir(workspace, layer):
@@ -334,7 +348,7 @@ def delete_normalized_raster_workspace(workspace):
 
 
 def get_bbox(workspace, layer):
-    filepath = get_normalized_raster_layer_main_filepath(workspace, layer)
+    filepath = get_normalized_raster_layer_main_filepaths(workspace, layer)[0]
     data = open_raster_file(filepath, gdalconst.GA_ReadOnly)
     geo_transform = data.GetGeoTransform()
     minx = geo_transform[0]
@@ -346,7 +360,7 @@ def get_bbox(workspace, layer):
 
 
 def get_crs(workspace, layer):
-    filepath = get_normalized_raster_layer_main_filepath(workspace, layer)
+    filepath = get_normalized_raster_layer_main_filepaths(workspace, layer)[0]
     data = open_raster_file(filepath, gdalconst.GA_ReadOnly)
     spatial_reference = osr.SpatialReference(wkt=data.GetProjection())
     auth_name = spatial_reference.GetAttrValue('AUTHORITY')
@@ -356,7 +370,7 @@ def get_crs(workspace, layer):
 
 
 def get_normalized_ground_sample_distance_in_m(workspace, layer, *, bbox_size):
-    filepath = get_normalized_raster_layer_main_filepath(workspace, layer)
+    filepath = get_normalized_raster_layer_main_filepaths(workspace, layer)[0]
     raster_size = get_raster_size(filepath)
     pixel_size = [bbox_size / raster_size[idx] for (idx, bbox_size) in enumerate(bbox_size)]
     distance_value = sum(pixel_size) / len(pixel_size)
