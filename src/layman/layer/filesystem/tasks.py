@@ -98,34 +98,35 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
     if self.is_aborted():
         raise AbortedException
 
-    input_path = layer_info['_file']['gdal_paths'][0]
-    vrt_file_path = gdal.create_vrt_file_if_needed(input_path)
-    tmp_vrt_file = tempfile.mkstemp(suffix='.vrt')[1]
-    process = gdal.normalize_raster_file_async(vrt_file_path or input_path, crs_id, output_file=tmp_vrt_file)
-    while process.poll() is None and not self.is_aborted():
-        pass
-    finish_gdal_process(process)
+    input_paths = layer_info['_file']['gdal_paths']
+    for input_path in input_paths:
+        vrt_file_path = gdal.create_vrt_file_if_needed(input_path)
+        tmp_vrt_file = tempfile.mkstemp(suffix='.vrt')[1]
+        process = gdal.normalize_raster_file_async(vrt_file_path or input_path, crs_id, output_file=tmp_vrt_file)
+        while process.poll() is None and not self.is_aborted():
+            pass
+        finish_gdal_process(process)
 
-    source_file = f'{layername}.tif' if normalize_filenames else input_path
-    normalize_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, layername, source_file=source_file, )
-    process = gdal.compress_raster_file_async(output_file=normalize_file_path, file_to_compress=tmp_vrt_file, )
-    while process.poll() is None and not self.is_aborted():
-        pass
-    if vrt_file_path:
+        source_file = f'{layername}.tif' if normalize_filenames else input_path
+        normalize_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, layername, source_file=source_file, )
+        process = gdal.compress_raster_file_async(output_file=normalize_file_path, file_to_compress=tmp_vrt_file, )
+        while process.poll() is None and not self.is_aborted():
+            pass
+        if vrt_file_path:
+            try:
+                os.remove(vrt_file_path)
+            except OSError:
+                pass
         try:
-            os.remove(vrt_file_path)
+            os.remove(tmp_vrt_file)
         except OSError:
             pass
-    try:
-        os.remove(tmp_vrt_file)
-    except OSError:
-        pass
-    finish_gdal_process(process)
+        finish_gdal_process(process)
 
-    process = gdal.add_overview_async(filepath=normalize_file_path, overview_resampling=overview_resampling, )
-    while process.poll() is None and not self.is_aborted():
-        pass
-    finish_gdal_process(process)
+        process = gdal.add_overview_async(filepath=normalize_file_path, overview_resampling=overview_resampling, )
+        while process.poll() is None and not self.is_aborted():
+            pass
+        finish_gdal_process(process)
 
 
 @celery_app.task(
