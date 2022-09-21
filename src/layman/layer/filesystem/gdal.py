@@ -15,29 +15,28 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
     gdal_paths = get_normalized_raster_layer_main_filepaths(workspace, layer)
     gs_directory = get_normalized_raster_layer_dir(workspace, layer, geoserver=True)
     result = {}
+    gdal_paths = [gdal_path for gdal_path in gdal_paths if os.path.exists(gdal_path)]
     if len(gdal_paths) > 0:
-        gdal_path = gdal_paths[0]
-        gdal_gs_path = os.path.join(gs_directory, os.path.basename(gdal_path))
-        if os.path.exists(gdal_path):
-            result = {
-                'name': layer,
-                '_file': {
-                    'normalized_file': {
-                        'path': gdal_path,
-                        'gs_path': gdal_gs_path,
-                    }
+        gdal_gs_paths = [os.path.join(gs_directory, os.path.basename(gdal_path)) for gdal_path in gdal_paths]
+        result = {
+            'name': layer,
+            '_file': {
+                'normalized_file': {
+                    'paths': gdal_paths,
+                    'gs_paths': gdal_gs_paths,
                 }
             }
-            norm_file_dict = result['_file']['normalized_file']
-            if '_file.normalized_file.stats' in extra_keys:
-                stats = get_statistics(gdal_path)
-                norm_file_dict['stats'] = stats
-            if '_file.normalized_file.mask_flags' in extra_keys:
-                mask_flags = get_mask_flags(gdal_path)
-                norm_file_dict['mask_flags'] = mask_flags
-            if '_file.normalized_file.color_interpretations' in extra_keys:
-                color_interpretations = get_color_interpretations(gdal_path)
-                norm_file_dict['color_interpretations'] = color_interpretations
+        }
+        norm_file_dict = result['_file']['normalized_file']
+        if '_file.normalized_file.stats' in extra_keys:
+            stats = get_statistics(gdal_paths[0])
+            norm_file_dict['stats'] = stats
+        if '_file.normalized_file.mask_flags' in extra_keys:
+            mask_flags = get_mask_flags(gdal_paths[0])
+            norm_file_dict['mask_flags'] = mask_flags
+        if '_file.normalized_file.color_interpretations' in extra_keys:
+            color_interpretations = get_color_interpretations(gdal_paths[0])
+            norm_file_dict['color_interpretations'] = color_interpretations
     return result
 
 

@@ -28,8 +28,8 @@ LAYERS = {
                     'gdal_paths': ['/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_default_post/input_file/sample_tif_colortable_nodata.tif'],
                     'path': '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_default_post/input_file/sample_tif_colortable_nodata.tif',
                     'normalized_file': {
-                        'gs_path': 'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_default_post/sample_tif_colortable_nodata.tif',
-                        'path': '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_default_post/sample_tif_colortable_nodata.tif'
+                        'gs_paths': ['normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_default_post/sample_tif_colortable_nodata.tif'],
+                        'paths': ['/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_default_post/sample_tif_colortable_nodata.tif']
                     },
                 },
                 'file': {
@@ -59,8 +59,14 @@ LAYERS = {
                     ],
                     'path': '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
                     'normalized_file': {
-                        'gs_path': 'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                        'path': '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'
+                        'gs_paths': [
+                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
+                        ],
+                        'paths': [
+                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
+                        ]
                     },
                 },
                 'file': {
@@ -93,8 +99,14 @@ LAYERS = {
                     ],
                     'path': '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/input_file/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
                     'normalized_file': {
-                        'gs_path': 'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                        'path': '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'
+                        'gs_paths': [
+                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
+                        ],
+                        'paths': [
+                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
+                        ]
                     },
                 },
                 'file': {
@@ -124,8 +136,14 @@ LAYERS = {
                     ],
                     'path': '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
                     'normalized_file': {
-                        'gs_path': 'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                        'path': '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'
+                        'gs_paths': [
+                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
+                        ],
+                        'paths': [
+                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
+                        ]
                     },
                 },
                 'file': {
@@ -159,8 +177,14 @@ LAYERS = {
                     ],
                     'path': '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/input_file/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
                     'normalized_file': {
-                        'gs_path': 'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                        'path': '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'
+                        'gs_paths': [
+                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
+                        ],
+                        'paths': [
+                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
+                        ]
                     },
                 },
                 'file': {
