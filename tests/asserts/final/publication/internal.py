@@ -163,7 +163,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        {
                                            '_file': {
                                                'path': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.{file_extension}',
-                                               'gdal_path': f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.{file_extension}',
+                                               'gdal_paths': [f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.{file_extension}'],
                                            },
                                            'file': {
                                                'path': f'{publ_type_dir}/{name}/input_file/{name}.{file_extension}'
@@ -251,9 +251,11 @@ def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file']})
     file_type = publ_info['file']['file_type']
     if file_type == settings.FILE_TYPE_RASTER:
-        input_nodata_value = gdal.get_nodata_value(publ_info['_file']['gdal_path'])
-        normalized_nodata_value = gdal.get_nodata_value(publ_info['_file']['normalized_file']['path'])
-        assert normalized_nodata_value == pytest.approx(input_nodata_value, 0.000000001)
+        gdal_paths = publ_info['_file']['gdal_paths']
+        for gdal_path in gdal_paths:
+            input_nodata_value = gdal.get_nodata_value(gdal_path)
+            normalized_nodata_value = gdal.get_nodata_value(publ_info['_file']['normalized_file']['path'])
+            assert normalized_nodata_value == pytest.approx(input_nodata_value, 0.000000001)
 
 
 def expected_chain_info_state(workspace, publ_type, name, state):

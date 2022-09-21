@@ -39,7 +39,9 @@ def refresh_table(
     if self.is_aborted():
         raise AbortedException
 
-    main_filepath = publ_info['_file']['gdal_path']
+    main_filepaths = publ_info['_file']['gdal_paths']
+    assert len(main_filepaths) == 1
+    main_filepath = main_filepaths[0]
     table_name = db.get_table_name(workspace, layername)
     process = db.import_layer_vector_file_async(workspace, table_name, main_filepath, crs_id)
     while process.poll() is None and not self.is_aborted():
