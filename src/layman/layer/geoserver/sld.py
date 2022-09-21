@@ -94,9 +94,8 @@ def create_customized_grayscale_sld(*, file_path, min_value, max_value, nodata_v
     nodata_high_entry = ''
     nodata_low_entry = ''
     if nodata_value is not None:
-        if nodata_value > max_value:
-            nodata_high_entry = f'<sld:ColorMapEntry color="#ffffff" quantity="{nodata_value}" opacity="0" />'
-        elif nodata_value < min_value:
+        # if nodata_value > max_value, setting nodata_high_entry seems not necessary
+        if nodata_value < min_value:
             nodata_low_entry = f'<sld:ColorMapEntry color="#ffffff" quantity="{nodata_value}" opacity="0" />'
     with open(os.path.join(DIRECTORY, 'sld_customized_raster_template.sld'), 'r') as template_file:
         template_str = template_file.read()
