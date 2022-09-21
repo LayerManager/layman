@@ -104,6 +104,9 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
     while process.poll() is None and not self.is_aborted():
         pass
     finish_gdal_process(process)
+    nodata_value = gdal.get_nodata_value(input_path)
+    if nodata_value is not None and nodata_value > pow(10, 38):
+        gdal.clear_vrt_file(tmp_vrt_file)
 
     process = gdal.compress_raster_file_async(workspace, layername, file_to_compress=tmp_vrt_file)
     while process.poll() is None and not self.is_aborted():

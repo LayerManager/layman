@@ -1,6 +1,7 @@
 import os
 import shutil
 import subprocess
+from lxml import etree as ET
 from osgeo import gdal, gdalconst, osr
 from layman import patch_mode, settings, LaymanError
 from layman.common import empty_method, empty_method_returns_dict
@@ -223,6 +224,17 @@ def create_vrt_file_if_needed(filepath):
     else:
         vrt_file_path = None
     return vrt_file_path
+
+
+def clear_vrt_file(input_path):
+    # In case NoData is big float number, these elements causes broken statistics.
+    # However, for some other files, removing it causes missing transparency in Alpha band
+    xml_tree = ET.parse(input_path)
+    elements_to_remove = ['SrcNoDataReal', 'SrcNoDataImag', 'DstNoDataReal', 'DstNoDataImag']
+    for element_to_remove in elements_to_remove:
+        for el_to_remove in xml_tree.xpath(f"//{element_to_remove}"):
+            el_to_remove.getparent().remove(el_to_remove)
+    xml_tree.write(input_path, pretty_print=True, xml_declaration=True, encoding="utf-8")
 
 
 def normalize_raster_file_async(input_path, crs_id, output_file):
