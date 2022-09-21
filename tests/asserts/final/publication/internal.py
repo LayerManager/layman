@@ -188,8 +188,8 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                'file': {'file_type': 'raster'},
                                                '_file': {
                                                    'normalized_file': {
-                                                       'path': f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif',
-                                                       'gs_path': f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif'
+                                                       'paths': [f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif', ],
+                                                       'gs_paths': [f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif', ],
                                                    },
                                                },
                                            })
@@ -252,9 +252,10 @@ def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
     file_type = publ_info['file']['file_type']
     if file_type == settings.FILE_TYPE_RASTER:
         gdal_paths = publ_info['_file']['gdal_paths']
-        for gdal_path in gdal_paths:
+        normalized_paths = publ_info['_file']['normalized_file']['paths']
+        for idx, gdal_path in enumerate(gdal_paths):
             input_nodata_value = gdal.get_nodata_value(gdal_path)
-            normalized_nodata_value = gdal.get_nodata_value(publ_info['_file']['normalized_file']['path'])
+            normalized_nodata_value = gdal.get_nodata_value(normalized_paths[idx])
             assert normalized_nodata_value == pytest.approx(input_nodata_value, 0.000000001)
 
 
