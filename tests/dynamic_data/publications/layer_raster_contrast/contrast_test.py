@@ -1,6 +1,7 @@
 import os
 import pytest
 
+from layman.layer.filesystem import gdal
 from test_tools import process_client
 from tests import TestTypes, Publication
 from tests.asserts.final import publication as asserts_publ
@@ -12,12 +13,57 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 pytest_generate_tests = base_test.pytest_generate_tests
 
 TEST_CASES = {
-    'tif_byte': {},
-    'tif_float': {},
-    'tif_byte_nodata_high': {},  # nodata > max value
-    'tif_byte_nodata_low': {},  # nodata < min value
-    'tif_byte_nodata_middle': {},  # min value < nodata < max value
+    'tif_byte': {
+        'expected_input': {
+            'color_interpretations': ['Gray'],
+            'nodata': None,
+            'min': 228,
+            'max': 255,
+        }
+    },
+    'tif_float': {
+        'expected_input': {
+            'color_interpretations': ['Gray'],
+            'nodata': None,
+            'min': 178,
+            'max': 205,
+        }
+    },
+    'tif_byte_nodata_high': {
+        'expected_input': {
+            'color_interpretations': ['Gray'],
+            'nodata': 255,
+            'min': 228,
+            'max': 254,
+        }
+    },
+    'tif_byte_nodata_low': {
+        'expected_input': {
+            'color_interpretations': ['Gray'],
+            'nodata': 200,
+            'min': 228,
+            'max': 254,
+        }
+    },
+    'tif_byte_nodata_middle': {
+        'expected_input': {
+            'color_interpretations': ['Gray'],
+            'nodata': 10,
+            'min': 1,
+            'max': 27,
+        }
+    },
 }
+
+
+def assert_input_file(file_path, expected_values):
+    assert gdal.get_color_interpretations(file_path) == expected_values['color_interpretations']
+
+    assert gdal.get_nodata_value(file_path) == expected_values['nodata']
+
+    min_value, max_value, _, _ = gdal.get_statistics(file_path)[0]
+    assert min_value == expected_values['min']
+    assert max_value == expected_values['max']
 
 
 class TestLayer(base_test.TestSingleRestPublication):
@@ -38,8 +84,10 @@ class TestLayer(base_test.TestSingleRestPublication):
         """Parametrized using pytest_generate_tests"""
         base_file_name = key
         file_name = f"{base_file_name}.{base_file_name.split('_')[0]}"
+        file_path = os.path.join(DIRECTORY, file_name)
+        assert_input_file(file_path, TEST_CASES[key]['expected_input'])
         layer_params = {
-            'file_paths': [os.path.join(DIRECTORY, file_name)],
+            'file_paths': [file_path],
         }
         rest_method(layer, params=layer_params)
 
