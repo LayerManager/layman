@@ -29,7 +29,7 @@ TEST_CASES = {
             'max': 205,
         }
     },
-    'tif_byte_nodata_high': {
+    'tif_byte_0_min_max_nd': {
         'expected_input': {
             'color_interpretations': ['Gray'],
             'nodata': 255,
@@ -37,7 +37,7 @@ TEST_CASES = {
             'max': 254,
         }
     },
-    'tif_byte_nodata_low': {
+    'tif_byte_0_nd_min_max': {
         'expected_input': {
             'color_interpretations': ['Gray'],
             'nodata': 200,
@@ -45,7 +45,7 @@ TEST_CASES = {
             'max': 254,
         }
     },
-    'tif_byte_nodata_middle': {
+    'tif_byte_0_min_nd_max': {
         'expected_input': {
             'color_interpretations': ['Gray'],
             'nodata': 10,
