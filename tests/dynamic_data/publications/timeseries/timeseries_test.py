@@ -3,7 +3,8 @@ import pytest
 
 from test_tools import process_client
 from tests import TestTypes, Publication
-from tests.asserts.final.publication import util as assert_util, internal as assert_internal
+from tests.asserts.final import publication as asserts_publ
+from tests.asserts.final.publication import util as asserts_util
 from tests.dynamic_data import base_test
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -193,8 +194,8 @@ class TestLayer(base_test.TestSingleRestPublication):
         """Parametrized using pytest_generate_tests"""
         rest_method(layer, params=params.get('params', {}))
 
-        assert_util.is_publication_valid_and_complete(layer)
+        asserts_util.is_publication_valid_and_complete(layer)
 
-        assert_internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
-                                                 **params.get('detail_values', {}),
-                                                 )
+        asserts_publ.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
+                                                       **params.get('detail_values', {}),
+                                                       )
