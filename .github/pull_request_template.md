@@ -2,7 +2,7 @@ Part of issue #
 
 - [ ] Tests
 - [ ] Layman Test Client
-- [ ] Changlelog
+- [ ] Changelog
 - [ ] Documentation
 
 Optionally
