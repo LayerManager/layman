@@ -215,3 +215,13 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                          expected_file_path=exp_wms,
                                                          time=time,
                                                          )
+
+        exp_wms = os.path.join(DIRECTORY, f"wms_2022-03-19.png")
+        asserts_publ.geoserver.wms_spatial_precision(layer.workspace, layer.type, layer.name, crs=crs_def.EPSG_3857,
+                                                     extent=[1743913.19942603237, 6499107.284021802247, 1755465.937341974815, 6503948.597792930901, ],
+                                                     img_size=(1322, 554),
+                                                     wms_version='1.3.0',
+                                                     pixel_diff_limit=200,
+                                                     obtained_file_path=f'tmp/artifacts/test_timeseries/downloaded_wms_{layer.name}_{time}.png',
+                                                     expected_file_path=exp_wms,
+                                                     )
