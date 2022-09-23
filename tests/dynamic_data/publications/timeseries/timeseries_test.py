@@ -225,3 +225,5 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                      obtained_file_path=f'tmp/artifacts/test_timeseries/downloaded_wms_{layer.name}_{time}.png',
                                                      expected_file_path=exp_wms,
                                                      )
+        exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_timeseries.png")
+        asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
