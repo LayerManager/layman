@@ -543,7 +543,7 @@ def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, de
     response.raise_for_status()
 
 
-def create_coverage_store(geoserver_workspace, auth, name, file, *, coverage_type=None):
+def create_coverage_store(geoserver_workspace, auth, name, file_or_dir, *, coverage_type=None):
     coverage_type = coverage_type or COVERAGESTORE_GEOTIFF
     data = {
         "coverageStore": {
@@ -551,7 +551,7 @@ def create_coverage_store(geoserver_workspace, auth, name, file, *, coverage_typ
             "name": name,
             "type": coverage_type,
             "enabled": "true",
-            "url": "file:" + file,
+            "url": "file:" + file_or_dir,
         }
     }
     response = requests.post(
