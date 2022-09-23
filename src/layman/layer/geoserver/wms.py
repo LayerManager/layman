@@ -14,6 +14,7 @@ from .util import get_gs_proxy_base_url
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
 DEFAULT_WMS_QGIS_STORE_PREFIX = 'qgis'
 DEFAULT_GEOTIFF_STORE_PREFIX = 'geotiff'
+DEFAULT_IMAGE_MOSAIC_STORE_PREFIX = 'image_mosaic'
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = gs_util.WMS_VERSION
@@ -249,3 +250,7 @@ def get_qgis_store_name(layer):
 
 def get_geotiff_store_name(layer):
     return f'{DEFAULT_GEOTIFF_STORE_PREFIX}_{layer}'
+
+
+def get_image_mosaic_store_name(layer):
+    return f'{DEFAULT_IMAGE_MOSAIC_STORE_PREFIX}_{layer}'

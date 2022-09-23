@@ -1,3 +1,5 @@
+import os
+import shutil
 from celery.utils.log import get_task_logger
 
 import crs as crs_def
@@ -9,6 +11,7 @@ from . import wms, wfs, sld
 from .. import geoserver, LAYER_TYPE
 
 logger = get_task_logger(__name__)
+DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 
 refresh_wms_needed = empty_method_returns_true
@@ -29,6 +32,8 @@ def refresh_wms(
         description=None,
         title=None,
         access_rights=None,
+        image_mosaic=False,
+        time_regex=None,
 ):
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'native_bounding_box', 'native_crs', 'db_table']})
     file_type = info['file']['file_type']
@@ -42,7 +47,6 @@ def refresh_wms(
     if self.is_aborted():
         raise AbortedException
 
-    coverage_store_name = wms.get_geotiff_store_name(layername)
     if file_type == settings.FILE_TYPE_VECTOR:
         if store_in_geoserver:
             gs_util.delete_wms_layer(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
@@ -65,14 +69,33 @@ def refresh_wms(
                                               geoserver_workspace=geoserver_workspace,
                                               )
     elif file_type == settings.FILE_TYPE_RASTER:
-        file_path = info['_file']['normalized_file']['gs_paths'][0]
-        real_bbox = info['native_bounding_box']
-        bbox = bbox_util.ensure_bbox_with_area(real_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding)\
-            if not bbox_util.is_empty(real_bbox) else crs_def.CRSDefinitions[crs].default_bbox
-        lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
-        gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, file_path)
-        gs_util.publish_coverage(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, layername, title,
-                                 description, bbox, crs, lat_lon_bbox=lat_lon_bbox)
+        if not image_mosaic:
+            coverage_store_name = wms.get_geotiff_store_name(layername)
+            file_path = info['_file']['normalized_file']['gs_paths'][0]
+            real_bbox = info['native_bounding_box']
+            bbox = bbox_util.ensure_bbox_with_area(real_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding)\
+                if not bbox_util.is_empty(real_bbox) else crs_def.CRSDefinitions[crs].default_bbox
+            lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
+            gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, file_path)
+            gs_util.publish_coverage(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, layername, title,
+                                     description, bbox, crs, lat_lon_bbox=lat_lon_bbox)
+        else:
+            coverage_store_name = wms.get_image_mosaic_store_name(layername)
+            gs_file_path = info['_file']['normalized_file']['gs_paths'][0]
+            gs_dir_path = os.path.dirname(gs_file_path)
+            file_path = info['_file']['normalized_file']['paths'][0]
+            dir_path = os.path.dirname(file_path)
+            shutil.copy(os.path.join(DIRECTORY, 'indexer.properties'), dir_path)
+            timeregex_path = os.path.join(dir_path, 'timeregex.properties')
+            with open(timeregex_path, 'w') as file:
+                file.write(f'regex={time_regex}\n')
+            real_bbox = info['native_bounding_box']
+            bbox = bbox_util.ensure_bbox_with_area(real_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding)\
+                if not bbox_util.is_empty(real_bbox) else crs_def.CRSDefinitions[crs].default_bbox
+            lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
+            gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, gs_dir_path, coverage_type=gs_util.COVERAGESTORE_IMAGEMOSAIC)
+            gs_util.publish_coverage(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, layername, title,
+                                     description, bbox, crs, lat_lon_bbox=lat_lon_bbox, enable_time_dimension=True)
     else:
         raise NotImplementedError(f"Unknown file type: {file_type}")
 
