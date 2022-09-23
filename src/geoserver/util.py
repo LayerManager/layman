@@ -21,6 +21,9 @@ FLASK_RULES_KEY = f"{__name__}:RULES"
 WMS_VERSION = '1.3.0'
 WFS_VERSION = '2.0.0'
 
+COVERAGESTORE_GEOTIFF = 'GeoTIFF'
+COVERAGESTORE_IMAGEMOSAIC = 'ImageMosaic'
+
 RESERVED_WORKSPACE_NAMES = [
     'default',
 ]
@@ -540,12 +543,13 @@ def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, de
     response.raise_for_status()
 
 
-def create_coverage_store(geoserver_workspace, auth, name, file):
+def create_coverage_store(geoserver_workspace, auth, name, file, *, coverage_type=None):
+    coverage_type = coverage_type or COVERAGESTORE_GEOTIFF
     data = {
         "coverageStore": {
             "workspace": geoserver_workspace,
             "name": name,
-            "type": "GeoTIFF",
+            "type": coverage_type,
             "enabled": "true",
             "url": "file:" + file,
         }
@@ -575,7 +579,7 @@ def delete_coverage_store(geoserver_workspace, auth, name):
         response.raise_for_status()
 
 
-def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, description, bbox, crs, *, lat_lon_bbox):
+def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, description, bbox, crs, *, lat_lon_bbox, enable_time_dimension=False):
     keywords = [
         "features",
         layer,
@@ -600,9 +604,32 @@ def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, de
                                 f'/coveragestores/coverages/{coverage_store}.json'),
                 "name": f"{geoserver_workspace}:{coverage_store}"
             },
-            "title": title
+            "title": title,
         }
     }
+    if enable_time_dimension:
+        data['coverage']['metadata'] = {
+            "entry": [
+                {
+                    "@key": "elevation",
+                    "dimensionInfo": {
+                        "enabled": False
+                    }
+                },
+                {
+                    "@key": "time",
+                    "dimensionInfo": {
+                        "enabled": True,
+                        "presentation": "LIST",
+                        "units": "ISO8601",
+                        "defaultValue": {
+                            "strategy": "MAXIMUM"
+                        },
+                        "nearestMatchEnabled": False
+                    }
+                }
+            ]
+        }
     response = requests.post(
         urljoin(GS_REST_WORKSPACES, geoserver_workspace + f'/coverages'),
         data=json.dumps(data),

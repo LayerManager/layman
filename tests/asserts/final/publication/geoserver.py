@@ -48,7 +48,7 @@ def feature_spatial_precision(workspace, publ_type, name, *, feature_id, crs, ex
 
 
 def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, wms_version, obtained_file_path,
-                          expected_file_path, diff_line_width=None, pixel_diff_limit=None):
+                          expected_file_path, diff_line_width=None, pixel_diff_limit=None, time=None):
     assert publ_type == process_client.LAYER_TYPE
     assert diff_line_width is None or pixel_diff_limit is None, f'diff_line_width={diff_line_width}, pixel_diff_limit={pixel_diff_limit}'
     assert diff_line_width is not None or pixel_diff_limit is not None, f'diff_line_width={diff_line_width}, pixel_diff_limit={pixel_diff_limit}'
@@ -78,6 +78,9 @@ def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, 
         'HEIGHT': img_size[1],
         'BBOX': ",".join((str(c) for c in extent)),
     }
+
+    if time:
+        query_params['TIME'] = time
 
     gs_query_params = copy.deepcopy(query_params)
     if native_crs == crs_def.EPSG_5514 and crs == crs_def.CRS_84 and style_type == 'sld':
