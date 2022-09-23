@@ -10,37 +10,7 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 pytest_generate_tests = base_test.pytest_generate_tests
 
-DEFAULT_TIME_REGEXP = r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)'
-
 LAYERS = {
-    'default': {
-        'params': {
-            'time_regex': DEFAULT_TIME_REGEXP,
-            'file_paths': ['sample/layman.layer/sample_tif_colortable_nodata.tif'],
-        },
-        'detail_values': {
-            'exp_publication_detail': {
-                'bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
-                'native_crs': 'EPSG:3857',
-                'native_bounding_box': [868376.0, 522128.0, 940583.0, 593255.0],
-                'image_mosaic': True,
-                '_file': {
-                    'gdal_paths': ['/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_default_post/input_file/sample_tif_colortable_nodata.tif'],
-                    'path': '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_default_post/input_file/sample_tif_colortable_nodata.tif',
-                    'normalized_file': {
-                        'gs_paths': ['normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_default_post/sample_tif_colortable_nodata.tif'],
-                        'paths': ['/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_default_post/sample_tif_colortable_nodata.tif']
-                    },
-                },
-                'file': {
-                    'file_type': 'raster',
-                    'path': 'layers/layer_default_post/input_file/sample_tif_colortable_nodata.tif',
-                },
-            },
-            'file_extension': 'tif',
-            'publ_type_detail': ('raster', 'sld'),
-        },
-    },
     'more_files_zip': {
         'params': {
             'time_regex': r'[0-9]{8}',
