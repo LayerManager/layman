@@ -38,30 +38,13 @@ LAYERS = {
                              'values': ['2022-03-16T00:00:00.000Z',
                                         '2022-03-19T00:00:00.000Z']},
                 },
-                '_file': {
-                    'gdal_paths': [
-                        '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                        '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
-                    ],
-                    'path': '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                    'normalized_file': {
-                        'gs_paths': [
-                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
-                        ],
-                        'paths': [
-                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
-                        ]
-                    },
-                },
-                'file': {
-                    'path': 'layers/layer_more_files_zip_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                },
             },
             'publ_type_detail': ('raster', 'sld'),
-            'file_extension': 'zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
             'gdal_prefix': '/vsizip/',
+            'files': [
+                'timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                'timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
+            ]
         },
     },
     'more_files': {
@@ -84,130 +67,33 @@ LAYERS = {
                              'values': ['2022-03-16T00:00:00.000Z',
                                         '2022-03-19T00:00:00.000Z']},
                 },
-                '_file': {
-                    'gdal_paths': [
-                        '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/input_file/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                        '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/input_file/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
-                    ],
-                    'path': '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/input_file/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                    'normalized_file': {
-                        'gs_paths': [
-                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
-                        ],
-                        'paths': [
-                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
-                        ]
-                    },
-                },
-                'file': {
-                    'path': 'layers/layer_more_files_post/input_file/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                },
             },
             'publ_type_detail': ('raster', 'sld'),
-            'file_extension': 'tif',
-        },
-    },
-    'more_files_zip_chunk': {
-        'params': {
-            'time_regex': r'[0-9]{8}',
-            'file_paths': [
-                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'),
-                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif'),
-            ],
-            'compress': True,
-            'compress_settings': process_client.CompressTypeDef(archive_name='timeseries_tif',
-                                                                inner_directory='/timeseries_tif/',
-                                                                file_name=None,
-                                                                ),
-            'with_chunks': True,
-        },
-        'detail_values': {
-            'exp_publication_detail': {
-                'bounding_box': [1737105.4141226907, 6491458.724017749, 1765157.537707582, 6509901.824098258],
-                'native_crs': 'EPSG:32633',
-                'native_bounding_box': [543100.0, 5567910.0, 560930.0, 5579500.0],
-                'image_mosaic': True,
-                'wms': {
-                    'time': {'default': '2022-03-19T00:00:00Z',
-                             'units': 'ISO8601',
-                             'values': ['2022-03-16T00:00:00.000Z',
-                                        '2022-03-19T00:00:00.000Z']},
-                },
-                '_file': {
-                    'gdal_paths': [
-                        '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                        '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
-                    ],
-                    'path': '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                    'normalized_file': {
-                        'gs_paths': [
-                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
-                        ],
-                        'paths': [
-                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
-                        ]
-                    },
-                },
-                'file': {
-                    'path': 'layers/layer_more_files_zip_chunk_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                },
-            },
-            'publ_type_detail': ('raster', 'sld'),
-            'file_extension': 'zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-            'gdal_prefix': '/vsizip/',
-        },
-    },
-    'more_files_chunks': {
-        'params': {
-            'time_regex': r'[0-9]{8}',
-            'file_paths': [
-                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'),
-                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif'),
-            ],
-            'with_chunks': True,
-        },
-        'detail_values': {
-            'exp_publication_detail': {
-                'bounding_box': [1737105.4141226907, 6491458.724017749, 1765157.537707582, 6509901.824098258],
-                'native_crs': 'EPSG:32633',
-                'native_bounding_box': [543100.0, 5567910.0, 560930.0, 5579500.0],
-                'image_mosaic': True,
-                'wms': {
-                    'time': {'default': '2022-03-19T00:00:00Z',
-                             'units': 'ISO8601',
-                             'values': ['2022-03-16T00:00:00.000Z',
-                                        '2022-03-19T00:00:00.000Z']},
-                },
-                '_file': {
-                    'gdal_paths': [
-                        '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/input_file/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                        '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/input_file/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
-                    ],
-                    'path': '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/input_file/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                    'normalized_file': {
-                        'gs_paths': [
-                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                            'normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
-                        ],
-                        'paths': [
-                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                            '/geoserver/data_dir/normalized_raster_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
-                        ]
-                    },
-                },
-                'file': {
-                    'path': 'layers/layer_more_files_chunks_post/input_file/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                },
-            },
-            'publ_type_detail': ('raster', 'sld'),
-            'file_extension': 'tif',
+            'files': [
+                'S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                'S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif',
+            ]
         },
     },
 }
+
+
+def generate_test_cases():
+    tc_list = list()
+    for name, test_case_params in LAYERS.items():
+        for name_suffix, with_chunks_value in [('', False),
+                                               ('_chunks', True),
+                                               ]:
+            params = test_case_params
+            params['params']['with_chunks'] = with_chunks_value
+            test_case = base_test.TestCaseType(key=name + name_suffix,
+                                               type=TestTypes.MANDATORY,
+                                               params=params,
+                                               marks=[pytest.mark.xfail(reason="Not yet implemented.")]
+                                               if test_case_params.get('xfail') else []
+                                               )
+            tc_list.append(test_case)
+    return tc_list
 
 
 class TestLayer(base_test.TestSingleRestPublication):
@@ -222,12 +108,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         ],
     }
 
-    test_cases = [base_test.TestCaseType(key=name,
-                                         type=TestTypes.MANDATORY,
-                                         params=test_case_params,
-                                         marks=[pytest.mark.xfail(reason="Not yet implemented.")]
-                                         if test_case_params.get('xfail') else []
-                                         ) for name, test_case_params in LAYERS.items()]
+    test_cases = generate_test_cases()
 
     # pylint: disable=unused-argument
     @staticmethod
