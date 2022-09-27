@@ -243,6 +243,10 @@ JSON object with following structure:
 - **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
 - **wms**
   - *url*: String. URL of WMS endpoint. It points to WMS endpoint of appropriate GeoServer workspace.
+  - *time*, available only for time-series layers
+    - **units**: String. Code of time format.
+    - **values**: List of times. Time values available for layer.
+    - **default**: Time. Default time value.
   - *status*: Status information about GeoServer import and availability of WMS layer. No status object means the source is available. Usual state values are
     - PENDING: publishing of this source is queued, but it did not start yet
     - STARTED: publishing of this source is in process

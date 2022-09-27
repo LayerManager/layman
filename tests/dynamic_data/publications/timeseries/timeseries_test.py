@@ -24,6 +24,12 @@ LAYERS = {
                 'native_crs': 'EPSG:32633',
                 'native_bounding_box': [543100.0, 5567910.0, 560930.0, 5579500.0],
                 'image_mosaic': True,
+                'wms': {
+                    'time': {'default': '2022-03-19T00:00:00Z',
+                             'units': 'ISO8601',
+                             'values': ['2022-03-16T00:00:00.000Z',
+                                        '2022-03-19T00:00:00.000Z']},
+                },
                 '_file': {
                     'gdal_paths': [
                         '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
@@ -64,6 +70,12 @@ LAYERS = {
                 'native_crs': 'EPSG:32633',
                 'native_bounding_box': [543100.0, 5567910.0, 560930.0, 5579500.0],
                 'image_mosaic': True,
+                'wms': {
+                    'time': {'default': '2022-03-19T00:00:00Z',
+                             'units': 'ISO8601',
+                             'values': ['2022-03-16T00:00:00.000Z',
+                                        '2022-03-19T00:00:00.000Z']},
+                },
                 '_file': {
                     'gdal_paths': [
                         '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_post/input_file/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
@@ -101,6 +113,12 @@ LAYERS = {
                 'native_crs': 'EPSG:32633',
                 'native_bounding_box': [543100.0, 5567910.0, 560930.0, 5579500.0],
                 'image_mosaic': True,
+                'wms': {
+                    'time': {'default': '2022-03-19T00:00:00Z',
+                             'units': 'ISO8601',
+                             'values': ['2022-03-16T00:00:00.000Z',
+                                        '2022-03-19T00:00:00.000Z']},
+                },
                 '_file': {
                     'gdal_paths': [
                         '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_zip_chunk_post/input_file/timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
@@ -142,6 +160,12 @@ LAYERS = {
                 'native_crs': 'EPSG:32633',
                 'native_bounding_box': [543100.0, 5567910.0, 560930.0, 5579500.0],
                 'image_mosaic': True,
+                'wms': {
+                    'time': {'default': '2022-03-19T00:00:00Z',
+                             'units': 'ISO8601',
+                             'values': ['2022-03-16T00:00:00.000Z',
+                                        '2022-03-19T00:00:00.000Z']},
+                },
                 '_file': {
                     'gdal_paths': [
                         '/layman_data_test/workspaces/dynamic_test_workspace_timeseries_layer/layers/layer_more_files_chunks_post/input_file/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',

@@ -15,7 +15,8 @@
 - [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) returns new key `image_mosaic` for raster layers.
 - [#635](https://github.com/LayerManager/layman/issues/635) Stored data files are not renamed to `<layer_name>.ext` format for image_mosaic layers. This applies both to files stored in Layman and normalized raster files stored in GeoServer.
 - [#635](https://github.com/LayerManager/layman/issues/635) Time series raster layers sent to endpoint [POST Workspace Layers](doc/rest.md#post-workspace-layers) with *time_regex* parameter are published to GeoServer with ImageMosaic plugin. 
-
+- [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) returns new subkey `wms`.`time` for raster time-series layers.
+- 
 ## v1.17.0
  2022-07-21
 ### Upgrade requirements
