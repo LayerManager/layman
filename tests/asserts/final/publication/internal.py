@@ -1,3 +1,5 @@
+import os
+
 import pytest
 from db import util as db_util
 from layman import app, util as layman_util, settings, celery
@@ -124,7 +126,8 @@ def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, *, max_diffs=Non
 
 
 def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_detail, publ_type_detail=None, full_comparison=True,
-                             file_extension=None, gdal_prefix='', keys_to_remove=None):
+                             file_extension=None, gdal_prefix='', keys_to_remove=None, files=None, ):
+    assert not file_extension or not files
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
@@ -169,6 +172,17 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                'path': f'{publ_type_dir}/{name}/input_file/{name}.{file_extension}'
                                            },
                                        })
+        if files:
+            util.recursive_dict_update(expected_detail,
+                                       {
+                                           '_file': {
+                                               'path': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{files[0]}',
+                                               'gdal_paths': [f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{filename}' for filename in files],
+                                           },
+                                           'file': {
+                                               'path': f'{publ_type_dir}/{name}/input_file/{files[0]}'
+                                           },
+                                       })
 
         file_type = publ_type_detail[0]
         expected_detail['_file_type'] = file_type
@@ -182,14 +196,27 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            'db_table': {'name': db_table},
                                        })
         elif file_type == settings.FILE_TYPE_RASTER:
+            util.recursive_dict_update(expected_detail,
+                                       {
+                                           'file': {'file_type': 'raster'},
+                                       })
             if file_extension:
                 util.recursive_dict_update(expected_detail,
                                            {
-                                               'file': {'file_type': 'raster'},
                                                '_file': {
                                                    'normalized_file': {
                                                        'paths': [f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif', ],
                                                        'gs_paths': [f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif', ],
+                                                   },
+                                               },
+                                           })
+            if files:
+                util.recursive_dict_update(expected_detail,
+                                           {
+                                               '_file': {
+                                                   'normalized_file': {
+                                                       'paths': [f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif' for filename in files],
+                                                       'gs_paths': [f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif' for filename in files],
                                                    },
                                                },
                                            })
