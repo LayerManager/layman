@@ -140,17 +140,20 @@ def get_layer_info(workspace, layername):
 
     if layername not in wms.contents:
         return {}
-    return {
+    result = {
         'title': wms.contents[layername].title,
         'description': wms.contents[layername].abstract,
         'wms': {
-            'url': wms_proxy_url
+            'url': wms_proxy_url,
         },
         '_wms': {
             'url': get_wms_url(workspace, external_url=False),
             'workspace': get_geoserver_workspace(workspace),
         },
     }
+    if 'time' in wms.contents[layername].dimensions:
+        result['wms']['time'] = wms.contents[layername].dimensions['time']
+    return result
 
 
 def get_metadata_comparison(workspace, layername):
