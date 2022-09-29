@@ -384,7 +384,7 @@ def publish_workspace_publication(publication_type,
                                  data=data,
                                  headers=headers)
         raise_layman_error(response)
-        assert response.json()[0]['name'] == name or not name
+        assert response.json()[0]['name'] == name or not name, f'name={name}, response.name={response.json()[0]["name"]}'
         name = name or response.json()[0]['name']
 
     finally:
