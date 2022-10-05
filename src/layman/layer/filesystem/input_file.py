@@ -54,6 +54,7 @@ def get_layer_info(workspace, layername):
         # input_files.raw_or_archived_main_file_path is None if user sent ZIP file by chunks without main file inside
         main_file_path = input_files.raw_or_archived_main_file_path or input_files.saved_paths[0]
         rel_main_filepath = os.path.relpath(main_file_path, common_util.get_workspace_dir(workspace))
+        main_files = input_files.raw_or_archived_main_file_paths or input_files.saved_paths
         file_type = get_file_type(rel_main_filepath)
         result = {
             'file': {
@@ -61,7 +62,7 @@ def get_layer_info(workspace, layername):
                 'file_type': file_type,
             },
             '_file': {
-                'path': main_file_path,
+                'paths': main_files,
                 'gdal_paths': input_files.main_file_paths_for_gdal,
             },
         }

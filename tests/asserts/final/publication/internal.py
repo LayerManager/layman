@@ -165,7 +165,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
             util.recursive_dict_update(expected_detail,
                                        {
                                            '_file': {
-                                               'path': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.{file_extension}',
+                                               'paths': [f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.{file_extension}'],
                                                'gdal_paths': [f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.{file_extension}'],
                                            },
                                            'file': {
@@ -176,7 +176,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
             util.recursive_dict_update(expected_detail,
                                        {
                                            '_file': {
-                                               'path': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{files[0]}',
+                                               'paths': [f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{filename}' for filename in files],
                                                'gdal_paths': [f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{filename}' for filename in files],
                                            },
                                            'file': {
