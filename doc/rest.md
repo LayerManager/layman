@@ -317,6 +317,7 @@ Body parameters:
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - if QML style is used (either directly within this request, or indirectly from previous state on server), it must list all attributes contained in given data file
+   - more than one main raster file is allowed in combination with *time_regex* parameter
 - *title*
 - *description*
 - *crs*, string, e.g. `EPSG:3857`, supported EPSG codes are defined by [LAYMAN_INPUT_SRS_LIST](./env-settings.md#LAYMAN_INPUT_SRS_LIST)

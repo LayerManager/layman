@@ -102,12 +102,6 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     publication_type = process_client.LAYER_TYPE
 
-    rest_parametrization = {
-        'method': [
-            base_test.RestMethodType('post_publication', 'post'),
-        ],
-    }
-
     test_cases = generate_test_cases()
 
     # pylint: disable=unused-argument
