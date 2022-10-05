@@ -110,12 +110,25 @@ def patch(workspace, layername):
         raise LaymanError(48, f'Parameter overview_resampling requires parameter file to be set.')
     kwargs['overview_resampling'] = overview_resampling
 
+    # Timeseries regex
+    time_regex = request.form.get('time_regex') or None
+    if time_regex:
+        try:
+            import re
+            re.compile(time_regex)
+        except re.error as exp:
+            raise LaymanError(2, {'parameter': 'time_regex',
+                                  'expected': 'Regular expression',
+                                  }) from exp
+    normalize_filenames = time_regex is None
+    enable_more_main_files = time_regex is not None
+
     # FILE NAMES
     use_chunk_upload = bool(input_files.sent_paths)
     if delete_from == 'layman.layer.filesystem.input_file':
         if not (use_chunk_upload and input_files.is_one_archive):
             input_file.check_filenames(workspace, layername, input_files,
-                                       check_crs, ignore_existing_files=True)
+                                       check_crs, ignore_existing_files=True, enable_more_main_files=enable_more_main_files)
         # file checks
         if not use_chunk_upload:
             temp_dir = tempfile.mkdtemp(prefix="layman_")
@@ -133,19 +146,10 @@ def patch(workspace, layername):
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
     kwargs['file_type'] = file_type
 
-    # Timeseries regex
-    time_regex = request.form.get('time_regex') or None
-    if time_regex:
-        try:
-            import re
-            re.compile(time_regex)
-        except re.error as exp:
-            raise LaymanError(2, {'parameter': 'time_regex',
-                                  'expected': 'Regular expression',
-                                  }) from exp
-
     kwargs['time_regex'] = time_regex
     kwargs['image_mosaic'] = time_regex is not None if delete_from == 'layman.layer.filesystem.input_file' else None
+    kwargs['normalize_filenames'] = normalize_filenames
+    kwargs['enable_more_main_files'] = enable_more_main_files
 
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
@@ -164,7 +168,7 @@ def patch(workspace, layername):
         kwargs['style_type'] = style_type
         kwargs['store_in_geoserver'] = style_type.store_in_geoserver
         if style_file:
-            input_style.save_layer_file(workspace, layername, style_file, style_type)
+            input_style.save_layer_file(workspace, layername, style_file, style_type, )
 
         kwargs.update({
             'crs_id': crs_id,
@@ -176,7 +180,7 @@ def patch(workspace, layername):
 
             if use_chunk_upload:
                 files_to_upload = input_chunk.save_layer_files_str(
-                    workspace, layername, input_files, check_crs)
+                    workspace, layername, input_files, check_crs, normalize_filenames=normalize_filenames)
                 layer_result.update({
                     'files_to_upload': files_to_upload,
                 })
