@@ -106,6 +106,7 @@ class TestResponsesClass:
         'native_bounding_box': list(test_data.SMALL_LAYER_NATIVE_BBOX),
         'db_table': {'name': None},
         'file': {'path': f'layers/{publication}/input_file/{publication}.geojson',
+                 'paths': [f'layers/{publication}/input_file/{publication}.geojson'],
                  'file_type': 'vector',
                  },
         'metadata': {'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/'

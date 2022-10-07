@@ -169,7 +169,8 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                'gdal_paths': [f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.{file_extension}'],
                                            },
                                            'file': {
-                                               'path': f'{publ_type_dir}/{name}/input_file/{name}.{file_extension}'
+                                               'path': f'{publ_type_dir}/{name}/input_file/{name}.{file_extension}',
+                                               'paths': [f'{publ_type_dir}/{name}/input_file/{name}.{file_extension}'],
                                            },
                                        })
         if files:
@@ -180,7 +181,10 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                'gdal_paths': [f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{filename}' for filename in files],
                                            },
                                            'file': {
-                                               'path': f'{publ_type_dir}/{name}/input_file/{files[0]}'
+                                               'path': f'{publ_type_dir}/{name}/input_file/{files[0]}',
+                                               'paths': [
+                                                   f'{publ_type_dir}/{name}/input_file/{filename}'
+                                                   for filename in files],
                                            },
                                        })
 
