@@ -7,11 +7,6 @@
         <sld:Name>name</sld:Name>
         <sld:Rule>
           <sld:RasterSymbolizer>
-            <sld:ChannelSelection>
-              <sld:GrayChannel>
-                <sld:SourceChannelName>1</sld:SourceChannelName>
-              </sld:GrayChannel>
-            </sld:ChannelSelection>
             <sld:ColorMap>
               {nodata_low_entry}
               <sld:ColorMapEntry color="#000000" quantity="{min_value}"/>
