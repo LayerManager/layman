@@ -11,16 +11,18 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 pytest_generate_tests = base_test.pytest_generate_tests
 
 PUBLICATIONS = {
-    'ne_110m_admin_0_countries': {
+    'one_data_file': {
         'publication_type': process_client.LAYER_TYPE,
+        'expected_name': 'ne_110m_admin_0_countries',
         'params': {
             'file_paths': [
                 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
             ],
         },
     },
-    's2a_msil2a_20220316t100031_n0400_r122_t33uwr_20220316t134748_tci_10m': {
+    'timeseries_multi_file': {
         'publication_type': process_client.LAYER_TYPE,
+        'expected_name': 's2a_msil2a_20220316t100031_n0400_r122_t33uwr_20220316t134748_tci_10m',
         'params': {
             'time_regex': r'[0-9]{8}',
             'file_paths': [
@@ -31,8 +33,9 @@ PUBLICATIONS = {
             ],
         },
     },
-    'timeseries_tif': {
+    'compressed_with_chunks': {
         'publication_type': process_client.LAYER_TYPE,
+        'expected_name': 'timeseries_tif',
         'params': {
             'time_regex': r'[0-9]{8}',
             'file_paths': [
@@ -49,8 +52,9 @@ PUBLICATIONS = {
             'with_chunks': True,
         },
     },
-    's2a_msil2a_20220319t100731_n0400_r022_t33uwr_20220319t131812_tci_10m': {
+    'timeseries_compressed': {
         'publication_type': process_client.LAYER_TYPE,
+        'expected_name': 's2a_msil2a_20220319t100731_n0400_r022_t33uwr_20220319t131812_tci_10m',
         'params': {
             'time_regex': r'[0-9]{8}',
             'file_paths': [
@@ -79,15 +83,15 @@ class TestLayer(base_test.TestSingleRestPublication):
         ],
     }
 
-    test_cases = [base_test.TestCaseType(key=name,
+    test_cases = [base_test.TestCaseType(key=key,
                                          publication=Publication(workspace='dynamic_test_workspace_implicit_name',
                                                                  type=params['publication_type'],
-                                                                 name=name),
+                                                                 name=params['expected_name']),
                                          type=EnumTestTypes.MANDATORY,
                                          params=params,
                                          marks=[pytest.mark.xfail(reason="Not yet implemented.")]
                                          if params.get('xfail') else []
-                                         ) for name, params in PUBLICATIONS.items()]
+                                         ) for key, params in PUBLICATIONS.items()]
 
     # pylint: disable=unused-argument
     @staticmethod
