@@ -31,6 +31,39 @@ PUBLICATIONS = {
             ],
         },
     },
+    'timeseries_tif': {
+        'publication_type': process_client.LAYER_TYPE,
+        'params': {
+            'time_regex': r'[0-9]{8}',
+            'file_paths': [
+                os.path.join(DIRECTORY, 'timeseries',
+                             'timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif'),
+                os.path.join(DIRECTORY, 'timeseries',
+                             'timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'),
+            ],
+            'compress': True,
+            'compress_settings': process_client.CompressTypeDef(archive_name='timeseries_tif',
+                                                                inner_directory='/timeseries_tif/',
+                                                                file_name=None,
+                                                                ),
+            'with_chunks': True,
+        },
+    },
+    's2a_msil2a_20220319t100731_n0400_r022_t33uwr_20220319t131812_tci_10m': {
+        'publication_type': process_client.LAYER_TYPE,
+        'params': {
+            'time_regex': r'[0-9]{8}',
+            'file_paths': [
+                os.path.join(DIRECTORY, 'timeseries',
+                             'timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif'),
+            ],
+            'compress': True,
+            'compress_settings': process_client.CompressTypeDef(archive_name='timeseries_tif',
+                                                                inner_directory='/timeseries_tif/',
+                                                                file_name=None,
+                                                                ),
+        },
+    },
 }
 
 
