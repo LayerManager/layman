@@ -315,6 +315,7 @@ def publish_workspace_publication(publication_type,
                                   overview_resampling=None,
                                   do_not_upload_chunks=False,
                                   time_regex=None,
+                                  do_not_post_name=False,
                                   ):
     title = title or name
     headers = headers or {}
@@ -356,9 +357,10 @@ def publish_workspace_publication(publication_type,
 
     files = []
     try:
-        data = {'name': name,
-                'title': title,
-                }
+        data = dict()
+        if not do_not_post_name:
+            data['name'] = name
+            data['title'] = title
         if not with_chunks:
             for file_path in file_paths:
                 assert os.path.isfile(file_path), file_path
