@@ -45,6 +45,14 @@ TEST_CASES = {
             'max': 254,
         }
     },
+    'tif_byte_nd0_min_max': {
+        'expected_input': {
+            'color_interpretations': ['Gray'],
+            'nodata': 0,
+            'min': 2,
+            'max': 20,
+        }
+    },
     'tif_byte_0_min_nd_max': {
         'expected_input': {
             'color_interpretations': ['Gray'],
