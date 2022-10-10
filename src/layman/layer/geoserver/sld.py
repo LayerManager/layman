@@ -97,7 +97,7 @@ def create_customized_grayscale_sld(*, file_path, min_value, max_value, nodata_v
     # and then it treats both NoData cells and 0 cells in the same way.
     if nodata_value is not None:
         # if 0 < min_value <= max_value < nodata_value, setting nodata_high_entry seems not necessary
-        if 0 <= nodata_value < min_value:
+        if nodata_value < min_value:
             nodata_low_entry = f'<sld:ColorMapEntry color="#000000" quantity="{nodata_value}" opacity="0" />'
         if 0 < min_value < nodata_value < max_value:
             nodata_low_entry = f'<sld:ColorMapEntry color="#000000" quantity="0" opacity="0" />'
