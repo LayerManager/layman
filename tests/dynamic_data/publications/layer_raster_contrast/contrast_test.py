@@ -3,7 +3,7 @@ import pytest
 
 from layman.layer.filesystem import gdal
 from test_tools import process_client
-from tests import TestTypes, Publication
+from tests import EnumTestTypes, Publication
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
@@ -72,7 +72,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     publication_type = process_client.LAYER_TYPE
 
-    test_cases = [base_test.TestCaseType(key=key, type=TestTypes.MANDATORY,
+    test_cases = [base_test.TestCaseType(key=key, type=EnumTestTypes.MANDATORY,
                                          marks=[pytest.mark.xfail(reason="Not yet implemented.")]
                                          if params.get('xfail') else []
                                          )

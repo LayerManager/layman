@@ -50,7 +50,7 @@ class TestMap(base_test.TestSingleRestPublication):
 
     test_cases = [base_test.TestCaseType(key=key,
                                          params=params,
-                                         type=tests.TestTypes.MANDATORY,
+                                         type=tests.EnumTestTypes.MANDATORY,
                                          ) for key, params in TEST_CASES.items()]
 
     def before_class(self):

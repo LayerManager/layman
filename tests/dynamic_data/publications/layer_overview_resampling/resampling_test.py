@@ -3,7 +3,7 @@ import crs as crs_def
 
 from layman import settings
 from test_tools import process_client
-from tests import TestTypes
+from tests import EnumTestTypes
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
@@ -20,7 +20,7 @@ class TestLayer(base_test.TestSingleRestPublication):
     publication_type = process_client.LAYER_TYPE
 
     test_cases = [base_test.TestCaseType(key=resampling_method,
-                                         type=TestTypes.MANDATORY if resampling_method == 'nearest' else TestTypes.OPTIONAL,
+                                         type=EnumTestTypes.MANDATORY if resampling_method == 'nearest' else EnumTestTypes.OPTIONAL,
                                          ) for
                   resampling_method in
                   settings.OVERVIEW_RESAMPLING_METHOD_LIST]

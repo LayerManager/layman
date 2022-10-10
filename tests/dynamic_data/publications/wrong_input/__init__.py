@@ -7,7 +7,7 @@ import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client, util
 from .. import common_publications as publications
-from .... import Action, Publication, dynamic_data as consts, TestTypes, TestKeys
+from .... import Action, Publication, dynamic_data as consts, EnumTestTypes, EnumTestKeys
 
 KEY_PUBLICATION_TYPE = 'publ_type'
 KEY_ACTION_PARAMS = 'action_params'
@@ -706,9 +706,9 @@ VALIDATION_PATCH_ACTION = {
 
 def generate(workspace=None):
     workspace = workspace or consts.COMMON_WORKSPACE
-    test_type_str = os.getenv(TestKeys.TYPE.value, TestTypes.MANDATORY.value)
-    test_type = TestTypes(test_type_str)
-    default_only_first_parametrization = test_type != TestTypes.OPTIONAL
+    test_type_str = os.getenv(EnumTestKeys.TYPE.value, EnumTestTypes.MANDATORY.value)
+    test_type = EnumTestTypes(test_type_str)
+    default_only_first_parametrization = test_type != EnumTestTypes.OPTIONAL
 
     result = dict()
     for testcase, tc_params in TESTCASES.items():

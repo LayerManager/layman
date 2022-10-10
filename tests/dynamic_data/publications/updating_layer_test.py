@@ -1,7 +1,7 @@
 import os
 
 from test_tools import process_client
-from tests import TestTypes
+from tests import EnumTestTypes
 from tests.asserts.final import publication as asserts_publ
 from tests.dynamic_data import base_test
 
@@ -17,7 +17,7 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
     publication_type = process_client.LAYER_TYPE
 
     test_cases = [base_test.TestCaseType(key='updating_layer',
-                                         type=TestTypes.MANDATORY,
+                                         type=EnumTestTypes.MANDATORY,
                                          params={'compress': True,
                                                  'with_chunks': True,
                                                  'do_not_upload_chunks': True,

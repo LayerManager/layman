@@ -6,7 +6,7 @@ from typing import final, List
 import pytest
 import _pytest.mark.structures
 from test_tools import process_client, cleanup
-from .. import Publication, TestTypes, TestKeys
+from .. import Publication, EnumTestTypes, EnumTestKeys
 
 RestMethodType = namedtuple('RestMethodTypeDef', ['function_name', 'name'])
 
@@ -18,22 +18,22 @@ class TestCaseType:
     key: str = None
     method: RestMethodType = None
     params: dict = field(default_factory=dict)
-    type: TestTypes = TestTypes.OPTIONAL
+    type: EnumTestTypes = EnumTestTypes.OPTIONAL
     marks: List[_pytest.mark.structures.Mark] = field(default_factory=list)
 
 
 def pytest_generate_tests(metafunc):
     # used for parametrizing subclasses of TestSingleRestPublication, called once per each test function
     # https://docs.pytest.org/en/6.2.x/parametrize.html#pytest-generate-tests
-    test_type_str = os.getenv(TestKeys.TYPE.value, TestTypes.MANDATORY.value)
-    test_type = TestTypes(test_type_str)
+    test_type_str = os.getenv(EnumTestKeys.TYPE.value, EnumTestTypes.MANDATORY.value)
+    test_type = EnumTestTypes(test_type_str)
     cls = metafunc.cls
     argvalues = []
     ids = []
 
     test_cases = cls.parametrize_test_cases()
     test_cases_for_type = [test_case for test_case in test_cases if
-                           test_type == TestTypes.OPTIONAL or test_case.type == TestTypes.MANDATORY]
+                           test_type == EnumTestTypes.OPTIONAL or test_case.type == EnumTestTypes.MANDATORY]
     for test_case in test_cases_for_type:
         rest_method = getattr(cls, test_case.method.function_name)
         argvalues.append(pytest.param(
@@ -96,7 +96,7 @@ class TestSingleRestPublication:
                                          key=input_test_case.key,
                                          method=rest_method,
                                          params=copy.deepcopy(input_test_case.params),
-                                         type=input_test_case.type or TestTypes.OPTIONAL,
+                                         type=input_test_case.type or EnumTestTypes.OPTIONAL,
                                          marks=input_test_case.marks,
                                          )
                 test_cases.append(test_case)

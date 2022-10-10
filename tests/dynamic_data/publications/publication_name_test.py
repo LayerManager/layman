@@ -6,13 +6,13 @@ from tests.asserts.final import publication as publ_asserts
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
 from tests.dynamic_data.publications import common_publications
-from ... import Publication, TestTypes, TestKeys, PublicationValues
+from ... import Publication, EnumTestTypes, EnumTestKeys, PublicationValues
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 TEST_CASES = {
     'starts_with_number': {'name': '0125_name',
-                           TestKeys.TYPE: TestTypes.OPTIONAL},
+                           EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL},
     'only_numbers': {'name': '0125'},
     '210_chars': {'name': 'a' * 210},
 }
@@ -48,7 +48,7 @@ def parametrize_test(workspace, input_test_cases, publication_types):
                                                publication=Publication(workspace, publication_definition.type, name),
                                                key=key,
                                                params=test_case_definition,
-                                               type=params.get(TestKeys.TYPE, TestTypes.MANDATORY)
+                                               type=params.get(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY)
                                                )
             test_cases.append(test_case)
     return test_cases
