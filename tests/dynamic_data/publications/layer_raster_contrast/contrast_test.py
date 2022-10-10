@@ -69,6 +69,16 @@ TEST_CASES = {
             'max': 27,
         }
     },
+    'tif_float_min_0_max_nd': {
+        'expected_input': {
+            'color_interpretations': ['Gray'],
+            'nodata': 3.4028234663852886e+38,
+            'min': -0.2364,
+            'max': 0.8629,
+            'tolerance': 0.0001,
+        },
+        'xfail': True,
+    },
 }
 
 
@@ -78,8 +88,9 @@ def assert_input_file(file_path, expected_values):
     assert gdal.get_nodata_value(file_path) == expected_values['nodata']
 
     min_value, max_value, _, _ = gdal.get_statistics(file_path)[0]
-    assert min_value == expected_values['min']
-    assert max_value == expected_values['max']
+    tolerance = expected_values.get('tolerance', 0)
+    assert min_value == pytest.approx(expected_values['min'], tolerance)
+    assert max_value == pytest.approx(expected_values['max'], tolerance)
 
 
 class TestLayer(base_test.TestSingleRestPublication):
