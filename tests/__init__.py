@@ -10,10 +10,10 @@ Publication = namedtuple('PublicationTypeDef', ['workspace', 'type', 'name'])
 PublicationValues = namedtuple('PublicationValuesDef', ['type', 'definition', 'info_values', 'thumbnail'])
 
 
-class TestTypes(Enum):
+class EnumTestTypes(Enum):
     MANDATORY = 'mandatory'
     OPTIONAL = 'optional'
 
 
-class TestKeys(Enum):
+class EnumTestKeys(Enum):
     TYPE = 'TEST_TYPE'

@@ -3,7 +3,7 @@ import pytest
 
 import crs as crs_def
 from test_tools import process_client
-from tests import TestTypes, Publication
+from tests import EnumTestTypes, Publication
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as asserts_util
 from tests.dynamic_data import base_test
@@ -87,7 +87,7 @@ def generate_test_cases():
             params = test_case_params
             params['params']['with_chunks'] = with_chunks_value
             test_case = base_test.TestCaseType(key=name + name_suffix,
-                                               type=TestTypes.MANDATORY,
+                                               type=EnumTestTypes.MANDATORY,
                                                params=params,
                                                marks=[pytest.mark.xfail(reason="Not yet implemented.")]
                                                if test_case_params.get('xfail') else []
