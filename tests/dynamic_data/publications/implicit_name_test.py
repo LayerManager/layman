@@ -19,6 +19,18 @@ PUBLICATIONS = {
             ],
         },
     },
+    's2a_msil2a_20220316t100031_n0400_r122_t33uwr_20220316t134748_tci_10m': {
+        'publication_type': process_client.LAYER_TYPE,
+        'params': {
+            'time_regex': r'[0-9]{8}',
+            'file_paths': [
+                os.path.join(DIRECTORY, 'timeseries',
+                             'timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'),
+                os.path.join(DIRECTORY, 'timeseries',
+                             'timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.tif'),
+            ],
+        },
+    },
 }
 
 
