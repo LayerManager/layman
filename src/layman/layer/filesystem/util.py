@@ -90,13 +90,15 @@ class InputFiles:
 
     @property
     def raw_main_file_paths(self):
-        return [fn for fn in self.raw_paths
-                if os.path.splitext(fn)[1].lower() in get_all_allowed_main_extensions()]
+        result = sorted([fn for fn in self.raw_paths
+                         if os.path.splitext(fn)[1].lower() in get_all_allowed_main_extensions()])
+        return result
 
     @property
     def raw_or_archived_main_file_paths(self):
-        return [fn for fn in self.raw_or_archived_paths
-                if os.path.splitext(fn)[1].lower() in get_all_allowed_main_extensions()]
+        result = sorted([fn for fn in self.raw_or_archived_paths
+                         if os.path.splitext(fn)[1].lower() in get_all_allowed_main_extensions()])
+        return result
 
     @property
     def raw_or_archived_main_file_path(self):

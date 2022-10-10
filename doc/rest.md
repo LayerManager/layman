@@ -147,6 +147,7 @@ Body parameters:
    - computer-friendly identifier of the layer
    - must be unique among all layers of one workspace
    - by default, it is file name without extension
+     - for layers with more than one main file, it is the first one in alphabetic order
    - maximal length is 210 characters
    - will be automatically adjusted using `to_safe_layer_name` function
 - *title*, string `.+`
