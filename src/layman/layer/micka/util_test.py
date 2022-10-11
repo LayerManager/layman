@@ -41,10 +41,25 @@ def test_fill_template():
         pass
     file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml',
                                                                       _get_property_values(
+                                                                          workspace='browser',
+                                                                          layername='layer',
+                                                                          uuid='ca238200-8200-1a23-9399-42c9fca53542',
+                                                                          title='CORINE - Krajinný pokryv CLC 90',
+                                                                          abstract=None,
+                                                                          md_organisation_name=None,
+                                                                          organisation_name=None,
+                                                                          publication_date='2007-05-25',
+                                                                          revision_date='2008-05-25',
+                                                                          md_date_stamp='2007-05-25',
+                                                                          identifier='http://www.env.cz/data/corine/1990',
+                                                                          identifier_label='MZP-CORINE',
                                                                           spatial_resolution={
                                                                               'scale_denominator': None,
                                                                           },
+                                                                          wms_url="http://www.env.cz/corine/data/download.zip",
                                                                           wfs_url='http://www.env.cz/corine/data/download.zip',
+                                                                          crs_list=['EPSG:3857', 'EPSG:4326'],
+                                                                          extent=[11.87, 48.12, 19.13, 51.59],
                                                                       ), METADATA_PROPERTIES)
     with open(xml_path, 'wb') as out:
         out.write(file_object.read())

@@ -192,28 +192,27 @@ def get_template_path_and_values(workspace, layername, http_method=None):
 
 
 def _get_property_values(
-        workspace='browser',
-        layername='layer',
-        uuid='ca238200-8200-1a23-9399-42c9fca53542',
-        title='CORINE - Krajinný pokryv CLC 90',
-        abstract=None,
-        md_organisation_name=None,
-        organisation_name=None,
-        publication_date='2007-05-25',
-        revision_date='2008-05-25',
-        md_date_stamp='2007-05-25',
-        identifier='http://www.env.cz/data/corine/1990',
-        identifier_label='MZP-CORINE',
-        extent=None,  # w, s, e, n
-        wms_url="http://www.env.cz/corine/data/download.zip",
-        wfs_url=None,
-        crs_list=None,
+        workspace,
+        layername,
+        uuid,
+        title,
+        abstract,
+        md_organisation_name,
+        organisation_name,
+        publication_date,
+        revision_date,
+        md_date_stamp,
+        identifier,
+        identifier_label,
+        wms_url,
+        extent,  # w, s, e, n
+        wfs_url,
+        crs_list,
         spatial_resolution=None,
         languages=None,
         md_language=None,
 ):
-    crs_list = crs_list or ['EPSG:3857', 'EPSG:4326']
-    west, south, east, north = extent or [11.87, 48.12, 19.13, 51.59]
+    west, south, east, north = extent
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
     languages = languages or []
 
