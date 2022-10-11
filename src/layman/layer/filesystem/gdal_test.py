@@ -167,3 +167,13 @@ def test_create_vrt_file_if_needed(file_path, exp_result):
     if result:
         assert os.path.exists(exp_result)
         os.remove(exp_result)
+
+
+@pytest.mark.parametrize('file_path, exp_result', [
+    ('sample/layman.layer/sample_jp2_rgb.jp2', 'JP2OpenJPEG'),
+    ('sample/layman.layer/sample_tif_rgb.tif', 'GTiff'),
+    ('sample/layman.layer/sample_tiff_rgba_opaque.tiff', 'GTiff'),
+    ('sample/layman.layer/sample_jpg_aux_rgba.jpg', 'JPEG'),
+])
+def test_get_driver_short_name(file_path, exp_result):
+    assert gdal.get_driver_short_name(file_path) == exp_result

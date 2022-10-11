@@ -181,6 +181,12 @@ def get_statistics(filepath):
     return result
 
 
+def get_driver_short_name(filepath):
+    dataset = open_raster_file(filepath, gdal.GA_ReadOnly)
+    result = dataset.GetDriver().ShortName
+    return result
+
+
 def is_nodata_out_of_min_max(filepath, *, nodata_values):
     if to_nodata_value(nodata_values) is None:
         result = False
