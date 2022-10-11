@@ -272,6 +272,18 @@ Synchronizable: yes
 XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution`
 
 
+### temporal_extent
+Multiplicity: 1..n
+
+Shape: Array of strings
+
+Example: `["2022-03-16T00:00:00.000Z", "2022-03-19T00:00:00.000Z"]`
+
+Synchronizable: yes
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:temporalElement[gmd:EX_TemporalExtent/gmd:extent/gml:TimeInstant/gml:timePosition]/gmd:EX_TemporalExtent/gmd:extent/gml:TimeInstant/gml:timePosition/text()`
+
+
 ### title
 Multiplicity: 1
 
