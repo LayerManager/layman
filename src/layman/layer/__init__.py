@@ -88,6 +88,7 @@ PUBLICATION_TYPES = {
                 'revision_date',
                 'reference_system',
                 'spatial_resolution',
+                'temporal_extent',
                 'title',
                 'wfs_url',
                 'wms_url',

@@ -455,6 +455,25 @@ def adjust_extent(prop_el, prop_value):
         _add_unknown_reason(prop_el)
 
 
+def adjust_temporal_element(prop_el, prop_value):
+    _clear_el(prop_el)
+    if prop_value is not None:
+        parser = ET.XMLParser(remove_blank_text=True)
+        el_id = f'TI_{prop_value.replace(":", "-")}'
+        child_el = ET.fromstring(f"""
+  <gmd:EX_TemporalExtent xmlns:gmd="{NAMESPACES['gmd']}" xmlns:gml="{NAMESPACES['gml']}">
+    <gmd:extent>
+      <gml:TimeInstant gml:id="{el_id}">
+        <gml:timePosition>{prop_value}</gml:timePosition>
+      </gml:TimeInstant>
+    </gmd:extent>
+  </gmd:EX_TemporalExtent>
+""", parser=parser)
+        prop_el.append(child_el)
+    else:
+        _add_unknown_reason(prop_el)
+
+
 def adjust_online_url(prop_el, prop_value, resource_protocol=None, online_function=None):
     assert resource_protocol is not None
     assert online_function is not None

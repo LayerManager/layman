@@ -176,6 +176,7 @@ def get_template_path_and_values(workspace, layername, http_method=None):
         identifier=url_for('rest_workspace_layer.get', workspace=workspace, layername=layername),
         identifier_label=layername,
         extent=extent,
+        temporal_extent=None,
         wms_url=wms.get_wms_url(workspace, external_url=True),
         wfs_url=wfs_url,
         md_organisation_name=None,
@@ -206,6 +207,7 @@ def _get_property_values(
         identifier_label,
         wms_url,
         extent,  # w, s, e, n
+        temporal_extent,
         wfs_url,
         crs_list,
         spatial_resolution=None,
@@ -215,6 +217,7 @@ def _get_property_values(
     west, south, east, north = extent
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
     languages = languages or []
+    temporal_extent = temporal_extent or []
 
     result = {
         'md_file_identifier': get_metadata_uuid(uuid),
@@ -231,7 +234,7 @@ def _get_property_values(
         'abstract': abstract,
         'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
         'extent': extent,
-
+        'temporal_extent': temporal_extent,
         'wms_url': f"{wms.add_capabilities_params_to_url(wms_url)}&LAYERS={layername}",
         'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={layername}" if wfs_url else None,
         'layer_endpoint': url_for('rest_workspace_layer.get', workspace=workspace, layername=layername),
@@ -352,6 +355,13 @@ METADATA_PROPERTIES = {
         'xpath_extract': './gmd:EX_GeographicBoundingBox/*/gco:Decimal/text()',
         'xpath_extract_fn': lambda l: [float(l[0]), float(l[2]), float(l[1]), float(l[3])] if len(l) == 4 else None,
         'adjust_property_element': common_util.adjust_extent,
+    },
+    'temporal_extent': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent',
+        'xpath_property': './gmd:temporalElement[gmd:EX_TemporalExtent/gmd:extent/gml:TimeInstant/gml:timePosition]',
+        'xpath_extract': './gmd:EX_TemporalExtent/gmd:extent/gml:TimeInstant/gml:timePosition/text()',
+        'xpath_extract_fn': lambda l: l[0] if l else None,
+        'adjust_property_element': common_util.adjust_temporal_element,
     },
     'wms_url': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
