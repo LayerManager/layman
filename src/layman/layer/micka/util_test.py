@@ -60,6 +60,8 @@ def test_fill_template():
                                                                           wfs_url='http://www.env.cz/corine/data/download.zip',
                                                                           crs_list=['EPSG:3857', 'EPSG:4326'],
                                                                           extent=[11.87, 48.12, 19.13, 51.59],
+                                                                          temporal_extent=['2022-03-16T00:00:00.000Z',
+                                                                                           '2022-03-19T00:00:00.000Z', ]
                                                                       ), METADATA_PROPERTIES)
     with open(xml_path, 'wb') as out:
         out.write(file_object.read())

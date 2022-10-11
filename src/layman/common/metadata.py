@@ -67,6 +67,11 @@ PROPERTIES = {
         'upper_mp': '1',
         'equals_fn': extent_4326_equals,
     },
+    'temporal_extent': {
+        'upper_mp': '*',
+        'equals_fn': lambda a, b: set(a) == set(b),
+        'empty_fn': lambda a: isinstance(a, list) and len(a) == 0,
+    },
     'wms_url': {
         'upper_mp': '1',
         'equals_fn': lambda a, b: strip_capabilities_and_layers_params(a) == strip_capabilities_and_layers_params(b),
