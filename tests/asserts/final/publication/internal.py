@@ -290,6 +290,27 @@ def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
             assert normalized_nodata_value == pytest.approx(input_nodata_value, 0.000000001)
 
 
+def stats_preserved_in_normalized_raster(workspace, publ_type, name):
+    with app.app_context():
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file']})
+    file_type = publ_info['file']['file_type']
+    if file_type == settings.FILE_TYPE_RASTER:
+        gdal_paths = publ_info['_file']['gdal_paths']
+        normalized_paths = publ_info['_file']['normalized_file']['paths']
+        for file_idx, gdal_path in enumerate(gdal_paths):
+            normalized_path = normalized_paths[file_idx]
+            input_stats = gdal.get_statistics(gdal_path)
+            driver_name = gdal.get_driver_short_name(gdal_path)
+            tolerance = 0.000000001 if driver_name != 'JPEG' else 0.1
+            normalized_stats = gdal.get_statistics(normalized_path)
+            for band_idx in range(0, min(len(input_stats), len(normalized_stats))):
+                input_band_stats = input_stats[band_idx]
+                normalized_band_stats = normalized_stats[band_idx]
+                for value_idx, input_value in enumerate(input_band_stats):
+                    normalized_value = normalized_band_stats[value_idx]
+                    assert input_value == pytest.approx(normalized_value, tolerance), f"band_idx={band_idx}, input_band_stats={input_band_stats}, normalized_band_stats={normalized_band_stats}, tolerance={tolerance}"
+
+
 def expected_chain_info_state(workspace, publ_type, name, state):
     chain_info = celery.get_publication_chain_info_dict(workspace, publ_type, name)
     assert chain_info['state'] == state, f'chain_info={chain_info}'
