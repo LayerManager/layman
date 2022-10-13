@@ -259,10 +259,14 @@ def normalize_raster_file_async(input_path, crs_id, output_file):
             bash_args.extend([
                 '-co', 'ALPHA=YES',
             ])
-    pixel_size = get_pixel_size(input_path)
-    tr_list = [str(ps) for ps in pixel_size]
-    tr_list.insert(0, '-tr')
-    bash_args.extend(tr_list)
+    raster_bbox = get_bbox_from_file(input_path)
+    te_list = [str(ps) for ps in raster_bbox]
+    te_list.insert(0, '-te')
+    bash_args.extend(te_list)
+    raster_size = get_raster_size(input_path)
+    ts_list = [str(ps) for ps in raster_size]
+    ts_list.insert(0, '-ts')
+    bash_args.extend(ts_list)
     if crs_id is not None:
         bash_args.extend([
             '-s_srs', f'{crs_id}',
