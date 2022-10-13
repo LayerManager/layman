@@ -114,6 +114,7 @@ def csw_insert(workspace, layername):
 
 
 def get_template_path_and_values(workspace, layername, http_method):
+    logger.info(f'get_template_path_and_values start calculating data for {workspace}:{layername}')
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
     publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
         'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'file_type', 'db_table'],
@@ -195,6 +196,7 @@ def get_template_path_and_values(workspace, layername, http_method):
     if http_method == common.REQUEST_METHOD_PATCH:
         prop_values['revision_date'] = revision_date.strftime('%Y-%m-%d')
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
+    logger.info(f'get_template_path_and_values data calculated for {workspace}:{layername}')
     return template_path, prop_values
 
 
