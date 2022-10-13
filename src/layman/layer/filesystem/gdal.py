@@ -355,8 +355,7 @@ def delete_normalized_raster_workspace(workspace):
         pass
 
 
-def get_bbox(workspace, layer):
-    filepath = get_normalized_raster_layer_main_filepaths(workspace, layer)[0]
+def get_bbox_from_file(filepath):
     data = open_raster_file(filepath, gdalconst.GA_ReadOnly)
     geo_transform = data.GetGeoTransform()
     minx = geo_transform[0]
@@ -364,6 +363,12 @@ def get_bbox(workspace, layer):
     maxx = minx + geo_transform[1] * data.RasterXSize
     miny = maxy + geo_transform[5] * data.RasterYSize
     result = (minx, miny, maxx, maxy)
+    return result
+
+
+def get_bbox(workspace, layer):
+    filepath = get_normalized_raster_layer_main_filepaths(workspace, layer)[0]
+    result = get_bbox_from_file(filepath)
     return result
 
 
