@@ -37,6 +37,7 @@ def test_raster_files(workspace, publ_type, publication):
         assert overview_counts == [exp_def_overview_count] * len(overview_counts)
 
     asserts_internal.nodata_preserved_in_normalized_raster(workspace, publ_type, publication)
+    asserts_internal.size_and_position_preserved_in_normalized_raster(workspace, publ_type, publication)
     asserts_internal.stats_preserved_in_normalized_raster(workspace, publ_type, publication)
 
 
