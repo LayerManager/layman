@@ -113,7 +113,7 @@ def csw_insert(workspace, layername):
     return muuid
 
 
-def get_template_path_and_values(workspace, layername, http_method=None):
+def get_template_path_and_values(workspace, layername, http_method):
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
     publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
         'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'file_type', 'db_table'],
