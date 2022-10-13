@@ -19,6 +19,7 @@ IS_LAYER_COMPLETE_AND_CONSISTENT = [
     Action(internal.other_keys_not_in_primary_db_schema_of_actor, dict()),
     Action(internal.mandatory_keys_in_all_sources_of_actor, dict()),
     Action(internal.nodata_preserved_in_normalized_raster, dict()),
+    Action(internal.size_and_position_preserved_in_normalized_raster, dict()),
     Action(internal.stats_preserved_in_normalized_raster, dict()),
     Action(rest.is_complete_in_rest, dict()),
     Action(rest.mandatory_keys_in_rest, dict()),

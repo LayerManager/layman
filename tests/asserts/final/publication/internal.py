@@ -311,6 +311,35 @@ def stats_preserved_in_normalized_raster(workspace, publ_type, name):
                     assert input_value == pytest.approx(normalized_value, tolerance), f"band_idx={band_idx}, input_band_stats={input_band_stats}, normalized_band_stats={normalized_band_stats}, tolerance={tolerance}"
 
 
+def size_and_position_preserved_in_normalized_raster(workspace, publ_type, name):
+    with app.app_context():
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file']})
+    file_type = publ_info['file']['file_type']
+    if file_type == settings.FILE_TYPE_RASTER:
+        gdal_paths = publ_info['_file']['gdal_paths']
+        normalized_paths = publ_info['_file']['normalized_file']['paths']
+        for file_idx, gdal_path in enumerate(gdal_paths):
+            normalized_path = normalized_paths[file_idx]
+
+            input_raster_size = gdal.get_raster_size(gdal_path)
+            normalized_raster_size = gdal.get_raster_size(normalized_path)
+            assert input_raster_size == normalized_raster_size, f"input_raster_size={input_raster_size}, normalized_raster_size={normalized_raster_size}"
+
+            input_pixel_size = gdal.get_pixel_size(gdal_path)
+            normalized_pixel_size = gdal.get_pixel_size(normalized_path)
+            pixel_size_tolerance = 0.000000001
+            for value_idx, input_value in enumerate(input_pixel_size):
+                normalized_value = normalized_pixel_size[value_idx]
+                assert input_value == pytest.approx(normalized_value, pixel_size_tolerance), f"input_pixel_size={input_pixel_size}, normalized_pixel_size={normalized_pixel_size}, tolerance={pixel_size_tolerance}"
+
+            input_bbox = gdal.get_bbox_from_file(gdal_path)
+            normalized_bbox = gdal.get_bbox_from_file(normalized_path)
+            bbox_tolerance = 0.000000001
+            for value_idx, input_value in enumerate(input_bbox):
+                normalized_value = normalized_bbox[value_idx]
+                assert input_value == pytest.approx(normalized_value, bbox_tolerance), f"input_bbox={input_bbox}, normalized_bbox={normalized_bbox}, tolerance={bbox_tolerance}"
+
+
 def expected_chain_info_state(workspace, publ_type, name, state):
     chain_info = celery.get_publication_chain_info_dict(workspace, publ_type, name)
     assert chain_info['state'] == state, f'chain_info={chain_info}'
