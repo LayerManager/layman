@@ -164,87 +164,38 @@ def get_template_path_and_values(workspace, layername, http_method):
     else:
         raise NotImplementedError(f"Unknown file type: {file_type}")
 
-    prop_values = _get_property_values(
-        workspace=workspace,
-        layername=layername,
-        uuid=get_layer_uuid(workspace, layername),
-        title=title,
-        abstract=abstract or None,
-        publication_date=publ_datetime.strftime('%Y-%m-%d'),
-        revision_date=revision_date.strftime('%Y-%m-%d'),
-        md_date_stamp=date.today().strftime('%Y-%m-%d'),
-        identifier=url_for('rest_workspace_layer.get', workspace=workspace, layername=layername),
-        identifier_label=layername,
-        extent=extent,
-        temporal_extent=None,
-        wms_url=wms.get_wms_url(workspace, external_url=True),
-        wfs_url=wfs_url,
-        md_organisation_name=None,
-        organisation_name=None,
-        md_language=md_language,
-        languages=languages,
-        spatial_resolution=spatial_resolution,
-        crs_list=settings.LAYMAN_OUTPUT_SRS_LIST,
-    )
-    if http_method == common.REQUEST_METHOD_POST:
-        prop_values.pop('revision_date', None)
-    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
-    return template_path, prop_values
-
-
-def _get_property_values(
-        workspace,
-        layername,
-        uuid,
-        title,
-        abstract,
-        md_organisation_name,
-        organisation_name,
-        publication_date,
-        revision_date,
-        md_date_stamp,
-        identifier,
-        identifier_label,
-        wms_url,
-        extent,  # w, s, e, n
-        temporal_extent,
-        wfs_url,
-        crs_list,
-        spatial_resolution=None,
-        languages=None,
-        md_language=None,
-):
     west, south, east, north = extent
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
     languages = languages or []
-    temporal_extent = temporal_extent or []
+    temporal_extent = None
 
-    result = {
-        'md_file_identifier': get_metadata_uuid(uuid),
+    prop_values = {
+        'md_file_identifier': get_metadata_uuid(get_layer_uuid(workspace, layername)),
         'md_language': md_language,
-        'md_date_stamp': md_date_stamp,
-        'reference_system': crs_list,
+        'md_date_stamp': date.today().strftime('%Y-%m-%d'),
+        'reference_system': settings.LAYMAN_OUTPUT_SRS_LIST,
         'title': title,
-        'publication_date': publication_date,
-        'revision_date': revision_date,
+        'publication_date': publ_datetime.strftime('%Y-%m-%d'),
         'identifier': {
-            'identifier': identifier,
-            'label': identifier_label,
+            'identifier': url_for('rest_workspace_layer.get', workspace=workspace, layername=layername),
+            'label': layername,
         },
         'abstract': abstract,
         'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
         'extent': extent,
-        'temporal_extent': temporal_extent,
-        'wms_url': f"{wms.add_capabilities_params_to_url(wms_url)}&LAYERS={layername}",
+        'temporal_extent': temporal_extent or [],
+        'wms_url': f"{wms.add_capabilities_params_to_url(wms.get_wms_url(workspace, external_url=True))}&LAYERS={layername}",
         'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={layername}" if wfs_url else None,
         'layer_endpoint': url_for('rest_workspace_layer.get', workspace=workspace, layername=layername),
         'spatial_resolution': spatial_resolution,
         'language': languages,
-        'md_organisation_name': md_organisation_name,
-        'organisation_name': organisation_name,
+        'md_organisation_name': None,
+        'organisation_name': None,
     }
-
-    return result
+    if http_method == common.REQUEST_METHOD_PATCH:
+        prop_values['revision_date'] = revision_date.strftime('%Y-%m-%d')
+    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
+    return template_path, prop_values
 
 
 METADATA_PROPERTIES = {
