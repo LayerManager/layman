@@ -6,11 +6,12 @@ import pytest
 
 del sys.modules['layman']
 
-from layman import uuid, app, settings
+from layman import uuid, app, settings, util as layman_util
 from layman.common.micka import util as common_util
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals
+from layman.layer.geoserver import wms, wfs
 from test_tools.util import url_for
-from .csw import _get_property_values, METADATA_PROPERTIES
+from . import csw as csw_util
 
 
 @pytest.fixture(scope="module")
@@ -39,30 +40,42 @@ def test_fill_template():
         os.remove(xml_path)
     except OSError:
         pass
+    workspace = 'browser'
+    layer = 'layer'
     file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml',
-                                                                      _get_property_values(
-                                                                          workspace='browser',
-                                                                          layername='layer',
-                                                                          uuid='ca238200-8200-1a23-9399-42c9fca53542',
-                                                                          title='CORINE - Krajinný pokryv CLC 90',
-                                                                          abstract=None,
-                                                                          md_organisation_name=None,
-                                                                          organisation_name=None,
-                                                                          publication_date='2007-05-25',
-                                                                          revision_date='2008-05-25',
-                                                                          md_date_stamp='2007-05-25',
-                                                                          identifier='http://www.env.cz/data/corine/1990',
-                                                                          identifier_label='MZP-CORINE',
-                                                                          spatial_resolution={
+                                                                      {
+                                                                          'md_file_identifier': csw_util.get_metadata_uuid('ca238200-8200-1a23-9399-42c9fca53542'),
+                                                                          'md_language': None,
+                                                                          'md_date_stamp': '2007-05-25',
+                                                                          'reference_system': ['EPSG:3857', 'EPSG:4326'],
+                                                                          'title': 'CORINE - Krajinný pokryv CLC 90',
+                                                                          'publication_date': '2007-05-25',
+                                                                          'revision_date': '2008-05-25',
+                                                                          'identifier': {
+                                                                              'identifier': 'http://www.env.cz/data/corine/1990',
+                                                                              'label': 'MZP-CORINE',
+                                                                          },
+                                                                          'abstract': None,
+                                                                          'graphic_url': layman_util.url_for(
+                                                                              'rest_workspace_layer_thumbnail.get',
+                                                                              workspace=workspace,
+                                                                              layername=layer),
+                                                                          'extent': [11.87, 48.12, 19.13, 51.59],
+                                                                          'temporal_extent': ['2022-03-16T00:00:00.000Z',
+                                                                                              '2022-03-19T00:00:00.000Z', ],
+                                                                          'wms_url': f"{wms.add_capabilities_params_to_url('http://www.env.cz/corine/data/download.zip')}&LAYERS={layer}",
+                                                                          'wfs_url': f"{wfs.add_capabilities_params_to_url('http://www.env.cz/corine/data/download.zip')}&LAYERS={layer}",
+                                                                          'layer_endpoint': layman_util.url_for(
+                                                                              'rest_workspace_layer.get',
+                                                                              workspace=workspace,
+                                                                              layername=layer),
+                                                                          'spatial_resolution': {
                                                                               'scale_denominator': None,
                                                                           },
-                                                                          wms_url="http://www.env.cz/corine/data/download.zip",
-                                                                          wfs_url='http://www.env.cz/corine/data/download.zip',
-                                                                          crs_list=['EPSG:3857', 'EPSG:4326'],
-                                                                          extent=[11.87, 48.12, 19.13, 51.59],
-                                                                          temporal_extent=['2022-03-16T00:00:00.000Z',
-                                                                                           '2022-03-19T00:00:00.000Z', ]
-                                                                      ), METADATA_PROPERTIES)
+                                                                          'language': [],
+                                                                          'md_organisation_name': None,
+                                                                          'organisation_name': None,
+                                                                      }, csw_util.METADATA_PROPERTIES)
     with open(xml_path, 'wb') as out:
         out.write(file_object.read())
 
@@ -94,7 +107,7 @@ def test_parse_md_properties():
             'title',
             'wfs_url',
             'wms_url',
-        ], METADATA_PROPERTIES)
+        ], csw_util.METADATA_PROPERTIES)
     with app.app_context():
         expected = {
             'md_file_identifier': 'm-ca238200-8200-1a23-9399-42c9fca53542',
@@ -157,7 +170,7 @@ def test_fill_xml_template():
                                                                               'wms_url': 'https://example.com/wms',
                                                                               'wfs_url': 'https://example.com/wfs',
                                                                               'layer_endpoint': 'https://example.com/layer_endpoint',
-                                                                          }, METADATA_PROPERTIES)
+                                                                          }, csw_util.METADATA_PROPERTIES)
 
     expected_path = 'src/layman/layer/micka/record-template-filled.xml'
     with open(expected_path) as file:
