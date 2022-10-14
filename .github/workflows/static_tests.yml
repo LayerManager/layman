@@ -5,13 +5,7 @@ on:
     branches:
       - master
       - '[1-9].*.x'
-    paths-ignore:
-      - '**.md'
-      - '**.txt'
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - '**.txt'
   workflow_dispatch:
 
 jobs:
