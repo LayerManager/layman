@@ -190,12 +190,16 @@ def get_metadata_comparison(workspace, layername):
     except BaseException as exc:
         current_app.logger.error(exc)
         reference_system = None
+
+    temporal_extent = wms.contents[layername].dimensions['time']['values'] if 'time' in wms.contents[layername].dimensions else None
+
     props = {
         'wms_url': wms_url,
         'title': title,
         'abstract': abstract,
         'extent': extent,
         'reference_system': reference_system,
+        'temporal_extent': temporal_extent,
     }
     # current_app.logger.info(f"props:\n{json.dumps(props, indent=2)}")
     url = get_capabilities_url(workspace)

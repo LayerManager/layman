@@ -299,6 +299,10 @@ def parse_md_properties(file_obj, property_names, publ_properties):
             result[prop_name] = prop_values[0] if prop_values else None
         else:
             result[prop_name] = prop_values
+        if common_prop.get('ensure_order') is True:
+            result[prop_name].sort()
+        if common_prop.get('empty_list_to_none') is True:
+            result[prop_name] = result[prop_name] if result[prop_name] else None
     return result
 
 
