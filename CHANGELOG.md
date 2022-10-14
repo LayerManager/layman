@@ -20,6 +20,7 @@
 - [#635](https://github.com/LayerManager/layman/issues/635) Metadata sources returns new key ['temporal_extent'](doc/metadata.md#temporal_extent).
 - [#667](https://github.com/LayerManager/layman/issues/667) Fix broken statistics during normalization of float rasters with big nodata value.
 - [#668](https://github.com/LayerManager/layman/issues/668) Fix broken size of raster in EPSG:3034 during normalization.
+- [#669](https://github.com/LayerManager/layman/issues/669) Fix slow publication of vector layers metadata to Micka. The reason was slow guessing of [`spatial_resolution.scale_denominator`](doc/metadata.md#spatial_resolution) metadata property.
 
 ## v1.17.0
  2022-07-21

@@ -284,14 +284,22 @@ select *, --ST_NPoints(geometry),
 from t2
 )
 , t3 as (
-SELECT ogc_fid, dump_id, ring_id, ST_Transform(geometry, 4326) as geometry, generate_series(1, st_npoints(geometry)-1) as point_idx
+SELECT ogc_fid, dump_id, ring_id, (ST_DumpPoints(st_transform(geometry, 4326))).*
 FROM t2cumsum
 where cum_sum_points < 50000
 )
+, t4 as MATERIALIZED (
+    select t3.ogc_fid, t3.dump_id, t3.ring_id, t3.path[1] as point_idx, t3.geom as point1, t3p2.geom as point2
+    from t3
+             inner join t3 t3p2 on (t3.ogc_fid = t3p2.ogc_fid and
+                                    t3.dump_id = t3p2.dump_id and
+                                    t3.ring_id = t3p2.ring_id and
+                                    t3.path[1] + 1 = t3p2.path[1])
+)
 , tdist as (
-SELECT ogc_fid, dump_id, ring_id, ST_PointN(geometry, point_idx), point_idx,
-    ST_DistanceSphere(ST_PointN(geometry, point_idx), ST_PointN(geometry, point_idx+1)) as distance
-FROM t3
+SELECT ogc_fid, dump_id, ring_id, point_idx,
+    ST_DistanceSphere(point1, point2) as distance
+FROM t4
 )
 , tstat as (
 select

@@ -33,6 +33,12 @@ def post_layer(workspace, layer, file_path):
         publications.delete_publication(workspace, LAYER_TYPE, layer)
 
 
+@pytest.fixture(scope="function")
+def posted_layer(request):
+    layer_name, file_path = request.param
+    yield from post_layer(WORKSPACE, layer_name, file_path)
+
+
 @pytest.fixture(scope="module")
 def boundary_table():
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp'
@@ -296,6 +302,17 @@ def test_guess_scale_denominator(country110m_table, country50m_table, country10m
         sd_5k = guess_scale_denominator(workspace, layername_5k)
     assert 1000 <= sd_5k <= 25000
     assert sd_5k == 5000
+
+
+@pytest.mark.parametrize("posted_layer, exp_result", [
+    pytest.param(('25k_vertexes', 'sample/layman.layer/25k_vertexes.geojson'), 5000, id='25k_vertexes',
+                 marks=pytest.mark.timeout(5, method="thread"))
+], indirect=["posted_layer"])
+def test_guess_scale_denominator_performance(posted_layer, exp_result):
+    workspace, layer = posted_layer
+    with layman.app_context():
+        result = guess_scale_denominator(workspace, layer)
+    assert result == exp_result
 
 
 def test_empty_table_bbox(empty_table):
