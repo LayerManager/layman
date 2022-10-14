@@ -48,6 +48,7 @@ METADATA_PROPERTIES = {
     'reference_system',
     'revision_date',
     'spatial_resolution',
+    'temporal_extent',
     'title',
     'wfs_url',
     'wms_url',

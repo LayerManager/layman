@@ -14,6 +14,7 @@ METADATA_PROPERTIES = {
     'reference_system',
     'revision_date',
     # 'spatial_resolution',  # It is not updated for vector layer updated as raster one (https://trello.com/c/hRkFNuXP)
+    'temporal_extent',
     'title',
     'wfs_url',
     'wms_url',

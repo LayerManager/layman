@@ -230,6 +230,7 @@ def layer_info_to_metadata_properties(info):
         'wms_url': info.get('wms', {}).get('url', None),
         'wfs_url': info.get('wfs', {}).get('url', None),
         'layer_endpoint': info['url'],
+        'temporal_extent': info.get('wms', {}).get('time', {}).get('values'),
     }
     return result
 

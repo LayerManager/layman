@@ -71,6 +71,8 @@ PROPERTIES = {
         'upper_mp': '*',
         'equals_fn': lambda a, b: set(a) == set(b),
         'empty_fn': lambda a: isinstance(a, list) and len(a) == 0,
+        'ensure_order': True,
+        'empty_list_to_none': True,
     },
     'wms_url': {
         'upper_mp': '1',
@@ -95,6 +97,7 @@ PROPERTIES = {
         'upper_mp': '1',
     },
 }
+assert all(prop_val.get('ensure_order') is None or prop_val['upper_mp'] == '*' for prop_val in PROPERTIES.values())
 
 
 def prop_equals(value_a, value_b, equals_fn=None):

@@ -117,7 +117,7 @@ def get_template_path_and_values(workspace, layername, http_method):
     logger.info(f'get_template_path_and_values start calculating data for {workspace}:{layername}')
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
     publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
-        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'file_type', 'db_table'],
+        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'file_type', 'db_table', 'wms'],
     })
     title = publ_info['title']
     abstract = publ_info.get('description')
@@ -134,6 +134,7 @@ def get_template_path_and_values(workspace, layername, http_method):
         title or '',
         abstract or ''
     ]))), None)
+    temporal_extent = publ_info['wms'].get('time', dict()).get('values', [])
 
     file_type = publ_info.get('_file_type')
     if file_type == settings.FILE_TYPE_VECTOR:
@@ -168,7 +169,6 @@ def get_template_path_and_values(workspace, layername, http_method):
     west, south, east, north = extent
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
     languages = languages or []
-    temporal_extent = None
 
     prop_values = {
         'md_file_identifier': get_metadata_uuid(get_layer_uuid(workspace, layername)),
@@ -184,7 +184,7 @@ def get_template_path_and_values(workspace, layername, http_method):
         'abstract': abstract,
         'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
         'extent': extent,
-        'temporal_extent': temporal_extent or [],
+        'temporal_extent': temporal_extent,
         'wms_url': f"{wms.add_capabilities_params_to_url(wms.get_wms_url(workspace, external_url=True))}&LAYERS={layername}",
         'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={layername}" if wfs_url else None,
         'layer_endpoint': url_for('rest_workspace_layer.get', workspace=workspace, layername=layername),
@@ -369,6 +369,7 @@ def get_metadata_comparison(workspace, layername):
         'revision_date',
         'reference_system',
         'spatial_resolution',
+        'temporal_extent',
         'title',
         'wfs_url',
         'wms_url',
