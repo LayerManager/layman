@@ -13,7 +13,7 @@ METADATA_PROPERTIES = {
     'publication_date',
     'reference_system',
     'revision_date',
-    # 'spatial_resolution',  # It is not updated for vector layer updated as raster one (https://trello.com/c/hRkFNuXP)
+    # 'spatial_resolution',  # It is not updated for vector layer updated as raster one (probably because of bug in Micka)
     'temporal_extent',
     'title',
     'wfs_url',
