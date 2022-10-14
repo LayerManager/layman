@@ -269,8 +269,8 @@ def guess_scale_denominator(workspace, layer):
     return db.guess_scale_denominator(workspace, table_name)
 
 
-def test_get_most_frequent_lower_distance(country110m_table, country50m_table, country10m_table,
-                                          data200road_table, sm5building_table):
+def test_guess_scale_denominator(country110m_table, country50m_table, country10m_table,
+                                 data200road_table, sm5building_table):
     _, layername_110m = country110m_table
     _, layername_50m = country50m_table
     _, layername_10m = country10m_table
