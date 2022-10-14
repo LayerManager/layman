@@ -2,6 +2,7 @@ import os
 import pytest
 
 import crs as crs_def
+from layman import common
 from test_tools import process_client
 from tests import EnumTestTypes, Publication
 from tests.asserts.final import publication as asserts_publ
@@ -97,7 +98,6 @@ def generate_test_cases():
 
 
 class TestLayer(base_test.TestSingleRestPublication):
-
     workspace = 'dynamic_test_workspace_timeseries_layer'
 
     publication_type = process_client.LAYER_TYPE
@@ -105,8 +105,7 @@ class TestLayer(base_test.TestSingleRestPublication):
     test_cases = generate_test_cases()
 
     # pylint: disable=unused-argument
-    @staticmethod
-    def test_timeseries_layer(layer: Publication, key, params, rest_method):
+    def test_timeseries_layer(self, layer: Publication, key, params, rest_method):
         """Parametrized using pytest_generate_tests"""
         rest_method(layer, params=params.get('params', {}))
 
@@ -122,7 +121,8 @@ class TestLayer(base_test.TestSingleRestPublication):
         ]:
             exp_wms = os.path.join(DIRECTORY, f"wms_{time}.png")
             asserts_publ.geoserver.wms_spatial_precision(layer.workspace, layer.type, layer.name, crs=crs_def.EPSG_3857,
-                                                         extent=[1743913.19942603237, 6499107.284021802247, 1755465.937341974815, 6503948.597792930901, ],
+                                                         extent=[1743913.19942603237, 6499107.284021802247, 1755465.937341974815,
+                                                                 6503948.597792930901, ],
                                                          img_size=(1322, 554),
                                                          wms_version='1.3.0',
                                                          pixel_diff_limit=200,
@@ -133,3 +133,12 @@ class TestLayer(base_test.TestSingleRestPublication):
 
         exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_timeseries.png")
         asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
+
+        if rest_method == self.post_publication:  # pylint: disable=W0143
+            http_method = common.REQUEST_METHOD_POST
+        elif rest_method == self.patch_publication:  # pylint: disable=W0143
+            http_method = common.REQUEST_METHOD_PATCH
+        else:
+            raise NotImplementedError(f"Unknown rest_method: {rest_method}")
+
+        asserts_publ.metadata.correct_values_in_layer_metadata(layer.workspace, layer.type, layer.name, http_method=http_method)
