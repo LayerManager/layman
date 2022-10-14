@@ -1,6 +1,6 @@
 from tests import Action
 from test_tools import process_client
-from . import geoserver, internal, internal_rest, rest
+from . import geoserver, internal, internal_rest, rest, metadata
 
 
 IS_LAYER_COMPLETE_AND_CONSISTENT = [
