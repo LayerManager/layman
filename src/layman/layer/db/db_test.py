@@ -33,7 +33,7 @@ def post_layer(workspace, layer, file_path):
         publications.delete_publication(workspace, LAYER_TYPE, layer)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def boundary_table():
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp'
     workspace = WORKSPACE
@@ -41,7 +41,7 @@ def boundary_table():
     yield from post_layer(workspace, layername, file_path)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def road_table():
     file_path = 'sample/data/upper_attr.geojson'
     workspace = WORKSPACE
@@ -49,7 +49,7 @@ def road_table():
     yield from post_layer(workspace, layername, file_path)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def country_table():
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp'
     workspace = WORKSPACE
@@ -57,7 +57,7 @@ def country_table():
     yield from post_layer(workspace, layername, file_path)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def country110m_table():
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
     workspace = WORKSPACE
@@ -65,7 +65,7 @@ def country110m_table():
     yield from post_layer(workspace, layername, file_path)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def country50m_table():
     file_path = 'tmp/naturalearth/50m/cultural/ne_50m_admin_0_countries.geojson'
     workspace = WORKSPACE
@@ -73,7 +73,7 @@ def country50m_table():
     yield from post_layer(workspace, layername, file_path)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def country10m_table():
     file_path = 'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson'
     workspace = WORKSPACE
@@ -81,7 +81,7 @@ def country10m_table():
     yield from post_layer(workspace, layername, file_path)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def data200road_table():
     file_path = 'tmp/data200/trans/RoadL.shp'
     workspace = WORKSPACE
@@ -89,7 +89,7 @@ def data200road_table():
     yield from post_layer(workspace, layername, file_path)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def sm5building_table():
     file_path = 'tmp/sm5/vektor/Budova.shp'
     workspace = WORKSPACE
@@ -97,7 +97,7 @@ def sm5building_table():
     yield from post_layer(workspace, layername, file_path)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def populated_places_table():
     file_path = 'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson'
     workspace = WORKSPACE
@@ -105,7 +105,7 @@ def populated_places_table():
     yield from post_layer(workspace, layername, file_path)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def empty_table():
     file_path = 'sample/layman.layer/empty.shp'
     workspace = WORKSPACE
@@ -113,7 +113,7 @@ def empty_table():
     yield from post_layer(workspace, layername, file_path)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def single_point_table():
     file_path = 'sample/layman.layer/single_point.shp'
     workspace = WORKSPACE
