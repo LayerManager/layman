@@ -682,6 +682,72 @@ TESTCASES = {
                           },
         },
     },
+    'raster_vector_time_regex': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+            'file_paths': ['sample/layman.layer/sample_jp2_rgb.jp2',
+                           'sample/layman.layer/single_point.dbf',
+                           'sample/layman.layer/single_point.prj',
+                           'sample/layman.layer/single_point.shp',
+                           'sample/layman.layer/single_point.shx',
+                           'sample/layman.layer/single_point.qpj',
+                           ],
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'detail': {'expected': 'All main files with the same extension.',
+                                     'files': ['sample_jp2_rgb.jp2', 'single_point.shp'],
+                                     'extensions': ['.jp2', '.shp'],
+                                     'parameter': 'file',
+                                     },
+                          },
+            frozenset([('compress', True), ('with_chunks', False)]): {
+                'detail': {'files': ['temporary_zip_file.zip/sample_jp2_rgb.jp2', 'temporary_zip_file.zip/single_point.shp'],
+                           },
+            },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+                'detail': {'files': ['temporary_zip_file.zip/sample_jp2_rgb.jp2', 'temporary_zip_file.zip/single_point.shp'],
+                           },
+            },
+        },
+    },
+    'dif_raster_types_time_regex': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+            'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.j2w',
+                           'sample/layman.layer/sample_jp2_j2w_rgb.jp2',
+                           'sample/layman.layer/sample_jpeg_jgw_rgb.jgw',
+                           'sample/layman.layer/sample_jpeg_jgw_rgb.jpeg',
+                           ],
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'detail': {'expected': 'All main files with the same extension.',
+                                     'files': ['sample_jp2_j2w_rgb.jp2', 'sample_jpeg_jgw_rgb.jpeg', ],
+                                     'extensions': ['.jp2', '.jpeg'],
+                                     'parameter': 'file',
+                                     },
+                          },
+            frozenset([('compress', True), ('with_chunks', False)]): {
+                'detail': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.jp2', 'temporary_zip_file.zip/sample_jpeg_jgw_rgb.jpeg', ],
+                           },
+            },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+                'detail': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.jp2', 'temporary_zip_file.zip/sample_jpeg_jgw_rgb.jpeg', ],
+                           },
+            },
+        },
+    },
 }
 
 VALIDATION_PATCH_ACTION = {
