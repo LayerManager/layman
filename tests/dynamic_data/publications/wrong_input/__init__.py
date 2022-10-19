@@ -680,6 +680,9 @@ TESTCASES = {
                           'code': 48,
                           'detail': 'Vector layers are not allowed to be combined with `time_regex` parameter.',
                           },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+            },
         },
     },
     'raster_vector_time_regex': {
