@@ -330,28 +330,6 @@ PUBLICATIONS = {
             ],
         },
     ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zip_and_main_file'): [
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': [
-                        'tmp/sm5/vektor/sm5.zip',
-                        'sample/layman.layer/small_layer.geojson',
-                    ],
-                }),
-                consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
-                ],
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, publications.SMALL_LAYER.info_values),
-                Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': publications.SMALL_LAYER.thumbnail,
-                }),
-            ],
-        },
-    ],
     Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_zip_and_main_file'): [
         {
             consts.KEY_ACTION: {
