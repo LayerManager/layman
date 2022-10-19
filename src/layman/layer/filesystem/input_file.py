@@ -179,6 +179,16 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
                                           + ', '.join(util.get_all_allowed_main_extensions()),
                               'files': [os.path.relpath(fp, input_files.saved_paths_dir) for fp in main_files],
                               })
+    if enable_more_main_files:
+        extensions = {os.path.splitext(main_filename)[1].lower() for main_filename in main_files}
+        if len(extensions) > 1:
+            files_list = sorted([os.path.relpath(fp, input_files.saved_paths_dir) for fp in main_files])
+            extensions_list = sorted(extensions)
+            raise LaymanError(2, {'parameter': 'file',
+                                  'expected': 'All main files with the same extension.',
+                                  'files': files_list,
+                                  'extensions': extensions_list,
+                                  })
 
     filenames = input_files.raw_or_archived_paths
     if not main_files:
