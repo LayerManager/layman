@@ -191,7 +191,7 @@ def get_metadata_comparison(workspace, layername):
         current_app.logger.error(exc)
         reference_system = None
 
-    temporal_extent = wms.contents[layername].dimensions['time']['values'] if 'time' in wms.contents[layername].dimensions else None
+    temporal_extent = wms.contents[layername].dimensions['time']['values'] if layername in wms.contents and 'time' in wms.contents[layername].dimensions else None
 
     props = {
         'wms_url': wms_url,
