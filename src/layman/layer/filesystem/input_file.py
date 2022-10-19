@@ -1,6 +1,7 @@
 import glob
 import os
 import pathlib
+import logging
 
 from osgeo import ogr
 
@@ -12,6 +13,7 @@ from . import util, gdal as fs_gdal
 
 LAYER_SUBDIR = __name__.split('.')[-1]
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
+logger = logging.getLogger(__name__)
 
 pre_publication_action_check = empty_method
 post_layer = empty_method
@@ -189,6 +191,12 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
                                   'files': files_list,
                                   'extensions': extensions_list,
                                   })
+
+    if len(input_files.raw_main_file_paths) > 0 and len(input_files.raw_paths_to_archives) > 0:
+        raise LaymanError(2, {'parameter': 'file',
+                              'expected': 'One compressed file or one or more uncompressed files.',
+                              'files': [os.path.relpath(fp, input_files.saved_paths_dir) for fp in sorted(input_files.raw_or_archived_paths)],
+                              })
 
     filenames = input_files.raw_or_archived_paths
     if not main_files:
