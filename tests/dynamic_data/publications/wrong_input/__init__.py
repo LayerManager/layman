@@ -797,6 +797,32 @@ TESTCASES = {
                           },
         },
     },
+    'different_rasters_time_regex': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+            'file_paths': ['tests/dynamic_data/publications/crs/rasters/cz_4326.tif',
+                           'tests/dynamic_data/publications/crs/rasters/cz_32633.tif',
+                           ],
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'detail': {'expected': 'All main files with the same CRS.',
+                                     'crs': ['EPSG:32633', 'EPSG:4326', ],
+                                     'parameter': 'file',
+                                     },
+                          },
+            frozenset([('compress', False), ('with_chunks', True)]): {
+                'sync': False,
+            },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+            },
+        },
+    },
 }
 
 VALIDATION_PATCH_ACTION = {
