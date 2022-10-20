@@ -10,7 +10,7 @@
 - [#635](https://github.com/LayerManager/layman/issues/635) Fill column `image_mosaic` in `publications` table in prime DB schema for all publications. Value of each publication is set to `false`.
 ### Changes
 - [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new body parameter *time_regex*.
-- [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support more main raster files in combination with *time_regex* parameter.
+- [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support timeseries raster layers.
 - [#446](https://github.com/LayerManager/layman/issues/446) If endpoint [POST Workspace Layers](doc/rest.md#post-workspace-layers) receives one-band grayscale input raster file and if no input style was sent with the raster file, then Layman will automatically create and use customized SLD style with stable contrast.
 - [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) do not support combination of zip file and not compressed main file. 
 - [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) returns new key `image_mosaic` for raster layers.

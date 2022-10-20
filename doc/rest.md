@@ -130,7 +130,7 @@ Body parameters:
       - JPEG (.jpg, .jpeg, with .jpg.aux.xml, .jgw, .jpgw, .jpegw or .wld)
       - any of above types in single ZIP file (.zip)
       - file names, i.e. array of strings
-   - more than one main raster file is allowed in combination with *time_regex* parameter
+   - it is allowed to publish time-series layer by setting time_regex parameter and sending one or more main raster files (compressed in one archive or uncompressed) with the same extension
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - in case of raster data input, following input combinations of bands and color interpretations are supported:
       - 1 band: Gray
