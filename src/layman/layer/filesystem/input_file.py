@@ -135,6 +135,14 @@ def check_raster_main_files(main_filepaths, *, check_crs=True):
         fs_gdal.assert_valid_raster(main_filepath)
         if check_crs:
             check_raster_layer_crs(main_filepath)
+    if len(main_filepaths) > 1:
+        if check_crs:
+            crs_list = sorted(list(set(get_raster_crs_id(main_filepath) for main_filepath in main_filepaths)))
+            if len(crs_list) > 1:
+                raise LaymanError(2, {'parameter': 'file',
+                                      'expected': 'All main files with the same CRS.',
+                                      'crs': crs_list,
+                                      })
 
 
 def spatial_ref_crs_to_crs_id(spatial_ref):
