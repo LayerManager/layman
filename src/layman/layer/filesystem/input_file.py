@@ -143,6 +143,42 @@ def check_raster_main_files(main_filepaths, *, check_crs=True):
                                       'expected': 'All main files with the same CRS.',
                                       'crs': crs_list,
                                       })
+        color_interpretations_list = sorted(list(set(tuple(fs_gdal.get_color_interpretations(main_filepath)) for main_filepath in main_filepaths)))
+        if len(color_interpretations_list) > 1:
+            raise LaymanError(2, {'parameter': 'file',
+                                  'expected': 'All main files with the same color interpretations.',
+                                  'color_interpretations': color_interpretations_list,
+                                  })
+        bbox_list = sorted(list(set(fs_gdal.get_bbox_from_file(main_filepath) for main_filepath in main_filepaths)))
+        if len(bbox_list) > 1:
+            raise LaymanError(2, {'parameter': 'file',
+                                  'expected': 'All main files with the same bounding box.',
+                                  'bounding_boxes': bbox_list,
+                                  })
+        raster_size_list = sorted(list(set(tuple(fs_gdal.get_raster_size(main_filepath)) for main_filepath in main_filepaths)))
+        if len(raster_size_list) > 1:
+            raise LaymanError(2, {'parameter': 'file',
+                                  'expected': 'All main files with the same raster size.',
+                                  'raster_sizes': raster_size_list,
+                                  })
+        nodata_value_list = sorted(list(set(fs_gdal.get_nodata_value(main_filepath) for main_filepath in main_filepaths)))
+        if len(nodata_value_list) > 1:
+            raise LaymanError(2, {'parameter': 'file',
+                                  'expected': 'All main files with the same nodata value.',
+                                  'bounding_boxes': nodata_value_list,
+                                  })
+        mask_flags_list = sorted(list(set(tuple(fs_gdal.get_mask_flags(main_filepath)) for main_filepath in main_filepaths)))
+        if len(mask_flags_list) > 1:
+            raise LaymanError(2, {'parameter': 'file',
+                                  'expected': 'All main files with the same mask flags.',
+                                  'raster_sizes': mask_flags_list,
+                                  })
+        data_type_name_list = sorted(list(set(fs_gdal.get_data_type_name(main_filepath) for main_filepath in main_filepaths)))
+        if len(data_type_name_list) > 1:
+            raise LaymanError(2, {'parameter': 'file',
+                                  'expected': 'All main files with the same nodata value.',
+                                  'bounding_boxes': data_type_name_list,
+                                  })
 
 
 def spatial_ref_crs_to_crs_id(spatial_ref):
