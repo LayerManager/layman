@@ -1,4 +1,5 @@
 import json
+import logging
 
 import datetime
 import os
@@ -14,6 +15,7 @@ from . import input_file
 
 LAYER_SUBDIR = __name__.split('.')[-1]
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
+logger = logging.getLogger(__name__)
 
 get_metadata_comparison = empty_method_returns_dict
 pre_publication_action_check = empty_method
@@ -44,11 +46,11 @@ get_publication_uuid = input_file.get_publication_uuid
 def save_layer_files_str(workspace, layername, input_files, check_crs, *, normalize_filenames=True):
     input_file_dir = input_file.get_layer_input_file_dir(workspace, layername)
     if input_files.is_one_archive:
-        main_filename = input_files.raw_paths_to_archives[0]
+        main_filenames = input_files.raw_paths_to_archives
     else:
-        main_filename = input_files.raw_or_archived_main_file_path
+        main_filenames = input_files.raw_or_archived_main_file_paths
     _, filepath_mapping = input_file.get_file_name_mappings(
-        input_files.raw_paths, main_filename, layername, input_file_dir, normalize_filenames=normalize_filenames
+        input_files.raw_paths, main_filenames, layername, input_file_dir, normalize_filenames=normalize_filenames
     )
     filepath_mapping = {
         k: v for k, v in filepath_mapping.items() if v is not None
@@ -138,10 +140,10 @@ def get_layer_info(workspace, layername):
     if info:
         files_to_upload = info['files_to_upload']
         file_names = [file['input_file'] for file in files_to_upload]
-        if len(file_names) == 1 and input_file.get_compressed_main_file_extension(file_names[0]):
+        if any(input_file.get_compressed_main_file_extension(file_name) for file_name in file_names):
             file_type = settings.FILE_TYPE_UNKNOWN
         else:
-            file_type = input_file.get_file_type(input_file.get_main_file_name(file_names))
+            file_type = input_file.get_file_type(input_file.get_all_main_file_names(file_names)[0])
         result = {'file': {'file_type': file_type}}
     return result
 

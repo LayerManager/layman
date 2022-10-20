@@ -58,8 +58,7 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
     input_file.check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=True, enable_more_main_files=enable_more_main_files)
 
     main_filepaths = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['_file']['gdal_paths']
-    for main_filepath in main_filepaths:
-        input_file.check_main_file(main_filepath, check_crs=check_crs, overview_resampling=overview_resampling)
+    input_file.check_main_files(main_filepaths, check_crs=check_crs, overview_resampling=overview_resampling)
 
     file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
     if enable_more_main_files and file_type == settings.FILE_TYPE_VECTOR:
