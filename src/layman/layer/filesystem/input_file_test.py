@@ -1,22 +1,22 @@
-from .input_file import get_main_file_name, get_file_name_mappings
+from .input_file import get_all_main_file_names, get_file_name_mappings
 
 
 def test_get_main_file_name():
     filenames = [
         'tmp/countries.geojson',
     ]
-    assert get_main_file_name(filenames) == 'tmp/countries.geojson'
+    assert get_all_main_file_names(filenames) == ['tmp/countries.geojson']
 
     filenames = [
         'tmp/countries.zip',
     ]
-    assert get_main_file_name(filenames) is None
+    assert get_all_main_file_names(filenames) == []
 
     filenames = [
         'tmp/countries_lakes.geojson',
         'tmp/countries.geojson',
     ]
-    assert get_main_file_name(filenames) == 'tmp/countries_lakes.geojson'
+    assert get_all_main_file_names(filenames) == ['tmp/countries_lakes.geojson', 'tmp/countries.geojson']
 
 
 def test_get_main_file_name_shp():
@@ -29,7 +29,7 @@ def test_get_main_file_name_shp():
         'tmp/countries.shx',
         'tmp/countries.VERSION.txt',
     ]
-    assert get_main_file_name(filenames) == 'tmp/countries.shp'
+    assert get_all_main_file_names(filenames) == ['tmp/countries.shp']
 
     filenames = [
         'tmp/countries.cpg',
@@ -39,7 +39,7 @@ def test_get_main_file_name_shp():
         'tmp/countries.shx',
         'tmp/countries.VERSION.txt',
     ]
-    assert get_main_file_name(filenames) is None
+    assert get_all_main_file_names(filenames) == []
 
     filenames = [
         'tmp/countries.cpg',
@@ -57,7 +57,7 @@ def test_get_main_file_name_shp():
         'tmp/countries.shx',
         'tmp/countries.VERSION.txt',
     ]
-    assert get_main_file_name(filenames) == 'tmp/countries_lakes.shp'
+    assert get_all_main_file_names(filenames) == ['tmp/countries_lakes.shp', 'tmp/countries.shp', ]
 
 
 def test_get_file_name_mappings():
@@ -78,7 +78,7 @@ def test_get_file_name_mappings():
             'tmp/countries.shx',
             'tmp/countries.VERSION.txt',
         ],
-        'main_file_name': 'tmp/countries.shp',
+        'main_file_names': ['tmp/countries.shp'],
         'layer_name': 'cntr',
         'output_dir': '/data'
     }

@@ -83,18 +83,18 @@ from . import uuid
 get_publication_uuid = uuid.get_publication_uuid
 
 
-def get_main_file_name(filenames):
-    return next((fn for fn in filenames if os.path.splitext(fn)[1].lower()
-                 in util.get_all_allowed_main_extensions()), None)
+def get_all_main_file_names(filenames):
+    return [fn for fn in filenames if os.path.splitext(fn)[1].lower()
+            in util.get_all_allowed_main_extensions()]
 
 
-def get_gdal_format_file_path(filepath):
+def get_gdal_format_file_paths(filepath):
     compress_type = get_compressed_main_file_extension(filepath)
-    result = filepath
+    result = [filepath]
     if compress_type:
-        main_file = get_main_file_name(util.get_filenames_from_zip_storage(filepath))
-        if main_file:
-            result = settings.COMPRESSED_FILE_EXTENSIONS[compress_type] + os.path.join(filepath, main_file)
+        main_files = get_all_main_file_names(util.get_filenames_from_zip_storage(filepath))
+        if main_files:
+            result = [settings.COMPRESSED_FILE_EXTENSIONS[compress_type] + os.path.join(filepath, main_file) for main_file in main_files]
     return result
 
 
@@ -107,14 +107,15 @@ def get_file_type(main_filepath):
     return file_type
 
 
-def check_main_file(main_filepath, *, check_crs=True, overview_resampling=''):
-    file_type = get_file_type(main_filepath)
+def check_main_files(main_filepaths, *, check_crs=True, overview_resampling=''):
+    file_type = get_file_type(main_filepaths[0])
     if file_type == settings.FILE_TYPE_VECTOR:
         if overview_resampling:
             raise LaymanError(48, f'Vector layers do not support overview resampling.')
-        check_vector_main_file(main_filepath, check_crs=check_crs)
+        assert len(main_filepaths) == 1, f'main_filepaths={main_filepaths}'
+        check_vector_main_file(main_filepaths[0], check_crs=check_crs)
     elif file_type == settings.FILE_TYPE_RASTER:
-        check_raster_main_file(main_filepath, check_crs=check_crs)
+        check_raster_main_files(main_filepaths, check_crs=check_crs)
     else:
         raise NotImplementedError(f"Unknown file type: {file_type}")
 
@@ -128,11 +129,12 @@ def check_vector_main_file(main_filepath, *, check_crs=True):
         check_vector_layer_crs(main_filepath)
 
 
-def check_raster_main_file(main_filepath, *, check_crs=True):
-    fs_gdal.open_raster_file(main_filepath)
-    fs_gdal.assert_valid_raster(main_filepath)
-    if check_crs:
-        check_raster_layer_crs(main_filepath)
+def check_raster_main_files(main_filepaths, *, check_crs=True):
+    for main_filepath in main_filepaths:
+        fs_gdal.open_raster_file(main_filepath)
+        fs_gdal.assert_valid_raster(main_filepath)
+        if check_crs:
+            check_raster_layer_crs(main_filepath)
 
 
 def spatial_ref_crs_to_crs_id(spatial_ref):
@@ -223,10 +225,11 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
                                   'files': [os.path.relpath(fp, input_files.saved_paths_dir) for fp in filenames],
                                   })
         main_files = input_files.raw_paths_to_archives
-    main_filename = main_files[0]
+    main_filenames = main_files
+    first_main_filename = main_filenames[0]
     basename, ext = map(
         lambda s: s.lower(),
-        os.path.splitext(main_filename)
+        os.path.splitext(first_main_filename)
     )
     if ext == '.shp':
         lower_filenames = list(map(
@@ -243,7 +246,7 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
         if len(missing_exts) > 0:
             detail = {
                 'missing_extensions': missing_exts,
-                'path': os.path.relpath(main_filename, input_files.saved_paths_dir),
+                'path': os.path.relpath(first_main_filename, input_files.saved_paths_dir),
             }
             if '.prj' in missing_exts:
                 detail['suggestion'] = 'Missing .prj file can be fixed also ' \
@@ -251,7 +254,7 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
             raise LaymanError(18, detail)
     input_file_dir = get_layer_input_file_dir(workspace, layername)
     filename_mapping, _ = get_file_name_mappings(
-        input_files.raw_paths, main_filename, layername, input_file_dir
+        input_files.raw_paths, main_filenames, layername, input_file_dir
     )
 
     if not ignore_existing_files:
@@ -264,18 +267,19 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
 
 def save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, *, output_dir=None, normalize_filenames=True):
     if input_files.is_one_archive:
-        main_filename = input_files.raw_paths_to_archives[0]
+        main_filenames = input_files.raw_paths_to_archives
     else:
-        main_filename = input_files.raw_or_archived_main_file_path
+        main_filenames = input_files.raw_or_archived_main_file_paths
     output_dir = output_dir or ensure_layer_input_file_dir(workspace, layername)
     _, filepath_mapping = get_file_name_mappings(
-        input_files.raw_paths, main_filename, layername, output_dir, normalize_filenames=normalize_filenames
+        input_files.raw_paths, main_filenames, layername, output_dir, normalize_filenames=normalize_filenames
     )
 
     common.save_files(input_files.sent_streams, filepath_mapping)
 
-    main_filepath = get_gdal_format_file_path(filepath_mapping[main_filename])
-    check_main_file(main_filepath, check_crs=check_crs, overview_resampling=overview_resampling)
+    filepaths = [filepath_mapping[main_filename] for main_filename in main_filenames]
+    gdal_main_filepaths = [gdal_path for filepath in filepaths for gdal_path in get_gdal_format_file_paths(filepath)]
+    check_main_files(gdal_main_filepaths, check_crs=check_crs, overview_resampling=overview_resampling)
 
 
 def get_unsafe_layername(input_files):
@@ -287,13 +291,14 @@ def get_unsafe_layername(input_files):
     return unsafe_layername
 
 
-def get_file_name_mappings(file_names, main_file_name, layer_name, output_dir, *, normalize_filenames=True):
-    main_file_name = os.path.splitext(main_file_name)[0]
+def get_file_name_mappings(file_names, main_file_names, layer_name, output_dir, *, normalize_filenames=True):
+    main_file_names = [os.path.splitext(main_file_name)[0] for main_file_name in main_file_names]
     filename_mapping = {}
     filepath_mapping = {}
     if normalize_filenames:
         for file_name in file_names:
-            if file_name.startswith(main_file_name + '.'):
+            main_file_name = next(iter(main_file_name for main_file_name in main_file_names if file_name.startswith(main_file_name + '.')), None)
+            if main_file_name:
                 new_fn = layer_name + file_name[len(main_file_name):].lower()
                 filepath_mapping[file_name] = os.path.join(output_dir, new_fn)
                 filename_mapping[file_name] = new_fn
