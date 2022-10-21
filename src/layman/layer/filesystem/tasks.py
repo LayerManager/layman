@@ -114,7 +114,11 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
 
         source_file = f'{layername}.tif' if normalize_filenames else input_path
         normalize_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, layername, source_file=source_file, )
-        process = gdal.compress_raster_file_async(output_file=normalize_file_path, file_to_compress=tmp_vrt_file, )
+        color_interpretations = gdal.get_color_interpretations(vrt_file_path or input_path)
+        process = gdal.compress_and_mask_raster_file_async(input_file_path=tmp_vrt_file,
+                                                           output_file=normalize_file_path,
+                                                           color_interpretations=color_interpretations,
+                                                           nodata_value=nodata_value)
         while process.poll() is None and not self.is_aborted():
             pass
         if vrt_file_path:
