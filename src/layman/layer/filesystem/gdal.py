@@ -167,7 +167,7 @@ def get_mask_flags(filepath):
     for band_id in range(1, dataset.RasterCount + 1):
         band = dataset.GetRasterBand(band_id)
         mask_flags_int = band.GetMaskFlags()
-        mask_flag_set = set(mask_flag_int for mask_flag_int in all_mask_flags if mask_flag_int & mask_flags_int)
+        mask_flag_set = frozenset(mask_flag_int for mask_flag_int in all_mask_flags if mask_flag_int & mask_flags_int)
         result.append(mask_flag_set)
     return result
 
