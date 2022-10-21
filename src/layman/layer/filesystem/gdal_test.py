@@ -122,6 +122,7 @@ def test_is_normalized_alpha_needed(file_path, exp_result):
     ('sample/layman.layer/sample_tif_tfw_rgba_opaque.tif',
      [{gdalconst.GMF_PER_DATASET, gdalconst.GMF_ALPHA}] * 3 + [{gdalconst.GMF_ALL_VALID}]),
     ('sample/layman.layer/sample_tif_colortable_nodata_opaque.tif', [{gdalconst.GMF_NODATA}]),
+    # GMF_ALPHA not listed, because GDAL recognizes it only if the band is Byte or UInt16
     ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', [{gdalconst.GMF_NODATA}] * 2),
     ('sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif', [{gdalconst.GMF_NODATA}]),
     ('sample/layman.layer/sample_jpg_aux_rgba.jpg', [{gdalconst.GMF_PER_DATASET}] * 3),

@@ -137,6 +137,10 @@ def get_nodata_value(filepath):
 
 
 def get_mask_flags(filepath):
+    # About GDAL and mask flags:
+    #   https://github.com/rasterio/rasterio/issues/1178#issuecomment-338798556
+    # GDAL recognizes GMF_ALPHA flag only if Alpha band is Byte or UInt16:
+    #   https://github.com/OSGeo/gdal/pull/742#issuecomment-462805377
     dataset = open_raster_file(filepath, gdal.GA_ReadOnly)
     all_mask_flags = [
         gdalconst.GMF_ALL_VALID,
