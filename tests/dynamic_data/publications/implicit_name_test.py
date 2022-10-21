@@ -68,6 +68,33 @@ PUBLICATIONS = {
                                                                 ),
         },
     },
+    'without_explicit_name': {
+        'publication_type': process_client.LAYER_TYPE,
+        'expected_name': 'small_layer',
+        'params': {
+            'file_paths': ['sample/layman.layer/small_layer.geojson'],
+            'with_chunks': True,
+        },
+    },
+    'zip_without_explicit_name': {
+        'publication_type': process_client.LAYER_TYPE,
+        'expected_name': 'small_layer_with_id',
+        'params': {
+            'file_paths': ['sample/layman.layer/small_layer_with_id.geojson'],
+            'compress': True,
+            'compress_settings': process_client.CompressTypeDef(archive_name='small_layer_with_id'),
+        },
+    },
+    'zip_chunks_without_explicit_name': {
+        'publication_type': process_client.LAYER_TYPE,
+        'expected_name': 'small_zip_layer',
+        'params': {
+            'file_paths': ['sample/layman.layer/small_layer.geojson'],
+            'compress': True,
+            'compress_settings': process_client.CompressTypeDef(archive_name='small_zip_layer'),
+            'with_chunks': True,
+        },
+    },
 }
 
 
