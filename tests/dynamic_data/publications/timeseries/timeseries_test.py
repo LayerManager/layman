@@ -142,3 +142,19 @@ class TestLayer(base_test.TestSingleRestPublication):
             raise NotImplementedError(f"Unknown rest_method: {rest_method}")
 
         asserts_publ.metadata.correct_values_in_layer_metadata(layer.workspace, layer.type, layer.name, http_method=http_method)
+
+        process_client.patch_workspace_layer(layer.workspace,
+                                             layer.name,
+                                             file_paths=['sample/layman.layer/small_layer.geojson'])
+        asserts_util.is_publication_valid_and_complete(layer)
+
+        asserts_publ.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
+                                                       exp_publication_detail={
+                                                           'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196,
+                                                                            6269876.335616991],
+                                                           'native_crs': 'EPSG:4326',
+                                                           'native_bounding_box': [14.114369, 48.964832, 14.126824, 48.970612],
+                                                       },
+                                                       file_extension='geojson',
+                                                       publ_type_detail=('vector', 'sld'),
+                                                       )

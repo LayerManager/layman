@@ -49,8 +49,6 @@ def refresh_wms(
 
     if file_type == settings.FILE_TYPE_VECTOR:
         if store_in_geoserver:
-            gs_util.delete_wms_layer(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
-            gs_util.delete_wms_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, wms.get_qgis_store_name(layername))
             table_name = info['db_table']['name']
             geoserver.publish_layer_from_db(workspace,
                                             layername,
@@ -61,7 +59,6 @@ def refresh_wms(
                                             geoserver_workspace=geoserver_workspace,
                                             )
         else:
-            gs_util.delete_feature_type(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
             geoserver.publish_layer_from_qgis(workspace,
                                               layername,
                                               description,
