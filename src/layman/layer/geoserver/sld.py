@@ -1,5 +1,4 @@
 import os
-from osgeo import gdalconst
 from geoserver import util as gs_util
 from layman import settings, patch_mode
 from layman.common import empty_method, empty_method_returns_none, empty_method_returns_dict
@@ -77,13 +76,12 @@ def ensure_custom_sld_file_if_needed(workspace, layer):
         ]})
     file_dict = info['_file']
     input_color_interpretations = file_dict['color_interpretations']
-    input_mask_flags = file_dict['mask_flags']
     norm_file_dict = file_dict['normalized_file']
     norm_stats = norm_file_dict['stats']
     norm_nodata_value = norm_file_dict['nodata_value']
 
-    # if there is one grayscale band without mask flags
-    if input_color_interpretations == ['Gray'] and input_mask_flags[0].issubset({gdalconst.GMF_ALL_VALID, gdalconst.GMF_NODATA}):
+    # if it is grayscale raster (with or without alpha band)
+    if input_color_interpretations[0] == 'Gray':
         input_style.ensure_layer_input_style_dir(workspace, layer)
         style_file_path = input_style.get_file_path(workspace, layer, with_extension=False) + '.sld'
         create_customized_grayscale_sld(file_path=style_file_path, min_value=norm_stats[0][0],

@@ -309,12 +309,24 @@ def normalize_raster_file_async(input_path, crs_id, output_file):
     return process
 
 
-def compress_raster_file_async(*, output_file, file_to_compress, ):
+def compress_and_mask_raster_file_async(*, output_file, input_file_path, color_interpretations, nodata_value):
     result_path = output_file
     bash_args = [
         'gdal_translate',
         '-co', 'compress=lzw',
-        file_to_compress,
+    ]
+
+    # GeoServer can visualize grayscale raster with partial opacity from alpha band, but it has unstable contrast.
+    # We don't know how to tell GeoServer to keep partial opacity from alpha band and to stabilize contrast.
+    # We prefer stable contrast over partial opacity, so we create 0/1 mask from alpha band.
+    # RGBA raster seems to have stable contrast in GeoServer, so we don't create mask for it.
+    if color_interpretations == ['Gray', 'Alpha'] and nodata_value is None:
+        bash_args += [
+            '-mask', '2',
+        ]
+
+    bash_args += [
+        input_file_path,
         result_path,
     ]
     process = subprocess.Popen(bash_args, stdout=subprocess.PIPE,

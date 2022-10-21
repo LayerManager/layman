@@ -78,6 +78,15 @@ TEST_CASES = {
             'tolerance': 0.0001,
         },
     },
+    'tif_float_alpha_min_0_max': {
+        'expected_input': {
+            'color_interpretations': ['Gray', 'Alpha'],
+            'nodata': None,
+            'min': -0.2364,
+            'max': 0.8629,
+            'tolerance': 0.0001,
+        },
+    },
 }
 
 
