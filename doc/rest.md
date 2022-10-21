@@ -135,7 +135,6 @@ Body parameters:
    - in case of raster data input, following input combinations of bands and color interpretations are supported:
       - 1 band: Gray
       - 1 band: Palette
-         - Transparency will be ignored. See [#466](https://github.com/LayerManager/layman/issues/446) for details.
       - 2 bands: Gray, Alpha
          - Opacity of WMS layer derived from Alpha band will be simplified to either fully transparent, or fully opaque (0 cells in Alpha convert to fully transparent, other cells convert to fully opaque).
       - 3 bands: Red, Green, Blue

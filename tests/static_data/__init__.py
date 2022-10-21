@@ -359,7 +359,7 @@ PUBLICATIONS = {
             'bbox': (868376, 522128, 940583, 593255),
             'file_extensions': ['.tif'],
             'normalized_color_interp': ['Palette'],
-            'thumbnail': '',
+            'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_colortable_nodata.png',
             'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
         },
