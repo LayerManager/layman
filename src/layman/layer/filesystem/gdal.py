@@ -136,6 +136,21 @@ def get_nodata_value(filepath):
     return to_one_value(nodata_values)
 
 
+def get_data_type_names(filepath):
+    dataset = open_raster_file(filepath, gdal.GA_ReadOnly)
+    result = []
+    for band_id in range(1, dataset.RasterCount + 1):
+        band = dataset.GetRasterBand(band_id)
+        data_type = gdal.GetDataTypeName(band.DataType)
+        result.append(data_type)
+    return result
+
+
+def get_data_type_name(filepath):
+    data_type_name_list = get_data_type_names(filepath)
+    return to_one_value(data_type_name_list)
+
+
 def get_mask_flags(filepath):
     dataset = open_raster_file(filepath, gdal.GA_ReadOnly)
     all_mask_flags = [

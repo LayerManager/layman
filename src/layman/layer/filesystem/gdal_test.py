@@ -177,3 +177,21 @@ def test_create_vrt_file_if_needed(file_path, exp_result):
 ])
 def test_get_driver_short_name(file_path, exp_result):
     assert gdal.get_driver_short_name(file_path) == exp_result
+
+
+@pytest.mark.parametrize('file_path, exp_result', [
+    ('sample/layman.layer/sample_jp2_rgb.jp2', 'Byte'),
+    ('sample/layman.layer/sample_tif_rgb.tif', 'Byte'),
+    ('sample/layman.layer/sample_tif_rgb_nodata.tif', 'Byte'),
+    ('sample/layman.layer/sample_tif_rgba.tif', 'Byte'),
+    ('sample/layman.layer/sample_tiff_rgba_opaque.tiff', 'Byte'),
+    ('sample/layman.layer/sample_tif_tfw_rgba_opaque.tif', 'Byte'),
+    ('sample/layman.layer/sample_tif_colortable_nodata_opaque.tif', 'Byte'),
+    ('sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif', 'Float32'),
+    ('sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif', 'Float32'),
+    ('sample/layman.layer/sample_tif_rg.tif', 'Byte'),
+    ('sample/layman.layer/sample_jpg_aux_rgba.jpg', 'Byte'),
+])
+def test_get_data_type_name(file_path, exp_result):
+    data_type_name = gdal.get_data_type_name(file_path)
+    assert data_type_name == exp_result
