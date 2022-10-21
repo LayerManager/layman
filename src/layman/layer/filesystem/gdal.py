@@ -45,7 +45,7 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
             color_interpretations = get_color_interpretations(gdal_paths[0])
             norm_file_dict['color_interpretations'] = color_interpretations
         if '_file.normalized_file.nodata_value' in extra_keys:
-            nodata_value = to_nodata_value(get_nodata_values(gdal_paths[0]))
+            nodata_value = get_nodata_value(gdal_paths[0])
             norm_file_dict['nodata_value'] = nodata_value
     return result
 
@@ -125,15 +125,15 @@ def get_nodata_values(filepath):
     return result
 
 
-def to_nodata_value(nodata_values):
-    first_nodata_value = nodata_values[0]
-    assert all(v == first_nodata_value for v in nodata_values)
-    return first_nodata_value
+def to_one_value(list_of_values):
+    first_value = list_of_values[0]
+    assert all(v == first_value for v in list_of_values)
+    return first_value
 
 
 def get_nodata_value(filepath):
     nodata_values = get_nodata_values(filepath)
-    return to_nodata_value(nodata_values)
+    return to_one_value(nodata_values)
 
 
 def get_mask_flags(filepath):
@@ -188,7 +188,7 @@ def get_driver_short_name(filepath):
 
 
 def is_nodata_out_of_min_max(filepath, *, nodata_values):
-    if to_nodata_value(nodata_values) is None:
+    if to_one_value(nodata_values) is None:
         result = False
     else:
         base_name = os.path.splitext(util.get_deepest_real_file(filepath))[0]
@@ -214,7 +214,7 @@ def is_normalized_alpha_needed(filepath, *, color_interp, nodata_values):
     elif mask_flags == [{gdalconst.GMF_PER_DATASET}] * 3:  # e.g. transparent JPG
         result = True
     else:
-        if to_nodata_value(nodata_values) is None:
+        if to_one_value(nodata_values) is None:
             result = False
         else:
             result = not is_nodata_out_of_min_max(filepath, nodata_values=nodata_values)
@@ -264,7 +264,7 @@ def normalize_raster_file_async(input_path, crs_id, output_file):
         ])
     src_nodata = 'None'
     nodata_values = get_nodata_values(input_path)
-    if to_nodata_value(nodata_values) is not None:
+    if to_one_value(nodata_values) is not None:
         src_nodata = ' '.join([str(val) for val in nodata_values])
     bash_args.extend([
         '-srcnodata', src_nodata,
