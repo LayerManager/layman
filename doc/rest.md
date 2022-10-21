@@ -137,7 +137,7 @@ Body parameters:
       - 1 band: Palette
          - Transparency will be ignored. See [#466](https://github.com/LayerManager/layman/issues/446) for details.
       - 2 bands: Gray, Alpha
-         - Float data type with min/max values other than 0/255 may result in unexpected WMS output. See [#466](https://github.com/LayerManager/layman/issues/446) for details.
+         - Opacity of WMS layer derived from Alpha band will be simplified to either fully transparent, or fully opaque (0 cells in Alpha convert to fully transparent, other cells convert to fully opaque).
       - 3 bands: Red, Green, Blue
       - 4 bands: Red, Green, Blue, Alpha
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
