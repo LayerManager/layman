@@ -61,6 +61,7 @@ def delete_layer(workspace, layername):
     gs_util.delete_wms_layer(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
     gs_util.delete_wms_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_qgis_store_name(layername))
     gs_util.delete_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_geotiff_store_name(layername))
+    gs_util.delete_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_image_mosaic_store_name(layername))
     clear_cache(workspace)
 
     gs_util.delete_security_roles(f"{geoserver_workspace}.{layername}.r", settings.LAYMAN_GS_AUTH)
