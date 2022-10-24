@@ -36,7 +36,7 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
             file_dict['mask_flags'] = get_mask_flags(input_file_gdal_path)
         norm_file_dict = file_dict['normalized_file']
         if '_file.normalized_file.stats' in extra_keys:
-            stats = get_statistics(gdal_paths[0])
+            stats = get_file_list_statistics(gdal_paths)
             norm_file_dict['stats'] = stats
         if '_file.normalized_file.mask_flags' in extra_keys:
             mask_flags = get_mask_flags(gdal_paths[0])
@@ -198,6 +198,14 @@ def get_statistics(filepath):
         # stats = [min, max, mean, stddev]
         result.append(stats[:2])
     return result
+
+
+def get_file_list_statistics(filepaths):
+    stats_list = [get_statistics(filepath) for filepath in filepaths]
+    bands_count = len(stats_list[0])
+    stats = [[min(stats[band_idx][0] for stats in stats_list),
+              max(stats[band_idx][1] for stats in stats_list)] for band_idx in range(0, bands_count)]
+    return stats
 
 
 def get_driver_short_name(filepath):

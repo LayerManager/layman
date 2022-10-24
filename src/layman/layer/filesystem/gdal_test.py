@@ -92,6 +92,27 @@ def test_get_statistics(file_path, exp_result):
                    for i in range(0, len(exp_band_stats))), f"band_idx={band_idx}, stats={stats[band_idx]}"
 
 
+@pytest.mark.parametrize('filepaths, exp_result', [
+    (['sample/layman.layer/sample_jp2_rgb.jp2'], [[17, 255], [30, 255], [16, 255]]),  # [min, max] for each band
+    (['tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+     [[31, 255], [38, 255], [38, 255]]),
+    (['tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF'],
+     [[17, 255], [30, 255], [16, 255]]),
+    (['tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+      'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF'],
+     [[17, 255], [30, 255], [16, 255]]),
+    (['sample/layman.layer/sample_jp2_rgb.jp2',
+      'sample/layman.layer/sample_tif_rgb.tif'],
+     [[0, 255], [0, 255], [0, 255]]),
+])
+def test_get_file_list_statistics(filepaths, exp_result):
+    stats = gdal.get_file_list_statistics(filepaths)
+    assert len(stats) == len(exp_result), stats
+    for band_idx, exp_band_stats in enumerate(exp_result):
+        assert all((stats[band_idx][i] - exp_band_stats[i]) <= 0.00000000000001
+                   for i in range(0, len(exp_band_stats))), f"band_idx={band_idx}, stats={stats[band_idx]}"
+
+
 @pytest.mark.parametrize('file_path, exp_result', [
     ('sample/layman.layer/sample_jp2_rgb.jp2', False),  # no alpha, no nodata
     ('sample/layman.layer/sample_tif_rgb.tif', False),  # no alpha, no nodata
