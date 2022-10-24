@@ -676,6 +676,9 @@ TESTCASES = {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'time_regex': '[',
+            'file_paths': [
+                'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+            ],
         },
         consts.KEY_EXCEPTION: LaymanError,
         KEY_EXPECTED_EXCEPTION: {
@@ -846,6 +849,75 @@ TESTCASES = {
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
+            },
+        },
+    },
+    'patch_with_time_regex_without_data_file': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_SKIP_POST: True,
+        KEY_ACTION_PARAMS: {},
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 48,
+                          'message': 'Wrong combination of parameters',
+                          'detail': 'Parameter time_regex is allowed only in combination with files.',
+                          },
+        },
+        KEY_PATCHES: {
+            'full': {
+                KEY_PATCH_POST: {
+                    'time_regex': r'[0-9]{8}',
+                    'file_paths': [
+                        'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                        'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF',
+                    ],
+                },
+                KEY_ACTION_PARAMS: {
+                    'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+                    'compress': False,
+                    'with_chunks': False,
+                },
+            },
+        },
+    },
+    'time_regex_with_non_data_file': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+            'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.j2w'],
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'message': 'Wrong parameter value',
+                          'detail': {
+                              'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
+                              'files': ['sample_jp2_j2w_rgb.j2w'],
+                              'message': 'No data file in input.',
+                              'parameter': 'file',
+                          }
+                          },
+            frozenset([('compress', True), ('with_chunks', False)]): {
+                'detail': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.j2w'],
+                           'message': 'Zip file without data file inside.', }
+            },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+                'detail': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.j2w'],
+                           'message': 'Zip file without data file inside.', }
+            },
+        },
+        KEY_PATCHES: {
+            'full': {
+                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
+                KEY_ACTION_PARAMS: {
+                    'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+                    'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.j2w'],
+                },
             },
         },
     },

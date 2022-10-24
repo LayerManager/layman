@@ -113,6 +113,8 @@ def patch(workspace, layername):
     # Timeseries regex
     time_regex = request.form.get('time_regex') or None
     if time_regex:
+        if len(input_files.raw_paths) == 0:
+            raise LaymanError(48, f'Parameter time_regex is allowed only in combination with files.')
         try:
             import re
             re.compile(time_regex)

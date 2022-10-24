@@ -349,6 +349,7 @@ Body parameters:
 - *time_regex*, string, e.g. `[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)`
   - used for timeseries raster files
   - specifies the pattern used for extracting the time information from the file name
+  - supported only in combination with *file* parameter
 
 #### Response
 Content-Type: `application/json`
