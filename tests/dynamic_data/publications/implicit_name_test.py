@@ -20,6 +20,33 @@ PUBLICATIONS = {
             ],
         },
     },
+    'one_data_file_with_chunks': {
+        'publication_type': process_client.LAYER_TYPE,
+        'expected_name': 'small_layer',
+        'params': {
+            'file_paths': ['sample/layman.layer/small_layer.geojson'],
+            'with_chunks': True,
+        },
+    },
+    'one_data_file_compressed': {
+        'publication_type': process_client.LAYER_TYPE,
+        'expected_name': 'small_layer_with_id',
+        'params': {
+            'file_paths': ['sample/layman.layer/small_layer_with_id.geojson'],
+            'compress': True,
+            'compress_settings': process_client.CompressTypeDef(archive_name='small_layer_with_id'),
+        },
+    },
+    'one_data_file_compressed_with_chunks': {
+        'publication_type': process_client.LAYER_TYPE,
+        'expected_name': 'small_zip_layer',
+        'params': {
+            'file_paths': ['sample/layman.layer/small_layer.geojson'],
+            'compress': True,
+            'compress_settings': process_client.CompressTypeDef(archive_name='small_zip_layer'),
+            'with_chunks': True,
+        },
+    },
     'timeseries_multi_file': {
         'publication_type': process_client.LAYER_TYPE,
         'expected_name': 's2a_msil2a_20220316t100031_n0400_r122_t33uwr_20220316t134748_tci_10m',
@@ -33,7 +60,7 @@ PUBLICATIONS = {
             ],
         },
     },
-    'compressed_with_chunks': {
+    'timeseries_compressed_with_chunks': {
         'publication_type': process_client.LAYER_TYPE,
         'expected_name': 'timeseries_tif',
         'params': {
@@ -68,33 +95,6 @@ PUBLICATIONS = {
                                                                 ),
         },
     },
-    'without_explicit_name': {
-        'publication_type': process_client.LAYER_TYPE,
-        'expected_name': 'small_layer',
-        'params': {
-            'file_paths': ['sample/layman.layer/small_layer.geojson'],
-            'with_chunks': True,
-        },
-    },
-    'zip_without_explicit_name': {
-        'publication_type': process_client.LAYER_TYPE,
-        'expected_name': 'small_layer_with_id',
-        'params': {
-            'file_paths': ['sample/layman.layer/small_layer_with_id.geojson'],
-            'compress': True,
-            'compress_settings': process_client.CompressTypeDef(archive_name='small_layer_with_id'),
-        },
-    },
-    'zip_chunks_without_explicit_name': {
-        'publication_type': process_client.LAYER_TYPE,
-        'expected_name': 'small_zip_layer',
-        'params': {
-            'file_paths': ['sample/layman.layer/small_layer.geojson'],
-            'compress': True,
-            'compress_settings': process_client.CompressTypeDef(archive_name='small_zip_layer'),
-            'with_chunks': True,
-        },
-    },
 }
 
 
@@ -122,7 +122,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     # pylint: disable=unused-argument
     @staticmethod
-    def test_timeseries_layer(publication: Publication, key, params, rest_method):
+    def test_implicit_name(publication: Publication, key, params, rest_method):
         """Parametrized using pytest_generate_tests"""
         rest_method(publication, params={**params.get('params', {}),
                                          'do_not_post_name': True,
