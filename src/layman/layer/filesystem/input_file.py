@@ -2,6 +2,7 @@ import glob
 import os
 import pathlib
 import logging
+import re
 
 from osgeo import ogr
 
@@ -225,7 +226,7 @@ def check_raster_layer_crs(main_filepath):
     check_spatial_ref_crs(crs)
 
 
-def check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=False, enable_more_main_files=False):
+def check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=False, enable_more_main_files=False, time_regex=None):
     main_files = input_files.raw_or_archived_main_file_paths
     if len(main_files) > 1 and not enable_more_main_files:
         raise LaymanError(2, {'parameter': 'file',
@@ -275,6 +276,23 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
                                   'files': [os.path.relpath(fp, input_files.saved_paths_dir) for fp in filenames],
                                   })
         main_files = input_files.raw_paths_to_archives
+
+    file_type = get_file_type(input_files.raw_or_archived_main_file_path)
+    if file_type == settings.FILE_TYPE_VECTOR and time_regex is not None:
+        raise LaymanError(48, f'Vector layers are not allowed to be combined with `time_regex` parameter.')
+
+    if time_regex:
+        filenames = [os.path.basename(main_file) for main_file in main_files]
+        unmatched_filenames = [filename for filename in filenames if not re.search(time_regex, filename)]
+        if len(unmatched_filenames) > 0:
+            raise LaymanError(48,
+                              {
+                                  'message': 'File does not match time_regex.',
+                                  'expected': 'All main data files match time_regex parameter',
+                                  'unmatched_filenames': unmatched_filenames,
+                              }
+                              )
+
     main_filenames = main_files
     first_main_filename = main_filenames[0]
     basename, ext = map(

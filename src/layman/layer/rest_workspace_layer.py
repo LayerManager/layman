@@ -130,7 +130,8 @@ def patch(workspace, layername):
     if delete_from == 'layman.layer.filesystem.input_file':
         if not (use_chunk_upload and input_files.is_one_archive):
             input_file.check_filenames(workspace, layername, input_files,
-                                       check_crs, ignore_existing_files=True, enable_more_main_files=enable_more_main_files)
+                                       check_crs, ignore_existing_files=True, enable_more_main_files=enable_more_main_files,
+                                       time_regex=time_regex)
         # file checks
         if not use_chunk_upload:
             temp_dir = tempfile.mkdtemp(prefix="layman_")

@@ -91,7 +91,7 @@ def post(workspace):
     # FILE NAMES
     use_chunk_upload = not input_files.sent_streams
     if not (use_chunk_upload and input_files.is_one_archive):
-        input_file.check_filenames(workspace, layername, input_files, check_crs, enable_more_main_files=enable_more_main_files)
+        input_file.check_filenames(workspace, layername, input_files, check_crs, enable_more_main_files=enable_more_main_files, time_regex=time_regex)
     file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
 
     # TITLE
@@ -113,9 +113,6 @@ def post(workspace):
 
     if file_type == settings.FILE_TYPE_RASTER and style_type.code == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
-
-    if file_type == settings.FILE_TYPE_VECTOR and time_regex is not None:
-        raise LaymanError(48, f'Vector layers are not allowed to be combined with `time_regex` parameter.')
 
     # Overview resampling
     overview_resampling = request.form.get('overview_resampling', '')
