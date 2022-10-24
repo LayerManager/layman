@@ -803,7 +803,7 @@ TESTCASES = {
     'different_rasters_time_regex': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
-            'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+            'time_regex': r'cz_[0-9]{4}',
             'file_paths': ['tests/dynamic_data/publications/crs/rasters/cz_4326.tif',
                            'tests/dynamic_data/publications/crs/rasters/cz_32633.tif',
                            ],
@@ -829,7 +829,7 @@ TESTCASES = {
     'different_bands_rasters_time_regex': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
-            'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+            'time_regex': r'[a-z]{5}',
             'file_paths': ['sample/layman.layer/sample_tif_rgba.tif',
                            'sample/layman.layer/sample_tif_rgb_nodata.tif',
                            ],
@@ -928,7 +928,7 @@ TESTCASES = {
     'time_regex_with_non_data_file': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
-            'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+            'time_regex': r'[a-z]{5}',
             'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.j2w'],
         },
         consts.KEY_EXCEPTION: LaymanError,
@@ -960,6 +960,39 @@ TESTCASES = {
                 KEY_ACTION_PARAMS: {
                     'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
                     'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.j2w'],
+                },
+            },
+        },
+    },
+    'filename_not_match_time_regex': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'time_regex': r'non_existing_regex',
+            'file_paths': ['tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 48,
+                          'message': 'Wrong combination of parameters',
+                          'detail': {
+                              'message': 'File does not match time_regex.',
+                              'expected': 'All main data files match time_regex parameter',
+                              'unmatched_filenames': ['S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+                          },
+                          },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+            },
+        },
+        KEY_PATCHES: {
+            'full': {
+                KEY_PATCH_POST: {},
+                KEY_ACTION_PARAMS: {
+                    'time_regex': r'non_existing_regex',
+                    'file_paths': [
+                        'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
                 },
             },
         },

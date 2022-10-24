@@ -23,7 +23,7 @@ refresh_gdal_needed = empty_method_returns_true
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_resampling='', enable_more_main_files=False):
+def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_resampling='', enable_more_main_files=False, time_regex=None):
     if self.is_aborted():
         raise AbortedException
     last_change = time.time()
@@ -55,7 +55,8 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
     logger.info(f'Layer chunks uploaded {workspace}.{layername}')
 
     input_files = input_file.get_layer_input_files(workspace, layername)
-    input_file.check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=True, enable_more_main_files=enable_more_main_files)
+    input_file.check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=True,
+                               enable_more_main_files=enable_more_main_files, time_regex=time_regex)
 
     publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
     main_filepaths = [path['gdal'] for path in publ_info['_file']['paths']]
