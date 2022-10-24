@@ -110,7 +110,8 @@ class TestLayer(base_test.TestSingleRestPublication):
         ],
     }
 
-    test_cases = [base_test.TestCaseType(key=key,
+    test_cases = [base_test.TestCaseType(pytest_id=key,
+                                         key=key,
                                          publication=Publication(workspace='dynamic_test_workspace_implicit_name',
                                                                  type=params['publication_type'],
                                                                  name=params['expected_name']),
