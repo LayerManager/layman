@@ -196,7 +196,7 @@ def get_statistics(filepath):
         stats = band.GetStatistics(False, True)  # (approx_ok, force), see
         # https://gdal.org/doxygen/classGDALRasterBand.html#a6aa58b6f0a0c17722b9bf763a96ff069
         # stats = [min, max, mean, stddev]
-        result.append(stats)
+        result.append(stats[:2])
     return result
 
 
@@ -226,7 +226,7 @@ def is_normalized_alpha_needed(filepath, *, color_interp, nodata_values):
     mask_flags = get_mask_flags(filepath)
     if color_interp[-1] == 'Alpha':
         stats = get_statistics(filepath)
-        alpha_min, alpha_max, _, _ = stats[-1]
+        alpha_min, alpha_max = stats[-1]
         result = not alpha_min == alpha_max == 255
     elif color_interp == ['Palette']:
         result = False
