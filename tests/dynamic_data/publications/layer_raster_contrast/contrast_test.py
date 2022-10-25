@@ -95,7 +95,7 @@ def assert_input_file(file_path, expected_values):
 
     assert gdal.get_nodata_value(file_path) == expected_values['nodata']
 
-    min_value, max_value, _, _ = gdal.get_statistics(file_path)[0]
+    min_value, max_value = gdal.get_statistics(file_path)[0]
     tolerance = expected_values.get('tolerance', 0)
     assert min_value == pytest.approx(expected_values['min'], tolerance)
     assert max_value == pytest.approx(expected_values['max'], tolerance)
