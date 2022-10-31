@@ -66,7 +66,8 @@ def refresh_wms(
                                               geoserver_workspace=geoserver_workspace,
                                               )
     elif file_type == settings.FILE_TYPE_RASTER:
-        gs_file_path = info['_file']['normalized_file']['gs_paths'][0]
+        file_paths = info['_file']['normalized_file']['paths'][0]
+        gs_file_path = file_paths['geoserver']
         real_bbox = info['native_bounding_box']
         bbox = bbox_util.ensure_bbox_with_area(real_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding) \
             if not bbox_util.is_empty(real_bbox) else crs_def.CRSDefinitions[crs].default_bbox
@@ -79,7 +80,7 @@ def refresh_wms(
         else:
             coverage_store_name = wms.get_image_mosaic_store_name(layername)
             source_file_or_dir = os.path.dirname(gs_file_path)
-            file_path = info['_file']['normalized_file']['paths'][0]
+            file_path = file_paths['absolute']
             dir_path = os.path.dirname(file_path)
             shutil.copy(os.path.join(DIRECTORY, 'indexer.properties'), dir_path)
             timeregex_path = os.path.join(dir_path, 'timeregex.properties')

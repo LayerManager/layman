@@ -218,8 +218,12 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            {
                                                '_file': {
                                                    'normalized_file': {
-                                                       'paths': [f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif', ],
-                                                       'gs_paths': [f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif', ],
+                                                       'paths': [
+                                                           {
+                                                               'absolute': f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif',
+                                                               'geoserver': f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif',
+                                                           }
+                                                       ],
                                                    },
                                                },
                                            })
@@ -228,8 +232,13 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            {
                                                '_file': {
                                                    'normalized_file': {
-                                                       'paths': [f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif' for filename in files],
-                                                       'gs_paths': [f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif' for filename in files],
+                                                       'paths': [
+                                                           {
+                                                               'absolute': f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif',
+                                                               'geoserver': f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif',
+                                                           }
+                                                           for filename in files
+                                                       ],
                                                    },
                                                },
                                            })
@@ -295,7 +304,7 @@ def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
         for idx, file_paths in enumerate(publ_info['_file']['paths']):
             gdal_path = file_paths['gdal']
             input_nodata_value = gdal.get_nodata_value(gdal_path)
-            normalized_nodata_value = gdal.get_nodata_value(normalized_paths[idx])
+            normalized_nodata_value = gdal.get_nodata_value(normalized_paths[idx]['absolute'])
             assert normalized_nodata_value == pytest.approx(input_nodata_value, 0.000000001)
 
 
@@ -307,7 +316,7 @@ def stats_preserved_in_normalized_raster(workspace, publ_type, name):
         normalized_paths = publ_info['_file']['normalized_file']['paths']
         for file_idx, file_paths in enumerate(publ_info['_file']['paths']):
             gdal_path = file_paths['gdal']
-            normalized_path = normalized_paths[file_idx]
+            normalized_path = normalized_paths[file_idx]['absolute']
             input_stats = gdal.get_statistics(gdal_path)
             driver_name = gdal.get_driver_short_name(gdal_path)
             tolerance = 0.000000001 if driver_name != 'JPEG' else 0.1
@@ -328,7 +337,7 @@ def size_and_position_preserved_in_normalized_raster(workspace, publ_type, name)
         normalized_paths = publ_info['_file']['normalized_file']['paths']
         for file_idx, file_paths in enumerate(publ_info['_file']['paths']):
             gdal_path = file_paths['gdal']
-            normalized_path = normalized_paths[file_idx]
+            normalized_path = normalized_paths[file_idx]['absolute']
 
             input_raster_size = gdal.get_raster_size(gdal_path)
             normalized_raster_size = gdal.get_raster_size(normalized_path)
