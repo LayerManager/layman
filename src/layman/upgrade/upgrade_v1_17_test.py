@@ -126,7 +126,7 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
 
         db.ensure_workspace(workspace)
         file_info = input_file.get_layer_info(workspace, layer)
-        main_filepath = file_info['_file']['paths'][0]
+        main_filepath = file_info['_file']['paths'][0]['absolute']
         process = db.import_layer_vector_file_async(workspace, table_name, main_filepath, crs_id=None)
         while process.poll() is None:
             pass

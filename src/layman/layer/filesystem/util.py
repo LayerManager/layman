@@ -112,13 +112,6 @@ class InputFiles:
         return os.path.splitext(self.saved_paths_to_archives[0])[1].lower() if self.is_one_archive else None
 
     @property
-    def main_file_paths_for_gdal(self):
-        main_paths = self.raw_or_archived_main_file_paths
-        if self.archive_type is not None:
-            return [settings.COMPRESSED_FILE_EXTENSIONS[self.archive_type] + main_path for main_path in main_paths]
-        return main_paths
-
-    @property
     def saved_paths_dir(self):
         result = None
         if self.saved_paths:

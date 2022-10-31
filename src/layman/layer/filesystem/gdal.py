@@ -29,7 +29,7 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
             }
         }
         file_dict = result['_file']
-        input_file_gdal_path = input_file.get_layer_info(workspace, layer)['_file']['gdal_paths'][0]
+        input_file_gdal_path = input_file.get_layer_info(workspace, layer)['_file']['paths'][0]['gdal']
         if '_file.color_interpretations' in extra_keys:
             file_dict['color_interpretations'] = get_color_interpretations(input_file_gdal_path)
         if '_file.mask_flags' in extra_keys:

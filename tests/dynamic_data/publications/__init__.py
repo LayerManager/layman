@@ -88,7 +88,12 @@ PUBLICATIONS = {
                     'exp_publication_detail': {
                         **publications.SMALL_LAYER_ZIP.info_values['exp_publication_detail'],
                         '_file': {
-                            'paths': ['/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_tif_tfw_rgba_opaque/input_file/zipped_tif_tfw_rgba_opaque.zip/small_layer.geojson']
+                            'paths': [
+                                {
+                                    'absolute': '/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_tif_tfw_rgba_opaque/input_file/zipped_tif_tfw_rgba_opaque.zip/small_layer.geojson',
+                                    'gdal': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_tif_tfw_rgba_opaque/input_file/zipped_tif_tfw_rgba_opaque.zip/small_layer.geojson',
+                                }
+                            ],
                         },
                         'file': {
                             'path': 'layers/zipped_tif_tfw_rgba_opaque/input_file/zipped_tif_tfw_rgba_opaque.zip/small_layer.geojson'
