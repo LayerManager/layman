@@ -47,6 +47,8 @@ LAYERS = {
                 'timeseries_tif.zip/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF',
             ]
         },
+        'expected_thumbnail': os.path.join(DIRECTORY, 'thumbnail_timeseries.png'),
+        'wms_bbox': [1743913.19942603237, 6499107.284021802247, 1755465.937341974815, 6503948.597792930901, ],
     },
     'more_files': {
         'params': {
@@ -75,6 +77,37 @@ LAYERS = {
                 'S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF',
             ]
         },
+        'expected_thumbnail': os.path.join(DIRECTORY, 'thumbnail_timeseries.png'),
+        'wms_bbox': [1743913.19942603237, 6499107.284021802247, 1755465.937341974815, 6503948.597792930901, ],
+    },
+    'longname_one_file': {
+        'params': {
+            'time_regex': r'[0-9]{8}',
+            'file_paths': [
+                os.path.join(DIRECTORY, 'timeseries_tif/210_long_name_20221031_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip'),
+            ],
+            'compress': False,
+        },
+        'detail_values': {
+            'exp_publication_detail': {
+                'bounding_box': [1669480.0, 6580973.0, 1675352.0, 6586999.0],
+                'native_crs': 'EPSG:3857',
+                'native_bounding_box': [1669480.0, 6580973.0, 1675352.0, 6586999.0],
+                'image_mosaic': True,
+                'wms': {
+                    'time': {'default': '2022-10-31T00:00:00Z',
+                             'units': 'ISO8601',
+                             'values': ['2022-10-31T00:00:00.000Z']},
+                },
+            },
+            'publ_type_detail': ('raster', 'sld'),
+            'gdal_prefix': '/vsizip/',
+            'files': [
+                '210_long_name_20221031_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip/210_long_name_20221031_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tiff',
+            ]
+        },
+        'expected_thumbnail': os.path.join(DIRECTORY, 'thumbnail_longname.png'),
+        'wms_bbox': [1669480.0, 6580973.0, 1675352.0, 6586999.0],
     },
 }
 
@@ -115,14 +148,11 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                        **params.get('detail_values', {}),
                                                        )
 
-        for time in [
-            '2022-03-16',
-            '2022-03-19',
-        ]:
+        time_snaps = [time_snap[:10] for time_snap in params['detail_values']['exp_publication_detail']['wms']['time']['values']]
+        for time in time_snaps:
             exp_wms = os.path.join(DIRECTORY, f"wms_{time}.png")
             asserts_publ.geoserver.wms_spatial_precision(layer.workspace, layer.type, layer.name, crs=crs_def.EPSG_3857,
-                                                         extent=[1743913.19942603237, 6499107.284021802247, 1755465.937341974815,
-                                                                 6503948.597792930901, ],
+                                                         extent=params['wms_bbox'],
                                                          img_size=(1322, 554),
                                                          wms_version='1.3.0',
                                                          pixel_diff_limit=200,
@@ -131,7 +161,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                          time=time,
                                                          )
 
-        exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_timeseries.png")
+        exp_thumbnail = os.path.join(DIRECTORY, params['expected_thumbnail'])
         asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
 
         if rest_method == self.post_publication:  # pylint: disable=W0143
