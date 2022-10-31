@@ -39,7 +39,7 @@ def refresh_table(
     if self.is_aborted():
         raise AbortedException
 
-    main_filepaths = publ_info['_file']['gdal_paths']
+    main_filepaths = [path['gdal'] for path in publ_info['_file']['paths']]
     assert len(main_filepaths) == 1
     main_filepath = main_filepaths[0]
     table_name = db.get_table_name(workspace, layername)

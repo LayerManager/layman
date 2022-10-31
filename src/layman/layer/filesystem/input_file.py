@@ -65,8 +65,14 @@ def get_layer_info(workspace, layername):
                 'file_type': file_type,
             },
             '_file': {
-                'paths': main_files,
-                'gdal_paths': input_files.main_file_paths_for_gdal,
+                'paths': [
+                    {
+                        'absolute': main_file,
+                        'gdal': main_file if input_files.archive_type is None
+                        else settings.COMPRESSED_FILE_EXTENSIONS[input_files.archive_type] + main_file,
+                    }
+                    for main_file in main_files
+                ],
             },
         }
     elif os.path.exists(util.get_layer_dir(workspace, layername)):

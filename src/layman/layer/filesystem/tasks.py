@@ -57,7 +57,8 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
     input_files = input_file.get_layer_input_files(workspace, layername)
     input_file.check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=True, enable_more_main_files=enable_more_main_files)
 
-    main_filepaths = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['_file']['gdal_paths']
+    publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
+    main_filepaths = [path['gdal'] for path in publ_info['_file']['paths']]
     input_file.check_main_files(main_filepaths, check_crs=check_crs, overview_resampling=overview_resampling)
 
     file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
@@ -100,7 +101,7 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
     if self.is_aborted():
         raise AbortedException
 
-    input_paths = layer_info['_file']['gdal_paths']
+    input_paths = [path['gdal'] for path in layer_info['_file']['paths']]
     for input_path in input_paths:
         vrt_file_path = gdal.create_vrt_file_if_needed(input_path)
         tmp_vrt_file = tempfile.mkstemp(suffix='.vrt')[1]
