@@ -17,13 +17,17 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
     gs_directory = get_normalized_raster_layer_dir(workspace, layer, geoserver=True)
     result = {}
     if len(gdal_paths) > 0:
-        gdal_gs_paths = [os.path.join(gs_directory, os.path.basename(gdal_path)) for gdal_path in gdal_paths]
         result = {
             'name': layer,
             '_file': {
                 'normalized_file': {
-                    'paths': gdal_paths,
-                    'gs_paths': gdal_gs_paths,
+                    'paths': [
+                        {
+                            'absolute': gdal_path,
+                            'geoserver': os.path.join(gs_directory, os.path.basename(gdal_path)),
+                        }
+                        for gdal_path in gdal_paths
+                    ],
                 }
             }
         }
