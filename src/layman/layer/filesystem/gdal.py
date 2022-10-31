@@ -16,7 +16,6 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
     gdal_paths = get_normalized_raster_layer_main_filepaths(workspace, layer)
     gs_directory = get_normalized_raster_layer_dir(workspace, layer, geoserver=True)
     result = {}
-    gdal_paths = [gdal_path for gdal_path in gdal_paths if os.path.exists(gdal_path)]
     if len(gdal_paths) > 0:
         gdal_gs_paths = [os.path.join(gs_directory, os.path.basename(gdal_path)) for gdal_path in gdal_paths]
         result = {
