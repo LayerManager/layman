@@ -346,7 +346,7 @@ TESTCASES = {
                           'code': 2,
                           'message': 'Wrong parameter value',
                           'detail': {
-                              'expected': 'At most one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg',
+                              'expected': 'At most one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or timeseries with time_regex parameter.',
                               'files': [
                                   'layer_with_two_main_files.zip/layer_with_two_main_files/geojson/small_layer.geojson',
                                   'layer_with_two_main_files.zip/layer_with_two_main_files/raster/sample_tif_rgb.tif'],

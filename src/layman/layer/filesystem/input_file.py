@@ -231,7 +231,8 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
     if len(main_files) > 1 and not enable_more_main_files:
         raise LaymanError(2, {'parameter': 'file',
                               'expected': 'At most one file with any of extensions: '
-                                          + ', '.join(util.get_all_allowed_main_extensions()),
+                                          + ', '.join(util.get_all_allowed_main_extensions())
+                                          + '; or timeseries with time_regex parameter.',
                               'files': [os.path.relpath(fp, input_files.saved_paths_dir) for fp in main_files],
                               })
     if enable_more_main_files:
