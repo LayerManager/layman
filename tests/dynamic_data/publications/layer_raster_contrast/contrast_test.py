@@ -1,3 +1,4 @@
+from copy import deepcopy
 import os
 import pytest
 
@@ -87,6 +88,29 @@ TEST_CASES = {
             'tolerance': 0.0001,
         },
     },
+    'timeseries': {
+        'input': {
+            'file_paths': [
+                'timeseries/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                'timeseries/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF',
+            ],
+            'time_regex': r'[0-9]{8}T[0-9]{6}',
+        },
+        'expected_input': {
+            'timeseries/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif': {
+                'color_interpretations': ['Gray'],
+                'nodata': 255,
+                'min': 82,
+                'max': 186,
+            },
+            'timeseries/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF': {
+                'color_interpretations': ['Gray'],
+                'nodata': 255,
+                'min': 64,
+                'max': 186,
+            },
+        },
+    },
 }
 
 
@@ -118,13 +142,20 @@ class TestLayer(base_test.TestSingleRestPublication):
     def test_contrast(layer: Publication, key, params, rest_method):
         """Parametrized using pytest_generate_tests"""
         base_file_name = key
-        file_name = f"{base_file_name}.{base_file_name.split('_')[0]}"
-        file_path = os.path.join(DIRECTORY, file_name)
-        assert_input_file(file_path, TEST_CASES[key]['expected_input'])
-        layer_params = {
-            'file_paths': [file_path],
-        }
-        rest_method(layer, params=layer_params)
+        test_case_def = deepcopy(TEST_CASES[key])
+
+        rest_input = test_case_def.get('input', {})
+        rest_input.setdefault('file_paths', [f"{base_file_name}.{base_file_name.split('_')[0]}"])
+        abs_file_paths = {fp: os.path.join(DIRECTORY, fp) for fp in rest_input['file_paths']}
+
+        expected_input = test_case_def['expected_input']
+        for input_file in rest_input['file_paths']:
+            abs_file_path = abs_file_paths[input_file]
+            assert_input_file(abs_file_path, expected_input.get(input_file, expected_input))
+
+        rest_input['file_paths'] = abs_file_paths.values()
+
+        rest_method(layer, params=rest_input)
 
         assert_util.is_publication_valid_and_complete(layer)
         base_file_name = '_'.join(layer.name.split('_')[1:])
