@@ -1,3 +1,4 @@
+from copy import deepcopy
 import os
 import pytest
 
@@ -118,7 +119,7 @@ def generate_test_cases():
         for name_suffix, with_chunks_value in [('', False),
                                                ('_chunks', True),
                                                ]:
-            params = test_case_params
+            params = deepcopy(test_case_params)
             params['params']['with_chunks'] = with_chunks_value
             test_case = base_test.TestCaseType(key=name + name_suffix,
                                                type=EnumTestTypes.MANDATORY,
