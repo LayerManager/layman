@@ -86,6 +86,7 @@ def post(workspace):
                                   }) from exp
 
     normalize_filenames = time_regex is None
+    normalize_raw_filenames = time_regex is None or input_files.is_one_archive
     enable_more_main_files = time_regex is not None
 
     # FILE NAMES
@@ -167,7 +168,7 @@ def post(workspace):
         input_style.save_layer_file(workspace, layername, style_file, style_type)
         if use_chunk_upload:
             files_to_upload = input_chunk.save_layer_files_str(
-                workspace, layername, input_files, check_crs, normalize_filenames=normalize_filenames)
+                workspace, layername, input_files, check_crs, normalize_filenames=normalize_raw_filenames)
             layer_result.update({
                 'files_to_upload': files_to_upload,
             })
@@ -176,7 +177,7 @@ def post(workspace):
             })
         else:
             try:
-                input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, normalize_filenames=normalize_filenames)
+                input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, normalize_filenames=normalize_raw_filenames)
             except BaseException as exc:
                 uuid.delete_layer(workspace, layername)
                 input_file.delete_layer(workspace, layername)
