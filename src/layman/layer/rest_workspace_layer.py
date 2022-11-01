@@ -135,7 +135,7 @@ def patch(workspace, layername):
         # file checks
         if not use_chunk_upload:
             temp_dir = tempfile.mkdtemp(prefix="layman_")
-            input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, output_dir=temp_dir)
+            input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, output_dir=temp_dir, normalize_filenames=normalize_filenames)
 
     if input_files.raw_paths:
         file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
