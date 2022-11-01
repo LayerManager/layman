@@ -76,7 +76,7 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=None, normalize_filenames=True):
+def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=None, name_normalized_tif_by_layer=True):
     def finish_gdal_process(process):
         if self.is_aborted():
             logger.info(f'terminating GDAL process workspace.layer={workspace}.{layername}')
@@ -113,7 +113,7 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
         nodata_value = gdal.get_nodata_value(vrt_file_path or input_path)
         gdal.correct_nodata_value_in_vrt(tmp_vrt_file, nodata_value=nodata_value)
 
-        source_file = f'{layername}.tif' if normalize_filenames else input_path
+        source_file = f'{layername}.tif' if name_normalized_tif_by_layer else input_path
         normalize_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, layername, source_file=source_file, )
         color_interpretations = gdal.get_color_interpretations(vrt_file_path or input_path)
         process = gdal.compress_and_mask_raster_file_async(input_file_path=tmp_vrt_file,
