@@ -122,8 +122,8 @@ def patch(workspace, layername):
             raise LaymanError(2, {'parameter': 'time_regex',
                                   'expected': 'Regular expression',
                                   }) from exp
-    normalize_filenames = time_regex is None
-    normalize_raw_filenames = time_regex is None or input_files.is_one_archive
+    name_normalized_tif_by_layer = time_regex is None
+    name_input_file_by_layer = time_regex is None or input_files.is_one_archive
     enable_more_main_files = time_regex is not None
 
     # FILE NAMES
@@ -136,7 +136,7 @@ def patch(workspace, layername):
         # file checks
         if not use_chunk_upload:
             temp_dir = tempfile.mkdtemp(prefix="layman_")
-            input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, output_dir=temp_dir, normalize_filenames=normalize_raw_filenames)
+            input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, output_dir=temp_dir, name_input_file_by_layer=name_input_file_by_layer)
 
     if input_files.raw_paths:
         file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
@@ -152,7 +152,7 @@ def patch(workspace, layername):
 
     kwargs['time_regex'] = time_regex
     kwargs['image_mosaic'] = time_regex is not None if delete_from == 'layman.layer.filesystem.input_file' else None
-    kwargs['normalize_filenames'] = normalize_filenames
+    kwargs['name_normalized_tif_by_layer'] = name_normalized_tif_by_layer
     kwargs['enable_more_main_files'] = enable_more_main_files
 
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
@@ -184,7 +184,7 @@ def patch(workspace, layername):
 
             if use_chunk_upload:
                 files_to_upload = input_chunk.save_layer_files_str(
-                    workspace, layername, input_files, check_crs, normalize_filenames=normalize_raw_filenames)
+                    workspace, layername, input_files, check_crs, name_input_file_by_layer=name_input_file_by_layer)
                 layer_result.update({
                     'files_to_upload': files_to_upload,
                 })

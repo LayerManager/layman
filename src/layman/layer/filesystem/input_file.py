@@ -343,14 +343,14 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
             raise LaymanError(3, conflict_paths)
 
 
-def save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, *, output_dir=None, normalize_filenames=True):
+def save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, *, output_dir=None, name_input_file_by_layer=True):
     if input_files.is_one_archive:
         main_filenames = input_files.raw_paths_to_archives
     else:
         main_filenames = input_files.raw_or_archived_main_file_paths
     output_dir = output_dir or ensure_layer_input_file_dir(workspace, layername)
     _, filepath_mapping = get_file_name_mappings(
-        input_files.raw_paths, main_filenames, layername, output_dir, normalize_filenames=normalize_filenames
+        input_files.raw_paths, main_filenames, layername, output_dir, name_input_file_by_layer=name_input_file_by_layer
     )
 
     common.save_files(input_files.sent_streams, filepath_mapping)
@@ -369,11 +369,11 @@ def get_unsafe_layername(input_files):
     return unsafe_layername
 
 
-def get_file_name_mappings(file_names, main_file_names, layer_name, output_dir, *, normalize_filenames=True):
+def get_file_name_mappings(file_names, main_file_names, layer_name, output_dir, *, name_input_file_by_layer=True):
     main_file_names = [os.path.splitext(main_file_name)[0] for main_file_name in main_file_names]
     filename_mapping = {}
     filepath_mapping = {}
-    if normalize_filenames:
+    if name_input_file_by_layer:
         for file_name in file_names:
             main_file_name = next(iter(main_file_name for main_file_name in main_file_names if file_name.startswith(main_file_name + '.')), None)
             if main_file_name:
