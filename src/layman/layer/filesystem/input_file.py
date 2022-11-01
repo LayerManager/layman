@@ -282,6 +282,16 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
         raise LaymanError(48, f'Vector layers are not allowed to be combined with `time_regex` parameter.')
 
     if time_regex:
+        too_long_filenames = [filename for filename in main_files if len(os.path.splitext(os.path.basename(filename))[0]) > 210]
+        if len(too_long_filenames) > 0:
+            raise LaymanError(48,
+                              {
+                                  'message': 'Too long filename in timeseries.',
+                                  'expected': 'All files names shorter than 211 characters',
+                                  'too_long_filenames': too_long_filenames,
+                              }
+                              )
+
         filenames = [os.path.basename(main_file) for main_file in main_files]
         unmatched_filenames = [filename for filename in filenames if not re.search(time_regex, filename)]
         if len(unmatched_filenames) > 0:
