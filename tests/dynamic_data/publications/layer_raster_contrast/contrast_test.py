@@ -114,6 +114,22 @@ TEST_CASES = {
 }
 
 
+def prepare_test_case(key):
+    test_case_def = deepcopy(TEST_CASES[key])
+
+    base_file_name = key
+
+    rest_input = test_case_def.get('input', {})
+    rest_input.setdefault('file_paths', [f"{base_file_name}.{base_file_name.split('_')[0]}"])
+    rest_input['file_paths'] = [os.path.join(DIRECTORY, fp) for fp in rest_input['file_paths']]
+    test_case_def['input'] = rest_input
+
+    return base_test.TestCaseType(key=key, type=EnumTestTypes.MANDATORY, params=test_case_def,
+                                  marks=[pytest.mark.xfail(reason="Not yet implemented.")]
+                                  if test_case_def.get('xfail') else [],
+                                  )
+
+
 def assert_input_file(file_path, expected_values):
     assert gdal.get_color_interpretations(file_path) == expected_values['color_interpretations']
 
@@ -131,31 +147,20 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     publication_type = process_client.LAYER_TYPE
 
-    test_cases = [base_test.TestCaseType(key=key, type=EnumTestTypes.MANDATORY,
-                                         marks=[pytest.mark.xfail(reason="Not yet implemented.")]
-                                         if params.get('xfail') else []
-                                         )
-                  for key, params in TEST_CASES.items()]
+    test_cases = [prepare_test_case(key) for key in TEST_CASES]
 
     # pylint: disable=unused-argument
     @staticmethod
     def test_contrast(layer: Publication, key, params, rest_method):
         """Parametrized using pytest_generate_tests"""
-        base_file_name = key
-        test_case_def = deepcopy(TEST_CASES[key])
 
-        rest_input = test_case_def.get('input', {})
-        rest_input.setdefault('file_paths', [f"{base_file_name}.{base_file_name.split('_')[0]}"])
-        abs_file_paths = {fp: os.path.join(DIRECTORY, fp) for fp in rest_input['file_paths']}
+        rest_params = params['input']
+        expected_input = params['expected_input']
+        for abs_file_path in rest_params['file_paths']:
+            rel_file_path = os.path.relpath(abs_file_path, DIRECTORY)
+            assert_input_file(abs_file_path, expected_input.get(rel_file_path, expected_input))
 
-        expected_input = test_case_def['expected_input']
-        for input_file in rest_input['file_paths']:
-            abs_file_path = abs_file_paths[input_file]
-            assert_input_file(abs_file_path, expected_input.get(input_file, expected_input))
-
-        rest_input['file_paths'] = abs_file_paths.values()
-
-        rest_method(layer, params=rest_input)
+        rest_method(layer, params=rest_params)
 
         assert_util.is_publication_valid_and_complete(layer)
         base_file_name = '_'.join(layer.name.split('_')[1:])
