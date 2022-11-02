@@ -132,7 +132,7 @@ def patch(workspace, layername):
         if not (use_chunk_upload and input_files.is_one_archive):
             input_file.check_filenames(workspace, layername, input_files,
                                        check_crs, ignore_existing_files=True, enable_more_main_files=enable_more_main_files,
-                                       time_regex=time_regex)
+                                       time_regex=time_regex, name_input_file_by_layer=name_input_file_by_layer)
         # file checks
         if not use_chunk_upload:
             temp_dir = tempfile.mkdtemp(prefix="layman_")
@@ -153,6 +153,7 @@ def patch(workspace, layername):
     kwargs['time_regex'] = time_regex
     kwargs['image_mosaic'] = time_regex is not None if delete_from == 'layman.layer.filesystem.input_file' else None
     kwargs['name_normalized_tif_by_layer'] = name_normalized_tif_by_layer
+    kwargs['name_input_file_by_layer'] = name_input_file_by_layer
     kwargs['enable_more_main_files'] = enable_more_main_files
 
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)

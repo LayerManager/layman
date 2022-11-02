@@ -227,7 +227,9 @@ def check_raster_layer_crs(main_filepath):
     check_spatial_ref_crs(crs)
 
 
-def check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=False, enable_more_main_files=False, time_regex=None):
+def check_filenames(workspace, layername, input_files, check_crs, *, ignore_existing_files=False,
+                    enable_more_main_files=False, time_regex=None, name_input_file_by_layer=None):
+    assert name_input_file_by_layer is not None
     main_files = input_files.raw_or_archived_main_file_paths
     if len(main_files) > 1 and not enable_more_main_files:
         raise LaymanError(2, {'parameter': 'file',
@@ -312,7 +314,8 @@ def check_filenames(workspace, layername, input_files, check_crs, ignore_existin
             raise LaymanError(18, detail)
     input_file_dir = get_layer_input_file_dir(workspace, layername)
     filename_mapping, _ = get_file_name_mappings(
-        input_files.raw_paths, main_filenames, layername, input_file_dir
+        input_files.raw_paths, main_filenames, layername, input_file_dir,
+        name_input_file_by_layer=name_input_file_by_layer
     )
 
     if time_regex:
