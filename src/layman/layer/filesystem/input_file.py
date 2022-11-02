@@ -3,6 +3,7 @@ import os
 import pathlib
 import logging
 import re
+import unicodedata
 
 from osgeo import ogr
 
@@ -15,6 +16,8 @@ from . import util, gdal as fs_gdal
 LAYER_SUBDIR = __name__.split('.')[-1]
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 logger = logging.getLogger(__name__)
+
+TIMESERIES_FILENAME_PATTERN = r"^(?![.])[a-zA-Z0-9_.-]+$"
 
 pre_publication_action_check = empty_method
 post_layer = empty_method
@@ -356,6 +359,16 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
                                   'unmatched_filenames': unmatched_filenames,
                               }
                               )
+        for old_filename, new_filename in main_filenames_to_check.items():
+            old_match = re.search(time_regex, os.path.basename(old_filename))
+            new_match = re.search(slugified_time_regex, new_filename)
+            assert old_match is not None and new_match is not None
+            assert len(old_match.groups()) == len(new_match.groups())
+            if len(old_match.groups()) > 0:
+                # if there are any matching groups, compare them instead of the whole result
+                assert old_match.groups() == new_match.groups()
+            else:
+                assert old_match.group(0) == new_match.group(0)
 
     if not ignore_existing_files:
         conflict_paths = [filename_mapping[k]
@@ -382,6 +395,21 @@ def save_layer_files(workspace, layername, input_files, check_crs, overview_resa
     check_main_files(gdal_main_filepaths, check_crs=check_crs, overview_resampling=overview_resampling)
 
 
+def slugify_timeseries_filename(filename):
+    slug = ''.join(c for c in unicodedata.normalize('NFD', filename) if unicodedata.category(c) != 'Mn')
+    slug = re.sub(r' ', '_', slug)
+    assert len(filename) == len(slug), f"filename={filename}, slug={slug}"
+    return slug
+
+
+def slugify_timeseries_filename_pattern(pattern):
+    return slugify_timeseries_filename(pattern)
+
+
+def is_safe_timeseries_filename(value):
+    return bool(re.match(TIMESERIES_FILENAME_PATTERN, value))
+
+
 def get_unsafe_layername(input_files):
     main_filepath = input_files.raw_or_archived_main_file_path or input_files.raw_paths_to_archives[0]
     unsafe_layername = ''
@@ -395,17 +423,16 @@ def get_file_name_mappings(file_names, main_file_names, layer_name, output_dir, 
     main_file_names = [os.path.splitext(main_file_name)[0] for main_file_name in main_file_names]
     filename_mapping = {}
     filepath_mapping = {}
-    if name_input_file_by_layer:
-        for file_name in file_names:
-            main_file_name = next(iter(main_file_name for main_file_name in main_file_names if file_name.startswith(main_file_name + '.')), None)
-            if main_file_name:
+    for file_name in file_names:
+        main_file_name = next(iter(main_file_name for main_file_name in main_file_names if file_name.startswith(main_file_name + '.')), None)
+        if main_file_name:
+            if name_input_file_by_layer:
                 new_filename = layer_name + file_name[len(main_file_name):].lower()
-                filepath_mapping[file_name] = os.path.join(output_dir, new_filename)
-                filename_mapping[file_name] = new_filename
             else:
-                filename_mapping[file_name] = None
-                filepath_mapping[file_name] = None
-    else:
-        filename_mapping = {file_name: file_name for file_name in file_names}
-        filepath_mapping = {file_name: os.path.join(output_dir, file_name) for file_name in file_names}
+                new_filename = slugify_timeseries_filename(os.path.basename(file_name))
+            filepath_mapping[file_name] = os.path.join(output_dir, new_filename)
+            filename_mapping[file_name] = new_filename
+        else:
+            filename_mapping[file_name] = None
+            filepath_mapping[file_name] = None
     return (filename_mapping, filepath_mapping)
