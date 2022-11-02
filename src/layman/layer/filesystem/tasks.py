@@ -104,6 +104,13 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
         raise AbortedException
 
     input_paths = list(path['gdal'] for path in layer_info['_file']['paths'].values())
+    if not name_normalized_tif_by_layer:
+        timeseries_filename_mapping, _ = input_file.get_file_name_mappings(
+            input_paths, input_paths, layername, output_dir='', name_input_file_by_layer=False)
+    else:
+        assert len(input_paths) == 1
+        timeseries_filename_mapping = None
+
     for input_path in input_paths:
         vrt_file_path = gdal.create_vrt_file_if_needed(input_path)
         tmp_vrt_file = tempfile.mkstemp(suffix='.vrt')[1]
@@ -114,7 +121,7 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
         nodata_value = gdal.get_nodata_value(vrt_file_path or input_path)
         gdal.correct_nodata_value_in_vrt(tmp_vrt_file, nodata_value=nodata_value)
 
-        source_file = f'{layername}.tif' if name_normalized_tif_by_layer else input_path
+        source_file = f'{layername}.tif' if name_normalized_tif_by_layer else timeseries_filename_mapping[input_path]
         normalize_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, layername, source_file=source_file, )
         color_interpretations = gdal.get_color_interpretations(vrt_file_path or input_path)
         process = gdal.compress_and_mask_raster_file_async(input_file_path=tmp_vrt_file,

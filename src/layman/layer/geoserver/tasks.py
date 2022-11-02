@@ -7,6 +7,7 @@ from geoserver import util as gs_util
 from layman.celery import AbortedException
 from layman import celery_app, settings, util as layman_util
 from layman.common import empty_method_returns_true, bbox as bbox_util
+from layman.layer.filesystem import input_file
 from . import wms, wfs, sld
 from .. import geoserver, LAYER_TYPE
 
@@ -85,7 +86,7 @@ def refresh_wms(
             shutil.copy(os.path.join(DIRECTORY, 'indexer.properties'), dir_path)
             timeregex_path = os.path.join(dir_path, 'timeregex.properties')
             with open(timeregex_path, 'w') as file:
-                file.write(f'regex={time_regex}\n')
+                file.write(f'regex={input_file.slugify_timeseries_filename_pattern(time_regex)}\n')
             coverage_type = gs_util.COVERAGESTORE_IMAGEMOSAIC
             enable_time_dimension = True
         gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, source_file_or_dir, coverage_type=coverage_type)
