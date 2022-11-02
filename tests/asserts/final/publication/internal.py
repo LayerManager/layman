@@ -126,9 +126,9 @@ def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, *, max_diffs=Non
 
 
 def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_detail, publ_type_detail=None, full_comparison=True,
-                             file_extension=None, gdal_prefix='', keys_to_remove=None, files=None, archive_extension=None, ):
-    assert not file_extension or not files
-    assert not archive_extension or files
+                             file_extension=None, gdal_prefix='', keys_to_remove=None, filenames=None, archive_extension=None, ):
+    assert not file_extension or not filenames
+    assert not archive_extension or filenames
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
@@ -178,7 +178,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                'paths': [f'{publ_type_dir}/{name}/input_file/{name}.{file_extension}'],
                                            },
                                        })
-        elif files:
+        elif filenames:
             archive_path = f"{name}.{archive_extension}/" if archive_extension else ''
             util.recursive_dict_update(expected_detail,
                                        {
@@ -188,14 +188,14 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                        'absolute': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{archive_path}{filename}',
                                                        'gdal': f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{archive_path}{filename}',
                                                    }
-                                                   for filename in files
+                                                   for filename in filenames
                                                ]
                                            },
                                            'file': {
-                                               'path': f'{publ_type_dir}/{name}/input_file/{archive_path}{files[0]}',
+                                               'path': f'{publ_type_dir}/{name}/input_file/{archive_path}{filenames[0]}',
                                                'paths': [
                                                    f'{publ_type_dir}/{name}/input_file/{archive_path}{filename}'
-                                                   for filename in files
+                                                   for filename in filenames
                                                ],
                                            },
                                        })
@@ -230,7 +230,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                    },
                                                },
                                            })
-            elif files:
+            elif filenames:
                 util.recursive_dict_update(expected_detail,
                                            {
                                                '_file': {
@@ -240,7 +240,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                                'absolute': f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif',
                                                                'geoserver': f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif',
                                                            }
-                                                           for filename in files
+                                                           for filename in filenames
                                                        ],
                                                    },
                                                },
