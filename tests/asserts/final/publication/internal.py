@@ -169,12 +169,13 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
             util.recursive_dict_update(expected_detail,
                                        {
                                            '_file': {
-                                               'paths': [
+                                               'paths': {
+                                                   name:
                                                    {
                                                        'absolute': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.{file_extension}',
                                                        'gdal': f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.{file_extension}',
                                                    }
-                                               ],
+                                               },
                                            },
                                            'file': {
                                                'path': f'{publ_type_dir}/{name}/input_file/{name}.{file_extension}',
@@ -186,13 +187,14 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
             util.recursive_dict_update(expected_detail,
                                        {
                                            '_file': {
-                                               'paths': [
+                                               'paths': {
+                                                   os.path.splitext(os.path.basename(filename))[0] if len(filenames) > 1 else name:
                                                    {
                                                        'absolute': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{archive_path}{filename}',
                                                        'gdal': f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{archive_path}{filename}',
                                                    }
                                                    for filename in filenames
-                                               ]
+                                               }
                                            },
                                            'file': {
                                                'path': f'{publ_type_dir}/{name}/input_file/{archive_path}{filenames[0]}',
@@ -223,13 +225,12 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                 util.recursive_dict_update(expected_detail,
                                            {
                                                '_file': {
-                                                   'normalized_file': {
-                                                       'paths': [
-                                                           {
-                                                               'absolute': f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif',
-                                                               'geoserver': f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif',
-                                                           }
-                                                       ],
+                                                   'paths': {
+                                                       name:
+                                                       {
+                                                           'normalized_absolute': f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif',
+                                                           'normalized_geoserver': f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif',
+                                                       }
                                                    },
                                                },
                                            })
@@ -237,14 +238,13 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                 util.recursive_dict_update(expected_detail,
                                            {
                                                '_file': {
-                                                   'normalized_file': {
-                                                       'paths': [
-                                                           {
-                                                               'absolute': f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif',
-                                                               'geoserver': f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif',
-                                                           }
-                                                           for filename in filenames
-                                                       ],
+                                                   'paths': {
+                                                       os.path.splitext(os.path.basename(filename))[0] if len(filenames) > 1 else name:
+                                                       {
+                                                           'normalized_absolute': f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif',
+                                                           'normalized_geoserver': f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif',
+                                                       }
+                                                       for filename in filenames
                                                    },
                                                },
                                            })
@@ -306,11 +306,10 @@ def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file']})
     file_type = publ_info['file']['file_type']
     if file_type == settings.FILE_TYPE_RASTER:
-        normalized_paths = publ_info['_file']['normalized_file']['paths']
-        for idx, file_paths in enumerate(publ_info['_file']['paths']):
+        for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
             input_nodata_value = gdal.get_nodata_value(gdal_path)
-            normalized_nodata_value = gdal.get_nodata_value(normalized_paths[idx]['absolute'])
+            normalized_nodata_value = gdal.get_nodata_value(file_paths['normalized_absolute'])
             assert normalized_nodata_value == pytest.approx(input_nodata_value, 0.000000001)
 
 
@@ -319,10 +318,9 @@ def stats_preserved_in_normalized_raster(workspace, publ_type, name):
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file']})
     file_type = publ_info['file']['file_type']
     if file_type == settings.FILE_TYPE_RASTER:
-        normalized_paths = publ_info['_file']['normalized_file']['paths']
-        for file_idx, file_paths in enumerate(publ_info['_file']['paths']):
+        for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
-            normalized_path = normalized_paths[file_idx]['absolute']
+            normalized_path = file_paths['normalized_absolute']
             input_stats = gdal.get_statistics(gdal_path)
             driver_name = gdal.get_driver_short_name(gdal_path)
             tolerance = 0.000000001 if driver_name != 'JPEG' else 0.1
@@ -340,10 +338,9 @@ def size_and_position_preserved_in_normalized_raster(workspace, publ_type, name)
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file']})
     file_type = publ_info['file']['file_type']
     if file_type == settings.FILE_TYPE_RASTER:
-        normalized_paths = publ_info['_file']['normalized_file']['paths']
-        for file_idx, file_paths in enumerate(publ_info['_file']['paths']):
+        for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
-            normalized_path = normalized_paths[file_idx]['absolute']
+            normalized_path = file_paths['normalized_absolute']
 
             input_raster_size = gdal.get_raster_size(gdal_path)
             normalized_raster_size = gdal.get_raster_size(normalized_path)
