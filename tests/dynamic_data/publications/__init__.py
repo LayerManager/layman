@@ -87,18 +87,8 @@ PUBLICATIONS = {
                     **publications.SMALL_LAYER_ZIP.info_values,
                     'exp_publication_detail': {
                         **publications.SMALL_LAYER_ZIP.info_values['exp_publication_detail'],
-                        '_file': {
-                            'paths': [
-                                {
-                                    'absolute': '/layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_tif_tfw_rgba_opaque/input_file/zipped_tif_tfw_rgba_opaque.zip/small_layer.geojson',
-                                    'gdal': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace/layers/zipped_tif_tfw_rgba_opaque/input_file/zipped_tif_tfw_rgba_opaque.zip/small_layer.geojson',
-                                }
-                            ],
-                        },
-                        'file': {
-                            'path': 'layers/zipped_tif_tfw_rgba_opaque/input_file/zipped_tif_tfw_rgba_opaque.zip/small_layer.geojson'
-                        },
                     },
+                    'file_extension': 'zip/small_layer.geojson',
                 }),
                 Action(publication.internal.thumbnail_equals, {
                     'exp_thumbnail': publications.SMALL_LAYER_ZIP.thumbnail,
