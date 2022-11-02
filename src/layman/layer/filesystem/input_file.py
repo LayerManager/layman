@@ -319,8 +319,22 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
     )
 
     if time_regex:
-        too_long_filenames = [filename for filename in main_files if
-                              len(os.path.splitext(os.path.basename(filename))[0]) > 210]
+        if name_input_file_by_layer:
+            assert input_files.is_one_archive
+            # timeseries files are in one ZIP file, so check main file names inside ZIP file instead of raw file names
+            # we can check only main files, because other files are not extracted
+            archived_main_filename_mapping, _ = get_file_name_mappings(
+                input_files.archived_main_file_paths, input_files.archived_main_file_paths, layername, input_file_dir,
+                name_input_file_by_layer=False)
+            filenames_to_check = archived_main_filename_mapping
+            main_filenames_to_check = filenames_to_check
+        else:
+            filenames_to_check = {k: v for k, v in filename_mapping.items() if v is not None}
+            main_filenames_to_check = {k: v for k, v in filenames_to_check.items() if k in main_files}
+            assert set(main_filenames_to_check) == set(main_files)
+
+        too_long_filenames = [old_filename for old_filename, new_filename in main_filenames_to_check.items()
+                              if len(os.path.splitext(new_filename)[0]) > 210]
         if len(too_long_filenames) > 0:
             raise LaymanError(48,
                               {
@@ -330,8 +344,9 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
                               }
                               )
 
-        filenames = [os.path.basename(main_file) for main_file in main_files]
-        unmatched_filenames = [filename for filename in filenames if not re.search(time_regex, filename)]
+        slugified_time_regex = slugify_timeseries_filename_pattern(time_regex)
+        unmatched_filenames = [old_filename for old_filename, new_filename in main_filenames_to_check.items()
+                               if not re.search(slugified_time_regex, new_filename)]
         if len(unmatched_filenames) > 0:
             raise LaymanError(48,
                               {
