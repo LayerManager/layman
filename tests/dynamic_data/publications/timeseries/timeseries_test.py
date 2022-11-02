@@ -82,7 +82,7 @@ LAYERS = {
         'expected_thumbnail': os.path.join(DIRECTORY, 'thumbnail_timeseries.png'),
         'wms_bbox': [1743913.19942603237, 6499107.284021802247, 1755465.937341974815, 6503948.597792930901, ],
     },
-    'longname_one_file': {
+    'longname_one_file_compressed': {
         'params': {
             'time_regex': r'[0-9]{8}',
             'file_paths': [
@@ -116,6 +116,39 @@ LAYERS = {
             'archive_extension': 'zip',
             'filenames': [
                 'timeseries_tif/210_long_name_20221031_sample_jpg_aux_rgba_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.jpeg',
+            ]
+        },
+        'expected_thumbnail': os.path.join(DIRECTORY, 'thumbnail_longname.png'),
+        'wms_bbox': [2707260.9569237595, 7740717.799460372, 2708414.90486888, 7741573.954387397],
+    },
+    'longname_one_file': {
+        'params': {
+            'time_regex': r'[0-9]{8}',
+            'file_paths': [
+                os.path.join(DIRECTORY,
+                             'timeseries_tif/210_long_name_20221031_sample_jpg_aux_rgba_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.jpeg',
+                             ),
+                os.path.join(DIRECTORY,
+                             'timeseries_tif/210_long_name_20221031_sample_jpg_aux_rgba_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.jpeg.aux.xml',
+                             ),
+            ],
+            'compress': False,
+        },
+        'detail_values': {
+            'exp_publication_detail': {
+                'bounding_box': [2707260.9569237595, 7740717.799460372, 2708414.90486888, 7741573.954387397],
+                'native_crs': 'EPSG:3857',
+                'native_bounding_box': [2707260.9569237595, 7740717.799460372, 2708414.90486888, 7741573.954387397],
+                'image_mosaic': True,
+                'wms': {
+                    'time': {'default': '2022-10-31T00:00:00Z',
+                             'units': 'ISO8601',
+                             'values': ['2022-10-31T00:00:00.000Z']},
+                },
+            },
+            'publ_type_detail': ('raster', 'sld'),
+            'filenames': [
+                '210_long_name_20221031_sample_jpg_aux_rgba_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.jpeg',
             ]
         },
         'expected_thumbnail': os.path.join(DIRECTORY, 'thumbnail_longname.png'),
