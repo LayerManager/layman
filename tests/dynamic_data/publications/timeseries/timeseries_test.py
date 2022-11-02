@@ -44,7 +44,7 @@ LAYERS = {
             'publ_type_detail': ('raster', 'sld'),
             'gdal_prefix': '/vsizip/',
             'archive_extension': 'zip',
-            'files': [
+            'filenames': [
                 'timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
                 'timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF',
             ]
@@ -74,7 +74,7 @@ LAYERS = {
                 },
             },
             'publ_type_detail': ('raster', 'sld'),
-            'files': [
+            'filenames': [
                 'S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
                 'S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF',
             ]
@@ -105,7 +105,7 @@ LAYERS = {
             'publ_type_detail': ('raster', 'sld'),
             'gdal_prefix': '/vsizip/',
             'archive_extension': 'zip',
-            'files': [
+            'filenames': [
                 '210_long_name_20221031_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tiff',
             ]
         },
