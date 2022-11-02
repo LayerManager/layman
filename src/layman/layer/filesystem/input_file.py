@@ -337,6 +337,17 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
             main_filenames_to_check = {k: v for k, v in filenames_to_check.items() if k in main_files}
             assert set(main_filenames_to_check) == set(main_files)
 
+        unsafe_filenames = [new_filename for new_filename in filenames_to_check.values()
+                            if not is_safe_timeseries_filename(new_filename)]
+        if len(unsafe_filenames) > 0:
+            raise LaymanError(48,
+                              {
+                                  'message': 'Unsafe filename in timeseries.',
+                                  'expected': f'All slugified file names matching pattern {TIMESERIES_FILENAME_PATTERN}',
+                                  'unsafe_slugified_filenames': unsafe_filenames,
+                              }
+                              )
+
         too_long_filenames = [old_filename for old_filename, new_filename in main_filenames_to_check.items()
                               if len(os.path.splitext(new_filename)[0]) > 210]
         if len(too_long_filenames) > 0:
