@@ -2,6 +2,7 @@ import glob
 import os
 import shutil
 import subprocess
+import logging
 from lxml import etree as ET
 from osgeo import gdal, gdalconst, osr
 from layman import patch_mode, settings, LaymanError
@@ -9,6 +10,7 @@ from layman.common import empty_method, empty_method_returns_dict
 from . import input_file, util
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
+logger = logging.getLogger(__name__)
 
 
 def get_layer_info(workspace, layer, *, extra_keys=None):
