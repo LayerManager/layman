@@ -95,6 +95,12 @@ class InputFiles:
         return result
 
     @property
+    def archived_main_file_paths(self):
+        result = sorted([fn for fn in self.archived_paths(with_zip_in_path=True)
+                         if os.path.splitext(fn)[1].lower() in get_all_allowed_main_extensions()])
+        return result
+
+    @property
     def raw_or_archived_main_file_paths(self):
         result = sorted([fn for fn in self.raw_or_archived_paths
                          if os.path.splitext(fn)[1].lower() in get_all_allowed_main_extensions()])
