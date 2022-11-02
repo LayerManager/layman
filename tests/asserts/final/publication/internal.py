@@ -1,4 +1,5 @@
 import os
+import logging
 
 import pytest
 from db import util as db_util
@@ -10,6 +11,8 @@ from layman.map import MAP_TYPE
 from layman.layer.filesystem import gdal
 from test_tools import process_client, util as test_util, assert_util
 from ... import util
+
+logger = logging.getLogger(__name__)
 
 
 def source_has_its_key_or_it_is_empty(workspace, publ_type, name):
