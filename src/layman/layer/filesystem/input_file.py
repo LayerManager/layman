@@ -379,9 +379,9 @@ def get_file_name_mappings(file_names, main_file_names, layer_name, output_dir, 
         for file_name in file_names:
             main_file_name = next(iter(main_file_name for main_file_name in main_file_names if file_name.startswith(main_file_name + '.')), None)
             if main_file_name:
-                new_fn = layer_name + file_name[len(main_file_name):].lower()
-                filepath_mapping[file_name] = os.path.join(output_dir, new_fn)
-                filename_mapping[file_name] = new_fn
+                new_filename = layer_name + file_name[len(main_file_name):].lower()
+                filepath_mapping[file_name] = os.path.join(output_dir, new_filename)
+                filename_mapping[file_name] = new_filename
             else:
                 filename_mapping[file_name] = None
                 filepath_mapping[file_name] = None
