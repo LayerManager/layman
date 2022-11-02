@@ -178,7 +178,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                'paths': [f'{publ_type_dir}/{name}/input_file/{name}.{file_extension}'],
                                            },
                                        })
-        if files:
+        elif files:
             archive_path = f"{name}.{archive_extension}/" if archive_extension else ''
             util.recursive_dict_update(expected_detail,
                                        {
@@ -230,7 +230,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                    },
                                                },
                                            })
-            if files:
+            elif files:
                 util.recursive_dict_update(expected_detail,
                                            {
                                                '_file': {
