@@ -22,24 +22,23 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
         result = {
             'name': layer,
             '_file': {
-                'normalized_file': {
-                    'paths': [
-                        {
-                            'absolute': gdal_path,
-                            'geoserver': os.path.join(gs_directory, os.path.basename(gdal_path)),
-                        }
-                        for gdal_path in gdal_paths
-                    ],
-                }
+                'paths': {
+                    os.path.splitext(os.path.basename(gdal_path))[0] if len(gdal_paths) > 1 else layer:
+                    {
+                        'normalized_absolute': gdal_path,
+                        'normalized_geoserver': os.path.join(gs_directory, os.path.basename(gdal_path)),
+                    }
+                    for gdal_path in gdal_paths
+                },
             }
         }
         file_dict = result['_file']
-        input_file_gdal_path = input_file.get_layer_info(workspace, layer)['_file']['paths'][0]['gdal']
+        input_file_gdal_path = next(iter(input_file.get_layer_info(workspace, layer)['_file']['paths'].values()))['gdal']
         if '_file.color_interpretations' in extra_keys:
             file_dict['color_interpretations'] = get_color_interpretations(input_file_gdal_path)
         if '_file.mask_flags' in extra_keys:
             file_dict['mask_flags'] = get_mask_flags(input_file_gdal_path)
-        norm_file_dict = file_dict['normalized_file']
+        norm_file_dict = dict()
         if '_file.normalized_file.stats' in extra_keys:
             stats = get_file_list_statistics(gdal_paths)
             norm_file_dict['stats'] = stats
@@ -52,6 +51,8 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
         if '_file.normalized_file.nodata_value' in extra_keys:
             nodata_value = get_nodata_value(gdal_paths[0])
             norm_file_dict['nodata_value'] = nodata_value
+        if norm_file_dict:
+            file_dict['normalized_file'] = norm_file_dict
     return result
 
 
