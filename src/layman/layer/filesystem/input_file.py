@@ -346,7 +346,8 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
 
         slugified_time_regex = slugify_timeseries_filename_pattern(time_regex)
         unmatched_filenames = [old_filename for old_filename, new_filename in main_filenames_to_check.items()
-                               if not re.search(slugified_time_regex, new_filename)]
+                               if not re.search(time_regex, os.path.basename(old_filename))
+                               or not re.search(slugified_time_regex, new_filename)]
         if len(unmatched_filenames) > 0:
             raise LaymanError(48,
                               {
