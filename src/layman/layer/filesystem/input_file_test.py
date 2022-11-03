@@ -63,8 +63,8 @@ def test_get_main_file_name_shp():
     assert get_all_main_file_names(filenames) == ['tmp/countries_lakes.shp', 'tmp/countries.shp', ]
 
 
-def test_get_file_name_mappings():
-    cfg = {
+@pytest.mark.parametrize("method_params, exp_filepath_mapping", [
+    pytest.param({
         'file_names': [
             'tmp/countries.cpg',
             'tmp/countries.dbf',
@@ -83,9 +83,8 @@ def test_get_file_name_mappings():
         ],
         'main_file_names': ['tmp/countries.shp'],
         'layer_name': 'cntr',
-        'output_dir': '/data'
-    }
-    assert get_file_name_mappings(**cfg)[1] == {
+        'output_dir': '/data',
+    }, {
         'tmp/countries.cpg': '/data/cntr.cpg',
         'tmp/countries.dbf': '/data/cntr.dbf',
         'tmp/countries.prj': '/data/cntr.prj',
@@ -100,7 +99,11 @@ def test_get_file_name_mappings():
         'tmp/countries_lakes.shp': None,
         'tmp/countries_lakes.shx': None,
         'tmp/countries_lakes.VERSION.txt': None,
-    }
+    }, id='basic'),
+])
+def test_get_file_name_mappings(method_params, exp_filepath_mapping):
+    _, result = get_file_name_mappings(**method_params)
+    assert result == exp_filepath_mapping
 
 
 @pytest.mark.parametrize("filename, exp_result", [
