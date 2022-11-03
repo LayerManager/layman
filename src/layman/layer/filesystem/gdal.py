@@ -343,6 +343,7 @@ def compress_and_mask_raster_file_async(*, output_file, input_file_path, color_i
     bash_args = [
         'gdal_translate',
         '-co', 'compress=lzw',
+        '-co', 'BIGTIFF=YES',
     ]
 
     # GeoServer can visualize grayscale raster with partial opacity from alpha band, but it has unstable contrast.
