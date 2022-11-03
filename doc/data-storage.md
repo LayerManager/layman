@@ -35,7 +35,7 @@ Subsequently, asynchronous tasks ensure following steps:
 - data file chunks and completed data files are saved to [filesystem](#filesystem) (if sent [asynchronously](async-file-upload.md))
 - vector data files are imported to [PostgreSQL](#postgresql)
    - PostgreSQL table with vector data is registered to [GeoServer](#geoserver)
-- raster files are normalized and compressed to GeoTIFF with overviews (pyramids)
+- raster files are normalized and compressed to BigTIFF GeoTIFF with overviews (pyramids)
    - normalized GeoTIFF is registered to [GeoServer](#geoserver)
 - SLD file is saved to [GeoServer](#geoserver) and registered to WMS layer
 - QGS file is created on [filesystem](#filesystem) and through QGIS server registered to [GeoServer](#geoserver)
