@@ -130,7 +130,7 @@ Body parameters:
       - JPEG (.jpg, .jpeg, with .jpg.aux.xml, .jgw, .jpgw, .jpegw or .wld)
       - any of above types in single ZIP file (.zip)
       - file names, i.e. array of strings
-   - it is allowed to publish time-series layer by setting time_regex parameter and sending one or more main raster files (compressed in one archive or uncompressed) with the same extension, color interpretation, bounding box, raster size, nodata value, mask flags, and data type name. Filename can be at most 210 characters long.
+   - it is allowed to publish time-series layer by setting time_regex parameter and sending one or more main raster files (compressed in one archive or uncompressed) with the same extension, color interpretation, bounding box, raster size, nodata value, mask flags, and data type name. Filename can be at most 210 characters long. Supported characters are 26 Latin letters `a-zA-Z` (with or without diacritics), numbers, underscores, dashes, dots, and spaces. Other Latin characters (e.g. `ß`, `Æ`, `ç`) and other than Latin scripts (e.g. Cyrillic or Chinese) are not supported. Files are stored and published with slugified filenames (diacritic is removed from letters, and space ` ` is converted to underscore `_`).
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - in case of raster data input, following input combinations of bands and color interpretations are supported:
       - 1 band: Gray
@@ -179,9 +179,12 @@ Body parameters:
    - method used by [`gdaladdo`](https://gdal.org/programs/gdaladdo.html#cmdoption-gdaladdo-r) for overview resampling when normalizing raster layer
    - by default Layman will guess overview resampling method from input file metadata
    - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
-- *time_regex*, string, e.g. `[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)`
+- *time_regex*, string, e.g. `[0-9]{8}T[0-9]{9}Z`
+  - regular expression pattern used for extracting the time information from the file name. The pattern
+    - either has no matching group and matches ISO 8601 [year](https://en.wikipedia.org/wiki/ISO_8601#Years), [date](https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates), or [datetime](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) patterns, e.g. `[0-9]{8}` or `[0-9]{8}T[0-9]{9}Z`
+    - or has one or more matching groups that concatenated together matches ISO 8601 year, date, or datetime patterns, e.g. `^some_prefix_([0-9]{8})_some_postfix.*$` or , e.g. `some_prefix_([0-9]{8})_some_separator_(T[0-9]{9}Z)_some_postfix`
   - used for timeseries raster files
-  - specifies the pattern used for extracting the time information from the file name
+  - latin diacritic is removed from the regex and spaces are replaced with underscores to be consistent with slugifying of timeseries filenames
   - error is raised if any of main data files do not match *time_regex* value
 
 #### Response
@@ -323,7 +326,7 @@ Body parameters:
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - if QML style is used (either directly within this request, or indirectly from previous state on server), it must list all attributes contained in given data file
-   - it is allowed to publish time-series layer by setting time_regex parameter and sending one or more main raster files (compressed in one archive or uncompressed) with the same extension, color interpretation, bounding box, raster size, nodata value, mask flags, and data type name. Filename can be at most 210 characters long.
+   - it is allowed to publish time-series layer - see [POST Workspace Layers](#post-workspace-layers)
 - *title*
 - *description*
 - *crs*, string, e.g. `EPSG:3857`, supported EPSG codes are defined by [LAYMAN_INPUT_SRS_LIST](./env-settings.md#LAYMAN_INPUT_SRS_LIST)
@@ -347,11 +350,9 @@ Body parameters:
    - by default Layman will guess overview resampling method from input file metadata
    - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
    - can be used only together with `file` parameter, otherwise error is raised
-- *time_regex*, string, e.g. `[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)`
-  - used for timeseries raster files
-  - specifies the pattern used for extracting the time information from the file name
+- *time_regex*, string, e.g. `[0-9]{8}T[0-9]{9}Z`
   - supported only in combination with *file* parameter
-  - error is raised if any of main data files do not match *time_regex* value
+  - see [POST Workspace Layers](#post-workspace-layers)
 
 #### Response
 Content-Type: `application/json`
