@@ -231,7 +231,8 @@ def check_raster_layer_crs(main_filepath):
 
 
 def check_filenames(workspace, layername, input_files, check_crs, *, ignore_existing_files=False,
-                    enable_more_main_files=False, time_regex=None, name_input_file_by_layer=None):
+                    enable_more_main_files=False, time_regex=None, name_input_file_by_layer=None,
+                    skip_timeseries_filename_checks=False):
     assert name_input_file_by_layer is not None
     main_files = input_files.raw_or_archived_main_file_paths
     if len(main_files) > 1 and not enable_more_main_files:
@@ -321,7 +322,7 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
         name_input_file_by_layer=name_input_file_by_layer
     )
 
-    if time_regex:
+    if time_regex and not skip_timeseries_filename_checks:
         if name_input_file_by_layer:
             assert input_files.is_one_archive
             # timeseries files are in one ZIP file, so check main file names inside ZIP file instead of raw file names
