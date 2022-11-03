@@ -154,6 +154,74 @@ LAYERS = {
         'expected_thumbnail': os.path.join(DIRECTORY, 'thumbnail_longname.png'),
         'wms_bbox': [2707260.9569237595, 7740717.799460372, 2708414.90486888, 7741573.954387397],
     },
+    'diacritics_and_spaces_zip': {
+        'params': {
+            'time_regex': r'^Cerekvice nad Bystřicí ([0-9]{8}).*$',
+            'file_paths': [
+                os.path.join(DIRECTORY, 'timeseries_tif/Cerekvice nad Bystřicí 20220316.tif'),
+                os.path.join(DIRECTORY, 'timeseries_tif/Cerekvice nad Bystřicí 20220319.TIF'),
+            ],
+            'compress': True,
+            'compress_settings': process_client.CompressTypeDef(archive_name='timeseries_tif',
+                                                                inner_directory='/timeseries_tif/',
+                                                                file_name=None,
+                                                                ),
+        },
+        'detail_values': {
+            'exp_publication_detail': {
+                'bounding_box': [1737105.4141226907, 6491458.724017749, 1765157.537707582, 6509901.824098258],
+                'native_crs': 'EPSG:32633',
+                'native_bounding_box': [543100.0, 5567910.0, 560930.0, 5579500.0],
+                'image_mosaic': True,
+                'wms': {
+                    'time': {'default': '2022-03-19T00:00:00Z',
+                             'units': 'ISO8601',
+                             'values': ['2022-03-16T00:00:00.000Z',
+                                        '2022-03-19T00:00:00.000Z']},
+                },
+            },
+            'publ_type_detail': ('raster', 'sld'),
+            'gdal_prefix': '/vsizip/',
+            'archive_extension': 'zip',
+            'filenames': [
+                'timeseries_tif/Cerekvice nad Bystřicí 20220316.tif',
+                'timeseries_tif/Cerekvice nad Bystřicí 20220319.TIF',
+            ]
+        },
+        'expected_thumbnail': os.path.join(DIRECTORY, 'thumbnail_timeseries.png'),
+        'wms_bbox': [1743913.19942603237, 6499107.284021802247, 1755465.937341974815, 6503948.597792930901, ],
+    },
+    'diacritics_and_spaces': {
+        'params': {
+            'time_regex': r'^Cerekvice nad Bystřicí ([0-9]{8}).*$',
+            'file_paths': [
+                os.path.join(DIRECTORY, 'timeseries_tif/Cerekvice nad Bystřicí 20220316.tif'),
+                os.path.join(DIRECTORY, 'timeseries_tif/Cerekvice nad Bystřicí 20220319.TIF'),
+            ],
+            'compress': False,
+        },
+        'detail_values': {
+            'exp_publication_detail': {
+                'bounding_box': [1737105.4141226907, 6491458.724017749, 1765157.537707582, 6509901.824098258],
+                'native_crs': 'EPSG:32633',
+                'native_bounding_box': [543100.0, 5567910.0, 560930.0, 5579500.0],
+                'image_mosaic': True,
+                'wms': {
+                    'time': {'default': '2022-03-19T00:00:00Z',
+                             'units': 'ISO8601',
+                             'values': ['2022-03-16T00:00:00.000Z',
+                                        '2022-03-19T00:00:00.000Z']},
+                },
+            },
+            'publ_type_detail': ('raster', 'sld'),
+            'filenames': [
+                'Cerekvice_nad_Bystrici_20220316.tif',
+                'Cerekvice_nad_Bystrici_20220319.TIF',
+            ]
+        },
+        'expected_thumbnail': os.path.join(DIRECTORY, 'thumbnail_timeseries.png'),
+        'wms_bbox': [1743913.19942603237, 6499107.284021802247, 1755465.937341974815, 6503948.597792930901, ],
+    },
 }
 
 
