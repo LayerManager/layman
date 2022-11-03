@@ -70,7 +70,7 @@ def get_layer_info(workspace, layername):
             },
             '_file': {
                 'paths': {
-                    os.path.splitext(os.path.basename(main_file))[0] if len(main_files) > 1 else layername:
+                    slugify_timeseries_filename(os.path.splitext(os.path.basename(main_file))[0]) if len(main_files) > 1 else layername:
                     {
                         'absolute': main_file,
                         'gdal': main_file if input_files.archive_type is None

@@ -8,7 +8,7 @@ from layman.common import bbox as bbox_util
 from layman.common.prime_db_schema import publications
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
-from layman.layer.filesystem import gdal
+from layman.layer.filesystem import gdal, input_file
 from test_tools import process_client, util as test_util, assert_util
 from ... import util
 
@@ -188,7 +188,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        {
                                            '_file': {
                                                'paths': {
-                                                   os.path.splitext(os.path.basename(filename))[0] if len(filenames) > 1 else name:
+                                                   input_file.slugify_timeseries_filename(os.path.splitext(os.path.basename(filename))[0]) if len(filenames) > 1 else name:
                                                    {
                                                        'absolute': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{archive_path}{filename}',
                                                        'gdal': f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{archive_path}{filename}',
@@ -239,10 +239,10 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            {
                                                '_file': {
                                                    'paths': {
-                                                       os.path.splitext(os.path.basename(filename))[0] if len(filenames) > 1 else name:
+                                                       input_file.slugify_timeseries_filename(os.path.splitext(os.path.basename(filename))[0]) if len(filenames) > 1 else name:
                                                        {
-                                                           'normalized_absolute': f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif',
-                                                           'normalized_geoserver': f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{os.path.splitext(os.path.basename(filename))[0]}.tif',
+                                                           'normalized_absolute': f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{input_file.slugify_timeseries_filename(os.path.splitext(os.path.basename(filename))[0])}.tif',
+                                                           'normalized_geoserver': f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{input_file.slugify_timeseries_filename(os.path.splitext(os.path.basename(filename))[0])}.tif',
                                                        }
                                                        for filename in filenames
                                                    },
