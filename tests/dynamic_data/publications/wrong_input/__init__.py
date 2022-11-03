@@ -750,7 +750,7 @@ TESTCASES = {
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'files': ['temporary_zip_file.zip/sample_jp2_rgb.jp2', 'temporary_zip_file.zip/single_point.shp'],
+                'detail': {'files': ['raster_vector_time_regex_post_chunks_zipped.zip/sample_jp2_rgb.jp2', 'raster_vector_time_regex_post_chunks_zipped.zip/single_point.shp'],
                            },
             },
         },
@@ -782,7 +782,7 @@ TESTCASES = {
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.jp2', 'temporary_zip_file.zip/sample_jpeg_jgw_rgb.jpeg', ],
+                'detail': {'files': ['dif_raster_types_time_regex_post_chunks_zipped.zip/sample_jp2_j2w_rgb.jp2', 'dif_raster_types_time_regex_post_chunks_zipped.zip/sample_jpeg_jgw_rgb.jpeg', ],
                            },
             },
         },
@@ -958,7 +958,7 @@ TESTCASES = {
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.j2w'],
+                'detail': {'files': ['time_regex_with_non_data_file_post_chunks_zipped.zip/sample_jp2_j2w_rgb.j2w'],
                            'message': 'Zip file without data file inside.', }
             },
         },
@@ -968,6 +968,12 @@ TESTCASES = {
                 KEY_ACTION_PARAMS: {
                     'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
                     'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.j2w'],
+                },
+                KEY_EXPECTED_EXCEPTION: {
+                    frozenset([('compress', True), ('with_chunks', True)]): {
+                        'detail': {'files': ['time_regex_with_non_data_file_patch_full_chunks_zipped.zip/sample_jp2_j2w_rgb.j2w'],
+                                   }
+                    },
                 },
             },
         },
@@ -1012,6 +1018,7 @@ TESTCASES = {
             'file_paths': [
                 f'{DIRECTORY}/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip',
             ],
+            'compress': False,
         },
         consts.KEY_EXCEPTION: LaymanError,
         KEY_EXPECTED_EXCEPTION: {
@@ -1025,8 +1032,9 @@ TESTCASES = {
                               'too_long_filenames': ['211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif'],
                           },
                           },
-            frozenset([('compress', True), ('with_chunks', True)]): {
+            frozenset([('compress', False), ('with_chunks', True)]): {
                 'sync': False,
+                'detail': {'too_long_filenames': ['/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/too_long_filename_with_time_regexp_post_chunks/input_file/too_long_filename_with_time_regexp_post_chunks.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif']}
             },
         },
         KEY_PATCHES: {
@@ -1037,6 +1045,12 @@ TESTCASES = {
                     'file_paths': [
                         f'{DIRECTORY}/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip',
                     ],
+                    'compress': False,
+                },
+                KEY_EXPECTED_EXCEPTION: {
+                    frozenset([('compress', False), ('with_chunks', True)]): {
+                        'detail': {'too_long_filenames': ['/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/too_long_filename_with_time_regexp_patch_full_chunks/input_file/too_long_filename_with_time_regexp_patch_full_chunks.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif']}
+                    },
                 },
             },
         },
