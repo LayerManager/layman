@@ -23,7 +23,9 @@ refresh_gdal_needed = empty_method_returns_true
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_resampling='', enable_more_main_files=False, time_regex=None, name_input_file_by_layer=None):
+def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_resampling='',
+                        enable_more_main_files=False, time_regex=None, slugified_time_regex=None,
+                        name_input_file_by_layer=None):
     if self.is_aborted():
         raise AbortedException
     last_change = time.time()
@@ -58,6 +60,7 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
     skip_timeseries_filename_checks = not input_files.is_one_archive
     input_file.check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=True,
                                enable_more_main_files=enable_more_main_files, time_regex=time_regex,
+                               slugified_time_regex=slugified_time_regex,
                                name_input_file_by_layer=name_input_file_by_layer,
                                skip_timeseries_filename_checks=skip_timeseries_filename_checks)
 

@@ -112,6 +112,7 @@ def patch(workspace, layername):
 
     # Timeseries regex
     time_regex = request.form.get('time_regex') or None
+    slugified_time_regex = input_file.slugify_timeseries_filename_pattern(time_regex) if time_regex else None
     if time_regex:
         if len(input_files.raw_paths) == 0:
             raise LaymanError(48, f'Parameter time_regex is allowed only in combination with files.')
@@ -132,7 +133,8 @@ def patch(workspace, layername):
         if not (use_chunk_upload and input_files.is_one_archive):
             input_file.check_filenames(workspace, layername, input_files,
                                        check_crs, ignore_existing_files=True, enable_more_main_files=enable_more_main_files,
-                                       time_regex=time_regex, name_input_file_by_layer=name_input_file_by_layer)
+                                       time_regex=time_regex, slugified_time_regex=slugified_time_regex,
+                                       name_input_file_by_layer=name_input_file_by_layer)
         # file checks
         if not use_chunk_upload:
             temp_dir = tempfile.mkdtemp(prefix="layman_")
@@ -151,6 +153,7 @@ def patch(workspace, layername):
     kwargs['file_type'] = file_type
 
     kwargs['time_regex'] = time_regex
+    kwargs['slugified_time_regex'] = slugified_time_regex
     kwargs['image_mosaic'] = time_regex is not None if delete_from == 'layman.layer.filesystem.input_file' else None
     kwargs['name_normalized_tif_by_layer'] = name_normalized_tif_by_layer
     kwargs['name_input_file_by_layer'] = name_input_file_by_layer
