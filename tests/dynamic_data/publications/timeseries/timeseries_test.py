@@ -86,15 +86,24 @@ LAYERS = {
         'params': {
             'time_regex': r'[0-9]{8}',
             'file_paths': [
-                os.path.join(DIRECTORY, 'timeseries_tif/210_long_name_20221031_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip'),
+                os.path.join(DIRECTORY,
+                             'timeseries_tif/210_long_name_20221031_sample_jpg_aux_rgba_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.jpeg',
+                             ),
+                os.path.join(DIRECTORY,
+                             'timeseries_tif/210_long_name_20221031_sample_jpg_aux_rgba_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.jpeg.aux.xml',
+                             ),
             ],
-            'compress': False,
+            'compress': True,
+            'compress_settings': process_client.CompressTypeDef(archive_name='210_long_name_20221031_sample_jpg_aux_rgba_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+                                                                inner_directory='/timeseries_tif/',
+                                                                file_name=None,
+                                                                ),
         },
         'detail_values': {
             'exp_publication_detail': {
-                'bounding_box': [1669480.0, 6580973.0, 1675352.0, 6586999.0],
+                'bounding_box': [2707260.9569237595, 7740717.799460372, 2708414.90486888, 7741573.954387397],
                 'native_crs': 'EPSG:3857',
-                'native_bounding_box': [1669480.0, 6580973.0, 1675352.0, 6586999.0],
+                'native_bounding_box': [2707260.9569237595, 7740717.799460372, 2708414.90486888, 7741573.954387397],
                 'image_mosaic': True,
                 'wms': {
                     'time': {'default': '2022-10-31T00:00:00Z',
@@ -106,11 +115,11 @@ LAYERS = {
             'gdal_prefix': '/vsizip/',
             'archive_extension': 'zip',
             'filenames': [
-                '210_long_name_20221031_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tiff',
+                'timeseries_tif/210_long_name_20221031_sample_jpg_aux_rgba_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.jpeg',
             ]
         },
         'expected_thumbnail': os.path.join(DIRECTORY, 'thumbnail_longname.png'),
-        'wms_bbox': [1669480.0, 6580973.0, 1675352.0, 6586999.0],
+        'wms_bbox': [2707260.9569237595, 7740717.799460372, 2708414.90486888, 7741573.954387397],
     },
 }
 
