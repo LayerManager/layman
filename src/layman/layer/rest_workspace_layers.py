@@ -76,6 +76,7 @@ def post(workspace):
 
     # Timeseries regex
     time_regex = request.form.get('time_regex') or None
+    slugified_time_regex = input_file.slugify_timeseries_filename_pattern(time_regex) if time_regex else None
     if time_regex:
         try:
             import re
@@ -94,6 +95,7 @@ def post(workspace):
     if not (use_chunk_upload and input_files.is_one_archive):
         input_file.check_filenames(workspace, layername, input_files, check_crs,
                                    enable_more_main_files=enable_more_main_files, time_regex=time_regex,
+                                   slugified_time_regex=slugified_time_regex,
                                    name_input_file_by_layer=name_input_file_by_layer)
     file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
 
@@ -138,6 +140,7 @@ def post(workspace):
         'overview_resampling': overview_resampling,
         'file_type': file_type,
         'time_regex': time_regex,
+        'slugified_time_regex': slugified_time_regex,
         'image_mosaic': time_regex is not None,
         'name_normalized_tif_by_layer': name_normalized_tif_by_layer,
         'name_input_file_by_layer': name_input_file_by_layer,

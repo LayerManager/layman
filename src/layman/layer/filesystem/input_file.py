@@ -231,9 +231,10 @@ def check_raster_layer_crs(main_filepath):
 
 
 def check_filenames(workspace, layername, input_files, check_crs, *, ignore_existing_files=False,
-                    enable_more_main_files=False, time_regex=None, name_input_file_by_layer=None,
-                    skip_timeseries_filename_checks=False):
+                    enable_more_main_files=False, time_regex=None, slugified_time_regex=None,
+                    name_input_file_by_layer=None, skip_timeseries_filename_checks=False):
     assert name_input_file_by_layer is not None
+    assert (time_regex is None) == (slugified_time_regex is None)
     main_files = input_files.raw_or_archived_main_file_paths
     if len(main_files) > 1 and not enable_more_main_files:
         raise LaymanError(2, {'parameter': 'file',
@@ -370,7 +371,6 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
                               }
                               )
 
-        slugified_time_regex = slugify_timeseries_filename_pattern(time_regex)
         unmatched_slugified_filenames = [new_filename for new_filename in main_filenames_to_check.values()
                                          if not re.search(slugified_time_regex, new_filename)]
         if len(unmatched_slugified_filenames) > 0:
