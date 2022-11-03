@@ -348,18 +348,30 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
                               }
                               )
 
-        slugified_time_regex = slugify_timeseries_filename_pattern(time_regex)
-        unmatched_filenames = [old_filename for old_filename, new_filename in main_filenames_to_check.items()
-                               if not re.search(time_regex, os.path.basename(old_filename))
-                               or not re.search(slugified_time_regex, new_filename)]
-        if len(unmatched_filenames) > 0:
+        old_unmatched_filenames = [old_filename for old_filename in main_filenames_to_check
+                                   if not re.search(time_regex, os.path.basename(old_filename))]
+        if len(old_unmatched_filenames) > 0:
             raise LaymanError(48,
                               {
                                   'message': 'File does not match time_regex.',
                                   'expected': 'All main data files match time_regex parameter',
-                                  'unmatched_filenames': unmatched_filenames,
+                                  'unmatched_filenames': old_unmatched_filenames,
                               }
                               )
+
+        slugified_time_regex = slugify_timeseries_filename_pattern(time_regex)
+        unmatched_slugified_filenames = [new_filename for new_filename in main_filenames_to_check.values()
+                                         if not re.search(slugified_time_regex, new_filename)]
+        if len(unmatched_slugified_filenames) > 0:
+            raise LaymanError(48,
+                              {
+                                  'message': 'File does not match time_regex.',
+                                  'expected': 'All main slugified data files match slugified time_regex parameter',
+                                  'slugified_unmatched_filenames': unmatched_slugified_filenames,
+                                  'slugified_time_regex': slugified_time_regex,
+                              }
+                              )
+
         for old_filename, new_filename in main_filenames_to_check.items():
             old_match = re.search(time_regex, os.path.basename(old_filename))
             new_match = re.search(slugified_time_regex, new_filename)
