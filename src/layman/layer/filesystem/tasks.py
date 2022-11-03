@@ -55,9 +55,11 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
     logger.info(f'Layer chunks uploaded {workspace}.{layername}')
 
     input_files = input_file.get_layer_input_files(workspace, layername)
+    skip_timeseries_filename_checks = not input_files.is_one_archive
     input_file.check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=True,
                                enable_more_main_files=enable_more_main_files, time_regex=time_regex,
-                               name_input_file_by_layer=name_input_file_by_layer)
+                               name_input_file_by_layer=name_input_file_by_layer,
+                               skip_timeseries_filename_checks=skip_timeseries_filename_checks)
 
     publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
     main_filepaths = list(path['gdal'] for path in publ_info['_file']['paths'].values())
