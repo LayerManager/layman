@@ -26,6 +26,7 @@ refresh_gdal_needed = empty_method_returns_true
 def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_resampling='',
                         enable_more_main_files=False, time_regex=None, slugified_time_regex=None,
                         name_input_file_by_layer=None):
+    assert (time_regex is None) == (slugified_time_regex is None)
     if self.is_aborted():
         raise AbortedException
     last_change = time.time()
