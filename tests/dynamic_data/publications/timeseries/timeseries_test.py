@@ -54,7 +54,7 @@ LAYERS = {
     },
     'more_files': {
         'params': {
-            'time_regex': r'[0-9]{8}',
+            'time_regex': r'^.*([0-9]{4})([0-9]{2})([0-9]{2}).*$',
             'file_paths': [
                 os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'),
                 os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF'),
