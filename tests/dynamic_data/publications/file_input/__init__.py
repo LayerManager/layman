@@ -1,8 +1,8 @@
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client, util
-from . import common_publications as publications
-from ... import Action, Publication, dynamic_data as consts
+from .. import common_publications as publications
+from .... import Action, Publication, dynamic_data as consts
 
 KEY_PUBLICATION_TYPE = 'publ_type'
 KEY_ACTION_PARAMS = 'action_params'
