@@ -5,7 +5,7 @@ import pytest
 import crs as crs_def
 from layman import common
 from test_tools import process_client
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication, EnumTestKeys
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as asserts_util
 from tests.dynamic_data import base_test
@@ -16,6 +16,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 LAYERS = {
     'more_files_zip': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'params': {
             'time_regex': r'[0-9]{8}',
             'file_paths': [
@@ -83,6 +84,7 @@ LAYERS = {
         'wms_bbox': [1743913.19942603237, 6499107.284021802247, 1755465.937341974815, 6503948.597792930901, ],
     },
     'longname_one_file_compressed': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'params': {
             'time_regex': r'[0-9]{8}',
             'file_paths': [
@@ -122,6 +124,7 @@ LAYERS = {
         'wms_bbox': [2707260.9569237595, 7740717.799460372, 2708414.90486888, 7741573.954387397],
     },
     'longname_one_file': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'params': {
             'time_regex': r'[0-9]{8}',
             'file_paths': [
@@ -155,6 +158,7 @@ LAYERS = {
         'wms_bbox': [2707260.9569237595, 7740717.799460372, 2708414.90486888, 7741573.954387397],
     },
     'diacritics_and_spaces_zip': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'params': {
             'time_regex': r'^Cerekvice nad Bystřicí ([0-9]{8}).*$',
             'file_paths': [
@@ -192,6 +196,7 @@ LAYERS = {
         'wms_bbox': [1743913.19942603237, 6499107.284021802247, 1755465.937341974815, 6503948.597792930901, ],
     },
     'diacritics_and_spaces': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'params': {
             'time_regex': r'^Cerekvice nad Bystřicí ([0-9]{8}).*$',
             'file_paths': [
@@ -234,7 +239,7 @@ def generate_test_cases():
             params = deepcopy(test_case_params)
             params['params']['with_chunks'] = with_chunks_value
             test_case = base_test.TestCaseType(key=name + name_suffix,
-                                               type=EnumTestTypes.MANDATORY,
+                                               type=test_case_params.get(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY),
                                                params=params,
                                                marks=[pytest.mark.xfail(reason="Not yet implemented.")]
                                                if test_case_params.get('xfail') else []
