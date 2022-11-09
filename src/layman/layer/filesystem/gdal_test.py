@@ -217,3 +217,25 @@ def test_get_driver_short_name(file_path, exp_result):
 def test_get_data_type_name(file_path, exp_result):
     data_type_name = gdal.get_data_type_name(file_path)
     assert data_type_name == exp_result
+
+
+@pytest.mark.parametrize('file_path, exp_result', [
+    pytest.param(
+        ['tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+        (543100.0, 5567910.0, 560930.0, 5579500.0),
+        id='one_file'
+    ),
+    pytest.param(
+        [
+            'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.0.tif',
+            'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.1.tif',
+            'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.2.tif',
+            'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.3.tif',
+        ],
+        (543100.0, 5567910.0, 560930.0, 5579500.0),
+        id='four_tiles'
+    ),
+])
+def test_get_bbox_from_files(file_path, exp_result):
+    data_type_name = gdal.get_bbox_from_files(file_path)
+    assert data_type_name == exp_result

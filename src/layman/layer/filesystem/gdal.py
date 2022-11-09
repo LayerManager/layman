@@ -437,6 +437,17 @@ def get_bbox_from_file(filepath):
     return result
 
 
+def get_bbox_from_files(filepaths):
+    result = (None,) * 4
+    for filepath in filepaths:
+        file_bbox = get_bbox_from_file(filepath)
+        result = tuple(
+            (min if coord_idx < 2 else max)(coord, file_bbox[coord_idx]) if coord is not None else file_bbox[coord_idx]
+            for coord_idx, coord in enumerate(result)
+        )
+    return result
+
+
 def get_bbox(workspace, layer):
     filepath = get_normalized_raster_layer_main_filepaths(workspace, layer)[0]
     result = get_bbox_from_file(filepath)
