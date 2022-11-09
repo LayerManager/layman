@@ -160,11 +160,11 @@ def check_raster_main_files(main_filepaths, *, check_crs=True):
                                   'expected': 'All main files with the same color interpretations.',
                                   'color_interpretations': color_interpretations_list,
                                   })
-        raster_size_list = sorted(list(set(tuple(fs_gdal.get_raster_size(main_filepath)) for main_filepath in main_filepaths)))
-        if len(raster_size_list) > 1:
+        pixel_size_list = sorted(list(set(tuple(fs_gdal.get_pixel_size(main_filepath)) for main_filepath in main_filepaths)))
+        if len(pixel_size_list) > 1:
             raise LaymanError(2, {'parameter': 'file',
-                                  'expected': 'All main files with the same raster size.',
-                                  'raster_sizes': raster_size_list,
+                                  'expected': 'All main files with the same pixel size.',
+                                  'pixel_sizes': pixel_size_list,
                                   })
         nodata_value_list = sorted(list(set(fs_gdal.get_nodata_value(main_filepath) for main_filepath in main_filepaths)))
         if len(nodata_value_list) > 1:
