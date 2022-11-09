@@ -449,8 +449,8 @@ def get_bbox_from_files(filepaths):
 
 
 def get_bbox(workspace, layer):
-    filepath = get_normalized_raster_layer_main_filepaths(workspace, layer)[0]
-    result = get_bbox_from_file(filepath)
+    filepaths = get_normalized_raster_layer_main_filepaths(workspace, layer)
+    result = get_bbox_from_files(filepaths)
     return result
 
 
