@@ -1,5 +1,6 @@
 import copy
 import os
+import logging
 
 from layman import LaymanError, settings
 from tests.asserts import util as asserts_util
@@ -18,6 +19,7 @@ KEY_PATCH_POST = 'post_params'
 KEY_SKIP_POST = 'skip_post'
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+logger = logging.getLogger(__name__)
 
 REST_PARAMETRIZATION = {
     'with_chunks': {False: 'sync', True: 'chunks'},
@@ -66,6 +68,7 @@ TESTCASES = {
         },
     },
     'shp_without_prj': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': [
@@ -222,6 +225,7 @@ TESTCASES = {
         },
     },
     'png_without_pgw': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': ['sample/layman.layer/sample_png_pgw_rgba.png', ],
@@ -248,6 +252,7 @@ TESTCASES = {
         },
     },
     'shp_with_unsupported_epsg': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': [
@@ -281,6 +286,7 @@ TESTCASES = {
         },
     },
     'tif_with_unsupported_epsg': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': [f'{DIRECTORY}/sample_tif_rgb_2154.tif', ],
@@ -387,6 +393,7 @@ TESTCASES = {
         },
     },
     'two_zip_files': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': [
@@ -464,6 +471,7 @@ TESTCASES = {
         },
     },
     'epsg_4326_en': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': [
@@ -485,6 +493,7 @@ TESTCASES = {
         },
     },
     'map_schema_1_0_0': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.MAP_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': [
@@ -505,6 +514,7 @@ TESTCASES = {
         },
     },
     'map_schema_3_0_0': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.MAP_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': [
@@ -544,6 +554,7 @@ TESTCASES = {
         },
     },
     'layer_unsupported_overview_resampling': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
@@ -567,6 +578,7 @@ TESTCASES = {
         },
     },
     'layer_vector_overview_resampling': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'overview_resampling': 'nearest',
@@ -597,6 +609,7 @@ TESTCASES = {
         },
     },
     'layer_overview_resampling_no_input_file': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_SKIP_POST: True,
         KEY_ACTION_PARAMS: {},
@@ -646,6 +659,7 @@ TESTCASES = {
         },
     },
     'layer_name_211': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'name': 'a' * 211,
@@ -662,6 +676,7 @@ TESTCASES = {
         },
     },
     'map_name_211': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.MAP_TYPE,
         KEY_ACTION_PARAMS: {
             'name': 'a' * 211,
@@ -680,6 +695,7 @@ TESTCASES = {
         },
     },
     'wrong_time_regex': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'time_regex': '[',
@@ -721,6 +737,7 @@ TESTCASES = {
         },
     },
     'raster_vector_time_regex': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
@@ -755,6 +772,7 @@ TESTCASES = {
         },
     },
     'dif_raster_types_time_regex': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
@@ -787,6 +805,7 @@ TESTCASES = {
         },
     },
     'raster_and_zip_raster_time_regex': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
@@ -808,6 +827,7 @@ TESTCASES = {
         },
     },
     'different_rasters_time_regex': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'time_regex': r'cz_[0-9]{4}',
@@ -834,6 +854,7 @@ TESTCASES = {
         },
     },
     'different_bands_rasters_time_regex': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'time_regex': r'[a-z]{5}',
@@ -860,6 +881,7 @@ TESTCASES = {
         },
     },
     'non_data_file_without_data_file': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.j2w'],
@@ -903,6 +925,7 @@ TESTCASES = {
         },
     },
     'patch_with_time_regex_without_data_file': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_SKIP_POST: True,
         KEY_ACTION_PARAMS: {},
@@ -933,6 +956,7 @@ TESTCASES = {
         },
     },
     'time_regex_with_non_data_file': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'time_regex': r'[a-z]{5}',
@@ -978,6 +1002,7 @@ TESTCASES = {
         },
     },
     'filename_not_match_time_regex': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'time_regex': r'non_existing_regex',
@@ -1011,6 +1036,7 @@ TESTCASES = {
         },
     },
     'too_long_filename_with_time_regexp': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'time_regex': r'[0-9]{8}',
@@ -1055,6 +1081,7 @@ TESTCASES = {
         },
     },
     'unsafe_timeseries_filename_with_dot': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'time_regex': r'[0-9]{8}',
@@ -1091,6 +1118,7 @@ TESTCASES = {
         },
     },
     'unsafe_timeseries_filename_with_cyrillic': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'time_regex': r'[0-9]{8}',
@@ -1156,6 +1184,9 @@ def generate(workspace=None):
 
     result = dict()
     for testcase, tc_params in TESTCASES.items():
+        if test_type == EnumTestTypes.MANDATORY:
+            if tc_params.get(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY) == EnumTestTypes.OPTIONAL:
+                continue
 
         if not tc_params.get(KEY_SKIP_POST, False):
             action_parametrization = util.get_test_case_parametrization(param_parametrization=REST_PARAMETRIZATION,
