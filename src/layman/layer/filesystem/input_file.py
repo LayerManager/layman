@@ -312,8 +312,9 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
                                        'by setting "crs" parameter.'
             raise LaymanError(18, detail)
     input_file_dir = get_layer_input_file_dir(workspace, layername)
-    filename_mapping, _ = get_file_name_mappings(
-        input_files.raw_paths, main_filenames, layername, input_file_dir,
+    raw_main_files = main_filenames if not input_files.is_one_archive else input_files.raw_paths_to_archives
+    raw_filename_mapping, _ = get_file_name_mappings(
+        input_files.raw_paths, raw_main_files, layername, input_file_dir,
         name_input_file_by_layer=name_input_file_by_layer
     )
 
@@ -328,9 +329,9 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
             filenames_to_check = archived_main_filename_mapping
             main_filenames_to_check = filenames_to_check
         else:
-            filenames_to_check = {k: v for k, v in filename_mapping.items() if v is not None}
-            main_filenames_to_check = {k: v for k, v in filenames_to_check.items() if k in main_files}
-            assert set(main_filenames_to_check) == set(main_files)
+            filenames_to_check = {k: v for k, v in raw_filename_mapping.items() if v is not None}
+            main_filenames_to_check = {k: v for k, v in filenames_to_check.items() if k in raw_main_files}
+            assert set(main_filenames_to_check) == set(raw_main_files)
 
         unsafe_filenames = [new_filename for new_filename in filenames_to_check.values()
                             if not is_safe_timeseries_filename(new_filename)]
@@ -389,8 +390,8 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
                 assert old_match.group(0) == new_match.group(0)
 
     if not ignore_existing_files:
-        conflict_paths = [filename_mapping[k]
-                          for k, v in filename_mapping.items()
+        conflict_paths = [raw_filename_mapping[k]
+                          for k, v in raw_filename_mapping.items()
                           if v is not None and os.path.exists(os.path.join(input_file_dir, v))]
         if len(conflict_paths) > 0:
             raise LaymanError(3, conflict_paths)
