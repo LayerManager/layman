@@ -145,7 +145,9 @@ def test_get_file_name_mappings(method_params, exp_filepath_mapping):
     pytest.param('S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif', 'S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif', id='real_name_S2A'),
     pytest.param('ěščřžýáíéúůóďťň ĚŠČŘŽÝÁÍÉÚŮÓĎŤŇ 2021.TIF', 'escrzyaieuuodtn_ESCRZYAIEUUODTN_2021.TIF', id='czech_diacritics_and_space'),
     pytest.param('áäčďéíĺľňóôŕšťúýž ÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽ 2021.TIF', 'aacdeillnoorstuyz_AACDEILLNOORSTUYZ_2021.TIF', id='slovak_diacritics_and_space'),
+    pytest.param('ÀàÂâÇçÉéÈèÊêËëÎîÏïÔôÙùÛûÜüŸÿ2021.tif', 'AaAaCcEeEeEeEeIiIiOoUuUuUuYy2021.tif', id='french_diacritics'),
     pytest.param('2022-11-02T10:17:58Z.tif', '2022-11-02T10:17:58Z.tif', id='time_with_colons'),
+    pytest.param('ßÆ.tif', 'ßÆ.tif', id='unsupported_latin_ligatures'),
 ])
 def test_slugify_timeseries_filename(filename, exp_result):
     assert slugify_timeseries_filename(filename) == exp_result
