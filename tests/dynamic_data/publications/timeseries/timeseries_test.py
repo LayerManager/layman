@@ -57,8 +57,14 @@ LAYERS = {
         'params': {
             'time_regex': r'^.*([0-9]{4})([0-9]{2})([0-9]{2}).*$',
             'file_paths': [
-                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'),
-                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF'),
+                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220316T100031.0.tif'),
+                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220316T100031.1.tif'),
+                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220316T100031.2.tif'),
+                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220316T100031.3.tif'),
+                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220319T100731.0.tif'),
+                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220319T100731.1.tif'),
+                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220319T100731.2.tif'),
+                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220319T100731.3.tif'),
             ],
         },
         'detail_values': {
@@ -76,11 +82,17 @@ LAYERS = {
             },
             'publ_type_detail': ('raster', 'sld'),
             'filenames': [
-                'S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                'S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF',
-            ]
+                'S2A_MSIL2A_20220316T100031.0.tif',
+                'S2A_MSIL2A_20220316T100031.1.tif',
+                'S2A_MSIL2A_20220316T100031.2.tif',
+                'S2A_MSIL2A_20220316T100031.3.tif',
+                'S2A_MSIL2A_20220319T100731.0.tif',
+                'S2A_MSIL2A_20220319T100731.1.tif',
+                'S2A_MSIL2A_20220319T100731.2.tif',
+                'S2A_MSIL2A_20220319T100731.3.tif',
+            ],
         },
-        'expected_thumbnail': os.path.join(DIRECTORY, 'thumbnail_timeseries.png'),
+        'expected_thumbnail': os.path.join(DIRECTORY, 'thumbnail_tiled_timeseries.png'),
         'wms_bbox': [1743913.19942603237, 6499107.284021802247, 1755465.937341974815, 6503948.597792930901, ],
     },
     'longname_one_file_compressed': {
