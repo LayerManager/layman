@@ -2,7 +2,7 @@ import os
 import pytest
 
 from test_tools import process_client
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication, EnumTestKeys
 from tests.asserts.final.publication import util as asserts_util
 from tests.dynamic_data import base_test
 
@@ -12,6 +12,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 PUBLICATIONS = {
     'one_data_file': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'publication_type': process_client.LAYER_TYPE,
         'expected_name': 'ne_110m_admin_0_countries',
         'params': {
@@ -21,6 +22,7 @@ PUBLICATIONS = {
         },
     },
     'one_data_file_with_chunks': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'publication_type': process_client.LAYER_TYPE,
         'expected_name': 'small_layer',
         'params': {
@@ -34,7 +36,7 @@ PUBLICATIONS = {
         'params': {
             'file_paths': ['sample/layman.layer/small_layer_with_id.geojson'],
             'compress': True,
-            'compress_settings': process_client.CompressTypeDef(archive_name='small_layer_with_id'),
+            'compress_settings': process_client.CompressTypeDef(archive_name='small_layer_with_id_zip'),
         },
     },
     'one_data_file_compressed_with_chunks': {
@@ -61,6 +63,7 @@ PUBLICATIONS = {
         },
     },
     'timeseries_compressed_with_chunks': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'publication_type': process_client.LAYER_TYPE,
         'expected_name': 'timeseries_tif',
         'params': {
@@ -80,6 +83,7 @@ PUBLICATIONS = {
         },
     },
     'timeseries_compressed': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'publication_type': process_client.LAYER_TYPE,
         'expected_name': 's2a_msil2a_20220319t100731_n0400_r022_t33uwr_20220319t131812_tci_10m',
         'params': {
@@ -115,7 +119,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          publication=Publication(workspace='dynamic_test_workspace_implicit_name',
                                                                  type=params['publication_type'],
                                                                  name=params['expected_name']),
-                                         type=EnumTestTypes.MANDATORY,
+                                         type=params.get(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY),
                                          params=params,
                                          marks=[pytest.mark.xfail(reason="Not yet implemented.")]
                                          if params.get('xfail') else []
