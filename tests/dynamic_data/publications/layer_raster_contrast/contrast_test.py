@@ -4,7 +4,7 @@ import pytest
 
 from layman.layer.filesystem import gdal
 from test_tools import process_client
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication, EnumTestKeys
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
@@ -23,52 +23,58 @@ TEST_CASES = {
         }
     },
     'tif_float': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'expected_input': {
             'color_interpretations': ['Gray'],
             'nodata': None,
             'min': 178,
             'max': 205,
-        }
+        },
     },
     'tif_byte_0_min_max_nd': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'expected_input': {
             'color_interpretations': ['Gray'],
             'nodata': 255,
             'min': 228,
             'max': 254,
-        }
+        },
     },
     'tif_byte_0_nd_min_max': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'expected_input': {
             'color_interpretations': ['Gray'],
             'nodata': 200,
             'min': 228,
             'max': 254,
-        }
+        },
     },
     'tif_byte_nd_min0_max': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'expected_input': {
             'color_interpretations': ['Gray'],
             'nodata': -999,
             'min': 0,
             'max': 40,
-        }
+        },
     },
     'tif_byte_nd0_min_max': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'expected_input': {
             'color_interpretations': ['Gray'],
             'nodata': 0,
             'min': 2,
             'max': 20,
-        }
+        },
     },
     'tif_byte_0_min_nd_max': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'expected_input': {
             'color_interpretations': ['Gray'],
             'nodata': 10,
             'min': 1,
             'max': 27,
-        }
+        },
     },
     'tif_float_min_0_max_nd': {
         'expected_input': {
@@ -89,6 +95,7 @@ TEST_CASES = {
         },
     },
     'timeseries': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'input': {
             'file_paths': [
                 'timeseries/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
@@ -124,7 +131,7 @@ def prepare_test_case(key):
     rest_input['file_paths'] = [os.path.join(DIRECTORY, fp) for fp in rest_input['file_paths']]
     test_case_def['input'] = rest_input
 
-    return base_test.TestCaseType(key=key, type=EnumTestTypes.MANDATORY, params=test_case_def,
+    return base_test.TestCaseType(key=key, type=test_case_def.get(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY), params=test_case_def,
                                   marks=[pytest.mark.xfail(reason="Not yet implemented.")]
                                   if test_case_def.get('xfail') else [],
                                   )
