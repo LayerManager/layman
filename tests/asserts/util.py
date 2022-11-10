@@ -4,6 +4,9 @@ from test_tools import process_client
 from .. import Action, Publication
 
 
+KEY_REPLACE = '__replace__'
+
+
 def get_publication_writer(publication):
     with app.app_context():
         info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name, context={'keys': ['access_rights']})
@@ -33,7 +36,7 @@ def get_directory_name_from_publ_type(publ_type):
     return publ_type.split('.')[1] + 's'
 
 
-def recursive_dict_update(base, updater):
+def recursive_dict_update(base, updater, *, keep_replace_key=False):
     stack = [(base, updater)]
     while stack:
         current_dst, current_src = stack.pop()
@@ -41,10 +44,12 @@ def recursive_dict_update(base, updater):
             if key not in current_dst:
                 current_dst[key] = current_src[key]
             else:
-                if isinstance(current_src[key], dict) and isinstance(current_dst[key], dict):
+                if isinstance(current_src[key], dict) and isinstance(current_dst[key], dict) and not current_src[key].get(KEY_REPLACE):
                     stack.append((current_dst[key], current_src[key]))
                 else:
                     current_dst[key] = current_src[key]
+                    if isinstance(current_src[key], dict) and not keep_replace_key:
+                        current_src[key].pop(KEY_REPLACE, None)
     return base
 
 
