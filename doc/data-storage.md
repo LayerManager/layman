@@ -34,6 +34,7 @@ When user [publishes new layer](rest.md#post-workspace-layers)
 Subsequently, asynchronous tasks ensure following steps:
 - data file chunks and completed data files are saved to [filesystem](#filesystem) (if sent [asynchronously](async-file-upload.md))
 - vector data files are imported to [PostgreSQL](#postgresql)
+   - files with invalid byte sequence are first converted to GeoJSON, then cleaned with iconv, and finally imported to database.
    - PostgreSQL table with vector data is registered to [GeoServer](#geoserver)
 - raster files are normalized and compressed to BigTIFF GeoTIFF with overviews (pyramids)
    - normalized GeoTIFF is registered to [GeoServer](#geoserver)

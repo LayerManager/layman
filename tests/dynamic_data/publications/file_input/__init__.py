@@ -1,8 +1,12 @@
+import os
+
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
 from test_tools import process_client, util
 from .. import common_publications as publications
 from .... import Action, Publication, dynamic_data as consts
+
+DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 KEY_PUBLICATION_TYPE = 'publ_type'
 KEY_ACTION_PARAMS = 'action_params'
@@ -66,6 +70,22 @@ TESTCASES = {
             ],
         },
         consts.KEY_FINAL_ASSERTS: [
+        ],
+    },
+    'invalid_byte_sequence': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': [
+                f'{DIRECTORY}/invalid_byte_sequence.zip',
+            ],
+            'crs': 'EPSG:5514',
+            'compress': False,
+        },
+        consts.KEY_FINAL_ASSERTS: [
+            *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+            Action(publication.internal.thumbnail_equals, {
+                'exp_thumbnail': f'{DIRECTORY}/thumbnail_invalid_byte_sequence.png',
+            }),
         ],
     },
 }

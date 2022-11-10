@@ -24,6 +24,7 @@
 - [#668](https://github.com/LayerManager/layman/issues/668) Fix broken size of raster in EPSG:3034 during normalization.
 - [#669](https://github.com/LayerManager/layman/issues/669) Fix slow publication of vector layers metadata to Micka. The reason was slow guessing of [`spatial_resolution.scale_denominator`](doc/metadata.md#spatial_resolution) metadata property.
 - [#697](https://github.com/LayerManager/layman/issues/697) Normalized GeoTIFF files are created as BigTIFF
+- [#660](https://github.com/LayerManager/layman/issues/660) Vector data files with invalid byte sequence are first converted to GeoJSON, then cleaned with iconv, and finally imported to database.
 - After publishing to GeoServer, Layman check that Layer is available in GetCapabilities
 
 ## v1.17.0

@@ -103,6 +103,62 @@ def import_layer_vector_file(workspace, layername, main_filepath, crs_id):
         raise LaymanError(11, private_data=pg_error)
 
 
+def import_layer_vector_file_async_with_iconv(schema, table_name, main_filepath, crs_id):
+    import subprocess
+    assert table_name, f'schema={schema}, table_name={table_name}, main_filepath={main_filepath}'
+    pg_conn = ' '.join([f"{k}='{v}'" for k, v in PG_CONN.items()])
+
+    first_ogr2ogr_args = [
+        'ogr2ogr',
+        '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
+        '-unsetFid',
+        '-a_srs', crs_id,
+        '-f', 'GeoJSON',
+        '/vsistdout/',
+        f'{main_filepath}',
+    ]
+    iconv_args = [
+        'iconv',
+        '-c',
+        '-t', 'utf8',
+    ]
+    final_ogr2ogr_args = [
+        'ogr2ogr',
+        '-nln', table_name,
+        '-nlt', 'GEOMETRY',
+        '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
+        '-lco', f'SCHEMA={schema}',
+        # '-clipsrc', '-180', '-85.06', '180', '85.06',
+        '-f', 'PostgreSQL',
+        '-unsetFid',
+        f'PG:{pg_conn}',
+        # 'PG:{} active_schema={}'.format(PG_CONN, username),
+    ]
+    if crs_id is not None:
+        final_ogr2ogr_args.extend([
+            '-a_srs', crs_id,
+        ])
+    if os.path.splitext(main_filepath)[1] == '.shp':
+        final_ogr2ogr_args.extend([
+            '-lco', 'PRECISION=NO',
+        ])
+    final_ogr2ogr_args.extend([
+        '/vsistdin/',
+    ])
+
+    first_ogr2ogr_process = subprocess.Popen(first_ogr2ogr_args,
+                                             stdout=subprocess.PIPE)
+    with first_ogr2ogr_process.stdout:
+        iconv_process = subprocess.Popen(iconv_args,
+                                         stdin=first_ogr2ogr_process.stdout,
+                                         stdout=subprocess.PIPE)
+        with iconv_process.stdout:
+            final_ogr2ogr_process = subprocess.Popen(final_ogr2ogr_args,
+                                                     stdin=iconv_process.stdout,
+                                                     stdout=subprocess.PIPE)
+    return [first_ogr2ogr_process, iconv_process, final_ogr2ogr_process]
+
+
 def import_layer_vector_file_async(schema, table_name, main_filepath,
                                    crs_id):
     # import file to database table
