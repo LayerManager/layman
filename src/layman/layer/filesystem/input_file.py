@@ -340,7 +340,10 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
         archived_main_filename_mapping, _ = get_file_name_mappings(
             input_files.archived_main_file_paths, input_files.archived_main_file_paths, layername, input_file_dir,
             name_input_file_by_layer=False)
-        filenames_to_check = archived_main_filename_mapping
+        filenames_to_check = {
+            (os.path.relpath(k, input_file_dir) if k.startswith(input_file_dir) else k): v
+            for k, v in archived_main_filename_mapping.items()
+        }
         main_filenames_to_check = filenames_to_check
     else:
         filenames_to_check = {k: v for k, v in raw_filename_mapping.items() if v is not None}

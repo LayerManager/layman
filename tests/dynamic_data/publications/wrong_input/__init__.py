@@ -1279,8 +1279,8 @@ TESTCASES = {
                 'detail': {
                     'similar_filenames_mapping': {
                         asserts_util.KEY_REPLACE: True,
-                        '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/duplicate_filename_differs_in_diacritics_post_chunks_zipped/input_file/duplicate_filename_differs_in_diacritics_post_chunks_zipped.zip/snimek_20220316.tif': 'snimek_20220316.tif',
-                        '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/duplicate_filename_differs_in_diacritics_post_chunks_zipped/input_file/duplicate_filename_differs_in_diacritics_post_chunks_zipped.zip/snímek_20220316.tif': 'snimek_20220316.tif',
+                        'duplicate_filename_differs_in_diacritics_post_chunks_zipped.zip/snimek_20220316.tif': 'snimek_20220316.tif',
+                        'duplicate_filename_differs_in_diacritics_post_chunks_zipped.zip/snímek_20220316.tif': 'snimek_20220316.tif',
                     },
                 },
             },
@@ -1310,8 +1310,8 @@ TESTCASES = {
                         'detail': {
                             'similar_filenames_mapping': {
                                 asserts_util.KEY_REPLACE: True,
-                                '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/duplicate_filename_differs_in_diacritics_patch_full_chunks_zipped/input_file/duplicate_filename_differs_in_diacritics_patch_full_chunks_zipped.zip/snimek_20220316.tif': 'snimek_20220316.tif',
-                                '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/duplicate_filename_differs_in_diacritics_patch_full_chunks_zipped/input_file/duplicate_filename_differs_in_diacritics_patch_full_chunks_zipped.zip/snímek_20220316.tif': 'snimek_20220316.tif',
+                                'duplicate_filename_differs_in_diacritics_patch_full_chunks_zipped.zip/snimek_20220316.tif': 'snimek_20220316.tif',
+                                'duplicate_filename_differs_in_diacritics_patch_full_chunks_zipped.zip/snímek_20220316.tif': 'snimek_20220316.tif',
                             },
                         },
                     },
