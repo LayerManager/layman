@@ -7,6 +7,7 @@ from geoserver import util as gs_util
 from layman.celery import AbortedException
 from layman import celery_app, settings, util as layman_util
 from layman.common import empty_method_returns_true, bbox as bbox_util
+from layman.http import LaymanError
 from . import wms, wfs, sld
 from .. import geoserver, LAYER_TYPE
 
@@ -98,6 +99,19 @@ def refresh_wms(
 
     wms.clear_cache(workspace)
 
+    try:
+        wms_info = wms.get_layer_info(workspace=workspace,
+                                      layername=layername)
+    except BaseException:
+        wms_info = dict()
+
+    if 'wms' not in wms_info:
+        wms.delete_layer(workspace, layername)
+        raise LaymanError(53,
+                          {
+                              'message': 'May happen for raster layers with wrong explicit CRS.',
+                          })
+
     if self.is_aborted():
         wms.delete_layer(workspace, layername)
         raise AbortedException
@@ -134,6 +148,19 @@ def refresh_wfs(
     geoserver.publish_layer_from_db(workspace, layername, description, title, crs=crs, table_name=table_name, )
     geoserver.set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, workspace)
     wfs.clear_cache(workspace)
+
+    try:
+        wfs_info = wfs.get_layer_info(workspace=workspace,
+                                      layername=layername)
+    except BaseException:
+        wfs_info = dict()
+
+    if 'wfs' not in wfs_info:
+        wfs.delete_layer(workspace, layername)
+        raise LaymanError(53,
+                          {
+                              'message': 'May happen for raster layers with wrong explicit CRS.',
+                          })
 
     if self.is_aborted():
         wfs.delete_layer(workspace, layername)
