@@ -1240,6 +1240,85 @@ TESTCASES = {
             },
         },
     },
+    'duplicate_filename_differs_in_diacritics': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'time_regex': r'[0-9]{8}',
+            'file_paths': [
+                f'{DIRECTORY}/snimek_20220316.tif',
+                f'{DIRECTORY}/snímek_20220316.tif',
+            ],
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'message': 'Wrong parameter value',
+                          'detail': {
+                              'parameter': 'file',
+                              'message': 'Two or more input file names map to the same name.',
+                              'expected': 'Input file names that differ at least in one letter (ignoring case and diacritics) or number.',
+                              'similar_filenames_mapping': {
+                                  'snimek_20220316.tif': 'snimek_20220316.tif',
+                                  'snímek_20220316.tif': 'snimek_20220316.tif',
+                              },
+                          },
+                          },
+            frozenset([('compress', True), ('with_chunks', False)]): {
+                'detail': {
+                    'similar_filenames_mapping': {
+                        asserts_util.KEY_REPLACE: True,
+                        'temporary_zip_file.zip/snimek_20220316.tif': 'snimek_20220316.tif',
+                        'temporary_zip_file.zip/snímek_20220316.tif': 'snimek_20220316.tif',
+                    },
+                },
+            },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'sync': False,
+                'detail': {
+                    'similar_filenames_mapping': {
+                        asserts_util.KEY_REPLACE: True,
+                        '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/duplicate_filename_differs_in_diacritics_post_chunks_zipped/input_file/duplicate_filename_differs_in_diacritics_post_chunks_zipped.zip/snimek_20220316.tif': 'snimek_20220316.tif',
+                        '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/duplicate_filename_differs_in_diacritics_post_chunks_zipped/input_file/duplicate_filename_differs_in_diacritics_post_chunks_zipped.zip/snímek_20220316.tif': 'snimek_20220316.tif',
+                    },
+                },
+            },
+        },
+        KEY_PATCHES: {
+            'full': {
+                KEY_PATCH_POST: {},
+                KEY_ACTION_PARAMS: {
+                    'time_regex': r'[0-9]{8}',
+                    'file_paths': [
+                        f'{DIRECTORY}/snimek_20220316.tif',
+                        f'{DIRECTORY}/snímek_20220316.tif',
+                    ],
+                },
+                KEY_EXPECTED_EXCEPTION: {
+                    frozenset([('compress', True), ('with_chunks', False)]): {
+                        'detail': {
+                            'similar_filenames_mapping': {
+                                asserts_util.KEY_REPLACE: True,
+                                'temporary_zip_file.zip/snimek_20220316.tif': 'snimek_20220316.tif',
+                                'temporary_zip_file.zip/snímek_20220316.tif': 'snimek_20220316.tif',
+                            },
+                        },
+                    },
+                    frozenset([('compress', True), ('with_chunks', True)]): {
+                        'sync': False,
+                        'detail': {
+                            'similar_filenames_mapping': {
+                                asserts_util.KEY_REPLACE: True,
+                                '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/duplicate_filename_differs_in_diacritics_patch_full_chunks_zipped/input_file/duplicate_filename_differs_in_diacritics_patch_full_chunks_zipped.zip/snimek_20220316.tif': 'snimek_20220316.tif',
+                                '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/duplicate_filename_differs_in_diacritics_patch_full_chunks_zipped/input_file/duplicate_filename_differs_in_diacritics_patch_full_chunks_zipped.zip/snímek_20220316.tif': 'snimek_20220316.tif',
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
 }
 
 VALIDATION_PATCH_ACTION = {
@@ -1286,7 +1365,7 @@ def generate(workspace=None):
                 rest_param_frozen_set = frozenset(rest_param_dict.items())
                 default_exp_exception = copy.deepcopy(tc_params[KEY_EXPECTED_EXCEPTION][KEY_DEFAULT])
                 exception_diff = tc_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, dict())
-                exp_exception = asserts_util.recursive_dict_update(default_exp_exception, exception_diff)
+                exp_exception = asserts_util.recursive_dict_update(default_exp_exception, copy.deepcopy(exception_diff))
                 is_sync = exp_exception.pop('sync')
                 if is_sync:
                     action_def = {
@@ -1352,8 +1431,8 @@ def generate(workspace=None):
                 default_exp_exception = copy.deepcopy(tc_params[KEY_EXPECTED_EXCEPTION][KEY_DEFAULT])
                 exception_diff_post = tc_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, dict())
                 exception_diff_patch = patch_params.get(KEY_EXPECTED_EXCEPTION, dict()).get(rest_param_frozen_set, dict())
-                exception_diff = asserts_util.recursive_dict_update(exception_diff_post, exception_diff_patch)
-                exp_exception = asserts_util.recursive_dict_update(default_exp_exception, exception_diff)
+                exception_diff = asserts_util.recursive_dict_update(exception_diff_post, exception_diff_patch, keep_replace_key=True)
+                exp_exception = asserts_util.recursive_dict_update(default_exp_exception, copy.deepcopy(exception_diff))
                 is_sync = exp_exception.pop('sync')
                 if is_sync:
                     action_def = {
