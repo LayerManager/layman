@@ -1,5 +1,6 @@
 from urllib.parse import urljoin
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qs, parse_qsl
+import logging
 from flask import current_app
 
 from geoserver import util as gs_util
@@ -18,6 +19,7 @@ DEFAULT_IMAGE_MOSAIC_STORE_PREFIX = 'image_mosaic'
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = gs_util.WMS_VERSION
+logger = logging.getLogger(__name__)
 
 pre_publication_action_check = empty_method
 post_layer = empty_method
