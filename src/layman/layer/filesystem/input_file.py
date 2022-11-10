@@ -224,6 +224,21 @@ def check_raster_layer_crs(main_filepath):
     check_spatial_ref_crs(crs)
 
 
+def check_duplicate_mapped_filenames(filenames_mapping):
+    mapped_filenames = sorted(filenames_mapping.values())
+    duplicate_mapped_filenames = {filename for filename in mapped_filenames if mapped_filenames.count(filename) > 1}
+    if len(duplicate_mapped_filenames) > 0:
+        similar_filenames = {k: v for k, v in filenames_mapping.items() if v in duplicate_mapped_filenames}
+        raise LaymanError(2,
+                          {
+                              'parameter': 'file',
+                              'message': 'Two or more input file names map to the same name.',
+                              'expected': 'Input file names that differ at least in one letter (ignoring case and diacritics) or number.',
+                              'similar_filenames_mapping': similar_filenames,
+                          }
+                          )
+
+
 def check_filenames(workspace, layername, input_files, check_crs, *, ignore_existing_files=False,
                     enable_more_main_files=False, time_regex=None, slugified_time_regex=None,
                     name_input_file_by_layer=None, skip_timeseries_filename_checks=False):
@@ -318,21 +333,23 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
         name_input_file_by_layer=name_input_file_by_layer
     )
 
-    if time_regex and not skip_timeseries_filename_checks:
-        if name_input_file_by_layer:
-            assert input_files.is_one_archive
-            # timeseries files are in one ZIP file, so check main file names inside ZIP file instead of raw file names
-            # we can check only main files, because other files are not extracted
-            archived_main_filename_mapping, _ = get_file_name_mappings(
-                input_files.archived_main_file_paths, input_files.archived_main_file_paths, layername, input_file_dir,
-                name_input_file_by_layer=False)
-            filenames_to_check = archived_main_filename_mapping
-            main_filenames_to_check = filenames_to_check
-        else:
-            filenames_to_check = {k: v for k, v in raw_filename_mapping.items() if v is not None}
-            main_filenames_to_check = {k: v for k, v in filenames_to_check.items() if k in raw_main_files}
-            assert set(main_filenames_to_check) == set(raw_main_files)
+    if time_regex and not skip_timeseries_filename_checks and name_input_file_by_layer:
+        assert input_files.is_one_archive
+        # timeseries files are in one ZIP file, so check main file names inside ZIP file instead of raw file names
+        # we can check only main files, because other files are not extracted
+        archived_main_filename_mapping, _ = get_file_name_mappings(
+            input_files.archived_main_file_paths, input_files.archived_main_file_paths, layername, input_file_dir,
+            name_input_file_by_layer=False)
+        filenames_to_check = archived_main_filename_mapping
+        main_filenames_to_check = filenames_to_check
+    else:
+        filenames_to_check = {k: v for k, v in raw_filename_mapping.items() if v is not None}
+        main_filenames_to_check = {k: v for k, v in filenames_to_check.items() if k in raw_main_files}
+        assert set(main_filenames_to_check) == set(raw_main_files)
 
+    check_duplicate_mapped_filenames(filenames_to_check)
+
+    if time_regex and not skip_timeseries_filename_checks:
         unsafe_filenames = [new_filename for new_filename in filenames_to_check.values()
                             if not is_safe_timeseries_filename(new_filename)]
         if len(unsafe_filenames) > 0:
