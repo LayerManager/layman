@@ -1069,6 +1069,10 @@ def wms_direct(wms_url, xml=None, version=None, headers=None):
         if exc.response.status_code == 404:
             return None
         raise exc
+    except AttributeError as exc:
+        if exc.args == ("'NoneType' object has no attribute 'find'",):
+            return None
+        raise exc
     return wms
 
 
