@@ -107,10 +107,7 @@ def refresh_wms(
 
     if 'wms' not in wms_info:
         wms.delete_layer(workspace, layername)
-        raise LaymanError(53,
-                          {
-                              'message': 'May happen for raster layers with wrong explicit CRS.',
-                          })
+        raise LaymanError(53,)
 
     if self.is_aborted():
         wms.delete_layer(workspace, layername)
@@ -157,10 +154,7 @@ def refresh_wfs(
 
     if 'wfs' not in wfs_info:
         wfs.delete_layer(workspace, layername)
-        raise LaymanError(53,
-                          {
-                              'message': 'May happen for raster layers with wrong explicit CRS.',
-                          })
+        raise LaymanError(53,)
 
     if self.is_aborted():
         wfs.delete_layer(workspace, layername)
