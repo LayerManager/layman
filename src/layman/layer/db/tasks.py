@@ -43,6 +43,7 @@ def refresh_table(
     assert len(main_filepaths) == 1
     main_filepath = main_filepaths[0]
     table_name = db.get_table_name(workspace, layername)
+
     process = db.import_layer_vector_file_async(workspace, table_name, main_filepath, crs_id)
     while process.poll() is None and not self.is_aborted():
         pass
@@ -61,9 +62,31 @@ def refresh_table(
             logger.error(f"STDOUT: {pg_error}")
             if "ERROR:  zero-length delimited identifier at or near" in pg_error:
                 err_code = 28
+                raise LaymanError(err_code, private_data=pg_error)
+            if 'ERROR:  invalid byte sequence for encoding "UTF8":' in pg_error:
+                processes = db.import_layer_vector_file_async_with_iconv(workspace, table_name, main_filepath, crs_id)
+                _, sterr = processes[-1].communicate()
+                if sterr:
+                    logger.error(f"STDOUT: {str(sterr)}")
+                if self.is_aborted():
+                    logger.info(f'terminating {workspace} {layername}')
+                    for proc in processes:
+                        proc.terminate()
+                    logger.info(f'terminating {workspace} {layername}')
+                    table.delete_layer(workspace, layername)
+                    raise AbortedException
+                return_code = process.poll()
+                output = process.stdout.read()
+                if return_code != 0 or output:
+                    info = table.get_layer_info(workspace, layername)
+                    if not info:
+                        pg_error = str(output)
+                        logger.error(f"STDOUT: {pg_error}")
+                        err_code = 11
+                        raise LaymanError(err_code, private_data=pg_error)
             else:
                 err_code = 11
-            raise LaymanError(err_code, private_data=pg_error)
+                raise LaymanError(err_code, private_data=pg_error)
 
     crs = db.get_crs(workspace, table_name)
     if crs_def.CRSDefinitions[crs].srid:
