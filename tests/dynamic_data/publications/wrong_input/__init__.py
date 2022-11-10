@@ -17,6 +17,8 @@ KEY_DEFAULT = 'default'
 KEY_PATCHES = 'patches'
 KEY_PATCH_POST = 'post_params'
 KEY_SKIP_POST = 'skip_post'
+KEY_ONLY_FIRST_PARAMETRIZATION = 'only_first_parametrization'
+KEY_FAILED_INFO_KEY = 'failed_info_key'
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 logger = logging.getLogger(__name__)
@@ -1188,6 +1190,8 @@ def generate(workspace=None):
             if tc_params.get(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY) == EnumTestTypes.OPTIONAL:
                 continue
 
+        failed_info_key = tc_params.get(KEY_FAILED_INFO_KEY, 'file')
+        assert_no_bbox_and_crs = KEY_FAILED_INFO_KEY not in tc_params
         if not tc_params.get(KEY_SKIP_POST, False):
             action_parametrization = util.get_test_case_parametrization(param_parametrization=REST_PARAMETRIZATION,
                                                                         only_first_parametrization=default_only_first_parametrization,
@@ -1228,11 +1232,12 @@ def generate(workspace=None):
                             ],
                         },
                         consts.KEY_FINAL_ASSERTS: [
-                            Action(publication.rest.async_error_in_info_key, {'info_key': 'file',
+                            Action(publication.rest.async_error_in_info_key, {'info_key': failed_info_key,
                                                                               'expected': exp_exception, }, ),
-                            Action(publication.internal.no_bbox_and_crs, dict()),
                         ],
                     }
+                    if assert_no_bbox_and_crs:
+                        action_def[consts.KEY_FINAL_ASSERTS].append(Action(publication.internal.no_bbox_and_crs, dict()))
                     action_list = [action_def, VALIDATION_PATCH_ACTION]
                 publ_name = f"{testcase}_post{test_case_postfix}"
                 result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = action_list
@@ -1296,11 +1301,13 @@ def generate(workspace=None):
                             ],
                         },
                         consts.KEY_FINAL_ASSERTS: [
-                            Action(publication.rest.async_error_in_info_key, {'info_key': 'file',
+                            Action(publication.rest.async_error_in_info_key, {'info_key': failed_info_key,
                                                                               'expected': exp_exception, }, ),
-                            Action(publication.internal.no_bbox_and_crs, dict()),
                         ],
                     }
+                    if assert_no_bbox_and_crs:
+                        action_def[consts.KEY_FINAL_ASSERTS].append(Action(publication.internal.no_bbox_and_crs, dict()))
+
                     patch.append(action_def)
                     patch.append(VALIDATION_PATCH_ACTION)
                 publ_name = f"{testcase}_patch_{patch_key}{test_case_postfix}"
