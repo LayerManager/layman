@@ -32,7 +32,7 @@ def patch_layer(workspace, layername, title, description, access_rights=None):
     if not get_layer_info(workspace, layername):
         return
     geoserver_workspace = get_geoserver_workspace(workspace)
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type', 'file_type', ], })
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type', 'file_type', 'image_mosaic'], })
     file_type = info['_file_type']
     if file_type == settings.FILE_TYPE_VECTOR:
         if info['_style_type'] == 'sld':
@@ -40,7 +40,11 @@ def patch_layer(workspace, layername, title, description, access_rights=None):
         if info['_style_type'] == 'qml':
             gs_util.patch_wms_layer(geoserver_workspace, layername, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     elif file_type == settings.FILE_TYPE_RASTER:
-        store = get_geotiff_store_name(layername)
+        image_mosaic = info['image_mosaic']
+        if image_mosaic:
+            store = get_image_mosaic_store_name(layername)
+        else:
+            store = get_geotiff_store_name(layername)
         gs_util.patch_coverage(geoserver_workspace, layername, store, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     else:
         raise NotImplementedError(f"Unknown file type: {file_type}")
