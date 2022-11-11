@@ -92,7 +92,6 @@ LAYERS = {
                 'S2A_MSIL2A_20220319T100731.3.tif',
             ],
         },
-        'expected_thumbnail': os.path.join(DIRECTORY, 'thumbnail_tiled_timeseries.png'),
         'wms_bbox': [1743913.19942603237, 6499107.284021802247, 1755465.937341974815, 6503948.597792930901, ],
     },
     'longname_one_file_compressed': {
@@ -292,8 +291,10 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                          time=time,
                                                          )
 
-        exp_thumbnail = os.path.join(DIRECTORY, params['expected_thumbnail'])
-        asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
+        exp_thumbnail_file = params.get('expected_thumbnail')
+        if exp_thumbnail_file is not None:
+            exp_thumbnail = os.path.join(DIRECTORY, exp_thumbnail_file)
+            asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
 
         if rest_method == self.post_publication:  # pylint: disable=W0143
             http_method = common.REQUEST_METHOD_POST
