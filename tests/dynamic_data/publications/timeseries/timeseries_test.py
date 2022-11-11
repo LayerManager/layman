@@ -307,7 +307,13 @@ class TestLayer(base_test.TestSingleRestPublication):
 
         process_client.patch_workspace_layer(layer.workspace,
                                              layer.name,
-                                             file_paths=['sample/layman.layer/small_layer.geojson'])
+                                             title='Title: ' + layer.name)
+        asserts_util.is_publication_valid_and_complete(layer)
+
+        process_client.patch_workspace_layer(layer.workspace,
+                                             layer.name,
+                                             file_paths=['sample/layman.layer/small_layer.geojson'],
+                                             title=layer.name)
         asserts_util.is_publication_valid_and_complete(layer)
 
         asserts_publ.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
