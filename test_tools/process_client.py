@@ -193,6 +193,7 @@ def patch_workspace_publication(publication_type,
     assert not compress_settings or compress
 
     assert not (time_regex and publication_type == MAP_TYPE)
+    assert not (publication_type == LAYER_TYPE and crs and not file_paths)
 
     with app.app_context():
         r_url = url_for(publication_type_def.patch_workspace_publication_url,
@@ -235,6 +236,8 @@ def patch_workspace_publication(publication_type,
             data['overview_resampling'] = overview_resampling
         if time_regex:
             data['time_regex'] = time_regex
+        if publication_type == LAYER_TYPE and crs:
+            data['crs'] = crs
 
         response = requests.patch(r_url,
                                   files=files,
