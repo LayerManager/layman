@@ -1,5 +1,6 @@
 import shutil
 import tempfile
+import logging
 from flask import Blueprint, jsonify, request, current_app as app, g
 
 from layman.common import rest as rest_util
@@ -12,6 +13,7 @@ from . import util, LAYER_REST_PATH_NAME, LAYER_TYPE
 from .filesystem import input_file, input_style, input_chunk, util as fs_util
 
 bp = Blueprint('rest_workspace_layer', __name__)
+logger = logging.getLogger(__name__)
 
 
 @bp.before_request
