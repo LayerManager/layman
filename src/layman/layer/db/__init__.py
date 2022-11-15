@@ -2,9 +2,9 @@ from collections import defaultdict, namedtuple
 import math
 import os
 import logging
+import subprocess
 
 from db import util as db_util, PG_CONN
-from layman.common import empty_method
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
@@ -132,7 +132,6 @@ def create_ogr2ogr_args(*, schema, table_name, main_filepath, crs_id, output):
 
 
 def import_layer_vector_file_async_with_iconv(schema, table_name, main_filepath, crs_id):
-    import subprocess
     assert table_name, f'schema={schema}, table_name={table_name}, main_filepath={main_filepath}'
 
     first_ogr2ogr_args = [
@@ -171,7 +170,6 @@ def import_layer_vector_file_async_with_iconv(schema, table_name, main_filepath,
 def import_layer_vector_file_async(schema, table_name, main_filepath,
                                    crs_id):
     # import file to database table
-    import subprocess
     assert table_name, f'schema={schema}, table_name={table_name}, main_filepath={main_filepath}'
     bash_args = create_ogr2ogr_args(schema=schema,
                                     table_name=table_name,
