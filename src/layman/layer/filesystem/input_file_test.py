@@ -1,7 +1,9 @@
+from contextlib import nullcontext as does_not_raise
 import pytest
+from layman.http import LaymanError
 
 from .input_file import get_all_main_file_names, get_file_name_mappings, slugify_timeseries_filename, \
-    is_safe_timeseries_filename, slugify_timeseries_filename_pattern
+    is_safe_timeseries_filename, slugify_timeseries_filename_pattern, check_duplicate_mapped_filenames
 
 
 def test_get_main_file_name():
@@ -139,6 +141,39 @@ def test_get_main_file_name_shp():
 def test_get_file_name_mappings(method_params, exp_filepath_mapping):
     _, result = get_file_name_mappings(**method_params)
     assert result == exp_filepath_mapping
+
+
+@pytest.mark.parametrize("method_params, exp_exception", [
+    pytest.param({
+        'filenames_mapping': {
+            'small_layer.geojson': 'small_layer.geojson',
+            'small_layer.README.txt': 'small_layer.readme.txt',
+        },
+    }, None, id='ok'),
+    pytest.param({
+        'filenames_mapping': {
+            'small_layer.geojson': 'small_layer.geojson',
+            'small_layer.README.txt': 'small_layer.readme.txt',
+            'small_layer.readme.txt': 'small_layer.readme.txt',
+        },
+    }, {
+        'code': 2,
+        'parameter': 'file',
+        'message': 'Two or more input file names map to the same name.',
+        'expected': 'Input file names that differ at least in one letter (ignoring case and diacritics) or number.',
+        'similar_filenames_mapping': {
+            'small_layer.README.txt': 'small_layer.readme.txt',
+            'small_layer.readme.txt': 'small_layer.readme.txt',
+        },
+    }, id='raises_exception'),
+])
+def test_check_duplicate_mapped_filenames(method_params, exp_exception):
+    expectation = pytest.raises(LaymanError) if exp_exception else does_not_raise()
+    with expectation as exc_info:
+        check_duplicate_mapped_filenames(**method_params)
+    if exp_exception:
+        assert exc_info.value.code == exp_exception['code']
+        assert exc_info.value.data == {k: v for k, v in exp_exception.items() if k != 'code'}
 
 
 @pytest.mark.parametrize("filename, exp_result", [
