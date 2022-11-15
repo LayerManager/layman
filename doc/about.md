@@ -6,7 +6,7 @@ Layman is a web service for publishing geospatial data online through REST API. 
 ## Most Important Features
 
 ### Layers and Maps
-Layman supports two main models of geospatial data: layers and maps. **Layer** is created from combination of vector or raster data (GeoJSON, ShapeFile, GeoTIFF, JPEG2000, PNG, or JPEG) and visualization (SLD, SE or QML style). **Map** is collection of layers described in JSON format.
+Layman supports two main models of geospatial data: layers and maps. **Layer** is created from combination of vector or raster data (GeoJSON, ShapeFile, GeoTIFF, JPEG2000, PNG, or JPEG) and visualization (SLD, SE or QML style). Raster layer can hold also timeseries data. **Map** is collection of layers described in JSON format.
 
 ### Acessibility
 There are multiple client applications for communication with Layman through its REST API: simple web test client shipped with Layman, QGIS desktop client, and HSLayers library. Published data are accessible through standardized OGC APIs: Web Map Service, Web Feature Service, and Catalogue Service.
