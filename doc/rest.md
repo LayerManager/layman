@@ -181,12 +181,11 @@ Body parameters:
    - by default Layman will guess overview resampling method from input file metadata
    - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
 - *time_regex*, string, e.g. `[0-9]{8}T[0-9]{9}Z`
-  - regular expression pattern used for extracting the time information from the file name. The pattern
+  - regular expression pattern used for extracting the time information from [timeseries](models.md#timeseries) raster file names. The pattern
     - either has no matching group and matches ISO 8601 [year](https://en.wikipedia.org/wiki/ISO_8601#Years), [date](https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates), or [datetime](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) patterns, e.g. `[0-9]{8}` or `[0-9]{8}T[0-9]{9}Z`
     - or has one or more matching groups that concatenated together matches ISO 8601 year, date, or datetime patterns, e.g. `^some_prefix_([0-9]{8})_some_postfix.*$` or , e.g. `some_prefix_([0-9]{8})_some_separator_(T[0-9]{9}Z)_some_postfix`
-  - used for timeseries raster files
   - latin diacritic is removed from the regex and spaces are replaced with underscores to be consistent with slugifying of timeseries filenames
-  - error is raised if any of main data files do not match *time_regex* value
+  - error is raised if any of main data file names do not match *time_regex* value
 
 #### Response
 Content-Type: `application/json`
@@ -302,7 +301,7 @@ JSON object with following structure:
 - **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
 - **native_crs**: Code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326". Native CRS is CRS of the input data file.
 - **native_bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
-- *image_mosaic*: Boolean. True for raster layers using `image_mosaic` plugin in GeoServer, so far only timeseries layers. Available only for raster layer
+- *image_mosaic*: Boolean. True for raster layers using `image_mosaic` plugin in GeoServer, so far only [timeseries](models.md#timeseries) layers. Available only for raster layer
 
 ### PATCH Workspace Layer
 Update information about existing layer. First, it deletes sources of the layer, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Layers](#post-workspace-layers).

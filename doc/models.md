@@ -6,7 +6,7 @@
 - Each publication is placed in one [workspace](#workspace). 
 
 ## Layer
-- Layer is [publication](#publication) created from combination of vector or raster data (GeoJSON, ShapeFile, GeoTIFF, JPEG2000, PNG or JPEG) and visualization (SLD, SE, or QML style)
+- Layer is [publication](#publication) created from combination of vector or raster data (GeoJSON, ShapeFile, GeoTIFF, JPEG2000, PNG or JPEG) and visualization (SLD, SE, or QML style). Raster layer can hold also [timeseries](#timeseries) data.
 - Published layer can be accessed by standardized OGC interfaces
   - [Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms)
   - [Web Feature Service (WFS)](https://www.opengeospatial.org/standards/wfs)
@@ -28,6 +28,11 @@
   - one SLD or QGIS style per WMS layer
   - one thumbnail per WMS layer
   - one metadata record per WMS&WFS layer
+
+## Timeseries
+- Timeseries is [layer](#layer) created from set of raster data files (GeoJSON, ShapeFile, GeoTIFF, JPEG2000, PNG or JPEG).
+- Each file represents one time instant, more files may represent the same time instant.
+- Information about time representation is passed through [time_regex](rest.md#post-workspace-layers) parameter.
   
 ## Map
 - Also referred to as **map composition**

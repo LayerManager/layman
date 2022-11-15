@@ -4,7 +4,7 @@
 Publishing geospatial data online through [REST API](doc/rest.md).
 
 - Two publication models available:
-  - [**layer**](doc/models.md#layer): visual representation of single vector or raster dataset
+  - [**layer**](doc/models.md#layer): visual representation of single vector or raster dataset, including raster [timeseries](doc/models.md#timeseries)
   - [**map**](doc/models.md#map): collection of layers
 - Accepts **vector** layer data in [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON) and [ShapeFile](https://en.wikipedia.org/wiki/Shapefile) formats
 - Accepts **raster** layer data in [GeoTIFF](https://gdal.org/drivers/raster/gtiff.html), [JPEG2000](https://gdal.org/drivers/raster/jp2openjpeg.html), [PNG](https://gdal.org/drivers/raster/png.html), and [JPEG](https://gdal.org/drivers/raster/jpeg.html) formats

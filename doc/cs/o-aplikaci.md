@@ -6,7 +6,7 @@ Layman je služba pro publikování geoporostorových dat na webu prostřednictv
 ## Nejdůležitější vlastnosti
 
 ### Vrstvy a mapy
-Layman podporuje dva základní modely geoprostorových dat: vrstvy a mapy. **Vrstva** je tvořena kombinací vektorových nebo rastrových dat (GeoJSON, ShapeFile, GeoTIFF, JPEG2000, PNG nebo JPEG) a vizualizace (SLD, SE nebo QML styl). **Mapa** je kolekcí vrstev, která je popsána ve formátu JSON.
+Layman podporuje dva základní modely geoprostorových dat: vrstvy a mapy. **Vrstva** je tvořena kombinací vektorových nebo rastrových dat (GeoJSON, ShapeFile, GeoTIFF, JPEG2000, PNG nebo JPEG) a vizualizace (SLD, SE nebo QML styl). Rastrová vrstva může mít podobu i časové série několika snímků. **Mapa** je kolekcí vrstev, která je popsána ve formátu JSON.
 
 
 ### Přístupnost
