@@ -103,10 +103,37 @@ def import_layer_vector_file(workspace, layername, main_filepath, crs_id):
         raise LaymanError(11, private_data=pg_error)
 
 
+def create_ogr2ogr_args(*, schema, table_name, main_filepath, crs_id, output):
+    pg_conn = ' '.join([f"{k}='{v}'" for k, v in PG_CONN.items()])
+    ogr2ogr_args = [
+        'ogr2ogr',
+        '-nln', table_name,
+        '-nlt', 'GEOMETRY',
+        '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
+        '-lco', f'SCHEMA={schema}',
+        # '-clipsrc', '-180', '-85.06', '180', '85.06',
+        '-f', 'PostgreSQL',
+        '-unsetFid',
+        f'PG:{pg_conn}',
+        # 'PG:{} active_schema={}'.format(PG_CONN, username),
+    ]
+    if crs_id is not None:
+        ogr2ogr_args.extend([
+            '-a_srs', crs_id,
+        ])
+    if os.path.splitext(main_filepath)[1] == '.shp':
+        ogr2ogr_args.extend([
+            '-lco', 'PRECISION=NO',
+        ])
+    ogr2ogr_args.extend([
+        output,
+    ])
+    return ogr2ogr_args
+
+
 def import_layer_vector_file_async_with_iconv(schema, table_name, main_filepath, crs_id):
     import subprocess
     assert table_name, f'schema={schema}, table_name={table_name}, main_filepath={main_filepath}'
-    pg_conn = ' '.join([f"{k}='{v}'" for k, v in PG_CONN.items()])
 
     first_ogr2ogr_args = [
         'ogr2ogr',
@@ -122,29 +149,11 @@ def import_layer_vector_file_async_with_iconv(schema, table_name, main_filepath,
         '-c',
         '-t', 'utf8',
     ]
-    final_ogr2ogr_args = [
-        'ogr2ogr',
-        '-nln', table_name,
-        '-nlt', 'GEOMETRY',
-        '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
-        '-lco', f'SCHEMA={schema}',
-        # '-clipsrc', '-180', '-85.06', '180', '85.06',
-        '-f', 'PostgreSQL',
-        '-unsetFid',
-        f'PG:{pg_conn}',
-        # 'PG:{} active_schema={}'.format(PG_CONN, username),
-    ]
-    if crs_id is not None:
-        final_ogr2ogr_args.extend([
-            '-a_srs', crs_id,
-        ])
-    if os.path.splitext(main_filepath)[1] == '.shp':
-        final_ogr2ogr_args.extend([
-            '-lco', 'PRECISION=NO',
-        ])
-    final_ogr2ogr_args.extend([
-        '/vsistdin/',
-    ])
+    final_ogr2ogr_args = create_ogr2ogr_args(schema=schema,
+                                             table_name=table_name,
+                                             main_filepath=main_filepath,
+                                             crs_id=crs_id,
+                                             output='/vsistdin/')
 
     first_ogr2ogr_process = subprocess.Popen(first_ogr2ogr_args,
                                              stdout=subprocess.PIPE)
@@ -164,30 +173,11 @@ def import_layer_vector_file_async(schema, table_name, main_filepath,
     # import file to database table
     import subprocess
     assert table_name, f'schema={schema}, table_name={table_name}, main_filepath={main_filepath}'
-    pg_conn = ' '.join([f"{k}='{v}'" for k, v in PG_CONN.items()])
-    bash_args = [
-        'ogr2ogr',
-        '-nln', table_name,
-        '-nlt', 'GEOMETRY',
-        '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
-        '-lco', f'SCHEMA={schema}',
-        # '-clipsrc', '-180', '-85.06', '180', '85.06',
-        '-f', 'PostgreSQL',
-        '-unsetFid',
-        f'PG:{pg_conn}',
-        # 'PG:{} active_schema={}'.format(PG_CONN, username),
-    ]
-    if crs_id is not None:
-        bash_args.extend([
-            '-a_srs', crs_id,
-        ])
-    if os.path.splitext(main_filepath)[1] == '.shp':
-        bash_args.extend([
-            '-lco', 'PRECISION=NO',
-        ])
-    bash_args.extend([
-        f'{main_filepath}',
-    ])
+    bash_args = create_ogr2ogr_args(schema=schema,
+                                    table_name=table_name,
+                                    main_filepath=main_filepath,
+                                    crs_id=crs_id,
+                                    output=main_filepath)
 
     # print(' '.join(bash_args))
     process = subprocess.Popen(bash_args, stdout=subprocess.PIPE,
