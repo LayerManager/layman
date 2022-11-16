@@ -160,7 +160,7 @@ Body parameters:
    - by default it is read/guessed from input file
 - *style*, style file
    - by default either default SLD style of GeoServer, or customized SLD created by Layman is used
-     - default customized SLD file is created only for grayscale raster input files with or without alpha band to stabilize contrast in WMS; [ColorMap with type `ramp`](https://docs.geoserver.org/stable/en/user/styling/sld/reference/rastersymbolizer.html#colormap) is used
+     - default customized SLD file is created only for grayscale raster input files with or without alpha band to stabilize contrast in WMS; [ColorMap with type `ramp`](https://docs.geoserver.org/2.19.x/en/user/styling/sld/reference/rastersymbolizer.html#colormap) is used
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
      - QML style for raster data file is not supported
      - It's possible to encode also external images in QML styles and use them in the style. To do so, each image needs to be encoded in Base64 encoding inside QML file. You can achieve it by selecting "Embed File" option in QGIS Layer Symbology window, see e.g. QGIS issues [2815](https://github.com/qgis/QGIS-Documentation/issues/2815) or [4563](https://github.com/qgis/QGIS-Documentation/pull/4563).
@@ -393,7 +393,7 @@ PNG image.
 ### URL
 `/rest/workspaces/<workspace_name>/layers/<layername>/style`
 ### GET Workspace Layer Style
-Get default style of the layer in XML format. Request is redirected to GeoServer [/rest/workspaces/{workspace}/styles/{style}](https://docs.geoserver.org/latest/en/api/#1.0.0/styles.yaml) for layers with SLD style. For layers with QML style, response is created in Layman. Anybody can call GET, nobody can call any other method. 
+Get default style of the layer in XML format. Request is redirected to GeoServer [/rest/workspaces/{workspace}/styles/{style}](https://docs.geoserver.org/2.19.x/en/api/#1.0.0/styles.yaml) for layers with SLD style. For layers with QML style, response is created in Layman. Anybody can call GET, nobody can call any other method. 
 
 #### Request
 No action parameters.
