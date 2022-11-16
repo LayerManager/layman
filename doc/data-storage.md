@@ -78,7 +78,7 @@ Data is saved in LAYMAN_REDIS_URL database. Keys are prefixed with
 Redis is used as temporary data store. When Layman stops, data persists in Redis, however on each startup Layman flushes the Redis database and imports user-related data and publication-related data from [filesystem](#filesystem). It means that any [task-related](#tasks) data is lost on startup. This can be controlled by [LAYMAN_SKIP_REDIS_LOADING](env-settings.md#LAYMAN_SKIP_REDIS_LOADING).
 
 ### Filesystem
-Data is saved to LAYMAN_DATA_DIR directory.
+Data is saved to LAYMAN_DATA_DIR directory, LAYMAN_QGIS_DATA_DIR directory, and GeoServer data directory.
 
 **Workspace directory** is created in LAYMAN_DATA_DIR directory for every created [workspace](models.md#workspace). Name of the workspace directory is the same as workspace name. User-related information is saved in the root of [personal workspace](models.md#personal-workspace) directory.
 
@@ -88,7 +88,7 @@ Data is saved to LAYMAN_DATA_DIR directory.
 
 **QGIS layer directory** is created inside QGIS workspace directory for each layer with QGIS style the user published. Name of the publication directory is the same as name of the layer. QGS project with style definition is stored in this directory for WMS purpose.
 
-**Normalized raster directory** named `normalized_raster_data` is created in LAYMAN_DATA_DIR directory.
+**Normalized raster directory** named `normalized_raster_data` is created in GeoServer data directory.
 
 **Normalized raster workspace directory** is created in Normalized raster directory for every [workspace](models.md#workspace) with at least one raster layer. Name of the workspace directory is the same as workspace name.
 
