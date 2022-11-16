@@ -22,8 +22,8 @@
       - [PostgreSQL](data-storage.md#postgresql): `db=LAYMAN_PG_DBNAME, schema=<workspace_name>, table=layer_<UUID>` 
       - Micka: `/record/basic/m-<uuid>`
 - Simple rules
-  - one DB table per input file
-  - one WFS feature type per DB table
+  - one DB table per input file (vector layers only)
+  - one WFS feature type per DB table (vector layers only)
   - one WMS layer per DB table
   - one SLD or QGIS style per WMS layer
   - one thumbnail per WMS layer
