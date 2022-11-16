@@ -179,11 +179,7 @@ Npm is recommended tool for installing **node.js-level** dependencies. Both pack
 
 Next you need to choose how you deploy Layman. As Layman is Flask application, check Flask's [deployment options](https://flask.palletsprojects.com/en/1.1.x/deploying/). Layman is safe to run with multiple WSGI Flask processes and with multiple Celery worker processes.
 
-Configure Layman using [environment settings](doc/env-settings.md). Demo configuration is a good starting point to setup Layman for production, however it needs to be adjusted carefully. First focus for example on
-- [FLASK_APP](doc/env-settings.md#FLASK_APP)
-- [FLASK_ENV](doc/env-settings.md#FLASK_ENV) (should be set to `production`)
-- [FLASK_SECRET_KEY](doc/env-settings.md#FLASK_SECRET_KEY)
-- [LTC_SESSION_SECRET](doc/env-settings.md#LTC_SESSION_SECRET)
+Configure Layman using [environment settings](doc/env-settings.md). Demo configuration is a good starting point to setup Layman for production, however it needs to be adjusted carefully.
 
 Last, start layman and necessary services:
 - thumbnail image generator (Timgen) using npm (see startup command of `timgen` docker-compose service)
