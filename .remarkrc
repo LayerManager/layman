@@ -8,8 +8,7 @@
       "skipUrlPatterns": [
         "https://help.liferay.com",
         "https://github.com/LayerManager/layman/issues/",
-        "https://docs.geoserver.org/2.15",
-        "https://openid.net/specs/openid-connect-core-1_0.html"
+        "https://docs.geoserver.org/2.15"
       ]
     }
   }
