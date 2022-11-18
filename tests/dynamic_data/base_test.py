@@ -25,7 +25,7 @@ class TestCaseType:
 def pytest_generate_tests(metafunc):
     # used for parametrizing subclasses of TestSingleRestPublication, called once per each test function
     # https://docs.pytest.org/en/6.2.x/parametrize.html#pytest-generate-tests
-    test_type_str = os.getenv(EnumTestKeys.TYPE.value, EnumTestTypes.MANDATORY.value)
+    test_type_str = os.getenv(EnumTestKeys.TYPE.value) or EnumTestTypes.MANDATORY.value
     test_type = EnumTestTypes(test_type_str)
     cls = metafunc.cls
     argvalues = []

@@ -1343,7 +1343,7 @@ VALIDATION_PATCH_ACTION = {
 
 def generate(workspace=None):
     workspace = workspace or consts.COMMON_WORKSPACE
-    test_type_str = os.getenv(EnumTestKeys.TYPE.value, EnumTestTypes.MANDATORY.value)
+    test_type_str = os.getenv(EnumTestKeys.TYPE.value) or EnumTestTypes.MANDATORY.value
     test_type = EnumTestTypes(test_type_str)
     default_only_first_parametrization = test_type != EnumTestTypes.OPTIONAL
 
