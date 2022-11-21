@@ -1,6 +1,9 @@
+import configparser
 from urllib.parse import urljoin
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qs, parse_qsl
+import itertools
 import logging
+import os
 from flask import current_app
 
 from geoserver import util as gs_util
@@ -9,6 +12,7 @@ from layman.cache import mem_redis
 from layman.common import geoserver as gs_common, empty_method_returns_none, empty_method
 from layman.layer.util import is_layer_chain_ready
 from layman.layer import LAYER_TYPE
+from layman.layer.filesystem import gdal
 import requests_util.retry
 from .util import get_gs_proxy_base_url
 
@@ -139,6 +143,21 @@ def clear_cache(workspace):
     mem_redis.delete(key)
 
 
+def get_timeregex_props(workspace, layername):
+    result = {}
+    layer_dir = gdal.get_normalized_raster_layer_dir(workspace, layername)
+    props_path = os.path.join(layer_dir, 'timeregex.properties')
+    props_config = configparser.ConfigParser()
+    section_name = 'global'
+    try:
+        with open(props_path) as props_file:
+            props_config.read_file(itertools.chain([f'[{section_name}]'], props_file), source=props_path)
+            result = {**props_config[section_name]}
+    except IOError:
+        logger.warning(f"File {props_path} seems not to exist or not to be readable.")
+    return result
+
+
 def get_layer_info(workspace, layername):
     wms = get_wms_proxy(workspace)
     if wms is None:
@@ -160,6 +179,7 @@ def get_layer_info(workspace, layername):
     }
     if 'time' in wms.contents[layername].dimensions:
         result['wms']['time'] = wms.contents[layername].dimensions['time']
+        result['wms']['time']['regex'] = get_timeregex_props(workspace, layername).get('regex')
     return result
 
 
