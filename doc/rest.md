@@ -248,10 +248,10 @@ JSON object with following structure:
 - **wms**
   - *url*: String. URL of WMS endpoint. It points to WMS endpoint of appropriate GeoServer workspace.
   - *time*, available only for time-series layers
-    - **units**: String. Code of time format.
-    - **values**: List of times. Time values available for layer.
-    - **default**: Time. Default time value.
-    - **regex**: Slugified regular expression used to extract time values from file names. Originally sent in `time_regex` parameter.
+    - **units**: String. Code of time format. Always `ISO8601`.
+    - **values**: List of strings. Time instants available for layer written in ISO 8601 format.
+    - **default**: Time. Default time instant.
+    - **regex**: Slugified regular expression used to extract time instants from file names. Originally sent in `time_regex` parameter.
   - *status*: Status information about GeoServer import and availability of WMS layer. No status object means the source is available. Usual state values are
     - PENDING: publishing of this source is queued, but it did not start yet
     - STARTED: publishing of this source is in process
