@@ -15,7 +15,7 @@
 - [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) returns new subkeys:
   - `file.paths` with list of paths to all main data files
   - `image_mosaic` for raster layers stating that layer was published to GeoServer using ImageMosaic coverage store  (`true` value for [timeseries](doc/models.md#timeseries) and `false` otherwise)
-  - `wms.time` for [timeseries](doc/models.md#timeseries) with list of available time instants
+  - `wms.time` for [timeseries](doc/models.md#timeseries) with list of available time instants and regular expression used to extract them from file names
 - [#635](https://github.com/LayerManager/layman/issues/635) Subkey `file.path` is marked deprecated for endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer). Use `file.paths` instead.
 - [#635](https://github.com/LayerManager/layman/issues/635) Metadata sources returns new key ['temporal_extent'](doc/metadata.md#temporal_extent).
 - [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) do not support combination of zip file and uncompressed main file. 

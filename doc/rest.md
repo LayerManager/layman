@@ -251,6 +251,7 @@ JSON object with following structure:
     - **units**: String. Code of time format.
     - **values**: List of times. Time values available for layer.
     - **default**: Time. Default time value.
+    - **regex**: Slugified regular expression used to extract time values from file names. Originally sent in `time_regex` parameter.
   - *status*: Status information about GeoServer import and availability of WMS layer. No status object means the source is available. Usual state values are
     - PENDING: publishing of this source is queued, but it did not start yet
     - STARTED: publishing of this source is in process
