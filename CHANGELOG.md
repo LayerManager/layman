@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.19.0
+ {release-date}
+### Upgrade requirements
+### Migrations and checks
+#### Schema migrations
+#### Data migrations
+### Changes
+
 ## v1.18.0
  2022-11-22
 ### Upgrade requirements
