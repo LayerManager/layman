@@ -41,7 +41,7 @@ jobs:
 
       - name: Run tests
         run: |
-          make test-separated test_type=optional
+          make test-separated test_type=optional max_fail=0
 
       - name: Usage info
         if: always()
@@ -110,7 +110,7 @@ jobs:
 
       - name: Run tests
         run: |
-          make test-static test_type=optional
+          make test-static test_type=optional max_fail=0
 
       - name: Usage info
         if: always()
