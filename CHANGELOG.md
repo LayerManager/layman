@@ -3,6 +3,10 @@
 ## v1.18.0
  {release-date}
 ### Upgrade requirements
+- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
+  ```
+  LAYMAN_CLIENT_VERSION=v1.13.0
+  ```
 ### Migrations and checks
 #### Schema migrations
 - [#635](https://github.com/LayerManager/layman/issues/635) Create new boolean column `image_mosaic` in `publication` table.
