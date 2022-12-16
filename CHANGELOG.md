@@ -3,10 +3,16 @@
 ## v1.19.0
  {release-date}
 ### Upgrade requirements
+- If you are running Layman with development settings, run  
+```
+make geoserver-build
+```
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [#348](https://github.com/LayerManager/layman/issues/348) Upgrade GeoServer to 2.21.2, because it has better rendering.
+  - In workspace-specific WMS GetCapabilities documents, style name consists only of style name without `<workspace>:` prefix. For example, formerly it was `testuser_wms:blue_style`, now it is only `blues_style`.
 
 ## v1.18.0
  2022-11-22

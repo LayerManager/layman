@@ -1,1 +1,1 @@
-FROM kartoza/geoserver:2.15.2
+FROM docker.osgeo.org/geoserver:2.21.2
