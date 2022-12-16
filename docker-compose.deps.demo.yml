@@ -33,10 +33,11 @@ services:
         context: deps/geoserver/docker
         dockerfile: Dockerfile
       volumes:
-        - ./deps/geoserver/data:/opt/geoserver/data_dir
+        - ./deps/geoserver/data:/opt/geoserver_data/
       restart: on-failure
       environment:
-        - GS_VERSION=2.15.2
+        - GS_VERSION=2.21.2
+        - SKIP_DEMO_DATA=true
       env_file:
         - deps/geoserver/docker/.env
       depends_on:
