@@ -514,7 +514,7 @@ def test_post_layers_complex(client):
         assert 'countries' in wms.contents
         assert wms['countries'].title == 'staty'
         assert wms['countries'].abstract == 'popis států'
-        assert wms['countries'].styles[workspace + '_wms:countries']['title'] == 'Generic Blue'
+        assert wms['countries'].styles['countries']['title'] == 'Generic Blue'
 
         assert layername != ''
         rest_path = url_for('rest_workspace_layer.get', workspace=workspace, layername=layername)
@@ -636,7 +636,7 @@ def test_uppercase_attr(client):
         sld_file = io.BytesIO(response.content)
         tree = ET.parse(sld_file)
         root = tree.getroot()
-        assert root.attrib['version'] == '1.1.0'
+        assert root.attrib['version'] == '1.0.0'
 
         feature_type = get_feature_type(workspace, 'postgresql', layername)
         attributes = feature_type['attributes']['attribute']
@@ -773,8 +773,7 @@ def test_patch_layer_style(client):
         wms = wms_proxy(wms_url)
         assert layername in wms.contents
         assert wms[layername].title == 'countries in blue'
-        assert wms[layername].styles[
-            workspace + '_wms:' + layername]['title'] == 'Generic Blue'
+        assert wms[layername].styles[layername]['title'] == 'Generic Blue'
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': publication_counter.get()
@@ -850,8 +849,8 @@ def test_post_layers_sld_1_1_0(client):
     sld_file = io.BytesIO(response.content)
     tree = ET.parse(sld_file)
     root = tree.getroot()
-    assert root.attrib['version'] == '1.1.0'
-    assert root[0][1][1][0][1][0][0].text == '#e31a1c'
+    assert root.attrib['version'] == '1.0.0'
+    assert root[0][1][1][1][1][0][0].text == '#e31a1c'
     # assert wms[layername].styles[
     #     username+':'+layername]['title'] == 'test_layer2'
 
