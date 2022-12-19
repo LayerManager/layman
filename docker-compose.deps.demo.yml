@@ -34,13 +34,10 @@ services:
         dockerfile: Dockerfile
       volumes:
         - ./deps/geoserver/data:/opt/geoserver/data_dir
-        - ./deps/geoserver/docker/code:/geoserver_code
-        - ./deps/geoserver/tmp:/geoserver_tmp
       restart: on-failure
       environment:
         - GS_VERSION=2.15.2
       env_file:
-        - .env
         - deps/geoserver/docker/.env
       depends_on:
         - qgis
