@@ -267,9 +267,6 @@ geoserver-restart:
 geoserver-build:
 	docker-compose -f docker-compose.deps.yml build geoserver
 
-geoserver-reset-empty-datadir:
-	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash /geoserver_code/reset-empty-datadir.sh
-
 geoserver-bash:
 	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash
 
