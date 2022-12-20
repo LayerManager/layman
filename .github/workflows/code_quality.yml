@@ -93,7 +93,7 @@ jobs:
       - uses: BSFishy/pip-action@v1
         with:
           packages: |
-            pylint==2.7.4
+            pylint==2.15.9
 
       - name: Get version
         run: pylint --version
@@ -114,7 +114,7 @@ jobs:
       - uses: BSFishy/pip-action@v1
         with:
           packages: |
-            pylint==2.7.4
+            pylint==2.15.9
 
       - name: Get version
         run: pylint --version
