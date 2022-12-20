@@ -39,6 +39,26 @@
 - [#668](https://github.com/LayerManager/layman/issues/668) Fix broken size of raster in EPSG:3034 during normalization.
 - [#669](https://github.com/LayerManager/layman/issues/669) Fix slow publication of vector layers metadata to Micka. The reason was slow guessing of [`spatial_resolution.scale_denominator`](doc/metadata.md#spatial_resolution) metadata property.
 - [#701](https://github.com/LayerManager/layman/pull/701) After publishing to GeoServer, Layman checks that Layer is available in WMS & WFS GetCapabilities to prevent situation when GeoServer hides publishing error. It may happen when data file with wrong CRS is published.
+- [#720](https://github.com/LayerManager/layman/issues/720) Upgrade Python dependencies
+  - celery 5.0.5 -> 5.2.7
+  - flask 2.0.2 -> 2.2.2
+  - unidecode 1.3.2 -> 1.3.6
+  - psycopg2-binary 2.9.3 -> 2.9.5
+  - requests 2.27.0 -> 2.28.1
+  - jsonschema 4.3.3 -> 4.17.3
+  - flower 1.0.0 -> 1.2.0
+  - selenium 4.1.0 -> 4.7.2
+  - cacheout 0.13.1 -> 0.14.1
+  - kombu 5.2.3 -> 5.2.4
+- [#720](https://github.com/LayerManager/layman/issues/720) Upgrade Python dev dependencies
+  - pytest 6.2.5 -> 7.2.0
+  - watchdog 2.1.6 -> 2.2.0
+  - flake8 4.0.1 -> 6.0.0
+  - pycodestyle 2.8.0 -> 2.10.0
+  - pylint 2.7.4 -> 2.15.9
+  - autopep8 1.6.0 -> 2.0.1
+  - pytest-rerunfailures 10.2 -> 10.3
+  - pytest-timeout 2.0.2 -> 2.1.0
 
 ## v1.17.0
  2022-07-21
