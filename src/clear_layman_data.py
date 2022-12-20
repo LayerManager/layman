@@ -2,6 +2,7 @@ import os
 import shutil
 from urllib.parse import urljoin
 import geoserver
+import micka_util
 import layman_settings as settings
 
 
@@ -148,6 +149,8 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
             response.raise_for_status()
 
     # micka
+    record_ids_to_delete = micka_util.csw_get_record_ids_containing_url(settings.CSW_URL, auth=settings.CSW_BASIC_AUTHN, contained_url_part=f"://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/")
+
     opts = {} if settings.CSW_BASIC_AUTHN is None else {
         'username': settings.CSW_BASIC_AUTHN[0],
         'password': settings.CSW_BASIC_AUTHN[1],
@@ -155,29 +158,10 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
     opts['skip_caps'] = True
     from owslib.csw import CatalogueServiceWeb
     csw = CatalogueServiceWeb(settings.CSW_URL, **opts) if settings.CSW_URL is not None else None
-    csw.getrecords2(xml=f"""
-        <csw:GetRecords xmlns:ogc="http://www.opengis.net/ogc" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:ows="http://www.opengis.net/ows" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:apiso="http://www.opengis.net/cat/csw/apiso/1.0" xmlns:gmd="http://www.isotc211.org/2005/gmd" outputSchema="http://www.isotc211.org/2005/gmd" maxRecords="100" startPosition="1" outputFormat="application/xml" service="CSW" resultType="results" version="2.0.2" requestId="1" debug="0">
-         <csw:Query typeNames="gmd:MD_Metadata">
-          <csw:ElementSetName>summary</csw:ElementSetName>
-          <csw:Constraint version="1.1.0">
-           <ogc:Filter xmlns:gml="http://www.opengis.net/gml">
-             <ogc:PropertyIsLike wildCard="*" singleChar="@" escapeChar="\\">
-               <ogc:PropertyName>apiso:Identifier</ogc:PropertyName>
-               <ogc:Literal>*</ogc:Literal>
-             </ogc:PropertyIsLike>
-           </ogc:Filter>
-          </csw:Constraint>
-         </csw:Query>
-        </csw:GetRecords>
-        """)
     assert csw.exceptionreport is None
-    items = csw.records.items()
-    for record_id, record in items:
-        urls = [ol.url for ol in record.distribution.online]
-        url_part = f"://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/"
-        if any((url_part in u for u in urls)):
-            print(f"Deleting metadata record {record_id}")
-            csw.transaction(ttype='delete', typename='gmd:MD_Metadata', identifier=record_id)
+    for record_id in record_ids_to_delete:
+        print(f"Deleting metadata record {record_id}")
+        csw.transaction(ttype='delete', typename='gmd:MD_Metadata', identifier=record_id)
 
     # Layman DB
     conn = psycopg2.connect(**settings.PG_CONN)
