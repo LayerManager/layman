@@ -20,13 +20,12 @@ flask = ">=2.2.2"
 unidecode = "*"
 psycopg2-binary = "*"
 requests = "*"
-owslib = "==0.22.0" # https://github.com/geopython/OWSLib/issues/762
+owslib = "*"
 jsonschema = "*"
 flower = "*"
 selenium = ">=4"
 cacheout = "*"
 kombu = "<5.3.0"
-pyproj = "<3.0.0"
 pycld2 = "*"
 
 [requires]
