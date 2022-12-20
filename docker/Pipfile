@@ -8,15 +8,15 @@ pytest = "*"
 watchdog = {extras = ["watchmedo"],version = "*"}
 flake8 = "*"
 pycodestyle = "*"
-pylint = "==2.7.4"
+pylint = "==2.15.9"
 autopep8 = "*"
 pytest-rerunfailures = "*"
 pytest-timeout = "*"
 pillow = "*"
 
 [packages]
-celery = {extras = ["redis"],version = "<5.1.0"}
-flask = ">=2.0.2"
+celery = {extras = ["redis"],version = "<5.3.0"}
+flask = ">=2.2.2"
 unidecode = "*"
 psycopg2-binary = "*"
 requests = "*"
@@ -25,7 +25,7 @@ jsonschema = "*"
 flower = "*"
 selenium = ">=4"
 cacheout = "*"
-kombu = "<6.0.0"
+kombu = "<5.3.0"
 pyproj = "<3.0.0"
 pycld2 = "*"
 
