@@ -71,20 +71,8 @@ def generate_layer_thumbnail(workspace, layername):
     raw_bbox = native_bbox if not bbox_util.is_empty(native_bbox) else crs_def.CRSDefinitions[native_crs].default_bbox
     bbox = bbox_util.ensure_bbox_with_area(raw_bbox, crs_def.CRSDefinitions[native_crs].no_area_bbox_padding)
     tn_bbox = gs_util.get_square_bbox(bbox)
-    # Reason: https://github.com/geopython/OWSLib/issues/709
-    # tn_img = wms.getmap(
-    #     layers=[layername],
-    #     srs='EPSG:3857',
-    #     bbox=tn_bbox,
-    #     size=(300, 300),
-    #     format='image/png',
-    #     transparent=True,
-    # )
     ensure_layer_thumbnail_dir(workspace, layername)
     tn_path = get_layer_thumbnail_path(workspace, layername)
-    # out = open(tn_path, 'wb')
-    # out.write(tn_img.read())
-    # out.close()
 
     from layman.layer.geoserver.wms import VERSION
     response = gs_util.get_layer_thumbnail(wms_url, layername, tn_bbox, native_crs, headers=headers, wms_version=VERSION)
