@@ -265,7 +265,7 @@ def abort_task_chain(results_by_order, results_by_name=None):
         current_app.logger.info(f'aborting result {task_name} {task_result.id} with state {task_result.state}')
         task_result.abort()
         # Task can finish in the meantime, so SUCCESS is also correct state
-        assert task_result.state in (ABORTED, states.SUCCESS), f"task_result.state={task_result.state}"
+        assert task_result.state in (ABORTED, states.FAILURE, states.SUCCESS), f"task_result.state={task_result.state}"
         if prev_task_state == 'STARTED':
             current_app.logger.info(
                 f'waiting for result of {task_name} {task_result.id} with state {task_result.state}')

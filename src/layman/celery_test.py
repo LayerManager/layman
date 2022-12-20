@@ -129,8 +129,8 @@ def test_abortable_task_chain():
         celery_util.abort_task_chain(results_copy)
     # first one is failure, because it throws AbortedException
     assert results[0].state == results_copy[0].state == 'FAILURE'
-    # second one (and all others) was revoked, but it was not started at all because of previous failure, so it's pending for ever
-    assert results[1].state == results_copy[1].state == 'ABORTED'
-    assert results[2].state == results_copy[2].state == 'ABORTED'
+    # second one (and all others) is also failure in celery v5.2
+    assert results[1].state == results_copy[1].state == 'FAILURE'
+    assert results[2].state == results_copy[2].state == 'FAILURE'
     with app.app_context():
         input_chunk.delete_layer(workspace, layername)
