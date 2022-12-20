@@ -5,6 +5,7 @@ import requests
 import pytest
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 del sys.modules['layman']
@@ -60,23 +61,23 @@ def test_post_no_file(browser):
     browser.set_window_size(1000, 2000)
     # browser.save_screenshot('/code/tmp/test-1.png')
 
-    map_tab = browser.find_elements_by_css_selector('.ui.attached.tabular.menu > a.item:nth-child(2)')
+    map_tab = browser.find_elements(By.CSS_SELECTOR, '.ui.attached.tabular.menu > a.item:nth-child(2)')
     assert len(map_tab) == 1
     map_tab = map_tab[0]
     map_tab.click()
 
-    button = browser.find_elements_by_xpath('//button[text()="POST"]')
+    button = browser.find_elements(By.XPATH, '//button[text()="POST"]')
     assert len(button) == 1
     button = button[0]
     button.click()
 
-    user_input = browser.find_elements_by_name('Workspace')
+    user_input = browser.find_elements(By.NAME, 'Workspace')
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
     user_input.send_keys(workspace)
 
-    button = browser.find_elements_by_xpath('//button[@type="submit"]')
+    button = browser.find_elements(By.XPATH, '//button[@type="submit"]')
     assert len(button) == 1
     button = button[0]
     button.click()
@@ -85,8 +86,8 @@ def test_post_no_file(browser):
 
     # browser.save_screenshot('/code/tmp/test-3.png')
 
-    resp_msg_div = browser.find_elements_by_css_selector(
-        'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.negative.message > code')
+    resp_msg_div = browser.find_elements(By.CSS_SELECTOR,
+                                         'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.negative.message > code')
     assert len(resp_msg_div) == 1
     resp_msg_div = resp_msg_div[0]
     resp_json = json.loads(resp_msg_div.text)

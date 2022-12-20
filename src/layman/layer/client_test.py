@@ -5,6 +5,7 @@ import pytest
 
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from layman.layer.filesystem import input_chunk
@@ -58,32 +59,32 @@ def test_post_layers_chunk(browser):
     browser.set_window_size(1000, 2000)
     browser.save_screenshot('/code/tmp/artifacts/client-post-layers-1.png')
 
-    button = browser.find_elements_by_xpath('//button[text()="POST"]')
+    button = browser.find_elements(By.XPATH, '//button[text()="POST"]')
     assert len(button) == 1
     button = button[0]
     button.click()
     browser.save_screenshot('/code/tmp/artifacts/client-post-layers-1.5.png')
 
-    user_input = browser.find_elements_by_name('Workspace')
+    user_input = browser.find_elements(By.NAME, 'Workspace')
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
     user_input.send_keys(WORKSPACE)
 
-    layername_input = browser.find_elements_by_name('name')
+    layername_input = browser.find_elements(By.NAME, 'name')
     assert len(layername_input) == 1
     layername_input = layername_input[0]
     layername_input.clear()
     layername_input.send_keys(LAYERNAME)
 
-    file_input = browser.find_elements_by_name('file')
+    file_input = browser.find_elements(By.NAME, 'file')
     assert len(file_input) == 1
     file_input = file_input[0]
     for file_path in file_paths:
         file_input.send_keys(file_path)
     browser.save_screenshot('/code/tmp/artifacts/client-post-layers-2.png')
 
-    button = browser.find_elements_by_xpath('//button[@type="submit"]')
+    button = browser.find_elements(By.XPATH, '//button[@type="submit"]')
     assert len(button) == 1
     button = button[0]
     button.click()
@@ -97,11 +98,11 @@ def test_post_layers_chunk(browser):
         raise exc
     browser.save_screenshot('/code/tmp/artifacts/client-post-layers-3.png')
 
-    positive_response = browser.find_elements_by_xpath('//div[@class="ui positive message"]')
+    positive_response = browser.find_elements(By.XPATH, '//div[@class="ui positive message"]')
     assert positive_response
 
-    resp_msg_div = browser.find_elements_by_css_selector(
-        'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.positive.message > code')
+    resp_msg_div = browser.find_elements(By.CSS_SELECTOR,
+                                         'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.positive.message > code')
     assert len(resp_msg_div) == 1
     resp_msg_div = resp_msg_div[0]
     resp_json = json.loads(resp_msg_div.text)
@@ -135,32 +136,32 @@ def test_patch_layer_chunk(browser):
     browser.get(client_url)
     browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-1.png')
 
-    button = browser.find_elements_by_xpath('//button[text()="PATCH"]')
+    button = browser.find_elements(By.XPATH, '//button[text()="PATCH"]')
     assert len(button) == 1
     button = button[0]
     button.click()
     browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-2.png')
 
-    user_input = browser.find_elements_by_name('Workspace')
+    user_input = browser.find_elements(By.NAME, 'Workspace')
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
     user_input.send_keys(WORKSPACE)
 
-    layername_input = browser.find_elements_by_name('name')
+    layername_input = browser.find_elements(By.NAME, 'name')
     assert len(layername_input) == 1
     layername_input = layername_input[0]
     layername_input.clear()
     layername_input.send_keys(LAYERNAME)
 
-    file_input = browser.find_elements_by_name('file')
+    file_input = browser.find_elements(By.NAME, 'file')
     assert len(file_input) == 1
     file_input = file_input[0]
     for file_path in file_paths:
         file_input.send_keys(file_path)
     browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.png')
 
-    button = browser.find_elements_by_xpath('//button[@type="submit"]')
+    button = browser.find_elements(By.XPATH, '//button[@type="submit"]')
     assert len(button) == 1
     button = button[0]
     button.click()
@@ -174,11 +175,11 @@ def test_patch_layer_chunk(browser):
         raise exc
     browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-4.png')
 
-    positive_response = browser.find_elements_by_xpath('//div[@class="ui positive message"]')
+    positive_response = browser.find_elements(By.XPATH, '//div[@class="ui positive message"]')
     assert positive_response
 
-    resp_msg_div = browser.find_elements_by_css_selector(
-        'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.positive.message > code')
+    resp_msg_div = browser.find_elements(By.CSS_SELECTOR,
+                                         'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.positive.message > code')
     assert len(resp_msg_div) == 1
     resp_msg_div = resp_msg_div[0]
     resp_json = json.loads(resp_msg_div.text)
