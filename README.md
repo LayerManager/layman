@@ -137,7 +137,6 @@ General steps to upgrade layman to MINOR or PATCH version:
    - If you run Layman in development mode (e.g. by `make start-dev`), run also
       - `make client-build`
       - `make timgen-build`
-      - `make geoserver-build`
       - `make micka-build`
 1. If you are expecting long-running upgrade, run **standalone upgrade**, otherwise Gunicorn could time out. The command depends on how you are starting Layman.
    - If you are starting Layman with `make start-demo`, run `make upgrade-demo`.

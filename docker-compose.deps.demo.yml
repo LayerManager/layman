@@ -29,17 +29,13 @@ services:
         - postgresql
 
    geoserver:
-      build:
-        context: deps/geoserver/docker
-        dockerfile: Dockerfile
+      image: docker.osgeo.org/geoserver:2.21.2
       volumes:
         - ./deps/geoserver/data:/opt/geoserver_data/
       restart: on-failure
       environment:
         - GS_VERSION=2.21.2
         - SKIP_DEMO_DATA=true
-      env_file:
-        - deps/geoserver/docker/.env
       depends_on:
         - qgis
         - postgresql

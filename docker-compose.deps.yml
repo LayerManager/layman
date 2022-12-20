@@ -40,9 +40,7 @@ services:
         - qgis
 
    geoserver:
-      build:
-        context: deps/geoserver/docker
-        dockerfile: Dockerfile
+      image: docker.osgeo.org/geoserver:2.21.2
       volumes:
         - ./deps/geoserver/data:/opt/geoserver_data/
       ports:
