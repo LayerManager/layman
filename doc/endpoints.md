@@ -1,7 +1,7 @@
 # Endpoints
 
 ## Web Map Service
-[Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms) endpoint is implemented using combination of Layman's authentication proxy, Layman's WMS proxy, and [GeoServer](https://docs.geoserver.org/2.19.x/en/user/services/wms/reference.html).
+[Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms) endpoint is implemented using combination of Layman's authentication proxy, Layman's WMS proxy, and [GeoServer](https://docs.geoserver.org/2.21.x/en/user/services/wms/reference.html).
 
 The authentication proxy understands same [authentication credentials](security.md#authentication) as Layman REST API (e.g. OAuth2 credentials) and passes the request to GeoServer with credentials understandable by GeoServer.
 
@@ -11,7 +11,7 @@ The WMS proxy parses request and adapts it in case of WMS GetMap requests:
 WMS respects [publication access rights](security.md#publication-access-rights). If user asks for layer he has not read access to by GetMap or GetFeatureInfo request, GeoServer returns standard ServiceExceptionReport (code LayerNotDefined).
 
 ## Web Feature Service
-[Web Feature Service (WFS)](https://www.opengeospatial.org/standards/wfs) endpoint is implemented using combination of Layman's authentication proxy, Layman's WFS proxy, and [GeoServer](https://docs.geoserver.org/2.19.x/en/user/services/wfs/reference.html).
+[Web Feature Service (WFS)](https://www.opengeospatial.org/standards/wfs) endpoint is implemented using combination of Layman's authentication proxy, Layman's WFS proxy, and [GeoServer](https://docs.geoserver.org/2.21.x/en/user/services/wfs/reference.html).
 
 The authentication proxy behaves in the same way as in case of [WMS](#web-map-service).
 
