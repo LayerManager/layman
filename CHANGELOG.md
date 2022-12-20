@@ -44,12 +44,14 @@
   - flask 2.0.2 -> 2.2.2
   - unidecode 1.3.2 -> 1.3.6
   - psycopg2-binary 2.9.3 -> 2.9.5
+  - owslib 0.22.0 -> 0.27.2
   - requests 2.27.0 -> 2.28.1
   - jsonschema 4.3.3 -> 4.17.3
   - flower 1.0.0 -> 1.2.0
   - selenium 4.1.0 -> 4.7.2
   - cacheout 0.13.1 -> 0.14.1
   - kombu 5.2.3 -> 5.2.4
+- [#720](https://github.com/LayerManager/layman/issues/720) Remove Python dependency "pyproj".
 - [#720](https://github.com/LayerManager/layman/issues/720) Upgrade Python dev dependencies
   - pytest 6.2.5 -> 7.2.0
   - watchdog 2.1.6 -> 2.2.0
