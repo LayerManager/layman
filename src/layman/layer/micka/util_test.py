@@ -6,7 +6,7 @@ import pytest
 
 del sys.modules['layman']
 
-from layman import uuid, app, settings, util as layman_util
+from layman import app, settings, util as layman_util
 from layman.common.micka import util as common_util
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals
 from layman.layer.geoserver import wms, wfs
@@ -179,24 +179,3 @@ def test_fill_xml_template():
     # print(f"FILE:\n{''.join(lines)}")
     diff_lines = list(difflib.unified_diff(expected_lines, lines))
     assert len(diff_lines) == 0, f"DIFF LINES:\n{''.join(diff_lines)}"
-
-
-@pytest.mark.usefixtures('app_context', 'ensure_layman', 'client')
-@pytest.mark.irritating
-def test_num_records():
-    publs_by_type = uuid.check_redis_consistency()
-    num_publications = sum([len(publs) for publs in publs_by_type.values()])
-    csw = common_util.create_csw()
-    assert csw is not None, f"{settings.CSW_URL}, {settings.CSW_BASIC_AUTHN}"
-    from owslib.fes import PropertyIsLike
-    any_query = PropertyIsLike('apiso:Identifier', '*', wildCard='*')
-    csw.getrecords2(constraints=[any_query], maxrecords=100, outputschema="http://www.isotc211.org/2005/gmd")
-    assert csw.exceptionreport is None
-    url_part = f"://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/"
-    records = {
-        k: r for k, r in csw.records.items()
-        if any((url_part in u for u in [ol.url for ol in r.distribution.online]))
-    }
-    import json
-    assert len(
-        records) == num_publications, f"md_record_ids={json.dumps(list(records.keys()), indent=5)}\npubls={json.dumps(publs_by_type, indent=2)}"
