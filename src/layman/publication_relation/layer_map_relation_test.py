@@ -15,6 +15,7 @@ def assert_map_thumbnail(workspace, map, expected_thumbnail_path):
 
 
 @pytest.mark.usefixtures('ensure_layman')
+@pytest.mark.timeout(40)
 def test_map_refresh_after_layer_change():
     workspace = 'test_map_refresh_after_layer_change_workspace'
     layer = 'test_map_refresh_after_layer_change_layer'
