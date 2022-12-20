@@ -2,13 +2,13 @@
 
 start-demo:
 	mkdir -p layman_data deps/qgis/data
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql qgis geoserver redis layman celery_worker flower timgen layman_client nginx
 
 start-demo-full:
 	mkdir -p layman_data deps/qgis/data
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql qgis geoserver redis layman celery_worker flower timgen layman_client micka nginx
 
@@ -20,7 +20,7 @@ start-demo-only:
 
 start-demo-full-with-optional-deps:
 	mkdir -p layman_data deps/qgis/data
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate
 
@@ -28,18 +28,18 @@ stop-demo:
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml stop
 
 build-demo:
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
 
 upgrade-demo:
 	mkdir -p layman_data deps/qgis/data
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps postgresql qgis geoserver redis timgen layman_client nginx
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps layman bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
 
 upgrade-demo-full:
 	mkdir -p layman_data deps/qgis/data
-	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client geoserver timgen
+	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps postgresql qgis geoserver redis timgen layman_client micka nginx
 	docker-compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps layman bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
@@ -263,9 +263,6 @@ redis-cli-client-standalone-db:
 geoserver-restart:
 	docker-compose -f docker-compose.deps.yml rm -fsv geoserver
 	docker-compose -f docker-compose.deps.yml up --no-deps -d geoserver
-
-geoserver-build:
-	docker-compose -f docker-compose.deps.yml build geoserver
 
 geoserver-bash:
 	docker-compose -f docker-compose.deps.yml run --rm --no-deps geoserver bash
