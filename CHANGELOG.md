@@ -3,6 +3,10 @@
 ## v1.19.0
  {release-date}
 ### Upgrade requirements
+- If you are running Layman with development settings, run  
+```
+make build-dev
+```
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
