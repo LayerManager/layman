@@ -5,7 +5,7 @@ from owslib.util import nspath_eval
 
 from layman import settings, LaymanError
 import requests_util.retry
-from . import NAMESPACES
+from micka_util import NAMESPACES
 
 
 def is_record_exists_exception(root_el):
