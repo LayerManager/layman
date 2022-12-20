@@ -46,7 +46,7 @@
 | [selenium](https://www.chromium.org/) | Apache License 2.0 | Dockerfile | prod | bin | for client-side map rendering and integration testing |
 | [cacheout](https://github.com/dgilland/cacheout) | MIT | Pipfile | prod | bin | |
 | [kombu](https://github.com/celery/kombu) | BSD 3-Clause | Pipfile | prod | bin | messaging for celery, direct dependency only for version |
-| [pyproj](https://pypi.org/project/pyproj/) | MIT | Pipfile | prod | bin | Python interface to PROJ (cartographic projections and coordinate transformations library), direct dependency only for version |
+| [pyproj](https://pypi.org/project/pyproj/) | MIT | Pipfile | prod | bin | Python interface to PROJ (cartographic projections and coordinate transformations library), subdependency of owslib, direct dependency only to lock version |
 | [pycld2](https://github.com/aboSamoor/pycld2) | Apache License 2.0 | Pipfile | prod | bin | detecting language for metadata |
 | [lxml](https://lxml.de) | BSD 3-Clause | python3-lxml | prod | bin | |
 | [watchdog](https://github.com/gorakhargosh/watchdog) | Apache License 2.0 | Pipfile | dev | bin | |
