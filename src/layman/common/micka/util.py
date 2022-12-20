@@ -13,7 +13,7 @@ from lxml import etree as ET
 from layman import settings, authz
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
 from layman.util import get_publication_info
-from micka_util import NAMESPACES
+from micka import NAMESPACES
 from .requests import base_insert, csw_delete, fill_template_as_str
 
 logger = logging.getLogger(__name__)

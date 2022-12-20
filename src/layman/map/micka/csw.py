@@ -265,7 +265,7 @@ def _get_property_values(
     return result
 
 
-from micka_util import NAMESPACES
+from micka import NAMESPACES
 
 METADATA_PROPERTIES = {
     'md_file_identifier': {

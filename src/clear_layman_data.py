@@ -2,7 +2,7 @@ import os
 import shutil
 from urllib.parse import urljoin
 import geoserver
-import micka_util
+import micka
 import layman_settings as settings
 
 
@@ -149,7 +149,7 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
             response.raise_for_status()
 
     # micka
-    record_ids_to_delete = micka_util.csw_get_record_ids_containing_url(settings.CSW_URL, auth=settings.CSW_BASIC_AUTHN, contained_url_part=f"://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/")
+    record_ids_to_delete = micka.csw_get_record_ids_containing_url(settings.CSW_URL, auth=settings.CSW_BASIC_AUTHN, contained_url_part=f"://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/")
 
     opts = {} if settings.CSW_BASIC_AUTHN is None else {
         'username': settings.CSW_BASIC_AUTHN[0],
