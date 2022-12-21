@@ -37,8 +37,8 @@ def assert_same_bboxes(bbox1, bbox2, precision):
 def assert_wfs_bbox(workspace, layer, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
     wfs_layer = f"{workspace}:{layer}"
     with app.app_context():
-        wfs_get_capabilities = wfs.get_wfs_proxy(workspace)
-    wfs_bbox_4326 = wfs_get_capabilities.contents[wfs_layer].boundingBoxWGS84
+        wfs_inst = wfs.get_wfs_proxy(workspace)
+    wfs_bbox_4326 = wfs_inst.contents[wfs_layer].boundingBoxWGS84
     with app.app_context():
         wfs_bbox = bbox_util.transform(wfs_bbox_4326, crs_from=crs_def.EPSG_4326, crs_to=expected_bbox_crs, )
     assert_same_bboxes(expected_bbox, wfs_bbox, 0.00001)
@@ -46,8 +46,8 @@ def assert_wfs_bbox(workspace, layer, expected_bbox, *, expected_bbox_crs='EPSG:
 
 def assert_wms_bbox(workspace, layer, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
     with app.app_context():
-        wms_get_capabilities = wms.get_wms_proxy(workspace)
-    wms_layer = wms_get_capabilities.contents[layer]
+        wms_inst = wms.get_wms_proxy(workspace)
+    wms_layer = wms_inst.contents[layer]
     bbox = next(bbox[:4] for bbox in wms_layer.crs_list if bbox[4] == expected_bbox_crs)
     assert_same_bboxes(expected_bbox, bbox, 0.00001)
 
