@@ -19,6 +19,9 @@ def is_complete_in_workspace_wms_1_3_0(workspace, publ_type, name, headers):
     wms_inst = gs_util.wms_proxy(wms_url, version=version, headers=headers)
     assert wms_inst.contents
     assert name in wms_inst.contents
+    wms_layer = wms_inst.contents[name]
+    for style_name, style_values in wms_layer.styles.items():
+        assert 'legend' in style_values, f'style_name={style_name}, style_values={style_values}'
 
 
 def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, name):
