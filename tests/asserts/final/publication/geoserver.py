@@ -6,20 +6,16 @@ import requests
 import crs as crs_def
 from layman import app, settings, util as layman_util
 from layman.common import bbox as bbox_util
-from layman.layer.geoserver import wfs, wms
+from layman.layer.geoserver import wfs, wms, util as gs_util
 from test_tools import util as test_util, geoserver_client, process_client, assert_util
 
 
-def workspace_wms_1_3_0_capabilities_available(workspace):
+def workspace_wms_1_3_0_capabilities_available(workspace, headers):
+    version = '1.3.0'
     with app.app_context():
-        internal_wms_url = test_util.url_for('geoserver_proxy_bp.proxy', subpath=workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + '/ows')
-
-    r_wms = requests.get(internal_wms_url, params={
-        'service': 'WMS',
-        'request': 'GetCapabilities',
-        'version': '1.3.0',
-    })
-    assert r_wms.status_code == 200
+        wms_url = test_util.url_for('geoserver_proxy_bp.proxy', subpath=workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + '/ows')
+    wms_inst = gs_util.wms_proxy(wms_url, version=version, headers=headers)
+    assert wms_inst.contents
 
 
 def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, name):
