@@ -54,6 +54,9 @@ def compare_images(image1, image2):
                     if pixel_diff != (0, 0, 0, 0) and \
                             (expected_image.getpixel((x_value, y_value))[3] > 0 or current_image.getpixel((x_value, y_value))[3] > 0):
                         diffs += 1
+                elif len(pixel_diff) == 3:
+                    if pixel_diff != (0, 0, 0):
+                        diffs += 1
                 else:
                     raise NotImplementedError(f"Unsupported number of bands: {len(pixel_diff)}")
             # one band, e.g. 8-bit PNG

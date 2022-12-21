@@ -142,3 +142,13 @@ def wms_bbox(workspace, publ_type, name, *, exp_bbox, crs, precision=0.00001, co
     assert_util.assert_same_bboxes(exp_bbox, bbox, precision)
     if contains:
         assert bbox_util.contains_bbox(bbox, exp_bbox, precision=precision / 10000)
+
+
+def wms_legend(workspace, publ_type, name, *, exp_legend, obtained_file_path):
+    assert publ_type == process_client.LAYER_TYPE
+
+    with app.app_context():
+        wms_inst = wms.get_wms_proxy(workspace)
+    wms_layer = wms_inst.contents[name]
+    legend_url = next(iter(wms_layer.styles.values()))['legend']
+    assert_util.assert_same_images(legend_url, obtained_file_path, exp_legend, 0)
