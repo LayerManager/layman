@@ -86,11 +86,11 @@ def test_post_no_file(browser):
 
     # browser.save_screenshot('/code/tmp/test-3.png')
 
-    resp_msg_div = browser.find_elements(By.CSS_SELECTOR,
-                                         'div.ui.container > div:nth-child(8) > div > div.ui.segment > div.ui.negative.message > code')
+    resp_negative_messages = browser.find_elements(By.CLASS_NAME, 'negative.message')
+    assert len(resp_negative_messages) == 1
+    resp_msg_div = resp_negative_messages[0].find_elements(By.CSS_SELECTOR, 'code')
     assert len(resp_msg_div) == 1
-    resp_msg_div = resp_msg_div[0]
-    resp_json = json.loads(resp_msg_div.text)
+    resp_json = json.loads(resp_msg_div[0].text)
     assert resp_json['code'] == 1
 
     check_redis_consistency(expected_publ_num_by_type={f'{MAP_TYPE}': 0})
