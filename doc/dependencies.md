@@ -26,8 +26,8 @@
 | [pipenv](https://pypi.org/project/pipenv/) | 2020.11.15 | MIT | Dockerfile | prod | bin | to install Python dependencies |
 | [node.js](https://nodejs.org/) | 10 | MIT | timgen/Dockerfile | prod | bin | to run Timgen |
 | [npm](https://www.npmjs.com/get-npm) | 6 | Artistic License 2.0 | timgen/Dockerfile | prod | bin | to install node.js dependencies |
-| [node.js](https://nodejs.org/) | 12 | MIT | client/docker/Dockerfile | prod | bin | to run Layman Test Client |
-| [npm](https://www.npmjs.com/get-npm) | 6 | Artistic License 2.0 | client/docker/Dockerfile | prod | bin | to install node.js dependencies |
+| [node.js](https://nodejs.org/) | 18 | MIT | client/docker/Dockerfile | prod | bin | to run Layman Test Client |
+| [npm](https://www.npmjs.com/get-npm) | 8 | Artistic License 2.0 | client/docker/Dockerfile | prod | bin | to install node.js dependencies |
 | [gunicorn](https://gunicorn.org/) | 20 | MIT | requirements.production.txt | opt | bin | as Flask production server |
 | [nginx](http://nginx.org/) | 1.16 | BSD 2-Clause | docker-compose.yml | opt | bin | as production server |
 
