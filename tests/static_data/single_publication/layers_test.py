@@ -19,7 +19,7 @@ from test_tools import process_client, assert_util, geoserver_client
 from test_tools.util import url_for
 from .. import util
 from ... import static_data as data
-from ...asserts.final.publication import geoserver as asserts_gs
+from ...asserts.final import publication as publ_asserts
 from ..data import ensure_publication
 
 
@@ -66,8 +66,8 @@ def test_geoserver_workspace(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
 
-    asserts_gs.is_complete_in_workspace_wms_1_3_0(workspace, publ_type, publication, headers)
-    asserts_gs.workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, publication)
+    publ_asserts.geoserver_proxy.is_complete_in_workspace_wms_1_3_0(workspace, publ_type, publication, headers)
+    publ_asserts.geoserver_proxy.workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, publication)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
