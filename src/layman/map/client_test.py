@@ -87,7 +87,7 @@ def test_post_no_file(browser):
     # browser.save_screenshot('/code/tmp/test-3.png')
 
     resp_msg_div = browser.find_elements(By.CSS_SELECTOR,
-                                         'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.negative.message > code')
+                                         'div.ui.container > div:nth-child(8) > div > div.ui.segment > div.ui.negative.message > code')
     assert len(resp_msg_div) == 1
     resp_msg_div = resp_msg_div[0]
     resp_json = json.loads(resp_msg_div.text)
