@@ -3,9 +3,14 @@
 ## v1.19.0
  {release-date}
 ### Upgrade requirements
+- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
+  ```
+  LAYMAN_CLIENT_VERSION=b2e9ecb8781d355281101a7dcd6d7e64342c5df9
+  ```
 - If you are running Layman with development settings, run  
 ```
 make build-dev
+make client-build
 ```
 ### Migrations and checks
 #### Schema migrations
@@ -65,6 +70,17 @@ make build-dev
   - autopep8 1.6.0 -> 2.0.1
   - pytest-rerunfailures 10.2 -> 10.3
   - pytest-timeout 2.0.2 -> 2.1.0
+- [#726](https://github.com/LayerManager/layman/issues/726) Node.js of Laymen Test Client from v12 to v18 and dependencies:
+  - connect-redis 3 -> 6
+  - dotenv 8 -> 16
+  - http-proxy-middleware 0.21 -> 2
+  - isomorphic-unfetch 2 -> 3
+  - next 9 -> 13
+  - react 16 -> 18
+  - react-dom 16 -> 18
+  - redis 3 -> 4
+  - semantic-ui-react 0.88 -> 2
+  - xml-formatter 2 -> 3
 
 ## v1.17.0
  2022-07-21
