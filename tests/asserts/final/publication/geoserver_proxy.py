@@ -3,6 +3,7 @@ import requests
 from layman import app, settings, util as layman_util
 from layman.layer.geoserver import util as gs_util
 from test_tools import util as test_util, process_client
+from . import geoserver_util
 
 
 def is_complete_in_workspace_wms_1_3_0(workspace, publ_type, name, headers):
@@ -12,11 +13,7 @@ def is_complete_in_workspace_wms_1_3_0(workspace, publ_type, name, headers):
     with app.app_context():
         wms_url = test_util.url_for('geoserver_proxy_bp.proxy', subpath=workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + '/ows')
     wms_inst = gs_util.wms_proxy(wms_url, version=version, headers=headers)
-    assert wms_inst.contents
-    assert name in wms_inst.contents
-    wms_layer = wms_inst.contents[name]
-    for style_name, style_values in wms_layer.styles.items():
-        assert 'legend' in style_values, f'style_name={style_name}, style_values={style_values}'
+    geoserver_util.is_complete_in_workspace_wms_instance(wms_inst, name)
 
 
 def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, name):
