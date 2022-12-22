@@ -102,7 +102,7 @@ def test_post_layers_chunk(browser):
     assert positive_response
 
     resp_msg_div = browser.find_elements(By.CSS_SELECTOR,
-                                         'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.positive.message > code')
+                                         'div.ui.container > div:nth-child(8) > div > div.ui.segment > div.ui.positive.message > code')
     assert len(resp_msg_div) == 1
     resp_msg_div = resp_msg_div[0]
     resp_json = json.loads(resp_msg_div.text)
@@ -179,7 +179,7 @@ def test_patch_layer_chunk(browser):
     assert positive_response
 
     resp_msg_div = browser.find_elements(By.CSS_SELECTOR,
-                                         'div.ui.container > div:nth-child(8) > div.ui.segment > div.ui.positive.message > code')
+                                         'div.ui.container > div:nth-child(8) > div > div.ui.segment > div.ui.positive.message > code')
     assert len(resp_msg_div) == 1
     resp_msg_div = resp_msg_div[0]
     resp_json = json.loads(resp_msg_div.text)
