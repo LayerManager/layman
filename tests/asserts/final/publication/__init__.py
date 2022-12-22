@@ -23,6 +23,7 @@ IS_LAYER_COMPLETE_AND_CONSISTENT = [
     Action(internal.stats_preserved_in_normalized_raster, dict()),
     Action(rest.is_complete_in_rest, dict()),
     Action(rest.mandatory_keys_in_rest, dict()),
+    Action(geoserver.is_complete_in_internal_workspace_wms, dict()),
     Action(geoserver_proxy.is_complete_in_workspace_wms_1_3_0, dict()),
     Action(geoserver_proxy.workspace_wfs_2_0_0_capabilities_available_if_vector, dict()),
 ]

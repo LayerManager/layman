@@ -7,6 +7,7 @@ from layman import app, settings, util as layman_util
 from layman.common import bbox as bbox_util
 from layman.layer.geoserver import wfs, wms
 from test_tools import geoserver_client, process_client, assert_util
+from . import geoserver_util
 
 
 def feature_spatial_precision(workspace, publ_type, name, *, feature_id, crs, exp_coordinates, precision):
@@ -121,3 +122,10 @@ def wms_legend(workspace, publ_type, name, *, exp_legend, obtained_file_path):
     wms_layer = wms_inst.contents[name]
     legend_url = next(iter(wms_layer.styles.values()))['legend']
     assert_util.assert_same_images(legend_url, obtained_file_path, exp_legend, 0)
+
+
+def is_complete_in_internal_workspace_wms(workspace, publ_type, name):
+    assert publ_type == process_client.LAYER_TYPE
+
+    wms_inst = wms.get_wms_proxy(workspace)
+    geoserver_util.is_complete_in_workspace_wms_instance(wms_inst, name)
