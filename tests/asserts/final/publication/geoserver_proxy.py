@@ -6,14 +6,18 @@ from test_tools import util as test_util, process_client
 from . import geoserver_util
 
 
-def is_complete_in_workspace_wms_1_3_0(workspace, publ_type, name, headers):
+def is_complete_in_workspace_wms(workspace, publ_type, name, *, version, headers=None):
     assert publ_type == process_client.LAYER_TYPE
 
-    version = '1.3.0'
     with app.app_context():
         wms_url = test_util.url_for('geoserver_proxy_bp.proxy', subpath=workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + '/ows')
     wms_inst = gs_util.wms_proxy(wms_url, version=version, headers=headers)
     geoserver_util.is_complete_in_workspace_wms_instance(wms_inst, name)
+
+
+def is_complete_in_workspace_wms_1_3_0(workspace, publ_type, name, headers):
+    assert publ_type == process_client.LAYER_TYPE
+    is_complete_in_workspace_wms(workspace, publ_type, name, version='1.3.0', headers=headers)
 
 
 def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, name):
