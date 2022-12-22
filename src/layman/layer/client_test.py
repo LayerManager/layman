@@ -101,11 +101,13 @@ def test_post_layers_chunk(browser):
     positive_response = browser.find_elements(By.XPATH, '//div[@class="ui positive message"]')
     assert positive_response
 
-    resp_msg_div = browser.find_elements(By.CSS_SELECTOR,
-                                         'div.ui.container > div:nth-child(8) > div > div.ui.segment > div.ui.positive.message > code')
+    resp_positive_messages = browser.find_elements(By.CLASS_NAME, 'positive.message')
+    assert len(resp_positive_messages) == 2
+    resp_msg = resp_positive_messages[0]
+    assert resp_msg.text == 'Upload finished!'
+    resp_msg_div = resp_positive_messages[1].find_elements(By.CSS_SELECTOR, 'code')
     assert len(resp_msg_div) == 1
-    resp_msg_div = resp_msg_div[0]
-    resp_json = json.loads(resp_msg_div.text)
+    resp_json = json.loads(resp_msg_div[0].text)
     assert resp_json[0]['name'] == LAYERNAME
 
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(WORKSPACE, LAYERNAME)
@@ -178,11 +180,13 @@ def test_patch_layer_chunk(browser):
     positive_response = browser.find_elements(By.XPATH, '//div[@class="ui positive message"]')
     assert positive_response
 
-    resp_msg_div = browser.find_elements(By.CSS_SELECTOR,
-                                         'div.ui.container > div:nth-child(8) > div > div.ui.segment > div.ui.positive.message > code')
+    resp_positive_messages = browser.find_elements(By.CLASS_NAME, 'positive.message')
+    assert len(resp_positive_messages) == 2
+    resp_msg = resp_positive_messages[0]
+    assert resp_msg.text == 'Upload finished!'
+    resp_msg_div = resp_positive_messages[1].find_elements(By.CSS_SELECTOR, 'code')
     assert len(resp_msg_div) == 1
-    resp_msg_div = resp_msg_div[0]
-    resp_json = json.loads(resp_msg_div.text)
+    resp_json = json.loads(resp_msg_div[0].text)
     assert resp_json['name'] == LAYERNAME
 
     total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(WORKSPACE, LAYERNAME)
