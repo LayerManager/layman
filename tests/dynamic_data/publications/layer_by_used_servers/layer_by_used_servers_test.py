@@ -61,3 +61,5 @@ class TestLayer(base_test.TestSingleRestPublication):
                                           exp_legend=exp_legend_filepath,
                                           obtained_file_path=f'tmp/artifacts/test_wms_legend/{layer.name}/legend_{layer.name}.png',
                                           )
+        asserts_publ.geoserver_proxy.is_complete_in_workspace_wms(layer.workspace, layer.type, layer.name,
+                                                                  version='1.1.1')
