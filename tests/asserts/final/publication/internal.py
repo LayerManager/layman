@@ -150,6 +150,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
         '_thumbnail': {'path': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/thumbnail/{name}.png'},
         'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
         'image_mosaic': False,
+        '_db_connection_string': settings.PG_CONN,
     }
     if publ_type == process_client.LAYER_TYPE:
         util.recursive_dict_update(expected_detail,

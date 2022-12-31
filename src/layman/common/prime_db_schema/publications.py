@@ -235,7 +235,8 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'native_bounding_box': [xmin, ymin, xmax, ymax],
                                    'native_crs': db_util.get_crs(srid) if srid else None,
                                    'access_rights': {'read': can_read_users.split(','),
-                                                     'write': can_write_users.split(',')}
+                                                     'write': can_write_users.split(',')},
+                                   '_db_connection_string': settings.PG_CONN,
                                    }
              for id_publication, workspace_name, publication_type, publication_name, title, uuid, file_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
              srid, can_read_users, can_write_users, _
