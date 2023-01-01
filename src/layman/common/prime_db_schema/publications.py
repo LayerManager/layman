@@ -3,11 +3,10 @@ import logging
 import psycopg2.extras
 
 import crs as crs_def
-from db import util as db_util
 from layman import settings, LaymanError
 from layman.authn import is_user_with_name
 from layman.common import get_publications_consts as consts, bbox as bbox_util
-from . import workspaces, users, rights
+from . import workspaces, users, rights, util as db_util
 
 logger = logging.getLogger(__name__)
 

@@ -3,11 +3,11 @@ import logging
 from urllib.parse import urljoin
 import requests
 
-from db import util as db_util
 import geoserver
 from geoserver import util as gs_util
 from layman import settings, util as layman_util
 from layman.layer import LAYER_TYPE
+from layman.common.prime_db_schema import util as db_util
 from layman.layer.geoserver import wms as gs_wms, wfs as gs_wfs
 from layman.layer.qgis import wms as qgis_wms
 from layman.map import MAP_TYPE

@@ -2,9 +2,8 @@ import pytest
 from werkzeug.datastructures import FileStorage
 
 import crs as crs_def
-from db import util as db_util
 from layman import app, settings, util as layman_util
-from layman.common.prime_db_schema import publications as prime_db_schema_publications
+from layman.common.prime_db_schema import publications as prime_db_schema_publications, util as db_util
 from layman.common.filesystem import uuid as uuid_common
 from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF, db, geoserver, qgis
 from layman.layer.db import table

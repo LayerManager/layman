@@ -4,10 +4,9 @@ from jsonschema import validate, Draft7Validator
 import requests
 
 from crs import EPSG_3857
-from db import util as db_util
 from layman import settings
 from layman.common import bbox as bbox_util
-from layman.common.prime_db_schema import publications as db_publications
+from layman.common.prime_db_schema import publications as db_publications, util as db_util
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE, util as map_util
 from layman.map.filesystem import input_file

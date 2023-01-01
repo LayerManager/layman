@@ -1,10 +1,9 @@
 import logging
 
-from db import util as db_util
 from layman import settings
 from layman.http import LaymanError
 from layman.util import get_workspaces as global_get_workspaces
-from . import model
+from . import model, util as db_util
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 ROLE_EVERYONE = settings.RIGHTS_EVERYONE_ROLE

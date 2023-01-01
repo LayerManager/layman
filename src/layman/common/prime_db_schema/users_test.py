@@ -1,6 +1,5 @@
-from db import util as db_util
 from layman import settings, app as app
-from . import users as user_util, workspaces as workspace_util
+from . import users as user_util, workspaces as workspace_util, util as db_util
 from .. import prime_db_schema
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA

@@ -2,8 +2,8 @@ import datetime
 import pytest
 from dateutil.parser import parse
 
-from db import util as db_util
 from layman import app, settings
+from layman.common.prime_db_schema import util as db_util
 from layman.rest_publication_test import db_schema
 from test_tools import process_client, data as test_data
 
