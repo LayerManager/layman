@@ -28,7 +28,7 @@ def get_table_name(workspace, layer):
 
 def get_workspaces(conn_cur=None):
     if conn_cur is None:
-        conn_cur = db_util.get_connection_cursor()
+        conn_cur = db_util.get_connection_cursor(settings.PG_CONN)
     _, cur = conn_cur
 
     try:
@@ -56,7 +56,7 @@ def check_workspace_name(workspace):
 
 def ensure_workspace(workspace, conn_cur=None):
     if conn_cur is None:
-        conn_cur = db_util.get_connection_cursor()
+        conn_cur = db_util.get_connection_cursor(settings.PG_CONN)
     conn, cur = conn_cur
 
     try:
@@ -70,7 +70,7 @@ def ensure_workspace(workspace, conn_cur=None):
 
 def delete_workspace(workspace, conn_cur=None):
     if conn_cur is None:
-        conn_cur = db_util.get_connection_cursor()
+        conn_cur = db_util.get_connection_cursor(settings.PG_CONN)
     conn, cur = conn_cur
 
     try:
@@ -104,7 +104,7 @@ def import_layer_vector_file(workspace, layername, main_filepath, crs_id):
 
 
 def create_ogr2ogr_args(*, schema, table_name, main_filepath, crs_id, output):
-    pg_conn = ' '.join([f"{k}='{v}'" for k, v in PG_CONN.items()])
+    pg_conn = ' '.join([f"{k}='{v}'" for k, v in settings.PG_CONN.items()])
     ogr2ogr_args = [
         'ogr2ogr',
         '-nln', table_name,
