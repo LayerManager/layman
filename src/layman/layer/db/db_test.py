@@ -6,7 +6,8 @@ import pytest
 
 del sys.modules['layman']
 
-from layman import app as layman, settings
+from db import util as db_util
+from layman import app as layman, settings, util as layman_util
 from layman.layer.filesystem.input_file import ensure_layer_input_file_dir
 from layman.layer.filesystem.util import get_layer_dir
 from layman.common import bbox as bbox_util
@@ -172,15 +173,18 @@ def test_data_language(boundary_table):
     # print(f"username={username}, layername={layername}")
     with layman.app_context():
         table_name = db.get_table_name(workspace, layername)
-        col_names = db.get_text_column_names(workspace, table_name)
+        pg_conn = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['db_connection_string', ]})[
+            '_db_connection_string']
+        conn_cur = db_util.get_connection_cursor(pg_conn)
+        col_names = db.get_text_column_names(workspace, table_name, conn_cur)
     assert set(col_names) == set(['featurecla', 'name', 'name_alt'])
     with layman.app_context():
-        text_data, _ = db.get_text_data(workspace, table_name)
+        text_data, _ = db.get_text_data(workspace, table_name, conn_cur)
     # print(f"num_rows={num_rows}")
     assert len(text_data) == 1
     assert text_data[0].startswith(' '.join(['International boundary (verify)'] * 100))
     with layman.app_context():
-        langs = db.get_text_languages(workspace, table_name)
+        langs = db.get_text_languages(workspace, table_name, conn_cur)
     assert langs == ['eng']
 
 
@@ -189,7 +193,10 @@ def test_data_language_roads(road_table):
     # print(f"username={username}, layername={layername}")
     with layman.app_context():
         table_name = db.get_table_name(workspace, layername)
-        col_names = db.get_text_column_names(workspace, table_name)
+        pg_conn = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['db_connection_string', ]})[
+            '_db_connection_string']
+        conn_cur = db_util.get_connection_cursor(pg_conn)
+        col_names = db.get_text_column_names(workspace, table_name, conn_cur)
     assert set(col_names) == set([
         'cislouseku',
         'dpr_smer_p',
@@ -214,7 +221,7 @@ def test_data_language_roads(road_table):
         'vym_tahy_p'
     ])
     with layman.app_context():
-        langs = db.get_text_languages(workspace, table_name)
+        langs = db.get_text_languages(workspace, table_name, conn_cur)
     assert langs == ['cze']
 
 
@@ -223,10 +230,13 @@ def test_populated_places_table(populated_places_table):
     print(f"workspace={workspace}, layername={layername}")
     with layman.app_context():
         table_name = db.get_table_name(workspace, layername)
-        col_names = db.get_text_column_names(workspace, table_name)
+        pg_conn = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['db_connection_string', ]})[
+            '_db_connection_string']
+        conn_cur = db_util.get_connection_cursor(pg_conn)
+        col_names = db.get_text_column_names(workspace, table_name, conn_cur)
     assert len(col_names) == 31
     with layman.app_context():
-        langs = db.get_text_languages(workspace, table_name)
+        langs = db.get_text_languages(workspace, table_name, conn_cur)
     assert set(langs) == set(['chi', 'eng', 'rus'])
 
 
@@ -235,10 +245,13 @@ def test_data_language_countries(country_table):
     # print(f"username={username}, layername={layername}")
     with layman.app_context():
         table_name = db.get_table_name(workspace, layername)
-        col_names = db.get_text_column_names(workspace, table_name)
+        pg_conn = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['db_connection_string', ]})[
+            '_db_connection_string']
+        conn_cur = db_util.get_connection_cursor(pg_conn)
+        col_names = db.get_text_column_names(workspace, table_name, conn_cur)
     assert len(col_names) == 63
     with layman.app_context():
-        langs = db.get_text_languages(workspace, table_name)
+        langs = db.get_text_languages(workspace, table_name, conn_cur)
     assert set(langs) == set([
         'ara',
         'ben',
@@ -266,7 +279,10 @@ def test_data_language_countries2(country110m_table):
     # assert len(col_names) == 63
     with layman.app_context():
         table_name = db.get_table_name(workspace, layername)
-        langs = db.get_text_languages(workspace, table_name)
+        pg_conn = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['db_connection_string', ]})[
+            '_db_connection_string']
+        conn_cur = db_util.get_connection_cursor(pg_conn)
+        langs = db.get_text_languages(workspace, table_name, conn_cur)
     assert set(langs) == set(['eng'])
 
 

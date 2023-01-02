@@ -7,6 +7,7 @@ from requests.exceptions import HTTPError, ConnectionError
 from lxml import etree as ET
 from flask import current_app
 
+from db import util as db_util
 import crs as crs_def
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util, requests as micka_requests
@@ -117,12 +118,13 @@ def get_template_path_and_values(workspace, layername, http_method):
     logger.info(f'get_template_path_and_values start calculating data for {workspace}:{layername}')
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
     publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
-        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'file_type', 'db_table', 'wms'],
+        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'file_type', 'db_table', 'wms', 'db_connection_string', ],
     })
     title = publ_info['title']
     abstract = publ_info.get('description')
     native_bbox = publ_info.get('native_bounding_box')
     crs = publ_info.get('native_crs')
+    conn_cur = db_util.get_connection_cursor(publ_info['_db_connection_string'])
     if bbox_util.is_empty(native_bbox):
         native_bbox = crs_def.CRSDefinitions[crs].default_bbox
     extent = bbox_util.transform(native_bbox, crs_from=crs, crs_to=crs_def.EPSG_4326)
@@ -140,7 +142,7 @@ def get_template_path_and_values(workspace, layername, http_method):
     if file_type == settings.FILE_TYPE_VECTOR:
         table_name = publ_info['db_table']['name']
         try:
-            languages = db.get_text_languages(workspace, table_name)
+            languages = db.get_text_languages(workspace, table_name, conn_cur=conn_cur)
         except LaymanError:
             languages = []
         try:

@@ -4,7 +4,7 @@ import os
 import logging
 import subprocess
 
-from db import util as db_util, PG_CONN
+from db import util as db_util
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
@@ -183,9 +183,8 @@ def import_layer_vector_file_async(schema, table_name, main_filepath,
     return process
 
 
-def get_text_column_names(schema, table_name, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
-
+def get_text_column_names(schema, table_name, conn_cur):
+    _, cur = conn_cur
     try:
         cur.execute(f"""
 SELECT QUOTE_IDENT(column_name) AS column_name
@@ -238,8 +237,8 @@ from {schema}.{table_name}
     return rows[0][0]
 
 
-def get_text_data(schema, table_name, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
+def get_text_data(schema, table_name, conn_cur):
+    _, cur = conn_cur
     col_names = get_text_column_names(schema, table_name, conn_cur=conn_cur)
     if len(col_names) == 0:
         return [], 0
@@ -272,8 +271,8 @@ limit {limit}
     return col_texts, limit
 
 
-def get_text_languages(schema, table_name):
-    texts, num_rows = get_text_data(schema, table_name)
+def get_text_languages(schema, table_name, conn_cur):
+    texts, num_rows = get_text_data(schema, table_name, conn_cur)
     all_langs = set()
     for text in texts:
         # skip short texts
