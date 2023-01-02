@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 
 
-def create_connection_cursor():
+def create_connection_cursor(pg_conn):
     try:
-        connection = psycopg2.connect(**PG_CONN)
+        connection = psycopg2.connect(**pg_conn)
         connection.set_session(autocommit=True)
     except BaseException as exc:
         raise Error(1) from exc
@@ -22,12 +22,16 @@ def create_connection_cursor():
     return connection, cursor
 
 
-def get_connection_cursor():
-    key = FLASK_CONN_CUR_KEY
-    if key not in g:
-        conn_cur = create_connection_cursor()
-        g.setdefault(key, conn_cur)
-    return g.get(key)
+def get_connection_cursor(pg_conn=None):
+    if not pg_conn or pg_conn == PG_CONN:
+        key = FLASK_CONN_CUR_KEY
+        if key not in g:
+            conn_cur = create_connection_cursor(pg_conn)
+            g.setdefault(key, conn_cur)
+        result = g.get(key)
+    else:
+        result = create_connection_cursor(pg_conn)
+    return result
 
 
 def run_query(query, data=None, conn_cur=None, encapsulate_exception=True, log_query=False):
