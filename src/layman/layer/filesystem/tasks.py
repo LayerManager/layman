@@ -130,10 +130,13 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
         source_file = f'{layername}.tif' if name_normalized_tif_by_layer else timeseries_filename_mapping[input_path]
         normalize_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, layername, source_file=source_file, )
         color_interpretations = gdal.get_color_interpretations(vrt_file_path or input_path)
+        data_type_name = gdal.get_data_type_name(tmp_vrt_file)
         process = gdal.compress_and_mask_raster_file_async(input_file_path=tmp_vrt_file,
                                                            output_file=normalize_file_path,
                                                            color_interpretations=color_interpretations,
-                                                           nodata_value=nodata_value)
+                                                           nodata_value=nodata_value,
+                                                           data_type_name=data_type_name,
+                                                           )
         while process.poll() is None and not self.is_aborted():
             pass
         if vrt_file_path:

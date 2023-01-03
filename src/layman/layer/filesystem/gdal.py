@@ -338,7 +338,7 @@ def normalize_raster_file_async(input_path, crs_id, output_file):
     return process
 
 
-def compress_and_mask_raster_file_async(*, output_file, input_file_path, color_interpretations, nodata_value):
+def compress_and_mask_raster_file_async(*, output_file, input_file_path, color_interpretations, nodata_value, data_type_name):
     result_path = output_file
     bash_args = [
         'gdal_translate',
@@ -353,6 +353,11 @@ def compress_and_mask_raster_file_async(*, output_file, input_file_path, color_i
     if color_interpretations == ['Gray', 'Alpha'] and nodata_value is None:
         bash_args += [
             '-mask', '2',
+        ]
+
+    if color_interpretations == ['Gray', 'Alpha'] and data_type_name == 'Float32':
+        bash_args += [
+            '-b', '1'
         ]
 
     bash_args += [

@@ -28,7 +28,6 @@ class TestFailingWms(base_test.TestSingleRestPublication):
 
     test_cases = [base_test.TestCaseType(pytest_id=key, key=key, type=EnumTestTypes.OPTIONAL,
                                          params=params['rest_params'],
-                                         marks=[pytest.mark.xfail(reason="Unknown GeoServer rendering issue.")]
                                          )
                   for key, params in TEST_CASES.items()]
 
