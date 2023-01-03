@@ -335,7 +335,10 @@ def test_empty_table_bbox(empty_table):
     workspace, layername = empty_table
     with layman.app_context():
         db_table = db.get_table_name(workspace, layername)
-        bbox = db.get_bbox(workspace, db_table)
+        pg_conn = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['db_connection_string', ]})[
+            '_db_connection_string']
+        conn_cur = db_util.get_connection_cursor(pg_conn)
+        bbox = db.get_bbox(workspace, db_table, conn_cur=conn_cur)
     assert bbox_util.is_empty(bbox), bbox
 
 
@@ -343,5 +346,8 @@ def test_single_point_table_bbox(single_point_table):
     workspace, layername = single_point_table
     with layman.app_context():
         db_table = db.get_table_name(workspace, layername)
-        bbox = db.get_bbox(workspace, db_table)
+        pg_conn = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['db_connection_string', ]})[
+            '_db_connection_string']
+        conn_cur = db_util.get_connection_cursor(pg_conn)
+        bbox = db.get_bbox(workspace, db_table, conn_cur=conn_cur)
     assert bbox[0] == bbox[2] and bbox[1] == bbox[3], bbox

@@ -391,7 +391,9 @@ def point_coordinates(workspace, publ_type, name, *, point_id, crs, exp_coordina
     assert publ_type == LAYER_TYPE
 
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['db_table']})
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['db_table', 'db_connection_string', ]})
+    pg_conn = publ_info[
+        '_db_connection_string']
     db_table = publ_info['db_table']['name']
 
     query = f'''with transformed as (select st_transform(wkb_geometry, %s) point
@@ -403,7 +405,7 @@ from transformed
 ;'''
     with app.app_context():
         to_srid = db_util.get_srid(crs)
-        coordinates = db_util.run_query(query, (to_srid, point_id))
+        coordinates = db_util.run_query(query, (to_srid, point_id), pg_conn=pg_conn)
     assert len(coordinates) == 1, coordinates
     coordinates = coordinates[0]
 

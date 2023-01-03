@@ -1,8 +1,9 @@
 from db import util as db_util
-from layman import settings, patch_mode
+from layman import settings, patch_mode, util as layman_util
 from layman.common import empty_method, empty_method_returns_none, empty_method_returns_dict
 from layman.http import LaymanError
 from . import get_table_name
+from .. import LAYER_TYPE
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
@@ -19,7 +20,9 @@ def get_layer_info(workspace, layername, conn_cur=None):
     result = {}
     if table_name:
         if conn_cur is None:
-            conn_cur = db_util.get_connection_cursor()
+            pg_conn = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['db_connection_string', ]})[
+                '_db_connection_string']
+            conn_cur = db_util.get_connection_cursor(pg_conn)
         _, cur = conn_cur
         try:
             cur.execute(f"""
@@ -41,11 +44,10 @@ def get_layer_info(workspace, layername, conn_cur=None):
     return result
 
 
-def delete_layer(workspace, layername, conn_cur=None):
+def delete_layer(workspace, layername):
+    pg_conn = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['db_connection_string', ]})['_db_connection_string']
+    conn, cur = db_util.get_connection_cursor(pg_conn)
     table_name = get_table_name(workspace, layername)
-    if conn_cur is None:
-        conn_cur = db_util.get_connection_cursor()
-    conn, cur = conn_cur
     query = f"""
     DROP TABLE IF EXISTS "{workspace}"."{table_name}" CASCADE
     """
@@ -56,7 +58,9 @@ def delete_layer(workspace, layername, conn_cur=None):
         raise LaymanError(7)from exc
 
 
-def set_layer_srid(schema, table_name, srid, *, conn_cur=None):
+def set_layer_srid(schema, layername, table_name, srid):
+    pg_conn = layman_util.get_publication_info(schema, LAYER_TYPE, layername, context={'keys': ['db_connection_string', ]})['_db_connection_string']
+    conn_cur = db_util.get_connection_cursor(pg_conn)
     query = '''SELECT UpdateGeometrySRID(%s, %s, 'wkb_geometry', %s);'''
     params = (schema, table_name, srid)
     db_util.run_query(query, params, conn_cur=conn_cur)

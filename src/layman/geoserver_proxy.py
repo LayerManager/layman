@@ -67,7 +67,8 @@ def extract_attributes_and_layers_from_wfs_t(binary_data):
 def ensure_wfs_t_attributes(attribs):
     app.logger.info(f"GET WFS check_xml_for_attribute attribs={attribs}")
     editable_attribs = set(attr for attr in attribs if authz.can_i_edit(LAYER_TYPE, attr[0], attr[1]))
-    created_attributes = db.ensure_attributes(editable_attribs)
+    created_attributes_dict = db.ensure_attributes(editable_attribs)
+    created_attributes = [attribs['attributes'] for attribs in created_attributes_dict.values()]
     if created_attributes:
         changed_layers = {(workspace, layer) for workspace, layer, _, _ in created_attributes}
         qgis_changed_layers = {(workspace, layer) for workspace, layer in changed_layers

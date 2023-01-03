@@ -1,5 +1,6 @@
 from celery.utils.log import get_task_logger
 
+from db import util as db_util
 import crs as crs_def
 from layman.celery import AbortedException
 from layman.common import empty_method_returns_true
@@ -29,7 +30,7 @@ def refresh_table(
     if self.is_aborted():
         raise AbortedException
 
-    publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
+    publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'db_connection_string', ]})
     file_type = publ_info['file']['file_type']
     if file_type == settings.FILE_TYPE_RASTER:
         return
@@ -75,6 +76,7 @@ def refresh_table(
                 raise LaymanError(err_code, private_data=str_error)
         break
 
-    crs = db.get_crs(workspace, table_name)
+    conn_cur = db_util.get_connection_cursor(publ_info['_db_connection_string'])
+    crs = db.get_crs(workspace, table_name, conn_cur)
     if crs_def.CRSDefinitions[crs].srid:
-        table.set_layer_srid(workspace, table_name, crs_def.CRSDefinitions[crs].srid)
+        table.set_layer_srid(workspace, layername, table_name, crs_def.CRSDefinitions[crs].srid)

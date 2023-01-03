@@ -200,13 +200,13 @@ AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
     return [r[0] for r in rows]
 
 
-def get_all_column_names(workspace, layername, conn_cur=None):
+def get_all_column_names(workspace, layername, conn_cur):
     table_name = get_table_name(workspace, layername)
     return [col.name for col in get_all_column_infos(workspace, table_name, conn_cur)]
 
 
-def get_all_column_infos(schema, table_name, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
+def get_all_column_infos(schema, table_name, conn_cur):
+    _, cur = conn_cur
 
     try:
         cur.execute(f"""
@@ -222,8 +222,8 @@ AND table_name = '{table_name}'
     return [ColumnInfo(name=r[0], data_type=r[1]) for r in rows]
 
 
-def get_number_of_features(schema, table_name, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
+def get_number_of_features(schema, table_name, conn_cur):
+    _, cur = conn_cur
 
     try:
         cur.execute(f"""
@@ -387,8 +387,8 @@ limit 1
     return query
 
 
-def get_most_frequent_lower_distance(schema, table_name, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
+def get_most_frequent_lower_distance(schema, table_name, conn_cur):
+    _, cur = conn_cur
 
     query = get_most_frequent_lower_distance_query(schema, table_name, [
         'ST_NPoints'
@@ -445,55 +445,62 @@ def guess_scale_denominator(schema, table_name):
     return scale_denominator
 
 
-def create_string_attributes(attribute_tuples, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
-    query = "\n".join([f"""ALTER TABLE {schema}.{table} ADD COLUMN {attrname} VARCHAR(1024);""" for schema, _, table, attrname in attribute_tuples]) + "\n COMMIT;"
-    try:
-        cur.execute(query)
-    except BaseException as exc:
-        logger.error(f'create_string_attributes ERROR')
-        raise LaymanError(7) from exc
+def create_string_attributes(missing_attribute_dicts):
+    for vals in missing_attribute_dicts.values():
+        cur = vals['cur']
+        attribute_tuples = vals['attributes']
 
-
-def get_missing_attributes(attribute_tuples, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
-
-    table_name = {(workspace, layer): get_table_name(workspace, layer) for workspace, layer, _ in attribute_tuples}
-
-    # Find all foursomes which do not already exist
-    query = f"""select attribs.*
-from (""" + "\n union all\n".join([f"select '{workspace}' workspace, '{layername}' layername, '{table_name[(workspace, layername)]}' table_name, '{attrname}' attrname" for workspace, layername, attrname in attribute_tuples]) + """) attribs left join
-    information_schema.columns c on c.table_schema = attribs.workspace
-                                and c.table_name = attribs.table_name
-                                and c.column_name = attribs.attrname
-where c.column_name is null"""
-
-    try:
-        if attribute_tuples:
+        query = "\n".join([f"""ALTER TABLE {schema}.{table} ADD COLUMN {attrname} VARCHAR(1024);""" for schema, _, table, attrname in attribute_tuples]) + "\n COMMIT;"
+        try:
             cur.execute(query)
-    except BaseException as exc:
-        logger.error(f'get_missing_attributes ERROR')
-        raise LaymanError(7) from exc
+        except BaseException as exc:
+            logger.error(f'create_string_attributes ERROR')
+            raise LaymanError(7) from exc
 
-    missing_attributes = set()
-    rows = cur.fetchall()
-    for row in rows:
-        missing_attributes.add((row[0],
-                                row[1],
-                                row[2],
-                                row[3]))
+
+def get_missing_attributes(attribute_tuples):
+    layer_dict = dict()
+    for workspace, layer, _ in attribute_tuples:
+        layer_info = get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['db_connection_string', ]})
+        layer_dict[layer_info['_db_connection_string']][(workspace, layer)]: get_table_name(workspace, layer)
+
+    missing_attributes = dict()
+    for pg_conn, table_names in layer_dict.items():
+        cur = db_util.get_connection_cursor(pg_conn)
+        # Find all foursomes which do not already exist
+        query = f"""select attribs.*
+    from (""" + "\n union all\n".join([f"select '{workspace}' workspace, '{layername}' layername, '{table_names[(workspace, layername)]}' table_name, '{attrname}' attrname" for workspace, layername, attrname in attribute_tuples]) + """) attribs left join
+        information_schema.columns c on c.table_schema = attribs.workspace
+                                    and c.table_name = attribs.table_name
+                                    and c.column_name = attribs.attrname
+    where c.column_name is null"""
+
+        try:
+            if attribute_tuples:
+                cur.execute(query)
+        except BaseException as exc:
+            logger.error(f'get_missing_attributes ERROR')
+            raise LaymanError(7) from exc
+
+        rows = cur.fetchall()
+        missing_attributes[pg_conn] = {
+            'cur': cur,
+            'attributes': set((row[0],
+                               row[1],
+                               row[2],
+                               row[3]) for row in rows)
+        }
     return missing_attributes
 
 
 def ensure_attributes(attribute_tuples):
-    conn_cur = db_util.get_connection_cursor()
-    missing_attributes = get_missing_attributes(attribute_tuples, conn_cur)
+    missing_attributes = get_missing_attributes(attribute_tuples)
     if missing_attributes:
-        create_string_attributes(missing_attributes, conn_cur)
+        create_string_attributes(missing_attributes)
     return missing_attributes
 
 
-def get_bbox(schema, table_name, conn_cur=None):
+def get_bbox(schema, table_name, conn_cur):
     query = f'''
     with tmp as (select ST_Extent(l.wkb_geometry) as bbox
                  from {schema}.{table_name} l
@@ -508,7 +515,8 @@ def get_bbox(schema, table_name, conn_cur=None):
     return result
 
 
-def get_crs(schema, table_name, conn_cur=None):
+def get_crs(schema, table_name, conn_cur):
+    conn_cur = conn_cur
     query = f'''
     select Find_SRID('{schema}', '{table_name}', 'wkb_geometry');
     '''
@@ -517,8 +525,8 @@ def get_crs(schema, table_name, conn_cur=None):
     return crs
 
 
-def get_geometry_types(schema, table_name, conn_cur=None):
-    conn, cur = conn_cur or db_util.get_connection_cursor()
+def get_geometry_types(schema, table_name, conn_cur):
+    conn, cur = conn_cur
     try:
         sql = f"""
 select distinct ST_GeometryType(wkb_geometry) as geometry_type_name

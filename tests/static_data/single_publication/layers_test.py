@@ -6,6 +6,7 @@ from lxml import etree as ET
 from owslib.wms import WebMapService
 import pytest
 
+from db import util as db_util
 import crs as crs_def
 from geoserver import GS_REST_WORKSPACES, GS_REST, GS_AUTH, util as gs_util
 from layman import settings, app, util as layman_util
@@ -197,8 +198,9 @@ def test_fill_project_template(workspace, publ_type, publication):
     assert excinfo.value.response.status_code == 500
 
     with app.app_context():
-        layer_bbox = layer_db.get_bbox(workspace, table_name)
-        layer_crs = layer_db.get_crs(workspace, table_name)
+        conn_cur = db_util.get_connection_cursor(settings.PG_CONN)
+        layer_bbox = layer_db.get_bbox(workspace, table_name, conn_cur)
+        layer_crs = layer_db.get_crs(workspace, table_name, conn_cur)
     layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[layer_crs].default_bbox
     with app.app_context():
         qml_path = qgis_util.get_original_style_path(workspace, publication)

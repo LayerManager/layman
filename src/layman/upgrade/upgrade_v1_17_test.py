@@ -1,6 +1,7 @@
 import pytest
 from werkzeug.datastructures import FileStorage
 
+from db import util as db_util
 import crs as crs_def
 from layman import app, settings, util as layman_util
 from layman.common.prime_db_schema import publications as prime_db_schema_publications, util as db_util
@@ -135,12 +136,13 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
             info = table.get_layer_info(workspace, layer)
             assert info
 
-        bbox = db.get_bbox(workspace, table_name)
-        crs = db.get_crs(workspace, table_name)
+        conn_cur = db_util.get_connection_cursor(settings.PG_CONN)
+        bbox = db.get_bbox(workspace, table_name, conn_cur)
+        crs = db.get_crs(workspace, table_name, conn_cur)
 
         prime_db_schema_publications.set_bbox(workspace, LAYER_TYPE, layer, bbox, crs, )
         if crs_def.CRSDefinitions[crs].srid:
-            table.set_layer_srid(workspace, table_name, crs_def.CRSDefinitions[crs].srid)
+            table.set_layer_srid(workspace, layer, table_name, crs_def.CRSDefinitions[crs].srid)
 
         wms_workspace = wms.get_geoserver_workspace(workspace)
 

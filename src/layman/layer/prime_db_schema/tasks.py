@@ -1,5 +1,6 @@
 from celery.utils.log import get_task_logger
 
+from db import util as db_util
 from layman.celery import AbortedException
 from layman.common import empty_method_returns_true
 from layman import celery_app, util as layman_util, settings
@@ -26,12 +27,13 @@ def refresh_file_data(
     if self.is_aborted():
         raise AbortedException
 
-    publ_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file', 'db_table']})
+    publ_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file', 'db_table', 'db_connection_string', ]})
     file_type = publ_info['file']['file_type']
     if file_type == settings.FILE_TYPE_VECTOR:
+        conn_cur = db_util.get_connection_cursor(publ_info['_db_connection_string'])
         table_name = publ_info['db_table']['name']
-        bbox = db_get_bbox(username, table_name)
-        crs = db_get_crs(username, table_name)
+        bbox = db_get_bbox(username, table_name, conn_cur)
+        crs = db_get_crs(username, table_name, conn_cur)
     elif file_type == settings.FILE_TYPE_RASTER:
         bbox = gdal_get_bbox(username, layername)
         crs = gdal_get_crs(username, layername)

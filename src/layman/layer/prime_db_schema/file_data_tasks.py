@@ -1,5 +1,6 @@
 from celery.utils.log import get_task_logger
 
+from db import util as db_util
 from layman.celery import AbortedException
 from layman import celery_app, util as layman_util, settings
 from .. import LAYER_TYPE
@@ -22,12 +23,13 @@ def patch_after_feature_change(
     if self.is_aborted():
         raise AbortedException
 
-    info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file', 'native_crs', 'db_table']})
+    info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file', 'native_crs', 'db_table', 'db_connection_string', ]})
     file_type = info['file']['file_type']
     crs = info['native_crs']
     db_table = info['db_table']['name']
+    conn_cur = db_util.get_connection_cursor(info['_db_connection_string'])
     assert file_type == settings.FILE_TYPE_VECTOR
-    bbox = db_get_bbox(username, db_table)
+    bbox = db_get_bbox(username, db_table, conn_cur)
 
     if self.is_aborted():
         raise AbortedException

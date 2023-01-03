@@ -34,9 +34,10 @@ def get_connection_cursor(pg_conn=None):
     return result
 
 
-def run_query(query, data=None, conn_cur=None, encapsulate_exception=True, log_query=False):
+def run_query(query, data=None, pg_conn=None, conn_cur=None, encapsulate_exception=True, log_query=False):
+    assert conn_cur or pg_conn
     if conn_cur is None:
-        conn_cur = get_connection_cursor()
+        conn_cur = get_connection_cursor(pg_conn)
     conn, cur = conn_cur
     try:
         if log_query:
@@ -53,9 +54,10 @@ def run_query(query, data=None, conn_cur=None, encapsulate_exception=True, log_q
     return rows
 
 
-def run_statement(query, data=None, conn_cur=None, encapsulate_exception=True, log_query=False):
+def run_statement(query, data=None, pg_conn=None, conn_cur=None, encapsulate_exception=True, log_query=False):
+    assert conn_cur or pg_conn
     if conn_cur is None:
-        conn_cur = get_connection_cursor()
+        conn_cur = get_connection_cursor(pg_conn)
     conn, cur = conn_cur
     try:
         if log_query:
@@ -97,7 +99,7 @@ def get_crs(srid):
     ), None)
     if not crs:
         sql = 'select auth_name, auth_srid from spatial_ref_sys where srid = %s;'
-        auth_name, auth_srid = run_query(sql, (srid, ))[0]
+        auth_name, auth_srid = run_query(sql, (srid, ), pg_conn=PG_CONN)[0]
         if auth_name or auth_srid:
             crs = f'{auth_name}:{auth_srid}'
     return crs
@@ -107,4 +109,4 @@ def ensure_srid_definition(srid, proj4text):
     sql = f'''INSERT into spatial_ref_sys (srid, auth_name, auth_srid, proj4text, srtext) values ( %s, null, null, %s, null)
 ON CONFLICT (srid) DO UPDATE SET proj4text = %s;'''
     params = (srid, proj4text, proj4text)
-    run_statement(sql, params)
+    run_statement(sql, params, pg_conn=PG_CONN)
