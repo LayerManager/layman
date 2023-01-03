@@ -372,7 +372,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'bbox': (1823049.056, 6310009.44, 1826918.349, 6312703.749),
             'file_extensions': ['.tif'],
-            'normalized_color_interp': ['Gray', 'Alpha'],
+            'normalized_color_interp': ['Gray'],
             'thumbnail': '/code/test_tools/data/thumbnail/raster_layer_tif_grayscale_alpha_nodata_styled.png',
             'file_type': settings.FILE_TYPE_RASTER,
             'style_type': 'sld',
