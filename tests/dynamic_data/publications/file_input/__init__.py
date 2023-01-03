@@ -88,6 +88,19 @@ TESTCASES = {
             }),
         ],
     },
+    'styled_raster_issue_681': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': ['/code/sample/layman.layer/sample_tif_grayscale_alpha_nodata.tif'],
+            'style_file': os.path.join(DIRECTORY, 'raster_float_grayscale_alpha_contrast_enhancement.sld'),
+        },
+        consts.KEY_FINAL_ASSERTS: [
+            *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
+            Action(publication.internal.thumbnail_equals, {
+                'exp_thumbnail': f'{DIRECTORY}/thumbnail_styled_raster_issue_681.png',
+            }),
+        ],
+    },
 }
 
 
