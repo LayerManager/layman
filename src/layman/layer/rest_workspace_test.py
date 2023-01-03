@@ -629,14 +629,17 @@ def test_uppercase_attr(client):
             assert 'status' not in resp_json[source], f"{source}: {resp_json[source]}"
 
         style_url = geoserver_sld.get_workspace_style_url(workspace, layername)
-        response = requests.get(style_url + '.sld',
-                                auth=settings.LAYMAN_GS_AUTH
+        response = requests.get(style_url,
+                                auth=settings.LAYMAN_GS_AUTH,
+                                headers={
+                                    'Accept': 'application/vnd.ogc.se+xml',
+                                }
                                 )
         response.raise_for_status()
         sld_file = io.BytesIO(response.content)
         tree = ET.parse(sld_file)
         root = tree.getroot()
-        assert root.attrib['version'] == '1.0.0'
+        assert root.attrib['version'] == '1.1.0'
 
         feature_type = get_feature_type(workspace, 'postgresql', layername)
         attributes = feature_type['attributes']['attribute']
@@ -842,15 +845,18 @@ def test_post_layers_sld_1_1_0(client):
     assert wms[layername].title == 'countries_sld_1_1_0'
 
     style_url = geoserver_sld.get_workspace_style_url(workspace, layername)
-    response = requests.get(style_url + '.sld',
-                            auth=settings.LAYMAN_GS_AUTH
+    response = requests.get(style_url,
+                            auth=settings.LAYMAN_GS_AUTH,
+                            headers={
+                                'Accept': 'application/vnd.ogc.se+xml',
+                            }
                             )
     response.raise_for_status()
     sld_file = io.BytesIO(response.content)
     tree = ET.parse(sld_file)
     root = tree.getroot()
-    assert root.attrib['version'] == '1.0.0'
-    assert root[0][1][1][1][1][0][0].text == '#e31a1c'
+    assert root.attrib['version'] == '1.1.0'
+    assert root[0][1][1][0][1][0][0].text == '#e31a1c'
     # assert wms[layername].styles[
     #     username+':'+layername]['title'] == 'test_layer2'
 
