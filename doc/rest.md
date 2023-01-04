@@ -394,7 +394,7 @@ PNG image.
 ### URL
 `/rest/workspaces/<workspace_name>/layers/<layername>/style`
 ### GET Workspace Layer Style
-Get default style of the layer in XML format. Request is redirected to GeoServer [/rest/workspaces/{workspace}/styles/{style}](https://docs.geoserver.org/2.21.x/en/api/#1.0.0/styles.yaml) for layers with SLD style. For layers with QML style, response is created in Layman. Anybody can call GET, nobody can call any other method. 
+Get default style of the layer in XML format. For layers with SLD style, request is redirected to GeoServer [/rest/workspaces/{workspace}/styles/{style}](https://docs.geoserver.org/2.21.x/en/api/#1.0.0/styles.yaml) and response is in version 1.0.0. For layers with QML style, response is created in Layman. Anybody can call GET, nobody can call any other method. 
 
 #### Request
 No action parameters.

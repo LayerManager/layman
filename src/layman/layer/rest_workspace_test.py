@@ -628,19 +628,6 @@ def test_uppercase_attr(client):
         ]:
             assert 'status' not in resp_json[source], f"{source}: {resp_json[source]}"
 
-        style_url = geoserver_sld.get_workspace_style_url(workspace, layername)
-        response = requests.get(style_url,
-                                auth=settings.LAYMAN_GS_AUTH,
-                                headers={
-                                    'Accept': 'application/vnd.ogc.se+xml',
-                                }
-                                )
-        response.raise_for_status()
-        sld_file = io.BytesIO(response.content)
-        tree = ET.parse(sld_file)
-        root = tree.getroot()
-        assert root.attrib['version'] == '1.1.0'
-
         feature_type = get_feature_type(workspace, 'postgresql', layername)
         attributes = feature_type['attributes']['attribute']
         attr_names = ["id", "dpr_smer_k", "fid_zbg", "silnice", "silnice_bs", "typsil_p", "cislouseku", "jmeno",
@@ -802,77 +789,6 @@ def test_patch_layer_style(client):
             'title': 'countries in blue',
         }
     check_metadata(client, workspace, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
-
-
-@pytest.mark.usefixtures('app_context', 'ensure_layman')
-def test_post_layers_sld_1_1_0(client):
-    workspace = 'testuser1'
-    layername = 'countries_sld_1_1_0'
-    rest_path = url_for('rest_workspace_layers.post', workspace=workspace, layername=layername)
-
-    file_paths = [
-        'sample/data/test_layer4.geojson',
-    ]
-    for file_path in file_paths:
-        assert os.path.isfile(file_path)
-    files = []
-    sld_path = 'sample/style/sld_1_1_0.xml'
-    assert os.path.isfile(sld_path)
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
-        response = client.post(rest_path, data={
-            'file': files,
-            'name': layername,
-            'style': (open(sld_path, 'rb'), os.path.basename(sld_path)),
-        })
-        assert response.status_code == 200
-        resp_json = response.get_json()
-        # print(resp_json)
-        assert layername == resp_json[0]['name']
-    finally:
-        for file_path in files:
-            file_path[0].close()
-
-    layer_info = util.get_layer_info(workspace, layername)
-    while ('status' in layer_info['wms'] and layer_info['wms']['status'] in ['PENDING', 'STARTED'])\
-            or ('status' in layer_info['style'] and layer_info['style']['status'] in ['PENDING', 'STARTED']):
-        time.sleep(0.1)
-        layer_info = util.get_layer_info(workspace, layername)
-
-    wms_url = geoserver_wms.get_wms_url(workspace)
-    wms = wms_proxy(wms_url)
-    assert layername in wms.contents
-    assert wms[layername].title == 'countries_sld_1_1_0'
-
-    style_url = geoserver_sld.get_workspace_style_url(workspace, layername)
-    response = requests.get(style_url,
-                            auth=settings.LAYMAN_GS_AUTH,
-                            headers={
-                                'Accept': 'application/vnd.ogc.se+xml',
-                            }
-                            )
-    response.raise_for_status()
-    sld_file = io.BytesIO(response.content)
-    tree = ET.parse(sld_file)
-    root = tree.getroot()
-    assert root.attrib['version'] == '1.1.0'
-    assert root[0][1][1][0][1][0][0].text == '#e31a1c'
-    # assert wms[layername].styles[
-    #     username+':'+layername]['title'] == 'test_layer2'
-
-    publication_counter.increase()
-    uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': publication_counter.get()
-    })
-
-    rest_path = url_for('rest_workspace_layer.delete_layer', workspace=workspace, layername=layername)
-    response = client.delete(rest_path)
-    assert response.status_code == 200
-
-    publication_counter.decrease()
-    uuid.check_redis_consistency(expected_publ_num_by_type={
-        f'{LAYER_TYPE}': publication_counter.get()
-    })
 
 
 @pytest.mark.usefixtures('ensure_layman')
