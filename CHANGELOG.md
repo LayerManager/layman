@@ -7,6 +7,7 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [#703](https://github.com/LayerManager/layman/issues/703) Endpoint [POST Workspace Layers](doc/rest.md#post-workspace-layers) support new body parameter *db_connection*.
 
 ## v1.19.0
  2023-01-11

@@ -53,8 +53,7 @@ def post(workspace):
             if len(filename) > 0
         ]
     input_files = fs_util.InputFiles(sent_streams=sent_file_streams, sent_paths=sent_file_paths)
-    if len(input_files.raw_paths) == 0:
-        raise LaymanError(1, {'parameter': 'file'})
+    db_connection = request.form.get('db_connection', '')
 
     # NAME
     unsafe_layername = request.form.get('name', '')
@@ -91,13 +90,13 @@ def post(workspace):
     enable_more_main_files = time_regex is not None
 
     # FILE NAMES
-    use_chunk_upload = not input_files.sent_streams
-    if not (use_chunk_upload and input_files.is_one_archive):
+    use_chunk_upload = bool(input_files.sent_paths)
+    if not (use_chunk_upload and input_files.is_one_archive) and input_files:
         input_file.check_filenames(workspace, layername, input_files, check_crs,
                                    enable_more_main_files=enable_more_main_files, time_regex=time_regex,
                                    slugified_time_regex=slugified_time_regex,
                                    name_input_file_by_layer=name_input_file_by_layer)
-    file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
+    file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path) if not db_connection else settings.FILE_TYPE_VECTOR
 
     # TITLE
     if len(request.form.get('title', '')) > 0:
@@ -181,7 +180,7 @@ def post(workspace):
             task_options.update({
                 'check_crs': check_crs,
             })
-        else:
+        elif input_files:
             try:
                 input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, name_input_file_by_layer=name_input_file_by_layer)
             except BaseException as exc:

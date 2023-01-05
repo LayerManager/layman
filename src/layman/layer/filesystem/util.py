@@ -33,6 +33,9 @@ class InputFiles:
         object.__setattr__(self, '_sent_paths', sent_paths)
         object.__setattr__(self, '_saved_paths', saved_paths)
 
+    def __bool__(self):
+        return bool(self.raw_paths)
+
     @property
     def sent_streams(self):
         # pylint: disable=no-member

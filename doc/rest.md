@@ -88,9 +88,9 @@ Have the same request parameters and response structure and headers as [GET Laye
 Publish vector or raster data file as new layer of WMS, in case of vector also new feature type of WFS.
 
 Processing chain consists of few steps:
-- save file to workspace directory within Layman data directory
+- save files (if sent) to workspace directory within Layman data directory
 - save basic information (name, title, access_rights) into PostgreSQL
-- for vector layers import the vector file to PostgreSQL database as new table into workspace schema
+- for vector layers import vector file (if sent) to PostgreSQL database as new table into workspace schema
   - files with invalid byte sequence are first converted to GeoJSON, then cleaned with iconv, and finally imported to database.
 - for raster layers normalize and compress raster file to GeoTIFF with overviews (pyramids); NoData values are normalized as transparent
 - for vector layers publish the vector table as new layer (feature type) within appropriate WFS workspaces of GeoServer
@@ -121,7 +121,8 @@ Check [Asynchronous file upload](async-file-upload.md) example.
 Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
 
 Body parameters:
-- **file**, file(s) or file name(s)
+- *file*, file(s) or file name(s)
+   - exactly one of `file` or `db_connection` must be set
    - one of following options is expected:
       - GeoJSON file
       - ShapeFile files (at least three files: .shp, .shx, .dbf)
@@ -143,6 +144,7 @@ Body parameters:
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be safely stored in DB
    - if QML style is used in this request, it must list all attributes contained in given data file
+- *db_connection*, string
 - *name*, string
    - computer-friendly identifier of the layer
    - must be unique among all layers of one workspace
