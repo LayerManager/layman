@@ -303,6 +303,7 @@ def publish_workspace_publication(publication_type,
                                   name,
                                   *,
                                   file_paths=None,
+                                  db_connection=None,
                                   headers=None,
                                   access_rights=None,
                                   title=None,
@@ -324,13 +325,13 @@ def publish_workspace_publication(publication_type,
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
-    # map layers must not be set together with file_paths
     assert not map_layers or not file_paths
+    assert not map_layers or not db_connection
 
     assert not (not with_chunks and do_not_upload_chunks)
     assert not (check_response_fn and do_not_upload_chunks)  # because check_response_fn is not called when do_not_upload_chunks
 
-    file_paths = [publication_type_def.source_path] if file_paths is None and not map_layers else file_paths
+    file_paths = [publication_type_def.source_path] if file_paths is None and db_connection is None and not map_layers else file_paths
 
     if style_file or with_chunks or compress or compress_settings or overview_resampling:
         assert publication_type == LAYER_TYPE
@@ -384,6 +385,8 @@ def publish_workspace_publication(publication_type,
             data['overview_resampling'] = overview_resampling
         if time_regex:
             data['time_regex'] = time_regex
+        if db_connection:
+            data['db_connection'] = db_connection
         response = requests.post(r_url,
                                  files=files,
                                  data=data,
