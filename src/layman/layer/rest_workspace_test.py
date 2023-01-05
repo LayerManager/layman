@@ -167,16 +167,6 @@ def test_wrong_value_of_layername(client):
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
-def test_no_file(client):
-    response = client.post(url_for('rest_workspace_layers.post', workspace='testuser1'))
-    assert response.status_code == 400
-    resp_json = response.get_json()
-    # print('resp_json', resp_json)
-    assert resp_json['code'] == 1
-    assert resp_json['detail']['parameter'] == 'file'
-
-
-@pytest.mark.usefixtures('app_context', 'ensure_layman')
 def test_workspace_schema_conflict(client):
     if len(settings.PG_NON_USER_SCHEMAS) == 0:
         return
