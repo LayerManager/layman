@@ -149,6 +149,9 @@ timgen-restart:
 timgen-bash:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm timgen sh
 
+timgen-bash-root:
+	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run -u root --rm timgen sh
+
 timgen-bash-exec:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec timgen sh
 

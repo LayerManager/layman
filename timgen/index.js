@@ -1,5 +1,5 @@
 // import 'ol/ol.css';
-import {json_to_map, adjust_map_url} from './src/map';
+import {json_to_map, adjust_map_url, map_to_canvas} from './src/map';
 import { saveAs } from 'file-saver';
 
 // const map_def_url = 'https://raw.githubusercontent.com/LayerManager/layman/1252fad2677f55182478c2206f47fbacb922fb97/sample/layman.map/full.json';
@@ -48,7 +48,7 @@ const main = async () => {
 
   ol_map.once('rendercomplete', (event) => {
     // console.log('rendercomplete');
-    const canvas = event.context.canvas;
+    const canvas = map_to_canvas(ol_map);
     window['canvas_data_url'] = canvas.toDataURL();
     if(file_name) {
       if (navigator.msSaveBlob) {
