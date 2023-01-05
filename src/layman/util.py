@@ -503,7 +503,7 @@ def get_info_with_statuses(info, chain_info, task_to_layer_info_keys, item_keys)
         source_state = {
             'status': res.state if not failed else 'NOT_AVAILABLE'
         }
-        if res.failed():
+        if res.failed() and not failed:
             failed = True
             res_exc = res.get(propagate=False)
             # current_app.logger.info(f"Exception catched: {str(res_exc)}")
