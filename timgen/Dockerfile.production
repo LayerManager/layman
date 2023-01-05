@@ -3,15 +3,19 @@ FROM node:18-alpine
 RUN mkdir /code
 WORKDIR /code
 
+RUN apk update && apk add nano
+
+ADD package.json \
+    package-lock.json \
+    /code/
+
+RUN npm ci
+
 ADD index.html \
     index.js \
-    package.json \
-    package-lock.json \
     proxy.js \
     /code/
 
 ADD src /code/src
-
-RUN npm ci
 
 RUN npm run build
