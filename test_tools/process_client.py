@@ -365,12 +365,13 @@ def publish_workspace_publication(publication_type,
         if not do_not_post_name:
             data['name'] = name
             data['title'] = title
-        if not with_chunks:
-            for file_path in file_paths:
-                assert os.path.isfile(file_path), file_path
-            files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
-        else:
-            data['file'] = [os.path.basename(file) for file in file_paths]
+        if file_paths:
+            if not with_chunks:
+                for file_path in file_paths:
+                    assert os.path.isfile(file_path), file_path
+                files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
+            else:
+                data['file'] = [os.path.basename(file) for file in file_paths]
         if style_file:
             files.append(('style', (os.path.basename(style_file), open(style_file, 'rb'))))
         if access_rights and access_rights.get('read'):

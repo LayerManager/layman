@@ -12,8 +12,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 TEST_CASES = {
     'external_vector_sld': {
         'rest_params': {
-            'file_paths': [],
-            'db_connection': 'db_connection_string',
+            'db_connection': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
         },
     },
 }
