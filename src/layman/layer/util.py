@@ -87,9 +87,9 @@ def get_layer_info(workspace, layername, context=None):
     return filled_partial_info
 
 
-def clear_publication_info(layer_info):
+def clear_publication_info(layer_info, file_type):
     clear_info = common_clear_publication_info(layer_info)
-    if clear_info['file']['file_type'] != settings.FILE_TYPE_RASTER:
+    if file_type != settings.FILE_TYPE_RASTER:
         clear_info.pop('image_mosaic')
     return clear_info
 
@@ -120,7 +120,7 @@ def get_complete_layer_info(workspace=None, layername=None, cached=False):
     complete_info.update(partial_info)
     complete_info['sld'] = complete_info['style']
 
-    complete_info = clear_publication_info(complete_info)
+    complete_info = clear_publication_info(complete_info, file_type)
 
     complete_info.pop('layman_metadata')
     complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(workspace, LAYER_TYPE, layername,
