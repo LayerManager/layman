@@ -1,8 +1,9 @@
 from functools import wraps, partial
+from urllib import parse
 import re
 
 from flask import current_app, request, g
-
+from db import ConnectionString
 from layman import LaymanError, patch_mode, util as layman_util, settings
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for
@@ -257,3 +258,14 @@ def get_same_or_missing_prop_names(workspace, layername):
     md_comparison = get_metadata_comparison(workspace, layername)
     prop_names = get_syncable_prop_names()
     return metadata_common.get_same_or_missing_prop_names(prop_names, md_comparison)
+
+
+def parse_and_validate_connection_string(connection_string):
+    connection = parse.urlparse(connection_string, )
+    params = parse.parse_qs(connection.query)
+    url = connection._replace(query='').geturl()
+    result = ConnectionString(url=url,
+                              table=params.get('table', [None])[0],
+                              geo_column=params.get('geo_column', [None])[0],
+                              )
+    return result

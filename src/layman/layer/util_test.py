@@ -3,7 +3,9 @@ import psycopg2
 from psycopg2 import tz
 import pytest
 
+from db import ConnectionString
 from layman import settings
+from . import util
 from .util import to_safe_layer_name, fill_in_partial_info_statuses
 
 
@@ -143,3 +145,45 @@ def test_fill_in_partial_info_statuses():
 
     filled_info = fill_in_partial_info_statuses(publication_info, chain_info)
     assert filled_info == expected_info, f'filled_info={filled_info}, expected_info={expected_info}'
+
+
+@pytest.mark.parametrize('connection_string, exp_result', [
+    ('postgresql://user:password@postgresql:5432/dbname?table=table_name&geo_column=wkb_geometry', ConnectionString(
+        url='postgresql://user:password@postgresql:5432/dbname',
+        table='table_name',
+        geo_column='wkb_geometry',
+    )),
+    ('postgresql://postgresql', ConnectionString(
+        url='postgresql://postgresql',
+        table=None,
+        geo_column=None,
+     )),
+    ('', ConnectionString(
+        url='',
+        table=None,
+        geo_column=None,
+     )),
+    (' ', ConnectionString(
+        url=' ',
+        table=None,
+        geo_column=None,
+    )),
+    ('_', ConnectionString(
+        url='_',
+        table=None,
+        geo_column=None,
+    )),
+    ('$^&*(', ConnectionString(
+        url='$^&*(',
+        table=None,
+        geo_column=None,
+    )),
+    ('ščžýžý', ConnectionString(
+        url='ščžýžý',
+        table=None,
+        geo_column=None,
+    )),
+])
+def test_parse_connection_string(connection_string, exp_result):
+    result = util.parse_and_validate_connection_string(connection_string)
+    assert result == exp_result
