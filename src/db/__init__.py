@@ -1,3 +1,13 @@
+from dataclasses import dataclass
+
+
+@dataclass
+class ConnectionString:
+    url: str
+    table: str
+    geo_column: str
+
+
 # It's expected to be set from another module
 # Example:
 # PG_CONN = {
