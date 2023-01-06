@@ -21,36 +21,6 @@ make client-build
   - [#613](https://github.com/LayerManager/layman/issues/613) Workspace-specific WMS GetCapabilities documents includes LegendURL element for every style for every layer. Previously vector layers with QML style did not have it. [GetLegendGraphic](doc/endpoints.md#getlegendgraphic) queries can be parametrized depending on layer style.
   - [#681](https://github.com/LayerManager/layman/issues/681) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) normalize grayscale float raster files with alpha channel to grayscale without it with internal mask 0/1.
   - Endpoint [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style) returns SLD styles in version 1.0.0.
-
-## v1.18.0
- 2022-11-22
-### Upgrade requirements
-- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
-  ```
-  LAYMAN_CLIENT_VERSION=v1.13.0
-  ```
-### Migrations and checks
-#### Schema migrations
-- [#635](https://github.com/LayerManager/layman/issues/635) Create new boolean column `image_mosaic` in `publication` table.
-#### Data migrations
-- [#635](https://github.com/LayerManager/layman/issues/635) Fill column `image_mosaic` in `publications` table in prime DB schema for all publications. Value of each publication is set to `false`.
-### Changes
-- [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support publishing [timeseries](doc/models.md#timeseries) raster layers. Temporal information is read from file names using new body parameter *time_regex*. Timeseries data files keep their original slugified names in both Layman and GeoServer data directories (instead of renaming to `<layer_name>.<extension>`). Each timeseries is published to GeoServer as one ImageMosaic coverage store.
-- [#446](https://github.com/LayerManager/layman/issues/446) If endpoint [POST Workspace Layers](doc/rest.md#post-workspace-layers) receives grayscale input raster file (with or without alpha band) and if no input style was sent with the raster file, then Layman will automatically create and use customized SLD style to stabilize contrast of the layer in WMS.
-- [#446](https://github.com/LayerManager/layman/issues/446) Transparency of paletted GeoTIFF with transparent data values is respected in WMS. No custom style is needed. It was probably fixed in [v1.16.0](#v1160) by upgrade of GeoServer.
-- [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) returns new subkeys:
-  - `file.paths` with list of paths to all main data files
-  - `image_mosaic` for raster layers stating that layer was published to GeoServer using ImageMosaic coverage store  (`true` value for [timeseries](doc/models.md#timeseries) and `false` otherwise)
-  - `wms.time` for [timeseries](doc/models.md#timeseries) with list of available time instants and regular expression used to extract them from file names
-- [#635](https://github.com/LayerManager/layman/issues/635) Subkey `file.path` is marked deprecated for endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer). Use `file.paths` instead.
-- [#635](https://github.com/LayerManager/layman/issues/635) Metadata sources returns new key ['temporal_extent'](doc/metadata.md#temporal_extent).
-- [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) do not support combination of zip file and uncompressed main file. 
-- [#697](https://github.com/LayerManager/layman/issues/697) Normalized GeoTIFF files are created as BigTIFF to enable publishing raster files greater than 4 GB.
-- [#660](https://github.com/LayerManager/layman/issues/660) Vector data files with invalid byte sequence (e.g. ShapeFile with invalid byte sequence in UTF-8 encoding) are first converted to GeoJSON, then cleaned with iconv, and finally imported to database.
-- [#667](https://github.com/LayerManager/layman/issues/667) Fix broken statistics during normalization of float rasters with big nodata value.
-- [#668](https://github.com/LayerManager/layman/issues/668) Fix broken size of raster in EPSG:3034 during normalization.
-- [#669](https://github.com/LayerManager/layman/issues/669) Fix slow publication of vector layers metadata to Micka. The reason was slow guessing of [`spatial_resolution.scale_denominator`](doc/metadata.md#spatial_resolution) metadata property.
-- [#701](https://github.com/LayerManager/layman/pull/701) After publishing to GeoServer, Layman checks that Layer is available in WMS & WFS GetCapabilities to prevent situation when GeoServer hides publishing error. It may happen when data file with wrong CRS is published.
 - [#720](https://github.com/LayerManager/layman/issues/720) Upgrade Python dependencies
   - celery 5.0.5 -> 5.2.7
   - flask 2.0.2 -> 2.2.2
@@ -84,6 +54,36 @@ make client-build
   - redis 3 -> 4
   - semantic-ui-react 0.88 -> 2
   - xml-formatter 2 -> 3
+
+## v1.18.0
+ 2022-11-22
+### Upgrade requirements
+- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
+  ```
+  LAYMAN_CLIENT_VERSION=v1.13.0
+  ```
+### Migrations and checks
+#### Schema migrations
+- [#635](https://github.com/LayerManager/layman/issues/635) Create new boolean column `image_mosaic` in `publication` table.
+#### Data migrations
+- [#635](https://github.com/LayerManager/layman/issues/635) Fill column `image_mosaic` in `publications` table in prime DB schema for all publications. Value of each publication is set to `false`.
+### Changes
+- [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support publishing [timeseries](doc/models.md#timeseries) raster layers. Temporal information is read from file names using new body parameter *time_regex*. Timeseries data files keep their original slugified names in both Layman and GeoServer data directories (instead of renaming to `<layer_name>.<extension>`). Each timeseries is published to GeoServer as one ImageMosaic coverage store.
+- [#446](https://github.com/LayerManager/layman/issues/446) If endpoint [POST Workspace Layers](doc/rest.md#post-workspace-layers) receives grayscale input raster file (with or without alpha band) and if no input style was sent with the raster file, then Layman will automatically create and use customized SLD style to stabilize contrast of the layer in WMS.
+- [#446](https://github.com/LayerManager/layman/issues/446) Transparency of paletted GeoTIFF with transparent data values is respected in WMS. No custom style is needed. It was probably fixed in [v1.16.0](#v1160) by upgrade of GeoServer.
+- [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) returns new subkeys:
+  - `file.paths` with list of paths to all main data files
+  - `image_mosaic` for raster layers stating that layer was published to GeoServer using ImageMosaic coverage store  (`true` value for [timeseries](doc/models.md#timeseries) and `false` otherwise)
+  - `wms.time` for [timeseries](doc/models.md#timeseries) with list of available time instants and regular expression used to extract them from file names
+- [#635](https://github.com/LayerManager/layman/issues/635) Subkey `file.path` is marked deprecated for endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer). Use `file.paths` instead.
+- [#635](https://github.com/LayerManager/layman/issues/635) Metadata sources returns new key ['temporal_extent'](doc/metadata.md#temporal_extent).
+- [#635](https://github.com/LayerManager/layman/issues/635) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) do not support combination of zip file and uncompressed main file. 
+- [#697](https://github.com/LayerManager/layman/issues/697) Normalized GeoTIFF files are created as BigTIFF to enable publishing raster files greater than 4 GB.
+- [#660](https://github.com/LayerManager/layman/issues/660) Vector data files with invalid byte sequence (e.g. ShapeFile with invalid byte sequence in UTF-8 encoding) are first converted to GeoJSON, then cleaned with iconv, and finally imported to database.
+- [#667](https://github.com/LayerManager/layman/issues/667) Fix broken statistics during normalization of float rasters with big nodata value.
+- [#668](https://github.com/LayerManager/layman/issues/668) Fix broken size of raster in EPSG:3034 during normalization.
+- [#669](https://github.com/LayerManager/layman/issues/669) Fix slow publication of vector layers metadata to Micka. The reason was slow guessing of [`spatial_resolution.scale_denominator`](doc/metadata.md#spatial_resolution) metadata property.
+- [#701](https://github.com/LayerManager/layman/pull/701) After publishing to GeoServer, Layman checks that Layer is available in WMS & WFS GetCapabilities to prevent situation when GeoServer hides publishing error. It may happen when data file with wrong CRS is published.
 
 ## v1.17.0
  2022-07-21
