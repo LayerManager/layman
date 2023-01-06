@@ -1334,6 +1334,65 @@ TESTCASES = {
             },
         },
     },
+    'none_file_none_db_connect': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': [],
+            'db_connection': '',
+            'compress': False,
+            'with_chunks': False,
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 1,
+                          'message': 'Missing parameter',
+                          'detail': {
+                              'parameters': ['file', 'db_connection'],
+                              'message': 'Both `file` and `db_connection` parameters are empty',
+                              'expected': 'One of the parameters is filled.',
+                          },
+                          },
+        },
+    },
+    'file_and_db_connect': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'file_paths': ['sample/layman.layer/small_layer.geojson'],
+            'db_connection': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 48,
+                          'message': 'Wrong combination of parameters',
+                          'detail': {
+                              'parameters': ['file', 'db_connection'],
+                              'message': 'Both `file` and `db_connection` parameters are filled',
+                              'expected': 'Only one of the parameters is fulfilled.',
+                              'found': {
+                                  'file': ['small_layer.geojson'],
+                                  'db_connection': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
+                              }},
+                          },
+            frozenset([('compress', True), ('with_chunks', False)]): {
+                'detail': {
+                    'found': {
+                        'file': ['temporary_zip_file.zip'],
+                    },
+                },
+            },
+            frozenset([('compress', True), ('with_chunks', True)]): {
+                'detail': {
+                    'found': {
+                        'file': ['temporary_zip_file.zip'],
+                    },
+                },
+            },
+        },
+    },
 }
 
 VALIDATION_PATCH_ACTION = {

@@ -145,6 +145,7 @@ Body parameters:
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be safely stored in DB
    - if QML style is used in this request, it must list all attributes contained in given data file
 - *db_connection*, string
+   - exactly one of `file` or `db_connection` must be set
 - *name*, string
    - computer-friendly identifier of the layer
    - must be unique among all layers of one workspace
