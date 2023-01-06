@@ -135,6 +135,7 @@ General steps to upgrade layman to MINOR or PATCH version:
    - `deps/*/data` (data directories of external dependencies)
 1. Follow **Upgrade requirements** in [Changelog](CHANGELOG.md) of all MINOR and PATCH versions greater than your current version and lower or equal to the version you are upgrading to.
    - If you run Layman in development mode (e.g. by `make start-dev`), run also
+      - `make build-dev`
       - `make client-build`
       - `make timgen-build`
       - `make micka-build`
