@@ -10,6 +10,7 @@
 - If you are running Layman with development settings, run  
 ```
 make build-dev
+make timgen-build
 make client-build
 ```
 ### Migrations and checks
@@ -43,7 +44,7 @@ make client-build
   - autopep8 1.6.0 -> 2.0.1
   - pytest-rerunfailures 10.2 -> 10.3
   - pytest-timeout 2.0.2 -> 2.1.0
-- [#726](https://github.com/LayerManager/layman/issues/726) Node.js of Laymen Test Client from v12 to v18 and dependencies:
+- [#726](https://github.com/LayerManager/layman/issues/726) Upgrade Node.js of Laymen Test Client from v12 to v18 and dependencies:
   - connect-redis 3 -> 6
   - dotenv 8 -> 16
   - http-proxy-middleware 0.21 -> 2
@@ -54,6 +55,10 @@ make client-build
   - redis 3 -> 4
   - semantic-ui-react 0.88 -> 2
   - xml-formatter 2 -> 3
+- [#732](https://github.com/LayerManager/layman/issues/732) Upgrade Node.js of Timgen from v10 to v18 and dependencies:
+  - ol 5 -> 7
+  - http-server 0.11 -> 14
+- [#732](https://github.com/LayerManager/layman/issues/732) Use "vite" instead of "parcel" and "babel" for dev & build of Timgen.
 
 ## v1.18.0
  2022-11-22
