@@ -54,6 +54,21 @@ def post(workspace):
         ]
     input_files = fs_util.InputFiles(sent_streams=sent_file_streams, sent_paths=sent_file_paths)
     db_connection = request.form.get('db_connection', '')
+    if not input_files and not db_connection:
+        raise LaymanError(1, {
+            'parameters': ['file', 'db_connection'],
+            'message': 'Both `file` and `db_connection` parameters are empty',
+            'expected': 'One of the parameters is filled.',
+        })
+    if input_files and db_connection:
+        raise LaymanError(48, {
+            'parameters': ['file', 'db_connection'],
+            'message': 'Both `file` and `db_connection` parameters are filled',
+            'expected': 'Only one of the parameters is fulfilled.',
+            'found': {
+                'file': input_files.raw_paths,
+                'db_connection': db_connection,
+            }})
 
     # NAME
     unsafe_layername = request.form.get('name', '')
