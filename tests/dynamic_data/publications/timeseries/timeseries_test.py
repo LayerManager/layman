@@ -17,7 +17,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 LAYERS = {
     'more_files_zip': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        'params': {
+        'rest_args': {
             'time_regex': r'[0-9]{8}',
             'file_paths': [
                 os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'),
@@ -55,7 +55,7 @@ LAYERS = {
         'wms_bbox': [1743913.19942603237, 6499107.284021802247, 1755465.937341974815, 6503948.597792930901, ],
     },
     'more_files': {
-        'params': {
+        'rest_args': {
             'time_regex': r'^.*([0-9]{4})([0-9]{2})([0-9]{2}).*$',
             'file_paths': [
                 os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_20220316T100031.0.tif'),
@@ -98,7 +98,7 @@ LAYERS = {
     },
     'longname_one_file_compressed': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        'params': {
+        'rest_args': {
             'time_regex': r'[0-9]{8}',
             'file_paths': [
                 os.path.join(DIRECTORY,
@@ -139,7 +139,7 @@ LAYERS = {
     },
     'longname_one_file': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        'params': {
+        'rest_args': {
             'time_regex': r'[0-9]{8}',
             'file_paths': [
                 os.path.join(DIRECTORY,
@@ -174,7 +174,7 @@ LAYERS = {
     },
     'diacritics_and_spaces_zip': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        'params': {
+        'rest_args': {
             'time_regex': r'^Cerekvice nad Bystřicí ([0-9]{8}).*$',
             'file_paths': [
                 os.path.join(DIRECTORY, 'timeseries_tif/Cerekvice nad Bystřicí 20220316.tif'),
@@ -213,7 +213,7 @@ LAYERS = {
     },
     'diacritics_and_spaces': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        'params': {
+        'rest_args': {
             'time_regex': r'^Cerekvice nad Bystřicí ([0-9]{8}).*$',
             'file_paths': [
                 os.path.join(DIRECTORY, 'timeseries_tif/Cerekvice nad Bystřicí 20220316.tif'),
@@ -250,18 +250,16 @@ LAYERS = {
 def generate_test_cases():
     tc_list = list()
     for name, test_case_params in LAYERS.items():
-        for name_suffix, with_chunks_value in [('', False),
-                                               ('_chunks', True),
-                                               ]:
-            params = deepcopy(test_case_params)
-            params['params']['with_chunks'] = with_chunks_value
-            test_case = base_test.TestCaseType(key=name + name_suffix,
-                                               type=test_case_params.get(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY),
-                                               params=params,
-                                               marks=[pytest.mark.xfail(reason="Not yet implemented.")]
-                                               if test_case_params.get('xfail') else []
-                                               )
-            tc_list.append(test_case)
+        all_params = deepcopy(test_case_params)
+        rest_args = all_params.pop('rest_args')
+        test_case = base_test.TestCaseType(key=name,
+                                           type=test_case_params.get(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY),
+                                           rest_args=rest_args,
+                                           params=all_params,
+                                           marks=[pytest.mark.xfail(reason="Not yet implemented.")]
+                                           if test_case_params.get('xfail') else []
+                                           )
+        tc_list.append(test_case)
     return tc_list
 
 
@@ -270,13 +268,18 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     publication_type = process_client.LAYER_TYPE
 
+    rest_parametrization = {
+        base_test.RestMethod,
+        base_test.RestArgs.WITH_CHUNKS,
+    }
+
     test_cases = generate_test_cases()
 
     # pylint: disable=unused-argument
     @pytest.mark.timeout(60)
-    def test_timeseries_layer(self, layer: Publication, key, params, rest_method):
+    def test_timeseries_layer(self, layer: Publication, key, params, rest_method, rest_args):
         """Parametrized using pytest_generate_tests"""
-        rest_method(layer, params=params.get('params', {}))
+        rest_method(layer, args=rest_args)
 
         asserts_util.is_publication_valid_and_complete(layer)
 
