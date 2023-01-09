@@ -45,8 +45,14 @@ headers_xml = {
 }
 
 headers_sld = {
-    'Accept': 'application/vnd.ogc.sld+xml',
-    'Content-type': 'application/xml',
+    '1.0.0': {
+        'Accept': 'application/vnd.ogc.sld+xml',
+        'Content-type': 'application/xml',
+    },
+    '1.1.0': {
+        'Accept': 'application/vnd.ogc.se+xml',
+        'Content-type': 'application/xml',
+    },
 }
 
 WMS_SERVICE_TYPE = 'wms'
@@ -413,11 +419,27 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
 
 def get_workspace_style_response(geoserver_workspace, stylename, headers=None, auth=None):
     if headers is None:
-        headers = headers_sld
+        response = get_workspace_style_json(geoserver_workspace, stylename, auth)
+        if response.status_code == 200:
+            style_dict = json.loads(response.content)
+            version = style_dict['style']['languageVersion']['version']
+        else:
+            version = '1.0.0'
+        headers = headers_sld[version]
     url = get_workspace_style_url(geoserver_workspace, stylename)
     response = requests.get(url,
                             auth=auth,
                             headers=headers,
+                            timeout=GS_REST_TIMEOUT,
+                            )
+    return response
+
+
+def get_workspace_style_json(geoserver_workspace, stylename, auth=None):
+    url = get_workspace_style_url(geoserver_workspace, stylename)
+    response = requests.get(url,
+                            auth=auth,
+                            headers=headers_json,
                             timeout=GS_REST_TIMEOUT,
                             )
     return response

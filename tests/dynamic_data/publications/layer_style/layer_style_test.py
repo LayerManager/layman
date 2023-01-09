@@ -13,11 +13,11 @@ pytest_generate_tests = base_test.pytest_generate_tests
 TEST_CASES = {
     'default_sld': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        'exp_version': '1.0.0',
+        'exp_version': '1.1.0',
     },
     'sld_1_1_0': {
         'style_file': 'sample/style/sld_1_1_0.xml',
-        'exp_version': '1.0.0',
+        'exp_version': '1.1.0',
     },
     'sld_1_0_0': {
         'style_file': 'sample/style/basic.sld',
