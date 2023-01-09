@@ -199,7 +199,7 @@ def ensure_security_roles(rule, roles, auth):
     )
     if response.status_code == 409:
         existing_roles = get_security_roles(rule, auth)
-        assert existing_roles == roles
+        assert existing_roles == roles, f'existing_roles={existing_roles}, roles={roles}'
     else:
         response.raise_for_status()
 
