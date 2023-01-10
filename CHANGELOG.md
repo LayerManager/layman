@@ -17,11 +17,12 @@ make client-build
 #### Schema migrations
 #### Data migrations
 ### Changes
-- [#348](https://github.com/LayerManager/layman/issues/348) Upgrade GeoServer to 2.21.2, because it has better rendering.
+- [#348](https://github.com/LayerManager/layman/issues/348) Upgrade GeoServer to 2.21.2.
+  - [#613](https://github.com/LayerManager/layman/issues/613) Workspace-specific WMS GetCapabilities documents includes LegendURL element for every style of every layer. Previously vector layers with QML style did not have it. [GetLegendGraphic](doc/endpoints.md#getlegendgraphic) queries can be parametrized depending on layer style.
   - In workspace-specific WMS GetCapabilities documents, style name consists only of style name without `<workspace>:` prefix. For example, formerly it was `testuser_wms:blue_style`, now it is only `blues_style`.
-  - [#613](https://github.com/LayerManager/layman/issues/613) Workspace-specific WMS GetCapabilities documents includes LegendURL element for every style for every layer. Previously vector layers with QML style did not have it. [GetLegendGraphic](doc/endpoints.md#getlegendgraphic) queries can be parametrized depending on layer style.
+  - [#681](https://github.com/LayerManager/layman/issues/681) Enable to publish layer with specific SLD style.
   - [#681](https://github.com/LayerManager/layman/issues/681) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) normalize grayscale float raster files with alpha channel to grayscale without it with internal mask 0/1.
-  - Endpoint [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style) returns SLD styles in version 1.0.0.
+  - Layman now uses official [GeoServer docker image](https://github.com/geoserver/docker) for demo and development purpose. 
 - [#720](https://github.com/LayerManager/layman/issues/720) Upgrade Python dependencies
   - celery 5.0.5 -> 5.2.7
   - flask 2.0.2 -> 2.2.2
