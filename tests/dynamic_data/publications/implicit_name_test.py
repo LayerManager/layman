@@ -60,6 +60,9 @@ PUBLICATIONS = {
                 'expected_name': 'data_zip',
             },
         },
+        'ignored_cases': {
+            frozenset([CompressDomain.FALSE, base_test.WithChunksDomain.TRUE, ]),
+        },
     },
 }
 
@@ -69,7 +72,10 @@ def generate_test_cases():
     for name, test_case_params in PUBLICATIONS.items():
         all_params = deepcopy(test_case_params)
         rest_args = all_params.pop('rest_args')
-        specific_types = {c: EnumTestTypes.MANDATORY for c in all_params.pop('mandatory_cases')}
+        specific_types = {tc: EnumTestTypes.MANDATORY for tc in all_params.pop('mandatory_cases')}
+        for case in all_params.pop('ignored_cases', {}):
+            assert case not in specific_types
+            specific_types[case] = EnumTestTypes.IGNORE
         specific_params = all_params.pop('specific_params')
         test_case = base_test.TestCaseType(key=name,
                                            publication=lambda params: Publication(
