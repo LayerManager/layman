@@ -57,6 +57,7 @@ def get_dimension_enum(dimension):
 
 @dataclass(frozen=True)
 class TestCaseType:
+    # pylint: disable=too-many-instance-attributes
     pytest_id: str = None
     publication: Union[Publication, Callable[[dict], Publication]] = None
     key: str = None
