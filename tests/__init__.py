@@ -13,6 +13,7 @@ PublicationValues = namedtuple('PublicationValuesDef', ['type', 'definition', 'i
 class EnumTestTypes(Enum):
     MANDATORY = 'mandatory'
     OPTIONAL = 'optional'
+    IGNORE = 'ignore'
 
 
 class EnumTestKeys(Enum):

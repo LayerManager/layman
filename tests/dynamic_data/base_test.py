@@ -84,6 +84,7 @@ def pytest_generate_tests(metafunc):
     for test_case in test_cases_for_type:
         assert not test_case.specific_params
         assert not test_case.specific_types
+        assert test_case.type != EnumTestTypes.IGNORE
         rest_method = getattr(cls, test_case.rest_method.function_name)
         rest_args = test_case.rest_args
         argvalues.append(pytest.param(
@@ -180,6 +181,11 @@ class TestSingleRestPublication:
             assert input_test_case.pytest_id is None  # Maybe enable it later
 
             for parametrization in parametrizations:
+                test_type = input_test_case.specific_types.get(frozenset(parametrization),
+                                                               input_test_case.type or EnumTestTypes.OPTIONAL)
+                if test_type == EnumTestTypes.IGNORE:
+                    continue
+
                 specific_params = copy.deepcopy(input_test_case.specific_params.get(frozenset(parametrization), {}))
                 params = {**copy.deepcopy(input_test_case.params), **specific_params}
                 input_publication = None
@@ -211,9 +217,6 @@ class TestSingleRestPublication:
                     base_arg = get_base_arg_of_arg_value(cls, arg_value)
                     rest_args[base_arg.arg_name] = arg_value.raw_value
                     rest_args.update(copy.deepcopy(arg_value.other_rest_args))
-
-                test_type = input_test_case.specific_types.get(frozenset(parametrization),
-                                                               input_test_case.type or EnumTestTypes.OPTIONAL)
 
                 test_case = TestCaseType(pytest_id=pytest_id,
                                          publication=Publication(workspace, publication_type, name),
