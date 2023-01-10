@@ -5,7 +5,7 @@
 ### Upgrade requirements
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
   ```
-  LAYMAN_CLIENT_VERSION=b2e9ecb8781d355281101a7dcd6d7e64342c5df9
+  LAYMAN_CLIENT_VERSION=v1.14.0
   ```
 - If you are running Layman with development settings, run  
 ```
