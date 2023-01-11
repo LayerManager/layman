@@ -59,10 +59,16 @@ class PublicationByDefinitionBase(Enum):
         self.publ_name_part = publ_name_part
 
 
-class PublicationByUsedServers(PublicationByDefinitionBase):
+class LayerByUsedServers(PublicationByDefinitionBase):
     LAYER_VECTOR_SLD = (common_publications.LAYER_VECTOR_SLD, 'vector_sld_layer')
     LAYER_VECTOR_QML = (common_publications.LAYER_VECTOR_QML, 'vector_qml_layer')
     LAYER_RASTER = (common_publications.LAYER_RASTER, 'raster_layer')
+
+
+class PublicationByUsedServers(PublicationByDefinitionBase):
+    LAYER_VECTOR_SLD = LayerByUsedServers.LAYER_VECTOR_SLD.value
+    LAYER_VECTOR_QML = LayerByUsedServers.LAYER_VECTOR_QML.value
+    LAYER_RASTER = LayerByUsedServers.LAYER_RASTER.value
     MAP = (common_publications.MAP_EMPTY, 'map')
 
 

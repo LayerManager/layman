@@ -16,6 +16,7 @@ SMALL_LAYER = PublicationValues(
         'publ_type_detail': ('vector', 'sld'),
     },
     thumbnail='sample/style/basic_sld.png',
+    legend_image='tests/dynamic_data/publications/layer_by_used_servers/legend_vector_sld.png',
 )
 
 SMALL_LAYER_ZIP = PublicationValues(
@@ -42,6 +43,7 @@ SMALL_LAYER_QML = PublicationValues(
         'publ_type_detail': ('vector', 'qml'),
     },
     thumbnail='sample/style/small_layer_qml.png',
+    legend_image=None,  # because layer name appears in the image
 )
 
 NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = PublicationValues(
@@ -105,6 +107,7 @@ SAMPLE_TIF_TFW_RGBA_OPAQUE = PublicationValues(
         'publ_type_detail': ('raster', 'sld'),
     },
     thumbnail='test_tools/data/thumbnail/raster_layer_tiff.png',
+    legend_image='tests/dynamic_data/publications/layer_by_used_servers/legend_raster.png',
 )
 
 SAMPLE_TIF_TFW_RGBA_OPAQUE_ZIP = PublicationValues(

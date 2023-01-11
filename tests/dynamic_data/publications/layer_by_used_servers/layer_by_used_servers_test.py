@@ -1,8 +1,9 @@
+from copy import deepcopy
 import os
 import pytest
 
 from test_tools import process_client
-from tests import EnumTestTypes, EnumTestKeys
+from tests import EnumTestTypes
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
@@ -12,26 +13,37 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 pytest_generate_tests = base_test.pytest_generate_tests
 
 LAYERS = {
-    'vector_sld': dict(),
-    'vector_qml': {
-        'rest_params': {
-            'style_file': 'sample/style/small_layer.qml'},
-        'expected_data': {
-            'legend': {
-                base_test.TestSingleRestPublication.patch_publication.__name__: f'legend_vector_qml_patch.png'
-            }
-        }
-
+    'main': {
+        'specific_params': {
+            frozenset([base_test.LayerByUsedServers.LAYER_VECTOR_QML, base_test.RestMethod.POST]): {
+                'expected_data': {
+                    'legend': f'legend_vector_qml_post.png',
+                },
+            },
+            frozenset([base_test.LayerByUsedServers.LAYER_VECTOR_QML, base_test.RestMethod.PATCH]): {
+                'expected_data': {
+                    'legend': f'legend_vector_qml_patch.png',
+                },
+            },
+        },
     },
-    'raster': {
-        'rest_params': {
-            'file_paths': [
-                'sample/layman.layer/sample_tif_tfw_rgba_opaque.tfw',
-                'sample/layman.layer/sample_tif_tfw_rgba_opaque.tif',
-            ],
-        }
-    }
 }
+
+
+def generate_test_cases():
+    tc_list = list()
+    for name, test_case_params in LAYERS.items():
+        all_params = deepcopy(test_case_params)
+        specific_params = all_params.pop('specific_params')
+        test_case = base_test.TestCaseType(key=name,
+                                           type=EnumTestTypes.MANDATORY,
+                                           params=all_params,
+                                           specific_params=specific_params,
+                                           marks=[pytest.mark.xfail(reason="Not yet implemented.")]
+                                           if test_case_params.get('xfail') else []
+                                           )
+        tc_list.append(test_case)
+    return tc_list
 
 
 class TestLayer(base_test.TestSingleRestPublication):
@@ -39,24 +51,24 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     publication_type = process_client.LAYER_TYPE
 
-    test_cases = [base_test.TestCaseType(key=key,
-                                         type=params.get(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY),
-                                         params=params,
-                                         marks=[pytest.mark.xfail(reason="Not yet implemented.")]
-                                         if params.get('xfail') else []
-                                         )
-                  for key, params in LAYERS.items()]
+    rest_parametrization = [
+        base_test.RestMethod,
+        base_test.LayerByUsedServers,
+    ]
+
+    test_cases = generate_test_cases()
 
     @staticmethod
-    def test_layer(layer, key, params, rest_method):
+    def test_layer(layer, params, rest_args, rest_method, parametrization):
         """Parametrized using pytest_generate_tests"""
-        rest_method(layer, params=params.get('rest_params', {}))
+        publ_def = parametrization.publication_definition
+        rest_method(layer, args=rest_args)
 
         assert_util.is_publication_valid_and_complete(layer)
 
-        exp_legend_filepath = os.path.join(DIRECTORY,
-                                           params.get('expected_data', dict()).get('legend', dict()).get(rest_method.__name__,
-                                                                                                         f'legend_{key}.png'))
+        exp_legend_filename = params.get('expected_data', dict()).get('legend')
+        exp_legend_filepath = os.path.join(DIRECTORY, exp_legend_filename) if exp_legend_filename else publ_def.legend_image
+
         asserts_publ.geoserver.wms_legend(layer.workspace, layer.type, layer.name,
                                           exp_legend=exp_legend_filepath,
                                           obtained_file_path=f'tmp/artifacts/test_wms_legend/{layer.name}/legend_{layer.name}.png',
