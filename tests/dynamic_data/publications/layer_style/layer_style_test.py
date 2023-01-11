@@ -43,11 +43,10 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          if value.get('xfail') else []
                                          ) for key, value in TEST_CASES.items()]
 
-    # pylint: disable=unused-argument
     @staticmethod
-    def test_style_xml(layer: Publication, key, params, rest_method):
+    def test_style_xml(layer: Publication, params, rest_method):
         """Parametrized using pytest_generate_tests"""
-        rest_method(layer, params={
+        rest_method(layer, args={
             'file_paths': ['sample/layman.layer/small_layer.geojson'],
             'style_file': params.get('style_file'),
         })
