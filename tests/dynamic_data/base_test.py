@@ -130,6 +130,7 @@ def pytest_generate_tests(metafunc):
         parametrization = test_case.parametrization
         wanted_arg_name_to_value = {
             publ_type_name: test_case.publication,
+            'key': test_case.key,
             'params': copy.deepcopy(test_case.params),
             'rest_method': rest_method,
             'rest_args': rest_args,

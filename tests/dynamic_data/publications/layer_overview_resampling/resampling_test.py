@@ -25,17 +25,16 @@ class TestLayer(base_test.TestSingleRestPublication):
                   resampling_method in
                   settings.OVERVIEW_RESAMPLING_METHOD_LIST]
 
-    # pylint: disable=unused-argument
     @staticmethod
-    def test_overview_resampling(layer, key, params, rest_method):
+    def test_overview_resampling(layer, key, rest_method):
         """Parametrized using pytest_generate_tests"""
         overview_resampling_method = key
-        layer_params = {
+        layer_args = {
             'file_paths': [os.path.join(DIRECTORY, 'raster_for_resampling.tif')],
             'overview_resampling': overview_resampling_method,
             'style_file': os.path.join(DIRECTORY, 'style.sld'),
         }
-        rest_method(layer, params=layer_params)
+        rest_method(layer, args=layer_args)
 
         assert_util.is_publication_valid_and_complete(layer)
         exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{overview_resampling_method}.png")
