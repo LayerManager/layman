@@ -4,7 +4,8 @@ from psycopg2 import tz
 import pytest
 
 from db import ConnectionString
-from layman import settings
+from layman import settings, LaymanError
+from test_tools import util as test_util
 from . import util
 from .util import to_safe_layer_name, fill_in_partial_info_statuses
 
@@ -153,37 +154,93 @@ def test_fill_in_partial_info_statuses():
         table='table_name',
         geo_column='wkb_geometry',
     )),
-    ('postgresql://postgresql', ConnectionString(
-        url='postgresql://postgresql',
-        table=None,
-        geo_column=None,
-     )),
-    ('', ConnectionString(
-        url='',
-        table=None,
-        geo_column=None,
-     )),
-    (' ', ConnectionString(
-        url=' ',
-        table=None,
-        geo_column=None,
-    )),
-    ('_', ConnectionString(
-        url='_',
-        table=None,
-        geo_column=None,
-    )),
-    ('$^&*(', ConnectionString(
-        url='$^&*(',
-        table=None,
-        geo_column=None,
-    )),
-    ('ščžýžý', ConnectionString(
-        url='ščžýžý',
-        table=None,
-        geo_column=None,
-    )),
 ])
 def test_parse_connection_string(connection_string, exp_result):
     result = util.parse_and_validate_connection_string(connection_string)
     assert result == exp_result
+
+
+@pytest.mark.parametrize('connection_string, exp_error', [
+    ('postgresql://postgresql', {'http_code': 400,
+                                 'code': 2,
+                                 'detail': {'parameter': 'db_connection',
+                                            'message': 'Parameter `db_connection` is expected to have `url` part and `table` and `geo_column` query parameters',
+                                            'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
+                                            'found': {
+                                                'db_connection': 'postgresql://postgresql',
+                                                'url': 'postgresql://postgresql',
+                                                'table': None,
+                                                'geo_column': None,
+                                            },
+                                            },
+                                 }),
+    ('', {'http_code': 400,
+          'code': 2,
+          'detail': {'parameter': 'db_connection',
+                     'message': 'Parameter `db_connection` is expected to have `url` part and `table` and `geo_column` query parameters',
+                     'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
+                     'found': {
+                         'db_connection': '',
+                         'url': '',
+                         'table': None,
+                         'geo_column': None,
+                     },
+                     },
+          }),
+    (' ', {'http_code': 400,
+           'code': 2,
+           'detail': {'parameter': 'db_connection',
+                      'message': 'Parameter `db_connection` is expected to have `url` part and `table` and `geo_column` query parameters',
+                      'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
+                      'found': {
+                          'db_connection': ' ',
+                          'url': ' ',
+                          'table': None,
+                          'geo_column': None,
+                      },
+                      },
+           }),
+    ('_', {'http_code': 400,
+           'code': 2,
+           'detail': {'parameter': 'db_connection',
+                      'message': 'Parameter `db_connection` is expected to have `url` part and `table` and `geo_column` query parameters',
+                      'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
+                      'found': {
+                          'db_connection': '_',
+                          'url': '_',
+                          'table': None,
+                          'geo_column': None,
+                      },
+                      },
+           }),
+    ('$^&*(', {'http_code': 400,
+               'code': 2,
+               'detail': {'parameter': 'db_connection',
+                          'message': 'Parameter `db_connection` is expected to have `url` part and `table` and `geo_column` query parameters',
+                          'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
+                          'found': {
+                              'db_connection': '$^&*(',
+                              'url': '$^&*(',
+                              'table': None,
+                              'geo_column': None,
+                          },
+                          },
+               }),
+    ('ščžýžý', {'http_code': 400,
+                'code': 2,
+                'detail': {'parameter': 'db_connection',
+                           'message': 'Parameter `db_connection` is expected to have `url` part and `table` and `geo_column` query parameters',
+                           'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
+                           'found': {
+                               'db_connection': 'ščžýžý',
+                               'url': 'ščžýžý',
+                               'table': None,
+                               'geo_column': None,
+                           },
+                           },
+                }),
+])
+def test_validate_connection_string(connection_string, exp_error):
+    with pytest.raises(LaymanError) as exc_info:
+        util.parse_and_validate_connection_string(connection_string)
+    test_util.assert_error(exp_error, exc_info)
