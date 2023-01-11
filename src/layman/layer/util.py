@@ -268,4 +268,17 @@ def parse_and_validate_connection_string(connection_string):
                               table=params.get('table', [None])[0],
                               geo_column=params.get('geo_column', [None])[0],
                               )
+    if not all([result.url, result.table, result.geo_column]):
+        raise LaymanError(2, {
+            'parameter': 'db_connection',
+            'message': 'Parameter `db_connection` is expected to have `url` part and `table` and `geo_column` query parameters',
+            'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
+            'found': {
+                'db_connection': connection_string,
+                'url': result.url,
+                'table': result.table,
+                'geo_column': result.geo_column,
+            }
+        })
+
     return result

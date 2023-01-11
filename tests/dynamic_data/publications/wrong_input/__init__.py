@@ -1393,6 +1393,31 @@ TESTCASES = {
             },
         },
     },
+    'partial_db_connect': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'db_connection': 'db_connection',
+            'compress': False,
+            'with_chunks': False,
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 2,
+                          'message': 'Wrong parameter value',
+                          'detail': {
+                              'parameter': 'db_connection',
+                              'message': 'Parameter `db_connection` is expected to have `url` part and `table` and `geo_column` query parameters',
+                              'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
+                              'found': {
+                                  'url': 'db_connection',
+                                  'table': None,
+                                  'geo_column': None,
+                              }},
+                          },
+        },
+    },
 }
 
 VALIDATION_PATCH_ACTION = {
