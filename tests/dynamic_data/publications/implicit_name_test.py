@@ -107,9 +107,8 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     test_cases = generate_test_cases()
 
-    # pylint: disable=unused-argument
     @staticmethod
-    def test_implicit_name(publication: Publication, key, params, rest_method, rest_args, parametrization):
+    def test_implicit_name(publication: Publication, rest_method, rest_args):
         """Parametrized using pytest_generate_tests"""
         rest_method(publication, args=rest_args)
 
