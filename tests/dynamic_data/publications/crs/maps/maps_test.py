@@ -60,13 +60,13 @@ class TestMap(base_test.TestSingleRestPublication):
         """Parametrized using pytest_generate_tests"""
         map_crs = key
         layer_name = LAYER_FOR_MAPS
-        map_params = {
+        map_args = {
             'map_layers': [(self.workspace, layer_name)],
             'native_extent': params[KEY_INFO_VALUES]['exp_publication_detail']['native_bounding_box'],
             'crs': map_crs,
             'title': map.name,
         }
-        rest_method(map, params=map_params)
+        rest_method(map, args=map_args)
 
         exp_publication_detail = {
             'description': 'Map generated for internal layers',
