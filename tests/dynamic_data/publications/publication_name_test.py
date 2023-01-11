@@ -61,7 +61,7 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     # pylint: disable=unused-argument
     @staticmethod
-    def test_publication_name(publication, key, params, rest_method, rest_args, parametrization):
+    def test_publication_name(publication, rest_method, rest_args, parametrization):
         """Parametrized using pytest_generate_tests"""
         publ_def = parametrization.publication_definition
         rest_method(publication, args=rest_args)

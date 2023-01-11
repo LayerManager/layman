@@ -105,6 +105,10 @@ def pytest_generate_tests(metafunc):
     test_type_str = os.getenv(EnumTestKeys.TYPE.value) or EnumTestTypes.MANDATORY.value
     test_type = EnumTestTypes(test_type_str)
     cls = metafunc.cls
+    test_fn = metafunc.function
+    arg_names = [a for a in inspect.getfullargspec(test_fn).args if a != 'self']
+    arg_names.append('post_before_patch')
+    publ_type_name = cls.publication_type.split('.')[-1] if cls.publication_type else 'publication'
     argvalues = []
     ids = []
 
@@ -118,20 +122,20 @@ def pytest_generate_tests(metafunc):
         rest_method = getattr(cls, test_case.rest_method.function_name)
         rest_args = test_case.rest_args
         parametrization = test_case.parametrization
-        argvalues.append(pytest.param(
-            test_case.publication,
-            test_case.key,
-            copy.deepcopy(test_case.params),
-            rest_method,
-            rest_args,
-            parametrization,
-            (test_case.publication, test_case.rest_method),
-            marks=test_case.marks,
-        ))
+        wanted_arg_name_to_value = {
+            publ_type_name: test_case.publication,
+            'params': copy.deepcopy(test_case.params),
+            'rest_method': rest_method,
+            'rest_args': rest_args,
+            'parametrization': parametrization,
+            'post_before_patch': (test_case.publication, test_case.rest_method),
+        }
+        arg_values = [wanted_arg_name_to_value[n] for n in arg_names]
+
+        argvalues.append(pytest.param(*arg_values, marks=test_case.marks))
         ids.append(test_case.pytest_id)
-    publ_type_name = cls.publication_type.split('.')[-1] if cls.publication_type else 'publication'
     metafunc.parametrize(
-        argnames=f'{publ_type_name}, key, params, rest_method, rest_args, parametrization, post_before_patch',
+        argnames=', '.join(arg_names),
         argvalues=argvalues,
         ids=ids,
         indirect=['post_before_patch'],
