@@ -277,7 +277,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     # pylint: disable=unused-argument
     @pytest.mark.timeout(60)
-    def test_timeseries_layer(self, layer: Publication, key, params, rest_method, rest_args):
+    def test_timeseries_layer(self, layer: Publication, key, params, rest_method, rest_args, parametrization):
         """Parametrized using pytest_generate_tests"""
         rest_method(layer, args=rest_args)
 

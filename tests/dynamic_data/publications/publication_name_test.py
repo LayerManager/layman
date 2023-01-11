@@ -1,3 +1,4 @@
+from copy import deepcopy
 import os
 import pytest
 
@@ -5,8 +6,7 @@ from test_tools import cleanup
 from tests.asserts.final import publication as publ_asserts
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
-from tests.dynamic_data.publications import common_publications
-from ... import Publication, EnumTestTypes, EnumTestKeys, PublicationValues
+from ... import Publication, EnumTestTypes, EnumTestKeys
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -19,51 +19,32 @@ TEST_CASES = {
 
 pytest_generate_tests = base_test.pytest_generate_tests
 
-PUBLICATION_TYPES = {
-    'vector_sld_layer': common_publications.LAYER_VECTOR_SLD,
-    'vector_qml_layer': common_publications.LAYER_VECTOR_QML,
-    'raster_layer': common_publications.LAYER_RASTER,
-    'map': common_publications.MAP_EMPTY,
-}
 
-
-def parametrize_test(workspace, input_test_cases, publication_types):
+def generate_test_cases():
     test_cases = []
-    for key, params in input_test_cases.items():
-        for parametrization_key, publication_definition in publication_types.items():
-            name = params['name']
-            test_case_id = f'{name}:{parametrization_key}_post'
+    for key, test_case_params in TEST_CASES.items():
+        all_params = deepcopy(test_case_params)
+        test_type = all_params.pop(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY)
 
-            post_definition = dict()
-            post_definition.update(publication_definition.definition)
-
-            test_case_definition = PublicationValues(
-                type=publication_definition.type,
-                definition=post_definition,
-                info_values=publication_definition.info_values,
-                thumbnail=publication_definition.thumbnail,
-            )
-
-            test_case = base_test.TestCaseType(pytest_id=test_case_id,
-                                               publication=Publication(workspace, publication_definition.type, name),
-                                               key=key,
-                                               params=test_case_definition,
-                                               type=params.get(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY)
-                                               )
-            test_cases.append(test_case)
+        test_case = base_test.TestCaseType(publication=lambda publ_def, cls, params: Publication(cls.workspace,
+                                                                                                 publ_def.type,
+                                                                                                 params['name']),
+                                           key=key,
+                                           params=all_params,
+                                           type=test_type,
+                                           )
+        test_cases.append(test_case)
     return test_cases
 
 
 class TestPublication(base_test.TestSingleRestPublication):
 
     workspace = 'dynamic_test_publication_name'
-    test_cases = parametrize_test('dynamic_test_publication_name', TEST_CASES, PUBLICATION_TYPES)
+    test_cases = generate_test_cases()
     publication_type = None
 
     rest_parametrization = {
-        'method': [
-            base_test.RestMethodType('post_publication', 'post'),
-        ],
+        base_test.PublicationByUsedServers,
     }
 
     @pytest.fixture(scope='class', autouse=True)
@@ -80,12 +61,13 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     # pylint: disable=unused-argument
     @staticmethod
-    def test_publication_name(publication, key, params, rest_method):
+    def test_publication_name(publication, key, params, rest_method, rest_args, parametrization):
         """Parametrized using pytest_generate_tests"""
-        rest_method(publication, params=params.definition)
+        publ_def = parametrization.publication_definition
+        rest_method(publication, args=rest_args)
         assert_util.is_publication_valid_and_complete(publication)
         publ_asserts.internal.correct_values_in_detail(publication.workspace, publication.type, publication.name,
-                                                       **params.info_values)
-        if params.thumbnail:
+                                                       **publ_def.info_values)
+        if publ_def.thumbnail:
             publ_asserts.internal.thumbnail_equals(publication.workspace, publication.type, publication.name,
-                                                   exp_thumbnail=params.thumbnail)
+                                                   exp_thumbnail=publ_def.thumbnail)
