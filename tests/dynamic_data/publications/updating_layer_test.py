@@ -24,11 +24,10 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
                                                  }
                                          )]
 
-    # pylint: disable=unused-argument
     @staticmethod
-    def test_layer(layer, key, params, rest_method):
+    def test_layer(layer, params, rest_method):
         """Parametrized using pytest_generate_tests"""
-        rest_method(layer, params=params)
+        rest_method(layer, args=params)
 
         exp_publication_detail = {
             '_file_type': 'unknown',
