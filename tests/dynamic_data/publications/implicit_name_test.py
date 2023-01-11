@@ -78,8 +78,8 @@ def generate_test_cases():
             specific_types[case] = EnumTestTypes.IGNORE
         specific_params = all_params.pop('specific_params')
         test_case = base_test.TestCaseType(key=name,
-                                           publication=lambda params: Publication(
-                                               workspace='dynamic_test_workspace_implicit_name',
+                                           publication=lambda params, cls: Publication(
+                                               workspace=cls.workspace,
                                                type=params['publication_type'],
                                                name=params['expected_name']),
                                            type=EnumTestTypes.OPTIONAL,
@@ -109,7 +109,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     # pylint: disable=unused-argument
     @staticmethod
-    def test_implicit_name(publication: Publication, key, params, rest_method, rest_args):
+    def test_implicit_name(publication: Publication, key, params, rest_method, rest_args, parametrization):
         """Parametrized using pytest_generate_tests"""
         rest_method(publication, args=rest_args)
 
