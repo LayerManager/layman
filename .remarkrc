@@ -2,7 +2,9 @@
   "settings": {
   },
   "plugins": {
-    "validate-links": null,
+    "validate-links": {
+      "repository": "git@github.com:layermanager/layman.git"
+    },
     "lint-no-dead-urls": {
       "skipLocalhost": true,
       "skipUrlPatterns": [
