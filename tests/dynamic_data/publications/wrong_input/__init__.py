@@ -1406,15 +1406,14 @@ TESTCASES = {
                           'sync': True,
                           'code': 2,
                           'message': 'Wrong parameter value',
-                          'detail': {
-                              'parameter': 'db_connection',
-                              'message': 'Parameter `db_connection` is expected to have `url` part and `table` and `geo_column` query parameters',
-                              'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
-                              'found': {
-                                  'url': 'db_connection',
-                                  'table': None,
-                                  'geo_column': None,
-                              }},
+                          'detail': {'parameter': 'db_connection',
+                                     'message': 'Parameter `db_connection` is expected to have schema `postgresql`',
+                                     'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
+                                     'found': {
+                                         'db_connection': 'db_connection',
+                                         'schema': '',
+                                     },
+                                     },
                           },
         },
     },

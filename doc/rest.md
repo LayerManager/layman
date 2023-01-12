@@ -146,7 +146,7 @@ Body parameters:
    - if QML style is used in this request, it must list all attributes contained in given data file
 - *db_connection*, string
    - exactly one of `file` or `db_connection` must be set
-   - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>` is expected query parameters `table` and `geo_column` specified
+   - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>` is expected with schema `postgresql` and query parameters `table` and `geo_column` specified
 - *name*, string
    - computer-friendly identifier of the layer
    - must be unique among all layers of one workspace
