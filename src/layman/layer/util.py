@@ -262,6 +262,17 @@ def get_same_or_missing_prop_names(workspace, layername):
 
 def parse_and_validate_connection_string(connection_string):
     connection = parse.urlparse(connection_string, )
+    if connection.scheme != 'postgresql':
+        raise LaymanError(2, {
+            'parameter': 'db_connection',
+            'message': 'Parameter `db_connection` is expected to have schema `postgresql`',
+            'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
+            'found': {
+                'db_connection': connection_string,
+                'schema': connection.scheme,
+            }
+        })
+
     params = parse.parse_qs(connection.query)
     url = connection._replace(query='').geturl()
     result = ConnectionString(url=url,
