@@ -4,6 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class ConnectionString:
     url: str
+    schema: str
     table: str
     geo_column: str
 

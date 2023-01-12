@@ -3,6 +3,7 @@ import os
 import logging
 
 from layman import LaymanError, settings
+from layman.layer.util import DB_CONNECTION_PATTERN
 from tests.asserts import util as asserts_util
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
@@ -1407,11 +1408,11 @@ TESTCASES = {
                           'code': 2,
                           'message': 'Wrong parameter value',
                           'detail': {'parameter': 'db_connection',
-                                     'message': 'Parameter `db_connection` is expected to have schema `postgresql`',
-                                     'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
+                                     'message': 'Parameter `db_connection` is expected to have URI scheme `postgresql`',
+                                     'expected': DB_CONNECTION_PATTERN,
                                      'found': {
                                          'db_connection': 'db_connection',
-                                         'schema': '',
+                                         'uri_scheme': '',
                                      },
                                      },
                           },
