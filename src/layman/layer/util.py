@@ -1,9 +1,10 @@
 from functools import wraps, partial
 from urllib import parse
 import re
+import psycopg2
 
 from flask import current_app, request, g
-from db import ConnectionString
+from db import ConnectionString, util as db_util
 from layman import LaymanError, patch_mode, util as layman_util, settings
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for
@@ -19,6 +20,8 @@ ATTRNAME_PATTERN = PUBLICATION_NAME_PATTERN
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
 FLASK_INFO_KEY = f'{__name__}:LAYER_INFO'
+
+DB_CONNECTION_PATTERN = 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<schema>.<table_name>&geo_column=<geo_column_name>'
 
 
 def to_safe_layer_name(value):
@@ -262,34 +265,94 @@ def get_same_or_missing_prop_names(workspace, layername):
 
 def parse_and_validate_connection_string(connection_string):
     connection = parse.urlparse(connection_string, )
-    if connection.scheme != 'postgresql':
+    if connection.scheme not in {'postgresql', 'postgres'}:
         raise LaymanError(2, {
             'parameter': 'db_connection',
-            'message': 'Parameter `db_connection` is expected to have schema `postgresql`',
-            'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
+            'message': 'Parameter `db_connection` is expected to have URI scheme `postgresql`',
+            'expected': DB_CONNECTION_PATTERN,
             'found': {
                 'db_connection': connection_string,
-                'schema': connection.scheme,
+                'uri_scheme': connection.scheme,
             }
         })
 
-    params = parse.parse_qs(connection.query)
-    url = connection._replace(query='').geturl()
-    result = ConnectionString(url=url,
-                              table=params.get('table', [None])[0],
-                              geo_column=params.get('geo_column', [None])[0],
-                              )
-    if not all([result.url, result.table, result.geo_column]):
+    query = parse.parse_qs(connection.query)
+    table = query.pop('table', [None])[0]
+    geo_column = query.pop('geo_column', [None])[0]
+    connection = connection._replace(query=parse.urlencode(query, True))
+    uri = parse.urlunparse(connection)
+    if not all([table, geo_column, connection.hostname]):
         raise LaymanError(2, {
             'parameter': 'db_connection',
-            'message': 'Parameter `db_connection` is expected to have `url` part and `table` and `geo_column` query parameters',
-            'expected': 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<table_name>&geo_column=<geo_column_name>',
+            'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `table` and `geo_column`.',
+            'expected': DB_CONNECTION_PATTERN,
             'found': {
                 'db_connection': connection_string,
-                'url': result.url,
-                'table': result.table,
-                'geo_column': result.geo_column,
+                'host': connection.hostname,
+                'table': table,
+                'geo_column': geo_column,
             }
         })
+
+    table_parsed = table.split('.')
+    if not len(table_parsed) == 2:
+        raise LaymanError(2, {
+            'parameter': 'db_connection',
+            'message': 'Parameter `db_connection` is expected to have query parameter `table` in format `<schema>.<table_name>`',
+            'expected': DB_CONNECTION_PATTERN,
+            'found': {
+                'db_connection': connection_string,
+                'table': table,
+            }
+        })
+    schema, table_name = table_parsed
+
+    try:
+        conn_cur = db_util.create_connection_cursor(uri, encapsulate_exception=False)
+    except psycopg2.OperationalError as exc:
+        raise LaymanError(2, {
+            'parameter': 'db_connection',
+            'message': 'Unable to connect to database. Please check connection string, firewall settings, etc.',
+            'expected': DB_CONNECTION_PATTERN,
+            'detail': str(exc),
+            'found': {
+                'db_connection': connection_string,
+            },
+        }) from exc
+
+    query = f'''select count(*) from information_schema.tables WHERE table_schema=%s and table_name=%s'''
+    query_res = db_util.run_query(query, (schema, table_name,), conn_cur=conn_cur)
+    if not query_res[0][0]:
+        raise LaymanError(2, {
+            'parameter': 'db_connection',
+            'message': 'Table not found in database.',
+            'expected': DB_CONNECTION_PATTERN,
+            'found': {
+                'db_connection': connection_string,
+                'schema': schema,
+                'table_name': table_name,
+            }
+        })
+
+    query = f'''select count(*) from geometry_columns where f_table_schema = %s and f_table_name = %s and f_geometry_column = %s'''
+    query_res = db_util.run_query(query, (schema, table_name, geo_column), conn_cur=conn_cur)
+    if not query_res[0][0]:
+        raise LaymanError(2, {
+            'parameter': 'db_connection',
+            'message': 'Column `geo_column` not found among geometry columns.',
+            'expected': DB_CONNECTION_PATTERN,
+            'found': {
+                'db_connection': connection_string,
+                'schema': schema,
+                'table_name': table_name,
+                'geo_column': geo_column,
+            }
+        })
+
+    result = ConnectionString(url=uri,
+                              schema=schema,
+                              table=table_name,
+                              geo_column=geo_column,
+                              )
 
     return result

@@ -5,6 +5,7 @@ from enum import Enum
 
 import pytest
 pytest.register_assert_rewrite('tests.asserts', 'tests.static_data.data')
+EXTERNAL_DB_NAME = 'external_test_db'
 
 
 Action = namedtuple('ActionTypeDef', ['method', 'params', ])
