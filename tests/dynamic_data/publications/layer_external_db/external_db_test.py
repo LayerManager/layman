@@ -11,7 +11,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 TEST_CASES = {
     'external_vector_sld': {
-        'rest_params': {
+        'rest_args': {
             'db_connection': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
         },
     },
@@ -27,20 +27,15 @@ class TestLayer(base_test.TestSingleRestPublication):
     test_cases = [base_test.TestCaseType(key=key,
                                          type=value.get(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY),
                                          params=value,
+                                         rest_args=value['rest_args'],
                                          marks=[pytest.mark.xfail(reason="Not yet implemented.")]
                                          if value.get('xfail') else []
                                          ) for key, value in TEST_CASES.items()]
 
-    rest_parametrization = {
-        'method': [
-            base_test.RestMethodType('post_publication', 'post'),
-        ],
-    }
+    rest_parametrization = {}
 
     # pylint: disable=unused-argument
     @staticmethod
-    def test_style_xml(layer: Publication, key, params, rest_method):
+    def test_style_xml(layer: Publication, params, rest_method, rest_args):
         """Parametrized using pytest_generate_tests"""
-        rest_method(layer, params={
-            **params['rest_params']
-        })
+        rest_method(layer, args=rest_args)
