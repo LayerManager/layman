@@ -12,7 +12,7 @@ KEY_PUBLICATION_TYPE = 'publ_type'
 KEY_ACTION_PARAMS = 'action_params'
 
 REST_PARAMETRIZATION = {
-    'with_chunks': {False: 'sync', True: 'chunks'},
+    'with_chunks': {False: '', True: 'chunks'},
     'compress': {False: '', True: 'zipped'},
 }
 
