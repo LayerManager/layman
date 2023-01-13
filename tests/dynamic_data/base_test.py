@@ -1,14 +1,15 @@
 import inspect
-import itertools
 import copy
 import os
-from typing import final
+from typing import final, Tuple, Optional
 import pytest
+
+from tests.asserts.util import recursive_dict_update
 from test_tools import process_client, cleanup
 from .base_test_classes import WithChunksDomain, CompressDomainBase, CompressDomain, RestArgs, RestMethod, PublicationByDefinitionBase, \
     LayerByUsedServers, PublicationByUsedServers, TestCaseType, Parametrization  # pylint: disable=unused-import
 from . import base_test_util as util
-from .. import Publication, EnumTestTypes, EnumTestKeys
+from .. import Publication, EnumTestTypes, EnumTestKeys, PublicationValues
 
 
 def pytest_generate_tests(metafunc):
@@ -28,13 +29,13 @@ def pytest_generate_tests(metafunc):
     test_cases_for_type = [test_case for test_case in test_cases if
                            test_type == EnumTestTypes.OPTIONAL or test_case.type == EnumTestTypes.MANDATORY]
     for test_case in test_cases_for_type:
-        assert not test_case.specific_params
-        assert not test_case.specific_types
-        assert test_case.type != EnumTestTypes.IGNORE
+        assert not test_case.specific_params, f"Property specific_params is meant only for input test cases."
+        assert not test_case.specific_types, f"Property specific_types is meant only for input test cases."
+        assert test_case.type != EnumTestTypes.IGNORE, f"Test type IGNORE is meant only for input test cases."
         rest_method = getattr(cls, test_case.rest_method.function_name)
         rest_args = test_case.rest_args
         parametrization = test_case.parametrization
-        wanted_arg_name_to_value = {
+        arg_name_to_value = {
             publ_type_name: test_case.publication,
             'key': test_case.key,
             'params': copy.deepcopy(test_case.params),
@@ -43,7 +44,7 @@ def pytest_generate_tests(metafunc):
             'parametrization': parametrization,
             'post_before_patch': (test_case.publication, test_case.rest_method),
         }
-        arg_values = [wanted_arg_name_to_value[n] for n in arg_names]
+        arg_values = [arg_name_to_value[n] for n in arg_names]
 
         argvalues.append(pytest.param(*arg_values, marks=test_case.marks))
         ids.append(test_case.pytest_id)
@@ -75,69 +76,45 @@ class TestSingleRestPublication:
     @classmethod
     @final
     def parametrize_test_cases(cls) -> [TestCaseType]:
-        util.check_rest_parametrization(cls)
+        util.check_rest_parametrization(cls.rest_parametrization)
 
-        parametrization_values = []
-        for dimension in cls.rest_parametrization:
-            all_dim_values = list(util.get_dimension_enum(dimension))
-            parametrization_values.append(all_dim_values)
+        parametrizations = util.rest_parametrization_to_parametrizations(cls.rest_parametrization)
+        util.check_input_test_cases(cls.test_cases, cls.rest_parametrization, parametrizations)
 
-        parametrizations = list(itertools.product(*parametrization_values)) or [[]]
-        util.check_input_test_cases(cls, parametrizations)
         test_cases = []
         for input_test_case in cls.test_cases:
             assert input_test_case.rest_method is None  # Maybe enable it later
             assert input_test_case.pytest_id is None  # Maybe enable it later
 
             for parametrization in parametrizations:
-                test_type = input_test_case.specific_types.get(frozenset(parametrization),
+                test_type = input_test_case.specific_types.get(parametrization.values_set,
                                                                input_test_case.type or EnumTestTypes.OPTIONAL)
                 if test_type == EnumTestTypes.IGNORE:
                     continue
 
-                param_inst = Parametrization(parametrization, rest_parametrization=cls.rest_parametrization)
-                publication_definition = param_inst.publication_definition
+                publication_definition = parametrization.publication_definition
 
-                specific_params = copy.deepcopy(input_test_case.specific_params.get(frozenset(parametrization), {}))
-                params = {**copy.deepcopy(input_test_case.params), **specific_params}
+                specific_params = copy.deepcopy(input_test_case.specific_params.get(parametrization.values_set, {}))
+                params = recursive_dict_update(input_test_case.params, specific_params)
 
-                input_publication = None
-                if isinstance(input_test_case.publication, Publication):
-                    input_publication = input_test_case.publication
-                elif callable(input_test_case.publication):
-                    args_spec = inspect.getfullargspec(input_test_case.publication)
-                    arg_names_to_values = {
-                        'params': params,
-                        'publ_def': publication_definition,
-                        'cls': cls,
-                    }
-                    args = [arg_names_to_values[n] for n in args_spec.args]
-                    input_publication = input_test_case.publication(*args)
+                input_publication, workspace, publication_type = cls._get_input_publication_workspace_and_type(
+                    input_test_case=input_test_case, params=params, publication_definition=publication_definition,
+                )
 
-                workspace = cls.workspace
-                publication_type = cls.publication_type
-
-                if input_publication:
-                    workspace = input_publication.workspace or workspace
-                    publication_type = input_publication.type or publication_type
                 publ_name_parts = [publication_type.split('.')[1], input_test_case.key.replace(':', '_').lower()] +\
-                                  [p.publ_name_part for p in parametrization if p.publ_name_part]
+                                  [val.publ_name_part for val in parametrization.values_list if val.publ_name_part]
                 name = '_'.join(publ_name_parts)
                 pytest_id = name
 
                 if input_publication:
                     name = input_publication.name or name
 
-                rest_method = next(
-                    (v for v in parametrization if v in RestMethod),
-                    RestMethod.POST,
-                )
+                rest_method = parametrization.rest_method or RestMethod.POST
                 if publication_definition:
                     rest_args = copy.deepcopy(publication_definition.definition)
                 else:
                     rest_args = copy.deepcopy(input_test_case.rest_args)
-                    for arg_value in [v for v in parametrization if v not in RestMethod]:
-                        base_arg = util.get_base_arg_of_value(cls.rest_parametrization, arg_value)
+                    for base_arg, arg_value in parametrization.rest_arg_dict.items():
                         rest_args[base_arg.arg_name] = arg_value.raw_value
                         rest_args.update(copy.deepcopy(arg_value.other_rest_args))
 
@@ -149,10 +126,38 @@ class TestSingleRestPublication:
                                          params=params,
                                          type=test_type,
                                          marks=input_test_case.marks,
-                                         parametrization=param_inst,
+                                         parametrization=parametrization,
                                          )
                 test_cases.append(test_case)
         return test_cases
+
+    @classmethod
+    @final
+    def _get_input_publication_workspace_and_type(cls, *,
+                                                  input_test_case: TestCaseType,
+                                                  params: dict,
+                                                  publication_definition: PublicationValues,
+                                                  ) -> Tuple[Optional[Publication], str, str]:
+        input_publication = None
+        if isinstance(input_test_case.publication, Publication):
+            input_publication = input_test_case.publication
+        elif callable(input_test_case.publication):
+            args_spec = inspect.getfullargspec(input_test_case.publication)
+            arg_names_to_values = {
+                'params': params,
+                'publ_def': publication_definition,
+                'cls': cls,
+            }
+            args = [arg_names_to_values[n] for n in args_spec.args]
+            input_publication = input_test_case.publication(*args)
+
+        workspace = cls.workspace
+        publication_type = cls.publication_type
+
+        if input_publication:
+            workspace = input_publication.workspace or workspace
+            publication_type = input_publication.type or publication_type
+        return input_publication, workspace, publication_type
 
     @classmethod
     def post_publication(cls, publication, args=None, scope='function'):
