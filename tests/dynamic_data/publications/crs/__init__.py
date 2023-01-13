@@ -45,7 +45,7 @@ LA_FINAL_ASSERTS = [
 ]
 
 REST_PARAMETRIZATION = {
-    'with_chunks': {False: 'sync', True: 'chunks'},
+    'with_chunks': {False: '', True: 'chunks'},
     'compress': {False: '', True: 'zipped'},
 }
 

@@ -16,7 +16,7 @@ KEY_ACTION_PARAMETRIZATION = 'action_parametrization'
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 REST_PARAMETRIZATION = {
-    'with_chunks': {False: 'sync', True: 'chunks'},
+    'with_chunks': {False: '', True: 'chunks'},
     'compress': {False: '', True: 'zipped'},
     'style_file': {f'{DIRECTORY}/sample_point_cz.sld': 'sld', f'{DIRECTORY}/sample_point_cz.qml': 'qml'}
 }

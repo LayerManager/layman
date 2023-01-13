@@ -24,7 +24,7 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 logger = logging.getLogger(__name__)
 
 REST_PARAMETRIZATION = {
-    'with_chunks': {False: 'sync', True: 'chunks'},
+    'with_chunks': {False: '', True: 'chunks'},
     'compress': {False: '', True: 'zipped'},
 }
 
@@ -180,11 +180,11 @@ TESTCASES = {
                           'detail': {'parameter': 'file',
                                      'message': 'Unable to open raster file.',
                                      'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                                     'file': '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_sync/input_file/non_readable_raster_post_sync.tif',
+                                     'file': '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post/input_file/non_readable_raster_post.tif',
                                      },
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
-                'detail': {'file': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_sync_zipped/input_file/non_readable_raster_post_sync_zipped.zip/non_readable_raster.tif',
+                'detail': {'file': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_zipped/input_file/non_readable_raster_post_zipped.zip/non_readable_raster.tif',
                            }
             },
             frozenset([('compress', False), ('with_chunks', True)]): {
@@ -1210,8 +1210,8 @@ TESTCASES = {
                               'message': 'Two or more input file names map to the same name.',
                               'expected': 'Input file names that differ at least in one letter (ignoring case and diacritics) or number.',
                               'similar_filenames_mapping': {
-                                  'small_layer.README.txt': 'duplicate_filename_differs_in_case_post_sync.readme.txt',
-                                  'small_layer.readme.txt': 'duplicate_filename_differs_in_case_post_sync.readme.txt',
+                                  'small_layer.README.txt': 'duplicate_filename_differs_in_case_post.readme.txt',
+                                  'small_layer.readme.txt': 'duplicate_filename_differs_in_case_post.readme.txt',
                               },
                           },
                           },
@@ -1238,8 +1238,8 @@ TESTCASES = {
                     frozenset([('compress', False), ('with_chunks', False)]): {
                         'detail': {
                             'similar_filenames_mapping': {
-                                'small_layer.README.txt': 'duplicate_filename_differs_in_case_patch_full_sync.readme.txt',
-                                'small_layer.readme.txt': 'duplicate_filename_differs_in_case_patch_full_sync.readme.txt',
+                                'small_layer.README.txt': 'duplicate_filename_differs_in_case_patch_full.readme.txt',
+                                'small_layer.readme.txt': 'duplicate_filename_differs_in_case_patch_full.readme.txt',
                             },
                         },
                     },

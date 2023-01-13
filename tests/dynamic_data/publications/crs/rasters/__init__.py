@@ -15,7 +15,7 @@ KEY_ONLY_FIRST_PARAMETRIZATION = 'only_first_parametrization'
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 REST_PARAMETRIZATION = {
-    'with_chunks': {False: 'sync', True: 'chunks'},
+    'with_chunks': {False: '', True: 'chunks'},
     'compress': {False: '', True: 'zipped'},
 }
 
