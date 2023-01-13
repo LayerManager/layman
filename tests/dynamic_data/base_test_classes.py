@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Union, Callable, List
+from typing import Union, Callable, List, Dict, Optional
 
 import _pytest.mark
 
 from tests.dynamic_data.publications import common_publications
-from tests import Publication, EnumTestTypes
+from tests import Publication, EnumTestTypes, PublicationValues
 
 
 class RestArgDomain(Enum):
@@ -69,15 +69,37 @@ class PublicationByUsedServers(PublicationByDefinitionBase):
 
 @dataclass(frozen=True)
 class Parametrization:
-    def __init__(self, values, *, rest_parametrization):
+    def __init__(self, values: list):
         object.__setattr__(self, '_values', values)
-        object.__setattr__(self, '_rest_parametrization', rest_parametrization)
 
     @property
-    def publication_definition(self):
+    def values_list(self) -> list:
+        # pylint: disable=no-member
+        return list(self._values)
+
+    @property
+    def values_set(self) -> frozenset:
+        # pylint: disable=no-member
+        return frozenset(self._values)
+
+    @property
+    def publication_definition(self) -> Optional[PublicationValues]:
         # pylint: disable=no-member
         val = next((v for v in self._values if isinstance(v, PublicationByDefinitionBase)), None)
         return val.publication_definition if val is not None else None
+
+    @property
+    def rest_method(self) -> Optional[RestMethod]:
+        # pylint: disable=no-member
+        return next((v for v in self._values if isinstance(v, RestMethod)), None)
+
+    @property
+    def rest_arg_dict(self) -> Dict[RestArgs, RestArgDomain]:
+        # pylint: disable=no-member
+        return {
+            next(arg for arg in RestArgs if issubclass(type(v), arg.base_domain)): v
+            for v in self._values if isinstance(v, RestArgDomain)
+        }
 
 
 @dataclass(frozen=True)
