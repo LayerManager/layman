@@ -12,6 +12,7 @@ def get_dimension_enum(dimension):
 
 
 def check_rest_parametrization(rest_parametrization):
+    assert isinstance(rest_parametrization, list), f"rest_parametrization must be list. Found: {type(rest_parametrization)}"
     rest_method_count = 0
     publ_type_count = 0
     base_arg_counts = defaultdict(int)
