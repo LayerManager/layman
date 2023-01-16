@@ -43,9 +43,9 @@ class TestPublication(base_test.TestSingleRestPublication):
     test_cases = generate_test_cases()
     publication_type = None
 
-    rest_parametrization = {
+    rest_parametrization = [
         base_test.PublicationByUsedServers,
-    }
+    ]
 
     @pytest.fixture(scope='class', autouse=True)
     def class_cleanup(self, request):

@@ -69,9 +69,7 @@ class TestSingleRestPublication:
 
     test_cases = []
 
-    rest_parametrization = {
-        RestMethod,  # parametrize with all values, i.e. PATCH and POST
-    }
+    rest_parametrization = []
 
     @classmethod
     @final
