@@ -26,6 +26,8 @@ class CustomCompressDomain(CompressDomainBase):
 
 
 @pytest.mark.parametrize('rest_parametrization, exp_message', [
+    pytest.param({}, "rest_parametrization must be list. Found: <class 'dict'>", id='empty-dict'),
+    pytest.param(set(), "rest_parametrization must be list. Found: <class 'set'>", id='empty-set'),
     pytest.param([RestArgs.COMPRESS, RestArgs.COMPRESS], 'RestArgs.compress dimension can be used only once in parametrization',
                  id='duplicate-arg-dimension1'),
     pytest.param([RestArgs.COMPRESS, CompressDomain], 'RestArgs.compress dimension can be used only once in parametrization',
@@ -34,14 +36,14 @@ class CustomCompressDomain(CompressDomainBase):
                  id='duplicate-arg-dimension3'),
     pytest.param([CompressDomain, CustomCompressDomain], 'RestArgs.compress dimension can be used only once in parametrization',
                  id='duplicate-arg-dimension4'),
-    pytest.param({PublicationByUsedServers, LayerByUsedServers}, 'PublicationByDefinitionBase dimension can be used only once in parametrization',
+    pytest.param([PublicationByUsedServers, LayerByUsedServers], 'PublicationByDefinitionBase dimension can be used only once in parametrization',
                  id='duplicate-publication-definition-dimension'),
-    pytest.param({'a'}, 'Only dimensions are allowed in cls.rest_parametrization. Found: a', id='string'),
+    pytest.param(['a'], "Only dimensions are allowed in cls.rest_parametrization. Found: a", id='string'),
     pytest.param([[1, 2]], 'Only dimensions are allowed in cls.rest_parametrization. Found: [1, 2]',
                  id='list-of-numbers'),
     pytest.param([RestArgs], 'Only dimensions are allowed in cls.rest_parametrization. Found: <enum \'RestArgs\'>',
                  id='rest-args'),
-    pytest.param({WrongCustomCompressDomain}, 'Values {False, \'abc\'} is not subset of values of base argument {False, True}, base_arg=RestArgs.COMPRESS.',
+    pytest.param([WrongCustomCompressDomain], 'Values {False, \'abc\'} is not subset of values of base argument {False, True}, base_arg=RestArgs.COMPRESS.',
                  id='wrong-custom-domain'),
     pytest.param([RestArgs.COMPRESS, PublicationByUsedServers], 'PublicationByDefinitionBase dimension must not be used with any RestArgs dimension.',
                  id='rest-arg-and-publication-definition'),
@@ -54,12 +56,11 @@ def test_check_rest_parametrization_raises(rest_parametrization, exp_message):
 
 @pytest.mark.parametrize('rest_parametrization', [
     pytest.param([], id='empty-list'),
-    pytest.param({}, id='empty-set'),
-    pytest.param({RestMethod}, id='rest-method'),
-    pytest.param({RestArgs.COMPRESS}, id='rest-args-compress'),
-    pytest.param({CompressDomain}, id='compress-domain'),
+    pytest.param([RestMethod], id='rest-method'),
+    pytest.param([RestArgs.COMPRESS], id='rest-args-compress'),
+    pytest.param([CompressDomain], id='compress-domain'),
     pytest.param([RestArgs.COMPRESS, RestArgs.WITH_CHUNKS], id='two-rest-args'),
-    pytest.param({RestMethod, RestArgs.COMPRESS, RestArgs.WITH_CHUNKS}, id='rest-method-and-args'),
+    pytest.param([RestMethod, RestArgs.COMPRESS, RestArgs.WITH_CHUNKS], id='rest-method-and-args'),
     pytest.param([RestMethod, PublicationByUsedServers], id='rest-method-and-publication-by-definition'),
 ])
 def test_check_rest_parametrization_passes(rest_parametrization):
@@ -143,6 +144,8 @@ def test_check_specific_parametrizations(rest_parametrization, specific_parametr
                  id='two-dimensions-one-custom'),
 ])
 def test_rest_parametrization_to_parametrizations(rest_parametrization, exp_output):
+    util.check_rest_parametrization(rest_parametrization)
+
     assert util.rest_parametrization_to_parametrizations(rest_parametrization) == exp_output
 
 
