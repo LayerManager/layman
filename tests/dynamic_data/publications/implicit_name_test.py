@@ -100,10 +100,10 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     publication_type = None
 
-    rest_parametrization = {
+    rest_parametrization = [
         base_test.WithChunksDomain,
         CompressDomain,
-    }
+    ]
 
     test_cases = generate_test_cases()
 

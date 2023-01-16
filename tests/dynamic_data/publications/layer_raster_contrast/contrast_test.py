@@ -154,6 +154,10 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     publication_type = process_client.LAYER_TYPE
 
+    rest_parametrization = [
+        base_test.RestMethod,
+    ]
+
     test_cases = [prepare_test_case(key) for key in TEST_CASES]
 
     @staticmethod

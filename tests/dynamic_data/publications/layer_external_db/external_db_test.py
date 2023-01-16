@@ -24,6 +24,8 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     publication_type = process_client.LAYER_TYPE
 
+    rest_parametrization = []
+
     test_cases = [base_test.TestCaseType(key=key,
                                          type=value.get(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY),
                                          params=value,
@@ -31,8 +33,6 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          marks=[pytest.mark.xfail(reason="Not yet implemented.")]
                                          if value.get('xfail') else []
                                          ) for key, value in TEST_CASES.items()]
-
-    rest_parametrization = {}
 
     # pylint: disable=unused-argument
     @staticmethod

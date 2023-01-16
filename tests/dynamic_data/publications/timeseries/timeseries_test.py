@@ -268,10 +268,10 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     publication_type = process_client.LAYER_TYPE
 
-    rest_parametrization = {
+    rest_parametrization = [
         base_test.RestMethod,
         base_test.RestArgs.WITH_CHUNKS,
-    }
+    ]
 
     test_cases = generate_test_cases()
 

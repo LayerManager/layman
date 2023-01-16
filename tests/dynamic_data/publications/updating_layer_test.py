@@ -16,6 +16,10 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
 
     publication_type = process_client.LAYER_TYPE
 
+    rest_parametrization = [
+        base_test.RestMethod,
+    ]
+
     test_cases = [base_test.TestCaseType(key='updating_layer',
                                          type=EnumTestTypes.MANDATORY,
                                          params={'compress': True,
