@@ -95,7 +95,7 @@ class TestSingleRestPublication:
                 publication_definition = parametrization.publication_definition
 
                 specific_params = copy.deepcopy(input_test_case.specific_params.get(parametrization.values_set, {}))
-                params = recursive_dict_update(input_test_case.params, specific_params)
+                params = recursive_dict_update(copy.deepcopy(input_test_case.params), specific_params)
 
                 input_publication, workspace, publication_type = cls._get_input_publication_workspace_and_type(
                     input_test_case=input_test_case, params=params, publication_definition=publication_definition,
