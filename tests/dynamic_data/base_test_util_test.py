@@ -88,7 +88,7 @@ def test_check_rest_parametrization_passes(rest_parametrization):
     pytest.param([TestCaseType(key='case1',
                                specific_types={frozenset([CompressDomain.TRUE]): EnumTestTypes.MANDATORY})],
                  [CompressDomain, RestMethod],
-                 'Specific parametrization idx=0 must have same number of members as rest_paramertization',
+                 'Specific parametrization idx=0 must have same number of members as rest_paramertization, test_case=case1',
                  id='wrong-specific-parametrization'),
     pytest.param([TestCaseType(key='case1',
                                rest_args={'compress': True})],
@@ -98,7 +98,7 @@ def test_check_rest_parametrization_passes(rest_parametrization):
     pytest.param([TestCaseType(key='case1',
                                rest_args={'compress': True})],
                  [PublicationByUsedServers],
-                 'Dimension PublicationByDefinitionBase must not be combined with rest_args',
+                 'Dimension PublicationByDefinitionBase must not be combined with rest_args, test_case=case1',
                  id='conflict-rest_args-and-publication-definition'),
 ])
 def test_check_input_test_cases_raises(test_cases, rest_parametrization, exp_message):
@@ -113,22 +113,22 @@ def test_check_input_test_cases_raises(test_cases, rest_parametrization, exp_mes
 @pytest.mark.parametrize('rest_parametrization, specific_parametrizations, exp_message', [
     pytest.param([RestArgs.COMPRESS, RestArgs.WITH_CHUNKS],
                  [frozenset([CompressDomain.TRUE])],
-                 'Specific parametrization idx=0 must have same number of members as rest_paramertization',
+                 'Specific parametrization idx=0 must have same number of members as rest_paramertization, test_case=case1',
                  id='different-length'),
     pytest.param([RestArgs.COMPRESS, RestArgs.WITH_CHUNKS],
                  [frozenset([CompressDomain.TRUE, PublicationByUsedServers.LAYER_RASTER])],
-                 'Specific parametrization idx=0 must have exactly one value of dimension RestArgs.WITH_CHUNKS. Found 0 values.',
+                 'Specific parametrization idx=0 must have exactly one value of dimension RestArgs.WITH_CHUNKS. Found 0 values. test_case=case1',
                  id='missing-dimension-value'),
     pytest.param([RestArgs.COMPRESS, RestArgs.WITH_CHUNKS],
                  [frozenset([CompressDomain.TRUE, CompressDomain.FALSE])],
-                 'Specific parametrization idx=0 must have exactly one value of dimension RestArgs.COMPRESS. Found 2 values.',
+                 'Specific parametrization idx=0 must have exactly one value of dimension RestArgs.COMPRESS. Found 2 values. test_case=case1',
                  id='two-values-of-the-same-dimension'),
 ])
 def test_check_specific_parametrizations(rest_parametrization, specific_parametrizations, exp_message):
     util.check_rest_parametrization(rest_parametrization)
 
     with pytest.raises(AssertionError) as exc_info:
-        util.check_specific_parametrizations(rest_parametrization, specific_parametrizations)
+        util.check_specific_parametrizations(rest_parametrization, specific_parametrizations, test_case_key='case1')
     assert str(exc_info.value) == exp_message
 
 
