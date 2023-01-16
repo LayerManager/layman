@@ -34,8 +34,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          if value.get('xfail') else []
                                          ) for key, value in TEST_CASES.items()]
 
-    # pylint: disable=unused-argument
     @staticmethod
-    def test_style_xml(layer: Publication, params, rest_method, rest_args):
+    def test_style_xml(layer: Publication, rest_method, rest_args):
         """Parametrized using pytest_generate_tests"""
         rest_method(layer, args=rest_args)
