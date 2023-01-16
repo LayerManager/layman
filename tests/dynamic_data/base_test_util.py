@@ -39,7 +39,12 @@ def check_rest_parametrization(rest_parametrization):
 
         assert sum([is_rest_method, is_base_arg, is_custom_arg_type, is_publ_type]) <= 1
 
-        assert is_simple_type or is_custom_arg_type or is_publ_type, f"Only dimensions are allowed in cls.rest_parametrization. Found: {val}"
+        assert is_simple_type or is_custom_arg_type or is_publ_type, \
+            f"Only dimensions are allowed in cls.rest_parametrization. Dimension is " \
+            f"(a) instance of RestMethod, " \
+            f"(b) instance of base_domain of any RestArgs item, or " \
+            f"(c) instance of PublicationByDefinitionBase. " \
+            f"Found: {val}"
 
         if is_custom_arg_type:
             base_arg_domain_raw_values = set(v.raw_value for v in base_arg.domain)

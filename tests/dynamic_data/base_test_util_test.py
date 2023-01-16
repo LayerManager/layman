@@ -25,6 +25,12 @@ class CustomCompressDomain(CompressDomainBase):
     TRUE = (True, 'compressed')
 
 
+ONLY_DIMENSIONS_MSG = f"Only dimensions are allowed in cls.rest_parametrization. Dimension is " \
+                      f"(a) instance of RestMethod, " \
+                      f"(b) instance of base_domain of any RestArgs item, or " \
+                      f"(c) instance of PublicationByDefinitionBase."
+
+
 @pytest.mark.parametrize('rest_parametrization, exp_message', [
     pytest.param({}, "rest_parametrization must be list. Found: <class 'dict'>", id='empty-dict'),
     pytest.param(set(), "rest_parametrization must be list. Found: <class 'set'>", id='empty-set'),
@@ -38,10 +44,10 @@ class CustomCompressDomain(CompressDomainBase):
                  id='duplicate-arg-dimension4'),
     pytest.param([PublicationByUsedServers, LayerByUsedServers], 'PublicationByDefinitionBase dimension can be used only once in parametrization',
                  id='duplicate-publication-definition-dimension'),
-    pytest.param(['a'], "Only dimensions are allowed in cls.rest_parametrization. Found: a", id='string'),
-    pytest.param([[1, 2]], 'Only dimensions are allowed in cls.rest_parametrization. Found: [1, 2]',
+    pytest.param(['a'], f"{ONLY_DIMENSIONS_MSG} Found: a", id='string'),
+    pytest.param([[1, 2]], f"{ONLY_DIMENSIONS_MSG} Found: [1, 2]",
                  id='list-of-numbers'),
-    pytest.param([RestArgs], 'Only dimensions are allowed in cls.rest_parametrization. Found: <enum \'RestArgs\'>',
+    pytest.param([RestArgs], f"{ONLY_DIMENSIONS_MSG} Found: <enum 'RestArgs'>",
                  id='rest-args'),
     pytest.param([WrongCustomCompressDomain], 'Values {False, \'abc\'} is not subset of values of base argument {False, True}, base_arg=RestArgs.COMPRESS.',
                  id='wrong-custom-domain'),
