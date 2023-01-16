@@ -124,7 +124,7 @@ def test_check_input_test_cases_raises(test_cases, rest_parametrization, exp_mes
                  'Specific parametrization idx=0 must have exactly one value of dimension RestArgs.COMPRESS. Found 2 values. test_case=case1',
                  id='two-values-of-the-same-dimension'),
 ])
-def test_check_specific_parametrizations(rest_parametrization, specific_parametrizations, exp_message):
+def test_check_specific_parametrizations_raises(rest_parametrization, specific_parametrizations, exp_message):
     util.check_rest_parametrization(rest_parametrization)
 
     with pytest.raises(AssertionError) as exc_info:
