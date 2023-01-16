@@ -71,24 +71,24 @@ def check_input_test_cases(test_cases, rest_parametrization, parametrizations: L
                 assert specific_type != test_case.type, f"No need to set specific test type that is same as main type: specific_type{specific_type}, type={test_case.type} test_case={test_case.key}"
 
         all_specific_parametrizations = set(test_case.specific_types.keys()).union(set(test_case.specific_params.keys()))
-        check_specific_parametrizations(rest_parametrization, all_specific_parametrizations)
+        check_specific_parametrizations(rest_parametrization, all_specific_parametrizations, test_case_key=test_case.key)
 
         for parametrization in parametrizations:
             for base_arg in parametrization.rest_arg_dict:
                 assert base_arg.arg_name not in test_case.rest_args, f"REST argument can be set either in parametrization or in test case, not both: {base_arg}, test_case={test_case.key}"
 
         if is_publ_type_dimension_used:
-            assert not test_case.rest_args, f"Dimension PublicationByDefinitionBase must not be combined with rest_args"
+            assert not test_case.rest_args, f"Dimension PublicationByDefinitionBase must not be combined with rest_args, test_case={test_case.key}"
 
 
-def check_specific_parametrizations(rest_parametrization, specific_parametrizations: Iterable[frozenset]):
+def check_specific_parametrizations(rest_parametrization, specific_parametrizations: Iterable[frozenset], *, test_case_key):
     for idx, sp_parametrization in enumerate(specific_parametrizations):
         # Maybe enable lower-length specific parametrizations later
-        assert len(sp_parametrization) == len(rest_parametrization), f"Specific parametrization idx={idx} must have same number of members as rest_paramertization"
+        assert len(sp_parametrization) == len(rest_parametrization), f"Specific parametrization idx={idx} must have same number of members as rest_paramertization, test_case={test_case_key}"
         for dimension in rest_parametrization:
             dimension_enum = get_dimension_enum(dimension)
             param_values = [v for v in sp_parametrization if v in dimension_enum]
-            assert len(param_values) == 1, f"Specific parametrization idx={idx} must have exactly one value of dimension {dimension}. Found {len(param_values)} values."
+            assert len(param_values) == 1, f"Specific parametrization idx={idx} must have exactly one value of dimension {dimension}. Found {len(param_values)} values. test_case={test_case_key}"
 
 
 def rest_parametrization_to_parametrizations(rest_parametrization):
