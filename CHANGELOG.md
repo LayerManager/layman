@@ -3,6 +3,14 @@
 ## v1.20.0
  {release-date}
 ### Upgrade requirements
+- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
+  ```
+  LAYMAN_CLIENT_VERSION=2b007729fccef956c8d11caae3b4bcd2f8583609
+  ```
+- If you are running Layman with development settings, run  
+```
+make client-build
+```
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
