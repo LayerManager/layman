@@ -13,7 +13,9 @@ make client-build
 ```
 ### Migrations and checks
 #### Schema migrations
+- [#703](https://github.com/LayerManager/layman/issues/703) Create new json column `db_connection` in `publications` table in prime DB schema.
 #### Data migrations
+- [#703](https://github.com/LayerManager/layman/issues/703) Fill column `db_connection` in `publications` table in prime DB schema for all publications. Value is set to `null` for all existing publications.
 ### Changes
 - [#703](https://github.com/LayerManager/layman/issues/703) Endpoint [POST Workspace Layers](doc/rest.md#post-workspace-layers) support new body parameter *db_connection*.
 
