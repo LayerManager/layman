@@ -149,6 +149,7 @@ def test_fill_in_partial_info_statuses():
     assert filled_info == expected_info, f'filled_info={filled_info}, expected_info={expected_info}'
 
 
+@pytest.mark.usefixtures('ensure_external_db')
 @pytest.mark.parametrize('connection_string, exp_result', [
     ('postgresql://docker:docker@postgresql:5432/external_test_db?table=schema.table_name&geo_column=geo_wkb_column', ConnectionString(
         url='postgresql://docker:docker@postgresql:5432/external_test_db',
@@ -158,12 +159,12 @@ def test_fill_in_partial_info_statuses():
     )),
 ])
 def test_parse_connection_string(connection_string, exp_result):
-    external_db.ensure_db()
     external_db.ensure_table('schema', 'table_name', 'geo_wkb_column')
     result = util.parse_and_validate_connection_string(connection_string)
     assert result == exp_result
 
 
+@pytest.mark.usefixtures('ensure_external_db')
 @pytest.mark.parametrize('connection_string, exp_error', [
     pytest.param('postgresql://postgresql', {
         'http_code': 400,
@@ -252,12 +253,12 @@ def test_parse_connection_string(connection_string, exp_result):
     }, id='invalid_schema'),
 ])
 def test_validate_connection_string(connection_string, exp_error):
-    external_db.ensure_db()
     with pytest.raises(LaymanError) as exc_info:
         util.parse_and_validate_connection_string(connection_string)
     test_util.assert_error(exp_error, exc_info)
 
 
+@pytest.mark.usefixtures('ensure_external_db')
 @pytest.mark.parametrize('connection_string, exp_err_msg_patterns', [
     pytest.param('postgresql://postgresql:5432/external_test_db?table=schema.table_name&geo_column=wkb_geometry', [
         r'^connection to server at \"postgresql\" \(\d+.\d+.\d+.\d+\), port 5432 failed: fe_sendauth: no password supplied\n$',
@@ -271,7 +272,6 @@ def test_validate_connection_string(connection_string, exp_error):
     ], id='invalid_user'),
 ])
 def test_validate_connection_string_connection(connection_string, exp_err_msg_patterns):
-    external_db.ensure_db()
     with pytest.raises(LaymanError) as exc_info:
         util.parse_and_validate_connection_string(connection_string)
     exp_error = {'http_code': 400,

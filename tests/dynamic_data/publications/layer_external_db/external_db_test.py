@@ -18,6 +18,7 @@ TEST_CASES = {
 }
 
 
+@pytest.mark.usefixtures('ensure_external_db')
 class TestLayer(base_test.TestSingleRestPublication):
 
     workspace = 'dynamic_test_workspace_layer_external_db'
@@ -37,6 +38,5 @@ class TestLayer(base_test.TestSingleRestPublication):
     @staticmethod
     def test_style_xml(layer: Publication, rest_method, rest_args):
         """Parametrized using pytest_generate_tests"""
-        external_db.ensure_db()
         external_db.ensure_table('schema', 'table_name', 'geo_wkb_column')
         rest_method(layer, args=rest_args)
