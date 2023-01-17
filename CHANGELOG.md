@@ -118,7 +118,7 @@ make client-build
   ```
 ### Migrations and checks
 #### Schema migrations
-- [#576](https://github.com/LayerManager/layman/issues/576) Create new column `file_type` in `publication` table.
+- [#576](https://github.com/LayerManager/layman/issues/576) Create new column `file_type` in `publications` table.
 - [#541](https://github.com/LayerManager/layman/issues/541) Rename vector data DB tables to `layer_<uuid>` format.
 #### Data migrations
 - [#576](https://github.com/LayerManager/layman/issues/576) Fill column `file_type` in `publications` table in prime DB schema for all publications. Value of each map will be `NULL`. Value of each layer will be same as value of `file.file_type` in [GET Workspace Layer](doc/rest.md#get-workspace-layer) response (i.e. `vector`, `raster`, or `unknown`).
@@ -199,7 +199,7 @@ make client-build
 ```
 ### Migrations and checks
 #### Schema migrations
-- [#64](https://github.com/LayerManager/layman/issues/64) Create new column `srid` in `publication` table.
+- [#64](https://github.com/LayerManager/layman/issues/64) Create new column `srid` in `publications` table.
 #### Data migrations
 - [#64](https://github.com/LayerManager/layman/issues/64) Native CRS of previously uploaded layers is set to `EPSG:3857`.
 - [#64](https://github.com/LayerManager/layman/issues/64) Native CRS of previously uploaded maps is set according their composition file (either `EPSG:3857` or `EPSG:4326`) and their composition file is upgraded to [version 2.0.0](https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json).
