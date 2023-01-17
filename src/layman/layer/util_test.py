@@ -11,6 +11,20 @@ from . import util
 from .util import to_safe_layer_name, fill_in_partial_info_statuses
 
 
+@pytest.fixture(scope="module")
+def ensure_tables():
+    tables = [
+        ('schema', 'table_name', 'geo_wkb_column'),
+    ]
+    for schema, table, geo_column in tables:
+        external_db.ensure_table(schema, table, geo_column)
+
+    yield
+
+    for schema, table, _ in tables:
+        external_db.drop_table(schema, table)
+
+
 @pytest.mark.parametrize('unsafe_name, exp_output', [
     ('', 'layer'),
     (' ?:"+  @', 'layer'),
@@ -149,7 +163,7 @@ def test_fill_in_partial_info_statuses():
     assert filled_info == expected_info, f'filled_info={filled_info}, expected_info={expected_info}'
 
 
-@pytest.mark.usefixtures('ensure_external_db')
+@pytest.mark.usefixtures('ensure_external_db', 'ensure_tables')
 @pytest.mark.parametrize('connection_string, exp_result', [
     ('postgresql://docker:docker@postgresql:5432/external_test_db?table=schema.table_name&geo_column=geo_wkb_column', ConnectionString(
         url='postgresql://docker:docker@postgresql:5432/external_test_db',
@@ -159,7 +173,6 @@ def test_fill_in_partial_info_statuses():
     )),
 ])
 def test_parse_connection_string(connection_string, exp_result):
-    external_db.ensure_table('schema', 'table_name', 'geo_wkb_column')
     result = util.parse_and_validate_connection_string(connection_string)
     assert result == exp_result
 

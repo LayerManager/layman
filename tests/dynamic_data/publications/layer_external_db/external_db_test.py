@@ -40,3 +40,4 @@ class TestLayer(base_test.TestSingleRestPublication):
         """Parametrized using pytest_generate_tests"""
         external_db.ensure_table('schema', 'table_name', 'geo_wkb_column')
         rest_method(layer, args=rest_args)
+        external_db.drop_table('schema', 'table_name')
