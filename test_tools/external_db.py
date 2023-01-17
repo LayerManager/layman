@@ -8,13 +8,10 @@ URI = f'''postgresql://{settings.LAYMAN_PG_USER}:{settings.LAYMAN_PG_PASSWORD}@{
 
 @pytest.fixture(scope="session")
 def ensure_db():
-    query = f"SELECT count(*) FROM pg_database WHERE datname = %s"
     statement = f"""CREATE DATABASE {EXTERNAL_DB_NAME} TEMPLATE {settings.LAYMAN_PG_TEMPLATE_DBNAME}"""
 
     with app.app_context():
-        res = db_util.run_query(query, (EXTERNAL_DB_NAME,))
-        if not res[0][0] == 1:
-            db_util.run_statement(statement)
+        db_util.run_statement(statement)
 
     yield
 
