@@ -1,4 +1,5 @@
 import datetime
+import re
 import psycopg2
 from psycopg2 import tz
 import pytest
@@ -257,12 +258,19 @@ def test_validate_connection_string(connection_string, exp_error):
     test_util.assert_error(exp_error, exc_info)
 
 
-@pytest.mark.parametrize('connection_string, err_msg', [
-    pytest.param('postgresql://postgresql:5432/external_test_db?table=schema.table_name&geo_column=wkb_geometry', 'local user with ID 1000 does not exist\n', id='without_username'),
-    # Error message is not the same every time (alternates IP addresses 127.0.0.4 and 127.0.0.7)
-    pytest.param('postgresql://docker:docker@postgresql:5432?table=schema.table_name&geo_column=wkb_geometry', None, id='without_database'),
+@pytest.mark.parametrize('connection_string, exp_err_msg_patterns', [
+    pytest.param('postgresql://postgresql:5432/external_test_db?table=schema.table_name&geo_column=wkb_geometry', [
+        r'^connection to server at \"postgresql\" \(\d+.\d+.\d+.\d+\), port 5432 failed: fe_sendauth: no password supplied\n$',
+        r'local user with ID 1000 does not exist\n',
+    ], id='without_username'),
+    pytest.param('postgresql://docker:docker@postgresql:5432?table=schema.table_name&geo_column=wkb_geometry', [
+        r'^connection to server at "postgresql" \(\d+.\d+.\d+.\d+\), port 5432 failed: FATAL:  database "docker" does not exist$'
+    ], id='without_database'),
+    pytest.param('postgresql://no_user@postgresql:5432/external_test_db?table=schema.table_name&geo_column=wkb_geometry', [
+        r'^connection to server at \"postgresql\" \(\d+.\d+.\d+.\d+\), port 5432 failed: fe_sendauth: no password supplied\n$'
+    ], id='invalid_user'),
 ])
-def test_validate_connection_string_connection(connection_string, err_msg):
+def test_validate_connection_string_connection(connection_string, exp_err_msg_patterns):
     external_db.ensure_db()
     with pytest.raises(LaymanError) as exc_info:
         util.parse_and_validate_connection_string(connection_string)
@@ -274,7 +282,9 @@ def test_validate_connection_string_connection(connection_string, err_msg):
                             'found': {
                                 'db_connection': connection_string}},
                  }
-    exp_error['detail']['detail'] = err_msg or exc_info.value.to_dict()['detail']['detail']
+    exc_detail_msg = exc_info.value.to_dict()['detail']['detail']
+    assert any(re.match(exp_err_msg_pattern, exc_detail_msg) for exp_err_msg_pattern in exp_err_msg_patterns), f'exc_detail_msg={exc_detail_msg}, exp_err_msg_patterns={exp_err_msg_patterns}'
+    exp_error['detail']['detail'] = exc_info.value.to_dict()['detail']['detail']
     test_util.assert_error(exp_error, exc_info)
 
 
