@@ -4,6 +4,7 @@ from urllib.parse import urljoin
 import geoserver
 import micka
 import layman_settings as settings
+from tests import EXTERNAL_DB_NAME
 
 
 def clear_directory(directory):
@@ -44,6 +45,10 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
     print(f"Dropping schemas in DB {conn_dict['dbname']}: {[r[1] for r in rows]}")
     for row in rows:
         cur.execute(f"""DROP SCHEMA "{row[1]}" CASCADE""")
+    print(f"Dropping external test DB '{EXTERNAL_DB_NAME}'")
+    cur.execute(f"""
+DROP DATABASE IF EXISTS {EXTERNAL_DB_NAME} WITH (FORCE)
+    """)
     conn.close()
 
     # redis

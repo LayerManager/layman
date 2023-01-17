@@ -10,7 +10,7 @@ services:
          - .env.test
       environment:
         - CI=${CI}
-        - PYTHONPATH=/code/src
+        - PYTHONPATH=/code/src:/code
       volumes:
         - ./layman_data_test:/layman_data_test
         - ./sample:/code/sample
