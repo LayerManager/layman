@@ -6,10 +6,10 @@ from db import util as db_util
 from layman import settings, app
 from tests import EXTERNAL_DB_NAME
 
-URI = f'''postgresql://{settings.LAYMAN_PG_USER}:{settings.LAYMAN_PG_PASSWORD}@{settings.LAYMAN_PG_HOST}:{settings.LAYMAN_PG_PORT}/{EXTERNAL_DB_NAME}'''
+URI_STR = f'''postgresql://{settings.LAYMAN_PG_USER}:{settings.LAYMAN_PG_PASSWORD}@{settings.LAYMAN_PG_HOST}:{settings.LAYMAN_PG_PORT}/{EXTERNAL_DB_NAME}'''
 
 
-def uri_to_ogr2ogr(uri_str):
+def uri_str_to_ogr2ogr_str(uri_str):
     uri = parse.urlparse(uri_str)
     return f"PG:host={uri.hostname} port={uri.port} dbname={uri.path[1:]} user={uri.username} password={uri.password}"
 
@@ -26,14 +26,14 @@ def ensure_db():
 
 def ensure_table(schema, name, geo_column):
     statement = f'''create table {schema}.{name} ({geo_column} geometry(Geometry, 4326))'''
-    conn_cur = db_util.create_connection_cursor(URI)
+    conn_cur = db_util.create_connection_cursor(URI_STR)
     db_util.run_statement(f"""CREATE SCHEMA IF NOT EXISTS "{schema}" AUTHORIZATION {settings.LAYMAN_PG_USER}""", conn_cur=conn_cur)
     db_util.run_statement(statement, conn_cur=conn_cur)
 
 
 def import_table(input_file_path, *, table=None, schema='public'):
     table = table or os.path.splitext(os.path.basename(input_file_path))[0]
-    target_db = uri_to_ogr2ogr(URI)
+    target_db = uri_str_to_ogr2ogr_str(URI_STR)
 
     bash_args = [
         'ogr2ogr',
@@ -54,5 +54,5 @@ def import_table(input_file_path, *, table=None, schema='public'):
 
 def drop_table(schema, name):
     statement = f'''drop table if exists {schema}.{name}'''
-    conn_cur = db_util.create_connection_cursor(URI)
+    conn_cur = db_util.create_connection_cursor(URI_STR)
     db_util.run_statement(statement, conn_cur=conn_cur)

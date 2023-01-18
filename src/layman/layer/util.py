@@ -4,7 +4,7 @@ import re
 import psycopg2
 
 from flask import current_app, request, g
-from db import ConnectionString, util as db_util
+from db import TableUri, util as db_util
 from layman import LaymanError, patch_mode, util as layman_util, settings
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for
@@ -21,7 +21,7 @@ FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
 FLASK_INFO_KEY = f'{__name__}:LAYER_INFO'
 
-DB_CONNECTION_PATTERN = 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<schema>.<table_name>&geo_column=<geo_column_name>'
+EXTERNAL_TABLE_URI_PATTERN = 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<schema>.<table_name>&geo_column=<geo_column_name>'
 
 
 def to_safe_layer_name(value):
@@ -263,32 +263,32 @@ def get_same_or_missing_prop_names(workspace, layername):
     return metadata_common.get_same_or_missing_prop_names(prop_names, md_comparison)
 
 
-def parse_and_validate_connection_string(connection_string):
-    connection = parse.urlparse(connection_string, )
-    if connection.scheme not in {'postgresql', 'postgres'}:
+def parse_and_validate_external_table_uri_str(external_table_uri_str):
+    external_table_uri = parse.urlparse(external_table_uri_str, )
+    if external_table_uri.scheme not in {'postgresql', 'postgres'}:
         raise LaymanError(2, {
             'parameter': 'db_connection',
             'message': 'Parameter `db_connection` is expected to have URI scheme `postgresql`',
-            'expected': DB_CONNECTION_PATTERN,
+            'expected': EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': connection_string,
-                'uri_scheme': connection.scheme,
+                'db_connection': external_table_uri_str,
+                'uri_scheme': external_table_uri.scheme,
             }
         })
 
-    query = parse.parse_qs(connection.query)
+    query = parse.parse_qs(external_table_uri.query)
     table = query.pop('table', [None])[0]
     geo_column = query.pop('geo_column', [None])[0]
-    connection = connection._replace(query=parse.urlencode(query, True))
-    uri = parse.urlunparse(connection)
-    if not all([table, geo_column, connection.hostname]):
+    db_uri = external_table_uri._replace(query=parse.urlencode(query, True))
+    db_uri_str = parse.urlunparse(db_uri)
+    if not all([table, geo_column, db_uri.hostname]):
         raise LaymanError(2, {
             'parameter': 'db_connection',
             'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `table` and `geo_column`.',
-            'expected': DB_CONNECTION_PATTERN,
+            'expected': EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': connection_string,
-                'host': connection.hostname,
+                'db_connection': external_table_uri_str,
+                'host': db_uri.hostname,
                 'table': table,
                 'geo_column': geo_column,
             }
@@ -299,24 +299,24 @@ def parse_and_validate_connection_string(connection_string):
         raise LaymanError(2, {
             'parameter': 'db_connection',
             'message': 'Parameter `db_connection` is expected to have query parameter `table` in format `<schema>.<table_name>`',
-            'expected': DB_CONNECTION_PATTERN,
+            'expected': EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': connection_string,
+                'db_connection': external_table_uri_str,
                 'table': table,
             }
         })
     schema, table_name = table_parsed
 
     try:
-        conn_cur = db_util.create_connection_cursor(uri, encapsulate_exception=False)
+        conn_cur = db_util.create_connection_cursor(db_uri_str, encapsulate_exception=False)
     except psycopg2.OperationalError as exc:
         raise LaymanError(2, {
             'parameter': 'db_connection',
             'message': 'Unable to connect to database. Please check connection string, firewall settings, etc.',
-            'expected': DB_CONNECTION_PATTERN,
+            'expected': EXTERNAL_TABLE_URI_PATTERN,
             'detail': str(exc),
             'found': {
-                'db_connection': connection_string,
+                'db_connection': external_table_uri_str,
             },
         }) from exc
 
@@ -326,9 +326,9 @@ def parse_and_validate_connection_string(connection_string):
         raise LaymanError(2, {
             'parameter': 'db_connection',
             'message': 'Table not found in database.',
-            'expected': DB_CONNECTION_PATTERN,
+            'expected': EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': connection_string,
+                'db_connection': external_table_uri_str,
                 'schema': schema,
                 'table_name': table_name,
             }
@@ -340,19 +340,19 @@ def parse_and_validate_connection_string(connection_string):
         raise LaymanError(2, {
             'parameter': 'db_connection',
             'message': 'Column `geo_column` not found among geometry columns.',
-            'expected': DB_CONNECTION_PATTERN,
+            'expected': EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': connection_string,
+                'db_connection': external_table_uri_str,
                 'schema': schema,
                 'table_name': table_name,
                 'geo_column': geo_column,
             }
         })
 
-    result = ConnectionString(url=uri,
-                              schema=schema,
-                              table=table_name,
-                              geo_column=geo_column,
-                              )
+    result = TableUri(db_uri_str=db_uri_str,
+                      schema=schema,
+                      table=table_name,
+                      geo_column=geo_column,
+                      )
 
     return result

@@ -31,7 +31,7 @@ MIGRATIONS = {
             upgrade_v1_18.adjust_db_for_image_mosaic,
         ]),
         ((1, 20, 0), [
-            upgrade_v1_20.adjust_db_for_db_connection,
+            upgrade_v1_20.adjust_db_for_table_uri,
         ])
     ],
     consts.MIGRATION_TYPE_DATA: [

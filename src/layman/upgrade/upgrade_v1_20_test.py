@@ -22,13 +22,13 @@ def test_db_connection():
         process_client.publish_workspace_publication(publication_type, workspace, publication, **rest_args)
 
     statement = f'''
-    ALTER TABLE {DB_SCHEMA}.publications DROP COLUMN db_connection;'''
+    ALTER TABLE {DB_SCHEMA}.publications DROP COLUMN table_uri;'''
     with app.app_context():
         db_util.run_statement(statement)
 
-        upgrade_v1_20.adjust_db_for_db_connection()
+        upgrade_v1_20.adjust_db_for_table_uri()
 
-    query = f'''select p.db_connection, p.uuid
+    query = f'''select p.table_uri, p.uuid
     from {DB_SCHEMA}.publications p left join
      {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
 where w.name = %s
@@ -37,5 +37,5 @@ where w.name = %s
 ;'''
     for workspace, publication_type, publication, _ in publication_defs:
         with app.app_context():
-            db_conn = db_util.run_query(query, (workspace, publication, publication_type))[0][0]
-        assert not db_conn, f'publication={publication_type}:{workspace}.{publication}, db_conn={db_conn}'
+            table_uri = db_util.run_query(query, (workspace, publication, publication_type))[0][0]
+        assert not table_uri, f'publication={publication_type}:{workspace}.{publication}, table_uri={table_uri}'

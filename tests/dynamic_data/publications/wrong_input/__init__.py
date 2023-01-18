@@ -3,7 +3,7 @@ import os
 import logging
 
 from layman import LaymanError, settings
-from layman.layer.util import DB_CONNECTION_PATTERN
+from layman.layer.util import EXTERNAL_TABLE_URI_PATTERN
 from tests.asserts import util as asserts_util
 import tests.asserts.processing as processing
 import tests.asserts.final.publication as publication
@@ -1409,7 +1409,7 @@ TESTCASES = {
                           'message': 'Wrong parameter value',
                           'detail': {'parameter': 'db_connection',
                                      'message': 'Parameter `db_connection` is expected to have URI scheme `postgresql`',
-                                     'expected': DB_CONNECTION_PATTERN,
+                                     'expected': EXTERNAL_TABLE_URI_PATTERN,
                                      'found': {
                                          'db_connection': 'db_connection',
                                          'uri_scheme': '',

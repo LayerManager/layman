@@ -55,24 +55,24 @@ def post(workspace):
     input_files = fs_util.InputFiles(sent_streams=sent_file_streams, sent_paths=sent_file_paths)
 
     # DB_CONNECTION
-    db_connection_string = request.form.get('db_connection', '')
-    if not input_files and not db_connection_string:
+    external_table_uri_str = request.form.get('db_connection', '')
+    if not input_files and not external_table_uri_str:
         raise LaymanError(1, {
             'parameters': ['file', 'db_connection'],
             'message': 'Both `file` and `db_connection` parameters are empty',
             'expected': 'One of the parameters is filled.',
         })
-    if input_files and db_connection_string:
+    if input_files and external_table_uri_str:
         raise LaymanError(48, {
             'parameters': ['file', 'db_connection'],
             'message': 'Both `file` and `db_connection` parameters are filled',
             'expected': 'Only one of the parameters is fulfilled.',
             'found': {
                 'file': input_files.raw_paths,
-                'db_connection': db_connection_string,
+                'db_connection': external_table_uri_str,
             }})
 
-    db_connection = util.parse_and_validate_connection_string(db_connection_string) if db_connection_string else None
+    table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None
 
     # NAME
     unsafe_layername = request.form.get('name', '')
@@ -115,7 +115,7 @@ def post(workspace):
                                    enable_more_main_files=enable_more_main_files, time_regex=time_regex,
                                    slugified_time_regex=slugified_time_regex,
                                    name_input_file_by_layer=name_input_file_by_layer)
-    file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path) if not db_connection else settings.FILE_TYPE_VECTOR
+    file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path) if not table_uri else settings.FILE_TYPE_VECTOR
 
     # TITLE
     if len(request.form.get('title', '')) > 0:
