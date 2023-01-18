@@ -53,6 +53,6 @@ def import_table(input_file_path, *, table=None, schema='public'):
 
 
 def drop_table(schema, name):
-    statement = f'''drop table if exists {schema}.{name}'''
+    statement = f'''drop table {schema}.{name}'''
     conn_cur = db_util.create_connection_cursor(URI_STR)
     db_util.run_statement(statement, conn_cur=conn_cur)
