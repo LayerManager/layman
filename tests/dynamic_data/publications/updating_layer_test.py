@@ -59,7 +59,8 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
             ],
             'file': {
                 'file_type': 'unknown'
-            }
+            },
+            '_table_uri': None,
         }
 
         asserts_publ.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
