@@ -2,7 +2,7 @@ import os
 import logging
 
 import pytest
-from db import util as db_util
+from db import util as db_util, TableUri
 from layman import app, util as layman_util, settings, celery
 from layman.common import bbox as bbox_util
 from layman.common.prime_db_schema import publications
@@ -209,17 +209,24 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
         expected_detail['_file_type'] = file_type
         if file_type == settings.FILE_TYPE_VECTOR:
             uuid = pub_info["uuid"]
-            db_table = f'layer_{uuid.replace("-","_")}'
+            db_table = f'layer_{uuid.replace("-", "_")}'
             util.recursive_dict_update(expected_detail,
                                        {
                                            'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
                                            'file': {'file_type': 'vector'},
                                            'db_table': {'name': db_table},
+                                           '_table_uri': TableUri(
+                                               db_uri_str='postgresql://docker:docker@postgresql:5432/layman_test',
+                                               schema=workspace,
+                                               table=db_table,
+                                               geo_column='wkb_geometry'
+                                           ),
                                        })
         elif file_type == settings.FILE_TYPE_RASTER:
             util.recursive_dict_update(expected_detail,
                                        {
                                            'file': {'file_type': 'raster'},
+                                           '_table_uri': None,
                                        })
             if file_extension:
                 util.recursive_dict_update(expected_detail,

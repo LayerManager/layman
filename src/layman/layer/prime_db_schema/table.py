@@ -1,7 +1,8 @@
+from db import TableUri
 from layman.common import empty_method_returns_dict
 from layman.common.prime_db_schema import publications as pubs_util
 from layman.layer import LAYER_TYPE
-from layman import patch_mode
+from layman import patch_mode, settings
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 get_metadata_comparison = empty_method_returns_dict
@@ -15,6 +16,15 @@ def get_publication_uuid(workspace, publication_type, publication_name):
 def get_layer_info(workspace, layername):
     layers = pubs_util.get_publication_infos(workspace, LAYER_TYPE)
     info = layers.get((workspace, LAYER_TYPE, layername), dict())
+    if info:
+        uuid = info['uuid']
+        info['_table_uri'] = TableUri(
+            db_uri_str=f'postgresql://{settings.LAYMAN_PG_USER}:{settings.LAYMAN_PG_PASSWORD}@{settings.LAYMAN_PG_HOST}:{settings.LAYMAN_PG_PORT}/{settings.LAYMAN_PG_DBNAME}',
+            schema=workspace,
+            table=f'layer_{uuid.replace("-", "_")}',
+            geo_column='wkb_geometry'
+        ) if info['_file_type'] == settings.FILE_TYPE_VECTOR else None
+
     return info
 
 
