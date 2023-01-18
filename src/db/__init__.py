@@ -2,8 +2,8 @@ from dataclasses import dataclass
 
 
 @dataclass
-class ConnectionString:
-    url: str
+class TableUri:
+    db_uri_str: str
     schema: str
     table: str
     geo_column: str

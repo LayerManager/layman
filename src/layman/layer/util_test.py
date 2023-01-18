@@ -4,7 +4,7 @@ import psycopg2
 from psycopg2 import tz
 import pytest
 
-from db import ConnectionString
+from db import TableUri
 from layman import settings, LaymanError
 from test_tools import util as test_util, external_db
 from . import util
@@ -164,27 +164,27 @@ def test_fill_in_partial_info_statuses():
 
 
 @pytest.mark.usefixtures('ensure_external_db', 'ensure_tables')
-@pytest.mark.parametrize('connection_string, exp_result', [
-    ('postgresql://docker:docker@postgresql:5432/external_test_db?table=schema.table_name&geo_column=geo_wkb_column', ConnectionString(
-        url='postgresql://docker:docker@postgresql:5432/external_test_db',
+@pytest.mark.parametrize('external_table_uri_str, exp_result', [
+    ('postgresql://docker:docker@postgresql:5432/external_test_db?table=schema.table_name&geo_column=geo_wkb_column', TableUri(
+        db_uri_str='postgresql://docker:docker@postgresql:5432/external_test_db',
         schema='schema',
         table='table_name',
         geo_column='geo_wkb_column',
     )),
 ])
-def test_parse_connection_string(connection_string, exp_result):
-    result = util.parse_and_validate_connection_string(connection_string)
+def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
+    result = util.parse_and_validate_external_table_uri_str(external_table_uri_str)
     assert result == exp_result
 
 
 @pytest.mark.usefixtures('ensure_external_db')
-@pytest.mark.parametrize('connection_string, exp_error', [
+@pytest.mark.parametrize('external_table_uri_str, exp_error', [
     pytest.param('postgresql://postgresql', {
         'http_code': 400,
         'code': 2,
         'detail': {'parameter': 'db_connection',
                    'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `table` and `geo_column`.',
-                   'expected': util.DB_CONNECTION_PATTERN,
+                   'expected': util.EXTERNAL_TABLE_URI_PATTERN,
                    'found': {
                        'db_connection': 'postgresql://postgresql',
                        'host': 'postgresql',
@@ -198,7 +198,7 @@ def test_parse_connection_string(connection_string, exp_result):
         'code': 2,
         'detail': {'parameter': 'db_connection',
                    'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `table` and `geo_column`.',
-                   'expected': util.DB_CONNECTION_PATTERN,
+                   'expected': util.EXTERNAL_TABLE_URI_PATTERN,
                    'found': {
                        'db_connection': 'postgresql:///external_test_db?table=schema.table_name&geo_column=wkb_geometry',
                        'host': None,
@@ -212,7 +212,7 @@ def test_parse_connection_string(connection_string, exp_result):
         'code': 2,
         'detail': {'parameter': 'db_connection',
                    'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `table` and `geo_column`.',
-                   'expected': util.DB_CONNECTION_PATTERN,
+                   'expected': util.EXTERNAL_TABLE_URI_PATTERN,
                    'found': {
                        'db_connection': 'postgresql://docker:docker@:5432/external_test_db?table=schema.table_name&geo_column=wkb_geometry',
                        'host': None,
@@ -227,7 +227,7 @@ def test_parse_connection_string(connection_string, exp_result):
         'detail': {
             'parameter': 'db_connection',
             'message': 'Table not found in database.',
-            'expected': util.DB_CONNECTION_PATTERN,
+            'expected': util.EXTERNAL_TABLE_URI_PATTERN,
             'found': {
                 'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?table=schema.no_table_name&geo_column=wkb_geometry',
                 'schema': 'schema',
@@ -241,7 +241,7 @@ def test_parse_connection_string(connection_string, exp_result):
         'detail': {
             'parameter': 'db_connection',
             'message': 'Column `geo_column` not found among geometry columns.',
-            'expected': util.DB_CONNECTION_PATTERN,
+            'expected': util.EXTERNAL_TABLE_URI_PATTERN,
             'found': {
                 'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?table=schema.table_name&geo_column=no_wkb_geometry',
                 'schema': 'schema',
@@ -256,7 +256,7 @@ def test_parse_connection_string(connection_string, exp_result):
         'detail': {
             'parameter': 'db_connection',
             'message': 'Table not found in database.',
-            'expected': util.DB_CONNECTION_PATTERN,
+            'expected': util.EXTERNAL_TABLE_URI_PATTERN,
             'found': {
                 'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?table=no_schema.table_name&geo_column=no_wkb_geometry',
                 'schema': 'no_schema',
@@ -265,14 +265,14 @@ def test_parse_connection_string(connection_string, exp_result):
         },
     }, id='invalid_schema'),
 ])
-def test_validate_connection_string(connection_string, exp_error):
+def test_validate_external_table_uri_str(external_table_uri_str, exp_error):
     with pytest.raises(LaymanError) as exc_info:
-        util.parse_and_validate_connection_string(connection_string)
+        util.parse_and_validate_external_table_uri_str(external_table_uri_str)
     test_util.assert_error(exp_error, exc_info)
 
 
 @pytest.mark.usefixtures('ensure_external_db')
-@pytest.mark.parametrize('connection_string, exp_err_msg_patterns', [
+@pytest.mark.parametrize('external_table_uri_str, exp_err_msg_patterns', [
     pytest.param('postgresql://postgresql:5432/external_test_db?table=schema.table_name&geo_column=wkb_geometry', [
         r'^connection to server at \"postgresql\" \(\d+.\d+.\d+.\d+\), port 5432 failed: fe_sendauth: no password supplied\n$',
         r'local user with ID 1000 does not exist\n',
@@ -284,16 +284,16 @@ def test_validate_connection_string(connection_string, exp_error):
         r'^connection to server at \"postgresql\" \(\d+.\d+.\d+.\d+\), port 5432 failed: fe_sendauth: no password supplied\n$'
     ], id='invalid_user'),
 ])
-def test_validate_connection_string_connection(connection_string, exp_err_msg_patterns):
+def test_validate_external_table_connection(external_table_uri_str, exp_err_msg_patterns):
     with pytest.raises(LaymanError) as exc_info:
-        util.parse_and_validate_connection_string(connection_string)
+        util.parse_and_validate_external_table_uri_str(external_table_uri_str)
     exp_error = {'http_code': 400,
                  'code': 2,
                  'detail': {'parameter': 'db_connection',
                             'message': 'Unable to connect to database. Please check connection string, firewall settings, etc.',
-                            'expected': util.DB_CONNECTION_PATTERN,
+                            'expected': util.EXTERNAL_TABLE_URI_PATTERN,
                             'found': {
-                                'db_connection': connection_string}},
+                                'db_connection': external_table_uri_str}},
                  }
     exc_detail_msg = exc_info.value.to_dict()['detail']['detail']
     assert any(re.match(exp_err_msg_pattern, exc_detail_msg) for exp_err_msg_pattern in exp_err_msg_patterns), f'exc_detail_msg={exc_detail_msg}, exp_err_msg_patterns={exp_err_msg_patterns}'
@@ -301,7 +301,7 @@ def test_validate_connection_string_connection(connection_string, exp_err_msg_pa
     test_util.assert_error(exp_error, exc_info)
 
 
-@pytest.mark.parametrize('connection_string, scheme', [
+@pytest.mark.parametrize('external_table_uri_str, scheme', [
     ('', ''),
     (' ', ''),
     ('_', ''),
@@ -310,16 +310,16 @@ def test_validate_connection_string_connection(connection_string, exp_err_msg_pa
     ('docker:docker@postgresql:5432/external_test_db?table=table_name&geo_column=wkb_geometry', 'docker'),
     ('mysql://docker:docker@postgresql:5432/external_test_db?table=table_name&geo_column=wkb_geometry', 'mysql'),
 ])
-def test_validate_connection_string_parse(connection_string, scheme):
+def test_validate_external_table_uri_str_parse(external_table_uri_str, scheme):
     with pytest.raises(LaymanError) as exc_info:
-        util.parse_and_validate_connection_string(connection_string)
+        util.parse_and_validate_external_table_uri_str(external_table_uri_str)
     exp_error = {'http_code': 400,
                  'code': 2,
                  'detail': {'parameter': 'db_connection',
                             'message': 'Parameter `db_connection` is expected to have URI scheme `postgresql`',
-                            'expected': util.DB_CONNECTION_PATTERN,
+                            'expected': util.EXTERNAL_TABLE_URI_PATTERN,
                             'found': {
-                                'db_connection': connection_string,
+                                'db_connection': external_table_uri_str,
                                 'uri_scheme': scheme,
                             },
                             },

@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 
 
-def create_connection_cursor(uri=None, encapsulate_exception=True):
+def create_connection_cursor(db_uri_str=None, encapsulate_exception=True):
     try:
-        connection = psycopg2.connect(uri) if uri else psycopg2.connect(**PG_CONN)
+        connection = psycopg2.connect(db_uri_str) if db_uri_str else psycopg2.connect(**PG_CONN)
         connection.set_session(autocommit=True)
     except BaseException as exc:
         if encapsulate_exception:

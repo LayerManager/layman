@@ -50,7 +50,7 @@ class TestLayer(base_test.TestSingleRestPublication):
     test_cases = [base_test.TestCaseType(key=key,
                                          type=EnumTestTypes.MANDATORY,
                                          rest_args={
-                                             'db_connection': f"{external_db.URI}?table=public.{key}&geo_column=wkb_geometry",
+                                             'db_connection': f"{external_db.URI_STR}?table=public.{key}&geo_column=wkb_geometry",
                                          },
                                          params=value,
                                          ) for key, value in TEST_CASES.items()]
@@ -61,7 +61,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         file_path = f"sample/data/geometry-types/{key}.geojson"
 
         external_db.import_table(file_path, table=key)
-        conn_cur = db_util.create_connection_cursor(external_db.URI)
+        conn_cur = db_util.create_connection_cursor(external_db.URI_STR)
         query = f'''select type from geometry_columns where f_table_schema = %s and f_table_name = %s and f_geometry_column = %s'''
         result = db_util.run_query(query, ('public', key, 'wkb_geometry'), conn_cur=conn_cur)
         assert result[0][0] == params['exp_geometry_type']
