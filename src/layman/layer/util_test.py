@@ -165,8 +165,8 @@ def test_fill_in_partial_info_statuses():
 
 @pytest.mark.usefixtures('ensure_external_db', 'ensure_tables')
 @pytest.mark.parametrize('external_table_uri_str, exp_result', [
-    ('postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_name&geo_column=geo_wkb_column', TableUri(
-        db_uri_str='postgresql://docker:docker@postgresql:5432/external_test_db',
+    ('postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_name&geo_column=geo_wkb_column&connect_timeout=10&target_session_attrs=primary', TableUri(
+        db_uri_str='postgresql://docker:docker@postgresql:5432/external_test_db?connect_timeout=10&target_session_attrs=primary',
         schema='schema_name',
         table='table_name',
         geo_column='geo_wkb_column',
