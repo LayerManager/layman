@@ -43,7 +43,7 @@ def ensure_table(schema, name, geo_column):
     db_util.run_statement(statement, conn_cur=conn_cur)
 
 
-def import_table(input_file_path, *, table=None, schema='public'):
+def import_table(input_file_path, *, table=None, schema='public', geo_column='wkb_geometry'):
     table = table or os.path.splitext(os.path.basename(input_file_path))[0]
 
     ensure_schema(schema)
@@ -56,6 +56,7 @@ def import_table(input_file_path, *, table=None, schema='public'):
         '-lco', f'SCHEMA={schema}',
         '-lco', f'LAUNDER=NO',
         '-lco', f'EXTRACT_SCHEMA_FROM_LAYER_NAME=NO',
+        '-lco', f'GEOMETRY_NAME={geo_column}',
         '-f', 'PostgreSQL',
         target_db,
         input_file_path,
