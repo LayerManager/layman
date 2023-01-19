@@ -11,44 +11,54 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 pytest_generate_tests = base_test.pytest_generate_tests
 
+DANGEROUS_NAME = '; DROP TABLE "public"."abc"; SELECT \'& Žlu-ťouč-ký\''
+
 TEST_CASES = {
     'all': {
         'input_file_name': 'all',
+        'schema_name': 'public',
         'table_name': 'all',
         'exp_geometry_type': 'GEOMETRY',
     },
     'geometrycollection_mixed_case_table_name': {
         'input_file_name': 'geometrycollection',
+        'schema_name': 'public',
         'table_name': 'MyGeometryCollection',
         'exp_geometry_type': 'GEOMETRYCOLLECTION',
     },
     'linestring_dangerous_table_name': {
         'input_file_name': 'linestring',
-        'table_name': '; DROP TABLE "public"."abc"; SELECT \'& Žlu-ťouč-ký\'',
+        'schema_name': 'public',
+        'table_name': DANGEROUS_NAME,
         'exp_geometry_type': 'LINESTRING',
     },
-    'multilinestring': {
+    'multilinestring_dangerous_schema_name': {
         'input_file_name': 'multilinestring',
+        'schema_name': DANGEROUS_NAME,
         'table_name': 'multilinestring',
         'exp_geometry_type': 'MULTILINESTRING',
     },
     'multipoint': {
         'input_file_name': 'multipoint',
+        'schema_name': 'public',
         'table_name': 'multipoint',
         'exp_geometry_type': 'MULTIPOINT',
     },
     'multipolygon': {
         'input_file_name': 'multipolygon',
+        'schema_name': 'public',
         'table_name': 'multipolygon',
         'exp_geometry_type': 'MULTIPOLYGON',
     },
     'point': {
         'input_file_name': 'point',
+        'schema_name': 'public',
         'table_name': 'point',
         'exp_geometry_type': 'POINT',
     },
     'polygon': {
         'input_file_name': 'polygon',
+        'schema_name': 'public',
         'table_name': 'polygon',
         'exp_geometry_type': 'POLYGON',
     },
@@ -67,7 +77,10 @@ class TestLayer(base_test.TestSingleRestPublication):
     test_cases = [base_test.TestCaseType(key=key,
                                          type=EnumTestTypes.MANDATORY,
                                          rest_args={
-                                             'db_connection': f"{external_db.URI_STR}?schema=public&table={quote(value['table_name'])}&geo_column=wkb_geometry",
+                                             'db_connection': f"{external_db.URI_STR}"
+                                                              f"?schema={quote(value['schema_name'])}"
+                                                              f"&table={quote(value['table_name'])}"
+                                                              f"&geo_column=wkb_geometry",
                                          },
                                          params=value,
                                          ) for key, value in TEST_CASES.items()]
@@ -76,13 +89,14 @@ class TestLayer(base_test.TestSingleRestPublication):
     def test_layer(layer: Publication, rest_method, rest_args, params):
         """Parametrized using pytest_generate_tests"""
         file_path = f"sample/data/geometry-types/{params['input_file_name']}.geojson"
+        schema = params['schema_name']
         table = params['table_name']
-        external_db.import_table(file_path, table=table)
+        external_db.import_table(file_path, table=table, schema=schema)
         conn_cur = db_util.create_connection_cursor(external_db.URI_STR)
         query = f'''select type from geometry_columns where f_table_schema = %s and f_table_name = %s and f_geometry_column = %s'''
-        result = db_util.run_query(query, ('public', table, 'wkb_geometry'), conn_cur=conn_cur)
+        result = db_util.run_query(query, (schema, table, 'wkb_geometry'), conn_cur=conn_cur)
         assert result[0][0] == params['exp_geometry_type']
 
         rest_method(layer, args=rest_args)
 
-        external_db.drop_table('public', table)
+        external_db.drop_table(schema, table)
