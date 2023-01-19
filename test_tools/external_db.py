@@ -53,7 +53,6 @@ def import_table(input_file_path, *, table=None, schema='public'):
     bash_args = [
         'ogr2ogr',
         '-nln', table,
-        # '-nlt', 'GEOMETRY',
         '-lco', f'SCHEMA={schema}',
         '-lco', f'LAUNDER=NO',
         '-lco', f'EXTRACT_SCHEMA_FROM_LAYER_NAME=NO',
