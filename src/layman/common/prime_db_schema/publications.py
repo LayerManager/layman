@@ -386,10 +386,17 @@ def insert_publication(workspace_name, info):
     check_publication_info(workspace_name, info)
 
     insert_publications_sql = f'''insert into {DB_SCHEMA}.publications as p
-        (id_workspace, name, title, type, uuid, style_type, file_type, everyone_can_read, everyone_can_write, updated_at, image_mosaic) values
-        (%s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp, %s)
+        (id_workspace, name, title, type, uuid, style_type, file_type, everyone_can_read, everyone_can_write, updated_at, image_mosaic, external_table_uri) values
+        (%s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp, %s, %s)
 returning id
 ;'''
+
+    external_table_uri = psycopg2.extras.Json({
+        'db_uri_str': info["external_table_uri"].db_uri_str,
+        'schema': info["external_table_uri"].schema,
+        'table': info["external_table_uri"].table,
+        'geo_column': info["external_table_uri"].geo_column,
+    }) if info.get("external_table_uri") else None
 
     data = (id_workspace,
             info.get("name"),
@@ -401,6 +408,7 @@ returning id
             ROLE_EVERYONE in info['access_rights']['read'],
             ROLE_EVERYONE in info['access_rights']['write'],
             info.get("image_mosaic"),
+            external_table_uri,
             )
     pub_id = db_util.run_query(insert_publications_sql, data)[0][0]
 

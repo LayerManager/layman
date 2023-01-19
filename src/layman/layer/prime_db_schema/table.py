@@ -80,6 +80,7 @@ def post_layer(workspace,
                actor_name,
                file_type,
                image_mosaic,
+               external_table_uri,
                style_type=None,
                ):
     db_info = {"name": layername,
@@ -91,6 +92,7 @@ def post_layer(workspace,
                "file_type": file_type,
                'style_type': style_type.code if style_type else None,
                'image_mosaic': image_mosaic,
+               'external_table_uri': external_table_uri,
                }
     pubs_util.insert_publication(workspace, db_info)
 

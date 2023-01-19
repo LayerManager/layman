@@ -3,6 +3,7 @@ from urllib.parse import quote
 import pytest
 
 from db import util as db_util
+from layman import settings, app
 from test_tools import process_client, external_db
 from tests import EnumTestTypes, Publication
 from tests.dynamic_data import base_test
@@ -100,6 +101,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         schema = params['schema_name']
         table = params['table_name']
         geo_column = params['geo_column_name']
+
         external_db.import_table(file_path, table=table, schema=schema, geo_column=geo_column)
         conn_cur = db_util.create_connection_cursor(external_db.URI_STR)
         query = f'''select type from geometry_columns where f_table_schema = %s and f_table_name = %s and f_geometry_column = %s'''
@@ -107,5 +109,22 @@ class TestLayer(base_test.TestSingleRestPublication):
         assert result[0][0] == params['exp_geometry_type']
 
         rest_method(layer, args=rest_args)
+
+        query = f'''select p.external_table_uri
+            from {settings.LAYMAN_PRIME_SCHEMA}.publications p left join
+             {settings.LAYMAN_PRIME_SCHEMA}.workspaces w on w.id = p.id_workspace
+        where w.name = %s
+          and p.name = %s
+          and p.type = %s
+        ;'''
+        with app.app_context():
+            external_table_uri = db_util.run_query(query, (layer.workspace, layer.name, layer.type))[0][0]
+
+        assert external_table_uri == {
+            "db_uri_str": external_db.URI_STR,
+            "schema": schema,
+            "table": table,
+            "geo_column": geo_column,
+        }
 
         external_db.drop_table(schema, table)
