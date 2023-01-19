@@ -24,7 +24,7 @@ TEST_CASES = {
     },
     'linestring_dangerous_table_name': {
         'input_file_name': 'linestring',
-        'table_name': '; DROP TABLE "abc"; SELECT \'& Žlu-ťouč-ký\'',
+        'table_name': '; DROP TABLE "public"."abc"; SELECT \'& Žlu-ťouč-ký\'',
         'exp_geometry_type': 'LINESTRING',
     },
     'multilinestring': {
