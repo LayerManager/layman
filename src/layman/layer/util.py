@@ -21,7 +21,7 @@ FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
 FLASK_INFO_KEY = f'{__name__}:LAYER_INFO'
 
-EXTERNAL_TABLE_URI_PATTERN = 'postgresql://<username>:<password>@<host>:<port>/<dbname>?table=<schema>.<table_name>&geo_column=<geo_column_name>'
+EXTERNAL_TABLE_URI_PATTERN = 'postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>'
 
 
 def to_safe_layer_name(value):
@@ -277,35 +277,24 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
         })
 
     query = parse.parse_qs(external_table_uri.query)
+    schema = query.pop('schema', [None])[0]
     table = query.pop('table', [None])[0]
     geo_column = query.pop('geo_column', [None])[0]
     db_uri = external_table_uri._replace(query=parse.urlencode(query, True))
     db_uri_str = parse.urlunparse(db_uri)
-    if not all([table, geo_column, db_uri.hostname]):
+    if not all([schema, table, geo_column, db_uri.hostname]):
         raise LaymanError(2, {
             'parameter': 'db_connection',
-            'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `table` and `geo_column`.',
+            'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
             'expected': EXTERNAL_TABLE_URI_PATTERN,
             'found': {
                 'db_connection': external_table_uri_str,
                 'host': db_uri.hostname,
+                'schema': schema,
                 'table': table,
                 'geo_column': geo_column,
             }
         })
-
-    table_parsed = table.split('.')
-    if not len(table_parsed) == 2:
-        raise LaymanError(2, {
-            'parameter': 'db_connection',
-            'message': 'Parameter `db_connection` is expected to have query parameter `table` in format `<schema>.<table_name>`',
-            'expected': EXTERNAL_TABLE_URI_PATTERN,
-            'found': {
-                'db_connection': external_table_uri_str,
-                'table': table,
-            }
-        })
-    schema, table_name = table_parsed
 
     try:
         conn_cur = db_util.create_connection_cursor(db_uri_str, encapsulate_exception=False)
@@ -321,7 +310,7 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
         }) from exc
 
     query = f'''select count(*) from information_schema.tables WHERE table_schema=%s and table_name=%s'''
-    query_res = db_util.run_query(query, (schema, table_name,), conn_cur=conn_cur)
+    query_res = db_util.run_query(query, (schema, table,), conn_cur=conn_cur)
     if not query_res[0][0]:
         raise LaymanError(2, {
             'parameter': 'db_connection',
@@ -330,12 +319,12 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
             'found': {
                 'db_connection': external_table_uri_str,
                 'schema': schema,
-                'table_name': table_name,
+                'table': table,
             }
         })
 
     query = f'''select count(*) from geometry_columns where f_table_schema = %s and f_table_name = %s and f_geometry_column = %s'''
-    query_res = db_util.run_query(query, (schema, table_name, geo_column), conn_cur=conn_cur)
+    query_res = db_util.run_query(query, (schema, table, geo_column), conn_cur=conn_cur)
     if not query_res[0][0]:
         raise LaymanError(2, {
             'parameter': 'db_connection',
@@ -344,14 +333,14 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
             'found': {
                 'db_connection': external_table_uri_str,
                 'schema': schema,
-                'table_name': table_name,
+                'table': table,
                 'geo_column': geo_column,
             }
         })
 
     result = TableUri(db_uri_str=db_uri_str,
                       schema=schema,
-                      table=table_name,
+                      table=table,
                       geo_column=geo_column,
                       )
 

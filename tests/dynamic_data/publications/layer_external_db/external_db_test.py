@@ -67,7 +67,7 @@ class TestLayer(base_test.TestSingleRestPublication):
     test_cases = [base_test.TestCaseType(key=key,
                                          type=EnumTestTypes.MANDATORY,
                                          rest_args={
-                                             'db_connection': f"{external_db.URI_STR}?table=public.{quote(value['table_name'])}&geo_column=wkb_geometry",
+                                             'db_connection': f"{external_db.URI_STR}?schema=public&table={quote(value['table_name'])}&geo_column=wkb_geometry",
                                          },
                                          params=value,
                                          ) for key, value in TEST_CASES.items()]
