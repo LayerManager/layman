@@ -1,6 +1,7 @@
 import os
 import subprocess
 from urllib import parse
+from psycopg2 import sql
 import pytest
 from db import util as db_util
 from layman import settings, app
@@ -40,6 +41,8 @@ def import_table(input_file_path, *, table=None, schema='public'):
         '-nln', table,
         # '-nlt', 'GEOMETRY',
         '-lco', f'SCHEMA={schema}',
+        '-lco', f'LAUNDER=NO',
+        '-lco', f'EXTRACT_SCHEMA_FROM_LAYER_NAME=NO',
         '-f', 'PostgreSQL',
         target_db,
         input_file_path,
@@ -49,10 +52,12 @@ def import_table(input_file_path, *, table=None, schema='public'):
                                stderr=subprocess.STDOUT)
     stdout, stderr = process.communicate()
     return_code = process.poll()
-    assert return_code == 0 and not stdout and not stderr
+    assert return_code == 0 and not stdout and not stderr, f"return_code={return_code}, stdout={stdout}, stderr={stderr}"
 
 
 def drop_table(schema, name):
-    statement = f'''drop table {schema}.{name}'''
+    statement = sql.SQL('drop table {table}').format(
+        table=sql.Identifier(schema, name)
+    )
     conn_cur = db_util.create_connection_cursor(URI_STR)
     db_util.run_statement(statement, conn_cur=conn_cur)
