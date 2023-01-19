@@ -3,7 +3,7 @@ import logging
 import psycopg2.extras
 
 import crs as crs_def
-from db import util as db_util
+from db import util as db_util, TableUri
 from layman import settings, LaymanError
 from layman.authn import is_user_with_name
 from layman.common import get_publications_consts as consts, bbox as bbox_util
@@ -148,6 +148,7 @@ select p.id as id_publication,
        ST_XMAX(p.bbox) as xmax,
        ST_YMAX(p.bbox) as ymax,
        p.srid as srid,
+       p.external_table_uri,
        (select rtrim(concat(case when u.id is not null then w.name || ',' end,
                             string_agg(w2.name, ',') || ',',
                             case when p.everyone_can_read then %s || ',' end
@@ -232,13 +233,19 @@ from {DB_SCHEMA}.workspaces w inner join
                                    '_style_type': style_type,
                                    'image_mosaic': image_mosaic,
                                    'updated_at': updated_at,
+                                   '_table_uri': TableUri(
+                                       db_uri_str=external_table_uri.get('db_uri_str'),
+                                       schema=external_table_uri.get('schema'),
+                                       table=external_table_uri.get('table'),
+                                       geo_column=external_table_uri.get('geo_column'),
+                                   ) if external_table_uri else None,
                                    'native_bounding_box': [xmin, ymin, xmax, ymax],
                                    'native_crs': db_util.get_crs(srid) if srid else None,
                                    'access_rights': {'read': can_read_users.split(','),
                                                      'write': can_write_users.split(',')}
                                    }
              for id_publication, workspace_name, publication_type, publication_name, title, uuid, file_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
-             srid, can_read_users, can_write_users, _
+             srid, external_table_uri, can_read_users, can_write_users, _
              in values}
 
     infos = {key: {**value,
