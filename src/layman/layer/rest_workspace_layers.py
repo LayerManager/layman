@@ -72,7 +72,7 @@ def post(workspace):
                 'db_connection': external_table_uri_str,
             }})
 
-    table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None
+    external_table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None
 
     # NAME
     unsafe_layername = request.form.get('name', '')
@@ -115,7 +115,7 @@ def post(workspace):
                                    enable_more_main_files=enable_more_main_files, time_regex=time_regex,
                                    slugified_time_regex=slugified_time_regex,
                                    name_input_file_by_layer=name_input_file_by_layer)
-    file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path) if not table_uri else settings.FILE_TYPE_VECTOR
+    file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path) if not external_table_uri else settings.FILE_TYPE_VECTOR
 
     # TITLE
     if len(request.form.get('title', '')) > 0:

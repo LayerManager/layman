@@ -22,13 +22,13 @@ def test_db_connection():
         process_client.publish_workspace_publication(publication_type, workspace, publication, **rest_args)
 
     statement = f'''
-    ALTER TABLE {DB_SCHEMA}.publications DROP COLUMN table_uri;'''
+    ALTER TABLE {DB_SCHEMA}.publications DROP COLUMN external_table_uri;'''
     with app.app_context():
         db_util.run_statement(statement)
 
         upgrade_v1_20.adjust_db_for_table_uri()
 
-    query = f'''select p.table_uri, p.uuid
+    query = f'''select p.external_table_uri, p.uuid
     from {DB_SCHEMA}.publications p left join
      {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
 where w.name = %s
