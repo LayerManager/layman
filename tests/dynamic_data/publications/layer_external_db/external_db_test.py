@@ -22,6 +22,7 @@ TEST_CASES = {
         'table_name': 'all',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'GEOMETRY',
+        'exp_bounding_box': [15.0, 49.0, 15.3, 49.3],
     },
     'geometrycollection_mixed_case_table_name': {
         'input_file_name': 'geometrycollection',
@@ -29,6 +30,7 @@ TEST_CASES = {
         'table_name': 'MyGeometryCollection',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'GEOMETRYCOLLECTION',
+        'exp_bounding_box': [15.0, 45.0, 18, 46],
     },
     'linestring_dangerous_table_name': {
         'input_file_name': 'linestring',
@@ -36,6 +38,7 @@ TEST_CASES = {
         'table_name': DANGEROUS_NAME,
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'LINESTRING',
+        'exp_bounding_box': [15.0, 49.0, 15.3, 49.3],
     },
     'multilinestring_dangerous_schema_name': {
         'input_file_name': 'multilinestring',
@@ -43,6 +46,7 @@ TEST_CASES = {
         'table_name': 'multilinestring',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'MULTILINESTRING',
+        'exp_bounding_box': [16.0, 47.0, 16.0, 48.5],
     },
     'multipoint_dangerous_geo_column_name': {
         'input_file_name': 'multipoint',
@@ -50,6 +54,7 @@ TEST_CASES = {
         'table_name': 'multipoint',
         'geo_column_name': DANGEROUS_NAME,
         'exp_geometry_type': 'MULTIPOINT',
+        'exp_bounding_box': [15.0, 47.8, 15.0, 48.0],
     },
     'multipolygon': {
         'input_file_name': 'multipolygon',
@@ -57,6 +62,7 @@ TEST_CASES = {
         'table_name': 'multipolygon',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'MULTIPOLYGON',
+        'exp_bounding_box': [17.0, 47.0, 18.0, 48.5],
     },
     'point': {
         'input_file_name': 'point',
@@ -64,6 +70,7 @@ TEST_CASES = {
         'table_name': 'point',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'POINT',
+        'exp_bounding_box': [15.0, 49.0, 15.3, 49.3],
     },
     'polygon': {
         'input_file_name': 'polygon',
@@ -71,6 +78,7 @@ TEST_CASES = {
         'table_name': 'polygon',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'POLYGON',
+        'exp_bounding_box': [15.0, 49.0, 15.3, 49.3],
     },
 }
 
@@ -112,7 +120,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         rest_method(layer, args=rest_args)
 
         with app.app_context():
-            publ_info = get_publication_info(layer.workspace, layer.type, layer.name, context={'keys': ['table_uri'], })
+            publ_info = get_publication_info(layer.workspace, layer.type, layer.name, context={'keys': ['table_uri', 'native_crs', 'native_bounding_box'], })
         table_uri = publ_info['_table_uri']
         assert table_uri == TableUri(
             db_uri_str=external_db.URI_STR,
@@ -120,5 +128,8 @@ class TestLayer(base_test.TestSingleRestPublication):
             table=table,
             geo_column=geo_column,
         )
+
+        assert publ_info['native_crs'] == 'EPSG:4326'
+        assert publ_info['native_bounding_box'] == params['exp_bounding_box']
 
         external_db.drop_table(schema, table)

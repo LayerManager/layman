@@ -3,6 +3,7 @@ import math
 import os
 import logging
 import subprocess
+from psycopg2 import sql
 
 from db import util as db_util, PG_CONN
 from layman.common.language import get_languages_iso639_2
@@ -494,26 +495,27 @@ def ensure_attributes(attribute_tuples):
     return missing_attributes
 
 
-def get_bbox(schema, table_name, conn_cur=None):
-    query = f'''
-    with tmp as (select ST_Extent(l.wkb_geometry) as bbox
-                 from {schema}.{table_name} l
+def get_bbox(schema, table_name, conn_cur=None, column='wkb_geometry'):
+    query = sql.SQL('''
+    with tmp as (select ST_Extent(l.{column}) as bbox
+                 from {table} l
     )
     select st_xmin(bbox),
            st_ymin(bbox),
            st_xmax(bbox),
            st_ymax(bbox)
     from tmp
-    '''
+    ''').format(
+        table=sql.Identifier(schema, table_name),
+        column=sql.Identifier(column),
+    )
     result = db_util.run_query(query, conn_cur=conn_cur)[0]
     return result
 
 
-def get_crs(schema, table_name, conn_cur=None):
-    query = f'''
-    select Find_SRID('{schema}', '{table_name}', 'wkb_geometry');
-    '''
-    srid = db_util.run_query(query, conn_cur=conn_cur)[0][0]
+def get_crs(schema, table_name, conn_cur=None, column='wkb_geometry'):
+    query = 'select Find_SRID(%s, %s, %s);'
+    srid = db_util.run_query(query, (schema, table_name, column), conn_cur=conn_cur)[0][0]
     crs = db_util.get_crs(srid)
     return crs
 
