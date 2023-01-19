@@ -25,15 +25,29 @@ def ensure_db():
     yield
 
 
-def ensure_table(schema, name, geo_column):
-    statement = f'''create table {schema}.{name} ({geo_column} geometry(Geometry, 4326))'''
+def ensure_schema(schema):
     conn_cur = db_util.create_connection_cursor(URI_STR)
-    db_util.run_statement(f"""CREATE SCHEMA IF NOT EXISTS "{schema}" AUTHORIZATION {settings.LAYMAN_PG_USER}""", conn_cur=conn_cur)
+    statement = sql.SQL(f'CREATE SCHEMA IF NOT EXISTS {{schema}} AUTHORIZATION {settings.LAYMAN_PG_USER}').format(
+        schema=sql.Identifier(schema),
+    )
+    db_util.run_statement(statement, conn_cur=conn_cur)
+
+
+def ensure_table(schema, name, geo_column):
+    ensure_schema(schema)
+    statement = sql.SQL('create table {table} ({geo_column} geometry(Geometry, 4326))').format(
+        table=sql.Identifier(schema, name),
+        geo_column=sql.Identifier(geo_column),
+    )
+    conn_cur = db_util.create_connection_cursor(URI_STR)
     db_util.run_statement(statement, conn_cur=conn_cur)
 
 
 def import_table(input_file_path, *, table=None, schema='public'):
     table = table or os.path.splitext(os.path.basename(input_file_path))[0]
+
+    ensure_schema(schema)
+
     target_db = uri_str_to_ogr2ogr_str(URI_STR)
 
     bash_args = [
