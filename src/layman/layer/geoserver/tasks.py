@@ -143,13 +143,14 @@ def refresh_wfs(
         raise AbortedException
     crs = info['native_crs']
     table_name = info['_table_uri'].table
+    store_name = None
     if is_external_table:
         table_uri = info['_table_uri']
-        geoserver.create_external_db_store(workspace=workspace,
-                                           layer=layername,
-                                           table_uri=table_uri,
-                                           )
-    geoserver.publish_layer_from_db(workspace, layername, description, title, crs=crs, table_name=table_name, )
+        store_name = geoserver.create_external_db_store(workspace=workspace,
+                                                        layer=layername,
+                                                        table_uri=table_uri,
+                                                        )
+    geoserver.publish_layer_from_db(workspace, layername, description, title, crs=crs, table_name=table_name, store_name=store_name)
     geoserver.set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, workspace)
     wfs.clear_cache(workspace)
 

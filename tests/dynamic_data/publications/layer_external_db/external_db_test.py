@@ -39,6 +39,7 @@ TEST_CASES = {
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'LINESTRING',
         'exp_bounding_box': [15.0, 49.0, 15.3, 49.3],
+        'exp_imported_into_GS': False,
     },
     'multilinestring_dangerous_schema_name': {
         'input_file_name': 'multilinestring',
@@ -47,6 +48,7 @@ TEST_CASES = {
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'MULTILINESTRING',
         'exp_bounding_box': [16.0, 47.0, 16.0, 48.5],
+        'exp_imported_into_GS': False,
     },
     'multipoint_dangerous_geo_column_name': {
         'input_file_name': 'multipoint',
@@ -55,6 +57,7 @@ TEST_CASES = {
         'geo_column_name': DANGEROUS_NAME,
         'exp_geometry_type': 'MULTIPOINT',
         'exp_bounding_box': [15.0, 47.8, 15.0, 48.0],
+        'exp_imported_into_GS': False,
     },
     'multipolygon': {
         'input_file_name': 'multipolygon',
@@ -120,7 +123,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         rest_method(layer, args=rest_args)
 
         with app.app_context():
-            publ_info = get_publication_info(layer.workspace, layer.type, layer.name, context={'keys': ['table_uri', 'native_crs', 'native_bounding_box'], })
+            publ_info = get_publication_info(layer.workspace, layer.type, layer.name, context={'keys': ['table_uri', 'native_crs', 'native_bounding_box', 'wfs'], })
         table_uri = publ_info['_table_uri']
         assert table_uri == TableUri(
             db_uri_str=external_db.URI_STR,
@@ -131,5 +134,8 @@ class TestLayer(base_test.TestSingleRestPublication):
 
         assert publ_info['native_crs'] == 'EPSG:4326'
         assert publ_info['native_bounding_box'] == params['exp_bounding_box']
+        if params.get('exp_imported_into_GS', True):
+            assert publ_info['wfs']['url'], f'publ_info={publ_info}'
+            assert 'status' not in publ_info['wfs']
 
         external_db.drop_table(schema, table)

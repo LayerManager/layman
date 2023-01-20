@@ -272,7 +272,8 @@ def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, de
     response.raise_for_status()
 
 
-def post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, auth, *, lat_lon_bbox, table_name):
+def post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, auth, *, lat_lon_bbox, table_name, store_name=None):
+    store_name = store_name or DEFAULT_DB_STORE_NAME
     keywords = [
         "features",
         layername,
@@ -292,13 +293,13 @@ def post_feature_type(geoserver_workspace, layername, description, title, bbox, 
         "enabled": True,
         "store": {
             "@class": "dataStore",
-            "name": geoserver_workspace + ":postgresql",
+            "name": f"{geoserver_workspace}:{store_name}",
         },
         'nativeBoundingBox': bbox_to_dict(bbox, crs),
         'latLonBoundingBox': bbox_to_dict(lat_lon_bbox, 'CRS:84'),
     }
     response = requests.post(urljoin(GS_REST_WORKSPACES,
-                                     geoserver_workspace + '/datastores/postgresql/featuretypes/'),
+                                     f'{geoserver_workspace}/datastores/{store_name}/featuretypes/'),
                              data=json.dumps({
                                  "featureType": feature_type_def
                              }),
