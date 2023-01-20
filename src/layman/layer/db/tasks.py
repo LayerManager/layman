@@ -24,11 +24,14 @@ def refresh_table(
         workspace,
         layername,
         crs_id=None,
+        is_external_table=False
 ):
     db.ensure_workspace(workspace)
     if self.is_aborted():
         raise AbortedException
 
+    if is_external_table:
+        return
     publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
     file_type = publ_info['file']['file_type']
     if file_type == settings.FILE_TYPE_RASTER:

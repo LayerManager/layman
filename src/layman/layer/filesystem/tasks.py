@@ -83,7 +83,11 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=None, name_normalized_tif_by_layer=True):
+def refresh_gdal(self, workspace, layername,
+                 crs_id=None,
+                 overview_resampling=None,
+                 name_normalized_tif_by_layer=True,
+                 is_external_table=False):
     def finish_gdal_process(process):
         if self.is_aborted():
             logger.info(f'terminating GDAL process workspace.layer={workspace}.{layername}')
@@ -99,6 +103,8 @@ def refresh_gdal(self, workspace, layername, crs_id=None, overview_resampling=No
 
     if self.is_aborted():
         raise AbortedException
+    if is_external_table:
+        return
     layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
     file_type = layer_info['file']['file_type']
     if file_type != settings.FILE_TYPE_RASTER:

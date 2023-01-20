@@ -164,6 +164,7 @@ def post(workspace):
         'name_input_file_by_layer': name_input_file_by_layer,
         'enable_more_main_files': enable_more_main_files,
         'external_table_uri': external_table_uri,
+        'is_external_table': bool(external_table_uri),
     }
 
     rest_common.setup_post_access_rights(request.form, task_options, actor_name)
