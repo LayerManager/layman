@@ -468,13 +468,13 @@ def delete_workspace_style(geoserver_workspace, stylename, auth=None):
     return sld_stream
 
 
-def create_db_store(geoserver_workspace, auth, db_schema=None, pg_conn=None, ):
+def create_db_store(geoserver_workspace, auth, db_schema=None, pg_conn=None, name=DEFAULT_DB_STORE_NAME):
     db_schema = db_schema or geoserver_workspace
     response = requests.post(
         urljoin(GS_REST_WORKSPACES, geoserver_workspace + '/datastores'),
         data=json.dumps({
             "dataStore": {
-                "name": DEFAULT_DB_STORE_NAME,
+                "name": name,
                 "connectionParameters": {
                     "entry": [
                         {
@@ -516,9 +516,9 @@ def create_db_store(geoserver_workspace, auth, db_schema=None, pg_conn=None, ):
     response.raise_for_status()
 
 
-def delete_db_store(geoserver_workspace, auth):
+def delete_db_store(geoserver_workspace, auth, *, store_name=DEFAULT_DB_STORE_NAME):
     response = requests.delete(
-        urljoin(GS_REST_WORKSPACES, geoserver_workspace + f'/datastores/{DEFAULT_DB_STORE_NAME}'),
+        urljoin(GS_REST_WORKSPACES, geoserver_workspace + f'/datastores/{store_name}'),
         headers=headers_json,
         auth=auth,
         timeout=GS_REST_TIMEOUT,
