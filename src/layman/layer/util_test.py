@@ -177,7 +177,7 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
     assert result == exp_result
 
 
-@pytest.mark.usefixtures('ensure_external_db')
+@pytest.mark.usefixtures('ensure_external_db', 'ensure_tables')
 @pytest.mark.parametrize('external_table_uri_str, exp_error', [
     pytest.param('postgresql://postgresql', {
         'http_code': 400,
@@ -259,7 +259,7 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
         'code': 2,
         'detail': {
             'parameter': 'db_connection',
-            'message': 'Table not found in database.',
+            'message': 'Table "schema_name"."no_table_name" not found in database.',
             'expected': util.EXTERNAL_TABLE_URI_PATTERN,
             'found': {
                 'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=no_table_name&geo_column=wkb_geometry',
@@ -268,6 +268,20 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
             },
         },
     }, id='invalid_table_name'),
+    pytest.param('postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=Table_name&geo_column=wkb_geometry', {
+        'http_code': 400,
+        'code': 2,
+        'detail': {
+            'parameter': 'db_connection',
+            'message': 'Table "schema_name"."Table_name" not found in database. Did you mean "schema_name"."table_name"?',
+            'expected': util.EXTERNAL_TABLE_URI_PATTERN,
+            'found': {
+                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=Table_name&geo_column=wkb_geometry',
+                'schema': 'schema_name',
+                'table': 'Table_name',
+            },
+        },
+    }, id='table_name_with_different_case'),
     pytest.param('postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_name&geo_column=no_wkb_geometry', {
         'http_code': 400,
         'code': 2,
@@ -288,7 +302,7 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
         'code': 2,
         'detail': {
             'parameter': 'db_connection',
-            'message': 'Table not found in database.',
+            'message': 'Table "no_schema"."table_name" not found in database.',
             'expected': util.EXTERNAL_TABLE_URI_PATTERN,
             'found': {
                 'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=no_schema&table=table_name&geo_column=no_wkb_geometry',
