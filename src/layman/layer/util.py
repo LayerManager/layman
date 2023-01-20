@@ -312,9 +312,12 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
     query = f'''select count(*) from information_schema.tables WHERE table_schema=%s and table_name=%s'''
     query_res = db_util.run_query(query, (schema, table,), conn_cur=conn_cur)
     if not query_res[0][0]:
+        query = f'''select table_schema, table_name from information_schema.tables WHERE lower(table_schema)=lower(%s) and lower(table_name)=lower(%s)'''
+        query_res = db_util.run_query(query, (schema, table,), conn_cur=conn_cur)
+        suggestion = f" Did you mean \"{query_res[0][0]}\".\"{query_res[0][1]}\"?" if query_res else ''
         raise LaymanError(2, {
             'parameter': 'db_connection',
-            'message': 'Table not found in database.',
+            'message': f'Table "{schema}"."{table}" not found in database.{suggestion}',
             'expected': EXTERNAL_TABLE_URI_PATTERN,
             'found': {
                 'db_connection': external_table_uri_str,
