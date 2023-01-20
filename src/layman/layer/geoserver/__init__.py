@@ -1,3 +1,4 @@
+from urllib import parse
 import logging
 from flask import g
 
@@ -11,6 +12,7 @@ from . import wms
 
 logger = logging.getLogger(__name__)
 FLASK_RULES_KEY = f"{__name__}:RULES"
+DEFAULT_EXTERNAL_DB_STORE_PREFIX = 'external_db'
 
 
 def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
@@ -37,6 +39,25 @@ def ensure_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
         created = gs_util.ensure_workspace(wspace, auth)
         if created:
             gs_util.create_db_store(wspace, auth, workspace, pg_conn=settings.PG_CONN)
+
+
+def create_external_db_store(workspace, layer, table_uri, auth=settings.LAYMAN_GS_AUTH):
+    uri = parse.urlparse(table_uri.db_uri_str)
+    pg_conn = {
+        'host': uri.hostname,
+        'port': uri.port,
+        'dbname': uri.path[1:],
+        'user': uri.username,
+        'password': uri.password,
+    }
+    store_name = get_external_db_store_name(layer)
+    gs_util.create_db_store(workspace,
+                            auth,
+                            table_uri.schema,
+                            pg_conn=pg_conn,
+                            name=store_name,
+                            )
+    return store_name
 
 
 def delete_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
@@ -134,3 +155,7 @@ def get_workspaces():
     all_workspaces = gs_util.get_all_workspaces(settings.LAYMAN_GS_AUTH)
     result = [workspace for workspace in all_workspaces if not workspace.endswith(settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX)]
     return result
+
+
+def get_external_db_store_name(layer):
+    return f'{DEFAULT_EXTERNAL_DB_STORE_PREFIX}_{layer}'
