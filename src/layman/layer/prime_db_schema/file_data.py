@@ -15,7 +15,7 @@ def delete_layer(workspace, layername):
     publications.set_bbox(workspace, LAYER_TYPE, layername, bbox=(None, None, None, None, ), crs=None)
     layers = publications.get_publication_infos(workspace, LAYER_TYPE)
     info = layers.get((workspace, LAYER_TYPE, layername), dict())
-    if not info['_table_uri']:
+    if not info['_is_external_table']:
         publications.set_file_type(workspace, LAYER_TYPE, layername, settings.FILE_TYPE_UNKNOWN, )
 
 

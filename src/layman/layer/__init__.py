@@ -50,7 +50,7 @@ PUBLICATION_TYPES = {
             ('layman.layer.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'title', 'uuid',
                                                                                      'bounding_box', 'style_type', 'native_crs',
                                                                                      'native_bounding_box', 'file_type', 'updated_at', 'id', 'type', 'image_mosaic',
-                                                                                     'table_uri']),),
+                                                                                     'table_uri', 'is_external_table']),),
             ('layman.layer.filesystem.input_chunk', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_file', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_style', InternalSourceTypeDef(info_items=[]),),
