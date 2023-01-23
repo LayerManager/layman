@@ -8,6 +8,7 @@ from lxml import etree as ET
 from flask import current_app
 
 import crs as crs_def
+from db import util as db_util
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util, requests as micka_requests
 from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
@@ -117,7 +118,7 @@ def get_template_path_and_values(workspace, layername, http_method):
     logger.info(f'get_template_path_and_values start calculating data for {workspace}:{layername}')
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
     publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
-        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'file_type', 'db_table', 'wms'],
+        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'file_type', 'table_uri', 'wms'],
     })
     title = publ_info['title']
     abstract = publ_info.get('description')
@@ -138,13 +139,15 @@ def get_template_path_and_values(workspace, layername, http_method):
 
     file_type = publ_info.get('_file_type')
     if file_type == settings.FILE_TYPE_VECTOR:
-        table_name = publ_info['db_table']['name']
+        table_uri = publ_info['_table_uri']
+        table_name = table_uri.table
+        conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
         try:
-            languages = db.get_text_languages(workspace, table_name)
+            languages = db.get_text_languages(table_uri.schema, table_name, conn_cur=conn_cur)
         except LaymanError:
             languages = []
         try:
-            scale_denominator = db.guess_scale_denominator(workspace, table_name)
+            scale_denominator = db.guess_scale_denominator(table_uri.schema, table_name, conn_cur=conn_cur)
         except LaymanError:
             scale_denominator = None
         spatial_resolution = {
