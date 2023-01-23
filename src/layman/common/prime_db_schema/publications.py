@@ -239,6 +239,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                        table=external_table_uri['table'],
                                        geo_column=external_table_uri['geo_column'],
                                    ) if external_table_uri else None,
+                                   '_is_external_table': bool(external_table_uri),
                                    'native_bounding_box': [xmin, ymin, xmax, ymax],
                                    'native_crs': db_util.get_crs(srid) if srid else None,
                                    'access_rights': {'read': can_read_users.split(','),
