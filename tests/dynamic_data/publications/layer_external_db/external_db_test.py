@@ -123,7 +123,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         rest_method(layer, args=rest_args)
 
         with app.app_context():
-            publ_info = get_publication_info(layer.workspace, layer.type, layer.name, context={'keys': ['table_uri', 'native_crs', 'native_bounding_box', 'wfs'], })
+            publ_info = get_publication_info(layer.workspace, layer.type, layer.name, context={'keys': ['table_uri', 'native_crs', 'native_bounding_box', 'wfs', 'wms'], })
         table_uri = publ_info['_table_uri']
         assert table_uri == TableUri(
             db_uri_str=external_db.URI_STR,
@@ -137,5 +137,8 @@ class TestLayer(base_test.TestSingleRestPublication):
         if params.get('exp_imported_into_GS', True):
             assert publ_info['wfs']['url'], f'publ_info={publ_info}'
             assert 'status' not in publ_info['wfs']
+            assert 'wms' in publ_info, f'publ_info={publ_info}'
+            assert publ_info['wms']['url'], f'publ_info={publ_info}'
+            assert 'status' not in publ_info['wms']
 
         external_db.drop_table(schema, table)

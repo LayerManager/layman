@@ -35,9 +35,12 @@ def refresh_wms(
         access_rights=None,
         image_mosaic=False,
         slugified_time_regex=None,
+        is_external_table=None,
 ):
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file', 'native_bounding_box', 'native_crs', 'db_table']})
-    file_type = info['file']['file_type']
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': [
+        'file', 'file_type', 'native_bounding_box', 'native_crs', 'table_uri'
+    ]})
+    file_type = info['_file_type']
     crs = info['native_crs']
 
     assert description is not None
@@ -50,7 +53,14 @@ def refresh_wms(
 
     if file_type == settings.FILE_TYPE_VECTOR:
         if store_in_geoserver:
-            table_name = info['db_table']['name']
+            table_uri = info['_table_uri']
+            table_name = table_uri.table
+            store_name = None
+            if is_external_table:
+                store_name = geoserver.create_external_db_store(workspace=geoserver_workspace,
+                                                                layer=layername,
+                                                                table_uri=table_uri,
+                                                                )
             geoserver.publish_layer_from_db(workspace,
                                             layername,
                                             description,
@@ -58,6 +68,7 @@ def refresh_wms(
                                             crs=crs,
                                             table_name=table_name,
                                             geoserver_workspace=geoserver_workspace,
+                                            store_name=store_name,
                                             )
         else:
             geoserver.publish_layer_from_qgis(workspace,
