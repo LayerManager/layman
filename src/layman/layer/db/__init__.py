@@ -273,8 +273,8 @@ limit {limit}
     return col_texts, limit
 
 
-def get_text_languages(schema, table_name):
-    texts, num_rows = get_text_data(schema, table_name)
+def get_text_languages(schema, table_name, *, conn_cur=None):
+    texts, num_rows = get_text_data(schema, table_name, conn_cur)
     all_langs = set()
     for text in texts:
         # skip short texts
@@ -433,8 +433,8 @@ SCALE_DENOMINATORS = [
 ]
 
 
-def guess_scale_denominator(schema, table_name):
-    distance = get_most_frequent_lower_distance(schema, table_name)
+def guess_scale_denominator(schema, table_name, *, conn_cur=None):
+    distance = get_most_frequent_lower_distance(schema, table_name, conn_cur=conn_cur)
     log_sd_list = [math.log10(sd) for sd in SCALE_DENOMINATORS]
     if distance is not None:
         coef = 2000 if distance > 100 else 1000
