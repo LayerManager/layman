@@ -63,10 +63,9 @@ services:
         dockerfile: Dockerfile.production
       image: timgen:latest
       user: ${UID_GID}
-      command: sh -c "node proxy.js & npx http-server dist/"
+      command: sh -c "node server.js"
 #      ports:
 #        - 8080:8080
-#        - 8081:8081
 
    layman_client_test:
       container_name: layman_client_test

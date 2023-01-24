@@ -62,8 +62,8 @@
 | --- | --- | --- | --- | --- | --- |
 | [layman-test-client](https://github.com/LayerManager/layman-test-client) | GNU GPL v3 | client/docker/Dockerfile | opt | bin | to demonstrate communication with REST API |
 | [openlayers](https://openlayers.org/) | BSD 2-Clause | timgen/package.json | prod | bin | for client-side map rendering in Timgen |
-| [http-server](https://www.npmjs.com/package/http-server) | MIT | timgen/package.json | prod | bin | as static HTTP server for Timgen |
-| [cors-anywhere](https://www.npmjs.com/package/cors-anywhere) | MIT | timgen/package.json | prod | bin | for proxying Timgen requests |
+| [express](https://expressjs.com/) | MIT | timgen/package.json | prod | bin | as HTTP server for Timgen |
+| [http-proxy-middleware](https://github.com/chimurai/http-proxy-middleware) | MIT | timgen/package.json | prod | bin | for proxying Timgen requests |
 | [file-saver](https://www.npmjs.com/package/file-saver) | MIT | timgen/package.json | prod | bin | for saving images in Timgen |
 
 ## Other dependencies

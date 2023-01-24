@@ -11,9 +11,9 @@
   "author": "jirik",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "cors-anywhere": "latest",
+    "express": "latest",
     "file-saver": "latest",
-    "http-server": "latest",
+    "http-proxy-middleware": "^2.0.6",
     "ol": "latest"
   },
   "devDependencies": {

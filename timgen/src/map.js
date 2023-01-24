@@ -45,8 +45,8 @@ const json_to_extent = (value) => {
 
 
 const proxify = (requested_url) => {
-  // toEncoding = toEncoding === undefined ? true : !!toEncoding;
-  return `http://${window.location.hostname}:8081/${requested_url}`;
+  const proxy = requested_url.startsWith('https://') ? 'https' : 'http';
+  return `http://${window.location.hostname}:8080/${proxy}_proxy?url=${encodeURIComponent(requested_url)}`;
 };
 
 
