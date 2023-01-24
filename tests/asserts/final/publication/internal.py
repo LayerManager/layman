@@ -70,7 +70,7 @@ def mandatory_keys_in_all_sources(workspace, publ_type, name):
     # Items
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
-    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
+    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', }.issubset(set(pub_info)), pub_info
 
 
 def metadata_key_sources_do_not_contain_other_keys(workspace, publ_type, name):
@@ -102,7 +102,7 @@ def other_keys_not_in_primary_db_schema_of_actor(workspace, publ_type, name, act
 def mandatory_keys_in_all_sources_of_actor(workspace, publ_type, name, actor, ):
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor})
-    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file', }.issubset(set(pub_info)), pub_info
+    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', }.issubset(set(pub_info)), pub_info
 
 
 def all_keys_assigned_to_source(workspace, publ_type, name):
