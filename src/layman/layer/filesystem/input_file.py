@@ -80,10 +80,6 @@ def get_layer_info(workspace, layername):
                 },
             },
         }
-    elif os.path.exists(util.get_layer_dir(workspace, layername)):
-        result = {
-            'name': layername
-        }
     else:
         result = {}
     return result
