@@ -59,7 +59,7 @@ const adjust_layer_url = (requested_url, gs_public_url, gs_url) => {
   if(gs_public_url && gs_url && requested_url.startsWith(gs_public_url)) {
     const old = requested_url;
     requested_url = requested_url.replace(gs_public_url, gs_url);
-    console.log(`replaced layer URL ${old} with ${requested_url}`);
+    log(`replaced layer URL ${old} with ${requested_url}`);
   }
   return proxify(requested_url);
 };
@@ -69,13 +69,16 @@ const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
   const source = layer.getSource();
 
   const load_fn = (tile_or_img, image_url) => {
-    image_url = adjust_layer_url(image_url, gs_public_url, gs_url);
-    fetch(image_url, {
+    const adjusted_image_url = adjust_layer_url(image_url, gs_public_url, gs_url);
+    log(`load_fn, image_url=${image_url} adjusted_image_url=${adjusted_image_url}`)
+    fetch(adjusted_image_url, {
       headers,
     }).then(res => {
+      log(`load_fn, res.status=${res.status}, image_url=${image_url}`)
       return res.blob();
     }).then(blob => {
       const data_url = URL.createObjectURL(blob);
+      log(`load_fn, blob loaded`)
       tile_or_img.getImage().src = data_url;
     })
   };
@@ -138,7 +141,7 @@ const json_to_layer = (layer_json, gs_public_url, gs_url, headers) => {
     //   return configParsers.createVectorLayer(layer_json);
     //   break;
     default:
-      console.error(`Unsupported layer className ${layer_json.className}`);
+      log(`Unsupported layer className ${layer_json.className}`);
       break;
   }
 };
@@ -174,13 +177,13 @@ export const json_to_map = ({
   });
 
 
-  // console.log('load_map', map_json);
+  // log('load_map', map_json);
   const view = ol_map.getView();
 
   const extent_4326 = json_to_extent(map_json.extent);
-  // console.log('extent_4326', extent_4326);
+  // log('extent_4326', extent_4326);
   const extent = ol_proj.transformExtent(extent_4326, 'EPSG:4326', view.getProjection());
-  // console.log('extent', extent);
+  // log('extent', extent);
   view.fit(extent, {
     constrainResolution: false
   });
@@ -245,4 +248,10 @@ export const map_to_canvas = (map) => {
   mapContext.globalAlpha = 1;
   mapContext.setTransform(1, 0, 0, 1, 0, 0);
   return mapCanvas;
+}
+
+
+export const log = (msg) => {
+  console.log(msg);
+  window['layman_logs'].push(msg);
 }
