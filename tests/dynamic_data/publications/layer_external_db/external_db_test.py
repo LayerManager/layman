@@ -7,6 +7,7 @@ from layman import app
 from layman.util import get_publication_info
 from test_tools import process_client, external_db
 from tests import EnumTestTypes, Publication
+from tests.asserts.final import publication as asserts_publ
 from tests.dynamic_data import base_test
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -107,7 +108,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          ) for key, value in TEST_CASES.items()]
 
     @staticmethod
-    def test_layer(layer: Publication, rest_method, rest_args, params):
+    def test_layer(layer: Publication, key, rest_method, rest_args, params):
         """Parametrized using pytest_generate_tests"""
         file_path = f"sample/data/geometry-types/{params['input_file_name']}.geojson"
         schema = params['schema_name']
@@ -143,5 +144,7 @@ class TestLayer(base_test.TestSingleRestPublication):
             assert 'wms' in publ_info, f'publ_info={publ_info}'
             assert publ_info['wms']['url'], f'publ_info={publ_info}'
             assert 'status' not in publ_info['wms']
+            exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{key}.png")
+            asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
 
         external_db.drop_table(schema, table)
