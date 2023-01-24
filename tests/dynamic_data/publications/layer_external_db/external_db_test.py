@@ -8,6 +8,7 @@ from layman.util import get_publication_info
 from test_tools import process_client, external_db
 from tests import EnumTestTypes, Publication
 from tests.asserts.final import publication as asserts_publ
+from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -146,5 +147,6 @@ class TestLayer(base_test.TestSingleRestPublication):
             assert 'status' not in publ_info['wms']
             exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{key}.png")
             asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
+            assert_util.is_publication_valid_and_complete(layer)
 
         external_db.drop_table(schema, table)
