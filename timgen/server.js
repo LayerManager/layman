@@ -41,7 +41,7 @@ const httpProxyMiddleware = createProxyMiddleware({
   onProxyRes: onProxyRes,
   changeOrigin: true,
   secure: false,
-  // logLevel: "debug",
+  logLevel: "debug",
 });
 
 const httpsProxyMiddleware = createProxyMiddleware({
@@ -59,7 +59,7 @@ const httpsProxyMiddleware = createProxyMiddleware({
   onProxyRes: onProxyRes,
   changeOrigin: true,
   secure: false,
-  // logLevel: "debug",
+  logLevel: "debug",
 });
 
 app.use("/http_proxy", httpProxyMiddleware);
