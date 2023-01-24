@@ -45,7 +45,8 @@ def test_info(workspace, publ_type, publication):
                                      internal=False)
 
     file_type = info_internal['file']['file_type']
-    item_keys = get_layer_info_keys(file_type)
+    is_external_table = info.get('_is_external_table', False)
+    item_keys = get_layer_info_keys(file_type=file_type, is_external_table=is_external_table)
 
     assert set(info.keys()) == item_keys, f'info={info}'
     assert info['wms'].get('url') == wms_url, f'r_json={info}, wms_url={wms_url}'
