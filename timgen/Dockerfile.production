@@ -13,7 +13,7 @@ RUN npm ci
 
 ADD index.html \
     index.js \
-    proxy.js \
+    server.js \
     /code/
 
 ADD src /code/src
