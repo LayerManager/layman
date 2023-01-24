@@ -311,8 +311,8 @@ def does_not_exist(workspace, publ_type, name, ):
 
 def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file']})
-    file_type = publ_info['file']['file_type']
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file_type', 'file']})
+    file_type = publ_info['_file_type']
     if file_type == settings.FILE_TYPE_RASTER:
         for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
@@ -323,8 +323,8 @@ def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
 
 def stats_preserved_in_normalized_raster(workspace, publ_type, name):
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file']})
-    file_type = publ_info['file']['file_type']
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file_type', 'file']})
+    file_type = publ_info['_file_type']
     if file_type == settings.FILE_TYPE_RASTER:
         for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
@@ -343,8 +343,8 @@ def stats_preserved_in_normalized_raster(workspace, publ_type, name):
 
 def size_and_position_preserved_in_normalized_raster(workspace, publ_type, name):
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file']})
-    file_type = publ_info['file']['file_type']
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file_type', 'file']})
+    file_type = publ_info['_file_type']
     if file_type == settings.FILE_TYPE_RASTER:
         for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
