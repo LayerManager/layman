@@ -31,35 +31,47 @@ const onProxyRes = (proxyRes, req, res) => {
 }
 
 const httpProxyMiddleware = createProxyMiddleware({
+  // agent: new http.Agent({
+  //   // see https://github.com/LayerManager/layman/issues/755
+  //   secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT,
+  // }),
   router: proxyRouter,
   pathRewrite,
   onProxyReq: (proxyReq, req, res) => {
     const full_url = proxyReq.protocol + '//' + proxyReq.host + proxyReq.path;
     const headers = proxyReq.getHeaders();
+    // proxyReq.agent = new http.Agent({
+    //   // see https://github.com/LayerManager/layman/issues/755
+    //   secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT,
+    // });
     console.log(`onProxyReq, full_url=${full_url}, headers=${JSON.stringify(headers, null, 2)}`)
   },
   onProxyRes: onProxyRes,
   changeOrigin: true,
   secure: false,
-  // logLevel: "debug",
+  logLevel: "debug",
 });
 
 const httpsProxyMiddleware = createProxyMiddleware({
+  agent: new https.Agent({
+    // see https://github.com/LayerManager/layman/issues/755
+    secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT,
+  }),
   router: proxyRouter,
   pathRewrite,
   onProxyReq: (proxyReq, req, res) => {
     const full_url = proxyReq.protocol + '//' + proxyReq.host + proxyReq.path;
     const headers = proxyReq.getHeaders();
-    proxyReq.agent = new https.Agent({
-      // see https://github.com/LayerManager/layman/issues/755
-      secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT,
-    });
+    // proxyReq.agent = new https.Agent({
+    //   // see https://github.com/LayerManager/layman/issues/755
+    //   secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT,
+    // });
     console.log(`onProxyReq, full_url=${full_url}, headers=${JSON.stringify(headers, null, 2)}`)
   },
   onProxyRes: onProxyRes,
   changeOrigin: true,
   secure: false,
-  // logLevel: "debug",
+  logLevel: "debug",
 });
 
 app.use("/http_proxy", httpProxyMiddleware);
