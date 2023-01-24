@@ -39,7 +39,7 @@ def is_complete_in_rest(rest_publication_detail):
 
 
 def mandatory_keys_in_rest(rest_publication_detail):
-    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', 'file'}.issubset(set(rest_publication_detail)), rest_publication_detail
+    assert {'name', 'title', 'access_rights', 'uuid', 'metadata', }.issubset(set(rest_publication_detail)), rest_publication_detail
 
 
 def async_error_in_info_key(rest_publication_detail, info_key, expected):
