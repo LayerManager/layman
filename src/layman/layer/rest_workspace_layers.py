@@ -80,7 +80,7 @@ def post(workspace):
         unsafe_layername = input_file.get_unsafe_layername(input_files)
     layername = util.to_safe_layer_name(unsafe_layername)
     util.check_layername(layername)
-    info = util.get_layer_info(workspace, layername)
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername)
     if info:
         raise LaymanError(17, {'layername': layername})
 
