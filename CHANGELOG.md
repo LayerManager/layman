@@ -10,6 +10,7 @@
 - If you are running Layman with development settings, run  
 ```
 make client-build
+make timgen-build
 ```
 ### Migrations and checks
 #### Schema migrations
@@ -18,6 +19,7 @@ make client-build
 - [#703](https://github.com/LayerManager/layman/issues/703) Fill column `external_table_uri` in `publications` table in prime DB schema for all publications. Value is set to `null` for all existing publications.
 ### Changes
 - [#703](https://github.com/LayerManager/layman/issues/703) Endpoint [POST Workspace Layers](doc/rest.md#post-workspace-layers) support new body parameter *db_connection*.
+- [#755](https://github.com/LayerManager/layman/issues/755) Downgrade Node.js of Timgen from v18 to v16
 
 ## v1.19.0
  2023-01-11

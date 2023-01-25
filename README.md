@@ -175,7 +175,8 @@ After providing external dependencies there is time to provide **internal depend
 - [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) utility of [gdal](https://gdal.org/) 3.3+
 - [chromium-browser](https://chromium.org/) 90+ and corresponding version of [chromedriver](https://chromedriver.chromium.org/)
 - [pipenv](https://pypi.org/project/pipenv/)
-- [node.js](https://nodejs.org/) 18 & npm 8 for running Timgen and Layman Test Client
+- [node.js](https://nodejs.org/) 18 & npm 8 Layman Test Client
+- [node.js](https://nodejs.org/) 16 & npm 8 for running Timgen and Layman Test Client
 
 Pipenv is recommended tool for installing **python-level** dependencies. Both Pipfile and Pipfile.lock are located in [`docker/`](docker/) directory.
 
