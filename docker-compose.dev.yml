@@ -79,7 +79,7 @@ services:
         dockerfile: Dockerfile.production
       image: timgen:latest
       user: ${UID_GID}
-      command: sh -c "node server.js"
+      command: node server.js
 #      ports:
 #        - 8080:8080
 
