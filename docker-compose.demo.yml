@@ -75,7 +75,7 @@ services:
         dockerfile: Dockerfile.production
       image: timgen:latest
       user: ${UID_GID}
-      command: sh -c "node server.js"
+      command: node server.js
       extra_hosts:
          - ${EXTRA_HOST1}
          - ${EXTRA_HOST2}
