@@ -24,7 +24,8 @@ TEST_CASES = {
         'table_name': 'all',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'GEOMETRY',
-        'exp_bounding_box': [15.0, 49.0, 15.3, 49.3],
+        'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
+        'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
     },
     'geometrycollection_mixed_case_table_name': {
         'input_file_name': 'geometrycollection',
@@ -32,7 +33,8 @@ TEST_CASES = {
         'table_name': 'MyGeometryCollection',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'GEOMETRYCOLLECTION',
-        'exp_bounding_box': [15.0, 45.0, 18, 46],
+        'exp_native_bounding_box': [15.0, 45.0, 18.0, 46.0],
+        'exp_bounding_box': [1669792.3618991035, 5621521.486192066, 2003750.8342789242, 5780349.220256351],
     },
     'linestring_dangerous_table_name': {
         'input_file_name': 'linestring',
@@ -40,7 +42,7 @@ TEST_CASES = {
         'table_name': DANGEROUS_NAME,
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'LINESTRING',
-        'exp_bounding_box': [15.0, 49.0, 15.3, 49.3],
+        'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
         'exp_imported_into_GS': False,
     },
     'multilinestring_dangerous_schema_name': {
@@ -49,7 +51,7 @@ TEST_CASES = {
         'table_name': 'multilinestring',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'MULTILINESTRING',
-        'exp_bounding_box': [16.0, 47.0, 16.0, 48.5],
+        'exp_native_bounding_box': [16.0, 47.0, 16.0, 48.5],
         'exp_imported_into_GS': False,
     },
     'multipoint_dangerous_geo_column_name': {
@@ -58,7 +60,7 @@ TEST_CASES = {
         'table_name': 'multipoint',
         'geo_column_name': DANGEROUS_NAME,
         'exp_geometry_type': 'MULTIPOINT',
-        'exp_bounding_box': [15.0, 47.8, 15.0, 48.0],
+        'exp_native_bounding_box': [15.0, 47.8, 15.0, 48.0],
         'exp_imported_into_GS': False,
     },
     'multipolygon': {
@@ -67,7 +69,8 @@ TEST_CASES = {
         'table_name': 'multipolygon',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'MULTIPOLYGON',
-        'exp_bounding_box': [17.0, 47.0, 18.0, 48.5],
+        'exp_native_bounding_box': [17.0, 47.0, 18.0, 48.5],
+        'exp_bounding_box': [1892431.3434856508, 5942074.072431108, 2003750.8342789242, 6190443.809135445],
     },
     'point': {
         'input_file_name': 'point',
@@ -75,7 +78,8 @@ TEST_CASES = {
         'table_name': 'point',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'POINT',
-        'exp_bounding_box': [15.0, 49.0, 15.3, 49.3],
+        'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
+        'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
     },
     'polygon': {
         'input_file_name': 'polygon',
@@ -83,7 +87,8 @@ TEST_CASES = {
         'table_name': 'polygon',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'POLYGON',
-        'exp_bounding_box': [15.0, 49.0, 15.3, 49.3],
+        'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
+        'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
     },
 }
 
@@ -137,7 +142,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         )
 
         assert publ_info['native_crs'] == 'EPSG:4326'
-        assert publ_info['native_bounding_box'] == params['exp_bounding_box']
+        assert publ_info['native_bounding_box'] == params['exp_native_bounding_box']
         assert publ_info['_is_external_table'] is True
         if params.get('exp_imported_into_GS', True):
             assert publ_info['wfs']['url'], f'publ_info={publ_info}'
@@ -148,5 +153,13 @@ class TestLayer(base_test.TestSingleRestPublication):
             exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{key}.png")
             asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
             assert_util.is_publication_valid_and_complete(layer)
+            asserts_publ.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
+                                                           exp_publication_detail={
+                                                               'bounding_box': params['exp_bounding_box'],
+                                                               'native_crs': 'EPSG:4326',
+                                                               'native_bounding_box': params['exp_native_bounding_box'],
+                                                           },
+                                                           external_table_uri=table_uri,
+                                                           )
 
         external_db.drop_table(schema, table)

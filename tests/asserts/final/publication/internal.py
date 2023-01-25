@@ -129,9 +129,13 @@ def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, *, max_diffs=Non
 
 
 def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_detail, publ_type_detail=None, full_comparison=True,
-                             file_extension=None, gdal_prefix='', keys_to_remove=None, filenames=None, archive_extension=None, ):
+                             file_extension=None, gdal_prefix='', keys_to_remove=None, filenames=None, archive_extension=None,
+                             external_table_uri=None, ):
     assert not file_extension or not filenames
     assert not archive_extension or filenames
+    assert not external_table_uri or not any([file_extension, gdal_prefix, filenames, archive_extension])
+    if external_table_uri and not publ_type_detail:
+        publ_type_detail = (settings.FILE_TYPE_VECTOR, 'sld')
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
@@ -163,7 +167,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            'url': f'{settings.LAYMAN_GS_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows',
                                            'workspace': f'{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'},
                                        'description': None,
-                                       '_is_external_table': False,
+                                       '_is_external_table': bool(external_table_uri),
                                    })
 
         if file_extension:
@@ -210,19 +214,28 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
         expected_detail['_file_type'] = file_type
         if file_type == settings.FILE_TYPE_VECTOR:
             uuid = pub_info["uuid"]
-            db_table = f'layer_{uuid.replace("-", "_")}'
-            util.recursive_dict_update(expected_detail,
-                                       {
-                                           'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
-                                           'file': {'file_type': 'vector'},
-                                           'db_table': {'name': db_table},
-                                           '_table_uri': TableUri(
-                                               db_uri_str='postgresql://docker:docker@postgresql:5432/layman_test',
-                                               schema=workspace,
-                                               table=db_table,
-                                               geo_column='wkb_geometry'
-                                           ),
-                                       })
+            if external_table_uri:
+                table_uri = external_table_uri
+                util.recursive_dict_update(expected_detail,
+                                           {
+                                               'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
+                                               '_table_uri': table_uri,
+                                           })
+            else:
+                db_table = f'layer_{uuid.replace("-", "_")}'
+                table_uri = TableUri(
+                    db_uri_str='postgresql://docker:docker@postgresql:5432/layman_test',
+                    schema=workspace,
+                    table=db_table,
+                    geo_column='wkb_geometry'
+                )
+                util.recursive_dict_update(expected_detail,
+                                           {
+                                               'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
+                                               'file': {'file_type': 'vector'},
+                                               'db_table': {'name': db_table},
+                                               '_table_uri': table_uri,
+                                           })
         elif file_type == settings.FILE_TYPE_RASTER:
             util.recursive_dict_update(expected_detail,
                                        {
