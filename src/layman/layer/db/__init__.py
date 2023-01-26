@@ -295,7 +295,7 @@ def get_text_languages(schema, table_name, *, conn_cur=None):
     return sorted(list(all_langs))
 
 
-def get_most_frequent_lower_distance_query(schema, table_name, order_by_methods):
+def get_most_frequent_lower_distance_query(schema, table_name):
     query = f"""
 with t1 as (
 select
@@ -306,7 +306,7 @@ from (
     ogc_fid, (st_dump(wkb_geometry)).geom as geometry
   FROM {{schema}}.{{table_name}}
 ) sub_view
-order by {{order_by_prefix}}geometry{{order_by_suffix}}, ogc_fid, dump_id
+order by ST_NPoints(geometry), ogc_fid, dump_id
 limit 5000
 )
 , t2 as (
@@ -326,7 +326,7 @@ from (
     where st_geometrytype(geometry) = 'ST_LineString'
 )
 ) sub_view
-order by {{order_by_prefix}}geometry{{order_by_suffix}}, ogc_fid, dump_id, ring_id
+order by ST_NPoints(geometry), ogc_fid, dump_id, ring_id
 limit 5000
 )
 , t2cumsum as (
@@ -385,13 +385,8 @@ order by freq desc
 limit 1
     """
 
-    order_by_prefix = ''.join([f"{method}(" for method in order_by_methods])
-    order_by_suffix = ')' * len(order_by_methods)
-
     query = query.format(schema=schema,
                          table_name=table_name,
-                         order_by_prefix=order_by_prefix,
-                         order_by_suffix=order_by_suffix,
                          )
     return query
 
@@ -399,9 +394,7 @@ limit 1
 def get_most_frequent_lower_distance(schema, table_name, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
-    query = get_most_frequent_lower_distance_query(schema, table_name, [
-        'ST_NPoints'
-    ])
+    query = get_most_frequent_lower_distance_query(schema, table_name)
 
     # print(f"\nget_most_frequent_lower_distance v1\nusername={username}, layername={layername}")
     # print(query)
