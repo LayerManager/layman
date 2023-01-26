@@ -76,7 +76,7 @@ def get_providers():
 
 
 def fill_in_partial_info_statuses(info, chain_info):
-    file_type = info.get('file', dict()).get('file_type', info['_file_type'])
+    file_type = info.get('file', dict()).get('file_type') or info['_file_type']
     is_external_table = info.get('_is_external_table', False)
     item_keys = get_layer_info_keys(file_type=file_type, is_external_table=is_external_table)
 
