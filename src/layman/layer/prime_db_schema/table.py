@@ -19,7 +19,7 @@ def get_layer_info(workspace, layername):
     if info:
         uuid = info['uuid']
         info['_table_uri'] = TableUri(
-            db_uri_str=f'postgresql://{settings.LAYMAN_PG_USER}:{settings.LAYMAN_PG_PASSWORD}@{settings.LAYMAN_PG_HOST}:{settings.LAYMAN_PG_PORT}/{settings.LAYMAN_PG_DBNAME}',
+            db_uri_str=settings.PG_URI_STR,
             schema=workspace,
             table=f'layer_{uuid.replace("-", "_")}',
             geo_column='wkb_geometry'
