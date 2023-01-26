@@ -3,7 +3,7 @@ from urllib.parse import quote
 import pytest
 
 from db import util as db_util, TableUri
-from layman import app
+from layman import app, settings
 from layman.util import get_publication_info
 from test_tools import process_client, external_db
 from tests import EnumTestTypes, Publication
@@ -20,6 +20,7 @@ DANGEROUS_NAME = '; DROP TABLE "public"."abc"; SELECT \'& Žlu-ťouč-ký\''
 TEST_CASES = {
     'all': {
         'input_file_name': 'all',
+        'style_file': None,
         'schema_name': 'public',
         'table_name': 'all',
         'geo_column_name': 'wkb_geometry',
@@ -29,6 +30,7 @@ TEST_CASES = {
     },
     'geometrycollection_mixed_case_table_name': {
         'input_file_name': 'geometrycollection',
+        'style_file': None,
         'schema_name': 'public',
         'table_name': 'MyGeometryCollection',
         'geo_column_name': 'wkb_geometry',
@@ -38,6 +40,7 @@ TEST_CASES = {
     },
     'linestring_dangerous_table_name': {
         'input_file_name': 'linestring',
+        'style_file': None,
         'schema_name': 'public',
         'table_name': DANGEROUS_NAME,
         'geo_column_name': 'wkb_geometry',
@@ -47,6 +50,7 @@ TEST_CASES = {
     },
     'multilinestring_dangerous_schema_name': {
         'input_file_name': 'multilinestring',
+        'style_file': None,
         'schema_name': DANGEROUS_NAME,
         'table_name': 'multilinestring',
         'geo_column_name': 'wkb_geometry',
@@ -56,6 +60,7 @@ TEST_CASES = {
     },
     'multipoint_dangerous_geo_column_name': {
         'input_file_name': 'multipoint',
+        'style_file': None,
         'schema_name': 'public',
         'table_name': 'multipoint',
         'geo_column_name': DANGEROUS_NAME,
@@ -63,8 +68,9 @@ TEST_CASES = {
         'exp_native_bounding_box': [15.0, 47.8, 15.0, 48.0],
         'exp_imported_into_GS': False,
     },
-    'multipolygon': {
+    'multipolygon_qml': {
         'input_file_name': 'multipolygon',
+        'style_file': 'tests/dynamic_data/publications/layer_external_db/multipolygon.qml',
         'schema_name': 'public',
         'table_name': 'multipolygon',
         'geo_column_name': 'wkb_geometry',
@@ -74,6 +80,7 @@ TEST_CASES = {
     },
     'point': {
         'input_file_name': 'point',
+        'style_file': None,
         'schema_name': 'public',
         'table_name': 'point',
         'geo_column_name': 'wkb_geometry',
@@ -83,6 +90,7 @@ TEST_CASES = {
     },
     'polygon': {
         'input_file_name': 'polygon',
+        'style_file': None,
         'schema_name': 'public',
         'table_name': 'polygon',
         'geo_column_name': 'wkb_geometry',
@@ -109,6 +117,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                               f"?schema={quote(value['schema_name'])}"
                                                               f"&table={quote(value['table_name'])}"
                                                               f"&geo_column={quote(value['geo_column_name'])}",
+                                             'style_file': value['style_file'],
                                          },
                                          params=value,
                                          ) for key, value in TEST_CASES.items()]
@@ -153,7 +162,11 @@ class TestLayer(base_test.TestSingleRestPublication):
             exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{key}.png")
             asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
             assert_util.is_publication_valid_and_complete(layer)
+            style_type = os.path.splitext(rest_args['style_file'])[1][1:] if rest_args['style_file'] else 'sld'
+            assert style_type in ['sld', 'qml']
+            publ_type_detail = (settings.FILE_TYPE_VECTOR, style_type)
             asserts_publ.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
+                                                           publ_type_detail=publ_type_detail,
                                                            exp_publication_detail={
                                                                'bounding_box': params['exp_bounding_box'],
                                                                'native_crs': 'EPSG:4326',

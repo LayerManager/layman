@@ -204,19 +204,26 @@ AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 
 def get_all_column_names(workspace, layername, conn_cur=None):
     table_name = get_table_name(workspace, layername)
-    return [col.name for col in get_all_column_infos(workspace, table_name, conn_cur)]
+    return [col.name for col in get_all_column_infos(workspace, table_name, conn_cur=conn_cur)]
 
 
-def get_all_column_infos(schema, table_name, conn_cur=None):
+def get_all_column_infos(schema, table_name, *, conn_cur=None, omit_geometry_columns=False):
     _, cur = conn_cur or db_util.get_connection_cursor()
+    query = """
+SELECT inf.column_name, inf.data_type
+FROM information_schema.columns inf
+    left outer join public.geometry_columns gc
+        on (inf.table_schema = gc.f_table_schema
+                and inf.table_name = gc.f_table_name
+                and inf.column_name = gc.f_geometry_column)
+WHERE table_schema = %s
+AND table_name = %s
+"""
+    if omit_geometry_columns:
+        query += " AND gc.f_geometry_column is null"
 
     try:
-        cur.execute(f"""
-SELECT column_name AS column_name, data_type
-FROM information_schema.columns
-WHERE table_schema = '{schema}'
-AND table_name = '{table_name}'
-""")
+        cur.execute(query, (schema, table_name))
     except BaseException as exc:
         logger.error(f'get_all_column_names ERROR')
         raise LaymanError(7) from exc
@@ -520,14 +527,17 @@ def get_crs(schema, table_name, conn_cur=None, column='wkb_geometry'):
     return crs
 
 
-def get_geometry_types(schema, table_name, conn_cur=None):
+def get_geometry_types(schema, table_name, *, column_name='wkb_geometry', conn_cur=None):
     conn, cur = conn_cur or db_util.get_connection_cursor()
+    query = sql.SQL("""
+    select distinct ST_GeometryType({column}) as geometry_type_name
+    from {table}
+    """).format(
+        table=sql.Identifier(schema, table_name),
+        column=sql.Identifier(column_name),
+    )
     try:
-        sql = f"""
-select distinct ST_GeometryType(wkb_geometry) as geometry_type_name
-from {schema}.{table_name}
-"""
-        cur.execute(sql)
+        cur.execute(query)
     except BaseException as exc:
         logger.error(f'get_geometry_types ERROR')
         raise LaymanError(7) from exc

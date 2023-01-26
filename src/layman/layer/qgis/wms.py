@@ -2,10 +2,11 @@ import os
 from owslib.wms import WebMapService
 
 import crs as crs_def
+from db import util as db_util
 from layman import patch_mode, settings, util as layman_util
 from layman.common import bbox as bbox_util, empty_method, empty_method_returns_none, empty_method_returns_dict
-from . import util
-from .. import db, qgis, util as layer_util
+from . import util, LAYER_TYPE
+from .. import db, qgis
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = "1.1.1"
@@ -59,24 +60,28 @@ def get_layer_file_path(workspace, layer):
 
 
 def save_qgs_file(workspace, layer):
-    info = layer_util.get_layer_info(workspace, layer)
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, {'keys': ['uuid', 'native_bounding_box',
+                                                                                    'table_uri']})
     uuid = info['uuid']
     qgis.ensure_layer_dir(workspace, layer)
     layer_bbox = info['native_bounding_box']
     crs = info['native_crs']
-    table_name = info['db_table']['name']
+    table_uri = info['_table_uri']
+    table_name = table_uri.table
+    db_schema = table_uri.schema
     layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[crs].default_bbox
     qml = util.get_original_style_xml(workspace, layer)
     qml_geometry = util.get_qml_geometry_from_qml(qml)
-    db_types = db.get_geometry_types(workspace, table_name)
+    conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
+    db_types = db.get_geometry_types(db_schema, table_name, conn_cur=conn_cur)
     db_cols = [
-        col for col in db.get_all_column_infos(workspace, table_name)
-        if col.name not in ['wkb_geometry', 'ogc_fid']
+        col for col in db.get_all_column_infos(db_schema, table_name, conn_cur=conn_cur, omit_geometry_columns=True)
+        if col.name not in ['ogc_fid']
     ]
     source_type = util.get_source_type(db_types, qml_geometry)
-    layer_qml = util.fill_layer_template(workspace, layer, uuid, layer_bbox, crs, qml, source_type, db_cols, table_name)
-    qgs_str = util.fill_project_template(workspace, layer, uuid, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
-                                         layer_bbox, source_type, table_name)
+    layer_qml = util.fill_layer_template(layer, uuid, layer_bbox, crs, qml, source_type, db_cols, table_uri)
+    qgs_str = util.fill_project_template(layer, uuid, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
+                                         layer_bbox, source_type, table_uri)
     with open(get_layer_file_path(workspace, layer), "w") as qgs_file:
         print(qgs_str, file=qgs_file)
 

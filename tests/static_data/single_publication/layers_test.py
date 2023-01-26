@@ -191,9 +191,13 @@ def test_fill_project_template(workspace, publ_type, publication):
     wms_url = f'{settings.LAYMAN_QGIS_URL}?MAP={qgs_path}'
     wms_version = '1.3.0'
 
-    layer_info = process_client.get_workspace_publication(publ_type, workspace, publication)
+    with app.app_context():
+        layer_info = layman_util.get_publication_info(workspace, publ_type, publication, context={
+            'keys': ['uuid', 'table_uri'],
+        })
     layer_uuid = layer_info['uuid']
-    table_name = layer_info['db_table']['name']
+    table_uri = layer_info['_table_uri']
+    table_name = table_uri.table
 
     with pytest.raises(requests.exceptions.HTTPError) as excinfo:
         WebMapService(wms_url, version=wms_version)
@@ -219,13 +223,13 @@ def test_fill_project_template(workspace, publ_type, publication):
     qml_geometry = qgis_util.get_qml_geometry_from_qml(qml_xml)
     source_type = qgis_util.get_source_type(db_types, qml_geometry)
     with app.app_context():
-        layer_qml_str = qgis_util.fill_layer_template(workspace, publication, layer_uuid, layer_bbox, layer_crs, qml_xml, source_type, db_cols, table_name)
+        layer_qml_str = qgis_util.fill_layer_template(publication, layer_uuid, layer_bbox, layer_crs, qml_xml, source_type, db_cols, table_uri)
     layer_qml = ET.fromstring(layer_qml_str.encode('utf-8'), parser=parser)
     if exp_min_scale is not None:
         assert layer_qml.attrib['minScale'] == exp_min_scale
     with app.app_context():
-        qgs_str = qgis_util.fill_project_template(workspace, publication, layer_uuid, layer_qml_str, layer_crs, settings.LAYMAN_OUTPUT_SRS_LIST,
-                                                  layer_bbox, source_type, table_name)
+        qgs_str = qgis_util.fill_project_template(publication, layer_uuid, layer_qml_str, layer_crs, settings.LAYMAN_OUTPUT_SRS_LIST,
+                                                  layer_bbox, source_type, table_uri)
     with open(qgs_path, "w") as qgs_file:
         print(qgs_str, file=qgs_file)
 

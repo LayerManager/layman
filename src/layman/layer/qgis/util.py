@@ -6,7 +6,7 @@ from lxml import etree as ET
 
 import crs as crs_def
 from db import util as db_util
-from layman import settings, LaymanError
+from layman import LaymanError
 from layman.layer.filesystem import input_style
 from layman.common import db as db_common
 from . import wms
@@ -58,8 +58,10 @@ def get_layer_original_style_stream(workspace, layer):
     return result
 
 
-def fill_layer_template(workspace, layer, uuid, native_bbox, crs, qml_xml, source_type, attrs_to_ensure, table_name):
-    db_schema = workspace
+def fill_layer_template(layer, uuid, native_bbox, crs, qml_xml, source_type, attrs_to_ensure, table_uri):
+    db_schema = table_uri.schema
+    table_name = table_uri.table
+    geo_column = table_uri.geo_column
     layer_name = layer
     wkb_type = source_type
     qml_geometry = get_qml_geometry_from_qml(qml_xml)
@@ -68,14 +70,15 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, crs, qml_xml, sourc
     with open(template_path, 'r') as template_file:
         template_str = template_file.read()
     skeleton_xml_str = template_str.format(
-        db_name=settings.LAYMAN_PG_DBNAME,
-        db_host=settings.LAYMAN_PG_HOST,
-        db_port=settings.LAYMAN_PG_PORT,
-        db_user=settings.LAYMAN_PG_USER,
-        db_password=settings.LAYMAN_PG_PASSWORD,
+        db_name=table_uri.db_name,
+        db_host=table_uri.hostname,
+        db_port=table_uri.port,
+        db_user=table_uri.username,
+        db_password=table_uri.password,
         source_type=source_type,
         db_schema=db_schema,
         db_table=table_name,
+        geo_column=geo_column,
         layer_name=layer_name,
         layer_uuid=uuid,
         wkb_type=wkb_type,
@@ -114,9 +117,11 @@ def fill_layer_template(workspace, layer, uuid, native_bbox, crs, qml_xml, sourc
     return full_xml_str
 
 
-def fill_project_template(workspace, layer, layer_uuid, layer_qml, crs, epsg_codes, extent, source_type, table_name):
+def fill_project_template(layer, layer_uuid, layer_qml, crs, epsg_codes, extent, source_type, table_uri):
     wms_crs_list_values = "\n".join((f"<value>{code}</value>" for code in epsg_codes))
-    db_schema = workspace
+    db_schema = table_uri.table
+    table_name = table_uri.table
+    geo_column = table_uri.geo_column
     layer_name = layer
     creation_iso_datetime = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
 
@@ -124,14 +129,15 @@ def fill_project_template(workspace, layer, layer_uuid, layer_qml, crs, epsg_cod
     with open(template_path, 'r') as template_file:
         template_str = template_file.read()
     return template_str.format(
-        db_name=settings.LAYMAN_PG_DBNAME,
-        db_host=settings.LAYMAN_PG_HOST,
-        db_port=settings.LAYMAN_PG_PORT,
-        db_user=settings.LAYMAN_PG_USER,
-        db_password=settings.LAYMAN_PG_PASSWORD,
+        db_name=table_uri.db_name,
+        db_host=table_uri.hostname,
+        db_port=table_uri.port,
+        db_user=table_uri.username,
+        db_password=table_uri.password,
         source_type=source_type,
         db_schema=db_schema,
         db_table=table_name,
+        geo_column=geo_column,
         layer_name=layer_name,
         layer_uuid=layer_uuid,
         layer_qml=layer_qml,

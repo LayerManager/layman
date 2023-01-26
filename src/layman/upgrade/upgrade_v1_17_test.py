@@ -2,7 +2,7 @@ import pytest
 from werkzeug.datastructures import FileStorage
 
 import crs as crs_def
-from db import util as db_util
+from db import util as db_util, TableUri
 from layman import app, settings, util as layman_util
 from layman.common.prime_db_schema import publications as prime_db_schema_publications
 from layman.common.filesystem import uuid as uuid_common
@@ -179,9 +179,10 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
                 if col.name not in ['wkb_geometry', 'ogc_fid']
             ]
             source_type = qgis_util.get_source_type(db_types, qml_geometry)
-            layer_qml = qgis_util.fill_layer_template(workspace, layer, uuid_str, bbox, crs, qml, source_type, db_cols, table_name)
-            qgs_str = qgis_util.fill_project_template(workspace, layer, uuid_str, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
-                                                      bbox, source_type, table_name)
+            table_uri = TableUri(db_uri_str=settings.PG_URI_STR, table=table_name, schema=workspace, geo_column='wkb_geometry')
+            layer_qml = qgis_util.fill_layer_template(layer, uuid_str, bbox, crs, qml, source_type, db_cols, table_uri)
+            qgs_str = qgis_util.fill_project_template(layer, uuid_str, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
+                                                      bbox, source_type, table_uri)
             with open(qgis_wms.get_layer_file_path(workspace, layer), "w") as qgs_file:
                 print(qgs_str, file=qgs_file)
 
