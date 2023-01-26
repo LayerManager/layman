@@ -42,13 +42,12 @@ def ensure_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
 
 
 def create_external_db_store(workspace, layer, table_uri, auth=settings.LAYMAN_GS_AUTH):
-    uri = parse.urlparse(table_uri.db_uri_str)
     pg_conn = {
-        'host': uri.hostname,
-        'port': uri.port,
-        'dbname': uri.path[1:],
-        'user': uri.username,
-        'password': uri.password,
+        'host': table_uri.hostname,
+        'port': table_uri.port,
+        'dbname': table_uri.db_name,
+        'user': table_uri.username,
+        'password': table_uri.password,
     }
     store_name = get_external_db_store_name(layer)
     gs_util.create_db_store(workspace,
