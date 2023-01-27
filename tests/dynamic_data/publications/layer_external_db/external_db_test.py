@@ -3,6 +3,7 @@ from urllib.parse import quote
 import pytest
 
 from db import util as db_util, TableUri
+from geoserver import util as gs_util
 from layman import app, settings
 from layman.util import get_publication_info
 from test_tools import process_client, external_db
@@ -101,6 +102,14 @@ TEST_CASES = {
 }
 
 
+def assert_stores(workspace, exp_stores):
+    stores = gs_util.get_db_stores(geoserver_workspace=workspace,
+                                   auth=settings.LAYMAN_GS_AUTH,
+                                   )
+    store_names = {store['name'] for store in stores['dataStores']['dataStore']}
+    assert store_names == exp_stores, f'workspace={workspace}, store_names={store_names}, exp_stores={exp_stores}'
+
+
 @pytest.mark.usefixtures('ensure_external_db')
 class TestLayer(base_test.TestSingleRestPublication):
 
@@ -153,6 +162,8 @@ class TestLayer(base_test.TestSingleRestPublication):
         assert publ_info['native_crs'] == 'EPSG:4326'
         assert publ_info['native_bounding_box'] == params['exp_native_bounding_box']
         assert publ_info['_is_external_table'] is True
+        only_default_db_store = {'postgresql'}
+        both_db_stores = {'postgresql', f'external_db_{layer.name}'}
         if params.get('exp_imported_into_GS', True):
             assert publ_info['wfs']['url'], f'publ_info={publ_info}'
             assert 'status' not in publ_info['wfs']
@@ -174,5 +185,17 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                            },
                                                            external_table_uri=table_uri,
                                                            )
+            exp_wms_stores = both_db_stores if style_type == 'sld' else only_default_db_store
+            assert_stores(workspace=layer.workspace, exp_stores=both_db_stores)
+            assert_stores(workspace=f'{layer.workspace}_wms', exp_stores=exp_wms_stores)
+
+        process_client.delete_workspace_layer(layer.workspace, layer.name)
+
+        assert_stores(workspace=layer.workspace, exp_stores=only_default_db_store)
+        assert_stores(workspace=f'{layer.workspace}_wms', exp_stores=only_default_db_store)
+
+        with app.app_context():
+            publ_info = get_publication_info(layer.workspace, layer.type, layer.name)
+        assert not publ_info
 
         external_db.drop_table(schema, table)
