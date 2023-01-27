@@ -4,9 +4,9 @@ from urllib.parse import urlparse
 from geoserver.util import get_proxy_base_url, wms_direct, wfs_direct
 from layman.cache.mem import CACHE as MEM_CACHE
 
-
 logger = logging.getLogger(__name__)
 CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL'
+DEFAULT_EXTERNAL_DB_STORE_PREFIX = 'external_db'
 
 from layman import settings
 
@@ -55,3 +55,7 @@ def wfs_proxy(wfs_url, xml=None, version=None, headers=None):
             )
             method['url'] = method_url.geturl()
     return wfs
+
+
+def get_external_db_store_name(layer):
+    return f'{DEFAULT_EXTERNAL_DB_STORE_PREFIX}_{layer}'
