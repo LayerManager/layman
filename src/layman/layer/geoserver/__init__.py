@@ -1,4 +1,3 @@
-from urllib import parse
 import logging
 from flask import g
 
@@ -6,13 +5,13 @@ import crs as crs_def
 from geoserver import util as gs_util
 from layman.http import LaymanError
 from layman import settings, util as layman_util
-from layman.common import bbox as bbox_util, geoserver as gs_common, empty_method
+from layman.common import bbox as bbox_util, geoserver as gs_common
 from layman.layer import LAYER_TYPE
 from . import wms
+from .util import get_external_db_store_name
 
 logger = logging.getLogger(__name__)
 FLASK_RULES_KEY = f"{__name__}:RULES"
-DEFAULT_EXTERNAL_DB_STORE_PREFIX = 'external_db'
 
 
 def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
@@ -154,7 +153,3 @@ def get_workspaces():
     all_workspaces = gs_util.get_all_workspaces(settings.LAYMAN_GS_AUTH)
     result = [workspace for workspace in all_workspaces if not workspace.endswith(settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX)]
     return result
-
-
-def get_external_db_store_name(layer):
-    return f'{DEFAULT_EXTERNAL_DB_STORE_PREFIX}_{layer}'
