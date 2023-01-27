@@ -14,7 +14,7 @@ from layman.layer.util import is_layer_chain_ready
 from layman.layer import LAYER_TYPE
 from layman.layer.filesystem import gdal
 import requests_util.retry
-from .util import get_gs_proxy_base_url
+from .util import get_gs_proxy_base_url, get_external_db_store_name
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
 DEFAULT_WMS_QGIS_STORE_PREFIX = 'qgis'
@@ -68,10 +68,12 @@ def patch_layer(workspace, layername, title, description, access_rights=None):
 def delete_layer(workspace, layername):
     geoserver_workspace = get_geoserver_workspace(workspace)
     gs_util.delete_feature_type(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
+    gs_util.delete_feature_type(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(layername))
     gs_util.delete_wms_layer(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
     gs_util.delete_wms_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_qgis_store_name(layername))
     gs_util.delete_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_geotiff_store_name(layername))
     gs_util.delete_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_image_mosaic_store_name(layername))
+    gs_util.delete_db_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(layername))
     clear_cache(workspace)
 
     gs_util.delete_security_roles(f"{geoserver_workspace}.{layername}.r", settings.LAYMAN_GS_AUTH)

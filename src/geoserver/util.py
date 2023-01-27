@@ -517,6 +517,18 @@ def create_db_store(geoserver_workspace, auth, db_schema=None, pg_conn=None, nam
     response.raise_for_status()
 
 
+def get_db_stores(geoserver_workspace, auth, ):
+    url = urljoin(GS_REST_WORKSPACES, geoserver_workspace + '/datastores/')
+    response = requests.get(
+        url,
+        headers=headers_json,
+        auth=auth,
+        timeout=GS_REST_TIMEOUT,
+    )
+    response.raise_for_status()
+    return json.loads(response.text)
+
+
 def delete_db_store(geoserver_workspace, auth, *, store_name=DEFAULT_DB_STORE_NAME):
     response = requests.delete(
         urljoin(GS_REST_WORKSPACES, geoserver_workspace + f'/datastores/{store_name}'),
