@@ -220,10 +220,10 @@ def ensure_layer_security_roles(workspace, layername, roles, type, auth):
     ensure_security_roles(rule, roles, auth)
 
 
-def delete_feature_type(geoserver_workspace, feature_type_name, auth):
+def delete_feature_type(geoserver_workspace, feature_type_name, auth, *, store=DEFAULT_DB_STORE_NAME):
     response = requests.delete(
         urljoin(GS_REST_WORKSPACES,
-                geoserver_workspace + f'/datastores/{DEFAULT_DB_STORE_NAME}/featuretypes/' + feature_type_name),
+                geoserver_workspace + f'/datastores/{store}/featuretypes/' + feature_type_name),
         headers=headers_json,
         auth=auth,
         params={
