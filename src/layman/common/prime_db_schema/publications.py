@@ -238,6 +238,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                        schema=external_table_uri['schema'],
                                        table=external_table_uri['table'],
                                        geo_column=external_table_uri['geo_column'],
+                                       primary_key_column=external_table_uri['primary_key_column'],
                                    ) if external_table_uri else None,
                                    '_is_external_table': bool(external_table_uri),
                                    'native_bounding_box': [xmin, ymin, xmax, ymax],
@@ -404,6 +405,7 @@ returning id
         'schema': info["external_table_uri"].schema,
         'table': info["external_table_uri"].table,
         'geo_column': info["external_table_uri"].geo_column,
+        'primary_key_column': info["external_table_uri"].primary_key_column,
     }) if info.get("external_table_uri") else None
 
     data = (id_workspace,

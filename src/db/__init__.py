@@ -4,11 +4,12 @@ from dataclasses import dataclass
 
 @dataclass
 class TableUri:
-    def __init__(self, *, db_uri_str, schema, table, geo_column):
+    def __init__(self, *, db_uri_str, schema, table, geo_column, primary_key_column):
         self.db_uri_str = db_uri_str
         self.schema = schema
         self.table = table
         self.geo_column = geo_column
+        self.primary_key_column = primary_key_column
 
     _db_uri_str: str
     _db_uri: parse.ParseResult

@@ -12,7 +12,7 @@
   </projectCrs>
   <layer-tree-group>
     <customproperties/>
-    <layer-tree-layer source="dbname='{db_name}' host={db_host} port={db_port} user='{db_user}' password='{db_password}' sslmode=disable key='ogc_fid' srid={srid} type={source_type} checkPrimaryKeyUnicity='1' table=&quot;{db_schema}&quot;.&quot;{db_table}&quot; ({geo_column})" providerKey="postgres" legend_exp="" checked="Qt::Checked" id="{layer_name}_{layer_uuid}" expanded="1" name="{layer_name}">
+    <layer-tree-layer source="dbname='{db_name}' host={db_host} port={db_port} user='{db_user}' password='{db_password}' sslmode=disable key='{primary_key_column}' srid={srid} type={source_type} checkPrimaryKeyUnicity='1' table=&quot;{db_schema}&quot;.&quot;{db_table}&quot; ({geo_column})" providerKey="postgres" legend_exp="" checked="Qt::Checked" id="{layer_name}_{layer_uuid}" expanded="1" name="{layer_name}">
       <customproperties/>
     </layer-tree-layer>
     <custom-order enabled="0">
