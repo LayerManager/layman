@@ -59,7 +59,7 @@ def ensure_table(schema, name, geo_column, *, primary_key=None):
 
 
 def import_table(input_file_path, *, table=None, schema='public', geo_column='wkb_geometry',
-                 primary_key_column='ogc_fid'):
+                 primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY):
     table = table or os.path.splitext(os.path.basename(input_file_path))[0]
 
     ensure_schema(schema)
@@ -73,7 +73,7 @@ def import_table(input_file_path, *, table=None, schema='public', geo_column='wk
         '-lco', f'LAUNDER=NO',
         '-lco', f'EXTRACT_SCHEMA_FROM_LAYER_NAME=NO',
         '-lco', f'GEOMETRY_NAME={geo_column}',
-        '-lco', f"FID={primary_key_column if primary_key_column is not None else 'ogc_fid'}",
+        '-lco', f"FID={primary_key_column if primary_key_column is not None else f'{settings.OGR_DEFAULT_PRIMARY_KEY}'}",
         '-f', 'PostgreSQL',
         target_db,
         input_file_path,
@@ -87,8 +87,9 @@ def import_table(input_file_path, *, table=None, schema='public', geo_column='wk
 
     if primary_key_column is None:
         conn_cur = db_util.create_connection_cursor(URI_STR)
-        statement = sql.SQL("alter table {table} drop column ogc_fid").format(
+        statement = sql.SQL("alter table {table} drop column {primary_key}").format(
             table=sql.Identifier(schema, table),
+            primary_key=sql.Identifier(settings.OGR_DEFAULT_PRIMARY_KEY),
         )
         db_util.run_statement(statement, conn_cur=conn_cur)
 
