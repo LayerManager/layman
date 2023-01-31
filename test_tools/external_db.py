@@ -33,11 +33,26 @@ def ensure_schema(schema):
     db_util.run_statement(statement, conn_cur=conn_cur)
 
 
-def ensure_table(schema, name, geo_column):
+def ensure_table(schema, name, geo_column, *, primary_key=None):
+    primary_key = ['id'] if primary_key is None else primary_key
+
     ensure_schema(schema)
-    statement = sql.SQL('create table {table} ({geo_column} geometry(Geometry, 4326))').format(
+    columns = []
+    for col in primary_key:
+        columns.append(sql.SQL('{column} serial').format(
+            column=sql.Identifier(col)
+        ))
+    columns.append(sql.SQL('{geo_column} geometry(Geometry, 4326)').format(
+        geo_column=sql.Identifier(geo_column)
+    ))
+    if primary_key:
+        columns.append(sql.SQL('PRIMARY KEY ({columns})').format(
+            columns=sql.SQL(',').join(sql.Identifier(c) for c in primary_key)
+        ))
+
+    statement = sql.SQL('create table {table} ({columns})').format(
         table=sql.Identifier(schema, name),
-        geo_column=sql.Identifier(geo_column),
+        columns=sql.SQL(',').join(columns),
     )
     conn_cur = db_util.create_connection_cursor(URI_STR)
     db_util.run_statement(statement, conn_cur=conn_cur)

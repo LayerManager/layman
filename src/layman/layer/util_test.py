@@ -14,14 +14,16 @@ from .util import to_safe_layer_name, fill_in_partial_info_statuses
 @pytest.fixture(scope="module")
 def ensure_tables():
     tables = [
-        ('schema_name', 'table_name', 'geo_wkb_column'),
+        ('schema_name', 'table_name', 'geo_wkb_column', ['my_id']),
+        ('schema_name', 'two_column_primary_key', 'geo_wkb_column', ['partial_id_1', 'partial_id_2']),
+        ('schema_name', 'no_primary_key', 'geo_wkb_column', []),
     ]
-    for schema, table, geo_column in tables:
-        external_db.ensure_table(schema, table, geo_column)
+    for schema, table, geo_column, primary_key in tables:
+        external_db.ensure_table(schema, table, geo_column, primary_key=primary_key)
 
     yield
 
-    for schema, table, _ in tables:
+    for schema, table, _, _ in tables:
         external_db.drop_table(schema, table)
 
 
@@ -172,6 +174,7 @@ def test_fill_in_partial_info_statuses():
         schema='schema_name',
         table='table_name',
         geo_column='geo_wkb_column',
+        primary_key_column='my_id',
     )),
 ])
 def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
@@ -313,6 +316,36 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
             },
         },
     }, id='invalid_schema'),
+    pytest.param('postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=two_column_primary_key&geo_column=geo_wkb_column', {
+        'http_code': 400,
+        'code': 2,
+        'detail': {
+            'parameter': 'db_connection',
+            'message': 'Table with multi-column primary key.',
+            'expected': 'Table with one-column primary key.',
+            'found': {
+                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=two_column_primary_key&geo_column=geo_wkb_column',
+                'schema': 'schema_name',
+                'table': 'two_column_primary_key',
+                'primary_key_columns': ['partial_id_1', 'partial_id_2'],
+            },
+        },
+    }, id='two_column_primary_key'),
+    pytest.param('postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=no_primary_key&geo_column=geo_wkb_column', {
+        'http_code': 400,
+        'code': 2,
+        'detail': {
+            'parameter': 'db_connection',
+            'message': 'No primary key found in the table.',
+            'expected': 'Table with one-column primary key.',
+            'found': {
+                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=no_primary_key&geo_column=geo_wkb_column',
+                'schema': 'schema_name',
+                'table': 'no_primary_key',
+                'primary_key_columns': [],
+            },
+        },
+    }, id='no_primary_key'),
 ])
 def test_validate_external_table_uri_str(external_table_uri_str, exp_error):
     with pytest.raises(LaymanError) as exc_info:
