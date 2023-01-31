@@ -59,7 +59,7 @@ def ensure_table(schema, name, geo_column, *, primary_key_columns=None):
 
 
 def import_table(input_file_path, *, table=None, schema='public', geo_column='wkb_geometry',
-                 primary_key_column='ogc_fid'):
+                 primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY):
     table = table or os.path.splitext(os.path.basename(input_file_path))[0]
     primary_key_to_later_drop = 'pk_to_drop'
 
