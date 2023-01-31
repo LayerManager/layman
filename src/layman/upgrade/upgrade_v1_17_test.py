@@ -176,11 +176,12 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
             db_types = db.get_geometry_types(workspace, table_name)
             db_cols = [
                 col for col in db.get_all_column_infos(workspace, table_name)
-                if col.name not in ['wkb_geometry', settings.OGR_DEFAULT_PRIMARY_KEY]
+                if col.name not in [settings.OGR_DEFAULT_GEOMETRY_COLUMN, settings.OGR_DEFAULT_PRIMARY_KEY]
             ]
             source_type = qgis_util.get_source_type(db_types, qml_geometry)
             table_uri = TableUri(db_uri_str=settings.PG_URI_STR, table=table_name, schema=workspace,
-                                 geo_column='wkb_geometry', primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY)
+                                 geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
+                                 primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY)
             layer_qml = qgis_util.fill_layer_template(layer, uuid_str, bbox, crs, qml, source_type, db_cols, table_uri)
             qgs_str = qgis_util.fill_project_template(layer, uuid_str, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
                                                       bbox, source_type, table_uri)
