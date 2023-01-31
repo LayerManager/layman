@@ -343,10 +343,52 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
             }
         })
 
+    # https://stackoverflow.com/a/20537829
+    query = f'''
+SELECT
+  pg_attribute.attname,
+  format_type(pg_attribute.atttypid, pg_attribute.atttypmod)
+FROM pg_index, pg_class, pg_attribute, pg_namespace
+WHERE
+  pg_class.relname = %s AND
+  indrelid = pg_class.oid AND
+  nspname = %s AND
+  pg_class.relnamespace = pg_namespace.oid AND
+  pg_attribute.attrelid = pg_class.oid AND
+  pg_attribute.attnum = any(pg_index.indkey)
+ AND indisprimary'''
+    query_res = db_util.run_query(query, (table, schema), conn_cur=conn_cur, log_query=True)
+    primary_key_columns = [r[0] for r in query_res]
+    if len(query_res) == 0:
+        raise LaymanError(2, {
+            'parameter': 'db_connection',
+            'message': 'No primary key found in the table.',
+            'expected': 'Table with one-column primary key.',
+            'found': {
+                'db_connection': external_table_uri_str,
+                'schema': schema,
+                'table': table,
+                'primary_key_columns': primary_key_columns,
+            }
+        })
+    if len(query_res) > 1:
+        raise LaymanError(2, {
+            'parameter': 'db_connection',
+            'message': 'Table with multi-column primary key.',
+            'expected': 'Table with one-column primary key.',
+            'found': {
+                'db_connection': external_table_uri_str,
+                'schema': schema,
+                'table': table,
+                'primary_key_columns': primary_key_columns,
+            }
+        })
+
     result = TableUri(db_uri_str=db_uri_str,
                       schema=schema,
                       table=table,
                       geo_column=geo_column,
+                      primary_key_column=primary_key_columns[0],
                       )
 
     return result

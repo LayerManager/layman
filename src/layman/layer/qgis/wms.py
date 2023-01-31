@@ -76,7 +76,7 @@ def save_qgs_file(workspace, layer):
     db_types = db.get_geometry_types(db_schema, table_name, conn_cur=conn_cur)
     db_cols = [
         col for col in db.get_all_column_infos(db_schema, table_name, conn_cur=conn_cur, omit_geometry_columns=True)
-        if col.name not in ['ogc_fid']
+        if col.name != table_uri.primary_key_column
     ]
     source_type = util.get_source_type(db_types, qml_geometry)
     layer_qml = util.fill_layer_template(layer, uuid, layer_bbox, crs, qml, source_type, db_cols, table_uri)
