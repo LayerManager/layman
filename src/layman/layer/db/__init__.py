@@ -313,7 +313,7 @@ def get_text_languages(schema, table_name, primary_key, *, conn_cur=None):
     return sorted(list(all_langs))
 
 
-def get_most_frequent_lower_distance_query(schema, table_name, primary_key):
+def get_most_frequent_lower_distance_query(schema, table_name, primary_key, geometry_column):
     query = sql.SQL("""
 with t1 as (
 select
@@ -321,7 +321,7 @@ select
   sub_view.*
 from (
   SELECT
-    {primary_key}, (st_dump(wkb_geometry)).geom as geometry
+    {primary_key}, (st_dump({geometry_column})).geom as geometry
   FROM {table}
 ) sub_view
 order by ST_NPoints(geometry), {primary_key}, dump_id
@@ -404,14 +404,15 @@ limit 1
     """).format(
         table=sql.Identifier(schema, table_name),
         primary_key=sql.Identifier(primary_key),
+        geometry_column=sql.Identifier(geometry_column),
     )
     return query
 
 
-def get_most_frequent_lower_distance(schema, table_name, primary_key, conn_cur=None):
+def get_most_frequent_lower_distance(schema, table_name, primary_key, geometry_column, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
-    query = get_most_frequent_lower_distance_query(schema, table_name, primary_key)
+    query = get_most_frequent_lower_distance_query(schema, table_name, primary_key, geometry_column)
 
     # print(f"\nget_most_frequent_lower_distance v1\nusername={username}, layername={layername}")
     # print(query)
@@ -450,8 +451,8 @@ SCALE_DENOMINATORS = [
 ]
 
 
-def guess_scale_denominator(schema, table_name, primary_key, *, conn_cur=None):
-    distance = get_most_frequent_lower_distance(schema, table_name, primary_key, conn_cur=conn_cur)
+def guess_scale_denominator(schema, table_name, primary_key, geometry_column, *, conn_cur=None):
+    distance = get_most_frequent_lower_distance(schema, table_name, primary_key, geometry_column, conn_cur=conn_cur)
     log_sd_list = [math.log10(sd) for sd in SCALE_DENOMINATORS]
     if distance is not None:
         coef = 2000 if distance > 100 else 1000

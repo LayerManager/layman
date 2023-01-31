@@ -149,7 +149,7 @@ def get_template_path_and_values(workspace, layername, http_method):
             languages = []
         try:
             scale_denominator = db.guess_scale_denominator(table_uri.schema, table_name, table_uri.primary_key_column,
-                                                           conn_cur=conn_cur)
+                                                           table_uri.geo_column, conn_cur=conn_cur)
         except LaymanError:
             scale_denominator = None
         spatial_resolution = {

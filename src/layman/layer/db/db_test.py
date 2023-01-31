@@ -272,7 +272,8 @@ def test_data_language_countries2(country110m_table):
 
 def guess_scale_denominator(workspace, layer):
     table_name = db.get_table_name(workspace, layer)
-    return db.guess_scale_denominator(workspace, table_name, settings.OGR_DEFAULT_PRIMARY_KEY)
+    return db.guess_scale_denominator(workspace, table_name, settings.OGR_DEFAULT_PRIMARY_KEY,
+                                      settings.OGR_DEFAULT_GEOMETRY_COLUMN)
 
 
 def test_guess_scale_denominator(country110m_table, country50m_table, country10m_table,
