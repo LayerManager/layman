@@ -179,7 +179,8 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
                 if col.name not in ['wkb_geometry', 'ogc_fid']
             ]
             source_type = qgis_util.get_source_type(db_types, qml_geometry)
-            table_uri = TableUri(db_uri_str=settings.PG_URI_STR, table=table_name, schema=workspace, geo_column='wkb_geometry')
+            table_uri = TableUri(db_uri_str=settings.PG_URI_STR, table=table_name, schema=workspace,
+                                 geo_column='wkb_geometry', primary_key_column='ogc_fid')
             layer_qml = qgis_util.fill_layer_template(layer, uuid_str, bbox, crs, qml, source_type, db_cols, table_uri)
             qgs_str = qgis_util.fill_project_template(layer, uuid_str, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
                                                       bbox, source_type, table_uri)
