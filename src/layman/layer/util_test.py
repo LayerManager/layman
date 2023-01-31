@@ -299,7 +299,7 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
             },
         },
     }, id='invalid_geo_column'),
-    pytest.param('postgresql://docker:docker@postgresql:5432/external_test_db?schema=no_schema&table=table_name&geo_column=no_wkb_geometry', {
+    pytest.param('postgresql://docker:docker@postgresql:5432/external_test_db?schema=no_schema&table=table_name&geo_column=geo_wkb_column', {
         'http_code': 400,
         'code': 2,
         'detail': {
@@ -307,7 +307,7 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
             'message': 'Table "no_schema"."table_name" not found in database.',
             'expected': util.EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=no_schema&table=table_name&geo_column=no_wkb_geometry',
+                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=no_schema&table=table_name&geo_column=geo_wkb_column',
                 'schema': 'no_schema',
                 'table': 'table_name',
             },
