@@ -227,7 +227,8 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                     db_uri_str='postgresql://docker:docker@postgresql:5432/layman_test',
                     schema=workspace,
                     table=db_table,
-                    geo_column='wkb_geometry'
+                    geo_column='wkb_geometry',
+                    primary_key_column='ogc_fid',
                 )
                 util.recursive_dict_update(expected_detail,
                                            {

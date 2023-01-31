@@ -58,8 +58,10 @@ def ensure_table(schema, name, geo_column, *, primary_key_columns=None):
     db_util.run_statement(statement, conn_cur=conn_cur)
 
 
-def import_table(input_file_path, *, table=None, schema='public', geo_column='wkb_geometry'):
+def import_table(input_file_path, *, table=None, schema='public', geo_column='wkb_geometry',
+                 primary_key_column='ogc_fid'):
     table = table or os.path.splitext(os.path.basename(input_file_path))[0]
+    primary_key_to_later_drop = 'pk_to_drop'
 
     ensure_schema(schema)
 
@@ -72,6 +74,7 @@ def import_table(input_file_path, *, table=None, schema='public', geo_column='wk
         '-lco', f'LAUNDER=NO',
         '-lco', f'EXTRACT_SCHEMA_FROM_LAYER_NAME=NO',
         '-lco', f'GEOMETRY_NAME={geo_column}',
+        '-lco', f"FID={primary_key_column if primary_key_column is not None else primary_key_to_later_drop}",
         '-f', 'PostgreSQL',
         target_db,
         input_file_path,
@@ -82,6 +85,14 @@ def import_table(input_file_path, *, table=None, schema='public', geo_column='wk
     stdout, stderr = process.communicate()
     return_code = process.poll()
     assert return_code == 0 and not stdout and not stderr, f"return_code={return_code}, stdout={stdout}, stderr={stderr}"
+
+    if primary_key_column is None:
+        conn_cur = db_util.create_connection_cursor(URI_STR)
+        statement = sql.SQL("alter table {table} drop column {primary_key}").format(
+            table=sql.Identifier(schema, table),
+            primary_key=sql.Identifier(primary_key_to_later_drop),
+        )
+        db_util.run_statement(statement, conn_cur=conn_cur)
 
 
 def drop_table(schema, name):

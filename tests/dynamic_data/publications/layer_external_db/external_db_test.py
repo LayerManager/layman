@@ -24,6 +24,7 @@ TEST_CASES = {
         'style_file': None,
         'schema_name': 'public',
         'table_name': 'all',
+        'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'GEOMETRY',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
@@ -34,6 +35,7 @@ TEST_CASES = {
         'style_file': None,
         'schema_name': 'public',
         'table_name': 'MyGeometryCollection',
+        'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'GEOMETRYCOLLECTION',
         'exp_native_bounding_box': [15.0, 45.0, 18.0, 46.0],
@@ -44,6 +46,7 @@ TEST_CASES = {
         'style_file': None,
         'schema_name': 'public',
         'table_name': DANGEROUS_NAME,
+        'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'LINESTRING',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
@@ -54,6 +57,7 @@ TEST_CASES = {
         'style_file': None,
         'schema_name': DANGEROUS_NAME,
         'table_name': 'multilinestring',
+        'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'MULTILINESTRING',
         'exp_native_bounding_box': [16.0, 47.0, 16.0, 48.5],
@@ -64,26 +68,29 @@ TEST_CASES = {
         'style_file': None,
         'schema_name': 'public',
         'table_name': 'multipoint',
+        'primary_key_column': 'ogc_fid',
         'geo_column_name': DANGEROUS_NAME,
         'exp_geometry_type': 'MULTIPOINT',
         'exp_native_bounding_box': [15.0, 47.8, 15.0, 48.0],
         'exp_imported_into_GS': False,
     },
-    'multipolygon_qml': {
+    'multipolygon_qml_custom_id_column': {
         'input_file_name': 'multipolygon',
         'style_file': 'tests/dynamic_data/publications/layer_external_db/multipolygon.qml',
         'schema_name': 'public',
         'table_name': 'multipolygon',
+        'primary_key_column': 'my_id',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'MULTIPOLYGON',
         'exp_native_bounding_box': [17.0, 47.0, 18.0, 48.5],
         'exp_bounding_box': [1892431.3434856508, 5942074.072431108, 2003750.8342789242, 6190443.809135445],
     },
-    'point': {
+    'point_custom_id_column': {
         'input_file_name': 'point',
         'style_file': None,
         'schema_name': 'public',
         'table_name': 'point',
+        'primary_key_column': 'my_id2',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'POINT',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
@@ -94,6 +101,7 @@ TEST_CASES = {
         'style_file': None,
         'schema_name': 'public',
         'table_name': 'polygon',
+        'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'POLYGON',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
@@ -138,8 +146,10 @@ class TestLayer(base_test.TestSingleRestPublication):
         schema = params['schema_name']
         table = params['table_name']
         geo_column = params['geo_column_name']
+        primary_key_column = params['primary_key_column']
 
-        external_db.import_table(file_path, table=table, schema=schema, geo_column=geo_column)
+        external_db.import_table(file_path, table=table, schema=schema, geo_column=geo_column,
+                                 primary_key_column=primary_key_column)
         conn_cur = db_util.create_connection_cursor(external_db.URI_STR)
         query = f'''select type from geometry_columns where f_table_schema = %s and f_table_name = %s and f_geometry_column = %s'''
         result = db_util.run_query(query, (schema, table, geo_column), conn_cur=conn_cur)
@@ -157,6 +167,7 @@ class TestLayer(base_test.TestSingleRestPublication):
             schema=schema,
             table=table,
             geo_column=geo_column,
+            primary_key_column=primary_key_column
         )
 
         assert publ_info['native_crs'] == 'EPSG:4326'
