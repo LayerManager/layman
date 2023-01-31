@@ -526,7 +526,7 @@ def ensure_attributes(attribute_tuples):
     return missing_attributes
 
 
-def get_bbox(schema, table_name, conn_cur=None, column='wkb_geometry'):
+def get_bbox(schema, table_name, conn_cur=None, column=settings.OGR_DEFAULT_GEOMETRY_COLUMN):
     query = sql.SQL('''
     with tmp as (select ST_Extent(l.{column}) as bbox
                  from {table} l
@@ -544,14 +544,14 @@ def get_bbox(schema, table_name, conn_cur=None, column='wkb_geometry'):
     return result
 
 
-def get_crs(schema, table_name, conn_cur=None, column='wkb_geometry'):
+def get_crs(schema, table_name, conn_cur=None, column=settings.OGR_DEFAULT_GEOMETRY_COLUMN):
     query = 'select Find_SRID(%s, %s, %s);'
     srid = db_util.run_query(query, (schema, table_name, column), conn_cur=conn_cur)[0][0]
     crs = db_util.get_crs(srid)
     return crs
 
 
-def get_geometry_types(schema, table_name, *, column_name='wkb_geometry', conn_cur=None):
+def get_geometry_types(schema, table_name, *, column_name=settings.OGR_DEFAULT_GEOMETRY_COLUMN, conn_cur=None):
     conn, cur = conn_cur or db_util.get_connection_cursor()
     query = sql.SQL("""
     select distinct ST_GeometryType({column}) as geometry_type_name

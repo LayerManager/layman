@@ -57,6 +57,6 @@ def delete_layer(workspace, layername, conn_cur=None):
 
 
 def set_layer_srid(schema, table_name, srid, *, conn_cur=None):
-    query = '''SELECT UpdateGeometrySRID(%s, %s, 'wkb_geometry', %s);'''
-    params = (schema, table_name, srid)
+    query = '''SELECT UpdateGeometrySRID(%s, %s, %s, %s);'''
+    params = (schema, table_name, settings.OGR_DEFAULT_GEOMETRY_COLUMN, srid)
     db_util.run_query(query, params, conn_cur=conn_cur)
