@@ -22,7 +22,7 @@ def get_layer_info(workspace, layername):
             db_uri_str=settings.PG_URI_STR,
             schema=workspace,
             table=f'layer_{uuid.replace("-", "_")}',
-            geo_column='wkb_geometry',
+            geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
             primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY,
         ) if info['_file_type'] == settings.FILE_TYPE_VECTOR and not info.get('_table_uri') else info.get('_table_uri')
 
