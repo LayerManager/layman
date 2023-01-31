@@ -143,11 +143,13 @@ def get_template_path_and_values(workspace, layername, http_method):
         table_name = table_uri.table
         conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
         try:
-            languages = db.get_text_languages(table_uri.schema, table_name, conn_cur=conn_cur)
+            languages = db.get_text_languages(table_uri.schema, table_name, table_uri.primary_key_column,
+                                              conn_cur=conn_cur)
         except LaymanError:
             languages = []
         try:
-            scale_denominator = db.guess_scale_denominator(table_uri.schema, table_name, conn_cur=conn_cur)
+            scale_denominator = db.guess_scale_denominator(table_uri.schema, table_name, table_uri.primary_key_column,
+                                                           conn_cur=conn_cur)
         except LaymanError:
             scale_denominator = None
         spatial_resolution = {

@@ -258,7 +258,7 @@ from {table}
     return rows[0][0]
 
 
-def get_text_data(schema, table_name, conn_cur=None):
+def get_text_data(schema, table_name, primary_key, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
     col_names = get_text_column_names(schema, table_name, conn_cur=conn_cur)
     if len(col_names) == 0:
@@ -270,11 +270,12 @@ def get_text_data(schema, table_name, conn_cur=None):
     statement = sql.SQL("""
 select {fields}
 from {table}
-order by ogc_fid
+order by {primary_key}
 limit {limit}
 """).format(
         fields=sql.SQL(',').join([sql.Identifier(col) for col in col_names]),
         table=sql.Identifier(schema, table_name),
+        primary_key=sql.Identifier(primary_key),
         limit=sql.Literal(limit),
     )
     try:
@@ -297,8 +298,8 @@ limit {limit}
     return col_texts, limit
 
 
-def get_text_languages(schema, table_name, *, conn_cur=None):
-    texts, num_rows = get_text_data(schema, table_name, conn_cur)
+def get_text_languages(schema, table_name, primary_key, *, conn_cur=None):
+    texts, num_rows = get_text_data(schema, table_name, primary_key, conn_cur)
     all_langs = set()
     for text in texts:
         # skip short texts
@@ -312,61 +313,61 @@ def get_text_languages(schema, table_name, *, conn_cur=None):
     return sorted(list(all_langs))
 
 
-def get_most_frequent_lower_distance_query(schema, table_name):
+def get_most_frequent_lower_distance_query(schema, table_name, primary_key):
     query = sql.SQL("""
 with t1 as (
 select
-  row_number() over (partition by ogc_fid) AS dump_id,
+  row_number() over (partition by {primary_key}) AS dump_id,
   sub_view.*
 from (
   SELECT
-    ogc_fid, (st_dump(wkb_geometry)).geom as geometry
+    {primary_key}, (st_dump(wkb_geometry)).geom as geometry
   FROM {table}
 ) sub_view
-order by ST_NPoints(geometry), ogc_fid, dump_id
+order by ST_NPoints(geometry), {primary_key}, dump_id
 limit 5000
 )
 , t2 as (
 select
-  row_number() over (partition by ogc_fid, dump_id) AS ring_id,
+  row_number() over (partition by {primary_key}, dump_id) AS ring_id,
   sub_view.*
 from (
 (
    SELECT
-    dump_id, ogc_fid, ST_ExteriorRing((ST_DumpRings(geometry)).geom) as geometry
+    dump_id, {primary_key}, ST_ExteriorRing((ST_DumpRings(geometry)).geom) as geometry
   FROM t1
     where st_geometrytype(geometry) = 'ST_Polygon'
 ) union all (
    SELECT
-    dump_id, ogc_fid, geometry
+    dump_id, {primary_key}, geometry
   FROM t1
     where st_geometrytype(geometry) = 'ST_LineString'
 )
 ) sub_view
-order by ST_NPoints(geometry), ogc_fid, dump_id, ring_id
+order by ST_NPoints(geometry), {primary_key}, dump_id, ring_id
 limit 5000
 )
 , t2cumsum as (
 select *, --ST_NPoints(geometry),
-  sum(ST_NPoints(geometry)) over (order by ST_NPoints(geometry), ogc_fid, dump_id, ring_id
+  sum(ST_NPoints(geometry)) over (order by ST_NPoints(geometry), {primary_key}, dump_id, ring_id
                                   rows between unbounded preceding and current row) as cum_sum_points
 from t2
 )
 , t3 as (
-SELECT ogc_fid, dump_id, ring_id, (ST_DumpPoints(st_transform(geometry, 4326))).*
+SELECT {primary_key}, dump_id, ring_id, (ST_DumpPoints(st_transform(geometry, 4326))).*
 FROM t2cumsum
 where cum_sum_points < 50000
 )
 , t4 as MATERIALIZED (
-    select t3.ogc_fid, t3.dump_id, t3.ring_id, t3.path[1] as point_idx, t3.geom as point1, t3p2.geom as point2
+    select t3.{primary_key}, t3.dump_id, t3.ring_id, t3.path[1] as point_idx, t3.geom as point1, t3p2.geom as point2
     from t3
-             inner join t3 t3p2 on (t3.ogc_fid = t3p2.ogc_fid and
+             inner join t3 t3p2 on (t3.{primary_key} = t3p2.{primary_key} and
                                     t3.dump_id = t3p2.dump_id and
                                     t3.ring_id = t3p2.ring_id and
                                     t3.path[1] + 1 = t3p2.path[1])
 )
 , tdist as (
-SELECT ogc_fid, dump_id, ring_id, point_idx,
+SELECT {primary_key}, dump_id, ring_id, point_idx,
     ST_DistanceSphere(point1, point2) as distance
 FROM t4
 )
@@ -402,14 +403,15 @@ order by freq desc
 limit 1
     """).format(
         table=sql.Identifier(schema, table_name),
+        primary_key=sql.Identifier(primary_key),
     )
     return query
 
 
-def get_most_frequent_lower_distance(schema, table_name, conn_cur=None):
+def get_most_frequent_lower_distance(schema, table_name, primary_key, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
-    query = get_most_frequent_lower_distance_query(schema, table_name)
+    query = get_most_frequent_lower_distance_query(schema, table_name, primary_key)
 
     # print(f"\nget_most_frequent_lower_distance v1\nusername={username}, layername={layername}")
     # print(query)
@@ -448,8 +450,8 @@ SCALE_DENOMINATORS = [
 ]
 
 
-def guess_scale_denominator(schema, table_name, *, conn_cur=None):
-    distance = get_most_frequent_lower_distance(schema, table_name, conn_cur=conn_cur)
+def guess_scale_denominator(schema, table_name, primary_key, *, conn_cur=None):
+    distance = get_most_frequent_lower_distance(schema, table_name, primary_key, conn_cur=conn_cur)
     log_sd_list = [math.log10(sd) for sd in SCALE_DENOMINATORS]
     if distance is not None:
         coef = 2000 if distance > 100 else 1000
