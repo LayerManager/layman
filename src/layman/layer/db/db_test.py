@@ -175,12 +175,12 @@ def test_data_language(boundary_table):
         col_names = db.get_text_column_names(workspace, table_name)
     assert set(col_names) == set(['featurecla', 'name', 'name_alt'])
     with layman.app_context():
-        text_data, _ = db.get_text_data(workspace, table_name)
+        text_data, _ = db.get_text_data(workspace, table_name, settings.OGR_DEFAULT_PRIMARY_KEY)
     # print(f"num_rows={num_rows}")
     assert len(text_data) == 1
     assert text_data[0].startswith(' '.join(['International boundary (verify)'] * 100))
     with layman.app_context():
-        langs = db.get_text_languages(workspace, table_name)
+        langs = db.get_text_languages(workspace, table_name, settings.OGR_DEFAULT_PRIMARY_KEY)
     assert langs == ['eng']
 
 
@@ -214,7 +214,7 @@ def test_data_language_roads(road_table):
         'vym_tahy_p'
     ])
     with layman.app_context():
-        langs = db.get_text_languages(workspace, table_name)
+        langs = db.get_text_languages(workspace, table_name, settings.OGR_DEFAULT_PRIMARY_KEY)
     assert langs == ['cze']
 
 
@@ -226,7 +226,7 @@ def test_populated_places_table(populated_places_table):
         col_names = db.get_text_column_names(workspace, table_name)
     assert len(col_names) == 31
     with layman.app_context():
-        langs = db.get_text_languages(workspace, table_name)
+        langs = db.get_text_languages(workspace, table_name, settings.OGR_DEFAULT_PRIMARY_KEY)
     assert set(langs) == set(['chi', 'eng', 'rus'])
 
 
@@ -238,7 +238,7 @@ def test_data_language_countries(country_table):
         col_names = db.get_text_column_names(workspace, table_name)
     assert len(col_names) == 63
     with layman.app_context():
-        langs = db.get_text_languages(workspace, table_name)
+        langs = db.get_text_languages(workspace, table_name, settings.OGR_DEFAULT_PRIMARY_KEY)
     assert set(langs) == set([
         'ara',
         'ben',
@@ -266,13 +266,13 @@ def test_data_language_countries2(country110m_table):
     # assert len(col_names) == 63
     with layman.app_context():
         table_name = db.get_table_name(workspace, layername)
-        langs = db.get_text_languages(workspace, table_name)
+        langs = db.get_text_languages(workspace, table_name, settings.OGR_DEFAULT_PRIMARY_KEY)
     assert set(langs) == set(['eng'])
 
 
 def guess_scale_denominator(workspace, layer):
     table_name = db.get_table_name(workspace, layer)
-    return db.guess_scale_denominator(workspace, table_name)
+    return db.guess_scale_denominator(workspace, table_name, settings.OGR_DEFAULT_PRIMARY_KEY)
 
 
 def test_guess_scale_denominator(country110m_table, country50m_table, country10m_table,
