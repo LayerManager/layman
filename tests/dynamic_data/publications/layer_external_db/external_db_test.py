@@ -88,7 +88,7 @@ TEST_CASES = {
         'exp_geometry_type': 'MULTIPOLYGON',
         'exp_native_bounding_box': [17.0, 47.0, 18.0, 48.5],
         'exp_bounding_box': [1892431.3434856508, 5942074.072431108, 2003750.8342789242, 6190443.809135445],
-        'exp_languages': set(),
+        'exp_languages': {'eng', 'cze'},
         'exp_scale_denominator': 50_000_000,
     },
     'point_custom_id_column': {
