@@ -59,6 +59,41 @@
           ]
         ]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "MultiPolygon"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                17.0,
+                47.6
+              ],
+              [
+                18.0,
+                47.6
+              ],
+              [
+                18.0,
+                47.9
+              ],
+              [
+                17.0,
+                47.9
+              ],
+              [
+                17.0,
+                47.6
+              ]
+            ]
+          ]
+        ]
+      }
     }
   ]
 }
