@@ -4,7 +4,9 @@
     {
       "type": "Feature",
       "properties": {
-        "geometry_type_name": "MultiPolygon"
+        "geometry_type_name": "MultiPolygon",
+        "description_en": "Layman is a web service for publishing geospatial data online through REST API",
+        "description_cs": "Layman je služba pro publikování geoporostorových dat na webu prostřednictvím REST API"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -63,7 +65,9 @@
     {
       "type": "Feature",
       "properties": {
-        "geometry_type_name": "MultiPolygon"
+        "geometry_type_name": "MultiPolygon",
+        "description_en": "Even large data files can be easily published thanks to chunk upload and asynchronous processing.",
+        "description_cs": "Layman umožňuje snadno publikovat i velké soubory dat, a to díky uploadu po částech a asynchronnímu zpracování."
       },
       "geometry": {
         "type": "MultiPolygon",
