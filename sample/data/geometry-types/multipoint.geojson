@@ -19,6 +19,25 @@
           ]
         ]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "MultiPoint"
+      },
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            16.0,
+            48.0
+          ],
+          [
+            15.5,
+            47.9
+          ]
+        ]
+      }
     }
   ]
 }
