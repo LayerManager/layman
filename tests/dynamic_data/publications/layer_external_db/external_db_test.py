@@ -29,6 +29,8 @@ TEST_CASES = {
         'exp_geometry_type': 'GEOMETRY',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
         'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
+        'exp_languages': {'eng'},
+        'exp_scale_denominator': 10_000_000,
     },
     'geometrycollection_mixed_case_table_name': {
         'input_file_name': 'geometrycollection',
@@ -40,6 +42,8 @@ TEST_CASES = {
         'exp_geometry_type': 'GEOMETRYCOLLECTION',
         'exp_native_bounding_box': [15.0, 45.0, 18.0, 46.0],
         'exp_bounding_box': [1669792.3618991035, 5621521.486192066, 2003750.8342789242, 5780349.220256351],
+        'exp_languages': set(),
+        'exp_scale_denominator': 100_000_000,
     },
     'linestring_dangerous_table_name': {
         'input_file_name': 'linestring',
@@ -84,6 +88,8 @@ TEST_CASES = {
         'exp_geometry_type': 'MULTIPOLYGON',
         'exp_native_bounding_box': [17.0, 47.0, 18.0, 48.5],
         'exp_bounding_box': [1892431.3434856508, 5942074.072431108, 2003750.8342789242, 6190443.809135445],
+        'exp_languages': set(),
+        'exp_scale_denominator': 50_000_000,
     },
     'point_custom_id_column': {
         'input_file_name': 'point',
@@ -95,6 +101,8 @@ TEST_CASES = {
         'exp_geometry_type': 'POINT',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
         'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
+        'exp_languages': set(),
+        'exp_scale_denominator': None,  # Layman doesn't guess scale denominator for (multi)points
     },
     'polygon': {
         'input_file_name': 'polygon',
@@ -106,6 +114,8 @@ TEST_CASES = {
         'exp_geometry_type': 'POLYGON',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
         'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
+        'exp_languages': set(),
+        'exp_scale_denominator': 10_000_000,
     },
 }
 
@@ -199,6 +209,18 @@ class TestLayer(base_test.TestSingleRestPublication):
             exp_wms_stores = both_db_stores if style_type == 'sld' else only_default_db_store
             assert_stores(workspace=layer.workspace, exp_stores=both_db_stores)
             assert_stores(workspace=f'{layer.workspace}_wms', exp_stores=exp_wms_stores)
+
+            comp = process_client.get_workspace_publication_metadata_comparison(layer.type, layer.workspace, layer.name)
+            md_lang = comp['metadata_properties']['language']
+            assert md_lang['equal'] is True
+            assert all(set(langs) == params['exp_languages'] for langs in md_lang['values'].values())
+
+            md_spatial_res = comp['metadata_properties']['spatial_resolution']
+            assert md_spatial_res['equal'] is True
+            exp_sp_res = {
+                'scale_denominator': params['exp_scale_denominator']
+            } if params['exp_scale_denominator'] is not None else None
+            assert all(sp_res == exp_sp_res for sp_res in md_spatial_res['values'].values())
 
         process_client.delete_workspace_layer(layer.workspace, layer.name)
 
