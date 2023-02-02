@@ -16,7 +16,7 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 pytest_generate_tests = base_test.pytest_generate_tests
 
-DANGEROUS_NAME = '; DROP TABLE "public"."abc"; SELECT \'& Žlu-ťouč-ký\''
+EDGE_NAME = '__0_MyTest_CASE_AB7_'
 
 TEST_CASES = {
     'all': {
@@ -45,38 +45,44 @@ TEST_CASES = {
         'exp_languages': set(),
         'exp_scale_denominator': 100_000_000,
     },
-    'linestring_dangerous_table_name': {
+    'linestring_edge_table_name': {
         'input_file_name': 'linestring',
         'style_file': None,
         'schema_name': 'public',
-        'table_name': DANGEROUS_NAME,
+        'table_name': EDGE_NAME,
         'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'LINESTRING',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
-        'exp_imported_into_GS': False,
+        'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
+        'exp_languages': set(),
+        'exp_scale_denominator': 25_000_000,
     },
-    'multilinestring_dangerous_schema_name': {
+    'multilinestring_edge_schema_name': {
         'input_file_name': 'multilinestring',
         'style_file': None,
-        'schema_name': DANGEROUS_NAME,
+        'schema_name': EDGE_NAME,
         'table_name': 'multilinestring',
         'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'MULTILINESTRING',
-        'exp_native_bounding_box': [16.0, 47.0, 16.0, 48.5],
-        'exp_imported_into_GS': False,
+        'exp_native_bounding_box': [15.0, 47.0, 16.0, 48.5],
+        'exp_bounding_box': [1669792.3618991035, 5942074.072431108, 1781111.852692377, 6190443.809135445],
+        'exp_languages': set(),
+        'exp_scale_denominator': 100_000_000,
     },
-    'multipoint_dangerous_geo_column_name': {
+    'multipoint_edge_geo_column_name': {
         'input_file_name': 'multipoint',
         'style_file': None,
         'schema_name': 'public',
         'table_name': 'multipoint',
         'primary_key_column': 'ogc_fid',
-        'geo_column_name': DANGEROUS_NAME,
+        'geo_column_name': EDGE_NAME,
         'exp_geometry_type': 'MULTIPOINT',
-        'exp_native_bounding_box': [15.0, 47.8, 15.0, 48.0],
-        'exp_imported_into_GS': False,
+        'exp_native_bounding_box': [15.0, 47.8, 16.0, 48.0],
+        'exp_bounding_box': [1669792.3618991035, 6073646.223350629, 1781111.852692377, 6106854.834885075],
+        'exp_languages': set(),
+        'exp_scale_denominator': None,  # Layman doesn't guess scale denominator for (multi)points
     },
     'multipolygon_qml_custom_id_column': {
         'input_file_name': 'multipolygon',
@@ -185,42 +191,43 @@ class TestLayer(base_test.TestSingleRestPublication):
         assert publ_info['_is_external_table'] is True
         only_default_db_store = {'postgresql'}
         both_db_stores = {'postgresql', f'external_db_{layer.name}'}
-        if params.get('exp_imported_into_GS', True):
-            assert publ_info['wfs']['url'], f'publ_info={publ_info}'
-            assert 'status' not in publ_info['wfs']
-            assert 'wms' in publ_info, f'publ_info={publ_info}'
-            assert publ_info['wms']['url'], f'publ_info={publ_info}'
-            assert 'status' not in publ_info['wms']
-            exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{key}.png")
-            asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
-            assert_util.is_publication_valid_and_complete(layer)
-            style_type = os.path.splitext(rest_args['style_file'])[1][1:] if rest_args['style_file'] else 'sld'
-            assert style_type in ['sld', 'qml']
-            publ_type_detail = (settings.FILE_TYPE_VECTOR, style_type)
-            asserts_publ.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
-                                                           publ_type_detail=publ_type_detail,
-                                                           exp_publication_detail={
-                                                               'bounding_box': params['exp_bounding_box'],
-                                                               'native_crs': 'EPSG:4326',
-                                                               'native_bounding_box': params['exp_native_bounding_box'],
-                                                           },
-                                                           external_table_uri=table_uri,
-                                                           )
-            exp_wms_stores = both_db_stores if style_type == 'sld' else only_default_db_store
-            assert_stores(workspace=layer.workspace, exp_stores=both_db_stores)
-            assert_stores(workspace=f'{layer.workspace}_wms', exp_stores=exp_wms_stores)
+        assert publ_info['wfs']['url'], f'publ_info={publ_info}'
+        assert 'status' not in publ_info['wfs']
+        assert 'wms' in publ_info, f'publ_info={publ_info}'
+        assert publ_info['wms']['url'], f'publ_info={publ_info}'
+        assert 'status' not in publ_info['wms']
+        exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{key}.png")
+        asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
+        assert_util.is_publication_valid_and_complete(layer)
+        style_type = os.path.splitext(rest_args['style_file'])[1][1:] if rest_args['style_file'] else 'sld'
+        assert style_type in ['sld', 'qml']
+        publ_type_detail = (settings.FILE_TYPE_VECTOR, style_type)
+        asserts_publ.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
+                                                       publ_type_detail=publ_type_detail,
+                                                       exp_publication_detail={
+                                                           'bounding_box': params['exp_bounding_box'],
+                                                           'native_crs': 'EPSG:4326',
+                                                           'native_bounding_box': params['exp_native_bounding_box'],
+                                                       },
+                                                       external_table_uri=table_uri,
+                                                       )
+        exp_wms_stores = both_db_stores if style_type == 'sld' else only_default_db_store
+        assert_stores(workspace=layer.workspace, exp_stores=both_db_stores)
+        assert_stores(workspace=f'{layer.workspace}_wms', exp_stores=exp_wms_stores)
 
-            comp = process_client.get_workspace_publication_metadata_comparison(layer.type, layer.workspace, layer.name)
-            md_lang = comp['metadata_properties']['language']
-            assert md_lang['equal'] is True
-            assert all(set(langs) == params['exp_languages'] for langs in md_lang['values'].values())
+        comp = process_client.get_workspace_publication_metadata_comparison(layer.type, layer.workspace, layer.name)
+        md_lang = comp['metadata_properties']['language']
+        assert md_lang['equal'] is True
+        assert all(set(langs) == params['exp_languages'] for langs in md_lang['values'].values()), \
+            f"langs={md_lang['values'].values()}, exp_langs={params['exp_languages']}"
 
-            md_spatial_res = comp['metadata_properties']['spatial_resolution']
-            assert md_spatial_res['equal'] is True
-            exp_sp_res = {
-                'scale_denominator': params['exp_scale_denominator']
-            } if params['exp_scale_denominator'] is not None else None
-            assert all(sp_res == exp_sp_res for sp_res in md_spatial_res['values'].values())
+        md_spatial_res = comp['metadata_properties']['spatial_resolution']
+        assert md_spatial_res['equal'] is True
+        exp_sp_res = {
+            'scale_denominator': params['exp_scale_denominator']
+        } if params['exp_scale_denominator'] is not None else None
+        assert all(sp_res == exp_sp_res for sp_res in md_spatial_res['values'].values()), \
+            f"sp_res={md_spatial_res['values'].values()}, exp_sp_res={exp_sp_res}"
 
         process_client.delete_workspace_layer(layer.workspace, layer.name)
 

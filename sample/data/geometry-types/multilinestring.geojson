@@ -21,12 +21,33 @@
           ],
           [
             [
-              16.0,
+              15.0,
               47.0
             ],
             [
               16.0,
               47.5
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geometry_type_name": "MultiLineString"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              15.0,
+              48.0
+            ],
+            [
+              16.0,
+              48.5
             ]
           ]
         ]
