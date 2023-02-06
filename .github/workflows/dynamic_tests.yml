@@ -31,9 +31,9 @@ jobs:
       - name: Build
         run: |
           cp .env.test .env
-          docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build layman_dev
+          make pull-dev-images
           docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql nginx-qgis
-          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel qgis geoserver micka timgen layman_client_test
+          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel qgis geoserver micka
 
       - name: Download test data
         run: |

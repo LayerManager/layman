@@ -380,3 +380,24 @@ github-purge-cache:
 	fi
 	chmod +x tmp/github-purge.sh
 	./tmp/github-purge.sh ${ARGS}
+
+push-layman-dev-image:
+	docker tag layman_dev layermanager/layman:dev-latest
+	docker push layermanager/layman:dev-latest
+
+push-client-image:
+	docker tag layman_client layermanager/layman:client-latest
+	docker push layermanager/layman:client-latest
+
+push-timgen-image:
+	docker tag timgen layermanager/layman:timgen-latest
+	docker push layermanager/layman:timgen-latest
+
+pull-dev-images:
+	docker pull layermanager/layman:dev-latest
+	docker tag layermanager/layman:dev-latest layman_dev
+	docker pull layermanager/layman:client-latest
+	docker tag layermanager/layman:client-latest layman_client
+	docker tag layermanager/layman:client-latest layman_client_test
+	docker pull layermanager/layman:timgen-latest
+	docker tag layermanager/layman:timgen-latest timgen
