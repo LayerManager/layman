@@ -259,6 +259,48 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
                    },
                    },
     }, id='without_table'),
+    pytest.param('postgresql://docker:docker@postgresql:5432/external_test_db?schema=01startsWithDigit&table=table_name&geo_column=wkb_geometry', {
+        'http_code': 400,
+        'code': 2,
+        'detail': {
+            'parameter': 'db_connection',
+            'message': r'Schema, table, and geo_column in `db_connection` parameter are expected to match regular expression ^[a-zA-Z_][a-zA-Z_0-9]*$',
+            'found': {
+                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=01startsWithDigit&table=table_name&geo_column=wkb_geometry',
+                'schema': '01startsWithDigit',
+                'table': 'table_name',
+                'geo_column': 'wkb_geometry',
+            },
+        },
+    }, id='unsafe_schema_name'),
+    pytest.param('postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=name%20with%20dash-and%20spaces&geo_column=wkb_geometry', {
+        'http_code': 400,
+        'code': 2,
+        'detail': {
+            'parameter': 'db_connection',
+            'message': r'Schema, table, and geo_column in `db_connection` parameter are expected to match regular expression ^[a-zA-Z_][a-zA-Z_0-9]*$',
+            'found': {
+                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=name%20with%20dash-and%20spaces&geo_column=wkb_geometry',
+                'schema': 'schema_name',
+                'table': 'name with dash-and spaces',
+                'geo_column': 'wkb_geometry',
+            },
+        },
+    }, id='unsafe_table_name'),
+    pytest.param('postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_name&geo_column=name%24with%24dollar', {
+        'http_code': 400,
+        'code': 2,
+        'detail': {
+            'parameter': 'db_connection',
+            'message': r'Schema, table, and geo_column in `db_connection` parameter are expected to match regular expression ^[a-zA-Z_][a-zA-Z_0-9]*$',
+            'found': {
+                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_name&geo_column=name%24with%24dollar',
+                'schema': 'schema_name',
+                'table': 'table_name',
+                'geo_column': 'name$with$dollar',
+            },
+        },
+    }, id='unsafe_geo_column_name'),
     pytest.param('postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=no_table_name&geo_column=wkb_geometry', {
         'http_code': 400,
         'code': 2,

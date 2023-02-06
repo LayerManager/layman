@@ -16,6 +16,7 @@ from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_
 LAYERNAME_PATTERN = PUBLICATION_NAME_PATTERN
 LAYERNAME_MAX_LENGTH = PUBLICATION_MAX_LENGTH
 ATTRNAME_PATTERN = PUBLICATION_NAME_PATTERN
+SAFE_PG_IDENTIFIER_PATTERN = r"^[a-zA-Z_][a-zA-Z_0-9]*$"
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
@@ -297,6 +298,19 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
                 'geo_column': geo_column,
             }
         })
+
+    for name in [schema, table, geo_column]:
+        if not re.match(SAFE_PG_IDENTIFIER_PATTERN, name):
+            raise LaymanError(2, {
+                'parameter': 'db_connection',
+                'message': 'Schema, table, and geo_column in `db_connection` parameter are expected to match regular expression ' + SAFE_PG_IDENTIFIER_PATTERN,
+                'found': {
+                    'db_connection': external_table_uri_str,
+                    'schema': schema,
+                    'table': table,
+                    'geo_column': geo_column,
+                }
+            })
 
     try:
         conn_cur = db_util.create_connection_cursor(db_uri_str, encapsulate_exception=False)
