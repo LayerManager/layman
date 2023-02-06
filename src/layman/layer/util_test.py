@@ -14,16 +14,18 @@ from .util import to_safe_layer_name, fill_in_partial_info_statuses
 @pytest.fixture(scope="module")
 def ensure_tables():
     tables = [
-        ('schema_name', 'table_name', 'geo_wkb_column', ['my_id']),
-        ('schema_name', 'two_column_primary_key', 'geo_wkb_column', ['partial_id_1', 'partial_id_2']),
-        ('schema_name', 'no_primary_key', 'geo_wkb_column', []),
+        ('schema_name', 'table_name', 'geo_wkb_column', ['my_id'], []),
+        ('schema_name', 'two_column_primary_key', 'geo_wkb_column', ['partial_id_1', 'partial_id_2'], []),
+        ('schema_name', 'no_primary_key', 'geo_wkb_column', [], []),
+        ('schema_name', 'table_with_unsafe_column_name', 'geo_wkb_column', ['my_id'], ['name-with-dashes']),
     ]
-    for schema, table, geo_column, primary_key_columns in tables:
-        external_db.ensure_table(schema, table, geo_column, primary_key_columns=primary_key_columns)
+    for schema, table, geo_column, primary_key_columns, other_columns in tables:
+        external_db.ensure_table(schema, table, geo_column, primary_key_columns=primary_key_columns,
+                                 other_columns=other_columns)
 
     yield
 
-    for schema, table, _, _ in tables:
+    for schema, table, _, _, _ in tables:
         external_db.drop_table(schema, table)
 
 
@@ -388,6 +390,20 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
             },
         },
     }, id='no_primary_key'),
+    pytest.param('postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_with_unsafe_column_name&geo_column=geo_wkb_column', {
+        'http_code': 400,
+        'code': 2,
+        'detail': {
+            'parameter': 'db_connection',
+            'message': 'Expected table with all column names mathing regular expression ^[a-zA-Z_][a-zA-Z_0-9]*$',
+            'found': {
+                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_with_unsafe_column_name&geo_column=geo_wkb_column',
+                'schema': 'schema_name',
+                'table': 'table_with_unsafe_column_name',
+                'unsafe_column_names': ['name-with-dashes'],
+            },
+        },
+    }, id='table_with_unsafe_column_name'),
 ])
 def test_validate_external_table_uri_str(external_table_uri_str, exp_error):
     with pytest.raises(LaymanError) as exc_info:

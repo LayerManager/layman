@@ -33,13 +33,18 @@ def ensure_schema(schema):
     db_util.run_statement(statement, conn_cur=conn_cur)
 
 
-def ensure_table(schema, name, geo_column, *, primary_key_columns=None):
+def ensure_table(schema, name, geo_column, *, primary_key_columns=None, other_columns=None):
     primary_key_columns = ['id'] if primary_key_columns is None else primary_key_columns
+    other_columns = other_columns or []
 
     ensure_schema(schema)
     columns = []
     for col in primary_key_columns:
         columns.append(sql.SQL('{column} serial').format(
+            column=sql.Identifier(col)
+        ))
+    for col in other_columns:
+        columns.append(sql.SQL('{column} varchar(100)').format(
             column=sql.Identifier(col)
         ))
     columns.append(sql.SQL('{geo_column} geometry(Geometry, 4326)').format(
