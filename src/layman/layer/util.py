@@ -12,6 +12,7 @@ from layman import celery as celery_util, common
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info as common_clear_publication_info
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_keys
+from .db import get_all_table_column_names
 
 LAYERNAME_PATTERN = PUBLICATION_NAME_PATTERN
 LAYERNAME_MAX_LENGTH = PUBLICATION_MAX_LENGTH
@@ -395,6 +396,20 @@ WHERE
                 'schema': schema,
                 'table': table,
                 'primary_key_columns': primary_key_columns,
+            }
+        })
+
+    column_names = get_all_table_column_names(schema, table, conn_cur=conn_cur)
+    unsafe_column_names = [c for c in column_names if not re.match(SAFE_PG_IDENTIFIER_PATTERN, c)]
+    if unsafe_column_names:
+        raise LaymanError(2, {
+            'parameter': 'db_connection',
+            'message': 'Expected table with all column names mathing regular expression ' + SAFE_PG_IDENTIFIER_PATTERN,
+            'found': {
+                'db_connection': external_table_uri_str,
+                'schema': schema,
+                'table': table,
+                'unsafe_column_names': unsafe_column_names,
             }
         })
 
