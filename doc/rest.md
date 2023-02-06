@@ -148,6 +148,7 @@ Body parameters:
    - exactly one of `file` or `db_connection` must be set
    - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is expected with URI scheme `postgresql` and query parameters `schema`, `table`, and `geo_column` specified
    - published table is required to have one-column primary key
+   - names of schema, table and all columns of the table are required to match regular expression `^[a-zA-Z_][a-zA-Z_0-9]*$`
 - *name*, string
    - computer-friendly identifier of the layer
    - must be unique among all layers of one workspace
