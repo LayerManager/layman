@@ -16,7 +16,6 @@ bp = Blueprint('rest_workspace_layer_style', __name__)
 @util.check_layername_decorator
 @authenticate
 @authorize_workspace_publications_decorator
-@util.info_decorator
 def before_request():
     pass
 
