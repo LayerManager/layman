@@ -213,7 +213,11 @@ AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 
 def get_all_column_names(workspace, layername, conn_cur=None):
     table_name = get_table_name(workspace, layername)
-    return [col.name for col in get_all_column_infos(workspace, table_name, conn_cur=conn_cur)]
+    return get_all_table_column_names(workspace, table_name, conn_cur=conn_cur)
+
+
+def get_all_table_column_names(schema, table_name, conn_cur=None):
+    return [col.name for col in get_all_column_infos(schema, table_name, conn_cur=conn_cur)]
 
 
 def get_all_column_infos(schema, table_name, *, conn_cur=None, omit_geometry_columns=False):
