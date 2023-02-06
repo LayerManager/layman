@@ -344,19 +344,19 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
         })
 
     # https://stackoverflow.com/a/20537829
-    query = f'''
+    query = '''
 SELECT
-  pg_attribute.attname,
-  format_type(pg_attribute.atttypid, pg_attribute.atttypmod)
-FROM pg_index, pg_class, pg_attribute, pg_namespace
+  attr.attname,
+  format_type(attr.atttypid, attr.atttypmod)
+FROM pg_index idx inner join
+     pg_attribute attr on attr.attnum = any(idx.indkey) inner join
+     pg_class cls on idx.indrelid = cls.oid AND
+                     cls.oid = attr.attrelid inner join
+     pg_namespace nspace on nspace.oid = cls.relnamespace
 WHERE
-  pg_class.relname = %s AND
-  indrelid = pg_class.oid AND
-  nspname = %s AND
-  pg_class.relnamespace = pg_namespace.oid AND
-  pg_attribute.attrelid = pg_class.oid AND
-  pg_attribute.attnum = any(pg_index.indkey)
- AND indisprimary'''
+  idx.indisprimary AND
+  cls.relname = %s AND
+  nspace.nspname = %s'''
     query_res = db_util.run_query(query, (table, schema), conn_cur=conn_cur, log_query=True)
     primary_key_columns = [r[0] for r in query_res]
     if len(query_res) == 0:
