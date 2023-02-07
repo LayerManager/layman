@@ -5,7 +5,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "LineString",
-        "Class-ID": 1
+        "Class_id": 1
       },
       "geometry": {
         "type": "LineString",
@@ -25,7 +25,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "LineString",
-        "Class-ID": 2
+        "Class_id": 2
       },
       "geometry": {
         "type": "LineString",
@@ -45,7 +45,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "LineString",
-        "Class-ID": 2
+        "Class_id": 2
       },
       "geometry": {
         "type": "LineString",
@@ -65,7 +65,7 @@
       "type": "Feature",
       "properties": {
         "geometry_type_name": "LineString",
-        "Class-ID": 3
+        "Class_id": 3
       },
       "geometry": {
         "type": "LineString",
