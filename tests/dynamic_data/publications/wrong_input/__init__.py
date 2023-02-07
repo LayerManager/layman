@@ -1393,6 +1393,11 @@ TESTCASES = {
                 },
             },
         },
+        KEY_PATCHES: {
+            'full': {
+                KEY_PATCH_POST: {},
+            },
+        },
     },
     'partial_db_connect': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
@@ -1416,6 +1421,11 @@ TESTCASES = {
                                      },
                                      },
                           },
+        },
+        KEY_PATCHES: {
+            'full': {
+                KEY_PATCH_POST: {},
+            },
         },
     },
 }
