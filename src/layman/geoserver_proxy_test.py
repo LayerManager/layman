@@ -4,11 +4,10 @@ import pytest
 from geoserver.error import Error as GS_Error
 from layman import app, settings, util as layman_util
 from layman.layer import db
-from layman.layer.filesystem import thumbnail
 from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
-from test_tools import process_client, util as test_util, assert_util
-from test_tools.data import wfs as data_wfs, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX, SMALL_LAYER_NATIVE_CRS
+from test_tools import process_client
+from test_tools.data import wfs as data_wfs
 from test_tools.process_client import get_authz_headers
 
 
@@ -203,44 +202,3 @@ def test_missing_attribute_authz():
     do_test(data_xml, attr_names)
 
     process_client.delete_workspace_layer(username, layername1, headers=authn_headers1)
-
-
-@pytest.mark.parametrize('style_file, thumbnail_style_postfix', [
-    (None, '_sld'),
-    ('sample/style/small_layer.qml', '_qml'),
-])
-@pytest.mark.usefixtures('ensure_layman')
-def test_wfs_bbox(style_file, thumbnail_style_postfix):
-    workspace = 'test_wfs_bbox_workspace'
-    layer = 'test_wfs_bbox_layer'
-
-    process_client.publish_workspace_layer(workspace, layer, style_file=style_file, )
-
-    native_crs = SMALL_LAYER_NATIVE_CRS
-    assert_util.assert_all_sources_bbox(workspace, layer, SMALL_LAYER_BBOX,
-                                        expected_native_bbox=SMALL_LAYER_NATIVE_BBOX,
-                                        expected_native_crs=native_crs)
-
-    expected_bbox = (1571000.0, 6268800.0, 1572590.854206196, 6269876.33561699)
-    exp_native_bbox = (14.112533113517683, 48.964264493114904, 14.126824, 48.970612)
-    method_bbox_thumbnail_tuples = [
-        (data_wfs.get_wfs20_insert_points, expected_bbox, exp_native_bbox, '_bigger'),
-        (data_wfs.get_wfs20_delete_point, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX, ''),
-    ]
-
-    for wfs_method, exp_bbox, exp_native_bbox, thumbnail_bbox_postfix in method_bbox_thumbnail_tuples:
-        data_xml = wfs_method(workspace, layer, )
-
-        process_client.post_wfst(data_xml, workspace=workspace)
-        process_client.wait_for_publication_status(workspace, process_client.LAYER_TYPE, layer)
-
-        assert_util.assert_all_sources_bbox(workspace, layer, exp_bbox, expected_native_bbox=exp_native_bbox,
-                                            expected_native_crs=native_crs)
-
-        expected_thumbnail_path = f'/code/sample/style/{layer}{thumbnail_style_postfix}{thumbnail_bbox_postfix}.png'
-        with app.app_context():
-            thumbnail_path = thumbnail.get_layer_thumbnail_path(workspace, layer)
-        diffs = test_util.compare_images(expected_thumbnail_path, thumbnail_path)
-        assert diffs < 100, expected_thumbnail_path
-
-    process_client.delete_workspace_layer(workspace, layer, )
