@@ -11,7 +11,7 @@
       <end></end>
     </fixedRange>
   </temporal>
-  <renderer-v2 attr="Class-ID" type="graduatedSymbol" forceraster="0" enableorderby="0" graduatedMethod="GraduatedSize" symbollevels="0">
+  <renderer-v2 attr="Class_id" type="graduatedSymbol" forceraster="0" enableorderby="0" graduatedMethod="GraduatedSize" symbollevels="0">
     <ranges>
       <range upper="1.900000000000000" symbol="0" render="true" lower="1.000000000000000" label="1"/>
       <range upper="2.900000000000000" symbol="1" render="true" lower="1.900000000000000" label="2"/>
@@ -390,7 +390,7 @@
         </config>
       </editWidget>
     </field>
-    <field configurationFlags="None" name="Class-ID">
+    <field configurationFlags="None" name="Class_id">
       <editWidget type="Range">
         <config>
           <Option/>
@@ -400,19 +400,19 @@
   </fieldConfiguration>
   <aliases>
     <alias index="0" field="geometry_type_name" name=""/>
-    <alias index="1" field="Class-ID" name=""/>
+    <alias index="1" field="Class_id" name=""/>
   </aliases>
   <defaults>
     <default expression="" field="geometry_type_name" applyOnUpdate="0"/>
-    <default expression="" field="Class-ID" applyOnUpdate="0"/>
+    <default expression="" field="Class_id" applyOnUpdate="0"/>
   </defaults>
   <constraints>
     <constraint notnull_strength="0" field="geometry_type_name" constraints="0" exp_strength="0" unique_strength="0"/>
-    <constraint notnull_strength="0" field="Class-ID" constraints="0" exp_strength="0" unique_strength="0"/>
+    <constraint notnull_strength="0" field="Class_id" constraints="0" exp_strength="0" unique_strength="0"/>
   </constraints>
   <constraintExpressions>
     <constraint field="geometry_type_name" desc="" exp=""/>
-    <constraint field="Class-ID" desc="" exp=""/>
+    <constraint field="Class_id" desc="" exp=""/>
   </constraintExpressions>
   <expressionfields/>
   <attributeactions>
@@ -421,7 +421,7 @@
   <attributetableconfig sortOrder="0" actionWidgetStyle="dropDown" sortExpression="">
     <columns>
       <column type="field" width="-1" name="geometry_type_name" hidden="0"/>
-      <column type="field" width="-1" name="Class-ID" hidden="0"/>
+      <column type="field" width="-1" name="Class_id" hidden="0"/>
       <column type="actions" width="-1" hidden="1"/>
     </columns>
   </attributetableconfig>
@@ -454,11 +454,11 @@ def my_form_open(dialog, layer, feature):
   <featformsuppress>0</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
   <editable>
-    <field editable="1" name="Class-ID"/>
+    <field editable="1" name="Class_id"/>
     <field editable="1" name="geometry_type_name"/>
   </editable>
   <labelOnTop>
-    <field labelOnTop="0" name="Class-ID"/>
+    <field labelOnTop="0" name="Class_id"/>
     <field labelOnTop="0" name="geometry_type_name"/>
   </labelOnTop>
   <dataDefinedFieldProperties/>
