@@ -445,6 +445,14 @@ def update_publication(workspace_name, info):
             'remove': set(),
         }
 
+    external_table_uri = psycopg2.extras.Json({
+        'db_uri_str': info["external_table_uri"].db_uri_str,
+        'schema': info["external_table_uri"].schema,
+        'table': info["external_table_uri"].table,
+        'geo_column': info["external_table_uri"].geo_column,
+        'primary_key_column': info["external_table_uri"].primary_key_column,
+    }) if info.get("external_table_uri") else None
+
     if info.get("access_rights") and (info["access_rights"].get("read") or info["access_rights"].get("write")):
         info_old = get_publication_infos(workspace_name,
                                          info["publ_type_name"])[(workspace_name,
@@ -471,6 +479,7 @@ def update_publication(workspace_name, info):
     everyone_can_write = coalesce(%s, everyone_can_write),
     updated_at =  current_timestamp,
     image_mosaic = coalesce(%s, image_mosaic),
+    external_table_uri = %s,
     file_type = coalesce(%s, file_type)
 where id_workspace = %s
   and name = %s
@@ -483,6 +492,7 @@ returning id
             access_rights_changes['read']['EVERYONE'],
             access_rights_changes['write']['EVERYONE'],
             info.get("image_mosaic"),
+            external_table_uri,
             info.get("file_type"),
             id_workspace,
             info.get("name"),

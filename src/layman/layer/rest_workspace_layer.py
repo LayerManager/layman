@@ -68,6 +68,19 @@ def patch(workspace, layername):
         ]
     input_files = fs_util.InputFiles(sent_streams=sent_file_streams, sent_paths=sent_file_paths)
 
+    external_table_uri_str = request.form.get('db_connection', '')
+    if input_files and external_table_uri_str:
+        raise LaymanError(48, {
+            'parameters': ['file', 'db_connection'],
+            'message': 'Both `file` and `db_connection` parameters are filled',
+            'expected': 'Only one of the parameters is fulfilled.',
+            'found': {
+                'file': input_files.raw_paths,
+                'db_connection': external_table_uri_str,
+            }})
+
+    external_table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None
+
     # CRS
     crs_id = None
     if len(input_files.raw_paths) > 0 and len(request.form.get('crs', '')) > 0:
@@ -98,7 +111,7 @@ def patch(workspace, layername):
         kwargs['style_type'] = style_type
         kwargs['store_in_geoserver'] = style_type.store_in_geoserver
         delete_from = 'layman.layer.qgis.wms'
-    if len(input_files.raw_paths) > 0:
+    if len(input_files.raw_paths) > 0 or external_table_uri:
         delete_from = 'layman.layer.filesystem.input_file'
 
     # Overview resampling
@@ -131,7 +144,7 @@ def patch(workspace, layername):
 
     # FILE NAMES
     use_chunk_upload = bool(input_files.sent_paths)
-    if delete_from == 'layman.layer.filesystem.input_file':
+    if delete_from == 'layman.layer.filesystem.input_file' and input_files:
         if not (use_chunk_upload and input_files.is_one_archive):
             input_file.check_filenames(workspace, layername, input_files,
                                        check_crs, ignore_existing_files=True, enable_more_main_files=enable_more_main_files,
@@ -144,8 +157,10 @@ def patch(workspace, layername):
 
     if input_files.raw_paths:
         file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
+    elif external_table_uri:
+        file_type = settings.FILE_TYPE_VECTOR
     else:
-        file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})['file']['file_type']
+        file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file_type']})['_file_type']
     if style_type:
         style_type_for_check = style_type.code
     else:
@@ -163,6 +178,8 @@ def patch(workspace, layername):
 
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
+    kwargs['external_table_uri'] = external_table_uri
+    kwargs['is_external_table'] = not input_files and (bool(external_table_uri) or info.get('_is_external_table'))
 
     layer_result = {}
 
@@ -197,7 +214,7 @@ def patch(workspace, layername):
                 kwargs.update({
                     'check_crs': check_crs,
                 })
-            else:
+            elif input_files:
                 shutil.move(temp_dir, input_file.get_layer_input_file_dir(workspace, layername))
     kwargs.update({'actor_name': authn.get_authn_username()})
 
