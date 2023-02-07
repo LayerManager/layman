@@ -2,7 +2,7 @@ import os
 from urllib.parse import quote
 import pytest
 
-from db import util as db_util, TableUri
+from db import util as db_util
 from geoserver import util as gs_util
 from layman import app, settings
 from layman.util import get_publication_info
@@ -164,6 +164,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         geo_column = params['geo_column_name']
         primary_key_column = params['primary_key_column']
 
+        # import data into external DB
         external_db.import_table(file_path, table=table, schema=schema, geo_column=geo_column,
                                  primary_key_column=primary_key_column)
         conn_cur = db_util.create_connection_cursor(external_db.URI_STR)
@@ -171,34 +172,15 @@ class TestLayer(base_test.TestSingleRestPublication):
         result = db_util.run_query(query, (schema, table, geo_column), conn_cur=conn_cur)
         assert result[0][0] == params['exp_geometry_type']
 
+        # publish layer from external DB table
         rest_method(layer, args=rest_args)
 
-        with app.app_context():
-            publ_info = get_publication_info(layer.workspace, layer.type, layer.name, context={'keys': [
-                'table_uri', 'native_crs', 'native_bounding_box', 'wfs', 'wms', 'is_external_table',
-            ], })
-        table_uri = publ_info['_table_uri']
-        assert table_uri == TableUri(
-            db_uri_str=external_db.URI_STR,
-            schema=schema,
-            table=table,
-            geo_column=geo_column,
-            primary_key_column=primary_key_column
-        )
-
-        assert publ_info['native_crs'] == 'EPSG:4326'
-        assert publ_info['native_bounding_box'] == params['exp_native_bounding_box']
-        assert publ_info['_is_external_table'] is True
-        only_default_db_store = {'postgresql'}
-        both_db_stores = {'postgresql', f'external_db_{layer.name}'}
-        assert publ_info['wfs']['url'], f'publ_info={publ_info}'
-        assert 'status' not in publ_info['wfs']
-        assert 'wms' in publ_info, f'publ_info={publ_info}'
-        assert publ_info['wms']['url'], f'publ_info={publ_info}'
-        assert 'status' not in publ_info['wms']
-        exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{key}.png")
-        asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
+        # general checks
         assert_util.is_publication_valid_and_complete(layer)
+        with app.app_context():
+            publ_info = get_publication_info(layer.workspace, layer.type, layer.name,
+                                             context={'keys': ['table_uri']})
+        table_uri = publ_info['_table_uri']
         style_type = os.path.splitext(rest_args['style_file'])[1][1:] if rest_args['style_file'] else 'sld'
         assert style_type in ['sld', 'qml']
         publ_type_detail = (settings.FILE_TYPE_VECTOR, style_type)
@@ -211,16 +193,24 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                        },
                                                        external_table_uri=table_uri,
                                                        )
+
+        # check thumbnail
+        exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{key}.png")
+        asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
+
+        # check GeoServer store of external DB exists
+        only_default_db_store = {'postgresql'}
+        both_db_stores = {'postgresql', f'external_db_{layer.name}'}
         exp_wms_stores = both_db_stores if style_type == 'sld' else only_default_db_store
         assert_stores(workspace=layer.workspace, exp_stores=both_db_stores)
         assert_stores(workspace=f'{layer.workspace}_wms', exp_stores=exp_wms_stores)
 
+        # check metadata properties language and scale_denominator (they are derived from DB)
         comp = process_client.get_workspace_publication_metadata_comparison(layer.type, layer.workspace, layer.name)
         md_lang = comp['metadata_properties']['language']
         assert md_lang['equal'] is True
         assert all(set(langs) == params['exp_languages'] for langs in md_lang['values'].values()), \
             f"langs={md_lang['values'].values()}, exp_langs={params['exp_languages']}"
-
         md_spatial_res = comp['metadata_properties']['spatial_resolution']
         assert md_spatial_res['equal'] is True
         exp_sp_res = {
@@ -229,13 +219,17 @@ class TestLayer(base_test.TestSingleRestPublication):
         assert all(sp_res == exp_sp_res for sp_res in md_spatial_res['values'].values()), \
             f"sp_res={md_spatial_res['values'].values()}, exp_sp_res={exp_sp_res}"
 
+        # delete layer from external DB table
         process_client.delete_workspace_layer(layer.workspace, layer.name)
 
+        # check GeoServer store of external DB does not exist anymore
         assert_stores(workspace=layer.workspace, exp_stores=only_default_db_store)
         assert_stores(workspace=f'{layer.workspace}_wms', exp_stores=only_default_db_store)
 
+        # check there is no information about the layer anymore
         with app.app_context():
             publ_info = get_publication_info(layer.workspace, layer.type, layer.name)
         assert not publ_info
 
+        # clean up external DB table
         external_db.drop_table(schema, table)
