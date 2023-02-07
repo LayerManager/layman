@@ -36,6 +36,7 @@ def delete_layer(workspace, layer_name):
 def patch_layer(workspace,
                 layername,
                 actor_name,
+                external_table_uri,
                 style_type=None,
                 title=None,
                 access_rights=None,
@@ -47,6 +48,7 @@ def patch_layer(workspace,
                "publ_type_name": LAYER_TYPE,
                "actor_name": actor_name,
                'image_mosaic': image_mosaic,
+               'external_table_uri': external_table_uri,
                'file_type': file_type,
                }
     if style_type:

@@ -330,10 +330,16 @@ Body parameters:
 - *file*, file(s) or file name(s)
    - If provided, current data file will be deleted and replaced by this file. GeoServer feature types, DB table, normalized raster file, and thumbnail will be deleted and created again using the new file.
    - same file types as in [POST Workspace Layers](#post-workspace-layers) are expected
+   - only one of `file` or `db_connection` can be set
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - if QML style is used (either directly within this request, or indirectly from previous state on server), it must list all attributes contained in given data file
    - it is allowed to publish time-series layer - see [POST Workspace Layers](#post-workspace-layers)
+- *db_connection*, string
+   - only one of `file` or `db_connection` can be set
+   - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is expected with URI scheme `postgresql` and query parameters `schema`, `table`, and `geo_column` specified
+   - published table is required to have one-column primary key
+   - names of schema, table and all columns of the table are required to match regular expression `^[a-zA-Z_][a-zA-Z_0-9]*$`
 - *title*
 - *description*
 - *crs*, string, e.g. `EPSG:3857`, supported EPSG codes are defined by [LAYMAN_INPUT_SRS_LIST](./env-settings.md#LAYMAN_INPUT_SRS_LIST)

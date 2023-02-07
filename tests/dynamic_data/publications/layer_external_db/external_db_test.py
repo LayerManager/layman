@@ -141,7 +141,9 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     publication_type = process_client.LAYER_TYPE
 
-    rest_parametrization = []
+    rest_parametrization = [
+        base_test.RestMethod,
+    ]
 
     test_cases = [base_test.TestCaseType(key=key,
                                          type=EnumTestTypes.MANDATORY,

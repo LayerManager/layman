@@ -158,6 +158,7 @@ def patch_workspace_publication(publication_type,
                                 name,
                                 *,
                                 file_paths=None,
+                                db_connection=None,
                                 headers=None,
                                 access_rights=None,
                                 title=None,
@@ -178,6 +179,7 @@ def patch_workspace_publication(publication_type,
 
     # map layers must not be set together with file_paths
     assert not map_layers or not file_paths
+    assert not map_layers or not db_connection
 
     assert not (not with_chunks and do_not_upload_chunks)
     assert not (check_response_fn and do_not_upload_chunks)  # because check_response_fn is not called when do_not_upload_chunks
@@ -238,6 +240,8 @@ def patch_workspace_publication(publication_type,
             data['time_regex'] = time_regex
         if publication_type == LAYER_TYPE and crs:
             data['crs'] = crs
+        if db_connection:
+            data['db_connection'] = db_connection
 
         response = requests.patch(r_url,
                                   files=files,
