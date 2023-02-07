@@ -470,7 +470,8 @@ def update_publication(workspace_name, info):
     everyone_can_read = coalesce(%s, everyone_can_read),
     everyone_can_write = coalesce(%s, everyone_can_write),
     updated_at =  current_timestamp,
-    image_mosaic = coalesce(%s, image_mosaic)
+    image_mosaic = coalesce(%s, image_mosaic),
+    file_type = coalesce(%s, file_type)
 where id_workspace = %s
   and name = %s
   and type = %s
@@ -482,6 +483,7 @@ returning id
             access_rights_changes['read']['EVERYONE'],
             access_rights_changes['write']['EVERYONE'],
             info.get("image_mosaic"),
+            info.get("file_type"),
             id_workspace,
             info.get("name"),
             info.get("publ_type_name"),

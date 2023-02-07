@@ -40,12 +40,14 @@ def patch_layer(workspace,
                 title=None,
                 access_rights=None,
                 image_mosaic=None,
+                file_type=None,
                 ):
     db_info = {"name": layername,
                "title": title,
                "publ_type_name": LAYER_TYPE,
                "actor_name": actor_name,
                'image_mosaic': image_mosaic,
+               'file_type': file_type,
                }
     if style_type:
         db_info['style_type'] = style_type.code
