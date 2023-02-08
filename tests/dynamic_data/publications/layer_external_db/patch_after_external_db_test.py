@@ -2,6 +2,7 @@ import os
 from urllib.parse import quote
 import pytest
 
+from db import TableUri
 from layman import settings
 from test_tools import process_client, external_db
 from tests import EnumTestTypes, Publication
@@ -28,22 +29,55 @@ TEST_CASES = {
                              f"&geo_column={GEO_COLUMN}"
         },
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_sld.png"),
+        'exp_info_values': {
+            'publ_type_detail': (settings.FILE_TYPE_VECTOR, 'sld'),
+            'exp_publication_detail': {
+                'bounding_box': [1892431.3434856508, 5942074.072431108, 2003750.8342789242, 6190443.809135445],
+                'native_crs': 'EPSG:4326',
+                'native_bounding_box': [17.0, 47.0, 18.0, 48.5],
+            },
+            'external_table_uri': TableUri(
+                db_uri_str=external_db.URI_STR,
+                schema=DB_SCHEMA,
+                table=TABLE_PATCH,
+                geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
+                primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY,
+            ),
+        },
     },
     'only_title': {
         'patch_args': {
             'title': 'New title',
         },
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_all.png"),
+        'exp_info_values': {
+            'publ_type_detail': (settings.FILE_TYPE_VECTOR, 'sld'),
+            'exp_publication_detail': {
+                'title': 'New title',
+                'bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
+                'native_crs': 'EPSG:4326',
+                'native_bounding_box': [15.0, 49.0, 15.3, 49.3],
+            },
+            'external_table_uri': TableUri(
+                db_uri_str=external_db.URI_STR,
+                schema=DB_SCHEMA,
+                table=TABLE_POST,
+                geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
+                primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY,
+            ),
+        },
     },
     'internal_vector': {
         'patch_args': {
             'file_paths': ['sample/layman.layer/small_layer.geojson'],
         },
         'exp_thumbnail': common_publications.LAYER_VECTOR_SLD.thumbnail,
+        'exp_info_values': common_publications.LAYER_VECTOR_SLD.info_values,
     },
     'internal_raster': {
         'patch_args': common_publications.LAYER_RASTER.definition,
         'exp_thumbnail': common_publications.LAYER_RASTER.thumbnail,
+        'exp_info_values': common_publications.LAYER_RASTER.info_values,
     },
     'other_external_table_qml': {
         'patch_args': {
@@ -54,6 +88,21 @@ TEST_CASES = {
             'style_file': 'tests/dynamic_data/publications/layer_external_db/multipolygon.qml',
         },
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_qml_custom_id_column.png"),
+        'exp_info_values': {
+            'publ_type_detail': (settings.FILE_TYPE_VECTOR, 'qml'),
+            'exp_publication_detail': {
+                'bounding_box': [1892431.3434856508, 5942074.072431108, 2003750.8342789242, 6190443.809135445],
+                'native_crs': 'EPSG:4326',
+                'native_bounding_box': [17.0, 47.0, 18.0, 48.5],
+            },
+            'external_table_uri': TableUri(
+                db_uri_str=external_db.URI_STR,
+                schema=DB_SCHEMA,
+                table=TABLE_PATCH,
+                geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
+                primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY,
+            ),
+        },
     },
 }
 
@@ -109,3 +158,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         assert_util.is_publication_valid_and_complete(layer)
         exp_thumbnail = params['exp_thumbnail']
         asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=5)
+
+        asserts_publ.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
+                                                       **params['exp_info_values'],
+                                                       )
