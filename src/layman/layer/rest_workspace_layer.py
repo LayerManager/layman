@@ -47,7 +47,9 @@ def get(workspace, layername):
 def patch(workspace, layername):
     app.logger.info(f"PATCH Layer, actor={g.user}")
 
-    info = util.get_complete_layer_info(cached=True)
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername,
+                                            context={'keys': ['title', 'name', 'description', 'table_uri', 'file_type', 'style_type',
+                                                              'is_external_table', ]})
     kwargs = {
         'title': info.get('title', info['name']) or '',
         'description': info.get('description', '') or '',
@@ -160,11 +162,11 @@ def patch(workspace, layername):
     elif external_table_uri:
         file_type = settings.FILE_TYPE_VECTOR
     else:
-        file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file_type']})['_file_type']
+        file_type = info['_file_type']
     if style_type:
         style_type_for_check = style_type.code
     else:
-        style_type_for_check = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type']})['_style_type']
+        style_type_for_check = info['_style_type']
     if file_type == settings.FILE_TYPE_RASTER and style_type_for_check == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
     kwargs['file_type'] = file_type
