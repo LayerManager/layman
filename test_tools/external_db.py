@@ -100,8 +100,9 @@ def import_table(input_file_path, *, table=None, schema='public', geo_column=set
         db_util.run_statement(statement, conn_cur=conn_cur)
 
 
-def drop_table(schema, name):
-    statement = sql.SQL('drop table {table}').format(
+def drop_table(schema, name, *, if_exists=False):
+    if_exists_str = 'IF EXISTS' if if_exists else ''
+    statement = sql.SQL(f'drop table {if_exists_str} {{table}}').format(
         table=sql.Identifier(schema, name)
     )
     conn_cur = db_util.create_connection_cursor(URI_STR)
