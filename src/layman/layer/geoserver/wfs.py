@@ -26,7 +26,7 @@ def get_flask_proxy_key(workspace):
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer(workspace, layername, title, description, access_rights=None):
+def patch_layer(workspace, layername, title, description, is_external_table, access_rights=None):
     if not get_layer_info(workspace, layername):
         return
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file_type', ]})
@@ -34,7 +34,8 @@ def patch_layer(workspace, layername, title, description, access_rights=None):
     if file_type != settings.FILE_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown file type: {file_type}")
 
-    gs_util.patch_feature_type(workspace, layername, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
+    store_name = get_external_db_store_name(layername) if is_external_table else gs_util.DEFAULT_DB_STORE_NAME
+    gs_util.patch_feature_type(workspace, layername, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     clear_cache(workspace)
 
     if access_rights and access_rights.get('read'):
