@@ -45,6 +45,16 @@ TEST_CASES = {
         'patch_args': common_publications.LAYER_RASTER.definition,
         'exp_thumbnail': common_publications.LAYER_RASTER.thumbnail,
     },
+    'other_external_table_qml': {
+        'patch_args': {
+            'db_connection': f"{external_db.URI_STR}"
+                             f"?schema={DB_SCHEMA}"
+                             f"&table={TABLE_PATCH}"
+                             f"&geo_column={GEO_COLUMN}",
+            'style_file': 'tests/dynamic_data/publications/layer_external_db/multipolygon.qml',
+        },
+        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_qml_custom_id_column.png"),
+    },
 }
 
 
