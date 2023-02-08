@@ -3,13 +3,12 @@ from urllib.parse import quote
 import pytest
 
 from db import util as db_util
-from geoserver import util as gs_util
 from layman import app, settings
 from layman.util import get_publication_info
 from test_tools import process_client, external_db
 from tests import EnumTestTypes, Publication
 from tests.asserts.final import publication as asserts_publ
-from tests.asserts.final.publication import util as assert_util
+from tests.asserts.final.publication import util as assert_util, geoserver as gs_asserts
 from tests.dynamic_data import base_test
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -126,14 +125,6 @@ TEST_CASES = {
 }
 
 
-def assert_stores(workspace, exp_stores):
-    stores = gs_util.get_db_stores(geoserver_workspace=workspace,
-                                   auth=settings.LAYMAN_GS_AUTH,
-                                   )
-    store_names = {store['name'] for store in stores['dataStores']['dataStore']}
-    assert store_names == exp_stores, f'workspace={workspace}, store_names={store_names}, exp_stores={exp_stores}'
-
-
 @pytest.mark.usefixtures('ensure_external_db')
 class TestLayer(base_test.TestSingleRestPublication):
 
@@ -204,8 +195,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         only_default_db_store = {'postgresql'}
         both_db_stores = {'postgresql', f'external_db_{layer.name}'}
         exp_wms_stores = both_db_stores if style_type == 'sld' else only_default_db_store
-        assert_stores(workspace=layer.workspace, exp_stores=both_db_stores)
-        assert_stores(workspace=f'{layer.workspace}_wms', exp_stores=exp_wms_stores)
+        gs_asserts.assert_stores(layer.workspace, exp_wfs_stores=both_db_stores, exp_wms_stores=exp_wms_stores)
 
         # check metadata properties language and scale_denominator (they are derived from DB)
         comp = process_client.get_workspace_publication_metadata_comparison(layer.type, layer.workspace, layer.name)
@@ -225,8 +215,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         process_client.delete_workspace_layer(layer.workspace, layer.name)
 
         # check GeoServer store of external DB does not exist anymore
-        assert_stores(workspace=layer.workspace, exp_stores=only_default_db_store)
-        assert_stores(workspace=f'{layer.workspace}_wms', exp_stores=only_default_db_store)
+        gs_asserts.assert_stores(layer.workspace, exp_wfs_stores=only_default_db_store, exp_wms_stores=only_default_db_store)
 
         # check there is no information about the layer anymore
         with app.app_context():
