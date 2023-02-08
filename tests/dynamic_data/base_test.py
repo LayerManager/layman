@@ -7,7 +7,7 @@ import pytest
 from tests.asserts.util import recursive_dict_update
 from test_tools import process_client, cleanup
 from .base_test_classes import WithChunksDomain, CompressDomainBase, CompressDomain, RestArgs, RestMethod, PublicationByDefinitionBase, \
-    LayerByUsedServers, PublicationByUsedServers, TestCaseType, Parametrization  # pylint: disable=unused-import
+    LayerByUsedServers, PublicationByUsedServers, TestCaseType, Parametrization, StyleFileDomainBase  # pylint: disable=unused-import
 from . import base_test_util as util
 from .. import Publication, EnumTestTypes, EnumTestKeys, PublicationValues
 
