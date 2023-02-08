@@ -3,7 +3,7 @@ from geoserver import util as gs_util
 from layman import celery_app, settings, util as layman_util
 from layman.common import bbox as bbox_util
 from layman.celery import AbortedException
-from . import wms
+from . import wms, get_external_db_store_name
 from .. import geoserver, LAYER_TYPE
 
 headers_json = gs_util.headers_json
@@ -22,7 +22,9 @@ def patch_after_feature_change(
     if self.is_aborted():
         raise AbortedException
 
-    file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['file_type']})['_file_type']
+    publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
+                                                 context={'keys': ['file_type', 'is_external_table']})
+    file_type = publ_info['_file_type']
     if file_type == settings.FILE_TYPE_VECTOR:
         bbox = geoserver.get_layer_bbox(workspace, layer)
         geoserver_workspace = wms.get_geoserver_workspace(workspace)
@@ -31,7 +33,10 @@ def patch_after_feature_change(
         crs = info['native_crs']
         lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
         if style_type == 'sld':
-            gs_util.patch_feature_type(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs, lat_lon_bbox=lat_lon_bbox)
+            is_external_table = info['_is_external_table']
+            store_name = get_external_db_store_name(layer) if is_external_table else gs_util.DEFAULT_DB_STORE_NAME
+            gs_util.patch_feature_type(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs,
+                                       lat_lon_bbox=lat_lon_bbox, store_name=store_name)
         elif style_type == 'qml':
             gs_util.patch_wms_layer(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs, lat_lon_bbox=lat_lon_bbox)
     elif file_type != settings.FILE_TYPE_RASTER:

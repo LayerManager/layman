@@ -476,7 +476,7 @@ def create_string_attributes(attribute_tuples, conn_cur=None):
             [sql.SQL("""ALTER TABLE {table} ADD COLUMN {fattrname} VARCHAR(1024);""").format(
                 table=sql.Identifier(schema, table_name),
                 fattrname=sql.Identifier(attrname),
-            ) for schema, _, table_name, attrname in attribute_tuples]
+            ) for schema, table_name, attrname in attribute_tuples]
         )
     )
     try:
@@ -489,21 +489,18 @@ def create_string_attributes(attribute_tuples, conn_cur=None):
 def get_missing_attributes(attribute_tuples, conn_cur=None):
     _, cur = conn_cur or db_util.get_connection_cursor()
 
-    table_name = {(workspace, layer): get_table_name(workspace, layer) for workspace, layer, _ in attribute_tuples}
-
     # Find all foursomes which do not already exist
     query = sql.SQL("""select attribs.*
 from ({selects}) attribs left join
-    information_schema.columns c on c.table_schema = attribs.workspace
+    information_schema.columns c on c.table_schema = attribs.schema_name
                                 and c.table_name = attribs.table_name
-                                and c.column_name = attribs.attrname
+                                and c.column_name = attribs.attr_name
 where c.column_name is null""").format(
-        selects=sql.SQL("\n union all\n").join([sql.SQL("select {fworkspace} workspace, {flayername} layername, {ftablename} table_name, {fattrname} attrname").format(
-            fworkspace=sql.Literal(workspace),
-            flayername=sql.Literal(layername),
-            ftablename=sql.Literal(table_name[(workspace, layername)]),
-            fattrname=sql.Literal(attrname),
-        ) for workspace, layername, attrname in attribute_tuples])
+        selects=sql.SQL("\n union all\n").join([sql.SQL("select {schema} schema_name, {table} table_name, {attr} attr_name").format(
+            schema=sql.Literal(schema),
+            table=sql.Literal(table),
+            attr=sql.Literal(attr),
+        ) for schema, table, attr in attribute_tuples])
     )
 
     try:
@@ -518,13 +515,11 @@ where c.column_name is null""").format(
     for row in rows:
         missing_attributes.add((row[0],
                                 row[1],
-                                row[2],
-                                row[3]))
+                                row[2]))
     return missing_attributes
 
 
-def ensure_attributes(attribute_tuples):
-    conn_cur = db_util.get_connection_cursor()
+def ensure_attributes(attribute_tuples, conn_cur):
     missing_attributes = get_missing_attributes(attribute_tuples, conn_cur)
     if missing_attributes:
         create_string_attributes(missing_attributes, conn_cur)
