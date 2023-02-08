@@ -174,12 +174,16 @@ class TestSingleRestPublication:
         process_client.patch_workspace_publication(publication.type, publication.workspace, publication.name, **args)
 
     @pytest.fixture(scope='class', autouse=True)
-    def class_fixture(self):
+    def class_fixture(self, request):
         self.before_class()
         yield
+        self.after_class(request)
 
     def before_class(self):
         """Override to setup something before all tests in this class."""
+
+    def after_class(self, request):
+        """Override to clean up something after all tests in this class."""
 
     @pytest.fixture(scope='class', autouse=True)
     def class_cleanup(self, request):
