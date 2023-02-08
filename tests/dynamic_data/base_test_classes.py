@@ -29,9 +29,18 @@ class CompressDomain(CompressDomainBase):
     TRUE = (True, 'zipped')
 
 
+class StyleFileDomainBase(RestArgDomain):
+    def __init__(self, raw_value_tuple, publ_name_part):
+        raw_value, style_type = raw_value_tuple
+        assert style_type in ['sld', 'qml']
+        super().__init__(raw_value, publ_name_part)
+        self.style_type = style_type
+
+
 class RestArgs(Enum):
     WITH_CHUNKS = ('with_chunks', WithChunksDomain)
     COMPRESS = ('compress', CompressDomain, CompressDomainBase)
+    STYLE_FILE = ('style_file', None, StyleFileDomainBase)
 
     def __init__(self, name, domain, base_domain=None):
         self.arg_name = name
@@ -92,6 +101,11 @@ class Parametrization:
     def rest_method(self) -> Optional[RestMethod]:
         # pylint: disable=no-member
         return next((v for v in self._values if isinstance(v, RestMethod)), None)
+
+    @property
+    def style_file(self) -> Optional[StyleFileDomainBase]:
+        # pylint: disable=no-member
+        return next((v for v in self._values if isinstance(v, StyleFileDomainBase)), None)
 
     @property
     def rest_arg_dict(self) -> Dict[RestArgs, RestArgDomain]:

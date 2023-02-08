@@ -17,7 +17,7 @@ def check_rest_parametrization(rest_parametrization):
     publ_type_count = 0
     base_arg_counts = defaultdict(int)
 
-    for val in rest_parametrization:
+    for val_idx, val in enumerate(rest_parametrization):
         is_rest_method = val == RestMethod
         if is_rest_method:
             rest_method_count += 1
@@ -46,7 +46,10 @@ def check_rest_parametrization(rest_parametrization):
             f"(c) instance of PublicationByDefinitionBase. " \
             f"Found: {val}"
 
-        if is_custom_arg_type:
+        dimension_enum = get_dimension_enum(val)
+        assert len(dimension_enum) > 0, f"Dimension at idx {val_idx} has no value."
+
+        if is_custom_arg_type and base_arg.domain is not None:
             base_arg_domain_raw_values = set(v.raw_value for v in base_arg.domain)
             domain_raw_values = set(v.raw_value for v in val)
             # Expected to be changed when implementing base argument without fix enumeration, e.g. 'style'

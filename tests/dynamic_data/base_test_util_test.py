@@ -1,7 +1,7 @@
 import pytest
 
 from tests import EnumTestTypes
-from .base_test_classes import RestMethod, RestArgs, CompressDomain, PublicationByUsedServers, LayerByUsedServers, CompressDomainBase, TestCaseType, Parametrization, WithChunksDomain
+from .base_test_classes import RestMethod, RestArgs, CompressDomain, PublicationByUsedServers, LayerByUsedServers, CompressDomainBase, TestCaseType, Parametrization, WithChunksDomain, StyleFileDomainBase
 from . import base_test_util as util
 
 
@@ -23,6 +23,11 @@ class WrongCustomCompressDomain(CompressDomainBase):
 class CustomCompressDomain(CompressDomainBase):
     FALSE = (False, None)
     TRUE = (True, 'compressed')
+
+
+class CustomStyleFileDomain(StyleFileDomainBase):
+    SLD = ((None, 'sld'), 'sld')
+    QML = (('sample/style/small_layer.qml', 'qml'), 'qml')
 
 
 ONLY_DIMENSIONS_MSG = f"Only dimensions are allowed in cls.rest_parametrization. Dimension is " \
@@ -53,6 +58,9 @@ ONLY_DIMENSIONS_MSG = f"Only dimensions are allowed in cls.rest_parametrization.
                  id='wrong-custom-domain'),
     pytest.param([RestArgs.COMPRESS, PublicationByUsedServers], 'PublicationByDefinitionBase dimension must not be used with any RestArgs dimension.',
                  id='rest-arg-and-publication-definition'),
+    pytest.param([StyleFileDomainBase], 'Dimension at idx 0 has no value.', id='one-dimension-without-value'),
+    pytest.param([RestArgs.WITH_CHUNKS, CompressDomainBase], 'Dimension at idx 1 has no value.',
+                 id='one-dimension-without-value-at-idx-1'),
 ])
 def test_check_rest_parametrization_raises(rest_parametrization, exp_message):
     with pytest.raises(AssertionError) as exc_info:
@@ -68,6 +76,7 @@ def test_check_rest_parametrization_raises(rest_parametrization, exp_message):
     pytest.param([RestArgs.COMPRESS, RestArgs.WITH_CHUNKS], id='two-rest-args'),
     pytest.param([RestMethod, RestArgs.COMPRESS, RestArgs.WITH_CHUNKS], id='rest-method-and-args'),
     pytest.param([RestMethod, PublicationByUsedServers], id='rest-method-and-publication-by-definition'),
+    pytest.param([CustomStyleFileDomain], id='custom-style-file'),
 ])
 def test_check_rest_parametrization_passes(rest_parametrization):
     util.check_rest_parametrization(rest_parametrization)
@@ -152,6 +161,10 @@ def test_check_specific_parametrizations_raises(rest_parametrization, specific_p
                                                       Parametrization([RestMethod.PATCH, CustomCompressDomain.TRUE]),
                                                       ],
                  id='two-dimensions-one-custom'),
+    pytest.param([CustomStyleFileDomain], [Parametrization([CustomStyleFileDomain.SLD]),
+                                           Parametrization([CustomStyleFileDomain.QML]),
+                                           ],
+                 id='one-custom-rest-arg-whose-parent-is-without-domain'),
 ])
 def test_rest_parametrization_to_parametrizations(rest_parametrization, exp_output):
     util.check_rest_parametrization(rest_parametrization)
