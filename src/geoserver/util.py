@@ -235,8 +235,9 @@ def delete_feature_type(geoserver_workspace, feature_type_name, auth, *, store=D
         response.raise_for_status()
 
 
-def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, description=None, bbox=None, crs=None, auth, lat_lon_bbox=None):
+def patch_feature_type(geoserver_workspace, feature_type_name, store_name=None, *, title=None, description=None, bbox=None, crs=None, auth, lat_lon_bbox=None):
     assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
+    store_name = store_name or DEFAULT_DB_STORE_NAME
     ftype = dict()
 
     if title is not None:
@@ -263,7 +264,7 @@ def patch_feature_type(geoserver_workspace, feature_type_name, *, title=None, de
     }
     response = requests.put(
         urljoin(GS_REST_WORKSPACES,
-                geoserver_workspace + '/datastores/postgresql/featuretypes/' + feature_type_name),
+                geoserver_workspace + f'/datastores/{store_name}/featuretypes/' + feature_type_name),
         data=json.dumps(body),
         headers=headers_json,
         auth=auth,
