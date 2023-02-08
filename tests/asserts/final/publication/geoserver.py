@@ -3,6 +3,7 @@ import math
 from urllib import parse
 
 import crs as crs_def
+from geoserver import util as gs_util
 from layman import app, settings, util as layman_util
 from layman.common import bbox as bbox_util
 from layman.layer.geoserver import wfs, wms
@@ -129,3 +130,16 @@ def is_complete_in_internal_workspace_wms(workspace, publ_type, name):
 
     wms_inst = wms.get_wms_proxy(workspace)
     geoserver_util.is_complete_in_workspace_wms_instance(wms_inst, name)
+
+
+def assert_workspace_stores(workspace, exp_stores):
+    stores = gs_util.get_db_stores(geoserver_workspace=workspace,
+                                   auth=settings.LAYMAN_GS_AUTH,
+                                   )
+    store_names = {store['name'] for store in stores['dataStores']['dataStore']}
+    assert store_names == exp_stores, f'workspace={workspace}, store_names={store_names}, exp_stores={exp_stores}'
+
+
+def assert_stores(workspace, *, exp_wfs_stores, exp_wms_stores):
+    assert_workspace_stores(workspace=workspace, exp_stores=exp_wfs_stores)
+    assert_workspace_stores(workspace=f'{workspace}_wms', exp_stores=exp_wms_stores)
