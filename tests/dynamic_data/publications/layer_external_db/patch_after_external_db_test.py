@@ -41,6 +41,10 @@ TEST_CASES = {
         },
         'exp_thumbnail': common_publications.LAYER_VECTOR_SLD.thumbnail,
     },
+    'internal_raster': {
+        'patch_args': common_publications.LAYER_RASTER.definition,
+        'exp_thumbnail': common_publications.LAYER_RASTER.thumbnail,
+    },
 }
 
 
