@@ -81,7 +81,7 @@ def patch(workspace, layername):
                 'db_connection': external_table_uri_str,
             }})
 
-    external_table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None
+    external_table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None if input_files or not info.get('_is_external_table') else info.get('_table_uri')
 
     # CRS
     crs_id = None

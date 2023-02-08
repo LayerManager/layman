@@ -28,6 +28,12 @@ TEST_CASES = {
         },
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_sld.png"),
     },
+    'only_title': {
+        'patch_args': {
+            'title': 'New title',
+        },
+        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_all.png"),
+    },
 }
 
 
