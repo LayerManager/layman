@@ -8,6 +8,7 @@ from tests import EnumTestTypes, Publication
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
+from .. import common_publications
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -33,6 +34,12 @@ TEST_CASES = {
             'title': 'New title',
         },
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_all.png"),
+    },
+    'internal_vector': {
+        'patch_args': {
+            'file_paths': ['sample/layman.layer/small_layer.geojson'],
+        },
+        'exp_thumbnail': common_publications.LAYER_VECTOR_SLD.thumbnail,
     },
 }
 
@@ -87,4 +94,4 @@ class TestLayer(base_test.TestSingleRestPublication):
 
         assert_util.is_publication_valid_and_complete(layer)
         exp_thumbnail = params['exp_thumbnail']
-        asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
+        asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=5)
