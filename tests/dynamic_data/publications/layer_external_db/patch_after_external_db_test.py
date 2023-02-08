@@ -15,17 +15,18 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 DB_SCHEMA = 'public'
 TABLE_POST = 'all_patch'
+TABLE_PATCH = 'multipolygon_patch'
 GEO_COLUMN = settings.OGR_DEFAULT_GEOMETRY_COLUMN
 
 TEST_CASES = {
-    'same_external_table': {
+    'other_external_table': {
         'patch_args': {
             'db_connection': f"{external_db.URI_STR}"
                              f"?schema={DB_SCHEMA}"
-                             f"&table={TABLE_POST}"
+                             f"&table={TABLE_PATCH}"
                              f"&geo_column={GEO_COLUMN}"
         },
-        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_all.png"),
+        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_sld.png"),
     },
 }
 
@@ -35,8 +36,12 @@ def ensure_external_table():
     external_db.import_table(f"sample/data/geometry-types/all.geojson",
                              table=TABLE_POST,
                              schema=DB_SCHEMA)
+    external_db.import_table(f"sample/data/geometry-types/multipolygon.geojson",
+                             table=TABLE_PATCH,
+                             schema=DB_SCHEMA)
     yield
     external_db.drop_table(DB_SCHEMA, TABLE_POST)
+    external_db.drop_table(DB_SCHEMA, TABLE_PATCH)
 
 
 @pytest.mark.usefixtures('ensure_external_db', 'ensure_external_table')
