@@ -286,7 +286,7 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
     geo_column = query.pop('geo_column', [None])[0]
     db_uri = external_table_uri._replace(query=parse.urlencode(query, True))
     db_uri_str = parse.urlunparse(db_uri)
-    if not all([schema, table, geo_column, db_uri.hostname]):
+    if not all([schema, table, db_uri.hostname]):
         raise LaymanError(2, {
             'parameter': 'db_connection',
             'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
@@ -300,19 +300,6 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
             }
         })
 
-    for name in [schema, table, geo_column]:
-        if not re.match(SAFE_PG_IDENTIFIER_PATTERN, name):
-            raise LaymanError(2, {
-                'parameter': 'db_connection',
-                'message': 'Schema, table, and geo_column in `db_connection` parameter are expected to match regular expression ' + SAFE_PG_IDENTIFIER_PATTERN,
-                'found': {
-                    'db_connection': external_table_uri_str,
-                    'schema': schema,
-                    'table': table,
-                    'geo_column': geo_column,
-                }
-            })
-
     try:
         conn_cur = db_util.create_connection_cursor(db_uri_str, encapsulate_exception=False)
     except psycopg2.OperationalError as exc:
@@ -325,6 +312,24 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
                 'db_connection': external_table_uri_str,
             },
         }) from exc
+
+    if not geo_column:
+        query = f'''select f_geometry_column from geometry_columns where f_table_schema = %s and f_table_name = %s order by f_geometry_column asc'''
+        query_res = db_util.run_query(query, (schema, table), conn_cur=conn_cur)
+        geo_column = query_res[0][0]
+
+    for name in [schema, table, geo_column]:
+        if not re.match(SAFE_PG_IDENTIFIER_PATTERN, name):
+            raise LaymanError(2, {
+                'parameter': 'db_connection',
+                'message': 'Schema, table, and geo_column in `db_connection` parameter are expected to match regular expression ' + SAFE_PG_IDENTIFIER_PATTERN,
+                'found': {
+                    'db_connection': external_table_uri_str,
+                    'schema': schema,
+                    'table': table,
+                    'geo_column': geo_column,
+                }
+            })
 
     query = f'''select count(*) from information_schema.tables WHERE table_schema=%s and table_name=%s'''
     query_res = db_util.run_query(query, (schema, table,), conn_cur=conn_cur)

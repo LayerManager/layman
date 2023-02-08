@@ -146,7 +146,8 @@ Body parameters:
    - if QML style is used in this request, it must list all attributes contained in given data file
 - *db_connection*, string
    - exactly one of `file` or `db_connection` must be set
-   - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is expected with URI scheme `postgresql` and query parameters `schema`, `table`, and `geo_column` specified
+   - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is expected with URI scheme `postgresql` and query parameters `schema`, and `table` specified
+   - if `geo_column` is not specified, first geometry column of the table by alphabetic order is used
    - published table is required to have one-column primary key
    - names of schema, table and all columns of the table are required to match regular expression `^[a-zA-Z_][a-zA-Z_0-9]*$`
 - *name*, string
@@ -337,7 +338,8 @@ Body parameters:
    - it is allowed to publish time-series layer - see [POST Workspace Layers](#post-workspace-layers)
 - *db_connection*, string
    - only one of `file` or `db_connection` can be set
-   - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is expected with URI scheme `postgresql` and query parameters `schema`, `table`, and `geo_column` specified
+   - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is expected with URI scheme `postgresql` and query parameters `schema`, and `table` specified
+   - if `geo_column` is not specified, first geometry column of the table by alphabetic order is used
    - published table is required to have one-column primary key
    - names of schema, table and all columns of the table are required to match regular expression `^[a-zA-Z_][a-zA-Z_0-9]*$`
 - *title*
