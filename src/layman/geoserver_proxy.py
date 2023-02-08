@@ -9,6 +9,7 @@ from lxml import etree as ET
 from flask import Blueprint, g, current_app as app, request, Response
 
 import crs as crs_def
+from db import util as db_util
 from geoserver.util import reset as gs_reset
 from layman import authn, authz, settings, util as layman_util
 from layman.authn import authenticate, is_user_with_name
@@ -65,13 +66,27 @@ def extract_attributes_and_layers_from_wfs_t(binary_data):
 
 
 def ensure_wfs_t_attributes(attribs):
-    app.logger.info(f"GET WFS check_xml_for_attribute attribs={attribs}")
+    app.logger.info(f"ensure_wfs_t_attributes attribs={attribs}")
+    all_created_attributes = set()
     editable_attribs = set(attr for attr in attribs if authz.can_i_edit(LAYER_TYPE, attr[0], attr[1]))
-    created_attributes = db.ensure_attributes(editable_attribs)
-    if created_attributes:
-        changed_layers = {(workspace, layer) for workspace, layer, _, _ in created_attributes}
-        qgis_changed_layers = {(workspace, layer) for workspace, layer in changed_layers
-                               if layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['style_type'], })['_style_type'] == 'qml'}
+    for layman_attr_tuple in editable_attribs:
+        workspace, layer, attr_name = layman_attr_tuple
+        publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['table_uri']})
+        table_uri = publ_info['_table_uri']
+        db_attr_tuple = (table_uri.schema, table_uri.table, attr_name)
+        conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
+        created_attributes = db.ensure_attributes([db_attr_tuple], conn_cur)
+        if created_attributes:
+            assert len(created_attributes) == 1
+            all_created_attributes.add(layman_attr_tuple)
+
+    if all_created_attributes:
+        changed_layers = {(workspace, layer) for workspace, layer, _ in all_created_attributes}
+        qgis_changed_layers = {
+            (workspace, layer) for workspace, layer in changed_layers
+            if layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['style_type'], }
+                                                )['_style_type'] == 'qml'
+        }
         for workspace, layer in qgis_changed_layers:
             qgis_wms.save_qgs_file(workspace, layer)
         gs_reset(settings.LAYMAN_GS_AUTH)
