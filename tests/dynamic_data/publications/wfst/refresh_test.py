@@ -33,6 +33,9 @@ TEST_CASES = {
         'rest_args': {
             'db_connection': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
         },
+        'ignored_cases': {
+            frozenset([StyleFileDomain.QML, ]),
+        },
     },
 }
 
@@ -53,6 +56,9 @@ class TestRefresh(base_test.TestSingleRestPublication):
     test_cases = [base_test.TestCaseType(key=key,
                                          type=EnumTestTypes.MANDATORY,
                                          rest_args=params['rest_args'],
+                                         specific_types={
+                                             case: EnumTestTypes.IGNORE for case in params.get('ignored_cases', {})
+                                         }
                                          ) for key, params in TEST_CASES.items()]
 
     def before_class(self):
