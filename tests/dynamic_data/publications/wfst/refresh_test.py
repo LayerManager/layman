@@ -1,9 +1,9 @@
 import os
 from test_tools import process_client, assert_util
 from test_tools.data import wfs as data_wfs, SMALL_LAYER_NATIVE_CRS, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX
+from tests import Publication, EnumTestTypes
 from tests.asserts.final import publication as asserts_publ
 from tests.dynamic_data import base_test
-from tests import Publication, EnumTestTypes
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -11,13 +11,14 @@ LAYER_FOR_MAPS = "layer_for_map_crs"
 
 KEY_INFO_VALUES = 'info_values'
 
+
+class StyleFileDomain(base_test.StyleFileDomainBase):
+    SLD = ((None, 'sld'), 'sld')
+    QML = (('sample/style/small_layer.qml', 'qml'), 'qml')
+
+
 TEST_CASES = {
-    'sld': {
-        'style_file': None,
-    },
-    'qml': {
-        'style_file': 'sample/style/small_layer.qml',
-    },
+    'internal_db': {},
 }
 
 pytest_generate_tests = base_test.pytest_generate_tests
@@ -29,16 +30,17 @@ class TestRefresh(base_test.TestSingleRestPublication):
 
     publication_type = process_client.LAYER_TYPE
 
+    rest_parametrization = [
+        StyleFileDomain,
+    ]
+
     test_cases = [base_test.TestCaseType(key=key,
-                                         rest_args={
-                                             'style_file': params['style_file'],
-                                         },
                                          type=EnumTestTypes.MANDATORY,
                                          ) for key, params in TEST_CASES.items()]
 
-    def test_refresh(self, layer: Publication, key, rest_args):
+    def test_refresh(self, layer: Publication, rest_args, parametrization: base_test.Parametrization):
         self.post_publication(layer, args=rest_args)
-        thumbnail_style_postfix = key
+        thumbnail_style_postfix = parametrization.style_file.publ_name_part
 
         native_crs = SMALL_LAYER_NATIVE_CRS
         assert_util.assert_all_sources_bbox(layer.workspace, layer.name, SMALL_LAYER_BBOX,
