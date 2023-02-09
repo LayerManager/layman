@@ -1,5 +1,6 @@
 import re
 import traceback
+from collections import defaultdict
 
 from urllib import parse
 import requests
@@ -65,20 +66,42 @@ def extract_attributes_and_layers_from_wfs_t(binary_data):
     return result
 
 
-def ensure_wfs_t_attributes(attribs):
-    app.logger.info(f"ensure_wfs_t_attributes attribs={attribs}")
-    all_created_attributes = set()
-    editable_attribs = set(attr for attr in attribs if authz.can_i_edit(LAYER_TYPE, attr[0], attr[1]))
-    for layman_attr_tuple in editable_attribs:
-        workspace, layer, attr_name = layman_attr_tuple
+def group_attributes_by_db(attribute_tuples):
+    attrs_by_layer = defaultdict(list)
+    for workspace, layer, attr in attribute_tuples:
+        attrs_by_layer[(workspace, layer)].append(attr)
+
+    attrs_by_db = defaultdict(list)
+    for (workspace, layer), attrs in attrs_by_layer.items():
         publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['table_uri']})
         table_uri = publ_info['_table_uri']
-        db_attr_tuple = (table_uri.schema, table_uri.table, attr_name)
-        conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
-        created_attributes = db.ensure_attributes([db_attr_tuple], conn_cur)
-        if created_attributes:
-            assert len(created_attributes) == 1
-            all_created_attributes.add(layman_attr_tuple)
+        attrs_by_db[table_uri.db_uri_str].extend([
+            (workspace, layer, attr, table_uri.schema, table_uri.table) for attr in attrs
+        ])
+
+    return attrs_by_db
+
+
+def ensure_attributes_in_db(attributes_by_db):
+    all_created_attr_tuples = set()
+    for db_uri_str, attr_tuples in attributes_by_db.items():
+        db_layman_attr_mapping = {
+            (schema, table, attr): (workspace, layer, attr)
+            for workspace, layer, attr, schema, table in attr_tuples
+        }
+        conn_cur = db_util.create_connection_cursor(db_uri_str=db_uri_str)
+        db_attr_tuples = list(db_layman_attr_mapping.keys())
+        created_db_attr_tuples = db.ensure_attributes(db_attr_tuples, conn_cur)
+        all_created_attr_tuples.update({db_layman_attr_mapping[a] for a in created_db_attr_tuples})
+    return all_created_attr_tuples
+
+
+def ensure_wfs_t_attributes(attribs):
+    app.logger.info(f"ensure_wfs_t_attributes attribs={attribs}")
+    editable_attribs = set(attr for attr in attribs if authz.can_i_edit(LAYER_TYPE, attr[0], attr[1]))
+
+    attrs_by_db = group_attributes_by_db(editable_attribs)
+    all_created_attributes = ensure_attributes_in_db(attrs_by_db)
 
     if all_created_attributes:
         changed_layers = {(workspace, layer) for workspace, layer, _ in all_created_attributes}
