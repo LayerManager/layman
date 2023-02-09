@@ -28,6 +28,7 @@ TEST_CASES = {
         'db_connection_str': f"{external_db.URI_STR}"
                              f"?schema={quote('public')}"
                              f"&table={quote('all')}",
+        'additional_geo_column': None,
         'exp_geometry_type': 'GEOMETRY',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
         'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
@@ -41,7 +42,10 @@ TEST_CASES = {
         'table_name': 'MyGeometryCollection',
         'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
-        'db_connection_str': None,
+        'db_connection_str': f"{external_db.URI_STR}"
+                             f"?schema={quote('public')}"
+                             f"&table={quote('MyGeometryCollection')}",
+        'additional_geo_column': 'wkb_geometry_2',
         'exp_geometry_type': 'GEOMETRYCOLLECTION',
         'exp_native_bounding_box': [15.0, 45.0, 18.0, 46.0],
         'exp_bounding_box': [1669792.3618991035, 5621521.486192066, 2003750.8342789242, 5780349.220256351],
@@ -56,6 +60,7 @@ TEST_CASES = {
         'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
         'db_connection_str': None,
+        'additional_geo_column': None,
         'exp_geometry_type': 'LINESTRING',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
         'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
@@ -70,6 +75,7 @@ TEST_CASES = {
         'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
         'db_connection_str': None,
+        'additional_geo_column': None,
         'exp_geometry_type': 'MULTILINESTRING',
         'exp_native_bounding_box': [15.0, 47.0, 16.0, 48.5],
         'exp_bounding_box': [1669792.3618991035, 5942074.072431108, 1781111.852692377, 6190443.809135445],
@@ -84,6 +90,7 @@ TEST_CASES = {
         'primary_key_column': 'ogc_fid',
         'geo_column_name': EDGE_NAME,
         'db_connection_str': None,
+        'additional_geo_column': None,
         'exp_geometry_type': 'MULTIPOINT',
         'exp_native_bounding_box': [15.0, 47.8, 16.0, 48.0],
         'exp_bounding_box': [1669792.3618991035, 6073646.223350629, 1781111.852692377, 6106854.834885075],
@@ -97,6 +104,7 @@ TEST_CASES = {
         'table_name': 'multipolygon',
         'primary_key_column': 'my_id',
         'db_connection_str': None,
+        'additional_geo_column': None,
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'MULTIPOLYGON',
         'exp_native_bounding_box': [17.0, 47.0, 18.0, 48.5],
@@ -112,6 +120,7 @@ TEST_CASES = {
         'primary_key_column': 'my_id2',
         'geo_column_name': 'wkb_geometry',
         'db_connection_str': None,
+        'additional_geo_column': None,
         'exp_geometry_type': 'POINT',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
         'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
@@ -126,6 +135,7 @@ TEST_CASES = {
         'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
         'db_connection_str': None,
+        'additional_geo_column': None,
         'exp_geometry_type': 'POLYGON',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
         'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
@@ -171,7 +181,8 @@ class TestLayer(base_test.TestSingleRestPublication):
             'schema': schema,
             'table': table,
             'geo_column': geo_column,
-            'primary_key_column': primary_key_column
+            'primary_key_column': primary_key_column,
+            'additional_geo_column': params['additional_geo_column'],
         })
         conn_cur = db_util.create_connection_cursor(external_db.URI_STR)
         query = f'''select type from geometry_columns where f_table_schema = %s and f_table_name = %s and f_geometry_column = %s'''
