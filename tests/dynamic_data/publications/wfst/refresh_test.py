@@ -1,6 +1,6 @@
 import os
 import pytest
-from test_tools import process_client, assert_util, external_db, cleanup
+from test_tools import process_client, assert_util, external_db
 from test_tools.data import wfs as data_wfs, SMALL_LAYER_NATIVE_CRS, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX
 from tests import Publication, EnumTestTypes
 from tests.asserts.final import publication as asserts_publ
@@ -62,8 +62,11 @@ class TestRefresh(base_test.TestSingleRestPublication):
                                          ) for key, params in TEST_CASES.items()]
 
     def before_class(self):
-        external_db.import_table(INPUT_FILE_PATH, schema=EXTERNAL_DB_SCHEMA, table=EXTERNAL_DB_TABLE,
-                                 geometry_type='GEOMETRY')
+        self.import_external_table(INPUT_FILE_PATH, {
+            'schema': EXTERNAL_DB_SCHEMA,
+            'table': EXTERNAL_DB_TABLE,
+            'geometry_type': 'GEOMETRY',
+        }, scope='class')
 
     def test_refresh(self, layer: Publication, rest_args, parametrization: base_test.Parametrization):
         self.post_publication(layer, args=rest_args)
@@ -93,6 +96,3 @@ class TestRefresh(base_test.TestSingleRestPublication):
             expected_thumbnail_path = f'/code/sample/style/test_wfs_bbox_layer_{thumbnail_style_postfix}{thumbnail_bbox_postfix}.png'
             asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, expected_thumbnail_path,
                                                    max_diffs=5)
-
-    def after_class(self, request):
-        cleanup.cleanup_external_tables(request, [(EXTERNAL_DB_SCHEMA, EXTERNAL_DB_TABLE)])

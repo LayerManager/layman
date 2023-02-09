@@ -107,20 +107,7 @@ TEST_CASES = {
 }
 
 
-@pytest.fixture(scope="session")
-def ensure_external_table():
-    external_db.import_table(f"sample/data/geometry-types/all.geojson",
-                             table=TABLE_POST,
-                             schema=DB_SCHEMA)
-    external_db.import_table(f"sample/data/geometry-types/multipolygon.geojson",
-                             table=TABLE_PATCH,
-                             schema=DB_SCHEMA)
-    yield
-    external_db.drop_table(DB_SCHEMA, TABLE_POST)
-    external_db.drop_table(DB_SCHEMA, TABLE_PATCH)
-
-
-@pytest.mark.usefixtures('ensure_external_db', 'ensure_external_table')
+@pytest.mark.usefixtures('ensure_external_db')
 class TestLayer(base_test.TestSingleRestPublication):
 
     workspace = 'dynamic_test_workspace_layer_external_db_geometry_type'
@@ -134,6 +121,16 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          rest_args=value['patch_args'],
                                          params=value,
                                          ) for key, value in TEST_CASES.items()]
+
+    def before_class(self):
+        self.import_external_table("sample/data/geometry-types/all.geojson", {
+            'schema': DB_SCHEMA,
+            'table': TABLE_POST,
+        }, scope='class')
+        self.import_external_table("sample/data/geometry-types/multipolygon.geojson", {
+            'schema': DB_SCHEMA,
+            'table': TABLE_PATCH,
+        }, scope='class')
 
     @staticmethod
     def test_layer(layer: Publication, rest_args, params):
