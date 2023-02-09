@@ -105,6 +105,8 @@ def import_table(input_file_path, *, table=None, schema='public', geo_column=set
         )
         db_util.run_statement(statement, conn_cur=conn_cur)
 
+    return schema, table
+
 
 def drop_table(schema, name, *, if_exists=False):
     if_exists_str = 'IF EXISTS' if if_exists else ''

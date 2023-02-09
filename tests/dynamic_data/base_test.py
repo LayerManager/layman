@@ -5,7 +5,7 @@ from typing import final, Tuple, Optional
 import pytest
 
 from tests.asserts.util import recursive_dict_update
-from test_tools import process_client, cleanup
+from test_tools import process_client, cleanup, external_db
 from .base_test_classes import WithChunksDomain, CompressDomainBase, CompressDomain, RestArgs, RestMethod, PublicationByDefinitionBase, \
     LayerByUsedServers, PublicationByUsedServers, TestCaseType, Parametrization, StyleFileDomainBase  # pylint: disable=unused-import
 from . import base_test_util as util
@@ -62,6 +62,8 @@ class TestSingleRestPublication:
 
     publications_to_cleanup_on_class_end = set()
     publications_to_cleanup_on_function_end = set()
+    external_tables_to_cleanup_on_class_end = set()
+    external_tables_to_cleanup_on_function_end = set()
 
     workspace = None
 
@@ -170,6 +172,16 @@ class TestSingleRestPublication:
                                                      **args)
 
     @classmethod
+    def import_external_table(cls, file_path, args=None, scope='function'):
+        args = args or {}
+        assert scope in {'function', 'class'}
+        schema_table = external_db.import_table(file_path, **args)
+        if scope == 'class':
+            cls.external_tables_to_cleanup_on_class_end.add(schema_table)
+        else:
+            cls.external_tables_to_cleanup_on_function_end.add(schema_table)
+
+    @classmethod
     def patch_publication(cls, publication, args=None):
         process_client.patch_workspace_publication(publication.type, publication.workspace, publication.name, **args)
 
@@ -190,12 +202,16 @@ class TestSingleRestPublication:
         yield
         cleanup.cleanup_publications(request, self.publications_to_cleanup_on_class_end)
         self.publications_to_cleanup_on_class_end.clear()
+        cleanup.cleanup_external_tables(request, self.external_tables_to_cleanup_on_class_end)
+        self.external_tables_to_cleanup_on_class_end.clear()
 
     @pytest.fixture(scope='function', autouse=True)
     def function_cleanup(self, request):
         yield
         cleanup.cleanup_publications(request, self.publications_to_cleanup_on_function_end)
         self.publications_to_cleanup_on_function_end.clear()
+        cleanup.cleanup_external_tables(request, self.external_tables_to_cleanup_on_function_end)
+        self.external_tables_to_cleanup_on_function_end.clear()
 
     @pytest.fixture(scope='function', autouse=True)
     def post_before_patch(self, request):

@@ -148,8 +148,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          params=value,
                                          ) for key, value in TEST_CASES.items()]
 
-    @staticmethod
-    def test_layer(layer: Publication, key, rest_method, rest_args, params):
+    def test_layer(self, layer: Publication, key, rest_method, rest_args, params):
         """Parametrized using pytest_generate_tests"""
         file_path = f"sample/data/geometry-types/{params['input_file_name']}.geojson"
         schema = params['schema_name']
@@ -158,8 +157,12 @@ class TestLayer(base_test.TestSingleRestPublication):
         primary_key_column = params['primary_key_column']
 
         # import data into external DB
-        external_db.import_table(file_path, table=table, schema=schema, geo_column=geo_column,
-                                 primary_key_column=primary_key_column)
+        self.import_external_table(file_path, {
+            'schema': schema,
+            'table': table,
+            'geo_column': geo_column,
+            'primary_key_column': primary_key_column
+        })
         conn_cur = db_util.create_connection_cursor(external_db.URI_STR)
         query = f'''select type from geometry_columns where f_table_schema = %s and f_table_name = %s and f_geometry_column = %s'''
         result = db_util.run_query(query, (schema, table, geo_column), conn_cur=conn_cur)
