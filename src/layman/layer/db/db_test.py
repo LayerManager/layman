@@ -146,7 +146,7 @@ def test_abort_import_layer_vector_file():
         prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layername,
                                                           file_type=settings.FILE_TYPE_VECTOR)
         with layman.app_context():
-            table_name = db.get_table_name(workspace, layername)
+            table_name = db.get_internal_table_name(workspace, layername)
         process = db.import_layer_vector_file_async(workspace, table_name, main_filepath,
                                                     crs_id)
         time1 = time.time()
@@ -171,7 +171,7 @@ def test_data_language(boundary_table):
     workspace, layername = boundary_table
     # print(f"username={username}, layername={layername}")
     with layman.app_context():
-        table_name = db.get_table_name(workspace, layername)
+        table_name = db.get_internal_table_name(workspace, layername)
         col_names = db.get_text_column_names(workspace, table_name)
     assert set(col_names) == set(['featurecla', 'name', 'name_alt'])
     with layman.app_context():
@@ -188,7 +188,7 @@ def test_data_language_roads(road_table):
     workspace, layername = road_table
     # print(f"username={username}, layername={layername}")
     with layman.app_context():
-        table_name = db.get_table_name(workspace, layername)
+        table_name = db.get_internal_table_name(workspace, layername)
         col_names = db.get_text_column_names(workspace, table_name)
     assert set(col_names) == set([
         'cislouseku',
@@ -222,7 +222,7 @@ def test_populated_places_table(populated_places_table):
     workspace, layername = populated_places_table
     print(f"workspace={workspace}, layername={layername}")
     with layman.app_context():
-        table_name = db.get_table_name(workspace, layername)
+        table_name = db.get_internal_table_name(workspace, layername)
         col_names = db.get_text_column_names(workspace, table_name)
     assert len(col_names) == 31
     with layman.app_context():
@@ -234,7 +234,7 @@ def test_data_language_countries(country_table):
     workspace, layername = country_table
     # print(f"username={username}, layername={layername}")
     with layman.app_context():
-        table_name = db.get_table_name(workspace, layername)
+        table_name = db.get_internal_table_name(workspace, layername)
         col_names = db.get_text_column_names(workspace, table_name)
     assert len(col_names) == 63
     with layman.app_context():
@@ -265,13 +265,13 @@ def test_data_language_countries2(country110m_table):
     # print(col_names)
     # assert len(col_names) == 63
     with layman.app_context():
-        table_name = db.get_table_name(workspace, layername)
+        table_name = db.get_internal_table_name(workspace, layername)
         langs = db.get_text_languages(workspace, table_name, settings.OGR_DEFAULT_PRIMARY_KEY)
     assert set(langs) == set(['eng'])
 
 
 def guess_scale_denominator(workspace, layer):
-    table_name = db.get_table_name(workspace, layer)
+    table_name = db.get_internal_table_name(workspace, layer)
     return db.guess_scale_denominator(workspace, table_name, settings.OGR_DEFAULT_PRIMARY_KEY,
                                       settings.OGR_DEFAULT_GEOMETRY_COLUMN)
 
@@ -319,7 +319,7 @@ def test_guess_scale_denominator_performance(posted_layer, exp_result):
 def test_empty_table_bbox(empty_table):
     workspace, layername = empty_table
     with layman.app_context():
-        db_table = db.get_table_name(workspace, layername)
+        db_table = db.get_internal_table_name(workspace, layername)
         bbox = db.get_bbox(workspace, db_table)
     assert bbox_util.is_empty(bbox), bbox
 
@@ -327,6 +327,6 @@ def test_empty_table_bbox(empty_table):
 def test_single_point_table_bbox(single_point_table):
     workspace, layername = single_point_table
     with layman.app_context():
-        db_table = db.get_table_name(workspace, layername)
+        db_table = db.get_internal_table_name(workspace, layername)
         bbox = db.get_bbox(workspace, db_table)
     assert bbox[0] == bbox[2] and bbox[1] == bbox[3], bbox
