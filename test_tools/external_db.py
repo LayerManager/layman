@@ -64,7 +64,7 @@ def ensure_table(schema, name, geo_column, *, primary_key_columns=None, other_co
 
 
 def import_table(input_file_path, *, table=None, schema='public', geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
-                 primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY, geometry_type=None):
+                 primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY, geometry_type=None, additional_geo_column=None):
     table = table or os.path.splitext(os.path.basename(input_file_path))[0]
     primary_key_to_later_drop = 'pk_to_drop'
 
@@ -102,6 +102,21 @@ def import_table(input_file_path, *, table=None, schema='public', geo_column=set
         statement = sql.SQL("alter table {table} drop column {primary_key}").format(
             table=sql.Identifier(schema, table),
             primary_key=sql.Identifier(primary_key_to_later_drop),
+        )
+        db_util.run_statement(statement, conn_cur=conn_cur)
+
+    if additional_geo_column:
+        conn_cur = db_util.create_connection_cursor(URI_STR)
+        statement = sql.SQL("alter table {table} add column {geo_column_2} GEOMETRY").format(
+            table=sql.Identifier(schema, table),
+            geo_column_2=sql.Identifier(additional_geo_column),
+        )
+        db_util.run_statement(statement, conn_cur=conn_cur)
+
+        statement = sql.SQL("update {table} set {geo_column_2} = st_buffer({geo_column}, 15)").format(
+            table=sql.Identifier(schema, table),
+            geo_column_2=sql.Identifier(additional_geo_column),
+            geo_column=sql.Identifier(geo_column),
         )
         db_util.run_statement(statement, conn_cur=conn_cur)
 
