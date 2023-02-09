@@ -7,7 +7,7 @@ from layman import settings
 from test_tools import process_client, external_db
 from tests import EnumTestTypes, Publication
 from tests.asserts.final import publication as asserts_publ
-from tests.asserts.final.publication import util as assert_util
+from tests.asserts.final.publication import util as assert_util, geoserver as gs_asserts
 from tests.dynamic_data import base_test
 from .. import common_publications
 
@@ -159,3 +159,12 @@ class TestLayer(base_test.TestSingleRestPublication):
         asserts_publ.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
                                                        **params['exp_info_values'],
                                                        )
+
+        exp_existing_wfs_stores = {'postgresql', f'external_db_{layer.name}'} if params['exp_info_values'].get('external_table_uri') else {'postgresql'}
+        exp_deleted_wfs_stores = {} if params['exp_info_values'].get('external_table_uri') else {f'external_db_{layer.name}'}
+        exp_existing_wms_stores = {'postgresql', f'external_db_{layer.name}'} if params['exp_info_values'].get('external_table_uri') and params['exp_info_values']['publ_type_detail'][1] == 'sld' else {'postgresql'}
+        exp_deleted_wms_stores = {} if params['exp_info_values'].get('external_table_uri') and params['exp_info_values']['publ_type_detail'][1] == 'sld' else {f'external_db_{layer.name}'}
+        gs_asserts.assert_stores(layer.workspace,
+                                 exp_existing_wfs_stores=exp_existing_wfs_stores, exp_deleted_wfs_stores=exp_deleted_wfs_stores,
+                                 exp_existing_wms_stores=exp_existing_wms_stores, exp_deleted_wms_stores=exp_deleted_wms_stores,
+                                 )
