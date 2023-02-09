@@ -3,6 +3,7 @@ from test_tools import process_client, assert_util, external_db
 from test_tools.data import wfs as data_wfs, SMALL_LAYER_NATIVE_CRS, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX
 from tests import Publication, EnumTestTypes
 from tests.asserts.final import publication as asserts_publ
+from tests.asserts.final.publication import util as assert_publ_util
 from tests.dynamic_data import base_test
 
 
@@ -81,6 +82,7 @@ class TestRefresh(base_test.TestSingleRestPublication):
             data_xml = wfs_method(layer.workspace, layer.name, )
             process_client.post_wfst(data_xml, workspace=layer.workspace)
             process_client.wait_for_publication_status(layer.workspace, process_client.LAYER_TYPE, layer.name)
+            assert_publ_util.is_publication_valid_and_complete(layer)
 
             assert_util.assert_all_sources_bbox(layer.workspace, layer.name, exp_bbox,
                                                 expected_native_bbox=exp_native_bbox,
