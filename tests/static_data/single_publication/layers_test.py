@@ -316,6 +316,6 @@ def test_layer_attributes_in_db(workspace, publ_type, publication):
     expected_names.update(generated_names)
 
     with app.app_context():
-        table_name = layer_db.get_table_name(workspace, publication)
+        table_name = layer_db.get_internal_table_name(workspace, publication)
         attr_names = {col.name for col in layer_db.get_all_column_infos(workspace, table_name)}
     assert attr_names == expected_names

@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 ColumnInfo = namedtuple('ColumnInfo', 'name data_type')
 
 
-def get_table_name(workspace, layer):
+def get_internal_table_name(workspace, layer):
     layer_info = get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['uuid', 'is_external_table']})
     table_name = None
     if layer_info and not layer_info['_is_external_table']:
@@ -100,7 +100,7 @@ def delete_whole_user(username):
 
 
 def import_layer_vector_file(workspace, layername, main_filepath, crs_id):
-    table_name = get_table_name(workspace, layername)
+    table_name = get_internal_table_name(workspace, layername)
     assert table_name, f'workspace={workspace}, layername={layername}, table_name={table_name}'
     process = import_layer_vector_file_async(workspace, table_name, main_filepath,
                                              crs_id)
@@ -212,7 +212,7 @@ AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 
 
 def get_all_column_names(workspace, layername, conn_cur=None):
-    table_name = get_table_name(workspace, layername)
+    table_name = get_internal_table_name(workspace, layername)
     return get_all_table_column_names(workspace, table_name, conn_cur=conn_cur)
 
 

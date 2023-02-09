@@ -45,7 +45,7 @@ def refresh_table(
     main_filepaths = list(path['gdal'] for path in publ_info['_file']['paths'].values())
     assert len(main_filepaths) == 1
     main_filepath = main_filepaths[0]
-    table_name = db.get_table_name(workspace, layername)
+    table_name = db.get_internal_table_name(workspace, layername)
 
     for try_num in [1, 2]:
         if try_num == 1:
