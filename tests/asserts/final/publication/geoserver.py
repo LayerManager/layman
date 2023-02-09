@@ -132,14 +132,25 @@ def is_complete_in_internal_workspace_wms(workspace, publ_type, name):
     geoserver_util.is_complete_in_workspace_wms_instance(wms_inst, name)
 
 
-def assert_workspace_stores(workspace, exp_stores):
+def assert_workspace_stores(workspace, *, exp_stores=None, exp_existing_stores=None, exp_deleted_stores=None):
+    exp_existing_stores = exp_existing_stores or []
+    exp_deleted_stores = exp_deleted_stores or []
     stores = gs_util.get_db_stores(geoserver_workspace=workspace,
                                    auth=settings.LAYMAN_GS_AUTH,
                                    )
     store_names = {store['name'] for store in stores['dataStores']['dataStore']}
-    assert store_names == exp_stores, f'workspace={workspace}, store_names={store_names}, exp_stores={exp_stores}'
+    if exp_stores:
+        assert store_names == exp_stores, f'workspace={workspace}, store_names={store_names}, exp_stores={exp_stores}'
+    for store in exp_existing_stores:
+        assert store in store_names, f'workspace={workspace}, store_names={store_names}, superfluous store={store}'
+    for store in exp_deleted_stores:
+        assert store not in store_names, f'workspace={workspace}, store_names={store_names}, missing store={store}'
 
 
-def assert_stores(workspace, *, exp_wfs_stores, exp_wms_stores):
-    assert_workspace_stores(workspace=workspace, exp_stores=exp_wfs_stores)
-    assert_workspace_stores(workspace=f'{workspace}_wms', exp_stores=exp_wms_stores)
+def assert_stores(workspace, *,
+                  exp_wfs_stores=None, exp_existing_wfs_stores=None, exp_deleted_wfs_stores=None,
+                  exp_wms_stores=None, exp_existing_wms_stores=None, exp_deleted_wms_stores=None,):
+    assert_workspace_stores(workspace=workspace, exp_stores=exp_wfs_stores,
+                            exp_existing_stores=exp_existing_wfs_stores, exp_deleted_stores=exp_deleted_wfs_stores)
+    assert_workspace_stores(workspace=f'{workspace}_wms', exp_stores=exp_wms_stores,
+                            exp_existing_stores=exp_existing_wms_stores, exp_deleted_stores=exp_deleted_wms_stores)
