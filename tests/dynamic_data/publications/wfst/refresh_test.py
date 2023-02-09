@@ -1,16 +1,9 @@
-import os
 import pytest
 from test_tools import process_client, assert_util, external_db
 from test_tools.data import wfs as data_wfs, SMALL_LAYER_NATIVE_CRS, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX
 from tests import Publication, EnumTestTypes
 from tests.asserts.final import publication as asserts_publ
 from tests.dynamic_data import base_test
-
-DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-
-LAYER_FOR_MAPS = "layer_for_map_crs"
-
-KEY_INFO_VALUES = 'info_values'
 
 
 class StyleFileDomain(base_test.StyleFileDomainBase):
