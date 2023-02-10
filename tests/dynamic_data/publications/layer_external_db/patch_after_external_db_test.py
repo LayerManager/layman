@@ -87,7 +87,7 @@ TEST_CASES = {
                              f"&geo_column={GEO_COLUMN}",
             'style_file': 'tests/dynamic_data/publications/layer_external_db/multipolygon.qml',
         },
-        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_qml_custom_id_column.png"),
+        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_qml.png"),
         'exp_info_values': {
             'publ_type_detail': (settings.FILE_TYPE_VECTOR, 'qml'),
             'exp_publication_detail': {

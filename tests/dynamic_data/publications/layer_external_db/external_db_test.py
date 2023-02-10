@@ -29,6 +29,7 @@ TEST_CASES = {
                              f"?schema={quote('public')}"
                              f"&table={quote('all')}",
         'additional_geo_column': None,
+        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_all.png"),
         'exp_geometry_type': 'GEOMETRY',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
         'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
@@ -46,6 +47,7 @@ TEST_CASES = {
                              f"?schema={quote('public')}"
                              f"&table={quote('MyGeometryCollection')}",
         'additional_geo_column': 'wkb_geometry_2',
+        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_geometrycollection.png"),
         'exp_geometry_type': 'GEOMETRYCOLLECTION',
         'exp_native_bounding_box': [15.0, 45.0, 18.0, 46.0],
         'exp_bounding_box': [1669792.3618991035, 5621521.486192066, 2003750.8342789242, 5780349.220256351],
@@ -61,6 +63,7 @@ TEST_CASES = {
         'geo_column_name': 'wkb_geometry',
         'db_connection_str': None,
         'additional_geo_column': None,
+        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_linestring.png"),
         'exp_geometry_type': 'LINESTRING',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
         'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
@@ -76,6 +79,7 @@ TEST_CASES = {
         'geo_column_name': 'wkb_geometry',
         'db_connection_str': None,
         'additional_geo_column': None,
+        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multilinestring.png"),
         'exp_geometry_type': 'MULTILINESTRING',
         'exp_native_bounding_box': [15.0, 47.0, 16.0, 48.5],
         'exp_bounding_box': [1669792.3618991035, 5942074.072431108, 1781111.852692377, 6190443.809135445],
@@ -91,6 +95,7 @@ TEST_CASES = {
         'geo_column_name': EDGE_NAME,
         'db_connection_str': None,
         'additional_geo_column': None,
+        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipoint.png"),
         'exp_geometry_type': 'MULTIPOINT',
         'exp_native_bounding_box': [15.0, 47.8, 16.0, 48.0],
         'exp_bounding_box': [1669792.3618991035, 6073646.223350629, 1781111.852692377, 6106854.834885075],
@@ -105,6 +110,7 @@ TEST_CASES = {
         'primary_key_column': 'my_id',
         'db_connection_str': None,
         'additional_geo_column': None,
+        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_qml.png"),
         'geo_column_name': 'wkb_geometry',
         'exp_geometry_type': 'MULTIPOLYGON',
         'exp_native_bounding_box': [17.0, 47.0, 18.0, 48.5],
@@ -121,6 +127,7 @@ TEST_CASES = {
         'geo_column_name': 'wkb_geometry',
         'db_connection_str': None,
         'additional_geo_column': None,
+        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_point.png"),
         'exp_geometry_type': 'POINT',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
         'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
@@ -136,6 +143,7 @@ TEST_CASES = {
         'geo_column_name': 'wkb_geometry',
         'db_connection_str': None,
         'additional_geo_column': None,
+        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_polygon.png"),
         'exp_geometry_type': 'POLYGON',
         'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
         'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
@@ -168,7 +176,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          params=value,
                                          ) for key, value in TEST_CASES.items()]
 
-    def test_layer(self, layer: Publication, key, rest_method, rest_args, params):
+    def test_layer(self, layer: Publication, rest_method, rest_args, params):
         """Parametrized using pytest_generate_tests"""
         file_path = f"sample/data/geometry-types/{params['input_file_name']}.geojson"
         schema = params['schema_name']
@@ -212,7 +220,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                        )
 
         # check thumbnail
-        exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{key}.png")
+        exp_thumbnail = params['exp_thumbnail']
         asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
 
         # check GeoServer store of external DB exists
