@@ -110,7 +110,7 @@ TEST_CASES = {
 @pytest.mark.usefixtures('ensure_external_db')
 class TestLayer(base_test.TestSingleRestPublication):
 
-    workspace = 'dynamic_test_workspace_layer_external_db_geometry_type'
+    workspace = 'dynamic_test_workspace_layer_patch_after_external_db'
 
     publication_type = process_client.LAYER_TYPE
 
@@ -132,25 +132,18 @@ class TestLayer(base_test.TestSingleRestPublication):
             'table': TABLE_PATCH,
         }, scope='class')
 
-    @staticmethod
-    def test_layer(layer: Publication, rest_args, params):
+    def test_layer(self, layer: Publication, rest_args, params):
         """Parametrized using pytest_generate_tests"""
         db_connection = f"{external_db.URI_STR}?schema={quote(DB_SCHEMA)}&table={quote(TABLE_POST)}&geo_column={GEO_COLUMN}"
-        process_client.publish_workspace_publication(publication_type=layer.type,
-                                                     workspace=layer.workspace,
-                                                     name=layer.name,
-                                                     db_connection=db_connection,
-                                                     )
+        self.post_publication(publication=layer,
+                              args={'db_connection': db_connection})
 
         assert_util.is_publication_valid_and_complete(layer)
         exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_all.png")
         asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
 
-        process_client.patch_workspace_publication(publication_type=layer.type,
-                                                   workspace=layer.workspace,
-                                                   name=layer.name,
-                                                   **rest_args,
-                                                   )
+        self.patch_publication(publication=layer,
+                               args=rest_args)
 
         assert_util.is_publication_valid_and_complete(layer)
         exp_thumbnail = params['exp_thumbnail']
