@@ -148,7 +148,7 @@ select p.id as id_publication,
        ST_XMAX(p.bbox) as xmax,
        ST_YMAX(p.bbox) as ymax,
        p.srid as srid,
-       p.external_table_uri,
+       PGP_SYM_DECRYPT(p.external_table_uri, p.uuid::text)::json external_table_uri,
        (select rtrim(concat(case when u.id is not null then w.name || ',' end,
                             string_agg(w2.name, ',') || ',',
                             case when p.everyone_can_read then %s || ',' end
@@ -396,7 +396,7 @@ def insert_publication(workspace_name, info):
 
     insert_publications_sql = f'''insert into {DB_SCHEMA}.publications as p
         (id_workspace, name, title, type, uuid, style_type, file_type, everyone_can_read, everyone_can_write, updated_at, image_mosaic, external_table_uri) values
-        (%s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp, %s, %s)
+        (%s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp, %s, PGP_SYM_ENCRYPT(%s::text, %s::text) )
 returning id
 ;'''
 
@@ -419,6 +419,7 @@ returning id
             ROLE_EVERYONE in info['access_rights']['write'],
             info.get("image_mosaic"),
             external_table_uri,
+            info.get("uuid"),
             )
     pub_id = db_util.run_query(insert_publications_sql, data)[0][0]
 
@@ -479,7 +480,7 @@ def update_publication(workspace_name, info):
     everyone_can_write = coalesce(%s, everyone_can_write),
     updated_at =  current_timestamp,
     image_mosaic = coalesce(%s, image_mosaic),
-    external_table_uri = %s,
+    external_table_uri = PGP_SYM_ENCRYPT(%s::text, uuid::text),
     file_type = coalesce(%s, file_type)
 where id_workspace = %s
   and name = %s
