@@ -1,3 +1,5 @@
+from psycopg2 import sql
+
 from db import util as db_util
 from layman import settings, patch_mode
 from layman.common import empty_method, empty_method_returns_none, empty_method_returns_dict
@@ -25,10 +27,10 @@ def get_layer_info(workspace, layername, conn_cur=None):
             cur.execute(f"""
     SELECT schemaname, tablename, tableowner
     FROM pg_tables
-    WHERE schemaname = '{workspace}'
-        AND tablename = '{table_name}'
-        AND tableowner = '{settings.LAYMAN_PG_USER}'
-    """)
+    WHERE schemaname = %s
+        AND tablename = %s
+        AND tableowner = %s
+    """, (workspace, table_name, settings.LAYMAN_PG_USER))
         except BaseException as exc:
             raise LaymanError(7) from exc
         rows = cur.fetchall()
@@ -47,9 +49,11 @@ def delete_layer(workspace, layername, conn_cur=None):
         if conn_cur is None:
             conn_cur = db_util.get_connection_cursor()
         conn, cur = conn_cur
-        query = f"""
-        DROP TABLE IF EXISTS "{workspace}"."{table_name}" CASCADE
-        """
+        query = sql.SQL("""
+        DROP TABLE IF EXISTS {table} CASCADE
+        """).format(
+            table=sql.Identifier(workspace, table_name),
+        )
         try:
             cur.execute(query)
             conn.commit()
