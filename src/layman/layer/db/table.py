@@ -43,17 +43,18 @@ def get_layer_info(workspace, layername, conn_cur=None):
 
 def delete_layer(workspace, layername, conn_cur=None):
     table_name = get_internal_table_name(workspace, layername)
-    if conn_cur is None:
-        conn_cur = db_util.get_connection_cursor()
-    conn, cur = conn_cur
-    query = f"""
-    DROP TABLE IF EXISTS "{workspace}"."{table_name}" CASCADE
-    """
-    try:
-        cur.execute(query)
-        conn.commit()
-    except BaseException as exc:
-        raise LaymanError(7)from exc
+    if table_name:
+        if conn_cur is None:
+            conn_cur = db_util.get_connection_cursor()
+        conn, cur = conn_cur
+        query = f"""
+        DROP TABLE IF EXISTS "{workspace}"."{table_name}" CASCADE
+        """
+        try:
+            cur.execute(query)
+            conn.commit()
+        except BaseException as exc:
+            raise LaymanError(7)from exc
 
 
 def set_layer_srid(schema, table_name, srid, *, conn_cur=None):
