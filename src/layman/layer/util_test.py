@@ -18,6 +18,7 @@ def ensure_tables():
         ('schema_name', 'two_column_primary_key', 'geo_wkb_column', ['partial_id_1', 'partial_id_2'], []),
         ('schema_name', 'no_primary_key', 'geo_wkb_column', [], []),
         ('schema_name', 'table_with_unsafe_column_name', 'geo_wkb_column', ['my_id'], ['name-with-dashes']),
+        ('schema_name', 'table_without_geo_column', None, ['my_id'], []),
     ]
     for schema, table, geo_column, primary_key_columns, other_columns in tables:
         external_db.ensure_table(schema, table, geo_column, primary_key_columns=primary_key_columns,
@@ -404,6 +405,22 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
             },
         },
     }, id='table_with_unsafe_column_name'),
+    pytest.param(
+        'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_without_geo_column',
+        {
+            'http_code': 400,
+            'code': 2,
+            'detail': {
+                'parameter': 'db_connection',
+                'message': 'Geometry column not found.',
+                'expected': 'Table with at least one geometry column.',
+                'found': {
+                    'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_without_geo_column',
+                    'schema': 'schema_name',
+                    'table': 'table_without_geo_column',
+                },
+            },
+        }, id='table_without_geo_column'),
 ])
 def test_validate_external_table_uri_str(external_table_uri_str, exp_error):
     with pytest.raises(LaymanError) as exc_info:

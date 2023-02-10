@@ -316,6 +316,17 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
     if not geo_column:
         query = f'''select f_geometry_column from geometry_columns where f_table_schema = %s and f_table_name = %s order by f_geometry_column asc'''
         query_res = db_util.run_query(query, (schema, table), conn_cur=conn_cur)
+        if len(query_res) == 0:
+            raise LaymanError(2, {
+                'parameter': 'db_connection',
+                'message': 'Geometry column not found.',
+                'expected': 'Table with at least one geometry column.',
+                'found': {
+                    'db_connection': external_table_uri_str,
+                    'schema': schema,
+                    'table': table,
+                }
+            })
         geo_column = query_res[0][0]
 
     for name in [schema, table, geo_column]:

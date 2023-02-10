@@ -47,9 +47,10 @@ def ensure_table(schema, name, geo_column, *, primary_key_columns=None, other_co
         columns.append(sql.SQL('{column} varchar(100)').format(
             column=sql.Identifier(col)
         ))
-    columns.append(sql.SQL('{geo_column} geometry(Geometry, 4326)').format(
-        geo_column=sql.Identifier(geo_column)
-    ))
+    if geo_column:
+        columns.append(sql.SQL('{geo_column} geometry(Geometry, 4326)').format(
+            geo_column=sql.Identifier(geo_column)
+        ))
     if primary_key_columns:
         columns.append(sql.SQL('PRIMARY KEY ({columns})').format(
             columns=sql.SQL(',').join(sql.Identifier(c) for c in primary_key_columns)
