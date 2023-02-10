@@ -99,6 +99,7 @@ class TestSingleRestPublication:
 
                 input_publication, workspace, publication_type = cls._get_input_publication_workspace_and_type(
                     input_test_case=input_test_case, params=params, publication_definition=publication_definition,
+                    parametrization=parametrization,
                 )
 
                 publ_name_parts = [publication_type.split('.')[1], input_test_case.key.replace(':', '_').lower()] +\
@@ -137,6 +138,7 @@ class TestSingleRestPublication:
                                                   input_test_case: TestCaseType,
                                                   params: dict,
                                                   publication_definition: PublicationValues,
+                                                  parametrization: Parametrization,
                                                   ) -> Tuple[Optional[Publication], str, str]:
         input_publication = None
         if isinstance(input_test_case.publication, Publication):
@@ -147,6 +149,7 @@ class TestSingleRestPublication:
                 'params': params,
                 'publ_def': publication_definition,
                 'cls': cls,
+                'parametrization': parametrization,
             }
             args = [arg_names_to_values[n] for n in args_spec.args]
             input_publication = input_test_case.publication(*args)

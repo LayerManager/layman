@@ -44,7 +44,7 @@ def liferay_mock():
                 'test_gs_rules_other_user': None,
                 'testproxy': None,
                 'testproxy2': None,
-                'testmissingattr': None,
+                'dynamic_test_workspace_wfst_new_attribute': None,
                 'testmissingattr_authz': None,
                 'testmissingattr_authz2': None,
                 'test_authorize_decorator_user': None,
