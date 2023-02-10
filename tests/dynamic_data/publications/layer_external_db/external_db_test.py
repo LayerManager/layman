@@ -18,7 +18,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 EDGE_NAME = '__0_MyTest_CASE_AB7_'
 
 TEST_CASES = {
-    'all': {
+    'all_unspecified_geocolumn': {
         'input_file_name': 'all',
         'style_file': None,
         'schema_name': 'public',
@@ -36,7 +36,7 @@ TEST_CASES = {
         'exp_languages': {'eng'},
         'exp_scale_denominator': 10_000_000,
     },
-    'geometrycollection_mixed_case_table_name': {
+    'geometrycollection_mixed_case_table_name_unspecified_geocolumn_with_2_geocolumns': {
         'input_file_name': 'geometrycollection',
         'style_file': None,
         'schema_name': 'public',
