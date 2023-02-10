@@ -13,29 +13,29 @@ def get_dimension_enum(dimension):
 
 def check_rest_parametrization(rest_parametrization):
     assert isinstance(rest_parametrization, list), f"rest_parametrization must be list. Found: {type(rest_parametrization)}"
-    rest_method_count = 0
-    publ_type_count = 0
-    base_arg_counts = defaultdict(int)
+    rest_methods = []
+    publ_by_defs = []
+    base_args = defaultdict(list)
 
     for val_idx, val in enumerate(rest_parametrization):
         is_rest_method = val == RestMethod
         if is_rest_method:
-            rest_method_count += 1
+            rest_methods.append(val)
 
         is_base_arg = val in list(RestArgs)
         if is_base_arg:
-            base_arg_counts[val.arg_name] += 1
+            base_args[val.arg_name].append(val)
 
         is_simple_type = is_rest_method or is_base_arg
 
         base_arg = inspect.isclass(val) and next((arg for arg in RestArgs if issubclass(val, arg.base_domain)), None)
         is_custom_arg_type = (not is_simple_type) and bool(base_arg)
         if is_custom_arg_type:
-            base_arg_counts[base_arg.arg_name] += 1
+            base_args[base_arg.arg_name].append(val)
 
         is_publ_type = inspect.isclass(val) and issubclass(val, PublicationByDefinitionBase)
         if is_publ_type:
-            publ_type_count += 1
+            publ_by_defs.append(val)
 
         assert sum([is_rest_method, is_base_arg, is_custom_arg_type, is_publ_type]) <= 1
 
@@ -55,12 +55,12 @@ def check_rest_parametrization(rest_parametrization):
             # Expected to be changed when implementing base argument without fix enumeration, e.g. 'style'
             assert domain_raw_values <= base_arg_domain_raw_values, f"Values {domain_raw_values} is not subset of values of base argument {base_arg_domain_raw_values}, base_arg={base_arg}."
 
-    assert rest_method_count <= 1, f"RestMethod dimension can be used only once in parametrization"
-    assert publ_type_count <= 1, f"PublicationByDefinitionBase dimension can be used only once in parametrization"
-    for arg_name, cnt in base_arg_counts.items():
-        assert cnt <= 1, f"RestArgs.{arg_name} dimension can be used only once in parametrization"
+    assert len(rest_methods) <= 1, f"RestMethod dimension can be used only once in parametrization"
+    assert len(publ_by_defs) <= 1, f"PublicationByDefinitionBase dimension can be used only once in parametrization"
+    for arg_name, dimensions in base_args.items():
+        assert len(dimensions) <= 1, f"RestArgs.{arg_name} dimension can be used only once in parametrization"
 
-    assert publ_type_count == 0 or sum(base_arg_counts.values()) == 0, f"PublicationByDefinitionBase dimension must not be used with any RestArgs dimension."
+    assert len(publ_by_defs) == 0 or sum([len(dims) for dims in base_args.values()]) == 0, f"PublicationByDefinitionBase dimension must not be used with any RestArgs dimension."
 
 
 def check_input_test_cases(test_cases, rest_parametrization, parametrizations: List[Parametrization]):
