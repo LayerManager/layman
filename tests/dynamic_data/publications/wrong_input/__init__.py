@@ -1428,6 +1428,37 @@ TESTCASES = {
             },
         },
     },
+    'crs_and_db_connect': {
+        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        KEY_ACTION_PARAMS: {
+            'crs': 'EPSG:4326',
+            'db_connection': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
+            'compress': False,
+            'with_chunks': False,
+            'skip_asserts': True,
+        },
+        consts.KEY_EXCEPTION: LaymanError,
+        KEY_EXPECTED_EXCEPTION: {
+            KEY_DEFAULT: {'http_code': 400,
+                          'sync': True,
+                          'code': 48,
+                          'message': 'Wrong combination of parameters',
+                          'detail': {
+                              'parameters': ['crs', 'file'],
+                              'message': 'Parameter `crs` needs also parameter `file`.',
+                              'expected': 'Input files in `file` parameter or empty `crs` parameter.',
+                              'found': {
+                                  'crs': 'EPSG:4326',
+                                  'file': [],
+                              }},
+                          },
+        },
+        KEY_PATCHES: {
+            'full': {
+                KEY_PATCH_POST: {},
+            },
+        },
+    },
 }
 
 VALIDATION_PATCH_ACTION = {

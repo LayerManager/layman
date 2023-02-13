@@ -163,6 +163,7 @@ Body parameters:
 - *description*
    - by default it is empty string
 - *crs*, string, e.g. `EPSG:3857`, supported EPSG codes are defined by [LAYMAN_INPUT_SRS_LIST](./env-settings.md#LAYMAN_INPUT_SRS_LIST)
+   - supported only for layers with file source
    - CRS of the file
    - by default it is read/guessed from input file
 - *style*, style file
@@ -345,7 +346,7 @@ Body parameters:
 - *title*
 - *description*
 - *crs*, string, e.g. `EPSG:3857`, supported EPSG codes are defined by [LAYMAN_INPUT_SRS_LIST](./env-settings.md#LAYMAN_INPUT_SRS_LIST)
-   - Taken into account only if `file` is provided.
+   - Supported only if `file` is provided.
 - *style*, style file
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
      - QML style for raster data file is not supported

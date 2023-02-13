@@ -72,8 +72,6 @@ def post(workspace):
                 'db_connection': external_table_uri_str,
             }})
 
-    external_table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None
-
     # NAME
     unsafe_layername = request.form.get('name', '')
     if len(unsafe_layername) == 0:
@@ -90,7 +88,18 @@ def post(workspace):
         crs_id = request.form['crs']
         if crs_id not in settings.INPUT_SRS_LIST:
             raise LaymanError(2, {'parameter': 'crs', 'supported_values': settings.INPUT_SRS_LIST})
+    if crs_id and not input_files:
+        raise LaymanError(48, {
+            'parameters': ['crs', 'file'],
+            'message': 'Parameter `crs` needs also parameter `file`.',
+            'expected': 'Input files in `file` parameter or empty `crs` parameter.',
+            'found': {
+                'crs': crs_id,
+                'file': request.form.getlist('file'),
+            }})
     check_crs = crs_id is None
+
+    external_table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None
 
     # Timeseries regex
     time_regex = request.form.get('time_regex') or None
