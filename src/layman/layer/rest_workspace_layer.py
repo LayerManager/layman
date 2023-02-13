@@ -81,15 +81,25 @@ def patch(workspace, layername):
                 'db_connection': external_table_uri_str,
             }})
 
-    external_table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None if input_files or not info.get('_is_external_table') else info.get('_table_uri')
-
     # CRS
     crs_id = None
-    if len(input_files.raw_paths) > 0 and len(request.form.get('crs', '')) > 0:
+    if len(request.form.get('crs', '')) > 0:
         crs_id = request.form['crs']
         if crs_id not in settings.INPUT_SRS_LIST:
             raise LaymanError(2, {'parameter': 'crs', 'supported_values': settings.INPUT_SRS_LIST})
     check_crs = crs_id is None
+
+    if crs_id and not input_files:
+        raise LaymanError(48, {
+            'parameters': ['crs', 'file'],
+            'message': 'Parameter `crs` needs also parameter `file`.',
+            'expected': 'Input files in `file` parameter or empty `crs` parameter.',
+            'found': {
+                'crs': crs_id,
+                'file': request.form.getlist('file'),
+            }})
+
+    external_table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None if input_files or not info.get('_is_external_table') else info.get('_table_uri')
 
     # TITLE
     if len(request.form.get('title', '')) > 0:
