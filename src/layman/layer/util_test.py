@@ -14,19 +14,20 @@ from .util import to_safe_layer_name, fill_in_partial_info_statuses
 @pytest.fixture(scope="module")
 def ensure_tables():
     tables = [
-        ('schema_name', 'table_name', 'geo_wkb_column', ['my_id'], []),
-        ('schema_name', 'two_column_primary_key', 'geo_wkb_column', ['partial_id_1', 'partial_id_2'], []),
-        ('schema_name', 'no_primary_key', 'geo_wkb_column', [], []),
-        ('schema_name', 'table_with_unsafe_column_name', 'geo_wkb_column', ['my_id'], ['name-with-dashes']),
-        ('schema_name', 'table_without_geo_column', None, ['my_id'], []),
+        ('schema_name', 'table_name', 'geo_wkb_column', ['my_id'], [], 4326),
+        ('schema_name', 'two_column_primary_key', 'geo_wkb_column', ['partial_id_1', 'partial_id_2'], [], 4326),
+        ('schema_name', 'no_primary_key', 'geo_wkb_column', [], [], 4326),
+        ('schema_name', 'table_with_unsafe_column_name', 'geo_wkb_column', ['my_id'], ['name-with-dashes'], 4326),
+        ('schema_name', 'table_without_geo_column', None, ['my_id'], [], 4326),
+        ('schema_name', 'table_name_32635', 'geo_wkb_column', ['my_id'], [], 32635),
     ]
-    for schema, table, geo_column, primary_key_columns, other_columns in tables:
+    for schema, table, geo_column, primary_key_columns, other_columns, srid in tables:
         external_db.ensure_table(schema, table, geo_column, primary_key_columns=primary_key_columns,
-                                 other_columns=other_columns)
+                                 other_columns=other_columns, srid=srid)
 
     yield
 
-    for schema, table, _, _, _ in tables:
+    for schema, table, _, _, _, _ in tables:
         external_db.drop_table(schema, table)
 
 
