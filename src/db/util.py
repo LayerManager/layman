@@ -88,14 +88,14 @@ def get_srid(crs):
     return srid
 
 
-def get_crs(srid):
+def get_crs(srid, conn_cur=None, *, use_internal_srid=True):
     crs = next((
         crs_code for crs_code, crs_item_def in crs_def.CRSDefinitions.items()
         if crs_item_def.srid == srid
-    ), None)
+    ), None) if use_internal_srid else None
     if not crs:
         sql = 'select auth_name, auth_srid from spatial_ref_sys where srid = %s;'
-        auth_name, auth_srid = run_query(sql, (srid, ))[0]
+        auth_name, auth_srid = run_query(sql, (srid, ), conn_cur=conn_cur)[0]
         if auth_name or auth_srid:
             crs = f'{auth_name}:{auth_srid}'
     return crs

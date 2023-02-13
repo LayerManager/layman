@@ -12,7 +12,7 @@ from layman import celery as celery_util, common
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info as common_clear_publication_info
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_keys
-from .db import get_all_table_column_names
+from .db import get_all_table_column_names, get_crs
 
 LAYERNAME_PATTERN = PUBLICATION_NAME_PATTERN
 LAYERNAME_MAX_LENGTH = PUBLICATION_MAX_LENGTH
@@ -372,6 +372,15 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
                 'table': table,
                 'geo_column': geo_column,
             }
+        })
+
+    crs = get_crs(schema, table, conn_cur=conn_cur, column=geo_column, use_internal_srid=False)
+    if crs not in settings.INPUT_SRS_LIST:
+        raise LaymanError(2, {
+            'parameter': 'db_connection',
+            'message': 'Unsupported CRS of table data.',
+            'supported_values': settings.INPUT_SRS_LIST,
+            'found': crs,
         })
 
     # https://stackoverflow.com/a/20537829

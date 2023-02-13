@@ -422,6 +422,18 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
                 },
             },
         }, id='table_without_geo_column'),
+    pytest.param(
+        'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_name_32635',
+        {
+            'http_code': 400,
+            'code': 2,
+            'detail': {
+                'parameter': 'db_connection',
+                'message': 'Unsupported CRS of table data.',
+                'found': 'EPSG:32635',
+                'supported_values': settings.INPUT_SRS_LIST,
+            },
+        }, id='table_in_crs_32635'),
 ])
 def test_validate_external_table_uri_str(external_table_uri_str, exp_error):
     with pytest.raises(LaymanError) as exc_info:
