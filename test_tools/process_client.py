@@ -173,29 +173,31 @@ def patch_workspace_publication(publication_type,
                                 overview_resampling=None,
                                 do_not_upload_chunks=False,
                                 time_regex=None,
+                                skip_asserts=False,
                                 ):
     headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
-    # map layers must not be set together with file_paths
-    assert not map_layers or not file_paths
-    assert not map_layers or not db_connection
+    if not skip_asserts:
+        # map layers must not be set together with file_paths
+        assert not map_layers or not file_paths
+        assert not map_layers or not db_connection
 
-    assert not (not with_chunks and do_not_upload_chunks)
-    assert not (check_response_fn and do_not_upload_chunks)  # because check_response_fn is not called when do_not_upload_chunks
+        assert not (not with_chunks and do_not_upload_chunks)
+        assert not (check_response_fn and do_not_upload_chunks)  # because check_response_fn is not called when do_not_upload_chunks
+
+        assert not (time_regex and publication_type == MAP_TYPE)
+        assert not (publication_type == LAYER_TYPE and crs and not file_paths)
+
+        if style_file or with_chunks or compress or compress_settings or overview_resampling:
+            assert publication_type == LAYER_TYPE
+        if map_layers or native_extent:
+            assert publication_type == MAP_TYPE
+
+        # Compress settings can be used only with compress option
+        assert not compress_settings or compress
 
     file_paths = [] if file_paths is None and not map_layers else file_paths
-
-    if style_file or with_chunks or compress or compress_settings or overview_resampling:
-        assert publication_type == LAYER_TYPE
-    if map_layers or native_extent:
-        assert publication_type == MAP_TYPE
-
-    # Compress settings can be used only with compress option
-    assert not compress_settings or compress
-
-    assert not (time_regex and publication_type == MAP_TYPE)
-    assert not (publication_type == LAYER_TYPE and crs and not file_paths)
 
     with app.app_context():
         r_url = url_for(publication_type_def.patch_workspace_publication_url,
