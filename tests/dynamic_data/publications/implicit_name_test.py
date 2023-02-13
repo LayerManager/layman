@@ -2,7 +2,7 @@ from copy import deepcopy
 import os
 import pytest
 
-from test_tools import process_client
+from test_tools import process_client, external_db
 from tests import EnumTestTypes, Publication
 from tests.asserts.final.publication import util as asserts_util
 from tests.dynamic_data import base_test
@@ -18,6 +18,10 @@ class CompressDomain(base_test.CompressDomainBase):
         'compress_settings': process_client.CompressTypeDef(archive_name='data_zip'),
     })
 
+
+INPUT_FILE_PATH = 'sample/layman.layer/small_layer.geojson'
+EXTERNAL_DB_TABLE = '_small_LAYER'
+EXTERNAL_DB_SCHEMA = 'public'
 
 PUBLICATIONS = {
     'one_data_file': {
@@ -64,6 +68,23 @@ PUBLICATIONS = {
             frozenset([CompressDomain.FALSE, base_test.WithChunksDomain.TRUE, ]),
         },
     },
+    'external_table': {
+        'publication_type': process_client.LAYER_TYPE,
+        'expected_name': 'small_layer',
+        'rest_args': {
+            'do_not_post_name': True,
+            'db_connection': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
+        },
+        'mandatory_cases': {
+            frozenset([CompressDomain.FALSE, base_test.WithChunksDomain.FALSE, ]),
+        },
+        'specific_params': dict(),
+        'ignored_cases': {
+            frozenset([CompressDomain.FALSE, base_test.WithChunksDomain.TRUE, ]),
+            frozenset([CompressDomain.TRUE, base_test.WithChunksDomain.FALSE, ]),
+            frozenset([CompressDomain.TRUE, base_test.WithChunksDomain.TRUE, ]),
+        },
+    },
 }
 
 
@@ -94,6 +115,7 @@ def generate_test_cases():
     return tc_list
 
 
+@pytest.mark.usefixtures('ensure_external_db')
 class TestLayer(base_test.TestSingleRestPublication):
 
     workspace = 'dynamic_test_workspace_implicit_name'
@@ -106,6 +128,12 @@ class TestLayer(base_test.TestSingleRestPublication):
     ]
 
     test_cases = generate_test_cases()
+
+    def before_class(self):
+        self.import_external_table(INPUT_FILE_PATH, {
+            'schema': EXTERNAL_DB_SCHEMA,
+            'table': EXTERNAL_DB_TABLE,
+        }, scope='class')
 
     @staticmethod
     def test_implicit_name(publication: Publication, rest_method, rest_args):
