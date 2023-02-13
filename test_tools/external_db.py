@@ -33,7 +33,7 @@ def ensure_schema(schema):
     db_util.run_statement(statement, conn_cur=conn_cur)
 
 
-def ensure_table(schema, name, geo_column, *, primary_key_columns=None, other_columns=None):
+def ensure_table(schema, name, geo_column, *, primary_key_columns=None, other_columns=None, srid=4326):
     primary_key_columns = ['id'] if primary_key_columns is None else primary_key_columns
     other_columns = other_columns or []
 
@@ -48,8 +48,9 @@ def ensure_table(schema, name, geo_column, *, primary_key_columns=None, other_co
             column=sql.Identifier(col)
         ))
     if geo_column:
-        columns.append(sql.SQL('{geo_column} geometry(Geometry, 4326)').format(
-            geo_column=sql.Identifier(geo_column)
+        columns.append(sql.SQL('{geo_column} geometry(Geometry, {srid})').format(
+            geo_column=sql.Identifier(geo_column),
+            srid=sql.Literal(srid),
         ))
     if primary_key_columns:
         columns.append(sql.SQL('PRIMARY KEY ({columns})').format(
@@ -61,7 +62,7 @@ def ensure_table(schema, name, geo_column, *, primary_key_columns=None, other_co
         columns=sql.SQL(',').join(columns),
     )
     conn_cur = db_util.create_connection_cursor(URI_STR)
-    db_util.run_statement(statement, conn_cur=conn_cur)
+    db_util.run_statement(statement, conn_cur=conn_cur, log_query=True)
 
 
 def import_table(input_file_path, *, table=None, schema='public', geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
