@@ -9,13 +9,25 @@ from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
 from test_tools.data import wfs as data_wfs
 from test_tools import process_client
-from tests import Publication, EnumTestTypes
+from tests import Publication, EnumTestTypes, PublicationValues
 from tests.dynamic_data import base_test
 
 
 class StyleFileDomain(base_test.StyleFileDomainBase):
     SLD = ((None, 'sld'), 'sld')
     QML = (('sample/style/ne_10m_admin_0_countries.qml', 'qml'), 'qml')
+
+
+class LayerByTableLocation(base_test.PublicationByDefinitionBase):
+    INTERNAL = (PublicationValues(
+        type=process_client.LAYER_TYPE,
+        definition={
+            'file_paths': ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+        },
+        info_values={},
+        thumbnail='',
+        legend_image='',
+    ), 'internal_table')
 
 
 WORKSPACE = 'dynamic_test_workspace_wfst_new_attribute'
@@ -96,6 +108,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
 
     rest_parametrization = [
         StyleFileDomain,
+        LayerByTableLocation,
     ]
 
     test_cases = [
@@ -110,7 +123,6 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
                                params=copy.deepcopy(params),
                                rest_args={
                                    'headers': AUTHN_HEADERS,
-                                   'file_paths': ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
                                }
                                )
         for key, params in TEST_CASES.items()
