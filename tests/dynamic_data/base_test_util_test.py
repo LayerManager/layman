@@ -1,5 +1,6 @@
 import pytest
 
+from test_tools import process_client
 from tests import EnumTestTypes
 from .base_test_classes import RestMethod, RestArgs, CompressDomain, PublicationByUsedServers, LayerByUsedServers, CompressDomainBase, TestCaseType, Parametrization, WithChunksDomain, StyleFileDomainBase
 from . import base_test_util as util
@@ -23,6 +24,13 @@ class WrongCustomCompressDomain(CompressDomainBase):
 class CustomCompressDomain(CompressDomainBase):
     FALSE = (False, None)
     TRUE = (True, 'compressed')
+
+
+class CustomCompressDomainWithCompressSettings(CompressDomainBase):
+    FALSE = (False, None)
+    TRUE = (True, 'zipped', {
+        'compress_settings': process_client.CompressTypeDef(archive_name='data_zip'),
+    })
 
 
 class CustomStyleFileDomain(StyleFileDomainBase):
@@ -109,6 +117,11 @@ def test_check_rest_parametrization_passes(rest_parametrization):
                  [PublicationByUsedServers],
                  'Dimension PublicationByDefinitionBase must not be combined with rest_args, test_case=case1',
                  id='conflict-rest_args-and-publication-definition'),
+    pytest.param([TestCaseType(key='case1',
+                               rest_args={'compress_settings': None})],
+                 [CustomCompressDomainWithCompressSettings],
+                 'REST argument can be set either in parametrization or in test case, not both: compress_settings (in CustomCompressDomainWithCompressSettings.TRUE.other_rest_args), test_case=case1',
+                 id='conflict-rest_args-and-other_rest_args'),
 ])
 def test_check_input_test_cases_raises(test_cases, rest_parametrization, exp_message):
     util.check_rest_parametrization(rest_parametrization)
