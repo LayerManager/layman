@@ -78,8 +78,10 @@ def check_input_test_cases(test_cases, rest_parametrization, parametrizations: L
                                             test_case_key=test_case.key, attribute_name=attr_name)
 
         for parametrization in parametrizations:
-            for base_arg in parametrization.rest_arg_dict:
+            for base_arg, arg_value in parametrization.rest_arg_dict.items():
                 assert base_arg.arg_name not in test_case.rest_args, f"REST argument can be set either in parametrization or in test case, not both: {base_arg}, test_case={test_case.key}"
+                for other_arg_name in arg_value.other_rest_args.keys():
+                    assert other_arg_name not in test_case.rest_args, f"REST argument can be set either in parametrization or in test case, not both: {other_arg_name} (in {arg_value}.other_rest_args), test_case={test_case.key}"
 
         if is_publ_type_dimension_used:
             assert not test_case.rest_args, f"Dimension PublicationByDefinitionBase must not be combined with rest_args, test_case={test_case.key}"
