@@ -4,7 +4,8 @@ from collections import defaultdict
 from enum import Enum
 from typing import List, Iterable
 
-from .base_test_classes import RestArgs, RestMethod, PublicationByDefinitionBase, Parametrization
+from tests import PublicationValues
+from .base_test_classes import RestArgs, RestMethod, PublicationByDefinitionBase, Parametrization, RestArgDomain
 
 
 def get_dimension_enum(dimension):
@@ -60,12 +61,24 @@ def check_rest_parametrization(rest_parametrization):
     for arg_name, dimensions in base_args.items():
         assert len(dimensions) <= 1, f"RestArgs.{arg_name} dimension can be used only once in parametrization"
 
-    assert len(publ_by_defs) == 0 or sum([len(dims) for dims in base_args.values()]) == 0, f"PublicationByDefinitionBase dimension must not be used with any RestArgs dimension."
+    if len(publ_by_defs) > 0 and sum([len(dims) for dims in base_args.values()]) > 0:
+        publ_by_def_dim: PublicationByDefinitionBase = publ_by_defs[0]
+        for publ_by_def in publ_by_def_dim:
+            publ_values: PublicationValues = publ_by_def.publication_definition
+            rest_arg: RestArgDomain
+            for base_arg_name, arg_dimensions in base_args.items():
+                arg_dimension = arg_dimensions[0]
+                assert base_arg_name not in publ_values.definition, \
+                    f"Rest argument {base_arg_name} can be used only once in parametrization. " \
+                    f"Found in two dimensions: {arg_dimension} and {publ_by_def}"
+                for rest_arg in get_dimension_enum(arg_dimension):
+                    for other_arg_name in rest_arg.other_rest_args.keys():
+                        assert other_arg_name not in publ_values.definition, \
+                            f"Rest argument {other_arg_name} can be used only once in parametrization. " \
+                            f"Found in two dimensions: {rest_arg} (in other_rest_args) and {publ_by_def}"
 
 
 def check_input_test_cases(test_cases, rest_parametrization, parametrizations: List[Parametrization]):
-    is_publ_type_dimension_used = any(par for par in rest_parametrization if inspect.isclass(par) and issubclass(par, PublicationByDefinitionBase))
-
     for test_case in test_cases:
         assert not test_case.parametrization, f"Attribute parametrization is meant only for output test cases, test_case={test_case.key}"
 
@@ -82,9 +95,9 @@ def check_input_test_cases(test_cases, rest_parametrization, parametrizations: L
                 assert base_arg.arg_name not in test_case.rest_args, f"REST argument can be set either in parametrization or in test case, not both: {base_arg}, test_case={test_case.key}"
                 for other_arg_name in arg_value.other_rest_args.keys():
                     assert other_arg_name not in test_case.rest_args, f"REST argument can be set either in parametrization or in test case, not both: {other_arg_name} (in {arg_value}.other_rest_args), test_case={test_case.key}"
-
-        if is_publ_type_dimension_used:
-            assert not test_case.rest_args, f"Dimension PublicationByDefinitionBase must not be combined with rest_args, test_case={test_case.key}"
+            if parametrization.publication_definition:
+                for arg_name in parametrization.publication_definition.definition.keys():
+                    assert arg_name not in test_case.rest_args, f"REST argument can be set either in parametrization or in test case, not both: {arg_name}, test_case={test_case.key}"
 
 
 def check_specific_parametrizations(rest_parametrization, specific_parametrizations: Iterable[frozenset], *, test_case_key, attribute_name):

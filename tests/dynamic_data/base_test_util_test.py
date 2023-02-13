@@ -1,8 +1,10 @@
 import pytest
 
 from test_tools import process_client
-from tests import EnumTestTypes
-from .base_test_classes import RestMethod, RestArgs, CompressDomain, PublicationByUsedServers, LayerByUsedServers, CompressDomainBase, TestCaseType, Parametrization, WithChunksDomain, StyleFileDomainBase
+from test_tools.external_db import URI_STR
+from tests import EnumTestTypes, PublicationValues
+from tests.dynamic_data.publications import common_publications
+from .base_test_classes import RestMethod, RestArgs, CompressDomain, PublicationByUsedServers, LayerByUsedServers, CompressDomainBase, TestCaseType, Parametrization, WithChunksDomain, StyleFileDomainBase, PublicationByDefinitionBase
 from . import base_test_util as util
 
 
@@ -33,6 +35,51 @@ class CustomCompressDomainWithCompressSettings(CompressDomainBase):
     })
 
 
+class PublicationByCompress(PublicationByDefinitionBase):
+    LAYER = (common_publications.SMALL_LAYER, '')
+    LAYER_COMPRESS = (common_publications.SMALL_LAYER_ZIP, 'zipped')
+
+
+class PublicationByCompressSettings(PublicationByDefinitionBase):
+    LAYER = (PublicationValues(
+        type=process_client.LAYER_TYPE,
+        definition={},
+        info_values={},
+        thumbnail='',
+        legend_image='',
+    ), 'no_compress_settings')
+    LAYER_COMPRESS_SETTINGS = (PublicationValues(
+        type=process_client.LAYER_TYPE,
+        definition={
+            'compress_settings': process_client.CompressTypeDef(archive_name='data_zip')
+        },
+        info_values={},
+        thumbnail='',
+        legend_image='',
+    ), 'compress_settings')
+
+
+class PublicationByInputData(PublicationByDefinitionBase):
+    FILE = (PublicationValues(
+        type=process_client.LAYER_TYPE,
+        definition={
+            'file_paths': ['sample/layman.layer/small_layer.geojson'],
+        },
+        info_values={},
+        thumbnail='',
+        legend_image='',
+    ), 'file')
+    EXTERNAL_TABLE = (PublicationValues(
+        type=process_client.LAYER_TYPE,
+        definition={
+            'db_connection': URI_STR,
+        },
+        info_values={},
+        thumbnail='',
+        legend_image='',
+    ), 'external_table')
+
+
 class CustomStyleFileDomain(StyleFileDomainBase):
     SLD = ((None, 'sld'), 'sld')
     QML = (('sample/style/small_layer.qml', 'qml'), 'qml')
@@ -57,6 +104,11 @@ ONLY_DIMENSIONS_MSG = f"Only dimensions are allowed in cls.rest_parametrization.
                  id='duplicate-arg-dimension4'),
     pytest.param([PublicationByUsedServers, LayerByUsedServers], 'PublicationByDefinitionBase dimension can be used only once in parametrization',
                  id='duplicate-publication-definition-dimension'),
+    pytest.param([RestArgs.COMPRESS, PublicationByCompress], 'Rest argument compress can be used only once in parametrization. Found in two dimensions: RestArgs.COMPRESS and PublicationByCompress.LAYER_COMPRESS',
+                 id='duplicate-rest-arg-and-publication-definition'),
+    pytest.param([CustomCompressDomainWithCompressSettings, PublicationByCompressSettings],
+                 'Rest argument compress_settings can be used only once in parametrization. Found in two dimensions: CustomCompressDomainWithCompressSettings.TRUE (in other_rest_args) and PublicationByCompressSettings.LAYER_COMPRESS_SETTINGS',
+                 id='duplicate-other-rest-arg-and-publication-definition'),
     pytest.param(['a'], f"{ONLY_DIMENSIONS_MSG} Found: a", id='string'),
     pytest.param([[1, 2]], f"{ONLY_DIMENSIONS_MSG} Found: [1, 2]",
                  id='list-of-numbers'),
@@ -64,8 +116,6 @@ ONLY_DIMENSIONS_MSG = f"Only dimensions are allowed in cls.rest_parametrization.
                  id='rest-args'),
     pytest.param([WrongCustomCompressDomain], 'Values {False, \'abc\'} is not subset of values of base argument {False, True}, base_arg=RestArgs.COMPRESS.',
                  id='wrong-custom-domain'),
-    pytest.param([RestArgs.COMPRESS, PublicationByUsedServers], 'PublicationByDefinitionBase dimension must not be used with any RestArgs dimension.',
-                 id='rest-arg-and-publication-definition'),
     pytest.param([StyleFileDomainBase], 'Dimension at idx 0 has no value.', id='one-dimension-without-value'),
     pytest.param([RestArgs.WITH_CHUNKS, CompressDomainBase], 'Dimension at idx 1 has no value.',
                  id='one-dimension-without-value-at-idx-1'),
@@ -85,6 +135,7 @@ def test_check_rest_parametrization_raises(rest_parametrization, exp_message):
     pytest.param([RestMethod, RestArgs.COMPRESS, RestArgs.WITH_CHUNKS], id='rest-method-and-args'),
     pytest.param([RestMethod, PublicationByUsedServers], id='rest-method-and-publication-by-definition'),
     pytest.param([CustomStyleFileDomain], id='custom-style-file'),
+    pytest.param([PublicationByInputData, CustomStyleFileDomain], id='publication-by-definition-and-rest-arg'),
 ])
 def test_check_rest_parametrization_passes(rest_parametrization):
     util.check_rest_parametrization(rest_parametrization)
@@ -114,8 +165,8 @@ def test_check_rest_parametrization_passes(rest_parametrization):
                  id='conflict-rest_args-and-parametrization'),
     pytest.param([TestCaseType(key='case1',
                                rest_args={'compress': True})],
-                 [PublicationByUsedServers],
-                 'Dimension PublicationByDefinitionBase must not be combined with rest_args, test_case=case1',
+                 [PublicationByCompress],
+                 'REST argument can be set either in parametrization or in test case, not both: compress, test_case=case1',
                  id='conflict-rest_args-and-publication-definition'),
     pytest.param([TestCaseType(key='case1',
                                rest_args={'compress_settings': None})],

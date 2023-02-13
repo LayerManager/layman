@@ -111,13 +111,12 @@ class TestSingleRestPublication:
                     name = input_publication.name or name
 
                 rest_method = parametrization.rest_method or RestMethod.POST
+                rest_args = copy.deepcopy(input_test_case.rest_args)
                 if publication_definition:
-                    rest_args = copy.deepcopy(publication_definition.definition)
-                else:
-                    rest_args = copy.deepcopy(input_test_case.rest_args)
-                    for base_arg, arg_value in parametrization.rest_arg_dict.items():
-                        rest_args[base_arg.arg_name] = arg_value.raw_value
-                        rest_args.update(copy.deepcopy(arg_value.other_rest_args))
+                    rest_args.update(copy.deepcopy(publication_definition.definition))
+                for base_arg, arg_value in parametrization.rest_arg_dict.items():
+                    rest_args[base_arg.arg_name] = arg_value.raw_value
+                    rest_args.update(copy.deepcopy(arg_value.other_rest_args))
 
                 test_case = TestCaseType(pytest_id=pytest_id,
                                          publication=Publication(workspace, publication_type, name),
