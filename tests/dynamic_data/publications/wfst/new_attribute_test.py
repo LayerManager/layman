@@ -165,15 +165,13 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         workspace = self.workspace
 
         # ensure layers
-        if layer not in self.publications_to_cleanup_on_class_end:
-            self.post_publication(layer, args=rest_args, scope='class')
+        self.ensure_publication(layer, args=rest_args, scope='class')
         layer2 = Publication(name=f"{layer.name}_2", workspace=workspace, type=layer.type)
         rest_args2 = rest_args if 'db_connection' not in rest_args else {
             **rest_args,
             'db_connection': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE_2}&geo_column=wkb_geometry",
         }
-        if layer2 not in self.publications_to_cleanup_on_class_end:
-            self.post_publication(layer2, args=rest_args2, scope='class')
+        self.ensure_publication(layer2, args=rest_args2, scope='class')
 
         # prepare data for WFS-T request and tuples of new attributes
         wfst_data, new_attributes = self.prepare_wfst_data_and_new_attributes(layer, layer2, params)
