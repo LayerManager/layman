@@ -58,26 +58,35 @@ TEST_CASES = {
         'simple': True,
         'attr_args_per_layer': [['new_attr_1a', 'new_attr_1b']],
         'data_method': data_wfs.get_wfs20_insert_points_new_attr,
+        'mandatory_cases': {
+            frozenset([StyleFileDomain.SLD, LayerByTableLocation.INTERNAL, ]),
+            frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]),
+            frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]),
+        },
     },
     'wfs20_update_points': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_2']],
         'data_method': data_wfs.get_wfs20_update_points_new_attr,
+        'mandatory_cases': {},
     },
     'wfs20_update_points_with_attr_namespace': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_3']],
         'data_method': lambda *args: data_wfs.get_wfs20_update_points_new_attr(*args, with_attr_namespace=True),
+        'mandatory_cases': {},
     },
     'wfs20_update_points_with_filter': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_4']],
         'data_method': lambda *args: data_wfs.get_wfs20_update_points_new_attr(*args, with_filter=True),
+        'mandatory_cases': {},
     },
     'wfs20_replace_points': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_5']],
         'data_method': data_wfs.get_wfs20_replace_points_new_attr,
+        'mandatory_cases': {},
     },
     'wfs20_complex_points': {
         'simple': False,
@@ -89,31 +98,41 @@ TEST_CASES = {
             'attr_names_update': ['new_layer2_attr_update'],
         }],
         'data_method': data_wfs.get_wfs20_complex_new_attr,
+        'mandatory_cases': {
+            frozenset([StyleFileDomain.SLD, LayerByTableLocation.INTERNAL, ]),
+            frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]),
+            frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]),
+        },
     },
     'wfs10_insert_points': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_7']],
         'data_method': data_wfs.get_wfs10_insert_points_new_attr,
+        'mandatory_cases': {},
     },
     'wfs11_insert_points': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_8']],
         'data_method': data_wfs.get_wfs11_insert_points_new_attr,
+        'mandatory_cases': {},
     },
     'wfs10_update_points_with_attr_namespace': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_9']],
         'data_method': lambda *args: data_wfs.get_wfs10_update_points_new(*args, with_attr_namespace=True),
+        'mandatory_cases': {},
     },
     'wfs10_update_points_with_filter': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_10']],
         'data_method': lambda *args: data_wfs.get_wfs10_update_points_new(*args, with_filter=True),
+        'mandatory_cases': {},
     },
     'wfs11_insert_polygon': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_11']],
         'data_method': data_wfs.get_wfs11_insert_polygon_new_attr,
+        'mandatory_cases': {},
     },
 }
 
@@ -138,8 +157,14 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
                 workspace=cls.workspace,
                 type=cls.publication_type,
                 name=f"lr_{'_'.join(v.publ_name_part for v in parametrization.values_list)}"),
-            type=EnumTestTypes.MANDATORY,
-            specific_types={frozenset([StyleFileDomain.QML, LayerByTableLocation.EXTERNAL]): EnumTestTypes.IGNORE},
+            type=EnumTestTypes.OPTIONAL,
+            specific_types={
+                frozenset([StyleFileDomain.QML, LayerByTableLocation.EXTERNAL]): EnumTestTypes.IGNORE,
+                **{
+                    case: EnumTestTypes.MANDATORY
+                    for case in params['mandatory_cases']
+                }
+            },
             params=copy.deepcopy(params),
             rest_args={
                 'headers': AUTHN_HEADERS,
