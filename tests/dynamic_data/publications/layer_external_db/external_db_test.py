@@ -19,7 +19,7 @@ EDGE_NAME = '__0_MyTest_CASE_AB7_'
 
 TEST_CASES = {
     'all_unspecified_geocolumn': {
-        'input_file_name': 'all',
+        'file_path': "sample/data/geometry-types/all.geojson",
         'style_file': None,
         'schema_name': 'public',
         'table_name': 'all',
@@ -37,7 +37,7 @@ TEST_CASES = {
         'exp_scale_denominator': 10_000_000,
     },
     'geometrycollection_mixed_case_table_name_unspecified_geocolumn_with_2_geocolumns': {
-        'input_file_name': 'geometrycollection',
+        'file_path': "sample/data/geometry-types/geometrycollection.geojson",
         'style_file': None,
         'schema_name': 'public',
         'table_name': 'MyGeometryCollection',
@@ -55,7 +55,7 @@ TEST_CASES = {
         'exp_scale_denominator': 100_000_000,
     },
     'linestring_edge_table_name': {
-        'input_file_name': 'linestring',
+        'file_path': "sample/data/geometry-types/linestring.geojson",
         'style_file': None,
         'schema_name': 'public',
         'table_name': EDGE_NAME,
@@ -71,7 +71,7 @@ TEST_CASES = {
         'exp_scale_denominator': 25_000_000,
     },
     'multilinestring_edge_schema_name': {
-        'input_file_name': 'multilinestring',
+        'file_path': "sample/data/geometry-types/multilinestring.geojson",
         'style_file': None,
         'schema_name': EDGE_NAME,
         'table_name': 'multilinestring',
@@ -87,7 +87,7 @@ TEST_CASES = {
         'exp_scale_denominator': 100_000_000,
     },
     'multipoint_edge_geo_column_name': {
-        'input_file_name': 'multipoint',
+        'file_path': "sample/data/geometry-types/multipoint.geojson",
         'style_file': None,
         'schema_name': 'public',
         'table_name': 'multipoint',
@@ -103,7 +103,7 @@ TEST_CASES = {
         'exp_scale_denominator': None,  # Layman doesn't guess scale denominator for (multi)points
     },
     'multipolygon_qml_custom_id_column': {
-        'input_file_name': 'multipolygon',
+        'file_path': "sample/data/geometry-types/multipolygon.geojson",
         'style_file': 'tests/dynamic_data/publications/layer_external_db/multipolygon.qml',
         'schema_name': 'public',
         'table_name': 'multipolygon',
@@ -119,7 +119,7 @@ TEST_CASES = {
         'exp_scale_denominator': 50_000_000,
     },
     'point_custom_id_column': {
-        'input_file_name': 'point',
+        'file_path': "sample/data/geometry-types/point.geojson",
         'style_file': None,
         'schema_name': 'public',
         'table_name': 'point',
@@ -135,7 +135,7 @@ TEST_CASES = {
         'exp_scale_denominator': None,  # Layman doesn't guess scale denominator for (multi)points
     },
     'polygon': {
-        'input_file_name': 'polygon',
+        'file_path': "sample/data/geometry-types/polygon.geojson",
         'style_file': None,
         'schema_name': 'public',
         'table_name': 'polygon',
@@ -178,14 +178,13 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     def test_layer(self, layer: Publication, rest_method, rest_args, params):
         """Parametrized using pytest_generate_tests"""
-        file_path = f"sample/data/geometry-types/{params['input_file_name']}.geojson"
         schema = params['schema_name']
         table = params['table_name']
         geo_column = params['geo_column_name']
         primary_key_column = params['primary_key_column']
 
         # import data into external DB
-        self.import_external_table(file_path, {
+        self.import_external_table(params['file_path'], {
             'schema': schema,
             'table': table,
             'geo_column': geo_column,
