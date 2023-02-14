@@ -153,10 +153,12 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         self.import_external_table(INPUT_FILE_PATH, {
             'schema': EXTERNAL_DB_SCHEMA,
             'table': EXTERNAL_DB_TABLE,
+            'launder': True,
         }, scope='class')
         self.import_external_table(INPUT_FILE_PATH, {
             'schema': EXTERNAL_DB_SCHEMA,
             'table': EXTERNAL_DB_TABLE_2,
+            'launder': True,
         }, scope='class')
 
     def test_new_attribute(self, layer: Publication, rest_args, params, parametrization):
