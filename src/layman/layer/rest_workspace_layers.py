@@ -54,34 +54,6 @@ def post(workspace):
         ]
     input_files = fs_util.InputFiles(sent_streams=sent_file_streams, sent_paths=sent_file_paths)
 
-    # DB_CONNECTION
-    external_table_uri_str = request.form.get('db_connection', '')
-    if not input_files and not external_table_uri_str:
-        raise LaymanError(1, {
-            'parameters': ['file', 'db_connection'],
-            'message': 'Both `file` and `db_connection` parameters are empty',
-            'expected': 'One of the parameters is filled.',
-        })
-    if input_files and external_table_uri_str:
-        raise LaymanError(48, {
-            'parameters': ['file', 'db_connection'],
-            'message': 'Both `file` and `db_connection` parameters are filled',
-            'expected': 'Only one of the parameters is fulfilled.',
-            'found': {
-                'file': input_files.raw_paths,
-                'db_connection': external_table_uri_str,
-            }})
-
-    # NAME
-    unsafe_layername = request.form.get('name', '')
-    if len(unsafe_layername) == 0:
-        unsafe_layername = input_file.get_unsafe_layername(input_files) if input_files else external_table_uri.table
-    layername = util.to_safe_layer_name(unsafe_layername)
-    util.check_layername(layername)
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername)
-    if info:
-        raise LaymanError(17, {'layername': layername})
-
     # CRS
     crs_id = None
     if len(request.form.get('crs', '')) > 0:
@@ -99,7 +71,34 @@ def post(workspace):
             }})
     check_crs = crs_id is None
 
+    # DB_CONNECTION
+    external_table_uri_str = request.form.get('db_connection', '')
+    if not input_files and not external_table_uri_str:
+        raise LaymanError(1, {
+            'parameters': ['file', 'db_connection'],
+            'message': 'Both `file` and `db_connection` parameters are empty',
+            'expected': 'One of the parameters is filled.',
+        })
+    if input_files and external_table_uri_str:
+        raise LaymanError(48, {
+            'parameters': ['file', 'db_connection'],
+            'message': 'Both `file` and `db_connection` parameters are filled',
+            'expected': 'Only one of the parameters is fulfilled.',
+            'found': {
+                'file': input_files.raw_paths,
+                'db_connection': external_table_uri_str,
+            }})
     external_table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None
+
+    # NAME
+    unsafe_layername = request.form.get('name', '')
+    if len(unsafe_layername) == 0:
+        unsafe_layername = input_file.get_unsafe_layername(input_files) if input_files else external_table_uri.table
+    layername = util.to_safe_layer_name(unsafe_layername)
+    util.check_layername(layername)
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername)
+    if info:
+        raise LaymanError(17, {'layername': layername})
 
     # Timeseries regex
     time_regex = request.form.get('time_regex') or None
