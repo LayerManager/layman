@@ -66,7 +66,8 @@ def ensure_table(schema, name, geo_column, *, primary_key_columns=None, other_co
 
 
 def import_table(input_file_path, *, table=None, schema='public', geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
-                 primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY, geometry_type=None, additional_geo_column=None):
+                 primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY, geometry_type=None, additional_geo_column=None,
+                 launder=False):
     table = table or os.path.splitext(os.path.basename(input_file_path))[0]
     primary_key_to_later_drop = 'pk_to_drop'
 
@@ -78,7 +79,7 @@ def import_table(input_file_path, *, table=None, schema='public', geo_column=set
         'ogr2ogr',
         '-nln', table,
         '-lco', f'SCHEMA={schema}',
-        '-lco', f'LAUNDER=NO',
+        '-lco', f'LAUNDER={"YES" if launder else "NO"}',
         '-lco', f'EXTRACT_SCHEMA_FROM_LAYER_NAME=NO',
         '-lco', f'GEOMETRY_NAME={geo_column}',
         '-lco', f"FID={primary_key_column if primary_key_column is not None else primary_key_to_later_drop}",
