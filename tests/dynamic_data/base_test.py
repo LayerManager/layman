@@ -174,6 +174,12 @@ class TestSingleRestPublication:
                                                      **args)
 
     @classmethod
+    def ensure_publication(cls, publication, args=None, scope='function'):
+        publ_set = cls.publications_to_cleanup_on_class_end if scope == 'class' else cls.publications_to_cleanup_on_function_end
+        if publication not in publ_set:
+            cls.post_publication(publication, args=args, scope=scope)
+
+    @classmethod
     def import_external_table(cls, file_path, args=None, scope='function'):
         args = args or {}
         assert scope in {'function', 'class'}
