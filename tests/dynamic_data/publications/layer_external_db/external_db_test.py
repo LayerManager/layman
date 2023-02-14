@@ -175,6 +175,23 @@ TEST_CASES = {
         'exp_languages': set(),
         'exp_scale_denominator': None,  # Layman doesn't guess scale denominator for (multi)points
     },
+    'point_epsg_3034': {
+        'file_path': "tests/dynamic_data/publications/crs/vectors/sample_point_cz_3034.shp",
+        'style_file': 'tests/dynamic_data/publications/crs/vectors/sample_point_cz.sld',
+        'schema_name': 'public',
+        'table_name': 'point_3034',
+        'primary_key_column': 'ogc_fid',
+        'geo_column_name': 'wkb_geometry',
+        'db_connection_str': None,
+        'additional_geo_column': None,
+        'exp_thumbnail': 'tests/dynamic_data/publications/crs/vectors/sample_point_cz_3034_thumbnail.png',
+        'exp_geometry_type': 'POINT',
+        'exp_native_crs': 'EPSG:3034',
+        'exp_native_bounding_box': [4464506.142159825, 2519866.800920298, 4464518.794200855, 2519878.8700591023],
+        'exp_bounding_box': [1848640.5623333207, 6308683.148403931, 1848662.1915096296, 6308704.001720284],
+        'exp_languages': set(),
+        'exp_scale_denominator': None,  # Layman doesn't guess scale denominator for (multi)points
+    },
 }
 
 
