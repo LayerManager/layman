@@ -3,14 +3,22 @@ import copy
 from owslib.feature.schema import get_schema as get_wfs_schema
 import pytest
 
+from db import util as db_util
 from layman import app, settings
 from layman.layer import db
 from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
+from layman.util import get_publication_info
 from test_tools.data import wfs as data_wfs
-from test_tools import process_client
+from test_tools import process_client, external_db
 from tests import Publication, EnumTestTypes, PublicationValues
 from tests.dynamic_data import base_test
+
+
+INPUT_FILE_PATH = 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
+EXTERNAL_DB_TABLE = 'ne_110m_admin_0_countries'
+EXTERNAL_DB_TABLE_2 = 'ne_110m_admin_0_countries_2'
+EXTERNAL_DB_SCHEMA = 'public'
 
 
 class StyleFileDomain(base_test.StyleFileDomainBase):
@@ -22,15 +30,27 @@ class LayerByTableLocation(base_test.PublicationByDefinitionBase):
     INTERNAL = (PublicationValues(
         type=process_client.LAYER_TYPE,
         definition={
-            'file_paths': ['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson', ],
+            'file_paths': [INPUT_FILE_PATH],
         },
         info_values={},
         thumbnail='',
         legend_image='',
     ), 'internal_table')
+    EXTERNAL = (PublicationValues(
+        type=process_client.LAYER_TYPE,
+        definition={
+            'db_connection': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
+        },
+        info_values={},
+        thumbnail='',
+        legend_image='',
+    ), 'external_table')
 
 
-WORKSPACE = 'dynamic_test_workspace_wfst_new_attribute'
+# It seems GeoServer is somehow sensitive to workspace and layer names, maybe to their length,
+# when receiving WFS-T requests, specifically wfs20_complex_points.
+# In this test case, GeoServer returns 500 for some combination of names.
+WORKSPACE = 'test_wfst_attr'
 AUTHN_HEADERS = process_client.get_authz_headers(WORKSPACE)
 
 TEST_CASES = {
@@ -112,48 +132,68 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
     ]
 
     test_cases = [
-        base_test.TestCaseType(key=key,
-                               publication=lambda cls, parametrization: Publication(
-                                   workspace=cls.workspace,
-                                   type=cls.publication_type,
-                                   # if following name is used, wfs20_complex_points with QML fails for unknown reason
-                                   # name=f"layer_{parametrization.style_file.publ_name_part}"),
-                                   name=f"new_attribute_layer_{parametrization.style_file.publ_name_part}"),
-                               type=EnumTestTypes.MANDATORY,
-                               params=copy.deepcopy(params),
-                               rest_args={
-                                   'headers': AUTHN_HEADERS,
-                               }
-                               )
+        base_test.TestCaseType(
+            key=key,
+            publication=lambda cls, parametrization: Publication(
+                workspace=cls.workspace,
+                type=cls.publication_type,
+                name=f"lr_{'_'.join(v.publ_name_part for v in parametrization.values_list)}"),
+            type=EnumTestTypes.MANDATORY,
+            specific_types={frozenset([StyleFileDomain.QML, LayerByTableLocation.EXTERNAL]): EnumTestTypes.IGNORE},
+            params=copy.deepcopy(params),
+            rest_args={
+                'headers': AUTHN_HEADERS,
+            }
+        )
         for key, params in TEST_CASES.items()
     ]
 
     def before_class(self):
         process_client.ensure_reserved_username(self.workspace, headers=AUTHN_HEADERS)
+        self.import_external_table(INPUT_FILE_PATH, {
+            'schema': EXTERNAL_DB_SCHEMA,
+            'table': EXTERNAL_DB_TABLE,
+        }, scope='class')
+        self.import_external_table(INPUT_FILE_PATH, {
+            'schema': EXTERNAL_DB_SCHEMA,
+            'table': EXTERNAL_DB_TABLE_2,
+        }, scope='class')
 
     def test_new_attribute(self, layer: Publication, rest_args, params, parametrization):
         # ensure layers
+        if layer not in self.publications_to_cleanup_on_class_end:
+            self.post_publication(layer, args=rest_args, scope='class')
         layer2 = Publication(name=f"{layer.name}_2", workspace=self.workspace, type=layer.type)
-        for lyr in [layer, layer2]:
-            if lyr not in self.publications_to_cleanup_on_class_end:
-                self.post_publication(lyr, args=rest_args, scope='class')
+        rest_args2 = rest_args if 'db_connection' not in rest_args else {
+            **rest_args,
+            'db_connection': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE_2}&geo_column=wkb_geometry",
+        }
+        if layer2 not in self.publications_to_cleanup_on_class_end:
+            self.post_publication(layer2, args=rest_args2, scope='class')
 
         # prepare data for WFS-T request and tuples of new attributes
         wfst_data, new_attributes = self.prepare_wfst_data_and_new_attributes(layer, layer2, params)
 
         # make WFS-T request and check that new attributes were added
-        self.post_wfst_and_check_attributes(self.workspace, new_attributes, wfst_data,
-                                            parametrization.style_file.style_type)
+        style_type = parametrization.style_file.style_type
+        with app.app_context():
+            table_uri = get_publication_info(self.workspace, layer.type, layer.name,
+                                             context={'keys': ['table_uri']})['_table_uri']
+        conn_cur = db_util.create_connection_cursor(table_uri.db_uri_str)
+        self.post_wfst_and_check_attributes(self.workspace, new_attributes, wfst_data, style_type, conn_cur)
 
     @staticmethod
-    def post_wfst_and_check_attributes(workspace, new_attributes, data_xml, style_type):
+    def post_wfst_and_check_attributes(workspace, new_attributes, data_xml, style_type, conn_cur):
         with app.app_context():
             wfs_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}/wfs"
             old_db_attributes = {}
             old_wfs_properties = {}
             for layer, attr_names in new_attributes:
                 # test that all attr_names are not yet presented in DB table
-                old_db_attributes[layer] = db.get_all_column_names(workspace, layer)
+                table_uri = get_publication_info(workspace, process_client.LAYER_TYPE, layer,
+                                                 context={'keys': ['table_uri']})['_table_uri']
+                old_db_attributes[layer] = db.get_all_table_column_names(table_uri.schema, table_uri.table,
+                                                                         conn_cur=conn_cur)
                 for attr_name in attr_names:
                     assert attr_name not in old_db_attributes[layer], \
                         f"old_db_attributes={old_db_attributes[layer]}, attr_name={attr_name}"
@@ -172,7 +212,10 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
             new_wfs_properties = {}
             for layer, attr_names in new_attributes:
                 # test that exactly all attr_names were created in DB table
-                new_db_attributes[layer] = db.get_all_column_names(workspace, layer)
+                table_uri = get_publication_info(workspace, process_client.LAYER_TYPE, layer,
+                                                 context={'keys': ['table_uri']})['_table_uri']
+                new_db_attributes[layer] = db.get_all_table_column_names(table_uri.schema, table_uri.table,
+                                                                         conn_cur=conn_cur)
                 for attr_name in attr_names:
                     assert attr_name in new_db_attributes[layer], \
                         f"new_db_attributes={new_db_attributes[layer]}, attr_name={attr_name}"
