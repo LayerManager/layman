@@ -158,6 +158,23 @@ TEST_CASES = {
         'exp_languages': set(),
         'exp_scale_denominator': 10_000_000,
     },
+    'point_epsg_5514_qml': {
+        'file_path': "tests/dynamic_data/publications/crs/vectors/sample_point_cz_5514.shp",
+        'style_file': 'tests/dynamic_data/publications/crs/vectors/sample_point_cz.qml',
+        'schema_name': 'public',
+        'table_name': 'point_5514',
+        'primary_key_column': 'ogc_fid',
+        'geo_column_name': 'wkb_geometry',
+        'db_connection_str': None,
+        'additional_geo_column': None,
+        'exp_thumbnail': 'tests/dynamic_data/publications/crs/vectors/sample_point_cz_5514_thumbnail.png',
+        'exp_geometry_type': 'POINT',
+        'exp_native_crs': 'EPSG:5514',
+        'exp_native_bounding_box': [-598214.7290553625, -1160319.8064114263, -598200.932166816, -1160307.4425631783],
+        'exp_bounding_box': [1848640.4769060146, 6308683.577507495, 1848663.461145939, 6308704.681240051],
+        'exp_languages': set(),
+        'exp_scale_denominator': None,  # Layman doesn't guess scale denominator for (multi)points
+    },
 }
 
 
