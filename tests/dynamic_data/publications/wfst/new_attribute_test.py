@@ -162,10 +162,12 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         }, scope='class')
 
     def test_new_attribute(self, layer: Publication, rest_args, params, parametrization):
+        workspace = self.workspace
+
         # ensure layers
         if layer not in self.publications_to_cleanup_on_class_end:
             self.post_publication(layer, args=rest_args, scope='class')
-        layer2 = Publication(name=f"{layer.name}_2", workspace=self.workspace, type=layer.type)
+        layer2 = Publication(name=f"{layer.name}_2", workspace=workspace, type=layer.type)
         rest_args2 = rest_args if 'db_connection' not in rest_args else {
             **rest_args,
             'db_connection': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE_2}&geo_column=wkb_geometry",
@@ -176,69 +178,71 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         # prepare data for WFS-T request and tuples of new attributes
         wfst_data, new_attributes = self.prepare_wfst_data_and_new_attributes(layer, layer2, params)
 
-        # make WFS-T request and check that new attributes were added
         style_type = parametrization.style_file.style_type
-        with app.app_context():
-            table_uri = get_publication_info(self.workspace, layer.type, layer.name,
-                                             context={'keys': ['table_uri']})['_table_uri']
-        conn_cur = db_util.create_connection_cursor(table_uri.db_uri_str)
-        self.post_wfst_and_check_attributes(self.workspace, new_attributes, wfst_data, style_type, conn_cur)
+        wfs_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}/wfs"
+        table_uris = {}
+        conn_cur = None
 
-    @staticmethod
-    def post_wfst_and_check_attributes(workspace, new_attributes, data_xml, style_type, conn_cur):
-        with app.app_context():
-            wfs_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}/wfs"
-            old_db_attributes = {}
-            old_wfs_properties = {}
-            for layer, attr_names in new_attributes:
-                # test that all attr_names are not yet presented in DB table
-                table_uri = get_publication_info(workspace, process_client.LAYER_TYPE, layer,
+        # get current attributes and assert that new attributes are not yet present
+        old_db_attributes = {}
+        old_wfs_properties = {}
+        for layer_name, attr_names in new_attributes:
+            # assert that all attr_names are not yet presented in DB table
+            with app.app_context():
+                table_uri = get_publication_info(workspace, process_client.LAYER_TYPE, layer_name,
                                                  context={'keys': ['table_uri']})['_table_uri']
-                old_db_attributes[layer] = db.get_all_table_column_names(table_uri.schema, table_uri.table,
-                                                                         conn_cur=conn_cur)
-                for attr_name in attr_names:
-                    assert attr_name not in old_db_attributes[layer], \
-                        f"old_db_attributes={old_db_attributes[layer]}, attr_name={attr_name}"
-                layer_schema = get_wfs_schema(wfs_url, typename=f"{workspace}:{layer}",
-                                              version=geoserver_wfs.VERSION, headers=AUTHN_HEADERS)
-                old_wfs_properties[layer] = sorted(layer_schema['properties'].keys())
-                if style_type == 'qml':
-                    assert qgis_wms.get_layer_info(workspace, layer)
-                    old_qgis_attributes = qgis_util.get_layer_attribute_names(workspace, layer)
-                    assert all(attr_name not in old_qgis_attributes
-                               for attr_name in attr_names), (attr_names, old_qgis_attributes)
+            conn_cur = conn_cur or db_util.create_connection_cursor(table_uri.db_uri_str)
+            table_uris[layer_name] = table_uri
+            old_db_attributes[layer_name] = db.get_all_table_column_names(table_uri.schema, table_uri.table,
+                                                                          conn_cur=conn_cur)
+            for attr_name in attr_names:
+                assert attr_name not in old_db_attributes[layer_name], \
+                    f"old_db_attributes={old_db_attributes[layer_name]}, attr_name={attr_name}"
 
-            process_client.post_wfst(data_xml, headers=AUTHN_HEADERS, workspace=workspace)
+            # assert that all attr_names are not yet presented in WFS feature type
+            layer_schema = get_wfs_schema(wfs_url, typename=f"{workspace}:{layer_name}",
+                                          version=geoserver_wfs.VERSION, headers=AUTHN_HEADERS)
+            old_wfs_properties[layer_name] = sorted(layer_schema['properties'].keys())
 
-            new_db_attributes = {}
-            new_wfs_properties = {}
-            for layer, attr_names in new_attributes:
-                # test that exactly all attr_names were created in DB table
-                table_uri = get_publication_info(workspace, process_client.LAYER_TYPE, layer,
-                                                 context={'keys': ['table_uri']})['_table_uri']
-                new_db_attributes[layer] = db.get_all_table_column_names(table_uri.schema, table_uri.table,
-                                                                         conn_cur=conn_cur)
-                for attr_name in attr_names:
-                    assert attr_name in new_db_attributes[layer], \
-                        f"new_db_attributes={new_db_attributes[layer]}, attr_name={attr_name}"
-                assert set(attr_names).union(set(old_db_attributes[layer])) == set(new_db_attributes[layer])
+            if style_type == 'qml':
+                # assert that all attr_names are not yet presented in QML
+                with app.app_context():
+                    assert qgis_wms.get_layer_info(workspace, layer_name)
+                    old_qgis_attributes = qgis_util.get_layer_attribute_names(workspace, layer_name)
+                assert all(attr_name not in old_qgis_attributes
+                           for attr_name in attr_names), (attr_names, old_qgis_attributes)
 
-                # test that exactly all attr_names were distinguished also in WFS feature type
-                layer_schema = get_wfs_schema(wfs_url, typename=f"{workspace}:{layer}",
-                                              version=geoserver_wfs.VERSION, headers=AUTHN_HEADERS)
-                new_wfs_properties[layer] = sorted(layer_schema['properties'].keys())
-                for attr_name in attr_names:
-                    assert attr_name in new_wfs_properties[layer], \
-                        f"new_wfs_properties={new_wfs_properties[layer]}, attr_name={attr_name}"
-                assert set(attr_names).union(set(old_wfs_properties[layer])) == set(new_wfs_properties[layer]), \
-                    set(new_wfs_properties[layer]).difference(set(attr_names).union(set(old_wfs_properties[layer])))
-                if style_type == 'qml':
-                    assert qgis_wms.get_layer_info(workspace, layer)
-                    new_qgis_attributes = qgis_util.get_layer_attribute_names(workspace, layer)
-                    assert all(attr_name in new_qgis_attributes
-                               for attr_name in attr_names), (attr_names, new_qgis_attributes)
-                else:
-                    assert not qgis_wms.get_layer_info(workspace, layer)
+        # make WFS-T request
+        process_client.post_wfst(wfst_data, headers=AUTHN_HEADERS, workspace=workspace)
+
+        # assert that new attributes are present
+        for layer_name, attr_names in new_attributes:
+            # assert that exactly all attr_names were created in DB table
+            table_uri = table_uris[layer_name]
+            db_attributes = db.get_all_table_column_names(table_uri.schema, table_uri.table, conn_cur=conn_cur)
+            for attr_name in attr_names:
+                assert attr_name in db_attributes, f"db_attributes={db_attributes}, attr_name={attr_name}"
+            assert set(attr_names).union(set(old_db_attributes[layer_name])) == set(db_attributes)
+
+            # assert that exactly all attr_names are present also in WFS feature type
+            layer_schema = get_wfs_schema(wfs_url, typename=f"{workspace}:{layer_name}",
+                                          version=geoserver_wfs.VERSION, headers=AUTHN_HEADERS)
+            wfs_properties = sorted(layer_schema['properties'].keys())
+            for attr_name in attr_names:
+                assert attr_name in wfs_properties, f"wfs_properties={wfs_properties}, attr_name={attr_name}"
+            assert set(attr_names).union(set(old_wfs_properties[layer_name])) == set(wfs_properties), \
+                set(wfs_properties).difference(set(attr_names).union(set(old_wfs_properties[layer_name])))
+
+            if style_type == 'qml':
+                # assert that exactly all attr_names are present also in QML
+                with app.app_context():
+                    assert qgis_wms.get_layer_info(workspace, layer_name)
+                    new_qgis_attributes = qgis_util.get_layer_attribute_names(workspace, layer_name)
+                assert all(attr_name in new_qgis_attributes for attr_name in attr_names), \
+                    (attr_names, new_qgis_attributes)
+            else:
+                with app.app_context():
+                    assert not qgis_wms.get_layer_info(workspace, layer_name)
 
     @staticmethod
     def prepare_wfst_data_and_new_attributes(layer, layer2, params):
