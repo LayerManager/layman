@@ -12,6 +12,7 @@ from layman.util import get_publication_info
 from test_tools.data import wfs as data_wfs
 from test_tools import process_client, external_db
 from tests import Publication, EnumTestTypes, PublicationValues
+from tests.asserts.final.publication import util as assert_publ_util
 from tests.dynamic_data import base_test
 
 
@@ -237,6 +238,10 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
 
         # make WFS-T request
         process_client.post_wfst(wfst_data, headers=AUTHN_HEADERS, workspace=workspace)
+        for layer_name, _ in new_attributes:
+            process_client.wait_for_publication_status(workspace, self.publication_type, layer_name,
+                                                       headers=AUTHN_HEADERS)
+            assert_publ_util.is_publication_valid_and_complete(layer)
 
         # assert that new attributes are present
         for layer_name, attr_names in new_attributes:
