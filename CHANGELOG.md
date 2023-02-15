@@ -20,6 +20,8 @@ make timgen-build
 ### Changes
 - [#703](https://github.com/LayerManager/layman/issues/703) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new body parameter *db_connection*.
 - [#703](https://github.com/LayerManager/layman/issues/703) Endpoint [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) supports parameter `crs` only if `file` is provided.
+- [#703](https://github.com/LayerManager/layman/issues/703)  Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) returns new subkey:
+  - `original_data_source` with values `file` or `database_table`
 - [#772](https://github.com/LayerManager/layman/issues/772) Speed up endpoints [GET Workspace Layer Thumbnail](doc/rest.md#get-workspace-layer-thumbnail), [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style), [GET Workspace Map Thumbnail](doc/rest.md#get-workspace-map-thumbnail) and [GET Workspace Map File](doc/rest.md#get-workspace-map-file).
 - [#755](https://github.com/LayerManager/layman/issues/755) Downgrade Node.js of Timgen from v18 to v16
 

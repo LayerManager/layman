@@ -298,6 +298,7 @@ JSON object with following structure:
 - **~~sld~~**
   - **Deprecated**
   - Replaced by **style**, contains same info
+- **original_data_source**: String. Either `file` if layer was published from file, or `database_table` if layer was published from external database table 
 - *metadata*
   - *identifier*: String. Identifier of metadata record in CSW instance.
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.
