@@ -167,7 +167,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            'url': f'{settings.LAYMAN_GS_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows',
                                            'workspace': f'{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'},
                                        'description': None,
-                                       '_is_external_table': bool(external_table_uri),
+                                       'original_data_source': settings.EnumOriginalDataSource.TABLE.value if external_table_uri else settings.EnumOriginalDataSource.FILE.value,
                                    })
 
         if file_extension:

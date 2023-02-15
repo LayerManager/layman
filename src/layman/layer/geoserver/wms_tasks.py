@@ -23,7 +23,7 @@ def patch_after_feature_change(
         raise AbortedException
 
     publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
-                                                 context={'keys': ['file_type', 'is_external_table']})
+                                                 context={'keys': ['file_type', 'original_data_source']})
     file_type = publ_info['_file_type']
     if file_type == settings.FILE_TYPE_VECTOR:
         bbox = geoserver.get_layer_bbox(workspace, layer)
@@ -33,8 +33,8 @@ def patch_after_feature_change(
         crs = info['native_crs']
         lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
         if style_type == 'sld':
-            is_external_table = info['_is_external_table']
-            store_name = get_external_db_store_name(layer) if is_external_table else gs_util.DEFAULT_DB_STORE_NAME
+            original_data_source = info['original_data_source']
+            store_name = get_external_db_store_name(layer) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
             gs_util.patch_feature_type(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs,
                                        lat_lon_bbox=lat_lon_bbox, store_name=store_name)
         elif style_type == 'qml':

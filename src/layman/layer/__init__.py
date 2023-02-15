@@ -3,11 +3,6 @@ from collections import namedtuple, OrderedDict
 LAYER_TYPE = __name__
 
 
-class EnumTableType(Enum):
-    INTERNAL = 'internal'
-    EXTERNAL = 'external'
-
-
 def get_layer_type_def():
     return PUBLICATION_TYPES[LAYER_TYPE]
 
@@ -16,10 +11,9 @@ def get_layer_sources():
     return get_layer_type_def()['internal_sources']
 
 
-def get_layer_info_keys(*, file_type, is_external_table):
+def get_layer_info_keys(*, file_type, original_data_source):
     if file_type == settings.FILE_TYPE_VECTOR:
-        table_type = EnumTableType.EXTERNAL if is_external_table else EnumTableType.INTERNAL
-        key = (file_type, table_type)
+        key = (file_type, original_data_source)
     else:
         key = file_type
     result = get_layer_type_def()['info_keys'][key]
@@ -62,7 +56,7 @@ PUBLICATION_TYPES = {
             ('layman.layer.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'title', 'uuid',
                                                                                      'bounding_box', 'style_type', 'native_crs',
                                                                                      'native_bounding_box', 'file_type', 'updated_at', 'id', 'type', 'image_mosaic',
-                                                                                     'table_uri', 'is_external_table']),),
+                                                                                     'table_uri', 'original_data_source']),),
             ('layman.layer.filesystem.input_chunk', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_file', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_style', InternalSourceTypeDef(info_items=[]),),
@@ -108,21 +102,25 @@ PUBLICATION_TYPES = {
             }
         },
         'info_keys': {
-            (settings.FILE_TYPE_VECTOR, EnumTableType.INTERNAL): {'name', 'uuid', 'layman_metadata', 'url', 'title', 'description',
-                                                                  'updated_at', 'wms', 'wfs', 'thumbnail', 'file', 'db_table',
-                                                                  'metadata',
-                                                                  'style', 'sld', 'access_rights', 'bounding_box', 'native_crs',
-                                                                  'native_bounding_box', },
-            (settings.FILE_TYPE_VECTOR, EnumTableType.EXTERNAL): {'name', 'uuid', 'layman_metadata', 'url', 'title', 'description',
-                                                                  'updated_at', 'wms', 'wfs', 'thumbnail', 'metadata', 'style', 'sld',
-                                                                  'access_rights', 'bounding_box', 'native_crs',
-                                                                  'native_bounding_box', },
-            settings.FILE_TYPE_RASTER: {'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at',
-                                        'wms', 'thumbnail', 'file', 'metadata', 'style', 'sld', 'access_rights',
-                                        'bounding_box', 'native_crs', 'native_bounding_box', 'image_mosaic', },
-            settings.FILE_TYPE_UNKNOWN: {'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at',
-                                         'wms', 'thumbnail', 'file', 'metadata', 'style', 'sld', 'access_rights',
-                                         'bounding_box', 'native_crs', 'native_bounding_box', },
+            (settings.FILE_TYPE_VECTOR, settings.EnumOriginalDataSource.FILE.value): {
+                'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'wfs', 'thumbnail', 'file',
+                'db_table', 'metadata', 'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
+                'original_data_source',
+            },
+            (settings.FILE_TYPE_VECTOR, settings.EnumOriginalDataSource.TABLE.value): {
+                'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'wfs', 'thumbnail',
+                'metadata', 'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
+                'original_data_source',
+            },
+            settings.FILE_TYPE_RASTER: {
+                'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'thumbnail', 'file', 'metadata',
+                'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', 'image_mosaic',
+                'original_data_source',
+            },
+            settings.FILE_TYPE_UNKNOWN: {
+                'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'thumbnail', 'file', 'metadata',
+                'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', 'original_data_source',
+            },
         },
         'multi_info_keys_to_remove': [],
     }

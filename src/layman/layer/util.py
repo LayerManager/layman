@@ -79,8 +79,8 @@ def get_providers():
 
 def fill_in_partial_info_statuses(info, chain_info):
     file_type = info.get('file', dict()).get('file_type') or info['_file_type']
-    is_external_table = info.get('_is_external_table', False)
-    item_keys = get_layer_info_keys(file_type=file_type, is_external_table=is_external_table)
+    original_data_source = info.get('original_data_source', settings.EnumOriginalDataSource.FILE.value)
+    item_keys = get_layer_info_keys(file_type=file_type, original_data_source=original_data_source)
 
     return layman_util.get_info_with_statuses(info, chain_info, TASKS_TO_LAYER_INFO_KEYS, item_keys)
 
@@ -111,8 +111,8 @@ def get_complete_layer_info(workspace=None, layername=None, cached=False):
         raise LaymanError(15, {'layername': layername})
 
     file_type = partial_info['_file_type']
-    is_external_table = partial_info['_is_external_table']
-    item_keys = get_layer_info_keys(file_type=file_type, is_external_table=is_external_table)
+    original_data_source = partial_info['original_data_source']
+    item_keys = get_layer_info_keys(file_type=file_type, original_data_source=original_data_source)
 
     complete_info = dict()
     for key in item_keys:

@@ -21,7 +21,7 @@ def patch_after_feature_change(
         raise AbortedException
 
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
-                                            context={'keys': ['file_type', 'native_crs', 'is_external_table']})
+                                            context={'keys': ['file_type', 'native_crs', 'original_data_source']})
     file_type = info['_file_type']
     if file_type == settings.FILE_TYPE_RASTER:
         return
@@ -30,8 +30,8 @@ def patch_after_feature_change(
 
     bbox = geoserver.get_layer_bbox(workspace, layer)
     crs = info['native_crs']
-    is_external_table = info['_is_external_table']
-    store_name = get_external_db_store_name(layer) if is_external_table else gs_util.DEFAULT_DB_STORE_NAME
+    original_data_source = info['original_data_source']
+    store_name = get_external_db_store_name(layer) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
     gs_util.patch_feature_type(workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs,
                                store_name=store_name)
     wfs.clear_cache(workspace)

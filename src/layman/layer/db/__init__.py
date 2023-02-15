@@ -19,9 +19,9 @@ ColumnInfo = namedtuple('ColumnInfo', 'name data_type')
 
 
 def get_internal_table_name(workspace, layer):
-    layer_info = get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['uuid', 'is_external_table']})
+    layer_info = get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['uuid', 'original_data_source']})
     table_name = None
-    if layer_info and not layer_info['_is_external_table']:
+    if layer_info and layer_info['original_data_source'] == settings.EnumOriginalDataSource.FILE.value:
         uuid = layer_info['uuid'].replace('-', '_')
         table_name = f'layer_{uuid}'
     return table_name

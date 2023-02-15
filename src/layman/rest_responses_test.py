@@ -123,6 +123,7 @@ class TestResponsesClass:
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
         'wfs': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}/wfs'},
         'wms': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}_wms/ows'},
+        'original_data_source': 'file',
     }
     expected_map = {
         **expected_common,

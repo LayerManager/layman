@@ -49,7 +49,7 @@ def patch(workspace, layername):
 
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername,
                                             context={'keys': ['title', 'name', 'description', 'table_uri', 'file_type', 'style_type',
-                                                              'is_external_table', ]})
+                                                              'original_data_source', ]})
     kwargs = {
         'title': info.get('title', info['name']) or '',
         'description': info.get('description', '') or '',
@@ -99,7 +99,7 @@ def patch(workspace, layername):
                 'file': request.form.getlist('file'),
             }})
 
-    external_table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None if input_files or not info.get('_is_external_table') else info.get('_table_uri')
+    external_table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None if input_files or info.get('original_data_source') == settings.EnumOriginalDataSource.FILE.value else info.get('_table_uri')
 
     # TITLE
     if len(request.form.get('title', '')) > 0:
@@ -191,7 +191,8 @@ def patch(workspace, layername):
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
     kwargs['external_table_uri'] = external_table_uri
-    kwargs['is_external_table'] = not input_files and (bool(external_table_uri) or info.get('_is_external_table'))
+    is_external_table = not input_files and (bool(external_table_uri) or info.get('original_data_source') == settings.EnumOriginalDataSource.TABLE.value)
+    kwargs['original_data_source'] = settings.EnumOriginalDataSource.TABLE.value if is_external_table else settings.EnumOriginalDataSource.FILE.value
 
     layer_result = {}
 
