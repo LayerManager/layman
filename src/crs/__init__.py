@@ -17,6 +17,8 @@ CRSTypeDef = namedtuple('CRSTypeDef', [
     # Boolean value, True if CRS definition in epsg.org DB specify axes in easting-northing order
     'axes_order_east_north_in_epsg_db',
     # Definition used for PostGIS spatial_ref_sys table
+    # It is used when transforming bounding boxes in prime DB schema.
+    # It is not used for data transformation in WMS and WFS (data are transformed by GeoServer).
     'proj4text',
     # SRID of transformation definition if it differs from the default one
     'srid'
