@@ -87,7 +87,8 @@ def refresh_gdal(self, workspace, layername,
                  crs_id=None,
                  overview_resampling=None,
                  name_normalized_tif_by_layer=True,
-                 is_external_table=False):
+                 original_data_source=settings.EnumOriginalDataSource.FILE.value,
+                 ):
     def finish_gdal_process(process):
         if self.is_aborted():
             logger.info(f'terminating GDAL process workspace.layer={workspace}.{layername}')
@@ -103,7 +104,7 @@ def refresh_gdal(self, workspace, layername,
 
     if self.is_aborted():
         raise AbortedException
-    if is_external_table:
+    if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
         return
     layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
     file_type = layer_info['file']['file_type']

@@ -34,7 +34,7 @@ def get_flask_proxy_key(workspace):
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer(workspace, layername, is_external_table, title, description, access_rights=None):
+def patch_layer(workspace, layername, original_data_source, title, description, access_rights=None):
     if not get_layer_info(workspace, layername):
         return
     geoserver_workspace = get_geoserver_workspace(workspace)
@@ -42,7 +42,7 @@ def patch_layer(workspace, layername, is_external_table, title, description, acc
     file_type = info['_file_type']
     if file_type == settings.FILE_TYPE_VECTOR:
         if info['_style_type'] == 'sld':
-            store_name = get_external_db_store_name(layername) if is_external_table else gs_util.DEFAULT_DB_STORE_NAME
+            store_name = get_external_db_store_name(layername) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
             gs_util.patch_feature_type(geoserver_workspace, layername, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
         if info['_style_type'] == 'qml':
             gs_util.patch_wms_layer(geoserver_workspace, layername, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)

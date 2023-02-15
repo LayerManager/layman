@@ -240,7 +240,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                        geo_column=external_table_uri['geo_column'],
                                        primary_key_column=external_table_uri['primary_key_column'],
                                    ) if external_table_uri else None,
-                                   '_is_external_table': bool(external_table_uri),
+                                   'original_data_source': settings.EnumOriginalDataSource.TABLE.value if external_table_uri else settings.EnumOriginalDataSource.FILE.value,
                                    'native_bounding_box': [xmin, ymin, xmax, ymax],
                                    'native_crs': db_util.get_crs(srid) if srid else None,
                                    'access_rights': {'read': can_read_users.split(','),

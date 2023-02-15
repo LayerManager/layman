@@ -1,11 +1,18 @@
 import os
 import re
 from urllib.parse import urljoin, urlparse
+from enum import Enum
 import redis
 
 import db
 import geoserver
 from layman_settings_util import read_clients_dict_from_env
+
+
+class EnumOriginalDataSource(Enum):
+    FILE = 'file'
+    TABLE = 'database_table'
+
 
 LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
 

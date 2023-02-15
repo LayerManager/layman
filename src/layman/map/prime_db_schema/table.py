@@ -15,7 +15,7 @@ def get_map_info(workspace, mapname):
     info = maps.get((workspace, MAP_TYPE, mapname), dict())
     if info:
         info.pop('_table_uri', None)
-        info.pop('_is_external_table', None)
+        info.pop('original_data_source', None)
     return info
 
 

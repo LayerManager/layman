@@ -35,7 +35,7 @@ def refresh_wms(
         access_rights=None,
         image_mosaic=False,
         slugified_time_regex=None,
-        is_external_table=None,
+        original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': [
         'file', 'file_type', 'native_bounding_box', 'native_crs', 'table_uri'
@@ -56,7 +56,7 @@ def refresh_wms(
             table_uri = info['_table_uri']
             table_name = table_uri.table
             store_name = None
-            if is_external_table:
+            if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
                 store_name = geoserver.create_external_db_store(workspace=geoserver_workspace,
                                                                 layer=layername,
                                                                 table_uri=table_uri,
@@ -137,7 +137,7 @@ def refresh_wfs(
         description=None,
         title=None,
         access_rights=None,
-        is_external_table=None,
+        original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file_type', 'native_crs', 'table_uri']})
     file_type = info['_file_type']
@@ -155,7 +155,7 @@ def refresh_wfs(
     crs = info['native_crs']
     table_name = info['_table_uri'].table
     store_name = None
-    if is_external_table:
+    if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
         table_uri = info['_table_uri']
         store_name = geoserver.create_external_db_store(workspace=workspace,
                                                         layer=layername,
