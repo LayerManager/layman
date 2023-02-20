@@ -1,6 +1,16 @@
 from enum import Enum
 from collections import namedtuple, OrderedDict
+
+from layman import settings
+from layman.util import url_for
+from ..common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH
+
 LAYER_TYPE = __name__
+
+LAYERNAME_PATTERN = PUBLICATION_NAME_PATTERN
+LAYERNAME_MAX_LENGTH = PUBLICATION_MAX_LENGTH
+ATTRNAME_PATTERN = PUBLICATION_NAME_PATTERN
+SAFE_PG_IDENTIFIER_PATTERN = r"^[a-zA-Z_][a-zA-Z_0-9]*$"
 
 
 def get_layer_type_def():
@@ -23,8 +33,6 @@ def get_layer_info_keys(*, file_type, original_data_source):
 LAYER_REST_PATH_NAME = "layers"
 
 
-from layman import settings
-from layman.util import url_for
 from ..common import InternalSourceTypeDef
 from .rest_workspace_layers import bp as workspace_layers_bp
 from .rest_workspace_layer import bp as workspace_layer_bp

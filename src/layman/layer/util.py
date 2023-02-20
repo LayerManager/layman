@@ -10,14 +10,10 @@ from layman.util import call_modules_fn, get_providers_from_source_names, get_in
     to_safe_name, url_for
 from layman import celery as celery_util, common
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
-from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info as common_clear_publication_info
-from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_keys
+from layman.common.util import clear_publication_info as common_clear_publication_info
+from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_keys, LAYERNAME_PATTERN, \
+    LAYERNAME_MAX_LENGTH, SAFE_PG_IDENTIFIER_PATTERN
 from .db import get_all_table_column_names, get_crs
-
-LAYERNAME_PATTERN = PUBLICATION_NAME_PATTERN
-LAYERNAME_MAX_LENGTH = PUBLICATION_MAX_LENGTH
-ATTRNAME_PATTERN = PUBLICATION_NAME_PATTERN
-SAFE_PG_IDENTIFIER_PATTERN = r"^[a-zA-Z_][a-zA-Z_0-9]*$"
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
