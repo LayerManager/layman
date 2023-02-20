@@ -138,7 +138,7 @@ def get_template_path_and_values(workspace, layername, http_method):
     temporal_extent = publ_info['wms'].get('time', dict()).get('values', [])
 
     file_type = publ_info.get('_file_type')
-    if file_type == settings.FILE_TYPE_VECTOR:
+    if file_type == settings.GEODATA_TYPE_VECTOR:
         table_uri = publ_info['_table_uri']
         table_name = table_uri.table
         conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
@@ -156,7 +156,7 @@ def get_template_path_and_values(workspace, layername, http_method):
             'scale_denominator': scale_denominator,
         }
         wfs_url = wfs.get_wfs_url(workspace, external_url=True)
-    elif file_type == settings.FILE_TYPE_RASTER:
+    elif file_type == settings.GEODATA_TYPE_RASTER:
         languages = []
         bbox_sphere_size = prime_db_table.get_bbox_sphere_size(workspace, layername)
         distance_value = gdal.get_normalized_ground_sample_distance_in_m(workspace, layername,

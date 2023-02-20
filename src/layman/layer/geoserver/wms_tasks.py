@@ -25,7 +25,7 @@ def patch_after_feature_change(
     publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
                                                  context={'keys': ['file_type', 'original_data_source']})
     file_type = publ_info['_file_type']
-    if file_type == settings.FILE_TYPE_VECTOR:
+    if file_type == settings.GEODATA_TYPE_VECTOR:
         bbox = geoserver.get_layer_bbox(workspace, layer)
         geoserver_workspace = wms.get_geoserver_workspace(workspace)
         info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['style_type', 'native_crs', ], })
@@ -39,7 +39,7 @@ def patch_after_feature_change(
                                        lat_lon_bbox=lat_lon_bbox, store_name=store_name)
         elif style_type == 'qml':
             gs_util.patch_wms_layer(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs, lat_lon_bbox=lat_lon_bbox)
-    elif file_type != settings.FILE_TYPE_RASTER:
+    elif file_type != settings.GEODATA_TYPE_RASTER:
         raise NotImplementedError(f"Unknown file type: {file_type}")
 
     wms.clear_cache(workspace)

@@ -22,7 +22,7 @@ def get_layer_sources():
 
 
 def get_layer_info_keys(*, file_type, original_data_source):
-    if file_type == settings.FILE_TYPE_VECTOR:
+    if file_type == settings.GEODATA_TYPE_VECTOR:
         key = (file_type, original_data_source)
     else:
         key = file_type
@@ -110,22 +110,22 @@ PUBLICATION_TYPES = {
             }
         },
         'info_keys': {
-            (settings.FILE_TYPE_VECTOR, settings.EnumOriginalDataSource.FILE.value): {
+            (settings.GEODATA_TYPE_VECTOR, settings.EnumOriginalDataSource.FILE.value): {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'wfs', 'thumbnail', 'file',
                 'db_table', 'metadata', 'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
                 'original_data_source',
             },
-            (settings.FILE_TYPE_VECTOR, settings.EnumOriginalDataSource.TABLE.value): {
+            (settings.GEODATA_TYPE_VECTOR, settings.EnumOriginalDataSource.TABLE.value): {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'wfs', 'thumbnail',
                 'metadata', 'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
                 'original_data_source',
             },
-            settings.FILE_TYPE_RASTER: {
+            settings.GEODATA_TYPE_RASTER: {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'thumbnail', 'file', 'metadata',
                 'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', 'image_mosaic',
                 'original_data_source',
             },
-            settings.FILE_TYPE_UNKNOWN: {
+            settings.GEODATA_TYPE_UNKNOWN: {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'thumbnail', 'file', 'metadata',
                 'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', 'original_data_source',
             },

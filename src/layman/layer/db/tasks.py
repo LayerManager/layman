@@ -34,9 +34,9 @@ def refresh_table(
         return
     publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
     file_type = publ_info['file']['file_type']
-    if file_type == settings.FILE_TYPE_RASTER:
+    if file_type == settings.GEODATA_TYPE_RASTER:
         return
-    if file_type != settings.FILE_TYPE_VECTOR:
+    if file_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown file type: {file_type}")
 
     if self.is_aborted():

@@ -277,7 +277,7 @@ def proxy(subpath):
     if response.status_code == 200:
         for workspace, layername in wfs_t_layers:
             file_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file_type']})['_file_type']
-            if authz.can_i_edit(LAYER_TYPE, workspace, layername) and file_type == settings.FILE_TYPE_VECTOR:
+            if authz.can_i_edit(LAYER_TYPE, workspace, layername) and file_type == settings.GEODATA_TYPE_VECTOR:
                 patch_after_feature_change(workspace, layername)
 
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']

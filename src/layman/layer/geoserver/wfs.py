@@ -31,7 +31,7 @@ def patch_layer(workspace, layername, title, description, original_data_source, 
         return
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file_type', ]})
     file_type = info['_file_type']
-    if file_type != settings.FILE_TYPE_VECTOR:
+    if file_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown file type: {file_type}")
 
     store_name = get_external_db_store_name(layername) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
@@ -143,9 +143,9 @@ def get_layer_info(workspace, layername):
 def get_metadata_comparison(workspace, layername):
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file_type', ]})
     file_type = info['_file_type']
-    if file_type in (settings.FILE_TYPE_RASTER, settings.FILE_TYPE_UNKNOWN):
+    if file_type in (settings.GEODATA_TYPE_RASTER, settings.GEODATA_TYPE_UNKNOWN):
         return dict()
-    if file_type != settings.FILE_TYPE_VECTOR:
+    if file_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown file type: {file_type}")
 
     wfs = get_wfs_direct(workspace)

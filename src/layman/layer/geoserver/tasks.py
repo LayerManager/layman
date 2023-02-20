@@ -51,7 +51,7 @@ def refresh_wms(
     if self.is_aborted():
         raise AbortedException
 
-    if file_type == settings.FILE_TYPE_VECTOR:
+    if file_type == settings.GEODATA_TYPE_VECTOR:
         if store_in_geoserver:
             table_uri = info['_table_uri']
             table_name = table_uri.table
@@ -77,7 +77,7 @@ def refresh_wms(
                                               title,
                                               geoserver_workspace=geoserver_workspace,
                                               )
-    elif file_type == settings.FILE_TYPE_RASTER:
+    elif file_type == settings.GEODATA_TYPE_RASTER:
         file_paths = next(iter(info['_file']['paths'].values()))
         gs_file_path = file_paths['normalized_geoserver']
         real_bbox = info['native_bounding_box']
@@ -141,9 +141,9 @@ def refresh_wfs(
 ):
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file_type', 'native_crs', 'table_uri']})
     file_type = info['_file_type']
-    if file_type == settings.FILE_TYPE_RASTER:
+    if file_type == settings.GEODATA_TYPE_RASTER:
         return
-    if file_type != settings.FILE_TYPE_VECTOR:
+    if file_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown file type: {file_type}")
 
     assert description is not None

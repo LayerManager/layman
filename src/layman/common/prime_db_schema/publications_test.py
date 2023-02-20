@@ -539,7 +539,7 @@ class TestWorldBboxFilter:
         for crs, values in crs_def.CRSDefinitions.items():
             layer = self.layer_prefix + '_' + crs.split(':')[1]
             prime_db_schema_client.post_workspace_publication(LAYER_TYPE, self.workspace, layer,
-                                                              file_type=settings.FILE_TYPE_VECTOR)
+                                                              file_type=settings.GEODATA_TYPE_VECTOR)
             bbox = values.max_bbox or values.default_bbox
             with app.app_context():
                 publications.set_bbox(self.workspace, LAYER_TYPE, layer, bbox, crs)
@@ -579,7 +579,7 @@ class TestExtremeCoordinatesFilter:
     def test_default_bbox_corner_filter(self, crs, crs_values, layer_suffix, x_coord_idx, y_coord_idx):
         name = self.name_prefix + '_' + crs.split(':')[1] + '_' + layer_suffix
         prime_db_schema_client.post_workspace_publication(self.publ_type, self.workspace, name,
-                                                          file_type=settings.FILE_TYPE_VECTOR)
+                                                          file_type=settings.GEODATA_TYPE_VECTOR)
         default_bbox = crs_values.default_bbox
         point_bbox = (
             default_bbox[x_coord_idx],

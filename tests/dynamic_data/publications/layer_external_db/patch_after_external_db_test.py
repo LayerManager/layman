@@ -30,7 +30,7 @@ TEST_CASES = {
         },
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_sld.png"),
         'exp_info_values': {
-            'publ_type_detail': (settings.FILE_TYPE_VECTOR, 'sld'),
+            'publ_type_detail': (settings.GEODATA_TYPE_VECTOR, 'sld'),
             'exp_publication_detail': {
                 'bounding_box': [1892431.3434856508, 5942074.072431108, 2003750.8342789242, 6190443.809135445],
                 'native_crs': 'EPSG:4326',
@@ -51,7 +51,7 @@ TEST_CASES = {
         },
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_all.png"),
         'exp_info_values': {
-            'publ_type_detail': (settings.FILE_TYPE_VECTOR, 'sld'),
+            'publ_type_detail': (settings.GEODATA_TYPE_VECTOR, 'sld'),
             'exp_publication_detail': {
                 'title': 'New title',
                 'bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
@@ -89,7 +89,7 @@ TEST_CASES = {
         },
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_qml.png"),
         'exp_info_values': {
-            'publ_type_detail': (settings.FILE_TYPE_VECTOR, 'qml'),
+            'publ_type_detail': (settings.GEODATA_TYPE_VECTOR, 'qml'),
             'exp_publication_detail': {
                 'bounding_box': [1892431.3434856508, 5942074.072431108, 2003750.8342789242, 6190443.809135445],
                 'native_crs': 'EPSG:4326',

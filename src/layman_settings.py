@@ -16,19 +16,19 @@ class EnumOriginalDataSource(Enum):
 
 LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
 
-FILE_TYPE_VECTOR = 'vector'
-FILE_TYPE_RASTER = 'raster'
-FILE_TYPE_UNKNOWN = 'unknown'
+GEODATA_TYPE_VECTOR = 'vector'
+GEODATA_TYPE_RASTER = 'raster'
+GEODATA_TYPE_UNKNOWN = 'unknown'
 
 MAIN_FILE_EXTENSIONS = {
-    '.geojson': FILE_TYPE_VECTOR,
-    '.shp': FILE_TYPE_VECTOR,
-    '.tiff': FILE_TYPE_RASTER,
-    '.tif': FILE_TYPE_RASTER,
-    '.jp2': FILE_TYPE_RASTER,
-    '.png': FILE_TYPE_RASTER,
-    '.jpg': FILE_TYPE_RASTER,
-    '.jpeg': FILE_TYPE_RASTER,
+    '.geojson': GEODATA_TYPE_VECTOR,
+    '.shp': GEODATA_TYPE_VECTOR,
+    '.tiff': GEODATA_TYPE_RASTER,
+    '.tif': GEODATA_TYPE_RASTER,
+    '.jp2': GEODATA_TYPE_RASTER,
+    '.png': GEODATA_TYPE_RASTER,
+    '.jpg': GEODATA_TYPE_RASTER,
+    '.jpeg': GEODATA_TYPE_RASTER,
 }
 
 # Files are opened with dedicated tools for each format, so adding new extension is not sufficient for new compress format to start working

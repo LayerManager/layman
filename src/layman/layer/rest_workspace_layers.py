@@ -123,7 +123,7 @@ def post(workspace):
                                    enable_more_main_files=enable_more_main_files, time_regex=time_regex,
                                    slugified_time_regex=slugified_time_regex,
                                    name_input_file_by_layer=name_input_file_by_layer)
-    file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path) if not external_table_uri else settings.FILE_TYPE_VECTOR
+    file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path) if not external_table_uri else settings.GEODATA_TYPE_VECTOR
 
     # TITLE
     if len(request.form.get('title', '')) > 0:
@@ -142,7 +142,7 @@ def post(workspace):
         style_file = request.files['sld']
     style_type = input_style.get_style_type_from_file_storage(style_file)
 
-    if file_type == settings.FILE_TYPE_RASTER and style_type.code == 'qml':
+    if file_type == settings.GEODATA_TYPE_RASTER and style_type.code == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
 
     # Overview resampling

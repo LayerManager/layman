@@ -116,7 +116,7 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
                                          title=layer,
                                          uuid=uuid_str,
                                          actor_name=None,
-                                         file_type=settings.FILE_TYPE_VECTOR,
+                                         file_type=settings.GEODATA_TYPE_VECTOR,
                                          style_type=style_type_def,
                                          image_mosaic=False,
                                          external_table_uri=None
