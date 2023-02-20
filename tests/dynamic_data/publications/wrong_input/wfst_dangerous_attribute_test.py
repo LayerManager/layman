@@ -24,7 +24,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 @pytest.mark.usefixtures('ensure_external_db')
 class TestDangerousAttribute(base_test.TestSingleRestPublication):
 
-    workspace = 'dynamic_test_workspace_wfst_refresh'
+    workspace = 'wrong_input_wfst_dangerous_attribute_ws'
 
     publication_type = process_client.LAYER_TYPE
 
