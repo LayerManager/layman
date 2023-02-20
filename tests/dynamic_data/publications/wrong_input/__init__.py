@@ -703,7 +703,7 @@ TESTCASES = {
         KEY_ACTION_PARAMS: {
             'time_regex': '[',
             'file_paths': [
-                'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
             ],
         },
         consts.KEY_EXCEPTION: LaymanError,
@@ -946,8 +946,8 @@ TESTCASES = {
                 KEY_PATCH_POST: {
                     'time_regex': r'[0-9]{8}',
                     'file_paths': [
-                        'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                        'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF',
+                        'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                        'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF',
                     ],
                 },
                 KEY_ACTION_PARAMS: {
@@ -1009,7 +1009,7 @@ TESTCASES = {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'time_regex': r'non_existing_regex',
-            'file_paths': ['tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+            'file_paths': ['tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
         },
         consts.KEY_EXCEPTION: LaymanError,
         KEY_EXPECTED_EXCEPTION: {
@@ -1040,7 +1040,7 @@ TESTCASES = {
                 KEY_ACTION_PARAMS: {
                     'time_regex': r'non_existing_regex',
                     'file_paths': [
-                        'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+                        'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
                 },
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', True), ('with_chunks', True)]): {
@@ -1176,7 +1176,7 @@ TESTCASES = {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': [
-                'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.0.tif'
+                'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.0.tif'
             ],
             'crs': 'EPSG:4326'
         },

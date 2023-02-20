@@ -94,12 +94,12 @@ def test_get_statistics(file_path, exp_result):
 
 @pytest.mark.parametrize('filepaths, exp_result', [
     (['sample/layman.layer/sample_jp2_rgb.jp2'], [[17, 255], [30, 255], [16, 255]]),  # [min, max] for each band
-    (['tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+    (['tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
      [[31, 255], [38, 255], [38, 255]]),
-    (['tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF'],
+    (['tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF'],
      [[17, 255], [30, 255], [16, 255]]),
-    (['tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-      'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF'],
+    (['tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+      'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF'],
      [[17, 255], [30, 255], [16, 255]]),
     (['sample/layman.layer/sample_jp2_rgb.jp2',
       'sample/layman.layer/sample_tif_rgb.tif'],
@@ -221,16 +221,16 @@ def test_get_data_type_name(file_path, exp_result):
 
 @pytest.mark.parametrize('file_path, exp_result', [
     pytest.param(
-        ['tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+        ['tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
         (543100.0, 5567910.0, 560930.0, 5579500.0),
         id='one_file'
     ),
     pytest.param(
         [
-            'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.0.tif',
-            'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.1.tif',
-            'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.2.tif',
-            'tests/dynamic_data/publications/timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.3.tif',
+            'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.0.tif',
+            'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.1.tif',
+            'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.2.tif',
+            'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.3.tif',
         ],
         (543100.0, 5567910.0, 560930.0, 5579500.0),
         id='four_tiles'
