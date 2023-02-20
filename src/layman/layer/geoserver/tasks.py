@@ -104,7 +104,7 @@ def refresh_wms(
         gs_util.publish_coverage(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, layername, title,
                                  description, bbox, crs, lat_lon_bbox=lat_lon_bbox, enable_time_dimension=enable_time_dimension)
     else:
-        raise NotImplementedError(f"Unknown file type: {geodata_type}")
+        raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
     geoserver.set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 
@@ -144,7 +144,7 @@ def refresh_wfs(
     if geodata_type == settings.GEODATA_TYPE_RASTER:
         return
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
-        raise NotImplementedError(f"Unknown file type: {geodata_type}")
+        raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
     assert description is not None
     assert title is not None

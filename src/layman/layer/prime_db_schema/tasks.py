@@ -48,7 +48,7 @@ def refresh_file_data(
         bbox = gdal_get_bbox(username, layername)
         crs = gdal_get_crs(username, layername)
     else:
-        raise NotImplementedError(f"Unknown file type: {geodata_type}")
+        raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
     if self.is_aborted():
         raise AbortedException

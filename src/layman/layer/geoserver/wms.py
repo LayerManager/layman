@@ -54,7 +54,7 @@ def patch_layer(workspace, layername, original_data_source, title, description, 
             store = get_geotiff_store_name(layername)
         gs_util.patch_coverage(geoserver_workspace, layername, store, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     else:
-        raise NotImplementedError(f"Unknown file type: {geodata_type}")
+        raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
     clear_cache(workspace)
 
     if access_rights and access_rights.get('read'):

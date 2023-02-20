@@ -26,7 +26,7 @@ def patch_after_feature_change(
     if geodata_type == settings.GEODATA_TYPE_RASTER:
         return
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
-        raise NotImplementedError(f"Unknown file type: {geodata_type}")
+        raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
     bbox = geoserver.get_layer_bbox(workspace, layer)
     crs = info['native_crs']

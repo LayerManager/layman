@@ -169,7 +169,7 @@ def get_template_path_and_values(workspace, layername, http_method):
         }
         wfs_url = None
     else:
-        raise NotImplementedError(f"Unknown file type: {geodata_type}")
+        raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
     west, south, east, north = extent
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
