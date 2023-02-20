@@ -19,3 +19,10 @@ def adjust_db_for_table_uri():
     statement = f'alter table {DB_SCHEMA}.publications add constraint external_table_uri_with_file_type_check CHECK ' \
                 f'(external_table_uri IS NULL OR file_type = %s);'
     db_util.run_statement(statement, (settings.GEODATA_TYPE_VECTOR,))
+
+
+def rename_file_type_to_geodata_type():
+    logger.info(f'    Rename DB in prime schema for db_connection')
+
+    statement = f'''alter table {DB_SCHEMA}.publications rename column file_type to geodata_type;'''
+    db_util.run_statement(statement)

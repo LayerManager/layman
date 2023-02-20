@@ -3,7 +3,7 @@ import pytest
 from db import util as db_util
 from layman import app, settings
 from test_tools import process_client
-from . import upgrade_v1_18
+from . import upgrade_v1_18, upgrade_v1_20
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
@@ -24,6 +24,7 @@ def test_image_mosaic():
     query = f'''
     ALTER TABLE {DB_SCHEMA}.publications DROP CONSTRAINT if exists image_mosaic_with_publ_type_check;
     ALTER TABLE {DB_SCHEMA}.publications DROP COLUMN image_mosaic;
+    alter table {DB_SCHEMA}.publications rename column geodata_type to file_type;
     '''
     with app.app_context():
         db_util.run_statement(query)
@@ -57,6 +58,10 @@ where w.name = %s
     with app.app_context():
         result = db_util.run_query(query, (main_workspace, map_def[2]))
     assert result[0][0] is False, f'result={result}'
+
+    # restore DB
+    with app.app_context():
+        upgrade_v1_20.rename_file_type_to_geodata_type()
 
     # clean data
     for workspace, publication_type, publication in publication_defs:

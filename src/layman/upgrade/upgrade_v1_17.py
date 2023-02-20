@@ -47,7 +47,7 @@ def adjust_publications_file_type():
                                                      context={'keys': ['file']})['file']['file_type']
 
         query = f'''update {DB_SCHEMA}.publications set
-        file_type = %s
+        geodata_type = %s
         where type = %s
           and name = %s
           and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
@@ -59,7 +59,7 @@ def adjust_publications_file_type():
 
 def adjust_db_publication_file_type_constraint():
     statement = f'alter table {DB_SCHEMA}.publications add constraint file_type_with_publ_type_check CHECK ' \
-                f'((type = %s AND file_type IS NULL) OR (type = %s AND file_type IS NOT NULL));'
+                f'((type = %s AND geodata_type IS NULL) OR (type = %s AND geodata_type IS NOT NULL));'
     db_util.run_statement(statement, (MAP_TYPE, LAYER_TYPE))
 
 

@@ -15,7 +15,7 @@ from layman.layer.qgis import util as qgis_util, wms as qgis_wms
 from layman.uuid import generate_uuid
 from test_tools import process_client, geoserver_client
 from tests.asserts.final.publication import internal as asserts_internal
-from . import upgrade_v1_17
+from . import upgrade_v1_17, upgrade_v1_20
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
@@ -46,7 +46,7 @@ def test_file_type():
 
     query = f'''
     ALTER TABLE {DB_SCHEMA}.publications DROP CONSTRAINT file_type_with_publ_type_check;
-    ALTER TABLE {DB_SCHEMA}.publications DROP COLUMN file_type;
+    ALTER TABLE {DB_SCHEMA}.publications DROP COLUMN geodata_type;
     '''
     with app.app_context():
         db_util.run_statement(query)
@@ -56,7 +56,7 @@ def test_file_type():
     query = f"""
         SELECT column_name
         FROM information_schema.columns
-        WHERE table_schema='{DB_SCHEMA}' and table_name='publications' and column_name='file_type';
+        WHERE table_schema='{DB_SCHEMA}' and table_name='publications' and column_name='geodata_type';
     """
     with app.app_context():
         result = db_util.run_query(query)
@@ -66,6 +66,7 @@ def test_file_type():
 
     with app.app_context():
         upgrade_v1_17.adjust_db_for_file_type()
+        upgrade_v1_20.rename_file_type_to_geodata_type()
         upgrade_v1_17.adjust_publications_file_type()
         upgrade_v1_17.adjust_db_publication_file_type_constraint()
 

@@ -139,7 +139,7 @@ select p.id as id_publication,
        p.name,
        p.title,
        p.uuid::text,
-       p.file_type,
+       p.geodata_type,
        p.style_type,
        p.image_mosaic,
        p.updated_at,
@@ -395,7 +395,7 @@ def insert_publication(workspace_name, info):
     check_publication_info(workspace_name, info)
 
     insert_publications_sql = f'''insert into {DB_SCHEMA}.publications as p
-        (id_workspace, name, title, type, uuid, style_type, file_type, everyone_can_read, everyone_can_write, updated_at, image_mosaic, external_table_uri) values
+        (id_workspace, name, title, type, uuid, style_type, geodata_type, everyone_can_read, everyone_can_write, updated_at, image_mosaic, external_table_uri) values
         (%s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp, %s, PGP_SYM_ENCRYPT(%s::text, %s::text) )
 returning id
 ;'''
@@ -481,7 +481,7 @@ def update_publication(workspace_name, info):
     updated_at =  current_timestamp,
     image_mosaic = coalesce(%s, image_mosaic),
     external_table_uri = PGP_SYM_ENCRYPT(%s::text, uuid::text),
-    file_type = coalesce(%s, file_type)
+    geodata_type = coalesce(%s, geodata_type)
 where id_workspace = %s
   and name = %s
   and type = %s
@@ -544,9 +544,9 @@ def set_bbox(workspace, publication_type, publication, bbox, crs, ):
     db_util.run_statement(query, params)
 
 
-def set_file_type(workspace, publication_type, publication, geodata_type, ):
+def set_geodata_type(workspace, publication_type, publication, geodata_type, ):
     query = f'''update {DB_SCHEMA}.publications set
-    file_type = %s
+    geodata_type = %s
     where type = %s
       and name = %s
       and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''

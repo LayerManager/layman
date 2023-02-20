@@ -32,6 +32,7 @@ MIGRATIONS = {
         ]),
         ((1, 20, 0), [
             upgrade_v1_20.adjust_db_for_table_uri,
+            upgrade_v1_20.rename_file_type_to_geodata_type,
         ])
     ],
     consts.MIGRATION_TYPE_DATA: [
