@@ -68,8 +68,9 @@ JSON array of objects representing available layers with following structure:
 - **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
 - **native_crs**: Code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326".
 - **native_bounding_box**: List of 4 floats and one string. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
-- **file**:
-  - **file_type**:  String. Either `vector`, `raster`, or `unknown` depending on source file type. Value `unknown` is used if input files are zipped and still being uploaded.
+- **geodata_type**: String. Either `vector`, `raster`, or `unknown`. Value `unknown` is used if input files are zipped and still being uploaded.
+- - **file**:
+  - *file_type*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info.
 
 Headers:
 - **X-Total-Count**: Total number of layers available from the request, taking into account all filtering parameters except `limit` and `offset`. Example `"247"`.
