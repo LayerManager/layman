@@ -1,3 +1,4 @@
+import re
 from collections import defaultdict, namedtuple
 import math
 import os
@@ -10,7 +11,7 @@ from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
 from layman.util import get_publication_info
-from .. import LAYER_TYPE
+from .. import LAYER_TYPE, ATTRNAME_PATTERN
 
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 logger = logging.getLogger(__name__)
@@ -522,6 +523,15 @@ where c.column_name is null""").format(
 def ensure_attributes(attribute_tuples, conn_cur):
     missing_attributes = get_missing_attributes(attribute_tuples, conn_cur)
     if missing_attributes:
+        dangerous_attribute_names = {
+            a for _, _, a in missing_attributes
+            if not re.match(ATTRNAME_PATTERN, a)
+        }
+        if dangerous_attribute_names:
+            raise LaymanError(2, {
+                'expected': r'Attribute names matching regex ^[a-zA-Z_][a-zA-Z_0-9]*$',
+                'found': sorted(dangerous_attribute_names),
+            })
         create_string_attributes(missing_attributes, conn_cur)
     return missing_attributes
 

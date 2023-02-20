@@ -12,7 +12,7 @@ from flask import Blueprint, g, current_app as app, request, Response
 import crs as crs_def
 from db import util as db_util
 from geoserver.util import reset as gs_reset
-from layman import authn, authz, settings, util as layman_util
+from layman import authn, authz, settings, util as layman_util, LaymanError
 from layman.authn import authenticate, is_user_with_name
 from layman.layer import db, LAYER_TYPE, LAYERNAME_PATTERN
 from layman.layer.geoserver import wms as gs_wms
@@ -227,6 +227,8 @@ def proxy(subpath):
             wfs_t_attribs, wfs_t_layers = extract_attributes_and_layers_from_wfs_t(data)
             if wfs_t_attribs:
                 ensure_wfs_t_attributes(wfs_t_attribs)
+        except LaymanError as err:
+            raise err
         except BaseException as err:
             app.logger.warning(f"WFS Proxy: error={err}, trace={traceback.format_exc()}")
 
