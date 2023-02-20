@@ -262,7 +262,7 @@ def test_gs_data_security(workspace, publ_type, publication):
     expected_roles = info['access_rights']
     gs_workspace = info['_wms']['workspace']
     file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
-    workspaces = [workspace, gs_workspace] if file_type != settings.FILE_TYPE_RASTER else [gs_workspace]
+    workspaces = [workspace, gs_workspace] if file_type != settings.GEODATA_TYPE_RASTER else [gs_workspace]
     for right_type in ['read', 'write']:
         for wspace in workspaces:
             gs_expected_roles = gs_common.layman_users_to_geoserver_roles(expected_roles[right_type])

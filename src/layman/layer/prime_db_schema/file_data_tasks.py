@@ -27,7 +27,7 @@ def patch_after_feature_change(
                                             context={'keys': ['file_type', 'native_crs', 'table_uri']})
     file_type = info['_file_type']
     crs = info['native_crs']
-    assert file_type == settings.FILE_TYPE_VECTOR
+    assert file_type == settings.GEODATA_TYPE_VECTOR
 
     table_uri = info['_table_uri']
     conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)

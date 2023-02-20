@@ -17,4 +17,4 @@ def adjust_db_for_image_mosaic():
 
     statement = f'alter table {DB_SCHEMA}.publications add constraint image_mosaic_with_publ_type_check CHECK ' \
                 f'(file_type IN (%s, %s) or image_mosaic IS FALSE);'
-    db_util.run_statement(statement, (settings.FILE_TYPE_RASTER, settings.FILE_TYPE_UNKNOWN))
+    db_util.run_statement(statement, (settings.GEODATA_TYPE_RASTER, settings.GEODATA_TYPE_UNKNOWN))

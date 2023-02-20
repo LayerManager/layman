@@ -249,7 +249,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         table_uri = publ_info['_table_uri']
         style_type = os.path.splitext(rest_args['style_file'])[1][1:] if rest_args['style_file'] else 'sld'
         assert style_type in ['sld', 'qml']
-        publ_type_detail = (settings.FILE_TYPE_VECTOR, style_type)
+        publ_type_detail = (settings.GEODATA_TYPE_VECTOR, style_type)
         asserts_publ.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
                                                        publ_type_detail=publ_type_detail,
                                                        exp_publication_detail={

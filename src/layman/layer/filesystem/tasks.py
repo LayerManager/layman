@@ -70,11 +70,11 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
     input_file.check_main_files(main_filepaths, check_crs=check_crs, overview_resampling=overview_resampling)
 
     file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
-    if enable_more_main_files and file_type == settings.FILE_TYPE_VECTOR:
+    if enable_more_main_files and file_type == settings.GEODATA_TYPE_VECTOR:
         raise LaymanError(48, f'Vector layers are not allowed to be combined with `time_regex` parameter.')
 
     style_type_for_check = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type']})['_style_type']
-    if file_type == settings.FILE_TYPE_RASTER and style_type_for_check == 'qml':
+    if file_type == settings.GEODATA_TYPE_RASTER and style_type_for_check == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
 
 
@@ -108,7 +108,7 @@ def refresh_gdal(self, workspace, layername,
         return
     layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
     file_type = layer_info['file']['file_type']
-    if file_type != settings.FILE_TYPE_RASTER:
+    if file_type != settings.GEODATA_TYPE_RASTER:
         return
 
     gdal.ensure_normalized_raster_layer_dir(workspace, layername)

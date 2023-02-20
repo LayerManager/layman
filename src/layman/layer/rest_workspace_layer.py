@@ -170,14 +170,14 @@ def patch(workspace, layername):
     if input_files.raw_paths:
         file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
     elif external_table_uri:
-        file_type = settings.FILE_TYPE_VECTOR
+        file_type = settings.GEODATA_TYPE_VECTOR
     else:
         file_type = info['_file_type']
     if style_type:
         style_type_for_check = style_type.code
     else:
         style_type_for_check = info['_style_type']
-    if file_type == settings.FILE_TYPE_RASTER and style_type_for_check == 'qml':
+    if file_type == settings.GEODATA_TYPE_RASTER and style_type_for_check == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
     kwargs['file_type'] = file_type
 

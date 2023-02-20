@@ -135,7 +135,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
     assert not archive_extension or filenames
     assert not external_table_uri or not any([file_extension, gdal_prefix, filenames, archive_extension])
     if external_table_uri and not publ_type_detail:
-        publ_type_detail = (settings.FILE_TYPE_VECTOR, 'sld')
+        publ_type_detail = (settings.GEODATA_TYPE_VECTOR, 'sld')
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
@@ -212,7 +212,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
 
         file_type = publ_type_detail[0]
         expected_detail['_file_type'] = file_type
-        if file_type == settings.FILE_TYPE_VECTOR:
+        if file_type == settings.GEODATA_TYPE_VECTOR:
             uuid = pub_info["uuid"]
             if external_table_uri:
                 table_uri = external_table_uri
@@ -237,7 +237,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                'db_table': {'name': db_table},
                                                '_table_uri': table_uri,
                                            })
-        elif file_type == settings.FILE_TYPE_RASTER:
+        elif file_type == settings.GEODATA_TYPE_RASTER:
             util.recursive_dict_update(expected_detail,
                                        {
                                            'file': {'file_type': 'raster'},
@@ -327,7 +327,7 @@ def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
     with app.app_context():
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file_type', 'file']})
     file_type = publ_info['_file_type']
-    if file_type == settings.FILE_TYPE_RASTER:
+    if file_type == settings.GEODATA_TYPE_RASTER:
         for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
             input_nodata_value = gdal.get_nodata_value(gdal_path)
@@ -339,7 +339,7 @@ def stats_preserved_in_normalized_raster(workspace, publ_type, name):
     with app.app_context():
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file_type', 'file']})
     file_type = publ_info['_file_type']
-    if file_type == settings.FILE_TYPE_RASTER:
+    if file_type == settings.GEODATA_TYPE_RASTER:
         for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
             normalized_path = file_paths['normalized_absolute']
@@ -359,7 +359,7 @@ def size_and_position_preserved_in_normalized_raster(workspace, publ_type, name)
     with app.app_context():
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file_type', 'file']})
     file_type = publ_info['_file_type']
-    if file_type == settings.FILE_TYPE_RASTER:
+    if file_type == settings.GEODATA_TYPE_RASTER:
         for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
             normalized_path = file_paths['normalized_absolute']

@@ -141,7 +141,7 @@ def get_layer_info(workspace, layername):
         files_to_upload = info['files_to_upload']
         file_names = [file['input_file'] for file in files_to_upload]
         if any(input_file.get_compressed_main_file_extension(file_name) for file_name in file_names):
-            file_type = settings.FILE_TYPE_UNKNOWN
+            file_type = settings.GEODATA_TYPE_UNKNOWN
         else:
             file_type = input_file.get_file_type(input_file.get_all_main_file_names(file_names)[0])
         result = {'file': {'file_type': file_type}}

@@ -92,7 +92,7 @@ def get_layer_info(workspace, layername, context=None):
 
 def clear_publication_info(layer_info, file_type):
     clear_info = common_clear_publication_info(layer_info)
-    if file_type != settings.FILE_TYPE_RASTER:
+    if file_type != settings.GEODATA_TYPE_RASTER:
         clear_info.pop('image_mosaic')
     return clear_info
 

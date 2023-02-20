@@ -108,20 +108,20 @@ def get_gdal_format_file_paths(filepath):
 def get_file_type(main_filepath):
     if main_filepath:
         ext = os.path.splitext(main_filepath)[1].lower()
-        file_type = settings.MAIN_FILE_EXTENSIONS.get(ext, settings.FILE_TYPE_UNKNOWN)
+        file_type = settings.MAIN_FILE_EXTENSIONS.get(ext, settings.GEODATA_TYPE_UNKNOWN)
     else:
-        file_type = settings.FILE_TYPE_UNKNOWN
+        file_type = settings.GEODATA_TYPE_UNKNOWN
     return file_type
 
 
 def check_main_files(main_filepaths, *, check_crs=True, overview_resampling=''):
     file_type = get_file_type(main_filepaths[0])
-    if file_type == settings.FILE_TYPE_VECTOR:
+    if file_type == settings.GEODATA_TYPE_VECTOR:
         if overview_resampling:
             raise LaymanError(48, f'Vector layers do not support overview resampling.')
         assert len(main_filepaths) == 1, f'main_filepaths={main_filepaths}'
         check_vector_main_file(main_filepaths[0], check_crs=check_crs)
-    elif file_type == settings.FILE_TYPE_RASTER:
+    elif file_type == settings.GEODATA_TYPE_RASTER:
         check_raster_main_files(main_filepaths, check_crs=check_crs)
     else:
         raise NotImplementedError(f"Unknown file type: {file_type}")
@@ -292,7 +292,7 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
         main_files = input_files.raw_paths_to_archives
 
     file_type = get_file_type(input_files.raw_or_archived_main_file_path)
-    if file_type == settings.FILE_TYPE_VECTOR and time_regex is not None:
+    if file_type == settings.GEODATA_TYPE_VECTOR and time_regex is not None:
         raise LaymanError(48, f'Vector layers are not allowed to be combined with `time_regex` parameter.')
 
     main_filenames = main_files

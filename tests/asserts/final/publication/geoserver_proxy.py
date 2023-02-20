@@ -27,7 +27,7 @@ def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, n
     with app.app_context():
         file_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file_type']})
     file_type = file_info['_file_type']
-    if file_type == settings.FILE_TYPE_VECTOR:
+    if file_type == settings.GEODATA_TYPE_VECTOR:
         r_wfs = requests.get(internal_wfs_url, params={
             'service': 'WFS',
             'request': 'GetCapabilities',

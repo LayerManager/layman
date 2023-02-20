@@ -64,7 +64,7 @@ def ensure_custom_sld_file_if_needed(workspace, layer):
     info = get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['file_type', 'style_type']})
     file_type = info['_file_type']
     style_type = info['_style_type']
-    if file_type != settings.FILE_TYPE_RASTER or style_type != 'sld':
+    if file_type != settings.GEODATA_TYPE_RASTER or style_type != 'sld':
         return
     info = get_publication_info(workspace, LAYER_TYPE, layer, {
         'keys': ['file'],

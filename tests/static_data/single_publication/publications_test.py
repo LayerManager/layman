@@ -124,7 +124,7 @@ def test_info(workspace, publ_type, publication):
         assert_util.assert_same_bboxes(info_bbox, exp_bbox, 0.01)
 
         file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
-        if file_type == settings.FILE_TYPE_RASTER:
+        if file_type == settings.GEODATA_TYPE_RASTER:
             native_bbox = gdal.get_bbox(workspace, publication)
             with app.app_context():
                 bbox_3857 = bbox_util.transform(native_bbox, info['native_crs'], crs_def.EPSG_3857)

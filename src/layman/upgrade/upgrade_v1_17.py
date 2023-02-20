@@ -81,7 +81,7 @@ def rename_table_names():
         style_type = publ_info['_style_type']
         table_name = f'layer_{uuid.replace("-", "_")}'
 
-        if file_type == settings.FILE_TYPE_VECTOR:
+        if file_type == settings.GEODATA_TYPE_VECTOR:
             query = f"""
             SELECT count(*)
             FROM information_schema.tables
