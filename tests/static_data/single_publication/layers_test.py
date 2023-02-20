@@ -46,12 +46,12 @@ def test_info(workspace, publ_type, publication):
 
     file_type = info_internal['file']['file_type']
     original_data_source = info.get('original_data_source', settings.EnumOriginalDataSource.FILE.value)
-    item_keys = get_layer_info_keys(file_type=file_type, original_data_source=original_data_source)
+    item_keys = get_layer_info_keys(geodata_type=file_type, original_data_source=original_data_source)
 
     assert set(info.keys()) == item_keys, f'info={info}'
     assert info['wms'].get('url') == wms_url, f'r_json={info}, wms_url={wms_url}'
     assert 'url' in info['wms'], f'info={info}'
-    assert info.get('file', dict()).get('file_type') == data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
+    assert info.get('file', dict()).get('file_type') == data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('geodata_type')
     if 'wfs' in info:
         assert info['wfs'].get('url') == wfs_url, f'r_json={info}, wfs_url={wfs_url}'
 
@@ -261,8 +261,8 @@ def test_gs_data_security(workspace, publ_type, publication):
         info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['access_rights', 'wms']})
     expected_roles = info['access_rights']
     gs_workspace = info['_wms']['workspace']
-    file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
-    workspaces = [workspace, gs_workspace] if file_type != settings.GEODATA_TYPE_RASTER else [gs_workspace]
+    geodata_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('geodata_type')
+    workspaces = [workspace, gs_workspace] if geodata_type != settings.GEODATA_TYPE_RASTER else [gs_workspace]
     for right_type in ['read', 'write']:
         for wspace in workspaces:
             gs_expected_roles = gs_common.layman_users_to_geoserver_roles(expected_roles[right_type])

@@ -114,10 +114,10 @@ class TestGetPublications:
         prime_db_schema_client.ensure_workspace(self.workspace1)
 
         for publ_type in process_client.PUBLICATION_TYPES:
-            file_type = 'vector' if publ_type == process_client.LAYER_TYPE else None
+            geodata_type = 'vector' if publ_type == process_client.LAYER_TYPE else None
             for workspace, publ_name, publ_params in self.publications:
                 prime_db_schema_client.post_workspace_publication(publ_type, workspace, publ_name, **publ_params,
-                                                                  file_type=file_type)
+                                                                  geodata_type=geodata_type)
         yield
         prime_db_schema_client.clear_workspaces([self.workspace1, self.workspace2])
 

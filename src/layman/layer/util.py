@@ -74,9 +74,9 @@ def get_providers():
 
 
 def fill_in_partial_info_statuses(info, chain_info):
-    file_type = info.get('file', dict()).get('file_type') or info['_file_type']
+    geodata_type = info.get('file', dict()).get('file_type') or info['geodata_type']
     original_data_source = info.get('original_data_source', settings.EnumOriginalDataSource.FILE.value)
-    item_keys = get_layer_info_keys(file_type=file_type, original_data_source=original_data_source)
+    item_keys = get_layer_info_keys(geodata_type=geodata_type, original_data_source=original_data_source)
 
     return layman_util.get_info_with_statuses(info, chain_info, TASKS_TO_LAYER_INFO_KEYS, item_keys)
 
@@ -106,9 +106,9 @@ def get_complete_layer_info(workspace=None, layername=None, cached=False):
     if not any(partial_info):
         raise LaymanError(15, {'layername': layername})
 
-    file_type = partial_info['_file_type']
+    geodata_type = partial_info['geodata_type']
     original_data_source = partial_info['original_data_source']
-    item_keys = get_layer_info_keys(file_type=file_type, original_data_source=original_data_source)
+    item_keys = get_layer_info_keys(geodata_type=geodata_type, original_data_source=original_data_source)
 
     complete_info = dict()
     for key in item_keys:
@@ -124,7 +124,7 @@ def get_complete_layer_info(workspace=None, layername=None, cached=False):
     complete_info.update(partial_info)
     complete_info['sld'] = complete_info['style']
 
-    complete_info = clear_publication_info(complete_info, file_type)
+    complete_info = clear_publication_info(complete_info, geodata_type)
 
     complete_info.pop('layman_metadata')
     complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(workspace, LAYER_TYPE, layername,

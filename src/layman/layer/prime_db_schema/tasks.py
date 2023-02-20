@@ -27,15 +27,15 @@ def refresh_file_data(
     if self.is_aborted():
         raise AbortedException
 
-    publ_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file_type', 'table_uri']})
-    if publ_info['_file_type'] == settings.GEODATA_TYPE_UNKNOWN:
+    publ_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['geodata_type', 'table_uri']})
+    if publ_info['geodata_type'] == settings.GEODATA_TYPE_UNKNOWN:
         publ_info_file = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})
-        file_type = publ_info_file['file']['file_type']
-        set_file_type(username, LAYER_TYPE, layername, file_type, )
+        geodata_type = publ_info_file['file']['file_type']
+        set_file_type(username, LAYER_TYPE, layername, geodata_type, )
     else:
-        file_type = publ_info['_file_type']
+        geodata_type = publ_info['geodata_type']
 
-    if file_type == settings.GEODATA_TYPE_VECTOR:
+    if geodata_type == settings.GEODATA_TYPE_VECTOR:
         if not publ_info.get('_table_uri'):
             # We have to set file type into publications table before asking for table_uri,
             # because for compressed files sent with chunks file_type would be UNKNOWN and table_uri not set
@@ -44,11 +44,11 @@ def refresh_file_data(
         conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
         bbox = db_get_bbox(table_uri.schema, table_uri.table, conn_cur=conn_cur, column=table_uri.geo_column)
         crs = db_get_crs(table_uri.schema, table_uri.table, conn_cur=conn_cur, column=table_uri.geo_column)
-    elif file_type == settings.GEODATA_TYPE_RASTER:
+    elif geodata_type == settings.GEODATA_TYPE_RASTER:
         bbox = gdal_get_bbox(username, layername)
         crs = gdal_get_crs(username, layername)
     else:
-        raise NotImplementedError(f"Unknown file type: {file_type}")
+        raise NotImplementedError(f"Unknown file type: {geodata_type}")
 
     if self.is_aborted():
         raise AbortedException

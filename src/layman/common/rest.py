@@ -257,7 +257,7 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
             'native_crs': info['native_crs'],
             'native_bounding_box': info['native_bounding_box'],
             'file': {
-                'file_type': info['_file_type'],
+                'file_type': info['geodata_type'],
             },
         }
         for (workspace, _, name), info in publication_infos_whole['items'].items()

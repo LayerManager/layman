@@ -40,9 +40,9 @@ def test_infos(workspace, publ_type, publication):
     asserts_internal_rest.same_title_in_source_and_rest_multi(workspace, publ_type, publication, headers)
     asserts_rest.is_in_rest_multi(workspace, publ_type, publication, headers)
     asserts_rest.correct_url_in_rest_multi(workspace, publ_type, publication, headers)
-    if 'file_type' in publ_def[data.TEST_DATA]:
-        exp_file_type = publ_def[data.TEST_DATA]['file_type']
-        asserts_rest.correct_file_type_in_rest_multi(workspace, publ_type, publication, headers, exp_file_type)
+    if 'geodata_type' in publ_def[data.TEST_DATA]:
+        exp_geodata_type = publ_def[data.TEST_DATA]['geodata_type']
+        asserts_rest.correct_file_type_in_rest_multi(workspace, publ_type, publication, headers, exp_geodata_type)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
@@ -123,8 +123,8 @@ def test_info(workspace, publ_type, publication):
         info_bbox = info['bounding_box']
         assert_util.assert_same_bboxes(info_bbox, exp_bbox, 0.01)
 
-        file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('file_type')
-        if file_type == settings.GEODATA_TYPE_RASTER:
+        geodata_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('geodata_type')
+        if geodata_type == settings.GEODATA_TYPE_RASTER:
             native_bbox = gdal.get_bbox(workspace, publication)
             with app.app_context():
                 bbox_3857 = bbox_util.transform(native_bbox, info['native_crs'], crs_def.EPSG_3857)

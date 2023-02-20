@@ -21,12 +21,12 @@ def patch_after_feature_change(
         raise AbortedException
 
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
-                                            context={'keys': ['file_type', 'native_crs', 'original_data_source']})
-    file_type = info['_file_type']
-    if file_type == settings.GEODATA_TYPE_RASTER:
+                                            context={'keys': ['geodata_type', 'native_crs', 'original_data_source']})
+    geodata_type = info['geodata_type']
+    if geodata_type == settings.GEODATA_TYPE_RASTER:
         return
-    if file_type != settings.GEODATA_TYPE_VECTOR:
-        raise NotImplementedError(f"Unknown file type: {file_type}")
+    if geodata_type != settings.GEODATA_TYPE_VECTOR:
+        raise NotImplementedError(f"Unknown file type: {geodata_type}")
 
     bbox = geoserver.get_layer_bbox(workspace, layer)
     crs = info['native_crs']

@@ -39,7 +39,6 @@ def source_internal_keys_are_subset_of_source_sibling_keys(workspace, publ_type,
                 internal_keys = [key[1:] for key in info if key.startswith('_')]
                 if publ_type == MAP_TYPE and source_name == 'layman.map.prime_db_schema.table':
                     internal_keys.remove('style_type')
-                    internal_keys.remove('file_type')
                 assert set(internal_keys) <= all_sibling_keys, \
                     f'internal_keys={set(internal_keys)}, all_sibling_keys={all_sibling_keys}, key={key}, info={info}'
 
@@ -115,7 +114,6 @@ def all_keys_assigned_to_source(workspace, publ_type, name):
     info_keys = {key[1:] if key.startswith('_') else key for key in info}
     if publ_type == MAP_TYPE:
         info_keys.remove('style_type')
-        info_keys.remove('file_type')
     assert info_keys.issubset(source_keys), f'missing={info_keys.difference(source_keys)} ,info_keys={info_keys}, source_keys={source_keys}'
 
 
@@ -156,6 +154,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
         'image_mosaic': False,
     }
     if publ_type == process_client.LAYER_TYPE:
+        geodata_type = publ_type_detail[0]
         util.recursive_dict_update(expected_detail,
                                    {
                                        'style': {
@@ -168,6 +167,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            'workspace': f'{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'},
                                        'description': None,
                                        'original_data_source': settings.EnumOriginalDataSource.TABLE.value if external_table_uri else settings.EnumOriginalDataSource.FILE.value,
+                                       'geodata_type': geodata_type,
                                    })
 
         if file_extension:
@@ -210,9 +210,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            },
                                        })
 
-        file_type = publ_type_detail[0]
-        expected_detail['_file_type'] = file_type
-        if file_type == settings.GEODATA_TYPE_VECTOR:
+        if geodata_type == settings.GEODATA_TYPE_VECTOR:
             uuid = pub_info["uuid"]
             if external_table_uri:
                 table_uri = external_table_uri
@@ -237,7 +235,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                'db_table': {'name': db_table},
                                                '_table_uri': table_uri,
                                            })
-        elif file_type == settings.GEODATA_TYPE_RASTER:
+        elif geodata_type == settings.GEODATA_TYPE_RASTER:
             util.recursive_dict_update(expected_detail,
                                        {
                                            'file': {'file_type': 'raster'},
@@ -271,7 +269,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                },
                                            })
         else:
-            raise NotImplementedError(f"Unknown file type: {file_type}")
+            raise NotImplementedError(f"Unknown file type: {geodata_type}")
 
         style_type = publ_type_detail[1]
         if style_type:
@@ -287,7 +285,6 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            })
 
     if publ_type == process_client.MAP_TYPE:
-        expected_detail['_file_type'] = None
         util.recursive_dict_update(expected_detail,
                                    {
                                        '_file': {
@@ -325,9 +322,9 @@ def does_not_exist(workspace, publ_type, name, ):
 
 def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file_type', 'file']})
-    file_type = publ_info['_file_type']
-    if file_type == settings.GEODATA_TYPE_RASTER:
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['geodata_type', 'file']})
+    geodata_type = publ_info['geodata_type']
+    if geodata_type == settings.GEODATA_TYPE_RASTER:
         for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
             input_nodata_value = gdal.get_nodata_value(gdal_path)
@@ -337,9 +334,9 @@ def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
 
 def stats_preserved_in_normalized_raster(workspace, publ_type, name):
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file_type', 'file']})
-    file_type = publ_info['_file_type']
-    if file_type == settings.GEODATA_TYPE_RASTER:
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['geodata_type', 'file']})
+    geodata_type = publ_info['geodata_type']
+    if geodata_type == settings.GEODATA_TYPE_RASTER:
         for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
             normalized_path = file_paths['normalized_absolute']
@@ -357,9 +354,9 @@ def stats_preserved_in_normalized_raster(workspace, publ_type, name):
 
 def size_and_position_preserved_in_normalized_raster(workspace, publ_type, name):
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['file_type', 'file']})
-    file_type = publ_info['_file_type']
-    if file_type == settings.GEODATA_TYPE_RASTER:
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['geodata_type', 'file']})
+    geodata_type = publ_info['geodata_type']
+    if geodata_type == settings.GEODATA_TYPE_RASTER:
         for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
             normalized_path = file_paths['normalized_absolute']

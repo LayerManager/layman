@@ -48,7 +48,7 @@ def patch(workspace, layername):
     app.logger.info(f"PATCH Layer, actor={g.user}")
 
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername,
-                                            context={'keys': ['title', 'name', 'description', 'table_uri', 'file_type', 'style_type',
+                                            context={'keys': ['title', 'name', 'description', 'table_uri', 'geodata_type', 'style_type',
                                                               'original_data_source', ]})
     kwargs = {
         'title': info.get('title', info['name']) or '',
@@ -168,18 +168,18 @@ def patch(workspace, layername):
             input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, output_dir=temp_dir, name_input_file_by_layer=name_input_file_by_layer)
 
     if input_files.raw_paths:
-        file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
+        geodata_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
     elif external_table_uri:
-        file_type = settings.GEODATA_TYPE_VECTOR
+        geodata_type = settings.GEODATA_TYPE_VECTOR
     else:
-        file_type = info['_file_type']
+        geodata_type = info['geodata_type']
     if style_type:
         style_type_for_check = style_type.code
     else:
         style_type_for_check = info['_style_type']
-    if file_type == settings.GEODATA_TYPE_RASTER and style_type_for_check == 'qml':
+    if geodata_type == settings.GEODATA_TYPE_RASTER and style_type_for_check == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
-    kwargs['file_type'] = file_type
+    kwargs['geodata_type'] = geodata_type
 
     kwargs['time_regex'] = time_regex
     kwargs['slugified_time_regex'] = slugified_time_regex
