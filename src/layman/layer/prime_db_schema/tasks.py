@@ -7,7 +7,7 @@ from layman import celery_app, util as layman_util, settings
 from .. import LAYER_TYPE
 from ..db import get_bbox as db_get_bbox, get_crs as db_get_crs
 from ..filesystem.gdal import get_bbox as gdal_get_bbox, get_crs as gdal_get_crs
-from ...common.prime_db_schema.publications import set_bbox, set_file_type
+from ...common.prime_db_schema.publications import set_bbox, set_geodata_type
 
 logger = get_task_logger(__name__)
 
@@ -31,7 +31,7 @@ def refresh_file_data(
     if publ_info['geodata_type'] == settings.GEODATA_TYPE_UNKNOWN:
         publ_info_file = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})
         geodata_type = publ_info_file['file']['file_type']
-        set_file_type(username, LAYER_TYPE, layername, geodata_type, )
+        set_geodata_type(username, LAYER_TYPE, layername, geodata_type, )
     else:
         geodata_type = publ_info['geodata_type']
 

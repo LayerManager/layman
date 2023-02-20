@@ -15,6 +15,7 @@ make timgen-build
 ### Migrations and checks
 #### Schema migrations
 - [#703](https://github.com/LayerManager/layman/issues/703) Create new json column `external_table_uri` in `publications` table in prime DB schema.
+- [#703](https://github.com/LayerManager/layman/issues/703) Rename column `file_type` to `geodata_type` in `publications` table in prime DB schema.
 #### Data migrations
 - [#703](https://github.com/LayerManager/layman/issues/703) Fill column `external_table_uri` in `publications` table in prime DB schema for all publications. Value is set to `null` for all existing publications.
 ### Changes

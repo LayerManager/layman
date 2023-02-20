@@ -16,12 +16,12 @@ def delete_layer(workspace, layername):
     layers = publications.get_publication_infos(workspace, LAYER_TYPE)
     info = layers.get((workspace, LAYER_TYPE, layername), dict())
     if info['original_data_source'] == settings.EnumOriginalDataSource.FILE.value:
-        publications.set_file_type(workspace, LAYER_TYPE, layername, settings.GEODATA_TYPE_UNKNOWN, )
+        publications.set_geodata_type(workspace, LAYER_TYPE, layername, settings.GEODATA_TYPE_UNKNOWN, )
 
 
 def patch_layer(workspace, layername, *, geodata_type):
-    publications.set_file_type(workspace, LAYER_TYPE, layername, geodata_type, )
+    publications.set_geodata_type(workspace, LAYER_TYPE, layername, geodata_type, )
 
 
 def post_layer(workspace, layername, *, geodata_type):
-    publications.set_file_type(workspace, LAYER_TYPE, layername, geodata_type, )
+    publications.set_geodata_type(workspace, LAYER_TYPE, layername, geodata_type, )

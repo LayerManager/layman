@@ -22,11 +22,13 @@ def test_db_connection():
         process_client.publish_workspace_publication(publication_type, workspace, publication, **rest_args)
 
     statement = f'''
-    ALTER TABLE {DB_SCHEMA}.publications DROP COLUMN external_table_uri;'''
+    ALTER TABLE {DB_SCHEMA}.publications DROP COLUMN external_table_uri;
+    alter table {DB_SCHEMA}.publications rename column geodata_type to file_type;'''
     with app.app_context():
         db_util.run_statement(statement)
 
         upgrade_v1_20.adjust_db_for_table_uri()
+        upgrade_v1_20.rename_file_type_to_geodata_type()
 
     query = f'''select p.external_table_uri, p.uuid
     from {DB_SCHEMA}.publications p left join
