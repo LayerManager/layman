@@ -14,10 +14,10 @@ from db import util as db_util
 from geoserver.util import reset as gs_reset
 from layman import authn, authz, settings, util as layman_util
 from layman.authn import authenticate, is_user_with_name
-from layman.layer import db, LAYER_TYPE
+from layman.layer import db, LAYER_TYPE, LAYERNAME_PATTERN
 from layman.layer.geoserver import wms as gs_wms
 from layman.layer.qgis import wms as qgis_wms
-from layman.layer.util import LAYERNAME_PATTERN, patch_after_feature_change
+from layman.layer.util import patch_after_feature_change
 from layman.util import WORKSPACE_NAME_ONLY_PATTERN
 
 
