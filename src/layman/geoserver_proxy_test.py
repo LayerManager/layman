@@ -6,6 +6,7 @@ from layman.layer import db
 from test_tools import process_client
 from test_tools.data import wfs as data_wfs
 from test_tools.process_client import get_authz_headers
+from .geoserver_proxy import extract_attributes_and_layers_from_wfs_t
 
 
 def setup_user_layer(username, layername, authn_headers):
@@ -66,3 +67,33 @@ def test_missing_attribute_authz():
     do_test(data_xml, attr_names)
 
     process_client.delete_workspace_layer(username, layername1, headers=authn_headers1)
+
+
+@pytest.mark.parametrize('wfst_data_method, hardcoded_attrs', [
+    pytest.param(
+        data_wfs.get_wfs20_insert_points_new_attr,
+        ['wkb_geometry', 'name', 'labelrank'],
+        id='insert',
+    ),
+    pytest.param(
+        data_wfs.get_wfs20_replace_points_new_attr,
+        ['wkb_geometry', 'name', 'labelrank'],
+        id='replace',
+    ),
+    pytest.param(
+        data_wfs.get_wfs20_update_points_new_attr,
+        [],
+        id='update',
+    ),
+])
+def test_extract_attributes_and_layers_from_wfs_t(wfst_data_method, hardcoded_attrs):
+    workspace = 'workspace_name'
+    layer = 'layer_name'
+    new_attrs = ['ok_attr', 'dangerous-attr-with-dashes']
+    data_xml = wfst_data_method(workspace, layer, new_attrs)
+    with app.app_context():
+        extracted_attribs, extracted_layers = extract_attributes_and_layers_from_wfs_t(data_xml)
+
+    exp_attrs = {*new_attrs, *hardcoded_attrs}
+    assert extracted_layers == {(workspace, layer)}
+    assert extracted_attribs == {(workspace, layer, attr) for attr in exp_attrs}
