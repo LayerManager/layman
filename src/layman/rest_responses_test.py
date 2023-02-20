@@ -164,12 +164,12 @@ class TestResponsesClass:
     @staticmethod
     @pytest.mark.usefixtures('ensure_layman', 'provide_data')
     @pytest.mark.parametrize('query_method, method_params, expected_info', [
-        (process_client.get_layers, dict(), expected_layers),
-        (process_client.get_maps, dict(), expected_maps),
-        (process_client.get_workspace_layers, {'workspace': workspace}, expected_layers),
-        (process_client.get_workspace_maps, {'workspace': workspace}, expected_maps),
-        (process_client.get_workspace_layer, {'workspace': workspace, 'name': publication}, expected_layer),
-        (process_client.get_workspace_map, {'workspace': workspace, 'name': publication}, expected_map),
+        pytest.param(process_client.get_layers, dict(), expected_layers, id='get_layers'),
+        pytest.param(process_client.get_maps, dict(), expected_maps, id='get_maps'),
+        pytest.param(process_client.get_workspace_layers, {'workspace': workspace}, expected_layers, id='get_workspace_layers'),
+        pytest.param(process_client.get_workspace_maps, {'workspace': workspace}, expected_maps, id='get_workspace_maps'),
+        pytest.param(process_client.get_workspace_layer, {'workspace': workspace, 'name': publication}, expected_layer, id='get_workspace_layer'),
+        pytest.param(process_client.get_workspace_map, {'workspace': workspace, 'name': publication}, expected_map, id='get_workspace_map'),
     ])
     def test_rest_responses(query_method, method_params, expected_info, ):
         response = query_method(**method_params)
