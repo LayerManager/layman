@@ -283,7 +283,7 @@ JSON object with following structure:
     - Replaced by *paths*, which contains list of all data files.
     - String. Path to input data file. Path is relative to workspace directory.  
     If data file was sent in ZIP archive to the server, path includes also path to the main file inside ZIP file. E.g. `layers/zipped_shapefile/input_file/zipped_shapefile.zip/layer_main_file.shp`
-  - *file_type*: String. Either `vector`, `raster`, or `unknown` depending on source file type. Value `unknown` is used if input files are zipped and still being uploaded.
+  - *file_type*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info.
   - *status*: Status information about saving and availability of files. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *db_table*, available only for vector layers
@@ -313,6 +313,7 @@ JSON object with following structure:
 - **native_crs**: Code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326". Native CRS is CRS of the input data file.
 - **native_bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
 - *image_mosaic*: Boolean. True for raster layers using `image_mosaic` plugin in GeoServer, so far only [timeseries](models.md#timeseries) layers. Available only for raster layer
+- **geodata_type**: String. Either `vector`, `raster`, or `unknown`. Value `unknown` is used if input files are zipped and still being uploaded.
 
 ### PATCH Workspace Layer
 Update information about existing layer. First, it deletes sources of the layer, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Layers](#post-workspace-layers).
