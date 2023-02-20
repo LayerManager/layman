@@ -183,7 +183,7 @@ if 'layman.authn.http_header' not in LAYMAN_AUTHN_MODULES:
     LAYMAN_AUTHN_MODULES.append('layman.authn.http_header')
 
 LAYMAN_AUTHN_HTTP_HEADER_NAME = os.environ['LAYMAN_AUTHN_HTTP_HEADER_NAME']
-assert re.match("[a-z][a-z0-9]*", LAYMAN_AUTHN_HTTP_HEADER_NAME), "Only lowercase characters and numbers " \
+assert re.match("^[a-z][a-z0-9]*$", LAYMAN_AUTHN_HTTP_HEADER_NAME), "Only lowercase characters and numbers " \
     "should be used for " \
     "LAYMAN_AUTHN_HTTP_HEADER_NAME. "
 
