@@ -40,7 +40,7 @@ def test_publication_basic():
                        "publ_type_name": publication_type,
                        "uuid": uuid_orig,
                        "actor_name": username,
-                       'file_type': 'vector' if publication_type == LAYER_TYPE else None,
+                       'geodata_type': 'vector' if publication_type == LAYER_TYPE else None,
                        'style_type': style_type,
                        "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
                                          "write": {settings.RIGHTS_EVERYONE_ROLE, },
@@ -54,8 +54,8 @@ def test_publication_basic():
             assert pubs[(username, publication_type, publication_name)].get('uuid') == str(uuid_str)
 
             publ_info = pubs[(username, publication_type, publication_name)]
-            assert '_file_type' in publ_info
-            assert publ_info['_file_type'] == ('vector' if publication_type == LAYER_TYPE else None)
+            assert 'geodata_type' in publ_info
+            assert publ_info['geodata_type'] == ('vector' if publication_type == LAYER_TYPE else None)
 
             db_info = {"name": publication_name,
                        "title": publication_title2,
@@ -539,7 +539,7 @@ class TestWorldBboxFilter:
         for crs, values in crs_def.CRSDefinitions.items():
             layer = self.layer_prefix + '_' + crs.split(':')[1]
             prime_db_schema_client.post_workspace_publication(LAYER_TYPE, self.workspace, layer,
-                                                              file_type=settings.GEODATA_TYPE_VECTOR)
+                                                              geodata_type=settings.GEODATA_TYPE_VECTOR)
             bbox = values.max_bbox or values.default_bbox
             with app.app_context():
                 publications.set_bbox(self.workspace, LAYER_TYPE, layer, bbox, crs)
@@ -579,7 +579,7 @@ class TestExtremeCoordinatesFilter:
     def test_default_bbox_corner_filter(self, crs, crs_values, layer_suffix, x_coord_idx, y_coord_idx):
         name = self.name_prefix + '_' + crs.split(':')[1] + '_' + layer_suffix
         prime_db_schema_client.post_workspace_publication(self.publ_type, self.workspace, name,
-                                                          file_type=settings.GEODATA_TYPE_VECTOR)
+                                                          geodata_type=settings.GEODATA_TYPE_VECTOR)
         default_bbox = crs_values.default_bbox
         point_bbox = (
             default_bbox[x_coord_idx],

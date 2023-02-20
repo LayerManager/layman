@@ -105,6 +105,7 @@ class TestResponsesClass:
         'native_crs': 'EPSG:4326',
         'native_bounding_box': list(test_data.SMALL_LAYER_NATIVE_BBOX),
         'db_table': {'name': None},
+        'geodata_type': 'vector',
         'file': {'path': f'layers/{publication}/input_file/{publication}.geojson',
                  'paths': [f'layers/{publication}/input_file/{publication}.geojson'],
                  'file_type': 'vector',

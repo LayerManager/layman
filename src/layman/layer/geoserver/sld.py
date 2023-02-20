@@ -61,10 +61,10 @@ def ensure_custom_sld_file_if_needed(workspace, layer):
     # if style already exists, don't use customized SLD style
     if input_style.get_layer_file(workspace, layer):
         return
-    info = get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['file_type', 'style_type']})
-    file_type = info['_file_type']
+    info = get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['geodata_type', 'style_type']})
+    geodata_type = info['geodata_type']
     style_type = info['_style_type']
-    if file_type != settings.GEODATA_TYPE_RASTER or style_type != 'sld':
+    if geodata_type != settings.GEODATA_TYPE_RASTER or style_type != 'sld':
         return
     info = get_publication_info(workspace, LAYER_TYPE, layer, {
         'keys': ['file'],

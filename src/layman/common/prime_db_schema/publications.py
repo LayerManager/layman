@@ -229,7 +229,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'title': title,
                                    'uuid': uuid,
                                    'type': publication_type,
-                                   '_file_type': file_type,
+                                   'geodata_type': geodata_type,
                                    '_style_type': style_type,
                                    'image_mosaic': image_mosaic,
                                    'updated_at': updated_at,
@@ -246,7 +246,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'access_rights': {'read': can_read_users.split(','),
                                                      'write': can_write_users.split(',')}
                                    }
-             for id_publication, workspace_name, publication_type, publication_name, title, uuid, file_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
+             for id_publication, workspace_name, publication_type, publication_name, title, uuid, geodata_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
              srid, external_table_uri, can_read_users, can_write_users, _
              in values}
 
@@ -414,7 +414,7 @@ returning id
             info.get("publ_type_name"),
             info.get("uuid"),
             info.get('style_type'),
-            info.get('file_type'),
+            info.get('geodata_type'),
             ROLE_EVERYONE in info['access_rights']['read'],
             ROLE_EVERYONE in info['access_rights']['write'],
             info.get("image_mosaic"),
@@ -494,7 +494,7 @@ returning id
             access_rights_changes['write']['EVERYONE'],
             info.get("image_mosaic"),
             external_table_uri,
-            info.get("file_type"),
+            info.get("geodata_type"),
             id_workspace,
             info.get("name"),
             info.get("publ_type_name"),
@@ -544,13 +544,13 @@ def set_bbox(workspace, publication_type, publication, bbox, crs, ):
     db_util.run_statement(query, params)
 
 
-def set_file_type(workspace, publication_type, publication, file_type, ):
+def set_file_type(workspace, publication_type, publication, geodata_type, ):
     query = f'''update {DB_SCHEMA}.publications set
     file_type = %s
     where type = %s
       and name = %s
       and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
-    params = (file_type, publication_type, publication, workspace,)
+    params = (geodata_type, publication_type, publication, workspace,)
     db_util.run_statement(query, params)
 
 

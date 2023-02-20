@@ -29,10 +29,10 @@ def get_flask_proxy_key(workspace):
 def patch_layer(workspace, layername, title, description, original_data_source, access_rights=None):
     if not get_layer_info(workspace, layername):
         return
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file_type', ]})
-    file_type = info['_file_type']
-    if file_type != settings.GEODATA_TYPE_VECTOR:
-        raise NotImplementedError(f"Unknown file type: {file_type}")
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['geodata_type', ]})
+    geodata_type = info['geodata_type']
+    if geodata_type != settings.GEODATA_TYPE_VECTOR:
+        raise NotImplementedError(f"Unknown file type: {geodata_type}")
 
     store_name = get_external_db_store_name(layername) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
     gs_util.patch_feature_type(workspace, layername, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
@@ -141,12 +141,12 @@ def get_layer_info(workspace, layername):
 
 
 def get_metadata_comparison(workspace, layername):
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file_type', ]})
-    file_type = info['_file_type']
-    if file_type in (settings.GEODATA_TYPE_RASTER, settings.GEODATA_TYPE_UNKNOWN):
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['geodata_type', ]})
+    geodata_type = info['geodata_type']
+    if geodata_type in (settings.GEODATA_TYPE_RASTER, settings.GEODATA_TYPE_UNKNOWN):
         return dict()
-    if file_type != settings.GEODATA_TYPE_VECTOR:
-        raise NotImplementedError(f"Unknown file type: {file_type}")
+    if geodata_type != settings.GEODATA_TYPE_VECTOR:
+        raise NotImplementedError(f"Unknown file type: {geodata_type}")
 
     wfs = get_wfs_direct(workspace)
     if wfs is None:

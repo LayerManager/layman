@@ -38,9 +38,9 @@ def refresh_wms(
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': [
-        'file', 'file_type', 'native_bounding_box', 'native_crs', 'table_uri'
+        'file', 'geodata_type', 'native_bounding_box', 'native_crs', 'table_uri'
     ]})
-    file_type = info['_file_type']
+    geodata_type = info['geodata_type']
     crs = info['native_crs']
 
     assert description is not None
@@ -51,7 +51,7 @@ def refresh_wms(
     if self.is_aborted():
         raise AbortedException
 
-    if file_type == settings.GEODATA_TYPE_VECTOR:
+    if geodata_type == settings.GEODATA_TYPE_VECTOR:
         if store_in_geoserver:
             table_uri = info['_table_uri']
             table_name = table_uri.table
@@ -77,7 +77,7 @@ def refresh_wms(
                                               title,
                                               geoserver_workspace=geoserver_workspace,
                                               )
-    elif file_type == settings.GEODATA_TYPE_RASTER:
+    elif geodata_type == settings.GEODATA_TYPE_RASTER:
         file_paths = next(iter(info['_file']['paths'].values()))
         gs_file_path = file_paths['normalized_geoserver']
         real_bbox = info['native_bounding_box']
@@ -104,7 +104,7 @@ def refresh_wms(
         gs_util.publish_coverage(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, layername, title,
                                  description, bbox, crs, lat_lon_bbox=lat_lon_bbox, enable_time_dimension=enable_time_dimension)
     else:
-        raise NotImplementedError(f"Unknown file type: {file_type}")
+        raise NotImplementedError(f"Unknown file type: {geodata_type}")
 
     geoserver.set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, geoserver_workspace)
 
@@ -139,12 +139,12 @@ def refresh_wfs(
         access_rights=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file_type', 'native_crs', 'table_uri']})
-    file_type = info['_file_type']
-    if file_type == settings.GEODATA_TYPE_RASTER:
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['geodata_type', 'native_crs', 'table_uri']})
+    geodata_type = info['geodata_type']
+    if geodata_type == settings.GEODATA_TYPE_RASTER:
         return
-    if file_type != settings.GEODATA_TYPE_VECTOR:
-        raise NotImplementedError(f"Unknown file type: {file_type}")
+    if geodata_type != settings.GEODATA_TYPE_VECTOR:
+        raise NotImplementedError(f"Unknown file type: {geodata_type}")
 
     assert description is not None
     assert title is not None

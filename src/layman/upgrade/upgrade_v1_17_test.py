@@ -74,9 +74,9 @@ def test_file_type():
     with app.app_context():
         prime_db_schema_infos = prime_db_schema_publications.get_publication_infos(workspace_name=main_workspace)
     assert len(prime_db_schema_infos) == len(publication_defs)
-    assert prime_db_schema_infos[vector_layer_def[:3]]['_file_type'] == 'vector'
-    assert prime_db_schema_infos[raster_layer_def[:3]]['_file_type'] == 'raster'
-    assert prime_db_schema_infos[map_def[:3]]['_file_type'] is None
+    assert prime_db_schema_infos[vector_layer_def[:3]]['geodata_type'] == 'vector'
+    assert prime_db_schema_infos[raster_layer_def[:3]]['geodata_type'] == 'raster'
+    assert prime_db_schema_infos[map_def[:3]]['geodata_type'] is None
 
     layer_infos = process_client.get_workspace_layers(main_workspace)
     assert len(layer_infos) == 2
@@ -88,7 +88,7 @@ def test_file_type():
     map_infos = process_client.get_workspace_maps(main_workspace)
     assert len(map_infos) == 1
     for map_info in map_infos:
-        assert '_file_type' not in map_info
+        assert 'geodata_type' not in map_info
 
     # clean data
 
@@ -116,7 +116,7 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
                                          title=layer,
                                          uuid=uuid_str,
                                          actor_name=None,
-                                         file_type=settings.GEODATA_TYPE_VECTOR,
+                                         geodata_type=settings.GEODATA_TYPE_VECTOR,
                                          style_type=style_type_def,
                                          image_mosaic=False,
                                          external_table_uri=None

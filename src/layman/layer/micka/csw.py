@@ -118,7 +118,7 @@ def get_template_path_and_values(workspace, layername, http_method):
     logger.info(f'get_template_path_and_values start calculating data for {workspace}:{layername}')
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
     publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
-        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'file_type', 'table_uri', 'wms'],
+        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'geodata_type', 'table_uri', 'wms'],
     })
     title = publ_info['title']
     abstract = publ_info.get('description')
@@ -137,8 +137,8 @@ def get_template_path_and_values(workspace, layername, http_method):
     ]))), None)
     temporal_extent = publ_info['wms'].get('time', dict()).get('values', [])
 
-    file_type = publ_info.get('_file_type')
-    if file_type == settings.GEODATA_TYPE_VECTOR:
+    geodata_type = publ_info.get('geodata_type')
+    if geodata_type == settings.GEODATA_TYPE_VECTOR:
         table_uri = publ_info['_table_uri']
         table_name = table_uri.table
         conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
@@ -156,7 +156,7 @@ def get_template_path_and_values(workspace, layername, http_method):
             'scale_denominator': scale_denominator,
         }
         wfs_url = wfs.get_wfs_url(workspace, external_url=True)
-    elif file_type == settings.GEODATA_TYPE_RASTER:
+    elif geodata_type == settings.GEODATA_TYPE_RASTER:
         languages = []
         bbox_sphere_size = prime_db_table.get_bbox_sphere_size(workspace, layername)
         distance_value = gdal.get_normalized_ground_sample_distance_in_m(workspace, layername,
@@ -169,7 +169,7 @@ def get_template_path_and_values(workspace, layername, http_method):
         }
         wfs_url = None
     else:
-        raise NotImplementedError(f"Unknown file type: {file_type}")
+        raise NotImplementedError(f"Unknown file type: {geodata_type}")
 
     west, south, east, north = extent
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]

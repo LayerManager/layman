@@ -24,7 +24,7 @@ def get_layer_info(workspace, layername):
             table=f'layer_{uuid.replace("-", "_")}',
             geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
             primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY,
-        ) if info['_file_type'] == settings.GEODATA_TYPE_VECTOR and not info.get('_table_uri') else info.get('_table_uri')
+        ) if info['geodata_type'] == settings.GEODATA_TYPE_VECTOR and not info.get('_table_uri') else info.get('_table_uri')
 
     return info
 
@@ -41,7 +41,7 @@ def patch_layer(workspace,
                 title=None,
                 access_rights=None,
                 image_mosaic=None,
-                file_type=None,
+                geodata_type=None,
                 ):
     db_info = {"name": layername,
                "title": title,
@@ -49,7 +49,7 @@ def patch_layer(workspace,
                "actor_name": actor_name,
                'image_mosaic': image_mosaic,
                'external_table_uri': external_table_uri,
-               'file_type': file_type,
+               'geodata_type': geodata_type,
                }
     if style_type:
         db_info['style_type'] = style_type.code
@@ -83,7 +83,7 @@ def post_layer(workspace,
                title,
                uuid,
                actor_name,
-               file_type,
+               geodata_type,
                image_mosaic,
                external_table_uri,
                style_type=None,
@@ -94,7 +94,7 @@ def post_layer(workspace,
                "uuid": uuid,
                "access_rights": access_rights,
                "actor_name": actor_name,
-               "file_type": file_type,
+               "geodata_type": geodata_type,
                'style_type': style_type.code if style_type else None,
                'image_mosaic': image_mosaic,
                'external_table_uri': external_table_uri,
