@@ -40,7 +40,7 @@ def patch_after_feature_change(
         elif style_type == 'qml':
             gs_util.patch_wms_layer(geoserver_workspace, layer, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs, lat_lon_bbox=lat_lon_bbox)
     elif geodata_type != settings.GEODATA_TYPE_RASTER:
-        raise NotImplementedError(f"Unknown file type: {geodata_type}")
+        raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
     wms.clear_cache(workspace)
 
