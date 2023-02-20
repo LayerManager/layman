@@ -123,6 +123,9 @@ def get_complete_layer_info(workspace=None, layername=None, cached=False):
 
     complete_info.update(partial_info)
     complete_info['sld'] = complete_info['style']
+    file_type = complete_info.get('file', dict()).get('file_type')
+    if complete_info['geodata_type'] == settings.GEODATA_TYPE_UNKNOWN and file_type and file_type != settings.GEODATA_TYPE_UNKNOWN:
+        complete_info['geodata_type'] = file_type
 
     complete_info = clear_publication_info(complete_info, geodata_type)
 
