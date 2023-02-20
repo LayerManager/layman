@@ -24,6 +24,8 @@ make timgen-build
 - [#703](https://github.com/LayerManager/layman/issues/703)  Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) returns new subkey:
   - `original_data_source` with values `file` or `database_table`
   - `geodata_type` which replace, now deprecated, key `file`.`file_type`
+- [#703](https://github.com/LayerManager/layman/issues/703)  Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Workspace Layers](doc/rest.md#get-workspace-layers) returns new subkey:
+  - `geodata_type` which replace, now deprecated, key `file`.`file_type`
 - [#703](https://github.com/LayerManager/layman/issues/703) Attribute names in [WFS-T requests](doc/endpoints.md#web-feature-service) must match to regex `^[a-zA-Z_][a-zA-Z_0-9]*$`, otherwise Layman error is raised. It applies to attributes of both internal and external tables, and only to attributes that not exist in database yet.
 - [#772](https://github.com/LayerManager/layman/issues/772) Speed up endpoints [GET Workspace Layer Thumbnail](doc/rest.md#get-workspace-layer-thumbnail), [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style), [GET Workspace Map Thumbnail](doc/rest.md#get-workspace-map-thumbnail) and [GET Workspace Map File](doc/rest.md#get-workspace-map-file).
 - [#755](https://github.com/LayerManager/layman/issues/755) Downgrade Node.js of Timgen from v18 to v16
