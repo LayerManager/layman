@@ -5,7 +5,7 @@ from layman import settings, patch_mode, util as layman_util
 from layman.common import empty_method, empty_method_returns_none, empty_method_returns_dict
 from layman.http import LaymanError
 from . import get_internal_table_name
-from .. import LAYER_TYPE
+from .. import LAYER_TYPE, util as layer_util
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
@@ -46,7 +46,7 @@ def get_layer_info(workspace, layername,):
                 'geo_column': table_uri.geo_column,
             }
             if layer_info['original_data_source'] == settings.EnumOriginalDataSource.TABLE.value:
-                result['db']['external_uri'] = table_uri.db_uri_str
+                result['db']['external_uri'] = layer_util.redact_uri(table_uri.db_uri_str)
     return result
 
 
