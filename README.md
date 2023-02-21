@@ -261,14 +261,16 @@ make start-dev
 - all files within [LAYMAN_QGIS_DATA_DIR](doc/env-settings.md#LAYMAN_QGIS_DATA_DIR)!
 - all files within [LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY](doc/env-settings.md#LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY)!
 - all layman-related schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME)!
-- all workspaces in [GeoServer](doc/data-storage.md#geoserver)!
+- database [EXTERNAL_DB_NAME](tests/__init__.py) and user [READ_ONLY_USER](tests/__init__.py)
+- all workspaces and Layman users in [GeoServer](doc/data-storage.md#geoserver)!
 - all keys in Redis logical database identified by [LAYMAN_REDIS_URL](doc/env-settings.md#LAYMAN_REDIS_URL)!
 - all keys in Redis logical database identified by [LTC_REDIS_URL](doc/env-settings.md#LTC_REDIS_URL)!
 - metadata records from CSW identified by [CSW_URL](doc/env-settings.md#CSW_URL) whose at least one online distribution URL contains [LAYMAN_PROXY_SERVER_NAME](doc/env-settings.md#LAYMAN_PROXY_SERVER_NAME)!
 
 Default values are defined in [.env.test](.env.test)
 ```bash
-# test related to static layers and maps
+# test related mainly to REST API endpoints of layers and maps
+make test-static
 make test-separated
 
 # other tests
