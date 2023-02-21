@@ -73,7 +73,7 @@ def test_fill_in_partial_info_statuses():
                         'file': {'path': 'layers/name_of_layer/input_file/name_of_layer.geojson',
                                  'file_type': settings.GEODATA_TYPE_VECTOR},
                         'geodata_type': settings.GEODATA_TYPE_UNKNOWN,
-                        'db_table': {'name': 'name_of_layer'},
+                        'db': {'table': 'layer_157d0c0b-f893-4b93-bd2f-04a771822e09'},
                         'style': {'url': 'https://www.layman.cz/rest/workspaces/workspace_name/layers/name_of_layer/style',
                                   'type': 'qml'}}
 
@@ -146,8 +146,8 @@ def test_fill_in_partial_info_statuses():
             'file_type': 'vector'
         },
         'geodata_type': settings.GEODATA_TYPE_UNKNOWN,
-        'db_table': {
-            'name': 'name_of_layer',
+        'db': {
+            'table': 'layer_157d0c0b-f893-4b93-bd2f-04a771822e09',
         },
         'style': {
             'url': 'https://www.layman.cz/rest/workspaces/workspace_name/layers/name_of_layer/style',

@@ -287,10 +287,18 @@ JSON object with following structure:
   - *file_type*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info.
   - *status*: Status information about saving and availability of files. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
-- *db_table*, available only for vector layers
-  - *name*: String. DB table name within PostgreSQL workspace schema. This table is used as GeoServer source of layer.
+- *db*, available only for vector layers
+  - *schema*: String. DB schema name within PostgreSQL database.
+  - *table*: String. DB table name within PostgreSQL schema. This table is used as GeoServer source of layer.
+  - *geo_column*: String. Geometry column of the table used by GeoServer.
+  - *external_uri*: String. Available only for layers published from external table. Connection string to external table without password.
   - *status*: Status information about DB import and availability of the table. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
+- *db_table*: **Deprecated**. Replaced by **db**.
+  - available only for vector layers
+  - *name*: Replaced by db.table.
+  - *status*: Replaced by db.status.
+  - *error*: Replaced by db.error.
 - **style**
   - *url*: String. URL of layer default style. It points to [GET Workspace Layer Style](#get-workspace-layer-style).
   - *type*: String. Type of used style. Either 'sld' or 'qml'.

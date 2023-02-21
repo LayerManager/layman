@@ -16,7 +16,7 @@ def test_wrong_sld_causes_no_thumbnail():
     style_file = '/code/sample/layman.layer/sample_point_cz_wrong_literal.sld'
 
     def wait_for_thumbnail_error(response):
-        ok_keys = ['db_table', 'wms', 'wfs', 'file']
+        ok_keys = ['db', 'wms', 'wfs', 'file']
         if response.status_code == 200:
             r_json = response.json()
             result = response.status_code == 200 and all(

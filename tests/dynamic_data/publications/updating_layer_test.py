@@ -69,5 +69,5 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
                                                        full_comparison=False,
                                                        file_extension=None,
                                                        keys_to_remove=['thumbnail', '_thumbnail', 'metadata', 'style', 'wms', '_wms',
-                                                                       'description', 'wfs', 'db_table', ]
+                                                                       'description', 'wfs', 'db', ]
                                                        )

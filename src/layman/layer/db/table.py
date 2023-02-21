@@ -1,10 +1,11 @@
 from psycopg2 import sql
 
 from db import util as db_util
-from layman import settings, patch_mode
+from layman import settings, patch_mode, util as layman_util
 from layman.common import empty_method, empty_method_returns_none, empty_method_returns_dict
 from layman.http import LaymanError
 from . import get_internal_table_name
+from .. import LAYER_TYPE
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
@@ -16,12 +17,16 @@ get_metadata_comparison = empty_method_returns_dict
 get_publication_uuid = empty_method_returns_none
 
 
-def get_layer_info(workspace, layername, conn_cur=None):
-    table_name = get_internal_table_name(workspace, layername)
+def get_layer_info(workspace, layername,):
+    layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['table_uri', 'original_data_source']})
+    table_uri = layer_info.get('_table_uri')
     result = {}
-    if table_name:
-        if conn_cur is None:
+    if table_uri:
+        if layer_info['original_data_source'] == settings.EnumOriginalDataSource.FILE.value:
             conn_cur = db_util.get_connection_cursor()
+        else:
+            conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
+
         _, cur = conn_cur
         try:
             cur.execute(f"""
@@ -30,16 +35,18 @@ def get_layer_info(workspace, layername, conn_cur=None):
     WHERE schemaname = %s
         AND tablename = %s
         AND tableowner = %s
-    """, (workspace, table_name, settings.LAYMAN_PG_USER))
+    """, (table_uri.schema, table_uri.table, settings.LAYMAN_PG_USER))
         except BaseException as exc:
             raise LaymanError(7) from exc
         rows = cur.fetchall()
         if len(rows) > 0:
-            result = {
-                'db_table': {
-                    'name': table_name,
-                },
+            result['db'] = {
+                'schema': table_uri.schema,
+                'table': table_uri.table,
+                'geo_column': table_uri.geo_column,
             }
+            if layer_info['original_data_source'] == settings.EnumOriginalDataSource.TABLE.value:
+                result['db']['external_uri'] = table_uri.db_uri_str
     return result
 
 
