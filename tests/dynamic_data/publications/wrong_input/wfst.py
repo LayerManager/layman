@@ -1,9 +1,11 @@
+import copy
 import pytest
 
 from geoserver.error import Error as GsError
 from layman import LaymanError
-from test_tools.data import wfs as wfs_data
 from test_tools import process_client, external_db
+from test_tools.data import wfs as wfs_data
+from test_tools.util import assert_error
 from tests import Publication, EnumTestTypes
 from tests.asserts.final.publication import util as assert_publ_util
 from tests.dynamic_data import base_test
@@ -73,7 +75,7 @@ class TestWfst(base_test.TestSingleRestPublication):
 
     test_cases = [base_test.TestCaseType(key=key,
                                          type=EnumTestTypes.MANDATORY,
-                                         publication=params['layer'],
+                                         publication=copy.deepcopy(params['layer']),
                                          params=params,
                                          ) for key, params in TEST_CASES.items()]
 
@@ -92,13 +94,11 @@ class TestWfst(base_test.TestSingleRestPublication):
     def test_proxy_raises(self, layer: Publication, params):
         data_xml = params['wfst_data_method'](layer.workspace, layer.name, *params['wfst_data_args'])
 
-        exception_class = params['exp_exception']['class']
+        exp_exception = params['exp_exception']
+        exception_class = exp_exception.pop('class')
         with pytest.raises(exception_class) as exc_info:
             process_client.post_wfst(data_xml, workspace=layer.workspace)
 
-        for key, value in params['exp_exception'].items():
-            if key == 'class':
-                continue
-            assert getattr(exc_info.value, key) == value
+        assert_error(exp_exception, exc_info)
 
         assert_publ_util.is_publication_valid_and_complete(layer)
