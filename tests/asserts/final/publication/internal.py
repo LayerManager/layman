@@ -1,4 +1,5 @@
 import os
+from psycopg2 import sql
 import logging
 
 import pytest
@@ -409,19 +410,21 @@ def point_coordinates(workspace, publ_type, name, *, point_id, crs, exp_coordina
     assert publ_type == LAYER_TYPE
 
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['db_table']})
-    db_table = publ_info['db_table']['name']
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['table_uri']})
+    table_uri = publ_info['_table_uri']
 
-    query = f'''with transformed as (select st_transform(wkb_geometry, %s) point
-from {workspace}.{db_table}
+    query = sql.SQL('''with transformed as (select st_transform(wkb_geometry, %s) point
+from {table}
 where point_id = %s)
 select st_x(point),
        st_y(point)
 from transformed
-;'''
+;''').format(
+        table=sql.Identifier(table_uri.schema, table_uri.table)
+    )
     with app.app_context():
         to_srid = db_util.get_srid(crs)
-        coordinates = db_util.run_query(query, (to_srid, point_id))
+        coordinates = db_util.run_query(query, (to_srid, point_id), conn_cur=db_util.create_connection_cursor(table_uri.db_uri_str))
     assert len(coordinates) == 1, coordinates
     coordinates = coordinates[0]
 
