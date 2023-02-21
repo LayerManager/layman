@@ -100,7 +100,7 @@ def test_style_correctly_saved(source_style_file_path,
      {'http_code': 400,
       'code': 48,
       'message': 'Wrong combination of parameters',
-      'detail': 'Raster layers are not allowed to have QML style.',
+      'data': 'Raster layers are not allowed to have QML style.',
       },
      )
 ])

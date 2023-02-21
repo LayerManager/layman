@@ -14,7 +14,7 @@ def test_patch_raster_qml(workspace, publ_type, publication):
     expected_exc = {'http_code': 400,
                     'code': 48,
                     'message': 'Wrong combination of parameters',
-                    'detail': 'Raster layers are not allowed to have QML style.',
+                    'data': 'Raster layers are not allowed to have QML style.',
                     }
 
     headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
@@ -31,7 +31,7 @@ def test_patch_qml_raster(workspace, publ_type, publication):
     expected_exc = {'http_code': 400,
                     'code': 48,
                     'message': 'Wrong combination of parameters',
-                    'detail': 'Raster layers are not allowed to have QML style.',
+                    'data': 'Raster layers are not allowed to have QML style.',
                     }
 
     with pytest.raises(LaymanError) as exc_info:

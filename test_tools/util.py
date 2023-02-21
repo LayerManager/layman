@@ -70,19 +70,17 @@ def compare_images(image1, image2):
 
 
 def assert_error(expected, thrown):
-    thrown_dict = thrown.value.to_dict()
-    for key, value in expected.items():
-        if key == 'http_code':
-            assert thrown.value.http_code == value, f'thrown_dict={thrown_dict}, expected={expected}'
-        else:
-            assert thrown_dict[key] == value, f'key={key}, thrown_dict={thrown_dict}, expected={expected}'
+    for key, exp_value in expected.items():
+        thrown_value = getattr(thrown.value, key)
+        assert thrown_value == exp_value, f'key={key}, thrown_value={thrown_value}, expected={exp_value}'
 
 
 def assert_async_error(expected, thrown):
-    expected = expected.copy()
+    expected = copy.deepcopy(expected)
     expected.pop('http_code', None)
     for key, value in expected.items():
-        assert thrown[key] == value, f'key={key}, thrown_dict={thrown}, expected={expected}'
+        thrown_key = key if key != 'data' else 'detail'
+        assert thrown[thrown_key] == value, f'key={key}, thrown_dict={thrown}, expected={expected}'
 
 
 def compress_files(filepaths, *, compress_settings, output_dir):

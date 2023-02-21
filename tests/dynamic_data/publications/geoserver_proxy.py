@@ -32,7 +32,7 @@ def wfst_insert_action(*,
                 Action(processing.exception.response_exception,
                        {'expected': {'code': -1,
                                      'message': 'WFS-T error',
-                                     'detail': {
+                                     'data': {
                                          'status_code': 400,
                                      },
                                      }, }, ),

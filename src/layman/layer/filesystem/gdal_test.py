@@ -21,12 +21,12 @@ from . import gdal
     ('sample/layman.layer/sample_jpg_aux_rgba.jpg', None),
     ('sample/layman.layer/sample_tif_rg.tif', {'http_code': 400,
                                                'code': 2,
-                                               'detail': {'parameter': 'file',
-                                                          'expected': 'Any of color interpretations [Gray], '
-                                                                      '[Gray, Alpha], [Palette], [Red, Green, Blue], '
-                                                                      '[Red, Green, Blue, Alpha].',
-                                                          'found': ['Red', 'Green']
-                                                          },
+                                               'data': {'parameter': 'file',
+                                                        'expected': 'Any of color interpretations [Gray], '
+                                                                    '[Gray, Alpha], [Palette], [Red, Green, Blue], '
+                                                                    '[Red, Green, Blue, Alpha].',
+                                                        'found': ['Red', 'Green']
+                                                        },
                                                }),
 ])
 def test_assert_valid_raster(file_path, exp_error):
