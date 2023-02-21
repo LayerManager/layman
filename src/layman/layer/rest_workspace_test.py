@@ -236,7 +236,7 @@ def test_post_layers_simple(client):
         chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
         layer_info = util.get_layer_info(workspace, layername)
-        keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
+        keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'metadata']
         for key_to_check in keys_to_check:
             assert 'status' in layer_info[key_to_check]
 
@@ -519,7 +519,7 @@ def test_post_layers_complex(client):
             'wfs',
             'thumbnail',
             'file',
-            'db_table',
+            'db',
             'metadata',
         ]:
             assert 'status' not in resp_json[source]
@@ -613,7 +613,7 @@ def test_uppercase_attr(client):
             'wfs',
             'thumbnail',
             'file',
-            'db_table',
+            'db',
             'metadata',
         ]:
             assert 'status' not in resp_json[source], f"{source}: {resp_json[source]}"
@@ -808,7 +808,7 @@ def test_patch_layer_data(client):
         chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
         resp_json = response.get_json()
-        keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
+        keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'metadata']
         for key_to_check in keys_to_check:
             assert 'status' in resp_json[key_to_check]
         flask_client.wait_till_layer_ready(workspace, layername)
@@ -958,7 +958,7 @@ def test_post_layers_long_and_delete_it(client):
     chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     layer_info = util.get_layer_info(workspace, layername)
-    keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
+    keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'metadata']
     for key_to_check in keys_to_check:
         assert 'status' in layer_info[key_to_check]
 
@@ -1004,13 +1004,13 @@ def test_post_layers_zero_length_attribute():
 
     def wait_for_db_finish(response):
         info = response.json()
-        return info.get('db_table', dict()).get('status', '') == 'FAILURE'
+        return info.get('db', dict()).get('status', '') == 'FAILURE'
 
     process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths, check_response_fn=wait_for_db_finish)
 
     layer_info = util.get_layer_info(workspace, layername)
-    assert layer_info['db_table']['status'] == 'FAILURE', f'layer_info={layer_info}'
-    assert layer_info['db_table']['error']['code'] == 28, f'layer_info={layer_info}'
+    assert layer_info['db']['status'] == 'FAILURE', f'layer_info={layer_info}'
+    assert layer_info['db']['error']['code'] == 28, f'layer_info={layer_info}'
 
     process_client.delete_workspace_layer(workspace, layername)
 

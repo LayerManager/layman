@@ -120,6 +120,10 @@ def get_complete_layer_info(workspace=None, layername=None, cached=False):
         'title': layername,
         'description': '',
     })
+    if original_data_source == settings.EnumOriginalDataSource.FILE.value and partial_info.get('db', dict()).get('table') is not None:
+        partial_info['db_table'] = {
+            'name': partial_info['db']['table'],
+        }
 
     complete_info.update(partial_info)
     complete_info['sld'] = complete_info['style']
@@ -172,7 +176,7 @@ def patch_layer(workspace, layername, task_options, stop_sync_at, start_async_at
 TASKS_TO_LAYER_INFO_KEYS = {
     'layman.layer.filesystem.input_chunk.refresh': ['file'],
     'layman.layer.filesystem.gdal.refresh': ['file'],
-    'layman.layer.db.table.refresh': ['db_table'],
+    'layman.layer.db.table.refresh': ['db'],
     'layman.layer.geoserver.wfs.refresh': ['wfs'],
     'layman.layer.geoserver.wms.refresh': ['wms'],
     'layman.layer.geoserver.sld.refresh': ['style'],

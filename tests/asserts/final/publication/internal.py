@@ -1,6 +1,6 @@
 import os
-from psycopg2 import sql
 import logging
+from psycopg2 import sql
 
 import pytest
 from db import util as db_util, TableUri
@@ -219,6 +219,12 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            {
                                                'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
                                                '_table_uri': table_uri,
+                                               'db': {
+                                                   'external_uri': table_uri.db_uri_str,
+                                                   'schema': table_uri.schema,
+                                                   'table': table_uri.table,
+                                                   'geo_column': table_uri.geo_column,
+                                               },
                                            })
             else:
                 db_table = f'layer_{uuid.replace("-", "_")}'
@@ -233,7 +239,11 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            {
                                                'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
                                                'file': {'file_type': 'vector'},
-                                               'db_table': {'name': db_table},
+                                               'db': {
+                                                   'schema': workspace,
+                                                   'table': db_table,
+                                                   'geo_column': 'wkb_geometry',
+                                               },
                                                '_table_uri': table_uri,
                                            })
         elif geodata_type == settings.GEODATA_TYPE_RASTER:

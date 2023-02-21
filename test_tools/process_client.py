@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 ISS_URL_HEADER = 'AuthorizationIssUrl'
 TOKEN_HEADER = 'Authorization'
 
-layer_keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
+layer_keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
 map_keys_to_check = ['thumbnail', 'file', 'metadata']
 
 

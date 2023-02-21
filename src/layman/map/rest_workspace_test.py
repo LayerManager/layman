@@ -666,7 +666,7 @@ def test_map_composed_from_local_layers(client):
                 file[0].close()
 
     with app.app_context():
-        keys_to_check = ['db_table', 'wms', 'wfs', 'thumbnail', 'metadata']
+        keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'metadata']
         layer_info = client.get(url_for('rest_workspace_layer.get', workspace=workspace, layername=layername1)).get_json()
         max_attempts = 100
         num_attempts = 1

@@ -47,8 +47,9 @@ def test_info(workspace, publ_type, publication):
     file_type = info_internal['file']['file_type']
     original_data_source = info.get('original_data_source', settings.EnumOriginalDataSource.FILE.value)
     item_keys = get_layer_info_keys(geodata_type=file_type, original_data_source=original_data_source)
+    info_keys = set(info.keys())
 
-    assert set(info.keys()) == item_keys, f'info={info}'
+    assert info_keys == item_keys, f'info={info}'
     assert info['wms'].get('url') == wms_url, f'r_json={info}, wms_url={wms_url}'
     assert 'url' in info['wms'], f'info={info}'
     assert info.get('file', dict()).get('file_type') == data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('geodata_type')

@@ -69,7 +69,7 @@ PUBLICATION_TYPES = {
             ('layman.layer.filesystem.input_file', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_style', InternalSourceTypeDef(info_items=[]),),
             ('layman.layer.filesystem.gdal', InternalSourceTypeDef(info_items=['file', ]),),
-            ('layman.layer.db.table', InternalSourceTypeDef(info_items=['db_table', ]),),
+            ('layman.layer.db.table', InternalSourceTypeDef(info_items=['db', ]),),
             ('layman.layer.prime_db_schema.file_data', InternalSourceTypeDef(info_items=[]),),
             ('layman.layer.qgis.wms', InternalSourceTypeDef(info_items=['style', 'wms', ]),),
             ('layman.layer.geoserver.wfs', InternalSourceTypeDef(info_items=['wfs', 'description', ]),),
@@ -112,8 +112,8 @@ PUBLICATION_TYPES = {
         'info_keys': {
             (settings.GEODATA_TYPE_VECTOR, settings.EnumOriginalDataSource.FILE.value): {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'wfs', 'thumbnail', 'file',
-                'db_table', 'metadata', 'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
-                'original_data_source', 'geodata_type',
+                'db', 'metadata', 'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
+                'original_data_source', 'geodata_type', 'db_table',
             },
             (settings.GEODATA_TYPE_VECTOR, settings.EnumOriginalDataSource.TABLE.value): {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'wfs', 'thumbnail',

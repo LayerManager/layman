@@ -24,6 +24,7 @@ make timgen-build
 - [#703](https://github.com/LayerManager/layman/issues/703)  Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) returns new subkey:
   - `original_data_source` with values `file` or `database_table`
   - `geodata_type` which replace, now deprecated, key `file`.`file_type`
+  - `db` which replace, now deprecated, key `db_table`
 - [#703](https://github.com/LayerManager/layman/issues/703)  Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Workspace Layers](doc/rest.md#get-workspace-layers) returns new subkey:
   - `geodata_type` which replace, now deprecated, key `file`.`file_type`
 - [#703](https://github.com/LayerManager/layman/issues/703) Attribute names in [WFS-T requests](doc/endpoints.md#web-feature-service) must match to regex `^[a-zA-Z_][a-zA-Z_0-9]*$`, otherwise Layman error is raised. It applies to attributes of both internal and external tables, and only to attributes that not exist in database yet.
