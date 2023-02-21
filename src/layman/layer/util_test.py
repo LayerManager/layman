@@ -495,3 +495,18 @@ def test_validate_external_table_uri_str_parse(external_table_uri_str, scheme):
                           },
                  }
     test_util.assert_error(exp_error, exc_info)
+
+
+@pytest.mark.parametrize('uri, exp_redact_uri', [
+    ('mysql://docker:docker@postgresql:5432/external_test_db?table=table_name&geo_column=wkb_geometry',
+     'mysql://docker@postgresql:5432/external_test_db?table=table_name&geo_column=wkb_geometry'),
+    ('mysql://docker:@postgresql:5432/external_test_db?table=table_name&geo_column=wkb_geometry',
+     'mysql://docker@postgresql:5432/external_test_db?table=table_name&geo_column=wkb_geometry'),
+    ('mysql://docker@postgresql:5432/external_test_db?table=table_name&geo_column=wkb_geometry',
+     'mysql://docker@postgresql:5432/external_test_db?table=table_name&geo_column=wkb_geometry'),
+    ('mysql://postgresql:5432/external_test_db?table=table_name&geo_column=wkb_geometry',
+     'mysql://postgresql:5432/external_test_db?table=table_name&geo_column=wkb_geometry'),
+])
+def test_redact_uri(uri, exp_redact_uri):
+    redact_table_uri = util.redact_uri(uri)
+    assert redact_table_uri == exp_redact_uri
