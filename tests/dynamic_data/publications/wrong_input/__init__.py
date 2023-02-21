@@ -47,25 +47,25 @@ TESTCASES = {
                           'sync': True,
                           'code': 18,
                           'message': 'Missing one or more ShapeFile files.',
-                          'detail': {'missing_extensions': ['.dbf', '.prj'],
-                                     'suggestion': 'Missing .prj file can be fixed also by setting "crs" parameter.',
-                                     'path': 'ne_110m_admin_0_boundary_lines_land.shp',
-                                     },
+                          'data': {'missing_extensions': ['.dbf', '.prj'],
+                                   'suggestion': 'Missing .prj file can be fixed also by setting "crs" parameter.',
+                                   'path': 'ne_110m_admin_0_boundary_lines_land.shp',
+                                   },
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
-                'detail': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
+                'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'path': 'shp_without_dbf_post_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
+                'data': {'path': 'shp_without_dbf_post_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
         },
         KEY_PATCHES: {
             'all_files': {
                 KEY_PATCH_POST: dict(),
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', True), ('with_chunks', False)]): {
-                        'detail': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
+                        'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
                     frozenset([('compress', True), ('with_chunks', True)]): {
-                        'detail': {'path': 'shp_without_dbf_patch_all_files_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}}
+                        'data': {'path': 'shp_without_dbf_patch_all_files_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}}
                 },
             },
         },
@@ -87,25 +87,25 @@ TESTCASES = {
                           'sync': True,
                           'code': 18,
                           'message': 'Missing one or more ShapeFile files.',
-                          'detail': {'missing_extensions': ['.prj'],
-                                     'suggestion': 'Missing .prj file can be fixed also by setting "crs" parameter.',
-                                     'path': 'ne_110m_admin_0_boundary_lines_land.shp',
-                                     },
+                          'data': {'missing_extensions': ['.prj'],
+                                   'suggestion': 'Missing .prj file can be fixed also by setting "crs" parameter.',
+                                   'path': 'ne_110m_admin_0_boundary_lines_land.shp',
+                                   },
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
-                'detail': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
+                'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'path': 'shp_without_prj_post_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
+                'data': {'path': 'shp_without_prj_post_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
         },
         KEY_PATCHES: {
             'all_files': {
                 KEY_PATCH_POST: dict(),
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', True), ('with_chunks', False)]): {
-                        'detail': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
+                        'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
                     frozenset([('compress', True), ('with_chunks', True)]): {
-                        'detail': {'path': 'shp_without_prj_patch_all_files_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}}
+                        'data': {'path': 'shp_without_prj_patch_all_files_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}}
                 },
             },
         },
@@ -121,17 +121,17 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 2,
-                          'detail': {'parameter': 'file',
-                                     'message': 'Zip file without data file inside.',
-                                     'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                                     'files': [
-                                         'temporary_zip_file.zip',
-                                     ],
-                                     },
+                          'data': {'parameter': 'file',
+                                   'message': 'Zip file without data file inside.',
+                                   'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
+                                   'files': [
+                                       'temporary_zip_file.zip',
+                                   ],
+                                   },
                           },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'files': ['empty_zip_post_chunks_zipped.zip']}}
+                'data': {'files': ['empty_zip_post_chunks_zipped.zip']}}
         },
     },
     'tif_with_qml': {
@@ -146,7 +146,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 48,
                           'message': 'Wrong combination of parameters',
-                          'detail': 'Raster layers are not allowed to have QML style.',
+                          'data': 'Raster layers are not allowed to have QML style.',
                           },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
@@ -178,25 +178,25 @@ TESTCASES = {
                           'sync': True,
                           'code': 2,
                           'message': 'Wrong parameter value',
-                          'detail': {'parameter': 'file',
-                                     'message': 'Unable to open raster file.',
-                                     'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                                     'file': '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post/input_file/non_readable_raster_post.tif',
-                                     },
+                          'data': {'parameter': 'file',
+                                   'message': 'Unable to open raster file.',
+                                   'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
+                                   'file': '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post/input_file/non_readable_raster_post.tif',
+                                   },
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
-                'detail': {'file': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_zipped/input_file/non_readable_raster_post_zipped.zip/non_readable_raster.tif',
-                           }
+                'data': {'file': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_zipped/input_file/non_readable_raster_post_zipped.zip/non_readable_raster.tif',
+                         }
             },
             frozenset([('compress', False), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'file': '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_chunks/input_file/non_readable_raster_post_chunks.tif',
-                           }
+                'data': {'file': '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_chunks/input_file/non_readable_raster_post_chunks.tif',
+                         }
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'file': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_chunks_zipped/input_file/non_readable_raster_post_chunks_zipped.zip/non_readable_raster.tif',
-                           }
+                'data': {'file': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_chunks_zipped/input_file/non_readable_raster_post_chunks_zipped.zip/non_readable_raster.tif',
+                         }
             },
         },
     },
@@ -212,7 +212,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 4,
                           'message': 'Unsupported CRS of data file',
-                          'detail': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
+                          'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
                           },
             frozenset([('compress', False), ('with_chunks', True)]): {
                 'sync': False,
@@ -239,7 +239,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 4,
                           'message': 'Unsupported CRS of data file',
-                          'detail': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
+                          'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
                           },
             frozenset([('compress', False), ('with_chunks', True)]): {
                 'sync': False,
@@ -273,7 +273,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 4,
                           'message': 'Unsupported CRS of data file',
-                          'detail': {'found': 'EPSG:2154', 'supported_values': settings.INPUT_SRS_LIST},
+                          'data': {'found': 'EPSG:2154', 'supported_values': settings.INPUT_SRS_LIST},
                           },
             frozenset([('compress', False), ('with_chunks', True)]): {
                 'sync': False,
@@ -300,7 +300,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 4,
                           'message': 'Unsupported CRS of data file',
-                          'detail': {'found': 'EPSG:2154', 'supported_values': settings.INPUT_SRS_LIST},
+                          'data': {'found': 'EPSG:2154', 'supported_values': settings.INPUT_SRS_LIST},
                           },
             frozenset([('compress', False), ('with_chunks', True)]): {
                 'sync': False,
@@ -327,12 +327,12 @@ TESTCASES = {
                           'sync': True,
                           'code': 2,
                           'message': 'Wrong parameter value',
-                          'detail': {'parameter': 'file',
-                                     'expected': 'Any of color interpretations [Gray], '
-                                                 '[Gray, Alpha], [Palette], [Red, Green, Blue], '
-                                                 '[Red, Green, Blue, Alpha].',
-                                     'found': ['Red', 'Green']
-                                     },
+                          'data': {'parameter': 'file',
+                                   'expected': 'Any of color interpretations [Gray], '
+                                               '[Gray, Alpha], [Palette], [Red, Green, Blue], '
+                                               '[Red, Green, Blue, Alpha].',
+                                   'found': ['Red', 'Green']
+                                   },
                           },
         },
         KEY_PATCHES: {
@@ -355,7 +355,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 2,
                           'message': 'Wrong parameter value',
-                          'detail': {
+                          'data': {
                               'expected': 'At most one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or timeseries with time_regex parameter.',
                               'files': [
                                   'sample_tif_rgb.tif',
@@ -363,7 +363,7 @@ TESTCASES = {
                               'parameter': 'file'},
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
-                'detail': {
+                'data': {
                     'files': [
                         'temporary_zip_file.zip/sample_tif_rgb.tif',
                         'temporary_zip_file.zip/small_layer.geojson'],
@@ -371,7 +371,7 @@ TESTCASES = {
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {
+                'data': {
                     'files': [
                         'two_main_files_post_chunks_zipped.zip/sample_tif_rgb.tif',
                         'two_main_files_post_chunks_zipped.zip/small_layer.geojson'],
@@ -385,7 +385,7 @@ TESTCASES = {
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', True), ('with_chunks', True)]): {
                         'sync': False,
-                        'detail': {
+                        'data': {
                             'files': [
                                 'two_main_files_patch_patch_chunks_zipped.zip/sample_tif_rgb.tif',
                                 'two_main_files_patch_patch_chunks_zipped.zip/small_layer.geojson'],
@@ -409,16 +409,16 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 2,
-                          'detail': {'parameter': 'file',
-                                     'expected': 'At most one file with extensions: .zip',
-                                     'files': [
-                                         'sm5.zip',
-                                         'layer_with_two_main_files.zip',
-                                     ],
-                                     },
+                          'data': {'parameter': 'file',
+                                   'expected': 'At most one file with extensions: .zip',
+                                   'files': [
+                                       'sm5.zip',
+                                       'layer_with_two_main_files.zip',
+                                   ],
+                                   },
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
-                'detail': {
+                'data': {
                     'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                     'files': [
                         'temporary_zip_file.zip/sm5.zip',
@@ -430,7 +430,7 @@ TESTCASES = {
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {
+                'data': {
                     'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                     'files': [
                         'two_zip_files_post_chunks_zipped.zip/sm5.zip',
@@ -446,7 +446,7 @@ TESTCASES = {
                 KEY_PATCH_POST: publications.SMALL_LAYER.definition,
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', True), ('with_chunks', False)]): {
-                        'detail': {
+                        'data': {
                             'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                             'files': [
                                 'temporary_zip_file.zip/sm5.zip',
@@ -458,7 +458,7 @@ TESTCASES = {
                     },
                     frozenset([('compress', True), ('with_chunks', True)]): {
                         'sync': False,
-                        'detail': {
+                        'data': {
                             'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                             'files': [
                                 'two_zip_files_patch_patch_chunks_zipped.zip/sm5.zip',
@@ -491,7 +491,7 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 4,
-                          'detail': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
+                          'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
                           },
         },
     },
@@ -510,9 +510,9 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 2,
-                          'detail': {'expected': 'JSON file according schema `https://github.com/hslayers/map-compositions`, version 2',
-                                     'parameter': 'file',
-                                     'reason': 'Missing key `describedBy`'},
+                          'data': {'expected': 'JSON file according schema `https://github.com/hslayers/map-compositions`, version 2',
+                                   'parameter': 'file',
+                                   'reason': 'Missing key `describedBy`'},
                           },
         },
     },
@@ -531,9 +531,9 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 2,
-                          'detail': {'expected': '2.x.x',
-                                     'parameter': 'file',
-                                     'reason': 'Invalid schema version'},
+                          'data': {'expected': '2.x.x',
+                                   'parameter': 'file',
+                                   'reason': 'Invalid schema version'},
                           },
         },
     },
@@ -551,8 +551,8 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 4,
-                          'detail': {'found': 'EPSG:3030',
-                                     'supported_values': settings.INPUT_SRS_LIST},
+                          'data': {'found': 'EPSG:3030',
+                                   'supported_values': settings.INPUT_SRS_LIST},
                           },
         },
     },
@@ -568,10 +568,10 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 2,
-                          'detail': {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/programs/gdaladdo.html',
-                                     'parameter': 'overview_resampling',
-                                     'detail': {'found': 'no_overview_resampling',
-                                                'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, },
+                          'data': {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/programs/gdaladdo.html',
+                                   'parameter': 'overview_resampling',
+                                   'data': {'found': 'no_overview_resampling',
+                                            'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, },
                           },
         },
         KEY_PATCHES: {
@@ -592,7 +592,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 48,
                           'message': 'Wrong combination of parameters',
-                          'detail': 'Vector layers do not support overview resampling.',
+                          'data': 'Vector layers do not support overview resampling.',
                           },
             frozenset([('compress', False), ('with_chunks', True)]): {
                 'sync': False,
@@ -622,7 +622,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 48,
                           'message': 'Wrong combination of parameters',
-                          'detail': 'Parameter overview_resampling requires parameter file to be set.',
+                          'data': 'Parameter overview_resampling requires parameter file to be set.',
                           },
         },
         KEY_PATCHES: {
@@ -639,7 +639,7 @@ TESTCASES = {
                     frozenset([('compress', True), ('with_chunks', False)]): {
                         'code': 2,
                         'message': 'Wrong parameter value',
-                        'detail': {
+                        'data': {
                             'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                             'files': ['temporary_zip_file.zip'],
                             'message': 'Zip file without data file inside.',
@@ -650,7 +650,7 @@ TESTCASES = {
                         'sync': False,
                         'code': 2,
                         'message': 'Wrong parameter value',
-                        'detail': {
+                        'data': {
                             'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                             'files': ['layer_overview_resampling_no_input_file_patch_full_chunks_zipped.zip'],
                             'message': 'Zip file without data file inside.',
@@ -672,9 +672,9 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 2,
-                          'detail': {'parameter': 'layername',
-                                     'detail': 'Layer name too long (211), maximum allowed length is 210.',
-                                     },
+                          'data': {'parameter': 'layername',
+                                   'data': 'Layer name too long (211), maximum allowed length is 210.',
+                                   },
                           },
         },
     },
@@ -691,9 +691,9 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 2,
-                          'detail': {'parameter': 'mapname',
-                                     'detail': 'Map name too long (211), maximum allowed length is 210.',
-                                     },
+                          'data': {'parameter': 'mapname',
+                                   'data': 'Map name too long (211), maximum allowed length is 210.',
+                                   },
                           },
         },
     },
@@ -711,9 +711,9 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 2,
-                          'detail': {'parameter': 'time_regex',
-                                     'expected': 'Regular expression',
-                                     },
+                          'data': {'parameter': 'time_regex',
+                                   'expected': 'Regular expression',
+                                   },
                           },
         },
         KEY_PATCHES: {
@@ -732,7 +732,7 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 48,
-                          'detail': 'Vector layers are not allowed to be combined with `time_regex` parameter.',
+                          'data': 'Vector layers are not allowed to be combined with `time_regex` parameter.',
                           },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
@@ -757,20 +757,20 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 2,
-                          'detail': {'expected': 'All main files with the same extension.',
-                                     'files': ['sample_jp2_rgb.jp2', 'single_point.shp'],
-                                     'extensions': ['.jp2', '.shp'],
-                                     'parameter': 'file',
-                                     },
+                          'data': {'expected': 'All main files with the same extension.',
+                                   'files': ['sample_jp2_rgb.jp2', 'single_point.shp'],
+                                   'extensions': ['.jp2', '.shp'],
+                                   'parameter': 'file',
+                                   },
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
-                'detail': {'files': ['temporary_zip_file.zip/sample_jp2_rgb.jp2', 'temporary_zip_file.zip/single_point.shp'],
-                           },
+                'data': {'files': ['temporary_zip_file.zip/sample_jp2_rgb.jp2', 'temporary_zip_file.zip/single_point.shp'],
+                         },
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'files': ['raster_vector_time_regex_post_chunks_zipped.zip/sample_jp2_rgb.jp2', 'raster_vector_time_regex_post_chunks_zipped.zip/single_point.shp'],
-                           },
+                'data': {'files': ['raster_vector_time_regex_post_chunks_zipped.zip/sample_jp2_rgb.jp2', 'raster_vector_time_regex_post_chunks_zipped.zip/single_point.shp'],
+                         },
             },
         },
     },
@@ -790,20 +790,20 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 2,
-                          'detail': {'expected': 'All main files with the same extension.',
-                                     'files': ['sample_jp2_j2w_rgb.jp2', 'sample_jpeg_jgw_rgb.jpeg', ],
-                                     'extensions': ['.jp2', '.jpeg'],
-                                     'parameter': 'file',
-                                     },
+                          'data': {'expected': 'All main files with the same extension.',
+                                   'files': ['sample_jp2_j2w_rgb.jp2', 'sample_jpeg_jgw_rgb.jpeg', ],
+                                   'extensions': ['.jp2', '.jpeg'],
+                                   'parameter': 'file',
+                                   },
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
-                'detail': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.jp2', 'temporary_zip_file.zip/sample_jpeg_jgw_rgb.jpeg', ],
-                           },
+                'data': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.jp2', 'temporary_zip_file.zip/sample_jpeg_jgw_rgb.jpeg', ],
+                         },
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'files': ['dif_raster_types_time_regex_post_chunks_zipped.zip/sample_jp2_j2w_rgb.jp2', 'dif_raster_types_time_regex_post_chunks_zipped.zip/sample_jpeg_jgw_rgb.jpeg', ],
-                           },
+                'data': {'files': ['dif_raster_types_time_regex_post_chunks_zipped.zip/sample_jp2_j2w_rgb.jp2', 'dif_raster_types_time_regex_post_chunks_zipped.zip/sample_jpeg_jgw_rgb.jpeg', ],
+                         },
             },
         },
     },
@@ -822,10 +822,10 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 2,
-                          'detail': {'expected': 'One compressed file or one or more uncompressed files.',
-                                     'files': ['sample_jp2_rgb.jp2', 'sample_jp2_rgb.zip', ],
-                                     'parameter': 'file',
-                                     },
+                          'data': {'expected': 'One compressed file or one or more uncompressed files.',
+                                   'files': ['sample_jp2_rgb.jp2', 'sample_jp2_rgb.zip', ],
+                                   'parameter': 'file',
+                                   },
                           },
         },
     },
@@ -843,10 +843,10 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 2,
-                          'detail': {'expected': 'All main files with the same CRS.',
-                                     'crs': ['EPSG:32633', 'EPSG:4326', ],
-                                     'parameter': 'file',
-                                     },
+                          'data': {'expected': 'All main files with the same CRS.',
+                                   'crs': ['EPSG:32633', 'EPSG:4326', ],
+                                   'parameter': 'file',
+                                   },
                           },
             frozenset([('compress', False), ('with_chunks', True)]): {
                 'sync': False,
@@ -870,10 +870,10 @@ TESTCASES = {
             KEY_DEFAULT: {'http_code': 400,
                           'sync': True,
                           'code': 2,
-                          'detail': {'expected': 'All main files with the same color interpretations.',
-                                     'color_interpretations': [['Red', 'Green', 'Blue'], ['Red', 'Green', 'Blue', 'Alpha']],
-                                     'parameter': 'file',
-                                     },
+                          'data': {'expected': 'All main files with the same color interpretations.',
+                                   'color_interpretations': [['Red', 'Green', 'Blue'], ['Red', 'Green', 'Blue', 'Alpha']],
+                                   'parameter': 'file',
+                                   },
                           },
             frozenset([('compress', False), ('with_chunks', True)]): {
                 'sync': False,
@@ -895,7 +895,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 2,
                           'message': 'Wrong parameter value',
-                          'detail': {
+                          'data': {
                               'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                               'files': ['sample_jp2_j2w_rgb.j2w'],
                               'message': 'No data file in input.',
@@ -903,13 +903,13 @@ TESTCASES = {
                           }
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
-                'detail': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.j2w'],
-                           'message': 'Zip file without data file inside.', }
+                'data': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.j2w'],
+                         'message': 'Zip file without data file inside.', }
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'files': ['non_data_file_without_data_file_post_chunks_zipped.zip/sample_jp2_j2w_rgb.j2w'],
-                           'message': 'Zip file without data file inside.', }
+                'data': {'files': ['non_data_file_without_data_file_post_chunks_zipped.zip/sample_jp2_j2w_rgb.j2w'],
+                         'message': 'Zip file without data file inside.', }
             },
         },
         KEY_PATCHES: {
@@ -920,8 +920,8 @@ TESTCASES = {
                 },
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', True), ('with_chunks', True)]): {
-                        'detail': {'files': ['non_data_file_without_data_file_patch_full_chunks_zipped.zip/sample_jp2_j2w_rgb.j2w'],
-                                   }
+                        'data': {'files': ['non_data_file_without_data_file_patch_full_chunks_zipped.zip/sample_jp2_j2w_rgb.j2w'],
+                                 }
                     },
                 },
             },
@@ -938,7 +938,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 48,
                           'message': 'Wrong combination of parameters',
-                          'detail': 'Parameter time_regex is allowed only in combination with files.',
+                          'data': 'Parameter time_regex is allowed only in combination with files.',
                           },
         },
         KEY_PATCHES: {
@@ -971,7 +971,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 2,
                           'message': 'Wrong parameter value',
-                          'detail': {
+                          'data': {
                               'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                               'files': ['sample_jp2_j2w_rgb.j2w'],
                               'message': 'No data file in input.',
@@ -979,13 +979,13 @@ TESTCASES = {
                           }
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
-                'detail': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.j2w'],
-                           'message': 'Zip file without data file inside.', }
+                'data': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.j2w'],
+                         'message': 'Zip file without data file inside.', }
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'files': ['time_regex_with_non_data_file_post_chunks_zipped.zip/sample_jp2_j2w_rgb.j2w'],
-                           'message': 'Zip file without data file inside.', }
+                'data': {'files': ['time_regex_with_non_data_file_post_chunks_zipped.zip/sample_jp2_j2w_rgb.j2w'],
+                         'message': 'Zip file without data file inside.', }
             },
         },
         KEY_PATCHES: {
@@ -997,8 +997,8 @@ TESTCASES = {
                 },
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', True), ('with_chunks', True)]): {
-                        'detail': {'files': ['time_regex_with_non_data_file_patch_full_chunks_zipped.zip/sample_jp2_j2w_rgb.j2w'],
-                                   }
+                        'data': {'files': ['time_regex_with_non_data_file_patch_full_chunks_zipped.zip/sample_jp2_j2w_rgb.j2w'],
+                                 }
                     },
                 },
             },
@@ -1017,19 +1017,19 @@ TESTCASES = {
                           'sync': True,
                           'code': 48,
                           'message': 'Wrong combination of parameters',
-                          'detail': {
+                          'data': {
                               'message': 'File does not match time_regex.',
                               'expected': 'All main data files match time_regex parameter',
                               'unmatched_filenames': ['S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
                           },
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
-                'detail': {'unmatched_filenames': ['temporary_zip_file.zip/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
-                           }
+                'data': {'unmatched_filenames': ['temporary_zip_file.zip/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+                         }
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'unmatched_filenames': [
+                'data': {'unmatched_filenames': [
                     'filename_not_match_time_regex_post_chunks_zipped.zip/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
                 }
             },
@@ -1045,7 +1045,7 @@ TESTCASES = {
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', True), ('with_chunks', True)]): {
                         'sync': False,
-                        'detail': {'unmatched_filenames': [
+                        'data': {'unmatched_filenames': [
                             'filename_not_match_time_regex_patch_full_chunks_zipped.zip/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
                         }
                     },
@@ -1069,7 +1069,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 48,
                           'message': 'Wrong combination of parameters',
-                          'detail': {
+                          'data': {
                               'message': 'Too long filename in timeseries.',
                               'expected': 'All files names shorter than 211 characters',
                               'too_long_filenames': ['211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif'],
@@ -1077,7 +1077,7 @@ TESTCASES = {
                           },
             frozenset([('compress', False), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {'too_long_filenames': ['too_long_filename_with_time_regexp_post_chunks.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif']}
+                'data': {'too_long_filenames': ['too_long_filename_with_time_regexp_post_chunks.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif']}
             },
         },
         KEY_PATCHES: {
@@ -1092,7 +1092,7 @@ TESTCASES = {
                 },
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', False), ('with_chunks', True)]): {
-                        'detail': {'too_long_filenames': ['too_long_filename_with_time_regexp_patch_full_chunks.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif']}
+                        'data': {'too_long_filenames': ['too_long_filename_with_time_regexp_patch_full_chunks.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif']}
                     },
                 },
             },
@@ -1113,7 +1113,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 48,
                           'message': 'Wrong combination of parameters',
-                          'detail': {
+                          'data': {
                               'message': 'Unsafe filename in timeseries.',
                               'expected': 'All slugified file names matching pattern ^(?![.])[a-zA-Z0-9_.-]+$',
                               'unsafe_slugified_filenames': ['.20220316.tif'],
@@ -1150,7 +1150,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 48,
                           'message': 'Wrong combination of parameters',
-                          'detail': {
+                          'data': {
                               'message': 'Unsafe filename in timeseries.',
                               'expected': 'All slugified file names matching pattern ^(?![.])[a-zA-Z0-9_.-]+$',
                               'unsafe_slugified_filenames': ['річка_20220316.tif'],
@@ -1206,7 +1206,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 2,
                           'message': 'Wrong parameter value',
-                          'detail': {
+                          'data': {
                               'parameter': 'file',
                               'message': 'Two or more input file names map to the same name.',
                               'expected': 'Input file names that differ at least in one letter (ignoring case and diacritics) or number.',
@@ -1217,7 +1217,7 @@ TESTCASES = {
                           },
                           },
             frozenset([('compress', False), ('with_chunks', True)]): {
-                'detail': {
+                'data': {
                     'similar_filenames_mapping': {
                         'small_layer.README.txt': 'duplicate_filename_differs_in_case_post_chunks.readme.txt',
                         'small_layer.readme.txt': 'duplicate_filename_differs_in_case_post_chunks.readme.txt',
@@ -1237,7 +1237,7 @@ TESTCASES = {
                 },
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', False), ('with_chunks', False)]): {
-                        'detail': {
+                        'data': {
                             'similar_filenames_mapping': {
                                 'small_layer.README.txt': 'duplicate_filename_differs_in_case_patch_full.readme.txt',
                                 'small_layer.readme.txt': 'duplicate_filename_differs_in_case_patch_full.readme.txt',
@@ -1245,7 +1245,7 @@ TESTCASES = {
                         },
                     },
                     frozenset([('compress', False), ('with_chunks', True)]): {
-                        'detail': {
+                        'data': {
                             'similar_filenames_mapping': {
                                 'small_layer.README.txt': 'duplicate_filename_differs_in_case_patch_full_chunks.readme.txt',
                                 'small_layer.readme.txt': 'duplicate_filename_differs_in_case_patch_full_chunks.readme.txt',
@@ -1271,7 +1271,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 2,
                           'message': 'Wrong parameter value',
-                          'detail': {
+                          'data': {
                               'parameter': 'file',
                               'message': 'Two or more input file names map to the same name.',
                               'expected': 'Input file names that differ at least in one letter (ignoring case and diacritics) or number.',
@@ -1282,7 +1282,7 @@ TESTCASES = {
                           },
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
-                'detail': {
+                'data': {
                     'similar_filenames_mapping': {
                         asserts_util.KEY_REPLACE: True,
                         'temporary_zip_file.zip/snimek_20220316.tif': 'snimek_20220316.tif',
@@ -1292,7 +1292,7 @@ TESTCASES = {
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
                 'sync': False,
-                'detail': {
+                'data': {
                     'similar_filenames_mapping': {
                         asserts_util.KEY_REPLACE: True,
                         'duplicate_filename_differs_in_diacritics_post_chunks_zipped.zip/snimek_20220316.tif': 'snimek_20220316.tif',
@@ -1313,7 +1313,7 @@ TESTCASES = {
                 },
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', True), ('with_chunks', False)]): {
-                        'detail': {
+                        'data': {
                             'similar_filenames_mapping': {
                                 asserts_util.KEY_REPLACE: True,
                                 'temporary_zip_file.zip/snimek_20220316.tif': 'snimek_20220316.tif',
@@ -1323,7 +1323,7 @@ TESTCASES = {
                     },
                     frozenset([('compress', True), ('with_chunks', True)]): {
                         'sync': False,
-                        'detail': {
+                        'data': {
                             'similar_filenames_mapping': {
                                 asserts_util.KEY_REPLACE: True,
                                 'duplicate_filename_differs_in_diacritics_patch_full_chunks_zipped.zip/snimek_20220316.tif': 'snimek_20220316.tif',
@@ -1349,7 +1349,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 1,
                           'message': 'Missing parameter',
-                          'detail': {
+                          'data': {
                               'parameters': ['file', 'db_connection'],
                               'message': 'Both `file` and `db_connection` parameters are empty',
                               'expected': 'One of the parameters is filled.',
@@ -1369,7 +1369,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 48,
                           'message': 'Wrong combination of parameters',
-                          'detail': {
+                          'data': {
                               'parameters': ['file', 'db_connection'],
                               'message': 'Both `file` and `db_connection` parameters are filled',
                               'expected': 'Only one of the parameters is fulfilled.',
@@ -1379,14 +1379,14 @@ TESTCASES = {
                               }},
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
-                'detail': {
+                'data': {
                     'found': {
                         'file': ['temporary_zip_file.zip'],
                     },
                 },
             },
             frozenset([('compress', True), ('with_chunks', True)]): {
-                'detail': {
+                'data': {
                     'found': {
                         'file': ['temporary_zip_file.zip'],
                     },
@@ -1412,14 +1412,14 @@ TESTCASES = {
                           'sync': True,
                           'code': 2,
                           'message': 'Wrong parameter value',
-                          'detail': {'parameter': 'db_connection',
-                                     'message': 'Parameter `db_connection` is expected to have URI scheme `postgresql`',
-                                     'expected': EXTERNAL_TABLE_URI_PATTERN,
-                                     'found': {
-                                         'db_connection': 'db_connection',
-                                         'uri_scheme': '',
-                                     },
-                                     },
+                          'data': {'parameter': 'db_connection',
+                                   'message': 'Parameter `db_connection` is expected to have URI scheme `postgresql`',
+                                   'expected': EXTERNAL_TABLE_URI_PATTERN,
+                                   'found': {
+                                       'db_connection': 'db_connection',
+                                       'uri_scheme': '',
+                                   },
+                                   },
                           },
         },
         KEY_PATCHES: {
@@ -1443,7 +1443,7 @@ TESTCASES = {
                           'sync': True,
                           'code': 48,
                           'message': 'Wrong combination of parameters',
-                          'detail': {
+                          'data': {
                               'parameters': ['crs', 'file'],
                               'message': 'Parameter `crs` needs also parameter `file`.',
                               'expected': 'Input files in `file` parameter or empty `crs` parameter.',
