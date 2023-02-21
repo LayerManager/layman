@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 import geoserver
 import micka
 import layman_settings as settings
-from tests import EXTERNAL_DB_NAME
+from tests import EXTERNAL_DB_NAME, READ_ONLY_USER
 
 
 def clear_directory(directory):
@@ -48,6 +48,10 @@ and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_
     print(f"Dropping external test DB '{EXTERNAL_DB_NAME}'")
     cur.execute(f"""
 DROP DATABASE IF EXISTS {EXTERNAL_DB_NAME} WITH (FORCE)
+    """)
+    print(f"Dropping user '{READ_ONLY_USER}'")
+    cur.execute(f"""
+DROP USER IF EXISTS {READ_ONLY_USER}
     """)
     conn.close()
 

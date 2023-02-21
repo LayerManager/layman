@@ -5,9 +5,11 @@ from psycopg2 import sql
 import pytest
 from db import util as db_util
 from layman import settings, app
-from tests import EXTERNAL_DB_NAME
+from tests import EXTERNAL_DB_NAME, READ_ONLY_USER
 
 URI_STR = f'''postgresql://{settings.LAYMAN_PG_USER}:{settings.LAYMAN_PG_PASSWORD}@{settings.LAYMAN_PG_HOST}:{settings.LAYMAN_PG_PORT}/{EXTERNAL_DB_NAME}'''
+READ_ONLY_PASSWORD = 'read_only_pwd'
+READ_ONLY_URI_STR = f'''postgresql://{READ_ONLY_USER}:{READ_ONLY_PASSWORD}@{settings.LAYMAN_PG_HOST}:{settings.LAYMAN_PG_PORT}/{EXTERNAL_DB_NAME}'''
 
 
 def uri_str_to_ogr2ogr_str(uri_str):
@@ -18,9 +20,16 @@ def uri_str_to_ogr2ogr_str(uri_str):
 @pytest.fixture(scope="session")
 def ensure_db():
     statement = f"""CREATE DATABASE {EXTERNAL_DB_NAME} TEMPLATE {settings.LAYMAN_PG_TEMPLATE_DBNAME}"""
-
     with app.app_context():
         db_util.run_statement(statement)
+
+    conn_cur = db_util.create_connection_cursor(URI_STR)
+    statement = f"""
+CREATE USER {READ_ONLY_USER} WITH PASSWORD '{READ_ONLY_PASSWORD}';
+GRANT CONNECT ON DATABASE {EXTERNAL_DB_NAME} TO {READ_ONLY_USER};
+ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLES TO {READ_ONLY_USER};
+"""
+    db_util.run_statement(statement, conn_cur=conn_cur)
 
     yield
 

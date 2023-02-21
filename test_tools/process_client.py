@@ -613,6 +613,7 @@ def post_wfst(xml, *, headers=None, url=None, workspace=None):
     if response.headers.get('content-type') == 'application/json':
         raise_layman_error(response)
     if response.status_code != 200:
+        logger.info(f"GeoServer error response:\n{response.text}")
         raise gs_error.Error(code_or_message='WFS-T error', data={'status_code': response.status_code})
 
 

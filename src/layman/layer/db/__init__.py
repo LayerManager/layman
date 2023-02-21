@@ -5,6 +5,7 @@ import os
 import logging
 import subprocess
 from psycopg2 import sql
+from psycopg2.errors import InsufficientPrivilege
 
 from db import util as db_util, PG_CONN
 from layman.common.language import get_languages_iso639_2
@@ -482,8 +483,12 @@ def create_string_attributes(attribute_tuples, conn_cur=None):
     )
     try:
         cur.execute(query)
+    except InsufficientPrivilege as exc:
+        raise LaymanError(7, data={
+            'reason': 'Insufficient privilege',
+        }, http_code=403) from exc
     except BaseException as exc:
-        logger.error(f'create_string_attributes ERROR')
+        logger.error(f'create_string_attributes ERROR, type={type(exc)}')
         raise LaymanError(7) from exc
 
 

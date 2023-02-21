@@ -151,6 +151,13 @@ Body parameters:
    - if `geo_column` is not specified, first geometry column of the table by alphabetic order is used
    - published table is required to have one-column primary key
    - names of schema, table and all columns of the table are required to match regular expression `^[a-zA-Z_][a-zA-Z_0-9]*$`
+   - DB user must have at least following privileges:
+     - `SELECT` on the table referenced in URI
+       - also `INSERT`, `UPDATE`, and/or `DELETE` if you want the layer to be editable using [WFS-T](endpoints.md#web-feature-service)
+     - `SELECT` on tables in [information_schema](https://www.postgresql.org/docs/current/information-schema.html)
+     - `SELECT` on [system catalogs](https://www.postgresql.org/docs/15/catalogs-overview.html)
+     - `SELECT` on `public.geometry_columns` schema
+     - `EXECUTE` or `USAGE` on PostGIS functions and types
 - *name*, string
    - computer-friendly identifier of the layer
    - must be unique among all layers of one workspace
