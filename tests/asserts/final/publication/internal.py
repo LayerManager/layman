@@ -7,7 +7,7 @@ from db import util as db_util, TableUri
 from layman import app, util as layman_util, settings, celery
 from layman.common import bbox as bbox_util
 from layman.common.prime_db_schema import publications
-from layman.layer import LAYER_TYPE
+from layman.layer import LAYER_TYPE, util as layer_util
 from layman.map import MAP_TYPE
 from layman.layer.filesystem import gdal, input_file
 from test_tools import process_client, util as test_util, assert_util
@@ -220,7 +220,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
                                                '_table_uri': table_uri,
                                                'db': {
-                                                   'external_uri': table_uri.db_uri_str,
+                                                   'external_uri': layer_util.redact_uri(table_uri.db_uri_str),
                                                    'schema': table_uri.schema,
                                                    'table': table_uri.table,
                                                    'geo_column': table_uri.geo_column,
