@@ -20,7 +20,6 @@ bp = Blueprint('rest_workspace_map', __name__)
 @util.check_mapname_decorator
 @authenticate
 @authorize_workspace_publications_decorator
-@util.info_decorator
 def before_request():
     pass
 
@@ -36,7 +35,7 @@ def get(workspace, mapname):
     # pylint: disable=unused-argument
     app.logger.info(f"GET Map, actor={g.user}")
 
-    info = util.get_complete_map_info(cached=True)
+    info = util.get_complete_map_info(workspace, mapname)
 
     return jsonify(info), 200
 
@@ -46,7 +45,7 @@ def get(workspace, mapname):
 def patch(workspace, mapname):
     app.logger.info(f"PATCH Map, actor={g.user}")
 
-    info = util.get_complete_map_info(cached=True)
+    info = util.get_complete_map_info(workspace, mapname)
 
     # FILE
     file = None
@@ -117,7 +116,7 @@ def delete_map(workspace, mapname):
     app.logger.info(f"DELETE Map, actor={g.user}")
 
     # raise exception if map does not exist
-    info = util.get_complete_map_info(cached=True)
+    info = util.get_complete_map_info(workspace, mapname)
 
     util.abort_map_chain(workspace, mapname)
 
