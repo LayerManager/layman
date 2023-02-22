@@ -79,7 +79,7 @@ def get_srid(crs):
     if crs is None:
         srid = None
     else:
-        srid = crs_def.CRSDefinitions[crs].srid
+        srid = crs_def.CRSDefinitions[crs].internal_srid
         if not srid:
             auth_name, auth_srid = crs.split(':')
             auth_srid = int(auth_srid)
@@ -91,7 +91,7 @@ def get_srid(crs):
 def get_crs(srid, conn_cur=None, *, use_internal_srid=True):
     crs = next((
         crs_code for crs_code, crs_item_def in crs_def.CRSDefinitions.items()
-        if crs_item_def.srid == srid
+        if crs_item_def.internal_srid == srid
     ), None) if use_internal_srid else None
     if not crs:
         sql = 'select auth_name, auth_srid from spatial_ref_sys where srid = %s;'
