@@ -5,7 +5,7 @@ from layman.celery import AbortedException
 from layman.common import empty_method_returns_true
 from layman import celery_app, util as layman_util, settings
 from .. import LAYER_TYPE
-from ..db import get_bbox as db_get_bbox, get_crs as db_get_crs
+from ..db import get_bbox as db_get_bbox, get_table_crs
 from ..filesystem.gdal import get_bbox as gdal_get_bbox, get_crs as gdal_get_crs
 from ...common.prime_db_schema.publications import set_bbox, set_geodata_type
 
@@ -43,7 +43,7 @@ def refresh_file_data(
         table_uri = publ_info['_table_uri']
         conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
         bbox = db_get_bbox(table_uri.schema, table_uri.table, conn_cur=conn_cur, column=table_uri.geo_column)
-        crs = db_get_crs(table_uri.schema, table_uri.table, conn_cur=conn_cur, column=table_uri.geo_column, use_internal_srid=True)
+        crs = get_table_crs(table_uri.schema, table_uri.table, conn_cur=conn_cur, column=table_uri.geo_column, use_internal_srid=True)
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
         bbox = gdal_get_bbox(username, layername)
         crs = gdal_get_crs(username, layername)

@@ -139,7 +139,7 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
             assert info
 
         bbox = db.get_bbox(workspace, table_name)
-        crs = db.get_crs(workspace, table_name, use_internal_srid=True)
+        crs = db.get_table_crs(workspace, table_name, use_internal_srid=True)
 
         prime_db_schema_publications.set_bbox(workspace, LAYER_TYPE, layer, bbox, crs, )
         if crs_def.CRSDefinitions[crs].internal_srid:
