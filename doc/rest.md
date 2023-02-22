@@ -147,7 +147,9 @@ Body parameters:
    - if QML style is used in this request, it must list all attributes contained in given data file
 - *external_table_uri*, string
    - exactly one of `file` or `external_table_uri` must be set
-   - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is expected with URI scheme `postgresql` and query parameters `schema`, and `table` specified
+   - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is required
+     - `host` part and query parameters `schema` and `table` are mandatory
+     - URI scheme is required to be `postgresql`
    - if `geo_column` is not specified, first geometry column of the table by alphabetic order is used
    - published table is required to have one-column primary key
    - names of schema, table and all columns of the table are required to match regular expression `^[a-zA-Z_][a-zA-Z_0-9]*$`
@@ -358,7 +360,9 @@ Body parameters:
    - it is allowed to publish time-series layer - see [POST Workspace Layers](#post-workspace-layers)
 - *external_table_uri*, string
    - only one of `file` or `external_table_uri` can be set
-   - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is expected with URI scheme `postgresql` and query parameters `schema`, and `table` specified
+   - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is required
+     - `host` part and query parameters `schema` and `table` are mandatory
+     - URI scheme is required to be `postgresql`
    - if `geo_column` is not specified, first geometry column of the table by alphabetic order is used
    - published table is required to have one-column primary key
    - names of schema, table and all columns of the table are required to match regular expression `^[a-zA-Z_][a-zA-Z_0-9]*$`
