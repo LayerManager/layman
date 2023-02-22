@@ -28,7 +28,7 @@ def test_missing_attribute_authz():
     def do_test(wfs_query, attribute_names):
         # Test, that unauthorized user will not cause new attribute
         with app.app_context():
-            old_db_attributes = db.get_all_column_names(username, layername1)
+            old_db_attributes = db.get_internal_table_all_column_names(username, layername1)
         for attr_name in attribute_names:
             assert attr_name not in old_db_attributes, f"old_db_attributes={old_db_attributes}, attr_name={attr_name}"
         with pytest.raises(GS_Error) as exc:
@@ -36,14 +36,14 @@ def test_missing_attribute_authz():
         assert exc.value.data['status_code'] == 400
 
         with app.app_context():
-            new_db_attributes = db.get_all_column_names(username, layername1)
+            new_db_attributes = db.get_internal_table_all_column_names(username, layername1)
         for attr_name in attribute_names:
             assert attr_name not in new_db_attributes, f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
 
         # Test, that authorized user will cause new attribute
         process_client.post_wfst(wfs_query, headers=authn_headers1, workspace=username)
         with app.app_context():
-            new_db_attributes = db.get_all_column_names(username, layername1)
+            new_db_attributes = db.get_internal_table_all_column_names(username, layername1)
         for attr_name in attribute_names:
             assert attr_name in new_db_attributes, f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
 

@@ -26,7 +26,7 @@ def post_layer(workspace, layer, file_path):
         prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layer,
                                                           geodata_type=settings.GEODATA_TYPE_VECTOR)
         ensure_layer_input_file_dir(workspace, layer)
-        db.import_layer_vector_file(workspace, layer, file_path, None)
+        db.import_layer_vector_file_to_internal_table(workspace, layer, file_path, None)
     yield workspace, layer
     with layman.app_context():
         table_util.delete_layer(workspace, layer)
@@ -147,8 +147,8 @@ def test_abort_import_layer_vector_file():
                                                           geodata_type=settings.GEODATA_TYPE_VECTOR)
         with layman.app_context():
             table_name = db.get_internal_table_name(workspace, layername)
-        process = db.import_layer_vector_file_async(workspace, table_name, main_filepath,
-                                                    crs_id)
+        process = db.import_layer_vector_file_to_internal_table_async(workspace, table_name, main_filepath,
+                                                                      crs_id)
         time1 = time.time()
         while process.poll() is None:
             if time.time() - time1 > 0.1:
