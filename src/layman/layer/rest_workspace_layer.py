@@ -70,15 +70,15 @@ def patch(workspace, layername):
         ]
     input_files = fs_util.InputFiles(sent_streams=sent_file_streams, sent_paths=sent_file_paths)
 
-    external_table_uri_str = request.form.get('db_connection', '')
+    external_table_uri_str = request.form.get('external_table_uri', '')
     if input_files and external_table_uri_str:
         raise LaymanError(48, {
-            'parameters': ['file', 'db_connection'],
-            'message': 'Both `file` and `db_connection` parameters are filled',
+            'parameters': ['file', 'external_table_uri'],
+            'message': 'Both `file` and `external_table_uri` parameters are filled',
             'expected': 'Only one of the parameters is fulfilled.',
             'found': {
                 'file': input_files.raw_paths,
-                'db_connection': external_table_uri_str,
+                'external_table_uri': external_table_uri_str,
             }})
 
     # CRS

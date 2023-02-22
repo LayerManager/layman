@@ -85,10 +85,10 @@ class TestWfst(base_test.TestSingleRestPublication):
             'table': EXTERNAL_DB_TABLE,
         }, scope='class')
         self.post_publication(EDITABLE_TABLE_LAYER, args={
-            'db_connection': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
+            'external_table_uri': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
         }, scope='class')
         self.post_publication(READ_ONLY_TABLE_LAYER, args={
-            'db_connection': f"{external_db.READ_ONLY_URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
+            'external_table_uri': f"{external_db.READ_ONLY_URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
         }, scope='class')
 
     def test_proxy_raises(self, layer: Publication, params):

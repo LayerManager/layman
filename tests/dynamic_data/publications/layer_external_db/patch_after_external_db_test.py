@@ -23,10 +23,10 @@ GEO_COLUMN = settings.OGR_DEFAULT_GEOMETRY_COLUMN
 TEST_CASES = {
     'other_external_table': {
         'patch_args': {
-            'db_connection': f"{external_db.URI_STR}"
-                             f"?schema={DB_SCHEMA}"
-                             f"&table={TABLE_PATCH}"
-                             f"&geo_column={GEO_COLUMN}"
+            'external_table_uri': f"{external_db.URI_STR}"
+                                  f"?schema={DB_SCHEMA}"
+                                  f"&table={TABLE_PATCH}"
+                                  f"&geo_column={GEO_COLUMN}"
         },
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_sld.png"),
         'exp_info_values': {
@@ -81,10 +81,10 @@ TEST_CASES = {
     },
     'other_external_table_qml': {
         'patch_args': {
-            'db_connection': f"{external_db.URI_STR}"
-                             f"?schema={DB_SCHEMA}"
-                             f"&table={TABLE_PATCH}"
-                             f"&geo_column={GEO_COLUMN}",
+            'external_table_uri': f"{external_db.URI_STR}"
+                                  f"?schema={DB_SCHEMA}"
+                                  f"&table={TABLE_PATCH}"
+                                  f"&geo_column={GEO_COLUMN}",
             'style_file': 'tests/dynamic_data/publications/layer_external_db/multipolygon.qml',
         },
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_qml.png"),
@@ -134,9 +134,9 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     def test_layer(self, layer: Publication, rest_args, params):
         """Parametrized using pytest_generate_tests"""
-        db_connection = f"{external_db.URI_STR}?schema={quote(DB_SCHEMA)}&table={quote(TABLE_POST)}&geo_column={GEO_COLUMN}"
+        external_table_uri = f"{external_db.URI_STR}?schema={quote(DB_SCHEMA)}&table={quote(TABLE_POST)}&geo_column={GEO_COLUMN}"
         self.post_publication(publication=layer,
-                              args={'db_connection': db_connection})
+                              args={'external_table_uri': external_table_uri})
 
         assert_util.is_publication_valid_and_complete(layer)
         exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_all.png")

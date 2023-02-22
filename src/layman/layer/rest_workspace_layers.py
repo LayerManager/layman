@@ -71,22 +71,22 @@ def post(workspace):
             }})
     check_crs = crs_id is None
 
-    # DB_CONNECTION
-    external_table_uri_str = request.form.get('db_connection', '')
+    # EXTERNAL_TABLE_URI
+    external_table_uri_str = request.form.get('external_table_uri', '')
     if not input_files and not external_table_uri_str:
         raise LaymanError(1, {
-            'parameters': ['file', 'db_connection'],
-            'message': 'Both `file` and `db_connection` parameters are empty',
+            'parameters': ['file', 'external_table_uri'],
+            'message': 'Both `file` and `external_table_uri` parameters are empty',
             'expected': 'One of the parameters is filled.',
         })
     if input_files and external_table_uri_str:
         raise LaymanError(48, {
-            'parameters': ['file', 'db_connection'],
-            'message': 'Both `file` and `db_connection` parameters are filled',
+            'parameters': ['file', 'external_table_uri'],
+            'message': 'Both `file` and `external_table_uri` parameters are filled',
             'expected': 'Only one of the parameters is fulfilled.',
             'found': {
                 'file': input_files.raw_paths,
-                'db_connection': external_table_uri_str,
+                'external_table_uri': external_table_uri_str,
             }})
     external_table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None
 
