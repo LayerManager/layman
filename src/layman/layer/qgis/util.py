@@ -86,7 +86,7 @@ def fill_layer_template(layer, uuid, native_bbox, crs, qml_xml, source_type, att
         qml_geometry=qml_geometry,
         extent=extent_to_xml_string(native_bbox),
         default_action_canvas_value='{00000000-0000-0000-0000-000000000000}',
-        srid=db_util.get_srid(crs),
+        srid=db_util.get_internal_srid(crs),
         qgis_template_spatialrefsys=crs_def.CRSDefinitions[crs].qgis_template_spatialrefsys,
     )
 
@@ -146,7 +146,7 @@ def fill_project_template(layer, layer_uuid, layer_qml, crs, epsg_codes, extent,
         wms_crs_list_values=wms_crs_list_values,
         creation_iso_datetime=creation_iso_datetime,
         extent=extent_to_xml_string(extent),
-        srid=db_util.get_srid(crs),
+        srid=db_util.get_internal_srid(crs),
         qgis_template_spatialrefsys=crs_def.CRSDefinitions[crs].qgis_template_spatialrefsys,
     )
 

@@ -73,8 +73,8 @@ def ensure_bbox_with_area(bbox, no_area_padding):
 def transform(bbox, crs_from, crs_to):
     if is_empty(bbox):
         return None, None, None, None
-    srid_from = db_util.get_srid(crs_from)
-    srid_to = db_util.get_srid(crs_to)
+    srid_from = db_util.get_internal_srid(crs_from)
+    srid_to = db_util.get_internal_srid(crs_to)
     world_bounds = crs_def.CRSDefinitions[crs_to].world_bounds.get(crs_from)
     if world_bounds:
         bbox = (

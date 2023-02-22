@@ -433,7 +433,7 @@ from transformed
         table=sql.Identifier(table_uri.schema, table_uri.table)
     )
     with app.app_context():
-        to_srid = db_util.get_srid(crs)
+        to_srid = db_util.get_internal_srid(crs)
         coordinates = db_util.run_query(query, (to_srid, point_id), conn_cur=db_util.create_connection_cursor(table_uri.db_uri_str))
     assert len(coordinates) == 1, coordinates
     coordinates = coordinates[0]

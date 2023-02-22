@@ -75,7 +75,7 @@ def to_tsquery_string(value):
     return value
 
 
-def get_srid(crs):
+def get_internal_srid(crs):
     if crs is None:
         srid = None
     else:

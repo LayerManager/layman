@@ -48,8 +48,8 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
     full_text_like = '%' + full_text_filter + '%' if full_text_filter else None
     ordering_full_text_tsquery = db_util.to_tsquery_string(ordering_full_text) if ordering_full_text else None
 
-    ordering_bbox_srid = db_util.get_srid(ordering_bbox_crs)
-    filtering_bbox_srid = db_util.get_srid(bbox_filter_crs)
+    ordering_bbox_srid = db_util.get_internal_srid(ordering_bbox_crs)
+    filtering_bbox_srid = db_util.get_internal_srid(bbox_filter_crs)
 
     bbox_filter_where_part = secure_bbox_transform(bbox_filter_crs)
     bbox_filter_where_part += ' && ST_MakeBox2D(ST_MakePoint(%s, %s), ST_MakePoint(%s, %s))'
@@ -292,7 +292,7 @@ def secure_bbox_transform(bbox_crs):
     if bbox_crs and bbox_crs in crs_def.CRSDefinitions and crs_def.CRSDefinitions[bbox_crs].world_bounds:
         bbox_sql = f"""ST_TRANSFORM(ST_SetSRID(case """
         for world_bound_crs, world_bound_bbox in crs_def.CRSDefinitions[bbox_crs].world_bounds.items():
-            world_bound_srid = db_util.get_srid(world_bound_crs)
+            world_bound_srid = db_util.get_internal_srid(world_bound_crs)
             bbox_sql += f'''
                               when p.srid = {world_bound_srid} then ST_MakeBox2D(
                         ST_MakePoint(least(greatest(ST_XMIN(p.bbox), {world_bound_bbox[0]}), {world_bound_bbox[2]}),
@@ -533,7 +533,7 @@ def set_bbox(workspace, publication_type, publication, bbox, crs, ):
         max(min(bbox[2], max_bbox[2]), max_bbox[0]),
         max(min(bbox[3], max_bbox[3]), max_bbox[1]),
     ) if not bbox_util.is_empty(bbox) and max_bbox else bbox
-    srid = db_util.get_srid(crs)
+    srid = db_util.get_internal_srid(crs)
     query = f'''update {DB_SCHEMA}.publications set
     bbox = ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s ,%s)),
     srid = %s

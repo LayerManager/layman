@@ -27,7 +27,7 @@ def adjust_db_for_srid():
 
 def adjust_db_publication_layer_srid_data():
     crs = EPSG_3857
-    srid = db_util.get_srid(crs)
+    srid = db_util.get_internal_srid(crs)
 
     statement = f'''
     update {DB_SCHEMA}.publications set
