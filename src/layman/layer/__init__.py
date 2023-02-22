@@ -117,7 +117,7 @@ PUBLICATION_TYPES = {
             },
             (settings.GEODATA_TYPE_VECTOR, settings.EnumOriginalDataSource.TABLE.value): {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'wfs', 'thumbnail',
-                'metadata', 'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
+                'db', 'metadata', 'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
                 'original_data_source', 'geodata_type',
             },
             settings.GEODATA_TYPE_RASTER: {
