@@ -8,6 +8,7 @@ from layman import settings, app
 from tests import EXTERNAL_DB_NAME, READ_ONLY_USER
 
 URI_STR = f'''postgresql://{settings.LAYMAN_PG_USER}:{settings.LAYMAN_PG_PASSWORD}@{settings.LAYMAN_PG_HOST}:{settings.LAYMAN_PG_PORT}/{EXTERNAL_DB_NAME}'''
+URI_STR_REDACTED = f'''postgresql://{settings.LAYMAN_PG_USER}@{settings.LAYMAN_PG_HOST}:{settings.LAYMAN_PG_PORT}/{EXTERNAL_DB_NAME}'''
 READ_ONLY_PASSWORD = 'read_only_pwd'
 READ_ONLY_URI_STR = f'''postgresql://{READ_ONLY_USER}:{READ_ONLY_PASSWORD}@{settings.LAYMAN_PG_HOST}:{settings.LAYMAN_PG_PORT}/{EXTERNAL_DB_NAME}'''
 

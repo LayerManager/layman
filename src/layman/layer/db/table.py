@@ -47,6 +47,16 @@ def get_layer_info(workspace, layername,):
             }
             if layer_info['original_data_source'] == settings.EnumOriginalDataSource.TABLE.value:
                 result['db']['external_uri'] = layer_util.redact_uri(table_uri.db_uri_str)
+        elif layer_info['original_data_source'] == settings.EnumOriginalDataSource.TABLE.value:
+            result['db'] = {
+                'schema': table_uri.schema,
+                'table': table_uri.table,
+                'geo_column': table_uri.geo_column,
+                'external_uri': layer_util.redact_uri(table_uri.db_uri_str),
+                'status': 'NOT_AVAILABLE',
+                'error': 'Table does not exist.',
+            }
+
     return result
 
 
