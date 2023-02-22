@@ -25,7 +25,18 @@ def get_layer_info(workspace, layername,):
         if layer_info['original_data_source'] == settings.EnumOriginalDataSource.FILE.value:
             conn_cur = db_util.get_connection_cursor()
         else:
-            conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
+            try:
+                conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str,)
+            except BaseException:
+                result['db'] = {
+                    'schema': table_uri.schema,
+                    'table': table_uri.table,
+                    'geo_column': table_uri.geo_column,
+                    'external_uri': layer_util.redact_uri(table_uri.db_uri_str),
+                    'status': 'NOT_AVAILABLE',
+                    'error': 'Cannot connect to DB.',
+                }
+                return result
 
         _, cur = conn_cur
         try:

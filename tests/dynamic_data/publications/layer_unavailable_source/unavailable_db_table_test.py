@@ -1,4 +1,5 @@
 import pytest
+import psycopg2
 from psycopg2 import sql
 
 from db import util as db_util
@@ -88,4 +89,31 @@ def test_external_layer():
         'table': 'small_layer',
     }
 
+    # disable external table connection
+    new_db_uri_str = psycopg2.extras.Json({'db_uri_str': external_db.URI_STR_REDACTED})
+    statement = sql.SQL("""update {prime_schema}.publications set
+        external_table_uri = PGP_SYM_ENCRYPT((PGP_SYM_DECRYPT(external_table_uri::bytea, uuid::text)::jsonb || {new_db_uri_str})::text, uuid::text)
+    where id_workspace = (select id from {prime_schema}.workspaces where name = {workspace})
+      and name = {name}
+      and type = {type}
+    ;""").format(
+        prime_schema=sql.Identifier(settings.LAYMAN_PRIME_SCHEMA),
+        workspace=sql.Literal(layer.workspace),
+        name=sql.Literal(layer.name),
+        type=sql.Literal(layer.type),
+        new_db_uri_str=sql.Literal(new_db_uri_str),
+    )
+    with app.app_context():
+        db_util.run_statement(statement)
+
+    rest_info_post = process_client.get_workspace_layer(layer.workspace, layer.name)
+    assert 'db_table' not in rest_info_pre
+    assert rest_info_post['db'] == {
+        'status': 'NOT_AVAILABLE',
+        'error': 'Cannot connect to DB.',
+        'external_uri': 'postgresql://docker@postgresql:5432/external_test_db',
+        'geo_column': 'wkb_geometry',
+        'schema': 'public',
+        'table': 'small_layer',
+    }
     process_client.delete_workspace_layer(layer.workspace, layer.name)
