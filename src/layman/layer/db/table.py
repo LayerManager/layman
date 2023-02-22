@@ -51,6 +51,7 @@ def get_layer_info(workspace, layername,):
 
 
 def delete_layer(workspace, layername, conn_cur=None):
+    """Deletes table from internal DB only"""
     table_name = get_internal_table_name(workspace, layername)
     if table_name:
         if conn_cur is None:
@@ -68,7 +69,7 @@ def delete_layer(workspace, layername, conn_cur=None):
             raise LaymanError(7)from exc
 
 
-def set_layer_srid(schema, table_name, srid, *, conn_cur=None):
+def set_internal_table_layer_srid(schema, table_name, srid, *, conn_cur=None):
     query = '''SELECT UpdateGeometrySRID(%s, %s, %s, %s);'''
     params = (schema, table_name, settings.OGR_DEFAULT_GEOMETRY_COLUMN, srid)
     db_util.run_query(query, params, conn_cur=conn_cur)

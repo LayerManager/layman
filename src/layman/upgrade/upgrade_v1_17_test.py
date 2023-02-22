@@ -129,7 +129,7 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
         db.ensure_workspace(workspace)
         file_info = input_file.get_layer_info(workspace, layer)
         main_filepath = next(iter(file_info['_file']['paths'].values()))['absolute']
-        process = db.import_layer_vector_file_async(workspace, table_name, main_filepath, crs_id=None)
+        process = db.import_layer_vector_file_to_internal_table_async(workspace, table_name, main_filepath, crs_id=None)
         while process.poll() is None:
             pass
         return_code = process.poll()
@@ -139,11 +139,11 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
             assert info
 
         bbox = db.get_bbox(workspace, table_name)
-        crs = db.get_crs(workspace, table_name)
+        crs = db.get_crs(workspace, table_name, use_internal_srid=True)
 
         prime_db_schema_publications.set_bbox(workspace, LAYER_TYPE, layer, bbox, crs, )
         if crs_def.CRSDefinitions[crs].srid:
-            table.set_layer_srid(workspace, table_name, crs_def.CRSDefinitions[crs].srid)
+            table.set_internal_table_layer_srid(workspace, table_name, crs_def.CRSDefinitions[crs].srid)
 
         wms_workspace = wms.get_geoserver_workspace(workspace)
 

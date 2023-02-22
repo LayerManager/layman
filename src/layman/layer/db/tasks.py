@@ -49,9 +49,9 @@ def refresh_table(
 
     for try_num in [1, 2]:
         if try_num == 1:
-            processes = [db.import_layer_vector_file_async(workspace, table_name, main_filepath, crs_id)]
+            processes = [db.import_layer_vector_file_to_internal_table_async(workspace, table_name, main_filepath, crs_id)]
         elif try_num == 2:
-            processes = db.import_layer_vector_file_async_with_iconv(workspace, table_name, main_filepath, crs_id)
+            processes = db.import_layer_vector_file_to_internal_table_async_with_iconv(workspace, table_name, main_filepath, crs_id)
         process = processes[-1]
         stdout, stderr = process.communicate()
         return_code = process.poll()
@@ -78,6 +78,6 @@ def refresh_table(
                 raise LaymanError(err_code, private_data=str_error)
         break
 
-    crs = db.get_crs(workspace, table_name)
+    crs = db.get_crs(workspace, table_name, use_internal_srid=True)
     if crs_def.CRSDefinitions[crs].srid:
-        table.set_layer_srid(workspace, table_name, crs_def.CRSDefinitions[crs].srid)
+        table.set_internal_table_layer_srid(workspace, table_name, crs_def.CRSDefinitions[crs].srid)

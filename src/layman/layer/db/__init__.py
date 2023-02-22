@@ -30,6 +30,7 @@ def get_internal_table_name(workspace, layer):
 
 
 def get_workspaces(conn_cur=None):
+    """Returns workspaces from internal DB only"""
     if conn_cur is None:
         conn_cur = db_util.get_connection_cursor()
     _, cur = conn_cur
@@ -61,6 +62,7 @@ def check_workspace_name(workspace):
 
 
 def ensure_workspace(workspace, conn_cur=None):
+    """Ensures workspace in internal DB only"""
     if conn_cur is None:
         conn_cur = db_util.get_connection_cursor()
     conn, cur = conn_cur
@@ -78,6 +80,7 @@ def ensure_workspace(workspace, conn_cur=None):
 
 
 def delete_workspace(workspace, conn_cur=None):
+    """Deletes workspace from internal DB only"""
     if conn_cur is None:
         conn_cur = db_util.get_connection_cursor()
     conn, cur = conn_cur
@@ -94,18 +97,20 @@ def delete_workspace(workspace, conn_cur=None):
 
 
 def ensure_whole_user(username):
+    """Ensures whole user in internal DB only"""
     ensure_workspace(username)
 
 
 def delete_whole_user(username):
+    """Deletes whole user from internal DB only"""
     delete_workspace(username)
 
 
-def import_layer_vector_file(workspace, layername, main_filepath, crs_id):
+def import_layer_vector_file_to_internal_table(workspace, layername, main_filepath, crs_id):
     table_name = get_internal_table_name(workspace, layername)
     assert table_name, f'workspace={workspace}, layername={layername}, table_name={table_name}'
-    process = import_layer_vector_file_async(workspace, table_name, main_filepath,
-                                             crs_id)
+    process = import_layer_vector_file_to_internal_table_async(workspace, table_name, main_filepath,
+                                                               crs_id)
     while process.poll() is None:
         pass
     return_code = process.poll()
@@ -142,7 +147,7 @@ def create_ogr2ogr_args(*, schema, table_name, main_filepath, crs_id, output):
     return ogr2ogr_args
 
 
-def import_layer_vector_file_async_with_iconv(schema, table_name, main_filepath, crs_id):
+def import_layer_vector_file_to_internal_table_async_with_iconv(schema, table_name, main_filepath, crs_id):
     assert table_name, f'schema={schema}, table_name={table_name}, main_filepath={main_filepath}'
 
     first_ogr2ogr_args = [
@@ -178,8 +183,8 @@ def import_layer_vector_file_async_with_iconv(schema, table_name, main_filepath,
     return [first_ogr2ogr_process, iconv_process, final_ogr2ogr_process]
 
 
-def import_layer_vector_file_async(schema, table_name, main_filepath,
-                                   crs_id):
+def import_layer_vector_file_to_internal_table_async(schema, table_name, main_filepath,
+                                                     crs_id):
     # import file to database table
     assert table_name, f'schema={schema}, table_name={table_name}, main_filepath={main_filepath}'
     bash_args = create_ogr2ogr_args(schema=schema,
@@ -213,7 +218,7 @@ AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
     return [r[0] for r in rows]
 
 
-def get_all_column_names(workspace, layername, conn_cur=None):
+def get_internal_table_all_column_names(workspace, layername, conn_cur=None):
     table_name = get_internal_table_name(workspace, layername)
     return get_all_table_column_names(workspace, table_name, conn_cur=conn_cur)
 
@@ -559,7 +564,8 @@ def get_bbox(schema, table_name, conn_cur=None, column=settings.OGR_DEFAULT_GEOM
     return result
 
 
-def get_crs(schema, table_name, conn_cur=None, column=settings.OGR_DEFAULT_GEOMETRY_COLUMN, *, use_internal_srid=True):
+def get_crs(schema, table_name, conn_cur=None, column=settings.OGR_DEFAULT_GEOMETRY_COLUMN, *, use_internal_srid=None):
+    assert use_internal_srid is not None
     query = 'select Find_SRID(%s, %s, %s);'
     srid = db_util.run_query(query, (schema, table_name, column), conn_cur=conn_cur)[0][0]
     crs = db_util.get_crs(srid, conn_cur, use_internal_srid=use_internal_srid)
