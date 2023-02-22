@@ -72,7 +72,7 @@ class PublicationByInputData(PublicationByDefinitionBase):
     EXTERNAL_TABLE = (PublicationValues(
         type=process_client.LAYER_TYPE,
         definition={
-            'db_connection': URI_STR,
+            'external_table_uri': URI_STR,
         },
         info_values={},
         thumbnail='',

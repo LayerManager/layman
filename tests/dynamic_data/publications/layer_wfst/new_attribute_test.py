@@ -40,7 +40,7 @@ class LayerByTableLocation(base_test.PublicationByDefinitionBase):
     EXTERNAL = (PublicationValues(
         type=process_client.LAYER_TYPE,
         definition={
-            'db_connection': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
+            'external_table_uri': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
         },
         info_values={},
         thumbnail='',
@@ -193,9 +193,9 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         # ensure layers
         self.ensure_publication(layer, args=rest_args, scope='class')
         layer2 = Publication(name=f"{layer.name}_2", workspace=workspace, type=layer.type)
-        rest_args2 = rest_args if 'db_connection' not in rest_args else {
+        rest_args2 = rest_args if 'external_table_uri' not in rest_args else {
             **rest_args,
-            'db_connection': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE_2}&geo_column=wkb_geometry",
+            'external_table_uri': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE_2}&geo_column=wkb_geometry",
         }
         self.ensure_publication(layer2, args=rest_args2, scope='class')
 

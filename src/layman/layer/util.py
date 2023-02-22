@@ -274,11 +274,11 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
     external_table_uri = parse.urlparse(external_table_uri_str, )
     if external_table_uri.scheme not in {'postgresql', 'postgres'}:
         raise LaymanError(2, {
-            'parameter': 'db_connection',
-            'message': 'Parameter `db_connection` is expected to have URI scheme `postgresql`',
+            'parameter': 'external_table_uri',
+            'message': 'Parameter `external_table_uri` is expected to have URI scheme `postgresql`',
             'expected': EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': external_table_uri_str,
+                'external_table_uri': external_table_uri_str,
                 'uri_scheme': external_table_uri.scheme,
             }
         })
@@ -291,11 +291,11 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
     db_uri_str = parse.urlunparse(db_uri)
     if not all([schema, table, db_uri.hostname]):
         raise LaymanError(2, {
-            'parameter': 'db_connection',
-            'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
+            'parameter': 'external_table_uri',
+            'message': 'Parameter `external_table_uri` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
             'expected': EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': external_table_uri_str,
+                'external_table_uri': external_table_uri_str,
                 'host': db_uri.hostname,
                 'schema': schema,
                 'table': table,
@@ -307,12 +307,12 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
         conn_cur = db_util.create_connection_cursor(db_uri_str, encapsulate_exception=False)
     except psycopg2.OperationalError as exc:
         raise LaymanError(2, {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': 'Unable to connect to database. Please check connection string, firewall settings, etc.',
             'expected': EXTERNAL_TABLE_URI_PATTERN,
             'detail': str(exc),
             'found': {
-                'db_connection': external_table_uri_str,
+                'external_table_uri': external_table_uri_str,
             },
         }) from exc
 
@@ -321,11 +321,11 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
         query_res = db_util.run_query(query, (schema, table), conn_cur=conn_cur)
         if len(query_res) == 0:
             raise LaymanError(2, {
-                'parameter': 'db_connection',
+                'parameter': 'external_table_uri',
                 'message': 'Geometry column not found.',
                 'expected': 'Table with at least one geometry column.',
                 'found': {
-                    'db_connection': external_table_uri_str,
+                    'external_table_uri': external_table_uri_str,
                     'schema': schema,
                     'table': table,
                 }
@@ -335,10 +335,10 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
     for name in [schema, table, geo_column]:
         if not re.match(SAFE_PG_IDENTIFIER_PATTERN, name):
             raise LaymanError(2, {
-                'parameter': 'db_connection',
-                'message': 'Schema, table, and geo_column in `db_connection` parameter are expected to match regular expression ' + SAFE_PG_IDENTIFIER_PATTERN,
+                'parameter': 'external_table_uri',
+                'message': 'Schema, table, and geo_column in `external_table_uri` parameter are expected to match regular expression ' + SAFE_PG_IDENTIFIER_PATTERN,
                 'found': {
-                    'db_connection': external_table_uri_str,
+                    'external_table_uri': external_table_uri_str,
                     'schema': schema,
                     'table': table,
                     'geo_column': geo_column,
@@ -352,11 +352,11 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
         query_res = db_util.run_query(query, (schema, table,), conn_cur=conn_cur)
         suggestion = f" Did you mean \"{query_res[0][0]}\".\"{query_res[0][1]}\"?" if query_res else ''
         raise LaymanError(2, {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': f'Table "{schema}"."{table}" not found in database.{suggestion}',
             'expected': EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': external_table_uri_str,
+                'external_table_uri': external_table_uri_str,
                 'schema': schema,
                 'table': table,
             }
@@ -366,11 +366,11 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
     query_res = db_util.run_query(query, (schema, table, geo_column), conn_cur=conn_cur)
     if not query_res[0][0]:
         raise LaymanError(2, {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': 'Column `geo_column` not found among geometry columns.',
             'expected': EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': external_table_uri_str,
+                'external_table_uri': external_table_uri_str,
                 'schema': schema,
                 'table': table,
                 'geo_column': geo_column,
@@ -380,7 +380,7 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
     crs = get_crs(schema, table, conn_cur=conn_cur, column=geo_column, use_internal_srid=False)
     if crs not in settings.INPUT_SRS_LIST:
         raise LaymanError(2, {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': 'Unsupported CRS of table data.',
             'supported_values': settings.INPUT_SRS_LIST,
             'found': crs,
@@ -404,11 +404,11 @@ WHERE
     primary_key_columns = [r[0] for r in query_res]
     if len(query_res) == 0:
         raise LaymanError(2, {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': 'No primary key found in the table.',
             'expected': 'Table with one-column primary key.',
             'found': {
-                'db_connection': external_table_uri_str,
+                'external_table_uri': external_table_uri_str,
                 'schema': schema,
                 'table': table,
                 'primary_key_columns': primary_key_columns,
@@ -416,11 +416,11 @@ WHERE
         })
     if len(query_res) > 1:
         raise LaymanError(2, {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': 'Table with multi-column primary key.',
             'expected': 'Table with one-column primary key.',
             'found': {
-                'db_connection': external_table_uri_str,
+                'external_table_uri': external_table_uri_str,
                 'schema': schema,
                 'table': table,
                 'primary_key_columns': primary_key_columns,
@@ -431,10 +431,10 @@ WHERE
     unsafe_column_names = [c for c in column_names if not re.match(SAFE_PG_IDENTIFIER_PATTERN, c)]
     if unsafe_column_names:
         raise LaymanError(2, {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': 'Expected table with all column names mathing regular expression ' + SAFE_PG_IDENTIFIER_PATTERN,
             'found': {
-                'db_connection': external_table_uri_str,
+                'external_table_uri': external_table_uri_str,
                 'schema': schema,
                 'table': table,
                 'unsafe_column_names': unsafe_column_names,

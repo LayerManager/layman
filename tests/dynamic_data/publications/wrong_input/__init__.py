@@ -1339,7 +1339,7 @@ TESTCASES = {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': [],
-            'db_connection': '',
+            'external_table_uri': '',
             'compress': False,
             'with_chunks': False,
         },
@@ -1350,8 +1350,8 @@ TESTCASES = {
                           'code': 1,
                           'message': 'Missing parameter',
                           'data': {
-                              'parameters': ['file', 'db_connection'],
-                              'message': 'Both `file` and `db_connection` parameters are empty',
+                              'parameters': ['file', 'external_table_uri'],
+                              'message': 'Both `file` and `external_table_uri` parameters are empty',
                               'expected': 'One of the parameters is filled.',
                           },
                           },
@@ -1361,7 +1361,7 @@ TESTCASES = {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': ['sample/layman.layer/small_layer.geojson'],
-            'db_connection': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
+            'external_table_uri': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
         },
         consts.KEY_EXCEPTION: LaymanError,
         KEY_EXPECTED_EXCEPTION: {
@@ -1370,12 +1370,12 @@ TESTCASES = {
                           'code': 48,
                           'message': 'Wrong combination of parameters',
                           'data': {
-                              'parameters': ['file', 'db_connection'],
-                              'message': 'Both `file` and `db_connection` parameters are filled',
+                              'parameters': ['file', 'external_table_uri'],
+                              'message': 'Both `file` and `external_table_uri` parameters are filled',
                               'expected': 'Only one of the parameters is fulfilled.',
                               'found': {
                                   'file': ['small_layer.geojson'],
-                                  'db_connection': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
+                                  'external_table_uri': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
                               }},
                           },
             frozenset([('compress', True), ('with_chunks', False)]): {
@@ -1402,7 +1402,7 @@ TESTCASES = {
     'partial_db_connect': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
-            'db_connection': 'db_connection',
+            'external_table_uri': 'external_table_uri',
             'compress': False,
             'with_chunks': False,
         },
@@ -1412,11 +1412,11 @@ TESTCASES = {
                           'sync': True,
                           'code': 2,
                           'message': 'Wrong parameter value',
-                          'data': {'parameter': 'db_connection',
-                                   'message': 'Parameter `db_connection` is expected to have URI scheme `postgresql`',
+                          'data': {'parameter': 'external_table_uri',
+                                   'message': 'Parameter `external_table_uri` is expected to have URI scheme `postgresql`',
                                    'expected': EXTERNAL_TABLE_URI_PATTERN,
                                    'found': {
-                                       'db_connection': 'db_connection',
+                                       'external_table_uri': 'external_table_uri',
                                        'uri_scheme': '',
                                    },
                                    },
@@ -1432,7 +1432,7 @@ TESTCASES = {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'crs': 'EPSG:4326',
-            'db_connection': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
+            'external_table_uri': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
             'compress': False,
             'with_chunks': False,
             'skip_asserts': True,

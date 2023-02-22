@@ -191,11 +191,11 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
     pytest.param('postgresql://postgresql', {
         'http_code': 400,
         'code': 2,
-        'data': {'parameter': 'db_connection',
-                 'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
+        'data': {'parameter': 'external_table_uri',
+                 'message': 'Parameter `external_table_uri` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
                  'expected': util.EXTERNAL_TABLE_URI_PATTERN,
                  'found': {
-                     'db_connection': 'postgresql://postgresql',
+                     'external_table_uri': 'postgresql://postgresql',
                      'host': 'postgresql',
                      'schema': None,
                      'table': None,
@@ -206,11 +206,11 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
     pytest.param('postgresql:///external_test_db?schema=schema_name&table=table_name&geo_column=wkb_geometry', {
         'http_code': 400,
         'code': 2,
-        'data': {'parameter': 'db_connection',
-                 'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
+        'data': {'parameter': 'external_table_uri',
+                 'message': 'Parameter `external_table_uri` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
                  'expected': util.EXTERNAL_TABLE_URI_PATTERN,
                  'found': {
-                     'db_connection': 'postgresql:///external_test_db?schema=schema_name&table=table_name&geo_column=wkb_geometry',
+                     'external_table_uri': 'postgresql:///external_test_db?schema=schema_name&table=table_name&geo_column=wkb_geometry',
                      'host': None,
                      'schema': 'schema_name',
                      'table': 'table_name',
@@ -221,11 +221,11 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
     pytest.param('postgresql://docker:docker@:5432/external_test_db?schema=schema_name&table=table_name&geo_column=wkb_geometry', {
         'http_code': 400,
         'code': 2,
-        'data': {'parameter': 'db_connection',
-                 'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
+        'data': {'parameter': 'external_table_uri',
+                 'message': 'Parameter `external_table_uri` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
                  'expected': util.EXTERNAL_TABLE_URI_PATTERN,
                  'found': {
-                     'db_connection': 'postgresql://docker:docker@:5432/external_test_db?schema=schema_name&table=table_name&geo_column=wkb_geometry',
+                     'external_table_uri': 'postgresql://docker:docker@:5432/external_test_db?schema=schema_name&table=table_name&geo_column=wkb_geometry',
                      'host': None,
                      'schema': 'schema_name',
                      'table': 'table_name',
@@ -236,11 +236,11 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
     pytest.param('postgresql://docker:docker@postgresql:5432/external_test_db?table=table_name&geo_column=wkb_geometry', {
         'http_code': 400,
         'code': 2,
-        'data': {'parameter': 'db_connection',
-                 'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
+        'data': {'parameter': 'external_table_uri',
+                 'message': 'Parameter `external_table_uri` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
                  'expected': util.EXTERNAL_TABLE_URI_PATTERN,
                  'found': {
-                     'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?table=table_name&geo_column=wkb_geometry',
+                     'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?table=table_name&geo_column=wkb_geometry',
                      'host': 'postgresql',
                      'schema': None,
                      'table': 'table_name',
@@ -251,11 +251,11 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
     pytest.param('postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&geo_column=wkb_geometry', {
         'http_code': 400,
         'code': 2,
-        'data': {'parameter': 'db_connection',
-                 'message': 'Parameter `db_connection` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
+        'data': {'parameter': 'external_table_uri',
+                 'message': 'Parameter `external_table_uri` is expected to be valid URL with `host` part and query parameters `schema`, `table`, and `geo_column`.',
                  'expected': util.EXTERNAL_TABLE_URI_PATTERN,
                  'found': {
-                     'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&geo_column=wkb_geometry',
+                     'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&geo_column=wkb_geometry',
                      'host': 'postgresql',
                      'schema': 'schema_name',
                      'table': None,
@@ -267,10 +267,10 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
         'http_code': 400,
         'code': 2,
         'data': {
-            'parameter': 'db_connection',
-            'message': r'Schema, table, and geo_column in `db_connection` parameter are expected to match regular expression ^[a-zA-Z_][a-zA-Z_0-9]*$',
+            'parameter': 'external_table_uri',
+            'message': r'Schema, table, and geo_column in `external_table_uri` parameter are expected to match regular expression ^[a-zA-Z_][a-zA-Z_0-9]*$',
             'found': {
-                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=01startsWithDigit&table=table_name&geo_column=wkb_geometry',
+                'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=01startsWithDigit&table=table_name&geo_column=wkb_geometry',
                 'schema': '01startsWithDigit',
                 'table': 'table_name',
                 'geo_column': 'wkb_geometry',
@@ -281,10 +281,10 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
         'http_code': 400,
         'code': 2,
         'data': {
-            'parameter': 'db_connection',
-            'message': r'Schema, table, and geo_column in `db_connection` parameter are expected to match regular expression ^[a-zA-Z_][a-zA-Z_0-9]*$',
+            'parameter': 'external_table_uri',
+            'message': r'Schema, table, and geo_column in `external_table_uri` parameter are expected to match regular expression ^[a-zA-Z_][a-zA-Z_0-9]*$',
             'found': {
-                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=name%20with%20dash-and%20spaces&geo_column=wkb_geometry',
+                'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=name%20with%20dash-and%20spaces&geo_column=wkb_geometry',
                 'schema': 'schema_name',
                 'table': 'name with dash-and spaces',
                 'geo_column': 'wkb_geometry',
@@ -295,10 +295,10 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
         'http_code': 400,
         'code': 2,
         'data': {
-            'parameter': 'db_connection',
-            'message': r'Schema, table, and geo_column in `db_connection` parameter are expected to match regular expression ^[a-zA-Z_][a-zA-Z_0-9]*$',
+            'parameter': 'external_table_uri',
+            'message': r'Schema, table, and geo_column in `external_table_uri` parameter are expected to match regular expression ^[a-zA-Z_][a-zA-Z_0-9]*$',
             'found': {
-                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_name&geo_column=name%24with%24dollar',
+                'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_name&geo_column=name%24with%24dollar',
                 'schema': 'schema_name',
                 'table': 'table_name',
                 'geo_column': 'name$with$dollar',
@@ -309,11 +309,11 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
         'http_code': 400,
         'code': 2,
         'data': {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': 'Table "schema_name"."no_table_name" not found in database.',
             'expected': util.EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=no_table_name&geo_column=wkb_geometry',
+                'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=no_table_name&geo_column=wkb_geometry',
                 'schema': 'schema_name',
                 'table': 'no_table_name',
             },
@@ -323,11 +323,11 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
         'http_code': 400,
         'code': 2,
         'data': {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': 'Table "schema_name"."Table_name" not found in database. Did you mean "schema_name"."table_name"?',
             'expected': util.EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=Table_name&geo_column=wkb_geometry',
+                'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=Table_name&geo_column=wkb_geometry',
                 'schema': 'schema_name',
                 'table': 'Table_name',
             },
@@ -337,11 +337,11 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
         'http_code': 400,
         'code': 2,
         'data': {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': 'Column `geo_column` not found among geometry columns.',
             'expected': util.EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_name&geo_column=no_wkb_geometry',
+                'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_name&geo_column=no_wkb_geometry',
                 'schema': 'schema_name',
                 'table': 'table_name',
                 'geo_column': 'no_wkb_geometry',
@@ -352,11 +352,11 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
         'http_code': 400,
         'code': 2,
         'data': {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': 'Table "no_schema"."table_name" not found in database.',
             'expected': util.EXTERNAL_TABLE_URI_PATTERN,
             'found': {
-                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=no_schema&table=table_name&geo_column=geo_wkb_column',
+                'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=no_schema&table=table_name&geo_column=geo_wkb_column',
                 'schema': 'no_schema',
                 'table': 'table_name',
             },
@@ -366,11 +366,11 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
         'http_code': 400,
         'code': 2,
         'data': {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': 'Table with multi-column primary key.',
             'expected': 'Table with one-column primary key.',
             'found': {
-                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=two_column_primary_key&geo_column=geo_wkb_column',
+                'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=two_column_primary_key&geo_column=geo_wkb_column',
                 'schema': 'schema_name',
                 'table': 'two_column_primary_key',
                 'primary_key_columns': ['partial_id_1', 'partial_id_2'],
@@ -381,11 +381,11 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
         'http_code': 400,
         'code': 2,
         'data': {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': 'No primary key found in the table.',
             'expected': 'Table with one-column primary key.',
             'found': {
-                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=no_primary_key&geo_column=geo_wkb_column',
+                'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=no_primary_key&geo_column=geo_wkb_column',
                 'schema': 'schema_name',
                 'table': 'no_primary_key',
                 'primary_key_columns': [],
@@ -396,10 +396,10 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
         'http_code': 400,
         'code': 2,
         'data': {
-            'parameter': 'db_connection',
+            'parameter': 'external_table_uri',
             'message': 'Expected table with all column names mathing regular expression ^[a-zA-Z_][a-zA-Z_0-9]*$',
             'found': {
-                'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_with_unsafe_column_name&geo_column=geo_wkb_column',
+                'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_with_unsafe_column_name&geo_column=geo_wkb_column',
                 'schema': 'schema_name',
                 'table': 'table_with_unsafe_column_name',
                 'unsafe_column_names': ['name-with-dashes'],
@@ -412,11 +412,11 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
             'http_code': 400,
             'code': 2,
             'data': {
-                'parameter': 'db_connection',
+                'parameter': 'external_table_uri',
                 'message': 'Geometry column not found.',
                 'expected': 'Table with at least one geometry column.',
                 'found': {
-                    'db_connection': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_without_geo_column',
+                    'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_without_geo_column',
                     'schema': 'schema_name',
                     'table': 'table_without_geo_column',
                 },
@@ -428,7 +428,7 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
             'http_code': 400,
             'code': 2,
             'data': {
-                'parameter': 'db_connection',
+                'parameter': 'external_table_uri',
                 'message': 'Unsupported CRS of table data.',
                 'found': 'EPSG:32635',
                 'supported_values': settings.INPUT_SRS_LIST,
@@ -459,11 +459,11 @@ def test_validate_external_table_connection(external_table_uri_str, exp_err_msg_
         util.parse_and_validate_external_table_uri_str(external_table_uri_str)
     exp_error = {'http_code': 400,
                  'code': 2,
-                 'data': {'parameter': 'db_connection',
+                 'data': {'parameter': 'external_table_uri',
                           'message': 'Unable to connect to database. Please check connection string, firewall settings, etc.',
                           'expected': util.EXTERNAL_TABLE_URI_PATTERN,
                           'found': {
-                              'db_connection': external_table_uri_str}},
+                              'external_table_uri': external_table_uri_str}},
                  }
     exc_detail_msg = exc_info.value.data['detail']
     assert any(re.match(exp_err_msg_pattern, exc_detail_msg) for exp_err_msg_pattern in exp_err_msg_patterns), f'exc_detail_msg={exc_detail_msg}, exp_err_msg_patterns={exp_err_msg_patterns}'
@@ -485,11 +485,11 @@ def test_validate_external_table_uri_str_parse(external_table_uri_str, scheme):
         util.parse_and_validate_external_table_uri_str(external_table_uri_str)
     exp_error = {'http_code': 400,
                  'code': 2,
-                 'data': {'parameter': 'db_connection',
-                          'message': 'Parameter `db_connection` is expected to have URI scheme `postgresql`',
+                 'data': {'parameter': 'external_table_uri',
+                          'message': 'Parameter `external_table_uri` is expected to have URI scheme `postgresql`',
                           'expected': util.EXTERNAL_TABLE_URI_PATTERN,
                           'found': {
-                              'db_connection': external_table_uri_str,
+                              'external_table_uri': external_table_uri_str,
                               'uri_scheme': scheme,
                           },
                           },

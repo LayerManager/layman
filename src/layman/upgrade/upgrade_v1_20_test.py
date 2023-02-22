@@ -9,8 +9,8 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
 @pytest.mark.usefixtures('ensure_layman')
-def test_db_connection():
-    main_workspace = 'test_db_connection_migration_workspace'
+def test_external_table_uri():
+    main_workspace = 'test_external_table_uri_migration_workspace'
 
     layer_vector_def = (main_workspace, process_client.LAYER_TYPE, 'test_layer_vector', dict())
     layer_raster_def = (main_workspace, process_client.LAYER_TYPE, 'test_layer_raster', {'file_paths': ['sample/layman.layer/sample_jp2_rgb.jp2', ]})

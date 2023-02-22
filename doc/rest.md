@@ -123,7 +123,7 @@ Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
 
 Body parameters:
 - *file*, file(s) or file name(s)
-   - exactly one of `file` or `db_connection` must be set
+   - exactly one of `file` or `external_table_uri` must be set
    - one of following options is expected:
       - GeoJSON file
       - ShapeFile files (at least three files: .shp, .shx, .dbf)
@@ -145,8 +145,8 @@ Body parameters:
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be safely stored in DB
    - if QML style is used in this request, it must list all attributes contained in given data file
-- *db_connection*, string
-   - exactly one of `file` or `db_connection` must be set
+- *external_table_uri*, string
+   - exactly one of `file` or `external_table_uri` must be set
    - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is expected with URI scheme `postgresql` and query parameters `schema`, and `table` specified
    - if `geo_column` is not specified, first geometry column of the table by alphabetic order is used
    - published table is required to have one-column primary key
@@ -351,13 +351,13 @@ Body parameters:
 - *file*, file(s) or file name(s)
    - If provided, current data file will be deleted and replaced by this file. GeoServer feature types, DB table, normalized raster file, and thumbnail will be deleted and created again using the new file.
    - same file types as in [POST Workspace Layers](#post-workspace-layers) are expected
-   - only one of `file` or `db_connection` can be set
+   - only one of `file` or `external_table_uri` can be set
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - if QML style is used (either directly within this request, or indirectly from previous state on server), it must list all attributes contained in given data file
    - it is allowed to publish time-series layer - see [POST Workspace Layers](#post-workspace-layers)
-- *db_connection*, string
-   - only one of `file` or `db_connection` can be set
+- *external_table_uri*, string
+   - only one of `file` or `external_table_uri` can be set
    - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is expected with URI scheme `postgresql` and query parameters `schema`, and `table` specified
    - if `geo_column` is not specified, first geometry column of the table by alphabetic order is used
    - published table is required to have one-column primary key

@@ -73,7 +73,7 @@ PUBLICATIONS = {
         'expected_name': 'small_layer',
         'rest_args': {
             'do_not_post_name': True,
-            'db_connection': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
+            'external_table_uri': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
         },
         'mandatory_cases': {
             frozenset([CompressDomain.FALSE, base_test.WithChunksDomain.FALSE, ]),

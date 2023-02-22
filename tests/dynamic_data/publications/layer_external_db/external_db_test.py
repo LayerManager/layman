@@ -25,9 +25,9 @@ TEST_CASES = {
         'table_name': 'all',
         'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
-        'db_connection_str': f"{external_db.URI_STR}"
-                             f"?schema={quote('public')}"
-                             f"&table={quote('all')}",
+        'external_table_uri_str': f"{external_db.URI_STR}"
+                                  f"?schema={quote('public')}"
+                                  f"&table={quote('all')}",
         'additional_geo_column': None,
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_all.png"),
         'exp_geometry_type': 'GEOMETRY',
@@ -44,9 +44,9 @@ TEST_CASES = {
         'table_name': 'MyGeometryCollection',
         'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
-        'db_connection_str': f"{external_db.URI_STR}"
-                             f"?schema={quote('public')}"
-                             f"&table={quote('MyGeometryCollection')}",
+        'external_table_uri_str': f"{external_db.URI_STR}"
+                                  f"?schema={quote('public')}"
+                                  f"&table={quote('MyGeometryCollection')}",
         'additional_geo_column': 'wkb_geometry_2',
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_geometrycollection.png"),
         'exp_geometry_type': 'GEOMETRYCOLLECTION',
@@ -63,7 +63,7 @@ TEST_CASES = {
         'table_name': EDGE_NAME,
         'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
-        'db_connection_str': None,
+        'external_table_uri_str': None,
         'additional_geo_column': None,
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_linestring.png"),
         'exp_geometry_type': 'LINESTRING',
@@ -80,7 +80,7 @@ TEST_CASES = {
         'table_name': 'multilinestring',
         'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
-        'db_connection_str': None,
+        'external_table_uri_str': None,
         'additional_geo_column': None,
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multilinestring.png"),
         'exp_geometry_type': 'MULTILINESTRING',
@@ -97,7 +97,7 @@ TEST_CASES = {
         'table_name': 'multipoint',
         'primary_key_column': 'ogc_fid',
         'geo_column_name': EDGE_NAME,
-        'db_connection_str': None,
+        'external_table_uri_str': None,
         'additional_geo_column': None,
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipoint.png"),
         'exp_geometry_type': 'MULTIPOINT',
@@ -113,7 +113,7 @@ TEST_CASES = {
         'schema_name': 'public',
         'table_name': 'multipolygon',
         'primary_key_column': 'my_id',
-        'db_connection_str': None,
+        'external_table_uri_str': None,
         'additional_geo_column': None,
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_qml.png"),
         'geo_column_name': 'wkb_geometry',
@@ -131,7 +131,7 @@ TEST_CASES = {
         'table_name': 'point',
         'primary_key_column': 'my_id2',
         'geo_column_name': 'wkb_geometry',
-        'db_connection_str': None,
+        'external_table_uri_str': None,
         'additional_geo_column': None,
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_point.png"),
         'exp_geometry_type': 'POINT',
@@ -148,7 +148,7 @@ TEST_CASES = {
         'table_name': 'polygon',
         'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
-        'db_connection_str': None,
+        'external_table_uri_str': None,
         'additional_geo_column': None,
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_polygon.png"),
         'exp_geometry_type': 'POLYGON',
@@ -165,7 +165,7 @@ TEST_CASES = {
         'table_name': 'point_5514',
         'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
-        'db_connection_str': None,
+        'external_table_uri_str': None,
         'additional_geo_column': None,
         'exp_thumbnail': 'tests/dynamic_data/publications/crs/vectors/sample_point_cz_5514_thumbnail.png',
         'exp_geometry_type': 'POINT',
@@ -182,7 +182,7 @@ TEST_CASES = {
         'table_name': 'point_3034',
         'primary_key_column': 'ogc_fid',
         'geo_column_name': 'wkb_geometry',
-        'db_connection_str': None,
+        'external_table_uri_str': None,
         'additional_geo_column': None,
         'exp_thumbnail': 'tests/dynamic_data/publications/crs/vectors/sample_point_cz_3034_thumbnail.png',
         'exp_geometry_type': 'POINT',
@@ -206,17 +206,18 @@ class TestLayer(base_test.TestSingleRestPublication):
         base_test.RestMethod,
     ]
 
-    test_cases = [base_test.TestCaseType(key=key,
-                                         type=EnumTestTypes.MANDATORY,
-                                         rest_args={
-                                             'db_connection': value['db_connection_str'] or f"{external_db.URI_STR}"
-                                                                                            f"?schema={quote(value['schema_name'])}"
-                                                                                            f"&table={quote(value['table_name'])}"
-                                                                                            f"&geo_column={quote(value['geo_column_name'])}",
-                                             'style_file': value['style_file'],
-                                         },
-                                         params=value,
-                                         ) for key, value in TEST_CASES.items()]
+    test_cases = [base_test.TestCaseType(
+        key=key,
+        type=EnumTestTypes.MANDATORY,
+        rest_args={
+            'external_table_uri': value['external_table_uri_str'] or f"{external_db.URI_STR}"
+                                                                     f"?schema={quote(value['schema_name'])}"
+                                                                     f"&table={quote(value['table_name'])}"
+                                                                     f"&geo_column={quote(value['geo_column_name'])}",
+            'style_file': value['style_file'],
+        },
+        params=value,
+    ) for key, value in TEST_CASES.items()]
 
     def test_layer(self, layer: Publication, rest_method, rest_args, params):
         """Parametrized using pytest_generate_tests"""

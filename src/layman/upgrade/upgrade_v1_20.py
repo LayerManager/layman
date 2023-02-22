@@ -8,7 +8,7 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
 def adjust_db_for_table_uri():
-    logger.info(f'    Alter DB prime schema for db_connection')
+    logger.info(f'    Alter DB prime schema for external_table_uri')
 
     statement = f'''
     CREATE EXTENSION IF NOT EXISTS pgcrypto;
