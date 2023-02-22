@@ -142,8 +142,8 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
         crs = db.get_crs(workspace, table_name, use_internal_srid=True)
 
         prime_db_schema_publications.set_bbox(workspace, LAYER_TYPE, layer, bbox, crs, )
-        if crs_def.CRSDefinitions[crs].srid:
-            table.set_internal_table_layer_srid(workspace, table_name, crs_def.CRSDefinitions[crs].srid)
+        if crs_def.CRSDefinitions[crs].internal_srid:
+            table.set_internal_table_layer_srid(workspace, table_name, crs_def.CRSDefinitions[crs].internal_srid)
 
         wms_workspace = wms.get_geoserver_workspace(workspace)
 

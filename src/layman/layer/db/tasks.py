@@ -79,5 +79,5 @@ def refresh_table(
         break
 
     crs = db.get_crs(workspace, table_name, use_internal_srid=True)
-    if crs_def.CRSDefinitions[crs].srid:
-        table.set_internal_table_layer_srid(workspace, table_name, crs_def.CRSDefinitions[crs].srid)
+    if crs_def.CRSDefinitions[crs].internal_srid:
+        table.set_internal_table_layer_srid(workspace, table_name, crs_def.CRSDefinitions[crs].internal_srid)

@@ -21,7 +21,8 @@ CRSTypeDef = namedtuple('CRSTypeDef', [
     # It is not used for data transformation in WMS and WFS (data are transformed by GeoServer).
     'proj4text',
     # SRID of transformation definition if it differs from the default one
-    'srid'
+    # Relevant only for internal DB, not for external DBs.
+    'internal_srid'
 ])
 
 EPSG_3857 = 'EPSG:3857'
@@ -66,7 +67,7 @@ CRSDefinitions = {
           <geographicflag>false</geographicflag>''',
         axes_order_east_north_in_epsg_db=True,
         proj4text=None,
-        srid=None,
+        internal_srid=None,
     ),
     EPSG_4326: CRSTypeDef(
         default_bbox=(
@@ -92,7 +93,7 @@ CRSDefinitions = {
             <geographicflag>true</geographicflag>''',
         axes_order_east_north_in_epsg_db=False,
         proj4text=None,
-        srid=None,
+        internal_srid=None,
     ),
     EPSG_5514: CRSTypeDef(
         default_bbox=(
@@ -113,7 +114,7 @@ CRSDefinitions = {
   <geographicflag>false</geographicflag>''',
         axes_order_east_north_in_epsg_db=True,
         proj4text=None,
-        srid=None,
+        internal_srid=None,
     ),
     EPSG_32633: CRSTypeDef(
         default_bbox=(
@@ -134,7 +135,7 @@ CRSDefinitions = {
       <geographicflag>false</geographicflag>''',
         axes_order_east_north_in_epsg_db=True,
         proj4text=None,
-        srid=None,
+        internal_srid=None,
     ),
     EPSG_32634: CRSTypeDef(
         default_bbox=(
@@ -155,7 +156,7 @@ CRSDefinitions = {
       <geographicflag>false</geographicflag>''',
         axes_order_east_north_in_epsg_db=True,
         proj4text=None,
-        srid=None,
+        internal_srid=None,
     ),
     EPSG_3034: CRSTypeDef(
         default_bbox=(
@@ -183,7 +184,7 @@ CRSDefinitions = {
       <geographicflag>false</geographicflag>''',
         axes_order_east_north_in_epsg_db=False,
         proj4text='+proj=lcc +lat_1=35 +lat_2=65 +lat_0=52 +lon_0=10 +x_0=4000000 +y_0=2800000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ',
-        srid=900915,
+        internal_srid=900915,
     ),
     EPSG_3035: CRSTypeDef(
         default_bbox=(
@@ -204,7 +205,7 @@ CRSDefinitions = {
       <geographicflag>false</geographicflag>''',
         axes_order_east_north_in_epsg_db=False,
         proj4text='+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ',
-        srid=900916,
+        internal_srid=900916,
     ),
     EPSG_3059: CRSTypeDef(
         default_bbox=(
@@ -225,7 +226,7 @@ CRSDefinitions = {
       <geographicflag>false</geographicflag>''',
         axes_order_east_north_in_epsg_db=False,
         proj4text='+proj=tmerc +lat_0=0 +lon_0=24 +k=0.9996 +x_0=500000 +y_0=-6000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs',
-        srid=900917,
+        internal_srid=900917,
     ),
 }
 
