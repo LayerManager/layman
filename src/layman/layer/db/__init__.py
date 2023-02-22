@@ -568,7 +568,7 @@ def get_table_crs(schema, table_name, conn_cur=None, column=settings.OGR_DEFAULT
     assert use_internal_srid is not None
     query = 'select Find_SRID(%s, %s, %s);'
     srid = db_util.run_query(query, (schema, table_name, column), conn_cur=conn_cur)[0][0]
-    crs = db_util.get_crs(srid, conn_cur, use_internal_srid=use_internal_srid)
+    crs = db_util.get_crs_from_srid(srid, conn_cur, use_internal_srid=use_internal_srid)
     return crs
 
 
