@@ -78,6 +78,6 @@ def refresh_table(
                 raise LaymanError(err_code, private_data=str_error)
         break
 
-    crs = db.get_crs(workspace, table_name, use_internal_srid=True)
+    crs = db.get_table_crs(workspace, table_name, use_internal_srid=True)
     if crs_def.CRSDefinitions[crs].internal_srid:
         table.set_internal_table_layer_srid(workspace, table_name, crs_def.CRSDefinitions[crs].internal_srid)

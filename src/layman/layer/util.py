@@ -13,7 +13,7 @@ from layman.common import redis as redis_util, tasks as tasks_util, metadata as 
 from layman.common.util import clear_publication_info as common_clear_publication_info
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_keys, LAYERNAME_PATTERN, \
     LAYERNAME_MAX_LENGTH, SAFE_PG_IDENTIFIER_PATTERN
-from .db import get_all_table_column_names, get_crs
+from .db import get_all_table_column_names, get_table_crs
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
@@ -358,7 +358,7 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
             }
         })
 
-    crs = get_crs(schema, table, conn_cur=conn_cur, column=geo_column, use_internal_srid=False)
+    crs = get_table_crs(schema, table, conn_cur=conn_cur, column=geo_column, use_internal_srid=False)
     if crs not in settings.INPUT_SRS_LIST:
         raise LaymanError(2, {
             'parameter': 'external_table_uri',
