@@ -5,7 +5,7 @@ import re
 import subprocess
 import requests
 from jsonschema import validate, Draft7Validator
-from flask import current_app, request, g
+from flask import current_app, request
 
 from layman import LaymanError, util as layman_util, celery as celery_util, settings
 from layman.authn.filesystem import get_authn_info
@@ -28,7 +28,6 @@ _ACCEPTED_SCHEMA_MAJOR_VERSION = '2'
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
-FLASK_INFO_KEY = f'{__name__}:MAP_INFO'
 
 
 def to_safe_map_name(value):
@@ -39,21 +38,6 @@ def check_mapname_decorator(function):
     @wraps(function)
     def decorated_function(*args, **kwargs):
         check_mapname(request.view_args['mapname'])
-        result = function(*args, **kwargs)
-        return result
-
-    return decorated_function
-
-
-def info_decorator(function):
-    @wraps(function)
-    def decorated_function(*args, **kwargs):
-        workspace = request.view_args['workspace']
-        mapname = request.view_args['mapname']
-        info = get_complete_map_info(workspace, mapname)
-        assert FLASK_INFO_KEY not in g, g.get(FLASK_INFO_KEY)
-        # current_app.logger.info(f"Setting INFO of map {workspace}:{mapname}")
-        g.setdefault(FLASK_INFO_KEY, info)
         result = function(*args, **kwargs)
         return result
 
@@ -148,10 +132,7 @@ def clear_publication_info(layer_info):
     return clear_info
 
 
-def get_complete_map_info(workspace=None, mapname=None, cached=False):
-    assert (workspace is not None and mapname is not None) or cached
-    if cached:
-        return g.get(FLASK_INFO_KEY)
+def get_complete_map_info(workspace, mapname):
     partial_info = get_map_info(workspace, mapname)
 
     if not any(partial_info):
@@ -329,7 +310,7 @@ def map_file_to_metadata_properties(map_json, operates_on_muuids_filter):
 
 
 def get_metadata_comparison(workspace, mapname):
-    layman_info = get_complete_map_info(cached=True)
+    layman_info = get_complete_map_info(workspace, mapname)
     layman_props = map_info_to_metadata_properties(layman_info)
     all_props = {
         f"{layman_props['map_endpoint']}": layman_props,

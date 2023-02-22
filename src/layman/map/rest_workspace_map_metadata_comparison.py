@@ -13,7 +13,6 @@ bp = Blueprint('rest_workspace_map_metadata_comparison', __name__)
 @util.check_mapname_decorator
 @authenticate
 @authorize_workspace_publications_decorator
-@util.info_decorator
 def before_request():
     pass
 
