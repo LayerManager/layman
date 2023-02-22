@@ -242,7 +242,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                    ) if external_table_uri else None,
                                    'original_data_source': settings.EnumOriginalDataSource.TABLE.value if external_table_uri else settings.EnumOriginalDataSource.FILE.value,
                                    'native_bounding_box': [xmin, ymin, xmax, ymax],
-                                   'native_crs': db_util.get_crs(srid) if srid else None,
+                                   'native_crs': db_util.get_crs(srid, use_internal_srid=True) if srid else None,
                                    'access_rights': {'read': can_read_users.split(','),
                                                      'write': can_write_users.split(',')}
                                    }
