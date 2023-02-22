@@ -22,7 +22,7 @@ def adjust_db_for_table_uri():
 
 
 def rename_file_type_to_geodata_type():
-    logger.info(f'    Rename DB in prime schema for db_connection')
+    logger.info(f'    Rename column file_type to geodata_type in DB prime schema')
 
     statement = f'''alter table {DB_SCHEMA}.publications rename column file_type to geodata_type;'''
     db_util.run_statement(statement)
