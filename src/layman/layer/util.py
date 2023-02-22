@@ -3,7 +3,7 @@ from urllib import parse
 import re
 import psycopg2
 
-from flask import current_app, request, g
+from flask import current_app, request
 from db import TableUri, util as db_util
 from layman import LaymanError, patch_mode, util as layman_util, settings
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
@@ -17,7 +17,6 @@ from .db import get_all_table_column_names, get_crs
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
-FLASK_INFO_KEY = f'{__name__}:LAYER_INFO'
 
 EXTERNAL_TABLE_URI_PATTERN = 'postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>'
 
@@ -30,21 +29,6 @@ def check_layername_decorator(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         check_layername(request.view_args['layername'])
-        result = func(*args, **kwargs)
-        return result
-
-    return decorated_function
-
-
-def info_decorator(func):
-    @wraps(func)
-    def decorated_function(*args, **kwargs):
-        workspace = request.view_args['workspace']
-        layername = request.view_args['layername']
-        info = get_complete_layer_info(workspace, layername)
-        assert FLASK_INFO_KEY not in g, g.get(FLASK_INFO_KEY)
-        # current_app.logger.info(f"Setting INFO of layer {username}:{layername}")
-        g.setdefault(FLASK_INFO_KEY, info)
         result = func(*args, **kwargs)
         return result
 
@@ -97,10 +81,7 @@ def clear_publication_info(layer_info, file_type):
     return clear_info
 
 
-def get_complete_layer_info(workspace=None, layername=None, cached=False):
-    assert (workspace is not None and layername is not None) or cached
-    if cached:
-        return g.get(FLASK_INFO_KEY)
+def get_complete_layer_info(workspace, layername):
     partial_info = get_layer_info(workspace, layername)
 
     if not any(partial_info):
@@ -246,8 +227,8 @@ def layer_info_to_metadata_properties(info):
     return result
 
 
-def get_metadata_comparison(workspace, layername, *, cached=True):
-    layman_info = get_complete_layer_info(workspace, layername, cached=cached)
+def get_metadata_comparison(workspace, layername):
+    layman_info = get_complete_layer_info(workspace, layername)
     layman_props = layer_info_to_metadata_properties(layman_info)
     all_props = {
         f"{layman_props['layer_endpoint']}": layman_props,

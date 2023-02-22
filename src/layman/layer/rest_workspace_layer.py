@@ -21,7 +21,6 @@ logger = logging.getLogger(__name__)
 @util.check_layername_decorator
 @authenticate
 @authorize_workspace_publications_decorator
-@util.info_decorator
 def before_request():
     pass
 
@@ -37,7 +36,7 @@ def get(workspace, layername):
     # pylint: disable=unused-argument
     app.logger.info(f"GET Layer, actor={g.user}")
 
-    info = util.get_complete_layer_info(cached=True)
+    info = util.get_complete_layer_info(workspace, layername)
 
     return jsonify(info), 200
 
@@ -257,7 +256,7 @@ def patch(workspace, layername):
 def delete_layer(workspace, layername):
     app.logger.info(f"DELETE Layer, actor={g.user}")
 
-    info = util.get_complete_layer_info(cached=True)
+    info = util.get_complete_layer_info(workspace, layername)
 
     util.abort_layer_chain(workspace, layername)
 
