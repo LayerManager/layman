@@ -566,10 +566,15 @@ def get_bbox(schema, table_name, conn_cur=None, column=settings.OGR_DEFAULT_GEOM
 
 def get_table_crs(schema, table_name, conn_cur=None, column=settings.OGR_DEFAULT_GEOMETRY_COLUMN, *, use_internal_srid=None):
     assert use_internal_srid is not None
-    query = 'select Find_SRID(%s, %s, %s);'
-    srid = db_util.run_query(query, (schema, table_name, column), conn_cur=conn_cur)[0][0]
+    srid = get_column_srid(schema, table_name, column, conn_cur=conn_cur)
     crs = db_util.get_crs_from_srid(srid, conn_cur, use_internal_srid=use_internal_srid)
     return crs
+
+
+def get_column_srid(schema, table, column, *, conn_cur=None):
+    query = 'select Find_SRID(%s, %s, %s);'
+    srid = db_util.run_query(query, (schema, table, column), conn_cur=conn_cur)[0][0]
+    return srid
 
 
 def get_geometry_types(schema, table_name, *, column_name=settings.OGR_DEFAULT_GEOMETRY_COLUMN, conn_cur=None):
