@@ -5,7 +5,6 @@ import io
 from lxml import etree as ET
 
 import crs as crs_def
-from db import util as db_util
 from layman import LaymanError
 from layman.layer.filesystem import input_style
 from layman.common import db as db_common
@@ -58,7 +57,7 @@ def get_layer_original_style_stream(workspace, layer):
     return result
 
 
-def fill_layer_template(layer, uuid, native_bbox, crs, qml_xml, source_type, attrs_to_ensure, table_uri):
+def fill_layer_template(layer, uuid, native_bbox, crs, qml_xml, source_type, attrs_to_ensure, table_uri, column_srid):
     db_schema = table_uri.schema
     table_name = table_uri.table
     geo_column = table_uri.geo_column
@@ -86,7 +85,7 @@ def fill_layer_template(layer, uuid, native_bbox, crs, qml_xml, source_type, att
         qml_geometry=qml_geometry,
         extent=extent_to_xml_string(native_bbox),
         default_action_canvas_value='{00000000-0000-0000-0000-000000000000}',
-        srid=db_util.get_internal_srid(crs),
+        srid=column_srid,
         qgis_template_spatialrefsys=crs_def.CRSDefinitions[crs].qgis_template_spatialrefsys,
     )
 
@@ -118,7 +117,7 @@ def fill_layer_template(layer, uuid, native_bbox, crs, qml_xml, source_type, att
     return full_xml_str
 
 
-def fill_project_template(layer, layer_uuid, layer_qml, crs, epsg_codes, extent, source_type, table_uri):
+def fill_project_template(layer, layer_uuid, layer_qml, crs, epsg_codes, extent, source_type, table_uri, column_srid):
     wms_crs_list_values = "\n".join((f"<value>{code}</value>" for code in epsg_codes))
     db_schema = table_uri.table
     table_name = table_uri.table
@@ -146,7 +145,7 @@ def fill_project_template(layer, layer_uuid, layer_qml, crs, epsg_codes, extent,
         wms_crs_list_values=wms_crs_list_values,
         creation_iso_datetime=creation_iso_datetime,
         extent=extent_to_xml_string(extent),
-        srid=db_util.get_internal_srid(crs),
+        srid=column_srid,
         qgis_template_spatialrefsys=crs_def.CRSDefinitions[crs].qgis_template_spatialrefsys,
     )
 

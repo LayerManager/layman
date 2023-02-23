@@ -79,9 +79,11 @@ def save_qgs_file(workspace, layer):
         if col.name != table_uri.primary_key_column
     ]
     source_type = util.get_source_type(db_types, qml_geometry)
-    layer_qml = util.fill_layer_template(layer, uuid, layer_bbox, crs, qml, source_type, db_cols, table_uri)
+    column_srid = db.get_column_srid(db_schema, table_name, table_uri.geo_column, conn_cur=conn_cur)
+    layer_qml = util.fill_layer_template(layer, uuid, layer_bbox, crs, qml, source_type, db_cols, table_uri,
+                                         column_srid)
     qgs_str = util.fill_project_template(layer, uuid, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
-                                         layer_bbox, source_type, table_uri)
+                                         layer_bbox, source_type, table_uri, column_srid)
     with open(get_layer_file_path(workspace, layer), "w") as qgs_file:
         print(qgs_str, file=qgs_file)
 
