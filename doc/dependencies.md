@@ -24,8 +24,7 @@
 | [firefox](https://www.mozilla.org/firefox/) | 95+ | MPL | Dockerfile | prod | bin | for client-side map rendering and integration testing |
 | [firefox-geckodriver](https://www.ubuntuupdates.org/package/ubuntu_mozilla_security/bionic/main/base/firefox-geckodriver) | 95+ | MPL | Dockerfile | prod | bin | for client-side map rendering and integration testing |
 | [pipenv](https://pypi.org/project/pipenv/) | 2020.11.15 | MIT | Dockerfile | prod | bin | to install Python dependencies |
-| [node.js](https://nodejs.org/) | 18 | MIT | client/docker/Dockerfile | prod | bin | to run Layman Test Client |
-| [node.js](https://nodejs.org/) | 16 | MIT | timgen/Dockerfile | prod | bin | to run Timgen |
+| [node.js](https://nodejs.org/) | 18 | MIT | timgen/Dockerfile, client/docker/Dockerfile | prod | bin | to run Timgen and Layman Test Client |
 | [npm](https://www.npmjs.com/get-npm) | 8 | Artistic License 2.0 | client/docker/Dockerfile | prod | bin | to install node.js dependencies |
 | [gunicorn](https://gunicorn.org/) | 20 | MIT | requirements.production.txt | opt | bin | as Flask production server |
 | [nginx](http://nginx.org/) | 1.16 | BSD 2-Clause | docker-compose.yml | opt | bin | as production server |
