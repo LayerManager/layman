@@ -88,8 +88,7 @@ def get_internal_srid(crs):
     return srid
 
 
-def get_crs_from_srid(srid, conn_cur=None, *, use_internal_srid=None):
-    assert use_internal_srid is not None
+def get_crs_from_srid(srid, conn_cur=None, *, use_internal_srid):
     crs = next((
         crs_code for crs_code, crs_item_def in crs_def.CRSDefinitions.items()
         if crs_item_def.internal_srid == srid
