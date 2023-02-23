@@ -6,10 +6,9 @@ WORKDIR /code
 RUN apk update && apk add nano
 
 ADD package.json \
-    package-lock.json \
     /code/
 
-RUN npm ci
+RUN npm install
 
 ADD index.html \
     index.js \
