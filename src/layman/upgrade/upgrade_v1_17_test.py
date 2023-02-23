@@ -183,9 +183,11 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
             table_uri = TableUri(db_uri_str=settings.PG_URI_STR, table=table_name, schema=workspace,
                                  geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
                                  primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY)
-            layer_qml = qgis_util.fill_layer_template(layer, uuid_str, bbox, crs, qml, source_type, db_cols, table_uri)
+            column_srid = db.get_column_srid(table_uri.schema, table_uri.table, table_uri.geo_column)
+            layer_qml = qgis_util.fill_layer_template(layer, uuid_str, bbox, crs, qml, source_type, db_cols, table_uri,
+                                                      column_srid)
             qgs_str = qgis_util.fill_project_template(layer, uuid_str, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
-                                                      bbox, source_type, table_uri)
+                                                      bbox, source_type, table_uri, column_srid)
             with open(qgis_wms.get_layer_file_path(workspace, layer), "w") as qgs_file:
                 print(qgs_str, file=qgs_file)
 
