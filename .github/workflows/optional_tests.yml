@@ -29,6 +29,7 @@ jobs:
         run: |
           cp .env.test .env
           make pull-dev-images
+          make timgen-build
           docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql nginx-qgis
           docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel qgis geoserver micka
 

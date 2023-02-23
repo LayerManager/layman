@@ -399,5 +399,3 @@ pull-dev-images:
 	docker pull layermanager/layman:client-latest
 	docker tag layermanager/layman:client-latest layman_client
 	docker tag layermanager/layman:client-latest layman_client_test
-	docker pull layermanager/layman:timgen-latest
-	docker tag layermanager/layman:timgen-latest timgen
