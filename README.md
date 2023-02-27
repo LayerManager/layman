@@ -6,7 +6,7 @@ Publishing geospatial data online through [REST API](doc/rest.md).
 - Two publication models available:
   - [**layer**](doc/models.md#layer): visual representation of single vector or raster dataset, including raster [timeseries](doc/models.md#timeseries)
   - [**map**](doc/models.md#map): collection of layers
-- Accepts **vector** layer data in [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON) and [ShapeFile](https://en.wikipedia.org/wiki/Shapefile) formats
+- Accepts **vector** layer data in [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON), [ShapeFile](https://en.wikipedia.org/wiki/Shapefile), or [PostGIS table](https://postgis.net/) identified by [PostgreSQL connection URI](https://www.postgresql.org/docs/15/libpq-connect.html#id-1.7.3.8.3.6)
 - Accepts **raster** layer data in [GeoTIFF](https://gdal.org/drivers/raster/gtiff.html), [JPEG2000](https://gdal.org/drivers/raster/jp2openjpeg.html), [PNG](https://gdal.org/drivers/raster/png.html), and [JPEG](https://gdal.org/drivers/raster/jpeg.html) formats
 - Accepts layer **style** in [Styled Layer Descriptor](https://www.opengeospatial.org/standards/sld), [Symbology Encoding](https://www.opengeospatial.org/standards/se), and [QGIS Style File Format](https://docs.qgis.org/3.16/en/docs/user_manual/appendices/qgis_file_formats.html#qml-the-qgis-style-file-format) (for vector data only) formats
 - Accepts **map** definition in [HSLayers Map Composition](https://github.com/hslayers/map-compositions) format
@@ -175,8 +175,8 @@ After providing external dependencies there is time to provide **internal depend
 - [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) utility of [gdal](https://gdal.org/) 3.3+
 - [chromium-browser](https://chromium.org/) 90+ and corresponding version of [chromedriver](https://chromedriver.chromium.org/)
 - [pipenv](https://pypi.org/project/pipenv/)
-- [node.js](https://nodejs.org/) 18 & npm 8 Layman Test Client
-- [node.js](https://nodejs.org/) 16 & npm 8 for running Timgen and Layman Test Client
+- [node.js](https://nodejs.org/) 18 & npm 8 for running Layman Test Client
+- [node.js](https://nodejs.org/) 16 & npm 8 for running Timgen
 
 Pipenv is recommended tool for installing **python-level** dependencies. Both Pipfile and Pipfile.lock are located in [`docker/`](docker/) directory.
 

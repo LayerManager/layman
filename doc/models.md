@@ -2,11 +2,11 @@
 
 ## Publication
 - Publication is any geospatial data that can be published by Layman through [REST API](rest.md).
-- Currently available publications are [map](#map) and [layer](#layer). 
+- Available publications are [map](#map) and [layer](#layer). 
 - Each publication is placed in one [workspace](#workspace). 
 
 ## Layer
-- Layer is [publication](#publication) created from combination of vector or raster data (GeoJSON, ShapeFile, GeoTIFF, JPEG2000, PNG or JPEG) and visualization (SLD, SE, or QML style). Raster layer can hold also [timeseries](#timeseries) data.
+- Layer is [publication](#publication) created from combination of vector or raster data (GeoJSON, ShapeFile, PostGIS table, GeoTIFF, JPEG2000, PNG or JPEG) and visualization (SLD, SE, or QML style). Raster layer can hold also [timeseries](#timeseries) data.
 - Published layer can be accessed by standardized OGC interfaces
   - [Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms)
   - [Web Feature Service (WFS)](https://www.opengeospatial.org/standards/wfs)
@@ -24,7 +24,9 @@
 - Simple rules
   - one DB table per input file (vector layers only)
   - one WFS feature type per DB table (vector layers only)
+    - exception: external PostGIS table can be published as multiple WFS feature types
   - one WMS layer per DB table
+    - exception: external PostGIS table can be published as multiple WMS layers
   - one SLD or QGIS style per WMS layer
   - one thumbnail per WMS layer
   - one metadata record per WMS&WFS layer
