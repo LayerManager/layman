@@ -1337,6 +1337,7 @@ TESTCASES = {
     },
     'none_file_none_external_table_uri': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_ACTION_PARAMS: {
             'file_paths': [],
             'external_table_uri': '',
@@ -1359,9 +1360,11 @@ TESTCASES = {
     },
     'file_and_external_table_uri': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_ACTION_PARAMS: {
             'file_paths': ['sample/layman.layer/small_layer.geojson'],
             'external_table_uri': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
+            'compress': False,
         },
         consts.KEY_EXCEPTION: LaymanError,
         KEY_EXPECTED_EXCEPTION: {
@@ -1378,20 +1381,6 @@ TESTCASES = {
                                   'external_table_uri': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
                               }},
                           },
-            frozenset([('compress', True), ('with_chunks', False)]): {
-                'data': {
-                    'found': {
-                        'file': ['temporary_zip_file.zip'],
-                    },
-                },
-            },
-            frozenset([('compress', True), ('with_chunks', True)]): {
-                'data': {
-                    'found': {
-                        'file': ['temporary_zip_file.zip'],
-                    },
-                },
-            },
         },
         KEY_PATCHES: {
             'full': {
@@ -1401,6 +1390,7 @@ TESTCASES = {
     },
     'partial_external_table_uri': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_ACTION_PARAMS: {
             'external_table_uri': 'external_table_uri',
             'compress': False,
@@ -1430,6 +1420,7 @@ TESTCASES = {
     },
     'crs_and_external_table_uri': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_ACTION_PARAMS: {
             'crs': 'EPSG:4326',
             'external_table_uri': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
