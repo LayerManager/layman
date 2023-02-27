@@ -89,7 +89,7 @@ def ensure_attributes_in_db(attributes_by_db):
             (schema, table, attr): (workspace, layer, attr)
             for workspace, layer, attr, schema, table in attr_tuples
         }
-        conn_cur = db_util.create_connection_cursor(db_uri_str=db_uri_str)
+        conn_cur = db_util.get_connection_cursor(db_uri_str=db_uri_str)
         db_attr_tuples = list(db_layman_attr_mapping.keys())
         created_db_attr_tuples = db.ensure_attributes(db_attr_tuples, conn_cur)
         all_created_attr_tuples.update({db_layman_attr_mapping[a] for a in created_db_attr_tuples})

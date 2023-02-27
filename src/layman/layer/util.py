@@ -285,7 +285,7 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
         })
 
     try:
-        conn_cur = db_util.create_connection_cursor(db_uri_str, encapsulate_exception=False)
+        conn_cur = db_util.get_connection_cursor(db_uri_str, encapsulate_exception=False)
     except psycopg2.OperationalError as exc:
         raise LaymanError(2, {
             'parameter': 'external_table_uri',

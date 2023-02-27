@@ -26,7 +26,7 @@ def get_layer_info(workspace, layername,):
             conn_cur = db_util.get_connection_cursor()
         else:
             try:
-                conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str,)
+                conn_cur = db_util.get_connection_cursor(db_uri_str=table_uri.db_uri_str,)
             except BaseException:
                 result['db'] = {
                     'schema': table_uri.schema,

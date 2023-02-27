@@ -57,3 +57,4 @@ class TableUri:
 #     'password': LAYMAN_PG_PASSWORD,
 # }
 PG_CONN = {}
+PG_URI_STR = str()

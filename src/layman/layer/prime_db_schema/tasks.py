@@ -41,7 +41,7 @@ def refresh_file_data(
             # because for compressed files sent with chunks file_type would be UNKNOWN and table_uri not set
             publ_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['table_uri']})
         table_uri = publ_info['_table_uri']
-        conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
+        conn_cur = db_util.get_connection_cursor(db_uri_str=table_uri.db_uri_str)
         bbox = db_get_bbox(table_uri.schema, table_uri.table, conn_cur=conn_cur, column=table_uri.geo_column)
         crs = get_table_crs(table_uri.schema, table_uri.table, conn_cur=conn_cur, column=table_uri.geo_column, use_internal_srid=True)
     elif geodata_type == settings.GEODATA_TYPE_RASTER:

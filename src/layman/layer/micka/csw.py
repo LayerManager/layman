@@ -141,7 +141,7 @@ def get_template_path_and_values(workspace, layername, http_method):
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
         table_uri = publ_info['_table_uri']
         table_name = table_uri.table
-        conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
+        conn_cur = db_util.get_connection_cursor(db_uri_str=table_uri.db_uri_str)
         try:
             languages = db.get_text_languages(table_uri.schema, table_name, table_uri.primary_key_column,
                                               conn_cur=conn_cur)
