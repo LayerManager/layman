@@ -30,7 +30,7 @@ def patch_after_feature_change(
     assert geodata_type == settings.GEODATA_TYPE_VECTOR
 
     table_uri = info['_table_uri']
-    conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
+    conn_cur = db_util.get_connection_cursor(db_uri_str=table_uri.db_uri_str)
     bbox = db_get_bbox(table_uri.schema, table_uri.table, conn_cur=conn_cur, column=table_uri.geo_column)
 
     if self.is_aborted():

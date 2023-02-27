@@ -251,7 +251,7 @@ class TestLayer(base_test.TestSingleRestPublication):
             'primary_key_column': primary_key_column,
             'additional_geo_column': params['additional_geo_column'],
         })
-        conn_cur = db_util.create_connection_cursor(external_db.URI_STR)
+        conn_cur = db_util.get_connection_cursor(external_db.URI_STR)
         query = f'''select type from geometry_columns where f_table_schema = %s and f_table_name = %s and f_geometry_column = %s'''
         result = db_util.run_query(query, (schema, table, geo_column), conn_cur=conn_cur)
         assert result[0][0] == params['exp_geometry_type']

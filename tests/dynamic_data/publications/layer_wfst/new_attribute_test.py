@@ -215,7 +215,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
             with app.app_context():
                 table_uri = get_publication_info(workspace, process_client.LAYER_TYPE, layer_name,
                                                  context={'keys': ['table_uri']})['_table_uri']
-            conn_cur = conn_cur or db_util.create_connection_cursor(table_uri.db_uri_str)
+                conn_cur = conn_cur or db_util.get_connection_cursor(table_uri.db_uri_str)
             table_uris[layer_name] = table_uri
             old_db_attributes[layer_name] = db.get_all_table_column_names(table_uri.schema, table_uri.table,
                                                                           conn_cur=conn_cur)

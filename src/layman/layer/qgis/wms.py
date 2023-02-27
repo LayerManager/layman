@@ -72,7 +72,7 @@ def save_qgs_file(workspace, layer):
     layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[crs].default_bbox
     qml = util.get_original_style_xml(workspace, layer)
     qml_geometry = util.get_qml_geometry_from_qml(qml)
-    conn_cur = db_util.create_connection_cursor(db_uri_str=table_uri.db_uri_str)
+    conn_cur = db_util.get_connection_cursor(db_uri_str=table_uri.db_uri_str)
     db_types = db.get_geometry_types(db_schema, table_name, conn_cur=conn_cur)
     db_cols = [
         col for col in db.get_all_column_infos(db_schema, table_name, conn_cur=conn_cur, omit_geometry_columns=True)
