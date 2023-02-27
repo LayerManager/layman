@@ -109,6 +109,8 @@ Layman uses directly **one database** specified by [LAYMAN_PG_DBNAME](env-settin
 
 **Other external databases** can be used to publish vector data from PostGIS tables (see `external_table_uri` in [POST Workspace Layers](rest.md#post-workspace-layers)). Layman is able to change data in the table using WFS-T (including adding new columns) if provided DB user has sufficient privileges. Other management is left completely on admin of such DB.
 
+Data changes made directly in vector data DB tables (both internal and external) are automatically propagated to WMS and WFS. However, layer thumbnail and bounding box at Layman are not automatically updated after such changes.
+
 PostgreSQL is used as persistent data store, so data survives Layman restart.
 
 ### GeoServer
