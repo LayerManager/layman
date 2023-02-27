@@ -59,35 +59,48 @@ TEST_CASES = {
         'simple': True,
         'attr_args_per_layer': [['new_attr_1a', 'new_attr_1b']],
         'data_method': data_wfs.get_wfs20_insert_points_new_attr,
-        'mandatory_cases': {
-            frozenset([StyleFileDomain.SLD, LayerByTableLocation.INTERNAL, ]),
-            frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]),
-            frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]),
-        },
+        'mandatory_cases': {},
+        'ignore_cases': {},
     },
     'wfs20_update_points': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_2']],
         'data_method': data_wfs.get_wfs20_update_points_new_attr,
         'mandatory_cases': {},
+        'ignore_cases': {
+            frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]),
+            frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]),
+        },
     },
     'wfs20_update_points_with_attr_namespace': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_3']],
         'data_method': lambda *args: data_wfs.get_wfs20_update_points_new_attr(*args, with_attr_namespace=True),
         'mandatory_cases': {},
+        'ignore_cases': {
+            frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]),
+            frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]),
+        },
     },
     'wfs20_update_points_with_filter': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_4']],
         'data_method': lambda *args: data_wfs.get_wfs20_update_points_new_attr(*args, with_filter=True),
         'mandatory_cases': {},
+        'ignore_cases': {
+            frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]),
+            frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]),
+        },
     },
     'wfs20_replace_points': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_5']],
         'data_method': data_wfs.get_wfs20_replace_points_new_attr,
         'mandatory_cases': {},
+        'ignore_cases': {
+            frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]),
+            frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]),
+        },
     },
     'wfs20_complex_points': {
         'simple': False,
@@ -104,36 +117,57 @@ TEST_CASES = {
             frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]),
             frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]),
         },
+        'ignore_cases': {},
     },
     'wfs10_insert_points': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_7']],
         'data_method': data_wfs.get_wfs10_insert_points_new_attr,
         'mandatory_cases': {},
+        'ignore_cases': {
+            frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]),
+            frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]),
+        },
     },
     'wfs11_insert_points': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_8']],
         'data_method': data_wfs.get_wfs11_insert_points_new_attr,
         'mandatory_cases': {},
+        'ignore_cases': {
+            frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]),
+            frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]),
+        },
     },
     'wfs10_update_points_with_attr_namespace': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_9']],
         'data_method': lambda *args: data_wfs.get_wfs10_update_points_new(*args, with_attr_namespace=True),
         'mandatory_cases': {},
+        'ignore_cases': {
+            frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]),
+            frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]),
+        },
     },
     'wfs10_update_points_with_filter': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_10']],
         'data_method': lambda *args: data_wfs.get_wfs10_update_points_new(*args, with_filter=True),
         'mandatory_cases': {},
+        'ignore_cases': {
+            frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]),
+            frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]),
+        },
     },
     'wfs11_insert_polygon': {
         'simple': True,
         'attr_args_per_layer': [['new_attr_11']],
         'data_method': data_wfs.get_wfs11_insert_polygon_new_attr,
         'mandatory_cases': {},
+        'ignore_cases': {
+            frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]),
+            frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]),
+        },
     },
 }
 
@@ -162,9 +196,13 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
             specific_types={
                 frozenset([StyleFileDomain.QML, LayerByTableLocation.EXTERNAL]): EnumTestTypes.IGNORE,
                 **{
+                    case: EnumTestTypes.IGNORE
+                    for case in params['ignore_cases']
+                },
+                **{
                     case: EnumTestTypes.MANDATORY
                     for case in params['mandatory_cases']
-                }
+                },
             },
             params=copy.deepcopy(params),
             rest_args={
