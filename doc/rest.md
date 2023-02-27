@@ -147,7 +147,7 @@ Body parameters:
    - if QML style is used in this request, it must list all attributes contained in given data file
 - *external_table_uri*, string
    - exactly one of `file` or `external_table_uri` must be set
-   - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is required
+   - [connection URI](https://www.postgresql.org/docs/15/libpq-connect.html#id-1.7.3.8.3.6) is required, usual format is `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>`
      - `host` part and query parameters `schema` and `table` are mandatory
      - URI scheme is required to be `postgresql`
    - if `geo_column` is not specified, first geometry column of the table by alphabetic order is used
@@ -360,12 +360,19 @@ Body parameters:
    - it is allowed to publish time-series layer - see [POST Workspace Layers](#post-workspace-layers)
 - *external_table_uri*, string
    - only one of `file` or `external_table_uri` can be set
-   - format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>` is required
+   - [connection URI](https://www.postgresql.org/docs/15/libpq-connect.html#id-1.7.3.8.3.6) is required, usual format is `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>`
      - `host` part and query parameters `schema` and `table` are mandatory
      - URI scheme is required to be `postgresql`
    - if `geo_column` is not specified, first geometry column of the table by alphabetic order is used
    - published table is required to have one-column primary key
    - names of schema, table and all columns of the table are required to match regular expression `^[a-zA-Z_][a-zA-Z_0-9]*$`
+   - DB user must have at least following privileges:
+     - `SELECT` on the table referenced in URI
+       - also `INSERT`, `UPDATE`, and/or `DELETE` if you want the layer to be editable using [WFS-T](endpoints.md#web-feature-service)
+     - `SELECT` on tables in [information_schema](https://www.postgresql.org/docs/current/information-schema.html)
+     - `SELECT` on [system catalogs](https://www.postgresql.org/docs/15/catalogs-overview.html)
+     - `SELECT` on `public.geometry_columns` schema
+     - `EXECUTE` or `USAGE` on PostGIS functions and types
 - *title*
 - *description*
 - *crs*, string, e.g. `EPSG:3857`, supported EPSG codes are defined by [LAYMAN_INPUT_SRS_LIST](./env-settings.md#LAYMAN_INPUT_SRS_LIST)
