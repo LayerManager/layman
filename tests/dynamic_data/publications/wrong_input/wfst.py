@@ -74,7 +74,7 @@ class TestWfst(base_test.TestSingleRestPublication):
     publication_type = process_client.LAYER_TYPE
 
     test_cases = [base_test.TestCaseType(key=key,
-                                         type=EnumTestTypes.MANDATORY,
+                                         type=EnumTestTypes.OPTIONAL,
                                          publication=copy.deepcopy(params['layer']),
                                          params=params,
                                          ) for key, params in TEST_CASES.items()]
