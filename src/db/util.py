@@ -4,7 +4,7 @@ import psycopg2
 from flask import g
 
 import crs as crs_def
-from . import PG_CONN, PG_URI_STR
+from . import PG_URI_STR
 from .error import Error
 
 logger = logging.getLogger(__name__)
@@ -13,8 +13,9 @@ FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 
 
 def create_connection_cursor(db_uri_str=None, encapsulate_exception=True):
+    db_uri_str = db_uri_str or PG_URI_STR
     try:
-        connection = psycopg2.connect(db_uri_str) if db_uri_str else psycopg2.connect(**PG_CONN)
+        connection = psycopg2.connect(db_uri_str)
         connection.set_session(autocommit=True)
     except BaseException as exc:
         if encapsulate_exception:

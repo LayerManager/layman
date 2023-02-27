@@ -7,7 +7,7 @@ import subprocess
 from psycopg2 import sql
 from psycopg2.errors import InsufficientPrivilege
 
-from db import util as db_util, PG_CONN
+from db import util as db_util
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
@@ -120,7 +120,7 @@ def import_layer_vector_file_to_internal_table(workspace, layername, main_filepa
 
 
 def create_ogr2ogr_args(*, schema, table_name, main_filepath, crs_id, output):
-    pg_conn = ' '.join([f"{k}='{v}'" for k, v in PG_CONN.items()])
+    pg_conn = ' '.join([f"{k}='{v}'" for k, v in settings.PG_CONN.items()])
     ogr2ogr_args = [
         'ogr2ogr',
         '-nln', table_name,
