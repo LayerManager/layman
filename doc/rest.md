@@ -160,6 +160,7 @@ Body parameters:
      - `SELECT` on [system catalogs](https://www.postgresql.org/docs/15/catalogs-overview.html)
      - `SELECT` on `public.geometry_columns` schema
      - `EXECUTE` or `USAGE` on PostGIS functions and types
+   - the parameter is not meant to publish tables from Layman's database [LAYMAN_PG_DBNAME](env-settings.md#layman_pg_dbname); such usage can easily damage Layman's database, so do it only at **your own risk!**
 - *name*, string
    - computer-friendly identifier of the layer
    - must be unique among all layers of one workspace
@@ -373,6 +374,7 @@ Body parameters:
      - `SELECT` on [system catalogs](https://www.postgresql.org/docs/15/catalogs-overview.html)
      - `SELECT` on `public.geometry_columns` schema
      - `EXECUTE` or `USAGE` on PostGIS functions and types
+   - the parameter is not meant to publish tables from Layman's database [LAYMAN_PG_DBNAME](env-settings.md#layman_pg_dbname); such usage can easily damage Layman's database, so do it only at **your own risk!**
 - *title*
 - *description*
 - *crs*, string, e.g. `EPSG:3857`, supported EPSG codes are defined by [LAYMAN_INPUT_SRS_LIST](./env-settings.md#LAYMAN_INPUT_SRS_LIST)
