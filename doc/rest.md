@@ -86,7 +86,7 @@ Get list of published layers.
 Have the same request parameters and response structure and headers as [GET Layers](#get-layers).
 
 ### POST Workspace Layers
-Publish vector or raster data file as new layer of WMS, in case of vector also new feature type of WFS.
+Publish vector or raster data as new WMS layer, in case of vector data also new WFS feature type.
 
 Processing chain consists of few steps:
 - save files (if sent) to workspace directory within Layman data directory
@@ -94,8 +94,8 @@ Processing chain consists of few steps:
 - for vector layers import vector file (if sent) to PostgreSQL database as new table into workspace schema
   - files with invalid byte sequence are first converted to GeoJSON, then cleaned with iconv, and finally imported to database.
 - for raster layers normalize and compress raster file to GeoTIFF with overviews (pyramids); NoData values are normalized as transparent
-- for vector layers publish the vector table as new layer (feature type) within appropriate WFS workspaces of GeoServer
 - save bounding box into PostgreSQL
+- for vector layers publish the vector table as new layer (feature type) within appropriate WFS workspaces of GeoServer
 - for vector layers
   - for layers with SLD or none style:
     - publish the table as new layer (feature type) within appropriate WMS workspaces of GeoServer
@@ -218,7 +218,7 @@ JSON array of objects representing posted layers with following structure:
    - **layman_original_parameter**: name of the request parameter that contained the file name; currently, the only possible value is `file`
 
 ### DELETE Workspace Layers
-Delete existing layers and all associated sources, including data file, vector DB table or normalized raster files for all layers in the workspace. The currently running [asynchronous tasks](async-tasks.md) of affected layers are aborted. Only layers on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
+Delete existing layers and all associated sources except external DB tables published using `external_table_uri`. So it deletes e.g. data file, vector internal DB table or normalized raster files for all layers in the workspace. The currently running [asynchronous tasks](async-tasks.md) of affected layers are aborted. Only layers on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
 
 #### Request
 No action parameters.
@@ -334,7 +334,7 @@ JSON object with following structure:
 - **geodata_type**: String. Either `vector`, `raster`, or `unknown`. Value `unknown` is used if input files are zipped and still being uploaded.
 
 ### PATCH Workspace Layer
-Update information about existing layer. First, it deletes sources of the layer, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Layers](#post-workspace-layers).
+Update information about existing layer. First, it deletes sources of the layer (except external DB table published using `external_table_uri`), and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Layers](#post-workspace-layers).
 
 Response to this request may be returned sooner than the processing chain is finished to enable [asynchronous processing](async-tasks.md).
 
@@ -407,7 +407,7 @@ JSON object, same as in case of [GET Workspace Layer](#get-workspace-layer), pos
 - *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. See [POST Workspace Layers](#post-workspace-layers) response to find out more.
 
 ### DELETE Workspace Layer
-Delete existing layer and all associated sources, including data file, vector DB table or normalized raster file. The currently running [asynchronous tasks](async-tasks.md) of affected layer are aborted.
+Delete existing layer and all associated sources except external DB table published using `external_table_uri`. So it deletes e.g. data file, vector internal DB table or normalized raster file. The currently running [asynchronous tasks](async-tasks.md) of affected layer are aborted.
 
 #### Request
 No action parameters.

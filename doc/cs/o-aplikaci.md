@@ -1,12 +1,12 @@
 # O Laymanovi
 
 ## Úvod
-Layman je služba pro publikování geoporostorových dat na webu prostřednictvím REST API. Layman přijímá vektorová i rastrová data například ve formátech GeoJSON, ShapeFile GeoTIFF nebo JPEG2000 a spolu s vizuálním stylem je zpřístupňuje přes standardizovaná OGC rozhraní: Web Map Service, Web Feature Service a Catalogue Service. Layman umožňuje snadno publikovat i velké soubory dat, a to díky uploadu po částech a asynchronnímu zpracování.
+Layman je služba pro publikování geoporostorových dat na webu prostřednictvím REST API. Layman přijímá vektorová i rastrová data například ve formátech GeoJSON, ShapeFile, tabulka PostGIS, GeoTIFF nebo JPEG2000 a spolu s vizuálním stylem je zpřístupňuje přes standardizovaná OGC rozhraní: Web Map Service, Web Feature Service a Catalogue Service. Layman umožňuje snadno publikovat i velké soubory dat, a to díky uploadu po částech a asynchronnímu zpracování.
 
 ## Nejdůležitější vlastnosti
 
 ### Vrstvy a mapy
-Layman podporuje dva základní modely geoprostorových dat: vrstvy a mapy. **Vrstva** je tvořena kombinací vektorových nebo rastrových dat (GeoJSON, ShapeFile, GeoTIFF, JPEG2000, PNG nebo JPEG) a vizualizace (SLD, SE nebo QML styl). Rastrová vrstva může mít podobu i časové série několika snímků. **Mapa** je kolekcí vrstev, která je popsána ve formátu JSON.
+Layman podporuje dva základní modely geoprostorových dat: vrstvy a mapy. **Vrstva** je tvořena kombinací vektorových nebo rastrových dat (GeoJSON, ShapeFile, tabulka PostGIS, GeoTIFF, JPEG2000, PNG nebo JPEG) a vizualizace (SLD, SE nebo QML styl). Rastrová vrstva může mít podobu i časové série několika snímků. **Mapa** je kolekcí vrstev, která je popsána ve formátu JSON.
 
 
 ### Přístupnost
