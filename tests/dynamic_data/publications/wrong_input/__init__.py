@@ -1335,7 +1335,7 @@ TESTCASES = {
             },
         },
     },
-    'none_file_none_db_connect': {
+    'none_file_none_external_table_uri': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': [],
@@ -1357,7 +1357,7 @@ TESTCASES = {
                           },
         },
     },
-    'file_and_db_connect': {
+    'file_and_external_table_uri': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'file_paths': ['sample/layman.layer/small_layer.geojson'],
@@ -1399,7 +1399,7 @@ TESTCASES = {
             },
         },
     },
-    'partial_db_connect': {
+    'partial_external_table_uri': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'external_table_uri': 'external_table_uri',
@@ -1428,7 +1428,7 @@ TESTCASES = {
             },
         },
     },
-    'crs_and_db_connect': {
+    'crs_and_external_table_uri': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
             'crs': 'EPSG:4326',
