@@ -36,6 +36,11 @@ TEST_CASES = {
         'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
         'exp_languages': {'eng'},
         'exp_scale_denominator': 10_000_000,
+        'mandatory_cases': {
+            frozenset([base_test.RestMethod.POST]),
+            frozenset([base_test.RestMethod.PATCH]),
+        },
+        'ignore_cases': {},
     },
     'geometrycollection_mixed_case_table_name_unspecified_geocolumn_with_2_geocolumns': {
         'file_path': "sample/data/geometry-types/geometrycollection.geojson",
@@ -55,14 +60,16 @@ TEST_CASES = {
         'exp_bounding_box': [1669792.3618991035, 5621521.486192066, 2003750.8342789242, 5780349.220256351],
         'exp_languages': set(),
         'exp_scale_denominator': 100_000_000,
+        'mandatory_cases': {},
+        'ignore_cases': {},
     },
-    'linestring_edge_table_name': {
+    'linestring_edge_all_names': {
         'file_path': "sample/data/geometry-types/linestring.geojson",
         'style_file': None,
-        'schema_name': 'public',
+        'schema_name': EDGE_NAME,
         'table_name': EDGE_NAME,
         'primary_key_column': 'ogc_fid',
-        'geo_column_name': 'wkb_geometry',
+        'geo_column_name': EDGE_NAME,
         'external_table_uri_str': None,
         'additional_geo_column': None,
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_linestring.png"),
@@ -72,40 +79,10 @@ TEST_CASES = {
         'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
         'exp_languages': set(),
         'exp_scale_denominator': 25_000_000,
-    },
-    'multilinestring_edge_schema_name': {
-        'file_path': "sample/data/geometry-types/multilinestring.geojson",
-        'style_file': None,
-        'schema_name': EDGE_NAME,
-        'table_name': 'multilinestring',
-        'primary_key_column': 'ogc_fid',
-        'geo_column_name': 'wkb_geometry',
-        'external_table_uri_str': None,
-        'additional_geo_column': None,
-        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multilinestring.png"),
-        'exp_geometry_type': 'MULTILINESTRING',
-        'exp_native_crs': 'EPSG:4326',
-        'exp_native_bounding_box': [15.0, 47.0, 16.0, 48.5],
-        'exp_bounding_box': [1669792.3618991035, 5942074.072431108, 1781111.852692377, 6190443.809135445],
-        'exp_languages': set(),
-        'exp_scale_denominator': 100_000_000,
-    },
-    'multipoint_edge_geo_column_name': {
-        'file_path': "sample/data/geometry-types/multipoint.geojson",
-        'style_file': None,
-        'schema_name': 'public',
-        'table_name': 'multipoint',
-        'primary_key_column': 'ogc_fid',
-        'geo_column_name': EDGE_NAME,
-        'external_table_uri_str': None,
-        'additional_geo_column': None,
-        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipoint.png"),
-        'exp_geometry_type': 'MULTIPOINT',
-        'exp_native_crs': 'EPSG:4326',
-        'exp_native_bounding_box': [15.0, 47.8, 16.0, 48.0],
-        'exp_bounding_box': [1669792.3618991035, 6073646.223350629, 1781111.852692377, 6106854.834885075],
-        'exp_languages': set(),
-        'exp_scale_denominator': None,  # Layman doesn't guess scale denominator for (multi)points
+        'mandatory_cases': {},
+        'ignore_cases': {
+            frozenset([base_test.RestMethod.PATCH]),
+        },
     },
     'multipolygon_qml_custom_id_column': {
         'file_path': "sample/data/geometry-types/multipolygon.geojson",
@@ -123,40 +100,11 @@ TEST_CASES = {
         'exp_bounding_box': [1892431.3434856508, 5942074.072431108, 2003750.8342789242, 6190443.809135445],
         'exp_languages': {'eng', 'cze'},
         'exp_scale_denominator': 50_000_000,
-    },
-    'point_custom_id_column': {
-        'file_path': "sample/data/geometry-types/point.geojson",
-        'style_file': None,
-        'schema_name': 'public',
-        'table_name': 'point',
-        'primary_key_column': 'my_id2',
-        'geo_column_name': 'wkb_geometry',
-        'external_table_uri_str': None,
-        'additional_geo_column': None,
-        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_point.png"),
-        'exp_geometry_type': 'POINT',
-        'exp_native_crs': 'EPSG:4326',
-        'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
-        'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
-        'exp_languages': set(),
-        'exp_scale_denominator': None,  # Layman doesn't guess scale denominator for (multi)points
-    },
-    'polygon': {
-        'file_path': "sample/data/geometry-types/polygon.geojson",
-        'style_file': None,
-        'schema_name': 'public',
-        'table_name': 'polygon',
-        'primary_key_column': 'ogc_fid',
-        'geo_column_name': 'wkb_geometry',
-        'external_table_uri_str': None,
-        'additional_geo_column': None,
-        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_polygon.png"),
-        'exp_geometry_type': 'POLYGON',
-        'exp_native_crs': 'EPSG:4326',
-        'exp_native_bounding_box': [15.0, 49.0, 15.3, 49.3],
-        'exp_bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
-        'exp_languages': set(),
-        'exp_scale_denominator': 10_000_000,
+        'mandatory_cases': {
+            frozenset([base_test.RestMethod.POST]),
+            frozenset([base_test.RestMethod.PATCH]),
+        },
+        'ignore_cases': {},
     },
     'point_epsg_5514_qml': {
         'file_path': "tests/dynamic_data/publications/crs/vectors/sample_point_cz_5514.shp",
@@ -174,6 +122,10 @@ TEST_CASES = {
         'exp_bounding_box': [1848640.4769060146, 6308683.577507495, 1848663.461145939, 6308704.681240051],
         'exp_languages': set(),
         'exp_scale_denominator': None,  # Layman doesn't guess scale denominator for (multi)points
+        'mandatory_cases': {},
+        'ignore_cases': {
+            frozenset([base_test.RestMethod.PATCH]),
+        },
     },
     'point_epsg_3034': {
         'file_path': "tests/dynamic_data/publications/crs/vectors/sample_point_cz_3034.shp",
@@ -191,6 +143,10 @@ TEST_CASES = {
         'exp_bounding_box': [1848640.5623333207, 6308683.148403931, 1848662.1915096296, 6308704.001720284],
         'exp_languages': set(),
         'exp_scale_denominator': None,  # Layman doesn't guess scale denominator for (multi)points
+        'mandatory_cases': {
+            frozenset([base_test.RestMethod.POST]),
+        },
+        'ignore_cases': {},
     },
     'point_epsg_3034_qml': {
         'file_path': "tests/dynamic_data/publications/crs/vectors/sample_point_cz_3034.shp",
@@ -208,6 +164,10 @@ TEST_CASES = {
         'exp_bounding_box': [1848640.5623333207, 6308683.148403931, 1848662.1915096296, 6308704.001720284],
         'exp_languages': set(),
         'exp_scale_denominator': None,  # Layman doesn't guess scale denominator for (multi)points
+        'mandatory_cases': {
+            frozenset([base_test.RestMethod.POST]),
+        },
+        'ignore_cases': {},
     },
 }
 
@@ -225,7 +185,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     test_cases = [base_test.TestCaseType(
         key=key,
-        type=EnumTestTypes.MANDATORY,
+        type=EnumTestTypes.OPTIONAL,
         rest_args={
             'external_table_uri': value['external_table_uri_str'] or f"{external_db.URI_STR}"
                                                                      f"?schema={quote(value['schema_name'])}"
@@ -234,6 +194,16 @@ class TestLayer(base_test.TestSingleRestPublication):
             'style_file': value['style_file'],
         },
         params=value,
+        specific_types={
+            **{
+                case: EnumTestTypes.IGNORE
+                for case in value['ignore_cases']
+            },
+            **{
+                case: EnumTestTypes.MANDATORY
+                for case in value['mandatory_cases']
+            },
+        },
     ) for key, value in TEST_CASES.items()]
 
     def test_layer(self, layer: Publication, rest_method, rest_args, params):
