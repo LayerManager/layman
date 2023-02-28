@@ -33,7 +33,7 @@ def refresh_table(
     if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
         return
     publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
-    file_type = publ_info['file']['file_type']
+    file_type = publ_info['_file']['file_type']
     if file_type == settings.GEODATA_TYPE_RASTER:
         return
     if file_type != settings.GEODATA_TYPE_VECTOR:

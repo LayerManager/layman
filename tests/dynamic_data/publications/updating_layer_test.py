@@ -57,7 +57,7 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
                 None,
                 None
             ],
-            'file': {
+            '_file': {
                 'file_type': 'unknown'
             },
             '_table_uri': None,

@@ -30,7 +30,7 @@ def refresh_file_data(
     publ_info = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['geodata_type', 'table_uri']})
     if publ_info['geodata_type'] == settings.GEODATA_TYPE_UNKNOWN:
         publ_info_file = layman_util.get_publication_info(username, LAYER_TYPE, layername, context={'keys': ['file']})
-        geodata_type = publ_info_file['file']['file_type']
+        geodata_type = publ_info_file['_file']['file_type']
         set_geodata_type(username, LAYER_TYPE, layername, geodata_type, )
     else:
         geodata_type = publ_info['geodata_type']

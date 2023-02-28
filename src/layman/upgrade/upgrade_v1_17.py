@@ -44,7 +44,7 @@ def adjust_publications_file_type():
         file_type = None
         logger.info(f'    Adjust file type of {publ_type} {workspace}.{publication}')
         file_type = layman_util.get_publication_info(workspace, publ_type, publication,
-                                                     context={'keys': ['file']})['file']['file_type']
+                                                     context={'keys': ['file']})['_file']['file_type']
 
         query = f'''update {DB_SCHEMA}.publications set
         geodata_type = %s
@@ -76,7 +76,7 @@ def rename_table_names():
         logger.info(f'    Table name for {publ_type} {workspace}.{publication}')
         publ_info = layman_util.get_publication_info(workspace, publ_type, publication,
                                                      context={'keys': ['file', 'uuid', 'style_type', ]})
-        file_type = publ_info['file']['file_type']
+        file_type = publ_info['_file']['file_type']
         uuid = publ_info['uuid']
         style_type = publ_info['_style_type']
         table_name = f'layer_{uuid.replace("-", "_")}'

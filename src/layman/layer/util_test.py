@@ -70,8 +70,8 @@ def test_fill_in_partial_info_statuses():
                         'native_crs': 'EPSG:3857',
                         'native_bounding_box': [1870322.81512642, 6281928.49798181, 1892002.82941466, 6304200.72172059],
                         'access_rights': {'read': ['lay3', 'EVERYONE'], 'write': ['lay3', 'EVERYONE']},
-                        'file': {'path': 'layers/name_of_layer/input_file/name_of_layer.geojson',
-                                 'file_type': settings.GEODATA_TYPE_VECTOR},
+                        'file': {'path': 'layers/name_of_layer/input_file/name_of_layer.geojson', },
+                        '_file': {'file_type': settings.GEODATA_TYPE_VECTOR},
                         'geodata_type': settings.GEODATA_TYPE_UNKNOWN,
                         'db': {'table': 'layer_157d0c0b-f893-4b93-bd2f-04a771822e09'},
                         'style': {'url': 'https://www.layman.cz/rest/workspaces/workspace_name/layers/name_of_layer/style',
@@ -143,6 +143,8 @@ def test_fill_in_partial_info_statuses():
         },
         'file': {
             'path': 'layers/name_of_layer/input_file/name_of_layer.geojson',
+        },
+        '_file': {
             'file_type': 'vector'
         },
         'geodata_type': settings.GEODATA_TYPE_UNKNOWN,

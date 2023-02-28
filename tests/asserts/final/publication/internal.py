@@ -238,7 +238,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                 util.recursive_dict_update(expected_detail,
                                            {
                                                'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
-                                               'file': {'file_type': 'vector'},
+                                               '_file': {'file_type': 'vector'},
                                                'db': {
                                                    'schema': workspace,
                                                    'table': db_table,
@@ -249,7 +249,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
         elif geodata_type == settings.GEODATA_TYPE_RASTER:
             util.recursive_dict_update(expected_detail,
                                        {
-                                           'file': {'file_type': 'raster'},
+                                           '_file': {'file_type': 'raster'},
                                            '_table_uri': None,
                                        })
             if file_extension:

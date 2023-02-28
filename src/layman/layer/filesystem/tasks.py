@@ -107,7 +107,7 @@ def refresh_gdal(self, workspace, layername,
     if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
         return
     layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
-    file_type = layer_info['file']['file_type']
+    file_type = layer_info['_file']['file_type']
     if file_type != settings.GEODATA_TYPE_RASTER:
         return
 

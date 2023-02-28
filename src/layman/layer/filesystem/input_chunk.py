@@ -144,7 +144,7 @@ def get_layer_info(workspace, layername):
             file_type = settings.GEODATA_TYPE_UNKNOWN
         else:
             file_type = input_file.get_file_type(input_file.get_all_main_file_names(file_names)[0])
-        result = {'file': {'file_type': file_type}}
+        result = {'_file': {'file_type': file_type}}
     return result
 
 
