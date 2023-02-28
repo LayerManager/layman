@@ -5,7 +5,7 @@ import pytest
 from db import TableUri
 from layman import settings
 from test_tools import process_client, external_db
-from tests import EnumTestTypes, Publication
+from tests import Publication, EnumTestTypes, EnumTestKeys
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util, geoserver as gs_asserts
 from tests.dynamic_data import base_test
@@ -21,31 +21,8 @@ TABLE_PATCH = 'multipolygon_patch'
 GEO_COLUMN = settings.OGR_DEFAULT_GEOMETRY_COLUMN
 
 TEST_CASES = {
-    'other_external_table': {
-        'patch_args': {
-            'external_table_uri': f"{external_db.URI_STR}"
-                                  f"?schema={DB_SCHEMA}"
-                                  f"&table={TABLE_PATCH}"
-                                  f"&geo_column={GEO_COLUMN}"
-        },
-        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_sld.png"),
-        'exp_info_values': {
-            'publ_type_detail': (settings.GEODATA_TYPE_VECTOR, 'sld'),
-            'exp_publication_detail': {
-                'bounding_box': [1892431.3434856508, 5942074.072431108, 2003750.8342789242, 6190443.809135445],
-                'native_crs': 'EPSG:4326',
-                'native_bounding_box': [17.0, 47.0, 18.0, 48.5],
-            },
-            'external_table_uri': TableUri(
-                db_uri_str=external_db.URI_STR,
-                schema=DB_SCHEMA,
-                table=TABLE_PATCH,
-                geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
-                primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY,
-            ),
-        },
-    },
     'only_title': {
+        EnumTestKeys.TYPE: EnumTestTypes.MANDATORY,
         'patch_args': {
             'title': 'New title',
         },
@@ -68,6 +45,7 @@ TEST_CASES = {
         },
     },
     'internal_vector': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'patch_args': {
             'file_paths': ['sample/layman.layer/small_layer.geojson'],
         },
@@ -75,11 +53,13 @@ TEST_CASES = {
         'exp_info_values': common_publications.LAYER_VECTOR_SLD.info_values,
     },
     'internal_raster': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'patch_args': common_publications.LAYER_RASTER.definition,
         'exp_thumbnail': common_publications.LAYER_RASTER.thumbnail,
         'exp_info_values': common_publications.LAYER_RASTER.info_values,
     },
     'other_external_table_qml': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'patch_args': {
             'external_table_uri': f"{external_db.URI_STR}"
                                   f"?schema={DB_SCHEMA}"
@@ -117,7 +97,7 @@ class TestLayer(base_test.TestSingleRestPublication):
     rest_parametrization = []
 
     test_cases = [base_test.TestCaseType(key=key,
-                                         type=EnumTestTypes.MANDATORY,
+                                         type=value[EnumTestKeys.TYPE],
                                          rest_args=value['patch_args'],
                                          params=value,
                                          ) for key, value in TEST_CASES.items()]
