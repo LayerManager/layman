@@ -58,7 +58,7 @@ def get_providers():
 
 
 def fill_in_partial_info_statuses(info, chain_info):
-    geodata_type = info.get('file', dict()).get('file_type') or info['geodata_type']
+    geodata_type = info.get('_file', dict()).get('file_type') or info['geodata_type']
     original_data_source = info.get('original_data_source', settings.EnumOriginalDataSource.FILE.value)
     item_keys = get_layer_info_keys(geodata_type=geodata_type, original_data_source=original_data_source)
 
@@ -108,9 +108,11 @@ def get_complete_layer_info(workspace, layername):
 
     complete_info.update(partial_info)
     complete_info['sld'] = complete_info['style']
-    file_type = complete_info.get('file', dict()).get('file_type')
+    file_type = complete_info.get('_file', dict()).get('file_type')
     if complete_info['geodata_type'] == settings.GEODATA_TYPE_UNKNOWN and file_type and file_type != settings.GEODATA_TYPE_UNKNOWN:
         complete_info['geodata_type'] = file_type
+    if 'file' in complete_info:
+        complete_info['file']['file_type'] = complete_info['geodata_type']
 
     complete_info = clear_publication_info(complete_info, geodata_type)
 

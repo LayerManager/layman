@@ -44,7 +44,7 @@ def test_info(workspace, publ_type, publication):
         expected_style_url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=publication,
                                      internal=False)
 
-    file_type = info_internal['file']['file_type']
+    file_type = info_internal['_file']['file_type']
     original_data_source = info.get('original_data_source', settings.EnumOriginalDataSource.FILE.value)
     item_keys = get_layer_info_keys(geodata_type=file_type, original_data_source=original_data_source)
     info_keys = set(info.keys())
