@@ -7,29 +7,22 @@
   ```
   LAYMAN_CLIENT_VERSION=v1.15.0
   ```
-- If you are running Layman with development settings, run  
-```
-make client-build
-make timgen-build
-```
 ### Migrations and checks
 #### Schema migrations
 - [#703](https://github.com/LayerManager/layman/issues/703) Create new json column `external_table_uri` in `publications` table in prime DB schema.
 - [#703](https://github.com/LayerManager/layman/issues/703) Rename column `file_type` to `geodata_type` in `publications` table in prime DB schema.
 #### Data migrations
-- [#703](https://github.com/LayerManager/layman/issues/703) Fill column `external_table_uri` in `publications` table in prime DB schema for all publications. Value is set to `null` for all existing publications.
+- [#703](https://github.com/LayerManager/layman/issues/703) Fill column `external_table_uri` in `publications` table in prime DB schema. Value is set to `null` for all existing publications.
 ### Changes
-- [#703](https://github.com/LayerManager/layman/issues/703) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new body parameter *external_table_uri*.
-- [#703](https://github.com/LayerManager/layman/issues/703) Endpoint [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) supports parameter `crs` only if `file` is provided.
-- [#703](https://github.com/LayerManager/layman/issues/703)  Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) returns new subkey:
+- [#703](https://github.com/LayerManager/layman/issues/703) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new body parameter `external_table_uri`.
+- [#703](https://github.com/LayerManager/layman/issues/703)  Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) return new keys:
   - `original_data_source` with values `file` or `database_table`
-  - `geodata_type` which replace, now deprecated, key `file`.`file_type`
-  - `db` which replace, now deprecated, key `db_table`
-- [#703](https://github.com/LayerManager/layman/issues/703)  Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Workspace Layers](doc/rest.md#get-workspace-layers) returns new subkey:
-  - `geodata_type` which replace, now deprecated, key `file`.`file_type`
+  - `geodata_type` which replaces key `file.file_type` that is deprecated now
+  - `db` which replaces key `db_table` that is deprecated now
 - [#703](https://github.com/LayerManager/layman/issues/703) Attribute names in [WFS-T requests](doc/endpoints.md#web-feature-service) must match to regex `^[a-zA-Z_][a-zA-Z_0-9]*$`, otherwise Layman error is raised. It applies to attributes of both internal and external tables, and only to attributes that not exist in database yet.
+- [#703](https://github.com/LayerManager/layman/issues/703) Endpoint [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) raises exception if parameter `crs` is used without `file` parameter. It's the same behaviour as behaviour of [POST Workspace Layers](doc/rest.md#post-workspace-layers) endpoint.
 - [#772](https://github.com/LayerManager/layman/issues/772) Speed up endpoints [GET Workspace Layer Thumbnail](doc/rest.md#get-workspace-layer-thumbnail), [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style), [GET Workspace Map Thumbnail](doc/rest.md#get-workspace-map-thumbnail) and [GET Workspace Map File](doc/rest.md#get-workspace-map-file).
-- [#755](https://github.com/LayerManager/layman/issues/755) Downgrade Node.js of Timgen from v18 to v16
+- [#755](https://github.com/LayerManager/layman/issues/755) Fix generation of some map thumbnails by downgrading Node.js of Timgen from v18 to v16.
 - [#755](https://github.com/LayerManager/layman/issues/755) Change Node.js dependencies of Timgen:
   - http-server -> express 4
   - cors-anywhere -> http-proxy-middleware 2 
