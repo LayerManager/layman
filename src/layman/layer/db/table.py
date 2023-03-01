@@ -45,8 +45,7 @@ def get_layer_info(workspace, layername,):
     FROM pg_tables
     WHERE schemaname = %s
         AND tablename = %s
-        AND tableowner = %s
-    """, (table_uri.schema, table_uri.table, settings.LAYMAN_PG_USER))
+    """, (table_uri.schema, table_uri.table, ))
         except BaseException as exc:
             raise LaymanError(7) from exc
         rows = cur.fetchall()
