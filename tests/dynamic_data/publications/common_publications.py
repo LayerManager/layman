@@ -1,5 +1,5 @@
-import tests.asserts.final.publication as publication
-import tests.asserts.processing as processing
+from tests.asserts.final import publication
+from tests.asserts import processing
 from test_tools import process_client
 from ... import PublicationValues, dynamic_data as consts, Action
 

@@ -1,7 +1,7 @@
 from geoserver.error import Error as gs_error
 from layman import settings
-import tests.asserts.final.publication as publication
-import tests.asserts.processing as processing
+from tests.asserts.final import publication
+from tests.asserts import processing
 from test_tools import process_client, wfs_client
 from . import common_publications as publications
 from ... import Action, Publication, dynamic_data as consts

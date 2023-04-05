@@ -1,4 +1,4 @@
-import tests.asserts.processing as processing
+from tests.asserts import processing
 from test_tools import process_client
 from .. import dynamic_data as consts, Action
 

@@ -1,5 +1,5 @@
-import tests.asserts.final.publication as publication
-import tests.asserts.processing as processing
+from tests.asserts.final import publication
+from tests.asserts import processing
 from test_tools import process_client
 from . import wrong_input, edge_cases, celery, common_publications as publications, geoserver_proxy, crs
 from .. import predefined_actions
