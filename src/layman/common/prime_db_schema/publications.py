@@ -108,7 +108,7 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
             """, tuple()),
     }
 
-    assert all(ordering_item in order_by_definition.keys() for ordering_item in order_by_list)
+    assert all(ordering_item in order_by_definition for ordering_item in order_by_list)
 
     calculated_columns = []
     ordering_bbox_clause = ''
