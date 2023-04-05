@@ -9,7 +9,7 @@ from layman.common.filesystem import input_file as common
 from layman.util import url_for
 from . import util
 
-MAP_SUBDIR = __name__.split('.')[-1]
+MAP_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
 pre_publication_action_check = empty_method
 get_metadata_comparison = empty_method_returns_dict
 

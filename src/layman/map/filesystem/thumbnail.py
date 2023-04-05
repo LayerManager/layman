@@ -18,7 +18,7 @@ from layman.util import url_for, get_publication_info
 from . import util, input_file
 from .. import MAP_TYPE
 
-MAP_SUBDIR = __name__.split('.')[-1]
+MAP_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
 get_metadata_comparison = empty_method_returns_dict
 pre_publication_action_check = empty_method
 post_map = empty_method

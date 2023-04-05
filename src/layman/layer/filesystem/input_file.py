@@ -13,7 +13,7 @@ from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import util as common_util, input_file as common
 from . import util, gdal as fs_gdal
 
-LAYER_SUBDIR = __name__.split('.')[-1]
+LAYER_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 logger = logging.getLogger(__name__)
 

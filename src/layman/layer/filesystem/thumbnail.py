@@ -10,7 +10,7 @@ from layman.common.filesystem import util as common_util
 from . import util, input_file
 from .. import LAYER_TYPE
 
-LAYER_SUBDIR = __name__.split('.')[-1]
+LAYER_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
