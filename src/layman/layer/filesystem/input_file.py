@@ -406,8 +406,8 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
                 assert old_match.group(0) == new_match.group(0)
 
     if not ignore_existing_files:
-        conflict_paths = [raw_filename_mapping[k]
-                          for k, v in raw_filename_mapping.items()
+        conflict_paths = [v
+                          for v in raw_filename_mapping.values()
                           if v is not None and os.path.exists(os.path.join(input_file_dir, v))]
         if len(conflict_paths) > 0:
             raise LaymanError(3, conflict_paths)
