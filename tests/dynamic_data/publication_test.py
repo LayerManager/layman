@@ -23,13 +23,13 @@ def test_action_chain(publication, request):
             action_call = action[consts.KEY_CALL]
             response = util.run_action(publication, action_call)
         exception_assert_param = {'thrown': exception_info}
-        for assert_call in action.get(consts.KEY_CALL_EXCEPTION, dict()).get(consts.KEY_EXCEPTION_ASSERTS, list()):
+        for assert_call in action.get(consts.KEY_CALL_EXCEPTION, dict()).get(consts.KEY_EXCEPTION_ASSERTS, []):
             params = dict(**exception_assert_param, **assert_call.params)
             util.run_action(publication, Action(assert_call.method, params))
 
         if not exception_info:
             response_assert_param = {'response': response}
-            for response_assert_idx, assert_response in enumerate(action.get(consts.KEY_RESPONSE_ASSERTS, list())):
+            for response_assert_idx, assert_response in enumerate(action.get(consts.KEY_RESPONSE_ASSERTS, [])):
                 params = dict(**response_assert_param, **assert_response.params)
                 try:
                     util.run_action(publication, Action(assert_response.method, params))
@@ -39,7 +39,7 @@ def test_action_chain(publication, request):
                     raise exc from exc
 
         data_cache = dict()
-        for final_assert_idx, assert_call in enumerate(step.get(consts.KEY_FINAL_ASSERTS, list())):
+        for final_assert_idx, assert_call in enumerate(step.get(consts.KEY_FINAL_ASSERTS, [])):
             try:
                 util.run_action(publication, assert_call, cache=data_cache)
             except AssertionError as exc:

@@ -169,7 +169,7 @@ def generate_local(workspace=None):
                     *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                     Action(publication.internal.correct_values_in_detail, copy.deepcopy(post_info_values)),
                     Action(publication.internal.thumbnail_equals, {'exp_thumbnail': exp_thumbnail, }),
-                    *tc_params.get(consts.KEY_FINAL_ASSERTS, list()),
+                    *tc_params.get(consts.KEY_FINAL_ASSERTS, []),
                 ]
             }
             actions_list = copy.deepcopy(action_predecessor)

@@ -157,7 +157,7 @@ class TestGetPublications:
             'X-Total-Count': '3',
             'Content-Range': 'items 1-3/3'
         },),
-        (None, {'full_text_filter': 'The Fačřš_tÚŮTŤsa   "  a34432[;] ;.\\Ra\'\'ts'}, list(), {
+        (None, {'full_text_filter': 'The Fačřš_tÚŮTŤsa   "  a34432[;] ;.\\Ra\'\'ts'}, [], {
             'X-Total-Count': '0',
             'Content-Range': 'items 0-0/0'
         },),
