@@ -111,7 +111,7 @@ EXP_BBOXES = {
 def generate(workspace=None):
     workspace = workspace or consts.COMMON_WORKSPACE
 
-    result = dict()
+    result = {}
     def_publ_info_values = {
         'exp_publication_detail': {
             'bounding_box': EXP_BBOXES[crs_def.EPSG_3857]['bbox'],
@@ -150,7 +150,7 @@ def generate(workspace=None):
 
         def_info_values = copy.deepcopy(def_publ_info_values)
         def_info_values['exp_publication_detail']['native_crs'] = crs
-        asserts_util.recursive_dict_update(def_info_values, tc_params.get(KEY_INFO_VALUES, dict()))
+        asserts_util.recursive_dict_update(def_info_values, tc_params.get(KEY_INFO_VALUES, {}))
 
         exp_thumbnail = f'{DIRECTORY}/cz_{crs_code}/thumbnail.png'
 
@@ -188,7 +188,7 @@ def generate(workspace=None):
                                             {**action_params,
                                              **rest_param_dict}),
                     consts.KEY_RESPONSE_ASSERTS: [
-                        Action(processing.response.valid_post, dict()),
+                        Action(processing.response.valid_post, {}),
                     ],
                 },
                 consts.KEY_FINAL_ASSERTS: [

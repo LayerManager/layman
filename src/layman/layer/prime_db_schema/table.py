@@ -10,12 +10,12 @@ get_metadata_comparison = empty_method_returns_dict
 
 def get_publication_uuid(workspace, publication_type, publication_name):
     infos = pubs_util.get_publication_infos(workspace, publication_type)
-    return infos.get((workspace, publication_type, publication_name), dict()).get("uuid")
+    return infos.get((workspace, publication_type, publication_name), {}).get("uuid")
 
 
 def get_layer_info(workspace, layername):
     layers = pubs_util.get_publication_infos(workspace, LAYER_TYPE)
-    info = layers.get((workspace, LAYER_TYPE, layername), dict())
+    info = layers.get((workspace, LAYER_TYPE, layername), {})
     if info:
         uuid = info['uuid']
         info['_table_uri'] = TableUri(

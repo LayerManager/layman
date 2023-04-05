@@ -107,12 +107,12 @@ TESTCASES = {
 def generate(workspace=None):
     workspace = workspace or consts.COMMON_WORKSPACE
 
-    result = dict()
+    result = {}
     for testcase, tc_params in TESTCASES.items():
         parametrization = {key: values for key, values in REST_PARAMETRIZATION.items()
                            if key not in tc_params.get(KEY_ACTION_PARAMS, [])}
         rest_param_dicts = util.dictionary_product(parametrization) if tc_params[KEY_PUBLICATION_TYPE] == process_client.LAYER_TYPE\
-            else [dict()]
+            else [{}]
         for rest_param_dict in rest_param_dicts:
             test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
                                           for key, value in rest_param_dict.items()
@@ -125,7 +125,7 @@ def generate(workspace=None):
                                             {**tc_params[KEY_ACTION_PARAMS],
                                              **rest_param_dict}),
                     consts.KEY_RESPONSE_ASSERTS: [
-                        Action(processing.response.valid_post, dict()),
+                        Action(processing.response.valid_post, {}),
                     ],
                 },
                 consts.KEY_FINAL_ASSERTS: [
@@ -146,7 +146,7 @@ def generate(workspace=None):
                                             {**tc_params[KEY_ACTION_PARAMS],
                                              **rest_param_dict}),
                     consts.KEY_RESPONSE_ASSERTS: [
-                        Action(processing.response.valid_post, dict()),
+                        Action(processing.response.valid_post, {}),
                     ],
                 },
                 consts.KEY_FINAL_ASSERTS: [

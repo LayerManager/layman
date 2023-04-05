@@ -50,7 +50,7 @@ def generate(workspace):
                 consts.KEY_ACTION: {
                     consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.SMALL_LAYER.definition),
                     consts.KEY_RESPONSE_ASSERTS: [
-                        Action(processing.response.valid_post, dict()),
+                        Action(processing.response.valid_post, {}),
                     ],
                 },
                 consts.KEY_FINAL_ASSERTS: [
@@ -88,14 +88,14 @@ def generate(workspace):
                         'headers': process_client.get_authz_headers(username=username),
                     }),
                     consts.KEY_RESPONSE_ASSERTS: [
-                        Action(processing.response.valid_post, dict()),
+                        Action(processing.response.valid_post, {}),
                     ],
                 },
                 consts.KEY_FINAL_ASSERTS: [
                     *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                     Action(publication.internal.correct_values_in_detail, {
                         **publications.SMALL_LAYER.info_values,
-                        'exp_publication_detail': {**publications.SMALL_LAYER.info_values.get('exp_publication_detail', dict()),
+                        'exp_publication_detail': {**publications.SMALL_LAYER.info_values.get('exp_publication_detail', {}),
                                                    'access_rights': {'read': [username],
                                                                      'write': [username]},
                                                    }

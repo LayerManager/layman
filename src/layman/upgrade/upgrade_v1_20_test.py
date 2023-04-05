@@ -12,9 +12,9 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 def test_external_table_uri():
     main_workspace = 'test_external_table_uri_migration_workspace'
 
-    layer_vector_def = (main_workspace, process_client.LAYER_TYPE, 'test_layer_vector', dict())
+    layer_vector_def = (main_workspace, process_client.LAYER_TYPE, 'test_layer_vector', {})
     layer_raster_def = (main_workspace, process_client.LAYER_TYPE, 'test_layer_raster', {'file_paths': ['sample/layman.layer/sample_jp2_rgb.jp2', ]})
-    map_def = (main_workspace, process_client.MAP_TYPE, 'test_map', dict())
+    map_def = (main_workspace, process_client.MAP_TYPE, 'test_map', {})
 
     publication_defs = [layer_vector_def, layer_raster_def, map_def, ]
 

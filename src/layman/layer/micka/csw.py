@@ -135,7 +135,7 @@ def get_template_path_and_values(workspace, layername, http_method):
         title or '',
         abstract or ''
     ]))), None)
-    temporal_extent = publ_info['wms'].get('time', dict()).get('values', [])
+    temporal_extent = publ_info['wms'].get('time', {}).get('values', [])
 
     geodata_type = publ_info.get('geodata_type')
     if geodata_type == settings.GEODATA_TYPE_VECTOR:

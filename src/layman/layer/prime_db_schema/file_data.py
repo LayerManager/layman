@@ -14,7 +14,7 @@ get_metadata_comparison = empty_method_returns_dict
 def delete_layer(workspace, layername):
     publications.set_bbox(workspace, LAYER_TYPE, layername, bbox=(None, None, None, None, ), crs=None)
     layers = publications.get_publication_infos(workspace, LAYER_TYPE)
-    info = layers.get((workspace, LAYER_TYPE, layername), dict())
+    info = layers.get((workspace, LAYER_TYPE, layername), {})
     if info['original_data_source'] == settings.EnumOriginalDataSource.FILE.value:
         publications.set_geodata_type(workspace, LAYER_TYPE, layername, settings.GEODATA_TYPE_UNKNOWN, )
 

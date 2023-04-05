@@ -128,13 +128,13 @@ TESTCASES = {
 def generate_local(workspace=None):
     workspace = workspace or consts.COMMON_WORKSPACE
 
-    result = dict()
+    result = {}
     for testcase, tc_params in TESTCASES.items():
         file_name = tc_params.get(KEY_FILE_NAME)
         file_paths = {'file_paths': [f'{DIRECTORY}/{file_name}.{ext}' for ext in ['shp', 'dbf', 'prj', 'shx', 'cpg', 'qmd']
-                                     if os.path.exists(f'{DIRECTORY}/{file_name}.{ext}')]} if file_name else dict()
+                                     if os.path.exists(f'{DIRECTORY}/{file_name}.{ext}')]} if file_name else {}
         action_params = {**file_paths,
-                         **tc_params.get(KEY_ACTION_PARAMS, dict()),
+                         **tc_params.get(KEY_ACTION_PARAMS, {}),
                          }
 
         action_parametrization = util.get_test_case_parametrization(param_parametrization=REST_PARAMETRIZATION,
@@ -162,7 +162,7 @@ def generate_local(workspace=None):
                                             {**action_params,
                                              **rest_param_dict}),
                     consts.KEY_RESPONSE_ASSERTS: [
-                        Action(processing.response.valid_post, dict()),
+                        Action(processing.response.valid_post, {}),
                     ],
                 },
                 consts.KEY_FINAL_ASSERTS: [

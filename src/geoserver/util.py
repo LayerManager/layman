@@ -238,7 +238,7 @@ def delete_feature_type(geoserver_workspace, feature_type_name, auth, *, store=D
 def patch_feature_type(geoserver_workspace, feature_type_name, store_name=None, *, title=None, description=None, bbox=None, crs=None, auth, lat_lon_bbox=None):
     assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
     store_name = store_name or DEFAULT_DB_STORE_NAME
-    ftype = dict()
+    ftype = {}
 
     if title is not None:
         ftype['title'] = title
@@ -544,7 +544,7 @@ def delete_db_store(geoserver_workspace, auth, *, store_name=DEFAULT_DB_STORE_NA
 def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, description=None, bbox=None, crs=None,
                    auth, lat_lon_bbox=None):
     assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
-    coverage = dict()
+    coverage = {}
 
     if title is not None:
         coverage['title'] = title

@@ -83,7 +83,7 @@ def test_auth_get_publication(workspace, publ_type, publication):
     for user in non_readers:
         with app.app_context():
             pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user})
-        assert pub_info == dict(), pub_info
+        assert not pub_info, pub_info
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)

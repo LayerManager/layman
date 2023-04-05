@@ -54,7 +54,7 @@ def recursive_dict_update(base, updater, *, keep_replace_key=False):
 
 
 def run_action(publication, action, *, cache=None):
-    cache = cache or dict()
+    cache = cache or {}
     publication = Publication(
         action.params.get('workspace', publication.workspace),
         action.params.get('publ_type', publication.type),
@@ -62,9 +62,9 @@ def run_action(publication, action, *, cache=None):
     )
 
     param_def = {
-        'headers': Action(get_publication_header, dict()),
-        'actor': Action(get_publication_actor, dict()),
-        'rest_publication_detail': Action(process_client.get_workspace_publication, dict())
+        'headers': Action(get_publication_header, {}),
+        'actor': Action(get_publication_actor, {}),
+        'rest_publication_detail': Action(process_client.get_workspace_publication, {})
     }
     method_params = inspect.getfullargspec(action.method)
     publ_type_param = 'publication_type' if 'publication_type' in method_params[0] else 'publ_type'

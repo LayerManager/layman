@@ -18,7 +18,7 @@ def generate(workspace):
 
                     }),
                     consts.KEY_RESPONSE_ASSERTS: [
-                        Action(processing.response.valid_post, dict()),
+                        Action(processing.response.valid_post, {}),
                     ],
                 },
             },
@@ -29,7 +29,7 @@ def generate(workspace):
             },
             {
                 consts.KEY_ACTION: {
-                    consts.KEY_CALL: Action(util.abort_publication_chain, dict()),
+                    consts.KEY_CALL: Action(util.abort_publication_chain, {}),
                 },
                 consts.KEY_FINAL_ASSERTS: [
                     Action(internal.expected_chain_info_state, {'state': 'ABORTED'})

@@ -77,7 +77,7 @@ def ensure_publication(workspace, publ_type, publication):
 
 def check_publication_status(response):
     try:
-        current_status = response.json().get('layman_metadata', dict()).get('publication_status')
+        current_status = response.json().get('layman_metadata', {}).get('publication_status')
     except json.JSONDecodeError as exc:
         print(f'response={response.text}')
         raise exc

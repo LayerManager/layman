@@ -144,7 +144,7 @@ def get_metadata_comparison(workspace, layername):
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['geodata_type', ]})
     geodata_type = info['geodata_type']
     if geodata_type in (settings.GEODATA_TYPE_RASTER, settings.GEODATA_TYPE_UNKNOWN):
-        return dict()
+        return {}
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 

@@ -12,11 +12,11 @@ def get_users_and_headers_for_publication(workspace, publ_type, publication):
     users = data.USERS | {settings.ANONYM_USER, settings.NONAME_USER}
     is_personal_workspace = workspace in data.USERS
 
-    result = dict()
+    result = {}
     for right in ['read', 'write']:
-        result[right] = dict()
+        result[right] = {}
         for type in [KEY_AUTH, KEY_NOT_AUTH]:
-            result[right][type] = dict()
+            result[right][type] = {}
 
         test_data = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_' + right)
         if test_data:
