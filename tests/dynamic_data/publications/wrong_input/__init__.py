@@ -60,7 +60,7 @@ TESTCASES = {
         },
         KEY_PATCHES: {
             'all_files': {
-                KEY_PATCH_POST: dict(),
+                KEY_PATCH_POST: {},
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', True), ('with_chunks', False)]): {
                         'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
@@ -100,7 +100,7 @@ TESTCASES = {
         },
         KEY_PATCHES: {
             'all_files': {
-                KEY_PATCH_POST: dict(),
+                KEY_PATCH_POST: {},
                 KEY_EXPECTED_EXCEPTION: {
                     frozenset([('compress', True), ('with_chunks', False)]): {
                         'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
@@ -154,7 +154,7 @@ TESTCASES = {
         },
         KEY_PATCHES: {
             'data_and_style': {
-                KEY_PATCH_POST: dict(),
+                KEY_PATCH_POST: {},
             },
             'data_without_style': {
                 KEY_PATCH_POST: {
@@ -1459,7 +1459,7 @@ VALIDATION_PATCH_ACTION = {
             'style_file': 'sample/style/basic.sld',
         }),
         consts.KEY_RESPONSE_ASSERTS: [
-            Action(processing.response.valid_post, dict()),
+            Action(processing.response.valid_post, {}),
         ],
     },
     consts.KEY_FINAL_ASSERTS: [
@@ -1478,7 +1478,7 @@ def generate(workspace=None):
     test_type = EnumTestTypes(test_type_str)
     default_only_first_parametrization = test_type != EnumTestTypes.OPTIONAL
 
-    result = dict()
+    result = {}
     for testcase, tc_params in TESTCASES.items():
         if test_type == EnumTestTypes.MANDATORY:
             if tc_params.get(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY) == EnumTestTypes.OPTIONAL:
@@ -1495,7 +1495,7 @@ def generate(workspace=None):
             for test_case_postfix, _, _, rest_param_dict in action_parametrization:
                 rest_param_frozen_set = frozenset(rest_param_dict.items())
                 default_exp_exception = copy.deepcopy(tc_params[KEY_EXPECTED_EXCEPTION][KEY_DEFAULT])
-                exception_diff = tc_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, dict())
+                exception_diff = tc_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, {})
                 exp_exception = asserts_util.recursive_dict_update(default_exp_exception, copy.deepcopy(exception_diff))
                 is_sync = exp_exception.pop('sync')
                 if is_sync:
@@ -1511,7 +1511,7 @@ def generate(workspace=None):
                                 ],
                             }, },
                         consts.KEY_FINAL_ASSERTS: [
-                            Action(publication.internal.does_not_exist, dict())
+                            Action(publication.internal.does_not_exist, {})
                         ],
                     }
                     action_list = [action_def]
@@ -1522,7 +1522,7 @@ def generate(workspace=None):
                                                     {**tc_params[KEY_ACTION_PARAMS],
                                                      **rest_param_dict}),
                             consts.KEY_RESPONSE_ASSERTS: [
-                                Action(processing.response.valid_post, dict()),
+                                Action(processing.response.valid_post, {}),
                             ],
                         },
                         consts.KEY_FINAL_ASSERTS: [
@@ -1531,16 +1531,16 @@ def generate(workspace=None):
                         ],
                     }
                     if assert_no_bbox_and_crs:
-                        action_def[consts.KEY_FINAL_ASSERTS].append(Action(publication.internal.no_bbox_and_crs, dict()))
+                        action_def[consts.KEY_FINAL_ASSERTS].append(Action(publication.internal.no_bbox_and_crs, {}))
                     action_list = [action_def, VALIDATION_PATCH_ACTION]
                 publ_name = f"{testcase}_post{test_case_postfix}"
                 result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = action_list
 
-        for patch_key, patch_params in tc_params.get(KEY_PATCHES, dict()).items():
+        for patch_key, patch_params in tc_params.get(KEY_PATCHES, {}).items():
             action_parametrization = util.get_test_case_parametrization(param_parametrization=REST_PARAMETRIZATION,
                                                                         only_first_parametrization=default_only_first_parametrization,
                                                                         default_params={**tc_params[KEY_ACTION_PARAMS],
-                                                                                        **patch_params.get(KEY_ACTION_PARAMS, dict())},
+                                                                                        **patch_params.get(KEY_ACTION_PARAMS, {})},
                                                                         action_parametrization=[('', None, []), ],
                                                                         )
             for test_case_postfix, _, _, rest_param_dict in action_parametrization:
@@ -1550,7 +1550,7 @@ def generate(workspace=None):
                             consts.KEY_CALL: Action(process_client.publish_workspace_publication,
                                                     patch_params[KEY_PATCH_POST]),
                             consts.KEY_RESPONSE_ASSERTS: [
-                                Action(processing.response.valid_post, dict()),
+                                Action(processing.response.valid_post, {}),
                             ],
                         },
                         consts.KEY_FINAL_ASSERTS: [
@@ -1560,8 +1560,8 @@ def generate(workspace=None):
                 ]
                 rest_param_frozen_set = frozenset(rest_param_dict.items())
                 default_exp_exception = copy.deepcopy(tc_params[KEY_EXPECTED_EXCEPTION][KEY_DEFAULT])
-                exception_diff_post = tc_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, dict())
-                exception_diff_patch = patch_params.get(KEY_EXPECTED_EXCEPTION, dict()).get(rest_param_frozen_set, dict())
+                exception_diff_post = tc_params[KEY_EXPECTED_EXCEPTION].get(rest_param_frozen_set, {})
+                exception_diff_patch = patch_params.get(KEY_EXPECTED_EXCEPTION, {}).get(rest_param_frozen_set, {})
                 exception_diff = asserts_util.recursive_dict_update(exception_diff_post, exception_diff_patch, keep_replace_key=True)
                 exp_exception = asserts_util.recursive_dict_update(default_exp_exception, copy.deepcopy(exception_diff))
                 is_sync = exp_exception.pop('sync')
@@ -1570,7 +1570,7 @@ def generate(workspace=None):
                         consts.KEY_ACTION: {
                             consts.KEY_CALL: Action(process_client.patch_workspace_publication,
                                                     {**tc_params[KEY_ACTION_PARAMS],
-                                                     **patch_params.get(KEY_ACTION_PARAMS, dict()),
+                                                     **patch_params.get(KEY_ACTION_PARAMS, {}),
                                                      **rest_param_dict}),
                             consts.KEY_CALL_EXCEPTION: {
                                 consts.KEY_EXCEPTION: LaymanError,
@@ -1588,10 +1588,10 @@ def generate(workspace=None):
                         consts.KEY_ACTION: {
                             consts.KEY_CALL: Action(process_client.patch_workspace_publication,
                                                     {**tc_params[KEY_ACTION_PARAMS],
-                                                     **patch_params.get(KEY_ACTION_PARAMS, dict()),
+                                                     **patch_params.get(KEY_ACTION_PARAMS, {}),
                                                      **rest_param_dict}),
                             consts.KEY_RESPONSE_ASSERTS: [
-                                Action(processing.response.valid_post, dict()),
+                                Action(processing.response.valid_post, {}),
                             ],
                         },
                         consts.KEY_FINAL_ASSERTS: [
@@ -1600,7 +1600,7 @@ def generate(workspace=None):
                         ],
                     }
                     if assert_no_bbox_and_crs:
-                        action_def[consts.KEY_FINAL_ASSERTS].append(Action(publication.internal.no_bbox_and_crs, dict()))
+                        action_def[consts.KEY_FINAL_ASSERTS].append(Action(publication.internal.no_bbox_and_crs, {}))
 
                     patch.append(action_def)
                     patch.append(VALIDATION_PATCH_ACTION)

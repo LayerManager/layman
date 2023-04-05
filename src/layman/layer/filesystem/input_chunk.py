@@ -136,7 +136,7 @@ def get_info_json(workspace, layername):
 
 def get_layer_info(workspace, layername):
     info = get_info_json(workspace, layername)
-    result = dict()
+    result = {}
     if info:
         files_to_upload = info['files_to_upload']
         file_names = [file['input_file'] for file in files_to_upload]

@@ -83,7 +83,7 @@ CRSDefinitions = {
             90,
         ),
         no_area_bbox_padding=0.00001,
-        world_bounds=dict(),
+        world_bounds={},
         qgis_template_spatialrefsys='''<srsid>3452</srsid>
             <srid>4326</srid>
             <authid>EPSG:4326</authid>
@@ -104,7 +104,7 @@ CRSDefinitions = {
         ),
         max_bbox=None,
         no_area_bbox_padding=10,
-        world_bounds=dict(),
+        world_bounds={},
         qgis_template_spatialrefsys='''<srsid>26812</srsid>
   <srid>5514</srid>
   <authid>EPSG:5514</authid>
@@ -125,7 +125,7 @@ CRSDefinitions = {
         ),
         max_bbox=None,
         no_area_bbox_padding=1,
-        world_bounds=dict(),
+        world_bounds={},
         qgis_template_spatialrefsys='''<srsid>3117</srsid>
       <srid>32633</srid>
       <authid>EPSG:32633</authid>
@@ -146,7 +146,7 @@ CRSDefinitions = {
         ),
         max_bbox=None,
         no_area_bbox_padding=1,
-        world_bounds=dict(),
+        world_bounds={},
         qgis_template_spatialrefsys='''<srsid>3118</srsid>
       <srid>32634</srid>
       <authid>EPSG:32634</authid>
@@ -195,7 +195,7 @@ CRSDefinitions = {
         ),
         max_bbox=None,
         no_area_bbox_padding=1,
-        world_bounds=dict(),
+        world_bounds={},
         qgis_template_spatialrefsys='''<srsid>1000</srsid>
       <srid>900916</srid>
       <authid>EPSG:3035</authid>
@@ -216,7 +216,7 @@ CRSDefinitions = {
         ),
         max_bbox=None,
         no_area_bbox_padding=1,
-        world_bounds=dict(),
+        world_bounds={},
         qgis_template_spatialrefsys='''<srsid>1022</srsid>
       <srid>900917</srid>
       <authid>EPSG:3059</authid>

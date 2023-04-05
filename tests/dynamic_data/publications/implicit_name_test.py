@@ -78,7 +78,7 @@ PUBLICATIONS = {
         'mandatory_cases': {
             frozenset([CompressDomain.FALSE, base_test.WithChunksDomain.FALSE, ]),
         },
-        'specific_params': dict(),
+        'specific_params': {},
         'ignored_cases': {
             frozenset([CompressDomain.FALSE, base_test.WithChunksDomain.TRUE, ]),
             frozenset([CompressDomain.TRUE, base_test.WithChunksDomain.FALSE, ]),

@@ -7,12 +7,12 @@ get_metadata_comparison = empty_method_returns_dict
 
 def get_publication_uuid(workspace, publication_type, publication_name):
     infos = pubs_util.get_publication_infos(workspace, publication_type)
-    return infos.get((workspace, publication_type, publication_name), dict()).get("uuid")
+    return infos.get((workspace, publication_type, publication_name), {}).get("uuid")
 
 
 def get_map_info(workspace, mapname):
     maps = pubs_util.get_publication_infos(workspace, MAP_TYPE)
-    info = maps.get((workspace, MAP_TYPE, mapname), dict())
+    info = maps.get((workspace, MAP_TYPE, mapname), {})
     if info:
         info.pop('_table_uri', None)
         info.pop('original_data_source', None)

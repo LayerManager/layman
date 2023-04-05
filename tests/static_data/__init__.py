@@ -212,7 +212,7 @@ PUBLICATIONS = {
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'patch_jp2'): {
         DEFINITION: [
-            dict(),
+            {},
             {'file_paths': ['sample/layman.layer/sample_jp2_rgb.jp2', ]},
         ],
         TEST_DATA: {

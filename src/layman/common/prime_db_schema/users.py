@@ -39,7 +39,7 @@ def get_user_infos(username=None,
                    iss_sub=None,
                    id_workspace=None):
     assert not (username and iss_sub)
-    iss_sub = iss_sub or dict()
+    iss_sub = iss_sub or {}
 
     join_clause = '1 = 1'
     if username:

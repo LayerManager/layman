@@ -438,7 +438,7 @@ def update_publication(workspace_name, info):
     id_workspace = workspaces.get_workspace_infos(workspace_name)[workspace_name]["id"]
     right_type_list = ['read', 'write']
 
-    access_rights_changes = dict()
+    access_rights_changes = {}
     for right_type in right_type_list:
         access_rights_changes[right_type] = {
             'EVERYONE': None,
@@ -511,7 +511,7 @@ returning id
 def delete_publication(workspace_name, type, name):
     workspace_info = workspaces.get_workspace_infos(workspace_name).get(workspace_name)
     if workspace_info:
-        id_publication = get_publication_infos(workspace_name, type).get((workspace_name, type, name), dict()).get("id")
+        id_publication = get_publication_infos(workspace_name, type).get((workspace_name, type, name), {}).get("id")
         if id_publication:
             rights.delete_rights_for_publication(id_publication)
             id_workspace = workspace_info["id"]

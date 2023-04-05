@@ -221,7 +221,7 @@ def patch_workspace_publication(publication_type,
         assert os.path.isfile(file_path), file_path
     files = []
     try:
-        data = dict()
+        data = {}
         if not with_chunks:
             for file_path in file_paths:
                 assert os.path.isfile(file_path), file_path
@@ -367,7 +367,7 @@ def publish_workspace_publication(publication_type,
 
     files = []
     try:
-        data = dict()
+        data = {}
         if not do_not_post_name:
             data['name'] = name
             data['title'] = title
@@ -603,7 +603,7 @@ def post_wfst(xml, *, headers=None, url=None, workspace=None):
     assert not (url and workspace)
     rest_url = url or f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}/wfs?request=Transaction"\
         if workspace else f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/wfs?request=Transaction"
-    headers = headers or dict()
+    headers = headers or {}
     headers['Accept'] = 'text/xml'
     headers['Content-type'] = 'text/xml'
 
@@ -619,7 +619,7 @@ def post_wfst(xml, *, headers=None, url=None, workspace=None):
 
 def check_publication_status(response):
     try:
-        current_status = response.json().get('layman_metadata', dict()).get('publication_status')
+        current_status = response.json().get('layman_metadata', {}).get('publication_status')
     except json.JSONDecodeError as exc:
         print(f'response={response.text}')
         raise exc

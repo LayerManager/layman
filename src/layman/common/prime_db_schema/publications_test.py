@@ -107,10 +107,10 @@ class TestSelectPublicationsBasic:
     workspace1 = 'test_select_publications_basic_workspace1'
     workspace2 = 'test_select_publications_basic_workspace2'
     qml_style_file = 'sample/style/small_layer.qml'
-    publications = [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le', dict()),
+    publications = [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le', {}),
                     (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml', {'style_file': qml_style_file}),
-                    (workspace1, MAP_TYPE, 'test_select_publications_publication1me', dict()),
-                    (workspace2, LAYER_TYPE, 'test_select_publications_publication2le', dict()),
+                    (workspace1, MAP_TYPE, 'test_select_publications_publication1me', {}),
+                    (workspace2, LAYER_TYPE, 'test_select_publications_publication2le', {}),
                     ]
 
     @pytest.fixture(scope="class")
@@ -136,11 +136,11 @@ class TestSelectPublicationsBasic:
                                           (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml'),
                                           (workspace1, MAP_TYPE, 'test_select_publications_publication1me'),
                                           ]),
-        (dict(), [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le'),
-                  (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml'),
-                  (workspace1, MAP_TYPE, 'test_select_publications_publication1me'),
-                  (workspace2, LAYER_TYPE, 'test_select_publications_publication2le'),
-                  ]),
+        ({}, [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le'),
+              (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml'),
+              (workspace1, MAP_TYPE, 'test_select_publications_publication1me'),
+              (workspace2, LAYER_TYPE, 'test_select_publications_publication2le'),
+              ]),
     ])
     @pytest.mark.usefixtures('ensure_layman', 'provide_data')
     def test_get_publications(query_params, expected_publications):
@@ -230,7 +230,7 @@ class TestSelectPublicationsComplex:
 
     @staticmethod
     @pytest.mark.parametrize('query_params, expected_result', [
-        (dict(), {
+        ({}, {
             'items': [(workspace1, MAP_TYPE, map_1e_2_4x6_6),
                       (workspace1, MAP_TYPE, map_1e_3_3x3_3),
                       (workspace1, MAP_TYPE, map_1o_2_2x3_6),

@@ -39,7 +39,7 @@ def find_maps_containing_layer(layer_workspace, layer_name):
             match = re.match(gs_ows_url_pattern, layer_url)
             if not match:
                 continue
-            map_layers = CaseInsensitiveDict(**map_layer.get('params', dict())).get('layers')
+            map_layers = CaseInsensitiveDict(**map_layer.get('params', {})).get('layers')
             layers = unquote(map_layers).split(',')
             if layer_name in layers or f'{layer_workspace}:{layer_name}' in layers or f'{layer_wms_workspace}:{layer_name}' in layers:
                 result_maps.add((workspace, map))

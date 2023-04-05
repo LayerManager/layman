@@ -256,7 +256,7 @@ def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_cal
         if func not in functions or not omit_duplicate_calls:
             functions.append(func)
 
-    results = dict()
+    results = {}
     for func in functions:
         fullargspec = inspect.getfullargspec(func)
         fn_arg_names = fullargspec[0] + fullargspec[4]  # args + kwonlyargs
@@ -470,7 +470,7 @@ def get_publication_status(workspace, publication_type, publication_name, comple
 
     if (chain_info and not celery_util.is_chain_ready(chain_info)) or current_lock:
         publication_status = 'UPDATING'
-    elif any(complete_info.get(v, dict()).get('status') for v in item_keys if isinstance(complete_info.get(v, dict()), dict)):
+    elif any(complete_info.get(v, {}).get('status') for v in item_keys if isinstance(complete_info.get(v, {}), dict)):
         publication_status = 'INCOMPLETE'
     else:
         publication_status = 'COMPLETE'

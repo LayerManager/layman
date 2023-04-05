@@ -114,7 +114,7 @@ def refresh_wms(
         wms_info = wms.get_layer_info(workspace=workspace,
                                       layername=layername)
     except BaseException:
-        wms_info = dict()
+        wms_info = {}
 
     if 'wms' not in wms_info:
         wms.delete_layer(workspace, layername)
@@ -169,7 +169,7 @@ def refresh_wfs(
         wfs_info = wfs.get_layer_info(workspace=workspace,
                                       layername=layername)
     except BaseException:
-        wfs_info = dict()
+        wfs_info = {}
 
     if 'wfs' not in wfs_info:
         wfs.delete_layer(workspace, layername)

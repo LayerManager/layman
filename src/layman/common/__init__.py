@@ -24,7 +24,7 @@ def empty_method_returns_none(*_args, **_kwargs):
 
 
 def empty_method_returns_dict(*_args, **_kwargs):
-    return dict()
+    return {}
 
 
 def empty_method_returns_true(*_args, **_kwargs):

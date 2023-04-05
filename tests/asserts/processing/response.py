@@ -4,7 +4,7 @@ from .. import util
 
 
 def valid_post(workspace, publ_type, name, response, expected=None):
-    expected = expected or dict()
+    expected = expected or {}
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
     exp_response = {
         'name': name,

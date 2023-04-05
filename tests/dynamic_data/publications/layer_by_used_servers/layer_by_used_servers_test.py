@@ -66,7 +66,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
         assert_util.is_publication_valid_and_complete(layer)
 
-        exp_legend_filename = params.get('expected_data', dict()).get('legend')
+        exp_legend_filename = params.get('expected_data', {}).get('legend')
         exp_legend_filepath = os.path.join(DIRECTORY, exp_legend_filename) if exp_legend_filename else publ_def.legend_image
 
         asserts_publ.geoserver.wms_legend(layer.workspace, layer.type, layer.name,

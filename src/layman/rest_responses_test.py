@@ -170,8 +170,8 @@ class TestResponsesClass:
     @staticmethod
     @pytest.mark.usefixtures('ensure_layman', 'provide_data')
     @pytest.mark.parametrize('query_method, method_params, expected_info', [
-        pytest.param(process_client.get_layers, dict(), expected_layers, id='get_layers'),
-        pytest.param(process_client.get_maps, dict(), expected_maps, id='get_maps'),
+        pytest.param(process_client.get_layers, {}, expected_layers, id='get_layers'),
+        pytest.param(process_client.get_maps, {}, expected_maps, id='get_maps'),
         pytest.param(process_client.get_workspace_layers, {'workspace': workspace}, expected_layers, id='get_workspace_layers'),
         pytest.param(process_client.get_workspace_maps, {'workspace': workspace}, expected_maps, id='get_workspace_maps'),
         pytest.param(process_client.get_workspace_layer, {'workspace': workspace, 'name': publication}, expected_layer, id='get_workspace_layer'),

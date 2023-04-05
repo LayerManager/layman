@@ -19,6 +19,6 @@ POST_ZIP_SHP_WITHOUT_PRJ_WITH_CRS = {
         'crs': 'EPSG:4326',
     }),
     consts.KEY_RESPONSE_ASSERTS: [
-        Action(processing.response.valid_post, dict()),
+        Action(processing.response.valid_post, {}),
     ],
 }

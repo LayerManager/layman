@@ -48,7 +48,7 @@ def test_parse_request_path(request_path, exp_result):
 
 
 @pytest.mark.parametrize('request_args, param_name, expected_value', [
-    (dict(), 'integer', None),
+    ({}, 'integer', None),
     ({'integer': '8'}, 'integer', 8),
     ({'integer': '-8'}, 'integer', -8),
     ({'integer': '0'}, 'integer', 0),
@@ -75,7 +75,7 @@ def test_get_integer_from_param_fail(request_args, param_name, other_params, exp
 
 
 @pytest.mark.parametrize('request_args, param_name, expected_value', [
-    (dict(), 'bbox', None),
+    ({}, 'bbox', None),
     ({'bbox': '8,8,8,8'}, 'bbox', (8, 8, 8, 8)),
     ({'bbox': '-4.5,-3.4,-2.3,-1.2'}, 'bbox', (-4.5, -3.4, -2.3, -1.2)),
 ])
@@ -100,7 +100,7 @@ def test_get_bbox_from_param_fail(request_args, param_name, expected_expected):
 
 
 @pytest.mark.parametrize('request_args, param_name, expected_value', [
-    (dict(), 'crs', None),
+    ({}, 'crs', None),
     ({'crs': 'EPSG:3857'}, 'crs', 'EPSG:3857'),
     ({'crs': 'EPSG:5514'}, 'crs', 'EPSG:5514'),
 ])

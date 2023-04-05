@@ -5,7 +5,7 @@ from ... import PublicationValues, dynamic_data as consts, Action
 
 SMALL_LAYER = PublicationValues(
     type=process_client.LAYER_TYPE,
-    definition=dict(),
+    definition={},
     info_values={
         'exp_publication_detail': {
             'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.335616991],
@@ -163,7 +163,7 @@ SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE_ZIP = PublicationValues(
 
 EMPTY_MAP = PublicationValues(
     type=process_client.MAP_TYPE,
-    definition=dict(),
+    definition={},
     info_values={
         'exp_publication_detail': {
             'bounding_box': [1627490.9553976597, 6547334.172794042, 1716546.5480322787, 6589515.35758913],
@@ -178,9 +178,9 @@ EMPTY_MAP = PublicationValues(
 DEFAULT_POST = {
     consts.KEY_ACTION: {
         consts.KEY_CALL: Action(process_client.publish_workspace_publication,
-                                dict()),
+                                {}),
         consts.KEY_RESPONSE_ASSERTS: [
-            Action(processing.response.valid_post, dict()),
+            Action(processing.response.valid_post, {}),
         ],
     },
     consts.KEY_FINAL_ASSERTS: [
@@ -193,9 +193,9 @@ DEFAULT_POST_DICT = {
     process_client.MAP_TYPE: {
         consts.KEY_ACTION: {
             consts.KEY_CALL: Action(process_client.publish_workspace_publication,
-                                    dict()),
+                                    {}),
             consts.KEY_RESPONSE_ASSERTS: [
-                Action(processing.response.valid_post, dict()),
+                Action(processing.response.valid_post, {}),
             ],
         },
         consts.KEY_FINAL_ASSERTS: [

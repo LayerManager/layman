@@ -80,7 +80,6 @@ disable=raw-checker-failed,
         logging-fstring-interpolation,
 
         missing-timeout,
-        use-dict-literal,
         consider-using-with,
         use-implicit-booleaness-not-comparison,
 

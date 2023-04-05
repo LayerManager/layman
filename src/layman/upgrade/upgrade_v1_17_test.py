@@ -35,7 +35,7 @@ def test_file_type():
     raster_layer_def = (main_workspace, process_client.LAYER_TYPE, 'test_raster_layer', {'file_paths': [
         'sample/layman.layer/sample_tif_rgb.tif',
     ], },)
-    map_def = (main_workspace, process_client.MAP_TYPE, 'test_map', dict(),)
+    map_def = (main_workspace, process_client.MAP_TYPE, 'test_map', {},)
 
     publication_defs = [vector_layer_def, raster_layer_def, map_def]
 

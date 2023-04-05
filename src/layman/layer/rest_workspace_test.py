@@ -1004,7 +1004,7 @@ def test_post_layers_zero_length_attribute():
 
     def wait_for_db_finish(response):
         info = response.json()
-        return info.get('db', dict()).get('status', '') == 'FAILURE'
+        return info.get('db', {}).get('status', '') == 'FAILURE'
 
     process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths, check_response_fn=wait_for_db_finish)
 

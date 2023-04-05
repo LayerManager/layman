@@ -12,7 +12,7 @@ PUBLICATIONS = {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.SMALL_LAYER.definition),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -29,7 +29,7 @@ PUBLICATIONS = {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.SMALL_LAYER_ZIP.definition),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -46,7 +46,7 @@ PUBLICATIONS = {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_ZIP.definition),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -63,7 +63,7 @@ PUBLICATIONS = {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.SAMPLE_TIF_TFW_RGBA_OPAQUE_ZIP.definition),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -78,7 +78,7 @@ PUBLICATIONS = {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.patch_workspace_publication, publications.SMALL_LAYER_ZIP.definition),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -99,7 +99,7 @@ PUBLICATIONS = {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.patch_workspace_publication, publications.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE_ZIP.definition),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -114,7 +114,7 @@ PUBLICATIONS = {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.patch_workspace_publication, publications.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_ZIP.definition),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -129,7 +129,7 @@ PUBLICATIONS = {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.patch_workspace_publication, publications.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE_ZIP.definition),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -146,7 +146,7 @@ PUBLICATIONS = {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE_ZIP.definition),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -166,7 +166,7 @@ PUBLICATIONS = {
                     'with_chunks': True,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -184,7 +184,7 @@ PUBLICATIONS = {
                     'with_chunks': True,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -204,7 +204,7 @@ PUBLICATIONS = {
                     'with_chunks': True,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -222,7 +222,7 @@ PUBLICATIONS = {
                     'with_chunks': True,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -242,7 +242,7 @@ PUBLICATIONS = {
                     'with_chunks': True,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -260,7 +260,7 @@ PUBLICATIONS = {
                     'with_chunks': True,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -280,7 +280,7 @@ PUBLICATIONS = {
                     'with_chunks': True,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -298,7 +298,7 @@ PUBLICATIONS = {
                     'with_chunks': True,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [
@@ -336,7 +336,7 @@ PUBLICATIONS = {
                     'compress': True,
                 }),
                 consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, dict()),
+                    Action(processing.response.valid_post, {}),
                 ],
             },
             consts.KEY_FINAL_ASSERTS: [

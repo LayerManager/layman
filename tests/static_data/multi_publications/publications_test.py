@@ -13,13 +13,13 @@ def test_get_publication_infos():
 
     users = data.USERS | {settings.ANONYM_USER, settings.NONAME_USER}
     # prepare expected data
-    expected = dict()
+    expected = {}
     for actor in users:
-        expected[actor] = dict()
+        expected[actor] = {}
         for workspace in data.WORKSPACES:
-            expected[actor][workspace] = dict()
+            expected[actor][workspace] = {}
             for publ_type in process_client.PUBLICATION_TYPES:
-                expected[actor][workspace][publ_type] = dict()
+                expected[actor][workspace][publ_type] = {}
                 for access_type in ['read', 'write']:
                     expected[actor][workspace][publ_type][access_type] = set()
     for (workspace, publ_type, publication), value in data.PUBLICATIONS.items():

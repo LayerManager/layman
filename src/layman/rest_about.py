@@ -26,7 +26,7 @@ def clean_version(version):
 def get_version():
     version, release_date = get_version_from_txt()
 
-    migrations = dict()
+    migrations = {}
     for migration_type in (upgrade.consts.MIGRATION_TYPE_DATA, upgrade.consts.MIGRATION_TYPE_SCHEMA, ):
         current_version = upgrade.get_current_version(migration_type)
         migrations[f'last-{migration_type}-migration'] =\
