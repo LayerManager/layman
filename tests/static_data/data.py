@@ -31,7 +31,7 @@ def assert_publication_before_post(workspace, publ_type, publication):
         map_directory = f'{workspace_directory}/maps/{publication}'
         assert not os.path.exists(map_directory)
 
-        layers = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('layers') or list()
+        layers = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('layers') or []
         for layer_workspace, layer_type, layer in layers:
             ensure_publication(layer_workspace, layer_type, layer)
     elif publ_type == process_client.LAYER_TYPE:

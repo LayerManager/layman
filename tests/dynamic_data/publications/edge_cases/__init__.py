@@ -110,7 +110,7 @@ def generate(workspace=None):
     result = dict()
     for testcase, tc_params in TESTCASES.items():
         parametrization = {key: values for key, values in REST_PARAMETRIZATION.items()
-                           if key not in tc_params.get(KEY_ACTION_PARAMS, list())}
+                           if key not in tc_params.get(KEY_ACTION_PARAMS, [])}
         rest_param_dicts = util.dictionary_product(parametrization) if tc_params[KEY_PUBLICATION_TYPE] == process_client.LAYER_TYPE\
             else [dict()]
         for rest_param_dict in rest_param_dicts:

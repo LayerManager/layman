@@ -32,5 +32,5 @@ def get_users_and_headers_for_publication(workspace, publ_type, publication):
                 result[right][KEY_AUTH][KEY_EXP_LIST].add(workspace)
             result[right][KEY_AUTH][KEY_HEADERS] = list(data.HEADERS.values()) + [None]
             result[right][KEY_NOT_AUTH][KEY_USERS] = {}
-            result[right][KEY_NOT_AUTH][KEY_HEADERS] = list()
+            result[right][KEY_NOT_AUTH][KEY_HEADERS] = []
     return result

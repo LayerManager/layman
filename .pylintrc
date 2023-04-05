@@ -82,7 +82,6 @@ disable=raw-checker-failed,
         missing-timeout,
         use-dict-literal,
         consider-using-with,
-        use-list-literal,
         use-implicit-booleaness-not-comparison,
         consider-using-from-import,
 

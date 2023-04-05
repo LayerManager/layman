@@ -121,7 +121,7 @@ def dictionary_product(source):
 
 
 def get_test_case_parametrization(*, param_parametrization, only_first_parametrization, default_params, action_parametrization):
-    result = list()
+    result = []
 
     parametrization = copy.deepcopy(param_parametrization)
     if default_params:

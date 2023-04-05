@@ -248,7 +248,7 @@ LAYERS = {
 
 
 def generate_test_cases():
-    tc_list = list()
+    tc_list = []
     for name, test_case_params in LAYERS.items():
         all_params = deepcopy(test_case_params)
         rest_args = all_params.pop('rest_args')

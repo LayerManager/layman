@@ -178,7 +178,7 @@ from {DB_SCHEMA}.workspaces w inner join
     #########################################################
     # WHERE clause
     where_params = tuple()
-    where_parts = list()
+    where_parts = []
     for (value, where_part, params, ) in where_params_def:
         if value:
             where_parts.append(where_part)
@@ -190,7 +190,7 @@ from {DB_SCHEMA}.workspaces w inner join
     #########################################################
     # ORDER BY clause
     order_by_params = tuple()
-    order_by_parts = list()
+    order_by_parts = []
     for order_by_part in order_by_list:
         order_by_parts.append(order_by_definition[order_by_part][0])
         order_by_params = order_by_params + order_by_definition[order_by_part][1]

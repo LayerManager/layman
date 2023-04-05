@@ -75,7 +75,7 @@ def test_find_maps_containing_layer():
     for l_workspace, l_type, layer in data.LIST_LAYERS:
         expected_maps = {(workspace, publication)
                          for (workspace, publ_type, publication), values in data.PUBLICATIONS.items()
-                         if publ_type == data.MAP_TYPE and (l_workspace, l_type, layer) in values[data.TEST_DATA].get('layers', list())}
+                         if publ_type == data.MAP_TYPE and (l_workspace, l_type, layer) in values[data.TEST_DATA].get('layers', [])}
 
         with app.app_context():
             result_maps = pr_util.find_maps_containing_layer(l_workspace, layer)

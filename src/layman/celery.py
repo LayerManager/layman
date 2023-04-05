@@ -58,7 +58,7 @@ def push_step_to_run_after_chain(workspace, publication_type, publication_name, 
     key = RUN_AFTER_CHAIN
     hash = _get_publication_hash(workspace, publication_type, publication_name)
     val = rds.hget(key, hash)
-    queue = json.loads(val) if val is not None else list()
+    queue = json.loads(val) if val is not None else []
     if step_code not in queue:
         queue.append(step_code)
         rds.hset(key, hash, json.dumps(queue))
@@ -83,7 +83,7 @@ def get_run_after_chain_queue(workspace, publication_type, publication_name, ):
     key = RUN_AFTER_CHAIN
     hash = _get_publication_hash(workspace, publication_type, publication_name)
     val = rds.hget(key, hash)
-    queue = json.loads(val) if val is not None else list()
+    queue = json.loads(val) if val is not None else []
     return queue
 
 
