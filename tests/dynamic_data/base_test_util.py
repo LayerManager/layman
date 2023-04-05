@@ -61,7 +61,7 @@ def check_rest_parametrization(rest_parametrization):
     for arg_name, dimensions in base_args.items():
         assert len(dimensions) <= 1, f"RestArgs.{arg_name} dimension can be used only once in parametrization"
 
-    if len(publ_by_defs) > 0 and sum([len(dims) for dims in base_args.values()]) > 0:
+    if len(publ_by_defs) > 0 and sum(len(dims) for dims in base_args.values()) > 0:
         publ_by_def_dim: PublicationByDefinitionBase = publ_by_defs[0]
         for publ_by_def in publ_by_def_dim:
             publ_values: PublicationValues = publ_by_def.publication_definition
