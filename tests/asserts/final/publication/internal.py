@@ -77,14 +77,14 @@ def metadata_key_sources_do_not_contain_other_keys(workspace, publ_type, name):
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['metadata']})
     assert {'metadata', }.issubset(set(pub_info)), pub_info
-    assert all(item not in pub_info for item in {'name', 'title', 'access_rights', 'uuid', 'file', }), pub_info
+    assert all(item not in pub_info for item in ('name', 'title', 'access_rights', 'uuid', 'file', )), pub_info
 
 
 def thumbnail_key_sources_do_not_contain_other_keys(workspace, publ_type, name):
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['thumbnail']})
     assert {'thumbnail', }.issubset(set(pub_info)), pub_info
-    assert all(item not in pub_info for item in {'name', 'title', 'access_rights', 'uuid', 'file', 'metadata', }), pub_info
+    assert all(item not in pub_info for item in ('name', 'title', 'access_rights', 'uuid', 'file', 'metadata', )), pub_info
 
 
 def mandatory_keys_in_primary_db_schema_of_actor(workspace, publ_type, name, actor, ):
@@ -96,7 +96,7 @@ def mandatory_keys_in_primary_db_schema_of_actor(workspace, publ_type, name, act
 def other_keys_not_in_primary_db_schema_of_actor(workspace, publ_type, name, actor, ):
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor, 'keys': []})
-    assert all(item not in pub_info for item in {'metadata', 'file', }), pub_info
+    assert all(item not in pub_info for item in ('metadata', 'file', )), pub_info
 
 
 def mandatory_keys_in_all_sources_of_actor(workspace, publ_type, name, actor, ):
@@ -314,9 +314,9 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
             expected_detail.pop(key)
 
     if full_comparison:
-        for key in {'id', 'uuid', 'updated_at', }:
+        for key in ('id', 'uuid', 'updated_at', ):
             pub_info.pop(key)
-        for key in {'identifier', 'record_url', }:
+        for key in ('identifier', 'record_url', ):
             pub_info['metadata'].pop(key)
         assert expected_detail == pub_info
     else:

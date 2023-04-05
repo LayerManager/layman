@@ -156,7 +156,7 @@ def test_wms_layer(workspace, publ_type, publication):
 
     gs_workspace = info['_wms']['workspace']
     authn_headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
-    for service_endpoint in {'ows', 'wms'}:
+    for service_endpoint in ('ows', 'wms'):
         wms_url = geoserver_client.get_wms_url(gs_workspace, service_endpoint)
 
         layer_info = process_client.get_workspace_layer(workspace, publication, headers=authn_headers)

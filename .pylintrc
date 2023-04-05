@@ -85,7 +85,6 @@ disable=raw-checker-failed,
         use-list-literal,
         use-implicit-booleaness-not-comparison,
         consider-using-from-import,
-        use-sequence-for-iteration,
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
