@@ -236,4 +236,4 @@ def layer_file_chunk_info(workspace, layername):
 
 
 def _get_chunk_name(uploaded_filename, chunk_number):
-    return uploaded_filename + "_part_%03d" % chunk_number
+    return f'{uploaded_filename}_part_{chunk_number:03d}'
