@@ -218,7 +218,7 @@ def tokenize(text):
 
 def get_languages_by_script(text):
     maxchar = max(text)
-    if u'\u0400' <= maxchar <= u'\u04ff':
+    if '\u0400' <= maxchar <= '\u04ff':
         return ['ru']
     return []
 
