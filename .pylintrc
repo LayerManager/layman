@@ -86,7 +86,6 @@ disable=raw-checker-failed,
         use-maxsplit-arg,
         consider-using-generator,
         use-implicit-booleaness-not-comparison,
-        redundant-u-string-prefix,
         consider-using-from-import,
         use-sequence-for-iteration,
 
