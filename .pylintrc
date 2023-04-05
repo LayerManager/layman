@@ -78,6 +78,7 @@ disable=raw-checker-failed,
         missing-docstring,
         f-string-without-interpolation,
         logging-fstring-interpolation,
+
         missing-timeout,
         use-dict-literal,
         consider-using-with,
@@ -91,7 +92,6 @@ disable=raw-checker-failed,
         redundant-u-string-prefix,
         consider-using-from-import,
         use-sequence-for-iteration,
-        consider-iterating-dictionary,
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
