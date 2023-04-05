@@ -760,7 +760,7 @@ def test_map_composed_from_local_layers(client):
         xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values,
                                                                                     csw.METADATA_PROPERTIES)
         expected_path = 'src/layman/map/rest_test_filled_template.xml'
-        with open(expected_path) as file:
+        with open(expected_path, encoding="utf-8") as file:
             expected_lines = file.readlines()
         diff_lines = list(
             difflib.unified_diff([line.decode('utf-8') for line in xml_file_object.readlines()], expected_lines))

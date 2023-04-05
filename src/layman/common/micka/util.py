@@ -41,7 +41,7 @@ def get_single_prop_els(parent_el, prop_name, publ_properties):
 
 
 def read_xml_tree(template_path):
-    with open(template_path, 'r') as template_file:
+    with open(template_path, 'r', encoding="utf-8") as template_file:
         xml_str = template_file.read()
     parser = ET.XMLParser(remove_blank_text=True)
     tree = ET.fromstring(xml_str.encode('utf-8'), parser=parser)

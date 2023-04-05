@@ -45,7 +45,7 @@ def test_fill_template():
         out.write(file_object.read())
 
     def get_diff(path1, path2):
-        diff = difflib.unified_diff(open(path1).readlines(), open(path2).readlines())
+        diff = difflib.unified_diff(open(path1, encoding="utf-8").readlines(), open(path2, encoding="utf-8").readlines())
         return f"diff={''.join(diff)}"
 
     expected_path = 'src/layman/map/micka/util_test_filled_template.xml'
@@ -54,7 +54,7 @@ def test_fill_template():
 
 def test_parse_md_properties():
     xml_path = 'src/layman/map/rest_test_filled_template.xml'
-    with open(xml_path, 'r') as xml_file:
+    with open(xml_path, 'r', encoding="utf-8") as xml_file:
         props = common_util.parse_md_properties(xml_file, [
             'abstract',
             'extent',
@@ -147,7 +147,7 @@ def test_fill_xml_template():
         }, METADATA_PROPERTIES)
 
     expected_path = 'src/layman/map/micka/record-template-filled.xml'
-    with open(expected_path) as file:
+    with open(expected_path, encoding="utf-8") as file:
         expected_lines = file.readlines()
     lines = [line.decode('utf-8') for line in xml_file_object.readlines()]
     # print(f"FILE:\n{''.join(lines)}")

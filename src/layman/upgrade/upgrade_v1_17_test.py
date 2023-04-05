@@ -188,7 +188,7 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
                                                       column_srid)
             qgs_str = qgis_util.fill_project_template(layer, uuid_str, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
                                                       bbox, source_type, table_uri, column_srid)
-            with open(qgis_wms.get_layer_file_path(workspace, layer), "w") as qgs_file:
+            with open(qgis_wms.get_layer_file_path(workspace, layer), "w", encoding="utf-8") as qgs_file:
                 print(qgs_str, file=qgs_file)
 
             geoserver.publish_layer_from_qgis(workspace,

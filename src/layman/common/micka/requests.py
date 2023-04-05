@@ -103,7 +103,7 @@ def csw_delete(muuid):
 
 
 def fill_template_as_str(template_path, template_values):
-    with open(template_path, 'r') as template_file:
+    with open(template_path, 'r', encoding="utf-8") as template_file:
         template_str = template_file.read()
     xml_str = template_str.format(**template_values)
     return xml_str

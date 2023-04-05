@@ -28,7 +28,7 @@ def get_publication_uuid(publ_type, workspace, publication_type, publication_nam
     uuid_path = get_publication_uuid_file(publ_type, workspace, publication_name)
     if not os.path.exists(uuid_path):
         return None
-    with open(uuid_path, "r") as uuid_file:
+    with open(uuid_path, "r", encoding="utf-8") as uuid_file:
         uuid_str = uuid_file.read().strip()
     return uuid_str
 
@@ -43,6 +43,6 @@ def assign_publication_uuid(publ_type, workspace, publication_name, uuid_str=Non
     uuid_str = register_publication_uuid(workspace, publ_type, publication_name, uuid_str)
     uuid_path = get_publication_uuid_file(publ_type, workspace, publication_name)
     util.ensure_publication_dir(publ_type, workspace, publication_name)
-    with open(uuid_path, "w") as uuid_file:
+    with open(uuid_path, "w", encoding="utf-8") as uuid_file:
         uuid_file.write(uuid_str)
     return uuid_str

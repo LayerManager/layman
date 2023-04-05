@@ -96,7 +96,7 @@ def refresh_wms(
             dir_path = os.path.dirname(file_path)
             shutil.copy(os.path.join(DIRECTORY, 'indexer.properties'), dir_path)
             timeregex_path = os.path.join(dir_path, 'timeregex.properties')
-            with open(timeregex_path, 'w') as file:
+            with open(timeregex_path, 'w', encoding="utf-8") as file:
                 file.write(f'regex={slugified_time_regex}\n')
             coverage_type = gs_util.COVERAGESTORE_IMAGEMOSAIC
             enable_time_dimension = True

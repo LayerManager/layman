@@ -71,7 +71,7 @@ def save_layer_files_str(workspace, layername, input_files, check_crs, *, name_i
     resumable_dir = ensure_layer_resumable_dir(workspace, layername)
     os.mkdir(os.path.join(resumable_dir, 'chunks'))
     info_path = os.path.join(resumable_dir, 'info.json')
-    with open(info_path, 'w') as file:
+    with open(info_path, 'w', encoding="utf-8") as file:
         json.dump(file_content, file)
     return [
         {
@@ -91,7 +91,7 @@ def save_layer_file_chunk(workspace, layername, parameter_name, filename, chunk,
     info_path = os.path.join(resumable_dir, 'info.json')
     chunk_dir = os.path.join(resumable_dir, 'chunks')
     if os.path.isfile(info_path):
-        with open(info_path, 'r') as info_file:
+        with open(info_path, 'r', encoding="utf-8") as info_file:
             info = json.load(info_file)
             files_to_upload = info['files_to_upload']
             file_info = next(
@@ -127,7 +127,7 @@ def get_info_json(workspace, layername):
     resumable_dir = get_layer_resumable_dir(workspace, layername)
     info_path = os.path.join(resumable_dir, 'info.json')
     if os.path.isfile(info_path):
-        with open(info_path, 'r') as info_file:
+        with open(info_path, 'r', encoding="utf-8") as info_file:
             result = json.load(info_file)
     else:
         result = None
@@ -184,7 +184,7 @@ def layer_file_chunk_info(workspace, layername):
     chunk_dir = os.path.join(resumable_dir, 'chunks')
     if os.path.isfile(info_path):
         # print('print layer_file_chunk_info info_path')
-        with open(info_path, 'r') as info_file:
+        with open(info_path, 'r', encoding="utf-8") as info_file:
             info = json.load(info_file)
             files_to_upload = info['files_to_upload']
 

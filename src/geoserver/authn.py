@@ -20,7 +20,7 @@ def create_request_header_authn(data_dir, name, attribute, user_group_service, r
     logger.info(f"Creating Request Header Authentication '{name}'")
     file_path = os.path.join(data_dir, 'security/filter', name, 'config.xml')
     pathlib.Path(os.path.dirname(file_path)).mkdir(parents=True, exist_ok=True)
-    with open(file_path, "x") as file:
+    with open(file_path, "x", encoding="utf-8") as file:
         file.write(f'''<requestHeaderAuthentication>
   <id>-7ae6319c:1744eafb853:-7f6d</id>
   <name>{name}</name>

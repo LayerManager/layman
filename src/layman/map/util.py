@@ -181,7 +181,7 @@ def get_composition_schema(url):
     local_path = os.path.join(_SCHEMA_CACHE_PATH, schema_path)
     local_full_path = os.path.join(local_path, schema_file_name)
     if os.path.exists(local_full_path):
-        with open(local_full_path) as schema_file:
+        with open(local_full_path, encoding="utf-8") as schema_file:
             schema_json = json.load(schema_file)
     else:
         res = requests.get(url,
@@ -191,7 +191,7 @@ def get_composition_schema(url):
         schema_json = json.loads(schema_txt)
 
         os.makedirs(local_path, exist_ok=True)
-        out_file = open(local_full_path, "w")
+        out_file = open(local_full_path, "w", encoding="utf-8")
         json.dump(schema_json, out_file, indent=4)
         out_file.close()
     return schema_json

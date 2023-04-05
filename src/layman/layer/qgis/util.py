@@ -48,7 +48,7 @@ def get_original_style_xml(workspace, layer):
 def get_layer_original_style_stream(workspace, layer):
     style_path = get_original_style_path(workspace, layer)
     if style_path and os.path.exists(style_path):
-        with open(style_path, 'r') as style_file:
+        with open(style_path, 'r', encoding="utf-8") as style_file:
             style = style_file.read()
         style_stream = io.BytesIO(style.encode())
         result = style_stream
@@ -66,7 +66,7 @@ def fill_layer_template(layer, uuid, native_bbox, crs, qml_xml, source_type, att
     qml_geometry = get_qml_geometry_from_qml(qml_xml)
 
     template_path = get_layer_template_path()
-    with open(template_path, 'r') as template_file:
+    with open(template_path, 'r', encoding="utf-8") as template_file:
         template_str = template_file.read()
     skeleton_xml_str = template_str.format(
         db_name=table_uri.db_name,
@@ -126,7 +126,7 @@ def fill_project_template(layer, layer_uuid, layer_qml, crs, epsg_codes, extent,
     creation_iso_datetime = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
 
     template_path = get_project_template_path()
-    with open(template_path, 'r') as template_file:
+    with open(template_path, 'r', encoding="utf-8") as template_file:
         template_str = template_file.read()
     return template_str.format(
         db_name=table_uri.db_name,
