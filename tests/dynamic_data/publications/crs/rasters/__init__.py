@@ -3,8 +3,8 @@ import copy
 import crs as crs_def
 from test_tools import process_client, util
 from tests.asserts import util as asserts_util
-import tests.asserts.final.publication as publication
-import tests.asserts.processing as processing
+from tests.asserts.final import publication
+from tests.asserts import processing
 from ... import common_publications as publications
 from ..... import Action, Publication, dynamic_data as consts
 

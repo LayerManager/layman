@@ -1,6 +1,6 @@
 from layman.common import empty_method_returns_true
 from tests.asserts.final.publication import internal
-import tests.asserts.processing as processing
+from tests.asserts import processing
 from test_tools import process_client, util
 from ... import Action, Publication, dynamic_data as consts
 
