@@ -78,5 +78,5 @@ def create_map_with_internal_layers_file(layers, *, file_path, native_extent=Non
     map_json = get_map_with_internal_layers_json(layers, native_extent=native_extent, native_crs=native_crs)
     file_dir = os.path.dirname(file_path)
     Path(file_dir).mkdir(parents=True, exist_ok=True)
-    with open(file_path, 'w') as out:
+    with open(file_path, 'w', encoding="utf-8") as out:
         out.write(json.dumps(map_json, indent=2))

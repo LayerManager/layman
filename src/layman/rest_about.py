@@ -10,7 +10,7 @@ def get_version_from_txt():
     file_path = '/code/version.txt'
     version, release_date = None, None
     if os.path.exists(file_path):
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding="utf-8") as file:
             version = file.readline().strip()
             release_date = file.readline().strip()
     return version, release_date

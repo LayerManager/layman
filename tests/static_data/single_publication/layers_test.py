@@ -235,7 +235,7 @@ def test_fill_project_template(workspace, publ_type, publication):
         qgs_str = qgis_util.fill_project_template(publication, layer_uuid, layer_qml_str, layer_crs,
                                                   settings.LAYMAN_OUTPUT_SRS_LIST, layer_bbox, source_type, table_uri,
                                                   column_srid)
-    with open(qgs_path, "w") as qgs_file:
+    with open(qgs_path, "w", encoding="utf-8") as qgs_file:
         print(qgs_str, file=qgs_file)
 
     wmsi = WebMapService(wms_url, version=wms_version)
@@ -291,7 +291,7 @@ def test_micka_xml(workspace, publ_type, publication):
                                                                                 csw.METADATA_PROPERTIES)
     micka_xml_def = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['micka_xml']
     expected_path = micka_xml_def['filled_template']
-    with open(expected_path) as file:
+    with open(expected_path, encoding="utf-8") as file:
         expected_lines = file.readlines()
     exp_diff_lines = micka_xml_def['diff_lines']
     diff_lines = list(difflib.unified_diff([line.decode('utf-8') for line in xml_file_object.readlines()], expected_lines))

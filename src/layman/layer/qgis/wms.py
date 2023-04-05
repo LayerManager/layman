@@ -84,7 +84,7 @@ def save_qgs_file(workspace, layer):
                                          column_srid)
     qgs_str = util.fill_project_template(layer, uuid, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
                                          layer_bbox, source_type, table_uri, column_srid)
-    with open(get_layer_file_path(workspace, layer), "w") as qgs_file:
+    with open(get_layer_file_path(workspace, layer), "w", encoding="utf-8") as qgs_file:
         print(qgs_str, file=qgs_file)
 
 

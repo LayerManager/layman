@@ -40,7 +40,7 @@ def get_map_info(workspace, mapname):
     map_file_path = get_map_file(workspace, mapname)
     result = {}
     if os.path.exists(map_file_path):
-        with open(map_file_path, 'r') as map_file:
+        with open(map_file_path, 'r', encoding="utf-8") as map_file:
             map_json = json.load(map_file)
         map_file_path = os.path.relpath(map_file_path, common_util.get_workspace_dir(workspace))
         result = {
@@ -106,7 +106,7 @@ def get_file_name_mappings(file_names, main_file_name, map_name, output_dir):
 def get_map_json(workspace, mapname):
     map_file_path = get_map_file(workspace, mapname)
     try:
-        with open(map_file_path, 'r') as map_file:
+        with open(map_file_path, 'r', encoding="utf-8") as map_file:
             map_json = json.load(map_file)
     except FileNotFoundError:
         map_json = None
@@ -126,12 +126,12 @@ def unquote_urls(map_json):
 
 def post_map(workspace, mapname, description, title):
     map_file_path = get_map_file(workspace, mapname)
-    with open(map_file_path, 'r') as map_file:
+    with open(map_file_path, 'r', encoding="utf-8") as map_file:
         map_json = json.load(map_file)
     map_json['name'] = mapname
     map_json['title'] = title
     map_json['abstract'] = description
-    with open(map_file_path, 'w') as map_file:
+    with open(map_file_path, 'w', encoding="utf-8") as map_file:
         json.dump(map_json, map_file, indent=4)
 
 

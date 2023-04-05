@@ -153,7 +153,7 @@ def get_timeregex_props(workspace, layername):
     props_config = configparser.ConfigParser()
     section_name = 'global'
     try:
-        with open(props_path) as props_file:
+        with open(props_path, encoding="utf-8") as props_file:
             props_config.read_file(itertools.chain([f'[{section_name}]'], props_file), source=props_path)
             result = {**props_config[section_name]}
     except IOError:

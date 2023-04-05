@@ -262,7 +262,7 @@ def test_post_layers_simple(client):
             get_layer_type_def()['type'], workspace, layername)
         assert os.path.isfile(uuid_filename)
         uuid_str = None
-        with open(uuid_filename, "r") as file:
+        with open(uuid_filename, "r", encoding="utf-8") as file:
             uuid_str = file.read().strip()
         assert uuid.is_valid_uuid(uuid_str)
         assert settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)

@@ -80,7 +80,7 @@ def adjust_maps():
         ]
         validate(instance=mapjson, schema=schema_json)
 
-        with open(map_file_path, 'w') as file:
+        with open(map_file_path, 'w', encoding="utf-8") as file:
             json.dump(mapjson, file, indent=2)
     logger.info(f'    Adjusting maps DONE')
 

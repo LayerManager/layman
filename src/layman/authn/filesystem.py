@@ -9,7 +9,7 @@ def save_username_reservation(username, iss_id, sub, claims):
     util.ensure_whole_user(username)
     authn_path = get_authn_file(username)
     assert not os.path.isfile(authn_path)
-    with open(authn_path, "w") as authn_file:
+    with open(authn_path, "w", encoding="utf-8") as authn_file:
         json.dump({
             'iss_id': iss_id,
             'sub': sub,
@@ -25,7 +25,7 @@ def get_authn_file(username):
 def get_authn_info(username):
     authn_path = get_authn_file(username)
     if os.path.isfile(authn_path):
-        with open(authn_path) as file:
+        with open(authn_path, encoding="utf-8") as file:
             result = json.load(file)
     else:
         result = {}
