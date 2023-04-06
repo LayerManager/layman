@@ -13,6 +13,7 @@ KEY_ACTION_PARAMS = 'action_params'
 KEY_FILE_NAME = 'file_suffix'
 KEY_INFO_VALUES = 'info_values'
 KEY_THUMBNAIL = 'thumbnail'
+KEY_THUMBNAIL_TOLERANCE = 'thumbnail_tolerance'
 KEY_ONLY_FIRST_PARAMETRIZATION = 'only_first_parametrization'
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -55,12 +56,14 @@ TESTCASES = {
         KEY_INFO_VALUES: {**publications.SMALL_LAYER.info_values,
                           'file_extension': 'shp', },
         KEY_THUMBNAIL: publications.SMALL_LAYER.thumbnail,
+        KEY_THUMBNAIL_TOLERANCE: 5,
     },
     'epsg_4326_ne': {
         KEY_FILE_NAME: 'small_layer_4326_ne',
         KEY_INFO_VALUES: {**publications.SMALL_LAYER.info_values,
                           'file_extension': 'shp', },
         KEY_THUMBNAIL: publications.SMALL_LAYER.thumbnail,
+        KEY_THUMBNAIL_TOLERANCE: 5,
     },
     'la_4326': {
         KEY_FILE_NAME: 'sample_point_la_4326',
@@ -75,6 +78,7 @@ TESTCASES = {
             'file_extension': 'shp',
             'publ_type_detail': ('vector', 'sld'), },
         KEY_THUMBNAIL: f'{DIRECTORY}/sample_point_la_4326_thumbnail.png',
+        KEY_THUMBNAIL_TOLERANCE: 279,
         consts.KEY_FINAL_ASSERTS: LA_FINAL_ASSERTS,
     },
     'la_4326_qml': {
@@ -90,6 +94,7 @@ TESTCASES = {
             'file_extension': 'shp',
             'publ_type_detail': ('vector', 'qml'), },
         KEY_THUMBNAIL: f'{DIRECTORY}/sample_point_la_4326_thumbnail.png',
+        KEY_THUMBNAIL_TOLERANCE: 5,
         consts.KEY_FINAL_ASSERTS: LA_FINAL_ASSERTS,
     },
     'la_3059': {
@@ -105,6 +110,7 @@ TESTCASES = {
             'file_extension': 'shp',
             'publ_type_detail': ('vector', 'sld'), },
         KEY_THUMBNAIL: f'{DIRECTORY}/sample_point_la_3059_thumbnail.png',
+        KEY_THUMBNAIL_TOLERANCE: 5,
         consts.KEY_FINAL_ASSERTS: LA_FINAL_ASSERTS,
     },
     'la_3059_qml': {
@@ -120,6 +126,7 @@ TESTCASES = {
             'file_extension': 'shp',
             'publ_type_detail': ('vector', 'qml'), },
         KEY_THUMBNAIL: f'{DIRECTORY}/sample_point_la_3059_qml_thumbnail.png',
+        KEY_THUMBNAIL_TOLERANCE: 5,
         consts.KEY_FINAL_ASSERTS: LA_FINAL_ASSERTS,
     },
 }
@@ -168,7 +175,7 @@ def generate_local(workspace=None):
                 consts.KEY_FINAL_ASSERTS: [
                     *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                     Action(publication.internal.correct_values_in_detail, copy.deepcopy(post_info_values)),
-                    Action(publication.internal.thumbnail_equals, {'exp_thumbnail': exp_thumbnail, }),
+                    Action(publication.internal.thumbnail_equals, {'exp_thumbnail': exp_thumbnail, 'max_diffs': tc_params[KEY_THUMBNAIL_TOLERANCE]}),
                     *tc_params.get(consts.KEY_FINAL_ASSERTS, []),
                 ]
             }

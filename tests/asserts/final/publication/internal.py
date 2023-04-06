@@ -123,7 +123,7 @@ def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, *, max_diffs=Non
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['thumbnail']})
 
     diffs = test_util.compare_images(exp_thumbnail, pub_info['_thumbnail']['path'])
-    max_diffs = max_diffs or 500
+    max_diffs = max_diffs or 5
     assert diffs < max_diffs
 
 

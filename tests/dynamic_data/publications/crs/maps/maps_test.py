@@ -11,6 +11,7 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 LAYER_FOR_MAPS = "layer_for_map_crs"
 
 KEY_INFO_VALUES = 'info_values'
+KEY_THUMBNAIL_TOLERANCE = 'thumbnail_tolerance'
 
 TEST_CASES = {
     crs_def.EPSG_4326: {
@@ -20,6 +21,7 @@ TEST_CASES = {
                 'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.8542061958, 6269876.335616991],
             }
         },
+        KEY_THUMBNAIL_TOLERANCE: 5,
     },
     crs_def.EPSG_3857: {
         KEY_INFO_VALUES: {
@@ -28,6 +30,7 @@ TEST_CASES = {
                 'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.8542061956, 6269876.335616991],
             }
         },
+        KEY_THUMBNAIL_TOLERANCE: 5,
     },
     crs_def.EPSG_5514: {
         KEY_INFO_VALUES: {
@@ -36,6 +39,7 @@ TEST_CASES = {
                 'bounding_box': [1570625.93383904, 6268188.730239409, 1573168.3505425507, 6270583.885785243],
             }
         },
+        KEY_THUMBNAIL_TOLERANCE: 318,
     },
 }
 
@@ -82,4 +86,4 @@ class TestMap(base_test.TestSingleRestPublication):
                                                        exp_publication_detail=exp_publication_detail,
                                                        )
         exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{map_crs.replace(':', '_').lower()}.png")
-        asserts_publ.internal.thumbnail_equals(map.workspace, map.type, map.name, exp_thumbnail, )
+        asserts_publ.internal.thumbnail_equals(map.workspace, map.type, map.name, exp_thumbnail, max_diffs=params[KEY_THUMBNAIL_TOLERANCE])
