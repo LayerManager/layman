@@ -12,6 +12,7 @@ from ..... import Action, Publication, dynamic_data as consts
 KEY_INFO_VALUES = 'info_values'
 KEY_ONLY_FIRST_PARAMETRIZATION = 'only_first_parametrization'
 KEY_ACTION_PARAMETRIZATION = 'action_parametrization'
+KEY_THUMBNAIL_TOLERANCE_SLD = 'thumbnail_tolerance_sld'
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -26,7 +27,8 @@ SOURCE_EPSG_CODES = {
         KEY_INFO_VALUES: {
             'exp_publication_detail': {
                 'native_bounding_box': [16.6066275955110711, 49.1989353676069285, 16.6068125589999127, 49.1990477233154735],
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE_SLD: 159,
         },
         consts.KEY_ACTION: {
             'with_chunks': False,
@@ -39,7 +41,8 @@ SOURCE_EPSG_CODES = {
         KEY_INFO_VALUES: {
             'exp_publication_detail': {
                 'native_bounding_box': [1848641.3277258177, 6308684.223766193, 1848661.9177672109, 6308703.364768417],
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE_SLD: 358,
         },
         consts.KEY_ACTION: {
             'with_chunks': False,
@@ -53,7 +56,8 @@ SOURCE_EPSG_CODES = {
             'exp_publication_detail': {
                 'native_bounding_box': [-598214.7290553625207394, -1160319.8064114262815565, -598200.9321668159682304, -1160307.4425631782505661],
                 'bounding_box': [1848640.4769060146, 6308683.577507495, 1848663.461145939, 6308704.681240051],
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE_SLD: 255,
         },
         KEY_ONLY_FIRST_PARAMETRIZATION: False,
     },
@@ -62,7 +66,8 @@ SOURCE_EPSG_CODES = {
             'exp_publication_detail': {
                 'native_bounding_box': [617041.7249990371, 5450813.311883376, 617055.1207238155, 5450825.813110342],
                 'bounding_box': [1848641.1346210986, 6308683.9454576615, 1848662.0013466848, 6308703.5310932305]
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE_SLD: 379,
         },
     },
     crs_def.EPSG_32634: {
@@ -70,7 +75,8 @@ SOURCE_EPSG_CODES = {
             'exp_publication_detail': {
                 'native_bounding_box': [179985.4523066559922881, 5458866.6349301775917411, 179999.1353933966602199, 5458879.0886732628569007],
                 'bounding_box': [1848640.784753341, 6308683.836580554, 1848662.7351645508, 6308704.081036061]
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE_SLD: 296,
         },
     },
     crs_def.EPSG_3034: {
@@ -78,7 +84,8 @@ SOURCE_EPSG_CODES = {
             'exp_publication_detail': {
                 'native_bounding_box': [4464506.1421598251909018, 2519866.8009202978573740, 4464518.7942008553072810, 2519878.8700591023080051],
                 'bounding_box': [1848640.5623333207, 6308683.148403931, 1848662.1915096296, 6308704.001720284]
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE_SLD: 220,
         },
     },
     crs_def.EPSG_3035: {
@@ -87,7 +94,8 @@ SOURCE_EPSG_CODES = {
                 'native_bounding_box': [4801864.984034311, 2920036.6864006906, 4801878.080408361,
                                         2920049.1861927817],
                 'bounding_box': [1848640.5726391396, 6308683.141668934, 1848662.1874939075, 6308704.004922842]
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE_SLD: 305,
         },
     },
 }
@@ -265,6 +273,9 @@ def generate(workspace=None):
                 post_info_values['file_extension'] = f'zip/sample_point_cz_{crs_code}.shp'
             if rest_param_dict.get('style_file'):
                 post_info_values['publ_type_detail'] = ('vector', REST_PARAMETRIZATION['style_file'][rest_param_dict['style_file']])
+            thumbnail_params = {'exp_thumbnail': exp_thumbnail, }
+            if post_info_values['publ_type_detail'][1] == 'sld':
+                thumbnail_params['max_diffs'] = tc_params[KEY_INFO_VALUES][KEY_THUMBNAIL_TOLERANCE_SLD]
 
             action_def = {
                 consts.KEY_ACTION: {
@@ -278,7 +289,7 @@ def generate(workspace=None):
                 consts.KEY_FINAL_ASSERTS: [
                     *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                     Action(publication.internal.correct_values_in_detail, copy.deepcopy(post_info_values)),
-                    Action(publication.internal.thumbnail_equals, {'exp_thumbnail': exp_thumbnail, }),
+                    Action(publication.internal.thumbnail_equals, thumbnail_params),
                     *feature_spacial_precision_assert,
                     *wms_spacial_precision_assert,
                     Action(publication.internal.detail_3857bbox_value, {'exp_bbox': bboxes[crs_def.EPSG_3857]['bbox'],

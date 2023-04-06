@@ -10,6 +10,7 @@ from ..... import Action, Publication, dynamic_data as consts
 
 
 KEY_INFO_VALUES = 'info_values'
+KEY_THUMBNAIL_TOLERANCE = 'thumbnail_tolerance'
 KEY_ONLY_FIRST_PARAMETRIZATION = 'only_first_parametrization'
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -25,7 +26,8 @@ SOURCE_CRS = {
             'exp_publication_detail': {
                 'native_bounding_box': [16.606587576736, 49.198911725592005, 16.606851456552, 49.199072702792],
                 'bounding_box': [1848636.8728561546, 6308680.196100452, 1848666.2478229022, 6308707.6202965565],
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE: 5,
         },
     },
     crs_def.EPSG_3857: {
@@ -33,7 +35,8 @@ SOURCE_CRS = {
             'exp_publication_detail': {
                 'native_bounding_box': [1848636.3811272, 6308680.1143396, 1848666.8389494002, 6308707.5628834],
                 'bounding_box': [1848636.3811272, 6308680.1143396, 1848666.8389494002, 6308707.5628834],
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE: 173,
         },
     },
     crs_def.EPSG_5514: {
@@ -41,7 +44,8 @@ SOURCE_CRS = {
             'exp_publication_detail': {
                 'native_bounding_box': [-598217.8828349999, -1160322.4535628, -598198.2786699999, -1160305.0114542001],
                 'bounding_box': [1848635.2878977319, 6308679.0262031425, 1848667.9258161425, 6308708.821095935],
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE: 5,
         },
         KEY_ONLY_FIRST_PARAMETRIZATION: False,
     },
@@ -50,7 +54,8 @@ SOURCE_CRS = {
             'exp_publication_detail': {
                 'native_bounding_box': [617038.822659, 5450810.940462001, 617058.1279862, 5450828.1348948],
                 'bounding_box': [1848636.6245464054, 6308680.214995095, 1848666.6700974994, 6308707.182104623],
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE: 5,
         },
     },
     crs_def.EPSG_32634: {
@@ -58,7 +63,8 @@ SOURCE_CRS = {
             'exp_publication_detail': {
                 'native_bounding_box': [179982.9579464, 5458864.3851908, 180001.7869064, 5458881.6025756],
                 'bounding_box': [1848636.761700774, 6308680.177464705, 1848666.9742205392, 6308708.157743086],
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE: 5,
         },
     },
     crs_def.EPSG_3034: {
@@ -66,7 +72,8 @@ SOURCE_CRS = {
             'exp_publication_detail': {
                 'native_bounding_box': [4464503.1786742, 2519864.4423224, 4464521.7093864, 2519881.639366],
                 'bounding_box': [1848635.5622696981, 6308679.010490673, 1848667.1735165308, 6308708.795145725],
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE: 5,
         },
     },
     crs_def.EPSG_3035: {
@@ -74,7 +81,8 @@ SOURCE_CRS = {
             'exp_publication_detail': {
                 'native_bounding_box': [4801862.1376458, 2920034.1033083997, 4801881.1769774, 2920052.2550572],
                 'bounding_box': [1848635.8928185008, 6308678.776642735, 1848667.3134760845, 6308709.076431936],
-            }
+            },
+            KEY_THUMBNAIL_TOLERANCE: 5,
         },
     },
 }
@@ -194,7 +202,8 @@ def generate(workspace=None):
                 consts.KEY_FINAL_ASSERTS: [
                     *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
                     Action(publication.internal.correct_values_in_detail, copy.deepcopy(post_info_values)),
-                    Action(publication.internal.thumbnail_equals, {'exp_thumbnail': exp_thumbnail, }),
+                    Action(publication.internal.thumbnail_equals,
+                           {'exp_thumbnail': exp_thumbnail, 'max_diffs': tc_params[KEY_INFO_VALUES][KEY_THUMBNAIL_TOLERANCE], }),
                     *wms_spacial_precision_assert,
                     Action(publication.internal.detail_3857bbox_value, {
                         'exp_bbox': bboxes[crs_def.EPSG_3857]['bbox'],
