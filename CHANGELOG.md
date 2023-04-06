@@ -7,6 +7,9 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- Upgrade Python dependencies
+  - redis 4.5.1 -> 4.5.4
+  - owslib 0.27.2 -> 0.28.1
 
 ## v1.20.0
  2023-03-01
