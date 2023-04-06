@@ -725,7 +725,7 @@ TESTCASES = {
     'vector_time_regex': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
-            'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+            'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
         },
         consts.KEY_EXCEPTION: LaymanError,
         KEY_EXPECTED_EXCEPTION: {
@@ -743,7 +743,7 @@ TESTCASES = {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
-            'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+            'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
             'file_paths': ['sample/layman.layer/sample_jp2_rgb.jp2',
                            'sample/layman.layer/single_point.dbf',
                            'sample/layman.layer/single_point.prj',
@@ -778,7 +778,7 @@ TESTCASES = {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
-            'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+            'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
             'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.j2w',
                            'sample/layman.layer/sample_jp2_j2w_rgb.jp2',
                            'sample/layman.layer/sample_jpeg_jgw_rgb.jgw',
@@ -811,7 +811,7 @@ TESTCASES = {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
-            'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+            'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
             'file_paths': ['sample/layman.layer/sample_jp2_rgb.jp2',
                            'sample/layman.layer/sample_jp2_rgb.zip',
                            ],
@@ -951,7 +951,7 @@ TESTCASES = {
                     ],
                 },
                 KEY_ACTION_PARAMS: {
-                    'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+                    'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
                     'compress': False,
                     'with_chunks': False,
                 },
@@ -992,7 +992,7 @@ TESTCASES = {
             'full': {
                 KEY_PATCH_POST: publications.SMALL_LAYER.definition,
                 KEY_ACTION_PARAMS: {
-                    'time_regex': r'[0-9]{8}T[0-9]{9}Z(\?!.\*[0-9]{8}T[0-9]{9}Z.\*)',
+                    'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
                     'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.j2w'],
                 },
                 KEY_EXPECTED_EXCEPTION: {

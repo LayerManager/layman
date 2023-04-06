@@ -7,6 +7,7 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- Fix `time_regex` sample values in documentation and tests.
 
 ## v1.20.0
  2023-03-01
