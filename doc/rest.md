@@ -200,10 +200,10 @@ Body parameters:
    - method used by [`gdaladdo`](https://gdal.org/programs/gdaladdo.html#cmdoption-gdaladdo-r) for overview resampling when normalizing raster layer
    - by default Layman will guess overview resampling method from input file metadata
    - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
-- *time_regex*, string, e.g. `[0-9]{8}T[0-9]{9}Z`
+- *time_regex*, string, e.g. `[0-9]{8}T[0-9]{6}Z`
   - regular expression pattern used for extracting the time information from [timeseries](models.md#timeseries) raster file names. The pattern
-    - either has no matching group and matches ISO 8601 [year](https://en.wikipedia.org/wiki/ISO_8601#Years), [date](https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates), or [datetime](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) patterns, e.g. `[0-9]{8}` or `[0-9]{8}T[0-9]{9}Z`
-    - or has one or more matching groups that concatenated together matches ISO 8601 year, date, or datetime patterns, e.g. `^some_prefix_([0-9]{8})_some_postfix.*$` or , e.g. `some_prefix_([0-9]{8})_some_separator_(T[0-9]{9}Z)_some_postfix`
+    - either has no matching group and matches ISO 8601 [year](https://en.wikipedia.org/wiki/ISO_8601#Years), [date](https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates), or [datetime](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) patterns, e.g. `[0-9]{8}` or `[0-9]{8}T[0-9]{6}Z`
+    - or has one or more matching groups that concatenated together matches ISO 8601 year, date, or datetime patterns, e.g. `^some_prefix_([0-9]{8})_some_postfix.*$` or , e.g. `some_prefix_([0-9]{8})_some_separator_(T[0-9]{6}Z)_some_postfix`
   - latin diacritic is removed from the regex and spaces are replaced with underscores to be consistent with slugifying of timeseries filenames
   - error is raised if any of main data file names do not match *time_regex* value
 
@@ -398,7 +398,7 @@ Body parameters:
    - by default Layman will guess overview resampling method from input file metadata
    - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
    - can be used only together with `file` parameter, otherwise error is raised
-- *time_regex*, string, e.g. `[0-9]{8}T[0-9]{9}Z`
+- *time_regex*, string, e.g. `[0-9]{8}T[0-9]{6}Z`
   - supported only in combination with *file* parameter
   - see [POST Workspace Layers](#post-workspace-layers)
 

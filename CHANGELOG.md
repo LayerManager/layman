@@ -11,6 +11,15 @@
   - redis 4.5.1 -> 4.5.4
   - owslib 0.27.2 -> 0.28.1
 
+## v1.20.1
+ {release-date}
+### Upgrade requirements
+### Migrations and checks
+#### Schema migrations
+#### Data migrations
+### Changes
+- Fix `time_regex` sample values in documentation and tests.
+
 ## v1.20.0
  2023-03-01
 ### Upgrade requirements

@@ -190,8 +190,8 @@ def test_slugify_timeseries_filename(filename, exp_result):
 
 @pytest.mark.parametrize("pattern, exp_result", [
     pytest.param(r"[0-9]{8}", r"[0-9]{8}", id='date'),
-    pytest.param(r"[0-9]{8}T[0-9]{9}Z", r"[0-9]{8}T[0-9]{9}Z", id='iso8601'),
-    pytest.param(r".*([0-9]{8}T[0-9]{9}Z).*", r".*([0-9]{8}T[0-9]{9}Z).*", id='group'),
+    pytest.param(r"[0-9]{8}T[0-9]{6}Z", r"[0-9]{8}T[0-9]{6}Z", id='iso8601'),
+    pytest.param(r".*([0-9]{8}T[0-9]{6}Z).*", r".*([0-9]{8}T[0-9]{6}Z).*", id='group'),
     pytest.param(r"^Jihočeský kraj ([0-9]{8}).*$", r"^Jihocesky_kraj_([0-9]{8}).*$", id='czech_diacritics_and_space'),
 ])
 def test_slugify_timeseries_filename_pattern(pattern, exp_result):
