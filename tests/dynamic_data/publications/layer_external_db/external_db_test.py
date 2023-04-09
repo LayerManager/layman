@@ -84,7 +84,7 @@ TEST_CASES = {
             frozenset([base_test.RestMethod.PATCH]),
         },
     },
-    'multipolygon_qml_custom_id_column': {
+    'multipolygon_qml_custom_id_column_custom_geo_column': {
         'file_path': "sample/data/geometry-types/multipolygon.geojson",
         'style_file': 'tests/dynamic_data/publications/layer_external_db/multipolygon.qml',
         'schema_name': 'public',
@@ -93,7 +93,7 @@ TEST_CASES = {
         'external_table_uri_str': None,
         'additional_geo_column': None,
         'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_multipolygon_qml.png"),
-        'geo_column_name': 'wkb_geometry',
+        'geo_column_name': 'my_geometry',
         'exp_geometry_type': 'MULTIPOLYGON',
         'exp_native_crs': 'EPSG:4326',
         'exp_native_bounding_box': [17.0, 47.0, 18.0, 48.5],
