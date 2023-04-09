@@ -7,6 +7,7 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [#818](https://github.com/LayerManager/layman/issues/818) Fix publishing QML layer from external DB with geo-column name other than `wkb_geometry`.
 - Fix `time_regex` sample values in documentation and tests.
 
 ## v1.20.0
