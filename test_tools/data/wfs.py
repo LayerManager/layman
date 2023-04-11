@@ -494,3 +494,39 @@ def get_wfs2_implicit_ns_update():
     </Filter>
   </Update>
 </Transaction>'''
+
+
+def get_wfs1_implicit_ns_delete():
+    return '''<Transaction xmlns="http://www.opengis.net/wfs" service="WFS" version="1.1.0" xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Delete typeName="filip:europa_5514"
+        xmlns:filip="http://filip">
+        <Filter xmlns="http://www.opengis.net/ogc">
+            <FeatureId fid="europa_5514.8"/>
+        </Filter>
+    </Delete>
+</Transaction>'''
+
+
+def get_wfs1_implicit_ns_insert():
+    return '''<Transaction xmlns="http://www.opengis.net/wfs" service="WFS" version="1.1.0" xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Insert>
+        <europa_5514 xmlns="http://filip" fid="europa_5514.6">
+            <name>Poland</name>
+            <featurecla>Admin-0 country</featurecla>
+            <scalerank>1</scalerank>
+            <labelrank>3</labelrank>
+            <sovereignt>Poland - edited</sovereignt>
+            <wkb_geometry>
+                <Polygon xmlns="http://www.opengis.net/gml" srsName="EPSG:3857">
+                    <exterior>
+                        <LinearRing srsName="EPSG:3857">
+                            <posList srsDimension="2">2614211.3651 7153629.9962 2619046.8052 7070463.4035 2649929.6652 6999641.6022 2649293.9241 6926090.8192 2582536.0408 6888685.9562 2616882.4216 6804428.1478 2619008.127 6724286.0382 2674998.4235 6569374.6514 2663063.4952 6520211.3403 2607821.7186 6499899.7148 2506741.6935 6356169.7269 2535461.5251 6279530.8739 2511162.08 6289440.8626 2405368.9686 6355024.0634 2325235.7895 6330844.9667 2272679.2096 6348400.3781 2206910.8099 6311791.8642 2150768.8287 6372414.4127 2105001.8373 6349146.2174 2098719.6077 6359489.0404 2047483.7377 6444309.7435 1964720.4814 6454772.7617 1954156.6924 6509230.7607 1877813.0448 6528765.0311 1861195.4001 6483719.8167 1800722.6293 6519782.3977 1807664.2538 6567993.8629 1724434.9305 6583294.4294 1671669.8951 6640174.5528 1626035.9364 6754170.8925 1634708.5062 6816394.1479 1607161.2921 6913892.4306 1566740.9467 6979519.1318 1597774.3249 7029023.1742 1571763.0525 7124261.0145 1647816.0606 7179755.323 1821535.6031 7267944.9442 1961724.1941 7333108.5554 2072825.8228 7300515.9271 2081220.7716 7253693.7653 2188576.2862 7251279.9765 2325679.4523 7229585.6542 2530380.9019 7232458.9747 2587476.5871 7212067.7144 2614211.3651 7153629.9962</posList>
+                        </LinearRing>
+                    </exterior>
+                </Polygon>
+            </wkb_geometry>
+        </europa_5514>
+    </Insert>
+</Transaction>'''

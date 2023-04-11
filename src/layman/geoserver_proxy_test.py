@@ -110,8 +110,19 @@ def test_extract_attributes_and_layers_from_wfs_t(wfst_data_method, hardcoded_at
         ({('filip', 'poly', 'wkb_geometry')}, {('filip', 'poly')}),
         id='update_wfs2',
     ),
+    pytest.param(
+        data_wfs.get_wfs1_implicit_ns_delete,
+        (set(), {('filip', 'europa_5514')}),
+        id='delete_wfs1',
+    ),
+    pytest.param(
+        data_wfs.get_wfs1_implicit_ns_insert,
+        ({('filip', 'europa_5514', 'scalerank'), ('filip', 'europa_5514', 'featurecla'), ('filip', 'europa_5514', 'sovereignt'), ('filip', 'europa_5514', 'wkb_geometry'), ('filip', 'europa_5514', 'name'), ('filip', 'europa_5514', 'labelrank')}, {('filip', 'europa_5514')}),
+        id='insert_wfs1',
+    ),
 ])
 def test_extract_attributes_and_layers_from_wfs_t_implicit_ws(wfst_data_method, exp_attributes_and_layers):
     binary_data = wfst_data_method()
-    attributes_and_layers = geoserver_proxy.extract_attributes_and_layers_from_wfs_t(binary_data)
+    with app.app_context():
+        attributes_and_layers = geoserver_proxy.extract_attributes_and_layers_from_wfs_t(binary_data)
     assert attributes_and_layers == exp_attributes_and_layers
