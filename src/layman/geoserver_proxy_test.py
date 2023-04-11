@@ -6,7 +6,7 @@ from layman.layer import db
 from test_tools import process_client
 from test_tools.data import wfs as data_wfs
 from test_tools.process_client import get_authz_headers
-from .geoserver_proxy import extract_attributes_and_layers_from_wfs_t
+from . import geoserver_proxy
 
 
 def setup_user_layer(username, layername, authn_headers):
@@ -92,7 +92,7 @@ def test_extract_attributes_and_layers_from_wfs_t(wfst_data_method, hardcoded_at
     new_attrs = ['ok_attr', 'dangerous-attr-with-dashes']
     data_xml = wfst_data_method(workspace, layer, new_attrs)
     with app.app_context():
-        extracted_attribs, extracted_layers = extract_attributes_and_layers_from_wfs_t(data_xml)
+        extracted_attribs, extracted_layers = geoserver_proxy.extract_attributes_and_layers_from_wfs_t(data_xml)
 
     exp_attrs = {*new_attrs, *hardcoded_attrs}
     assert extracted_layers == {(workspace, layer)}
