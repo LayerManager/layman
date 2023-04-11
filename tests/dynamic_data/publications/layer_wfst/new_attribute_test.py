@@ -175,6 +175,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 
 @pytest.mark.usefixtures('ensure_external_db', 'liferay_mock')
+@pytest.mark.timeout(60)
 class TestNewAttribute(base_test.TestSingleRestPublication):
     workspace = WORKSPACE
 
