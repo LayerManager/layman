@@ -148,7 +148,11 @@ def extract_attributes_from_wfs_t_update(action, xml_tree, major_version="2"):
     if not (layer_name and ws_name):
         return attribs
     value_ref_string = "Name" if major_version == "1" else "ValueReference"
-    properties = action.xpath('wfs:Property/wfs:' + value_ref_string, namespaces=xml_tree.nsmap)
+    namespaces = xml_tree.nsmap
+    if None in namespaces:
+        namespaces['wfs'] = namespaces[None]
+        namespaces.pop(None)
+    properties = action.xpath('wfs:Property/wfs:' + value_ref_string, namespaces=namespaces)
     for prop in properties:
         split_text = prop.text.split(':')
         # No namespace in element text
