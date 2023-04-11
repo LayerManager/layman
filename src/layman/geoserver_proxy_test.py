@@ -97,3 +97,21 @@ def test_extract_attributes_and_layers_from_wfs_t(wfst_data_method, hardcoded_at
     exp_attrs = {*new_attrs, *hardcoded_attrs}
     assert extracted_layers == {(workspace, layer)}
     assert extracted_attribs == {(workspace, layer, attr) for attr in exp_attrs}
+
+
+@pytest.mark.parametrize('wfst_data_method, exp_attributes_and_layers', [
+    pytest.param(
+        data_wfs.get_wfs11_implicit_ns_update,
+        ({('filip', 'poly', 'wkb_geometry')}, {('filip', 'poly')}),
+        id='update_wfs1',
+    ),
+    pytest.param(
+        data_wfs.get_wfs2_implicit_ns_update,
+        ({('filip', 'poly', 'wkb_geometry')}, {('filip', 'poly')}),
+        id='update_wfs2',
+    ),
+])
+def test_extract_attributes_and_layers_from_wfs_t_implicit_ws(wfst_data_method, exp_attributes_and_layers):
+    binary_data = wfst_data_method()
+    attributes_and_layers = geoserver_proxy.extract_attributes_and_layers_from_wfs_t(binary_data)
+    assert attributes_and_layers == exp_attributes_and_layers

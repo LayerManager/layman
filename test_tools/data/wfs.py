@@ -444,3 +444,53 @@ def get_wfs20_complex_new_attr(workspace,
        </fes:Filter>
    </wfs:Replace>
 </wfs:Transaction>'''
+
+
+def get_wfs11_implicit_ns_update():
+    return '''<Transaction xmlns="http://www.opengis.net/wfs" service="WFS" version="1.1.0"
+  xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Update typeName="filip:poly" xmlns:filip="http://filip">
+    <Property>
+      <Name>wkb_geometry</Name>
+      <Value>
+        <Polygon xmlns="http://www.opengis.net/gml" srsName="EPSG:3857">
+          <exterior>
+            <LinearRing srsName="EPSG:3857">
+              <posList srsDimension="2">1766017.811 11424089.3044 -2106309.2073 3245917.4174 2674829.2541 3522473.9546
+                4613901.549156107 6717360.945902297 4492452.1402 11187040.8439 1766017.811 11424089.3044</posList>
+            </LinearRing>
+          </exterior>
+        </Polygon>
+      </Value>
+    </Property>
+    <Filter xmlns="http://www.opengis.net/ogc">
+      <FeatureId fid="poly.1" />
+    </Filter>
+  </Update>
+</Transaction>'''
+
+
+def get_wfs2_implicit_ns_update():
+    return '''<Transaction xmlns="http://www.opengis.net/wfs" service="WFS" version="2.0.0"
+  xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Update typeName="filip:poly" xmlns:filip="http://filip">
+    <Property>
+      <ValueReference>wkb_geometry</ValueReference>
+      <Value>
+        <Polygon xmlns="http://www.opengis.net/gml" srsName="EPSG:3857">
+          <exterior>
+            <LinearRing srsName="EPSG:3857">
+              <posList srsDimension="2">1766017.811 11424089.3044 -2106309.2073 3245917.4174 2674829.2541 3522473.9546
+                4613901.549156107 6717360.945902297 4492452.1402 11187040.8439 1766017.811 11424089.3044</posList>
+            </LinearRing>
+          </exterior>
+        </Polygon>
+      </Value>
+    </Property>
+    <Filter xmlns="http://www.opengis.net/ogc">
+      <FeatureId fid="poly.1" />
+    </Filter>
+  </Update>
+</Transaction>'''
