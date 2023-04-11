@@ -15,6 +15,7 @@ def get_map_info(workspace, mapname):
     info = maps.get((workspace, MAP_TYPE, mapname), {})
     if info:
         info.pop('_table_uri', None)
+        info.pop('_wfs_wms_status', None)
         info.pop('original_data_source', None)
         info.pop('geodata_type', None)
     return info

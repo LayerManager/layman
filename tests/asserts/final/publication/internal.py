@@ -169,6 +169,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        'description': None,
                                        'original_data_source': settings.EnumOriginalDataSource.TABLE.value if external_table_uri else settings.EnumOriginalDataSource.FILE.value,
                                        'geodata_type': geodata_type,
+                                       '_wfs_wms_status': settings.EnumWfsWmsStatus.AVAILABLE,
                                    })
 
         if file_extension:
@@ -440,3 +441,12 @@ from transformed
 
     for i in range(0, 1):
         assert abs(exp_coordinates[i] - coordinates[i]) <= precision, f'exp_coordinates={exp_coordinates}, coordinates={coordinates}'
+
+
+def wfs_wms_status_available(workspace, publ_type, name):
+    assert publ_type == LAYER_TYPE
+
+    with app.app_context():
+        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['wfs_wms_status']})
+    wfs_wms_status = publ_info['_wfs_wms_status']
+    assert wfs_wms_status == settings.EnumWfsWmsStatus.AVAILABLE
