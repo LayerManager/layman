@@ -21,6 +21,7 @@ IS_LAYER_COMPLETE_AND_CONSISTENT = [
     Action(internal.nodata_preserved_in_normalized_raster, {}),
     Action(internal.size_and_position_preserved_in_normalized_raster, {}),
     Action(internal.stats_preserved_in_normalized_raster, {}),
+    Action(internal.wfs_wms_status_available, {}),
     Action(rest.is_complete_in_rest, {}),
     Action(rest.mandatory_keys_in_rest, {}),
     Action(geoserver.is_complete_in_internal_workspace_wms, {}),

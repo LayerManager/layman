@@ -14,6 +14,12 @@ class EnumOriginalDataSource(Enum):
     TABLE = 'database_table'
 
 
+class EnumWfsWmsStatus(Enum):
+    PREPARING = 'preparing'
+    AVAILABLE = 'available'
+    NOT_AVAILABLE = 'not_available'
+
+
 LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
 
 GEODATA_TYPE_VECTOR = 'vector'
