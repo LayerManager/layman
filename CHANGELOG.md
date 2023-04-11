@@ -12,11 +12,7 @@
   - owslib 0.27.2 -> 0.28.1
 
 ## v1.20.1
- {release-date}
-### Upgrade requirements
-### Migrations and checks
-#### Schema migrations
-#### Data migrations
+ 2023-04-11
 ### Changes
 - [#818](https://github.com/LayerManager/layman/issues/818) Fix publishing QML layer from external DB with geo-column name other than `wkb_geometry`.
 - [#812](https://github.com/LayerManager/layman/issues/812) Fix processing of WFS-T queries with implicit namespace. 
