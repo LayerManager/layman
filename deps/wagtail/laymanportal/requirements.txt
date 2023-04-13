@@ -1,0 +1,2 @@
+coderedcms==2.0.*
+wagtail==4.2.*
