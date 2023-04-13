@@ -303,6 +303,18 @@ liferay-start:
 liferay-stop:
 	docker-compose -f docker-compose.deps.yml stop liferay
 
+wagtail-build:
+	docker-compose -f docker-compose.deps.yml build wagtail
+
+wagtail-bash:
+	docker-compose -f docker-compose.deps.yml run --rm --entrypoint="bash" wagtail
+
+wagtail-restart:
+	docker-compose -f docker-compose.deps.yml up --force-recreate --no-deps -d wagtail
+
+wagtail-stop:
+	docker-compose -f docker-compose.deps.yml stop wagtail
+
 micka-restart:
 	docker-compose -f docker-compose.deps.yml up --force-recreate --no-deps -d micka
 

@@ -72,6 +72,13 @@ services:
                                                   # ./deps/liferay/tmp must be owned by non-root
         - ./deps/liferay/sample/hypersonic:/etc/liferay/mount/files/data/hypersonic
 
+   wagtail:
+      build:
+        context: deps/wagtail
+        dockerfile: docker/Dockerfile
+      ports:
+        - 8083:8000
+
    micka:
       container_name: micka
       build:
