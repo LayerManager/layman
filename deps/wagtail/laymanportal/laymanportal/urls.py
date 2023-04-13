@@ -21,6 +21,8 @@ urlpatterns = [
     # Alternatively, if you want pages to be served from a subpath
     # of your site, rather than the site root:
     #    path("pages/", include(crx_urls)),
+
+    path('accounts/', include('allauth.urls')),
 ]
 
 
