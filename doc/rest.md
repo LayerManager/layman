@@ -71,6 +71,7 @@ JSON array of objects representing available layers with following structure:
 - **geodata_type**: String. Either `vector`, `raster`, or `unknown`. Value `unknown` is used if input files are zipped and still being uploaded.
 - - **file**:
   - *file_type*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info.
+- **wfs_wms_status**: String. Either `available`, `preparing`, or `not_available`.
 
 Headers:
 - **X-Total-Count**: Total number of layers available from the request, taking into account all filtering parameters except `limit` and `offset`. Example `"247"`.
@@ -521,7 +522,7 @@ JSON object with one attribute:
 ### GET Maps
 Get list of published maps (map compositions).
 
-Have the same request parameters and response structure and headers as [GET Layers](#get-layers), except `file_type` key is not available in response.
+Have the same request parameters and response structure and headers as [GET Layers](#get-layers), except `file_type`, `geodata_type` and `wfs_wms_status` keys are not available in response.
 
 ## Workspace Maps
 ### URL
