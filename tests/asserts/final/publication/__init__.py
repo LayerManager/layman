@@ -6,7 +6,7 @@ from . import geoserver, geoserver_proxy, internal, internal_rest, rest, metadat
 IS_LAYER_COMPLETE_AND_CONSISTENT = [
     Action(internal.source_has_its_key_or_it_is_empty, {}),
     Action(internal.source_internal_keys_are_subset_of_source_sibling_keys, {}),
-    Action(internal_rest.same_title_in_source_and_rest_multi, {}),
+    Action(internal_rest.same_title_and_wfs_wms_status_in_source_and_rest_multi, {}),
     Action(internal_rest.same_values_in_internal_and_rest, {}),
     Action(rest.is_in_rest_multi, {}),
     Action(rest.correct_url_in_rest_multi, {}),
@@ -32,7 +32,7 @@ IS_LAYER_COMPLETE_AND_CONSISTENT = [
 IS_MAP_COMPLETE_AND_CONSISTENT = [
     Action(internal.source_has_its_key_or_it_is_empty, {}),
     Action(internal.source_internal_keys_are_subset_of_source_sibling_keys, {}),
-    Action(internal_rest.same_title_in_source_and_rest_multi, {}),
+    Action(internal_rest.same_title_and_wfs_wms_status_in_source_and_rest_multi, {}),
     Action(internal_rest.same_values_in_internal_and_rest, {}),
     Action(rest.is_in_rest_multi, {}),
     Action(rest.correct_url_in_rest_multi, {}),

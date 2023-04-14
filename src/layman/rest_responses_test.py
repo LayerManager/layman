@@ -82,6 +82,7 @@ class TestResponsesClass:
         'file': {
             'file_type': settings.GEODATA_TYPE_VECTOR,
         },
+        'wfs_wms_status': settings.EnumWfsWmsStatus.AVAILABLE.value,
     }
     expected_maps = {
         **expected_common_multi,

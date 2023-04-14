@@ -260,6 +260,7 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
             'file': {
                 'file_type': info['geodata_type'],
             },
+            'wfs_wms_status': info['_wfs_wms_status'].value if info['_wfs_wms_status'] else None,
         }
         for (workspace, _, name), info in publication_infos_whole['items'].items()
     ]

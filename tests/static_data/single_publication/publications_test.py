@@ -37,7 +37,7 @@ def test_infos(workspace, publ_type, publication):
 
     publ_def = data.PUBLICATIONS[(workspace, publ_type, publication)]
     headers = data.HEADERS.get(publ_def[data.TEST_DATA].get('users_can_write', [None])[0])
-    asserts_internal_rest.same_title_in_source_and_rest_multi(workspace, publ_type, publication, headers)
+    asserts_internal_rest.same_title_and_wfs_wms_status_in_source_and_rest_multi(workspace, publ_type, publication, headers)
     asserts_rest.is_in_rest_multi(workspace, publ_type, publication, headers)
     asserts_rest.correct_url_in_rest_multi(workspace, publ_type, publication, headers)
     if 'geodata_type' in publ_def[data.TEST_DATA]:
