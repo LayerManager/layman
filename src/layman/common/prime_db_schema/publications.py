@@ -167,6 +167,7 @@ select p.id as id_publication,
              {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
         where r.id_publication = p.id
           and r.type = 'write') can_write_users,
+       p.wfs_wms_status,
        count(*) OVER() AS full_count
 from {DB_SCHEMA}.workspaces w inner join
      publs p on p.id_workspace = w.id left join
@@ -245,10 +246,10 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'native_crs': db_util.get_crs_from_srid(srid, use_internal_srid=True) if srid else None,
                                    'access_rights': {'read': can_read_users.split(','),
                                                      'write': can_write_users.split(',')},
-                                   '_wfs_wms_status': settings.EnumWfsWmsStatus.AVAILABLE,
+                                   '_wfs_wms_status': settings.EnumWfsWmsStatus(wfs_wms_status) if wfs_wms_status else None,
                                    }
              for id_publication, workspace_name, publication_type, publication_name, title, uuid, geodata_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
-             srid, external_table_uri, can_read_users, can_write_users, _
+             srid, external_table_uri, can_read_users, can_write_users, wfs_wms_status, _
              in values}
 
     infos = {key: {**value,
@@ -396,8 +397,8 @@ def insert_publication(workspace_name, info):
     check_publication_info(workspace_name, info)
 
     insert_publications_sql = f'''insert into {DB_SCHEMA}.publications as p
-        (id_workspace, name, title, type, uuid, style_type, geodata_type, everyone_can_read, everyone_can_write, updated_at, image_mosaic, external_table_uri) values
-        (%s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp, %s, PGP_SYM_ENCRYPT(%s::text, %s::text) )
+        (id_workspace, name, title, type, uuid, style_type, geodata_type, everyone_can_read, everyone_can_write, updated_at, image_mosaic, external_table_uri, wfs_wms_status) values
+        (%s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp, %s, PGP_SYM_ENCRYPT(%s::text, %s::text), %s )
 returning id
 ;'''
 
@@ -421,6 +422,7 @@ returning id
             info.get("image_mosaic"),
             external_table_uri,
             info.get("uuid"),
+            info.get("wfs_wms_status")
             )
     pub_id = db_util.run_query(insert_publications_sql, data)[0][0]
 

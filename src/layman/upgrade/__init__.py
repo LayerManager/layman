@@ -1,7 +1,8 @@
 import logging
 
 from db import util as db_util
-from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_16, upgrade_v1_17, upgrade_v1_18, upgrade_v1_20
+from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_16, upgrade_v1_17, upgrade_v1_18, \
+    upgrade_v1_20, upgrade_v1_21
 from layman import settings
 from . import consts
 
@@ -33,7 +34,10 @@ MIGRATIONS = {
         ((1, 20, 0), [
             upgrade_v1_20.adjust_db_for_table_uri,
             upgrade_v1_20.rename_file_type_to_geodata_type,
-        ])
+        ]),
+        ((1, 21, 0), [
+            upgrade_v1_21.adjust_db_for_wfs_wms_status,
+        ]),
     ],
     consts.MIGRATION_TYPE_DATA: [
         ((1, 16, 0), [
