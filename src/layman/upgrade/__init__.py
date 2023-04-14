@@ -51,6 +51,9 @@ MIGRATIONS = {
             upgrade_v1_17.adjust_db_publication_file_type_constraint,
             upgrade_v1_17.rename_table_names,
         ]),
+        ((1, 21, 0), [
+            upgrade_v1_21.adjust_publications_wfs_wms_status,
+        ])
     ],
 }
 
