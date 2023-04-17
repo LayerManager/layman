@@ -170,8 +170,8 @@ class TestSingleRestPublication:
         else:
             cls.publications_to_cleanup_on_function_end.add(publication)
 
-        process_client.publish_workspace_publication(publication.type, publication.workspace, publication.name,
-                                                     **args)
+        return process_client.publish_workspace_publication(publication.type, publication.workspace, publication.name,
+                                                            **args)
 
     @classmethod
     def ensure_publication(cls, publication, args=None, scope='function'):
@@ -191,7 +191,7 @@ class TestSingleRestPublication:
 
     @classmethod
     def patch_publication(cls, publication, args=None):
-        process_client.patch_workspace_publication(publication.type, publication.workspace, publication.name, **args)
+        return process_client.patch_workspace_publication(publication.type, publication.workspace, publication.name, **args)
 
     @pytest.fixture(scope='class', autouse=True)
     def class_fixture(self, request):
