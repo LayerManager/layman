@@ -31,6 +31,7 @@ def pytest_generate_tests(metafunc):
     for test_case in test_cases_for_type:
         assert not test_case.specific_params, f"Property specific_params is meant only for input test cases."
         assert not test_case.specific_types, f"Property specific_types is meant only for input test cases."
+        assert not test_case.publication_type, f"Property publication_type is meant only for input test cases."
         assert test_case.type != EnumTestTypes.IGNORE, f"Test type IGNORE is meant only for input test cases."
         rest_method = getattr(cls, test_case.rest_method.function_name)
         rest_args = test_case.rest_args
@@ -154,7 +155,7 @@ class TestSingleRestPublication:
             input_publication = input_test_case.publication(*args)
 
         workspace = cls.workspace
-        publication_type = cls.publication_type
+        publication_type = input_test_case.publication_type or cls.publication_type
 
         if input_publication:
             workspace = input_publication.workspace or workspace

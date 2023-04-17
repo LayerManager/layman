@@ -121,6 +121,7 @@ class TestCaseType:
     # pylint: disable=too-many-instance-attributes
     pytest_id: str = None
     publication: Union[Publication, Callable[[dict], Publication]] = None
+    publication_type: str = None
     key: str = None
     rest_method: RestMethod = None
     rest_args: dict = field(default_factory=dict)
