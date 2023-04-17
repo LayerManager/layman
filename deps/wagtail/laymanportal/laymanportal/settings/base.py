@@ -64,6 +64,10 @@ INSTALLED_APPS = [
     "oauth2_provider",
 ]
 
+OAUTH2_PROVIDER = {
+    "PKCE_REQUIRED": False
+}
+
 MIDDLEWARE = [
     # Save pages to cache. Must be FIRST.
     "wagtailcache.cache.UpdateCacheMiddleware",
