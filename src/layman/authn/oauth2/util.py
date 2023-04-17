@@ -177,7 +177,9 @@ def get_open_id_claims():
     result = {}
     try:
         result = provider.get_open_id_claims(access_token)
-    except (ConnectionError, requests.HTTPError):
+    except (ConnectionError, requests.HTTPError) as err:
+        current_app.logger.error(f"get_open_id_claims error:")
+        current_app.logger.error(err)
         flush_cache()
     result['iss'] = provider.AUTH_URLS[0]
     return result
