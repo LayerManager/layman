@@ -28,7 +28,7 @@ def reserve_username(username, adjust=False):
     current_username = authn.get_authn_username()
     if is_user_with_name(current_username):
         raise LaymanError(34, {'username': current_username})
-    if adjust is not True:
+    if not adjust:
         check_workspace_name(username)
         workspaces = get_workspaces()
         if username in workspaces:
@@ -57,8 +57,9 @@ def reserve_username(username, adjust=False):
             try:
                 check_workspace_name(suggestion)
             except LaymanError as exc:
-                if exc.code not in (2, 35):
+                if exc.code not in (2, 35, 41, 45):
                     raise exc
+                continue
             if suggestion in workspaces:
                 continue
             try:
