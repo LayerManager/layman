@@ -5,6 +5,7 @@ from wagtail.documents import urls as wagtaildocs_urls
 from coderedcms import admin_urls as crx_admin_urls
 from coderedcms import search_urls as crx_search_urls
 from coderedcms import urls as crx_urls
+from laymanportal import views
 
 urlpatterns = [
     # Admin
@@ -17,6 +18,7 @@ urlpatterns = [
 
     path('accounts/', include('allauth.urls')),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path('profile/', views.profile),
 
     # For anything not caught by a more specific rule above, hand over to
     # the page serving mechanism. This should be the last pattern in
