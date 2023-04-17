@@ -14,6 +14,10 @@ urlpatterns = [
     path("docs/", include(wagtaildocs_urls)),
     # Search
     path("search/", include(crx_search_urls)),
+
+    path('accounts/', include('allauth.urls')),
+    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+
     # For anything not caught by a more specific rule above, hand over to
     # the page serving mechanism. This should be the last pattern in
     # the list:
@@ -21,9 +25,6 @@ urlpatterns = [
     # Alternatively, if you want pages to be served from a subpath
     # of your site, rather than the site root:
     #    path("pages/", include(crx_urls)),
-
-    path('accounts/', include('allauth.urls')),
-    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 ]
 
 
