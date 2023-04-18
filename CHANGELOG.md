@@ -5,7 +5,7 @@
 ### Upgrade requirements
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
   ```
-  LAYMAN_CLIENT_VERSION=765-wagtail-oauth
+  LAYMAN_CLIENT_VERSION=0aee22e712c4e99cd3a5d72690e782a0fbaa2d27
   ```
 - If you are running Layman with development settings
   - change environment variables:  
