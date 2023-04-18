@@ -49,6 +49,12 @@ class ParametrizationSets(Enum):
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
     ])
+    POST_ALL = frozenset([
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+    ])
 
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -162,6 +168,59 @@ TESTCASES = {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'files': ['{publication_name}.zip']},
+                    'sync': False,
+                },
+            },
+        },
+    },
+    'tif_with_qml': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
+            'style_file': 'sample/style/ne_10m_admin_0_countries.qml',
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 48,
+            'message': 'Wrong combination of parameters',
+            'data': 'Raster layers are not allowed to have QML style.',
+        },
+        Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
+        Key.IGNORED_CASES: {},
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                },
+            },
+        },
+    },
+    'tif_with_qml_data_without_style': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
+        },
+        Key.POST_BEFORE_PATCH_ARGS: {
+            'file_paths': ['sample/layman.layer/sample_point_cz.geojson'],
+            'style_file': 'sample/layman.layer/sample_point_cz.qml',
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 48,
+            'message': 'Wrong combination of parameters',
+            'data': 'Raster layers are not allowed to have QML style.',
+        },
+        Key.MANDATORY_CASES: {frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.IGNORED_CASES: ParametrizationSets.POST_ALL,
+        Key.SPECIFIC_CASES: {
+            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+                Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
             },

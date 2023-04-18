@@ -30,39 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'tif_with_qml': {
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
-            'style_file': 'sample/style/ne_10m_admin_0_countries.qml',
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 48,
-                          'message': 'Wrong combination of parameters',
-                          'data': 'Raster layers are not allowed to have QML style.',
-                          },
-            frozenset([('compress', True), ('with_chunks', True)]): {
-                'sync': False,
-            }
-        },
-        KEY_PATCHES: {
-            'data_and_style': {
-                KEY_PATCH_POST: {},
-            },
-            'data_without_style': {
-                KEY_PATCH_POST: {
-                    'file_paths': ['sample/layman.layer/sample_point_cz.geojson'],
-                    'style_file': 'sample/layman.layer/sample_point_cz.qml',
-                },
-                KEY_ACTION_PARAMS: {
-                    'style_file': None,
-                },
-            },
-        },
-    },
     'non_readable_raster': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
