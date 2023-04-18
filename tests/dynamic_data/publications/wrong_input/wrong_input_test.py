@@ -36,6 +36,10 @@ class ParametrizationSets(Enum):
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
     ])
+    POST_PATCH_CHUNKS_COMPRESS = frozenset([
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+    ])
 
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -76,15 +80,9 @@ TESTCASES = {
                     'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'},
                 },
             },
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS.value: {
                 Key.EXPECTED_EXCEPTION: {
-                    'data': {'path': 'layer_shp_without_dbf_post_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'},
-                    'sync': False,
-                },
-            },
-            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
-                Key.EXPECTED_EXCEPTION: {
-                    'data': {'path': 'layer_shp_without_dbf_patch_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'},
+                    'data': {'path': '{publication_name}.zip/ne_110m_admin_0_boundary_lines_land.shp'},
                     'sync': False,
                 },
             },
@@ -103,7 +101,7 @@ def generate_test_cases():
             assert case not in specific_types
             specific_types[case] = EnumTestTypes.IGNORE
         specific_params_def = all_params.pop(Key.SPECIFIC_CASES)
-        specific_params = dict()
+        specific_params = {}
         for parametrization_key, parametrization_value in specific_params_def.items():
             if all(isinstance(parametrization_item, frozenset) for parametrization_item in parametrization_key):
                 for parametrization_item in parametrization_key:
@@ -125,6 +123,10 @@ def generate_test_cases():
     return tc_list
 
 
+def format_exception(exception_info: dict, format_variables: dict):
+    exception_info['data']['path'] = exception_info['data']['path'].format(**format_variables)
+
+
 @pytest.mark.usefixtures('ensure_external_db')
 class TestPublication(base_test.TestSingleRestPublication):
     workspace = 'dynamic_test_workspace_wrong_input'
@@ -141,6 +143,7 @@ class TestPublication(base_test.TestSingleRestPublication):
 
         exp_exception = params[Key.EXPECTED_EXCEPTION]
         is_sync = exp_exception.pop('sync')
+        format_exception(exp_exception, {'publication_name': publication.name})
         exception = pytest.raises(params[Key.EXCEPTION]) if is_sync else does_not_raise()
         with exception as exception_info:
             response = rest_method(publication, args=rest_args)
