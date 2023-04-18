@@ -131,3 +131,4 @@ class TestCaseType:
     specific_types: dict = field(default_factory=dict)
     marks: List[_pytest.mark.structures.Mark] = field(default_factory=list)
     parametrization: Parametrization = None
+    post_before_patch_args: dict = field(default_factory=dict)
