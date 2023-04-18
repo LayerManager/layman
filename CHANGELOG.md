@@ -8,6 +8,17 @@
   LAYMAN_CLIENT_VERSION=765-wagtail-oauth
   ```
 - If you are running Layman with development settings
+  - change environment variables:  
+    ```
+    OAUTH2_LIFERAY_CLIENT_ID=VECGuQb00tWt8HZNkA4cxu6dnoQD5pF6Up3daAoK
+    OAUTH2_LIFERAY_SECRET=aY14rwkEKasNqBEZX8OnhpRk8lpHAfT7oKTlf4LriEK8oMZxhnGKcnt4bZ72pceNEl83B6LtBvhKr3BqBLFA80Pd6Ugav2rkc8bk7TE4LkaoB2qcBQmjiOiEpizsgZGx
+    OAUTH2_LIFERAY_AUTH_URL=http://localhost:8083/o/authorize
+    OAUTH2_LIFERAY_TOKEN_URL=http://wagtail:8000/o/token/
+    OAUTH2_LIFERAY_INTROSPECTION_URL=http://wagtail:8000/o/introspect/
+    OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY=username
+    OAUTH2_LIFERAY_USER_PROFILE_URL=http://wagtail:8000/profile
+    ```
+  - unset environment variable `OAUTH2_LIFERAY_SCOPE`
   - after [usual dev upgrade commands](README.md#upgrade) run also
     ```
     make wagtail-build
