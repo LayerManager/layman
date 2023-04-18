@@ -185,7 +185,7 @@ def generate_test_cases():
         ignore_cases = ignore_cases.value if isinstance(ignore_cases,
                                                         ParametrizationSets) else ignore_cases
         for case in ignore_cases:
-            assert case not in specific_types
+            assert case not in specific_types, f'key={key},\ncase={case},\nspecific_types={specific_types}'
             specific_types[case] = EnumTestTypes.IGNORE
 
         specific_params_def = all_params.pop(Key.SPECIFIC_CASES)
