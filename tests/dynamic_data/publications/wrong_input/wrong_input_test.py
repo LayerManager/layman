@@ -88,6 +88,44 @@ TESTCASES = {
             },
         },
     },
+    'shp_without_prj': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.dbf',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
+            ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 18,
+            'message': 'Missing one or more ShapeFile files.',
+            'data': {'missing_extensions': ['.prj'],
+                     'suggestion': 'Missing .prj file can be fixed also by setting "crs" parameter.',
+                     'path': 'ne_110m_admin_0_boundary_lines_land.shp',
+                     },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: {},
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'},
+                },
+            },
+            ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'data': {'path': '{publication_name}.zip/ne_110m_admin_0_boundary_lines_land.shp'},
+                    'sync': False,
+                },
+            },
+        },
+    },
 }
 
 
