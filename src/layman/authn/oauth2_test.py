@@ -169,7 +169,7 @@ def test_no_provider_found(client, headers):
 
 @pytest.mark.parametrize('headers', [
     {
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+        f'{ISS_URL_HEADER}': 'http://localhost:8083/o/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
     }, {
         f'{TOKEN_HEADER}': 'Bearer abc',
@@ -187,7 +187,7 @@ def test_unexisting_introspection_url(client, headers):
 
 @pytest.mark.parametrize('headers', [
     {
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+        f'{ISS_URL_HEADER}': 'http://localhost:8083/o/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
     }, {
         f'{TOKEN_HEADER}': 'Bearer abc',
@@ -206,7 +206,7 @@ def test_token_inactive(client, headers):
 
 @pytest.mark.parametrize('headers', [
     {
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+        f'{ISS_URL_HEADER}': 'http://localhost:8083/o/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
     }, {
         f'{TOKEN_HEADER}': 'Bearer abc',
@@ -226,7 +226,7 @@ def test_token_active(client, headers):
 def test_authn_get_current_user_without_username(client):
     rest_path = url_for('rest_current_user.get')
     response = client.get(rest_path, headers={
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+        f'{ISS_URL_HEADER}': 'http://localhost:8083/o/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
     })
     assert response.status_code == 200

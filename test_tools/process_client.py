@@ -587,7 +587,7 @@ def ensure_reserved_username(username, headers=None):
 
 
 def get_authz_headers(username):
-    return {f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+    return {f'{ISS_URL_HEADER}': 'http://localhost:8083/o/authorize',
             f'{TOKEN_HEADER}': f'Bearer {username}',
             }
 

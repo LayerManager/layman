@@ -62,7 +62,7 @@ def server2():
 def test_mock():
     url1 = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT1}/rest/test-oauth2/user-profile"
     response = requests.get(url1, headers={
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+        f'{ISS_URL_HEADER}': 'http://localhost:8083/o/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc'
     })
     assert response.status_code == 200
@@ -71,7 +71,7 @@ def test_mock():
 
     url2 = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT2}/rest/test-oauth2/user-profile"
     response = requests.get(url2, headers={
-        f'{ISS_URL_HEADER}': 'http://localhost:8082/o/oauth2/authorize',
+        f'{ISS_URL_HEADER}': 'http://localhost:8083/o/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc'
     })
     assert response.status_code == 200
