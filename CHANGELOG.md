@@ -7,6 +7,11 @@
   ```
   LAYMAN_CLIENT_VERSION=765-wagtail-oauth
   ```
+- If you are running Layman with development settings
+  - after [usual dev upgrade commands](README.md#upgrade) run also
+    ```
+    make wagtail-build
+    ```
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations

@@ -10,6 +10,7 @@
 | [redis](https://redis.io/) | 4.0.11 | BSD 3-Clause | docker-library/redis | prod-external | bin | celery message broker, source of truth for server side |
 | [micka](https://github.com/hsrs-cz/Micka) | [v2020.014](https://github.com/hsrs-cz/Micka/releases/tag/v2020.014) | BSD 3-Clause | jirikcz/micka | prod-external | bin | to provide CSW endpoint |
 | [liferay portal](https://portal.liferay.dev/) | 7.1.3 | GNU GPL v2 | liferay/portal | opt | bin | as OAuth2 provider |
+| [Wagtail](https://wagtail.org/) + [extensions](#wagtail-extensions) | 4.2 | BSD 3-Clause | deps/wagtail/laymanportal/requirements.txt | opt | bin | as OAuth2 provider |
 
 
 ## Internal dependencies
@@ -65,6 +66,13 @@
 | [express](https://expressjs.com/) | MIT | timgen/package.json | prod | bin | as HTTP server for Timgen |
 | [http-proxy-middleware](https://github.com/chimurai/http-proxy-middleware) | MIT | timgen/package.json | prod | bin | for proxying Timgen requests |
 | [file-saver](https://www.npmjs.com/package/file-saver) | MIT | timgen/package.json | prod | bin | for saving images in Timgen |
+
+## Wagtail extensions
+| name | license | used by | env | bin or src | purpose |
+| --- | --- | --- | --- | --- | --- |
+| [Wagtail CRX (CodeRed Extensions)](https://docs.coderedcorp.com/wagtail-crx/) | BSD 3-Clause | deps/wagtail/laymanportal/requirements.txt | opt | bin | to be consistent with production usage |
+| [django-allauth](https://github.com/pennersr/django-allauth) | MIT | deps/wagtail/laymanportal/requirements.txt | opt | bin | to be consistent with production usage |
+| [django-oauth-toolkit](https://github.com/jazzband/django-oauth-toolkit) | BSD 2-Clause | deps/wagtail/laymanportal/requirements.txt | opt | bin | as OAuth2 provider |
 
 ## Other dependencies
 
