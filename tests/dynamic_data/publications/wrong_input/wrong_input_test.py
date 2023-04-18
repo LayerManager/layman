@@ -72,15 +72,15 @@ TESTCASES = {
                      'path': 'ne_110m_admin_0_boundary_lines_land.shp',
                      },
         },
-        Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH.value,
+        Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
         Key.IGNORED_CASES: {},
         Key.SPECIFIC_CASES: {
-            ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS.value: {
+            ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'},
                 },
             },
-            ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS.value: {
+            ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS: {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'path': '{publication_name}.zip/ne_110m_admin_0_boundary_lines_land.shp'},
                     'sync': False,
@@ -96,18 +96,29 @@ def generate_test_cases():
     for key, test_case_params in TESTCASES.items():
         all_params = deepcopy(test_case_params)
         rest_args = all_params.pop(Key.REST_ARGS)
-        specific_types = {tc: EnumTestTypes.MANDATORY for tc in all_params.pop(Key.MANDATORY_CASES)}
+
+        mandatory_cases = all_params.pop(Key.MANDATORY_CASES)
+        mandatory_cases = mandatory_cases.value if isinstance(mandatory_cases,
+                                                              ParametrizationSets) else mandatory_cases
+        specific_types = {tc: EnumTestTypes.MANDATORY for tc in mandatory_cases}
+
         for case in all_params.pop(Key.IGNORED_CASES, {}):
             assert case not in specific_types
             specific_types[case] = EnumTestTypes.IGNORE
+
         specific_params_def = all_params.pop(Key.SPECIFIC_CASES)
+        specific_params_def = specific_params_def.value if isinstance(specific_params_def,
+                                                                      ParametrizationSets) else specific_params_def
         specific_params = {}
         for parametrization_key, parametrization_value in specific_params_def.items():
+            parametrization_key = parametrization_key.value if isinstance(parametrization_key,
+                                                                          ParametrizationSets) else parametrization_key
             if all(isinstance(parametrization_item, frozenset) for parametrization_item in parametrization_key):
                 for parametrization_item in parametrization_key:
                     specific_params[parametrization_item] = parametrization_value
             else:
                 specific_params[parametrization_key] = parametrization_value
+
         publ_type = all_params.pop(Key.PUBLICATION_TYPE)
         test_case = base_test.TestCaseType(key=key,
                                            publication_type=publ_type,
