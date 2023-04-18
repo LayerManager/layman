@@ -40,6 +40,14 @@ class ParametrizationSets(Enum):
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
     ])
+    NOT_POST_COMPRESS = frozenset([
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+    ])
 
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -126,6 +134,38 @@ TESTCASES = {
             },
         },
     },
+    'empty_zip': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'data': {'parameter': 'file',
+                     'message': 'Zip file without data file inside.',
+                     'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
+                     'files': [
+                         'temporary_zip_file.zip',
+                     ],
+                     },
+        },
+        Key.MANDATORY_CASES: {
+            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE])
+        },
+        Key.IGNORED_CASES: ParametrizationSets.NOT_POST_COMPRESS,
+        Key.SPECIFIC_CASES: {
+            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+                Key.EXPECTED_EXCEPTION: {
+                    'data': {'files': ['{publication_name}.zip']},
+                    'sync': False,
+                },
+            },
+        },
+    },
 }
 
 
@@ -140,7 +180,10 @@ def generate_test_cases():
                                                               ParametrizationSets) else mandatory_cases
         specific_types = {tc: EnumTestTypes.MANDATORY for tc in mandatory_cases}
 
-        for case in all_params.pop(Key.IGNORED_CASES, {}):
+        ignore_cases = all_params.pop(Key.IGNORED_CASES)
+        ignore_cases = ignore_cases.value if isinstance(ignore_cases,
+                                                        ParametrizationSets) else ignore_cases
+        for case in ignore_cases:
             assert case not in specific_types
             specific_types[case] = EnumTestTypes.IGNORE
 
@@ -173,7 +216,10 @@ def generate_test_cases():
 
 
 def format_exception(exception_info: dict, format_variables: dict):
-    exception_info['data']['path'] = exception_info['data']['path'].format(**format_variables)
+    if 'path' in exception_info['data']:
+        exception_info['data']['path'] = exception_info['data']['path'].format(**format_variables)
+    if 'files' in exception_info['data']:
+        exception_info['data']['files'] = [file.format(**format_variables) for file in exception_info['data']['files']]
 
 
 @pytest.mark.usefixtures('ensure_external_db')

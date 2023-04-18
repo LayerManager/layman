@@ -30,30 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'empty_zip': {
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'file_paths': [],
-            'compress': True,
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 2,
-                          'data': {'parameter': 'file',
-                                   'message': 'Zip file without data file inside.',
-                                   'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                                   'files': [
-                                       'temporary_zip_file.zip',
-                                   ],
-                                   },
-                          },
-            frozenset([('compress', True), ('with_chunks', True)]): {
-                'sync': False,
-                'data': {'files': ['empty_zip_post_chunks_zipped.zip']}}
-        },
-    },
     'tif_with_qml': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
