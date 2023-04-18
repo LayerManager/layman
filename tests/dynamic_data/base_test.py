@@ -43,7 +43,7 @@ def pytest_generate_tests(metafunc):
             'rest_method': rest_method,
             'rest_args': rest_args,
             'parametrization': parametrization,
-            'post_before_patch': (test_case.publication, test_case.rest_method),
+            'post_before_patch': (test_case.publication, test_case.rest_method, test_case.post_before_patch_args),
         }
         arg_values = [arg_name_to_value[n] for n in arg_names]
 
@@ -124,6 +124,7 @@ class TestSingleRestPublication:
                                          key=input_test_case.key,
                                          rest_method=rest_method,
                                          rest_args=rest_args,
+                                         post_before_patch_args=input_test_case.post_before_patch_args,
                                          params=params,
                                          type=test_type,
                                          marks=input_test_case.marks,
@@ -224,8 +225,7 @@ class TestSingleRestPublication:
 
     @pytest.fixture(scope='function', autouse=True)
     def post_before_patch(self, request):
-        publication, method = request.param
+        publication, method, patch_args = request.param
         if method == RestMethod.PATCH:
-            # currently, it posts default layer or map
-            self.post_publication(publication)
+            self.post_publication(publication, args=patch_args)
         yield

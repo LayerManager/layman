@@ -24,6 +24,7 @@ class Key(Enum):
     MANDATORY_CASES = 'mandatory_cases'
     IGNORED_CASES = 'ignored_cases'
     SPECIFIC_CASES = 'specific_params'
+    POST_BEFORE_PATCH_ARGS = 'post_before_patch_args'
 
 
 @unique
@@ -200,6 +201,7 @@ def generate_test_cases():
             else:
                 specific_params[parametrization_key] = parametrization_value
 
+        post_before_patch_args = test_case_params.pop(Key.POST_BEFORE_PATCH_ARGS, {})
         publ_type = all_params.pop(Key.PUBLICATION_TYPE)
         test_case = base_test.TestCaseType(key=key,
                                            publication_type=publ_type,
@@ -208,6 +210,7 @@ def generate_test_cases():
                                            rest_args=rest_args,
                                            params=all_params,
                                            specific_params=specific_params,
+                                           post_before_patch_args=post_before_patch_args,
                                            marks=[pytest.mark.xfail(reason="Not yet implemented.")]
                                            if test_case_params.get('xfail') else []
                                            )
