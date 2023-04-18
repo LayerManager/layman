@@ -114,7 +114,7 @@ def post():
     access_token = request.form.get('token')
     assert access_token in current_app.config['OAUTH2_TOKEN_2_INTROSPECTION'], f"access_token={access_token}, current_app.config['OAUTH2_TOKEN_2_INTROSPECTION']={current_app.config['OAUTH2_TOKEN_2_INTROSPECTION']}"
     result = {
-        "active": is_active, "client_id": "id-353ab09c-f117-f2d5-d3a3-85cfb89e6746", "exp": 1568981517,
+        "active": is_active, "client_id": "VECGuQb00tWt8HZNkA4cxu6dnoQD5pF6Up3daAoK", "exp": 1568981517,
         "iat": 1568980917,
         "scope": "liferay-json-web-services.everything.read.userprofile", "sub": "20139", "token_type": "Bearer",
         "username": "Test Test", "company.id": "20099"
