@@ -26,6 +26,18 @@ class Key(Enum):
     SPECIFIC_CASES = 'specific_params'
 
 
+@unique
+class ParametrizationSets(Enum):
+    SIMPLE_POST_PATCH = frozenset([
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+    ])
+    POST_PATCH_NO_CHUNKS_COMPRESS = frozenset([
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+    ])
+
+
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 logger = logging.getLogger(__name__)
 
@@ -56,13 +68,10 @@ TESTCASES = {
                      'path': 'ne_110m_admin_0_boundary_lines_land.shp',
                      },
         },
-        Key.MANDATORY_CASES: {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        },
+        Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH.value,
         Key.IGNORED_CASES: {},
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+            ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS.value: {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'},
                 },
@@ -71,11 +80,6 @@ TESTCASES = {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'path': 'layer_shp_without_dbf_post_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'},
                     'sync': False,
-                },
-            },
-            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
-                Key.EXPECTED_EXCEPTION: {
-                    'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'},
                 },
             },
             frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
@@ -98,7 +102,14 @@ def generate_test_cases():
         for case in all_params.pop(Key.IGNORED_CASES, {}):
             assert case not in specific_types
             specific_types[case] = EnumTestTypes.IGNORE
-        specific_params = all_params.pop(Key.SPECIFIC_CASES)
+        specific_params_def = all_params.pop(Key.SPECIFIC_CASES)
+        specific_params = dict()
+        for parametrization_key, parametrization_value in specific_params_def.items():
+            if all(isinstance(parametrization_item, frozenset) for parametrization_item in parametrization_key):
+                for parametrization_item in parametrization_key:
+                    specific_params[parametrization_item] = parametrization_value
+            else:
+                specific_params[parametrization_key] = parametrization_value
         publ_type = all_params.pop(Key.PUBLICATION_TYPE)
         test_case = base_test.TestCaseType(key=key,
                                            publication_type=publ_type,
