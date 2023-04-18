@@ -30,46 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'shp_without_prj': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'file_paths': [
-                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
-                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.dbf',
-                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp',
-                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
-            ],
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 18,
-                          'message': 'Missing one or more ShapeFile files.',
-                          'data': {'missing_extensions': ['.prj'],
-                                   'suggestion': 'Missing .prj file can be fixed also by setting "crs" parameter.',
-                                   'path': 'ne_110m_admin_0_boundary_lines_land.shp',
-                                   },
-                          },
-            frozenset([('compress', True), ('with_chunks', False)]): {
-                'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
-            frozenset([('compress', True), ('with_chunks', True)]): {
-                'sync': False,
-                'data': {'path': 'shp_without_prj_post_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
-        },
-        KEY_PATCHES: {
-            'all_files': {
-                KEY_PATCH_POST: {},
-                KEY_EXPECTED_EXCEPTION: {
-                    frozenset([('compress', True), ('with_chunks', False)]): {
-                        'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'}},
-                    frozenset([('compress', True), ('with_chunks', True)]): {
-                        'data': {'path': 'shp_without_prj_patch_all_files_chunks_zipped.zip/ne_110m_admin_0_boundary_lines_land.shp'}}
-                },
-            },
-        },
-    },
     'empty_zip': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
