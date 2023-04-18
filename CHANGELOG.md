@@ -3,6 +3,10 @@
 ## v1.21.0
  {release-date}
 ### Upgrade requirements
+- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
+  ```
+  LAYMAN_CLIENT_VERSION=765-wagtail-oauth
+  ```
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
