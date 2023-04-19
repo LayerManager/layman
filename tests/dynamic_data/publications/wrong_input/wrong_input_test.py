@@ -546,6 +546,27 @@ TESTCASES = {
         Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
         Key.SPECIFIC_CASES: {},
     },
+    'map_schema_1_0_0': {
+        Key.PUBLICATION_TYPE: process_client.MAP_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [
+                f'{DIRECTORY}/map_schema_1_1_0.json',
+            ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'data': {'expected': 'JSON file according schema `https://github.com/hslayers/map-compositions`, version 2',
+                     'parameter': 'file',
+                     'reason': 'Missing key `describedBy`'},
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 
