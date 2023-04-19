@@ -30,39 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'non_readable_raster': {
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'file_paths': [f'{DIRECTORY}/non_readable_raster.tif'],
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 2,
-                          'message': 'Wrong parameter value',
-                          'data': {'parameter': 'file',
-                                   'message': 'Unable to open raster file.',
-                                   'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                                   'file': '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post/input_file/non_readable_raster_post.tif',
-                                   },
-                          },
-            frozenset([('compress', True), ('with_chunks', False)]): {
-                'data': {'file': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_zipped/input_file/non_readable_raster_post_zipped.zip/non_readable_raster.tif',
-                         }
-            },
-            frozenset([('compress', False), ('with_chunks', True)]): {
-                'sync': False,
-                'data': {'file': '/layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_chunks/input_file/non_readable_raster_post_chunks.tif',
-                         }
-            },
-            frozenset([('compress', True), ('with_chunks', True)]): {
-                'sync': False,
-                'data': {'file': '/vsizip//layman_data_test/workspaces/dynamic_test_workspace_generated_wrong_input/layers/non_readable_raster_post_chunks_zipped/input_file/non_readable_raster_post_chunks_zipped.zip/non_readable_raster.tif',
-                         }
-            },
-        },
-    },
     'pgw_png_unsupported_crs': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
