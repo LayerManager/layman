@@ -438,6 +438,60 @@ TESTCASES = {
             },
         },
     },
+    'two_zip_files': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [
+                'tmp/sm5/vektor/sm5.zip',
+                f'{DIRECTORY}/layer_with_two_main_files.zip',
+            ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'data': {'parameter': 'file',
+                     'expected': 'At most one file with extensions: .zip',
+                     'files': [
+                         'sm5.zip',
+                         'layer_with_two_main_files.zip',
+                     ],
+                     },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: {},
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'data': {
+                        'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
+                        'files': [
+                            'temporary_zip_file.zip/sm5.zip',
+                            'temporary_zip_file.zip/layer_with_two_main_files.zip',
+                        ],
+                        'message': 'Zip file without data file inside.',
+                        'parameter': 'file'
+                    },
+                },
+            },
+            ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                    'data': {
+                        'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
+                        'files': [
+                            '{publication_name}.zip/sm5.zip',
+                            '{publication_name}.zip/layer_with_two_main_files.zip',
+                        ],
+                        'message': 'Zip file without data file inside.',
+                        'parameter': 'file'
+                    },
+                },
+            },
+        },
+    },
 }
 
 
