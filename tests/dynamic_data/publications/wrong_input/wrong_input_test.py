@@ -5,7 +5,7 @@ import os
 import logging
 import pytest
 
-from layman import LaymanError
+from layman import LaymanError, settings
 from test_tools import process_client
 from tests import EnumTestTypes, Publication
 from tests.asserts import processing
@@ -64,6 +64,12 @@ class ParametrizationSets(Enum):
     POST_COMPRESS = frozenset([
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+    ])
+    POST_PATCH_CHUNKS = frozenset([
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
     ])
 
 
@@ -278,6 +284,31 @@ TESTCASES = {
                     'data': {
                         'file': '/vsizip//layman_data_test/workspaces/{workspace}/layers/{publication_name}/input_file/{publication_name}.zip/non_readable_raster.tif',
                     }
+                },
+            },
+        },
+    },
+    'pgw_png_unsupported_crs': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': ['sample/layman.layer/sample_png_pgw_rgba.pgw',
+                           'sample/layman.layer/sample_png_pgw_rgba.png', ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 4,
+            'message': 'Unsupported CRS of data file',
+            'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
+        },
+        Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
+        Key.IGNORED_CASES: {},
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_CHUNKS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
                 },
             },
         },
