@@ -61,34 +61,34 @@ Secret name of HTTP header used for authentication internally (e.g. when generat
 List of dotted paths to Python modules to be used as OAuth2 providers. Paths are separated with comma (`,`). See [OAuth2](oauth2/index.md).
 
 ### OAUTH2_CLIENT_ID
-Client ID of Layman's Test Client registered as OAuth2 provider at Liferay instance.
+Client ID of Layman's Test Client registered at OAuth2 provider (e.g. Wagtail or Liferay).
 
 ### OAUTH2_CLIENT&lt;n&gt;_ID
-Client ID of another Layman's client registered as OAuth2 provider at Liferay instance. The **n** must be integer starting from `1`. In case of more clients other than LTC, list of **n**s must be uninterrupted series of integers.
+Client ID of another Layman's client registered at OAuth2 provider. The **n** must be integer starting from `1`. In case of more clients other than LTC, list of **n**s must be uninterrupted series of integers.
 
 ### OAUTH2_SECRET
-Client secret of Layman's Test Client registered as OAuth2 provider at Liferay instance.
+Client secret of Layman's Test Client registered at OAuth2 provider.
 
 ### OAUTH2_SECRET&lt;n&gt;
-Client secret of another Layman's Test client registered as OAuth2 provider at Liferay instance. The **&lt;n&gt;** corresponds with [OAUTH2_CLIENT&lt;n&gt;_ID](#OAUTH2_CLIENTn_ID). Do not set client secret for OAuth2 Authorization Code flow with PKCE.
+Client secret of another Layman's client registered at OAuth2 provider. The **&lt;n&gt;** corresponds with [OAUTH2_CLIENT&lt;n&gt;_ID](#OAUTH2_CLIENTn_ID). Do not set client secret for client that uses OAuth2 Authorization Code flow with PKCE.
 
 ### OAUTH2_AUTH_URL
-URL of Liferay OAuth2 Authorization endpoint.
+URL of OAuth2 Authorization endpoint.
 
 ### OAUTH2_TOKEN_URL
-URL of Liferay OAuth2 Token endpoint. Used by LTC only.
+URL of OAuth2 Token endpoint. Used by LTC only.
 
 ### OAUTH2_CALLBACK_URL
-URL of LTC OAuth2 callback endpoint to be called after Liferay authorization. Used by LTC only.
+URL of LTC OAuth2 callback endpoint to be called after successful OAuth2 authorization. Used by LTC only.
 
 ### OAUTH2_INTROSPECTION_URL
-URL of Liferay OAuth2 Introspection endpoint.
+URL of OAuth2 Introspection endpoint.
 
 ### OAUTH2_INTROSPECTION_SUB_KEY
 Name of the key in OAuth2 introspection response whose value is OAuth2 subject (also known as "sub"). If not set or set to empty string, `sub` is used, that is suitable for Liferay. Value `username` is suitable for Wagtail.
 
 ### OAUTH2_USER_PROFILE_URL
-URL of Liferay User Profile endpoint.
+URL of User Profile endpoint used to obtain user's ID, name, email, etc.
 
 ### OAUTH2_SCOPE
 Comma-separated list of requested OAuth2 scopes. Value `liferay-json-web-services.everything.read.userprofile` is suitable for Liferay. Do not set this variable at all (not even to empty string) if you don't want to request scope; this is suitable option for Wagtail.
