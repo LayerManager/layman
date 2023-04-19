@@ -30,27 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'map_schema_3_0_0': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.MAP_TYPE,
-        KEY_ACTION_PARAMS: {
-            'file_paths': [
-                f'{DIRECTORY}/map_schema_3_0_0.json',
-            ],
-            'compress': False,
-            'with_chunks': False,
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 2,
-                          'data': {'expected': '2.x.x',
-                                   'parameter': 'file',
-                                   'reason': 'Invalid schema version'},
-                          },
-        },
-    },
     'map_unsupported_crs': {
         KEY_PUBLICATION_TYPE: process_client.MAP_TYPE,
         KEY_ACTION_PARAMS: {
