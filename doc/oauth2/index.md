@@ -63,7 +63,7 @@ After successful authorization, *client* is able to communicate with Layman REST
 
 **Authorization** header contains access token according to [RFC6750 Bearer Token Usage](https://tools.ietf.org/html/rfc6750#section-2.1). Structure of its value is `"Bearer <access token>"`.
 
-**AuthorizationIssUrl** header is Layman-specific header and it contains URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), e.g. `"http://localhost:8082/o/oauth2/authorize"`. LTC uses the value from OAUTH2_LIFERAY_AUTH_URL setting.
+**AuthorizationIssUrl** header is Layman-specific header and it contains URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), e.g. `"http://localhost:8082/o/oauth2/authorize"`. LTC uses the value from OAUTH2_AUTH_URL setting.
 
 Because access token is known only on server side of LTC and not to client side, every request from client side to Layman REST API goes through **proxy** on LTC server side. The proxy adds `Authorization` and `AuthorizationIssUrl` headers to the request and forward it to the Layman. To authenticate end-user, Layman then validates access token on *authorization server* using [Token Introspection](https://oauth.net/2/token-introspection/) mechanism.
  
@@ -102,20 +102,20 @@ Schema specific for LTC:
 To enable OAuth2 authentication in Layman, adjust following [environment settings](../env-settings.md):
 - [LAYMAN_AUTHN_MODULES](../env-settings.md#LAYMAN_AUTHN_MODULES)
 - [LAYMAN_AUTHN_OAUTH2_PROVIDERS](../env-settings.md#LAYMAN_AUTHN_OAUTH2_PROVIDERS)
-- [OAUTH2_LIFERAY_AUTH_URL](../env-settings.md#OAUTH2_LIFERAY_AUTH_URL)
-- [OAUTH2_LIFERAY_INTROSPECTION_URL](../env-settings.md#OAUTH2_LIFERAY_INTROSPECTION_URL)
-- [OAUTH2_LIFERAY_USER_PROFILE_URL](../env-settings.md#OAUTH2_LIFERAY_USER_PROFILE_URL)
-- [OAUTH2_LIFERAY_CLIENT_ID](../env-settings.md#OAUTH2_LIFERAY_CLIENT_ID)
-- [OAUTH2_LIFERAY_SECRET](../env-settings.md#OAUTH2_LIFERAY_SECRET)
-- [OAUTH2_LIFERAY_TOKEN_URL](../env-settings.md#OAUTH2_LIFERAY_TOKEN_URL)
-- [OAUTH2_LIFERAY_CALLBACK_URL](../env-settings.md#OAUTH2_LIFERAY_CALLBACK_URL)
+- [OAUTH2_AUTH_URL](../env-settings.md#OAUTH2_AUTH_URL)
+- [OAUTH2_INTROSPECTION_URL](../env-settings.md#OAUTH2_INTROSPECTION_URL)
+- [OAUTH2_USER_PROFILE_URL](../env-settings.md#OAUTH2_USER_PROFILE_URL)
+- [OAUTH2_CLIENT_ID](../env-settings.md#OAUTH2_CLIENT_ID)
+- [OAUTH2_SECRET](../env-settings.md#OAUTH2_SECRET)
+- [OAUTH2_TOKEN_URL](../env-settings.md#OAUTH2_TOKEN_URL)
+- [OAUTH2_CALLBACK_URL](../env-settings.md#OAUTH2_CALLBACK_URL)
 
 Sample values for OAuth2 authentication can be found in [`layman_settings.py`](../../src/layman_settings.py).
 
 ### Liferay Settings
 Every *client* must be registered in Liferay as *application*, as described in [Liferay documentation](https://help.liferay.com/hc/en-us/articles/360018176491-OAuth-2-0#creating-an-application). For LTC, fill in following settings:
 - **Website URL** should point to application's home page, e.g. `http://localhost:3000/`.
-- **Callback URIs** must contain URL of OAuth2 [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2). In case of LTC, the value is the same as LTC setting OAUTH2_LIFERAY_CALLBACK_URL.
+- **Callback URIs** must contain URL of OAuth2 [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2). In case of LTC, the value is the same as LTC setting OAUTH2_CALLBACK_URL.
 - **Client Profile**: Web Application
 - **Allowed Authorization Types**:
     - Authorization Code
@@ -133,16 +133,16 @@ By default, only Liferay users with Administrator role have enough privileges to
 - add **View** and **Create token** permissions for each registered OAuth2 application to desired roles
   - to open permissions, visit *Configuration > OAuth 2 Administration*, click on three dots for desired application and select *Permissions*
 
-After registration, add **Client ID** and **Client Secret** pair to Layman's setting OAUTH2_LIFERAY_CLIENTS.
+After registration, add **Client ID** and **Client Secret** pair to Layman's setting OAUTH2_CLIENTS.
 
 ### Layman Test Client Settings
 Check following environment variables of LTC:
-- OAUTH2_LIFERAY_CLIENT_ID: **Client ID** from Liferay
-- OAUTH2_LIFERAY_SECRET: **Client Secret** from Liferay
-- OAUTH2_LIFERAY_AUTH_URL: URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), usually the same as the first URL from Layman's OAUTH2_LIFERAY_AUTH_URLS
-- OAUTH2_LIFERAY_TOKEN_URL: URL of [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2). In case of liferay, it's something like `<http or https>://<Liferay domain and port>/o/oauth2/token`
-- OAUTH2_LIFERAY_CALLBACK_URL: URL of [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2), the value is `<http or https>://<LTC domain, port, and path prefix>/auth/oauth2-liferay/callback`.
-- OAUTH2_LIFERAY_USER_PROFILE_URL: URL of Layman's [GET Current User](../rest.md#get-current-user)
+- OAUTH2_CLIENT_ID: **Client ID** from Liferay
+- OAUTH2_SECRET: **Client Secret** from Liferay
+- OAUTH2_AUTH_URL: URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), usually the same as the first URL from Layman's OAUTH2_AUTH_URLS
+- OAUTH2_TOKEN_URL: URL of [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2). In case of liferay, it's something like `<http or https>://<Liferay domain and port>/o/oauth2/token`
+- OAUTH2_CALLBACK_URL: URL of [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2), the value is `<http or https>://<LTC domain, port, and path prefix>/auth/oauth2-liferay/callback`.
+- OAUTH2_USER_PROFILE_URL: URL of Layman's [GET Current User](../rest.md#get-current-user)
 
 
 

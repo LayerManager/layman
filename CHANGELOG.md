@@ -7,18 +7,19 @@
   ```
   LAYMAN_CLIENT_VERSION=0aee22e712c4e99cd3a5d72690e782a0fbaa2d27
   ```
+- Rename all `OAUTH2_LIFERAY_<postfix>` environment variables to `OAUTH2_<postfix>`. For example, variable `OAUTH2_LIFERAY_AUTH_URL` becomes `OAUTH2_AUTH_URL`.
 - If you are running Layman with development settings
-  - change environment variables:  
+  - change values of environment variables:  
     ```
-    OAUTH2_LIFERAY_CLIENT_ID=VECGuQb00tWt8HZNkA4cxu6dnoQD5pF6Up3daAoK
-    OAUTH2_LIFERAY_SECRET=aY14rwkEKasNqBEZX8OnhpRk8lpHAfT7oKTlf4LriEK8oMZxhnGKcnt4bZ72pceNEl83B6LtBvhKr3BqBLFA80Pd6Ugav2rkc8bk7TE4LkaoB2qcBQmjiOiEpizsgZGx
-    OAUTH2_LIFERAY_AUTH_URL=http://localhost:8083/o/authorize
-    OAUTH2_LIFERAY_TOKEN_URL=http://wagtail:8000/o/token/
-    OAUTH2_LIFERAY_INTROSPECTION_URL=http://wagtail:8000/o/introspect/
-    OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY=username
-    OAUTH2_LIFERAY_USER_PROFILE_URL=http://wagtail:8000/profile
+    OAUTH2_CLIENT_ID=VECGuQb00tWt8HZNkA4cxu6dnoQD5pF6Up3daAoK
+    OAUTH2_SECRET=aY14rwkEKasNqBEZX8OnhpRk8lpHAfT7oKTlf4LriEK8oMZxhnGKcnt4bZ72pceNEl83B6LtBvhKr3BqBLFA80Pd6Ugav2rkc8bk7TE4LkaoB2qcBQmjiOiEpizsgZGx
+    OAUTH2_AUTH_URL=http://localhost:8083/o/authorize
+    OAUTH2_TOKEN_URL=http://wagtail:8000/o/token/
+    OAUTH2_INTROSPECTION_URL=http://wagtail:8000/o/introspect/
+    OAUTH2_INTROSPECTION_SUB_KEY=username
+    OAUTH2_USER_PROFILE_URL=http://wagtail:8000/profile
     ```
-  - unset environment variable `OAUTH2_LIFERAY_SCOPE`
+  - unset environment variable `OAUTH2_SCOPE` (previously `OAUTH2_LIFERAY_SCOPE`)
   - after [usual dev upgrade commands](README.md#upgrade) run also
     ```
     make wagtail-build
@@ -178,8 +179,8 @@ make client-build
 - [#541](https://github.com/LayerManager/layman/issues/541) Layer name and map name can start with numbers.
 - Maximum length of layer and map name is 210 characters.
 - [#606](https://github.com/LayerManager/layman/issues/606) Fix filtering and ordering publications by bounding box in case of publication with whole world bounding box in database.
-- New environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_liferay_scope). Introduced in v1.16.2.
-- New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](doc/env-settings.md#oauth2_liferay_introspection_sub_key). Introduced in v1.16.1.
+- New environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_scope). Introduced in v1.16.2.
+- New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](doc/env-settings.md#oauth2_introspection_sub_key). Introduced in v1.16.1.
 - [#599](https://github.com/LayerManager/layman/issues/599) Layman supports uploading data files with upper or mixed case extensions. Introduced in v1.16.1.
 - [#541](https://github.com/LayerManager/layman/issues/541) Vector layers are stored in DB table with name in form `layer_<UUID>`, e.g. `layer_96b918c6_d88c_42d8_b999_f3992b826958`, previously the name of the table was the same as name of the layer.
 
@@ -196,7 +197,7 @@ make client-build
   ```
   LAYMAN_CLIENT_VERSION=v1.11.0
   ```
-- If you are using Liferay as OAuth2 provider, set new environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_liferay_scope):
+- If you are using Liferay as OAuth2 provider, set new environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_scope):
   ```
   OAUTH2_LIFERAY_SCOPE=liferay-json-web-services.everything.read.userprofile
   ```
@@ -206,14 +207,14 @@ make client-build
   make client-build
   ```
 ### Changes
-- New environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_liferay_scope).
+- New environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_scope).
 
 ## v1.16.1
  2022-02-25
 ### Changes
 - Fix infinity loop when generating map thumbnail. One of consequences was that such infinity loops consumed all celery workers and it was not possible to complete POST/PATCH map or layer.
 - Fix empty map thumbnail. In some cases, map thumbnail was generated as if anonymous user asks for the map. Now the thumbnail is generated as if user with writing rights asks for the map.
-- New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](doc/env-settings.md#oauth2_liferay_introspection_sub_key).
+- New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](doc/env-settings.md#oauth2_introspection_sub_key).
 - [#599](https://github.com/LayerManager/layman/issues/599) Layman supports uploading data files with upper or mixed case extensions.
 
 ## v1.16.0

@@ -63,7 +63,7 @@ def authenticate():
     if access_token_info is None:
         # current_app.logger.info(f"Veryfying cretentials against OAuth2 provider")
 
-        clients = settings.OAUTH2_LIFERAY_CLIENTS
+        clients = settings.OAUTH2_CLIENTS
         valid_resp = None
         all_connection_errors = True
         for client in clients:
