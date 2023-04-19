@@ -392,6 +392,52 @@ TESTCASES = {
             },
         },
     },
+    'two_main_files': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [
+                'sample/layman.layer/small_layer.geojson',
+                'sample/layman.layer/sample_tif_rgb.tif',
+            ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'message': 'Wrong parameter value',
+            'data': {
+                'expected': 'At most one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or timeseries with time_regex parameter.',
+                'files': [
+                    'sample_tif_rgb.tif',
+                    'small_layer.geojson'],
+                'parameter': 'file'},
+        },
+        Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
+        Key.IGNORED_CASES: {},
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'data': {
+                        'files': [
+                            'temporary_zip_file.zip/sample_tif_rgb.tif',
+                            'temporary_zip_file.zip/small_layer.geojson'],
+                    }
+                },
+            },
+            ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                    'data': {
+                        'files': [
+                            '{publication_name}.zip/sample_tif_rgb.tif',
+                            '{publication_name}.zip/small_layer.geojson'],
+                    }
+                },
+            },
+        },
+    },
 }
 
 
