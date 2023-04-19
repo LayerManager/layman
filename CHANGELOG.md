@@ -7,12 +7,14 @@
   ```
   LAYMAN_CLIENT_VERSION=0aee22e712c4e99cd3a5d72690e782a0fbaa2d27
   ```
-- Rename all `OAUTH2_LIFERAY_<postfix>` environment variables to `OAUTH2_<postfix>`. For example, variable `OAUTH2_LIFERAY_AUTH_URL` becomes `OAUTH2_AUTH_URL`.
+- Rename environment variable `OAUTH2_LIFERAY_SECRET` to `OAUTH2_CLIENT_SECRET`.
+- Rename all environment variables `OAUTH2_LIFERAY_SECRET<n>` to `OAUTH2_CLIENT<n>_SECRET`. For example, variable `OAUTH2_LIFERAY_SECRET4` becomes `OAUTH2_CLIENT4_SECRET`.
+- Rename all other `OAUTH2_LIFERAY_<postfix>` environment variables to `OAUTH2_<postfix>`. For example, variable `OAUTH2_LIFERAY_AUTH_URL` becomes `OAUTH2_AUTH_URL`.
 - If you are running Layman with development settings
   - change values of environment variables:  
     ```
     OAUTH2_CLIENT_ID=VECGuQb00tWt8HZNkA4cxu6dnoQD5pF6Up3daAoK
-    OAUTH2_SECRET=aY14rwkEKasNqBEZX8OnhpRk8lpHAfT7oKTlf4LriEK8oMZxhnGKcnt4bZ72pceNEl83B6LtBvhKr3BqBLFA80Pd6Ugav2rkc8bk7TE4LkaoB2qcBQmjiOiEpizsgZGx
+    OAUTH2_CLIENT_SECRET=aY14rwkEKasNqBEZX8OnhpRk8lpHAfT7oKTlf4LriEK8oMZxhnGKcnt4bZ72pceNEl83B6LtBvhKr3BqBLFA80Pd6Ugav2rkc8bk7TE4LkaoB2qcBQmjiOiEpizsgZGx
     OAUTH2_AUTH_URL=http://localhost:8083/o/authorize
     OAUTH2_TOKEN_URL=http://wagtail:8000/o/token/
     OAUTH2_INTROSPECTION_URL=http://wagtail:8000/o/introspect/

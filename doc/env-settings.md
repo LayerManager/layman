@@ -66,10 +66,10 @@ Client ID of Layman's Test Client registered at OAuth2 provider (e.g. Wagtail or
 ### OAUTH2_CLIENT&lt;n&gt;_ID
 Client ID of another Layman's client registered at OAuth2 provider. The **n** must be integer starting from `1`. In case of more clients other than LTC, list of **n**s must be uninterrupted series of integers.
 
-### OAUTH2_SECRET
+### OAUTH2_CLIENT_SECRET
 Client secret of Layman's Test Client registered at OAuth2 provider.
 
-### OAUTH2_SECRET&lt;n&gt;
+### OAUTH2_CLIENT&lt;n&gt;_SECRET
 Client secret of another Layman's client registered at OAuth2 provider. The **&lt;n&gt;** corresponds with [OAUTH2_CLIENT&lt;n&gt;_ID](#OAUTH2_CLIENTn_ID). Do not set client secret for client that uses OAuth2 Authorization Code flow with PKCE.
 
 ### OAUTH2_AUTH_URL
