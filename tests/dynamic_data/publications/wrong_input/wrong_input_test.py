@@ -629,6 +629,31 @@ TESTCASES = {
         Key.IGNORED_CASES: {},
         Key.SPECIFIC_CASES: {},
     },
+    'layer_vector_overview_resampling': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': ['sample/layman.layer/small_layer.geojson'],
+            'overview_resampling': 'nearest',
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 48,
+            'message': 'Wrong combination of parameters',
+            'data': 'Vector layers do not support overview resampling.',
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: {},
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_CHUNKS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                },
+            },
+        },
+    },
 }
 
 
