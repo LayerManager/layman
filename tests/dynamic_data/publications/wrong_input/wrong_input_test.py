@@ -492,6 +492,29 @@ TESTCASES = {
             },
         },
     },
+    'tif_with_unsupported_bands': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': ['sample/layman.layer/sample_tif_rg.tif', ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'message': 'Wrong parameter value',
+            'data': {'parameter': 'file',
+                     'expected': 'Any of color interpretations [Gray], '
+                                 '[Gray, Alpha], [Palette], [Red, Green, Blue], '
+                                 '[Red, Green, Blue, Alpha].',
+                     'found': ['Red', 'Green']
+                     },
+        },
+        Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
+        Key.IGNORED_CASES: ParametrizationSets.POST_PATCH_CHUNKS,
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 
