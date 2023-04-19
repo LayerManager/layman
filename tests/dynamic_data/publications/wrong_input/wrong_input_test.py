@@ -588,6 +588,26 @@ TESTCASES = {
         Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
         Key.SPECIFIC_CASES: {},
     },
+    'map_unsupported_crs': {
+        Key.PUBLICATION_TYPE: process_client.MAP_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [
+                f'{DIRECTORY}/map_unsupported_crs.json',
+            ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 4,
+            'data': {'found': 'EPSG:3030',
+                     'supported_values': settings.INPUT_SRS_LIST},
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 
