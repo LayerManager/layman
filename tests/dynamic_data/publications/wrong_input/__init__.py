@@ -30,28 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'epsg_4326_en': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'file_paths': [
-                f'{DIRECTORY}/small_layer_4326_en.shp',
-                f'{DIRECTORY}/small_layer_4326_en.dbf',
-                f'{DIRECTORY}/small_layer_4326_en.prj',
-                f'{DIRECTORY}/small_layer_4326_en.shx',
-            ],
-            'compress': False,
-            'with_chunks': False,
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 4,
-                          'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
-                          },
-        },
-    },
     'map_schema_1_0_0': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.MAP_TYPE,
