@@ -55,6 +55,16 @@ class ParametrizationSets(Enum):
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
     ])
+    PATCH_ALL = frozenset([
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+    ])
+    POST_COMPRESS = frozenset([
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+    ])
 
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -226,6 +236,52 @@ TESTCASES = {
             },
         },
     },
+    'non_readable_raster': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [f'{DIRECTORY}/non_readable_raster.tif'],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'message': 'Wrong parameter value',
+            'data': {'parameter': 'file',
+                     'message': 'Unable to open raster file.',
+                     'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
+                     'file': '/layman_data_test/workspaces/{workspace}/layers/{publication_name}/input_file/{publication_name}.tif',
+                     },
+        },
+        Key.MANDATORY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.SPECIFIC_CASES: {
+            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+                Key.EXPECTED_EXCEPTION: {
+                    'data': {
+                        'file': '/vsizip//layman_data_test/workspaces/{workspace}/layers/{publication_name}/input_file/{publication_name}.zip/non_readable_raster.tif',
+                    }
+                },
+            },
+            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]): {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                    'data': {
+                        'file': '/layman_data_test/workspaces/{workspace}/layers/{publication_name}/input_file/{publication_name}.tif'
+                    }
+                },
+            },
+            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                    'data': {
+                        'file': '/vsizip//layman_data_test/workspaces/{workspace}/layers/{publication_name}/input_file/{publication_name}.zip/non_readable_raster.tif',
+                    }
+                },
+            },
+        },
+    },
 }
 
 
@@ -280,6 +336,8 @@ def generate_test_cases():
 def format_exception(exception_info: dict, format_variables: dict):
     if 'path' in exception_info['data']:
         exception_info['data']['path'] = exception_info['data']['path'].format(**format_variables)
+    if 'file' in exception_info['data']:
+        exception_info['data']['file'] = exception_info['data']['file'].format(**format_variables)
     if 'files' in exception_info['data']:
         exception_info['data']['files'] = [file.format(**format_variables) for file in exception_info['data']['files']]
 
@@ -300,7 +358,10 @@ class TestPublication(base_test.TestSingleRestPublication):
 
         exp_exception = params[Key.EXPECTED_EXCEPTION]
         is_sync = exp_exception.pop('sync')
-        format_exception(exp_exception, {'publication_name': publication.name})
+        format_exception(exp_exception, {
+            'publication_name': publication.name,
+            'workspace': publication.workspace,
+        })
         exception = pytest.raises(params[Key.EXCEPTION]) if is_sync else does_not_raise()
         with exception as exception_info:
             response = rest_method(publication, args=rest_args)
