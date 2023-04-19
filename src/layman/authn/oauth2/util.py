@@ -1,4 +1,3 @@
-import importlib
 import json
 import math
 import time
@@ -9,9 +8,8 @@ from flask import request, g, current_app
 from layman import settings
 from layman.http import LaymanError
 from layman.authn.redis import get_username
+from . import liferay
 
-FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
-FLASK_PROVIDER_KEY = f'{__name__}:PROVIDER'
 FLASK_ACCESS_TOKEN_KEY = f'{__name__}:ACCESS_TOKEN'
 FLASK_SUB_KEY = f'{__name__}:SUB'
 
@@ -25,8 +23,8 @@ def authenticate():
     user = None
     iss_url = request.headers.get(ISS_URL_HEADER, None)
     authz_header = request.headers.get(TOKEN_HEADER, None)
-    if authz_header is not None and iss_url is None and len(_get_provider_modules()) == 1:
-        iss_url = _get_provider_modules()[0].AUTH_URLS[0]
+    if authz_header is not None and iss_url is None:
+        iss_url = liferay.AUTH_URLS[0]
         current_app.logger.info(f"\nusing default iss_url={iss_url}")
     if iss_url is None and authz_header is None:
         return user
@@ -53,7 +51,7 @@ def authenticate():
                           f'HTTP header {TOKEN_HEADER} contains empty access token. The structure must be "Bearer <access_token>"',
                           sub_code=5)
 
-    provider_module = _get_provider_by_auth_url(iss_url)
+    provider_module = liferay if iss_url == liferay.AUTH_URLS[0] else None
     if provider_module is None:
         raise LaymanError(32, f'No OAuth2 provider was found for URL passed in HTTP header {ISS_URL_HEADER}.',
                           sub_code=6)
@@ -117,10 +115,8 @@ def authenticate():
         # current_app.logger.info(f"Cretentials verified against Layman cache")
         sub = access_token_info['sub']
 
-    assert FLASK_PROVIDER_KEY not in g
     assert FLASK_ACCESS_TOKEN_KEY not in g
     assert FLASK_SUB_KEY not in g
-    g.setdefault(FLASK_PROVIDER_KEY, provider_module)
     g.setdefault(FLASK_ACCESS_TOKEN_KEY, access_token)
     g.setdefault(FLASK_SUB_KEY, sub)
 
@@ -135,19 +131,8 @@ def authenticate():
     return user
 
 
-def _get_provider_modules():
-    key = FLASK_PROVIDERS_KEY
-    if key not in current_app.config:
-        modules = [
-            importlib.import_module('layman.authn.oauth2.liferay'),
-        ]
-        current_app.config[key] = modules
-    return current_app.config[key]
-
-
 def _get_provider_module():
-    key = FLASK_PROVIDER_KEY
-    return g.get(key)
+    return liferay
 
 
 def get_iss_id():
@@ -162,13 +147,6 @@ def get_sub():
 def _get_access_token():
     key = FLASK_ACCESS_TOKEN_KEY
     return g.get(key)
-
-
-def _get_provider_by_auth_url(iss_url):
-    return next((
-        m for m in _get_provider_modules()
-        if iss_url in m.AUTH_URLS
-    ), None)
 
 
 def get_open_id_claims():
