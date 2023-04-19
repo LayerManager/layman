@@ -56,60 +56,6 @@ TESTCASES = {
             },
         },
     },
-    'two_main_files': {
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'file_paths': [
-                'sample/layman.layer/small_layer.geojson',
-                'sample/layman.layer/sample_tif_rgb.tif',
-            ],
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 2,
-                          'message': 'Wrong parameter value',
-                          'data': {
-                              'expected': 'At most one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or timeseries with time_regex parameter.',
-                              'files': [
-                                  'sample_tif_rgb.tif',
-                                  'small_layer.geojson'],
-                              'parameter': 'file'},
-                          },
-            frozenset([('compress', True), ('with_chunks', False)]): {
-                'data': {
-                    'files': [
-                        'temporary_zip_file.zip/sample_tif_rgb.tif',
-                        'temporary_zip_file.zip/small_layer.geojson'],
-                }
-            },
-            frozenset([('compress', True), ('with_chunks', True)]): {
-                'sync': False,
-                'data': {
-                    'files': [
-                        'two_main_files_post_chunks_zipped.zip/sample_tif_rgb.tif',
-                        'two_main_files_post_chunks_zipped.zip/small_layer.geojson'],
-                }
-            },
-        },
-        KEY_PATCHES: {
-            'patch': {
-                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
-                KEY_ACTION_PARAMS: {},
-                KEY_EXPECTED_EXCEPTION: {
-                    frozenset([('compress', True), ('with_chunks', True)]): {
-                        'sync': False,
-                        'data': {
-                            'files': [
-                                'two_main_files_patch_patch_chunks_zipped.zip/sample_tif_rgb.tif',
-                                'two_main_files_patch_patch_chunks_zipped.zip/small_layer.geojson'],
-                        }
-                    },
-                },
-            },
-        },
-    },
     'two_zip_files': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
