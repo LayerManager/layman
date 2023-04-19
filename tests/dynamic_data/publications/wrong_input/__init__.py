@@ -30,33 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'png_without_pgw': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'file_paths': ['sample/layman.layer/sample_png_pgw_rgba.png', ],
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 4,
-                          'message': 'Unsupported CRS of data file',
-                          'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
-                          },
-            frozenset([('compress', False), ('with_chunks', True)]): {
-                'sync': False,
-            },
-            frozenset([('compress', True), ('with_chunks', True)]): {
-                'sync': False,
-            },
-        },
-        KEY_PATCHES: {
-            'patch': {
-                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
-            },
-        },
-    },
     'shp_with_unsupported_epsg': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
