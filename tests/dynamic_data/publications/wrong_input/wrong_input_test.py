@@ -368,6 +368,30 @@ TESTCASES = {
             },
         },
     },
+    'tif_with_unsupported_epsg': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [f'{DIRECTORY}/sample_tif_rgb_2154.tif', ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 4,
+            'message': 'Unsupported CRS of data file',
+            'data': {'found': 'EPSG:2154', 'supported_values': settings.INPUT_SRS_LIST},
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: {},
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_CHUNKS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                },
+            },
+        },
+    },
 }
 
 
