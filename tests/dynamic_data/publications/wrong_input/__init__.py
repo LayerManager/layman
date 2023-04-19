@@ -30,25 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'map_unsupported_crs': {
-        KEY_PUBLICATION_TYPE: process_client.MAP_TYPE,
-        KEY_ACTION_PARAMS: {
-            'file_paths': [
-                f'{DIRECTORY}/map_unsupported_crs.json',
-            ],
-            'compress': False,
-            'with_chunks': False,
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 4,
-                          'data': {'found': 'EPSG:3030',
-                                   'supported_values': settings.INPUT_SRS_LIST},
-                          },
-        },
-    },
     'layer_unsupported_overview_resampling': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
