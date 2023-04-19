@@ -193,11 +193,6 @@ assert re.match("^[a-z][a-z0-9]*$", LAYMAN_AUTHN_HTTP_HEADER_NAME), "Only lowerc
     "should be used for " \
     "LAYMAN_AUTHN_HTTP_HEADER_NAME. "
 
-LAYMAN_AUTHN_OAUTH2_PROVIDERS = [
-    m for m in os.getenv('LAYMAN_AUTHN_OAUTH2_PROVIDERS', '').split(',')
-    if len(m) > 0
-]
-
 LAYMAN_AUTHN_CACHE_MAX_TIMEOUT = 60
 
 OAUTH2_AUTH_URLS = [

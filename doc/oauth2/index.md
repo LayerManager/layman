@@ -101,7 +101,6 @@ Schema specific for LTC:
 
 To enable OAuth2 authentication in Layman, adjust following [environment settings](../env-settings.md):
 - [LAYMAN_AUTHN_MODULES](../env-settings.md#LAYMAN_AUTHN_MODULES)
-- [LAYMAN_AUTHN_OAUTH2_PROVIDERS](../env-settings.md#LAYMAN_AUTHN_OAUTH2_PROVIDERS)
 - [OAUTH2_AUTH_URL](../env-settings.md#OAUTH2_AUTH_URL)
 - [OAUTH2_INTROSPECTION_URL](../env-settings.md#OAUTH2_INTROSPECTION_URL)
 - [OAUTH2_USER_PROFILE_URL](../env-settings.md#OAUTH2_USER_PROFILE_URL)

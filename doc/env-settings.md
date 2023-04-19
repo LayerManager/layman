@@ -57,9 +57,6 @@ List of dotted paths to Python modules to be used for authentication. Paths are 
 ### LAYMAN_AUTHN_HTTP_HEADER_NAME
 Secret name of HTTP header used for authentication internally (e.g. when generating private map thumbnail). Only combination of lowercase characters and numbers must be used for the value. At demo configuration, the HTTP header is automatically removed by Nginx on every request to Layman REST API or to GeoServer WMS/WFS/OWS.
 
-### LAYMAN_AUTHN_OAUTH2_PROVIDERS
-List of dotted paths to Python modules to be used as OAuth2 providers. Paths are separated with comma (`,`). See [OAuth2](oauth2/index.md).
-
 ### OAUTH2_CLIENT_ID
 Client ID of Layman's Test Client registered at OAuth2 provider (e.g. Wagtail or Liferay).
 

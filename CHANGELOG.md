@@ -10,6 +10,7 @@
 - Rename environment variable `OAUTH2_LIFERAY_SECRET` to `OAUTH2_CLIENT_SECRET`.
 - Rename all environment variables `OAUTH2_LIFERAY_SECRET<n>` to `OAUTH2_CLIENT<n>_SECRET`. For example, variable `OAUTH2_LIFERAY_SECRET4` becomes `OAUTH2_CLIENT4_SECRET`.
 - Rename all other `OAUTH2_LIFERAY_<postfix>` environment variables to `OAUTH2_<postfix>`. For example, variable `OAUTH2_LIFERAY_AUTH_URL` becomes `OAUTH2_AUTH_URL`.
+- Stop using environment variable `LAYMAN_AUTHN_OAUTH2_PROVIDERS`, it has no effect to Layman anymore. There is exactly one OAuth2 provider Python module now, no need to set it.
 - If you are running Layman with development settings
   - change values of environment variables:  
     ```
