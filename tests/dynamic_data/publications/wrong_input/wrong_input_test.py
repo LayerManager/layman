@@ -608,6 +608,27 @@ TESTCASES = {
         Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
         Key.SPECIFIC_CASES: {},
     },
+    'layer_unsupported_overview_resampling': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
+            'overview_resampling': 'no_overview_resampling',
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'data': {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/programs/gdaladdo.html',
+                     'parameter': 'overview_resampling',
+                     'detail': {'found': 'no_overview_resampling',
+                                'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: {},
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 
