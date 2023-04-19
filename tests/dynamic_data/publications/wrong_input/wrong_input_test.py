@@ -71,6 +71,15 @@ class ParametrizationSets(Enum):
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
     ])
+    NOT_SIMPLE_POST = frozenset([
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+    ])
 
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -513,6 +522,28 @@ TESTCASES = {
         },
         Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
         Key.IGNORED_CASES: ParametrizationSets.POST_PATCH_CHUNKS,
+        Key.SPECIFIC_CASES: {},
+    },
+    'epsg_4326_en': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [
+                f'{DIRECTORY}/small_layer_4326_en.shp',
+                f'{DIRECTORY}/small_layer_4326_en.dbf',
+                f'{DIRECTORY}/small_layer_4326_en.prj',
+                f'{DIRECTORY}/small_layer_4326_en.shx',
+            ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 4,
+            'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
         Key.SPECIFIC_CASES: {},
     },
 }
