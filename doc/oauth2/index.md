@@ -106,7 +106,7 @@ To enable OAuth2 authentication in Layman, adjust following [environment setting
 - [OAUTH2_INTROSPECTION_URL](../env-settings.md#OAUTH2_INTROSPECTION_URL)
 - [OAUTH2_USER_PROFILE_URL](../env-settings.md#OAUTH2_USER_PROFILE_URL)
 - [OAUTH2_CLIENT_ID](../env-settings.md#OAUTH2_CLIENT_ID)
-- [OAUTH2_SECRET](../env-settings.md#OAUTH2_SECRET)
+- [OAUTH2_CLIENT_SECRET](../env-settings.md#OAUTH2_CLIENT_SECRET)
 - [OAUTH2_TOKEN_URL](../env-settings.md#OAUTH2_TOKEN_URL)
 - [OAUTH2_CALLBACK_URL](../env-settings.md#OAUTH2_CALLBACK_URL)
 
@@ -138,7 +138,7 @@ After registration, add **Client ID** and **Client Secret** pair to Layman's set
 ### Layman Test Client Settings
 Check following environment variables of LTC:
 - OAUTH2_CLIENT_ID: **Client ID** from Liferay
-- OAUTH2_SECRET: **Client Secret** from Liferay
+- OAUTH2_CLIENT_SECRET: **Client Secret** from Liferay
 - OAUTH2_AUTH_URL: URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), usually the same as the first URL from Layman's OAUTH2_AUTH_URLS
 - OAUTH2_TOKEN_URL: URL of [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2). In case of liferay, it's something like `<http or https>://<Liferay domain and port>/o/oauth2/token`
 - OAUTH2_CALLBACK_URL: URL of [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2), the value is `<http or https>://<LTC domain, port, and path prefix>/auth/oauth2-liferay/callback`.
