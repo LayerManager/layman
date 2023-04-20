@@ -101,6 +101,12 @@ class ParametrizationSets(Enum):
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
     ])
+    POST_PATCH_COMPRESS = frozenset([
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+    ])
 
 
 
@@ -1111,6 +1117,40 @@ TESTCASES = {
             },
         },
     },
+    'too_long_filename_with_time_regexp': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'time_regex': r'[0-9]{8}',
+            'file_paths': [
+                f'{DIRECTORY}/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip',
+            ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 48,
+            'message': 'Wrong combination of parameters',
+            'data': {
+                'message': 'Too long filename in timeseries.',
+                'expected': 'All files names shorter than 211 characters',
+                'too_long_filenames': [
+                    '211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif'],
+            },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.POST_PATCH_COMPRESS,
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_CHUNKS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                    'data': {'too_long_filenames': [
+                        '{publication_name}.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif']}
+                },
+            },
+        },
+    },
 }
 
 
@@ -1180,6 +1220,8 @@ def format_exception(exception_info: dict, format_variables: dict):
             exception_info['data']['files'] = [file.format(**format_variables) for file in exception_info['data']['files']]
         if 'unmatched_filenames' in exception_info['data']:
             exception_info['data']['unmatched_filenames'] = [file.format(**format_variables) for file in exception_info['data']['unmatched_filenames']]
+        if 'too_long_filenames' in exception_info['data']:
+            exception_info['data']['too_long_filenames'] = [file.format(**format_variables) for file in exception_info['data']['too_long_filenames']]
 
 
 @pytest.mark.usefixtures('ensure_external_db')

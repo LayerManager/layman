@@ -30,51 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'too_long_filename_with_time_regexp': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'time_regex': r'[0-9]{8}',
-            'file_paths': [
-                f'{DIRECTORY}/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip',
-            ],
-            'compress': False,
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 48,
-                          'message': 'Wrong combination of parameters',
-                          'data': {
-                              'message': 'Too long filename in timeseries.',
-                              'expected': 'All files names shorter than 211 characters',
-                              'too_long_filenames': ['211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif'],
-                          },
-                          },
-            frozenset([('compress', False), ('with_chunks', True)]): {
-                'sync': False,
-                'data': {'too_long_filenames': ['too_long_filename_with_time_regexp_post_chunks.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif']}
-            },
-        },
-        KEY_PATCHES: {
-            'full': {
-                KEY_PATCH_POST: {},
-                KEY_ACTION_PARAMS: {
-                    'time_regex': r'[0-9]{8}',
-                    'file_paths': [
-                        f'{DIRECTORY}/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip',
-                    ],
-                    'compress': False,
-                },
-                KEY_EXPECTED_EXCEPTION: {
-                    frozenset([('compress', False), ('with_chunks', True)]): {
-                        'data': {'too_long_filenames': ['too_long_filename_with_time_regexp_patch_full_chunks.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif']}
-                    },
-                },
-            },
-        },
-    },
     'unsafe_timeseries_filename_with_dot': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
