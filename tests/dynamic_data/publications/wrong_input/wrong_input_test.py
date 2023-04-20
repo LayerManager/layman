@@ -833,6 +833,46 @@ TESTCASES = {
             }
         },
     },
+    'raster_vector_time_regex': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
+            'file_paths': ['sample/layman.layer/sample_jp2_rgb.jp2',
+                           'sample/layman.layer/single_point.dbf',
+                           'sample/layman.layer/single_point.prj',
+                           'sample/layman.layer/single_point.shp',
+                           'sample/layman.layer/single_point.shx',
+                           'sample/layman.layer/single_point.qpj',
+                           ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'data': {'expected': 'All main files with the same extension.',
+                     'files': ['sample_jp2_rgb.jp2', 'single_point.shp'],
+                     'extensions': ['.jp2', '.shp'],
+                     'parameter': 'file',
+                     },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.SPECIFIC_CASES: {
+            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+                Key.EXPECTED_EXCEPTION: {
+                    'data': {'files': ['temporary_zip_file.zip/sample_jp2_rgb.jp2', 'temporary_zip_file.zip/single_point.shp'], },
+                },
+            },
+            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+                Key.EXPECTED_EXCEPTION: {
+                    'data': {'files': ['{publication_name}.zip/sample_jp2_rgb.jp2', '{publication_name}.zip/single_point.shp'], },
+                    'sync': False,
+                },
+            },
+        },
+    },
 }
 
 
