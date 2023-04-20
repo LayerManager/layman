@@ -8,7 +8,7 @@ import pytest
 from layman import LaymanError, settings
 from test_tools import process_client
 from tests import EnumTestTypes, Publication
-from tests.asserts import processing
+from tests.asserts import processing, util as asserts_util
 from tests.asserts.final import publication as publication_asserts
 from tests.asserts.final.publication import util as assert_utils
 from tests.dynamic_data import base_test
@@ -1264,6 +1264,60 @@ TESTCASES = {
         Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
         Key.IGNORED_CASES: ParametrizationSets.POST_PATCH_COMPRESS,
         Key.SPECIFIC_CASES: {},
+    },
+    'duplicate_filename_differs_in_diacritics': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'time_regex': r'[0-9]{8}',
+            'file_paths': [
+                f'{DIRECTORY}/snimek_20220316.tif',
+                f'{DIRECTORY}/snímek_20220316.tif',
+            ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'message': 'Wrong parameter value',
+            'data': {
+                'parameter': 'file',
+                'message': 'Two or more input file names map to the same name.',
+                'expected': 'Input file names that differ at least in one letter (ignoring case and diacritics) or number.',
+                'similar_filenames_mapping': {
+                    'snimek_20220316.tif': 'snimek_20220316.tif',
+                    'snímek_20220316.tif': 'snimek_20220316.tif',
+                },
+            },
+        },
+        Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
+        Key.IGNORED_CASES: {},
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'data': {
+                        'similar_filenames_mapping': {
+                            asserts_util.KEY_REPLACE: True,
+                            'temporary_zip_file.zip/snimek_20220316.tif': 'snimek_20220316.tif',
+                            'temporary_zip_file.zip/snímek_20220316.tif': 'snimek_20220316.tif',
+                        },
+                    },
+                },
+            },
+            ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                    'data': {
+                        'similar_filenames_mapping': {
+                            asserts_util.KEY_REPLACE: True,
+                            '{publication_name}.zip/snimek_20220316.tif': 'snimek_20220316.tif',
+                            '{publication_name}.zip/snímek_20220316.tif': 'snimek_20220316.tif',
+                        },
+                    },
+                },
+            },
+        },
     },
 }
 
