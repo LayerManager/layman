@@ -118,7 +118,6 @@ class ParametrizationSets(Enum):
     ])
 
 
-
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 logger = logging.getLogger(__name__)
 
@@ -1400,6 +1399,59 @@ TESTCASES = {
         },
         Key.MANDATORY_CASES: {},
         Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST_PATCH,
+        Key.SPECIFIC_CASES: {},
+    },
+    'crs_and_external_table_uri_post': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'crs': 'EPSG:4326',
+            'external_table_uri': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 48,
+            'message': 'Wrong combination of parameters',
+            'data': {
+                'parameters': ['crs', 'file'],
+                'message': 'Parameter `crs` needs also parameter `file`.',
+                'expected': 'Input files in `file` parameter or empty `crs` parameter.',
+                'found': {
+                    'crs': 'EPSG:4326',
+                    'file': [],
+                }},
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
+        Key.SPECIFIC_CASES: {},
+    },
+    'crs_and_external_table_uri_patch': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'crs': 'EPSG:4326',
+            'external_table_uri': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
+            'skip_asserts': True,
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 48,
+            'message': 'Wrong combination of parameters',
+            'data': {
+                'parameters': ['crs', 'file'],
+                'message': 'Parameter `crs` needs also parameter `file`.',
+                'expected': 'Input files in `file` parameter or empty `crs` parameter.',
+                'found': {
+                    'crs': 'EPSG:4326',
+                    'file': [],
+                }},
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_PATCH,
         Key.SPECIFIC_CASES: {},
     },
 }
