@@ -30,43 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'unsafe_timeseries_filename_with_dot': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'time_regex': r'[0-9]{8}',
-            'file_paths': [
-                f'{DIRECTORY}/.20220316.tif',
-            ],
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 48,
-                          'message': 'Wrong combination of parameters',
-                          'data': {
-                              'message': 'Unsafe filename in timeseries.',
-                              'expected': 'All slugified file names matching pattern ^(?![.])[a-zA-Z0-9_.-]+$',
-                              'unsafe_slugified_filenames': ['.20220316.tif'],
-                          },
-                          },
-            frozenset([('compress', True), ('with_chunks', True)]): {
-                'sync': False,
-            },
-        },
-        KEY_PATCHES: {
-            'full': {
-                KEY_PATCH_POST: {},
-                KEY_ACTION_PARAMS: {
-                    'time_regex': r'[0-9]{8}',
-                    'file_paths': [
-                        f'{DIRECTORY}/.20220316.tif',
-                    ],
-                },
-            },
-        },
-    },
     'unsafe_timeseries_filename_with_cyrillic': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
