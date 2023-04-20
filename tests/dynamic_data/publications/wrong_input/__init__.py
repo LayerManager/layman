@@ -30,56 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'layer_overview_resampling_no_input_file': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_SKIP_POST: True,
-        KEY_ACTION_PARAMS: {},
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 48,
-                          'message': 'Wrong combination of parameters',
-                          'data': 'Parameter overview_resampling requires parameter file to be set.',
-                          },
-        },
-        KEY_PATCHES: {
-            'full': {
-                KEY_PATCH_POST: {
-                    'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
-                    'overview_resampling': 'nearest',
-                },
-                KEY_ACTION_PARAMS: {
-                    'file_paths': [],
-                    'overview_resampling': 'mode',
-                },
-                KEY_EXPECTED_EXCEPTION: {
-                    frozenset([('compress', True), ('with_chunks', False)]): {
-                        'code': 2,
-                        'message': 'Wrong parameter value',
-                        'data': {
-                            'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                            'files': ['temporary_zip_file.zip'],
-                            'message': 'Zip file without data file inside.',
-                            'parameter': 'file'
-                        },
-                    },
-                    frozenset([('compress', True), ('with_chunks', True)]): {
-                        'sync': False,
-                        'code': 2,
-                        'message': 'Wrong parameter value',
-                        'data': {
-                            'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                            'files': ['layer_overview_resampling_no_input_file_patch_full_chunks_zipped.zip'],
-                            'message': 'Zip file without data file inside.',
-                            'parameter': 'file'
-                        },
-                    },
-                },
-            },
-        },
-    },
     'layer_name_211': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,

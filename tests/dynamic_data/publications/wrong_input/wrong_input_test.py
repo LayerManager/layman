@@ -694,6 +694,55 @@ TESTCASES = {
             },
         },
     },
+    'layer_overview_resampling_no_input_file': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [],
+            'overview_resampling': 'mode',
+        },
+        Key.POST_BEFORE_PATCH_ARGS: {
+            'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
+            'overview_resampling': 'nearest',
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 48,
+            'message': 'Wrong combination of parameters',
+            'data': 'Parameter overview_resampling requires parameter file to be set.',
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.POST_ALL,
+        Key.SPECIFIC_CASES: {
+            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+                Key.EXPECTED_EXCEPTION: {
+                    'code': 2,
+                    'message': 'Wrong parameter value',
+                    'data': {
+                        'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
+                        'files': ['temporary_zip_file.zip'],
+                        'message': 'Zip file without data file inside.',
+                        'parameter': 'file'
+                    },
+                },
+            },
+            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                    'code': 2,
+                    'message': 'Wrong parameter value',
+                    'data': {
+                        'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
+                        'files': ['{publication_name}.zip'],
+                        'message': 'Zip file without data file inside.',
+                        'parameter': 'file'
+                    },
+                },
+            },
+        },
+    },
 }
 
 
@@ -746,14 +795,15 @@ def generate_test_cases():
 
 
 def format_exception(exception_info: dict, format_variables: dict):
-    if 'path' in exception_info['data']:
-        exception_info['data']['path'] = exception_info['data']['path'].format(**format_variables)
-    if 'file' in exception_info['data']:
-        exception_info['data']['file'] = exception_info['data']['file'].format(**format_variables)
-    if 'files' in exception_info['data']:
-        exception_info['data']['files'] = [file.format(**format_variables) for file in exception_info['data']['files']]
-    if 'unmatched_filenames' in exception_info['data']:
-        exception_info['data']['unmatched_filenames'] = [file.format(**format_variables) for file in exception_info['data']['unmatched_filenames']]
+    if isinstance(exception_info['data'], dict):
+        if 'path' in exception_info['data']:
+            exception_info['data']['path'] = exception_info['data']['path'].format(**format_variables)
+        if 'file' in exception_info['data']:
+            exception_info['data']['file'] = exception_info['data']['file'].format(**format_variables)
+        if 'files' in exception_info['data']:
+            exception_info['data']['files'] = [file.format(**format_variables) for file in exception_info['data']['files']]
+        if 'unmatched_filenames' in exception_info['data']:
+            exception_info['data']['unmatched_filenames'] = [file.format(**format_variables) for file in exception_info['data']['unmatched_filenames']]
 
 
 @pytest.mark.usefixtures('ensure_external_db')
