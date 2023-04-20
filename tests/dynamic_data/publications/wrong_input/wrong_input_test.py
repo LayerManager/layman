@@ -1073,6 +1073,44 @@ TESTCASES = {
         Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_PATCH,
         Key.SPECIFIC_CASES: {},
     },
+    'time_regex_with_non_data_file': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.j2w'],
+            'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'message': 'Wrong parameter value',
+            'data': {
+                'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
+                'files': ['sample_jp2_j2w_rgb.j2w'],
+                'message': 'No data file in input.',
+                'parameter': 'file',
+            },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: {},
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'data': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.j2w'],
+                             'message': 'Zip file without data file inside.', }
+                },
+            },
+            ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                    'data': {'files': ['{publication_name}.zip/sample_jp2_j2w_rgb.j2w'],
+                             'message': 'Zip file without data file inside.', }
+                },
+            },
+        },
+    },
 }
 
 
