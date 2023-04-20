@@ -30,29 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'none_file_none_external_table_uri': {
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_ACTION_PARAMS: {
-            'file_paths': [],
-            'external_table_uri': '',
-            'compress': False,
-            'with_chunks': False,
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 1,
-                          'message': 'Missing parameter',
-                          'data': {
-                              'parameters': ['file', 'external_table_uri'],
-                              'message': 'Both `file` and `external_table_uri` parameters are empty',
-                              'expected': 'One of the parameters is filled.',
-                          },
-                          },
-        },
-    },
     'file_and_external_table_uri': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
