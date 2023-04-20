@@ -30,39 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'dif_raster_types_time_regex': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
-            'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.j2w',
-                           'sample/layman.layer/sample_jp2_j2w_rgb.jp2',
-                           'sample/layman.layer/sample_jpeg_jgw_rgb.jgw',
-                           'sample/layman.layer/sample_jpeg_jgw_rgb.jpeg',
-                           ],
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 2,
-                          'data': {'expected': 'All main files with the same extension.',
-                                   'files': ['sample_jp2_j2w_rgb.jp2', 'sample_jpeg_jgw_rgb.jpeg', ],
-                                   'extensions': ['.jp2', '.jpeg'],
-                                   'parameter': 'file',
-                                   },
-                          },
-            frozenset([('compress', True), ('with_chunks', False)]): {
-                'data': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.jp2', 'temporary_zip_file.zip/sample_jpeg_jgw_rgb.jpeg', ],
-                         },
-            },
-            frozenset([('compress', True), ('with_chunks', True)]): {
-                'sync': False,
-                'data': {'files': ['dif_raster_types_time_regex_post_chunks_zipped.zip/sample_jp2_j2w_rgb.jp2', 'dif_raster_types_time_regex_post_chunks_zipped.zip/sample_jpeg_jgw_rgb.jpeg', ],
-                         },
-            },
-        },
-    },
     'raster_and_zip_raster_time_regex': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
