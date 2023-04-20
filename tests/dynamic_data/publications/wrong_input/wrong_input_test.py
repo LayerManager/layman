@@ -1182,6 +1182,37 @@ TESTCASES = {
             },
         },
     },
+    'unsafe_timeseries_filename_with_cyrillic': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'time_regex': r'[0-9]{8}',
+            'file_paths': [
+                f'{DIRECTORY}/річка_20220316.tif',
+            ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 48,
+            'message': 'Wrong combination of parameters',
+            'data': {
+                'message': 'Unsafe filename in timeseries.',
+                'expected': 'All slugified file names matching pattern ^(?![.])[a-zA-Z0-9_.-]+$',
+                'unsafe_slugified_filenames': ['річка_20220316.tif'],
+            },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: {},
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                },
+            },
+        },
+    },
 }
 
 
