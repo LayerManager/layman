@@ -808,6 +808,31 @@ TESTCASES = {
         Key.IGNORED_CASES: {},
         Key.SPECIFIC_CASES: {},
     },
+    'vector_time_regex': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 48,
+            'data': 'Vector layers are not allowed to be combined with `time_regex` parameter.',
+        },
+        Key.MANDATORY_CASES: {
+            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        },
+        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.SPECIFIC_CASES: {
+            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                },
+            }
+        },
+    },
 }
 
 
