@@ -972,6 +972,35 @@ TESTCASES = {
             },
         },
     },
+    'different_bands_rasters_time_regex': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'time_regex': r'[a-z]{5}',
+            'file_paths': ['sample/layman.layer/sample_tif_rgba.tif',
+                           'sample/layman.layer/sample_tif_rgb_nodata.tif',
+                           ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'data': {'expected': 'All main files with the same color interpretations.',
+                     'color_interpretations': [['Red', 'Green', 'Blue'], ['Red', 'Green', 'Blue', 'Alpha']],
+                     'parameter': 'file',
+                     },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_CHUNKS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                },
+            },
+        },
+    },
 }
 
 
