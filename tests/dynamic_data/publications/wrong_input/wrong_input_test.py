@@ -943,6 +943,35 @@ TESTCASES = {
         Key.IGNORED_CASES: ParametrizationSets.NOT_POST_NO_COMPRESS,
         Key.SPECIFIC_CASES: {},
     },
+    'different_rasters_time_regex': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'time_regex': r'cz_[0-9]{4}',
+            'file_paths': ['tests/dynamic_data/publications/crs/rasters/cz_4326.tif',
+                           'tests/dynamic_data/publications/crs/rasters/cz_32633.tif',
+                           ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'data': {'expected': 'All main files with the same CRS.',
+                     'crs': ['EPSG:32633', 'EPSG:4326', ],
+                     'parameter': 'file',
+                     },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_CHUNKS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                },
+            },
+        },
+    },
 }
 
 
