@@ -30,37 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'patch_with_time_regex_without_data_file': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_SKIP_POST: True,
-        KEY_ACTION_PARAMS: {},
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 48,
-                          'message': 'Wrong combination of parameters',
-                          'data': 'Parameter time_regex is allowed only in combination with files.',
-                          },
-        },
-        KEY_PATCHES: {
-            'full': {
-                KEY_PATCH_POST: {
-                    'time_regex': r'[0-9]{8}',
-                    'file_paths': [
-                        'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                        'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF',
-                    ],
-                },
-                KEY_ACTION_PARAMS: {
-                    'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
-                    'compress': False,
-                    'with_chunks': False,
-                },
-            },
-        },
-    },
     'time_regex_with_non_data_file': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
