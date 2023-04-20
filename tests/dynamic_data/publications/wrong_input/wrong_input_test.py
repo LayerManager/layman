@@ -1342,6 +1342,32 @@ TESTCASES = {
         Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
         Key.SPECIFIC_CASES: {},
     },
+    'file_and_external_table_uri': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': ['sample/layman.layer/small_layer.geojson'],
+            'external_table_uri': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 48,
+            'message': 'Wrong combination of parameters',
+            'data': {
+                'parameters': ['file', 'external_table_uri'],
+                'message': 'Both `file` and `external_table_uri` parameters are filled',
+                'expected': 'Only one of the parameters is fulfilled.',
+                'found': {
+                    'file': ['small_layer.geojson'],
+                    'external_table_uri': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
+                }},
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.POST_PATCH_COMPRESS,
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 

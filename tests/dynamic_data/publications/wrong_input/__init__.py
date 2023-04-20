@@ -30,36 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'file_and_external_table_uri': {
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_ACTION_PARAMS: {
-            'file_paths': ['sample/layman.layer/small_layer.geojson'],
-            'external_table_uri': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
-            'compress': False,
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 48,
-                          'message': 'Wrong combination of parameters',
-                          'data': {
-                              'parameters': ['file', 'external_table_uri'],
-                              'message': 'Both `file` and `external_table_uri` parameters are filled',
-                              'expected': 'Only one of the parameters is fulfilled.',
-                              'found': {
-                                  'file': ['small_layer.geojson'],
-                                  'external_table_uri': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
-                              }},
-                          },
-        },
-        KEY_PATCHES: {
-            'full': {
-                KEY_PATCH_POST: {},
-            },
-        },
-    },
     'partial_external_table_uri': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
