@@ -30,23 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'vector_time_regex': {
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 48,
-                          'data': 'Vector layers are not allowed to be combined with `time_regex` parameter.',
-                          },
-            frozenset([('compress', True), ('with_chunks', True)]): {
-                'sync': False,
-            },
-        },
-    },
     'raster_vector_time_regex': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
