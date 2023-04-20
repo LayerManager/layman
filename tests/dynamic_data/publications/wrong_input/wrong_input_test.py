@@ -27,6 +27,9 @@ class Key(Enum):
     POST_BEFORE_PATCH_ARGS = 'post_before_patch_args'
 
 
+WORKSPACE = 'dynamic_test_workspace_wrong_input'
+
+
 @unique
 class ParametrizationSets(Enum):
     SIMPLE_POST_PATCH = frozenset([
@@ -743,6 +746,25 @@ TESTCASES = {
             },
         },
     },
+    'layer_name_211': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'name': 'a' * 211,
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'data': {'parameter': 'layername',
+                     'detail': 'Layer name too long (211), maximum allowed length is 210.',
+                     },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 
@@ -779,7 +801,15 @@ def generate_test_cases():
 
         post_before_patch_args = test_case_params.pop(Key.POST_BEFORE_PATCH_ARGS, {})
         publ_type = all_params.pop(Key.PUBLICATION_TYPE)
+
+        publication_name = rest_args.pop('name', None)
+        publication = Publication(workspace=WORKSPACE,
+                                  type=publ_type,
+                                  name=publication_name,
+                                  ) if publication_name else None
+
         test_case = base_test.TestCaseType(key=key,
+                                           publication=publication,
                                            publication_type=publ_type,
                                            type=EnumTestTypes.OPTIONAL,
                                            specific_types=specific_types,
@@ -808,7 +838,7 @@ def format_exception(exception_info: dict, format_variables: dict):
 
 @pytest.mark.usefixtures('ensure_external_db')
 class TestPublication(base_test.TestSingleRestPublication):
-    workspace = 'dynamic_test_workspace_wrong_input'
+    workspace = WORKSPACE
     test_cases = generate_test_cases()
     publication_type = None
     rest_parametrization = [
