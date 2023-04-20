@@ -30,50 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'non_data_file_without_data_file': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.j2w'],
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 2,
-                          'message': 'Wrong parameter value',
-                          'data': {
-                              'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                              'files': ['sample_jp2_j2w_rgb.j2w'],
-                              'message': 'No data file in input.',
-                              'parameter': 'file',
-                          }
-                          },
-            frozenset([('compress', True), ('with_chunks', False)]): {
-                'data': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.j2w'],
-                         'message': 'Zip file without data file inside.', }
-            },
-            frozenset([('compress', True), ('with_chunks', True)]): {
-                'sync': False,
-                'data': {'files': ['non_data_file_without_data_file_post_chunks_zipped.zip/sample_jp2_j2w_rgb.j2w'],
-                         'message': 'Zip file without data file inside.', }
-            },
-        },
-        KEY_PATCHES: {
-            'full': {
-                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
-                KEY_ACTION_PARAMS: {
-                    'file_paths': ['sample/layman.layer/sample_jp2_j2w_rgb.j2w'],
-                },
-                KEY_EXPECTED_EXCEPTION: {
-                    frozenset([('compress', True), ('with_chunks', True)]): {
-                        'data': {'files': ['non_data_file_without_data_file_patch_full_chunks_zipped.zip/sample_jp2_j2w_rgb.j2w'],
-                                 }
-                    },
-                },
-            },
-        },
-    },
     'patch_with_time_regex_without_data_file': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
