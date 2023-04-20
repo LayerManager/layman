@@ -1235,6 +1235,36 @@ TESTCASES = {
         Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
         Key.SPECIFIC_CASES: {},
     },
+    'duplicate_filename_differs_in_case': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [
+                f'{DIRECTORY}/small_layer.geojson',
+                f'{DIRECTORY}/small_layer.README.txt',
+                f'{DIRECTORY}/small_layer.readme.txt',
+            ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'message': 'Wrong parameter value',
+            'data': {
+                'parameter': 'file',
+                'message': 'Two or more input file names map to the same name.',
+                'expected': 'Input file names that differ at least in one letter (ignoring case and diacritics) or number.',
+                'similar_filenames_mapping': {
+                    'small_layer.README.txt': '{publication_name}.readme.txt',
+                    'small_layer.readme.txt': '{publication_name}.readme.txt',
+                },
+            },
+        },
+        Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
+        Key.IGNORED_CASES: ParametrizationSets.POST_PATCH_COMPRESS,
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 
@@ -1306,6 +1336,9 @@ def format_exception(exception_info: dict, format_variables: dict):
             exception_info['data']['unmatched_filenames'] = [file.format(**format_variables) for file in exception_info['data']['unmatched_filenames']]
         if 'too_long_filenames' in exception_info['data']:
             exception_info['data']['too_long_filenames'] = [file.format(**format_variables) for file in exception_info['data']['too_long_filenames']]
+        if 'similar_filenames_mapping' in exception_info['data']:
+            exception_info['data']['similar_filenames_mapping'] = {key.format(**format_variables): value.format(**format_variables) for
+                                                                   key, value in exception_info['data']['similar_filenames_mapping'].items()}
 
 
 @pytest.mark.usefixtures('ensure_external_db')
