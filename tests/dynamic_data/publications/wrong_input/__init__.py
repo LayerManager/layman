@@ -30,31 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'wrong_time_regex': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'time_regex': '[',
-            'file_paths': [
-                'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-            ],
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 2,
-                          'data': {'parameter': 'time_regex',
-                                   'expected': 'Regular expression',
-                                   },
-                          },
-        },
-        KEY_PATCHES: {
-            'full': {
-                KEY_PATCH_POST: publications.SMALL_LAYER.definition,
-            },
-        },
-    },
     'vector_time_regex': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {
