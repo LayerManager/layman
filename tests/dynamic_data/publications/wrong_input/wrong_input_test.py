@@ -6,6 +6,7 @@ import logging
 import pytest
 
 from layman import LaymanError, settings
+from layman.layer.util import EXTERNAL_TABLE_URI_PATTERN
 from test_tools import process_client
 from tests import EnumTestTypes, Publication
 from tests.asserts import processing, util as asserts_util
@@ -94,6 +95,14 @@ class ParametrizationSets(Enum):
     ])
     NOT_SIMPLE_PATCH = frozenset([
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+    ])
+    NOT_SIMPLE_POST_PATCH = frozenset([
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
@@ -1366,6 +1375,31 @@ TESTCASES = {
         },
         Key.MANDATORY_CASES: {},
         Key.IGNORED_CASES: ParametrizationSets.POST_PATCH_COMPRESS,
+        Key.SPECIFIC_CASES: {},
+    },
+    'partial_external_table_uri': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'external_table_uri': 'external_table_uri',
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'message': 'Wrong parameter value',
+            'data': {'parameter': 'external_table_uri',
+                     'message': 'Parameter `external_table_uri` is expected to have URI scheme `postgresql`',
+                     'expected': EXTERNAL_TABLE_URI_PATTERN,
+                     'found': {
+                         'external_table_uri': 'external_table_uri',
+                         'uri_scheme': '',
+                     },
+                     },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST_PATCH,
         Key.SPECIFIC_CASES: {},
     },
 }

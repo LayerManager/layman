@@ -30,36 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'partial_external_table_uri': {
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_ACTION_PARAMS: {
-            'external_table_uri': 'external_table_uri',
-            'compress': False,
-            'with_chunks': False,
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 2,
-                          'message': 'Wrong parameter value',
-                          'data': {'parameter': 'external_table_uri',
-                                   'message': 'Parameter `external_table_uri` is expected to have URI scheme `postgresql`',
-                                   'expected': EXTERNAL_TABLE_URI_PATTERN,
-                                   'found': {
-                                       'external_table_uri': 'external_table_uri',
-                                       'uri_scheme': '',
-                                   },
-                                   },
-                          },
-        },
-        KEY_PATCHES: {
-            'full': {
-                KEY_PATCH_POST: {},
-            },
-        },
-    },
     'crs_and_external_table_uri': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
