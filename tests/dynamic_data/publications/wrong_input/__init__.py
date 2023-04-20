@@ -423,55 +423,6 @@ TESTCASES = {
             },
         },
     },
-    'filename_not_match_time_regex': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'time_regex': r'non_existing_regex',
-            'file_paths': ['tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 48,
-                          'message': 'Wrong combination of parameters',
-                          'data': {
-                              'message': 'File does not match time_regex.',
-                              'expected': 'All main data files match time_regex parameter',
-                              'unmatched_filenames': ['S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
-                          },
-                          },
-            frozenset([('compress', True), ('with_chunks', False)]): {
-                'data': {'unmatched_filenames': ['temporary_zip_file.zip/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
-                         }
-            },
-            frozenset([('compress', True), ('with_chunks', True)]): {
-                'sync': False,
-                'data': {'unmatched_filenames': [
-                    'filename_not_match_time_regex_post_chunks_zipped.zip/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
-                }
-            },
-        },
-        KEY_PATCHES: {
-            'full': {
-                KEY_PATCH_POST: {},
-                KEY_ACTION_PARAMS: {
-                    'time_regex': r'non_existing_regex',
-                    'file_paths': [
-                        'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
-                },
-                KEY_EXPECTED_EXCEPTION: {
-                    frozenset([('compress', True), ('with_chunks', True)]): {
-                        'sync': False,
-                        'data': {'unmatched_filenames': [
-                            'filename_not_match_time_regex_patch_full_chunks_zipped.zip/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
-                        }
-                    },
-                },
-            },
-        },
-    },
     'too_long_filename_with_time_regexp': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,

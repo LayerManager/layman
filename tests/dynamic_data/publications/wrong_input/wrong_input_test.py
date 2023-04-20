@@ -654,6 +654,46 @@ TESTCASES = {
             },
         },
     },
+    'filename_not_match_time_regex': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'time_regex': r'non_existing_regex',
+            'file_paths': [
+                'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 48,
+            'message': 'Wrong combination of parameters',
+            'data': {
+                'message': 'File does not match time_regex.',
+                'expected': 'All main data files match time_regex parameter',
+                'unmatched_filenames': ['S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+            },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: {},
+        Key.SPECIFIC_CASES: {
+            ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'data': {'unmatched_filenames': [
+                        'temporary_zip_file.zip/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+                    }
+                },
+            },
+            ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS: {
+                Key.EXPECTED_EXCEPTION: {
+                    'sync': False,
+                    'data': {'unmatched_filenames': [
+                        '{publication_name}.zip/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+                    }
+                },
+            },
+        },
+    },
 }
 
 
@@ -712,6 +752,8 @@ def format_exception(exception_info: dict, format_variables: dict):
         exception_info['data']['file'] = exception_info['data']['file'].format(**format_variables)
     if 'files' in exception_info['data']:
         exception_info['data']['files'] = [file.format(**format_variables) for file in exception_info['data']['files']]
+    if 'unmatched_filenames' in exception_info['data']:
+        exception_info['data']['unmatched_filenames'] = [file.format(**format_variables) for file in exception_info['data']['unmatched_filenames']]
 
 
 @pytest.mark.usefixtures('ensure_external_db')
