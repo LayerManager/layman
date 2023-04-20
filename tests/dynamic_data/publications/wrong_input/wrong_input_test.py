@@ -1319,6 +1319,29 @@ TESTCASES = {
             },
         },
     },
+    'none_file_none_external_table_uri': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [],
+            'external_table_uri': '',
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 1,
+            'message': 'Missing parameter',
+            'data': {
+                'parameters': ['file', 'external_table_uri'],
+                'message': 'Both `file` and `external_table_uri` parameters are empty',
+                'expected': 'One of the parameters is filled.',
+            },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 
