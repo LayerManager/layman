@@ -30,24 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'raster_wrong_crs': {
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'file_paths': [
-                'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.0.tif'
-            ],
-            'crs': 'EPSG:4326'
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_FAILED_INFO_KEY: 'wms',
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 500,
-                          'sync': False,
-                          'code': 53,
-                          'message': 'Error when publishing on GeoServer. It happens for example for raster files with wrong explicit CRS.',
-                          },
-        },
-    },
     'duplicate_filename_differs_in_case': {
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
         KEY_ACTION_PARAMS: {

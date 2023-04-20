@@ -1213,6 +1213,28 @@ TESTCASES = {
             },
         },
     },
+    'raster_wrong_crs': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [
+                'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031.0.tif'
+            ],
+            'crs': 'EPSG:4326'
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'wms',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 500,
+            'sync': False,
+            'code': 53,
+            'message': 'Error when publishing on GeoServer. It happens for example for raster files with wrong explicit CRS.',
+        },
+        Key.MANDATORY_CASES: {
+            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        },
+        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 
@@ -1273,7 +1295,7 @@ def generate_test_cases():
 
 
 def format_exception(exception_info: dict, format_variables: dict):
-    if isinstance(exception_info['data'], dict):
+    if 'data' in exception_info and isinstance(exception_info['data'], dict):
         if 'path' in exception_info['data']:
             exception_info['data']['path'] = exception_info['data']['path'].format(**format_variables)
         if 'file' in exception_info['data']:
