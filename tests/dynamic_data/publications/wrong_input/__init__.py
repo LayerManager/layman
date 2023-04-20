@@ -30,28 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'raster_and_zip_raster_time_regex': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,
-        KEY_ACTION_PARAMS: {
-            'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
-            'file_paths': ['sample/layman.layer/sample_jp2_rgb.jp2',
-                           'sample/layman.layer/sample_jp2_rgb.zip',
-                           ],
-            'compress': False,
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 2,
-                          'data': {'expected': 'One compressed file or one or more uncompressed files.',
-                                   'files': ['sample_jp2_rgb.jp2', 'sample_jp2_rgb.zip', ],
-                                   'parameter': 'file',
-                                   },
-                          },
-        },
-    },
     'different_rasters_time_regex': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,

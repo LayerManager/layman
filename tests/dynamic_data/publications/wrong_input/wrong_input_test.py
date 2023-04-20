@@ -53,6 +53,14 @@ class ParametrizationSets(Enum):
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
     ])
+    NOT_POST_NO_COMPRESS = frozenset([
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+    ])
     POST_ALL = frozenset([
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
@@ -911,6 +919,29 @@ TESTCASES = {
                 },
             },
         },
+    },
+    'raster_and_zip_raster_time_regex': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
+            'file_paths': ['sample/layman.layer/sample_jp2_rgb.jp2',
+                           'sample/layman.layer/sample_jp2_rgb.zip',
+                           ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'data': {'expected': 'One compressed file or one or more uncompressed files.',
+                     'files': ['sample_jp2_rgb.jp2', 'sample_jp2_rgb.zip', ],
+                     'parameter': 'file',
+                     },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.NOT_POST_NO_COMPRESS,
+        Key.SPECIFIC_CASES: {},
     },
 }
 
