@@ -12,6 +12,7 @@ from tests.asserts import processing
 from tests.asserts.final import publication as publication_asserts
 from tests.asserts.final.publication import util as assert_utils
 from tests.dynamic_data import base_test
+from .. import common_publications as publications
 
 
 @unique
@@ -782,6 +783,29 @@ TESTCASES = {
         },
         Key.MANDATORY_CASES: {},
         Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
+        Key.SPECIFIC_CASES: {},
+    },
+    'wrong_time_regex': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            **publications.SMALL_LAYER.definition,
+            'time_regex': '[',
+            'file_paths': [
+                'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+            ],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'data': {'parameter': 'time_regex',
+                     'expected': 'Regular expression',
+                     },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: {},
         Key.SPECIFIC_CASES: {},
     },
 }
