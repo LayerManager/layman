@@ -30,25 +30,6 @@ REST_PARAMETRIZATION = {
 }
 
 TESTCASES = {
-    'map_name_211': {
-        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
-        KEY_PUBLICATION_TYPE: process_client.MAP_TYPE,
-        KEY_ACTION_PARAMS: {
-            'name': 'a' * 211,
-            'compress': False,
-            'with_chunks': False,
-        },
-        consts.KEY_EXCEPTION: LaymanError,
-        KEY_EXPECTED_EXCEPTION: {
-            KEY_DEFAULT: {'http_code': 400,
-                          'sync': True,
-                          'code': 2,
-                          'data': {'parameter': 'mapname',
-                                   'detail': 'Map name too long (211), maximum allowed length is 210.',
-                                   },
-                          },
-        },
-    },
     'wrong_time_regex': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         KEY_PUBLICATION_TYPE: process_client.LAYER_TYPE,

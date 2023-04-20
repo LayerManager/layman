@@ -765,6 +765,25 @@ TESTCASES = {
         Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
         Key.SPECIFIC_CASES: {},
     },
+    'map_name_211': {
+        Key.PUBLICATION_TYPE: process_client.MAP_TYPE,
+        Key.REST_ARGS: {
+            'name': 'a' * 211,
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 2,
+            'data': {'parameter': 'mapname',
+                     'detail': 'Map name too long (211), maximum allowed length is 210.',
+                     },
+        },
+        Key.MANDATORY_CASES: {},
+        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 
