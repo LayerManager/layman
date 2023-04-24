@@ -447,5 +447,8 @@ def redact_uri(uri):
 
 
 def set_wfs_wms_status_after_fail(workspace, name):
-    publications.set_wfs_wms_status(workspace, LAYER_TYPE, name, settings.EnumWfsWmsStatus.NOT_AVAILABLE)
-
+    keys = ['wfs', 'wms', 'style']
+    publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, name, context={'keys': keys})
+    wfs_wms_status = settings.EnumWfsWmsStatus.AVAILABLE if all(
+        publ_info.get(key) for key in keys) else settings.EnumWfsWmsStatus.NOT_AVAILABLE
+    publications.set_wfs_wms_status(workspace, LAYER_TYPE, name, wfs_wms_status)
