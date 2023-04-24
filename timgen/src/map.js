@@ -35,6 +35,8 @@ import ol_source_TileWMS from 'ol/source/TileWMS';
 import ol_layer_Image from 'ol/layer/Image';
 import ol_layer_Tile from 'ol/layer/Tile';
 
+const EMPTY_IMAGE_DATA_URL = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+
 const json_to_extent = (value) => {
   if (typeof value === 'string') {
     value = value.split(" ");
@@ -73,19 +75,38 @@ const adjust_layer_url = (requested_url, gs_public_url, gs_url) => {
 const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
   const source = layer.getSource();
 
-  const load_fn = (tile_or_img, image_url) => {
+  const load_fn = async (tile_or_img, image_url) => {
     const adjusted_image_url = adjust_layer_url(image_url, gs_public_url, gs_url);
     log(`load_fn, image_url=${image_url} adjusted_image_url=${adjusted_image_url}`)
-    fetch(adjusted_image_url, {
+
+    const [ok, blob_or_text] = await fetch(adjusted_image_url, {
       headers,
     }).then(res => {
-      log(`load_fn, res.status=${res.status}, image_url=${image_url}`)
-      return res.blob();
-    }).then(blob => {
+      const headers = [...res.headers];
+      log(`load_fn, res.status=${res.status}, headers=${JSON.stringify(headers, null, 2)}, image_url=${image_url} adjusted_image_url=${adjusted_image_url}`)
+      if(res.headers.get('content-type').includes('text/xml')) {
+        return Promise.all([false, res.text()])
+      } else {
+        return Promise.all([true, res.blob()])
+      }
+    });
+
+    log(`load_fn, loaded, ok=${ok}, image_url=${image_url} adjusted_image_url=${adjusted_image_url}`)
+    if (ok) {
+      const blob = blob_or_text;
       const data_url = URL.createObjectURL(blob);
-      log(`load_fn, blob loaded`)
+      log(`load_fn, loaded OK, blob.size=${blob.size}`)
       tile_or_img.getImage().src = data_url;
-    })
+    } else {
+      const text = blob_or_text;
+      log(`load_fn, loaded ERROR, XML:\n${text}\n`)
+      if(is_internal_geoserver_url(image_url, gs_public_url, gs_url) && text.indexOf('Could not find layer') >= 0) {
+        log(`load_fn, loaded ERROR, request to internal GS => setting empty image`)
+        tile_or_img.getImage().src = EMPTY_IMAGE_DATA_URL;
+      } else {
+        log(`load_fn, loaded ERROR, other`)
+      }
+    }
   };
 
   if (tiled) {
