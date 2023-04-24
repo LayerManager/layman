@@ -1,5 +1,7 @@
 import os
 
+from layman import settings
+
 from test_tools import process_client
 from tests import EnumTestTypes
 from tests.asserts.final import publication as asserts_publ
@@ -61,6 +63,7 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
                 'file_type': 'unknown'
             },
             '_table_uri': None,
+            '_wfs_wms_status': settings.EnumWfsWmsStatus.PREPARING,
         }
 
         asserts_publ.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
@@ -71,3 +74,9 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
                                                        keys_to_remove=['thumbnail', '_thumbnail', 'metadata', 'style', 'wms', '_wms',
                                                                        'description', 'wfs', 'db', ]
                                                        )
+
+        asserts_publ.internal_rest.same_title_and_wfs_wms_status_in_source_and_rest_multi(workspace=layer.workspace,
+                                                                                          publ_type=layer.type,
+                                                                                          name=layer.name,
+                                                                                          headers=None,
+                                                                                          )

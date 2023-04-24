@@ -98,7 +98,7 @@ def post_layer(workspace,
                'style_type': style_type.code if style_type else None,
                'image_mosaic': image_mosaic,
                'external_table_uri': external_table_uri,
-               'wfs_wms_status': settings.EnumWfsWmsStatus.AVAILABLE.value,
+               'wfs_wms_status': settings.EnumWfsWmsStatus.PREPARING.value,
                }
     pubs_util.insert_publication(workspace, db_info)
 
