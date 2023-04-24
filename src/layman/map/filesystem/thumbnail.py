@@ -105,12 +105,14 @@ def generate_map_thumbnail(workspace, mapname, editor):
     max_attempts = 40
     attempts = 0
     data_url = browser.execute_script('''return window.canvas_data_url;''')
-    while data_url is None and attempts < max_attempts:
+    data_url_error = browser.execute_script('''return window.canvas_data_url_error;''')
+    while data_url is None and data_url_error is None and attempts < max_attempts:
         current_app.logger.info(f"waiting for entries, data_url={data_url}, attempts={attempts}")
         show_timgen_logs()
         time.sleep(0.5)
         attempts += 1
         data_url = browser.execute_script('''return window.canvas_data_url;''')
+        data_url_error = browser.execute_script('''return window.canvas_data_url_error;''')
 
     performance_entries = json.loads(browser.execute_script("return JSON.stringify(window.performance.getEntries())"))
     show_timgen_logs()
@@ -118,6 +120,12 @@ def generate_map_thumbnail(workspace, mapname, editor):
     # browser.save_screenshot(f'/code/tmp/{workspace}.{mapname}.png')
     browser.close()
     browser.quit()
+
+    if data_url_error:
+        raise LaymanError(51, data={
+            'reason': 'Error when requesting layer through WMS',
+            'timgen_log': data_url_error,
+        })
 
     if attempts >= max_attempts:
         current_app.logger.info(f"max attempts reach")

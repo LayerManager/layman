@@ -105,6 +105,7 @@ const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
         tile_or_img.getImage().src = EMPTY_IMAGE_DATA_URL;
       } else {
         log(`load_fn, loaded ERROR, other`)
+        window['canvas_data_url_error'] = `Timgen load_fn error:\nimage_url=${image_url}\nadjusted_image_url=${adjusted_image_url}\nerror body:\n${text}`;
       }
     }
   };
