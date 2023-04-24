@@ -4,6 +4,7 @@ import logging
 from flask import Blueprint, jsonify, request, current_app as app, g
 
 from layman.common import rest as rest_util
+from layman.common.prime_db_schema import publications
 from layman.http import LaymanError
 from layman.util import check_workspace_name_decorator
 from layman import settings, authn, util as layman_util
@@ -228,6 +229,7 @@ def patch(workspace, layername):
                 })
             elif input_files:
                 shutil.move(temp_dir, input_file.get_layer_input_file_dir(workspace, layername))
+        publications.set_wfs_wms_status(workspace, LAYER_TYPE, layername, settings.EnumWfsWmsStatus.PREPARING)
     kwargs.update({'actor_name': authn.get_authn_username()})
 
     rest_util.setup_patch_access_rights(request.form, kwargs)

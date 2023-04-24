@@ -75,6 +75,7 @@ PUBLICATION_TYPES = {
             ('layman.layer.geoserver.wfs', InternalSourceTypeDef(info_items=['wfs', 'description', ]),),
             ('layman.layer.geoserver.wms', InternalSourceTypeDef(info_items=['wms', 'description', ]),),
             ('layman.layer.geoserver.sld', InternalSourceTypeDef(info_items=['style', ]),),
+            ('layman.layer.prime_db_schema.wfs_wms_status', InternalSourceTypeDef(info_items=[]),),
             ('layman.layer.filesystem.thumbnail', InternalSourceTypeDef(info_items=['thumbnail', ]),),
             ('layman.layer.micka.soap', InternalSourceTypeDef(info_items=['metadata', ]),),
         ]),

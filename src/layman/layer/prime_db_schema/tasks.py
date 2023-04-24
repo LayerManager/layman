@@ -3,6 +3,7 @@ from celery.utils.log import get_task_logger
 from db import util as db_util
 from layman.celery import AbortedException
 from layman.common import empty_method_returns_true
+from layman.common.prime_db_schema import publications
 from layman import celery_app, util as layman_util, settings
 from .. import LAYER_TYPE
 from ..db import get_bbox as db_get_bbox, get_table_crs
@@ -12,6 +13,7 @@ from ...common.prime_db_schema.publications import set_bbox, set_geodata_type
 logger = get_task_logger(__name__)
 
 refresh_file_data_needed = empty_method_returns_true
+refresh_wfs_wms_status_needed = empty_method_returns_true
 
 
 @celery_app.task(
@@ -54,6 +56,25 @@ def refresh_file_data(
         raise AbortedException
 
     set_bbox(username, LAYER_TYPE, layername, bbox, crs, )
+
+    if self.is_aborted():
+        raise AbortedException
+
+
+@celery_app.task(
+    name='layman.layer.prime_db_schema.wfs_wms_status.refresh',
+    bind=True,
+    base=celery_app.AbortableTask
+)
+def refresh_wfs_wms_status(
+        self,
+        username,
+        layername,
+):
+    if self.is_aborted():
+        raise AbortedException
+
+    publications.set_wfs_wms_status(username, LAYER_TYPE, layername, settings.EnumWfsWmsStatus.AVAILABLE)
 
     if self.is_aborted():
         raise AbortedException
