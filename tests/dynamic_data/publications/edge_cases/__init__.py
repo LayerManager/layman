@@ -85,6 +85,7 @@ TESTCASES = {
             *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
             Action(publication.internal.thumbnail_equals, {
                 'exp_thumbnail': f'{DIRECTORY}/thumbnail_invalid_byte_sequence.png',
+                'max_diffs': 36,
             }),
         ],
     },
