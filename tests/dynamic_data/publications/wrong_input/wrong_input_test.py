@@ -5,7 +5,7 @@ import os
 import logging
 import pytest
 
-from layman import LaymanError, settings
+from layman import LaymanError, settings, app, util as layman_util
 from layman.layer.util import EXTERNAL_TABLE_URI_PATTERN
 from test_tools import process_client
 from tests import EnumTestTypes, Publication
@@ -1572,3 +1572,15 @@ class TestPublication(base_test.TestSingleRestPublication):
                                                              info_key=failed_info_key,
                                                              expected=exp_exception,
                                                              )
+            if publication.type == process_client.LAYER_TYPE:
+                with app.app_context():
+                    publ_info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name,
+                                                                 context={'keys': ['wfs_wms_status']})
+
+                assert publ_info['_wfs_wms_status'] == settings.EnumWfsWmsStatus.NOT_AVAILABLE
+
+                publication_asserts.internal_rest.same_title_and_wfs_wms_status_in_source_and_rest_multi(workspace=publication.workspace,
+                                                                                                         publ_type=publication.type,
+                                                                                                         name=publication.name,
+                                                                                                         headers=None,
+                                                                                                         )
