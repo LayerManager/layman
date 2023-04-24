@@ -47,6 +47,10 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
             last_task_id = chain_info['last']
             clear_steps_to_run_after_chain(workspace, publication_type, publication_name)
             finish_publication_chain(last_task_id, task_state)
+            from layman.layer import LAYER_TYPE
+            if publication_type == LAYER_TYPE:
+                from layman.layer import util
+                util.set_wfs_wms_status_after_fail(workspace, publication_name, )
 
 
 def _get_task_hash(task_name, workspace, publication_name):

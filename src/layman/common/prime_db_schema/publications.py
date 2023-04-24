@@ -588,3 +588,13 @@ def get_bbox_sphere_size(workspace, publication_type, publication):
 
     [x_size, y_size] = db_util.run_query(query, (publication_type, publication, workspace))[0]
     return [x_size, y_size]
+
+
+def set_wfs_wms_status(workspace, publication_type, publication, status, ):
+    query = f'''update {DB_SCHEMA}.publications set
+    wfs_wms_status = %s
+    where type = %s
+      and name = %s
+      and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
+    params = (status.value, publication_type, publication, workspace,)
+    db_util.run_statement(query, params)

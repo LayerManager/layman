@@ -10,6 +10,7 @@ from layman.util import call_modules_fn, get_providers_from_source_names, get_in
     to_safe_name, url_for
 from layman import celery as celery_util, common
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
+from layman.common.prime_db_schema import publications
 from layman.common.util import clear_publication_info as common_clear_publication_info
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_keys, LAYERNAME_PATTERN, \
     LAYERNAME_MAX_LENGTH, SAFE_PG_IDENTIFIER_PATTERN
@@ -443,3 +444,8 @@ def redact_uri(uri):
         )
 
     return url_components.geturl()
+
+
+def set_wfs_wms_status_after_fail(workspace, name):
+    publications.set_wfs_wms_status(workspace, LAYER_TYPE, name, settings.EnumWfsWmsStatus.NOT_AVAILABLE)
+
