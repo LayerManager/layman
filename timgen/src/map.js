@@ -55,8 +55,13 @@ export const adjust_map_url = (requested_url) => {
 };
 
 
+const is_internal_geoserver_url = (requested_url, gs_public_url, gs_url) => {
+  return gs_public_url && gs_url && requested_url.startsWith(gs_public_url);
+};
+
+
 const adjust_layer_url = (requested_url, gs_public_url, gs_url) => {
-  if(gs_public_url && gs_url && requested_url.startsWith(gs_public_url)) {
+  if(is_internal_geoserver_url(requested_url, gs_public_url, gs_url)) {
     const old = requested_url;
     requested_url = requested_url.replace(gs_public_url, gs_url);
     log(`replaced layer URL ${old} with ${requested_url}`);
