@@ -81,11 +81,12 @@ const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
 
     const fetch_retry = async (remaining_tries) => {
       remaining_tries -= 1;
+      log(`load_fn.fetch_retry, remaining_tries=${remaining_tries}, start, image_url=${image_url}`)
       const [ok, blob_or_text] = await fetch(adjusted_image_url, {
         headers,
       }).then(res => {
         const headers = [...res.headers];
-        log(`load_fn.fetch_retry, res.status=${res.status}, headers=${JSON.stringify(headers, null, 2)}, image_url=${image_url} adjusted_image_url=${adjusted_image_url}`)
+        log(`load_fn.fetch_retry, res.status=${res.status}, headers=${JSON.stringify(headers, null, 2)}, image_url=${image_url}`)
         if(res.headers.get('content-type').includes('text/xml')) {
           return Promise.all([false, res.text()])
         } else {
@@ -93,23 +94,23 @@ const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
         }
       });
 
-      log(`load_fn.fetch_retry, loaded, ok=${ok}, image_url=${image_url} adjusted_image_url=${adjusted_image_url}`)
+      log(`load_fn.fetch_retry, loaded, ok=${ok}, image_url=${image_url}`)
       if (ok) {
         const blob = blob_or_text;
         const data_url = URL.createObjectURL(blob);
-        log(`load_fn.fetch_retry, loaded OK, blob.size=${blob.size}`)
         tile_or_img.getImage().src = data_url;
       } else {
         const text = blob_or_text;
         log(`load_fn.fetch_retry, loaded ERROR, XML:\n${text}\n`)
         if(is_internal_geoserver_url(image_url, gs_public_url, gs_url) && text.indexOf('Could not find layer') >= 0) {
-          log(`load_fn.fetch_retry, loaded ERROR, request to internal GS => setting empty image`)
+          // request to internal GS => setting empty image
           tile_or_img.getImage().src = EMPTY_IMAGE_DATA_URL;
         } else {
-          log(`load_fn.fetch_retry, loaded ERROR, other`)
           if(remaining_tries > 0) {
+            log(`load_fn.fetch_retry, loaded ERROR unknown, going to retry`)
             await fetch_retry(remaining_tries);
           } else {
+            log(`load_fn.fetch_retry, loaded ERROR unknown, STOP TRYING`)
             window['canvas_data_url_error'] = `Timgen load_fn error:\nimage_url=${image_url}\nadjusted_image_url=${adjusted_image_url}\nerror body:\n${text}`;
           }
         }
