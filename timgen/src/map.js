@@ -79,35 +79,44 @@ const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
     const adjusted_image_url = adjust_layer_url(image_url, gs_public_url, gs_url);
     log(`load_fn, image_url=${image_url} adjusted_image_url=${adjusted_image_url}`)
 
-    const [ok, blob_or_text] = await fetch(adjusted_image_url, {
-      headers,
-    }).then(res => {
-      const headers = [...res.headers];
-      log(`load_fn, res.status=${res.status}, headers=${JSON.stringify(headers, null, 2)}, image_url=${image_url} adjusted_image_url=${adjusted_image_url}`)
-      if(res.headers.get('content-type').includes('text/xml')) {
-        return Promise.all([false, res.text()])
-      } else {
-        return Promise.all([true, res.blob()])
-      }
-    });
+    const fetch_retry = async (remaining_tries) => {
+      remaining_tries -= 1;
+      const [ok, blob_or_text] = await fetch(adjusted_image_url, {
+        headers,
+      }).then(res => {
+        const headers = [...res.headers];
+        log(`load_fn.fetch_retry, res.status=${res.status}, headers=${JSON.stringify(headers, null, 2)}, image_url=${image_url} adjusted_image_url=${adjusted_image_url}`)
+        if(res.headers.get('content-type').includes('text/xml')) {
+          return Promise.all([false, res.text()])
+        } else {
+          return Promise.all([true, res.blob()])
+        }
+      });
 
-    log(`load_fn, loaded, ok=${ok}, image_url=${image_url} adjusted_image_url=${adjusted_image_url}`)
-    if (ok) {
-      const blob = blob_or_text;
-      const data_url = URL.createObjectURL(blob);
-      log(`load_fn, loaded OK, blob.size=${blob.size}`)
-      tile_or_img.getImage().src = data_url;
-    } else {
-      const text = blob_or_text;
-      log(`load_fn, loaded ERROR, XML:\n${text}\n`)
-      if(is_internal_geoserver_url(image_url, gs_public_url, gs_url) && text.indexOf('Could not find layer') >= 0) {
-        log(`load_fn, loaded ERROR, request to internal GS => setting empty image`)
-        tile_or_img.getImage().src = EMPTY_IMAGE_DATA_URL;
+      log(`load_fn.fetch_retry, loaded, ok=${ok}, image_url=${image_url} adjusted_image_url=${adjusted_image_url}`)
+      if (ok) {
+        const blob = blob_or_text;
+        const data_url = URL.createObjectURL(blob);
+        log(`load_fn.fetch_retry, loaded OK, blob.size=${blob.size}`)
+        tile_or_img.getImage().src = data_url;
       } else {
-        log(`load_fn, loaded ERROR, other`)
-        window['canvas_data_url_error'] = `Timgen load_fn error:\nimage_url=${image_url}\nadjusted_image_url=${adjusted_image_url}\nerror body:\n${text}`;
+        const text = blob_or_text;
+        log(`load_fn.fetch_retry, loaded ERROR, XML:\n${text}\n`)
+        if(is_internal_geoserver_url(image_url, gs_public_url, gs_url) && text.indexOf('Could not find layer') >= 0) {
+          log(`load_fn.fetch_retry, loaded ERROR, request to internal GS => setting empty image`)
+          tile_or_img.getImage().src = EMPTY_IMAGE_DATA_URL;
+        } else {
+          log(`load_fn.fetch_retry, loaded ERROR, other`)
+          if(remaining_tries > 0) {
+            await fetch_retry(remaining_tries);
+          } else {
+            window['canvas_data_url_error'] = `Timgen load_fn error:\nimage_url=${image_url}\nadjusted_image_url=${adjusted_image_url}\nerror body:\n${text}`;
+          }
+        }
       }
     }
+
+    await fetch_retry(3);
   };
 
   if (tiled) {
