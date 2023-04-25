@@ -72,6 +72,8 @@ const adjust_layer_url = (requested_url, gs_public_url, gs_url) => {
 };
 
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
   const source = layer.getSource();
 
@@ -79,7 +81,7 @@ const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
     const adjusted_image_url = adjust_layer_url(image_url, gs_public_url, gs_url);
     log(`load_fn, image_url=${image_url} adjusted_image_url=${adjusted_image_url}`)
 
-    const fetch_retry = async (remaining_tries) => {
+    const fetch_retry = async (remaining_tries, delay_ms) => {
       remaining_tries -= 1;
       log(`load_fn.fetch_retry, remaining_tries=${remaining_tries}, start, image_url=${image_url}`)
       const [ok, blob_or_text] = await fetch(adjusted_image_url, {
@@ -107,8 +109,9 @@ const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
           tile_or_img.getImage().src = EMPTY_IMAGE_DATA_URL;
         } else {
           if(remaining_tries > 0) {
-            log(`load_fn.fetch_retry, loaded ERROR unknown, going to retry`)
-            await fetch_retry(remaining_tries);
+            log(`load_fn.fetch_retry, loaded ERROR unknown, going to retry in ${delay_ms} ms`)
+            await sleep(delay_ms)
+            await fetch_retry(remaining_tries, 2 * delay_ms);
           } else {
             log(`load_fn.fetch_retry, loaded ERROR unknown, STOP TRYING`)
             window['canvas_data_url_error'] = `Timgen load_fn error:\nimage_url=${image_url}\nadjusted_image_url=${adjusted_image_url}\nerror body:\n${text}`;
@@ -117,7 +120,7 @@ const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
       }
     }
 
-    await fetch_retry(3);
+    await fetch_retry(3, 1000);
   };
 
   if (tiled) {
