@@ -95,25 +95,28 @@ def generate_map_thumbnail(workspace, mapname, editor):
 
     browser.get(timgen_url)
 
-    def show_timgen_logs():
+    def show_timgen_logs(*, start_at_idx=0):
         layman_logs = browser.execute_script('''return window.layman_logs;''')
         current_app.logger.info(f"number of layman_logs: {len(layman_logs)}")
-        for idx, layman_log in enumerate(layman_logs):
+        for idx in range(start_at_idx, len(layman_logs)):
+            layman_log = layman_logs[idx]
             current_app.logger.info(f"layman_log {idx+1}: {layman_log}")
+        return len(layman_logs)
 
     max_attempts = 40
     attempts = 0
     data_url = browser.execute_script('''return window.canvas_data_url;''')
     data_url_error = browser.execute_script('''return window.canvas_data_url_error;''')
+    already_shown_layman_logs = 0
     while data_url is None and data_url_error is None and attempts < max_attempts:
         current_app.logger.info(f"waiting for entries, data_url={data_url}, attempts={attempts}")
-        show_timgen_logs()
+        already_shown_layman_logs = show_timgen_logs(start_at_idx=already_shown_layman_logs)
         time.sleep(0.5)
         attempts += 1
         data_url = browser.execute_script('''return window.canvas_data_url;''')
         data_url_error = browser.execute_script('''return window.canvas_data_url_error;''')
 
-    show_timgen_logs()
+    show_timgen_logs(start_at_idx=already_shown_layman_logs)
 
     # browser.save_screenshot(f'/code/tmp/{workspace}.{mapname}.png')
     browser.close()
