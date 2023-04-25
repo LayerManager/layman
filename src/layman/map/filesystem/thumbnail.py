@@ -1,5 +1,4 @@
 import base64
-import json
 import os
 import pathlib
 import re
@@ -114,7 +113,6 @@ def generate_map_thumbnail(workspace, mapname, editor):
         data_url = browser.execute_script('''return window.canvas_data_url;''')
         data_url_error = browser.execute_script('''return window.canvas_data_url_error;''')
 
-    performance_entries = json.loads(browser.execute_script("return JSON.stringify(window.performance.getEntries())"))
     show_timgen_logs()
 
     # browser.save_screenshot(f'/code/tmp/{workspace}.{mapname}.png')
@@ -129,8 +127,7 @@ def generate_map_thumbnail(workspace, mapname, editor):
 
     if attempts >= max_attempts:
         current_app.logger.info(f"max attempts reach")
-        current_app.logger.info(f"Map thumbnail: {workspace, mapname}, editor={editor}\n"
-                                f"Timgen performance entries: {json.dumps(performance_entries, indent=2)}\n")
+        current_app.logger.info(f"Map thumbnail: {workspace, mapname}, editor={editor}")
         raise LaymanError(51, data="Max attempts reached when generating thumbnail")
 
     match = re.match(r'^data:image/png;base64,(.+)$', data_url)
