@@ -83,8 +83,10 @@ const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
 
     const fetch_retry = async (remaining_tries, delay_ms) => {
       remaining_tries -= 1;
-      log(`load_fn.fetch_retry, remaining_tries=${remaining_tries}, start, image_url=${image_url}`)
-      const [ok, blob_or_text] = await fetch(adjusted_image_url, {
+      const stamped_image_url = image_url + `&timestamp=${Date.now()}`;
+      const adjusted_stamped_image_url = adjust_layer_url(stamped_image_url, gs_public_url, gs_url);
+      log(`load_fn.fetch_retry, remaining_tries=${remaining_tries}, start, image_url=${image_url}, stamped_image_url=${stamped_image_url}`)
+      const [ok, blob_or_text] = await fetch(adjusted_stamped_image_url, {
         headers,
       }).then(res => {
         const headers = [...res.headers];
