@@ -15,7 +15,7 @@ FLASK_SUB_KEY = f'{__name__}:SUB'
 
 TOKEN_HEADER = 'Authorization'
 
-REDIS_ACCESS_TOKEN_KEY = f'{__name__}:ISS_ACCESS_TOKEN:{{provider_module}}:{{access_token}}'
+REDIS_ACCESS_TOKEN_KEY = f'{__name__}:ACCESS_TOKEN:{{access_token}}'
 
 
 def authenticate():
@@ -41,7 +41,7 @@ def authenticate():
 
     provider_module = liferay
 
-    access_token_info = _get_redis_access_token_info(provider_module, access_token)
+    access_token_info = _get_redis_access_token_info(access_token)
 
     if access_token_info is None:
         # current_app.logger.info(f"Veryfying cretentials against OAuth2 provider")
@@ -94,7 +94,7 @@ def authenticate():
             'sub': sub
         }
         # current_app.logger.info(f'Cache authn info, info={authn_info}, exp_in={exp_in}')
-        _set_redis_access_token_info(provider_module, access_token, authn_info, ex=key_exp)
+        _set_redis_access_token_info(access_token, authn_info, ex=key_exp)
 
     else:
         # current_app.logger.info(f"Cretentials verified against Layman cache")
@@ -148,26 +148,25 @@ def get_open_id_claims():
     return result
 
 
-def _get_redis_access_token_key(provider_module, access_token):
-    return REDIS_ACCESS_TOKEN_KEY.format(provider_module=provider_module.__name__, access_token=access_token)
+def _get_redis_access_token_key(access_token):
+    return REDIS_ACCESS_TOKEN_KEY.format(access_token=access_token)
 
 
-def _get_redis_access_token_info(provider_module, access_token):
-    key = _get_redis_access_token_key(provider_module, access_token)
+def _get_redis_access_token_info(access_token):
+    key = _get_redis_access_token_key(access_token)
     val = settings.LAYMAN_REDIS.get(key)
     val = json.loads(val) if val is not None else val
     return val
 
 
-def _set_redis_access_token_info(provider_module, access_token, authn_info, ex=None):
-    key = _get_redis_access_token_key(provider_module, access_token)
+def _set_redis_access_token_info(access_token, authn_info, ex=None):
+    key = _get_redis_access_token_key(access_token)
     val = json.dumps(authn_info)
     return settings.LAYMAN_REDIS.set(key, val, ex=ex)
 
 
 def flush_cache():
     # current_app.logger.info(f"Flushing cache")
-    provider_module = _get_provider_module()
     access_token = _get_access_token()
-    key = _get_redis_access_token_key(provider_module, access_token)
+    key = _get_redis_access_token_key(access_token)
     settings.LAYMAN_REDIS.delete(key)
