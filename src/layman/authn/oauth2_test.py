@@ -8,7 +8,7 @@ from layman import app
 from layman import settings
 from test_tools import process, process_client
 from test_tools.util import url_for
-from .oauth2.util import TOKEN_HEADER, ISS_URL_HEADER
+from .oauth2.util import TOKEN_HEADER
 from .oauth2 import liferay
 
 
@@ -85,23 +85,8 @@ def test_two_clients():
     assert settings.OAUTH2_CLIENTS[1]['secret'] is None
 
 
-@pytest.mark.usefixtures('app_context')
-def test_no_auth_header(client):
-    username = 'testuser1'
-    response = client.get(url_for('rest_workspace_layers.get', workspace=username), headers={
-        f'{ISS_URL_HEADER}': 'abc'
-    })
-    assert response.status_code == 403
-    resp_json = response.get_json()
-    assert resp_json['code'] == 32
-    assert resp_json['sub_code'] == 2
-
-
 @pytest.mark.parametrize('headers', [
     {
-        f'{ISS_URL_HEADER}': 'abc',
-        f'{TOKEN_HEADER}': 'abc',
-    }, {
         f'{TOKEN_HEADER}': 'abc',
     }
 ])
@@ -117,9 +102,6 @@ def test_auth_header_one_part(client, headers):
 
 @pytest.mark.parametrize('headers', [
     {
-        f'{ISS_URL_HEADER}': 'abc',
-        f'{TOKEN_HEADER}': 'abc abc',
-    }, {
         f'{TOKEN_HEADER}': 'abc abc',
     }
 ])
@@ -135,9 +117,6 @@ def test_auth_header_bad_first_part(client, headers):
 
 @pytest.mark.parametrize('headers', [
     {
-        f'{ISS_URL_HEADER}': 'abc',
-        f'{TOKEN_HEADER}': 'Bearer ',
-    }, {
         f'{TOKEN_HEADER}': 'Bearer ',
     }
 ])
@@ -153,25 +132,6 @@ def test_auth_header_no_access_token(client, headers):
 
 @pytest.mark.parametrize('headers', [
     {
-        f'{ISS_URL_HEADER}': 'abc',
-        f'{TOKEN_HEADER}': 'Bearer abc',
-    }
-])
-@pytest.mark.usefixtures('app_context')
-def test_no_provider_found(client, headers):
-    username = 'testuser1'
-    response = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
-    assert response.status_code == 403
-    resp_json = response.get_json()
-    assert resp_json['code'] == 32
-    assert resp_json['sub_code'] == 6
-
-
-@pytest.mark.parametrize('headers', [
-    {
-        f'{ISS_URL_HEADER}': 'http://localhost:8083/o/authorize',
-        f'{TOKEN_HEADER}': 'Bearer abc',
-    }, {
         f'{TOKEN_HEADER}': 'Bearer abc',
     }
 ])
@@ -187,9 +147,6 @@ def test_unexisting_introspection_url(client, headers):
 
 @pytest.mark.parametrize('headers', [
     {
-        f'{ISS_URL_HEADER}': 'http://localhost:8083/o/authorize',
-        f'{TOKEN_HEADER}': 'Bearer abc',
-    }, {
         f'{TOKEN_HEADER}': 'Bearer abc',
     }
 ])
@@ -206,9 +163,6 @@ def test_token_inactive(client, headers):
 
 @pytest.mark.parametrize('headers', [
     {
-        f'{ISS_URL_HEADER}': 'http://localhost:8083/o/authorize',
-        f'{TOKEN_HEADER}': 'Bearer abc',
-    }, {
         f'{TOKEN_HEADER}': 'Bearer abc',
     }
 ])
@@ -226,7 +180,6 @@ def test_token_active(client, headers):
 def test_authn_get_current_user_without_username(client):
     rest_path = url_for('rest_current_user.get')
     response = client.get(rest_path, headers={
-        f'{ISS_URL_HEADER}': 'http://localhost:8083/o/authorize',
         f'{TOKEN_HEADER}': 'Bearer abc',
     })
     assert response.status_code == 200

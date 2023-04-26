@@ -13,7 +13,6 @@ from . import liferay
 FLASK_ACCESS_TOKEN_KEY = f'{__name__}:ACCESS_TOKEN'
 FLASK_SUB_KEY = f'{__name__}:SUB'
 
-ISS_URL_HEADER = 'AuthorizationIssUrl'
 TOKEN_HEADER = 'Authorization'
 
 REDIS_ACCESS_TOKEN_KEY = f'{__name__}:ISS_ACCESS_TOKEN:{{provider_module}}:{{access_token}}'
@@ -21,20 +20,9 @@ REDIS_ACCESS_TOKEN_KEY = f'{__name__}:ISS_ACCESS_TOKEN:{{provider_module}}:{{acc
 
 def authenticate():
     user = None
-    iss_url = request.headers.get(ISS_URL_HEADER, None)
     authz_header = request.headers.get(TOKEN_HEADER, None)
-    if authz_header is not None and iss_url is None:
-        iss_url = liferay.AUTH_URLS[0]
-        current_app.logger.info(f"\nusing default iss_url={iss_url}")
-    if iss_url is None and authz_header is None:
-        return user
-
-    if iss_url is None:
-        raise LaymanError(32, f'HTTP header {TOKEN_HEADER} was set, but HTTP header {ISS_URL_HEADER} was not found',
-                          sub_code=1)
     if authz_header is None:
-        raise LaymanError(32, f'HTTP header {ISS_URL_HEADER} was set, but HTTP header {TOKEN_HEADER} was not found.',
-                          sub_code=2)
+        return user
 
     authz_header_parts = authz_header.split(' ')
     if len(authz_header_parts) != 2:
@@ -51,10 +39,7 @@ def authenticate():
                           f'HTTP header {TOKEN_HEADER} contains empty access token. The structure must be "Bearer <access_token>"',
                           sub_code=5)
 
-    provider_module = liferay if iss_url == liferay.AUTH_URLS[0] else None
-    if provider_module is None:
-        raise LaymanError(32, f'No OAuth2 provider was found for URL passed in HTTP header {ISS_URL_HEADER}.',
-                          sub_code=6)
+    provider_module = liferay
 
     access_token_info = _get_redis_access_token_info(provider_module, access_token)
 
