@@ -13,16 +13,16 @@ from test_tools.mock.oauth2_provider import run
 logger = logging.getLogger(__name__)
 
 SUBPROCESSES = set()
-LIFERAY_PORT = 8030
+OAUTH2_PROVIDER_MOCK_PORT = 8030
 
-AUTHN_INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection?is_active=true"
+AUTHN_INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{OAUTH2_PROVIDER_MOCK_PORT}/rest/test-oauth2/introspection?is_active=true"
 
 LAYMAN_CELERY_QUEUE = 'temporary'
 
 AUTHN_SETTINGS = {
     'LAYMAN_AUTHN_MODULES': 'layman.authn.oauth2',
     'OAUTH2_INTROSPECTION_URL': AUTHN_INTROSPECTION_URL,
-    'OAUTH2_USER_PROFILE_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile",
+    'OAUTH2_USER_PROFILE_URL': f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{OAUTH2_PROVIDER_MOCK_PORT}/rest/test-oauth2/user-profile",
 }
 
 LAYMAN_SETTING = layman_util.SimpleStorage()
@@ -37,8 +37,8 @@ def oauth2_provider_mock():
         },
         'app_config': {
             'ENV': 'development',
-            'SERVER_NAME': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}",
-            'SESSION_COOKIE_DOMAIN': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}",
+            'SERVER_NAME': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{OAUTH2_PROVIDER_MOCK_PORT}",
+            'SESSION_COOKIE_DOMAIN': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{OAUTH2_PROVIDER_MOCK_PORT}",
             'OAUTH2_USERS': {
                 'test_gs_rules_user': None,
                 'test_gs_rules_other_user': None,
@@ -71,7 +71,7 @@ def oauth2_provider_mock():
             },
         },
         'host': '0.0.0.0',
-        'port': LIFERAY_PORT,
+        'port': OAUTH2_PROVIDER_MOCK_PORT,
         'debug': True,  # preserve error log in HTTP responses
         'load_dotenv': False,
         'options': {
