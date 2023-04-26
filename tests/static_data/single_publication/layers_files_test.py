@@ -12,7 +12,7 @@ from ..data import ensure_publication
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_RASTER_LAYERS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_raster_files(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     with app.app_context():
@@ -42,7 +42,7 @@ def test_raster_files(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_QML_LAYERS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_qml_files(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     workspace_directory = f'{settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}'

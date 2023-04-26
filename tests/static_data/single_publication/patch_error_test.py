@@ -7,7 +7,7 @@ from ..data import ensure_publication
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_RASTER_LAYERS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_patch_raster_qml(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
@@ -24,7 +24,7 @@ def test_patch_raster_qml(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_QML_LAYERS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_patch_qml_raster(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 

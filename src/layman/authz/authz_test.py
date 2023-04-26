@@ -121,7 +121,7 @@ class TestRestApiClass:
             ('rest_workspace_map_thumbnail.get', {'mapname': mapname}, 200, None, 404, 26),
         ],
     )
-    @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'provide_publications')
+    @pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman', 'provide_publications')
     def test_authorize_publications_decorator_on_rest_api(
             self,
             rest_action,

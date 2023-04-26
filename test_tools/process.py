@@ -31,7 +31,7 @@ layman_start_counter = layman_util.SimpleCounter()
 
 
 @pytest.fixture(scope="session")
-def liferay_mock():
+def oauth2_provider_mock():
     server = Process(target=run, kwargs={
         'env_vars': {
         },

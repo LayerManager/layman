@@ -12,7 +12,7 @@ from ..data import ensure_publication
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_thumbnail(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
@@ -22,7 +22,7 @@ def test_thumbnail(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman',)
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman',)
 def test_get_publication_info_items(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     asserts_internal.source_has_its_key_or_it_is_empty(workspace, publ_type, publication)
@@ -31,7 +31,7 @@ def test_get_publication_info_items(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_infos(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
@@ -46,7 +46,7 @@ def test_infos(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_auth_get_publications(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
@@ -66,7 +66,7 @@ def test_auth_get_publications(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_auth_get_publication(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
@@ -87,7 +87,7 @@ def test_auth_get_publication(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_internal_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     asserts_internal.mandatory_keys_in_all_sources(workspace, publ_type, publication)
@@ -100,7 +100,7 @@ def test_internal_info(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
@@ -132,7 +132,7 @@ def test_info(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_all_source_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     asserts_internal.same_value_of_key_in_all_sources(workspace, publ_type, publication)

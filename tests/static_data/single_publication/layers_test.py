@@ -30,7 +30,7 @@ headers_sld = {
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     wms_url = f"http://localhost:8000/geoserver/{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows"
@@ -63,7 +63,7 @@ def test_info(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_geoserver_workspace(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
@@ -73,7 +73,7 @@ def test_geoserver_workspace(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_get_layer_style(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
@@ -100,7 +100,7 @@ def test_get_layer_style(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_wms_layer(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
@@ -184,7 +184,7 @@ def test_wms_layer(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_QML_LAYERS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_fill_project_template(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
@@ -254,7 +254,7 @@ def test_fill_project_template(workspace, publ_type, publication):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_gs_data_security(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
@@ -280,7 +280,7 @@ def test_gs_data_security(workspace, publ_type, publication):
 @pytest.mark.parametrize('workspace, publ_type, publication', [(wspace, ptype, pub)
                                                                for wspace, ptype, pub in data.LIST_LAYERS
                                                                if data.PUBLICATIONS[(wspace, ptype, pub)][data.TEST_DATA].get('micka_xml')])
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_micka_xml(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
@@ -313,7 +313,7 @@ def test_micka_xml(workspace, publ_type, publication):
     publ_tuple for publ_tuple in data.LIST_LAYERS
     if data.PUBLICATIONS[publ_tuple][data.TEST_DATA].get('attributes') is not None
 ])
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_layer_attributes_in_db(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     generated_names = {'wkb_geometry', 'ogc_fid'}
