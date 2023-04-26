@@ -16,7 +16,7 @@ def test_get_user_infos():
     iss_sub = {'issuer_id': 'mock_test_users_test',
                'sub': '5'}
     userinfo = {**iss_sub,
-                "claims": {"email": "test@liferay.com",
+                "claims": {"email": "test@oauth2.org",
                            "name": "test ensure user",
                            "preferred_username": 'test_preferred',
                            "given_name": "test",
@@ -38,7 +38,7 @@ def test_ensure_user():
     username = 'test_ensure_user'
     userinfo = {"issuer_id": 'mock_test_users_test',
                 "sub": '10',
-                "claims": {"email": "test@liferay.com",
+                "claims": {"email": "test@oauth2.org",
                            "name": "test ensure user",
                            "preferred_username": 'test_preferred',
                            "given_name": "test",
@@ -76,7 +76,7 @@ def test_delete_user():
     workspace = 'test_delete_user_workspace'
     userinfo = {"issuer_id": 'mock_test_users_test',
                 "sub": '20',
-                "claims": {"email": "test@liferay.com",
+                "claims": {"email": "test@oauth2.org",
                            "preferred_username": 'test_preferred',
                            "name": "test ensure user",
                            "given_name": "test",

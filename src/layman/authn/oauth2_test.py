@@ -191,7 +191,7 @@ def test_authn_get_current_user_without_username(client):
         'email', 'email_verified', 'family_name', 'given_name', 'iss', 'middle_name', 'name',
         'preferred_username', 'sub', 'updated_at', 'screen_name'
     } == set(claims.keys())
-    assert claims['email'] == 'test@liferay.com'
+    assert claims['email'] == 'test@oauth2.org'
     assert claims['email_verified'] is True
     assert claims['family_name'] == 'Test'
     assert claims['given_name'] == 'Test'
@@ -302,7 +302,7 @@ def test_patch_current_user_without_username():
 
     # test map metadata
     workspace = exp_username
-    exp_email = 'test_patch_current_user_user1_email' + '@liferay.com'
+    exp_email = 'test_patch_current_user_user1_email' + '@oauth2.org'
     exp_name = 'FirstName MiddleName LastName'
     mapname = 'map1'
     process_client.publish_workspace_map(workspace, mapname, headers=user1_authn_headers)
