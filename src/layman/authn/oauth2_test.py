@@ -12,7 +12,7 @@ from .oauth2 import TOKEN_HEADER
 from . import oauth2
 
 
-LIFERAY_PORT = process.LIFERAY_PORT
+OAUTH2_PROVIDER_MOCK_PORT = process.OAUTH2_PROVIDER_MOCK_PORT
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -37,7 +37,7 @@ def unexisting_introspection_url():
 def inactive_token_introspection_url(oauth2_provider_mock):
     # pylint: disable=unused-argument
     introspection_url = oauth2.INTROSPECTION_URL
-    oauth2.INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection"
+    oauth2.INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{OAUTH2_PROVIDER_MOCK_PORT}/rest/test-oauth2/introspection"
     yield
     oauth2.INTROSPECTION_URL = introspection_url
 
@@ -55,7 +55,7 @@ def active_token_introspection_url(oauth2_provider_mock):
 def user_profile_url(oauth2_provider_mock):
     # pylint: disable=unused-argument
     user_profile_url = oauth2.USER_PROFILE_URL
-    oauth2.USER_PROFILE_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile"
+    oauth2.USER_PROFILE_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{OAUTH2_PROVIDER_MOCK_PORT}/rest/test-oauth2/user-profile"
     yield
     oauth2.USER_PROFILE_URL = user_profile_url
 
