@@ -6,7 +6,7 @@ from ..data import ensure_all_publications
 
 @pytest.mark.timeout(600)
 @pytest.mark.parametrize('workspace', data.WORKSPACES)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_user_workspace(workspace):
     ensure_all_publications()
 

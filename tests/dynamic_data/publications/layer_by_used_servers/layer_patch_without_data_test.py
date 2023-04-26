@@ -56,7 +56,7 @@ def generate_test_cases():
     return tc_list
 
 
-@pytest.mark.usefixtures('liferay_mock')
+@pytest.mark.usefixtures('oauth2_provider_mock')
 class TestLayer(base_test.TestSingleRestPublication):
     workspace = WORKSPACE
 

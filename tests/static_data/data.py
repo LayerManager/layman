@@ -42,7 +42,7 @@ def assert_publication_before_post(workspace, publ_type, publication):
 
 
 @pytest.fixture(scope="session", autouse=True)
-def ensure_test_data(liferay_mock, request):
+def ensure_test_data(oauth2_provider_mock, request):
     # pylint: disable=unused-argument
     yield
 

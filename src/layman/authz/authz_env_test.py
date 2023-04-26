@@ -20,7 +20,7 @@ class TestPublicWorkspaceClass:
         yield
 
     @staticmethod
-    @pytest.mark.usefixtures('liferay_mock', 'setup_test_public_workspace_variable')
+    @pytest.mark.usefixtures('oauth2_provider_mock', 'setup_test_public_workspace_variable')
     @pytest.mark.parametrize("publish_method, delete_method, workspace_suffix", [
         (process_client.publish_workspace_layer, process_client.delete_workspace_layer, '_layer',),
         (process_client.publish_workspace_map, process_client.delete_workspace_map, '_map',),

@@ -19,7 +19,7 @@ def test_check_workspace_wms():
     assert exc_info.value.data['workspace_name'] == workspace
 
 
-@pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
+@pytest.mark.usefixtures('ensure_layman', 'oauth2_provider_mock')
 def test_check_user_wms():
     user = 'test_check_user_wms' + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
     auth_headers = process_client.get_authz_headers(user)

@@ -13,7 +13,7 @@ def publication_id(publication):
 
 @pytest.mark.timeout(60)
 @pytest.mark.parametrize('publication', data.PUBLICATIONS, ids=publication_id)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_action_chain(publication, request):
     for action_idx, step in enumerate(data.PUBLICATIONS[publication]):
         response = None

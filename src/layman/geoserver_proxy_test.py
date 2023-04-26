@@ -16,7 +16,7 @@ def setup_user_layer(username, layername, authn_headers):
     ], headers=authn_headers)
 
 
-@pytest.mark.usefixtures('ensure_layman', 'liferay_mock')
+@pytest.mark.usefixtures('ensure_layman', 'oauth2_provider_mock')
 def test_missing_attribute_authz():
     username = 'testmissingattr_authz'
     layername1 = 'testmissingattr_authz_layer'

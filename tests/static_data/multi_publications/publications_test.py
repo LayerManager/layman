@@ -7,7 +7,7 @@ from ..data import ensure_all_publications
 
 
 @pytest.mark.timeout(600)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman',)
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman',)
 def test_get_publication_infos():
     ensure_all_publications()
 
@@ -68,7 +68,7 @@ def test_get_publication_infos():
 
 
 @pytest.mark.timeout(600)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_find_maps_containing_layer():
     ensure_all_publications()
 

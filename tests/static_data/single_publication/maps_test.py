@@ -24,7 +24,7 @@ def assert_operates_on(workspace, mapname, expected_layers, authz_headers):
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_INTERNAL_MAPS)
-@pytest.mark.usefixtures('liferay_mock', 'ensure_layman')
+@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_map_with_unauthorized_layer(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 

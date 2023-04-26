@@ -73,7 +73,7 @@ class TestSoapClass:
                                                     headers=self.authz_headers)
 
     @pytest.mark.flaky(reruns=5, reruns_delay=2)
-    @pytest.mark.usefixtures('liferay_mock', 'ensure_layman', 'reserve_username', 'clear_data')
+    @pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman', 'reserve_username', 'clear_data')
     @pytest.mark.parametrize('params_and_expected_list', [
         # (input access rights, expected public visibility of metadata record)
         [(access_rights_rowo, False), (access_rights_rewe, True)],
