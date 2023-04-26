@@ -17,7 +17,7 @@ def ensure_user(workspace):
         'sub': oauth2_sub_counter.get(),
         'issuer_id': 'layman',
         'claims': {
-            'email': f"{workspace}@liferay.com",
+            'email': f"{workspace}@oauth2.org",
             'name': workspace,
             'middle_name': '',
             'family_name': workspace,

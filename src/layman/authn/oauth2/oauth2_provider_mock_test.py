@@ -5,7 +5,7 @@ import requests
 import pytest
 
 from layman import settings
-from test_tools.mock.liferay import run
+from test_tools.mock.oauth2_provider import run
 
 del sys.modules['layman']
 from . import TOKEN_HEADER

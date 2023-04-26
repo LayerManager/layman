@@ -23,7 +23,7 @@ def create_app(app_config):
                     'sub': sub
                 }
                 tok2prof[username] = {
-                    "emailAddress": f"{username}@liferay.com",
+                    "emailAddress": f"{username}@oauth2.org",
                     "firstName": f"{username}",
                     "lastName": f"{username}",
                     "middleName": "",
@@ -64,7 +64,7 @@ token_2_introspection = {
 }
 token_2_profile = {
     'abc': {
-        "emailAddress": "test@liferay.com",
+        "emailAddress": "test@oauth2.org",
         "firstName": "Test",
         "lastName": "Test",
         "middleName": "",
@@ -72,7 +72,7 @@ token_2_profile = {
         "userId": "20139",
     },
     'test2': {
-        "emailAddress": "test2@liferay.com",
+        "emailAddress": "test2@oauth2.org",
         "firstName": "Test",
         "lastName": "Test",
         "middleName": "",
@@ -80,7 +80,7 @@ token_2_profile = {
         "userId": "20140",
     },
     'test3': {
-        "emailAddress": "test3@liferay.com",
+        "emailAddress": "test3@oauth2.org",
         "firstName": "Test",
         "lastName": "Test",
         "middleName": "",
@@ -88,7 +88,7 @@ token_2_profile = {
         "userId": "20141",
     },
     'test_patch_current_user_user1': {
-        "emailAddress": "test_patch_current_user_user1_email@liferay.com",
+        "emailAddress": "test_patch_current_user_user1_email@oauth2.org",
         "firstName": "FirstName",
         "lastName": "LastName",
         "middleName": "MiddleName",
@@ -96,7 +96,7 @@ token_2_profile = {
         "userId": "20142",
     },
     'test_patch_current_user_user2': {
-        "emailAddress": "test_patch_current_user_user2@liferay.com",
+        "emailAddress": "test_patch_current_user_user2@oauth2.org",
         "firstName": "Test",
         "lastName": "Test",
         "middleName": "",
@@ -116,7 +116,7 @@ def post():
     result = {
         "active": is_active, "client_id": "VECGuQb00tWt8HZNkA4cxu6dnoQD5pF6Up3daAoK", "exp": 1568981517,
         "iat": 1568980917,
-        "scope": "liferay-json-web-services.everything.read.userprofile", "sub": "20139", "token_type": "Bearer",
+        "sub": "20139", "token_type": "Bearer",
         "username": "Test Test", "company.id": "20099"
     }
     result.update(current_app.config['OAUTH2_TOKEN_2_INTROSPECTION'][access_token])
@@ -136,7 +136,7 @@ def get():
         "contactId": "20141",
         "createDate": 1557361648854,
         "defaultUser": False,
-        "emailAddress": "test@liferay.com",
+        "emailAddress": "test@oauth2.org",
         "emailAddressVerified": True,
         "externalReferenceCode": "",
         "facebookId": "0",

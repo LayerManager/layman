@@ -11,7 +11,7 @@ def test_get_users():
     username = 'test_get_users_user'
     userinfo = {"issuer_id": 'mock_test_rest_user_test',
                 "sub": '1',
-                "claims": {"email": "test@liferay.com",
+                "claims": {"email": "test@oauth2.org",
                            "preferred_username": 'test_preferred',
                            "name": "test ensure user",
                            "given_name": "test",

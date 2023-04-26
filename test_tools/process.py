@@ -7,7 +7,7 @@ import pytest
 
 from layman import settings, util as layman_util
 from test_tools import util
-from test_tools.mock.liferay import run
+from test_tools.mock.oauth2_provider import run
 
 
 logger = logging.getLogger(__name__)
