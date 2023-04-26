@@ -8,8 +8,8 @@ from layman import app
 from layman import settings
 from test_tools import process, process_client
 from test_tools.util import url_for
-from .oauth2.util import TOKEN_HEADER
-from .oauth2 import liferay
+from .oauth2 import TOKEN_HEADER
+from . import oauth2
 
 
 LIFERAY_PORT = process.LIFERAY_PORT
@@ -27,37 +27,37 @@ def adjust_settings():
 
 @pytest.fixture()
 def unexisting_introspection_url():
-    introspection_url = liferay.INTROSPECTION_URL
-    liferay.INTROSPECTION_URL = 'http://blabla:8000/bla'
+    introspection_url = oauth2.INTROSPECTION_URL
+    oauth2.INTROSPECTION_URL = 'http://blabla:8000/bla'
     yield
-    liferay.INTROSPECTION_URL = introspection_url
+    oauth2.INTROSPECTION_URL = introspection_url
 
 
 @pytest.fixture()
 def inactive_token_introspection_url(liferay_mock):
     # pylint: disable=unused-argument
-    introspection_url = liferay.INTROSPECTION_URL
-    liferay.INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection"
+    introspection_url = oauth2.INTROSPECTION_URL
+    oauth2.INTROSPECTION_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/introspection"
     yield
-    liferay.INTROSPECTION_URL = introspection_url
+    oauth2.INTROSPECTION_URL = introspection_url
 
 
 @pytest.fixture()
 def active_token_introspection_url(liferay_mock):
     # pylint: disable=unused-argument
-    introspection_url = liferay.INTROSPECTION_URL
-    liferay.INTROSPECTION_URL = process.AUTHN_INTROSPECTION_URL
+    introspection_url = oauth2.INTROSPECTION_URL
+    oauth2.INTROSPECTION_URL = process.AUTHN_INTROSPECTION_URL
     yield
-    liferay.INTROSPECTION_URL = introspection_url
+    oauth2.INTROSPECTION_URL = introspection_url
 
 
 @pytest.fixture()
 def user_profile_url(liferay_mock):
     # pylint: disable=unused-argument
-    user_profile_url = liferay.USER_PROFILE_URL
-    liferay.USER_PROFILE_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile"
+    user_profile_url = oauth2.USER_PROFILE_URL
+    oauth2.USER_PROFILE_URL = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{LIFERAY_PORT}/rest/test-oauth2/user-profile"
     yield
-    liferay.USER_PROFILE_URL = user_profile_url
+    oauth2.USER_PROFILE_URL = user_profile_url
 
 
 @pytest.fixture(scope="module")
@@ -255,7 +255,7 @@ def test_patch_current_user_without_username():
     assert resp_json['username'] == exp_username
     assert resp_json['claims']['sub'] == exp_sub
 
-    iss_id = liferay.__name__
+    iss_id = oauth2.__name__
     from layman.authn.redis import _get_issid_sub_2_username_key
     rds_key = _get_issid_sub_2_username_key(iss_id, exp_sub)
     rds = settings.LAYMAN_REDIS

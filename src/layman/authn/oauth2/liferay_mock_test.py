@@ -8,7 +8,7 @@ from layman import settings
 from test_tools.mock.liferay import run
 
 del sys.modules['layman']
-from .util import TOKEN_HEADER
+from . import TOKEN_HEADER
 
 PORT1 = 8031
 PORT2 = 8032
