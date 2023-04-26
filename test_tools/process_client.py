@@ -21,7 +21,6 @@ from .process import LAYMAN_CELERY_QUEUE
 
 logger = logging.getLogger(__name__)
 
-ISS_URL_HEADER = 'AuthorizationIssUrl'
 TOKEN_HEADER = 'Authorization'
 
 layer_keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
@@ -587,8 +586,7 @@ def ensure_reserved_username(username, headers=None):
 
 
 def get_authz_headers(username):
-    return {f'{ISS_URL_HEADER}': 'http://localhost:8083/o/authorize',
-            f'{TOKEN_HEADER}': f'Bearer {username}',
+    return {f'{TOKEN_HEADER}': f'Bearer {username}',
             }
 
 

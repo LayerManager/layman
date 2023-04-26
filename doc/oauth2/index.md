@@ -57,15 +57,11 @@ Schema specific for LTC, distinguishing client side and server side of LTC:
 ![auth-code.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/LayerManager/layman/master/doc/oauth2/auth-code.puml) 
 
 ### Request Layman REST API
-After successful authorization, *client* is able to communicate with Layman REST API. To authenticate using OAuth2, every request to Layman REST API must contain two HTTP headers:
-- `Authorization`
-- `AuthorizationIssUrl`
+After successful authorization, *client* is able to communicate with Layman REST API. To authenticate using OAuth2, every request to Layman REST API must contain HTTP header `Authorization`.
 
 **Authorization** header contains access token according to [RFC6750 Bearer Token Usage](https://tools.ietf.org/html/rfc6750#section-2.1). Structure of its value is `"Bearer <access token>"`.
 
-**AuthorizationIssUrl** header is Layman-specific header and it contains URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), e.g. `"http://localhost:8082/o/oauth2/authorize"`. LTC uses the value from OAUTH2_AUTH_URL setting.
-
-Because access token is known only on server side of LTC and not to client side, every request from client side to Layman REST API goes through **proxy** on LTC server side. The proxy adds `Authorization` and `AuthorizationIssUrl` headers to the request and forward it to the Layman. To authenticate end-user, Layman then validates access token on *authorization server* using [Token Introspection](https://oauth.net/2/token-introspection/) mechanism.
+Because access token is known only on server side of LTC and not to client side, every request from client side to Layman REST API goes through **proxy** on LTC server side. The proxy adds `Authorization` header to the request and forward it to the Layman. To authenticate end-user, Layman then validates access token on *authorization server* using [Token Introspection](https://oauth.net/2/token-introspection/) mechanism.
  
 General schema of any request to Layman REST API:
 

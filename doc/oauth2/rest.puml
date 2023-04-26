@@ -16,8 +16,8 @@ ltcc [#0000FF]-> ltcsproxy: Request to\nLayman REST API
 activate ltcc
 activate ltcsproxy
 note over ltcsproxy
-    Proxy adds HTTP headers
-    Authorization and AuthorizationIssUrl
+    Proxy adds HTTP header
+    Authorization
     to every request
     to Layman REST API.
 end note
