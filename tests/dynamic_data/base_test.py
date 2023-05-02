@@ -74,6 +74,8 @@ class TestSingleRestPublication:
 
     rest_parametrization = []
 
+    post_before_patch_scope = 'function'
+
     @classmethod
     @final
     def parametrize_test_cases(cls) -> [TestCaseType]:
@@ -226,6 +228,10 @@ class TestSingleRestPublication:
     @pytest.fixture(scope='function', autouse=True)
     def post_before_patch(self, request):
         publication, method, patch_args = request.param
+        assert self.post_before_patch_scope in {'function', 'class'}
         if method == RestMethod.PATCH:
-            self.post_publication(publication, args=patch_args)
+            if self.post_before_patch_scope == 'function':
+                self.post_publication(publication, args=patch_args)
+            else:
+                self.ensure_publication(publication, args=patch_args, scope='class')
         yield
