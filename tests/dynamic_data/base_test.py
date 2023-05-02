@@ -84,7 +84,6 @@ class TestSingleRestPublication:
 
         test_cases = []
         for input_test_case in cls.test_cases:
-            assert input_test_case.rest_method is None  # Maybe enable it later
             assert input_test_case.pytest_id is None  # Maybe enable it later
 
             for parametrization in parametrizations:
@@ -111,7 +110,8 @@ class TestSingleRestPublication:
                 if input_publication:
                     name = input_publication.name or name
 
-                rest_method = parametrization.rest_method or RestMethod.POST
+                assert input_test_case.rest_method is None or parametrization.rest_method is None
+                rest_method = parametrization.rest_method or input_test_case.rest_method or RestMethod.POST
                 rest_args = copy.deepcopy(input_test_case.rest_args)
                 if publication_definition:
                     rest_args.update(copy.deepcopy(publication_definition.definition))
