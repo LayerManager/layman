@@ -36,13 +36,13 @@ def generate_test_cases():
     for name, test_case_params in LAYERS.items():
         for layer_by_server in base_test.LayerByUsedServers:
             all_params = deepcopy(test_case_params)
-            name = f'{layer_by_server.publ_name_part}_{name}'
+            key = f'{layer_by_server.publ_name_part}_{name}'
             post_args = {**layer_by_server.publication_definition.definition, **{'headers': AUTHN_HEADERS, }}
             rest_args = {**all_params[Key.REST_ARGS], **{'headers': AUTHN_HEADERS, }}
-            test_case = base_test.TestCaseType(key=name,
+            test_case = base_test.TestCaseType(key=key,
                                                publication=Publication(workspace=WORKSPACE,
                                                                        type=process_client.LAYER_TYPE,
-                                                                       name=name,
+                                                                       name=layer_by_server.publ_name_part,
                                                                        ),
                                                type=EnumTestTypes.OPTIONAL,
                                                post_before_patch_args=post_args,
@@ -65,6 +65,8 @@ class TestLayer(base_test.TestSingleRestPublication):
     rest_parametrization = []
 
     test_cases = generate_test_cases()
+
+    post_before_patch_scope = 'class'
 
     def before_class(self):
         process_client.ensure_reserved_username(self.workspace, headers=AUTHN_HEADERS)
