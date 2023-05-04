@@ -1435,20 +1435,21 @@ TESTCASES = {
 }
 
 
+def cases_to_simple_parametrizations(cases):
+    cases = cases.value if isinstance(cases, ParametrizationSets) else cases
+    return cases
+
+
 def generate_test_cases():
     tc_list = []
     for key, test_case_params in TESTCASES.items():
         all_params = deepcopy(test_case_params)
         rest_args = all_params.pop(Key.REST_ARGS)
 
-        mandatory_cases = all_params.pop(Key.MANDATORY_CASES)
-        mandatory_cases = mandatory_cases.value if isinstance(mandatory_cases,
-                                                              ParametrizationSets) else mandatory_cases
+        mandatory_cases = cases_to_simple_parametrizations(all_params.pop(Key.MANDATORY_CASES))
         specific_types = {tc: EnumTestTypes.MANDATORY for tc in mandatory_cases}
 
-        run_only_cases = all_params.pop(Key.RUN_ONLY_CASES)
-        run_only_cases = run_only_cases.value if isinstance(run_only_cases,
-                                                            ParametrizationSets) else run_only_cases
+        run_only_cases = cases_to_simple_parametrizations(all_params.pop(Key.RUN_ONLY_CASES))
         ignore_cases = ParametrizationSets.ALL.value.difference(run_only_cases)
         for case in ignore_cases:
             assert case not in specific_types, f'key={key},\ncase={case},\nspecific_types={specific_types}'
@@ -1457,13 +1458,12 @@ def generate_test_cases():
         specific_params_def = all_params.pop(Key.SPECIFIC_CASES)
         specific_params = {}
         for parametrization_key, parametrization_value in specific_params_def.items():
-            parametrization_key = parametrization_key.value if isinstance(parametrization_key,
-                                                                          ParametrizationSets) else parametrization_key
-            if all(isinstance(parametrization_item, frozenset) for parametrization_item in parametrization_key):
-                for parametrization_item in parametrization_key:
-                    specific_params[parametrization_item] = parametrization_value
-            else:
-                specific_params[parametrization_key] = parametrization_value
+            cases = parametrization_key.value if isinstance(parametrization_key, ParametrizationSets) \
+                else {parametrization_key}
+            cases = cases_to_simple_parametrizations(cases)
+            for case in cases:
+                assert case not in specific_params
+                specific_params[case] = parametrization_value
 
         post_before_patch_args = test_case_params.pop(Key.POST_BEFORE_PATCH_ARGS, {})
         publ_type = all_params.pop(Key.PUBLICATION_TYPE)
