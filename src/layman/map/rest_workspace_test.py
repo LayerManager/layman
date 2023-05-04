@@ -192,7 +192,7 @@ def test_post_maps_simple(client):
     with app.app_context():
         workspace = 'testuser1'
         mapname = None
-        expected_mapname = 'administrativni_cleneni_libereckeho_kraje'
+        expected_mapname = 'podkladova_mapa'
         rest_path = url_for('rest_workspace_maps.post', workspace=workspace)
         file_paths = [
             'sample/layman.map/full.json',
@@ -230,9 +230,9 @@ def test_post_maps_simple(client):
         assert resp_json['name'] == mapname
         assert resp_json['uuid'] == uuid_str
         assert resp_json['url'] == url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname)
-        assert resp_json['title'] == "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
+        assert resp_json['title'] == "Podkladová mapa"
         assert resp_json[
-            'description'] == "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce."
+            'description'] == "Popis podkladové mapy."
         map_file = resp_json['file']
         assert 'status' not in map_file
         assert 'path' in map_file
@@ -285,7 +285,7 @@ def test_post_maps_simple(client):
 
     with app.app_context():
         expected_md_values = {
-            'abstract': "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce.",
+            'abstract': "Popis podkladové mapy.",
             'extent': [
                 14.62,
                 50.58,
@@ -295,7 +295,7 @@ def test_post_maps_simple(client):
             'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname),
             'identifier': {
                 "identifier": url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-                "label": "administrativni_cleneni_libereckeho_kraje"
+                "label": "podkladova_mapa"
             },
             'map_endpoint': url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
             'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
@@ -306,7 +306,7 @@ def test_post_maps_simple(client):
                 'EPSG:3857'
             ],
             'revision_date': None,
-            'title': "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje",
+            'title': "Podkladová mapa",
         }
     check_metadata(client, workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
@@ -447,7 +447,7 @@ def test_post_maps_complex(client):
 def test_patch_map(client):
     with app.app_context():
         workspace = 'testuser1'
-        mapname = 'administrativni_cleneni_libereckeho_kraje'
+        mapname = 'podkladova_mapa'
         uuid_str = map_uuid.get_map_uuid(workspace, mapname)
         rest_path = url_for('rest_workspace_map.patch', workspace=workspace, mapname=mapname)
 
@@ -475,7 +475,7 @@ def test_patch_map(client):
 
         assert resp_json['uuid'] == uuid_str
         assert resp_json['url'] == url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname)
-        assert resp_json['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
+        assert resp_json['title'] == "Jiná podkladová mapa"
         assert resp_json['description'] == "Jiný popis"
         map_file = resp_json['file']
         assert 'status' not in map_file
@@ -507,7 +507,7 @@ def test_patch_map(client):
         assert response.status_code == 200
         resp_json = response.get_json()
         assert resp_json['name'] == mapname
-        assert resp_json['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
+        assert resp_json['title'] == "Jiná podkladová mapa"
         assert resp_json['abstract'] == "Jiný popis"
         user_json = resp_json['user']
         assert user_json['name'] == workspace
@@ -559,7 +559,7 @@ def test_patch_map(client):
             'graphic_url': url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname),
             'identifier': {
                 "identifier": url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-                "label": "administrativni_cleneni_libereckeho_kraje"
+                "label": "podkladova_mapa"
             },
             'map_endpoint': url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
             'map_file_endpoint': url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
@@ -579,7 +579,7 @@ def test_patch_map(client):
 def test_delete_map(client):
     with app.app_context():
         workspace = 'testuser1'
-        mapname = 'administrativni_cleneni_libereckeho_kraje'
+        mapname = 'podkladova_mapa'
         rest_path = url_for('rest_workspace_map.delete_map', workspace=workspace, mapname=mapname)
         response = client.delete(rest_path)
         assert response.status_code == 200
