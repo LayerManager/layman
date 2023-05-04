@@ -24,7 +24,7 @@ class Key(Enum):
     EXPECTED_EXCEPTION = 'expected_exception'
     FAILED_INFO_KEY = 'failed_info_key'
     MANDATORY_CASES = 'mandatory_cases'
-    IGNORED_CASES = 'ignored_cases'
+    RUN_ONLY_CASES = 'run_only_cases'
     SPECIFIC_CASES = 'specific_params'
     POST_BEFORE_PATCH_ARGS = 'post_before_patch_args'
 
@@ -34,6 +34,16 @@ WORKSPACE = 'dynamic_test_workspace_wrong_input'
 
 @unique
 class ParametrizationSets(Enum):
+    ALL = frozenset([
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+    ])
     SIMPLE_POST_PATCH = frozenset([
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
@@ -44,22 +54,6 @@ class ParametrizationSets(Enum):
     ])
     POST_PATCH_CHUNKS_COMPRESS = frozenset([
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
-    ])
-    NOT_POST_COMPRESS = frozenset([
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
-    ])
-    NOT_POST_NO_COMPRESS = frozenset([
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
     ])
     POST_ALL = frozenset([
@@ -78,43 +72,27 @@ class ParametrizationSets(Enum):
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
     ])
+    POST_NO_COMPRESS = frozenset([
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+    ])
     POST_PATCH_CHUNKS = frozenset([
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
     ])
-    NOT_SIMPLE_POST = frozenset([
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+    POST_PATCH_NO_CHUNKS = frozenset([
+        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
     ])
-    NOT_SIMPLE_PATCH = frozenset([
+    POST_PATCH_NO_COMPRESS = frozenset([
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
-    ])
-    NOT_SIMPLE_POST_PATCH = frozenset([
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
-    ])
-    POST_PATCH_COMPRESS = frozenset([
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
     ])
 
 
@@ -149,7 +127,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -187,7 +165,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -224,7 +202,7 @@ TESTCASES = {
         Key.MANDATORY_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE])
         },
-        Key.IGNORED_CASES: ParametrizationSets.NOT_POST_COMPRESS,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_COMPRESS,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -250,7 +228,7 @@ TESTCASES = {
             'data': 'Raster layers are not allowed to have QML style.',
         },
         Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -278,7 +256,7 @@ TESTCASES = {
             'data': 'Raster layers are not allowed to have QML style.',
         },
         Key.MANDATORY_CASES: {frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
-        Key.IGNORED_CASES: ParametrizationSets.POST_ALL,
+        Key.RUN_ONLY_CASES: ParametrizationSets.PATCH_ALL,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -306,7 +284,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
-        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_ALL,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -349,7 +327,7 @@ TESTCASES = {
             'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
         },
         Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_CHUNKS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -373,7 +351,7 @@ TESTCASES = {
             'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_CHUNKS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -404,7 +382,7 @@ TESTCASES = {
             'data': {'found': 'EPSG:2154', 'supported_values': settings.INPUT_SRS_LIST},
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_CHUNKS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -428,7 +406,7 @@ TESTCASES = {
             'data': {'found': 'EPSG:2154', 'supported_values': settings.INPUT_SRS_LIST},
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_CHUNKS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -460,7 +438,7 @@ TESTCASES = {
                 'parameter': 'file'},
         },
         Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -506,7 +484,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -557,7 +535,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
-        Key.IGNORED_CASES: ParametrizationSets.POST_PATCH_CHUNKS,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_PATCH_NO_CHUNKS,
         Key.SPECIFIC_CASES: {},
     },
     'epsg_4326_en': {
@@ -579,7 +557,7 @@ TESTCASES = {
             'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
+        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
         Key.SPECIFIC_CASES: {},
     },
     'map_schema_1_0_0': {
@@ -600,7 +578,7 @@ TESTCASES = {
                      'reason': 'Missing key `describedBy`'},
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
+        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
         Key.SPECIFIC_CASES: {},
     },
     'map_schema_3_0_0': {
@@ -621,7 +599,7 @@ TESTCASES = {
                      'reason': 'Invalid schema version'},
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
+        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
         Key.SPECIFIC_CASES: {},
     },
     'map_unsupported_crs': {
@@ -641,7 +619,7 @@ TESTCASES = {
                      'supported_values': settings.INPUT_SRS_LIST},
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
+        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
         Key.SPECIFIC_CASES: {},
     },
     'layer_unsupported_overview_resampling': {
@@ -662,7 +640,7 @@ TESTCASES = {
                                 'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {},
     },
     'layer_vector_overview_resampling': {
@@ -681,7 +659,7 @@ TESTCASES = {
             'data': 'Vector layers do not support overview resampling.',
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_CHUNKS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -711,7 +689,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -750,7 +728,7 @@ TESTCASES = {
             'data': 'Parameter overview_resampling requires parameter file to be set.',
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.POST_ALL,
+        Key.RUN_ONLY_CASES: ParametrizationSets.PATCH_ALL,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -795,7 +773,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_ALL,
         Key.SPECIFIC_CASES: {},
     },
     'map_name_211': {
@@ -814,7 +792,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
+        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
         Key.SPECIFIC_CASES: {},
     },
     'wrong_time_regex': {
@@ -837,7 +815,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {},
     },
     'vector_time_regex': {
@@ -856,7 +834,7 @@ TESTCASES = {
         Key.MANDATORY_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         },
-        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_ALL,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -890,7 +868,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_ALL,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -928,7 +906,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_ALL,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -964,7 +942,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.NOT_POST_NO_COMPRESS,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_NO_COMPRESS,
         Key.SPECIFIC_CASES: {},
     },
     'different_rasters_time_regex': {
@@ -987,7 +965,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_CHUNKS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -1016,7 +994,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_CHUNKS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -1045,7 +1023,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -1084,7 +1062,7 @@ TESTCASES = {
             'data': 'Parameter time_regex is allowed only in combination with files.',
         },
         Key.MANDATORY_CASES: {frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
-        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_PATCH,
+        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
         Key.SPECIFIC_CASES: {},
     },
     'time_regex_with_non_data_file': {
@@ -1108,7 +1086,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -1148,7 +1126,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.POST_PATCH_COMPRESS,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_PATCH_NO_COMPRESS,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_CHUNKS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -1181,7 +1159,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -1212,7 +1190,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_CHUNKS_COMPRESS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -1240,7 +1218,7 @@ TESTCASES = {
         Key.MANDATORY_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         },
-        Key.IGNORED_CASES: ParametrizationSets.PATCH_ALL,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_ALL,
         Key.SPECIFIC_CASES: {},
     },
     'duplicate_filename_differs_in_case': {
@@ -1270,7 +1248,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
-        Key.IGNORED_CASES: ParametrizationSets.POST_PATCH_COMPRESS,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_PATCH_NO_COMPRESS,
         Key.SPECIFIC_CASES: {},
     },
     'duplicate_filename_differs_in_diacritics': {
@@ -1300,7 +1278,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
-        Key.IGNORED_CASES: {},
+        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
         Key.SPECIFIC_CASES: {
             ParametrizationSets.POST_PATCH_NO_CHUNKS_COMPRESS: {
                 Key.EXPECTED_EXCEPTION: {
@@ -1347,7 +1325,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
+        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
         Key.SPECIFIC_CASES: {},
     },
     'file_and_external_table_uri': {
@@ -1373,7 +1351,7 @@ TESTCASES = {
                 }},
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.POST_PATCH_COMPRESS,
+        Key.RUN_ONLY_CASES: ParametrizationSets.POST_PATCH_NO_COMPRESS,
         Key.SPECIFIC_CASES: {},
     },
     'partial_external_table_uri': {
@@ -1398,7 +1376,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST_PATCH,
+        Key.RUN_ONLY_CASES: ParametrizationSets.SIMPLE_POST_PATCH,
         Key.SPECIFIC_CASES: {},
     },
     'crs_and_external_table_uri_post': {
@@ -1424,7 +1402,7 @@ TESTCASES = {
                 }},
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_POST,
+        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
         Key.SPECIFIC_CASES: {},
     },
     'crs_and_external_table_uri_patch': {
@@ -1451,7 +1429,7 @@ TESTCASES = {
                 }},
         },
         Key.MANDATORY_CASES: {},
-        Key.IGNORED_CASES: ParametrizationSets.NOT_SIMPLE_PATCH,
+        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
         Key.SPECIFIC_CASES: {},
     },
 }
@@ -1468,9 +1446,10 @@ def generate_test_cases():
                                                               ParametrizationSets) else mandatory_cases
         specific_types = {tc: EnumTestTypes.MANDATORY for tc in mandatory_cases}
 
-        ignore_cases = all_params.pop(Key.IGNORED_CASES)
-        ignore_cases = ignore_cases.value if isinstance(ignore_cases,
-                                                        ParametrizationSets) else ignore_cases
+        run_only_cases = all_params.pop(Key.RUN_ONLY_CASES)
+        run_only_cases = run_only_cases.value if isinstance(run_only_cases,
+                                                            ParametrizationSets) else run_only_cases
+        ignore_cases = ParametrizationSets.ALL.value.difference(run_only_cases)
         for case in ignore_cases:
             assert case not in specific_types, f'key={key},\ncase={case},\nspecific_types={specific_types}'
             specific_types[case] = EnumTestTypes.IGNORE
