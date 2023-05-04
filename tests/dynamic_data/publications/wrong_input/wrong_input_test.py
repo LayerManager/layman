@@ -919,7 +919,7 @@ TESTCASES = {
         Key.MANDATORY_CASES: {},
         Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain])},
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
+            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -948,7 +948,7 @@ TESTCASES = {
         Key.MANDATORY_CASES: {},
         Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain])},
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
+            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -1080,7 +1080,7 @@ TESTCASES = {
         Key.MANDATORY_CASES: {},
         Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain.FALSE])},
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
+            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'data': {'too_long_filenames': [
@@ -1418,6 +1418,7 @@ def generate_test_cases():
 
         run_only_cases = cases_to_simple_parametrizations(all_params.pop(Key.RUN_ONLY_CASES))
         ignore_cases = ParametrizationSets.ALL.value.difference(run_only_cases)
+        assert mandatory_cases <= run_only_cases, f"key={key}: mandatory cases is not subset of run-only cases"
         for case in ignore_cases:
             assert case not in specific_types, f'key={key},\ncase={case},\nspecific_types={specific_types}'
             specific_types[case] = EnumTestTypes.IGNORE
@@ -1431,6 +1432,7 @@ def generate_test_cases():
             for case in cases:
                 assert case not in specific_params
                 specific_params[case] = parametrization_value
+        assert set(specific_params.keys()) <= run_only_cases, f"key={key}: specific param cases is not subset of run-only cases"
 
         post_before_patch_args = test_case_params.pop(Key.POST_BEFORE_PATCH_ARGS, {})
         publ_type = all_params.pop(Key.PUBLICATION_TYPE)
