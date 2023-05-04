@@ -1455,8 +1455,6 @@ def generate_test_cases():
             specific_types[case] = EnumTestTypes.IGNORE
 
         specific_params_def = all_params.pop(Key.SPECIFIC_CASES)
-        specific_params_def = specific_params_def.value if isinstance(specific_params_def,
-                                                                      ParametrizationSets) else specific_params_def
         specific_params = {}
         for parametrization_key, parametrization_value in specific_params_def.items():
             parametrization_key = parametrization_key.value if isinstance(parametrization_key,
