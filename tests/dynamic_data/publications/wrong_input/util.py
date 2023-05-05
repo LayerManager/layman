@@ -1,6 +1,7 @@
 import inspect
 import itertools
 
+from tests import Publication
 from tests.dynamic_data import base_test_classes
 
 
@@ -23,7 +24,11 @@ def case_to_simple_parametrizations(case):
     return result
 
 
-def format_exception(exception_info: dict, format_variables: dict):
+def format_exception(exception_info: dict, publication: Publication):
+    format_variables = {
+        'publication_name': publication.name,
+        'workspace': publication.workspace,
+    }
     if 'data' in exception_info and isinstance(exception_info['data'], dict):
         if 'path' in exception_info['data']:
             exception_info['data']['path'] = exception_info['data']['path'].format(**format_variables)
