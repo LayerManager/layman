@@ -34,18 +34,7 @@ class Key(Enum):
 WORKSPACE = 'dynamic_test_workspace_wrong_input'
 
 
-@unique
-class ParametrizationSets(Enum):
-    ALL = frozenset([
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-        frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
-    ])
+ALL_CASES = {frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain])}
 
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -79,7 +68,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -117,7 +106,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -180,7 +169,7 @@ TESTCASES = {
             'data': 'Raster layers are not allowed to have QML style.',
         },
         Key.MANDATORY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -279,7 +268,7 @@ TESTCASES = {
             'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
         },
         Key.MANDATORY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -303,7 +292,7 @@ TESTCASES = {
             'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
         },
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -334,7 +323,7 @@ TESTCASES = {
             'data': {'found': 'EPSG:2154', 'supported_values': settings.INPUT_SRS_LIST},
         },
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -358,7 +347,7 @@ TESTCASES = {
             'data': {'found': 'EPSG:2154', 'supported_values': settings.INPUT_SRS_LIST},
         },
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -390,7 +379,7 @@ TESTCASES = {
                 'parameter': 'file'},
         },
         Key.MANDATORY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -436,7 +425,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -592,7 +581,7 @@ TESTCASES = {
                                 'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, },
         },
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {},
     },
     'layer_vector_overview_resampling': {
@@ -611,7 +600,7 @@ TESTCASES = {
             'data': 'Vector layers do not support overview resampling.',
         },
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -641,7 +630,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -767,7 +756,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {},
     },
     'vector_time_regex': {
@@ -975,7 +964,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -1038,7 +1027,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -1111,7 +1100,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -1142,7 +1131,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -1230,7 +1219,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
-        Key.RUN_ONLY_CASES: ParametrizationSets.ALL,
+        Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -1388,7 +1377,6 @@ TESTCASES = {
 
 
 def cases_to_simple_parametrizations(cases):
-    cases = cases.value if isinstance(cases, ParametrizationSets) else cases
     result = set()
     for case in cases:
         dimensions_values = []
@@ -1417,7 +1405,8 @@ def generate_test_cases():
         specific_types = {tc: EnumTestTypes.MANDATORY for tc in mandatory_cases}
 
         run_only_cases = cases_to_simple_parametrizations(all_params.pop(Key.RUN_ONLY_CASES))
-        ignore_cases = ParametrizationSets.ALL.value.difference(run_only_cases)
+        all_cases = cases_to_simple_parametrizations(ALL_CASES)
+        ignore_cases = all_cases.difference(run_only_cases)
         assert mandatory_cases <= run_only_cases, f"key={key}: mandatory cases is not subset of run-only cases"
         for case in ignore_cases:
             assert case not in specific_types, f'key={key},\ncase={case},\nspecific_types={specific_types}'
@@ -1426,9 +1415,7 @@ def generate_test_cases():
         specific_params_def = all_params.pop(Key.SPECIFIC_CASES)
         specific_params = {}
         for parametrization_key, parametrization_value in specific_params_def.items():
-            cases = parametrization_key.value if isinstance(parametrization_key, ParametrizationSets) \
-                else {parametrization_key}
-            cases = cases_to_simple_parametrizations(cases)
+            cases = cases_to_simple_parametrizations({parametrization_key})
             for case in cases:
                 assert case not in specific_params
                 specific_params[case] = parametrization_value
