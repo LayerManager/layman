@@ -13,6 +13,7 @@ from tests.asserts import processing, util as asserts_util
 from tests.asserts.final import publication as publication_asserts
 from tests.asserts.final.publication import util as assert_utils
 from tests.dynamic_data import base_test
+from tests.dynamic_data.base_test import RestMethod, WithChunksDomain, CompressDomain
 from .util import case_to_simple_parametrizations, format_exception
 from .. import common_publications as publications
 
@@ -33,7 +34,7 @@ class Key(Enum):
 WORKSPACE = 'dynamic_test_workspace_wrong_input'
 
 
-ALL_CASES = frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain])
+ALL_CASES = frozenset([RestMethod, WithChunksDomain, CompressDomain])
 
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -66,15 +67,15 @@ TESTCASES = {
                      'path': 'ne_110m_admin_0_boundary_lines_land.shp',
                      },
         },
-        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.MANDATORY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'},
                 },
             },
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'path': '{publication_name}.zip/ne_110m_admin_0_boundary_lines_land.shp'},
                     'sync': False,
@@ -107,12 +108,12 @@ TESTCASES = {
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'},
                 },
             },
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'path': '{publication_name}.zip/ne_110m_admin_0_boundary_lines_land.shp'},
                     'sync': False,
@@ -139,10 +140,10 @@ TESTCASES = {
                      ],
                      },
         },
-        Key.MANDATORY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain.TRUE]),
+        Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain, CompressDomain.TRUE]),
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'files': ['{publication_name}.zip']},
                     'sync': False,
@@ -165,10 +166,10 @@ TESTCASES = {
             'message': 'Wrong combination of parameters',
             'data': 'Raster layers are not allowed to have QML style.',
         },
-        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.MANDATORY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -193,10 +194,10 @@ TESTCASES = {
             'message': 'Wrong combination of parameters',
             'data': 'Raster layers are not allowed to have QML style.',
         },
-        Key.MANDATORY_CASES: frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain, base_test.CompressDomain]),
+        Key.MANDATORY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain, CompressDomain]),
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod.PATCH, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -221,17 +222,17 @@ TESTCASES = {
                      'file': '/layman_data_test/workspaces/{workspace}/layers/{publication_name}/input_file/{publication_name}.tif',
                      },
         },
-        Key.MANDATORY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
+        Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain, CompressDomain]),
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {
                         'file': '/vsizip//layman_data_test/workspaces/{workspace}/layers/{publication_name}/input_file/{publication_name}.zip/non_readable_raster.tif',
                     }
                 },
             },
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]): {
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.FALSE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'data': {
@@ -239,7 +240,7 @@ TESTCASES = {
                     }
                 },
             },
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'data': {
@@ -264,10 +265,10 @@ TESTCASES = {
             'message': 'Unsupported CRS of data file',
             'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
         },
-        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.MANDATORY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -291,7 +292,7 @@ TESTCASES = {
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -322,7 +323,7 @@ TESTCASES = {
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -346,7 +347,7 @@ TESTCASES = {
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -375,10 +376,10 @@ TESTCASES = {
                     'small_layer.geojson'],
                 'parameter': 'file'},
         },
-        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.MANDATORY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {
                         'files': [
@@ -387,7 +388,7 @@ TESTCASES = {
                     }
                 },
             },
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'data': {
@@ -424,7 +425,7 @@ TESTCASES = {
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {
                         'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
@@ -437,7 +438,7 @@ TESTCASES = {
                     },
                 },
             },
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'data': {
@@ -472,8 +473,8 @@ TESTCASES = {
                      'found': ['Red', 'Green']
                      },
         },
-        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain]),
+        Key.MANDATORY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain]),
         Key.SPECIFIC_CASES: {},
     },
     'epsg_4326_en': {
@@ -495,7 +496,7 @@ TESTCASES = {
             'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'map_schema_1_0_0': {
@@ -516,7 +517,7 @@ TESTCASES = {
                      'reason': 'Missing key `describedBy`'},
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'map_schema_3_0_0': {
@@ -537,7 +538,7 @@ TESTCASES = {
                      'reason': 'Invalid schema version'},
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'map_unsupported_crs': {
@@ -557,7 +558,7 @@ TESTCASES = {
                      'supported_values': settings.INPUT_SRS_LIST},
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'layer_unsupported_overview_resampling': {
@@ -599,7 +600,7 @@ TESTCASES = {
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -629,14 +630,14 @@ TESTCASES = {
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'unmatched_filenames': [
                         'temporary_zip_file.zip/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
                     }
                 },
             },
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'data': {'unmatched_filenames': [
@@ -666,9 +667,9 @@ TESTCASES = {
             'data': 'Parameter overview_resampling requires parameter file to be set.',
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain, base_test.CompressDomain]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain, CompressDomain]),
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'code': 2,
                     'message': 'Wrong parameter value',
@@ -680,7 +681,7 @@ TESTCASES = {
                     },
                 },
             },
-            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod.PATCH, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'code': 2,
@@ -711,7 +712,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain, CompressDomain]),
         Key.SPECIFIC_CASES: {},
     },
     'map_name_211': {
@@ -730,7 +731,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'wrong_time_regex': {
@@ -769,10 +770,10 @@ TESTCASES = {
             'code': 48,
             'data': 'Vector layers are not allowed to be combined with `time_regex` parameter.',
         },
-        Key.MANDATORY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
+        Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain, CompressDomain]),
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -804,14 +805,14 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain, CompressDomain]),
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'files': ['temporary_zip_file.zip/sample_jp2_rgb.jp2', 'temporary_zip_file.zip/single_point.shp'], },
                 },
             },
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'files': ['{publication_name}.zip/sample_jp2_rgb.jp2', '{publication_name}.zip/single_point.shp'], },
                     'sync': False,
@@ -842,14 +843,14 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain, CompressDomain]),
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.jp2', 'temporary_zip_file.zip/sample_jpeg_jgw_rgb.jpeg', ], },
                 },
             },
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'files': ['{publication_name}.zip/sample_jp2_j2w_rgb.jp2',
                                        '{publication_name}.zip/sample_jpeg_jgw_rgb.jpeg', ], },
@@ -878,7 +879,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'different_rasters_time_regex': {
@@ -901,9 +902,9 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain, CompressDomain]),
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -930,9 +931,9 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain, CompressDomain]),
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -961,13 +962,13 @@ TESTCASES = {
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.j2w'],
                              'message': 'Zip file without data file inside.', }
                 },
             },
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'data': {'files': ['{publication_name}.zip/sample_jp2_j2w_rgb.j2w'],
@@ -997,8 +998,8 @@ TESTCASES = {
             'message': 'Wrong combination of parameters',
             'data': 'Parameter time_regex is allowed only in combination with files.',
         },
-        Key.MANDATORY_CASES: frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.MANDATORY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'time_regex_with_non_data_file': {
@@ -1024,13 +1025,13 @@ TESTCASES = {
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.j2w'],
                              'message': 'Zip file without data file inside.', }
                 },
             },
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'data': {'files': ['{publication_name}.zip/sample_jp2_j2w_rgb.j2w'],
@@ -1062,9 +1063,9 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.FALSE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'data': {'too_long_filenames': [
@@ -1097,7 +1098,7 @@ TESTCASES = {
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -1128,7 +1129,7 @@ TESTCASES = {
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                 },
@@ -1151,8 +1152,8 @@ TESTCASES = {
             'code': 53,
             'message': 'Error when publishing on GeoServer. It happens for example for raster files with wrong explicit CRS.',
         },
-        Key.MANDATORY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
+        Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain, CompressDomain]),
         Key.SPECIFIC_CASES: {},
     },
     'duplicate_filename_differs_in_case': {
@@ -1181,8 +1182,8 @@ TESTCASES = {
                 },
             },
         },
-        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain.FALSE]),
+        Key.MANDATORY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'duplicate_filename_differs_in_diacritics': {
@@ -1211,10 +1212,10 @@ TESTCASES = {
                 },
             },
         },
-        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.MANDATORY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {
                         'similar_filenames_mapping': {
@@ -1225,7 +1226,7 @@ TESTCASES = {
                     },
                 },
             },
-            frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
+            frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'data': {
@@ -1259,7 +1260,7 @@ TESTCASES = {
             },
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'file_and_external_table_uri': {
@@ -1285,7 +1286,7 @@ TESTCASES = {
                 }},
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'partial_external_table_uri': {
@@ -1310,7 +1311,7 @@ TESTCASES = {
                      },
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'crs_and_external_table_uri_post': {
@@ -1336,7 +1337,7 @@ TESTCASES = {
                 }},
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'crs_and_external_table_uri_patch': {
@@ -1363,7 +1364,7 @@ TESTCASES = {
                 }},
         },
         Key.MANDATORY_CASES: None,
-        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
 }
@@ -1426,9 +1427,9 @@ class TestPublication(base_test.TestSingleRestPublication):
     test_cases = generate_test_cases()
     publication_type = None
     rest_parametrization = [
-        base_test.RestMethod,
-        base_test.WithChunksDomain,
-        base_test.CompressDomain,
+        RestMethod,
+        WithChunksDomain,
+        CompressDomain,
     ]
 
     def test_publication(self, publication: Publication, rest_method, rest_args, params):

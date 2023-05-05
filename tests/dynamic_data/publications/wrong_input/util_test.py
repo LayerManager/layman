@@ -1,32 +1,32 @@
 import pytest
-from tests.dynamic_data import base_test
+from tests.dynamic_data.base_test import RestMethod, WithChunksDomain, CompressDomain
 from .util import case_to_simple_parametrizations
 
 
 @pytest.mark.parametrize('input, exp_result', [
     pytest.param(None, set(), id='None'),
     pytest.param(
-        frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain]),
+        frozenset([RestMethod, WithChunksDomain, CompressDomain]),
         {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
-            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
-            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]),
+            frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.FALSE]),
+            frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]),
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.TRUE]),
+            frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+            frozenset([RestMethod.PATCH, WithChunksDomain.TRUE, CompressDomain.FALSE]),
+            frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.TRUE]),
+            frozenset([RestMethod.PATCH, WithChunksDomain.TRUE, CompressDomain.TRUE]),
         },
         id='three_domains'),
     pytest.param(
-        frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-        {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE])},
+        frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.FALSE]),
+        {frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.FALSE])},
         id='three_values'),
     pytest.param(
-        frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+        frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.FALSE]),
         {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
-            frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]),
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.FALSE]),
+            frozenset([RestMethod.PATCH, WithChunksDomain.TRUE, CompressDomain.FALSE]),
         },
         id='two_values_one_domain'),
 ])
