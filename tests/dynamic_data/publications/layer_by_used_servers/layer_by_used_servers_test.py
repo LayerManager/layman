@@ -6,7 +6,7 @@ from test_tools import process_client
 from tests import EnumTestTypes
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util
-from tests.dynamic_data import base_test
+from tests.dynamic_data import base_test, base_test_classes
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -57,6 +57,8 @@ class TestLayer(base_test.TestSingleRestPublication):
     ]
 
     test_cases = generate_test_cases()
+
+    external_tables_to_create = base_test_classes.EXTERNAL_TABLE_FOR_LAYERS_BY_USED_SERVERS
 
     @staticmethod
     def test_layer(layer, params, rest_args, rest_method, parametrization):

@@ -5,7 +5,7 @@ import pytest
 from test_tools import cleanup
 from tests.asserts.final import publication as publ_asserts
 from tests.asserts.final.publication import util as assert_util
-from tests.dynamic_data import base_test
+from tests.dynamic_data import base_test, base_test_classes
 from ... import Publication, EnumTestTypes, EnumTestKeys
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -46,6 +46,8 @@ class TestPublication(base_test.TestSingleRestPublication):
     rest_parametrization = [
         base_test.PublicationByUsedServers,
     ]
+
+    external_tables_to_create = base_test_classes.EXTERNAL_TABLE_FOR_LAYERS_BY_USED_SERVERS
 
     @pytest.fixture(scope='class', autouse=True)
     def class_cleanup(self, request):

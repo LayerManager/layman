@@ -67,13 +67,28 @@ class LayerByUsedServers(PublicationByDefinitionBase):
     LAYER_VECTOR_SLD = (common_publications.LAYER_VECTOR_SLD, 'vector_sld_layer')
     LAYER_VECTOR_QML = (common_publications.LAYER_VECTOR_QML, 'vector_qml_layer')
     LAYER_RASTER = (common_publications.LAYER_RASTER, 'raster_layer')
+    LAYER_EXTERNAL_TABLE_SLD = (common_publications.LAYER_EXTERNAL_TABLE_SLD, 'external_sld_layer')
 
 
 class PublicationByUsedServers(PublicationByDefinitionBase):
     LAYER_VECTOR_SLD = LayerByUsedServers.LAYER_VECTOR_SLD.value
     LAYER_VECTOR_QML = LayerByUsedServers.LAYER_VECTOR_QML.value
     LAYER_RASTER = LayerByUsedServers.LAYER_RASTER.value
+    LAYER_EXTERNAL_TABLE_SLD = (common_publications.LAYER_EXTERNAL_TABLE_SLD, 'external_sld_layer')
     MAP = (common_publications.MAP_EMPTY, 'map')
+
+
+@dataclass(frozen=True)
+class ExternalTableDef:
+    file_path: str = None
+    db_schema: str = None
+    db_table: str = None
+
+
+EXTERNAL_TABLE_FOR_LAYERS_BY_USED_SERVERS = [ExternalTableDef(file_path=common_publications.INPUT_FILE_PATH,
+                                                              db_schema=common_publications.EXTERNAL_DB_SCHEMA,
+                                                              db_table=common_publications.EXTERNAL_DB_TABLE,
+                                                              )]
 
 
 @dataclass(frozen=True)

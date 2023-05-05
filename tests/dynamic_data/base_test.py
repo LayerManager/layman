@@ -9,6 +9,7 @@ from test_tools import process_client, cleanup, external_db
 from .base_test_classes import WithChunksDomain, CompressDomainBase, CompressDomain, RestArgs, RestMethod, PublicationByDefinitionBase, \
     LayerByUsedServers, PublicationByUsedServers, TestCaseType, Parametrization, StyleFileDomainBase  # pylint: disable=unused-import
 from . import base_test_util as util
+from .base_test_classes import ExternalTableDef
 from .. import Publication, EnumTestTypes, EnumTestKeys, PublicationValues
 
 
@@ -57,7 +58,7 @@ def pytest_generate_tests(metafunc):
     )
 
 
-@pytest.mark.usefixtures('ensure_layman_module')
+@pytest.mark.usefixtures('ensure_layman_module', 'ensure_external_db')
 class TestSingleRestPublication:
     # pylint: disable=too-few-public-methods
 
@@ -73,6 +74,8 @@ class TestSingleRestPublication:
     test_cases = []
 
     rest_parametrization = []
+
+    external_tables_to_create = []
 
     post_before_patch_scope = 'function'
 
@@ -199,6 +202,12 @@ class TestSingleRestPublication:
 
     @pytest.fixture(scope='class', autouse=True)
     def class_fixture(self, request):
+        for table in self.external_tables_to_create:
+            assert isinstance(table, ExternalTableDef)
+            self.import_external_table(table.file_path, {
+                'schema': table.db_schema,
+                'table': table.db_table,
+            }, scope='class')
         self.before_class()
         yield
         self.after_class(request)

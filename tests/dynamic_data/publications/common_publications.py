@@ -1,6 +1,8 @@
+from db import TableUri
+from layman import settings
 from tests.asserts.final import publication
 from tests.asserts import processing
-from test_tools import process_client
+from test_tools import process_client, external_db
 from ... import PublicationValues, dynamic_data as consts, Action
 
 SMALL_LAYER = PublicationValues(
@@ -173,6 +175,59 @@ EMPTY_MAP = PublicationValues(
         },
     },
     thumbnail=None,
+)
+
+INPUT_FILE_PATH = 'sample/layman.layer/small_layer.geojson'
+EXTERNAL_DB_TABLE = '_small_LAYER_by_used_servers'
+EXTERNAL_DB_SCHEMA = 'public'
+
+LAYER_EXTERNAL_TABLE_SLD = PublicationValues(
+    type=process_client.LAYER_TYPE,
+    definition={
+        'external_table_uri': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
+    },
+    info_values={
+        'publ_type_detail': (settings.GEODATA_TYPE_VECTOR, 'sld'),
+        'exp_publication_detail': {
+            'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.335616991],
+            'native_crs': 'EPSG:4326',
+            'native_bounding_box': [14.114369, 48.964832, 14.126824, 48.970612],
+        },
+        'external_table_uri': TableUri(
+            db_uri_str=external_db.URI_STR,
+            schema=EXTERNAL_DB_SCHEMA,
+            table=EXTERNAL_DB_TABLE,
+            geo_column='wkb_geometry',
+            primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY,
+        ),
+    },
+    thumbnail=None,
+    legend_image='tests/dynamic_data/publications/layer_by_used_servers/legend_vector_sld.png',
+)
+
+LAYER_EXTERNAL_TABLE_QML = PublicationValues(
+    type=process_client.LAYER_TYPE,
+    definition={
+        'external_table_uri': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
+        'style_file': 'sample/style/small_layer.qml'
+    },
+    info_values={
+        'publ_type_detail': (settings.GEODATA_TYPE_VECTOR, 'sld'),
+        'exp_publication_detail': {
+            'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.335616991],
+            'native_crs': 'EPSG:4326',
+            'native_bounding_box': [14.114369, 48.964832, 14.126824, 48.970612],
+        },
+        'external_table_uri': TableUri(
+            db_uri_str=external_db.URI_STR,
+            schema=EXTERNAL_DB_SCHEMA,
+            table=EXTERNAL_DB_TABLE,
+            geo_column='wkb_geometry',
+            primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY,
+        ),
+    },
+    thumbnail=None,
+    legend_image=None,  # because layer name appears in the image
 )
 
 DEFAULT_POST = {
