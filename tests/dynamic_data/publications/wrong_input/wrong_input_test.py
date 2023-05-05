@@ -1,8 +1,6 @@
 from copy import deepcopy
 from contextlib import nullcontext as does_not_raise
 from enum import Enum, unique
-import inspect
-import itertools
 import os
 import logging
 import pytest
@@ -14,7 +12,8 @@ from tests import EnumTestTypes, Publication
 from tests.asserts import processing, util as asserts_util
 from tests.asserts.final import publication as publication_asserts
 from tests.asserts.final.publication import util as assert_utils
-from tests.dynamic_data import base_test, base_test_classes
+from tests.dynamic_data import base_test
+from .util import case_to_simple_parametrizations, format_exception
 from .. import common_publications as publications
 
 
@@ -1370,25 +1369,6 @@ TESTCASES = {
 }
 
 
-def case_to_simple_parametrizations(case):
-    result = set()
-    if case is not None:
-        dimensions_values = []
-        for item in case:
-            if inspect.isclass(item) \
-                    and (issubclass(item, base_test_classes.RestArgDomain)
-                         or issubclass(item, base_test_classes.RestMethod)
-                         or issubclass(item, base_test_classes.PublicationByDefinitionBase)):
-                dimensions_values.append(list(item))
-            else:
-                dimensions_values.append([item])
-        for parametrization in itertools.product(*dimensions_values):
-            parametrization = frozenset(parametrization)
-            assert parametrization not in result
-            result.add(parametrization)
-    return result
-
-
 def generate_test_cases():
     tc_list = []
     for key, test_case_params in TESTCASES.items():
@@ -1438,23 +1418,6 @@ def generate_test_cases():
                                            )
         tc_list.append(test_case)
     return tc_list
-
-
-def format_exception(exception_info: dict, format_variables: dict):
-    if 'data' in exception_info and isinstance(exception_info['data'], dict):
-        if 'path' in exception_info['data']:
-            exception_info['data']['path'] = exception_info['data']['path'].format(**format_variables)
-        if 'file' in exception_info['data']:
-            exception_info['data']['file'] = exception_info['data']['file'].format(**format_variables)
-        if 'files' in exception_info['data']:
-            exception_info['data']['files'] = [file.format(**format_variables) for file in exception_info['data']['files']]
-        if 'unmatched_filenames' in exception_info['data']:
-            exception_info['data']['unmatched_filenames'] = [file.format(**format_variables) for file in exception_info['data']['unmatched_filenames']]
-        if 'too_long_filenames' in exception_info['data']:
-            exception_info['data']['too_long_filenames'] = [file.format(**format_variables) for file in exception_info['data']['too_long_filenames']]
-        if 'similar_filenames_mapping' in exception_info['data']:
-            exception_info['data']['similar_filenames_mapping'] = {key.format(**format_variables): value.format(**format_variables) for
-                                                                   key, value in exception_info['data']['similar_filenames_mapping'].items()}
 
 
 @pytest.mark.usefixtures('ensure_external_db')
