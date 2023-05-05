@@ -9,7 +9,7 @@ from layman import LaymanError, settings, app, util as layman_util
 from layman.layer.util import EXTERNAL_TABLE_URI_PATTERN
 from test_tools import process_client
 from tests import EnumTestTypes, Publication
-from tests.asserts import processing, util as asserts_util
+from tests.asserts import processing
 from tests.asserts.final import publication as publication_asserts
 from tests.asserts.final.publication import util as assert_utils
 from tests.dynamic_data import base_test
@@ -64,20 +64,14 @@ TESTCASES = {
             'message': 'Missing one or more ShapeFile files.',
             'data': {'missing_extensions': ['.dbf', '.prj'],
                      'suggestion': 'Missing .prj file can be fixed also by setting "crs" parameter.',
-                     'path': 'ne_110m_admin_0_boundary_lines_land.shp',
+                     'path': '{path_prefix}ne_110m_admin_0_boundary_lines_land.shp',
                      },
         },
         Key.MANDATORY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
-                Key.EXPECTED_EXCEPTION: {
-                    'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'},
-                },
-            },
             frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
-                    'data': {'path': '{publication_name}.zip/ne_110m_admin_0_boundary_lines_land.shp'},
                     'sync': False,
                 },
             },
@@ -102,20 +96,14 @@ TESTCASES = {
             'message': 'Missing one or more ShapeFile files.',
             'data': {'missing_extensions': ['.prj'],
                      'suggestion': 'Missing .prj file can be fixed also by setting "crs" parameter.',
-                     'path': 'ne_110m_admin_0_boundary_lines_land.shp',
+                     'path': '{path_prefix}ne_110m_admin_0_boundary_lines_land.shp',
                      },
         },
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
-                Key.EXPECTED_EXCEPTION: {
-                    'data': {'path': 'temporary_zip_file.zip/ne_110m_admin_0_boundary_lines_land.shp'},
-                },
-            },
             frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
-                    'data': {'path': '{publication_name}.zip/ne_110m_admin_0_boundary_lines_land.shp'},
                     'sync': False,
                 },
             },
@@ -136,7 +124,7 @@ TESTCASES = {
                      'message': 'Zip file without data file inside.',
                      'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
                      'files': [
-                         'temporary_zip_file.zip',
+                         '{zip_file_name}',
                      ],
                      },
         },
@@ -145,7 +133,6 @@ TESTCASES = {
         Key.SPECIFIC_CASES: {
             frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
-                    'data': {'files': ['{publication_name}.zip']},
                     'sync': False,
                 },
             },
@@ -372,30 +359,16 @@ TESTCASES = {
             'data': {
                 'expected': 'At most one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or timeseries with time_regex parameter.',
                 'files': [
-                    'sample_tif_rgb.tif',
-                    'small_layer.geojson'],
+                    '{path_prefix}sample_tif_rgb.tif',
+                    '{path_prefix}small_layer.geojson'],
                 'parameter': 'file'},
         },
         Key.MANDATORY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
-                Key.EXPECTED_EXCEPTION: {
-                    'data': {
-                        'files': [
-                            'temporary_zip_file.zip/sample_tif_rgb.tif',
-                            'temporary_zip_file.zip/small_layer.geojson'],
-                    }
-                },
-            },
             frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
-                    'data': {
-                        'files': [
-                            '{publication_name}.zip/sample_tif_rgb.tif',
-                            '{publication_name}.zip/small_layer.geojson'],
-                    }
                 },
             },
         },
@@ -417,8 +390,8 @@ TESTCASES = {
             'data': {'parameter': 'file',
                      'expected': 'At most one file with extensions: .zip',
                      'files': [
-                         'sm5.zip',
-                         'layer_with_two_main_files.zip',
+                         '{path_prefix}sm5.zip',
+                         '{path_prefix}layer_with_two_main_files.zip',
                      ],
                      },
         },
@@ -429,12 +402,7 @@ TESTCASES = {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {
                         'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                        'files': [
-                            'temporary_zip_file.zip/sm5.zip',
-                            'temporary_zip_file.zip/layer_with_two_main_files.zip',
-                        ],
                         'message': 'Zip file without data file inside.',
-                        'parameter': 'file'
                     },
                 },
             },
@@ -443,12 +411,7 @@ TESTCASES = {
                     'sync': False,
                     'data': {
                         'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                        'files': [
-                            '{publication_name}.zip/sm5.zip',
-                            '{publication_name}.zip/layer_with_two_main_files.zip',
-                        ],
                         'message': 'Zip file without data file inside.',
-                        'parameter': 'file'
                     },
                 },
             },
@@ -624,25 +587,15 @@ TESTCASES = {
             'data': {
                 'message': 'File does not match time_regex.',
                 'expected': 'All main data files match time_regex parameter',
-                'unmatched_filenames': ['S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+                'unmatched_filenames': ['{path_prefix}S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
             },
         },
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
-                Key.EXPECTED_EXCEPTION: {
-                    'data': {'unmatched_filenames': [
-                        'temporary_zip_file.zip/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
-                    }
-                },
-            },
             frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
-                    'data': {'unmatched_filenames': [
-                        '{publication_name}.zip/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
-                    }
                 },
             },
         },
@@ -675,7 +628,7 @@ TESTCASES = {
                     'message': 'Wrong parameter value',
                     'data': {
                         'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                        'files': ['temporary_zip_file.zip'],
+                        'files': ['{zip_file_name}'],
                         'message': 'Zip file without data file inside.',
                         'parameter': 'file'
                     },
@@ -688,7 +641,7 @@ TESTCASES = {
                     'message': 'Wrong parameter value',
                     'data': {
                         'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                        'files': ['{publication_name}.zip'],
+                        'files': ['{zip_file_name}'],
                         'message': 'Zip file without data file inside.',
                         'parameter': 'file'
                     },
@@ -799,7 +752,7 @@ TESTCASES = {
             'sync': True,
             'code': 2,
             'data': {'expected': 'All main files with the same extension.',
-                     'files': ['sample_jp2_rgb.jp2', 'single_point.shp'],
+                     'files': ['{path_prefix}sample_jp2_rgb.jp2', '{path_prefix}single_point.shp'],
                      'extensions': ['.jp2', '.shp'],
                      'parameter': 'file',
                      },
@@ -807,14 +760,8 @@ TESTCASES = {
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain, CompressDomain]),
         Key.SPECIFIC_CASES: {
-            frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
-                Key.EXPECTED_EXCEPTION: {
-                    'data': {'files': ['temporary_zip_file.zip/sample_jp2_rgb.jp2', 'temporary_zip_file.zip/single_point.shp'], },
-                },
-            },
             frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
-                    'data': {'files': ['{publication_name}.zip/sample_jp2_rgb.jp2', '{publication_name}.zip/single_point.shp'], },
                     'sync': False,
                 },
             },
@@ -837,7 +784,7 @@ TESTCASES = {
             'sync': True,
             'code': 2,
             'data': {'expected': 'All main files with the same extension.',
-                     'files': ['sample_jp2_j2w_rgb.jp2', 'sample_jpeg_jgw_rgb.jpeg', ],
+                     'files': ['{path_prefix}sample_jp2_j2w_rgb.jp2', '{path_prefix}sample_jpeg_jgw_rgb.jpeg', ],
                      'extensions': ['.jp2', '.jpeg'],
                      'parameter': 'file',
                      },
@@ -845,15 +792,8 @@ TESTCASES = {
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain, CompressDomain]),
         Key.SPECIFIC_CASES: {
-            frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
-                Key.EXPECTED_EXCEPTION: {
-                    'data': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.jp2', 'temporary_zip_file.zip/sample_jpeg_jgw_rgb.jpeg', ], },
-                },
-            },
             frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
-                    'data': {'files': ['{publication_name}.zip/sample_jp2_j2w_rgb.jp2',
-                                       '{publication_name}.zip/sample_jpeg_jgw_rgb.jpeg', ], },
                     'sync': False,
                 },
             },
@@ -954,7 +894,7 @@ TESTCASES = {
             'message': 'Wrong parameter value',
             'data': {
                 'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                'files': ['sample_jp2_j2w_rgb.j2w'],
+                'files': ['{path_prefix}sample_jp2_j2w_rgb.j2w'],
                 'message': 'No data file in input.',
                 'parameter': 'file',
             },
@@ -964,15 +904,13 @@ TESTCASES = {
         Key.SPECIFIC_CASES: {
             frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
-                    'data': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.j2w'],
-                             'message': 'Zip file without data file inside.', }
+                    'data': {'message': 'Zip file without data file inside.', }
                 },
             },
             frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
-                    'data': {'files': ['{publication_name}.zip/sample_jp2_j2w_rgb.j2w'],
-                             'message': 'Zip file without data file inside.', }
+                    'data': {'message': 'Zip file without data file inside.', }
                 },
             },
         },
@@ -1017,7 +955,7 @@ TESTCASES = {
             'message': 'Wrong parameter value',
             'data': {
                 'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                'files': ['sample_jp2_j2w_rgb.j2w'],
+                'files': ['{path_prefix}sample_jp2_j2w_rgb.j2w'],
                 'message': 'No data file in input.',
                 'parameter': 'file',
             },
@@ -1027,15 +965,13 @@ TESTCASES = {
         Key.SPECIFIC_CASES: {
             frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
-                    'data': {'files': ['temporary_zip_file.zip/sample_jp2_j2w_rgb.j2w'],
-                             'message': 'Zip file without data file inside.', }
+                    'data': {'message': 'Zip file without data file inside.', }
                 },
             },
             frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
-                    'data': {'files': ['{publication_name}.zip/sample_jp2_j2w_rgb.j2w'],
-                             'message': 'Zip file without data file inside.', }
+                    'data': {'message': 'Zip file without data file inside.', }
                 },
             },
         },
@@ -1207,35 +1143,17 @@ TESTCASES = {
                 'message': 'Two or more input file names map to the same name.',
                 'expected': 'Input file names that differ at least in one letter (ignoring case and diacritics) or number.',
                 'similar_filenames_mapping': {
-                    'snimek_20220316.tif': 'snimek_20220316.tif',
-                    'snímek_20220316.tif': 'snimek_20220316.tif',
+                    '{path_prefix}snimek_20220316.tif': 'snimek_20220316.tif',
+                    '{path_prefix}snímek_20220316.tif': 'snimek_20220316.tif',
                 },
             },
         },
         Key.MANDATORY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
-            frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
-                Key.EXPECTED_EXCEPTION: {
-                    'data': {
-                        'similar_filenames_mapping': {
-                            asserts_util.KEY_REPLACE: True,
-                            'temporary_zip_file.zip/snimek_20220316.tif': 'snimek_20220316.tif',
-                            'temporary_zip_file.zip/snímek_20220316.tif': 'snimek_20220316.tif',
-                        },
-                    },
-                },
-            },
             frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
-                    'data': {
-                        'similar_filenames_mapping': {
-                            asserts_util.KEY_REPLACE: True,
-                            '{publication_name}.zip/snimek_20220316.tif': 'snimek_20220316.tif',
-                            '{publication_name}.zip/snímek_20220316.tif': 'snimek_20220316.tif',
-                        },
-                    },
                 },
             },
         },
