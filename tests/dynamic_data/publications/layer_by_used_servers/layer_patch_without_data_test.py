@@ -7,7 +7,7 @@ from layman import app, util as layman_util
 from test_tools import process_client
 from tests import EnumTestTypes
 from tests.asserts.final.publication import util as assert_util
-from tests.dynamic_data import base_test
+from tests.dynamic_data import base_test, base_test_classes
 from .. import Publication
 
 
@@ -67,6 +67,8 @@ class TestLayer(base_test.TestSingleRestPublication):
     test_cases = generate_test_cases()
 
     post_before_patch_scope = 'class'
+
+    external_tables_to_create = base_test_classes.EXTERNAL_TABLE_FOR_LAYERS_BY_USED_SERVERS
 
     def before_class(self):
         process_client.ensure_reserved_username(self.workspace, headers=AUTHN_HEADERS)
