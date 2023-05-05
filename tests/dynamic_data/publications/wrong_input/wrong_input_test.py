@@ -1432,12 +1432,13 @@ class TestPublication(base_test.TestSingleRestPublication):
         CompressDomain,
     ]
 
-    def test_publication(self, publication: Publication, rest_method, rest_args, params):
+    def test_publication(self, publication: Publication, rest_method, rest_args, params,
+                         parametrization: base_test.Parametrization):
         """Parametrized using pytest_generate_tests"""
 
         exp_exception = params[Key.EXPECTED_EXCEPTION]
         is_sync = exp_exception.pop('sync')
-        format_exception(exp_exception, publication)
+        format_exception(exp_exception, publication, parametrization)
         exception = pytest.raises(params[Key.EXCEPTION]) if is_sync else does_not_raise()
         with exception as exception_info:
             response = rest_method(publication, args=rest_args)
